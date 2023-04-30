@@ -69,8 +69,6 @@ class Configuration {
 
     console.log(Configuration.toYaml(config.data).gray);
 
-    process.exit();
-
     return config;
   }
 
