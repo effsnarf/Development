@@ -5,7 +5,7 @@ import { Configuration } from "@shared/Configuration";
 import { Console } from "@shared/Console";
 
 const config = Configuration.new({
-  quitIfChanged: [__filename],
+  quitIfChanged: [__filename.replace(".temp.ts", "")],
 }).data;
 
 const url = config.url;

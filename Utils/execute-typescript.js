@@ -45,7 +45,7 @@ const preprocessTypeScript = (inputPath, outputPath) => {
 }
 
 const inputPath = process.argv[2];
-const outputPath = `${path.dirname(inputPath)}/_.${path.basename(inputPath)}.temp.ts`;
+const outputPath = `${path.dirname(inputPath)}/${path.basename(inputPath)}.temp.ts`;
 
 preprocessTypeScript(inputPath, outputPath);
 

@@ -1,3 +1,4 @@
+import "./Extensions";
 import path from "path";
 import * as colors from "colors";
 import * as fs from "fs";
@@ -60,6 +61,7 @@ class Configuration {
     if (options.quitIfChanged) {
       // If the source file or configuration file changes, exit the process (and restart from the cmd file)
       [configPath, ...options.quitIfChanged].forEach((file) => {
+        console.log(`Watching ${file.getShortPath()}`);
         fs.watchFile(file, () => {
           console.log(`${file.yellow} ${`changed, restarting...`.gray}`);
           process.exit();

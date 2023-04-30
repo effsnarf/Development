@@ -12,7 +12,7 @@ import { Analytics } from "@shared/Analytics";
 import { MongoDatabase } from "@shared/MongoDatabase";
 
 const config = Configuration.new({
-  quitIfChanged: [__filename],
+  quitIfChanged: [__filename.replace(".temp.ts", "")],
 }).data;
 
 const console = Console.new();

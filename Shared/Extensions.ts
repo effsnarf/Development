@@ -384,7 +384,10 @@ if (typeof String !== "undefined") {
     let parts = path.split("/");
     // Return the last 2 parts of the path
     parts = parts.slice(Math.max(parts.length - 2, 0));
-    const s = `${parts[0].yellow}${`\\`.gray}${parts[1]}`;
+    let s = `${parts[0].yellow}${`\\`.gray}${parts[1]}`;
+    if (parts.length > 2) {
+      s = `${s} (${parts.slice(0, -2).join("\\")})`.gray;
+    }
     return s;
   };
 

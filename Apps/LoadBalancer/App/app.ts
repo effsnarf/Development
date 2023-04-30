@@ -16,7 +16,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
 
 (async () => {
   const config = Configuration.new({
-    quitIfChanged: [__filename],
+    quitIfChanged: [__filename.replace(".temp.ts", "")],
     toAbsolutePaths: ["process"],
   }).data;
 
