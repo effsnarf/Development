@@ -131,7 +131,7 @@ const init = (httpServer: express.Express) => {
     processRequest(async (req: any, res: any) => {
       const url = req.url;
       // If a .ts version exists, transpile it and return it
-      const tsUrl = url.substring(0, url.length - 3) + "ts";
+      const tsUrl = url.substring(0, url.length - 3) + ".ts";
       const tsFilePath = path.join(__dirname, "../Client", tsUrl.substring(1));
       if (fs.existsSync(tsFilePath)) {
         // Read the TypeScript file
