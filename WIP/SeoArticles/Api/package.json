@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "js-yaml": "^4.1.0",
+    "ts-node": "^10.9.1"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.5"
+  }
+}

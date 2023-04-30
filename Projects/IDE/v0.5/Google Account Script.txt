@@ -1,0 +1,9 @@
+if (typeof(google) == "undefined") return;
+
+google.accounts.id.initialize({
+  client_id: "300191119097-vb42vuiqtcovo565mrd3cl2jgh219nc7.apps.googleusercontent.com",
+  callback: (response) => { console.log(response); }
+});
+
+google.accounts.id.renderButton($(".google-login-button")[0], {size: "large", shape: "pill", theme: "blue"});
+

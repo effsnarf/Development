@@ -1,0 +1,28 @@
+
+const program = ts.createProgram(
+    ["./classes/tests/HelloWorld.ts"],
+    compilerOptions
+  );
+  const sourceFile = program.getSourceFile("./classes/tests/HelloWorld.ts");
+  
+  transformer.on.method.enter((method: ts.MethodDeclaration) => {
+    return code.block(code.call.method("console.log", ["testing enter method"]));
+  });
+  
+  const transformers: ts.CustomTransformers = {
+    before: [transformer.factory(program, compilerOptions)],
+  };
+  
+  const { emitSkipped, diagnostics } = program.emit(
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    transformers
+  );
+  
+  this generates javascript files which is not what i want
+  i want to just get the transformed source
+  
+  also, the js files contain the original code, not the transformed one
+  

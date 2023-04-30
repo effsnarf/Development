@@ -1,0 +1,1181 @@
+### Instruction:
+
+You are AnalyzerGPT, an expert on analyzing content.
+I will send you posts from a 4chan thread, and you reply in JSON.
+
+Analyze the entire thread in this JSON format:
+{
+  "title": "(news article title, in 15 words or less)",
+
+  "subject": "(what this thread is about, in 5 words or less)",
+
+  "article": "(new article)",
+
+  "entity": "(name of the main video game, tv show, person, etc discussed in the thread, e.g. Breaking Bad, Metal Gear Solid, Belle Delphine, etc if applicable)",
+
+  "keywords": ["keyword", "keyword", ..],
+
+  "scores": (0.0-1.0 each)
+  {
+    "news": (how much is this thread about current news events),
+    "humor":
+    "useful": (contains useful information)
+    "meme":
+  }
+}
+
+Reply only with properly formatted JSON fields and nothing else.
+
+{
+  "_id": 207,
+  "checked": {
+      "dt": 1678718374046
+  },
+  "created": {
+      "dt": 1678671943000
+  },
+  "forum": {
+      "id": "fit"
+  },
+  "id": 70252662,
+  "isOnline": false,
+  "isSticky": false,
+  "modified": {
+      "dt": 1678718318000
+  },
+  "posts": {
+      "count": 71,
+      "items": [
+          {
+              "id": 70252662,
+              "title": "/CBT/ - Current Body Thread",
+              "comment": "Post ur gainz",
+              "image": {
+                  "filename": "1678671943592044.jpg"
+              },
+              "created": {
+                  "dt": 1678671943000
+              },
+              "length": 41,
+              "replies": {
+                  "from": 48,
+                  "to": 0
+              },
+              "relevance": 1
+          },
+          {
+              "id": 70252780,
+              "title": null,
+              "comment": null,
+              "image": {
+                  "filename": "1678672920037092.jpg"
+              },
+              "created": {
+                  "dt": 1678672920000
+              },
+              "length": 0,
+              "replies": {
+                  "from": 48,
+                  "to": 0
+              },
+              "relevance": 1
+          },
+          {
+              "id": 70252801,
+              "title": null,
+              "comment": "<a href=\"#p70252780\" class=\"quotelink\">&gt;&gt;70252780</a><br>Look8ng gud.<br><a href=\"#p70252662\" class=\"quotelink\">&gt;&gt;70252662</a><br>I want murder you with a hammer",
+              "image": null,
+              "created": {
+                  "dt": 1678673059000
+              },
+              "length": 173,
+              "replies": {
+                  "from": 0,
+                  "to": 2
+              },
+              "relevance": 1
+          },
+          {
+              "id": 70252927,
+              "title": null,
+              "comment": "Ok chads, tell me where to start. 1 year off gym, 178cm, 76.6 kg. 24% body fat.",
+              "image": {
+                  "filename": "1678674296953193.jpg"
+              },
+              "created": {
+                  "dt": 1678674296000
+              },
+              "length": 79,
+              "replies": {
+                  "from": 36,
+                  "to": 0
+              },
+              "relevance": 0.49766091305049204
+          },
+          {
+              "id": 70252930,
+              "title": null,
+              "comment": "<a href=\"#p70252662\" class=\"quotelink\">&gt;&gt;70252662</a><br>Anyone got the pic of the anon in a gas mask with an absolute huge wingspan",
+              "image": null,
+              "created": {
+                  "dt": 1678674327000
+              },
+              "length": 138,
+              "replies": {
+                  "from": 12,
+                  "to": 1
+              },
+              "relevance": 0.22443135989675753
+          },
+          {
+              "id": 70252980,
+              "title": null,
+              "comment": "36 yo, 6&#039;3&quot;, 192 lbs, ~17% bf.<br><br>Down 80 lbs over 8-9 months, was going to stop at 200, decided to go to 190 instead, now thinking 180.<br><br>Sure would be nice to start eating at maintenance. But would also like to be sub-15% before I stop.<br><br>Thoughts?",
+              "image": {
+                  "filename": "1678674769231312.jpg"
+              },
+              "created": {
+                  "dt": 1678674769000
+              },
+              "length": 274,
+              "replies": {
+                  "from": 60,
+                  "to": 0
+              },
+              "relevance": 0.9040571059848361
+          },
+          {
+              "id": 70252996,
+              "title": null,
+              "comment": "<a href=\"#p70252980\" class=\"quotelink\">&gt;&gt;70252980</a><br>What&#039;s it like being 6&#039;3&quot; with the shoulder width of a 5&#039;6&quot; man",
+              "image": null,
+              "created": {
+                  "dt": 1678674898000
+              },
+              "length": 151,
+              "replies": {
+                  "from": 12,
+                  "to": 1
+              },
+              "relevance": 0.23124697531859978
+          },
+          {
+              "id": 70253081,
+              "title": null,
+              "comment": "<a href=\"#p70252996\" class=\"quotelink\">&gt;&gt;70252996</a><br><br>Eh, they&#039;re not really, ~18&quot; across, ~48&quot; circumference. Google says average width is apparently ~16&quot;.<br><br>Looks narrower because my waist fucks up the proportions. I think shoulder circumference being 1.6x waist circumference or something like that is considered &quot;ideal&quot;. I&#039;m more like 1.35x. But my waist will get smaller, and I can add some mass to my shoulders.<br><br>But to answer your question specifically, feels just fine. I&#039;m satisfied with how I look—particularly being 80 lbs lighter—although still plenty of room for improvement. <br><br>Good try at uncovering a new insecurity though. Now post body and mog me properly.",
+              "image": null,
+              "created": {
+                  "dt": 1678675682000
+              },
+              "length": 743,
+              "replies": {
+                  "from": 0,
+                  "to": 1
+              },
+              "relevance": 0.38953863526375226
+          },
+          {
+              "id": 70253447,
+              "title": null,
+              "comment": "<a href=\"#p70252662\" class=\"quotelink\">&gt;&gt;70252662</a><br>I liked your /biz/ version better. <br><span class=\"deadlink\">&gt;&gt;54074840</span>",
+              "image": {
+                  "filename": "1678678830388737.png"
+              },
+              "created": {
+                  "dt": 1678678830000
+              },
+              "length": 148,
+              "replies": {
+                  "from": 12,
+                  "to": 2
+              },
+              "relevance": 0.22967414099048236
+          },
+          {
+              "id": 70253462,
+              "title": null,
+              "comment": "<a href=\"#p70253447\" class=\"quotelink\">&gt;&gt;70253447</a><br>ah shit, forgot to crossboard the post #. <br><span class=\"deadlink\">&gt;&gt;&gt;/biz/54074840</span>",
+              "image": null,
+              "created": {
+                  "dt": 1678678977000
+              },
+              "length": 164,
+              "replies": {
+                  "from": 0,
+                  "to": 1
+              },
+              "relevance": 0.08598160993708663
+          },
+          {
+              "id": 70253568,
+              "title": null,
+              "comment": "<a href=\"#p70252980\" class=\"quotelink\">&gt;&gt;70252980</a><br>You could cut a bit more but you don&#039;t need to. If you learned how to flex your abs you would probably be more satisfied with your bodyfat%",
+              "image": null,
+              "created": {
+                  "dt": 1678680135000
+              },
+              "length": 207,
+              "replies": {
+                  "from": 12,
+                  "to": 1
+              },
+              "relevance": 0.2606065494434586
+          },
+          {
+              "id": 70253592,
+              "title": null,
+              "comment": "5&#039;6 132lbs, I have osteogenosis imperfecta, I&#039;ve gone from 105lbs to 132lbs. Training with gymnastic rings and weighted vest. Trying to start eating a bit healthier.",
+              "image": {
+                  "filename": "1678680394454696.jpg"
+              },
+              "created": {
+                  "dt": 1678680394000
+              },
+              "length": 175,
+              "replies": {
+                  "from": 24,
+                  "to": 0
+              },
+              "relevance": 0.39591063074689464
+          },
+          {
+              "id": 70253613,
+              "title": null,
+              "comment": "I&#039;m 5&#039;8 and roughly 162 lbs. Been going to the gym consistently since January",
+              "image": {
+                  "filename": "1678680556829042.jpg"
+              },
+              "created": {
+                  "dt": 1678680556000
+              },
+              "length": 87,
+              "replies": {
+                  "from": 36,
+                  "to": 0
+              },
+              "relevance": 0.5018551379254719
+          },
+          {
+              "id": 70253640,
+              "title": null,
+              "comment": "<a href=\"#p70252930\" class=\"quotelink\">&gt;&gt;70252930</a><br>u mean this dude",
+              "image": {
+                  "filename": "1678680861231257.jpg"
+              },
+              "created": {
+                  "dt": 1678680861000
+              },
+              "length": 79,
+              "replies": {
+                  "from": 12,
+                  "to": 1
+              },
+              "relevance": 0.19349895144378126
+          },
+          {
+              "id": 70253678,
+              "title": null,
+              "comment": "<a href=\"#p70253568\" class=\"quotelink\">&gt;&gt;70253568</a><br><br>I take those pictures too every weekend, at least recently, I just didn&#039;t post them. Just a two-pack basically right now",
+              "image": {
+                  "filename": "1678681299227971.jpg"
+              },
+              "created": {
+                  "dt": 1678681299000
+              },
+              "length": 192,
+              "replies": {
+                  "from": 0,
+                  "to": 1
+              },
+              "relevance": 0.10066139699951605
+          },
+          {
+              "id": 70253687,
+              "title": null,
+              "comment": "6&#039;2, down from 275lbs, you can see the stretch marks on my stomach. Been lifting since July last year. I need a lot more work but I&#039;m slowly getting there.",
+              "image": {
+                  "filename": "1678681374297911.jpg"
+              },
+              "created": {
+                  "dt": 1678681374000
+              },
+              "length": 165,
+              "replies": {
+                  "from": 48,
+                  "to": 0
+              },
+              "relevance": 0.6948298112598805
+          },
+          {
+              "id": 70253822,
+              "title": null,
+              "comment": "<a href=\"#p70252780\" class=\"quotelink\">&gt;&gt;70252780</a><br>Miring<br><a href=\"#p70252927\" class=\"quotelink\">&gt;&gt;70252927</a><br>Just lift weights and eat healthy for a year then decide to go “in a direction” since it seems like you’re asking cut or bulk <br><br><a href=\"#p70253613\" class=\"quotelink\">&gt;&gt;70253613</a><br>Nice anon <br><br><a href=\"#p70253687\" class=\"quotelink\">&gt;&gt;70253687</a><br>Would look sick shredded <br><br>6’ 194 lbs",
+              "image": {
+                  "filename": "1678682672682948.jpg"
+              },
+              "created": {
+                  "dt": 1678682672000
+              },
+              "length": 457,
+              "replies": {
+                  "from": 60,
+                  "to": 4
+              },
+              "relevance": 1
+          },
+          {
+              "id": 70253856,
+              "title": null,
+              "comment": "<a href=\"#p70253822\" class=\"quotelink\">&gt;&gt;70253822</a><br>Great body. I want to get shredded that&#039;s the goal. Have been on a massive cut for 10 days now that pic was day 1. Will post updated pic on day 45.",
+              "image": null,
+              "created": {
+                  "dt": 1678682974000
+              },
+              "length": 215,
+              "replies": {
+                  "from": 0,
+                  "to": 1
+              },
+              "relevance": 0.1127197935150831
+          },
+          {
+              "id": 70253871,
+              "title": null,
+              "comment": "<a href=\"#p70253687\" class=\"quotelink\">&gt;&gt;70253687</a><br>The cut is gonna be insane",
+              "image": null,
+              "created": {
+                  "dt": 1678683061000
+              },
+              "length": 89,
+              "replies": {
+                  "from": 12,
+                  "to": 1
+              },
+              "relevance": 0.19874173253750607
+          },
+          {
+              "id": 70253886,
+              "title": null,
+              "comment": "It gets better, fatties. You could never tell I used to be breaking 260lbs.<br><br>I need to buy new pants now.",
+              "image": {
+                  "filename": "1678683182076309.jpg"
+              },
+              "created": {
+                  "dt": 1678683182000
+              },
+              "length": 111,
+              "replies": {
+                  "from": 36,
+                  "to": 0
+              },
+              "relevance": 0.5144378125504114
+          },
+          {
+              "id": 70253929,
+              "title": null,
+              "comment": "<a href=\"#p70253886\" class=\"quotelink\">&gt;&gt;70253886</a><br>I know it&#039;s nothing special but this is the first time in my life I have ever had muscles that I can actually see. When I was in High School I was maybe 125 soaking wet and by age 20 I had balooned to 240. I have only ever been a stick figure or a borderline land whale my whole life.",
+              "image": {
+                  "filename": "1678683489848302.jpg"
+              },
+              "created": {
+                  "dt": 1678683489000
+              },
+              "length": 352,
+              "replies": {
+                  "from": 24,
+                  "to": 1
+              },
+              "relevance": 0.4887078561058235
+          },
+          {
+              "id": 70253936,
+              "title": null,
+              "comment": "<a href=\"#p70253871\" class=\"quotelink\">&gt;&gt;70253871</a><br>I&#039;m on a major cut right now and I&#039;ll post the results when I&#039;m done. I have lost a lot of weight but mentally I feel like I look the same as I did then. Weird",
+              "image": {
+                  "filename": "1678683553861411.jpg"
+              },
+              "created": {
+                  "dt": 1678683553000
+              },
+              "length": 237,
+              "replies": {
+                  "from": 0,
+                  "to": 1
+              },
+              "relevance": 0.12425391192127763
+          },
+          {
+              "id": 70254094,
+              "title": null,
+              "comment": "<a href=\"#p70252980\" class=\"quotelink\">&gt;&gt;70252980</a><br>How does your skin look so good at 36? What&#039;s your routine?",
+              "image": null,
+              "created": {
+                  "dt": 1678684735000
+              },
+              "length": 127,
+              "replies": {
+                  "from": 12,
+                  "to": 1
+              },
+              "relevance": 0.21866430069366027
+          },
+          {
+              "id": 70254158,
+              "title": null,
+              "comment": "Don&#039;t like body, but working on it has felt satisfying. Gonna keep maintenance with it",
+              "image": {
+                  "filename": "1678685314836956.jpg"
+              },
+              "created": {
+                  "dt": 1678685314000
+              },
+              "length": 91,
+              "replies": {
+                  "from": 24,
+                  "to": 0
+              },
+              "relevance": 0.3518712695596064
+          },
+          {
+              "id": 70254461,
+              "title": null,
+              "comment": "179cm<br>95 kg <br>5.5 months of lifting",
+              "image": {
+                  "filename": "1678688341189663.jpg"
+              },
+              "created": {
+                  "dt": 1678688341000
+              },
+              "length": 40,
+              "replies": {
+                  "from": 24,
+                  "to": 0
+              },
+              "relevance": 0.32513308598160995
+          },
+          {
+              "id": 70254556,
+              "title": null,
+              "comment": "<a href=\"#p70253822\" class=\"quotelink\">&gt;&gt;70253822</a><br><span class=\"quote\">&gt;Covering his tiny wrist with a watch</span><br>Kek loser",
+              "image": null,
+              "created": {
+                  "dt": 1678689346000
+              },
+              "length": 143,
+              "replies": {
+                  "from": 12,
+                  "to": 1
+              },
+              "relevance": 0.22705275044361994
+          },
+          {
+              "id": 70255018,
+              "title": null,
+              "comment": "<a href=\"#p70254556\" class=\"quotelink\">&gt;&gt;70254556</a><br>envious gymcel kys",
+              "image": null,
+              "created": {
+                  "dt": 1678693922000
+              },
+              "length": 81,
+              "replies": {
+                  "from": 0,
+                  "to": 1
+              },
+              "relevance": 0.042466526859170836
+          },
+          {
+              "id": 70255046,
+              "title": null,
+              "comment": "<a href=\"#p70252662\" class=\"quotelink\">&gt;&gt;70252662</a>",
+              "image": {
+                  "filename": "1678694187043555.jpg"
+              },
+              "created": {
+                  "dt": 1678694187000
+              },
+              "length": 59,
+              "replies": {
+                  "from": 24,
+                  "to": 1
+              },
+              "relevance": 0.33509437005968706
+          },
+          {
+              "id": 70255184,
+              "title": null,
+              "comment": "<a href=\"#p70253640\" class=\"quotelink\">&gt;&gt;70253640</a><br>Ya thanks anon",
+              "image": null,
+              "created": {
+                  "dt": 1678695259000
+              },
+              "length": 77,
+              "replies": {
+                  "from": 0,
+                  "to": 1
+              },
+              "relevance": 0.04036941442168092
+          },
+          {
+              "id": 70256755,
+              "title": null,
+              "comment": "Some progress made.<br><br>Current stats:<br>65.9kg<br>1.84m<br><br><a href=\"#p70253929\" class=\"quotelink\">&gt;&gt;70253929</a><br><a href=\"#p70253886\" class=\"quotelink\">&gt;&gt;70253886</a><br>Great work anon",
+              "image": {
+                  "filename": "1678709203173220.png"
+              },
+              "created": {
+                  "dt": 1678709203000
+              },
+              "length": 209,
+              "replies": {
+                  "from": 12,
+                  "to": 2
+              },
+              "relevance": 0.26165510566220357
+          },
+          {
+              "id": 70256899,
+              "title": null,
+              "comment": "<a href=\"#p70252780\" class=\"quotelink\">&gt;&gt;70252780</a> reporting back to share thoughts/critiques<br><br><a href=\"#p70252927\" class=\"quotelink\">&gt;&gt;70252927</a><br>Tough one, I lean towards a short, moderate cut to get your hips slimmed out before bulking<br><a href=\"#p70252980\" class=\"quotelink\">&gt;&gt;70252980</a><br>Congrats on weight loss, nice work. From the front and back profile I would’ve said just switch to maintenance now but that side profile shows you could cut a lil more. Your back is already shaping up crazy<br><a href=\"#p70253592\" class=\"quotelink\">&gt;&gt;70253592</a><br>Chad for training despite your disadvantage, that’s grit!<br><a href=\"#p70253613\" class=\"quotelink\">&gt;&gt;70253613</a><br>Very solid, mirin abs<br><a href=\"#p70253687\" class=\"quotelink\">&gt;&gt;70253687</a><br>Unit. you look like you toss hay bales for a living. Farmstrong<br><a href=\"#p70253822\" class=\"quotelink\">&gt;&gt;70253822</a><br>Mirin<br><a href=\"#p70253886\" class=\"quotelink\">&gt;&gt;70253886</a><br>260 is nuts, you probably look so much better especially in the face. Soon you’ll be ready to start putting on muscle<br><a href=\"#p70254158\" class=\"quotelink\">&gt;&gt;70254158</a><br>You look healthy, no reason to have body dysmorphia. I’d put on some mass if I were you but that’s my preference. <br><a href=\"#p70254461\" class=\"quotelink\">&gt;&gt;70254461</a><br>Promising chest and delts for 5.5 months keep grinding king <br><a href=\"#p70255046\" class=\"quotelink\">&gt;&gt;70255046</a><br>Clean your mirror! Core has really solid potential",
+              "image": null,
+              "created": {
+                  "dt": 1678710324000
+              },
+              "length": 1560,
+              "replies": {
+                  "from": 0,
+                  "to": 11
+              },
+              "relevance": 0.817873850621068
+          },
+          {
+              "id": 70256948,
+              "title": null,
+              "comment": "I think I have another 10 15 more lbs to lose or so to really be cut. <br><br>5&#039;7<br>146lbs",
+              "image": {
+                  "filename": "1678710597355257.jpg"
+              },
+              "created": {
+                  "dt": 1678710597000
+              },
+              "length": 96,
+              "replies": {
+                  "from": 0,
+                  "to": 0
+              },
+              "relevance": 0.05033069849975803
+          },
+          {
+              "id": 70256975,
+              "title": null,
+              "comment": "Here is my back.",
+              "image": {
+                  "filename": "1678710811046905.jpg"
+              },
+              "created": {
+                  "dt": 1678710811000
+              },
+              "length": 16,
+              "replies": {
+                  "from": 12,
+                  "to": 0
+              },
+              "relevance": 0.16046943055331506
+          },
+          {
+              "id": 70257103,
+              "title": null,
+              "comment": "<a href=\"#p70252780\" class=\"quotelink\">&gt;&gt;70252780</a><br>Great, natty?<br><a href=\"#p70252927\" class=\"quotelink\">&gt;&gt;70252927</a><br>Lift weights with the requisite intensity and stop eating slop<br><a href=\"#p70252980\" class=\"quotelink\">&gt;&gt;70252980</a><br>Based boomer, well done so far. I think you should focus on building more muscle for a while before you continue the cut though.<br><a href=\"#p70253592\" class=\"quotelink\">&gt;&gt;70253592</a><br><a href=\"#p70253613\" class=\"quotelink\">&gt;&gt;70253613</a><br>Gg lads good progress<br><a href=\"#p70253687\" class=\"quotelink\">&gt;&gt;70253687</a><br>You’re big now dude time to cut<br><a href=\"#p70253822\" class=\"quotelink\">&gt;&gt;70253822</a><br>Mirin brah<br><a href=\"#p70253929\" class=\"quotelink\">&gt;&gt;70253929</a><br>Well done so far man. Tough love though, you are still dyel. If you’ve made it this far though you can make it brah<br><a href=\"#p70254158\" class=\"quotelink\">&gt;&gt;70254158</a><br>Very strange pic anon<br><a href=\"#p70254461\" class=\"quotelink\">&gt;&gt;70254461</a><br>Excellent results for that timeframe<br><a href=\"#p70256755\" class=\"quotelink\">&gt;&gt;70256755</a><br>I too am on the breaking bad &amp; lifting grind my brother in crystal<br><br><br>184cm 82kg",
+              "image": {
+                  "filename": "1678711867248330.jpg"
+              },
+              "created": {
+                  "dt": 1678711867000
+              },
+              "length": 1258,
+              "replies": {
+                  "from": 24,
+                  "to": 11
+              },
+              "relevance": 0.96370382319729
+          },
+          {
+              "id": 70257125,
+              "title": null,
+              "comment": "bros she left me it&#039;s over",
+              "image": {
+                  "filename": "1678712052698743.jpg"
+              },
+              "created": {
+                  "dt": 1678712052000
+              },
+              "length": 31,
+              "replies": {
+                  "from": 24,
+                  "to": 0
+              },
+              "relevance": 0.3204145829972576
+          },
+          {
+              "id": 70257139,
+              "title": null,
+              "comment": "<a href=\"#p70254094\" class=\"quotelink\">&gt;&gt;70254094</a><br><br>I don&#039;t really have a routine. Try to not get sunburned all the time I guess, but it happens every now and then.<br><br>And its hard to see but I do have keratosis pilaris (upper arms, thighs, ass mostly). For that, 10% benzyl peroxide wash and exfoliate in the shower, clindamycin lotion after shower, cetaphil rough and bumpy lotion in the morning. Helps reduce the apperance of it a lot, but I only use that stuff where I have the KP.",
+              "image": null,
+              "created": {
+                  "dt": 1678712158000
+              },
+              "length": 509,
+              "replies": {
+                  "from": 0,
+                  "to": 1
+              },
+              "relevance": 0.26685755767059205
+          },
+          {
+              "id": 70257152,
+              "title": null,
+              "comment": "<a href=\"#p70256975\" class=\"quotelink\">&gt;&gt;70256975</a><br>very nice, I&#039;d be super satisfied with that back<br>mind if I ask routine?",
+              "image": null,
+              "created": {
+                  "dt": 1678712334000
+              },
+              "length": 142,
+              "replies": {
+                  "from": 12,
+                  "to": 1
+              },
+              "relevance": 0.22652847233424744
+          },
+          {
+              "id": 70257184,
+              "title": null,
+              "comment": "31yo 5ft 11in 190lbs been bulking slow to try and avoid outpacing and getting a belly again",
+              "image": {
+                  "filename": "1678712690556987.jpg"
+              },
+              "created": {
+                  "dt": 1678712690000
+              },
+              "length": 91,
+              "replies": {
+                  "from": 0,
+                  "to": 0
+              },
+              "relevance": 0.04770930795289562
+          },
+          {
+              "id": 70257207,
+              "title": null,
+              "comment": "How to grow chest i bench 100kg for 5",
+              "image": {
+                  "filename": "1678712992887408.jpg"
+              },
+              "created": {
+                  "dt": 1678712992000
+              },
+              "length": 37,
+              "replies": {
+                  "from": 0,
+                  "to": 0
+              },
+              "relevance": 0.01939829004678174
+          },
+          {
+              "id": 70257211,
+              "title": null,
+              "comment": "<a href=\"#p70257152\" class=\"quotelink\">&gt;&gt;70257152</a><br>Thanks. I don&#039;t have a strict routine, except for core which I do at the start of every session - just my favorite exercises for 5-10 minutes. Besides that, I just kind of do what I feel like, which usually is some combination of bench, squats, deadlifts, pull-ups, cleans, presses and rows. I do either push-pull split or full body every day. I typically vary the reps and sets each day, so e.g. one day I might do 3x10, another I might do 5x6, or 8x4, or occasionally 10x10, or sometimes I might vary the number of reps in each set. It&#039;s pretty random, but everything (unless I&#039;m doing 10x10 or something similar) is to within 1-2 reps of failure.<br>I also like supersetting, so I&#039;ll often do e.g bench press followed by pull-ups or DB rows. Also, when I do DB rows, I do cheat rows so that the beginning becomes like a rotational core exercise, and then it allows you to bring the dumbell higher up to engage more of the lats.<br>The last time I did a proper program was Smolov for bench, squat, deadlift, pull-ups, OHP and Pendlay rows, which got me good results.",
+              "image": null,
+              "created": {
+                  "dt": 1678713038000
+              },
+              "length": 1151,
+              "replies": {
+                  "from": 12,
+                  "to": 1
+              },
+              "relevance": 0.7555250846910792
+          },
+          {
+              "id": 70257226,
+              "title": null,
+              "comment": "<a href=\"#p70257211\" class=\"quotelink\">&gt;&gt;70257211</a><br>cool man thank you for this detailed response<br>I like the intuitive and flexible style of training and supersets are a great way to make the most out of time in the gym!<br>all the best to you man, hope you&#039;re doing well",
+              "image": null,
+              "created": {
+                  "dt": 1678713170000
+              },
+              "length": 290,
+              "replies": {
+                  "from": 12,
+                  "to": 1
+              },
+              "relevance": 0.3041216325213744
+          },
+          {
+              "id": 70257245,
+              "title": null,
+              "comment": "<a href=\"#p70257226\" class=\"quotelink\">&gt;&gt;70257226</a><br>Thanks.<br>I think the biggest key is that unless you have an iron will, the gym needs to be enjoyable, so in the long run, you&#039;re better off with a suboptimal routine that makes you look forward to going to the gym every day rather than the scientifically-proven &quot;best&quot; routine.<br>All the best to you too! WAGMI",
+              "image": null,
+              "created": {
+                  "dt": 1678713358000
+              },
+              "length": 391,
+              "replies": {
+                  "from": 0,
+                  "to": 1
+              },
+              "relevance": 0.20499274076463944
+          },
+          {
+              "id": 70257314,
+              "title": null,
+              "comment": "<a href=\"#p70253822\" class=\"quotelink\">&gt;&gt;70253822</a><br><a href=\"#p70257103\" class=\"quotelink\">&gt;&gt;70257103</a><br>miring<br><a href=\"#p70257125\" class=\"quotelink\">&gt;&gt;70257125</a><br>you gna kill yourself kam? i would if my dick was as small as yours",
+              "image": null,
+              "created": {
+                  "dt": 1678714051000
+              },
+              "length": 266,
+              "replies": {
+                  "from": 12,
+                  "to": 3
+              },
+              "relevance": 0.2915389578964349
+          },
+          {
+              "id": 70257345,
+              "title": null,
+              "comment": "<a href=\"#p70257314\" class=\"quotelink\">&gt;&gt;70257314</a><br>I made a dozens of /fit/ whores cum when i posted my cock <br>where&#039;s t800 I got questions 2 ask her",
+              "image": null,
+              "created": {
+                  "dt": 1678714312000
+              },
+              "length": 168,
+              "replies": {
+                  "from": 12,
+                  "to": 1
+              },
+              "relevance": 0.24015970317793192
+          },
+          {
+              "id": 70257354,
+              "title": null,
+              "comment": "<a href=\"#p70257345\" class=\"quotelink\">&gt;&gt;70257345</a><br>did sum1 really send it 2 ur dad or was that a larper",
+              "image": null,
+              "created": {
+                  "dt": 1678714406000
+              },
+              "length": 116,
+              "replies": {
+                  "from": 12,
+                  "to": 1
+              },
+              "relevance": 0.212897241490563
+          },
+          {
+              "id": 70257365,
+              "title": null,
+              "comment": "<a href=\"#p70257354\" class=\"quotelink\">&gt;&gt;70257354</a><br>of course they did and he was like wow ur fucking hung bro u wanna fuck my wife???",
+              "image": null,
+              "created": {
+                  "dt": 1678714473000
+              },
+              "length": 145,
+              "replies": {
+                  "from": 12,
+                  "to": 1
+              },
+              "relevance": 0.22810130666236486
+          },
+          {
+              "id": 70257404,
+              "title": null,
+              "comment": "<a href=\"#p70257365\" class=\"quotelink\">&gt;&gt;70257365</a><br>we’ve all seen your dick, it’s on the internet 4ever &amp; it’s 4 inches hard",
+              "image": null,
+              "created": {
+                  "dt": 1678714779000
+              },
+              "length": 140,
+              "replies": {
+                  "from": 12,
+                  "to": 1
+              },
+              "relevance": 0.2254799161155025
+          },
+          {
+              "id": 70257443,
+              "title": null,
+              "comment": "<a href=\"#p70257404\" class=\"quotelink\">&gt;&gt;70257404</a><br>5 iches easy",
+              "image": {
+                  "filename": "1678715150769589.jpg"
+              },
+              "created": {
+                  "dt": 1678715150000
+              },
+              "length": 75,
+              "replies": {
+                  "from": 12,
+                  "to": 1
+              },
+              "relevance": 0.19140183900629132
+          },
+          {
+              "id": 70257459,
+              "title": null,
+              "comment": "<a href=\"#p70257103\" class=\"quotelink\">&gt;&gt;70257103</a><br>80kg x 3 reps",
+              "image": {
+                  "filename": "1678715298988758.jpg"
+              },
+              "created": {
+                  "dt": 1678715298000
+              },
+              "length": 76,
+              "replies": {
+                  "from": 0,
+                  "to": 1
+              },
+              "relevance": 0.03984513631230843
+          },
+          {
+              "id": 70257471,
+              "title": null,
+              "comment": "<a href=\"#p70257443\" class=\"quotelink\">&gt;&gt;70257443</a><br>even if it was that’s a micropenis in 2023",
+              "image": null,
+              "created": {
+                  "dt": 1678715401000
+              },
+              "length": 105,
+              "replies": {
+                  "from": 24,
+                  "to": 1
+              },
+              "relevance": 0.3592111630908211
+          },
+          {
+              "id": 70257492,
+              "title": null,
+              "comment": "<a href=\"#p70257471\" class=\"quotelink\">&gt;&gt;70257471</a><br>no ass",
+              "image": null,
+              "created": {
+                  "dt": 1678715516000
+              },
+              "length": 69,
+              "replies": {
+                  "from": 0,
+                  "to": 1
+              },
+              "relevance": 0.036175189546701084
+          },
+          {
+              "id": 70257509,
+              "title": null,
+              "comment": null,
+              "image": {
+                  "filename": "1678715654650662.jpg"
+              },
+              "created": {
+                  "dt": 1678715654000
+              },
+              "length": 0,
+              "replies": {
+                  "from": 0,
+                  "to": 0
+              },
+              "relevance": 0
+          },
+          {
+              "id": 70257522,
+              "title": null,
+              "comment": "<a href=\"#p70255046\" class=\"quotelink\">&gt;&gt;70255046</a><br><br>cock stats?",
+              "image": null,
+              "created": {
+                  "dt": 1678715765000
+              },
+              "length": 78,
+              "replies": {
+                  "from": 0,
+                  "to": 1
+              },
+              "relevance": 0.0408936925310534
+          },
+          {
+              "id": 70257536,
+              "title": null,
+              "comment": "<a href=\"#p70257471\" class=\"quotelink\">&gt;&gt;70257471</a><br>https://vocaroo.com/1mcpknyOZGxd",
+              "image": null,
+              "created": {
+                  "dt": 1678715885000
+              },
+              "length": 95,
+              "replies": {
+                  "from": 0,
+                  "to": 1
+              },
+              "relevance": 0.04980642039038555
+          },
+          {
+              "id": 70257556,
+              "title": null,
+              "comment": "Always the fattest fuck in these threads",
+              "image": {
+                  "filename": "1678716066878276.jpg"
+              },
+              "created": {
+                  "dt": 1678716066000
+              },
+              "length": 40,
+              "replies": {
+                  "from": 12,
+                  "to": 0
+              },
+              "relevance": 0.17305210517825453
+          },
+          {
+              "id": 70257579,
+              "title": null,
+              "comment": "<a href=\"#p70257556\" class=\"quotelink\">&gt;&gt;70257556</a><br>my pussy is tingling u got snapchat?",
+              "image": null,
+              "created": {
+                  "dt": 1678716329000
+              },
+              "length": 99,
+              "replies": {
+                  "from": 0,
+                  "to": 1
+              },
+              "relevance": 0.051903532827875465
+          },
+          {
+              "id": 70257643,
+              "title": null,
+              "comment": "Kinda gainz.<br>Posted in previous threads because I kinda need advice on where to go at this point.<br>6&#039;1 <br>Ive dropped from 380(right) to 215(left). Before anyone asks I put the after on the left because im retarded.<br>Do i keep trimming down or do I maingain/bulk to try and salvage my chest and midsection?<br>Also what routine do giga chads do to gain mass in the mid section without it being fat?",
+              "image": {
+                  "filename": "1678716946094653.png"
+              },
+              "created": {
+                  "dt": 1678716946000
+              },
+              "length": 411,
+              "replies": {
+                  "from": 24,
+                  "to": 0
+              },
+              "relevance": 0.5196402645587999
+          },
+          {
+              "id": 70257666,
+              "title": null,
+              "comment": "<a href=\"#p70257643\" class=\"quotelink\">&gt;&gt;70257643</a><br>look at that practical &amp; notable bone difference compared 2 other guys <br>being fat for years and then cutting is a right of passage 4 a man",
+              "image": null,
+              "created": {
+                  "dt": 1678717095000
+              },
+              "length": 208,
+              "replies": {
+                  "from": 0,
+                  "to": 1
+              },
+              "relevance": 0.10904984674947574
+          },
+          {
+              "id": 70257684,
+              "title": null,
+              "comment": "chicken legs here, do you do calf raises and do you do them weighted?",
+              "image": {
+                  "filename": "1678717275948946.png"
+              },
+              "created": {
+                  "dt": 1678717275000
+              },
+              "length": 69,
+              "replies": {
+                  "from": 0,
+                  "to": 0
+              },
+              "relevance": 0.036175189546701084
+          },
+          {
+              "id": 70257687,
+              "title": null,
+              "comment": "<a href=\"#p70257643\" class=\"quotelink\">&gt;&gt;70257643</a><br>Cut more until you&#039;re lean then maintain for a while and give you skin a chance to tighten up as much as possible. Then (slowly) bulk a bit and see how it goes. Though seeing as you were 380 and you skin isn&#039;t super loose and flabby, that may be about as good as it gets... But it&#039;s worth trying in any case and you won&#039;t know for sure until you&#039;re totally lean.",
+              "image": null,
+              "created": {
+                  "dt": 1678717280000
+              },
+              "length": 450,
+              "replies": {
+                  "from": 12,
+                  "to": 1
+              },
+              "relevance": 0.3880061300209712
+          },
+          {
+              "id": 70257701,
+              "title": null,
+              "comment": "<a href=\"#p70257687\" class=\"quotelink\">&gt;&gt;70257687</a><br>Anon what is the defintion of totally lean? <br><br>Which body fat calculator should I use and what % to aim for.<br>Any good indications of when Im lean enough?",
+              "image": null,
+              "created": {
+                  "dt": 1678717446000
+              },
+              "length": 224,
+              "replies": {
+                  "from": 12,
+                  "to": 1
+              },
+              "relevance": 0.26951927730279074
+          },
+          {
+              "id": 70257723,
+              "title": null,
+              "comment": "<a href=\"#p70257701\" class=\"quotelink\">&gt;&gt;70257701</a><br>y do u want 2 look like a little bitch other men will bully u n embarrass u in front of ur girl",
+              "image": null,
+              "created": {
+                  "dt": 1678717656000
+              },
+              "length": 158,
+              "replies": {
+                  "from": 12,
+                  "to": 1
+              },
+              "relevance": 0.2349169220842071
+          },
+          {
+              "id": 70257739,
+              "title": null,
+              "comment": "<a href=\"#p70257723\" class=\"quotelink\">&gt;&gt;70257723</a><br>Lol why would someone bully me in front of my girl because im lean?",
+              "image": null,
+              "created": {
+                  "dt": 1678717804000
+              },
+              "length": 130,
+              "replies": {
+                  "from": 12,
+                  "to": 1
+              },
+              "relevance": 0.22023713502177772
+          },
+          {
+              "id": 70257745,
+              "title": null,
+              "comment": "Can I get a bf% estimate? I’m currently doing an aggressive but short cut. 1000kcal deficit<br>6’2”, 207lbs and 31.25” waist<br>Even with this deficit, I don’t feel super hungry desu, and is relatively easy to maintain. I wonder why that is?",
+              "image": {
+                  "filename": "1678717865227546.jpg"
+              },
+              "created": {
+                  "dt": 1678717865000
+              },
+              "length": 241,
+              "replies": {
+                  "from": 24,
+                  "to": 0
+              },
+              "relevance": 0.43051298596547827
+          },
+          {
+              "id": 70257763,
+              "title": null,
+              "comment": "<a href=\"#p70257745\" class=\"quotelink\">&gt;&gt;70257745</a><br>12-14.",
+              "image": null,
+              "created": {
+                  "dt": 1678718003000
+              },
+              "length": 69,
+              "replies": {
+                  "from": 0,
+                  "to": 1
+              },
+              "relevance": 0.036175189546701084
+          },
+          {
+              "id": 70257767,
+              "title": null,
+              "comment": "<a href=\"#p70257739\" class=\"quotelink\">&gt;&gt;70257739</a><br>by standing next 2 u<br>when a guy looks like he can kick ur ass its over her pussy belongs 2 him if only ib spirit n big guys luv cucking ppl",
+              "image": null,
+              "created": {
+                  "dt": 1678718070000
+              },
+              "length": 205,
+              "replies": {
+                  "from": 24,
+                  "to": 1
+              },
+              "relevance": 0.41163897402806904
+          },
+          {
+              "id": 70257785,
+              "title": null,
+              "comment": "<a href=\"#p70257125\" class=\"quotelink\">&gt;&gt;70257125</a><br>tiny wang",
+              "image": null,
+              "created": {
+                  "dt": 1678718197000
+              },
+              "length": 72,
+              "replies": {
+                  "from": 0,
+                  "to": 1
+              },
+              "relevance": 0.03774802387481852
+          },
+          {
+              "id": 70257794,
+              "title": null,
+              "comment": "<a href=\"#p70257767\" class=\"quotelink\">&gt;&gt;70257767</a><br>Is this what drives you in the gym?<br>Some unseen fear of someone bigger than you?<br>Respect anon this must be the purest of motivation.",
+              "image": null,
+              "created": {
+                  "dt": 1678718240000
+              },
+              "length": 201,
+              "replies": {
+                  "from": 12,
+                  "to": 1
+              },
+              "relevance": 0.25746088078722373
+          },
+          {
+              "id": 70257796,
+              "title": null,
+              "comment": "<a href=\"#p70257767\" class=\"quotelink\">&gt;&gt;70257767</a><br>You don’t look like you could kick anyone’s ass though. You’re really fat.",
+              "image": null,
+              "created": {
+                  "dt": 1678718267000
+              },
+              "length": 137,
+              "replies": {
+                  "from": 0,
+                  "to": 1
+              },
+              "relevance": 0.07182610098402968
+          },
+          {
+              "id": 70257797,
+              "title": null,
+              "comment": "<a href=\"#p70257745\" class=\"quotelink\">&gt;&gt;70257745</a><br><span class=\"quote\">&gt;Even with this deficit, I don’t feel super hungry desu, and is relatively easy to maintain. I wonder why that is?</span><br>Sometimes shit just works out.",
+              "image": null,
+              "created": {
+                  "dt": 1678718278000
+              },
+              "length": 241,
+              "replies": {
+                  "from": 0,
+                  "to": 1
+              },
+              "relevance": 0.12635102435876755
+          },
+          {
+              "id": 70257800,
+              "title": null,
+              "comment": "<a href=\"#p70257794\" class=\"quotelink\">&gt;&gt;70257794</a><br>no what drives me is cucking other men by simply existing",
+              "image": null,
+              "created": {
+                  "dt": 1678718318000
+              },
+              "length": 120,
+              "replies": {
+                  "from": 0,
+                  "to": 1
+              },
+              "relevance": 0.06291337312469754
+          }
+      ]
+  }
+}
+
+### Response:
+

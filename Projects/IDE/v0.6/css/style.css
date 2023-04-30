@@ -1,0 +1,121 @@
+body {
+    background-image: url(/img/background.png);
+    background-size: contain;
+    background-attachment: fixed;
+}
+
+.box {
+    padding: 0.5em;
+    border: 1px solid #ffffffa0;
+    background: #ffffff30;
+    box-shadow: -4px 4px 2px #000000, inset -4px 4px 2px #000000;
+}
+
+h3 {
+    margin-bottom: 0.5em;
+}
+
+div {
+    border: 0px solid #ffffff30;
+    transition: 0.3s;
+}
+
+.hovered {
+    border: 4px dashed white !important;
+    transition: border 0s !important;
+}
+
+.selected {
+    border: 3px solid white !important;
+    box-shadow: -4px 4px 2px #000000, inset -4px 4px 2px #000000 !important;
+}
+
+ul li:first-child {
+    border-radius: 1em 1em 0 0;
+}
+
+ul li:last-child {
+    border-radius: 0 0 1em 1em;
+}
+
+.done {
+    background: #ffffff20;
+}
+
+.done:hover {
+    background: #ffffff40;
+}
+
+
+
+button {
+    padding: 0.3em 0.5em;
+    border-radius: 0.5em;
+    color: white;
+    text-shadow: -2px 2px 2px #000, 2px -2px 2px #000;
+    background: #ffffff60;
+    box-shadow: -2px 2px 2px #00000080;
+    user-select: none;
+}
+
+button:hover {
+    background: #ffffff90;
+}
+
+
+.layout.list>div:hover {
+    background: #ffffff30;
+    transition: 0s;
+}
+
+
+
+
+/* Absolutely positioned message container in the bottom right corner */
+.msg-container {
+    position: fixed;
+    top: 1em;
+    right: 1em;
+    margin: 1em;
+    z-index: 1000;
+    border: none;
+}
+
+.msg.alert {
+    /* light blue */
+    background: #4080ff;
+}
+
+.msg.warning {
+    /* yellowish */
+    background: #ffff60;
+    color: black;
+    text-shadow: none;
+}
+
+.msg.error {
+    /* light red */
+    background: #ff6060;
+}
+
+.msg.visible {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.msg {
+    opacity: 0;
+    transform: translateX(10em);
+    transition: 0.6s;
+
+    background: #606060;
+    border: 1px solid var(--white-30pc);
+    border-radius: 1em;
+    padding: 1vw;
+    margin-bottom: 1vh;
+    color: var(--white);
+    font-size: 1.1em;
+    text-align: center;
+    width: 20vw;
+    box-shadow: -1em 1em 1em #00000080;
+}

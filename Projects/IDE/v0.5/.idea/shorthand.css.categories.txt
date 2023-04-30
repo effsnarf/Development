@@ -1,0 +1,118 @@
+  var splitItems = (s => s.split(`,`).map(s => s.trim()));
+
+  var getTitle = (k) => {
+    var titles = `width, height, margin, padding, border color, border radius, border width`;
+    if (k.length <= 2) return (splitItems(titles).find(title => {
+      if (title.includes(' ')) if (title.split(' ').map(s => s[0]).join('') == k) return true;
+      if (title.startsWith(k)) return true;
+    }) || k);
+    return k;
+  };
+
+  this.categorize = (list, path = []) => {
+    var nodeNames = list.map(s => s[0]).distinct();
+    var nodes = nodeNames.map(nn => {
+      return {
+        path: [...path, nn],
+        title: [...path, getTitle(nn)].join(`-`),
+        children: this.categorize(list.filter(s => (s.length > (path.length + 1)) && (s[0] == nn)).map(s => s.slice(1)), [...path, nn])
+      };
+    });
+    nodes.forEach(n => { if (!n.children.length) delete n.children; });
+    return nodes;
+  };
+
+  this.categorizeShorthandFramework = (list) => {
+    var categories = {
+      size: splitItems(`w, h, m, p`),
+      border: splitItems(`border, br, bw, bc`),
+      colors: splitItems(`linear, almond, blue, brown, gray, green, indigo, mint, orange, pear, pink, purple, red, slategray, teal, white, wine, yellow`),
+      'background-color': ['bg'],
+      layout: splitItems(``)
+    }
+    var getPathStr = (k) => {
+      if (typeof(k) == `string`) return k;
+      if (typeof(k) == `object`) return Object.entries(k)[0][1];
+      return null;
+    };
+    var items = Object.keys(categories).map(k => {
+      return {
+        path: [k],
+        children: list.filter(a => categories[k].map(getPathStr).includes(a.path.join()))
+      };
+    });
+    items.push({
+      title: `misc`,
+      path: [`misc`],
+      children: list
+    });
+
+    return items;
+  };
+
+
+
+
+
+
+
+background-color
+	bg
+
+		
+shadow
+
+layout
+	position
+		absolute
+		fixed
+	text (center, left, right)
+	float
+	inline
+	flex
+	items
+	justify
+	align
+	left, right, top, bottom
+bg
+fs
+fw
+line-height (lh)
+
+
+
+
+
+size
+	width (w)
+	height (h)
+	margin (m, mr, ml, mt, mb, mx, my)
+	padding (p...)
+
+colors
+	linear
+	almond
+	blue
+	brown
+	gray
+	green
+	indigo
+	mint
+	orange
+	pear
+	pink
+	purple
+	red
+	slategray
+	teal
+	white
+	wine
+	yellow
+
+border
+border-radius
+	br
+border-width
+	bw
+border-color
+	bc

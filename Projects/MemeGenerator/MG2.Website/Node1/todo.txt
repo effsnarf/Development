@@ -1,0 +1,36 @@
+
+
+$localStorage
+
+
+
+Stream Queries
+  get votes info
+
+Ensure fields are correct
+  Instances.CommentsCount
+  Instances.TotalVotesScore
+
+
+
+
+Can wait
+  - Logout
+  - Caption / Create Generator
+  Instance Page - Show instance image (not optimized text)
+  General visual fixes
+  URLs
+    Check all existing URLs
+    Redirects
+    Redirect /user/1/images to posts
+    Redirect /user/1/liked-images to liked-posts
+
+
+
+Later
+  Animations / Transitions
+  Detect instance language
+
+
+Pretty much done
+- Mobile Resolution

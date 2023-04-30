@@ -1,0 +1,24 @@
+- type: root
+  subs:
+    - type: method
+      name: HelloWorld.test
+      subs:
+        - type: method
+          name: HelloWorld.log
+          args:
+            msg: "Hello World"
+          subs:
+            - type: statement
+              code: |
+                console.log(msg);
+
+      returned: void
+
+
+renders to
+
+
+root
+  HelloWorld.test()
+    HelloWorld.log("Hello World")
+      console.log("Hello World")

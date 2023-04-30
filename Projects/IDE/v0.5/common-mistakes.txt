@@ -1,0 +1,8 @@
+nodes
+    attributes
+        forgetting ":" to bind instead of plain value (":style" vs "style")
+
+warnings
+    property binding
+    ...
+    

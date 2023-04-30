@@ -1,0 +1,14 @@
+{
+  "type": "module",
+  "dependencies": {
+    "fs": "^0.0.1-security",
+    "imagemin": "^8.0.1",
+    "imagemin-jpegtran": "^7.0.0",
+    "jimp": "^0.16.2",
+    "path": "^0.12.7",
+    "sharp": "^0.31.1"
+  },
+  "devDependencies": {
+    "compress-images": "^2.0.5"
+  }
+}
