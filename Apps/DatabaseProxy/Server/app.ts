@@ -130,28 +130,22 @@ const init = (httpServer: express.Express) => {
     "/*.js",
     processRequest(async (req: any, res: any) => {
       const url = req.url;
+      // If a .ts version exists, transpile it and return it
+      const tsUrl = url.substring(0, url.length - 3) + "ts";
+      const tsFilePath = path.join(__dirname, "../Client", tsUrl.substring(1));
+      if (fs.existsSync(tsFilePath)) {
+        // Read the TypeScript file
+        const tsCode = fs.readFileSync(tsFilePath, "utf8");
+        // Transpile the TypeScript code
+        const jsCode = TypeScript.transpile(tsCode);
+        // Return the JavaScript code
+        return res.send(jsCode);
+      }
       const fileName = url.substring(1);
       // Get [__dirname]/Client/[fileName].js
       const filePath = path.join(__dirname, "../Client", fileName);
       // Read the TypeScript file
       const jsCode = fs.readFileSync(filePath, "utf8");
-      // Return the JavaScript code
-      return res.send(jsCode);
-    })
-  );
-
-  // For /*.ts, transpile the *.ts file and return it
-  httpServer.get(
-    "/*.ts",
-    processRequest(async (req: any, res: any) => {
-      const url = req.url;
-      const fileName = url.substring(1, url.length - 3);
-      // Get [__dirname]/Client/[fileName].ts
-      const filePath = path.join(__dirname, "../Client", fileName + ".ts");
-      // Read the TypeScript file
-      const tsCode = fs.readFileSync(filePath, "utf8");
-      // Transpile the TypeScript code
-      const jsCode = TypeScript.transpile(tsCode);
       // Return the JavaScript code
       return res.send(jsCode);
     })
