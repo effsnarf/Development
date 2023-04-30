@@ -1,0 +1,33 @@
+.w-10pc
+{
+  width: 10%;
+}
+.w-15pc
+{
+  width: 15%;
+}
+.w-65pc
+{
+  width: 65%;
+}
+
+.w-l12
+{
+  width: 12rem !important;
+}
+.w-l15
+{
+  width: 15rem !important;
+}
+
+
+.opacity-50
+{
+  opacity: 0.5 !important;
+}
+
+
+.invisibile
+{
+  visibility: hidden;
+}

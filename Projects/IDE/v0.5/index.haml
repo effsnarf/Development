@@ -1,0 +1,96 @@
+%html
+  %head
+    %title Vue Studio
+    %link{rel: "stylesheet", href: "https://fonts.googleapis.com/css?family=Qwigley|Kulim+Park|Satisfy|Source+Code+Pro|Bangers|IM Fell English&display=swap"}
+    %link{rel: "stylesheet", href: "./css/lib/shorthand.css"}
+    %link{rel: "stylesheet", href: "./css/shorthand.css"}
+    %link{rel: "stylesheet", href: "./css/defaults.css"}
+    %link{rel: "stylesheet", href: "./css/default-controls.css"}
+    %link{rel: "stylesheet", href: "./css/hourglass.css"}
+    %link{rel: "stylesheet", href: "./css/animations.css"}
+    %link{rel: "stylesheet", href: "./css/animations-stagger.css"}
+    %link{rel: "stylesheet", href: "./css/style.css"}
+    %link{rel: "stylesheet", href: "https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/css/alertify.css"}
+    %link{rel: "icon", type: "image/x-icon", href: "/favicon.png"}
+    %meta{name: "google-signin-client_id", content: "3680328427-kaad8n5b808er5sgt3ieqdpu3sgde8p6.apps.googleusercontent.com"}
+    %script{src: "//accounts.google.com/gsi/client", async: true, defer: true}
+    %script{src: "/js/lib/jszip.js"}
+    %script{src: "/js/lib/utility.js"}
+    %script{src: "/js/lib/haml.js"}
+    %script{src: "/js/lib/handlebars.min.js"}
+    %script{src: "//cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"}
+    %script{src: "//cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/alertify.js"}
+    %script{src: "//cdnjs.cloudflare.com/ajax/libs/deep-diff/1.0.2/deep-diff.min.js"}
+    %script{src: "//www.gstatic.com/charts/loader.js"}
+    %script{src: "./js/misc/localStorage.js"}
+    %script{src: "./js/misc/memegenerator.js"}
+    %script{src: "./js/lib/jquery.js"}
+    %script{src: "./js/lib/jquery-ui.min.js"}
+    %script{src: "./js/lib/jshint.js"}
+    %script{src: "./js/lib/css.js"}
+    %script{src: "./js/lib/leader-line/leader-line.min.js"}
+    %script{src: "./js/lib/vue.js"}
+    %script{src: "./js/lib/vue-async-computed.js"}
+    %script{src: "./js/ide/GraphDatabase.js"}
+    %script{src: "./js/ide/DataBinder.js"}
+    %script{src: "//db.memegenerator.net/client.js"}
+    %script{src: "//unpkg.com/@babel/standalone@7.18.7/babel.min.js"}
+    %script{src: "./js/misc/vue-user-component-compiler.js"}
+    %script{src: "./js/misc/live-data.js"}
+    %script{src: "./js/misc/drag-and-drop.js"}
+    %script{src: "./js/misc/animation.js"}
+    %script{src: "./js/misc/state-tracker.js"}
+    %script{src: "./js/misc/auto-grow-list.js"}
+    %script{src: "./js/misc/ide.js"}
+    %script{src: "./js/misc/comp-dom.js"}
+    %script{src: "./js/misc/view-dom.js"}
+    %script{src: "./js/misc/vue-dom.js"}
+    %script{src: "./js/startup.js"}
+    / Share Widget
+    / %script{async: true, src: "https://platform-api.sharethis.com/js/sharethis.js#property=6334844fb22a350012c876fb&product=sop"}
+    / Google tag (gtag.js)
+    %script{async: true, src:"https://www.googletagmanager.com/gtag/js?id=G-7SQVHMPQCY"}
+    %script
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-7SQVHMPQCY');
+
+  %body
+    .body-background
+    .body-main
+      #app
+        %div{":key": "key1"}
+          %div{"v-if": "(!isIniting)"}
+            %img.hidden.ide-anim-on-load.w-l10{src: "./img/1.webp", style: "position: fixed; bottom: 0.5em;"}
+          %div{"v-if": "(!isIniting)"}
+            %div.flex.ide-anim-on-load{style: "align-items: start; justify-content: space-between;"}
+              %div.flex{style: "font-size: 5rem; text-shadow: -0.1em 0.1em 6px #000;"}
+                / Blue cube
+                %div.mr-l1 &#x1F9CA;
+                / %div
+                  %img{src: "./img/logo.png", style: "width: 1.5em;"}
+                %div
+                  %h1.fs-l5.mt-1{style: "margin-bottom: -0.3em; transform: scaleY(0.9);"} Vue
+                  %div.fs-m3.text-center.opacity-50 studio
+              %div.flex.text-right
+                / ide-search-comps
+                / %meow-comp-268.m-l1.z-100
+                %div.flex.z-10{style: "gap: 2em;"}
+                  / meow-support
+                  / %meow-comp-398
+                  / ide-user-account
+                  %meow-comp-267{ref: "ideUserAccount1"}
+            / %button{"@click": "refresh"} refresh
+          %hr{"v-if": "(!isIniting)"}
+          .logo{"v-if": "(!isIniting)"}
+            / %img{src: "./img/1.png"}
+          .levitating
+          %div
+            %ide-system-splash-intro.center-screen{"v-if": "showSplashIntro"}
+            %transition{name: "ide-vt-fade"}
+              %ide-system-hourglass.pt-l8{"v-show": "isIniting", ref: "hourglass1"}
+            / ide-workspace
+            %meow-comp-171.ide-anim-on-load
+        / %div{"v-if": "(!isIniting)", style: "position: fixed; right: 1em; bottom: 1em;"}
+          %iframe{src: "https://discord.com/widget?id=1007614412561055876&theme=dark", width: "350", height: "500", allowtransparency: "true", frameborder: "0", sandbox: "allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"}

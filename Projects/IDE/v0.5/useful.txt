@@ -1,0 +1,5 @@
+// view keywords
+viewDom.mapTree(comp.view.node, n => n.attrs.flatMap(a => a.value?.getWords())).flatMap(a => a).filter(a => a).distinct().sortBy(a => a);
+
+// search nodes by keyword
+viewDom.filterTree(comp.view.node, n => n.attrs.find(a => (a.value?.getWords().includes(`cssClass`))))

@@ -1,0 +1,33 @@
+formats:
+  summarized: |
+    {
+      title: (very short title)
+      subtitle: (short one sentence summary)
+      summary:
+      explanation:
+    }
+categories:
+  Creativity:
+    Write a poem:
+      props:
+        type: [Haiku, Sonnet, Free Verse]
+  Coding:
+    Explain code:
+      props:
+        code: code
+      format: summarized
+      prompt: |
+        explain the following code:
+
+        {{code}}
+      examples:
+        input: |
+          const f = n => n <= 1 ? n : f(n-1) + f(n-2);
+        output: |
+          {
+            title: "Recursive Fibonacci Function"
+            subtitle: "This is a recursive function in JavaScript that returns the nth Fibonacci number."
+            summary: "..."
+            output: "..."
+          }
+    Debug code: ...

@@ -1,0 +1,22 @@
+{
+  "dependencies": {
+    "colors": "^1.4.0",
+    "highlight.js": "^11.7.0",
+    "highlight.js-console": "^1.0.1",
+    "js-yaml": "^4.1.0",
+    "typescript": "^5.0.2"
+  },
+  "name": "coder",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "ts-node main.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "eff",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.5",
+    "ts-node": "^10.9.1"
+  }
+}

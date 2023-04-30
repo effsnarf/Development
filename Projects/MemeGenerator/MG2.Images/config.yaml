@@ -1,0 +1,6 @@
+server:
+  ip: 10.35.16.37
+  port: 80
+
+folders:
+  images: F:\MemeGenerator\Images

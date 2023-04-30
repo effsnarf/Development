@@ -1,0 +1,14 @@
+title: MG.DBP
+incoming:
+  address:
+    dev: localhost:4040
+    prod: 10.35.16.36:80
+nodes:
+  - name: MG.DBP 1
+    address: localhost:4041
+    process: ./Node1/start.cmd
+  - name: MG.DBP 2
+    address: localhost:4042
+    process: ./Node2/start.cmd
+sync:
+  exclude: [node_modules, config.yaml, nuxt.config.js, .nuxt, dist]

@@ -1,0 +1,27 @@
+@font-face {
+    font-family: 'Pixeboy';
+    src: url('Pixeboy.woff2') format('woff2'),
+        url('Pixeboy.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Diary of an 8-bit mage';
+    src: url('Diary-of-an-8-bit-mage.woff2') format('woff2'),
+        url('Diary-of-an-8-bit-mage.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Tiny Islanders';
+    src: url('Tiny-Islanders.woff2') format('woff2'),
+        url('Tiny-Islanders.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+

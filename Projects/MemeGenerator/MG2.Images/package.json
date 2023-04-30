@@ -1,0 +1,16 @@
+{
+  "type": "module",
+  "dependencies": {
+    "colors": "^1.4.0",
+    "fs": "^0.0.1-security",
+    "hamljs": "^0.6.2",
+    "http": "^0.0.1-security",
+    "https": "^1.0.0",
+    "indent": "^0.0.2",
+    "jimp": "^0.16.2",
+    "js-yaml": "^4.1.0",
+    "mime-types": "^2.1.35",
+    "node-fetch": "^3.2.10",
+    "request": "^2.88.2"
+  }
+}

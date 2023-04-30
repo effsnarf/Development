@@ -1,0 +1,18 @@
+{
+  "dependencies": {
+    "animate.css": "^4.1.1",
+    "colors": "^1.4.0",
+    "deep-object-diff": "^1.1.7",
+    "fs": "^0.0.1-security",
+    "hamljs": "^0.6.2",
+    "handlebars": "^4.7.7",
+    "http": "^0.0.1-security",
+    "indent": "^0.0.2",
+    "mime-types": "^2.1.35",
+    "shorthandcss": "^1.1.1",
+    "utf8": "^3.0.0",
+    "vue": "^3.2.37",
+    "vue3-async-computed": "^3.0.0",
+    "yaml": "^2.1.1"
+  }
+}

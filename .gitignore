@@ -1,3 +1,6 @@
+# Temp TypeScript files
+*.temp.ts
+
 # Logs
 logs
 *.log

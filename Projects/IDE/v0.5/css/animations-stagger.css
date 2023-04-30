@@ -1,0 +1,148 @@
+
+
+hr.ide-anim-2
+{
+    animation-delay: 600ms;
+}
+
+.ide-list-item
+{
+    animation-delay: 300ms !important;
+}
+
+
+button:nth-child(1) { animation-delay: 100ms; }
+button:nth-child(2) { animation-delay: 200ms; }
+button:nth-child(3) { animation-delay: 300ms; }
+button:nth-child(4) { animation-delay: 400ms; }
+button:nth-child(5) { animation-delay: 500ms; }
+button:nth-child(6) { animation-delay: 600ms; }
+button:nth-child(7) { animation-delay: 700ms; }
+button:nth-child(8) { animation-delay: 800ms; }
+button:nth-child(9) { animation-delay: 900ms; }
+button:nth-child(10) { animation-delay: 1000ms; }
+
+
+
+:nth-child(1) > [draggable=true],
+:nth-child(1) > div > [draggable=true],
+[draggable=true]:nth-child(1)
+{
+    animation-delay: 100ms;
+  }
+
+
+  :nth-child(2) > [draggable=true],
+  :nth-child(2) > div > [draggable=true],
+  [draggable=true]:nth-child(2)
+    {
+  animation-delay: 200ms;
+  }
+
+
+
+  :nth-child(3) > [draggable=true],
+  :nth-child(3) > div > [draggable=true],
+  [draggable=true]:nth-child(3)
+    {
+  animation-delay: 300ms;
+  }
+
+
+  :nth-child(4) > [draggable=true],
+  :nth-child(4) > div > [draggable=true],
+  [draggable=true]:nth-child(4)
+    {
+  animation-delay: 400ms;
+  }
+
+
+  :nth-child(5) > [draggable=true],
+  :nth-child(5) > div > [draggable=true],
+  [draggable=true]:nth-child(5)
+    {
+  animation-delay: 500ms;
+  }
+
+
+  :nth-child(6) > [draggable=true],
+  :nth-child(6) > div > [draggable=true],
+  [draggable=true]:nth-child(6)
+    {
+  animation-delay: 600ms;
+  }
+
+
+  :nth-child(7) > [draggable=true],
+  :nth-child(7) > div > [draggable=true],
+  [draggable=true]:nth-child(7)
+    {
+  animation-delay: 700ms;
+  }
+
+
+  :nth-child(8) > [draggable=true],
+  :nth-child(8) > div > [draggable=true],
+  [draggable=true]:nth-child(8)
+    {
+  animation-delay: 800ms;
+  }
+
+
+  :nth-child(9) > [draggable=true],
+  :nth-child(9) > div > [draggable=true],
+  [draggable=true]:nth-child(9)
+    {
+  animation-delay: 900ms;
+  }
+
+
+  :nth-child(10) > [draggable=true],
+  :nth-child(10) > div > [draggable=true],
+  [draggable=true]:nth-child(10)
+    {
+  animation-delay: 1000ms;
+  }
+
+  li:nth-child(1) > .ide-title { animation-delay: 100ms; }
+  li:nth-child(2) > .ide-title { animation-delay: 200ms; }
+  li:nth-child(3) > .ide-title { animation-delay: 300ms; }
+  li:nth-child(4) > .ide-title { animation-delay: 400ms; }
+  li:nth-child(5) > .ide-title { animation-delay: 500ms; }
+  li:nth-child(6) > .ide-title { animation-delay: 600ms; }
+  li:nth-child(7) > .ide-title { animation-delay: 700ms; }
+  li:nth-child(8) > .ide-title { animation-delay: 800ms; }
+  li:nth-child(9) > .ide-title { animation-delay: 900ms; }
+  li:nth-child(10) > .ide-title { animation-delay: 1000ms; }
+
+  li:nth-child(1) > div > div > div > div > .ide-title { animation-delay: 100ms; }
+  li:nth-child(2) > div > div > div > div > .ide-title { animation-delay: 200ms; }
+  li:nth-child(3) > div > div > div > div > .ide-title { animation-delay: 300ms; }
+  li:nth-child(4) > div > div > div > div > .ide-title { animation-delay: 400ms; }
+  li:nth-child(5) > div > div > div > div > .ide-title { animation-delay: 500ms; }
+  li:nth-child(6) > div > div > div > div > .ide-title { animation-delay: 600ms; }
+  li:nth-child(7) > div > div > div > div > .ide-title { animation-delay: 700ms; }
+  li:nth-child(8) > div > div > div > div > .ide-title { animation-delay: 800ms; }
+  li:nth-child(9) > div > div > div > div > .ide-title { animation-delay: 900ms; }
+  li:nth-child(10) > div > div > div > div > .ide-title { animation-delay: 1000ms; }
+
+  .ide-tree-node-line[ide-node-tree-index="1"] .ide-anim-2 { animation-delay: 100ms; }
+  .ide-tree-node-line[ide-node-tree-index="2"] .ide-anim-2 { animation-delay: 200ms; }
+  .ide-tree-node-line[ide-node-tree-index="3"] .ide-anim-2 { animation-delay: 300ms; }
+  .ide-tree-node-line[ide-node-tree-index="4"] .ide-anim-2 { animation-delay: 400ms; }
+  .ide-tree-node-line[ide-node-tree-index="5"] .ide-anim-2 { animation-delay: 500ms; }
+  .ide-tree-node-line[ide-node-tree-index="6"] .ide-anim-2 { animation-delay: 600ms; }
+  .ide-tree-node-line[ide-node-tree-index="7"] .ide-anim-2 { animation-delay: 700ms; }
+  .ide-tree-node-line[ide-node-tree-index="8"] .ide-anim-2 { animation-delay: 800ms; }
+  .ide-tree-node-line[ide-node-tree-index="9"] .ide-anim-2 { animation-delay: 900ms; }
+  .ide-tree-node-line[ide-node-tree-index="10"] .ide-anim-2 { animation-delay: 1000ms; }
+  .ide-tree-node-line[ide-node-tree-index="11"] .ide-anim-2 { animation-delay: 1100ms; }
+  .ide-tree-node-line[ide-node-tree-index="12"] .ide-anim-2 { animation-delay: 1200ms; }
+  .ide-tree-node-line[ide-node-tree-index="13"] .ide-anim-2 { animation-delay: 1300ms; }
+  .ide-tree-node-line[ide-node-tree-index="14"] .ide-anim-2 { animation-delay: 1400ms; }
+  .ide-tree-node-line[ide-node-tree-index="15"] .ide-anim-2 { animation-delay: 1500ms; }
+  .ide-tree-node-line[ide-node-tree-index="16"] .ide-anim-2 { animation-delay: 1600ms; }
+  .ide-tree-node-line[ide-node-tree-index="17"] .ide-anim-2 { animation-delay: 1700ms; }
+  .ide-tree-node-line[ide-node-tree-index="18"] .ide-anim-2 { animation-delay: 1800ms; }
+  .ide-tree-node-line[ide-node-tree-index="19"] .ide-anim-2 { animation-delay: 1900ms; }
+  .ide-tree-node-line[ide-node-tree-index="20"] .ide-anim-2 { animation-delay: 2000ms; }

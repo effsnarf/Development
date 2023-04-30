@@ -1,0 +1,14 @@
+title: MG (Website)
+incoming:
+  address:
+    dev: localhost:5050
+    prod: 10.35.16.35:80
+nodes:
+  - name: MG.Website 1
+    address: localhost:5051
+    process: .\Node1\start.cmd
+  - name: MG.Website 2
+    address: localhost:5052
+    process: .\Node2\start.cmd
+sync:
+  exclude: [node_modules, config.yaml, nuxt.config.js, .nuxt, dist]
