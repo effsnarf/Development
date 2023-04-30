@@ -513,7 +513,7 @@ class Console2 {
 }
 
 class Console {
-  private redrawPerSecond = 4;
+  private redrawPerSecond = 1;
 
   private headerItems: string[] = [];
   private header2Items: string[] = [];
