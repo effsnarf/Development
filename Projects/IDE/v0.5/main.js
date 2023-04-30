@@ -29,7 +29,7 @@ var getContent = (path) => {
     return (fileContent);
   }
   catch (ex) {
-    console.log(`File not found: ${path}`.red);
+    console.log(`File not found: ${path}`.bgRed);
     return "";
   }
 }
@@ -65,7 +65,7 @@ const requestListener = async function (req, res) {
     return;
   }
   catch (ex) {
-    console.log(`${ex.toString().red}`);
+    console.log(`${ex.toString().bgRed}`);
     res.write(ex.toString());
     res.end();
   }

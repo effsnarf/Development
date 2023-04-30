@@ -102,11 +102,11 @@ const init = (httpServer: express.Express) => {
         })
         .catch((ex: any) => {
           if (!ex.response) {
-            console.error(ex.message.bgRed);
+            console.error(ex.message);
             return;
           }
           if (ex.response.status != 404) {
-            console.error(ex.response.data.bgRed);
+            console.error(ex.response.data);
           }
           res.status(ex.response.status).send(ex.response.data);
         });
@@ -144,6 +144,9 @@ const init = (httpServer: express.Express) => {
       const fileName = url.substring(1);
       // Get [__dirname]/Client/[fileName].js
       const filePath = path.join(__dirname, "../Client", fileName);
+      // If the file doesn't exist, return 404
+      if (!fs.existsSync(filePath))
+        return res.status(404).send(`${filePath} not found`);
       // Read the TypeScript file
       const jsCode = fs.readFileSync(filePath, "utf8");
       // Return the JavaScript code

@@ -574,13 +574,16 @@ if (typeof require != "undefined") {
     };
   };
   
-  export default async ({ app }, inject) => {
-    // Inject in Vue, context and store.
-  
-    let dbp = new anat.dev.DatabaseProxy(`db.memegenerator.net`, `MemeGenerator`);
-    await dbp.createEntityMethods();
-    await dbp.createApiMethods();
-  
-    inject("dbp", dbp);
-  };
-  
+
+  if (module)
+  {
+    module.exports = async ({ app }, inject) => {
+      // Inject in Vue, context and store.
+    
+      let dbp = new anat.dev.DatabaseProxy(`db.memegenerator.net`, `MemeGenerator`);
+      await dbp.createEntityMethods();
+      await dbp.createApiMethods();
+    
+      inject("dbp", dbp);
+    };
+  }
