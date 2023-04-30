@@ -9,6 +9,9 @@ server:
   proxy:
 database:
   connectionString: mongodb://localhost:27017
+  query:
+    max:
+      docs: 50
 analytics:
   min:
     elapsed: 50
