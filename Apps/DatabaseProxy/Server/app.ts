@@ -288,7 +288,7 @@ const init = (httpServer: express.Express) => {
   );
 };
 
-const start = async () => {
+const start = () => {
   console.header(
     `HTTP server running on ${config.server.host.yellow}:${
       config.server.port.toString().green

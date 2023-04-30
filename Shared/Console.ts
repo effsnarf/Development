@@ -611,6 +611,8 @@ class Console {
   }
 
   redraw() {
+    console.clear();
+
     const window = Console.getWindowSize();
 
     // Print the header
