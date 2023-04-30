@@ -575,7 +575,7 @@ if (typeof require != "undefined") {
   };
   
 
-  if (module)
+  if (typeof(module) != `undefined`)
   {
     module.exports = async ({ app }, inject) => {
       // Inject in Vue, context and store.
