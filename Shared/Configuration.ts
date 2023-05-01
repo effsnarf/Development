@@ -55,7 +55,7 @@ class Configuration {
         )
       )
       // Merge all config files into a single object
-      .reduce((acc, cur) => ({ ...acc, ...cur }), {});
+      .reduce((acc, cur) => cur.deepMerge(acc), {});
 
     // Replace [dev] or [prod] with the current environment
     traverse(config.data, (node: any, key: string, value: any) => {

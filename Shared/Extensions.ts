@@ -89,6 +89,7 @@ interface Object {
   stringify(): string;
   stringifyAddress(): string;
   toAddress(): Address;
+  deepMerge(...objects: any[]): any;
 }
 
 if (typeof Object !== "undefined") {
@@ -167,6 +168,30 @@ if (typeof Object !== "undefined") {
 
   Object.prototype.toAddress = function (): Address {
     return Converter.toAddress(this);
+  };
+
+  Object.prototype.deepMerge = function (...objects: any[]): any {
+    const deepMerge = (target: any, source: any) => {
+      if (typeof target !== "object" || typeof source !== "object") {
+        return target;
+      }
+
+      const merged = target.clone();
+      for (const key of Object.keys(source)) {
+        if (key in merged) {
+          merged[key] = deepMerge(merged[key], source[key]);
+        } else {
+          merged[key] = source[key];
+        }
+      }
+      return merged;
+    };
+
+    let result = this;
+    for (const object of objects) {
+      result = deepMerge(result, object);
+    }
+    return result;
   };
 }
 
