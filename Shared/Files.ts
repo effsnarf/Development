@@ -58,7 +58,7 @@ class Files {
         onProgress(
           progress!,
           `${pathsCount.toLocaleString()} ${`items in `.gray} ${
-            master.getShortPath().yellow
+            master.toShortPath().yellow
           }`
         );
 
@@ -105,7 +105,7 @@ class Files {
               progress.data.modifieds.push(clonePath);
               onProgress(
                 progress,
-                `${`Created`.cyan} ${clonePath.getShortPath()}`
+                `${`Created`.cyan} ${clonePath.toShortPath()}`
               );
             }
 
@@ -124,10 +124,7 @@ class Files {
           if (!fs.existsSync(clonePath)) {
             fs.copyFileSync(masterPath, clonePath);
             progress.data.modifieds.push(clonePath);
-            onProgress(
-              progress,
-              `${`Copied`.cyan} ${clonePath.getShortPath()}`
-            );
+            onProgress(progress, `${`Copied`.cyan} ${clonePath.toShortPath()}`);
             continue;
           }
 
@@ -137,7 +134,7 @@ class Files {
             progress.data.modifieds.push(clonePath);
             onProgress(
               progress,
-              `${`Modified`.cyan} ${clonePath.getShortPath()}`
+              `${`Modified`.cyan} ${clonePath.toShortPath()}`
             );
             continue;
           }

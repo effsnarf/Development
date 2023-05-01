@@ -1,0 +1,22 @@
+title:
+server:
+  host: localhost
+  port:
+  cors:
+    dev: [localhost]
+    prod: [memegenerator.net, localhost]
+  # on dev, we're relaying requests to the production dbp/db
+  proxy:
+database:
+  connectionString: mongodb://localhost:27017
+  query:
+    max:
+      docs: 50
+analytics:
+  min:
+    elapsed: 50
+  database:
+    connectionString:
+      dev: mongodb://localhost:27017
+      prod: mongodb://localhost:47017
+    databaseName: MG2-Analytics

@@ -19,7 +19,7 @@ const traverse = function (
   traverse(obj, "", obj);
 };
 
-type ConfigPath = string | string[];
+type ConfigPaths = string | string[];
 
 interface ConfigurationOptions {
   quitIfChanged?: string[];
@@ -31,14 +31,33 @@ class Configuration {
   static environments = ["dev", "prod"];
   data: any;
 
-  static new(options: ConfigurationOptions = {}, configPath?: ConfigPath) {
+  static new(options: ConfigurationOptions = {}, configPaths?: ConfigPaths) {
     const config = new Configuration();
-    configPath = Configuration.getConfigPath(configPath);
-    console.log(`${configPath.green}`);
-    config.data = jsyaml.load(fs.readFileSync(configPath, "utf8")) as any;
-    // Some config values are environment specific
-    // Any value that is an object with a key that matches the environment
-    // will be replaced with the value of that key
+    configPaths = Configuration.getConfigPaths(configPaths);
+    console.log(`${configPaths.length} config file(s) found:`.gray);
+    configPaths.forEach((p) => console.log(`  ${p.toShortPath()}`.gray));
+    console.log();
+    // Load all config files into a single object
+    config.data = configPaths
+      .map((file) => {
+        // Read the YAML content
+        return { file, yaml: fs.readFileSync(file, "utf8") };
+      })
+      .map((cp) => {
+        // Parse the YAML content
+        return { ...cp, data: jsyaml.load(cp.yaml) as any };
+      })
+      .map((cp) =>
+        // Replace all relative paths with absolute paths
+        Object.assign(
+          cp.data,
+          Configuration.setAbsolutePaths(cp.file, cp.data, options)
+        )
+      )
+      // Merge all config files into a single object
+      .reduce((acc, cur) => ({ ...acc, ...cur }), {});
+
+    // Replace [dev] or [prod] with the current environment
     traverse(config.data, (node: any, key: string, value: any) => {
       if (typeof value === "object" && value !== null) {
         if (value[Configuration.environment]) {
@@ -47,26 +66,17 @@ class Configuration {
       }
     });
 
-    if (options.toAbsolutePaths?.length) {
-      // Convert all relative paths to absolute paths
-      traverse(config.data, (node: any, key: string, value: any) => {
-        if (typeof value === "string") {
-          if (options.toAbsolutePaths?.includes(key)) {
-            node[key] = path.resolve(path.dirname(configPath as string), value);
-          }
-        }
-      });
-    }
-
     if (options.quitIfChanged) {
       // If the source file or configuration file changes, exit the process (and restart from the cmd file)
-      [configPath, ...options.quitIfChanged].forEach((file) => {
-        console.log(`Watching ${file.getShortPath()}`);
+      [...configPaths, ...options.quitIfChanged].forEach((file) => {
+        console.log(`${`Watching`.gray} ${file.toShortPath()}`);
         fs.watchFile(file, () => {
           console.log(`${file.yellow} ${`changed, restarting...`.gray}`);
           process.exit();
         });
       });
+
+      console.log();
     }
 
     console.log(Configuration.toYaml(config.data).gray);
@@ -74,41 +84,58 @@ class Configuration {
     return config;
   }
 
+  static setAbsolutePaths(
+    configPath: string,
+    data: any,
+    options: ConfigurationOptions = {}
+  ) {
+    if (options.toAbsolutePaths?.length) {
+      // Convert all relative paths to absolute paths
+      traverse(data, (node: any, key: string, value: any) => {
+        if (typeof value === "string") {
+          if (options.toAbsolutePaths?.includes(key)) {
+            node[key] = path.resolve(path.dirname(configPath), value);
+          }
+        }
+      });
+    }
+  }
+
   static toYaml(config: any) {
     return jsyaml.dump(config);
   }
 
-  private static getConfigPath(configPath?: ConfigPath) {
+  private static getConfigPaths(configPaths?: ConfigPaths) {
     const isConfigPath = (filePath: string) => {
       if (filePath.endsWith(".config.yaml")) return true;
       if (path.basename(filePath) === "config.yaml") return true;
       return false;
     };
-    // If process.argv[] contains a config path, use it
-    const argConfigPath = process.argv.find(isConfigPath);
-    if (argConfigPath) return argConfigPath.toAbsolutePath(path);
+    // If process.argv[] contains config paths, use them
+    const argConfigPaths = process.argv.filter(isConfigPath);
+    if (argConfigPaths.length)
+      return argConfigPaths.map((p) => p.toAbsolutePath(path));
     // In case of string, return it
-    if (typeof configPath === "string") return configPath.toAbsolutePath(path);
-    // In case of string[], find the file that exists
-    if (Array.isArray(configPath)) {
-      for (const p of configPath) {
-        if (fs.existsSync(p.toAbsolutePath(path)))
-          return p.toAbsolutePath(path);
-      }
+    if (typeof configPaths === "string")
+      return [configPaths.toAbsolutePath(path)];
+    // In case of string[], find the files that exists
+    if (Array.isArray(configPaths)) {
+      return configPaths
+        .filter((p) => fs.existsSync(p.toAbsolutePath(path)))
+        .map((p) => p.toAbsolutePath(path));
     }
-    // If no config file specified in [process.argv] or [configPath],
+    // If no config file specified in [process.argv] or [configPaths],
     // try to find a config file in the current directory
     // (anything that ends with ".config.yaml" or "config.yaml")
-    const configPathCandidates = fs
+    const existingFiles = fs
       .readdirSync(process.cwd())
-      .filter(isConfigPath);
-    if (configPathCandidates.length == 1) return configPathCandidates[0];
-    if (configPathCandidates.length > 1)
-      throw new Error(
-        `Multiple config files found: ${configPathCandidates.join(", ")}`
-      );
+      .filter(isConfigPath)
+      .map((p) => p.toAbsolutePath(path));
+
+    if (existingFiles.length) return existingFiles;
+
     // If no config file found, throw an error
-    throw new Error(`Config file not found: ${configPath}`);
+    throw new Error(`Config file(s) not found: ${configPaths}`);
   }
 
   // static "environment" getter

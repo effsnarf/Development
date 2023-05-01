@@ -236,7 +236,7 @@ interface String {
   getColorCodesLength(): number;
   withoutColors(): string;
   toAddress(): Address;
-  getShortPath(): string;
+  toShortPath(): string;
   toAbsolutePath(path: any): string;
 }
 
@@ -379,7 +379,7 @@ if (typeof String !== "undefined") {
     return Converter.toAddress(this);
   };
 
-  String.prototype.getShortPath = function (): string {
+  String.prototype.toShortPath = function (): string {
     const path = this.toString().replace(/\\/g, "/");
     let parts = path.split("/");
     // Return the last 2 parts of the path
@@ -394,8 +394,9 @@ if (typeof String !== "undefined") {
   // Convert a relative path to an absolute path
   // If the path is already absolute, return it as is
   // If the path is relative, convert from the current working directory
+  // If the path contains ..\, resolve the path
   String.prototype.toAbsolutePath = function (path: any): string {
-    if (path.isAbsolute(this.toString())) return this.toString();
-    return path.join(process.cwd(), this.toString());
+    if (path.isAbsolute(this.toString())) return path.resolve(this.toString());
+    return path.resolve(path.join(process.cwd(), this.toString()));
   };
 }
