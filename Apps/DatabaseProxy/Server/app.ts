@@ -130,6 +130,8 @@ const init = (httpServer: express.Express) => {
     "/*.js",
     processRequest(async (req: any, res: any) => {
       const url = req.url;
+      // Response type
+      res.setHeader("Content-Type", "application/javascript");
       // If a .ts version exists, transpile it and return it
       const tsUrl = url.substring(0, url.length - 3) + ".ts";
       const tsFilePath = path.join(__dirname, "../Client", tsUrl.substring(1));
@@ -163,6 +165,8 @@ const init = (httpServer: express.Express) => {
   httpServer.get(
     "/:database",
     processRequest(async (req: any, res: any) => {
+      // Response type
+      res.setHeader("Content-Type", "application/json");
       // If database name has a dot, it's a file
       if (req.params.database.indexOf(".") > -1)
         return res.status(404).send(`File ${req.params.database} not found`);
@@ -184,6 +188,8 @@ const init = (httpServer: express.Express) => {
   httpServer.get(
     "/:database/api",
     processRequest(async (req: any, res: any) => {
+      // Response type
+      res.setHeader("Content-Type", "application/json");
       const db = await dbs.get(req.params.database);
       const apiMethods = await db?.find("_ApiMethods", {});
       const entityNames = apiMethods?.map((m: any) => m.entity).distinct();
@@ -215,6 +221,9 @@ const init = (httpServer: express.Express) => {
 
   // For /[database]/get/new/id, return a new unique ID
   httpServer.get("/:database/get/new/id", async (req: any, res: any) => {
+    // Response type
+    res.setHeader("Content-Type", "application/json");
+
     const count = parseInt(req.query.count || 1);
 
     const db = await dbs.get(req.params.database);
@@ -229,6 +238,9 @@ const init = (httpServer: express.Express) => {
   httpServer.get(
     "/:database/api/:entity/:group/:method",
     processRequest(async (req: any, res: any) => {
+      // Response type
+      res.setHeader("Content-Type", "application/json");
+
       const db = await dbs.get(req.params.database);
       const apiMethods = await db?.find("_ApiMethods", {
         entity: req.params.entity,
@@ -281,6 +293,9 @@ const init = (httpServer: express.Express) => {
   httpServer.get(
     "/:database/:entity",
     processRequest(async (req: any, res: any) => {
+      // Response type
+      res.setHeader("Content-Type", "application/json");
+
       const db = await dbs.get(req.params.database);
       const getArg = (name: string) => {
         if (req.query[name]) return JSON.parse(req.query[name]);
