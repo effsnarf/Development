@@ -473,7 +473,7 @@ if (typeof require != "undefined") {
       return result;
     };
     this.ensureNewIds = async () => {
-      let minNewIDs = 100;
+      let minNewIDs = 10;
       while (this.newIds.length < minNewIDs)
         this.newIds.push(
           ...(await this._getNewIDs(minNewIDs - this.newIds.length))
