@@ -465,7 +465,7 @@ if (typeof require != "undefined") {
         count || 1
       }&_u=${Date.now()}`;
       var result = await dbProxy.fetchUrlJson(url);
-      return result.id;
+      return result.id || result;
     };
     this._getNewIDs = async (count) => {
       var result = await this._getNewID(count);

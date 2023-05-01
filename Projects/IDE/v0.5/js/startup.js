@@ -93,15 +93,6 @@ const animateCSS = (element, animation, prefix = 'animate__') =>
 document.addEventListener("DOMContentLoaded", async function() {
 
 
-  window._mfq = window._mfq || [];
-  (function() {
-    var mf = document.createElement("script");
-    mf.type = "text/javascript"; mf.defer = true;
-    mf.src = "//cdn.mouseflow.com/projects/3cfe7b4a-ee7d-4306-a8b2-2d003d532862.js";
-    document.getElementsByTagName("head")[0].appendChild(mf);
-  })();
-
-
   Vue.component(`progress-bar`, {
     props: {
       value: {

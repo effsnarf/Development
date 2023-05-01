@@ -1,7 +1,7 @@
 import * as colors from "colors";
 import "../Shared/Extensions";
 import { Timer } from "../Shared/Timer";
-import { MongoClient } from "mongodb";
+import { MongoClient, ObjectId } from "mongodb";
 
 class MongoDatabase {
   private database: string;
@@ -138,6 +138,20 @@ class MongoDatabase {
     const result = await collection.countDocuments(query);
 
     return result;
+  }
+
+  async getNewIDs(count: number) {
+    const collection = await this.getCollection("_IdentityIntegers");
+
+    const result = await collection.findOneAndUpdate(
+      { _id: null } as any,
+      { $inc: { uniqueID: count } },
+      { upsert: true, returnOriginal: true } as any
+    );
+
+    const start = result.value?.uniqueID || 1;
+    // Return an array of IDs
+    return Array.from(Array(count).keys()).map((i) => start + i);
   }
 
   async getNewID() {
