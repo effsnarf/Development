@@ -213,7 +213,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
       masterFolder,
       nodeFolder,
       {
-        exclude: config.sync.exclude || [],
+        exclude: config.node.sync.exclude || [],
       },
       true,
       (progress, message) => {

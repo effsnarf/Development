@@ -12,3 +12,8 @@ nodes:
     process: ./Node2/start.cmd
 sync:
   exclude: [node_modules, config.yaml, nuxt.config.js, .nuxt, dist]
+analytics:
+  database:
+    prod:
+      connectionString: mongodb://localhost:47017
+      dbName: MG2-Analytics
