@@ -213,6 +213,18 @@ const init = (httpServer: express.Express) => {
     })
   );
 
+  // For /[database]/get/new/id, return a new unique ID
+  httpServer.get("/:database/get/new/id", async (req: any, res: any) => {
+    const count = parseInt(req.query.count || 1);
+
+    const db = await dbs.get(req.params.database);
+
+    // Get and inc [uniqueID] from _IdentityIntegers where _id = null
+    const ids = await db?.getNewIDs(count);
+
+    return res.send(JSON.stringify(ids));
+  });
+
   // For /[database]/api/[entity]/[group]/[method], execute the method
   httpServer.get(
     "/:database/api/:entity/:group/:method",
@@ -289,17 +301,6 @@ const init = (httpServer: express.Express) => {
       return res.send(items);
     })
   );
-
-  httpServer.get(":database/get/new/id", async (req: any, res: any) => {
-    const count = parseInt(req.query.count || 1);
-
-    const db = await dbs.get(req.params.database);
-
-    // Get and inc [uniqueID] from _IdentityIntegers where _id = null
-    const ids = await db?.getNewIDs(count);
-
-    return res.send(JSON.stringify(ids));
-  });
 };
 
 const start = () => {
