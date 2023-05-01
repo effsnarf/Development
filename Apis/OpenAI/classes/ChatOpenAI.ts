@@ -1,4 +1,4 @@
-import "../../Shared/Extensions";
+import "../../../Shared/Extensions";
 import * as colors from "colors";
 import fs from "fs";
 import * as yaml from "js-yaml";
@@ -85,12 +85,15 @@ class ChatOpenAI {
     this._log = log;
     this.role = role;
     this._openAI = OpenAI.new(log);
-    if (this._log)
-      console.log(colors.bgCyan.black(role.toString().shorten(100)));
+    if (this._log) {
+      console.log(role.toString().shorten(100).gray);
+      console.log();
+    }
   }
 
   public async send(message: string, maxReplyTokens?: number) {
     try {
+      if (this._log) console.log(message.cyan);
       this._messages.push({
         role: "user",
         content: JSON.stringify(message),
@@ -102,9 +105,9 @@ class ChatOpenAI {
       this._messages.push(responseMessage);
       return responseMessage.content;
     } catch (ex: any) {
-      console.log(colors.red(`An error occurred while sending a message:`));
+      console.log(`An error occurred while sending a message:`.bgRed);
       console.log(message.shorten(100));
-      console.log(colors.red(ex.toString()));
+      console.log(ex.toString().bgRed);
       console.log(this._messages.length);
       // Delete the last message
       this._messages.pop();

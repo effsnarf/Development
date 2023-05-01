@@ -1,3 +1,4 @@
+// #region 🛠 Utility
 if (typeof require != "undefined") {
     var fetch = require("node-fetch");
   }
@@ -11,14 +12,14 @@ if (typeof require != "undefined") {
       setTimeout(resolve, ms);
     });
   }
-  
-  
+    
   var _fetch = fetch;
   fetch = async (...args) => {
     var result = await _fetch(...args);
     return result;
   };
-  
+// #endregion
+
   var anat = anat || {};
   var dev = anat.dev || (anat.dev = {});
   
@@ -35,6 +36,7 @@ if (typeof require != "undefined") {
       error: [],
     };
   
+    // #region 🛠 Utility
     var traverse = (obj, callback, path, depth) => {
       if (!obj) return;
       if (typeof obj != "object") return;
@@ -108,6 +110,8 @@ if (typeof require != "undefined") {
         throw str;
       }
     };
+
+    // #endregion
   
     var StoreQueue = function () {
       this.items = {};
@@ -574,7 +578,7 @@ if (typeof require != "undefined") {
     };
   };
   
-
+// #region 📤 exports
   if (typeof(module) != `undefined`)
   {
     module.exports = async ({ app }, inject) => {
@@ -587,3 +591,4 @@ if (typeof require != "undefined") {
       inject("dbp", dbp);
     };
   }
+// #endregion

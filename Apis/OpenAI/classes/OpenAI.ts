@@ -3,7 +3,7 @@ const { encode, decode } = require("gpt-3-encoder");
 import axios, { AxiosResponse } from "axios";
 import * as colors from "colors";
 
-import { Loading } from "@shared/Loading";
+import { Loading } from "../../../Shared/Loading";
 
 interface Message {
   role: "user" | string;
@@ -118,9 +118,10 @@ class OpenAI {
       dataProps.prompt || dataProps.input || dataProps.messages || dataProps
     );
     const maxReplyTokens = this.maxTotalTokens - tokens;
-    console.log(
-      `Max reply tokens: ${maxReplyTokens} (${tokens} tokens used)`.gray
-    );
+    if (false)
+      console.log(
+        `Max reply tokens: ${maxReplyTokens} (${tokens} tokens used)`.gray
+      );
 
     const data = {
       model: model,
@@ -128,7 +129,7 @@ class OpenAI {
       ...dataProps,
     };
 
-    console.log(data.stringify().shorten(400));
+    if (false) console.log(data.stringify().shorten(400));
 
     const headers = {
       "Content-Type": "application/json",
@@ -165,7 +166,7 @@ class OpenAI {
       choices[0].message.content = choices[0].message.content.trim();
     let reply = (choices[0].text || choices[0].message) as T;
     this.log();
-    this.log(colors.green((reply as any)?.content || reply));
+    this.log(((reply as any)?.content || reply).green);
     return reply;
   }
 

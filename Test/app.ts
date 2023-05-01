@@ -1,11 +1,12 @@
 import path from "path";
 import fs from "fs";
 import "colors";
-//import "@/shared/Extensions";
+import "@shared/Extensions";
 import { Console } from "@shared/Console";
+import { ChatOpenAI, Roles } from "../apis/OpenAI/classes/ChatOpenAI";
 
-const console = Console.new();
+(async () => {
+  const chat = await ChatOpenAI.new(Roles.ChatGPT, true);
 
-console.log("test".green);
-
-//console.log((0.8).stringify("%"));
+  const reply = await chat.send("Hello, how are you?");
+})();

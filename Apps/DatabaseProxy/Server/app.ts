@@ -1,3 +1,6 @@
+// #region 🛠️ Setup
+
+// #region ⚙️ Imports
 import "colors";
 import path from "path";
 import fs from "fs";
@@ -10,11 +13,15 @@ import { Configuration } from "@shared/Configuration";
 import { TypeScript } from "@shared/TypeScript";
 import { Analytics } from "@shared/Analytics";
 import { MongoDatabase } from "@shared/MongoDatabase";
+// #endregion
 
+// #region 📝 Configuration
 const config = Configuration.new({
   quitIfChanged: [__filename.replace(".temp.ts", "")],
 }).data;
+// #endregion
 
+// #region 💻 Console
 const console = Console.new();
 
 console.header("Database Proxy".green);
@@ -23,7 +30,11 @@ console.header2(
     .split("\n")
     .map((s) => s.gray)
 );
+// #endregion
 
+// #endregion
+
+// #region 📦 Database
 const dbs = {
   _analytics: null as Analytics | null,
   _dbs: new Map<string, MongoDatabase>(),
@@ -59,9 +70,11 @@ const dbs = {
     return dbs._dbs.get(dbName);
   },
 };
+// #endregion
 
+// #region 🔍 Request Handling
 const init = (httpServer: express.Express) => {
-  // Allow CORS
+  // #region 🌐 CORS
   httpServer.use(function (req: any, res: any, next: any) {
     const allowedOrigins = config.server.cors
       .map((host: string) => [`https://${host}`, `http://${host}`])
@@ -75,7 +88,9 @@ const init = (httpServer: express.Express) => {
     res.header("Access-Control-Allow-Headers", "Content-Type");
     next();
   });
+  // #endregion
 
+  // #region 🔗 Proxy
   if (config.server.proxy) {
     // Proxy GET, POST and all requests to the host specified in config.server.proxy
     httpServer.all("*", (req: any, res: any) => {
@@ -114,7 +129,9 @@ const init = (httpServer: express.Express) => {
     });
     return;
   }
+  // #endregion
 
+  // #region processRequest() helper
   const processRequest = (handler: any) => {
     return async (req: any, res: any) => {
       try {
@@ -125,7 +142,9 @@ const init = (httpServer: express.Express) => {
       }
     };
   };
+  // #endregion
 
+  // #region 📝 File Transpilation
   httpServer.get(
     "/*.js",
     processRequest(async (req: any, res: any) => {
@@ -155,12 +174,14 @@ const init = (httpServer: express.Express) => {
       return res.send(jsCode);
     })
   );
+  // #endregion
 
   // For /, return "Add a database name to the URL: /[database]"
   httpServer.get("/", (req: any, res: any) => {
     return res.send("Add a database name to the URL: /[database]");
   });
 
+  // #region 📑 Entity Listing
   // For /[database], return the list of entities (collections)
   httpServer.get(
     "/:database",
@@ -183,6 +204,7 @@ const init = (httpServer: express.Express) => {
       return res.send(entities);
     })
   );
+  // #endregion
 
   // For /[database]/api, return {}
   httpServer.get(
@@ -289,6 +311,7 @@ const init = (httpServer: express.Express) => {
     })
   );
 
+  // #region 🔍 Document Retrieval
   // For /[database]/[entity]?find={...}, return the list of documents
   httpServer.get(
     "/:database/:entity",
@@ -316,8 +339,11 @@ const init = (httpServer: express.Express) => {
       return res.send(items);
     })
   );
+  // #endregion
 };
+// #endregion
 
+// #region 🚀 Start the server
 const start = () => {
   console.header(
     `HTTP server running on ${config.server.host.yellow}:${
@@ -338,3 +364,4 @@ const start = () => {
 process.title = config.title;
 
 start();
+// #endregion
