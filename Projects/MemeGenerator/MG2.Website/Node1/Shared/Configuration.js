@@ -38,7 +38,7 @@ const traverse = function (obj, onValue) {
     traverse(obj, "", obj);
 };
 class Configuration {
-    static new(configPath, options = {}) {
+    static new(options = {}, configPath) {
         const config = new Configuration();
         config.data = jsyaml.load(fs.readFileSync(configPath, "utf8"));
         // Some config values are environment specific

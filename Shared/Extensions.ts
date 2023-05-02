@@ -57,38 +57,12 @@ if (typeof Number !== "undefined") {
 //   };
 // }
 
-interface Address {
-  protocol: "http" | "https";
-  host: string;
-  port: number;
-}
-
-class Converter {
-  static toAddress(s: string | any): Address {
-    if (typeof s === "object")
-      return {
-        protocol: s.protocol || "http",
-        host: s.host,
-        port: s.port || 80,
-      };
-
-    const i = s.startsWith("http") ? 0 : -1;
-    const parts = s.split(":");
-    const protocol = i < 0 ? "http" : (parts[i + 0] as "http" | "https");
-    const host = parts[i + 1].replace("//", "");
-    const port = parseInt(parts[i + 2] || "80");
-    return { protocol, host, port };
-  }
-}
-
 interface Object {
   clone(): any;
   on(key: string, callback: (value: any) => void): void;
   traverse(onValue: (node: any, key: string, value: any) => void): void;
   toCamelCaseKeys(): any;
   stringify(): string;
-  stringifyAddress(): string;
-  toAddress(): Address;
   deepMerge(...objects: any[]): any;
 }
 
@@ -159,17 +133,6 @@ if (typeof Object !== "undefined") {
     return JSON.stringify(this);
   };
 
-  Object.prototype.stringifyAddress = function (): string {
-    const self = this as any;
-    return `${self.protocol.gray}${`://`.gray}${self.host.yellow}:${
-      self.port.toString().green
-    }`;
-  };
-
-  Object.prototype.toAddress = function (): Address {
-    return Converter.toAddress(this);
-  };
-
   Object.prototype.deepMerge = function (...objects: any[]): any {
     const deepMerge = (target: any, source: any) => {
       if (typeof target !== "object" || typeof source !== "object") {
@@ -199,6 +162,7 @@ interface Array<T> {
   sum(): number;
   last(): any;
   distinct(project?: ((item: T) => any) | null): T[];
+  except(...items: T[]): T[];
   stringify(): string;
 }
 
@@ -239,6 +203,10 @@ if (typeof Array !== "undefined") {
     return result;
   };
 
+  Array.prototype.except = function (...items: any[]) {
+    return this.filter((item) => !items.includes(item));
+  };
+
   Array.prototype.stringify = function (): any {
     return JSON.stringify(this);
   };
@@ -260,7 +228,6 @@ interface String {
   getCharsCount(): number;
   getColorCodesLength(): number;
   withoutColors(): string;
-  toAddress(): Address;
   toShortPath(): string;
   toAbsolutePath(path: any): string;
 }
@@ -398,10 +365,6 @@ if (typeof String !== "undefined") {
 
   String.prototype.withoutColors = function (): string {
     return this.replace(/\x1b\[[0-9;]*m/g, "");
-  };
-
-  String.prototype.toAddress = function () {
-    return Converter.toAddress(this);
   };
 
   String.prototype.toShortPath = function (): string {

@@ -16,7 +16,7 @@ export default {
     }
   },
   async mounted() {
-    const api = await ApifyClient.createClasses(`http://localhost:3009/api`);
+    const api = await Apify.Client.createClasses(`http://localhost:3009/api`);
     const db = (await api.Database.new());
 
     let teasers = await db.getThreadTeasers();

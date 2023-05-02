@@ -484,7 +484,7 @@ if (typeof require != "undefined") {
         );
       setTimeout(this.ensureNewIds, 200);
     };
-    this.ensureNewIds();
+    //this.ensureNewIds();
   
     this.logout = async () => {
       var url = `${dbProxy.urlBase}/logout`;
@@ -497,7 +497,7 @@ if (typeof require != "undefined") {
         id: async () => {
           var self = this;
           var tryToResolve = (resolve) => {
-            if (!self.newIds.length) return null;
+            if (!self.newIds.length) throw "No new ids available";
             var newID = self.newIds.splice(0, 1)[0];
             resolve(newID);
             return newID;

@@ -3,6 +3,7 @@ import fs from "fs";
 import "colors";
 import http from "http";
 import axios, { AxiosResponse, AxiosResponseHeaders } from "axios";
+import { Types } from "./Types";
 import { Process } from "./Process";
 import { Events } from "./Events";
 import { HealthMonitor } from "./HealthMonitor";
@@ -10,7 +11,7 @@ import { Timer, IntervalCounter } from "./Timer";
 
 interface Node {
   name: string;
-  address: Address;
+  address: Types.Address;
   process: Process;
   enabled: boolean;
   health: HealthMonitor;
@@ -101,6 +102,11 @@ interface IncomingItem {
   response: http.ServerResponse;
 }
 
+interface LoadBalancerOptions {
+  address: Types.Address;
+  cors: string[];
+}
+
 class IncomingItemCollection {
   private items: IncomingItem[] = [];
 
@@ -166,10 +172,10 @@ class LoadBalancer {
     10
   );
 
-  constructor(private address: Address) {}
+  constructor(private options: LoadBalancerOptions) {}
 
-  static new(address: string | Address) {
-    return new LoadBalancer(address.toAddress());
+  static new(options: LoadBalancerOptions) {
+    return new LoadBalancer(options);
   }
 
   addNode(node: Node) {
@@ -397,9 +403,21 @@ class LoadBalancer {
 
   start() {
     const server = http.createServer(this.handleRequest.bind(this));
-    server.listen(this.address.port, this.address.host, () => {
+    // CORS
+    if (this.options?.cors?.length) {
+      server.on("request", (req, res) => {
+        for (const origin in this.options.cors) {
+          res.setHeader("Access-Control-Allow-Origin", origin);
+        }
+      });
+    }
+
+    server.listen(this.options.address.port, this.options.address.host, () => {
       this.logText(
-        `Load balancer started on ${`${this.address.stringifyAddress()}`}`
+        `Load balancer started on ${`${Types.stringify(
+          this.options.address,
+          "Address"
+        )}`}`
       );
     });
   }

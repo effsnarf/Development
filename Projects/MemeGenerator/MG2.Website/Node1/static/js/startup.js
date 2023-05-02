@@ -60,7 +60,7 @@ const initApi = (async() => {
 
   const capturedUiEvents = ["click", "wheel", "keypress"];
 
-  const apify = (await ApifyClient.createClasses("/api"));
+  const apify = (await Apify.Client.createClasses("/api"));
   const analytics = (await apify.Analytics.new());
 
   if (window.location.pathname.startsWith("/admin")) {
@@ -124,7 +124,7 @@ const initApi = (async() => {
 
 
 
-when(() => (window.ApifyClient), initApi);
+when(() => (window.Apify.Client), initApi);
 
 
 window.dataLayer = window.dataLayer || [];

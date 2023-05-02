@@ -1,5 +1,6 @@
 import path from "path";
 import "@shared/Extensions";
+import { Types } from "@shared/Types";
 import { Configuration } from "@shared/Configuration";
 import { Files } from "@shared/Files";
 import { Analytics } from "@shared/Analytics";
@@ -18,13 +19,8 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   const config = Configuration.new({
     quitIfChanged: [__filename.replace(".temp.ts", "")],
     toAbsolutePaths: ["process"],
+    types: Types,
   }).data;
-
-  config.traverse((node: any, key: string, value: any) => {
-    if (key == "address") {
-      node[key] = value.toAddress();
-    }
-  });
 
   const getIncomingLogTitle = (
     count: number = 0,
@@ -66,7 +62,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   };
 
   // Create the load balancer
-  const loadBalancer = LoadBalancer.new(config.incoming.address);
+  const loadBalancer = LoadBalancer.new(config.incoming);
 
   // Create the main log
   const mainLog = Log.new(getIncomingLogTitle());

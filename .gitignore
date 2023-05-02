@@ -131,3 +131,4 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+/Projects/MemeGenerator/MG2.Website/Node2

@@ -24,19 +24,28 @@ type ConfigPaths = string | string[];
 interface ConfigurationOptions {
   quitIfChanged?: string[];
   toAbsolutePaths?: string[];
+  types?: any;
+  log?: boolean;
 }
 
 class Configuration {
   static _environment: string | undefined;
   static environments = ["dev", "prod"];
+  options: ConfigurationOptions;
   data: any;
 
+  constructor(options: ConfigurationOptions) {
+    if (!options) options = {};
+    if (!("log" in options)) options.log = true;
+    this.options = options;
+  }
+
   static new(options: ConfigurationOptions = {}, configPaths?: ConfigPaths) {
-    const config = new Configuration();
+    const config = new Configuration(options);
     configPaths = Configuration.getConfigPaths(configPaths);
-    console.log(`${configPaths.length} config file(s) found:`.gray);
-    configPaths.forEach((p) => console.log(`  ${p.toShortPath()}`.gray));
-    console.log();
+    config.log(`${configPaths.length} config file(s) found:`.gray);
+    configPaths.forEach((p) => config.log(`  ${p.toShortPath()}`.gray));
+    config.log();
     // Load all config files into a single object
     config.data = configPaths
       .map((file) => {
@@ -57,29 +66,56 @@ class Configuration {
       // Merge all config files into a single object
       .reduce((acc, cur) => cur.deepMerge(acc), {});
 
-    // Replace [dev] or [prod] with the current environment
+    // Process the config object tree
     traverse(config.data, (node: any, key: string, value: any) => {
+      const env = Configuration.getEnvironment(options);
       if (typeof value === "object" && value !== null) {
-        if (value[Configuration.environment]) {
-          node[key] = value[Configuration.environment];
+        // Replace [dev] or [prod] with the current environment
+        if (value[env]) {
+          node[key] = value[env];
+        }
+        // Remove other environment keys
+        for (const otherEnv of Configuration.environments.except(env)) {
+          delete value[otherEnv];
+        }
+        // Remove empty objects
+        if (Object.keys(value).length == 0) {
+          node[key] = null;
         }
       }
     });
 
+    if (options?.types) {
+      traverse(config.data, (node: any, key: string, value: any) => {
+        // Types could be:
+        // { Address: {}, }
+        // If any key matches a type name, convert the object to that type
+        const typeNames = Object.keys(options.types.Convert);
+        for (const typeName of typeNames) {
+          if (key.toLowerCase() === typeName.toLowerCase()) {
+            console.log(`Converting ${key} to ${typeName}`.gray);
+            console.log(value);
+            node[key] = options.types.Convert[typeName].from.any(value);
+            console.log(node[key]);
+          }
+        }
+      });
+    }
+
     if (options.quitIfChanged) {
       // If the source file or configuration file changes, exit the process (and restart from the cmd file)
       [...configPaths, ...options.quitIfChanged].forEach((file) => {
-        console.log(`${`Watching`.gray} ${file.toShortPath()}`);
+        config.log(`${`Watching`.gray} ${file.toShortPath()}`);
         fs.watchFile(file, () => {
-          console.log(`${file.yellow} ${`changed, restarting...`.gray}`);
+          config.log(`${file.yellow} ${`changed, restarting...`.gray}`);
           process.exit();
         });
       });
 
-      console.log();
+      config.log();
     }
 
-    console.log(Configuration.toYaml(config.data).gray);
+    config.log(Configuration.toYaml(config.data).gray);
 
     return config;
   }
@@ -139,16 +175,23 @@ class Configuration {
   }
 
   // static "environment" getter
-  static get environment() {
+  static getEnvironment(options: ConfigurationOptions) {
     if (Configuration._environment) return Configuration._environment;
     let env = (process.env.NODE_ENV || "dev") as string | undefined;
     // If env starts with ["dev", "prod"], replace it with the first match
     env = Configuration.environments.find((e) => env?.startsWith(e));
     Configuration._environment = env;
-    console.log(`Environment is ${env?.yellow}`.gray);
-    console.log();
+    if (options.log) {
+      console.log(`Environment is ${env?.yellow}`.gray);
+      console.log();
+    }
     if (env) return env;
     throw new Error(`Invalid environment: ${env}`);
+  }
+
+  private log(...args: any[]) {
+    if (!this.options.log) return;
+    console.log(...args);
   }
 }
 

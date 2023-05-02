@@ -4,10 +4,10 @@ import "../../Shared/Extensions";
 import { TimeSpan } from "../../Shared/TimeSpan";
 import { Configuration } from "../../Shared/Configuration";
 import { MongoDatabase } from "../../Shared/MongoDatabase";
-import { Apify } from "../../Shared/Apify/Apify";
+import { Apify } from "../../../../../../Shared/Apify";
 import { Analytics } from "../../Shared/Analytics";
 
-const config = Configuration.new(path.join(__dirname, "../../config.yaml")).data;
+const config = Configuration.new({ log: false }, path.join(__dirname, "../../config.yaml")).data;
 
 Analytics.defaults.connectionString = config.database.analytics.connectionString;
 Analytics.defaults.database = config.database.analytics.name;
@@ -18,7 +18,7 @@ const analyticsApify = new Apify.Server(
   null,
   "/",
   [Analytics],
-  "../../Shared/Apify",
+  "../../../../Shared/Apify",
   { singletons: ["Analytics"] }
 );
 

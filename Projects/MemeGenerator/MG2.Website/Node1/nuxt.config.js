@@ -40,7 +40,6 @@ export default {
     ],
     script: [
       { src: `https://www.googletagmanager.com/gtag/js?id=G-P952PRPTTR`, async: true },
-      { src: `/js/startup.js` },
       { src: `https://code.jquery.com/jquery-3.6.1.js` },
       { src: `${envPort}://${dbProxyHost}/utility.js` },
       { src: `/api/client.js` },
@@ -54,6 +53,7 @@ export default {
       },
       { async: true, src: `https://static.addtoany.com/menu/page.js` },
       //{ src: "/js/startup.js", body: true },
+      { src: `/js/startup.js` },
     ],
     link: [
       { rel: "icon", type: "image/x-icon", href: "/img/favicon.ico" },

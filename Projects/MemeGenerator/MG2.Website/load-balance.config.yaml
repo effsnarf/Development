@@ -3,6 +3,7 @@ incoming:
   address:
     dev: localhost:5050
     prod: 10.35.16.35:80
+  cors: [http://localhost:5050]
 nodes:
   - name: MG.Website 1
     address: localhost:5051

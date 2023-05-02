@@ -1,5 +1,6 @@
 interface MethodSignature {
   name: string;
+  modifiers?: string[];
   args: string[];
 }
 
@@ -32,6 +33,16 @@ class Reflection {
         methods.push({
           name: key,
           args: Reflection.getFunctionArgs(cls.prototype[key]),
+        });
+      }
+    }
+    // Get static methods
+    for (let key of Object.getOwnPropertyNames(cls)) {
+      if (typeof (cls as any)[key] === "function") {
+        methods.push({
+          name: key,
+          modifiers: ["static"],
+          args: Reflection.getFunctionArgs((cls as any)[key]),
         });
       }
     }

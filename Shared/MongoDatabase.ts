@@ -180,11 +180,17 @@ class MongoDatabase {
   }
 
   private static async getDatabaseNames(connectionString: string) {
-    const client = new MongoClient(connectionString);
-    await client.connect();
-    const databases = await client.db().admin().listDatabases();
-    await client.close();
-    return databases.databases.map((d) => d.name);
+    try {
+      const client = new MongoClient(connectionString);
+      await client.connect();
+      const databases = await client.db().admin().listDatabases();
+      await client.close();
+      return databases.databases.map((d) => d.name);
+    } catch (ex: any) {
+      console.log("Connection string: ");
+      console.log(connectionString);
+      throw ex;
+    }
   }
 
   private removeDollarSigns(obj: any) {

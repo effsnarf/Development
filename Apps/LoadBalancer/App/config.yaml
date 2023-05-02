@@ -1,6 +1,8 @@
 incoming:
-  host: localhost
-  port: 3000
+  address:
+    host: localhost
+    port: 3000
+  cors: []
 nodes:
   - name: Website 1
     protocol: https
