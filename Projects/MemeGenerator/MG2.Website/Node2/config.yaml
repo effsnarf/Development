@@ -1,9 +1,0 @@
-database:
-  content:
-    name: MemeGenerator
-    connectionString: mongodb://localhost:27017
-  analytics:
-    name: MG2-Analytics
-    connectionString:
-      dev: mongodb://localhost:27017
-      prod: mongodb://localhost:47017
