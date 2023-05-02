@@ -406,7 +406,7 @@ class LoadBalancer {
     // CORS
     if (this.options?.cors?.length) {
       server.on("request", (req, res) => {
-        for (const origin in this.options.cors) {
+        for (const origin of this.options.cors) {
           res.setHeader("Access-Control-Allow-Origin", origin);
         }
       });
