@@ -313,6 +313,13 @@ class LoadBalancer {
   private async processIncomingItem(incomingItem: IncomingItem) {
     const { request, response, nodeItem } = incomingItem;
 
+    // CORS
+    if (this.options?.cors?.length) {
+      for (const origin of this.options.cors) {
+        response.setHeader("Access-Control-Allow-Origin", origin);
+      }
+    }
+
     incomingItem.isProcessing = true;
 
     incomingItem.nodeItem;
@@ -403,14 +410,6 @@ class LoadBalancer {
 
   start() {
     const server = http.createServer(this.handleRequest.bind(this));
-    // CORS
-    if (this.options?.cors?.length) {
-      server.on("request", (req, res) => {
-        for (const origin of this.options.cors) {
-          res.setHeader("Access-Control-Allow-Origin", origin);
-        }
-      });
-    }
 
     server.listen(this.options.address.port, this.options.address.host, () => {
       this.logText(

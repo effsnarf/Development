@@ -75,13 +75,13 @@ class Process {
         await this.killProcessTree(processID);
         this.process = null;
       } catch (ex: any) {
-        this.emit("log", {
-          text: `${
+        this.log(
+          `${
             `Failed to kill (pid ${processID}) ${
               ` ${this.title} `.bgWhite.black
             }`.bgRed
-          }`,
-        });
+          }`
+        );
         this.log(ex.toString().bgRed);
         return;
       }
