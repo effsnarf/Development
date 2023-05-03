@@ -1,7 +1,6 @@
 // #region 🛠️ Setup
 
 // #region ⚙️ Imports
-import * as yaml from "js-yaml";
 import "colors";
 import path from "path";
 import fs from "fs";
