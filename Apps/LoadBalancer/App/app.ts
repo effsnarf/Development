@@ -157,7 +157,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
           `Node ${index}: Health < ${config.node.restart.health}%`.bgRed
         );
         mainLog.log(`Node ${index}: Restarting..`.bgRed);
-        loadBalancer.restartNode(index);
+        //loadBalancer.restartNode(index);
       }
     }
   );

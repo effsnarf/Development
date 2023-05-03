@@ -40,12 +40,6 @@ class NodeSwitcher {
     );
     node.health.on("successRate", (successRate) => {
       this.emitNodeEvent(node, "successRate", successRate);
-      if (successRate < 0.5) {
-        //this.log({
-        //  text: `${node.name} is unhealthy, restarting..`.bgRed,
-        //});
-        //node.process.restart();
-      }
     });
   }
 
