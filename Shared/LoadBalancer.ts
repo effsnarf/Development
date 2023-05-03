@@ -361,9 +361,9 @@ class LoadBalancer {
     this.nodeSwitcher.toggleEnabled(nodeIndex);
   }
 
-  restartNode(nodeIndex: number) {
+  async restartNode(nodeIndex: number) {
     const node = this.getNode(nodeIndex);
-    node.process.restart();
+    await node.process.restart();
   }
 
   // Convert milliseconds number to [seconds]s.

@@ -14,3 +14,7 @@ nodes:
     host: localhost
     port: 80
     enabled: false
+node:
+  restart:
+    health: 0.5 # Restart the node if the health is below 50%
+    timeout: 5 # and it has been unhealthy for 5 minutes

@@ -2,20 +2,26 @@ import path from "path";
 import fs from "fs";
 import "colors";
 import "@shared/Extensions";
-import { TreeScript } from "@shared/TreeScript";
+import { Configuration } from "@shared/Configuration";
+import { TreeScript } from "@shared/TreeScript/TreeScript";
 import { Apify } from "@shared/Apify";
 import { Console } from "@shared/Console";
 import { ChatOpenAI, Roles } from "../apis/OpenAI/classes/ChatOpenAI";
 
-const trsSource = path.resolve(
+const treeScriptConfig = Configuration.new(
+  undefined,
+  "@shared/TreeScript/TreeScript.config.yaml"
+).data;
+
+const treeScriptSource = path.resolve(
   __dirname,
   "../Apps/DatabaseProxy/Server/app.ts.yaml"
 );
 
-const source = fs.readFileSync(trsSource, "utf8");
-const trs = TreeScript.new(source);
+const source = fs.readFileSync(treeScriptSource, "utf8");
+const trs = TreeScript.new(source, treeScriptConfig);
 
-console.log(trs.yaml);
+console.log(trs.compile());
 
 process.exit();
 

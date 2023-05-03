@@ -93,8 +93,6 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
     incomingItemsLog,
     counterLog,
   ]);
-  // Add the main log
-  layout.addColumn(Unit.box("0%", "50%", "40%", "50%"), [mainLog]);
   // Add the nodes
   layout.addRow(
     Unit.box("40%", "0%", "100%", "50%"),
@@ -106,6 +104,8 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
     [nodeLogs[1], healthBars[1]],
     ["50%", "10%"]
   );
+  // Add the main log
+  layout.addColumn(Unit.box("0%", "50%", "40%", "50%"), [mainLog]);
 
   console.clear();
   setInterval(layout.render.bind(layout), 1000 / 1);
@@ -140,11 +140,25 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   loadBalancer.events.on(
     "node-successRate",
     (index: number, successRate: number) => {
+      // Update the node title
       nodeLogs[index].title = getNodeLogTitle(
         loadBalancer.getNode(index),
         successRate
       );
+      // Update the node health bar
       healthBars[index].value = successRate;
+      // If the node is unhealthy, restart it
+      if (
+        successRate < config.node.restart.health &&
+        loadBalancer.getNode(index).process.started <
+          Date.now() - config.node.restart.timeout * 60 * 1000
+      ) {
+        mainLog.log(
+          `Node ${index}: Health < ${config.node.restart.health}%`.bgRed
+        );
+        mainLog.log(`Node ${index}: Restarting..`.bgRed);
+        loadBalancer.restartNode(index);
+      }
     }
   );
   // Update the node status (enabled/disabled) in the dashboard
@@ -184,7 +198,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
     Console.on.key(char, (char: string) =>
       loadBalancer.toggleNodeEnabled(parseInt(char) - 1)
     );
-    Console.on.key(shift12345678.charAt(i), (char: string) => {
+    Console.on.key(shift12345678.charAt(i), async (char: string) => {
       const index = [...shift12345678].findIndex((c) => c == char);
       loadBalancer.restartNode(index);
     });
