@@ -13,3 +13,7 @@ nodes:
     process: .\Node2\start.cmd
 sync:
   exclude: [node_modules, config.yaml, nuxt.config.js, .nuxt, dist]
+node:
+  restart:
+    health: 0.5 # Restart the node if the health is below 50%
+    timeout: 5 # and it has been unhealthy for 5 minutes

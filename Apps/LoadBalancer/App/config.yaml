@@ -14,6 +14,8 @@ nodes:
     host: localhost
     port: 80
     enabled: false
+sync:
+  exclude: [node_modules, config.yaml, nuxt.config.js, .nuxt, dist]
 node:
   restart:
     health: 0.5 # Restart the node if the health is below 50%
