@@ -1,9 +1,33 @@
+const is = (value: any, type: any) => {
+  switch (type) {
+    case String:
+      return typeof value === "string" || value instanceof String;
+    case Number:
+      return typeof value === "number" && isFinite(value);
+    case Boolean:
+      return typeof value === "boolean";
+    case Array:
+      return Array.isArray(value);
+    case Object:
+      return (
+        value !== null && typeof value === "object" && !Array.isArray(value)
+      );
+    default:
+      return value instanceof type;
+  }
+};
+
 interface Number {
+  is(type: any): boolean;
   stringify(unit: string, places?: number): string;
   severity(green: number, yellow: number): string;
 }
 
 if (typeof Number !== "undefined") {
+  Number.prototype.is = function (type: any): boolean {
+    return is(this, type);
+  };
+
   Number.prototype.stringify = function (
     unit: string,
     places?: number
@@ -58,6 +82,7 @@ if (typeof Number !== "undefined") {
 // }
 
 interface Object {
+  is(type: any): boolean;
   clone(): any;
   on(key: string, callback: (value: any) => void): void;
   traverse(onValue: (node: any, key: string, value: any) => void): void;
@@ -67,6 +92,10 @@ interface Object {
 }
 
 if (typeof Object !== "undefined") {
+  Object.prototype.is = function (type: any): boolean {
+    return is(this, type);
+  };
+
   Object.prototype.clone = function () {
     return JSON.parse(JSON.stringify(this));
   };
@@ -167,10 +196,15 @@ interface Array<T> {
 }
 
 interface Function {
+  is(type: any): boolean;
   getArgumentNames(): string[];
 }
 
 if (typeof Function !== "undefined") {
+  Function.prototype.is = function (type: any): boolean {
+    return is(this, type);
+  };
+
   Function.prototype.getArgumentNames = function () {
     const code = this.toString();
     const args = code
@@ -213,6 +247,7 @@ if (typeof Array !== "undefined") {
 }
 
 interface String {
+  is(type: any): boolean;
   sliceChars(start: number | undefined, end?: number | undefined): string;
   alignRight(): string;
   shorten(maxLength: number): string;
@@ -233,6 +268,10 @@ interface String {
 }
 
 if (typeof String !== "undefined") {
+  String.prototype.is = function (type: any): boolean {
+    return is(this, type);
+  };
+
   // Slice a string by character count instead of by byte count
   // Copies color codes too but doesn't count them in the character count
   String.prototype.sliceChars = function (

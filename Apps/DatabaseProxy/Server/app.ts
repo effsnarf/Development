@@ -1,6 +1,7 @@
 // #region 🛠️ Setup
 
 // #region ⚙️ Imports
+import * as yaml from "js-yaml";
 import "colors";
 import path from "path";
 import fs from "fs";
@@ -138,7 +139,7 @@ const init = (httpServer: express.Express) => {
         await handler(req, res);
       } catch (ex: any) {
         console.error(ex);
-        res.status(500).send(ex.message);
+        res.status(500).send(ex.stack);
       }
     };
   };
@@ -148,12 +149,16 @@ const init = (httpServer: express.Express) => {
   httpServer.get(
     "/*.js",
     processRequest(async (req: any, res: any) => {
-      const url = req.url;
       // Response type
       res.setHeader("Content-Type", "application/javascript");
+      const fileName = req.url.substring(1);
       // If a .ts version exists, transpile it and return it
-      const tsUrl = url.substring(0, url.length - 3) + ".ts";
-      const tsFilePath = path.join(__dirname, "../Client", tsUrl.substring(1));
+      const tsUrl = req.url.substring(0, req.url.length - 3) + ".ts";
+      const tsFilePath = path.join(
+        __dirname,
+        "../Client",
+        fileName.replace(/\.js$/, ".ts")
+      );
       if (fs.existsSync(tsFilePath)) {
         // Read the TypeScript file
         const tsCode = fs.readFileSync(tsFilePath, "utf8");
@@ -162,16 +167,16 @@ const init = (httpServer: express.Express) => {
         // Return the JavaScript code
         return res.send(jsCode);
       }
-      const fileName = url.substring(1);
       // Get [__dirname]/Client/[fileName].js
-      const filePath = path.join(__dirname, "../Client", fileName);
+      const jsFilePath = path.join(__dirname, "../Client", fileName);
+      if (fs.existsSync(jsFilePath)) {
+        // Read the JavaScript file
+        const jsCode = fs.readFileSync(jsFilePath, "utf8");
+        // Return the JavaScript code
+        return res.send(jsCode);
+      }
       // If the file doesn't exist, return 404
-      if (!fs.existsSync(filePath))
-        return res.status(404).send(`${filePath} not found`);
-      // Read the TypeScript file
-      const jsCode = fs.readFileSync(filePath, "utf8");
-      // Return the JavaScript code
-      return res.send(jsCode);
+      return res.status(404).send(`${jsFilePath} not found`);
     })
   );
   // #endregion
@@ -271,11 +276,10 @@ const init = (httpServer: express.Express) => {
       });
       if (!apiMethods?.length) return res.status(404).send("Method not found");
       const apiMethod = apiMethods[0];
-      const func = eval(
-        `async (db, db${req.params.entity}, axios, ${apiMethod.args.join(
-          ", "
-        )}) => { ${apiMethod.code} }`
-      );
+      const funcStr = `async (db, db${
+        req.params.entity
+      }, axios, ${apiMethod.args.join(", ")}) => { ${apiMethod.code} }`;
+      const func = eval(funcStr);
       const collection = await db?.getCollection(req.params.entity);
       const args = apiMethod.args.map((arg: any) =>
         JSON.parse(req.query[arg] || "null")
@@ -283,8 +287,10 @@ const init = (httpServer: express.Express) => {
 
       const start = Date.now();
 
+      let result: any;
+
       try {
-        const result = await func(db, collection, axios, ...args);
+        result = await func(db, collection, axios, ...args);
 
         const elapsed = Date.now() - start;
 
@@ -306,7 +312,13 @@ const init = (httpServer: express.Express) => {
 
         return res.send(result);
       } catch (ex: any) {
-        return res.status(500).send(ex.message);
+        return res
+          .status(500)
+          .send(
+            `${args}\n\n${funcStr}\n\n${JSON.stringify(
+              apiMethod
+            )}\n\n${result}\n\n${ex.stack}`
+          );
       }
     })
   );

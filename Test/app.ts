@@ -2,19 +2,20 @@ import path from "path";
 import fs from "fs";
 import "colors";
 import "@shared/Extensions";
-import { Apify } from "@shared/Apify/Apify";
+import { TreeScript } from "@shared/TreeScript";
+import { Apify } from "@shared/Apify";
 import { Console } from "@shared/Console";
 import { ChatOpenAI, Roles } from "../apis/OpenAI/classes/ChatOpenAI";
 
-const apify = new Apify.Server(
-  "localhost",
-  80,
-  "/",
-  [ChatOpenAI],
-  path.join(__dirname, "../Shared/Apify")
+const trsSource = path.resolve(
+  __dirname,
+  "../Apps/DatabaseProxy/Server/app.ts.yaml"
 );
 
-console.log(apify.getApifyClientSourceJs());
+const source = fs.readFileSync(trsSource, "utf8");
+const trs = TreeScript.new(source);
+
+console.log(trs.yaml);
 
 process.exit();
 
