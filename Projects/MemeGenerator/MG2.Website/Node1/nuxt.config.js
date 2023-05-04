@@ -5,8 +5,7 @@ import * as yaml from "js-yaml";
 const isDevEnv = (process.env.NODE_ENV != 'production');
 const envPort = isDevEnv ? 'http' : 'https';
 const dbProxyHost = isDevEnv ? 'localhost:4040' : 'db.memegenerator.net';
-const config = yaml.load(path.resolve(__dirname, 'config.yaml'));
-
+const config = yaml.load(fs.readFileSync(path.resolve(__dirname, 'config.yaml'), 'utf8'));
 export default {
   ssr: false,
 
