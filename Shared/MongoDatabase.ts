@@ -28,7 +28,7 @@ class MongoDatabase {
       connectionString
     );
     if (!databaseNames.find((d) => d === database)) {
-      throw new Error(`Database ${database} not found.`);
+      throw new Error(`Database ${database} not found (${connectionString})).`);
     }
 
     const db = new MongoDatabase(connectionString, database);
