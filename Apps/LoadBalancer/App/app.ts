@@ -110,6 +110,28 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   console.clear();
   setInterval(layout.render.bind(layout), 1000 / 1);
 
+  const checkNodes = () => {
+    return;
+    const nodes = loadBalancer.getNodes();
+    for (let i = 0; i < nodes.length; i++) {
+      const node = nodes[i];
+      // If the node is unhealthy, restart it
+      if (
+        node.health.successRate < config.node.restart.health &&
+        loadBalancer.getNode(i).process.started <
+          Date.now() - config.node.restart.timeout * 60 * 1000
+      ) {
+        mainLog.log(
+          `Node ${i + 1}: Health < ${
+            `${Math.round(config.node.restart.health * 100)}%`.bgWhite
+          }`.bgRed
+        );
+        mainLog.log(`Node ${i + 1}: Restarting..`.bgRed);
+        //loadBalancer.restartNode(i);
+      }
+    }
+  };
+
   // Connect the load balancer to the dashboard
   // Log events in the dashboard
   loadBalancer.events.on("log", (data: any) => {
@@ -124,7 +146,6 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   });
   // Update incoming items count in the dashboard
   loadBalancer.events.on("incoming-items", (count: any) => {
-    if (count > 20) process.exit();
     const title = getIncomingLogTitle(
       count,
       loadBalancer.stats.requests.per.second.count,
@@ -147,20 +168,10 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
       );
       // Update the node health bar
       healthBars[index].value = successRate;
-      // If the node is unhealthy, restart it
-      if (
-        successRate < config.node.restart.health &&
-        loadBalancer.getNode(index).process.started <
-          Date.now() - config.node.restart.timeout * 60 * 1000
-      ) {
-        mainLog.log(
-          `Node ${index}: Health < ${config.node.restart.health}%`.bgRed
-        );
-        mainLog.log(`Node ${index}: Restarting..`.bgRed);
-        //loadBalancer.restartNode(index);
-      }
     }
   );
+  // Every minute, check the nodes' health
+  setInterval(checkNodes, 60 * 1000);
   // Update the node status (enabled/disabled) in the dashboard
   loadBalancer.events.on("node-enabled", (index: number, enabled: boolean) => {
     nodeLogs[index].options.isDimmed = !enabled;

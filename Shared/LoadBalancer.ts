@@ -47,6 +47,10 @@ class NodeSwitcher {
     return this.nodes[index];
   }
 
+  getNodes() {
+    return this.nodes;
+  }
+
   emitNodeEvent(node: Node, event: string, data: any) {
     const index = this.nodes.indexOf(node);
     this.events.emit(`node-${event}`, index, data);
@@ -180,6 +184,10 @@ class LoadBalancer {
 
   getNode(index: number) {
     return this.nodeSwitcher.get(index);
+  }
+
+  getNodes() {
+    return this.nodeSwitcher.getNodes();
   }
 
   ignoreRequest(request: http.IncomingMessage) {

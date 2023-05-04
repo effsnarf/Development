@@ -36,6 +36,15 @@ namespace Types {
         },
       },
     },
+    date: {
+      from: {
+        wmic: (wmicDateStr: string) => {
+          const dateStr = wmicDateStr.slice(0, 14);
+          const dateObj = new Date(Date.parse(dateStr));
+          return dateObj;
+        },
+      },
+    },
   };
 
   export function stringify(obj: any, typeName?: string) {
