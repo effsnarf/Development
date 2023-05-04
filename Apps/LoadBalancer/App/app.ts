@@ -157,7 +157,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
     counterLog.text =
       loadBalancer.stats.requests.per.minute.count.toLocaleString();
     // Set the console window title
-    process.title = `${config.title} (${count})`;
+    process.title = `${config.title} (${loadBalancer.stats.requests.per.minute.count})`;
   });
   // Update health check status in the dashboard
   loadBalancer.events.on(
