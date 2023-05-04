@@ -1,30 +1,16 @@
 import path from "path";
 import fs from "fs";
+import * as yaml from "js-yaml";
 
 const isDevEnv = (process.env.NODE_ENV != 'production');
 const envPort = isDevEnv ? 'http' : 'https';
 const dbProxyHost = isDevEnv ? 'localhost:4040' : 'db.memegenerator.net';
+const config = yaml.load(path.resolve(__dirname, 'config.yaml'));
 
 export default {
   ssr: false,
 
-  ...isDevEnv ?
-  {
-    server: {
-      host: `localhost`,
-      port: 5051,
-    }
-  } :
-  {
-    server: {
-      host: `localhost`,
-      port: 5051,
-      // https: {
-      //   key: fs.readFileSync(path.resolve(__dirname, './ssl/memegenerator.net.key')),
-      //   cert: fs.readFileSync(path.resolve(__dirname, './ssl/memegenerator.net.crt'))
-      // }
-    }
-  },
+  server: config.server,
 
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {

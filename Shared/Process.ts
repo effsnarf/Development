@@ -2,30 +2,45 @@ const treeKill = require("tree-kill");
 const path = require("path");
 import { exec } from "child_process";
 import { Events } from "./Events";
+import { Types } from "./Types";
+
+interface ProcessInfo {
+  pid: number;
+  creationDate: Date;
+  commandLine: string;
+}
 
 class Process {
   private uniqueID = `uniqueID(${Math.random().toString(36).substring(2, 15)})`;
-  started!: number;
+  started: number = 0;
   process: any;
 
   private constructor(
     private title: string,
     private path: string,
     private events?: Events
-  ) {
-    // process.on("exit", () => {
-    //   if (!this.process) {
-    //     this.emit("log", {
-    //       text: `Exiting ${this.path}, killing process ${title.green}`,
-    //     });
-    //     this.process.kill();
-    //   }
-    // });
-  }
+  ) {}
 
-  static start(title: string, path: string, events?: Events) {
+  static async start(title: string, path: string, events?: Events) {
     const proc = Process.new(title, path, events);
-    proc.restart();
+    const existingProcess = await Process.findProcess(path);
+    if (existingProcess) {
+      proc.started = existingProcess.creationDate.valueOf();
+      // Extract the uniqueID from the command line
+      const uniqueID = existingProcess.commandLine
+        .split(" ")
+        .find((s: string) => s.startsWith("uniqueID("));
+      if (!uniqueID) throw new Error("Failed to find uniqueID");
+      proc.uniqueID = uniqueID;
+      const timespan = (Date.now() - proc.started) / 1000;
+      proc.log(
+        `${title.green} is already running (pid ${
+          existingProcess.pid
+        }) (${timespan.stringify(`m`)}min)`
+      );
+    } else {
+      proc.restart();
+    }
     return proc;
   }
 
@@ -69,15 +84,15 @@ class Process {
   async stop() {
     // If the process is running
     if (this.process) {
-      const processID = await this.getProcessID();
-      this.log(`Restarting ${this.title.green} (pid ${processID})..`);
+      const processInfo = await this.getProcessInfo();
+      this.log(`Restarting ${this.title.green} (pid ${processInfo.pid})..`);
       try {
-        await this.killProcessTree(processID);
+        await this.killProcessTree(processInfo.pid);
         this.process = null;
       } catch (ex: any) {
         this.log(
           `${
-            `Failed to kill (pid ${processID}) ${
+            `Failed to kill (pid ${processInfo.pid}) ${
               ` ${this.title} `.bgWhite.black
             }`.bgRed
           }`
@@ -86,6 +101,10 @@ class Process {
         return;
       }
     }
+  }
+
+  async isRunning() {
+    return await this.getProcessInfo();
   }
 
   private killProcessTree(pid: number) {
@@ -100,19 +119,32 @@ class Process {
     });
   }
 
-  private async getProcessID(): Promise<number> {
+  private async getProcessInfo(): Promise<ProcessInfo> {
+    return await Process.findProcess(this.uniqueID);
+  }
+
+  static async findProcess(commandLine: string): Promise<ProcessInfo> {
+    const cmd = `wmic process where "CommandLine like '%${commandLine}%' and Name='cmd.exe'" get ProcessId,CreationDate,CommandLine /format:csv`;
+    const output = await Process.execute(cmd);
+    const lines = output
+      .split("\r\n")
+      .filter((line: string) => line.trim()?.length)
+      .filter((line: string) => !line.includes("wmic process"));
+    const columns = lines[lines.length - 1].split(/,(?=\S)/);
+    return {
+      pid: parseInt(columns[columns.length - 1]),
+      creationDate: Types.Convert.date.from.wmic(columns[columns.length - 2]),
+      commandLine: columns[columns.length - 3],
+    } as ProcessInfo;
+  }
+
+  static async execute(command: string): Promise<string> {
     return new Promise((resolve, reject) => {
-      const cmd = `wmic process where "CommandLine like '%${this.uniqueID}%' and Name='cmd.exe'" get ProcessId,CommandLine /format:csv`;
-      const child = exec(cmd, (error, stdout, stderr) => {
+      const child = exec(command, (error: any, stdout, stderr) => {
         if (error) {
           reject(error);
         } else {
-          const lines = stdout
-            .split("\r\n")
-            .filter((line) => line.trim()?.length)
-            .filter((line) => !line.includes("wmic process"));
-          const columns = lines[lines.length - 1].split(/,(?=\S)/);
-          resolve(parseInt(columns[columns.length - 1]));
+          resolve(stdout);
         }
       });
     });

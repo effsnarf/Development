@@ -44,6 +44,8 @@ if (typeof Number !== "undefined") {
       return `${bar}${empty} ${value.stringify("%").withoutColors()}`;
     }
     if (unit == "s") value = value / 1000;
+    if (unit == "m") value = value / 1000 / 60;
+
     const isNegative = value < 0;
     const absValue = Math.abs(value);
     const isInteger = absValue % 1 === 0;
