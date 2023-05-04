@@ -108,7 +108,14 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   layout.addColumn(Unit.box("0%", "50%", "40%", "50%"), [mainLog]);
 
   console.clear();
-  setInterval(layout.render.bind(layout), 1000 / 1);
+
+  // Render the dashboard
+  const renderDashboard = () => {
+    layout.render();
+    // Set the console window title
+    process.title = `${config.title} (${loadBalancer.stats.requests.per.minute.count})`;
+  };
+  setInterval(renderDashboard, 1000 / 1);
 
   const checkNodes = () => {
     return;
@@ -156,8 +163,6 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
     loadBalancer.stats.requests.per.second.count.toLocaleString();
     counterLog.text =
       loadBalancer.stats.requests.per.minute.count.toLocaleString();
-    // Set the console window title
-    process.title = `${config.title} (${loadBalancer.stats.requests.per.minute.count})`;
   });
   // Update health check status in the dashboard
   loadBalancer.events.on(
