@@ -163,7 +163,7 @@ class MongoDatabase {
       { upsert: true, returnOriginal: false } as any
     );
 
-    return result.value?.UniqueID || 1;
+    return result.value?.uniqueID || 1;
   }
 
   async getCollectionNames() {
