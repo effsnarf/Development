@@ -9,14 +9,6 @@ import { Apify } from "@shared/Apify";
 import { Console } from "@shared/Console";
 import { ChatOpenAI, Roles } from "../apis/OpenAI/classes/ChatOpenAI";
 
-const s = `Hello, ${"world".green}! This is ${"TreeScript".bgYellow.black}!`;
-
-console.log(s.colorsToHandleBars());
-
-console.log(s.colorsToHandleBars().handleBarsColorsToHtml());
-
-process.exit();
-
 const treeScriptConfig = Configuration.new(
   undefined,
   "@shared/TreeScript/TreeScript.config.yaml"
@@ -24,7 +16,8 @@ const treeScriptConfig = Configuration.new(
 
 const treeScriptSource = path.resolve(
   __dirname,
-  "../Apps/DatabaseProxy/Server/app.ts.yaml"
+  "../Projects/MemeGenerator/MG2.Website/Node1/api.yaml"
+  //"../Apps/DatabaseProxy/Server/app.ts.yaml"
 );
 
 const source = fs.readFileSync(treeScriptSource, "utf8");

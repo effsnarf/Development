@@ -1,11 +1,15 @@
 import * as yaml from "js-yaml";
 import "../Extensions";
 import { Configuration } from "../Configuration";
-import Handlebars from "handlebars";
 
 enum NodeType {
   CodeBlock,
   CodeTemplate,
+}
+
+interface TreeScriptSource {
+  data: any;
+  templates: any;
 }
 
 interface CodeTemplate {
@@ -14,12 +18,17 @@ interface CodeTemplate {
 }
 
 class TreeScript {
-  public tree: any;
+  public source: TreeScriptSource;
   public yaml: string;
 
-  private constructor(private source: string, private config: any) {
-    this.tree = this.parse(source);
-    this.yaml = yaml.dump(this.tree);
+  private static handlebarsOptions = {
+    // Prevents handlebars from escaping HTML
+    noEscape: true,
+  };
+
+  private constructor(source: string, private config: any) {
+    this.source = yaml.load(source) as TreeScriptSource;
+    this.yaml = yaml.dump(this.source);
   }
 
   static new(source: string, config: any) {
@@ -27,26 +36,60 @@ class TreeScript {
   }
 
   compile() {
-    return this.compileNode(this.tree).join("\n");
+    const handlebars = require("handlebars");
+    // Register the code templates (helpers)
+    Object.entries(this.source.templates).forEach((entry) => {
+      const templateName = entry[0];
+      const code = entry[1] as any;
+      if (code.is(String)) {
+        handlebars.registerHelper(templateName, (context: any) => {
+          return handlebars.compile(
+            code,
+            TreeScript.handlebarsOptions
+          )(context);
+        });
+        return;
+      }
+      if (code.args)
+        handlebars.registerHelper(templateName, (...argValues: any[]) => {
+          const args = {} as any;
+          code.args.forEach((argName: string, index: number) => {
+            args[argName] = argValues[index];
+          });
+          //console.log(args);
+          return handlebars.compile(
+            code.code,
+            TreeScript.handlebarsOptions
+          )(args) as string;
+        });
+    });
+
+    const output = handlebars.compile(
+      this.source.templates.main,
+      TreeScript.handlebarsOptions
+    )(this.source.data);
+    return output;
+    //return this.compileNode(this.source).join("\n");
   }
 
-  private compileNode(node: any) {
-    if (node.is(Array)) return node.map((item: any) => this.compileNode(item));
+  private compileNode(handlebars: any, node: any) {
+    if (node.is(Array))
+      return node.map((item: any) => this.compileNode(handlebars, item));
     // Detect the node type
     const nodeType = this.getNodeType(node);
     switch (nodeType) {
       case NodeType.CodeTemplate:
-        return this.compileCodeTemplate(node);
+        return this.compileCodeTemplate(handlebars, node);
     }
   }
 
-  private compileCodeTemplate(node: any) {
+  private compileCodeTemplate(handlebars: any, node: any) {
     const nodeKey = Object.keys(node)[0];
     const nodeValue = node[nodeKey];
     const codeTemplate = this.getCodeTemplate(node);
     if (!codeTemplate) return null;
     console.log(nodeValue);
-    return Handlebars.compile(codeTemplate.template)(nodeValue);
+    return handlebars.compile(codeTemplate.template)(nodeValue);
   }
 
   private getNodeType(node: any) {
@@ -83,7 +126,7 @@ class TreeScript {
           // If the YAML compiled branch is still a string, it's not a TreeScript.
           if (branch.is(String)) return;
           // Replace the string with the compiled branch.
-          node[key] = new TreeScript(value, this.config).tree;
+          node[key] = new TreeScript(value, this.config).source;
         } catch (ex) {
           if (ex instanceof yaml.YAMLException) {
             // Ignore this error, it's probably not a TreeScript.
@@ -99,7 +142,7 @@ class TreeScript {
   private static tryParse(value: any, config: Configuration) {
     if (!value?.is(String)) return value;
     try {
-      return new TreeScript(value, config).tree;
+      return new TreeScript(value, config).source;
     } catch (ex) {
       if (ex instanceof yaml.YAMLException) {
         // Ignore this error, it's probably not a TreeScript.

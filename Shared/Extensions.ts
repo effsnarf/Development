@@ -396,6 +396,10 @@ if (typeof String !== "undefined") {
         .replace(/&#(\d+);/g, (match: any, dec: any) =>
           String.fromCharCode(dec)
         )
+        // Replace &#x[number]; with the unicode character
+        .replace(/&#x([0-9a-f]+);/gi, (match: any, hex: any) =>
+          String.fromCharCode(parseInt(hex, 16))
+        )
     );
   };
 

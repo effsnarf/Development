@@ -1,4 +1,6 @@
-- http-server:
+# TreeScript
+data:
+  httpServer:
     varName: dbProxyServer
     config: config.server
     routes:
@@ -47,3 +49,19 @@
               );
           - return res.send(entities);
       /:database/api:
+templates:
+  main: | #ts
+    {{httpServer httpServer}}
+  httpServer: | #ts
+    // Create the express app
+    const {{varName}} = express();
+    {{varName}}.use(express.json());
+
+    {{#each routes}}
+    {{../varName}}.get("{{@key}}", (req: any, res: any) => {
+      // Handle the route
+    });
+    {{/each}}
+
+    // Start the server
+    {{varName}}.listen({{config.server.port}}, {{config.server.host}});
