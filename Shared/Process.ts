@@ -11,7 +11,7 @@ interface ProcessInfo {
 }
 
 class Process {
-  private uniqueID = `uniqueID(${Math.random().toString(36).substring(2, 15)})`;
+  private uniqueID;
   started: number = 0;
   process: any;
 
@@ -19,7 +19,9 @@ class Process {
     private title: string,
     private path: string,
     private events?: Events
-  ) {}
+  ) {
+    this.uniqueID = `uniqueID(${this.title})`;
+  }
 
   static async start(title: string, path: string, events?: Events) {
     const proc = Process.new(title, path, events);
@@ -85,7 +87,8 @@ class Process {
     // If the process is running
     if (this.process) {
       const processInfo = await this.getProcessInfo();
-      this.log(`Restarting ${this.title.green} (pid ${processInfo.pid})..`);
+      if (!processInfo) return;
+      this.log(`Stopping ${this.title.green} (pid ${processInfo.pid})..`);
       try {
         await this.killProcessTree(processInfo.pid);
         this.process = null;
@@ -119,11 +122,11 @@ class Process {
     });
   }
 
-  private async getProcessInfo(): Promise<ProcessInfo> {
+  private async getProcessInfo(): Promise<ProcessInfo | null> {
     return await Process.findProcess(this.uniqueID);
   }
 
-  static async findProcess(commandLine: string): Promise<ProcessInfo> {
+  static async findProcess(commandLine: string): Promise<ProcessInfo | null> {
     const cmd = `wmic process where "CommandLine like '%${commandLine}%' and Name='cmd.exe'" get ProcessId,CreationDate,CommandLine /format:csv`;
     const output = await Process.execute(cmd);
     const lines = output
@@ -131,8 +134,10 @@ class Process {
       .filter((line: string) => line.trim()?.length)
       .filter((line: string) => !line.includes("wmic process"));
     const columns = lines[lines.length - 1].split(/,(?=\S)/);
+    const pid = parseInt(columns[columns.length - 1]);
+    if (!pid) return null;
     return {
-      pid: parseInt(columns[columns.length - 1]),
+      pid,
       creationDate: Types.Convert.date.from.wmic(columns[columns.length - 2]),
       commandLine: columns[columns.length - 3],
     } as ProcessInfo;

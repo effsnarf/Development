@@ -118,7 +118,6 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   setInterval(renderDashboard, 1000 / 1);
 
   const checkNodes = () => {
-    return;
     const nodes = loadBalancer.getNodes();
     for (let i = 0; i < nodes.length; i++) {
       const node = nodes[i];
@@ -130,11 +129,11 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
       ) {
         mainLog.log(
           `Node ${i + 1}: Health < ${
-            `${Math.round(config.node.restart.health * 100)}%`.bgWhite
+            `${Math.round(config.node.restart.health * 100)}%`.bgWhite.black
           }`.bgRed
         );
         mainLog.log(`Node ${i + 1}: Restarting..`.bgRed);
-        //loadBalancer.restartNode(i);
+        loadBalancer.restartNode(i);
       }
     }
   };
@@ -178,7 +177,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
     }
   );
   // Every minute, check the nodes' health
-  setInterval(checkNodes, 60 * 1000);
+  setInterval(checkNodes, 10 * 1000);
   // Update the node status (enabled/disabled) in the dashboard
   loadBalancer.events.on("node-enabled", (index: number, enabled: boolean) => {
     nodeLogs[index].options.isDimmed = !enabled;
@@ -203,6 +202,27 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
           rtpm.average
         );
       }, 60 * 1000);
+      // Every second, track long running incoming items in analytics
+      setInterval(() => {
+        const items = loadBalancer.incomingItems
+          .getItems()
+          .filter((item: IncomingItem) => (Date.now() - item.dt) / 1000 > 5)
+          .sort((a: IncomingItem, b: IncomingItem) => b.dt - a.dt)
+          .map((item: IncomingItem) => {
+            return {
+              dt: {
+                started: item.dt,
+                elapsed: Date.now() - item.dt,
+              },
+              isProcessing: item.isProcessing,
+              attempt: item.attempt,
+              url: item.request.url,
+            };
+          });
+        for (const item of items) {
+          analytics.create("loadBalancer", "processing", item);
+        }
+      }, 1000);
     })();
   }
 

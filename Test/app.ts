@@ -1,3 +1,4 @@
+const util = require("util");
 import path from "path";
 import fs from "fs";
 import "colors";
@@ -7,6 +8,14 @@ import { TreeScript } from "@shared/TreeScript/TreeScript";
 import { Apify } from "@shared/Apify";
 import { Console } from "@shared/Console";
 import { ChatOpenAI, Roles } from "../apis/OpenAI/classes/ChatOpenAI";
+
+const s = `Hello, ${"world".green}! This is ${"TreeScript".bgYellow.black}!`;
+
+console.log(s.colorsToHandleBars());
+
+console.log(s.colorsToHandleBars().handleBarsColorsToHtml());
+
+process.exit();
 
 const treeScriptConfig = Configuration.new(
   undefined,

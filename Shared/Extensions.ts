@@ -1,3 +1,56 @@
+const colorCodes = {
+  codeToColor: {
+    "0": "reset",
+    "1": "bright",
+    "2": "dim",
+    "4": "underscore",
+    "5": "blink",
+    "7": "reverse",
+    "8": "hidden",
+    "30": "black",
+    "31": "red",
+    "32": "green",
+    "33": "yellow",
+    "34": "blue",
+    "35": "magenta",
+    "36": "cyan",
+    "37": "white",
+    "40": "bgBlack",
+    "41": "bgRed",
+    "42": "bgGreen",
+    "43": "bgYellow",
+    "44": "bgBlue",
+    "45": "bgMagenta",
+    "46": "bgCyan",
+    "47": "bgWhite",
+  } as any,
+  colorToCode: {
+    reset: "0",
+    bright: "1",
+    dim: "2",
+    underscore: "4",
+    blink: "5",
+    reverse: "7",
+    hidden: "8",
+    black: "30",
+    red: "31",
+    green: "32",
+    yellow: "33",
+    blue: "34",
+    magenta: "35",
+    cyan: "36",
+    white: "37",
+    bgBlack: "40",
+    bgRed: "41",
+    bgGreen: "42",
+    bgYellow: "43",
+    bgBlue: "44",
+    bgMagenta: "45",
+    bgCyan: "46",
+    bgWhite: "47",
+  } as any,
+};
+
 const is = (value: any, type: any) => {
   switch (type) {
     case String:
@@ -265,6 +318,10 @@ interface String {
   getCharsCount(): number;
   getColorCodesLength(): number;
   withoutColors(): string;
+  showColorCodes(): string;
+  colorsToHandleBars(): string;
+  handleBarsColorsToHtml(): string;
+  colorsToHtml(): string;
   toShortPath(): string;
   toAbsolutePath(path: any): string;
 }
@@ -406,6 +463,49 @@ if (typeof String !== "undefined") {
 
   String.prototype.withoutColors = function (): string {
     return this.replace(/\x1b\[[0-9;]*m/g, "");
+  };
+
+  String.prototype.showColorCodes = function (): string {
+    return this.replace(/\x1B\[/g, "\\x1B[");
+  };
+
+  String.prototype.colorsToHandleBars = function (): string {
+    // Create a regular expression pattern to match each console color escape sequence and replace it with the corresponding handlebars-style syntax
+    const pattern = /\x1B\[(\d+)m(.+?)\x1B\[(\d+)m/g;
+    const result = this.replace(
+      pattern,
+      (match: any, colorCode: string, content: string) => {
+        const colorName = colorCodes.codeToColor[colorCode];
+        if (colorName) {
+          return `{{#${colorName}}}${content}{{/${colorName}}}`;
+        } else {
+          return content;
+        }
+      }
+    );
+
+    if (result.includes("\x1B")) {
+      return result.colorsToHandleBars();
+    }
+
+    return result;
+  };
+
+  String.prototype.handleBarsColorsToHtml = function (): string {
+    const pattern = /\{\{\#([^\{\}]*?)\}\}([\s\S]*?)\{\{\/\1\}\}/g;
+    const result = this.replace(pattern, (match, color, content) => {
+      if (!colorCodes.colorToCode[color]) return content;
+      return `<span class="${color}">${content.handleBarsColorsToHtml()}</span>`;
+    });
+    // If pattern is found, call the function recursively
+    if (result.match(pattern)) {
+      return result.handleBarsColorsToHtml();
+    }
+    return result;
+  };
+
+  String.prototype.colorsToHtml = function (): string {
+    return this.colorsToHandleBars().handleBarsColorsToHtml();
   };
 
   String.prototype.toShortPath = function (): string {
