@@ -159,7 +159,7 @@ class MongoDatabase {
 
     const result = await collection.findOneAndUpdate(
       { name: "global.unique.id" },
-      { $inc: { UniqueID: 1 } },
+      { $inc: { uniqueID: 1 } },
       { upsert: true, returnOriginal: false } as any
     );
 
