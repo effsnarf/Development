@@ -6,7 +6,7 @@
 <component is="mg2-user-menu" class=""></component>
 <component url="/create/generator" is="mg2-link" class="">
 <template >
-<span class="flex button justify-around">
+<span class="hidden flex button justify-around">
 <span class="">👤</span>
 <span class="">Create a Meme</span>
 <span class="">➕</span></span></template></component></div>
