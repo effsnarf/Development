@@ -40,7 +40,7 @@ const pathFilterToFunction = (filter: PathFilter) => {
 };
 
 class Files {
-  static async SyncFolders(
+  static async syncFolders(
     master: string,
     clone: string,
     filter: PathFilter,
@@ -109,7 +109,7 @@ class Files {
               );
             }
 
-            await Files.SyncFolders(
+            await Files.syncFolders(
               masterPath,
               clonePath,
               filter,
@@ -129,7 +129,7 @@ class Files {
           }
 
           // Copy the file if the master and clone files are not equal
-          if (!Files.AreFilesEqual(masterPath, clonePath)) {
+          if (!Files.areFilesEqual(masterPath, clonePath)) {
             fs.copyFileSync(masterPath, clonePath);
             progress.data.modifieds.push(clonePath);
             onProgress(
@@ -185,7 +185,7 @@ class Files {
 
   // If their size is different, they are not equal
   // If their size is the same, compare their contents
-  static AreFilesEqual(path1: string, path2: string): boolean {
+  static areFilesEqual(path1: string, path2: string): boolean {
     const stats1 = fs.statSync(path1);
     const stats2 = fs.statSync(path2);
 

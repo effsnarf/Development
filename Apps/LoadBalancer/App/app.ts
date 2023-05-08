@@ -117,7 +117,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   };
   setInterval(renderDashboard, 1000 / 1);
 
-  const checkNodesAgain = (interval: number) => {
+  const checkNodesAgain = async (interval: number) => {
     const nodes = loadBalancer.getNodes();
     for (let i = 0; i < nodes.length; i++) {
       const node = nodes[i];
@@ -133,6 +133,8 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
           }`.bgRed
         );
         mainLog.log(`Node ${i + 1}: Restarting..`.bgRed);
+
+        await syncNodeVersions(config.nodes[0], config.nodes[i]);
         loadBalancer.restartNode(i);
       }
     }
@@ -242,6 +244,8 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
     );
     Console.on.key(shift12345678.charAt(i), async (char: string) => {
       const index = [...shift12345678].findIndex((c) => c == char);
+
+      await syncNodeVersions(config.nodes[0], config.nodes[index]);
       loadBalancer.restartNode(index);
     });
   }
@@ -261,7 +265,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
     if (masterFolder == nodeFolder) return;
     mainLog.log(`Syncing ${masterNode.name.green} <- ${cloneNode.name.yellow}`);
 
-    await Files.SyncFolders(
+    await Files.syncFolders(
       masterFolder,
       nodeFolder,
       {
