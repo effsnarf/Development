@@ -117,7 +117,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   };
   setInterval(renderDashboard, 1000 / 1);
 
-  const checkNodes = () => {
+  const checkNodesAgain = (interval: number) => {
     const nodes = loadBalancer.getNodes();
     for (let i = 0; i < nodes.length; i++) {
       const node = nodes[i];
@@ -136,6 +136,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
         loadBalancer.restartNode(i);
       }
     }
+    setTimeout(checkNodesAgain, interval);
   };
 
   // Connect the load balancer to the dashboard
@@ -176,8 +177,11 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
       healthBars[index].value = successRate;
     }
   );
-  // Every minute, check the nodes' health
-  setInterval(checkNodes, 10 * 1000);
+  // Check the nodes' health periodically
+  const interval = 10 * 1000;
+  setTimeout(() => {
+    checkNodesAgain(interval);
+  }, interval);
   // Update the node status (enabled/disabled) in the dashboard
   loadBalancer.events.on("node-enabled", (index: number, enabled: boolean) => {
     nodeLogs[index].options.isDimmed = !enabled;
