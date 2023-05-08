@@ -16,7 +16,7 @@ sync:
 node:
   restart:
     health: 0.5 # Restart the node if the health is below 50%
-    timeout: 1 # and it has been unhealthy for N minutes
+    timeout: 5 # and it has been unhealthy for N minutes
 request:
   timeout: 10 # Timeout requests after 10 seconds
 analytics:
