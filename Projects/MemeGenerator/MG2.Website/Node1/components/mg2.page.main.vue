@@ -20,7 +20,7 @@
 <template v-slot:body="" class="">
 <div class="mb-l3">
 <transition name="slide-in-list" class="">
-<component v-if="(pageName == `create-generator`)" is="mg2-generator-create" class=""></component></transition>
+<component v-if="(false) && (pageName == `create-generator`)" is="mg2-generator-create" class=""></component></transition>
 <component :instance="instance" v-if="showInstance" is="mg2-instance" class=""></component></div>
 <component :get-items="getStreamItems" :selected-item="selectedItem" ref="stream1" @scroll="onScroll" @items-changed="onGalleryStreamItemsChanged" is="mg2-gallery-infinite-scroll" class=""></component></template></component></div>
 </template>
