@@ -103,6 +103,9 @@ interface IncomingItem {
 interface LoadBalancerOptions {
   address: Types.Address;
   cors: string[];
+  request: {
+    timeout: number;
+  };
 }
 
 class IncomingItemCollection {
@@ -343,6 +346,7 @@ class LoadBalancer {
         // We want to proxy the request as-is,
         // let the client handle the redirects
         maxRedirects: 0,
+        timeout: this.options.request?.timeout || 0,
       });
 
       timer.stop();
