@@ -21,4 +21,4 @@ analytics:
     elapsed: 50
   database:
     connectionString: mongodb://localhost:27017
-    databaseName: MG2-Analytics
+    databaseName: MG-Analytics
