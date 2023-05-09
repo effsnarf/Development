@@ -9,21 +9,18 @@ import { Apify } from "@shared/Apify";
 import { Console } from "@shared/Console";
 import { ChatOpenAI, Roles } from "../apis/OpenAI/classes/ChatOpenAI";
 
-const treeScriptConfig = Configuration.new(
-  undefined,
-  "@shared/TreeScript/TreeScript.config.yaml"
-).data;
-
-const treeScriptSource = path.resolve(
+const tsSourcePath = path.resolve(
   __dirname,
-  "../Projects/MemeGenerator/MG2.Website/Node1/api.yaml"
-  //"../Apps/DatabaseProxy/Server/app.ts.yaml"
+  "../Shared/TreeScript/test.ts.yaml"
 );
 
-const source = fs.readFileSync(treeScriptSource, "utf8");
-const trs = TreeScript.new(source, treeScriptConfig);
+const source = fs.readFileSync(tsSourcePath, "utf8");
+const trs = TreeScript.new(source);
 
-console.log(trs.compile());
+console.log(tsSourcePath.toShortPath());
+console.log();
+
+console.log(trs.output);
 
 process.exit();
 
