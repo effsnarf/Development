@@ -76,6 +76,8 @@ export default async function (req, res, next) {
       return;
     }
 
+    // /events?filter={e:"visit","v.dt.end":{$gte:1600000000000}}
+
     // /Instances/[sinceMinutes]/[intervalMinutes]
     if (req.url.startsWith("/instances"))
     {

@@ -4,12 +4,16 @@ import { Types } from "@shared/Types";
 import { Configuration } from "@shared/Configuration";
 import { Console } from "@shared/Console";
 
-const config = Configuration.new({
-  quitIfChanged: [__filename.replace(".temp.ts", "")],
-  toAbsolutePaths: [],
-  types: Types,
-}).data;
+(async () => {
+  const config = (
+    await Configuration.new({
+      quitIfChanged: [__filename.replace(".temp.ts", "")],
+      toAbsolutePaths: [],
+      types: Types,
+    })
+  ).data;
 
-const console = Console.new();
+  const console = Console.new();
 
-console.log("Hello from TypeScript!");
+  console.log("Hello from TypeScript!");
+})();
