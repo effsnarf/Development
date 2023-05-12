@@ -3,6 +3,8 @@ import path from "path";
 import * as colors from "colors";
 import * as fs from "fs";
 import * as jsyaml from "js-yaml";
+import { ChatOpenAI, Roles } from "../Apis/OpenAI/classes/ChatOpenAI";
+import { OsTempFolderCache } from "./Cache";
 
 const traverse = function (
   obj: any,
@@ -40,7 +42,10 @@ class Configuration {
     this.options = options;
   }
 
-  static new(options: ConfigurationOptions = {}, configPaths?: ConfigPaths) {
+  static async new(
+    options: ConfigurationOptions = {},
+    configPaths?: ConfigPaths
+  ) {
     const config = new Configuration(options);
     configPaths = Configuration.getConfigPaths(configPaths);
     config.log(`${configPaths.length} config file(s) found:`.gray);
@@ -85,6 +90,7 @@ class Configuration {
       }
     });
 
+    // Convert any types
     if (options?.types) {
       traverse(config.data, (node: any, key: string, value: any) => {
         // Types could be:
@@ -102,6 +108,16 @@ class Configuration {
       });
     }
 
+    // Evaluate any functions
+    traverse(config.data, (node: any, key: string, value: any) => {
+      if (typeof value === "string") {
+        if (value.startsWith("(env) => ")) {
+          const func = eval(value);
+          node[key] = func.apply(null, [{ process, path }]);
+        }
+      }
+    });
+
     if (options.quitIfChanged) {
       // If the source file or configuration file changes, exit the process (and restart from the cmd file)
       [...configPaths, ...options.quitIfChanged].forEach((file) => {
@@ -115,9 +131,33 @@ class Configuration {
       config.log();
     }
 
-    config.log(Configuration.toYaml(config.data).gray);
+    const yaml = Configuration.toYaml(config.data);
+
+    const desc = await Configuration.getConfigDescription(yaml);
+
+    config.log(desc);
 
     return config;
+  }
+
+  private static async getConfigDescription(yaml: string) {
+    const cache = new OsTempFolderCache();
+
+    const desc = await cache.get(yaml, async () => {
+      const aiTaskDesc = `this is a configuration file for my app
+      write it in human terms in several very short and concise bullets (*) that can be shown when the app starts, as if you were the app ("* starting http server on port.. * analytics database: [dbname]" etc)
+      wrap important things (db names, host names, ports, etc) in yellow (ex: {{#yellow}}text{{/yellow}}).`;
+
+      const chat = await ChatOpenAI.new(Roles.ChatGPT, false);
+
+      const desc = (
+        await chat.send(`${aiTaskDesc}\n\n${yaml}`)
+      ).handlebarsColorsToConsole();
+
+      return desc;
+    });
+
+    return desc;
   }
 
   static setAbsolutePaths(
@@ -138,6 +178,17 @@ class Configuration {
   }
 
   static toYaml(config: any) {
+    // Replace any functions with their string representation
+    // (so that they can be saved to YAML)
+    // Clone the config object
+    config = config.clone();
+    // Convert any functions to strings
+    traverse(config, (node: any, key: string, value: any) => {
+      if (typeof value === "function") {
+        node[key] = value.toString();
+      }
+    });
+    // Convert the config object to YAML
     return jsyaml.dump(config);
   }
 

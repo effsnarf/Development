@@ -7,9 +7,14 @@ const path = require("path");
 class FileSystemDatabase extends Database {
   private readonly dataDir: string;
 
-  constructor(dataDir: string) {
+  static async new(basePath: string) {
+    const db = new FileSystemDatabase(basePath);
+    return db;
+  }
+
+  private constructor(basePath: string) {
     super();
-    this.dataDir = dataDir;
+    this.dataDir = basePath;
   }
 
   private getFilePath(type: string, id: number | string, ext: string = "json") {

@@ -1,9 +1,10 @@
 import * as colors from "colors";
-import "../Shared/Extensions";
-import { Timer } from "../Shared/Timer";
+import "../Extensions";
+import { Timer } from "../Timer";
+import { DatabaseBase } from "./DatabaseBase";
 import { MongoClient, ObjectId } from "mongodb";
 
-class MongoDatabase {
+class MongoDatabase extends DatabaseBase {
   private database: string;
   private client: MongoClient;
   public onMethodDone: ((
@@ -14,6 +15,7 @@ class MongoDatabase {
   ) => void)[] = [];
 
   constructor(connectionString: string, database: string) {
+    super();
     this.database = database;
     this.client = new MongoClient(connectionString);
   }
@@ -65,8 +67,6 @@ class MongoDatabase {
         return d;
       });
     return docs;
-
-    return docs;
   }
 
   async aggregate(collectionName: string, pipeline: any[]) {
@@ -112,10 +112,12 @@ class MongoDatabase {
     return docs;
   }
 
-  async upsert(collectionName: string, doc: any, returnNewDoc: boolean = true) {
+  protected async _upsert(
+    collectionName: string,
+    doc: any,
+    returnNewDoc: boolean = true
+  ) {
     const collection = await this.getCollection(collectionName);
-
-    if (!doc._id) doc._id = await this.getNewID();
 
     const result = await collection.updateOne(
       { _id: doc._id },

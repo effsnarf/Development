@@ -2,5 +2,4 @@ server:
   host: localhost
   port: 3000
 database:
-  connectionString: mongodb://localhost
-  database: Test
+  path: (env) => env.path.join(env.process.cwd(), 'Database\\FileSystem')

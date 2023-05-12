@@ -1,5 +1,5 @@
 const colorCodes = {
-  codeToColor: {
+  codeNumToColor: {
     "0": "reset",
     "1": "bright",
     "2": "dim",
@@ -24,7 +24,7 @@ const colorCodes = {
     "46": "bgCyan",
     "47": "bgWhite",
   } as any,
-  colorToCode: {
+  colorToCodeNum: {
     reset: "0",
     bright: "1",
     dim: "2",
@@ -48,6 +48,31 @@ const colorCodes = {
     bgMagenta: "45",
     bgCyan: "46",
     bgWhite: "47",
+  } as any,
+  colorToCodeChar: {
+    reset: "\x1b[0m",
+    bright: "\x1b[1m",
+    dim: "\x1b[2m",
+    underscore: "\x1b[4m",
+    blink: "\x1b[5m",
+    reverse: "\x1b[7m",
+    hidden: "\x1b[8m",
+    black: "\x1b[30m",
+    red: "\x1b[31m",
+    green: "\x1b[32m",
+    yellow: "\x1b[33m",
+    blue: "\x1b[34m",
+    magenta: "\x1b[35m",
+    cyan: "\x1b[36m",
+    white: "\x1b[37m",
+    bgBlack: "\x1b[40m",
+    bgRed: "\x1b[41m",
+    bgGreen: "\x1b[42m",
+    bgYellow: "\x1b[43m",
+    bgBlue: "\x1b[44m",
+    bgMagenta: "\x1b[45m",
+    bgCyan: "\x1b[46m",
+    bgWhite: "\x1b[47m",
   } as any,
 };
 
@@ -320,8 +345,10 @@ interface String {
   withoutColors(): string;
   showColorCodes(): string;
   colorsToHandleBars(): string;
-  handleBarsColorsToHtml(): string;
+  handlebarsColorsToHtml(): string;
+  handlebarsColorsToConsole(): string;
   colorsToHtml(): string;
+  parseColorCodes(): string;
   toShortPath(): string;
   toAbsolutePath(path: any): string;
 }
@@ -479,7 +506,7 @@ if (typeof String !== "undefined") {
     const result = this.replace(
       pattern,
       (match: any, colorCode: string, content: string) => {
-        const colorName = colorCodes.codeToColor[colorCode];
+        const colorName = colorCodes.codeNumToColor[colorCode];
         if (colorName) {
           return `{{#${colorName}}}${content}{{/${colorName}}}`;
         } else {
@@ -495,21 +522,63 @@ if (typeof String !== "undefined") {
     return result;
   };
 
-  String.prototype.handleBarsColorsToHtml = function (): string {
+  String.prototype.handlebarsColorsToHtml = function (): string {
     const pattern = /\{\{\#([^\{\}]*?)\}\}([\s\S]*?)\{\{\/\1\}\}/g;
     const result = this.replace(pattern, (match, color, content) => {
-      if (!colorCodes.colorToCode[color]) return content;
+      if (!colorCodes.colorToCodeNum[color]) return content;
       return `<span class="${color}">${content.handleBarsColorsToHtml()}</span>`;
     });
     // If pattern is found, call the function recursively
     if (result.match(pattern)) {
-      return result.handleBarsColorsToHtml();
+      return result.handlebarsColorsToHtml();
+    }
+    return result;
+  };
+
+  String.prototype.handlebarsColorsToConsole = function (): string {
+    // {{#red}}Hello {{#green}}World{{/green}}!{{/red}}
+    // {{#red}}
+    const pattern = /\{\{\#([^\{\}]*?)\}\}([\s\S]*?)\{\{\/\1\}\}/g;
+    // {{/red}}
+    let result = this.replace(pattern, (match, color, content) => {
+      if (!colorCodes.colorToCodeChar[color]) return content;
+      return `${
+        colorCodes.colorToCodeChar[color]
+      }${content.handlebarsColorsToConsole()}${
+        colorCodes.colorToCodeChar["reset"]
+      }`;
+    });
+    // If pattern is found, call the function recursively
+    if (result.match(pattern)) {
+      return result.handlebarsColorsToConsole();
     }
     return result;
   };
 
   String.prototype.colorsToHtml = function (): string {
-    return this.colorsToHandleBars().handleBarsColorsToHtml();
+    return this.colorsToHandleBars().handlebarsColorsToHtml();
+  };
+
+  String.prototype.parseColorCodes = function (): string {
+    const escapeRegex = /\x1b\[(\d+)m/g; // matches escape sequences in the form \x1b[<number>m
+    const resetCode = "\x1b[0m"; // reset code to remove all colors and styles
+
+    return this.replace(escapeRegex, (_, code) => {
+      const colorCode = (
+        {
+          30: "\x1b[30m", // black
+          31: "\x1b[31m", // red
+          32: "\x1b[32m", // green
+          33: "\x1b[33m", // yellow
+          34: "\x1b[34m", // blue
+          35: "\x1b[35m", // magenta
+          36: "\x1b[36m", // cyan
+          37: "\x1b[37m", // white
+        } as any
+      )[code];
+
+      return colorCode ? colorCode : resetCode;
+    });
   };
 
   String.prototype.toShortPath = function (): string {

@@ -1,24 +1,20 @@
-import { MongoDatabase } from "./MongoDatabase";
+import { DatabaseBase } from "./Database/DatabaseBase";
 
 class Analytics {
-  private db!: MongoDatabase;
+  private db!: DatabaseBase;
 
   static defaults = {
-    connectionString: "",
-    database: "",
+    database: null as DatabaseBase | null,
   };
 
   constructor() {}
 
-  static async new(
-    connectionString: string | null = null,
-    database: string | null = null
-  ) {
-    if (!connectionString)
-      connectionString = Analytics.defaults.connectionString;
-    if (!database) database = Analytics.defaults.database;
+  static async new(database: DatabaseBase) {
+    if (!database) {
+      if (Analytics.defaults.database) database = Analytics.defaults.database;
+    }
     const analytics = new Analytics();
-    analytics.db = await MongoDatabase.new(connectionString, database);
+    analytics.db = database;
     return analytics;
   }
 

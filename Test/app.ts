@@ -4,15 +4,26 @@ import fs from "fs";
 import "colors";
 import "@shared/Extensions";
 import { Configuration } from "@shared/Configuration";
+import { Database } from "@shared/Database/Database";
+import { Analytics } from "@shared/Analytics";
 import { TreeScript } from "@shared/TreeScript/TreeScript";
 import { Apify } from "@shared/Apify";
 import { Console } from "@shared/Console";
 import { ChatOpenAI, Roles } from "../Apis/OpenAI/classes/ChatOpenAI";
 
 (async () => {
-  const configPath = `../Apps/DatabaseProxy/Server/config.yaml`;
+  //const configPath = `../Apps/DatabaseProxy/Server/config.yaml`;
+  const configPath = `./config.yaml`;
 
-  const config = await Configuration.new({}, configPath);
+  const config = (await Configuration.new({}, configPath)).data;
+
+  //const db = await Database.newDb(config.database);
+
+  const analytics = await Analytics.new(await Database.new(config.database));
+
+  await analytics.create("category", "event", { value: 1 });
+
+  console.log(`test string`.bgRed);
 })();
 
 // const tsSourcePath = path.resolve(

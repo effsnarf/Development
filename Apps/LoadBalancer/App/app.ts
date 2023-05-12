@@ -4,6 +4,7 @@ import { Types } from "@shared/Types";
 import { Configuration } from "@shared/Configuration";
 import { Files } from "@shared/Files";
 import { Analytics } from "@shared/Analytics";
+import { Database } from "@shared/Database/Database";
 import {
   Console,
   Layout,
@@ -16,11 +17,13 @@ import {
 import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
 
 (async () => {
-  const config = Configuration.new({
-    quitIfChanged: [__filename.replace(".temp.ts", "")],
-    toAbsolutePaths: ["process"],
-    types: Types,
-  }).data;
+  const config = (
+    await Configuration.new({
+      quitIfChanged: [__filename.replace(".temp.ts", "")],
+      toAbsolutePaths: ["process"],
+      types: Types,
+    })
+  ).data;
 
   const getIncomingLogTitle = (
     count: number = 0,
@@ -192,8 +195,9 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   // Analytics
   if (config.analytics?.database) {
     (async () => {
-      const adb = config.analytics.database;
-      const analytics = await Analytics.new(adb.connectionString, adb.dbName);
+      const analytics = await Analytics.new(
+        await Database.new(config.analytics.database)
+      );
       // Every minute, track requests/minute and response times in analytics
       const rtpm = loadBalancer.stats.response.times.per.minute;
       setInterval(() => {
