@@ -3,6 +3,9 @@ incoming:
     host: localhost
     port: 3000
   cors: []
+  os:
+    restart: # memegenerator.net/restart/.. will restart the server
+      url: /restart/Jz0xnwG1bDv57LFpKTS6UkV8h9XQtCeBOMl2NHfRIj3yPcZYimAsrqdV4oWEaFhu
 nodes:
   - name: Website 1
     protocol: https
