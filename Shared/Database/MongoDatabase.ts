@@ -41,10 +41,10 @@ class MongoDatabase extends DatabaseBase {
   async find(
     collectionName: string,
     query: any,
-    sort: any = {},
-    limit?: number,
-    skip?: number,
-    lowercaseFields: boolean = true
+    sort: any,
+    limit?: number | undefined,
+    skip?: number | undefined,
+    lowercaseFields?: boolean | undefined
   ) {
     let docs = await this.aggregate(collectionName, [
       {
@@ -66,7 +66,22 @@ class MongoDatabase extends DatabaseBase {
         if (typeof d == "object") return Object.toCamelCaseKeys.apply(d);
         return d;
       });
+
     return docs;
+  }
+
+  async *findIterable(
+    collectionName: string,
+    query: any,
+    sort: any,
+    limit?: number | undefined,
+    skip?: number | undefined,
+    lowercaseFields?: boolean | undefined
+  ): AsyncGenerator<any, any, unknown> {
+    const docs = await this.find(collectionName, query, sort, limit, skip);
+    for (const doc of docs) {
+      yield doc;
+    }
   }
 
   async aggregate(collectionName: string, pipeline: any[]) {
@@ -134,7 +149,7 @@ class MongoDatabase extends DatabaseBase {
     return newDoc;
   }
 
-  async count(collectionName: string, query: any) {
+  async count(collectionName: string, query?: any) {
     const collection = await this.getCollection(collectionName);
 
     const result = await collection.countDocuments(query);

@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+import { Files } from "../Files";
 import { DatabaseBase } from "./DatabaseBase";
 
 class FileSystemDatabase extends DatabaseBase {
@@ -17,16 +18,58 @@ class FileSystemDatabase extends DatabaseBase {
     return db;
   }
 
-  find(
+  async find(
     collectionName: string,
     query: any,
     sort: any,
-    limit?: number | undefined,
-    skip?: number | undefined,
-    lowercaseFields?: boolean | undefined
-  ): Promise<any[]> {
-    throw new Error("Method not implemented.");
+    limit?: number,
+    skip?: number,
+    lowercaseFields?: boolean
+  ) {
+    const collectionPath = path.join(this.basePath, collectionName);
+    if (!fs.existsSync(collectionPath)) return [];
+    if (query) throw new Error("Query not implemented");
+    if (sort) throw new Error("Sort not implemented");
+    if (skip) throw new Error("Skip not implemented");
+    let docs = [];
+    for (const filePath of Files.listFiles(collectionPath, {
+      recursive: true,
+    })) {
+      if (limit && docs.length >= limit) break;
+      docs.push(JSON.parse(fs.readFileSync(filePath, "utf8")));
+    }
+    if (lowercaseFields) docs = docs.map((d) => d.toCamelCaseKeys());
+    return docs;
   }
+
+  async *findIterable(
+    collectionName: string,
+    query: any,
+    sort: any,
+    limit?: number,
+    skip?: number,
+    lowercaseFields?: boolean
+  ): AsyncGenerator<any> {
+    const collectionPath = path.join(this.basePath, collectionName);
+    if (!fs.existsSync(collectionPath)) return;
+    if (query) throw new Error("Query not implemented");
+    if (sort) throw new Error("Sort not implemented");
+    if (skip) throw new Error("Skip not implemented");
+    let docsYieldedCount = 0;
+
+    // List files in collectionPath recursively
+    for (const file of Files.listFiles(collectionPath, { recursive: true })) {
+      if (limit && docsYieldedCount >= limit) return;
+      let doc = JSON.parse(fs.readFileSync(file, "utf8"));
+      if (lowercaseFields) {
+        doc = doc.toCamelCaseKeys();
+      }
+      yield doc;
+      docsYieldedCount++;
+    }
+    return; // No more docs
+  }
+
   protected async _upsert(
     collectionName: string,
     doc: any,
@@ -38,8 +81,27 @@ class FileSystemDatabase extends DatabaseBase {
     if (!returnNewDoc) return doc._id;
     return doc;
   }
-  count(collectionName: string, query: any): Promise<number> {
-    throw new Error("Method not implemented.");
+  count(collectionName: string, query?: any): Promise<number> {
+    return new Promise((resolve, reject) => {
+      if (query) throw new Error("Query not implemented");
+      let count = 0;
+      for (const file of Files.listFiles(
+        path.join(this.basePath, collectionName),
+        { recursive: true }
+      )) {
+        count++;
+        console.log(
+          `${count.toLocaleString().green} ${`files found in`.gray} ${
+            collectionName.yellow
+          }`
+        );
+        // Move the cursor up one line
+        process.stdout.write("\u001B[1A");
+      }
+      // Move the cursor down one line
+      console.log();
+      resolve(count);
+    });
   }
   async getNewIDs(count: number): Promise<number[]> {
     const ids = await Promise.all(

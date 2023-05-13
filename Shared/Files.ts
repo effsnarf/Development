@@ -40,6 +40,28 @@ const pathFilterToFunction = (filter: PathFilter) => {
 };
 
 class Files {
+  static *listFiles(
+    folder: string,
+    options?: { recursive?: boolean }
+  ): Generator<string> {
+    const { recursive = true } = options || {};
+
+    function* traverseDirectory(currentPath: string): Generator<string> {
+      const entries = fs.readdirSync(currentPath, { withFileTypes: true });
+
+      for (const entry of entries) {
+        const fullPath = path.join(currentPath, entry.name);
+        if (entry.isFile()) {
+          yield fullPath;
+        } else if (entry.isDirectory() && recursive) {
+          yield* traverseDirectory(fullPath);
+        }
+      }
+    }
+
+    yield* traverseDirectory(folder);
+  }
+
   static async syncFolders(
     master: string,
     clone: string,
@@ -89,7 +111,7 @@ class Files {
           }
 
           // Increment the progress
-          progress.addOne();
+          progress.increment();
 
           // Get the full path of the clone file
           const clonePath = path.join(clone, file);

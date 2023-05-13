@@ -12,6 +12,15 @@ abstract class DatabaseBase {
     lowercaseFields?: boolean
   ): Promise<any[]>;
 
+  abstract findIterable(
+    collectionName: string,
+    query: any,
+    sort: any,
+    limit?: number,
+    skip?: number,
+    lowercaseFields?: boolean
+  ): AsyncGenerator<any, void, unknown>;
+
   async upsert(
     collectionName: string,
     doc: any,
@@ -27,7 +36,7 @@ abstract class DatabaseBase {
     returnNewDoc: boolean
   ): Promise<any>;
 
-  abstract count(collectionName: string, query: any): Promise<number>;
+  abstract count(collectionName: string, query?: any): Promise<number>;
 
   abstract getNewIDs(count: number): Promise<number[]>;
 

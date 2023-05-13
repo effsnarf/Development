@@ -5,3 +5,4 @@ target:
   database:
     connectionString: mongodb://localhost
     database: MG-Analytics
+collections: [Events]
