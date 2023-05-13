@@ -5,7 +5,7 @@
       "strict": true,
       "esModuleInterop": true,
       "paths": {
-        "@shared/*": ["../../../Shared/*"]
+        "@shared/*": ["../../Shared/*"]
       }  
     }
   }
