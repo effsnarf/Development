@@ -1,0 +1,15 @@
+source:
+  database:
+    prod:
+      path: F:\Database\MG-Analytics
+    dev:
+      path: C:\Database\FileSystem\MG-Analytics
+target:
+  database:
+    prod:
+      connectionString: mongodb://localhost:47017
+      database: MG-Analytics
+    dev:
+      connectionString: mongodb://localhost
+      database: MG-Analytics
+collections: [Events]

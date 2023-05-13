@@ -46,6 +46,7 @@ import { Database } from "@shared/Database/Database";
   }
 
   console.log("Done".green);
+  console.log();
 
   process.exit();
 })();
