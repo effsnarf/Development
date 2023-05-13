@@ -188,7 +188,9 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
           (sum: number, bar: Bar) => sum + (bar.value || 0),
           0
         ) / healthBars.length;
-      counterLog.color = averageHealth.getSeverityColor(0.8, 0.5, ">");
+      counterLog.color = averageHealth
+        .getSeverityColor(0.8, 0.5, ">")
+        .replace("green", "white");
     }
   );
   // Check the nodes' health periodically
