@@ -23,4 +23,4 @@ analytics:
   database:
     prod:
       connectionString: mongodb://localhost:47017
-      dbName: MG-Analytics
+      database: MG-Analytics
