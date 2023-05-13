@@ -328,6 +328,8 @@ if (typeof Array !== "undefined") {
 
 interface String {
   is(type: any): boolean;
+  color(color: string): string;
+  padStartChars(maxLength: number, fillString?: string): string;
   sliceChars(start: number | undefined, end?: number | undefined): string;
   alignRight(): string;
   shorten(maxLength: number): string;
@@ -356,6 +358,22 @@ interface String {
 if (typeof String !== "undefined") {
   String.prototype.is = function (type: any): boolean {
     return is(this, type);
+  };
+
+  String.prototype.color = function (color: string): string {
+    return eval(`this.${color}`);
+  };
+
+  String.prototype.padStartChars = function (
+    maxLength: number,
+    fillString?: string
+  ): string {
+    if (fillString === undefined) fillString = " ";
+    let result = this;
+    while (result.getCharsCount() < maxLength) {
+      result = fillString + result;
+    }
+    return result.toString();
   };
 
   // Slice a string by character count instead of by byte count

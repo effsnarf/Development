@@ -393,11 +393,13 @@ class LoadBalancer {
   // "s" is gray.
   // [seconds] is green (<0.1), yellow (<0.5), or bgRed.
   private toElapsedString(elapsed: number) {
-    elapsed = elapsed / 1000;
-    const s = elapsed.toFixed(2);
-    if (elapsed < 0.1) return s.green + "s".gray;
-    if (elapsed < 0.5) return s.yellow + "s".gray;
-    return s.bgRed + "s".gray;
+    const color = elapsed < 100 ? "green" : elapsed < 500 ? "yellow" : "bgRed";
+    const isOver1000 = elapsed > 1000;
+    const elapsedStr = (isOver1000 ? elapsed / 1000 : elapsed).toFixed(
+      isOver1000 ? 2 : 0
+    );
+    const unit = isOver1000 ? "s" : "ms";
+    return `${elapsedStr.color(color)}${unit.gray}`.padStartChars(5);
   }
 
   private toSizeKbString(size: number | null) {
