@@ -122,23 +122,25 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
 
   const checkNodesAgain = async (interval: number) => {
     const nodes = loadBalancer.getNodes();
-    for (let i = 0; i < nodes.length; i++) {
-      const node = nodes[i];
-      // If the node is unhealthy, restart it
-      if (
-        node.health.successRate < config.node.restart.health &&
-        loadBalancer.getNode(i).process.started <
-          Date.now() - config.node.restart.timeout * 60 * 1000
-      ) {
-        mainLog.log(
-          `Node ${i + 1}: Health < ${
-            `${Math.round(config.node.restart.health * 100)}%`.bgWhite.black
-          }`.bgRed
-        );
-        mainLog.log(`Node ${i + 1}: Restarting..`.bgRed);
+    if (config.node.restart.enabled) {
+      for (let i = 0; i < nodes.length; i++) {
+        const node = nodes[i];
+        // If the node is unhealthy, restart it
+        if (
+          node.health.successRate < config.node.restart.health &&
+          loadBalancer.getNode(i).process.started <
+            Date.now() - config.node.restart.timeout * 60 * 1000
+        ) {
+          mainLog.log(
+            `Node ${i + 1}: Health < ${
+              `${Math.round(config.node.restart.health * 100)}%`.bgWhite.black
+            }`.bgRed
+          );
+          mainLog.log(`Node ${i + 1}: Restarting..`.bgRed);
 
-        await syncNodeVersions(config.nodes[0], config.nodes[i]);
-        loadBalancer.restartNode(i);
+          await syncNodeVersions(config.nodes[0], config.nodes[i]);
+          loadBalancer.restartNode(i);
+        }
       }
     }
     setTimeout(checkNodesAgain, interval);
