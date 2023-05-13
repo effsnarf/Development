@@ -1,0 +1,7 @@
+source:
+  database:
+    path: C:\Database\FileSystem\MG-Analytics
+target:
+  database:
+    connectionString: mongodb://localhost
+    database: MG-Analytics
