@@ -228,6 +228,7 @@ type LargeFont = "block" | "simple" | "simpleBlock" | "3d" | "tiny";
 
 class LargeText extends ConsoleElement {
   text: string = "";
+  color: string = "system";
 
   constructor(status: string, public font: LargeFont = "block") {
     super("", status);
@@ -249,7 +250,7 @@ class LargeText extends ConsoleElement {
     const result = cfonts.render(this.text, {
       font: this.font, // define the font face
       align: "left", // define text alignment
-      colors: ["system"], // define all colors
+      colors: [this.color], // define all colors
       background: "transparent", // define the background color, you can also use `backgroundColor` here as key
       letterSpacing: 1, // define letter spacing
       lineHeight: 1, // define the line height

@@ -35,7 +35,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
     //   config.title
     // } ─ ${config.incoming.address.stringifyAddress()}`;
     const items = count;
-    return `${title} ─ (${items.severity(10, 30)} ${
+    return `${title} ─ (${items.colorize(10, 30, "<")} ${
       `reqs`.gray
     }) (${countPerSecond}${`/s`.gray}) (${countPerMinute}${`/m`.gray})`;
   };
@@ -182,6 +182,13 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
       );
       // Update the node health bar
       healthBars[index].value = successRate;
+      // Update the average health bar
+      const averageHealth =
+        healthBars.reduce(
+          (sum: number, bar: Bar) => sum + (bar.value || 0),
+          0
+        ) / healthBars.length;
+      counterLog.color = averageHealth.getSeverityColor(0.8, 0.5, ">");
     }
   );
   // Check the nodes' health periodically

@@ -98,7 +98,8 @@ const is = (value: any, type: any) => {
 interface Number {
   is(type: any): boolean;
   stringify(unit: string, places?: number): string;
-  severity(green: number, yellow: number): string;
+  colorize(green: number, yellow: number, direction: "<" | ">"): string;
+  getSeverityColor(green: number, yellow: number, direction: "<" | ">"): string;
 }
 
 if (typeof Number !== "undefined") {
@@ -138,11 +139,33 @@ if (typeof Number !== "undefined") {
     return `${sign}${stringValue}${unit.gray}`;
   };
 
-  Number.prototype.severity = function (green: number, yellow: number): string {
+  Number.prototype.colorize = function (
+    green: number,
+    yellow: number,
+    direction: "<" | ">"
+  ): string {
+    return this.toString().colorize(
+      this.getSeverityColor(green, yellow, direction)
+    );
+  };
+
+  Number.prototype.getSeverityColor = function (
+    green: number,
+    yellow: number,
+    direction: "<" | ">"
+  ): string {
     const value = this.valueOf();
-    if (value < green) return value.toString().green;
-    if (value < yellow) return value.toString().yellow;
-    return value.toString().bgRed;
+    if (direction == "<") {
+      if (value < green) return "green";
+      if (value < yellow) return "yellow";
+      return "red";
+    }
+    if (direction == ">") {
+      if (value > green) return "green";
+      if (value > yellow) return "yellow";
+      return "red";
+    }
+    throw new Error(`Invalid direction: ${direction}`);
   };
 }
 
@@ -332,7 +355,7 @@ if (typeof Array !== "undefined") {
 
 interface String {
   is(type: any): boolean;
-  color(color: string): string;
+  colorize(color: string): string;
   padStartChars(maxLength: number, fillString?: string): string;
   sliceChars(start: number | undefined, end?: number | undefined): string;
   alignRight(): string;
@@ -364,7 +387,7 @@ if (typeof String !== "undefined") {
     return is(this, type);
   };
 
-  String.prototype.color = function (color: string): string {
+  String.prototype.colorize = function (color: string): string {
     return eval(`this.${color}`);
   };
 

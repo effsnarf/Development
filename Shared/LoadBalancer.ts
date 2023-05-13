@@ -399,7 +399,7 @@ class LoadBalancer {
       isOver1000 ? 2 : 0
     );
     const unit = isOver1000 ? "s" : "ms";
-    return `${elapsedStr.color(color)}${unit.gray}`.padStartChars(5);
+    return `${elapsedStr.colorize(color)}${unit.gray}`.padStartChars(5);
   }
 
   private toSizeKbString(size: number | null) {
