@@ -3,6 +3,7 @@ import path from "path";
 import * as colors from "colors";
 import * as fs from "fs";
 import * as jsyaml from "js-yaml";
+import { Types } from "./Types";
 import { ChatOpenAI, Roles } from "../Apis/OpenAI/classes/ChatOpenAI";
 import { OsTempFolderCache } from "./Cache";
 
@@ -42,8 +43,20 @@ class Configuration {
     this.options = options;
   }
 
+  static async new2(filename: string) {
+    return Configuration.new({
+      quitIfChanged: [filename.replace(".temp.ts", "")],
+      toAbsolutePaths: [],
+      types: Types,
+    });
+  }
+
   static async new(
-    options: ConfigurationOptions = {},
+    options: ConfigurationOptions = {
+      quitIfChanged: [],
+      toAbsolutePaths: [],
+      types: Types,
+    },
     configPaths?: ConfigPaths
   ) {
     const config = new Configuration(options);
@@ -131,31 +144,37 @@ class Configuration {
       config.log();
     }
 
-    const yaml = Configuration.toYaml(config.data);
-
-    const desc = await Configuration.getConfigDescription(yaml);
+    const desc = await Configuration.getConfigDescription(config.data);
 
     config.log(desc);
 
     return config;
   }
 
-  private static async getConfigDescription(yaml: string) {
+  private static async getConfigDescription(data: any) {
+    return Configuration.toYaml(data).gray;
+
+    const yaml = Configuration.toYaml(data);
+
     const cache = new OsTempFolderCache();
 
-    const desc = await cache.get(yaml, async () => {
-      const aiTaskDesc = `this is a configuration file for my app
+    const desc = await cache.get(
+      yaml,
+      async () => {
+        const aiTaskDesc = `this is a configuration file for my app
       write it in human terms in several very short and concise bullets (*) that can be shown when the app starts, as if you were the app ("* starting http server on port.. * analytics database: [dbname]" etc)
       wrap important things (db names, host names, ports, etc) in yellow (ex: {{#yellow}}text{{/yellow}}).`;
 
-      const chat = await ChatOpenAI.new(Roles.ChatGPT, false);
+        const chat = await ChatOpenAI.new(Roles.ChatGPT, false);
 
-      const desc = (
-        await chat.send(`${aiTaskDesc}\n\n${yaml}`)
-      ).handlebarsColorsToConsole();
+        const desc = (
+          await chat.send(`${aiTaskDesc}\n\n${yaml}`)
+        ).handlebarsColorsToConsole();
 
-      return desc;
-    });
+        return desc;
+      },
+      async () => yaml
+    );
 
     return desc;
   }

@@ -13,17 +13,27 @@ class OsTempFolderCache extends CacheBase {
     return new OsTempFolderCache();
   }
 
-  async get<T>(key: string, getDefaultValue: () => T) {
+  async get<T>(key: string, getDefaultValue: () => T, getTempValue?: () => T) {
     const path = this.getTempFilePath(key);
+    // If the file exists, read it
+    if (fs.existsSync(path)) {
+      const json = fs.readFileSync(path, "utf8");
+      return JSON.parse(json);
+    }
+
     // If the file doesn't exist, create it with the default value
-    if (!fs.existsSync(path)) {
+    // Start a promise to get the value
+    const promise = new Promise<T>(async (resolve, reject) => {
       const value = await getDefaultValue();
       fs.writeFileSync(path, JSON.stringify(value));
-      return value;
+      resolve(value);
+    });
+    // If a temp value is provided, return that until the promise is resolved
+    if (getTempValue) {
+      return await getTempValue();
     }
-    // If the file exists, read it
-    const json = fs.readFileSync(path, "utf8");
-    return JSON.parse(json);
+    // Otherwise, return the promise
+    return await promise;
   }
 
   set<T>(key: string, value: T) {

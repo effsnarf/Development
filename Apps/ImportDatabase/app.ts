@@ -1,6 +1,5 @@
 import fs from "fs";
 import "colors";
-import { Types } from "@shared/Types";
 import { Configuration } from "@shared/Configuration";
 import {
   Console,
@@ -11,16 +10,10 @@ import {
   Bar,
   Unit,
 } from "@shared/Console";
-import { Database } from "@shared/Database";
+import { Database } from "@shared/Database/Database";
 
 (async () => {
-  const config = (
-    await Configuration.new({
-      quitIfChanged: [__filename.replace(".temp.ts", "")],
-      toAbsolutePaths: [],
-      types: Types,
-    })
-  ).data;
+  const config = (await Configuration.new2(__filename)).data;
 
-  const source = Database.new(config.source);
+  const source = Database.new(config.source.database);
 })();
