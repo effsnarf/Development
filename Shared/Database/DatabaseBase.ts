@@ -6,7 +6,7 @@ abstract class DatabaseBase {
   abstract find(
     collectionName: string,
     query: any,
-    sort: any,
+    sort?: any,
     limit?: number,
     skip?: number,
     lowercaseFields?: boolean

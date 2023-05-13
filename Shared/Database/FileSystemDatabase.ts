@@ -21,7 +21,7 @@ class FileSystemDatabase extends DatabaseBase {
   async find(
     collectionName: string,
     query: any,
-    sort: any,
+    sort?: any,
     limit?: number,
     skip?: number,
     lowercaseFields?: boolean

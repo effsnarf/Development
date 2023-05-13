@@ -41,7 +41,7 @@ class MongoDatabase extends DatabaseBase {
   async find(
     collectionName: string,
     query: any,
-    sort: any,
+    sort?: any,
     limit?: number | undefined,
     skip?: number | undefined,
     lowercaseFields?: boolean | undefined
