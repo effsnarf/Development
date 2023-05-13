@@ -4,6 +4,7 @@ import "colors";
 import http from "http";
 import axios, { AxiosResponse, AxiosResponseHeaders } from "axios";
 import { Types } from "./Types";
+import { System } from "./System";
 import { Process } from "./Process";
 import { Events } from "./Events";
 import { HealthMonitor } from "./HealthMonitor";
@@ -103,6 +104,11 @@ interface IncomingItem {
 interface LoadBalancerOptions {
   address: Types.Address;
   cors: string[];
+  os: {
+    restart: {
+      url: string;
+    };
+  };
   request: {
     timeout: number;
   };
@@ -317,6 +323,10 @@ class LoadBalancer {
 
   private async processIncomingItem(incomingItem: IncomingItem) {
     const { request, response, nodeItem } = incomingItem;
+
+    if (request.url == this.options.os?.restart?.url) {
+      await System.restartComputer();
+    }
 
     // CORS
     if (this.options?.cors?.length) {

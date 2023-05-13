@@ -4,6 +4,9 @@ incoming:
     dev: localhost:5050
     prod: 10.35.16.35:80
   cors: [http://localhost:5050]
+  os:
+    restart: # memegenerator.net/restart/.. will restart the server
+      url: /restart/Jz0xnwG1bDv57LFpKTS6UkV8h9XQtCeBOMl2NHfRIj3yPcZYimAsrqdV4oWEaFhu
 nodes:
   - name: MG.Website 1
     address: localhost:5051

@@ -2,7 +2,15 @@ import fs from "fs";
 import "colors";
 import { Types } from "@shared/Types";
 import { Configuration } from "@shared/Configuration";
-import { Console } from "@shared/Console";
+import {
+  Console,
+  Layout,
+  Log,
+  ObjectLog,
+  LargeText,
+  Bar,
+  Unit,
+} from "@shared/Console";
 
 (async () => {
   const config = (
@@ -12,8 +20,6 @@ import { Console } from "@shared/Console";
       types: Types,
     })
   ).data;
-
-  const console = Console.new();
 
   console.log("Hello from TypeScript!");
 })();
