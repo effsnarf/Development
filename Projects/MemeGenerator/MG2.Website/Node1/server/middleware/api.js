@@ -9,8 +9,8 @@ import { Analytics } from "../../Shared/Analytics";
 
 const config = Configuration.new({ log: false }, path.join(__dirname, "../../config.yaml")).data;
 
-Analytics.defaults.connectionString = config.database.analytics.connectionString;
-Analytics.defaults.database = config.database.analytics.name;
+Analytics.defaults.connectionString = config.database.analytics?.connectionString;
+Analytics.defaults.database = config.database.analytics?.name;
 
 
 const analyticsApify = new Apify.Server(
