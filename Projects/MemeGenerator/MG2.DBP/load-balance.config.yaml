@@ -22,5 +22,4 @@ request:
 analytics:
   database:
     prod:
-      connectionString: mongodb://localhost:47017
-      database: MG-Analytics
+      path: F:\Database\MG-Analytics
