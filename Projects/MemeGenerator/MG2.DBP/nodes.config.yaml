@@ -16,7 +16,4 @@ analytics:
   min:
     elapsed: 50
   database:
-    connectionString:
-      dev: mongodb://localhost:27017
-      prod: mongodb://localhost:47017
-    databaseName: MG-Analytics
+    path: F:\Database\MG-Analytics
