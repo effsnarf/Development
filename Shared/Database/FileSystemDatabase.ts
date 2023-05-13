@@ -72,8 +72,8 @@ class FileSystemDatabase extends DatabaseBase {
   }
 
   private getFilePath(collectionName: string, id: number) {
-    const dir1 = Math.round(id / 1000000).toString();
-    const dir2 = Math.round(id / 1000).toString();
+    const dir1 = Math.floor(id / 1000000).toString();
+    const dir2 = Math.floor(id / 1000).toString();
     const dirPath = path.join(this.basePath, collectionName, dir1, dir2);
     if (!fs.existsSync(dirPath)) {
       fs.mkdirSync(dirPath, { recursive: true });
