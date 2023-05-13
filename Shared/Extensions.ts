@@ -248,6 +248,10 @@ if (typeof Object !== "undefined") {
         return target;
       }
 
+      if (null == source) {
+        return target;
+      }
+
       const merged = target.clone();
       for (const key of Object.keys(source)) {
         if (key in merged) {
