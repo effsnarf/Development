@@ -266,7 +266,10 @@ class LargeText extends ConsoleElement {
 
     // Center the text by the width
     lines = lines.map((line: string) => {
-      const padding = Math.max(0, Math.floor((w.chars - line.length) / 2));
+      const padding = Math.max(
+        0,
+        Math.floor((w.chars - line.getCharsCount()) / 2)
+      );
       return `${" ".repeat(padding)}${line}`;
     });
 
