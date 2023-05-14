@@ -277,11 +277,13 @@ class LoadBalancer {
     );
     nodeResponse.data.pipe(incomingItem.response);
 
-    // Log the successful attempt
-    this.log({
-      node: { index: incomingItem.nodeItem.index },
-      text: `${statusStr} ${sizeKB || ""} ${elapsedStr} ${url}`,
-    });
+    if (!url.endsWith(".jpg")) {
+      // Log the successful attempt
+      this.log({
+        node: { index: incomingItem.nodeItem.index },
+        text: `${statusStr} ${sizeKB || ""} ${elapsedStr} ${url}`,
+      });
+    }
 
     // Successfully processed the incoming item
     this.incomingItems.remove(incomingItem);
