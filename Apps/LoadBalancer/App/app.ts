@@ -276,9 +276,9 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
 
   // Assign keys
   const shift12345678 = "!@#$%^&*";
-  mainConsoleLog.log("Press [q] to quit".green);
-  mainConsoleLog.log("Press [1, 2, ..] to enable/disable nodes".green);
-  mainConsoleLog.log("Press shift+[1, 2, ..] to start node processes".green);
+  mainConsoleLog.log("Press [q] to quit".bgWhite);
+  mainConsoleLog.log("Press [1, 2, ..] to enable/disable nodes".bgWhite);
+  mainConsoleLog.log("Press shift+[1, 2, ..] to start node processes".bgWhite);
   for (var i = 0; i < config.nodes.length; i++) {
     const char = (i + 1).toString();
     Console.on.key(char, (char: string) =>
