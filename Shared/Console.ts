@@ -360,7 +360,10 @@ class Log extends ConsoleElement {
     super(title);
   }
 
-  static new(title: string, logOptions?: { breakLines: boolean }) {
+  static new(
+    title: string,
+    logOptions: { breakLines: boolean } = { breakLines: true }
+  ) {
     return new Log(title, logOptions);
   }
 
