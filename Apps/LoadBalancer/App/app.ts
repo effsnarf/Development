@@ -342,7 +342,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
     async (paths) => {
       for (const [index, node] of config.nodes.entries()) {
         if (index == 0) continue;
-        mainLog.log(`Syncing ${node.name.green} <- ${masterNode.name.yellow}`);
+        mainLog.log(`Syncing ${node.name.yellow} <- ${masterNode.name.green}`);
         await syncNodeVersions(masterNode, node);
       }
       mainLog.log(`Not restarting node (temporarily disabled)`);
