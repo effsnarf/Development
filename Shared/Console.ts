@@ -354,6 +354,7 @@ class Log extends ConsoleElement {
   private maxItems = 100;
   private items: LogItem[] = [];
   showDate: boolean = true;
+  reverseItems: boolean = true;
 
   constructor(
     title: string,
@@ -385,7 +386,8 @@ class Log extends ConsoleElement {
     height = Unit.from(height, "y");
     return new Promise((resolve) => {
       const lines: string[] = [];
-      [...this.items].reverse().forEach((item) => {
+      const items = this.reverseItems ? [...this.items].reverse() : this.items;
+      items.forEach((item) => {
         const dt = new Date(item.dt);
         const dtString = `${dt.toLocaleTimeString()}`;
         const dateStr = !this.showDate ? "" : `${dtString.gray} `;

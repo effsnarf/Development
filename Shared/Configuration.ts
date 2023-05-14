@@ -36,6 +36,7 @@ class Configuration {
   static environments = ["dev", "prod"];
   options: ConfigurationOptions;
   data: any;
+  yaml!: string;
 
   constructor(
     options: ConfigurationOptions,
@@ -146,6 +147,8 @@ class Configuration {
 
       config.log();
     }
+
+    config.yaml = Configuration.toYaml(config.data);
 
     const desc = await Configuration.getConfigDescription(config.data);
 

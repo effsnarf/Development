@@ -37,10 +37,16 @@ import { Analytics } from "@shared/Analytics";
   const mainLog = Log.new(config.title);
   const itemsLog = Log.new("Items");
 
-  const configLog = ObjectLog.new(
-    `Configuration ${configObj.configPaths.map((cp) => cp.toShortPath())}`,
-    () => config
-  );
+  const configLog = Log.new(`Configuration`);
+  configLog.showDate = false;
+  configLog.reverseItems = false;
+  configObj.configPaths
+    .map((cp) => cp.toShortPath())
+    .forEach((cp) => {
+      configLog.log(cp);
+    });
+  configLog.log("-");
+  configObj.yaml.split("\n").forEach((line) => configLog.log(line));
 
   const layout = Layout.new();
 
