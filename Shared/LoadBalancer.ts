@@ -365,7 +365,7 @@ class LoadBalancer {
     const timer = Timer.start();
 
     try {
-      const response = await axios.request({
+      const options = {
         url,
         method: request.method as any,
         headers: request.headers,
@@ -375,8 +375,13 @@ class LoadBalancer {
         // We want to proxy the request as-is,
         // let the client handle the redirects
         maxRedirects: 0,
-        timeout: this.options.request?.timeout || 0,
-      });
+      } as any;
+
+      if (this.options.request?.timeout) {
+        options.timeout = this.options.request.timeout * 1000;
+      }
+
+      const response = await axios.request(options);
 
       timer.stop();
 
