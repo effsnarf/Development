@@ -242,6 +242,7 @@ if (typeof Number !== "undefined") {
     const units = !Array.isArray(unit)
       ? [unit]
       : unit.sortByDesc((u) => unitClass.unitToValue[u]);
+    if (value < 0.01) return `${`<`.gray}${value.toFixed(0)}${units.last()}`;
     for (const u of units) {
       const currentUnitValue = unitClass.unitToValue[u];
       const nextUnitValue = unitClass.unitToValue[unitClass.nextUnit(u)];
