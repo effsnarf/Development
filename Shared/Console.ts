@@ -353,8 +353,15 @@ class Log extends ConsoleElement {
   private items: LogItem[] = [];
   showDate: boolean = true;
 
-  static new(title: string) {
-    return new Log(title);
+  constructor(
+    title: string,
+    private readonly logOptions?: { breakLines: boolean }
+  ) {
+    super(title);
+  }
+
+  static new(title: string, logOptions?: { breakLines: boolean }) {
+    return new Log(title, logOptions);
   }
 
   log(...args: any[]) {
@@ -380,7 +387,9 @@ class Log extends ConsoleElement {
         const line = `${dateStr}${item.args
           .flatMap((arg) => Console.objectToLines(arg))
           .join(" ")}`;
-        const widthLines = line.splitOnWidth((width as Unit).chars);
+        const widthLines = !this.logOptions?.breakLines
+          ? [line]
+          : line.splitOnWidth((width as Unit).chars);
         lines.push(...widthLines);
       });
       resolve(lines);

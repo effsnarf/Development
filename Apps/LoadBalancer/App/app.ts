@@ -108,7 +108,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
 
   // Create a log for each node
   const nodeLogs = config.nodes.map((node: any) =>
-    Log.new(getNodeLogTitle(node))
+    Log.new(getNodeLogTitle(node), { breakLines: false })
   );
 
   // Create a health bar for each node
