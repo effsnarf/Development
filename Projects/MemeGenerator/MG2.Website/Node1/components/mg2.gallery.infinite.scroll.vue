@@ -171,6 +171,8 @@ export default
       }, "scrollToItem": function () {
 
       }, "loadShareScript": function () {
+        return;
+        
         let url = `//cdn.social9.com/js/socialshare.min.js`;
         let content = `537e87dc3b5341119b8e79333f9703f3`;
 
@@ -179,7 +181,7 @@ export default
         script.content = content;
         script.src = url;
 
-        //document.documentElement.firstChild.appendChild(script);
+        document.documentElement.firstChild.appendChild(script);
       }
     }, "watch": {
       "getItems": {
