@@ -255,7 +255,7 @@ class LoadBalancer {
     nodeResponse: AxiosResponse<any>,
     elapsed: number
   ) {
-    if (elapsed < 20) {
+    if (elapsed < 50) {
       incomingItem.nodeItem.node.health.trackSuccess();
     } else {
       incomingItem.nodeItem.node.health.trackFailure();
