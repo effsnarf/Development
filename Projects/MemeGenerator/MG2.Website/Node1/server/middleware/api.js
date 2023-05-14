@@ -49,6 +49,7 @@ function getEventsInInterval(events, interval) {
 const dbs = {
   _dbs: new Map(),
   async get(database) {
+    if (!database) return null;
     if (!this._dbs.has(database)) {
       // Find which connection string to use by the database name
       const dbEntry = Object.values(config.database).find(db => db.name == database);
@@ -66,8 +67,8 @@ export default async function (req, res, next) {
     // CORS
     res.setHeader('Access-Control-Allow-Origin', '*');
 
-    const dbEvents = (await dbs.get(config.database.analytics.name));
-    const dbContent = (await dbs.get(config.database.content.name));
+    const dbEvents = (await dbs.get(config.database.analytics?.name));
+    const dbContent = (await dbs.get(config.database.content?.name));
 
     const ip = (req.headers['x-forwarded-for'] || req.connection.remoteAddress);
 
