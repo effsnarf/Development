@@ -329,7 +329,7 @@ import { Analytics } from "@shared/Analytics";
 
           mainLog.log(
             `${
-              `${elapsed.toLocaleString()}ms`.padStart(8).gray
+              elapsed.unitifyTime().severifyTime(50, 500, "<").padStart(8).gray
             } ${`${methodStr}`}(${util
               .inspect(args, { colors: true })
               .replace("\n", "")})`
