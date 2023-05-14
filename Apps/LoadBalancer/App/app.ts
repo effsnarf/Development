@@ -114,7 +114,6 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
 
   // Render the dashboard
   const renderDashboard = () => {
-    console.clear();
     layout.render();
     // Set the console window title
     process.title = `${config.title} (${loadBalancer.stats.requests.per.minute.count})`;
