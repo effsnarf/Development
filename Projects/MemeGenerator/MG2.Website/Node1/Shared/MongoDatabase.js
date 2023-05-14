@@ -68,6 +68,7 @@ let MongoDatabase = (() => {
         }
         static new(connectionString, database) {
             return __awaiter(this, void 0, void 0, function* () {
+                if (!connectionString) throw new Error(`Connection string is required to connect to ${database}.`);
                 // console.log("Connecting to MongoDB...".gray);
                 // console.log(`  ${connectionString.yellow}`);
                 // console.log(`  ${database.green}`);
