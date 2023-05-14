@@ -400,11 +400,12 @@ import { Analytics } from "@shared/Analytics";
     );
 
     const allowedOrigins = config.server.cors
-    .map((host: string) => [`https://${host}`, `http://${host}`])
-    .flatMap((hosts: string[]) => hosts);
+      .map((host: string) => [`https://${host}`, `http://${host}`])
+      .flatMap((hosts: string[]) => hosts);
 
     for (const origin of allowedOrigins) {
       mainLog.log(`CORS allowed origin: ${origin.green}`);
+    }
   };
 
   process.title = config.title;
