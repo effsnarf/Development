@@ -185,6 +185,7 @@ interface Number {
   unitifyTime(unit?: string[] | string): string;
   unitifySize(unit?: string[] | string): string;
   unitifyPercent(): string;
+  toProgressBar(barLength?: number): string;
   severify(green: number, yellow: number, direction: "<" | ">"): string;
   getSeverityColor(
     green: number,
@@ -254,22 +255,8 @@ if (typeof Number !== "undefined") {
     return `${value.toFixed(2)}${units.last()}`;
   };
 
-  Number.prototype.unitifyTime = function (
-    unit?: string[] | string,
-    barLength?: number
-  ): string {
-    if (!barLength) barLength = 0;
-    let value = this.valueOf();
-    if (unit == "bar") {
-      if (!barLength) barLength = 50;
-      barLength = barLength - ` 100%`.length;
-      const progressLength = Math.round(value * barLength);
-      const bar = "█".repeat(progressLength);
-      const emptyLength = barLength - progressLength;
-      const empty = emptyLength <= 0 ? "" : "█".repeat(emptyLength).gray;
-      return `${bar}${empty} ${value.unitifyPercent().withoutColors()}`;
-    }
-    return value.unitify(Time, unit);
+  Number.prototype.unitifyTime = function (unit?: string[] | string): string {
+    return this.unitify(Time, unit);
   };
 
   Number.prototype.unitifySize = function (unit?: string[] | string): string {
@@ -278,6 +265,17 @@ if (typeof Number !== "undefined") {
 
   Number.prototype.unitifyPercent = function (): string {
     return `${Math.round(this.valueOf() * 100)}${`%`.gray}`;
+  };
+
+  Number.prototype.toProgressBar = function (barLength?: number): string {
+    const value = this.valueOf();
+    if (!barLength) barLength = 50;
+    barLength = barLength - ` 100%`.length;
+    const progressLength = Math.round(value * barLength);
+    const bar = "█".repeat(progressLength);
+    const emptyLength = barLength - progressLength;
+    const empty = emptyLength <= 0 ? "" : "█".repeat(emptyLength).gray;
+    return `${bar}${empty} ${value.unitifyPercent().withoutColors()}`;
   };
 
   Number.prototype.severify = function (

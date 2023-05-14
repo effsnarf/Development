@@ -5,6 +5,7 @@ import "colors";
 import "@shared/Extensions";
 import { Configuration } from "@shared/Configuration";
 import { Files } from "@shared/Files";
+import { Progress } from "@shared/Progress";
 import { Database } from "@shared/Database/Database";
 import { Analytics } from "@shared/Analytics";
 import { TreeScript } from "@shared/TreeScript/TreeScript";
@@ -12,24 +13,33 @@ import { Apify } from "@shared/Apify";
 import { Console } from "@shared/Console";
 import { ChatOpenAI, Roles } from "../Apis/OpenAI/classes/ChatOpenAI";
 
-const path1 = `C:\\eff\\Development\\${
-  `Projects`.green
-}\\MemeGenerator\\MG2.Website\\Node1\\`;
-
-console.log(path1.splitOnWidth(22).join("\n"));
-
-process.exit();
+const progress = Progress.newAutoDisplay(100, { skipped: 0, modifieds: [] });
 
 (async () => {
-  Files.watch(
-    [path1],
-    { recursive: true, exclude: ["node_modules"] },
-    (paths) => {
-      console.log(paths);
-    },
-    (message) => console.log(message)
-  );
+  for (let i = 0; i < 100; i++) {
+    progress.increment();
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
 })();
+
+// const path1 = `C:\\eff\\Development\\${
+//   `Projects`.green
+// }\\MemeGenerator\\MG2.Website\\Node1\\`;
+
+// console.log(path1.splitOnWidth(22).join("\n"));
+
+// process.exit();
+
+// (async () => {
+//   Files.watch(
+//     [path1],
+//     { recursive: true, exclude: ["node_modules"] },
+//     (paths) => {
+//       console.log(paths);
+//     },
+//     (message) => console.log(message)
+//   );
+// })();
 
 // (async () => {
 //   //const configPath = `../Apps/DatabaseProxy/Server/config.yaml`;

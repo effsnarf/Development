@@ -9,7 +9,8 @@ class Progress {
   private constructor(
     public readonly total: number,
     public readonly data: any,
-    private readonly onProgress: (percent: number) => void
+    private readonly onProgress: (percent: number) => void,
+    private readonly started = Date.now()
   ) {}
 
   static newAutoDisplay(total: number, data: any = {}) {
@@ -67,15 +68,23 @@ class Progress {
     return this.processed / this.total;
   }
 
+  get msLeft() {
+    const elapsed = Date.now() - this.started;
+    const percent = this.progress;
+    return (elapsed / percent) * (1 - percent);
+  }
+
   get bar() {
-    const tab = "        ";
+    const tab = "    ";
 
     return (
       `${this.processed.toLocaleString().yellow} / ${
         this.total.toLocaleString().green
       }` +
       tab +
-      this.progress.unitifyTime("bar")
+      this.progress.toProgressBar() +
+      tab +
+      `-${this.msLeft.unitifyTime()}`
     );
   }
 }
