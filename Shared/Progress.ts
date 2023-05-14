@@ -84,7 +84,8 @@ class Progress {
       tab +
       this.progress.toProgressBar() +
       tab +
-      `-${this.msLeft.unitifyTime()}`
+      `-${this.msLeft.unitifyTime()}` +
+      tab
     );
   }
 }
