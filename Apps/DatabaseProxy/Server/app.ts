@@ -404,7 +404,7 @@ import { Analytics } from "@shared/Analytics";
       .flatMap((hosts: string[]) => hosts);
 
     for (const origin of allowedOrigins) {
-      mainLog.log(`CORS allowed origin: ${origin.green}`);
+      mainLog.log(`CORS: ${origin.green}`);
     }
   };
 
