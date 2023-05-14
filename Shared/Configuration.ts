@@ -130,7 +130,9 @@ class Configuration {
       if (typeof value === "string") {
         if (value.startsWith("(env) => ")) {
           const func = eval(value);
-          node[key] = func.apply(null, [{ process, path }]);
+          node[key] = func.apply(null, [
+            { process, path, config: config.data },
+          ]);
         }
       }
     });

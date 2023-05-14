@@ -27,4 +27,4 @@ request:
   timeout: 10 # Timeout requests after 10 seconds
 log:
   enabled: true
-  path: (env) => env.path.resolve(env.process.cwd(), "main.log")
+  path: (env) => env.path.resolve(env.process.cwd(), `${env.config.title}.log`)
