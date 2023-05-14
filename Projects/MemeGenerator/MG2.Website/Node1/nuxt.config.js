@@ -127,4 +127,6 @@ export default {
     { path: "/api", handler: '~/server/middleware/api' },
     { path: "/img", handler: '~/server/middleware/img' },
   ],
+
+  watch: ["~/server", "~/shared", "~/static", "~/plugins", "~/components", "~/pages", "~/layouts", "~/store"],
 };
