@@ -20,7 +20,10 @@ class Analytics {
             if (!database)
                 database = Analytics.defaults.database;
             const analytics = new Analytics();
-            analytics.db = yield MongoDatabase_1.MongoDatabase.new(connectionString, database);
+            if (connectionString && database)
+            {
+                analytics.db = yield MongoDatabase_1.MongoDatabase.new(connectionString, database);
+            }
             return analytics;
         });
     }
