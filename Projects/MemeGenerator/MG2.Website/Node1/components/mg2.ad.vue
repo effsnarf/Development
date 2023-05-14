@@ -131,7 +131,9 @@ export default
   opacity: 0.5;
 }
 
-.ad {}
+.ad {
+  display: none;
+}
 
 .ad-100pcx500 {
   width: 100%;
