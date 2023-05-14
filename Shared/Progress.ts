@@ -74,7 +74,7 @@ class Progress {
         this.total.toLocaleString().green
       }` +
       tab +
-      this.progress.stringify("bar")
+      this.progress.unitifyTime("bar")
     );
   }
 }

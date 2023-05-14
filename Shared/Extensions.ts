@@ -1,3 +1,80 @@
+interface UnitClass {
+  units: string[];
+  unitToValue: { [key: string]: number };
+  prevUnit(unit: string): string;
+  nextUnit(unit: string): string;
+}
+
+class Time {
+  static readonly units: string[] = [
+    "ms",
+    "s",
+    "m",
+    "h",
+    "d",
+    "w",
+    "M",
+    "y",
+    "decade",
+    "century",
+  ];
+
+  static readonly unitToValue: { [key: string]: number } = {
+    ms: 1,
+    s: 1000,
+    m: 1000 * 60,
+    h: 1000 * 60 * 60,
+    d: 1000 * 60 * 60 * 24,
+    w: 1000 * 60 * 60 * 24 * 7,
+    M: 1000 * 60 * 60 * 24 * 30,
+    y: 1000 * 60 * 60 * 24 * 30 * 365,
+    decade: 1000 * 60 * 60 * 24 * 30 * 365 * 10,
+    century: 1000 * 60 * 60 * 24 * 30 * 365 * 100,
+  };
+
+  static prevUnit(unit: string) {
+    return this.units[this.units.indexOf(unit) - 1];
+  }
+
+  static nextUnit(unit: string) {
+    return this.units[this.units.indexOf(unit) + 1];
+  }
+}
+
+class Size {
+  static readonly units: string[] = [
+    "b",
+    "kb",
+    "mb",
+    "gb",
+    "tb",
+    "pb",
+    "eb",
+    "zb",
+    "yb",
+  ];
+
+  static readonly unitToValue: { [key: string]: number } = {
+    b: 1,
+    kb: 1000,
+    mb: 1000 * 1000,
+    gb: 1000 * 1000 * 1000,
+    tb: 1000 * 1000 * 1000 * 1000,
+    pb: 1000 * 1000 * 1000 * 1000 * 1000,
+    eb: 1000 * 1000 * 1000 * 1000 * 1000 * 1000,
+    zb: 1000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000,
+    yb: 1000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000,
+  };
+
+  static prevUnit(unit: string) {
+    return this.units[this.units.indexOf(unit) - 1];
+  }
+
+  static nextUnit(unit: string) {
+    return this.units[this.units.indexOf(unit) + 1];
+  }
+}
+
 const colorCodes = {
   codeNumToColor: {
     "0": "reset",
@@ -97,9 +174,24 @@ const is = (value: any, type: any) => {
 
 interface Number {
   is(type: any): boolean;
-  stringify(unit: string, places?: number): string;
-  colorize(green: number, yellow: number, direction: "<" | ">"): string;
-  getSeverityColor(green: number, yellow: number, direction: "<" | ">"): string;
+  isBetween(min: number, max: number, strictOrder?: boolean): boolean;
+  isBetweenOrEq(min: number, max: number, strictOrder?: boolean): boolean;
+  unitify(
+    unitClass: UnitClass,
+    unit?: string[] | string,
+    places?: number
+  ): string;
+  unitifyTime(unit?: string[] | string): string;
+  unitifySize(unit?: string[] | string): string;
+  unitifyPercent(): string;
+  severify(green: number, yellow: number, direction: "<" | ">"): string;
+  getSeverityColor(
+    green: number,
+    yellow: number,
+    direction: "<" | ">",
+    bgRed?: boolean
+  ): string;
+  toFixedRounded(places: number): string;
 }
 
 if (typeof Number !== "undefined") {
@@ -107,65 +199,116 @@ if (typeof Number !== "undefined") {
     return is(this, type);
   };
 
-  Number.prototype.stringify = function (
-    unit: string,
-    places?: number
+  Number.prototype.isBetween = function (
+    min: number,
+    max: number,
+    strictOrder?: boolean
+  ): boolean {
+    // strictOrder: if false, max could be min and vice versa
+    const value = this.valueOf();
+    if (strictOrder) return value > min && value < max;
+    return (value > min && value < max) || (value > max && value < min);
+  };
+
+  Number.prototype.isBetweenOrEq = function (
+    min: number,
+    max: number,
+    strictOrder?: boolean
+  ): boolean {
+    // strictOrder: if false, max could be min and vice versa
+    const value = this.valueOf();
+    if (strictOrder) return value >= min && value <= max;
+    return (value >= min && value <= max) || (value >= max && value <= min);
+  };
+
+  Number.prototype.unitify = function (
+    unitClass: UnitClass,
+    unit?: string[] | string
   ): string {
-    if (!places) places = 0;
+    // ["m", "s", "ms"] should:
+    // return "230ms" if value is < 1000
+    // return "1.23s" if value is < 60000 and > 1000
+    // return "1.23m" if value is > 60000
+    if (!unit) unit = unitClass.units;
+    let value = this.valueOf();
+    const units = !Array.isArray(unit)
+      ? [unit]
+      : unit.sortByDesc((u) => unitClass.unitToValue[u]);
+    for (const u of units) {
+      const currentUnitValue = unitClass.unitToValue[u];
+      const nextUnitValue = unitClass.unitToValue[unitClass.nextUnit(u)];
+      if (value.isBetweenOrEq(currentUnitValue, nextUnitValue)) {
+        const unitValue = value / currentUnitValue;
+        if (unitValue < 10) {
+          return `${unitValue.toFixedRounded(2)}${u.gray}`;
+        } else return `${unitValue.toFixed(0)}${u.gray}`;
+      }
+    }
+    return `${value.toFixed(2)}${units.last()}`;
+  };
+
+  Number.prototype.unitifyTime = function (
+    unit?: string[] | string,
+    barLength?: number
+  ): string {
+    if (!barLength) barLength = 0;
     let value = this.valueOf();
     if (unit == "bar") {
-      if (!places) places = 50;
-      const barLength = places - ` 100%`.length;
+      if (!barLength) barLength = 50;
+      barLength = barLength - ` 100%`.length;
       const progressLength = Math.round(value * barLength);
       const bar = "█".repeat(progressLength);
       const emptyLength = barLength - progressLength;
       const empty = emptyLength <= 0 ? "" : "█".repeat(emptyLength).gray;
-      return `${bar}${empty} ${value.stringify("%").withoutColors()}`;
+      return `${bar}${empty} ${value.unitifyPercent().withoutColors()}`;
     }
-    if (unit == "s") value = value / 1000;
-    if (unit == "m") value = value / 1000 / 60;
-
-    const isNegative = value < 0;
-    const absValue = Math.abs(value);
-    const isInteger = absValue % 1 === 0;
-    let stringValue = isInteger ? absValue.toString() : absValue.toFixed(2);
-    const sign = isNegative ? "-" : "";
-    if (unit == "%") {
-      stringValue = (absValue * 100).toFixed(places);
-      if (absValue < 0.8) stringValue = stringValue.bgRed.black;
-      else if (absValue < 0.95) stringValue = stringValue.bgYellow.black;
-      else stringValue = stringValue.green;
-    }
-    return `${sign}${stringValue}${unit.gray}`;
+    return value.unitify(Time, unit);
   };
 
-  Number.prototype.colorize = function (
+  Number.prototype.unitifySize = function (unit?: string[] | string): string {
+    return this.unitify(Size, unit);
+  };
+
+  Number.prototype.unitifyPercent = function (): string {
+    return `${Math.round(this.valueOf() * 100)}${`%`.gray}`;
+  };
+
+  Number.prototype.severify = function (
     green: number,
     yellow: number,
     direction: "<" | ">"
   ): string {
     return this.toString().colorize(
-      this.getSeverityColor(green, yellow, direction)
+      this.getSeverityColor(green, yellow, direction, true)
     );
   };
 
   Number.prototype.getSeverityColor = function (
     green: number,
     yellow: number,
-    direction: "<" | ">"
+    direction: "<" | ">",
+    bgRed?: boolean
   ): string {
     const value = this.valueOf();
     if (direction == "<") {
       if (value < green) return "green";
       if (value < yellow) return "yellow";
-      return "red";
+      return bgRed ? "bgRed" : "red";
     }
     if (direction == ">") {
       if (value > green) return "green";
       if (value > yellow) return "yellow";
-      return "red";
+      return bgRed ? "bgRed" : "red";
     }
     throw new Error(`Invalid direction: ${direction}`);
+  };
+
+  Number.prototype.toFixedRounded = function (places: number): string {
+    const value = this.valueOf();
+    let str = value.toFixed(places);
+    while (str.endsWith("0")) str = str.slice(0, -1);
+    if (str.endsWith(".")) str = str.slice(0, -1);
+    return str;
   };
 }
 
@@ -294,14 +437,6 @@ if (typeof Object !== "undefined") {
   };
 }
 
-interface Array<T> {
-  sum(): number;
-  last(): any;
-  distinct(project?: ((item: T) => any) | null): T[];
-  except(...items: T[]): T[];
-  stringify(): string;
-}
-
 interface Function {
   is(type: any): boolean;
   getArgumentNames(): string[];
@@ -319,6 +454,16 @@ if (typeof Function !== "undefined") {
       .match(/([^\s,]+)/g);
     return args || [];
   };
+}
+
+interface Array<T> {
+  sum(): number;
+  last(): any;
+  distinct(project?: ((item: T) => any) | null): T[];
+  except(...items: T[]): T[];
+  sortBy(project: (item: T) => any): T[];
+  sortByDesc(project: (item: T) => any): T[];
+  stringify(): string;
 }
 
 if (typeof Array !== "undefined") {
@@ -348,6 +493,20 @@ if (typeof Array !== "undefined") {
     return this.filter((item) => !items.includes(item));
   };
 
+  Array.prototype.sortBy = function (project: (item: any) => any) {
+    return [...this].sort((a, b) => {
+      const aKey = project(a);
+      const bKey = project(b);
+      if (aKey < bKey) return -1;
+      if (aKey > bKey) return 1;
+      return 0;
+    });
+  };
+
+  Array.prototype.sortByDesc = function (project: (item: any) => any) {
+    return [...this.sortBy(project)].reverse();
+  };
+
   Array.prototype.stringify = function (): any {
     return JSON.stringify(this);
   };
@@ -355,7 +514,17 @@ if (typeof Array !== "undefined") {
 
 interface String {
   is(type: any): boolean;
+
   colorize(color: string): string;
+
+  severifyTime(green: number, yellow: number, direction: "<" | ">"): string;
+  deunitify(unitClass: UnitClass): number;
+  deunitifyTime(): number;
+  deunitifySize(): number;
+
+  getUnit(): string;
+  withoutUnit(): string;
+
   padStartChars(maxLength: number, fillString?: string): string;
   sliceChars(start: number | undefined, end?: number | undefined): string;
   alignRight(): string;
@@ -370,6 +539,7 @@ interface String {
   parseJSON(): any;
   truncate(maxLength: number): string;
   getCharsCount(): number;
+
   getColorCodesLength(): number;
   withoutColors(): string;
   showColorCodes(): string;
@@ -378,8 +548,10 @@ interface String {
   handlebarsColorsToConsole(): string;
   colorsToHtml(): string;
   parseColorCodes(): string;
+
   toShortPath(): string;
   toAbsolutePath(path: any): string;
+  toNumber(): number;
 }
 
 if (typeof String !== "undefined") {
@@ -389,6 +561,40 @@ if (typeof String !== "undefined") {
 
   String.prototype.colorize = function (color: string): string {
     return eval(`this.${color}`);
+  };
+
+  String.prototype.severifyTime = function (
+    green: number,
+    yellow: number,
+    direction: "<" | ">"
+  ): string {
+    const value = this.deunitifyTime();
+    const unit = this.getUnit();
+    const color = value.getSeverityColor(green, yellow, direction, true);
+    return `${value.unitifyTime().withoutUnit().colorize(color)}${unit.gray}`;
+  };
+
+  String.prototype.deunitify = function (unitClass: UnitClass): number {
+    const s = this.withoutColors();
+    const unit = s.getUnit();
+    const value = parseFloat(s.withoutUnit());
+    return value * (unit ? Time.unitToValue[unit] : 1);
+  };
+
+  String.prototype.deunitifyTime = function (): number {
+    return this.deunitify(Time);
+  };
+
+  String.prototype.deunitifySize = function (): number {
+    return this.deunitify(Size);
+  };
+
+  String.prototype.getUnit = function (): string {
+    return this.withoutColors().replace(/[^a-zA-Z]/g, "");
+  };
+
+  String.prototype.withoutUnit = function (): string {
+    return this.withoutColors().replace(/[^0-9.-]/g, "");
   };
 
   String.prototype.padStartChars = function (
@@ -645,5 +851,9 @@ if (typeof String !== "undefined") {
   String.prototype.toAbsolutePath = function (path: any): string {
     if (path.isAbsolute(this.toString())) return path.resolve(this.toString());
     return path.resolve(path.join(process.cwd(), this.toString()));
+  };
+
+  String.prototype.toNumber = function (): number {
+    return parseFloat(this.withoutColors());
   };
 }

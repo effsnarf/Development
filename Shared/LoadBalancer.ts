@@ -112,6 +112,9 @@ interface LoadBalancerOptions {
   request: {
     timeout: number;
   };
+  severity: {
+    time: [number, number, "<" | ">"];
+  };
 }
 
 class IncomingItemCollection {
@@ -244,7 +247,7 @@ class LoadBalancer {
     item.response.end();
     // Log the timeout
     this.logText(
-      `${`Timed out`.bgRed} ${elapsed.stringify("s")}: ${
+      `${`Timed out`.bgRed} ${elapsed.unitifyTime("s")}: ${
         (status || "").toString().padStart(3).bgRed
       } ${item.request.url?.bgRed}`
     );
@@ -261,7 +264,10 @@ class LoadBalancer {
       incomingItem.nodeItem.node.health.trackFailure();
     }
 
-    const elapsedStr = this.toElapsedString(elapsed);
+    const uElapsed = elapsed
+      .unitifyTime()
+      .severifyTime(...this.options.severity.time)
+      .padStartChars(5);
     const status = nodeResponse.status;
     const sizeKB = !nodeResponse ? ` `.repeat(4) : "";
     //: this.toSizeKbString(Buffer.byteLength(nodeResponse.data));
@@ -285,7 +291,7 @@ class LoadBalancer {
       // Log the successful attempt
       this.log({
         node: { index: incomingItem.nodeItem.index },
-        text: `${statusStr} ${sizeKB || ""} ${elapsedStr} ${url}`,
+        text: `${statusStr} ${sizeKB || ""} ${uElapsed} ${url}`,
       });
     }
 
@@ -301,7 +307,10 @@ class LoadBalancer {
   ) {
     incomingItem.nodeItem.node.health.trackFailure();
 
-    const elapsedStr = this.toElapsedString(elapsed);
+    const uElapsed = elapsed
+      .unitifyTime()
+      .severifyTime(...this.options.severity.time)
+      .padStartChars(5);
 
     // Failed to process the incoming item
     // Increment the attempt counter
@@ -311,7 +320,7 @@ class LoadBalancer {
       node: { index: incomingItem.nodeItem.index },
       text: `${
         (ex.status || "").toString().padStart(3).bgRed
-      } ${`(${incomingItem.attempt})`.padStart(4)} ${elapsedStr} ${
+      } ${`(${incomingItem.attempt})`.padStart(4)} ${uElapsed} ${
         logMsg.bgWhite.black
       }`,
     });
@@ -397,19 +406,6 @@ class LoadBalancer {
   async restartNode(nodeIndex: number) {
     const node = this.getNode(nodeIndex);
     await node.process.restart();
-  }
-
-  // Convert milliseconds number to [seconds]s.
-  // "s" is gray.
-  // [seconds] is green (<0.1), yellow (<0.5), or bgRed.
-  private toElapsedString(elapsed: number) {
-    const color = elapsed < 100 ? "green" : elapsed < 500 ? "yellow" : "bgRed";
-    const isOver1000 = elapsed > 1000;
-    const elapsedStr = (isOver1000 ? elapsed / 1000 : elapsed).toFixed(
-      isOver1000 ? 2 : 0
-    );
-    const unit = isOver1000 ? "s" : "ms";
-    return `${elapsedStr.colorize(color)}${unit.gray}`.padStartChars(5);
   }
 
   private toSizeKbString(size: number | null) {

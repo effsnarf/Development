@@ -35,7 +35,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
     //   config.title
     // } ─ ${config.incoming.address.stringifyAddress()}`;
     const items = count;
-    return `${title} ─ (${items.colorize(10, 30, "<")} ${
+    return `${title} ─ (${items.severify(10, 30, "<")} ${
       `reqs`.gray
     }) (${countPerSecond}${`/s`.gray}) (${countPerMinute}${`/m`.gray})`;
   };
@@ -43,7 +43,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   const getNodeLogTitle = (node: any, successRate?: number) => {
     return `${node.name} ─ ${`${node.address.host.yellow}:${
       node.address.port.toString().green
-    }`} (${successRate ? successRate.stringify("%") : ""})`;
+    }`} (${successRate ? successRate.unitifyTime("%") : ""})`;
   };
 
   const incomingItemToString = (item: IncomingItem) => {

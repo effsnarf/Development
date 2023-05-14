@@ -38,7 +38,7 @@ class Process {
       proc.log(
         `${title.green} is already running (pid ${
           existingProcess.pid
-        }) (${timespan.stringify(`m`)}min)`
+        }) (${timespan.unitifyTime(`m`)}min)`
       );
     } else {
       proc.restart();
