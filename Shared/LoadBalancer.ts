@@ -277,7 +277,11 @@ class LoadBalancer {
     );
     nodeResponse.data.pipe(incomingItem.response);
 
-    if (!url.endsWith(".jpg")) {
+    const displayItem = incomingItem.request.url?.endsWith(".jpg")
+      ? false
+      : true;
+
+    if (displayItem) {
       // Log the successful attempt
       this.log({
         node: { index: incomingItem.nodeItem.index },
