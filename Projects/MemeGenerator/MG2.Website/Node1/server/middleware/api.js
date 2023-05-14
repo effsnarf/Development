@@ -317,7 +317,7 @@ export default async function (req, res, next) {
 
     try
     {
-      //res.end(await analyticsApify.processUrl(ip, req.url, data, { stringify: true }));
+      res.end(await analyticsApify.processUrl(ip, req.url, data, { stringify: true }));
     }
     catch (ex)
     {
