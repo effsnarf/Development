@@ -108,7 +108,6 @@ import { Analytics } from "@shared/Analytics";
       const origin = req.headers.origin || req.headers.host;
       if (allowedOrigins.includes(origin)) {
         res.setHeader("Access-Control-Allow-Origin", origin);
-        mainLog.log(`CORS: ${origin.green}`);
       }
       res.header("Access-Control-Allow-Credentials", "true");
       res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
@@ -385,12 +384,6 @@ import { Analytics } from "@shared/Analytics";
 
   // #region 🚀 Start the server
   const start = () => {
-    mainLog.log(
-      `HTTP server running on ${config.server.host.yellow}:${
-        config.server.port.toString().green
-      }`.gray
-    );
-
     // Create the express app
     const httpServer = express();
     httpServer.use(express.json());
@@ -399,6 +392,19 @@ import { Analytics } from "@shared/Analytics";
 
     // Start the server
     httpServer.listen(config.server.port, config.server.host);
+
+    mainLog.log(
+      `HTTP server running on ${config.server.host.yellow}:${
+        config.server.port.toString().green
+      }`.gray
+    );
+
+    const allowedOrigins = config.server.cors
+    .map((host: string) => [`https://${host}`, `http://${host}`])
+    .flatMap((hosts: string[]) => hosts);
+
+    for (const origin of allowedOrigins) {
+      mainLog.log(`CORS allowed origin: ${origin.green}`);
   };
 
   process.title = config.title;
