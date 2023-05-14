@@ -9,33 +9,41 @@ import "./Extensions";
 
 class Unit {
   public readonly percentage: number;
-  public readonly chars: number;
 
   constructor(
     percentage: number | null,
     chars: number | null,
     public readonly direction: "x" | "y"
   ) {
-    const windowSize = Console.getWindowSize();
-    const dir = this.direction === "x" ? "width" : "height";
-
     if (percentage != null) {
       if (percentage < 0 || percentage > 100)
         throw new Error(
           `Percentage must be between 0 and 100 (was ${percentage})`
         );
       this.percentage = percentage;
-      this.chars = Math.round((windowSize[dir] * percentage) / 100);
     } else if (chars != null) {
-      if (chars < 0 || chars > windowSize[dir])
+      if (chars < 0 || chars > this.windowSize[this.dir])
         throw new Error(
-          `Chars must be between 0 and ${windowSize[dir]} (was ${chars})`
+          `Chars must be between 0 and ${
+            this.windowSize[this.dir]
+          } (was ${chars})`
         );
-      this.percentage = Math.round((chars * 100) / windowSize[dir]);
-      this.chars = chars;
+      this.percentage = Math.round((chars * 100) / this.windowSize[this.dir]);
     } else {
       throw new Error("Either percentage or chars must be set");
     }
+  }
+
+  get chars() {
+    return Math.round((this.windowSize[this.dir] * this.percentage) / 100);
+  }
+
+  private get dir() {
+    return this.direction === "x" ? "width" : "height";
+  }
+
+  private get windowSize() {
+    return Console.getWindowSize();
   }
 
   static percent(percentage: number, direction: "x" | "y") {
@@ -95,7 +103,11 @@ abstract class ConsoleElement {
 
   constructor(public title: string, public status?: string) {}
 
-  async render(
+  async render(box: Box) {
+    await this._render(box.x, box.y, box.width, box.height);
+  }
+
+  private async _render(
     _x: string | Unit,
     _y: string | Unit,
     _width: string | Unit,
@@ -477,11 +489,7 @@ class Layout {
   }
 
   async render() {
-    for (let i = 0; i < this.items.length; i++) {
-      const item = this.items[i];
-      const box = item.box;
-      await item.element.render(box.x, box.y, box.width, box.height);
-    }
+    for (const item of this.items) await item.element.render(item.box);
   }
 }
 
