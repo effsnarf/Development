@@ -432,6 +432,7 @@ class ObjectLog extends ConsoleElement {
       yaml
         .split("\n")
         .reverse()
+        .map((line) => line.gray)
         .forEach((line) => log.log(line));
     }
     return log;

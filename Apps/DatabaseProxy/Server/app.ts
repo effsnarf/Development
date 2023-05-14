@@ -38,12 +38,16 @@ import { Analytics } from "@shared/Analytics";
 
   const configLog = ObjectLog.new(
     `Configuration ${configObj.configPaths.map((cp) => cp.toShortPath())}`,
-    () => Configuration.toYaml(config)
+    () => config
   );
 
   const layout = Layout.new();
 
-  layout.addRow(Unit.box("0%", "0%", "100%", "100%"), [mainLog, configLog]);
+  layout.addRow(
+    Unit.box("0%", "0%", "100%", "100%"),
+    [mainLog, configLog],
+    ["75%", "25%"]
+  );
 
   // Render the dashboard
   const renderDashboard = () => {
