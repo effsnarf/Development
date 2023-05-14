@@ -75,6 +75,22 @@ class Size {
   }
 }
 
+class Percentage {
+  static readonly units: string[] = ["%"];
+
+  static readonly unitToValue: { [key: string]: number } = {
+    "%": 100,
+  };
+
+  static prevUnit(unit: string) {
+    return this.units[this.units.indexOf(unit) - 1];
+  }
+
+  static nextUnit(unit: string) {
+    return this.units[this.units.indexOf(unit) + 1];
+  }
+}
+
 const color = {
   fromNumber: {
     0: "reset",
@@ -239,10 +255,14 @@ if (typeof Number !== "undefined") {
     // return "1.23m" if value is > 60000
     if (!unit) unit = unitClass.units;
     let value = this.valueOf();
+    // Percent is a special case
+    if (unitClass == Percentage) return `${Math.round(value * 100)}${`%`.gray}`;
+
     const units = !Array.isArray(unit)
       ? [unit]
       : unit.sortByDesc((u) => unitClass.unitToValue[u]);
-    if (value < 0.01) return `${`~`.gray}${value.toFixed(0)}${units.last()}`;
+    if (value < 0.01)
+      return `${`~`.gray}${value.toFixed(0)}${units.last().gray}`;
     for (const u of units) {
       const currentUnitValue = unitClass.unitToValue[u];
       const nextUnitValue = unitClass.unitToValue[unitClass.nextUnit(u)];
@@ -265,7 +285,8 @@ if (typeof Number !== "undefined") {
   };
 
   Number.prototype.unitifyPercent = function (): string {
-    return `${Math.round(this.valueOf() * 100)}${`%`.gray}`;
+    return this.unitify(Percentage);
+    //return `${Math.round(this.valueOf() * 100)}${`%`.gray}`;
   };
 
   Number.prototype.toProgressBar = function (barLength?: number): string {
@@ -533,8 +554,10 @@ interface String {
   deunitify(unitClass: UnitClass): number;
   deunitifyTime(): number;
   deunitifySize(): number;
+  deunitifyPercent(): number;
 
   getUnit(): string;
+  getUnitClass(): UnitClass;
   withoutUnit(): string;
 
   padStartChars(maxLength: number, fillString?: string): string;
@@ -617,17 +640,25 @@ if (typeof String !== "undefined") {
     yellow: number,
     direction: "<" | ">"
   ): string {
-    const value = this.deunitifyTime();
+    const unitClass = this.getUnitClass();
+    const value = this.deunitify(unitClass);
     const unit = this.getUnit();
     const color = value.getSeverityColor(green, yellow, direction, true);
-    return `${value.unitifyTime().withoutUnit().colorize(color)}${unit.gray}`;
+    return `${value.unitify(unitClass).withoutUnit().colorize(color)}${
+      unit.gray
+    }`;
   };
 
   String.prototype.deunitify = function (unitClass: UnitClass): number {
+    // Percentages are special, because they are relative to 100
+    if (unitClass === Percentage) {
+      const value = parseFloat(this.withoutUnit());
+      return value / 100;
+    }
     const s = this.withoutColors();
     const unit = s.getUnit();
     const value = parseFloat(s.withoutUnit());
-    return value * (unit ? Time.unitToValue[unit] : 1);
+    return value * (unit ? unitClass.unitToValue[unit] : 1);
   };
 
   String.prototype.deunitifyTime = function (): number {
@@ -638,8 +669,20 @@ if (typeof String !== "undefined") {
     return this.deunitify(Size);
   };
 
+  String.prototype.deunitifyPercent = function (): number {
+    return this.deunitify(Percentage);
+  };
+
   String.prototype.getUnit = function (): string {
     return this.withoutColors().replace(/[^a-zA-Z]/g, "");
+  };
+
+  String.prototype.getUnitClass = function (): UnitClass {
+    const unit = this.getUnit();
+    if (Time.units.includes(unit)) return Time;
+    if (Size.units.includes(unit)) return Size;
+    if (Percentage.units.includes(unit)) return Percentage;
+    throw new Error(`Unknown unit: ${unit}`);
   };
 
   String.prototype.withoutUnit = function (): string {

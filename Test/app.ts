@@ -13,14 +13,25 @@ import { Apify } from "@shared/Apify";
 import { Console } from "@shared/Console";
 import { ChatOpenAI, Roles } from "../Apis/OpenAI/classes/ChatOpenAI";
 
-const progress = Progress.newAutoDisplay(100, { skipped: 0, modifieds: [] });
+for (var i = 0; i <= 100; i += 10) {
+  const percent = i / 100;
+  const value = i * 1000;
+  //console.log(value.unitifyTime(), value.unitifyTime().deunitifyTime());
 
-(async () => {
-  for (let i = 0; i < 100; i++) {
-    progress.increment();
-    await new Promise((resolve) => setTimeout(resolve, 100));
-  }
-})();
+  console.log(
+    percent.unitifyPercent(),
+    percent.unitifyPercent().deunitifyPercent()
+  );
+}
+
+// const progress = Progress.newAutoDisplay(100, { skipped: 0, modifieds: [] });
+
+// (async () => {
+//   for (let i = 0; i < 100; i++) {
+//     progress.increment();
+//     await new Promise((resolve) => setTimeout(resolve, 100));
+//   }
+// })();
 
 // const path1 = `C:\\eff\\Development\\${
 //   `Projects`.green
