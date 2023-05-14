@@ -674,7 +674,7 @@ if (typeof String !== "undefined") {
   };
 
   String.prototype.getUnit = function (): string {
-    return this.withoutColors().replace(/[^a-zA-Z]/g, "");
+    return this.withoutColors().replace(/[0-9]/g, "");
   };
 
   String.prototype.getUnitClass = function (): UnitClass {

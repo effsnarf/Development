@@ -45,7 +45,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
     return `${node.name} ─ ${`${node.address.host.yellow}:${
       node.address.port.toString().green
     }`} (${
-      successRate ? successRate.unitifyPercent().severify(90, 80, ">") : ""
+      successRate ? successRate.unitifyPercent().severify(0.9, 0.8, ">") : ""
     })`;
   };
 

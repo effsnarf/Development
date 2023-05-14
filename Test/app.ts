@@ -20,7 +20,7 @@ for (var i = 0; i <= 100; i += 10) {
 
   console.log(
     percent.unitifyPercent(),
-    percent.unitifyPercent().deunitifyPercent()
+    percent.unitifyPercent().severify(0.9, 0.8, ">")
   );
 }
 
