@@ -276,9 +276,11 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
 
   // Assign keys
   const shift12345678 = "!@#$%^&*";
-  mainConsoleLog.log("Press [q] to quit".bgWhite);
-  mainConsoleLog.log("Press [1, 2, ..] to enable/disable nodes".bgWhite);
-  mainConsoleLog.log("Press shift+[1, 2, ..] to start node processes".bgWhite);
+  mainConsoleLog.log("Press [q] to quit".bgWhite.black);
+  mainConsoleLog.log("Press [1, 2, ..] to enable/disable nodes".bgWhite.black);
+  mainConsoleLog.log(
+    "Press shift+[1, 2, ..] to start node processes".bgWhite.black
+  );
   for (var i = 0; i < config.nodes.length; i++) {
     const char = (i + 1).toString();
     Console.on.key(char, (char: string) =>
