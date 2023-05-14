@@ -172,6 +172,7 @@ let MongoDatabase = (() => {
         }
         static getDatabaseNames(connectionString) {
             return __awaiter(this, void 0, void 0, function* () {
+                if (!connectionString) throw new Error(`Connection string is required.`);
                 const client = new mongodb_1.MongoClient(connectionString);
                 yield client.connect();
                 const databases = yield client.db().admin().listDatabases();
