@@ -600,7 +600,7 @@ class Console {
     const window = process.stdout.getWindowSize();
     return {
       width: window[0],
-      height: window[1] - 2,
+      height: window[1] - 4,
     };
   }
 
