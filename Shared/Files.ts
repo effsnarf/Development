@@ -105,7 +105,7 @@ class Files {
       if (onLog) {
         onLog(`Watching ${watchPath.toShortPath()}`);
         if (exclude.length) {
-          onLog(`Excluding ${exclude.map((s) => s.yellow).join(", ")}`);
+          onLog(`  Excluding ${exclude.map((s) => s.yellow).join(", ")}`);
         }
       }
     }
