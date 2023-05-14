@@ -1,3 +1,5 @@
+import * as jsyaml from "js-yaml";
+
 // Replaces console.log()
 // Shows timestamps, etc
 
@@ -426,7 +428,11 @@ class ObjectLog extends ConsoleElement {
     if (Array.isArray(data)) {
       data.forEach((item) => log.log(item));
     } else {
-      throw new Error("Not implemented");
+      const yaml = jsyaml.dump(data);
+      yaml
+        .split("\n")
+        .reverse()
+        .forEach((line) => log.log(line));
     }
     return log;
   }

@@ -8,7 +8,15 @@ import util from "util";
 import axios from "axios";
 import express from "express";
 import "@shared/Extensions";
-import { Console } from "@shared/Console";
+import {
+  Console,
+  Layout,
+  Log,
+  ObjectLog,
+  LargeText,
+  Bar,
+  Unit,
+} from "@shared/Console";
 import { Configuration } from "@shared/Configuration";
 import { TypeScript } from "@shared/TypeScript";
 import { Database } from "@shared/Database/Database";
@@ -18,22 +26,32 @@ import { Analytics } from "@shared/Analytics";
 
 (async () => {
   // #region 📝 Configuration
-  const config = (
-    await Configuration.new({
-      quitIfChanged: [__filename.replace(".temp.ts", "")],
-    })
-  ).data;
+  const configObj = await Configuration.new({
+    quitIfChanged: [__filename.replace(".temp.ts", "")],
+  });
+  const config = configObj.data;
   // #endregion
 
   // #region 💻 Console
-  const console = Console.new();
+  // Create the dashboard layout
+  const mainLog = Log.new(config.title);
 
-  console.header("Database Proxy".green);
-  console.header2(
-    ...Configuration.toYaml(config)
-      .split("\n")
-      .map((s) => s.gray)
+  const configLog = ObjectLog.new(
+    `Configuration ${configObj.configPaths.map((cp) => cp.toShortPath())}`,
+    () => Configuration.toYaml(config)
   );
+
+  const layout = Layout.new();
+
+  layout.addRow(Unit.box("0%", "0%", "100%", "100%"), [mainLog, configLog]);
+
+  // Render the dashboard
+  const renderDashboard = () => {
+    layout.render();
+    // Set the console window title
+    process.title = `${config.title} (?)`;
+  };
+  setInterval(renderDashboard, 1000 / 1);
   // #endregion
 
   // #endregion
@@ -102,7 +120,7 @@ import { Analytics } from "@shared/Analytics";
         const body = req.body;
         const proxyUrl = `https://${config.server.proxy}${url}`;
 
-        console.log(
+        mainLog.log(
           `${`${method.yellow} ${url.gray}`.padEnd(50)} ${"->".gray} ${
             proxyUrl.yellow
           }`
@@ -120,11 +138,11 @@ import { Analytics } from "@shared/Analytics";
           })
           .catch((ex: any) => {
             if (!ex.response) {
-              console.error(ex.message);
+              mainLog.log(ex.message.bgRed);
               return;
             }
             if (ex.response.status != 404) {
-              console.error(ex.response.data);
+              mainLog.log(JSON.stringify(ex.response.data).bgRed);
             }
             res.status(ex.response.status).send(ex.response.data);
           });
@@ -140,7 +158,7 @@ import { Analytics } from "@shared/Analytics";
         try {
           await handler(req, res);
         } catch (ex: any) {
-          console.error(ex);
+          mainLog.log(ex.message.bgRed);
           res.status(500).send(ex.stack);
         }
       };
@@ -305,7 +323,7 @@ import { Analytics } from "@shared/Analytics";
             dbs._analytics?.create("api", methodStr, { args }, elapsed);
           }
 
-          console.log(
+          mainLog.log(
             `${
               `${elapsed.toLocaleString()}ms`.padStart(8).gray
             } ${`${methodStr}`}(${util
@@ -347,7 +365,7 @@ import { Analytics } from "@shared/Analytics";
           },
         ];
 
-        //console.log(pipeline);
+        //mainLog.log(pipeline);
 
         const items = await db?.aggregate(req.params.entity, pipeline);
 
@@ -360,7 +378,7 @@ import { Analytics } from "@shared/Analytics";
 
   // #region 🚀 Start the server
   const start = () => {
-    console.header(
+    mainLog.log(
       `HTTP server running on ${config.server.host.yellow}:${
         config.server.port.toString().green
       }`.gray
