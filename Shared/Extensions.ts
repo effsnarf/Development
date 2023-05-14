@@ -682,7 +682,7 @@ if (typeof String !== "undefined") {
     if (Time.units.includes(unit)) return Time;
     if (Size.units.includes(unit)) return Size;
     if (Percentage.units.includes(unit)) return Percentage;
-    throw new Error(`Unknown unit: ${unit}`);
+    throw new Error(`Unknown unit: ${unit} (${this})`);
   };
 
   String.prototype.withoutUnit = function (): string {
