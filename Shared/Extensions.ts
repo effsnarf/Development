@@ -529,7 +529,7 @@ interface String {
   singularize(): string;
   pluralize(): string;
 
-  severifyTime(green: number, yellow: number, direction: "<" | ">"): string;
+  severify(green: number, yellow: number, direction: "<" | ">"): string;
   deunitify(unitClass: UnitClass): number;
   deunitifyTime(): number;
   deunitifySize(): number;
@@ -612,7 +612,7 @@ if (typeof String !== "undefined") {
     return this + "s";
   };
 
-  String.prototype.severifyTime = function (
+  String.prototype.severify = function (
     green: number,
     yellow: number,
     direction: "<" | ">"

@@ -331,7 +331,7 @@ import { Analytics } from "@shared/Analytics";
           itemsLog.log(
             `${elapsed
               .unitifyTime()
-              .severifyTime(50, 500, "<")
+              .severify(50, 500, "<")
               .padStartChars(8)} ${`${methodStr}`}(${util
               .inspect(args, { colors: true })
               .replace("\n", "")})`

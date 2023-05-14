@@ -266,7 +266,7 @@ class LoadBalancer {
 
     const uElapsed = elapsed
       .unitifyTime()
-      .severifyTime(...this.options.severity.time)
+      .severify(...this.options.severity.time)
       .padStartChars(5);
     const status = nodeResponse.status;
     const sizeKB = !nodeResponse ? ` `.repeat(4) : "";
@@ -309,7 +309,7 @@ class LoadBalancer {
 
     const uElapsed = elapsed
       .unitifyTime()
-      .severifyTime(...this.options.severity.time)
+      .severify(...this.options.severity.time)
       .padStartChars(5);
 
     // Failed to process the incoming item
