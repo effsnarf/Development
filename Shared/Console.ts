@@ -299,7 +299,7 @@ class Bar extends ConsoleElement {
   }
   set value(value: number | undefined) {
     this._value = value;
-    this.status = `${value?.unitifyTime("%") || ""}`;
+    this.status = `${value?.unitifyPercent() || ""}`;
   }
 
   constructor(

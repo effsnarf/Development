@@ -44,7 +44,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   const getNodeLogTitle = (node: any, successRate?: number) => {
     return `${node.name} ─ ${`${node.address.host.yellow}:${
       node.address.port.toString().green
-    }`} (${successRate ? successRate.unitifyTime("%") : ""})`;
+    }`} (${successRate ? successRate.unitifyPercent() : ""})`;
   };
 
   const incomingItemToString = (item: IncomingItem) => {
