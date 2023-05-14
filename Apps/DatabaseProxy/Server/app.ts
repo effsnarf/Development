@@ -35,6 +35,7 @@ import { Analytics } from "@shared/Analytics";
   // #region 💻 Console
   // Create the dashboard layout
   const mainLog = Log.new(config.title);
+  const itemsLog = Log.new("Items");
 
   const configLog = ObjectLog.new(
     `Configuration ${configObj.configPaths.map((cp) => cp.toShortPath())}`,
@@ -45,8 +46,8 @@ import { Analytics } from "@shared/Analytics";
 
   layout.addRow(
     Unit.box("0%", "0%", "100%", "100%"),
-    [mainLog, configLog],
-    ["75%", "25%"]
+    [mainLog, itemsLog, configLog],
+    ["25%", "50%", "25%"]
   );
 
   // Render the dashboard
@@ -107,6 +108,7 @@ import { Analytics } from "@shared/Analytics";
       const origin = req.headers.origin || req.headers.host;
       if (allowedOrigins.includes(origin)) {
         res.setHeader("Access-Control-Allow-Origin", origin);
+        mainLog.log(`CORS: ${origin.green}`);
       }
       res.header("Access-Control-Allow-Credentials", "true");
       res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
@@ -124,7 +126,7 @@ import { Analytics } from "@shared/Analytics";
         const body = req.body;
         const proxyUrl = `https://${config.server.proxy}${url}`;
 
-        mainLog.log(
+        itemsLog.log(
           `${`${method.yellow} ${url.gray}`.padEnd(50)} ${"->".gray} ${
             proxyUrl.yellow
           }`
@@ -142,11 +144,11 @@ import { Analytics } from "@shared/Analytics";
           })
           .catch((ex: any) => {
             if (!ex.response) {
-              mainLog.log(ex.message.bgRed);
+              itemsLog.log(ex.message.bgRed);
               return;
             }
             if (ex.response.status != 404) {
-              mainLog.log(JSON.stringify(ex.response.data).bgRed);
+              itemsLog.log(JSON.stringify(ex.response.data).bgRed);
             }
             res.status(ex.response.status).send(ex.response.data);
           });
@@ -162,7 +164,7 @@ import { Analytics } from "@shared/Analytics";
         try {
           await handler(req, res);
         } catch (ex: any) {
-          mainLog.log(ex.message.bgRed);
+          itemsLog.log(ex.message.bgRed);
           res.status(500).send(ex.stack);
         }
       };
@@ -327,7 +329,7 @@ import { Analytics } from "@shared/Analytics";
             dbs._analytics?.create("api", methodStr, { args }, elapsed);
           }
 
-          mainLog.log(
+          itemsLog.log(
             `${elapsed
               .unitifyTime()
               .severifyTime(50, 500, "<")
@@ -370,7 +372,7 @@ import { Analytics } from "@shared/Analytics";
           },
         ];
 
-        //mainLog.log(pipeline);
+        //itemsLog.log(pipeline);
 
         const items = await db?.aggregate(req.params.entity, pipeline);
 
