@@ -87,28 +87,31 @@ const initApi = (async() => {
       }
     }));
 
-    // Track UI events
-    capturedUiEvents.forEach((eventType) => {
-      window.addEventListener(eventType, (e) => {
-        visit.v.ui.e[e.type] = (visit.v.ui.e[e.type] || 0) + 1;
-        visit.v.ui.total = Object.values(visit.v.ui.e).reduce((a, b) => a + b, 0);
+    if (visit)
+    {
+      // Track UI events
+      capturedUiEvents.forEach((eventType) => {
+        window.addEventListener(eventType, (e) => {
+          visit.v.ui.e[e.type] = (visit.v.ui.e[e.type] || 0) + 1;
+          visit.v.ui.total = Object.values(visit.v.ui.e).reduce((a, b) => a + b, 0);
+        });
       });
-    });
 
-    // Track time spent on page
-    repeat(() => {
-      visit.v.dt.end = Date.now();
-      visit.v.dt.length = (visit.v.dt.end - visit.v.dt.start);
-    }, 100);
+      // Track time spent on page
+      repeat(() => {
+        visit.v.dt.end = Date.now();
+        visit.v.dt.length = (visit.v.dt.end - visit.v.dt.start);
+      }, 100);
 
-    // Track active time on page
-    trackActiveTime((activeTime) => {
-      visit.v.dt.active = activeTime;
-    });
+      // Track active time on page
+      trackActiveTime((activeTime) => {
+        visit.v.dt.active = activeTime;
+      });
 
-    repeat(async () => {
-      //await analytics.update(visit._id, visit.v);
-    }, 1000);
+      repeat(async () => {
+        //await analytics.update(visit._id, visit.v);
+      }, 1000);
+    }
 
     const api = {
       user,
