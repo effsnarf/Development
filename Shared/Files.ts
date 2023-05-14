@@ -62,6 +62,55 @@ class Files {
     yield* traverseDirectory(folder);
   }
 
+  static watch(
+    paths: string[],
+    options: { recursive: boolean; exclude: string[] } = {
+      recursive: false,
+      exclude: [],
+    },
+    callback: (paths: string[]) => void,
+    onLog?: (message: string) => void
+  ) {
+    if (!paths.length) throw new Error("No paths provided");
+
+    const { recursive, exclude } = options;
+
+    let timeout: number = 0;
+    let changedPaths: string[] = [];
+
+    for (const watchPath of paths) {
+      const watcher = fs.watch(watchPath, { recursive });
+
+      watcher.on("change", (event, filename) => {
+        if (typeof filename != "string") return;
+        if (filename.split("\\").some((part) => exclude.includes(part))) return;
+        clearTimeout(timeout);
+        const filePath = path.resolve(watchPath, filename);
+        if (!changedPaths.includes(filePath)) changedPaths.push(filePath);
+        setTimeout(() => {
+          if (changedPaths.length) {
+            if (onLog) {
+              onLog(`Change detected in ${watchPath.toShortPath()}`);
+              onLog(`  ${changedPaths.length.pluralize("files")} changed`);
+              for (const changedPath of changedPaths) {
+                onLog(`    ${changedPath.toShortPath()}`);
+              }
+            }
+            callback(changedPaths);
+          }
+          changedPaths = [];
+        }, 400);
+      });
+
+      if (onLog) {
+        onLog(`Watching ${watchPath.toShortPath()}`);
+        if (exclude.length) {
+          onLog(`Excluding ${exclude.map((s) => s.yellow).join(", ")}`);
+        }
+      }
+    }
+  }
+
   static async syncFolders(
     master: string,
     clone: string,
@@ -77,12 +126,12 @@ class Files {
       if (!progress) {
         const pathsCount = await Files.CountPaths(master, filter, recursive);
 
-        onProgress(
-          progress!,
-          `${pathsCount.toLocaleString()} ${`items in `.gray} ${
-            master.toShortPath().yellow
-          }`
-        );
+        // onProgress(
+        //   progress!,
+        //   `${pathsCount.toLocaleString()} ${`items in `.gray} ${
+        //     master.toShortPath().yellow
+        //   }`
+        // );
 
         progress = Progress.new(
           pathsCount,
@@ -125,10 +174,7 @@ class Files {
             if (!fs.existsSync(clonePath)) {
               fs.mkdirSync(clonePath);
               progress.data.modifieds.push(clonePath);
-              onProgress(
-                progress,
-                `${`Created`.cyan} ${clonePath.toShortPath()}`
-              );
+              onProgress(progress, `  ${`Created`.cyan} ${clonePath.yellow}`);
             }
 
             await Files.syncFolders(
@@ -146,7 +192,12 @@ class Files {
           if (!fs.existsSync(clonePath)) {
             fs.copyFileSync(masterPath, clonePath);
             progress.data.modifieds.push(clonePath);
-            onProgress(progress, `${`Copied`.cyan} ${clonePath.toShortPath()}`);
+            onProgress(
+              progress,
+              `  ${`Created`.cyan} ${
+                clonePath.toShortPath(masterPath).yellow
+              } <- ${masterPath.toShortPath(clonePath).green}`
+            );
             continue;
           }
 
@@ -156,7 +207,9 @@ class Files {
             progress.data.modifieds.push(clonePath);
             onProgress(
               progress,
-              `${`Modified`.cyan} ${clonePath.toShortPath()}`
+              `  ${`Copied`.cyan} ${
+                clonePath.toShortPath(masterPath).yellow
+              } <- ${masterPath.toShortPath(clonePath).green}`
             );
             continue;
           }

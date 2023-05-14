@@ -1,6 +1,10 @@
 # Temp TypeScript files
 *.temp.ts
 
+# Project folders
+/Projects/MemeGenerator/MG2.Website/Node2
+Test/Database
+
 # Logs
 logs
 *.log
@@ -131,4 +135,4 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
-/Projects/MemeGenerator/MG2.Website/Node2
+

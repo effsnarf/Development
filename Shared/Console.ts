@@ -377,11 +377,11 @@ class Log extends ConsoleElement {
         const dt = new Date(item.dt);
         const dtString = `${dt.toLocaleTimeString()}`;
         const dateStr = !this.showDate ? "" : `${dtString.gray} `;
-        lines.push(
-          `${dateStr}${item.args
-            .flatMap((arg) => Console.objectToLines(arg))
-            .join(" ")}`
-        );
+        const line = `${dateStr}${item.args
+          .flatMap((arg) => Console.objectToLines(arg))
+          .join(" ")}`;
+        const widthLines = line.splitOnWidth((width as Unit).chars);
+        lines.push(...widthLines);
       });
       resolve(lines);
     });

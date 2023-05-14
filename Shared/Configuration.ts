@@ -37,7 +37,10 @@ class Configuration {
   options: ConfigurationOptions;
   data: any;
 
-  constructor(options: ConfigurationOptions) {
+  constructor(
+    options: ConfigurationOptions,
+    public readonly configPaths: string[]
+  ) {
     if (!options) options = {};
     if (!("log" in options)) options.log = true;
     this.options = options;
@@ -59,8 +62,8 @@ class Configuration {
     },
     configPaths?: ConfigPaths
   ) {
-    const config = new Configuration(options);
     configPaths = Configuration.getConfigPaths(configPaths);
+    const config = new Configuration(options, configPaths);
     config.log(`${configPaths.length} config file(s) found:`.gray);
     configPaths.forEach((p) => config.log(`  ${p.toShortPath()}`.gray));
     config.log();

@@ -12,7 +12,6 @@ const config = Configuration.new({ log: false }, path.join(__dirname, "../../con
 Analytics.defaults.connectionString = config.database.analytics?.connectionString;
 Analytics.defaults.database = config.database.analytics?.name;
 
-
 const analyticsApify = new Apify.Server(
   null,
   null,

@@ -75,33 +75,33 @@ class Size {
   }
 }
 
-const colorCodes = {
-  codeNumToColor: {
-    "0": "reset",
-    "1": "bright",
-    "2": "dim",
-    "4": "underscore",
-    "5": "blink",
-    "7": "reverse",
-    "8": "hidden",
-    "30": "black",
-    "31": "red",
-    "32": "green",
-    "33": "yellow",
-    "34": "blue",
-    "35": "magenta",
-    "36": "cyan",
-    "37": "white",
-    "40": "bgBlack",
-    "41": "bgRed",
-    "42": "bgGreen",
-    "43": "bgYellow",
-    "44": "bgBlue",
-    "45": "bgMagenta",
-    "46": "bgCyan",
-    "47": "bgWhite",
+const color = {
+  fromNumber: {
+    0: "reset",
+    1: "bright",
+    2: "dim",
+    4: "underscore",
+    5: "blink",
+    7: "reverse",
+    8: "hidden",
+    30: "black",
+    31: "red",
+    32: "green",
+    33: "yellow",
+    34: "blue",
+    35: "magenta",
+    36: "cyan",
+    37: "white",
+    40: "bgBlack",
+    41: "bgRed",
+    42: "bgGreen",
+    43: "bgYellow",
+    44: "bgBlue",
+    45: "bgMagenta",
+    46: "bgCyan",
+    47: "bgWhite",
   } as any,
-  colorToCodeNum: {
+  toNumber: {
     reset: "0",
     bright: "1",
     dim: "2",
@@ -126,7 +126,7 @@ const colorCodes = {
     bgCyan: "46",
     bgWhite: "47",
   } as any,
-  colorToCodeChar: {
+  toChar: {
     reset: "\x1b[0m",
     bright: "\x1b[1m",
     dim: "\x1b[2m",
@@ -176,6 +176,7 @@ interface Number {
   is(type: any): boolean;
   isBetween(min: number, max: number, strictOrder?: boolean): boolean;
   isBetweenOrEq(min: number, max: number, strictOrder?: boolean): boolean;
+  pluralize(plural: string): string;
   unitify(
     unitClass: UnitClass,
     unit?: string[] | string,
@@ -219,6 +220,12 @@ if (typeof Number !== "undefined") {
     const value = this.valueOf();
     if (strictOrder) return value >= min && value <= max;
     return (value >= min && value <= max) || (value >= max && value <= min);
+  };
+
+  Number.prototype.pluralize = function (plural: string): string {
+    const singular = plural.singularize();
+    if (this.valueOf() === 1) return `${this} ${singular}`;
+    return `${this} ${plural}`;
   };
 
   Number.prototype.unitify = function (
@@ -514,8 +521,14 @@ if (typeof Array !== "undefined") {
 
 interface String {
   is(type: any): boolean;
+  isColorCode(): boolean;
+
+  nextChar(): string;
+  getChars(): Generator<string, void, unknown>;
 
   colorize(color: string): string;
+  singularize(): string;
+  pluralize(): string;
 
   severifyTime(green: number, yellow: number, direction: "<" | ">"): string;
   deunitify(unitClass: UnitClass): number;
@@ -529,6 +542,7 @@ interface String {
   sliceChars(start: number | undefined, end?: number | undefined): string;
   alignRight(): string;
   shorten(maxLength: number): string;
+  splitOnWidth(width: number): string[];
   trimAll(): string;
   trimDoubleQuotes(): string;
   stripHtmlTags(): string;
@@ -549,7 +563,7 @@ interface String {
   colorsToHtml(): string;
   parseColorCodes(): string;
 
-  toShortPath(): string;
+  toShortPath(comparePath?: string): string;
   toAbsolutePath(path: any): string;
   toNumber(): number;
 }
@@ -559,8 +573,44 @@ if (typeof String !== "undefined") {
     return is(this, type);
   };
 
+  String.prototype.isColorCode = function (): boolean {
+    return this.startsWith("\x1b[");
+  };
+
+  // Returns the next character in the string ("abcd" => "a")
+  // In case of console color codes, it returns the whole color code
+  String.prototype.nextChar = function (): string {
+    const s = this.toString();
+    if (s.isColorCode()) {
+      return s.slice(0, 5);
+    }
+    return s[0];
+  };
+
+  // "[red]ab[/reset]cdef" -> ["[red]", "a", "b", "[reset]", "c", "d", "e", "f"]
+  String.prototype.getChars = function* () {
+    let s = this.toString();
+    while (s.length > 0) {
+      const char = s.nextChar();
+      yield char;
+      s = s.slice(char.length);
+    }
+  };
+
   String.prototype.colorize = function (color: string): string {
     return eval(`this.${color}`);
+  };
+
+  String.prototype.singularize = function (): string {
+    if (this.endsWith("ies")) return this.slice(0, -3) + "y";
+    if (this.endsWith("s")) return this.slice(0, -1);
+    return this.toString();
+  };
+
+  String.prototype.pluralize = function (): string {
+    if (this.endsWith("y")) return this.slice(0, -1) + "ies";
+    if (this.endsWith("s")) return this.toString();
+    return this + "s";
   };
 
   String.prototype.severifyTime = function (
@@ -642,6 +692,28 @@ if (typeof String !== "undefined") {
   String.prototype.shorten = function (maxLength: number): string {
     if (this.length > maxLength) return this.slice(0, maxLength) + "...";
     return this.toString();
+  };
+
+  String.prototype.splitOnWidth = function (width: number): string[] {
+    const lines: string[] = [];
+    let currentLine = "";
+    let colorStack = [];
+    for (const char of this.getChars()) {
+      if (char.isColorCode()) colorStack.push(char);
+      if (currentLine.getCharsCount() >= width) {
+        // new line
+        if (colorStack.length > 0)
+          // reset the color
+          currentLine += color.toChar.reset;
+        lines.push(currentLine);
+        currentLine = "";
+        colorStack.forEach((c) => (currentLine += c));
+        colorStack = [];
+      }
+      currentLine += char;
+    }
+    if (currentLine.length > 0) lines.push(currentLine);
+    return lines;
   };
 
   String.prototype.trimAll = function (): string {
@@ -757,7 +829,7 @@ if (typeof String !== "undefined") {
     const result = this.replace(
       pattern,
       (match: any, colorCode: string, content: string) => {
-        const colorName = colorCodes.codeNumToColor[colorCode];
+        const colorName = color.fromNumber[colorCode.toNumber()];
         if (colorName) {
           return `{{#${colorName}}}${content}{{/${colorName}}}`;
         } else {
@@ -776,7 +848,7 @@ if (typeof String !== "undefined") {
   String.prototype.handlebarsColorsToHtml = function (): string {
     const pattern = /\{\{\#([^\{\}]*?)\}\}([\s\S]*?)\{\{\/\1\}\}/g;
     const result = this.replace(pattern, (match, color, content) => {
-      if (!colorCodes.colorToCodeNum[color]) return content;
+      if (!color.colorToCodeNum[color]) return content;
       return `<span class="${color}">${content.handleBarsColorsToHtml()}</span>`;
     });
     // If pattern is found, call the function recursively
@@ -792,12 +864,10 @@ if (typeof String !== "undefined") {
     const pattern = /\{\{\#([^\{\}]*?)\}\}([\s\S]*?)\{\{\/\1\}\}/g;
     // {{/red}}
     let result = this.replace(pattern, (match, color, content) => {
-      if (!colorCodes.colorToCodeChar[color]) return content;
+      if (!color.colorToCodeChar[color]) return content;
       return `${
-        colorCodes.colorToCodeChar[color]
-      }${content.handlebarsColorsToConsole()}${
-        colorCodes.colorToCodeChar["reset"]
-      }`;
+        color.colorToCodeChar[color]
+      }${content.handlebarsColorsToConsole()}${color.colorToCodeChar["reset"]}`;
     });
     // If pattern is found, call the function recursively
     if (result.match(pattern)) {
@@ -832,15 +902,25 @@ if (typeof String !== "undefined") {
     });
   };
 
-  String.prototype.toShortPath = function (): string {
+  String.prototype.toShortPath = function (comparePath?: string): string {
     const path = this.toString().replace(/\\/g, "/");
-    let parts = path.split("/");
+    const allParts = path.split("/");
     // Return the last 2 parts of the path
-    parts = parts.slice(Math.max(parts.length - 2, 0));
+    const parts = allParts.slice(Math.max(allParts.length - 2, 0));
     let s = `${parts[0].yellow}${`\\`.gray}${parts[1]}`;
     if (parts.length > 2) {
       s = `${s} (${parts.slice(0, -2).join("\\")})`.gray;
     }
+    if (comparePath) {
+      const compareParts = comparePath.replace(/\\/g, "/").split("/");
+      const diffs = allParts.filter((part, index) => {
+        return part !== compareParts[index];
+      });
+      if (diffs.length > 0) {
+        s = `${diffs.join("\\").gray}..\\${s}`;
+      }
+    }
+    s = `${`..\\`.gray}${s}`;
     return s;
   };
 

@@ -25,3 +25,6 @@ node:
     timeout: 5 # and it has been unhealthy for N minutes
 request:
   timeout: 10 # Timeout requests after 10 seconds
+log:
+  enabled: true
+  path: (env) => env.path.resolve(env.process.cwd(), "main.log")

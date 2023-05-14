@@ -43,6 +43,7 @@ class Progress {
   }
 
   private displayProgressBar() {
+    if (!this.displayProgress) return;
     if (this.showedFirstLine) {
       // Go up one line
       process.stdout.write("\x1b[1A");

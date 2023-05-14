@@ -3,6 +3,7 @@ import "@shared/Extensions";
 import { Types } from "@shared/Types";
 import { Configuration } from "@shared/Configuration";
 import { Files } from "@shared/Files";
+import { EmptyLogger, MultiLogger, FileSystemLogger } from "@shared/Logger";
 import { Analytics } from "@shared/Analytics";
 import { Database } from "@shared/Database/Database";
 import {
@@ -17,13 +18,13 @@ import {
 import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
 
 (async () => {
-  const config = (
-    await Configuration.new({
-      quitIfChanged: [__filename.replace(".temp.ts", "")],
-      toAbsolutePaths: ["process"],
-      types: Types,
-    })
-  ).data;
+  const configObj = await Configuration.new({
+    quitIfChanged: [__filename.replace(".temp.ts", "")],
+    toAbsolutePaths: ["process"],
+    types: Types,
+  });
+
+  const config = configObj.data;
 
   const getIncomingLogTitle = (
     count: number = 0,
@@ -68,12 +69,38 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   const loadBalancer = LoadBalancer.new(config.incoming);
 
   // Create the main log
-  const mainLog = Log.new(getIncomingLogTitle());
+  const mainConsoleLog = Log.new(getIncomingLogTitle());
   const incomingItemsLog = ObjectLog.new(getIncomingLogTitle(), () =>
     loadBalancer.incomingItems
       .getItems()
       .sort((a: IncomingItem, b: IncomingItem) => b.dt - a.dt)
       .map((item: IncomingItem) => incomingItemToString(item))
+  );
+
+  // Create a file system logger
+  const fsLog = !config.log?.enabled
+    ? EmptyLogger.new()
+    : FileSystemLogger.new(config.log.path);
+
+  if (fsLog instanceof EmptyLogger) {
+    mainConsoleLog.log(
+      `File system logging is disabled. To enable it, set ${
+        `log.enabled`.yellow
+      } to ${`true`.yellow} and ${"log.path".yellow} in ${configObj.configPaths
+        .map((cp) => cp.toShortPath())
+        .join(" or ")}`
+    );
+  } else {
+    mainConsoleLog.log(`Logging to ${`${config.log.path.toShortPath()}`}`);
+  }
+
+  // Main logger logs to console and file system (if enabled)
+  const mainLog = MultiLogger.new([mainConsoleLog, fsLog]);
+
+  mainLog.log(
+    `Configuration loaded from ${configObj.configPaths
+      .map((cp) => cp.toShortPath())
+      .join(", ")}`
   );
 
   const counterLog = LargeText.new("Requests per minute");
@@ -108,7 +135,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
     ["50%", "10%"]
   );
   // Add the main log
-  layout.addColumn(Unit.box("0%", "50%", "40%", "50%"), [mainLog]);
+  layout.addColumn(Unit.box("0%", "50%", "40%", "50%"), [mainConsoleLog]);
 
   console.clear();
 
@@ -165,7 +192,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
       loadBalancer.stats.requests.per.second.count,
       loadBalancer.stats.requests.per.minute.count
     );
-    mainLog.title = title;
+    mainConsoleLog.title = title;
     incomingItemsLog.title = title;
     loadBalancer.stats.requests.per.second.count.toLocaleString();
     counterLog.text =
@@ -249,9 +276,9 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
 
   // Assign keys
   const shift12345678 = "!@#$%^&*";
-  mainLog.log("Press [q] to quit");
-  mainLog.log("Press [1, 2, ..] to enable/disable nodes");
-  mainLog.log("Press shift+[1, 2, ..] to start node processes");
+  mainConsoleLog.log("Press [q] to quit");
+  mainConsoleLog.log("Press [1, 2, ..] to enable/disable nodes");
+  mainConsoleLog.log("Press shift+[1, 2, ..] to start node processes");
   for (var i = 0; i < config.nodes.length; i++) {
     const char = (i + 1).toString();
     Console.on.key(char, (char: string) =>
@@ -278,7 +305,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
     );
     // Sync the node folder with the master node folder
     if (masterFolder == nodeFolder) return;
-    mainLog.log(`Syncing ${masterNode.name.green} <- ${cloneNode.name.yellow}`);
+    //mainLog.log(`Syncing ${masterNode.name.green} <- ${cloneNode.name.yellow}`);
 
     await Files.syncFolders(
       masterFolder,
@@ -293,12 +320,34 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
     );
   };
 
+  // Master node
+  const masterNode = config.nodes[0];
+
   // Create nodes from the config in the load balancer
-  for (const node of config.nodes) {
-    await syncNodeVersions(config.nodes[0], node);
+  for (const [index, node] of config.nodes.entries()) {
+    await syncNodeVersions(masterNode, node);
     // Add the node
     loadBalancer.addNode(node);
   }
+
+  // Watch the master node folder for changes
+  const nodeFolder = path.dirname(
+    masterNode.process.path || masterNode.process
+  );
+  Files.watch(
+    [nodeFolder],
+    { recursive: true, exclude: config.sync.exclude },
+    async (paths) => {
+      for (const [index, node] of config.nodes.entries()) {
+        if (index == 0) continue;
+        mainLog.log(`Syncing ${node.name.green} <- ${masterNode.name.yellow}`);
+        await syncNodeVersions(masterNode, node);
+      }
+      mainLog.log(`Not restarting node (temporarily disabled)`);
+      //loadBalancer.restartNode(node.index);
+    },
+    (message) => mainLog.log(message)
+  );
 
   // Set the console window title
   process.title = config.title;
