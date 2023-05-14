@@ -49,6 +49,8 @@ function getEventsInInterval(events, interval) {
 const dbs = {
   _dbs: new Map(),
   async get(database) {
+    try
+    {
     if (!database) return null;
     if (!this._dbs.has(database)) {
       // Find which connection string to use by the database name
@@ -58,6 +60,11 @@ const dbs = {
       this._dbs.set(database, db);
     }
     return this._dbs.get(database);
+  }
+  catch (ex) {
+    console.error(ex);
+    return null;
+  }
   }
 }
 
