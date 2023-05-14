@@ -179,9 +179,7 @@ export default
         script.content = content;
         script.src = url;
 
-        document.documentElement.firstChild.appendChild(script);
-
-
+        //document.documentElement.firstChild.appendChild(script);
       }
     }, "watch": {
       "getItems": {
