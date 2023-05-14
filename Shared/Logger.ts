@@ -23,6 +23,10 @@ abstract class LoggerBase implements Logger {
     this.queue.add(item);
   }
 
+  async flush() {
+    await this.queue.flush();
+  }
+
   protected abstract _log(items: any[]): Promise<void>;
 }
 

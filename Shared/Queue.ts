@@ -20,16 +20,18 @@ class Queue {
   }
 
   private async process() {
-    if (this.items.length) {
-      const items = this.items;
-      this.items = [];
-      await this.callback(items);
-    }
+    if (this.items.length) await this.flush();
     setTimeout(this.process.bind(this), this.interval);
   }
 
   add(item: any) {
     this.items.push(item);
+  }
+
+  async flush() {
+    const items = this.items;
+    this.items = [];
+    await this.callback(items);
   }
 }
 

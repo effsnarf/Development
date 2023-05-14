@@ -40,6 +40,7 @@ import { Analytics } from "@shared/Analytics";
   const configLog = Log.new(`Configuration`);
   configLog.showDate = false;
   configLog.reverseItems = false;
+  configLog.log(`${Configuration.getEnvironment().green}`);
   configObj.configPaths
     .map((cp) => cp.toShortPath())
     .forEach((cp) => {

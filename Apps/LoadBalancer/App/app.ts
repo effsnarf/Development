@@ -45,7 +45,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
     return `${node.name} ─ ${`${node.address.host.yellow}:${
       node.address.port.toString().green
     }`} (${
-      successRate ? successRate.unitifyPercent().severify(0.9, 0.8, ">") : ""
+      successRate ? successRate?.unitifyPercent().severify(0.9, 0.8, ">") : ""
     })`;
   };
 
@@ -98,6 +98,19 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
 
   // Main logger logs to console and file system (if enabled)
   const mainLog = MultiLogger.new([mainConsoleLog, fsLog]);
+
+  // Log the start of the app
+  mainLog.log(`Starting ${config.title}...`);
+
+  // Catch unhandled errors
+  process.on("uncaughtException", async (ex: any) => {
+    fsLog.log(`Uncaught exception:`);
+    for (const line of ex.stack.split("\n")) {
+      fsLog.log(line);
+    }
+    await fsLog.flush();
+    process.exit(1);
+  });
 
   mainLog.log(
     `Configuration loaded from ${configObj.configPaths

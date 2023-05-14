@@ -251,13 +251,13 @@ class Configuration {
   }
 
   // static "environment" getter
-  static getEnvironment(options: ConfigurationOptions) {
+  static getEnvironment(options?: ConfigurationOptions) {
     if (Configuration._environment) return Configuration._environment;
     let env = (process.env.NODE_ENV || "dev") as string | undefined;
     // If env starts with ["dev", "prod"], replace it with the first match
     env = Configuration.environments.find((e) => env?.startsWith(e));
     Configuration._environment = env;
-    if (options.log) {
+    if (options?.log) {
       console.log(`Environment is ${env?.yellow}`.gray);
       console.log();
     }

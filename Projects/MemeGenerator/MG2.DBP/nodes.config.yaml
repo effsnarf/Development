@@ -16,6 +16,7 @@ analytics:
   min:
     elapsed: 50
   database:
-    path: F:\Database\MG-Analytics
+    prod:
+      path: F:\Database\MG-Analytics
 severity:
   time: [50, 500, "<"]
