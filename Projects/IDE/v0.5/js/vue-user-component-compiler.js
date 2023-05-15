@@ -765,7 +765,7 @@ compiler.compileAll = async (comps, options = { fix: true }, onProgress) => {
       catch (ex) {}
 
       i++;
-      let percent = (i / total);
+      let percent = (!total) ? 1 : (i / total);
       if (onProgress) onProgress(percent);
       console.clear();
       console.log(`compileAll (${i} / ${total})`);
