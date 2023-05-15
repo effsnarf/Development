@@ -4,17 +4,8 @@ import * as colors from "colors";
 import { Reflection } from "./Reflection";
 import https from "https";
 import express from "express";
+import "./Extensions";
 import { TypeScript } from "./TypeScript";
-
-const ipToNumber = (ip: string) => {
-  let parts = ip.split(".");
-  return (
-    parseInt(parts[0]) * 256 * 256 * 256 +
-    parseInt(parts[1]) * 256 * 256 +
-    parseInt(parts[2]) * 256 +
-    parseInt(parts[3])
-  );
-};
 
 const getIP = (req: any) => {
   const ip =
@@ -22,7 +13,7 @@ const getIP = (req: any) => {
     req.connection.remoteAddress ||
     req.socket.remoteAddress ||
     req.connection.socket.remoteAddress;
-  return ipToNumber(ip);
+  return ip.ipToNumber();
 };
 
 namespace Apify {

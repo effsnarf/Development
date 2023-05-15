@@ -520,6 +520,7 @@ if (typeof Function !== "undefined") {
 
 interface Array<T> {
   sum(): number;
+  first(): any;
   last(): any;
   joinColumns(columns: (number | null)[], ellipsis?: boolean): string;
   distinct(project?: ((item: T) => any) | null): T[];
@@ -532,6 +533,10 @@ interface Array<T> {
 if (typeof Array !== "undefined") {
   Array.prototype.sum = function () {
     return this.reduce((a, b) => a + b, 0);
+  };
+
+  Array.prototype.first = function () {
+    return this[0];
   };
 
   Array.prototype.last = function () {
@@ -642,6 +647,8 @@ interface String {
   toShortPath(comparePath?: string): string;
   toAbsolutePath(path: any): string;
   toNumber(): number;
+
+  ipToNumber(): number;
 }
 
 if (typeof String !== "undefined") {
@@ -1083,5 +1090,15 @@ if (typeof String !== "undefined") {
 
   String.prototype.toNumber = function (): number {
     return parseFloat(this.withoutColors());
+  };
+
+  String.prototype.ipToNumber = function (): number {
+    let parts = this.split(".");
+    return (
+      parseInt(parts[0]) * 256 * 256 * 256 +
+      parseInt(parts[1]) * 256 * 256 +
+      parseInt(parts[2]) * 256 +
+      parseInt(parts[3])
+    );
   };
 }

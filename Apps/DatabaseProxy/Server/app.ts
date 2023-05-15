@@ -25,19 +25,67 @@ import { MongoDatabase } from "@shared/Database/MongoDatabase";
 import { Analytics } from "@shared/Analytics";
 // #endregion
 
-class User {
-  private constructor(public readonly data: any) {}
-
-  static get = async (req: any) => {
-    return { data: req.cookies };
-    // Get the userLoginTokenKey cookie value from the express request
-    const userLoginTokenKey = req.cookies.userLoginTokenKey;
-    if (!userLoginTokenKey) return null;
-    return new User({ userLoginTokenKey });
-  };
-}
-
 (async () => {
+  class User {
+    private constructor(public readonly data: any) {}
+
+    static get = async (req: any) => {
+      const database = req.params.database;
+      const db = await dbs.get(database);
+      const userLoginTokenKey = req.cookies.userLoginTokenKey;
+      if (userLoginTokenKey) {
+        const token = (
+          await db?.find("Tokens", {
+            "data.key": userLoginTokenKey,
+          })
+        )?.first();
+        if (token) {
+          const user = await db?.find("Users", {
+            _id: token.data.user._id,
+          });
+          if (user) {
+            return new User(user);
+          }
+        }
+      }
+      const userIP = (
+        req.headers["x-forwarded-for"] ||
+        req.connection.remoteAddress ||
+        req.socket.remoteAddress ||
+        req.connection.socket.remoteAddress
+      ).ipToNumber();
+
+      let dbUser = (
+        await db?.find("Users", {
+          ip: userIP,
+        })
+      )?.first();
+
+      if (!dbUser) {
+        dbUser = {
+          _id: await db?.getNewID(),
+          type: null,
+          ip: userIP,
+          created: Date.now(),
+          data: {
+            componentClasses: {
+              _ids: [],
+            },
+          },
+          google: null,
+          info: {
+            image: null,
+            name: null,
+          },
+        };
+
+        await db?.upsert("Users", dbUser);
+      }
+
+      return new User(dbUser);
+    };
+  }
+
   // #region 📝 Configuration
   const configObj = await Configuration.new({
     quitIfChanged: [__filename.replace(".temp.ts", "")],
@@ -316,7 +364,7 @@ class User {
     // For /[database]/api/[entity]/[group]/[method], execute the method
     httpServer.get(
       "/:database/api/:entity/:group/:method",
-      processRequest(async (req: any, res: any) => {
+      processRequest(async (req: any, res: any, user: User) => {
         // Response type
         res.setHeader("Content-Type", "application/json");
 
@@ -329,7 +377,7 @@ class User {
         if (!apiMethods?.length)
           return res.status(404).send("Method not found");
         const apiMethod = apiMethods[0];
-        const funcStr = `async (db, db${
+        const funcStr = `async (user, db, db${
           req.params.entity
         }, axios, ${apiMethod.args.join(", ")}) => { ${apiMethod.code} }`;
         const func = eval(funcStr);
@@ -343,7 +391,7 @@ class User {
         let result: any;
 
         try {
-          result = await func(db, collection, axios, ...args);
+          result = await func(user, db, collection, axios, ...args);
 
           const elapsed = Date.now() - start;
 

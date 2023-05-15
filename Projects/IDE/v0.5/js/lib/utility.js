@@ -72,6 +72,15 @@ Array.prototype.sortBy = function(getKey)
     });
 }
 
+Array.prototype.removeAll = function(predicate)
+{
+    const toRemove = this.filter(predicate);
+    for (const item of toRemove)
+    {
+        this.splice(this.indexOf(item), 1);
+    }
+}
+
 var util = {
     haml: (s) => {
         // Remove empty lines
