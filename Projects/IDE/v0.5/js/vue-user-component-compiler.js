@@ -670,7 +670,7 @@ compiler.toVueComponentOptions = (compClass) => {
     `);
   // $watch for every prop
   var propWatches = [];
-  if (compClass.options.debug)
+  if (compClass.options?.debug)
   {
     propWatches = compClass.props
       //.filter(p => false)
@@ -739,6 +739,7 @@ compiler.compile = async (compClass, options = { fix: true }) => {
     }
     catch (ex)
     {
+      console.error(`Error compiling ${compClass.name}`);
       reject(ex);
     }
   });

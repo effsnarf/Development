@@ -228,8 +228,8 @@ var compDom = {
       removeDuplicates(true);
       removeDuplicates(false);
     },
-    prop: (prop) => {
-      //delete prop.comp;
+    prop: async(prop) => {
+      delete prop.comp;
       if (!prop.id) prop.id = (await compDom.get.new.id());
       if (prop.type == `UI.Icon`) prop.type = `IDE.UI.Icon`;
       if (prop.type)

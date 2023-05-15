@@ -52,6 +52,52 @@ _.trim = (s) => _.ltrim(_.rtrim(s));
 _.startsWith = (s, prefix) => s.indexOf(prefix) === 0;
 _.endsWith = (s, suffix) => s.indexOf(suffix, s.length - suffix.length) !== -1;
 
+String.prototype.getWords = function()
+{
+    // Get words from string
+    // Word characters only ([a-zA-Z0-9_])
+    return this.match(/\w+/g) || [];
+}
+
+Array.prototype.sortBy = function(getKey)
+{
+    // Sort array by key
+    // getKey: (item) => key
+    return this.sort((a, b) => {
+        const keyA = getKey(a);
+        const keyB = getKey(b);
+        if (keyA < keyB) return -1;
+        if (keyA > keyB) return 1;
+        return 0;
+    });
+}
+
 var util = {
-    haml: (s) => haml.compileStringToJs(s)()
+    haml: (s) => {
+        // Remove empty lines
+        s = s.replace(/^\s*[\r\n]/gm, '');
+        return HAML.compile(s)();
+    },
+    html: {
+        escape: (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'),
+    },
+    clone: (obj) => JSON.parse(JSON.stringify(obj)),
+    with: (obj, key, value) => {
+        const newObj = Object.assign({}, obj);
+        newObj[key] = () => value;
+        return newObj;
+    },
+    traverse: (obj,
+        onValue
+      ) => {
+        const _traverse = function (node, key, value) {
+          onValue(node, key, value);
+          if (value && typeof value === "object") {
+            for (const k of Object.keys(value)) {
+                _traverse(value, k, value[k]);
+            }
+          }
+        };
+        _traverse(obj, "", obj);
+      }
 }

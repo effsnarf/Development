@@ -7,6 +7,7 @@ import fs from "fs";
 import util from "util";
 import axios from "axios";
 import express from "express";
+import cookieParser from "cookie-parser";
 import "@shared/Extensions";
 import {
   Console,
@@ -23,6 +24,18 @@ import { Database } from "@shared/Database/Database";
 import { MongoDatabase } from "@shared/Database/MongoDatabase";
 import { Analytics } from "@shared/Analytics";
 // #endregion
+
+class User {
+  private constructor(public readonly data: any) {}
+
+  static get = async (req: any) => {
+    return { data: req.cookies };
+    // Get the userLoginTokenKey cookie value from the express request
+    const userLoginTokenKey = req.cookies.userLoginTokenKey;
+    if (!userLoginTokenKey) return null;
+    return new User({ userLoginTokenKey });
+  };
+}
 
 (async () => {
   // #region 📝 Configuration
@@ -66,17 +79,17 @@ import { Analytics } from "@shared/Analytics";
   setInterval(renderDashboard, 1000 / 1);
   // #endregion
 
-  // #endregion
-
   // #region 📦 Database
   const dbs = {
     _analytics: null as Analytics | null,
     _dbs: new Map<string, MongoDatabase>(),
     get: async (dbName: string) => {
       if (!dbs._analytics) {
-        dbs._analytics = await Analytics.new(
-          await Database.new(config.analytics.database)
-        );
+        if (config.analytics.database) {
+          dbs._analytics = await Analytics.new(
+            await Database.new(config.analytics.database)
+          );
+        }
       }
 
       if (!dbs._dbs.has(dbName)) {
@@ -168,7 +181,8 @@ import { Analytics } from "@shared/Analytics";
     const processRequest = (handler: any) => {
       return async (req: any, res: any) => {
         try {
-          await handler(req, res);
+          const user = await User.get(req);
+          await handler(req, res, user);
         } catch (ex: any) {
           itemsLog.log(ex.message.bgRed);
           res.status(500).send(ex.stack);
@@ -243,6 +257,12 @@ import { Analytics } from "@shared/Analytics";
     );
     // #endregion
 
+    httpServer.get(
+      "/:database/get/user",
+      processRequest(async (req: any, res: any, user: User) => {
+        return res.send(JSON.stringify(user.data));
+      })
+    );
     // For /[database]/api, return {}
     httpServer.get(
       "/:database/api",
@@ -394,6 +414,7 @@ import { Analytics } from "@shared/Analytics";
     // Create the express app
     const httpServer = express();
     httpServer.use(express.json());
+    httpServer.use(cookieParser());
 
     init(httpServer);
 
