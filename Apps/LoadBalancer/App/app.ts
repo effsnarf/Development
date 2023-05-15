@@ -384,7 +384,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   }) as any;
 
   // Log all node output to the file system
-  if (config.log.requests.min.ms) {
+  if (config.log?.requests?.min.ms) {
     nodeLogs.forEach((nodeLog: Log, index: number) => {
       nodeLog.on(nodeLog.log, (...args: any[]) => {
         const ms = args
