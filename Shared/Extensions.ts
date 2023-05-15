@@ -262,6 +262,9 @@ if (typeof Number !== "undefined") {
     const units = !Array.isArray(unit)
       ? [unit]
       : unit.sortByDesc((u) => unitClass.unitToValue[u]);
+
+    if (this == 0) return `0${units.last()}`.gray;
+
     for (const u of units) {
       const currentUnitValue = unitClass.unitToValue[u];
       const nextUnitValue = unitClass.unitToValue[unitClass.nextUnit(u)];
@@ -274,7 +277,7 @@ if (typeof Number !== "undefined") {
         return `${unitValue.toFixedRounded(2)}${u.gray}`;
       }
     }
-    return `${value.toFixed(0)}${units.last()}`;
+    return `${value.toFixed(0)}${units.last().gray}`;
   };
 
   Number.prototype.unitifyTime = function (unit?: string[] | string): string {
