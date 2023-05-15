@@ -351,8 +351,9 @@ class Bar extends ConsoleElement {
 }
 
 interface LogOptions {
-  breakLines: boolean;
   columns: (number | null)[];
+  breakLines: boolean;
+  extraSpaceForBytes: boolean;
 }
 
 class Log extends ConsoleElement {
@@ -367,7 +368,11 @@ class Log extends ConsoleElement {
 
   static new(
     title: string,
-    logOptions: LogOptions = { breakLines: true, columns: [] }
+    logOptions: LogOptions = {
+      columns: [],
+      breakLines: true,
+      extraSpaceForBytes: true,
+    }
   ) {
     return new Log(title, logOptions);
   }
@@ -393,7 +398,13 @@ class Log extends ConsoleElement {
         const dt = new Date(item.dt);
         const dtString = `${dt.toLocaleTimeString()}`;
         const dateStr = !this.showDate ? "" : `${dtString.gray} `;
-        const line = `${dateStr}${item.args.joinColumns(
+        const args = [...item.args];
+        if (this.logOptions?.extraSpaceForBytes) {
+          args.forEach((arg, i) => {
+            if (arg?.getUnit() == "b") args[i] = arg + " ";
+          });
+        }
+        const line = `${dateStr}${args.joinColumns(
           this.logOptions?.columns || [],
           false
         )}`;

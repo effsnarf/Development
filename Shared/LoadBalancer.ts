@@ -36,10 +36,10 @@ class NodeSwitcher {
     node.enabled = true;
     node.health = new HealthMonitor(1000 * 60 * 1);
     this.nodes.push(node as Node);
-    node.on("enabled", (enabled) =>
+    node.on("enabled", (enabled: boolean) =>
       this.emitNodeEvent(node, "enabled", enabled)
     );
-    node.health.on("successRate", (successRate) => {
+    node.health.on("successRate", (successRate: number) => {
       this.emitNodeEvent(node, "successRate", successRate);
     });
   }
@@ -280,7 +280,7 @@ class LoadBalancer {
     const status = nodeResponse.status;
     const sizeKB = !nodeResponse
       ? "?"
-      : this.getResponseBodySize(nodeResponse).unitifySize([], true);
+      : this.getResponseBodySize(nodeResponse).unitifySize();
 
     let statusStr = this.colorByStatus(status, status);
 

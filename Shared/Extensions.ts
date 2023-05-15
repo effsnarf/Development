@@ -199,7 +199,7 @@ interface Number {
     places?: number
   ): string;
   unitifyTime(unit?: string[] | string): string;
-  unitifySize(unit?: string[] | string, extraSpaceForBytes?: boolean): string;
+  unitifySize(unit?: string[] | string): string;
   unitifyPercent(): string;
   toProgressBar(barLength?: number): string;
   severify(green: number, yellow: number, direction: "<" | ">"): string;
@@ -279,13 +279,8 @@ if (typeof Number !== "undefined") {
     return this.unitify(Time, unit);
   };
 
-  Number.prototype.unitifySize = function (
-    unit?: string[] | string,
-    extraSpaceForBytes?: boolean
-  ): string {
-    const s = this.unitify(Size, unit);
-    if (extraSpaceForBytes && s.getUnit() == "b") return `${s} `;
-    return s;
+  Number.prototype.unitifySize = function (unit?: string[] | string): string {
+    return this.unitify(Size, unit);
   };
 
   Number.prototype.unitifyPercent = function (): string {
@@ -382,7 +377,7 @@ if (typeof Number !== "undefined") {
 interface Object {
   is(type: any): boolean;
   clone(): any;
-  on(key: string, callback: (value: any) => void): void;
+  on(key: string | Function, callback: Function): void;
   traverse(onValue: (node: any, key: string, value: any) => void): void;
   toCamelCaseKeys(): any;
   stringify(): string;
@@ -398,7 +393,17 @@ if (typeof Object !== "undefined") {
     return JSON.parse(JSON.stringify(this));
   };
 
-  Object.prototype.on = function (key: string, callback: (value: any) => void) {
+  Object.prototype.on = function (key: string | Function, callback: Function) {
+    if (typeof key == "function") {
+      const func = key;
+      const self = this as any;
+      self[func.name] = (...args: any[]) => {
+        setTimeout(() => callback.apply(self, args), 0);
+        return func.apply(self, args);
+      };
+      return;
+    }
+
     const self = this as any;
     // If already has a getter/setter, replace it
     const descriptor = Object.getOwnPropertyDescriptor(self, key);
@@ -596,7 +601,7 @@ interface String {
   deunitifyPercent(): number;
 
   getUnit(): string;
-  getUnitClass(): UnitClass;
+  getUnitClass(): UnitClass | null;
   withoutUnit(): string;
 
   padStartChars(maxLength: number, fillString?: string): string;
@@ -712,6 +717,7 @@ if (typeof String !== "undefined") {
     direction: "<" | ">"
   ): string {
     const unitClass = this.getUnitClass();
+    if (!unitClass) throw new Error("No unit class found");
     const value = this.deunitify(unitClass);
     const unit = this.getUnit();
     const color = value.getSeverityColor(green, yellow, direction, true);
@@ -748,12 +754,12 @@ if (typeof String !== "undefined") {
     return this.withoutColors().replace(/[0-9\.]/g, "");
   };
 
-  String.prototype.getUnitClass = function (): UnitClass {
+  String.prototype.getUnitClass = function (): UnitClass | null {
     const unit = this.getUnit();
     if (Time.units.includes(unit)) return Time;
     if (Size.units.includes(unit)) return Size;
     if (Percentage.units.includes(unit)) return Percentage;
-    throw new Error(`Unknown unit: ${unit} (${this})`);
+    return null;
   };
 
   String.prototype.withoutUnit = function (): string {

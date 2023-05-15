@@ -13,7 +13,7 @@ import { Apify } from "@shared/Apify";
 import { Console } from "@shared/Console";
 import { ChatOpenAI, Roles } from "../Apis/OpenAI/classes/ChatOpenAI";
 
-console.log((300).unitifySize([], true) + "!");
+console.log((300).unitifySize() + "!");
 
 console.log(
   [null, null, null, "1234567890"].joinColumns([5, 5, 10, null], false)

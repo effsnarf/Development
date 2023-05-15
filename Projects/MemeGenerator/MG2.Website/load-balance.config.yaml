@@ -28,3 +28,6 @@ request:
 log:
   enabled: true
   path: (env) => env.path.resolve(env.process.cwd(), `${env.config.title}.log`)
+  requests:
+    min:
+      ms: 100

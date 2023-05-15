@@ -104,10 +104,11 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   // Create a log for each node
   const nodeLogs = config.nodes.map((node: any) =>
     Log.new(getNodeLogTitle(node), {
-      breakLines: false,
       columns: [3, 6, 6, null],
+      breakLines: false,
+      extraSpaceForBytes: true,
     })
-  );
+  ) as Log[];
 
   // Create a health bar for each node
   const healthBars = config.nodes.map((node: any, i: number) =>
@@ -378,9 +379,22 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   }
 
   // Log all console output to the file system
-  mainConsoleLog.log = (...args: any[]) => {
+  mainConsoleLog.on(mainConsoleLog.log, (...args: any[]) => {
     fsLog.log(...args);
-  };
+  }) as any;
+
+  // Log all node output to the file system
+  if (config.log.requests.min.ms) {
+    nodeLogs.forEach((nodeLog: Log, index: number) => {
+      nodeLog.on(nodeLog.log, (...args: any[]) => {
+        const ms = args
+          .find((a) => a?.getUnitClass()?.name == "Time")
+          ?.deunitifyTime();
+        if (ms && ms < config.log.requests.min.ms) return;
+        fsLog.log(...[config.nodes[index].name, ...args]);
+      });
+    });
+  }
 
   // Log unhandled errors
   process.on("uncaughtException", async (ex: any) => {
