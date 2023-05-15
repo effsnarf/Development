@@ -202,16 +202,19 @@ class LoadBalancer {
     return this.nodeSwitcher.getNodes();
   }
 
-  getResponseBodySize(response: AxiosResponse<any>) {
-    let size = 0;
-    if (response.data?.headers)
-      size = parseInt(response.data.headers["content-length"] || "0");
-    return (
-      size ||
-      parseInt(
-        response.headers["content-length"] || response.data.length || "0"
-      )
-    );
+  async getResponseStreamSize(response: AxiosResponse<any>) {
+    return new Promise<number>((resolve, reject) => {
+      let size = 0;
+      response.data.on("data", (chunk: any) => {
+        size += chunk.length;
+      });
+      response.data.on("end", () => {
+        resolve(size);
+      });
+      response.data.on("error", (error: any) => {
+        reject(error);
+      });
+    });
   }
 
   ignoreRequest(request: http.IncomingMessage) {
@@ -265,7 +268,7 @@ class LoadBalancer {
     );
   }
 
-  private nodeResponseSuccess(
+  private async nodeResponseSuccess(
     incomingItem: IncomingItem,
     nodeResponse: AxiosResponse<any>,
     elapsed: number
@@ -280,9 +283,6 @@ class LoadBalancer {
       .unitifyTime()
       .severify(...this.options.severity.time);
     const status = nodeResponse.status;
-    const sizeKB = !nodeResponse
-      ? "?"
-      : this.getResponseBodySize(nodeResponse).unitifySize();
 
     let statusStr = this.colorByStatus(status, status);
 
@@ -293,7 +293,12 @@ class LoadBalancer {
       nodeResponse?.statusText,
       nodeResponse?.headers as any
     );
+
     nodeResponse.data.pipe(incomingItem.response);
+
+    let nodeResponseSize = (
+      await this.getResponseStreamSize(nodeResponse)
+    ).unitifySize();
 
     const displayItem = incomingItem.request.url?.endsWith(".jpg")
       ? false
@@ -303,7 +308,7 @@ class LoadBalancer {
       // Log the successful attempt
       this.log({
         node: { index: incomingItem.nodeItem.index },
-        texts: [statusStr, sizeKB, uElapsed, url],
+        texts: [statusStr, nodeResponseSize, uElapsed, url],
       });
     }
 
