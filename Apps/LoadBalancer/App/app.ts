@@ -18,6 +18,7 @@ import {
 import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
 
 (async () => {
+  // #region Configuration
   const configObj = await Configuration.new({
     quitIfChanged: [__filename.replace(".temp.ts", "")],
     toAbsolutePaths: ["process"],
@@ -26,6 +27,9 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
 
   const config = configObj.data;
 
+  // #endregion
+
+  // #region Helper functions
   const getIncomingLogTitle = (
     count: number = 0,
     countPerSecond: number = 0,
@@ -66,9 +70,14 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
 
     return `${elapsedStr} ${attempt} ${isProcessing} ${url}`;
   };
+  // #endregion
 
   // Create the load balancer
   const loadBalancer = LoadBalancer.new(config.incoming);
+
+  // #region Dashboard
+
+  // #region Dashboard setup
 
   // Create the main log
   const mainConsoleLog = Log.new(getIncomingLogTitle());
@@ -79,38 +88,8 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
       .map((item: IncomingItem) => incomingItemToString(item))
   );
 
-  // Create a file system logger
-  const fsLog = !config.log?.enabled
-    ? EmptyLogger.new()
-    : FileSystemLogger.new(config.log.path);
-
-  if (fsLog instanceof EmptyLogger) {
-    mainConsoleLog.log(
-      `File system logging is disabled. To enable it, set ${
-        `log.enabled`.yellow
-      } to ${`true`.yellow} and ${"log.path".yellow} in ${configObj.configPaths
-        .map((cp) => cp.toShortPath())
-        .join(" or ")}`
-    );
-  } else {
-    mainConsoleLog.log(`Logging to ${`${config.log.path.toShortPath()}`}`);
-  }
-
-  // Main logger logs to console and file system (if enabled)
-  const mainLog = MultiLogger.new([mainConsoleLog, fsLog]);
-
   // Log the start of the app
-  mainLog.log(`Starting ${config.title}...`);
-
-  // Catch unhandled errors
-  process.on("uncaughtException", async (ex: any) => {
-    fsLog.log(`Uncaught exception:`);
-    for (const line of ex.stack.split("\n")) {
-      fsLog.log(line);
-    }
-    await fsLog.flush();
-    process.exit(1);
-  });
+  mainConsoleLog.log(`Starting ${config.title}...`);
 
   mainLog.log(
     `Configuration loaded from ${configObj.configPaths
@@ -131,7 +110,9 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
     Bar.new("", "y")
   );
 
-  // Create the dashboard layout
+  // #endregion
+
+  // #region Create the dashboard layout
   const layout = Layout.new();
   // Add the incoming items log and the counter log
   layout.addColumn(Unit.box("0%", "0%", "40%", "48%"), [
@@ -151,17 +132,20 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   );
   // Add the main log
   layout.addColumn(Unit.box("0%", "50%", "40%", "50%"), [mainConsoleLog]);
+  // #endregion
 
+  // #region Render the dashboard
   console.clear();
 
-  // Render the dashboard
   const renderDashboard = () => {
     layout.render();
     // Set the console window title
     process.title = `${config.title} (${loadBalancer.stats.requests.per.minute.count})`;
   };
   setInterval(renderDashboard, 1000 / 1);
+  // #endregion
 
+  // #region Connect load balancer events to the dashboard
   const checkNodesAgain = async (interval: number) => {
     const nodes = loadBalancer.getNodes();
     if (config.node.restart.enabled) {
@@ -187,8 +171,6 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
     }
     setTimeout(checkNodesAgain, interval);
   };
-
-  // Connect the load balancer to the dashboard
   // Log events in the dashboard
   loadBalancer.events.on("log", (data: any) => {
     if (!data.node) {
@@ -244,8 +226,11 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   loadBalancer.events.on("node-enabled", (index: number, enabled: boolean) => {
     nodeLogs[index].options.isDimmed = !enabled;
   });
+  // #endregion
 
-  // Analytics
+  // #endregion
+
+  // #region Analytics
   if (config.analytics?.database) {
     (async () => {
       const analytics = await Analytics.new(
@@ -288,6 +273,9 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
       }, 1000);
     })();
   }
+  // #endregion
+
+  // #region ⌨ Console keys
 
   // Assign keys
   const shift12345678 = "!@#$%^&*";
@@ -312,6 +300,44 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   Console.on.key("q", () => {
     process.exit();
   });
+
+  // #endregion
+
+  // #region 📃 Logging
+
+  // Create a file system logger
+  const fsLog = !config.log?.enabled
+    ? EmptyLogger.new()
+    : FileSystemLogger.new(config.log.path);
+
+  if (config.log?.enabled) {
+    mainConsoleLog.log(`Logging to ${`${config.log.path.toShortPath()}`}`);
+  } else {
+    mainConsoleLog.log(
+      `File system logging is disabled. To enable it, set ${
+        `log.enabled`.yellow
+      } to ${`true`.yellow} and ${"log.path".yellow} in ${configObj.configPaths
+        .map((cp) => cp.toShortPath())
+        .join(" or ")}`
+    );
+  }
+
+  // Log all console output to the file system
+  mainConsoleLog.log = (...args: any[]) => {};
+
+  // Log unhandled errors
+  process.on("uncaughtException", async (ex: any) => {
+    fsLog.log(`Uncaught exception:`);
+    for (const line of ex.stack.split("\n")) {
+      fsLog.log(line);
+    }
+    await fsLog.flush();
+    process.exit(1);
+  });
+
+  // #endregion
+
+  // #region 🔄 Synching nodes
 
   const syncNodeVersions = async (masterNode: any, cloneNode: any) => {
     const masterFolder = path.dirname(
@@ -365,6 +391,8 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
     },
     (message) => mainLog.log(message)
   );
+
+  // #endregion
 
   // Set the console window title
   process.title = config.title;
