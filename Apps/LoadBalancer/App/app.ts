@@ -2,6 +2,7 @@ import path from "path";
 import "@shared/Extensions";
 import { Types } from "@shared/Types";
 import { Configuration } from "@shared/Configuration";
+import { Timer } from "@shared/Timer";
 import { Files } from "@shared/Files";
 import { EmptyLogger, MultiLogger, FileSystemLogger } from "@shared/Logger";
 import { Analytics } from "@shared/Analytics";
@@ -26,10 +27,11 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   });
 
   const config = configObj.data;
-
   // #endregion
 
   // #region Helper functions
+  const uptime = Timer.start();
+
   const getIncomingLogTitle = (
     count: number = 0,
     countPerSecond: number = 0,
@@ -40,7 +42,9 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
     //   config.title
     // } ─ ${config.incoming.address.stringifyAddress()}`;
     const items = count;
-    return `${title} ─ (${items.severify(10, 30, "<")} ${
+    return `${title} ─ (${
+      `uptime`.gray
+    } ${uptime.elapsed?.unitifyTime()}) (${items.severify(10, 30, "<")} ${
       `reqs`.gray
     }) (${countPerSecond}${`/s`.gray}) (${countPerMinute}${`/m`.gray})`;
   };
