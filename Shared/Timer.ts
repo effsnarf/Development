@@ -36,8 +36,8 @@ class IntervalCounter {
 }
 
 class Timer {
+  private isRunning: boolean = false;
   private started: number | null = null;
-  elapsed: number | null = null;
   private _data: any;
   private onDone: (data: any) => void;
 
@@ -78,11 +78,17 @@ class Timer {
   }
 
   start() {
+    this.isRunning = true;
     this.started = Date.now();
   }
 
   stop() {
-    this.elapsed = Date.now() - this.started!;
+    this.isRunning = false;
+  }
+
+  get elapsed() {
+    if (!this.started) return null;
+    return Date.now() - this.started;
   }
 }
 
