@@ -203,12 +203,14 @@ class LoadBalancer {
   }
 
   getResponseBodySize(response: AxiosResponse<any>) {
-    return parseInt(
-      response.headers["content-length"] ||
-        response.data.length ||
-        //JSON.stringify(response.data).length ||
-        //Buffer.byteLength(response.data) ||
-        "0"
+    let size = 0;
+    if (response.data?.headers)
+      size = parseInt(response.data.headers["content-length"] || "0");
+    return (
+      size ||
+      parseInt(
+        response.headers["content-length"] || response.data.length || "0"
+      )
     );
   }
 

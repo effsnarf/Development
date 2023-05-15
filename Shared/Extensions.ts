@@ -267,9 +267,11 @@ if (typeof Number !== "undefined") {
       const nextUnitValue = unitClass.unitToValue[unitClass.nextUnit(u)];
       if (value.isBetweenOrEq(currentUnitValue, nextUnitValue)) {
         const unitValue = value / currentUnitValue;
-        if (unitValue < 10) {
-          return `${unitValue.toFixedRounded(2)}${u.gray}`;
-        } else return `${unitValue.toFixed(0)}${u.gray}`;
+
+        if (unitValue >= 10 || u == units.last()) {
+          return `${unitValue.toFixed(0)}${u.gray}`;
+        }
+        return `${unitValue.toFixedRounded(2)}${u.gray}`;
       }
     }
     return `${value.toFixed(2)}${units.last()}`;
