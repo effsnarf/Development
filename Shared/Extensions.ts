@@ -274,7 +274,7 @@ if (typeof Number !== "undefined") {
         return `${unitValue.toFixedRounded(2)}${u.gray}`;
       }
     }
-    return `${value.toFixed(2)}${units.last()}`;
+    return `${value.toFixed(0)}${units.last()}`;
   };
 
   Number.prototype.unitifyTime = function (unit?: string[] | string): string {
