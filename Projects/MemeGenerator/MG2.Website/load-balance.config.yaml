@@ -30,4 +30,4 @@ log:
   path: (env) => env.path.resolve(env.process.cwd(), `${env.config.title}.log`)
   requests:
     min:
-      ms: 100
+      ms: 5000
