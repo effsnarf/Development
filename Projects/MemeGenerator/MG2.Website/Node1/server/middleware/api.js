@@ -320,7 +320,8 @@ export default async function (req, res, next) {
     }
     catch (ex)
     {
-      console.log(ex.message);
+      console.log(ex.stack);
+      res.end(ex.message + "\n" + ex.stack);
     }
     return;
   };
