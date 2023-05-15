@@ -117,7 +117,7 @@ namespace Apify {
       reqBody?: string,
       options?: CallOptions
     ) {
-      ip = ipToNumber(ip);
+      if (typeof ip == "string") ip = ip.ipToNumber();
       switch (url) {
         case "":
         case "/":
@@ -132,6 +132,7 @@ namespace Apify {
           if ((match = url.match(/^\/([a-zA-Z]+)\/new$/))) {
             const className = match[1];
             let cls = this.classes.find((c) => c.name === className);
+            if (!cls) throw new Error(`Class ${className} not found`);
             let inst = await this.instanceManager.createInstance(
               className,
               cls,
