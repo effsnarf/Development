@@ -199,7 +199,7 @@ interface Number {
     places?: number
   ): string;
   unitifyTime(unit?: string[] | string): string;
-  unitifySize(unit?: string[] | string): string;
+  unitifySize(unit?: string[] | string, extraSpaceForBytes?: boolean): string;
   unitifyPercent(): string;
   toProgressBar(barLength?: number): string;
   severify(green: number, yellow: number, direction: "<" | ">"): string;
@@ -210,6 +210,7 @@ interface Number {
     bgRed?: boolean
   ): string;
   toFixedRounded(places: number): string;
+  ordinalize(): string;
 }
 
 if (typeof Number !== "undefined") {
@@ -253,7 +254,7 @@ if (typeof Number !== "undefined") {
     // return "230ms" if value is < 1000
     // return "1.23s" if value is < 60000 and > 1000
     // return "1.23m" if value is > 60000
-    if (!unit) unit = unitClass.units;
+    if (!unit?.length) unit = unitClass.units;
     let value = this.valueOf();
     // Percent is a special case
     if (unitClass == Percentage) return `${Math.round(value * 100)}${`%`.gray}`;
@@ -261,8 +262,6 @@ if (typeof Number !== "undefined") {
     const units = !Array.isArray(unit)
       ? [unit]
       : unit.sortByDesc((u) => unitClass.unitToValue[u]);
-    if (value < 0.01)
-      return `${`~`.gray}${value.toFixed(0)}${units.last().gray}`;
     for (const u of units) {
       const currentUnitValue = unitClass.unitToValue[u];
       const nextUnitValue = unitClass.unitToValue[unitClass.nextUnit(u)];
@@ -280,8 +279,13 @@ if (typeof Number !== "undefined") {
     return this.unitify(Time, unit);
   };
 
-  Number.prototype.unitifySize = function (unit?: string[] | string): string {
-    return this.unitify(Size, unit);
+  Number.prototype.unitifySize = function (
+    unit?: string[] | string,
+    extraSpaceForBytes?: boolean
+  ): string {
+    const s = this.unitify(Size, unit);
+    if (extraSpaceForBytes && s.getUnit() == "b") return `${s} `;
+    return s;
   };
 
   Number.prototype.unitifyPercent = function (): string {
@@ -336,6 +340,27 @@ if (typeof Number !== "undefined") {
     while (str.endsWith("0")) str = str.slice(0, -1);
     if (str.endsWith(".")) str = str.slice(0, -1);
     return str;
+  };
+
+  Number.prototype.ordinalize = function (): string {
+    const number = this.valueOf();
+
+    if (number === 0) {
+      return "0"; // No ordinal representation for 0
+    }
+    const suffixes = ["th", "st", "nd", "rd"];
+    const mod100 = number % 100;
+    const mod10 = number % 10;
+
+    if (mod10 === 1 && mod100 !== 11) {
+      return number + "st";
+    } else if (mod10 === 2 && mod100 !== 12) {
+      return number + "nd";
+    } else if (mod10 === 3 && mod100 !== 13) {
+      return number + "rd";
+    } else {
+      return number + "th";
+    }
   };
 }
 
@@ -486,6 +511,7 @@ if (typeof Function !== "undefined") {
 interface Array<T> {
   sum(): number;
   last(): any;
+  joinColumns(columns: (number | null)[], ellipsis?: boolean): string;
   distinct(project?: ((item: T) => any) | null): T[];
   except(...items: T[]): T[];
   sortBy(project: (item: T) => any): T[];
@@ -500,6 +526,16 @@ if (typeof Array !== "undefined") {
 
   Array.prototype.last = function () {
     return this[this.length - 1];
+  };
+
+  Array.prototype.joinColumns = function (
+    columns: (number | null)[],
+    ellipsis?: boolean
+  ) {
+    if (!columns.length) return this.join(" ");
+    return this.map(
+      (item, i) => `${(item || "").toLength(columns[i], ellipsis, "right")}`
+    ).join(" ");
   };
 
   Array.prototype.distinct = function (project?: ((item: any) => any) | null) {
@@ -543,12 +579,15 @@ interface String {
   is(type: any): boolean;
   isColorCode(): boolean;
 
+  pad(align: "left" | "right", fillString: string): string;
+
   nextChar(): string;
   getChars(): Generator<string, void, unknown>;
 
   colorize(color: string): string;
   singularize(): string;
   pluralize(): string;
+  antonym(): string;
 
   severify(green: number, yellow: number, direction: "<" | ">"): string;
   deunitify(unitClass: UnitClass): number;
@@ -563,7 +602,12 @@ interface String {
   padStartChars(maxLength: number, fillString?: string): string;
   sliceChars(start: number | undefined, end?: number | undefined): string;
   alignRight(): string;
-  shorten(maxLength: number): string;
+  shorten(maxLength: number, ellipsis?: boolean): string;
+  toLength(
+    length: number,
+    ellipsis?: boolean,
+    align?: "left" | "right"
+  ): string;
   splitOnWidth(width: number): string[];
   trimAll(): string;
   trimDoubleQuotes(): string;
@@ -597,6 +641,15 @@ if (typeof String !== "undefined") {
 
   String.prototype.isColorCode = function (): boolean {
     return this.startsWith("\x1b[");
+  };
+
+  String.prototype.pad = function (
+    align: "left" | "right",
+    fillString: string
+  ) {
+    if (!align) align = "left";
+    if (align === "left") return `${fillString}${this}`;
+    return `${this}${fillString}`;
   };
 
   // Returns the next character in the string ("abcd" => "a")
@@ -633,6 +686,24 @@ if (typeof String !== "undefined") {
     if (this.endsWith("y")) return this.slice(0, -1) + "ies";
     if (this.endsWith("s")) return this.toString();
     return this + "s";
+  };
+
+  String.prototype.antonym = function (): string {
+    const antonyms = [
+      ["up", "down"],
+      ["left", "right"],
+      ["top", "bottom"],
+      ["start", "end"],
+      ["before", "after"],
+      ["above", "below"],
+      ["first", "last"],
+      ["front", "back"],
+    ];
+    for (const [a, b] of antonyms) {
+      if (this === a) return b;
+      if (this === b) return a;
+    }
+    return this.toString();
   };
 
   String.prototype.severify = function (
@@ -731,9 +802,33 @@ if (typeof String !== "undefined") {
     return `${padding}${this}`;
   };
 
-  String.prototype.shorten = function (maxLength: number): string {
-    if (this.length > maxLength) return this.slice(0, maxLength) + "...";
-    return this.toString();
+  String.prototype.shorten = function (
+    maxLength: number,
+    ellipsis: boolean = true
+  ): string {
+    if (maxLength == null) return this.toString();
+    if (ellipsis) maxLength -= 2;
+    let s = this.toString();
+    if (s.getCharsCount() > maxLength) {
+      s = s.sliceChars(0, maxLength);
+      if (ellipsis) s += "..";
+    }
+    return s;
+  };
+
+  String.prototype.toLength = function (
+    length: number,
+    ellipsis?: boolean,
+    align?: "left" | "right"
+  ): string {
+    if (!align) align = "left";
+    let s = (this || "").toString().shorten(length, ellipsis);
+    if (length)
+      s = s.pad(
+        align.antonym() as "left" | "right",
+        " ".repeat(Math.max(0, length - s.getCharsCount()))
+      );
+    return s;
   };
 
   String.prototype.splitOnWidth = function (width: number): string[] {

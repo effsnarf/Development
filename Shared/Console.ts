@@ -350,22 +350,24 @@ class Bar extends ConsoleElement {
   }
 }
 
+interface LogOptions {
+  breakLines: boolean;
+  columns: (number | null)[];
+}
+
 class Log extends ConsoleElement {
   private maxItems = 100;
   private items: LogItem[] = [];
   showDate: boolean = true;
   reverseItems: boolean = true;
 
-  constructor(
-    title: string,
-    private readonly logOptions?: { breakLines: boolean }
-  ) {
+  constructor(title: string, private readonly logOptions?: LogOptions) {
     super(title);
   }
 
   static new(
     title: string,
-    logOptions: { breakLines: boolean } = { breakLines: true }
+    logOptions: LogOptions = { breakLines: true, columns: [] }
   ) {
     return new Log(title, logOptions);
   }
@@ -391,13 +393,15 @@ class Log extends ConsoleElement {
         const dt = new Date(item.dt);
         const dtString = `${dt.toLocaleTimeString()}`;
         const dateStr = !this.showDate ? "" : `${dtString.gray} `;
-        const line = `${dateStr}${item.args
-          .flatMap((arg) => Console.objectToLines(arg))
-          .join(" ")}`;
-        const widthLines = !this.logOptions?.breakLines
-          ? [line]
-          : line.splitOnWidth((width as Unit).chars);
-        lines.push(...widthLines);
+        const line = `${dateStr}${item.args.joinColumns(
+          this.logOptions?.columns || [],
+          false
+        )}`;
+        lines.push(line);
+        // const widthLines = !this.logOptions?.breakLines
+        //   ? [line]
+        //   : line.splitOnWidth((width as Unit).chars);
+        // lines.push(...widthLines);
       });
       resolve(lines);
     });

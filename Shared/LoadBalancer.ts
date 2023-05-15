@@ -202,6 +202,16 @@ class LoadBalancer {
     return this.nodeSwitcher.getNodes();
   }
 
+  getResponseBodySize(response: AxiosResponse<any>) {
+    return parseInt(
+      response.headers["content-length"] ||
+        response.data.length ||
+        //JSON.stringify(response.data).length ||
+        //Buffer.byteLength(response.data) ||
+        "0"
+    );
+  }
+
   ignoreRequest(request: http.IncomingMessage) {
     if (request.url?.startsWith("/api/Analytics/")) {
       if (!request.url.startsWith("/api/Analytics/new")) return true;
@@ -266,11 +276,11 @@ class LoadBalancer {
 
     const uElapsed = elapsed
       .unitifyTime()
-      .severify(...this.options.severity.time)
-      .padStartChars(5);
+      .severify(...this.options.severity.time);
     const status = nodeResponse.status;
-    const sizeKB = !nodeResponse ? ` `.repeat(4) : "";
-    //: this.toSizeKbString(Buffer.byteLength(nodeResponse.data));
+    const sizeKB = !nodeResponse
+      ? "?"
+      : this.getResponseBodySize(nodeResponse).unitifySize([], true);
 
     let statusStr = this.colorByStatus(status, status);
 
@@ -291,7 +301,7 @@ class LoadBalancer {
       // Log the successful attempt
       this.log({
         node: { index: incomingItem.nodeItem.index },
-        text: `${statusStr} ${sizeKB || ""} ${uElapsed} ${url}`,
+        texts: [statusStr, sizeKB, uElapsed, url],
       });
     }
 
@@ -309,8 +319,7 @@ class LoadBalancer {
 
     const uElapsed = elapsed
       .unitifyTime()
-      .severify(...this.options.severity.time)
-      .padStartChars(5);
+      .severify(...this.options.severity.time);
 
     // Failed to process the incoming item
     // Increment the attempt counter
@@ -318,11 +327,14 @@ class LoadBalancer {
     // Log the failed attempt
     this.log({
       node: { index: incomingItem.nodeItem.index },
-      text: `${
-        (ex.status || "").toString().padStart(3).bgRed
-      } ${`(${incomingItem.attempt})`.padStart(4)} ${uElapsed} ${
-        logMsg.bgWhite.black
-      }`,
+      texts: [
+        (ex.status || "").toString().bgRed,
+        null, // sizeKB,
+        uElapsed,
+        `(${incomingItem.attempt.ordinalize()} attempt) ${
+          logMsg.bgWhite.black
+        }`,
+      ],
     });
 
     // We haven't reached the maximum number of attempts
@@ -332,7 +344,7 @@ class LoadBalancer {
         incomingItem.nodeItem.index
       );
       // Try again
-      setTimeout(() => this.processIncomingItem.bind(this)(incomingItem), 0);
+      setTimeout(() => this.processIncomingItem.bind(this)(incomingItem), 1000);
     } else {
       // We've reached the maximum number of attempts
       // Remove the item from the queue
@@ -398,6 +410,12 @@ class LoadBalancer {
         this.nodeResponseSuccess(incomingItem, ex.response, timer.elapsed!);
         return;
       } else {
+        if (ex.code != "ECONNREFUSED") {
+          this.log({
+            node: { index: incomingItem.nodeItem.index },
+            texts: [null, null, null, ex.message.bgRed],
+          });
+        }
         this.nodeResponseFailure(incomingItem, ex, logMsg, timer.elapsed!);
         return;
       }
@@ -411,14 +429,6 @@ class LoadBalancer {
   async restartNode(nodeIndex: number) {
     const node = this.getNode(nodeIndex);
     await node.process.restart();
-  }
-
-  private toSizeKbString(size: number | null) {
-    if (!size) return ` ?${`k`.gray} `;
-    const sizeBytes = Math.round(size);
-    let sizeKB = Math.round(sizeBytes / 1024) as any;
-    sizeKB = `${sizeKB.toString().padStart(4)}${`k`.gray}`;
-    return sizeKB;
   }
 
   private colorByStatus(s: any, status: number) {

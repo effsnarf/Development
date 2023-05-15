@@ -13,16 +13,22 @@ import { Apify } from "@shared/Apify";
 import { Console } from "@shared/Console";
 import { ChatOpenAI, Roles } from "../Apis/OpenAI/classes/ChatOpenAI";
 
-for (var i = 0; i <= 100; i += 10) {
-  const percent = i / 100;
-  const value = i * 1000;
-  //console.log(value.unitifyTime(), value.unitifyTime().deunitifyTime());
+console.log((300).unitifySize([], true) + "!");
 
-  console.log(
-    percent.unitifyPercent(),
-    percent.unitifyPercent().severify(0.9, 0.8, ">")
-  );
-}
+console.log(
+  [null, null, null, "1234567890"].joinColumns([5, 5, 10, null], false)
+);
+
+// for (var i = 0; i <= 100; i += 10) {
+//   const percent = i / 100;
+//   const value = i * 1000;
+//   //console.log(value.unitifyTime(), value.unitifyTime().deunitifyTime());
+
+//   console.log(
+//     percent.unitifyPercent(),
+//     percent.unitifyPercent().severify(0.9, 0.8, ">")
+//   );
+// }
 
 // const progress = Progress.newAutoDisplay(100, { skipped: 0, modifieds: [] });
 
