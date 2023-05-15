@@ -3,7 +3,7 @@ incoming:
   address:
     dev: localhost:4040
     prod: 10.35.16.36:80
-  cors: [http://localhost:5050, http://localhost:5051]
+  cors: [https://vue-studio.com, http://localhost:5050, http://localhost:5051]
   severity:
     time: [100, 500, "<"]
 nodes:
