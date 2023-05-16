@@ -6,3 +6,5 @@ database:
     name: MemeGenerator
     connectionString: mongodb://localhost:27017
   analytics:
+    prod:
+      path: F:\Database\MG-Analytics
