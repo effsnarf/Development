@@ -173,6 +173,7 @@ const color = {
 
 // #region Interfaces
 interface Number {
+  _is(obj: any, type: any): boolean;
   is(type: any): boolean;
   isBetween(min: number, max: number, strictOrder?: boolean): boolean;
   isBetweenOrEq(min: number, max: number, strictOrder?: boolean): boolean;
@@ -278,8 +279,33 @@ interface Function {
 
 // #region Number
 if (typeof Number !== "undefined") {
+  // #warning This is a hack to save the _is function somewhere we can access it
+  // This is needed because we can't export or import anything from Extensions.ts
+  // Usage: (0)._is([obj], [type])
+  // Examples:
+  //   (0)._is(5, Number) // true
+  //   (0)._is(5, String) // false
+  //   (0)._is("5", String) // true
+  //   (0)._is("5", Number) // false
+  Number.prototype._is = function (obj: any, type: any): boolean {
+    switch (type) {
+      case String:
+        return typeof obj === "string" || obj instanceof String;
+      case Number:
+        return typeof obj === "number" && isFinite(obj);
+      case Boolean:
+        return typeof obj === "boolean";
+      case Array:
+        return Array.isArray(obj);
+      case Object:
+        return obj !== null && typeof obj === "object" && !Array.isArray(obj);
+      default:
+        return obj instanceof type;
+    }
+  };
+
   Number.prototype.is = function (type: any): boolean {
-    return Objects.is(this, type);
+    return (0)._is(this, type);
   };
 
   Number.prototype.isBetween = function (
@@ -432,7 +458,7 @@ if (typeof Number !== "undefined") {
 // #region String
 if (typeof String !== "undefined") {
   String.prototype.is = function (type: any): boolean {
-    return Objects.is(this, type);
+    return (0)._is(this, type);
   };
 
   String.prototype.isColorCode = function (): boolean {
@@ -948,7 +974,7 @@ if (typeof Array !== "undefined") {
 // #region Function
 if (typeof Function !== "undefined") {
   Function.prototype.is = function (type: any): boolean {
-    return Objects.is(this, type);
+    return (0)._is(this, type);
   };
 
   Function.prototype.getArgumentNames = function () {
@@ -958,134 +984,6 @@ if (typeof Function !== "undefined") {
       .match(/([^\s,]+)/g);
     return args || [];
   };
-}
-
-// #endregion
-
-// #region Objects
-class Objects {
-  static is(obj: any, type: any): boolean {
-    const value = obj;
-    switch (type) {
-      case String:
-        return typeof value === "string" || value instanceof String;
-      case Number:
-        return typeof value === "number" && isFinite(value);
-      case Boolean:
-        return typeof value === "boolean";
-      case Array:
-        return Array.isArray(value);
-      case Object:
-        return (
-          value !== null && typeof value === "object" && !Array.isArray(value)
-        );
-      default:
-        return value instanceof type;
-    }
-  }
-
-  static clone(obj: any): any {
-    return JSON.parse(JSON.stringify(obj));
-  }
-
-  static on(obj: any, key: string | Function, callback: Function): void {
-    if (typeof key === "function") {
-      const func = key;
-      const self = obj;
-      self[func.name] = (...args: any[]) => {
-        setTimeout(() => callback.apply(self, args), 0);
-        return func.apply(self, args);
-      };
-      return;
-    }
-
-    const self = obj;
-    const descriptor = Object.getOwnPropertyDescriptor(self, key);
-    if (descriptor && (descriptor.get || descriptor.set)) {
-      if (!descriptor.get)
-        throw new Error("Cannot watch a non-getter property");
-      if (!descriptor.set)
-        throw new Error("Cannot watch a non-setter property");
-      const getter = descriptor.get;
-      const setter = descriptor.set;
-      Object.defineProperty(self, key, {
-        get: function () {
-          return getter();
-        },
-        set: function (newValue) {
-          setter(newValue);
-          callback(newValue);
-        },
-      });
-      return;
-    }
-
-    let value = self[key];
-    Object.defineProperty(self, key, {
-      get: function () {
-        return value;
-      },
-      set: function (newValue) {
-        value = newValue;
-        callback(newValue);
-      },
-    });
-  }
-
-  static traverse(
-    obj: any,
-    onValue: (node: any, key: string, value: any) => void
-  ): void {
-    const traverse = function (node: any, key: string, value: any) {
-      onValue(node, key, value);
-      if (value && typeof value === "object") {
-        for (const k of Object.keys(value)) {
-          traverse(value, k, value[k]);
-        }
-      }
-    };
-    traverse(obj, "", obj);
-  }
-
-  static toCamelCaseKeys(obj: any): any {
-    const result = {};
-    for (const key of Object.keys(obj)) {
-      (result as any)[key.toCamelCase()] = obj[key];
-    }
-    return result;
-  }
-
-  static stringify(obj: any): string {
-    return JSON.stringify(obj);
-  }
-
-  static deepMerge(target: any, ...objects: any[]): any {
-    const deepMerge = (tgt: any, src: any) => {
-      if (typeof tgt !== "object" || typeof src !== "object") {
-        return tgt;
-      }
-
-      if (null == src) {
-        return tgt;
-      }
-
-      const merged = Objects.clone(tgt);
-      for (const key of Object.keys(src)) {
-        if (key in merged) {
-          merged[key] = deepMerge(merged[key], src[key]);
-        } else {
-          merged[key] = src[key];
-        }
-      }
-      return merged;
-    };
-
-    let result = target;
-    for (const object of objects) {
-      result = deepMerge(result, object);
-    }
-    return result;
-  }
 }
 
 // #endregion

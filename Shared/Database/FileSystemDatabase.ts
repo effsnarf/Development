@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+import { Objects } from "../Extensions.Objects";
 import { Files } from "../Files";
 import { DatabaseBase } from "./DatabaseBase";
 

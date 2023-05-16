@@ -1,8 +1,8 @@
-import "./Extensions";
 import path from "path";
 import * as colors from "colors";
 import * as fs from "fs";
 import * as jsyaml from "js-yaml";
+import { Objects } from "./Extensions.Objects";
 import { Types } from "./Types";
 import { ChatOpenAI, Roles } from "../Apis/OpenAI/classes/ChatOpenAI";
 import { OsTempFolderCache } from "./Cache";

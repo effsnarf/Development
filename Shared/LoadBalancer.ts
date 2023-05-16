@@ -3,6 +3,7 @@ import fs from "fs";
 import "colors";
 import http from "http";
 import axios, { AxiosResponse, AxiosResponseHeaders } from "axios";
+import { Objects } from "./Extensions.Objects";
 import { Types } from "./Types";
 import { System } from "./System";
 import { Process } from "./Process";
@@ -36,10 +37,10 @@ class NodeSwitcher {
     node.enabled = true;
     node.health = new HealthMonitor(1000 * 60 * 1);
     this.nodes.push(node as Node);
-    node.on("enabled", (enabled: boolean) =>
+    Objects.on(node, "enabled", (enabled: boolean) =>
       this.emitNodeEvent(node, "enabled", enabled)
     );
-    node.health.on("successRate", (successRate: number) => {
+    Objects.on(node.health, "successRate", (successRate: number) => {
       this.emitNodeEvent(node, "successRate", successRate);
     });
   }

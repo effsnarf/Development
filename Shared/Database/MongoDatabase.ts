@@ -1,5 +1,6 @@
 import * as colors from "colors";
 import "../Extensions";
+import { Objects } from "../Extensions.Objects";
 import { Timer } from "../Timer";
 import { DatabaseBase } from "./DatabaseBase";
 import { MongoClient, ObjectId } from "mongodb";

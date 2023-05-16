@@ -1,5 +1,6 @@
 import path from "path";
 import "@shared/Extensions";
+import { Objects } from "@shared/Extensions.Objects";
 import { Types } from "@shared/Types";
 import { Configuration } from "@shared/Configuration";
 import { Timer } from "@shared/Timer";
@@ -383,14 +384,14 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   }
 
   // Log all console output to the file system
-  mainConsoleLog.on(mainConsoleLog.log, (...args: any[]) => {
+  Objects.on(mainConsoleLog, mainConsoleLog.log, (...args: any[]) => {
     fsLog.log(...args);
   }) as any;
 
   // Log all node output to the file system
   if (config.log?.requests?.min.ms) {
     nodeLogs.forEach((nodeLog: Log, index: number) => {
-      nodeLog.on(nodeLog.log, (...args: any[]) => {
+      Objects.on(nodeLog, nodeLog.log, (...args: any[]) => {
         const ms = args
           .find((a) => a?.getUnitClass()?.name == "Time")
           ?.deunitifyTime();

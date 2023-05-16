@@ -1,5 +1,6 @@
 import * as yaml from "js-yaml";
 import "../Extensions";
+import { Objects } from "../Extensions.Objects";
 import { Configuration } from "../Configuration";
 
 enum NodeType {

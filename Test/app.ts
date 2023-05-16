@@ -13,20 +13,6 @@ import { Apify } from "@shared/Apify";
 import { Console } from "@shared/Console";
 import { ChatOpenAI, Roles } from "../Apis/OpenAI/classes/ChatOpenAI";
 
-const combineExtensions = () => {
-  const miscPath = path.join(__dirname, "../Shared/Extensions.misc.ts");
-  const allPath = path.join(__dirname, "../Shared/Extensions.ts");
-
-  const misc = fs.readFileSync(miscPath, "utf8");
-  const all = fs.readFileSync(allPath, "utf8");
-
-  const objectExtensionsRegex =
-    /\/\/\s*#region\s+Object\n(.+?)\/\/\s*#endregion/gs;
-  const objectExtensions = all.match(objectExtensionsRegex)![1];
-
-  console.log(objectExtensions);
-};
-
 // for (var i = 0; i <= 100; i += 10) {
 //   const percent = i / 100;
 //   const value = i * 1000;
