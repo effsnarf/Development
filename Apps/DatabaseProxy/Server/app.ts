@@ -210,6 +210,7 @@ import { Analytics } from "@shared/Analytics";
             res.end();
           })
           .catch((ex: any) => {
+            itemsLog.log(proxyUrl.bgRed);
             if (!ex.response) {
               itemsLog.log(ex.message.bgRed);
               return;
