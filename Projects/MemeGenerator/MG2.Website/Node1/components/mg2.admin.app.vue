@@ -36,7 +36,7 @@
     </template>
     
     <script>
-    import { Refreshing } from '../Shared/Refreshing';
+    import { Refreshing } from '../../../../../Shared/Refreshing';
     
     export default {
         data() {

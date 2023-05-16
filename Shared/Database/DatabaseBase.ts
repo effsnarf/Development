@@ -21,6 +21,8 @@ abstract class DatabaseBase {
     lowercaseFields?: boolean
   ): AsyncGenerator<any, void, unknown>;
 
+  abstract aggregate(collectionName: string, pipeline: any[]): Promise<any[]>;
+
   async upsert(
     collectionName: string,
     doc: any,

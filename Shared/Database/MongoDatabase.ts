@@ -63,7 +63,7 @@ class MongoDatabase extends DatabaseBase {
 
     if (lowercaseFields)
       docs = docs.map((d) => {
-        if (typeof d == "object") return Object.toCamelCaseKeys.apply(d);
+        if (typeof d == "object") return d.toCamelCaseKeys();
         return d;
       });
 

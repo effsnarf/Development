@@ -169,25 +169,6 @@ const color = {
   } as any,
 };
 
-const is = (value: any, type: any) => {
-  switch (type) {
-    case String:
-      return typeof value === "string" || value instanceof String;
-    case Number:
-      return typeof value === "number" && isFinite(value);
-    case Boolean:
-      return typeof value === "boolean";
-    case Array:
-      return Array.isArray(value);
-    case Object:
-      return (
-        value !== null && typeof value === "object" && !Array.isArray(value)
-      );
-    default:
-      return value instanceof type;
-  }
-};
-
 interface Number {
   is(type: any): boolean;
   isBetween(min: number, max: number, strictOrder?: boolean): boolean;
@@ -215,7 +196,7 @@ interface Number {
 
 if (typeof Number !== "undefined") {
   Number.prototype.is = function (type: any): boolean {
-    return is(this, type);
+    return Objects.is(this, type);
   };
 
   Number.prototype.isBetween = function (
@@ -364,22 +345,7 @@ if (typeof Number !== "undefined") {
   };
 }
 
-// interface Number {
-//   toTimeSpan(): TimeSpan;
-//   fromMinutes(): TimeSpan;
-// }
-
-// if (typeof Number !== "undefined") {
-//   Number.prototype.toTimeSpan = function (): TimeSpan {
-//     return TimeSpan.new(this.valueOf());
-//   };
-
-//   Number.prototype.fromMinutes = function (): TimeSpan {
-//     return TimeSpan.new(this.valueOf() * 60 * 1000);
-//   };
-// }
-
-interface Object {
+interface ObjectExtensions {
   is(type: any): boolean;
   clone(): any;
   on(key: string | Function, callback: Function): void;
@@ -389,19 +355,35 @@ interface Object {
   deepMerge(...objects: any[]): any;
 }
 
-if (typeof Object !== "undefined") {
-  Object.prototype.is = function (type: any): boolean {
-    return is(this, type);
-  };
+class Objects {
+  static is(obj: any, type: any): boolean {
+    const value = obj;
+    switch (type) {
+      case String:
+        return typeof value === "string" || value instanceof String;
+      case Number:
+        return typeof value === "number" && isFinite(value);
+      case Boolean:
+        return typeof value === "boolean";
+      case Array:
+        return Array.isArray(value);
+      case Object:
+        return (
+          value !== null && typeof value === "object" && !Array.isArray(value)
+        );
+      default:
+        return value instanceof type;
+    }
+  }
 
-  Object.prototype.clone = function () {
-    return JSON.parse(JSON.stringify(this));
-  };
+  static clone(obj: any): any {
+    return JSON.parse(JSON.stringify(obj));
+  }
 
-  Object.prototype.on = function (key: string | Function, callback: Function) {
-    if (typeof key == "function") {
+  static on(obj: any, key: string | Function, callback: Function): void {
+    if (typeof key === "function") {
       const func = key;
-      const self = this as any;
+      const self = obj;
       self[func.name] = (...args: any[]) => {
         setTimeout(() => callback.apply(self, args), 0);
         return func.apply(self, args);
@@ -409,8 +391,7 @@ if (typeof Object !== "undefined") {
       return;
     }
 
-    const self = this as any;
-    // If already has a getter/setter, replace it
+    const self = obj;
     const descriptor = Object.getOwnPropertyDescriptor(self, key);
     if (descriptor && (descriptor.get || descriptor.set)) {
       if (!descriptor.get)
@@ -430,9 +411,8 @@ if (typeof Object !== "undefined") {
       });
       return;
     }
-    // Store the value in a private variable
+
     let value = self[key];
-    // Create a getter/setter for the property
     Object.defineProperty(self, key, {
       get: function () {
         return value;
@@ -442,11 +422,12 @@ if (typeof Object !== "undefined") {
         callback(newValue);
       },
     });
-  };
+  }
 
-  Object.prototype.traverse = function (
+  static traverse(
+    obj: any,
     onValue: (node: any, key: string, value: any) => void
-  ) {
+  ): void {
     const traverse = function (node: any, key: string, value: any) {
       onValue(node, key, value);
       if (value && typeof value === "object") {
@@ -455,48 +436,59 @@ if (typeof Object !== "undefined") {
         }
       }
     };
-    traverse(this, "", this);
-  };
+    traverse(obj, "", obj);
+  }
 
-  Object.prototype.toCamelCaseKeys = function () {
+  static toCamelCaseKeys(obj: any): any {
     const result = {};
-    for (const key of Object.keys(this)) {
-      (result as any)[key.toCamelCase()] = (this as any)[key];
+    for (const key of Object.keys(obj)) {
+      (result as any)[key.toCamelCase()] = obj[key];
     }
     return result;
-  };
+  }
 
-  Object.prototype.stringify = function (): any {
-    return JSON.stringify(this);
-  };
+  static stringify(obj: any): string {
+    return JSON.stringify(obj);
+  }
 
-  Object.prototype.deepMerge = function (...objects: any[]): any {
-    const deepMerge = (target: any, source: any) => {
-      if (typeof target !== "object" || typeof source !== "object") {
-        return target;
+  static deepMerge(target: any, ...objects: any[]): any {
+    const deepMerge = (tgt: any, src: any) => {
+      if (typeof tgt !== "object" || typeof src !== "object") {
+        return tgt;
       }
 
-      if (null == source) {
-        return target;
+      if (null == src) {
+        return tgt;
       }
 
-      const merged = target.clone();
-      for (const key of Object.keys(source)) {
+      const merged = Objects.clone(tgt);
+      for (const key of Object.keys(src)) {
         if (key in merged) {
-          merged[key] = deepMerge(merged[key], source[key]);
+          merged[key] = deepMerge(merged[key], src[key]);
         } else {
-          merged[key] = source[key];
+          merged[key] = src[key];
         }
       }
       return merged;
     };
 
-    let result = this;
+    let result = target;
     for (const object of objects) {
       result = deepMerge(result, object);
     }
     return result;
-  };
+  }
+}
+
+if (process?.env?.NUXT_ENV) {
+  // Copy all ObjectExtensions methods from Objects to Object
+  // so that we can use them as if they were instance methods.
+  // For each method, pass [this] as the first argument.
+  for (const key of Object.keys(Objects)) {
+    (Object.prototype as any)[key] = function (this: any, ...args: any[]) {
+      return (Objects as any)[key](this, ...args);
+    };
+  }
 }
 
 interface Function {
@@ -506,7 +498,7 @@ interface Function {
 
 if (typeof Function !== "undefined") {
   Function.prototype.is = function (type: any): boolean {
-    return is(this, type);
+    return Objects.is(this, type);
   };
 
   Function.prototype.getArgumentNames = function () {
@@ -653,7 +645,7 @@ interface String {
 
 if (typeof String !== "undefined") {
   String.prototype.is = function (type: any): boolean {
-    return is(this, type);
+    return Objects.is(this, type);
   };
 
   String.prototype.isColorCode = function (): boolean {

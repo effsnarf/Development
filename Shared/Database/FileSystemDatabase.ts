@@ -70,6 +70,10 @@ class FileSystemDatabase extends DatabaseBase {
     return; // No more docs
   }
 
+  async aggregate(collectionName: string, pipeline: any[]): Promise<any[]> {
+    throw new Error("Method not implemented.");
+  }
+
   protected async _upsert(
     collectionName: string,
     doc: any,

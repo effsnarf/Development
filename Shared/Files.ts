@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
-import "../Shared/Extensions";
-import { Progress } from "../Shared/Progress";
+import "./Extensions";
+import { Progress } from "./Progress";
 
 interface PathFilter1 {
   include: string[];
