@@ -233,6 +233,7 @@ import { Analytics } from "@shared/Analytics";
           const user = await User.get(req);
           await handler(req, res, user);
         } catch (ex: any) {
+          itemsLog.log(req.url.bgRed);
           itemsLog.log(ex.message.bgRed);
           res.status(500).send(ex.stack);
         }
