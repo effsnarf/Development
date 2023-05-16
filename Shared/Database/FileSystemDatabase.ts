@@ -38,7 +38,7 @@ class FileSystemDatabase extends DatabaseBase {
       if (limit && docs.length >= limit) break;
       docs.push(JSON.parse(fs.readFileSync(filePath, "utf8")));
     }
-    if (lowercaseFields) docs = docs.map((d) => d.toCamelCaseKeys());
+    if (lowercaseFields) docs = docs.map((d) => Objects.toCamelCaseKeys(d));
     return docs;
   }
 
@@ -62,7 +62,7 @@ class FileSystemDatabase extends DatabaseBase {
       if (limit && docsYieldedCount >= limit) return;
       let doc = JSON.parse(fs.readFileSync(file, "utf8"));
       if (lowercaseFields) {
-        doc = doc.toCamelCaseKeys();
+        doc = Objects.toCamelCaseKeys(doc);
       }
       yield doc;
       docsYieldedCount++;

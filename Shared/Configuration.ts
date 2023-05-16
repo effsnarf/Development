@@ -87,7 +87,7 @@ class Configuration {
         )
       )
       // Merge all config files into a single object
-      .reduce((acc, cur) => cur.deepMerge(acc), {});
+      .reduce((acc, cur) => Objects.deepMerge(cur, acc), {});
 
     // Process the config object tree
     traverse(config.data, (node: any, key: string, value: any) => {
@@ -209,7 +209,7 @@ class Configuration {
     // Replace any functions with their string representation
     // (so that they can be saved to YAML)
     // Clone the config object
-    config = config.clone();
+    config = Objects.clone(config);
     // Convert any functions to strings
     traverse(config, (node: any, key: string, value: any) => {
       if (typeof value === "function") {

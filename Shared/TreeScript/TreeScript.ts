@@ -70,7 +70,7 @@ class TreeScript {
   private parse(source: string) {
     let tree = yaml.load(source) as any;
     // Traverse the tree, if any value is a TreeScript (compilable YAML), compile it.
-    tree.traverse((node: any, key: string, value: any) => {
+    Objects.traverse(tree, (node: any, key: string, value: any) => {
       if (!value) return;
       if (value.is(Array)) {
         node[key] = value.map((item: any) => TreeScript.tryParse(item));

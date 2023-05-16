@@ -63,7 +63,7 @@ class MongoDatabase extends DatabaseBase {
 
     if (lowercaseFields)
       docs = docs.map((d) => {
-        if (typeof d == "object") return d.toCamelCaseKeys();
+        if (typeof d == "object") return Objects.toCamelCaseKeys(d);
         return d;
       });
 
@@ -211,12 +211,12 @@ class MongoDatabase extends DatabaseBase {
   }
 
   private removeDollarSigns(obj: any) {
-    obj.traverse((node: any, key: string, value: any) => {
+    Objects.traverse(obj, (node: any, key: string, value: any) => {
       if (key.startsWith("$")) {
         node[key.substring(1)] = value;
         delete node[key];
       }
-    }, true);
+    });
   }
 }
 

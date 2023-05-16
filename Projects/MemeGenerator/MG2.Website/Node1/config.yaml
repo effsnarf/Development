@@ -3,6 +3,6 @@ server:
   port: 5051
 database:
   content:
-    database: MemeGenerator
+    name: MemeGenerator
     connectionString: mongodb://localhost:27017
   analytics:

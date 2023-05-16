@@ -1,3 +1,4 @@
+// #region UnitClass, Type, Size, Percentage, color
 interface UnitClass {
   units: string[];
   unitToValue: { [key: string]: number };
@@ -168,7 +169,9 @@ const color = {
     bgWhite: "\x1b[47m",
   } as any,
 };
+// #endregion
 
+// #region Interfaces
 interface Number {
   is(type: any): boolean;
   isBetween(min: number, max: number, strictOrder?: boolean): boolean;
@@ -194,6 +197,86 @@ interface Number {
   ordinalize(): string;
 }
 
+interface String {
+  is(type: any): boolean;
+  isColorCode(): boolean;
+
+  pad(align: "left" | "right", fillString: string): string;
+
+  nextChar(): string;
+  getChars(): Generator<string, void, unknown>;
+
+  colorize(color: string): string;
+  singularize(): string;
+  pluralize(): string;
+  antonym(): string;
+
+  severify(green: number, yellow: number, direction: "<" | ">"): string;
+  deunitify(unitClass: UnitClass): number;
+  deunitifyTime(): number;
+  deunitifySize(): number;
+  deunitifyPercent(): number;
+
+  getUnit(): string;
+  getUnitClass(): UnitClass | null;
+  withoutUnit(): string;
+
+  padStartChars(maxLength: number, fillString?: string): string;
+  sliceChars(start: number | undefined, end?: number | undefined): string;
+  alignRight(): string;
+  shorten(maxLength: number, ellipsis?: boolean): string;
+  toLength(
+    length: number,
+    ellipsis?: boolean,
+    align?: "left" | "right"
+  ): string;
+  splitOnWidth(width: number): string[];
+  trimAll(): string;
+  trimDoubleQuotes(): string;
+  stripHtmlTags(): string;
+  decodeHtml(): string;
+  getMatches(regex: RegExp): string[];
+  getWords(): string[];
+  toCamelCase(): string;
+  parseJSON(): any;
+  truncate(maxLength: number): string;
+  getCharsCount(): number;
+
+  getColorCodesLength(): number;
+  withoutColors(): string;
+  showColorCodes(): string;
+  colorsToHandleBars(): string;
+  handlebarsColorsToHtml(): string;
+  handlebarsColorsToConsole(): string;
+  colorsToHtml(): string;
+  parseColorCodes(): string;
+
+  toShortPath(comparePath?: string): string;
+  toAbsolutePath(path: any): string;
+  toNumber(): number;
+
+  ipToNumber(): number;
+}
+
+interface Array<T> {
+  sum(): number;
+  first(): any;
+  last(): any;
+  joinColumns(columns: (number | null)[], ellipsis?: boolean): string;
+  distinct(project?: ((item: T) => any) | null): T[];
+  except(...items: T[]): T[];
+  sortBy(project: (item: T) => any): T[];
+  sortByDesc(project: (item: T) => any): T[];
+  stringify(): string;
+}
+
+interface Function {
+  is(type: any): boolean;
+  getArgumentNames(): string[];
+}
+// #endregion
+
+// #region Number
 if (typeof Number !== "undefined") {
   Number.prototype.is = function (type: any): boolean {
     return Objects.is(this, type);
@@ -344,305 +427,9 @@ if (typeof Number !== "undefined") {
     }
   };
 }
+// #endregion
 
-interface ObjectExtensions {
-  is(type: any): boolean;
-  clone(): any;
-  on(key: string | Function, callback: Function): void;
-  traverse(onValue: (node: any, key: string, value: any) => void): void;
-  toCamelCaseKeys(): any;
-  stringify(): string;
-  deepMerge(...objects: any[]): any;
-}
-
-class Objects {
-  static is(obj: any, type: any): boolean {
-    const value = obj;
-    switch (type) {
-      case String:
-        return typeof value === "string" || value instanceof String;
-      case Number:
-        return typeof value === "number" && isFinite(value);
-      case Boolean:
-        return typeof value === "boolean";
-      case Array:
-        return Array.isArray(value);
-      case Object:
-        return (
-          value !== null && typeof value === "object" && !Array.isArray(value)
-        );
-      default:
-        return value instanceof type;
-    }
-  }
-
-  static clone(obj: any): any {
-    return JSON.parse(JSON.stringify(obj));
-  }
-
-  static on(obj: any, key: string | Function, callback: Function): void {
-    if (typeof key === "function") {
-      const func = key;
-      const self = obj;
-      self[func.name] = (...args: any[]) => {
-        setTimeout(() => callback.apply(self, args), 0);
-        return func.apply(self, args);
-      };
-      return;
-    }
-
-    const self = obj;
-    const descriptor = Object.getOwnPropertyDescriptor(self, key);
-    if (descriptor && (descriptor.get || descriptor.set)) {
-      if (!descriptor.get)
-        throw new Error("Cannot watch a non-getter property");
-      if (!descriptor.set)
-        throw new Error("Cannot watch a non-setter property");
-      const getter = descriptor.get;
-      const setter = descriptor.set;
-      Object.defineProperty(self, key, {
-        get: function () {
-          return getter();
-        },
-        set: function (newValue) {
-          setter(newValue);
-          callback(newValue);
-        },
-      });
-      return;
-    }
-
-    let value = self[key];
-    Object.defineProperty(self, key, {
-      get: function () {
-        return value;
-      },
-      set: function (newValue) {
-        value = newValue;
-        callback(newValue);
-      },
-    });
-  }
-
-  static traverse(
-    obj: any,
-    onValue: (node: any, key: string, value: any) => void
-  ): void {
-    const traverse = function (node: any, key: string, value: any) {
-      onValue(node, key, value);
-      if (value && typeof value === "object") {
-        for (const k of Object.keys(value)) {
-          traverse(value, k, value[k]);
-        }
-      }
-    };
-    traverse(obj, "", obj);
-  }
-
-  static toCamelCaseKeys(obj: any): any {
-    const result = {};
-    for (const key of Object.keys(obj)) {
-      (result as any)[key.toCamelCase()] = obj[key];
-    }
-    return result;
-  }
-
-  static stringify(obj: any): string {
-    return JSON.stringify(obj);
-  }
-
-  static deepMerge(target: any, ...objects: any[]): any {
-    const deepMerge = (tgt: any, src: any) => {
-      if (typeof tgt !== "object" || typeof src !== "object") {
-        return tgt;
-      }
-
-      if (null == src) {
-        return tgt;
-      }
-
-      const merged = Objects.clone(tgt);
-      for (const key of Object.keys(src)) {
-        if (key in merged) {
-          merged[key] = deepMerge(merged[key], src[key]);
-        } else {
-          merged[key] = src[key];
-        }
-      }
-      return merged;
-    };
-
-    let result = target;
-    for (const object of objects) {
-      result = deepMerge(result, object);
-    }
-    return result;
-  }
-}
-
-if (process?.env?.NUXT_ENV) {
-  // Copy all ObjectExtensions methods from Objects to Object
-  // so that we can use them as if they were instance methods.
-  // For each method, pass [this] as the first argument.
-  for (const key of Object.keys(Objects)) {
-    (Object.prototype as any)[key] = function (this: any, ...args: any[]) {
-      return (Objects as any)[key](this, ...args);
-    };
-  }
-}
-
-interface Function {
-  is(type: any): boolean;
-  getArgumentNames(): string[];
-}
-
-if (typeof Function !== "undefined") {
-  Function.prototype.is = function (type: any): boolean {
-    return Objects.is(this, type);
-  };
-
-  Function.prototype.getArgumentNames = function () {
-    const code = this.toString();
-    const args = code
-      .slice(code.indexOf("(") + 1, code.indexOf(")"))
-      .match(/([^\s,]+)/g);
-    return args || [];
-  };
-}
-
-interface Array<T> {
-  sum(): number;
-  first(): any;
-  last(): any;
-  joinColumns(columns: (number | null)[], ellipsis?: boolean): string;
-  distinct(project?: ((item: T) => any) | null): T[];
-  except(...items: T[]): T[];
-  sortBy(project: (item: T) => any): T[];
-  sortByDesc(project: (item: T) => any): T[];
-  stringify(): string;
-}
-
-if (typeof Array !== "undefined") {
-  Array.prototype.sum = function () {
-    return this.reduce((a, b) => a + b, 0);
-  };
-
-  Array.prototype.first = function () {
-    return this[0];
-  };
-
-  Array.prototype.last = function () {
-    return this[this.length - 1];
-  };
-
-  Array.prototype.joinColumns = function (
-    columns: (number | null)[],
-    ellipsis?: boolean
-  ) {
-    if (!columns.length) return this.join(" ");
-    return this.map(
-      (item, i) => `${(item || "").toLength(columns[i], ellipsis, "right")}`
-    ).join(" ");
-  };
-
-  Array.prototype.distinct = function (project?: ((item: any) => any) | null) {
-    if (!project) project = (item) => item;
-    const result = [];
-    const map = new Map();
-    for (const item of this) {
-      const key = project ? project(item) : item;
-      if (!map.has(key)) {
-        map.set(key, true);
-        result.push(item);
-      }
-    }
-    return result;
-  };
-
-  Array.prototype.except = function (...items: any[]) {
-    return this.filter((item) => !items.includes(item));
-  };
-
-  Array.prototype.sortBy = function (project: (item: any) => any) {
-    return [...this].sort((a, b) => {
-      const aKey = project(a);
-      const bKey = project(b);
-      if (aKey < bKey) return -1;
-      if (aKey > bKey) return 1;
-      return 0;
-    });
-  };
-
-  Array.prototype.sortByDesc = function (project: (item: any) => any) {
-    return [...this.sortBy(project)].reverse();
-  };
-
-  Array.prototype.stringify = function (): any {
-    return JSON.stringify(this);
-  };
-}
-
-interface String {
-  is(type: any): boolean;
-  isColorCode(): boolean;
-
-  pad(align: "left" | "right", fillString: string): string;
-
-  nextChar(): string;
-  getChars(): Generator<string, void, unknown>;
-
-  colorize(color: string): string;
-  singularize(): string;
-  pluralize(): string;
-  antonym(): string;
-
-  severify(green: number, yellow: number, direction: "<" | ">"): string;
-  deunitify(unitClass: UnitClass): number;
-  deunitifyTime(): number;
-  deunitifySize(): number;
-  deunitifyPercent(): number;
-
-  getUnit(): string;
-  getUnitClass(): UnitClass | null;
-  withoutUnit(): string;
-
-  padStartChars(maxLength: number, fillString?: string): string;
-  sliceChars(start: number | undefined, end?: number | undefined): string;
-  alignRight(): string;
-  shorten(maxLength: number, ellipsis?: boolean): string;
-  toLength(
-    length: number,
-    ellipsis?: boolean,
-    align?: "left" | "right"
-  ): string;
-  splitOnWidth(width: number): string[];
-  trimAll(): string;
-  trimDoubleQuotes(): string;
-  stripHtmlTags(): string;
-  decodeHtml(): string;
-  getMatches(regex: RegExp): string[];
-  getWords(): string[];
-  toCamelCase(): string;
-  parseJSON(): any;
-  truncate(maxLength: number): string;
-  getCharsCount(): number;
-
-  getColorCodesLength(): number;
-  withoutColors(): string;
-  showColorCodes(): string;
-  colorsToHandleBars(): string;
-  handlebarsColorsToHtml(): string;
-  handlebarsColorsToConsole(): string;
-  colorsToHtml(): string;
-  parseColorCodes(): string;
-
-  toShortPath(comparePath?: string): string;
-  toAbsolutePath(path: any): string;
-  toNumber(): number;
-
-  ipToNumber(): number;
-}
-
+// #region String
 if (typeof String !== "undefined") {
   String.prototype.is = function (type: any): boolean {
     return Objects.is(this, type);
@@ -1094,3 +881,211 @@ if (typeof String !== "undefined") {
     );
   };
 }
+// #endregion
+
+// #region Array
+if (typeof Array !== "undefined") {
+  Array.prototype.sum = function () {
+    return this.reduce((a, b) => a + b, 0);
+  };
+
+  Array.prototype.first = function () {
+    return this[0];
+  };
+
+  Array.prototype.last = function () {
+    return this[this.length - 1];
+  };
+
+  Array.prototype.joinColumns = function (
+    columns: (number | null)[],
+    ellipsis?: boolean
+  ) {
+    if (!columns.length) return this.join(" ");
+    return this.map(
+      (item, i) => `${(item || "").toLength(columns[i], ellipsis, "right")}`
+    ).join(" ");
+  };
+
+  Array.prototype.distinct = function (project?: ((item: any) => any) | null) {
+    if (!project) project = (item) => item;
+    const result = [];
+    const map = new Map();
+    for (const item of this) {
+      const key = project ? project(item) : item;
+      if (!map.has(key)) {
+        map.set(key, true);
+        result.push(item);
+      }
+    }
+    return result;
+  };
+
+  Array.prototype.except = function (...items: any[]) {
+    return this.filter((item) => !items.includes(item));
+  };
+
+  Array.prototype.sortBy = function (project: (item: any) => any) {
+    return [...this].sort((a, b) => {
+      const aKey = project(a);
+      const bKey = project(b);
+      if (aKey < bKey) return -1;
+      if (aKey > bKey) return 1;
+      return 0;
+    });
+  };
+
+  Array.prototype.sortByDesc = function (project: (item: any) => any) {
+    return [...this.sortBy(project)].reverse();
+  };
+
+  Array.prototype.stringify = function (): any {
+    return JSON.stringify(this);
+  };
+}
+// #endregion
+
+// #region Function
+if (typeof Function !== "undefined") {
+  Function.prototype.is = function (type: any): boolean {
+    return Objects.is(this, type);
+  };
+
+  Function.prototype.getArgumentNames = function () {
+    const code = this.toString();
+    const args = code
+      .slice(code.indexOf("(") + 1, code.indexOf(")"))
+      .match(/([^\s,]+)/g);
+    return args || [];
+  };
+}
+
+// #endregion
+
+// #region Objects
+class Objects {
+  static is(obj: any, type: any): boolean {
+    const value = obj;
+    switch (type) {
+      case String:
+        return typeof value === "string" || value instanceof String;
+      case Number:
+        return typeof value === "number" && isFinite(value);
+      case Boolean:
+        return typeof value === "boolean";
+      case Array:
+        return Array.isArray(value);
+      case Object:
+        return (
+          value !== null && typeof value === "object" && !Array.isArray(value)
+        );
+      default:
+        return value instanceof type;
+    }
+  }
+
+  static clone(obj: any): any {
+    return JSON.parse(JSON.stringify(obj));
+  }
+
+  static on(obj: any, key: string | Function, callback: Function): void {
+    if (typeof key === "function") {
+      const func = key;
+      const self = obj;
+      self[func.name] = (...args: any[]) => {
+        setTimeout(() => callback.apply(self, args), 0);
+        return func.apply(self, args);
+      };
+      return;
+    }
+
+    const self = obj;
+    const descriptor = Object.getOwnPropertyDescriptor(self, key);
+    if (descriptor && (descriptor.get || descriptor.set)) {
+      if (!descriptor.get)
+        throw new Error("Cannot watch a non-getter property");
+      if (!descriptor.set)
+        throw new Error("Cannot watch a non-setter property");
+      const getter = descriptor.get;
+      const setter = descriptor.set;
+      Object.defineProperty(self, key, {
+        get: function () {
+          return getter();
+        },
+        set: function (newValue) {
+          setter(newValue);
+          callback(newValue);
+        },
+      });
+      return;
+    }
+
+    let value = self[key];
+    Object.defineProperty(self, key, {
+      get: function () {
+        return value;
+      },
+      set: function (newValue) {
+        value = newValue;
+        callback(newValue);
+      },
+    });
+  }
+
+  static traverse(
+    obj: any,
+    onValue: (node: any, key: string, value: any) => void
+  ): void {
+    const traverse = function (node: any, key: string, value: any) {
+      onValue(node, key, value);
+      if (value && typeof value === "object") {
+        for (const k of Object.keys(value)) {
+          traverse(value, k, value[k]);
+        }
+      }
+    };
+    traverse(obj, "", obj);
+  }
+
+  static toCamelCaseKeys(obj: any): any {
+    const result = {};
+    for (const key of Object.keys(obj)) {
+      (result as any)[key.toCamelCase()] = obj[key];
+    }
+    return result;
+  }
+
+  static stringify(obj: any): string {
+    return JSON.stringify(obj);
+  }
+
+  static deepMerge(target: any, ...objects: any[]): any {
+    const deepMerge = (tgt: any, src: any) => {
+      if (typeof tgt !== "object" || typeof src !== "object") {
+        return tgt;
+      }
+
+      if (null == src) {
+        return tgt;
+      }
+
+      const merged = Objects.clone(tgt);
+      for (const key of Object.keys(src)) {
+        if (key in merged) {
+          merged[key] = deepMerge(merged[key], src[key]);
+        } else {
+          merged[key] = src[key];
+        }
+      }
+      return merged;
+    };
+
+    let result = target;
+    for (const object of objects) {
+      result = deepMerge(result, object);
+    }
+    return result;
+  }
+}
+
+// #endregion
