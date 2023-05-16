@@ -129,4 +129,6 @@ export default {
   ],
 
   watch: ["~/server", "~/shared", "~/static", "~/plugins", "~/components", "~/pages", "~/layouts", "~/store"],
+
+  extensions: ["ts"]
 };
