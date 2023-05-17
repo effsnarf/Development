@@ -140,7 +140,7 @@ class Configuration {
 
     if (options.quitIfChanged) {
       // If the source file or configuration file changes, exit the process (and restart from the cmd file)
-      [...configPaths, ...options.quitIfChanged].forEach((file) => {
+      [...configPaths, ...options.quitIfChanged].distinct().forEach((file) => {
         config.log(`${`Watching`.gray} ${file.toShortPath()}`);
         fs.watchFile(file, () => {
           config.log(`${file.yellow} ${`changed, restarting...`.gray}`);

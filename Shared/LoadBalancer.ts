@@ -95,6 +95,7 @@ class NodeSwitcher {
 interface IncomingItem {
   id: number;
   isProcessing: boolean;
+  infos: string[];
   nodeItem: NodeItem;
   dt: number;
   attempt: number;
@@ -242,6 +243,7 @@ class LoadBalancer {
     const incomingItem: IncomingItem = {
       id: this.incomingItemID++, // Unique ID for this request
       isProcessing: false, // Is this request being processed?
+      infos: [], // Information about this request
       nodeItem, // The node that will process this request
       dt: Date.now(), // The time this request was received
       attempt: 0, // Which attempt is this?
@@ -255,6 +257,7 @@ class LoadBalancer {
   }
 
   private removeIncomingItem(item: IncomingItem, status?: number) {
+    item.infos.push(`${`removing`.yellow} ${`(${item.attempt} attempts)`}`);
     const elapsed = Date.now() - item.dt;
     // Remove the item from the incoming items collection
     this.incomingItems.remove(item);
@@ -263,7 +266,9 @@ class LoadBalancer {
     item.response.end();
     // Log the timeout
     this.logText(
-      `${`Timed out`.bgRed} ${elapsed.unitifyTime("s")}: ${
+      `${`Timed out`.bgRed} ${elapsed
+        .unitifyTime()
+        .severify(...this.options.severity.time)}: ${
         (status || "").toString().padStart(3).bgRed
       } ${item.request.url?.bgRed}`
     );
@@ -274,6 +279,12 @@ class LoadBalancer {
     nodeResponse: AxiosResponse<any>,
     elapsed: number
   ) {
+    incomingItem.infos.push(
+      `${elapsed.unitifyTime().severify(...this.options.severity.time)} ${
+        `success`.green
+      }`
+    );
+
     if (elapsed < 50) {
       incomingItem.nodeItem.node.health.trackSuccess();
     } else {
@@ -285,15 +296,19 @@ class LoadBalancer {
       .severify(...this.options.severity.time);
     const status = nodeResponse.status;
 
-    let statusStr = this.colorByStatus(status, status);
+    let statusStr = status.severifyByHttpStatus();
 
-    const url = this.colorByStatus(incomingItem.request.url, status);
+    const url = incomingItem.request.url?.severifyByHttpStatus(status);
+
+    incomingItem.infos.push(`writing headers`);
 
     incomingItem.response.writeHead(
       status,
       nodeResponse?.statusText,
       nodeResponse?.headers as any
     );
+
+    incomingItem.infos.push(`piping data`);
 
     nodeResponse.data.pipe(incomingItem.response);
 
@@ -332,6 +347,8 @@ class LoadBalancer {
     // Failed to process the incoming item
     // Increment the attempt counter
     incomingItem.attempt++;
+
+    incomingItem.infos.push(`${uElapsed} ${`failure`.red}`);
     // Log the failed attempt
     this.log({
       node: { index: incomingItem.nodeItem.index },
@@ -347,6 +364,9 @@ class LoadBalancer {
 
     // We haven't reached the maximum number of attempts
     if (incomingItem.attempt < this.incomingItems.attempts) {
+      incomingItem.infos.push(
+        `trying again ${`(${incomingItem.attempt.ordinalize()} attempt)`}`
+      );
       // Try again with another node
       incomingItem.nodeItem = this.nodeSwitcher.getNextNode(
         incomingItem.nodeItem.index
@@ -377,6 +397,10 @@ class LoadBalancer {
     incomingItem.isProcessing = true;
 
     incomingItem.nodeItem;
+
+    incomingItem.infos.push(
+      `processing ${`(${incomingItem.attempt.ordinalize()} attempt)`}`
+    );
 
     const url = `${nodeItem.node.address.protocol}://${nodeItem.node.address.host}:${nodeItem.node.address.port}${request.url}`;
 
@@ -418,6 +442,7 @@ class LoadBalancer {
         this.nodeResponseSuccess(incomingItem, ex.response, timer.elapsed!);
         return;
       } else {
+        incomingItem.infos.push(ex.message.bgRed);
         if (ex.code != "ECONNREFUSED") {
           this.log({
             node: { index: incomingItem.nodeItem.index },
@@ -427,6 +452,15 @@ class LoadBalancer {
         this.nodeResponseFailure(incomingItem, ex, logMsg, timer.elapsed!);
         return;
       }
+    } finally {
+      timer.stop();
+      incomingItem.infos.push(
+        `${timer.elapsed
+          ?.unitifyTime()
+          .severify(
+            ...this.options.severity.time
+          )} ${response.statusCode.severifyByHttpStatus()}`
+      );
     }
   }
 
@@ -437,14 +471,6 @@ class LoadBalancer {
   async restartNode(nodeIndex: number) {
     const node = this.getNode(nodeIndex);
     await node.process.restart();
-  }
-
-  private colorByStatus(s: any, status: number) {
-    s = s.toString();
-    if (status >= 200 && status < 300) return s.green;
-    else if (status >= 300 && status < 400) return s.yellow;
-    else if (status >= 400 && status < 500) return s.bgRed;
-    return s;
   }
 
   private log(data: any) {

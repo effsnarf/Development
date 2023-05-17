@@ -188,6 +188,7 @@ interface Number {
   unitifyPercent(): string;
   toProgressBar(barLength?: number): string;
   severify(green: number, yellow: number, direction: "<" | ">"): string;
+  severifyByHttpStatus(): string;
   getSeverityColor(
     green: number,
     yellow: number,
@@ -213,6 +214,7 @@ interface String {
   antonym(): string;
 
   severify(green: number, yellow: number, direction: "<" | ">"): string;
+  severifyByHttpStatus(statusCode?: number): string;
   deunitify(unitClass: UnitClass): number;
   deunitifyTime(): number;
   deunitifySize(): number;
@@ -404,6 +406,11 @@ if (typeof Number !== "undefined") {
     );
   };
 
+  Number.prototype.severifyByHttpStatus = function (): string {
+    const value = this.valueOf();
+    return value.severify(200, 400, "<");
+  };
+
   Number.prototype.getSeverityColor = function (
     green: number,
     yellow: number,
@@ -412,13 +419,13 @@ if (typeof Number !== "undefined") {
   ): string {
     const value = this.valueOf();
     if (direction == "<") {
-      if (value < green) return "green";
-      if (value < yellow) return "yellow";
+      if (value <= green) return "green";
+      if (value <= yellow) return "yellow";
       return bgRed ? "bgRed" : "red";
     }
     if (direction == ">") {
-      if (value > green) return "green";
-      if (value > yellow) return "yellow";
+      if (value >= green) return "green";
+      if (value >= yellow) return "yellow";
       return bgRed ? "bgRed" : "red";
     }
     throw new Error(`Invalid direction: ${direction}`);
@@ -541,6 +548,17 @@ if (typeof String !== "undefined") {
     return `${value.unitify(unitClass).withoutUnit().colorize(color)}${
       unit.gray
     }`;
+  };
+
+  String.prototype.severifyByHttpStatus = function (
+    statusCode?: number
+  ): string {
+    if (!statusCode)
+      statusCode = this.split(" ")
+        .map((s) => parseInt(s))
+        .find((n) => !isNaN(n));
+    if (!statusCode) return this.toString();
+    return this.colorize(statusCode.getSeverityColor(200, 400, "<"));
   };
 
   String.prototype.deunitify = function (unitClass: UnitClass): number {

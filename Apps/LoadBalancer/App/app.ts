@@ -58,7 +58,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
     })`;
   };
 
-  const incomingItemToString = (item: IncomingItem) => {
+  const incomingItemToStrings = (item: IncomingItem) => {
     const elapsedS = (Date.now() - item.dt) / 1000;
     let elapsedStr = elapsedS.toFixed(2);
     if (elapsedS < 0.1) elapsedStr = elapsedStr.green;
@@ -73,7 +73,10 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
 
     const url = item.request.url;
 
-    return `${elapsedStr} ${attempt} ${isProcessing} ${url}`;
+    return [
+      `${elapsedStr} ${attempt} ${isProcessing} ${url}`,
+      ...item.infos.map((info) => `  ${info}`),
+    ];
   };
   // #endregion
 
@@ -91,7 +94,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
     loadBalancer.incomingItems
       .getItems()
       .sort((a: IncomingItem, b: IncomingItem) => b.dt - a.dt)
-      .map((item: IncomingItem) => incomingItemToString(item))
+      .flatMap((item: IncomingItem) => incomingItemToStrings(item))
   );
 
   // Log the start of the app
