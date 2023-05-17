@@ -252,14 +252,14 @@ class LargeText extends ConsoleElement {
     return new LargeText(status, font);
   }
 
-  protected _draw(
+  protected async _draw(
     width: string | Unit,
     height: string | Unit
   ): Promise<string[]> {
     const w = Unit.from(width, "x");
     const h = Unit.from(height, "y");
 
-    if (!this.text?.trim().length) return Promise.resolve([]);
+    if (!this.text?.trim().length) return [];
 
     const result = cfonts.render(this.text, {
       font: this.font, // define the font face
@@ -276,7 +276,9 @@ class LargeText extends ConsoleElement {
       env: "node",
     });
 
-    let lines = result.string.split("\n");
+    let lines: string[] = [];
+    lines.push("");
+    lines.push(result.string.split("\n"));
 
     // Center the text by the width
     lines = lines.map((line: string) => {
