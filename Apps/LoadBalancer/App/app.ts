@@ -127,24 +127,23 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
 
   // #region Create the dashboard layout
   const layout = Layout.new();
-  // Add the incoming items log and the counter log
-  layout.addColumn(Unit.box("0%", "0%", "40%", "48%"), [
-    incomingItemsLog,
-    counterLog,
-  ]);
+  // Add the counter log
+  layout.addColumn(Unit.box("0%", "0%", "30%", "28%"), [counterLog]);
+  // Add the incoming items log
+  layout.addColumn(Unit.box("30%", "0%", "20%", "100%"), [incomingItemsLog]);
   // Add the nodes
   layout.addRow(
-    Unit.box("40%", "0%", "100%", "50%"),
+    Unit.box("50%", "0%", "50%", "50%"),
     [nodeLogs[0], healthBars[0]],
-    ["50%", "10%"]
+    ["40%", "10%"]
   );
   layout.addRow(
-    Unit.box("40%", "50%", "100%", "50%"),
+    Unit.box("50%", "50%", "50%", "50%"),
     [nodeLogs[1], healthBars[1]],
-    ["50%", "10%"]
+    ["40%", "10%"]
   );
   // Add the main log
-  layout.addColumn(Unit.box("0%", "50%", "40%", "50%"), [mainConsoleLog]);
+  layout.addColumn(Unit.box("0%", "30%", "30%", "70%"), [mainConsoleLog]);
   // #endregion
 
   // #region Render the dashboard
