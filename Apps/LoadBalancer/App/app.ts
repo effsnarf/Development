@@ -59,11 +59,11 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   };
 
   const incomingItemToStrings = (item: IncomingItem) => {
-    const elapsedS = (Date.now() - item.dt) / 1000;
-    let elapsedStr = elapsedS.toFixed(2);
-    if (elapsedS < 0.1) elapsedStr = elapsedStr.green;
-    else if (elapsedS < 0.5) elapsedStr = elapsedStr.yellow;
-    else elapsedStr = elapsedStr.bgRed;
+    const elapsedStr = (Date.now() - item.dt)
+      .unitifyTime()
+      .severify(
+        ...(config.incoming.severity.time as [number, number, "<" | ">"])
+      );
 
     const attempt = `(${item.attempt})`.gray;
 
