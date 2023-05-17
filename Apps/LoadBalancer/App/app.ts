@@ -93,7 +93,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   const incomingItemsLog = ObjectLog.new(config.title, () =>
     loadBalancer.incomingItems
       .getItems()
-      .sort((a: IncomingItem, b: IncomingItem) => b.dt - a.dt)
+      .sort((a: IncomingItem, b: IncomingItem) => a.dt - b.dt)
       .flatMap((item: IncomingItem) => incomingItemToStrings(item))
   );
 
