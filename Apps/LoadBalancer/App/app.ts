@@ -33,7 +33,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   // #region Helper functions
   const uptime = Timer.start();
 
-  const getIncomingLogTitle = (
+  const getMainTitle = (
     count: number = 0,
     countPerSecond: number = 0,
     countPerMinute: number = 0
@@ -88,9 +88,9 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   // #region Dashboard setup
 
   // Create the main log
-  const mainConsoleLog = Log.new(getIncomingLogTitle());
+  const mainConsoleLog = Log.new(config.title);
   const mainLog = mainConsoleLog;
-  const incomingItemsLog = ObjectLog.new(getIncomingLogTitle(), () =>
+  const incomingItemsLog = ObjectLog.new(config.title, () =>
     loadBalancer.incomingItems
       .getItems()
       .sort((a: IncomingItem, b: IncomingItem) => b.dt - a.dt)
@@ -197,13 +197,12 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   });
   // Update incoming items count in the dashboard
   loadBalancer.events.on("incoming-items", (count: any) => {
-    const title = getIncomingLogTitle(
+    const title = getMainTitle(
       count,
       loadBalancer.stats.requests.per.second.count,
       loadBalancer.stats.requests.per.minute.count
     );
-    mainConsoleLog.title = title;
-    incomingItemsLog.title = title;
+    counterLog.title = title;
     loadBalancer.stats.requests.per.second.count.toLocaleString();
     counterLog.text =
       loadBalancer.stats.requests.per.minute.count.toLocaleString();
