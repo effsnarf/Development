@@ -348,7 +348,9 @@ class LoadBalancer {
     // Increment the attempt counter
     incomingItem.attempt++;
 
-    incomingItem.infos.push(`${uElapsed} ${`failure`.red}`);
+    incomingItem.infos.push(
+      `${uElapsed} ${ex.status || ""} ${ex.message?.bgRed}`
+    );
     // Log the failed attempt
     this.log({
       node: { index: incomingItem.nodeItem.index },
