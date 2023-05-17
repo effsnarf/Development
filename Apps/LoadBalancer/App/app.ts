@@ -129,7 +129,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   const layouts: Layout[] = [];
   const layout1 = Layout.new();
   // Add the counter log
-  layout1.addColumn(Unit.box("0%", "0%", "30%", "28%"), [counterLog]);
+  layout1.addColumn(Unit.box("0%", "2%", "30%", "28%"), [counterLog]);
   // Add the incoming items log
   layout1.addColumn(Unit.box("30%", "0%", "20%", "100%"), [incomingItemsLog]);
   // Add the nodes
