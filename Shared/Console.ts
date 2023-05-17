@@ -278,7 +278,7 @@ class LargeText extends ConsoleElement {
 
     let lines: string[] = [];
     lines.push("");
-    lines.push(result.string.split("\n"));
+    lines.push(...result.string.split("\n"));
 
     // Center the text by the width
     lines = lines.map((line: string) => {
