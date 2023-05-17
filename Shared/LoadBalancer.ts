@@ -312,8 +312,8 @@ class LoadBalancer {
 
     nodeResponse.data.pipe(incomingItem.response);
 
-    let nodeResponseSize = (
-      await this.getResponseStreamSize(nodeResponse)
+    let nodeResponseSize = parseInt(
+      nodeResponse.headers["content-length"] || 0
     ).unitifySize();
 
     const displayItem = incomingItem.request.url?.endsWith(".jpg")
@@ -327,6 +327,8 @@ class LoadBalancer {
         texts: [statusStr, nodeResponseSize, uElapsed, url],
       });
     }
+
+    incomingItem.infos.push(`removing item from queue`);
 
     // Successfully processed the incoming item
     this.incomingItems.remove(incomingItem);
