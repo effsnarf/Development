@@ -442,6 +442,7 @@ class ObjectLog extends ConsoleElement {
     const data = await this.getData();
     const log = Log.new(this.title);
     log.showDate = false;
+    log.reverseItems = false;
     if (Array.isArray(data)) {
       data.forEach((item) => log.log(item));
     } else {
