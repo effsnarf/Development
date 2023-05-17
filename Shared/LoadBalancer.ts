@@ -402,10 +402,6 @@ class LoadBalancer {
 
     incomingItem.nodeItem;
 
-    incomingItem.infos.push(
-      `processing ${`(${incomingItem.attempt.ordinalize()} attempt)`}`
-    );
-
     const url = `${nodeItem.node.address.protocol}://${nodeItem.node.address.host}:${nodeItem.node.address.port}${request.url}`;
 
     let logMsg = request.url || "";

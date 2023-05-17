@@ -65,7 +65,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
         ...(config.incoming.severity.time as [number, number, "<" | ">"])
       );
 
-    const attempt = `(${item.attempt})`.gray;
+    const attempt = `${item.attempt.ordinalize()}`;
 
     const isProcessing = (
       item.isProcessing ? "processing".yellow : "queued".gray
