@@ -126,31 +126,38 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   // #endregion
 
   // #region Create the dashboard layout
-  const layout = Layout.new();
+  const layouts: Layout[] = [];
+  const layout1 = Layout.new();
   // Add the counter log
-  layout.addColumn(Unit.box("0%", "0%", "30%", "28%"), [counterLog]);
+  layout1.addColumn(Unit.box("0%", "0%", "30%", "28%"), [counterLog]);
   // Add the incoming items log
-  layout.addColumn(Unit.box("30%", "0%", "20%", "100%"), [incomingItemsLog]);
+  layout1.addColumn(Unit.box("30%", "0%", "20%", "100%"), [incomingItemsLog]);
   // Add the nodes
-  layout.addRow(
+  layout1.addRow(
     Unit.box("50%", "0%", "50%", "50%"),
     [nodeLogs[0], healthBars[0]],
     ["40%", "10%"]
   );
-  layout.addRow(
+  layout1.addRow(
     Unit.box("50%", "50%", "50%", "50%"),
     [nodeLogs[1], healthBars[1]],
     ["40%", "10%"]
   );
   // Add the main log
-  layout.addColumn(Unit.box("0%", "30%", "30%", "70%"), [mainConsoleLog]);
+  layout1.addColumn(Unit.box("0%", "30%", "30%", "70%"), [mainConsoleLog]);
+  // Alternative dashboard layout
+  const layout2 = Layout.new();
+  layout2.add(Unit.box("0%", "0%", "100%", "100%"), incomingItemsLog);
+  // Layout selection
+  layouts.push(layout1, layout2);
+  let selectedLayoutIndex = 0;
   // #endregion
 
   // #region Render the dashboard
   console.clear();
 
   const renderDashboard = () => {
-    layout.render();
+    layouts[selectedLayoutIndex].render();
     // Set the console window title
     process.title = `${config.title} (${loadBalancer.stats.requests.per.minute.count})`;
   };
@@ -286,6 +293,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   // Assign keys
   const shift12345678 = "!@#$%^&*";
   mainConsoleLog.log("Press [q] to quit".bgWhite.black);
+  mainConsoleLog.log("Press [`] to switch layouts".bgWhite.black);
   mainConsoleLog.log("Press [1, 2, ..] to enable/disable nodes".bgWhite.black);
   mainConsoleLog.log(
     "Press shift+[1, 2, ..] to start node processes".bgWhite.black
@@ -305,6 +313,11 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   // If [esc] is pressed, stop the load balancer
   Console.on.key("q", () => {
     process.exit();
+  });
+
+  // If [`] is pressed, switch layouts
+  Console.on.key("`", () => {
+    selectedLayoutIndex = (selectedLayoutIndex + 1) % layouts.length;
   });
 
   // #endregion
