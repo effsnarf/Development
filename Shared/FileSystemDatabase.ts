@@ -118,10 +118,14 @@ class FileSystemDatabase extends Database {
       for (const file of files) {
         if (file.endsWith(".json")) {
           const filePath = `${this.dataDir}/${type}/${file}`;
-          const data = fs.readFileSync(filePath, { encoding: "utf8" });
-          const doc = JSON.parse(data);
-          if (!filter || filter(doc)) {
-            docs.push(doc);
+          try {
+            const data = fs.readFileSync(filePath, { encoding: "utf8" });
+            const doc = JSON.parse(data);
+            if (!filter || filter(doc)) {
+              docs.push(doc);
+            }
+          } catch (ex: any) {
+            throw new Error(`Error reading file ${filePath}: ${ex.message}`);
           }
         }
       }

@@ -206,6 +206,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
     loadBalancer.stats.requests.per.second.count.toLocaleString();
     counterLog.text =
       loadBalancer.stats.requests.per.minute.count.toLocaleString();
+    incomingItemsLog.title = `${loadBalancer.incomingItems.getItems().length}`;
   });
   // Update health check status in the dashboard
   loadBalancer.events.on(
