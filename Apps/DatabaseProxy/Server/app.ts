@@ -30,6 +30,7 @@ import { Analytics } from "@shared/Analytics";
 
     static get = async (req: any) => {
       const database = req.params.database;
+      if (!database) return null;
       const db = await dbs.get(database);
       const userLoginTokenKey = req.cookies.userLoginTokenKey;
       if (userLoginTokenKey) {
