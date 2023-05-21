@@ -259,7 +259,7 @@ import { Analytics } from "@shared/Analytics";
           // Read the TypeScript file
           const tsCode = fs.readFileSync(tsFilePath, "utf8");
           // Transpile the TypeScript code
-          const jsCode = TypeScript.transpile(tsCode);
+          const jsCode = TypeScript.transpileToJavaScript(tsCode);
           // Return the JavaScript code
           return res.send(jsCode);
         }

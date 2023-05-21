@@ -241,7 +241,7 @@ namespace Apify {
       Apify.Client = ${cls};`;
       let source = fs.readFileSync(`${this.apifyPath}/ApifyClient.ts`, "utf8");
       source = source.replace("export { ApifyClient }", "");
-      return TypeScript.transpile(source);
+      return TypeScript.transpileToJavaScript(source);
     }
   }
 
