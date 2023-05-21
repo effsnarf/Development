@@ -6,36 +6,6 @@ import path from "path";
 import webpack from "webpack";
 import { Loading } from "./Loading";
 
-const preprocessTypeScript = (inputScript: string) => {
-  // From the current folder up, find the Shared folder
-  const findSharedPath = () => {
-    let currentPath = path.dirname(process.argv[1]);
-    while (currentPath !== "/") {
-      let sharedPath = path.join(currentPath, "Shared");
-      if (fs.existsSync(sharedPath)) {
-        // Convert to forward slashes
-        sharedPath = sharedPath.replace(/\\/g, "/");
-        return sharedPath;
-      }
-      currentPath = path.join(currentPath, "..");
-    }
-    throw new Error("Shared folder not found");
-  };
-
-  let s = inputScript;
-
-  const sharedPath = findSharedPath();
-
-  // Replace paths like @shared/[module] with `${sharedPath}/[module]`.
-  // This is necessary because webpack doesn't support @shared/ in the source code.
-  s = s.replace(/@shared\/([a-zA-Z0-9_\-\/]+)/g, (match, module) => {
-    let s = `${sharedPath}/${module}`;
-    return s;
-  });
-
-  return s;
-};
-
 class TypeScript {
   static transpileToJavaScript(tsCode: string): string {
     // Options for the TypeScript compiler (no generators)
@@ -77,7 +47,9 @@ class TypeScript {
         const fs = require('fs');
         const path = require('path');
 
-        module.exports = ${preprocessTypeScript.toString().replace(/_1/g, "")}`
+        module.exports = ${TypeScript.preprocessTypeScript
+          .toString()
+          .replace(/_1/g, "")}`
       );
 
       const output = {
@@ -140,6 +112,36 @@ class TypeScript {
         resolve(bundleCode);
       });
     });
+  }
+
+  static preprocessTypeScript(inputScript: string) {
+    // From the current folder up, find the Shared folder
+    const findSharedPath = () => {
+      let currentPath = path.dirname(process.argv[1]);
+      while (currentPath !== "/") {
+        let sharedPath = path.join(currentPath, "Shared");
+        if (fs.existsSync(sharedPath)) {
+          // Convert to forward slashes
+          sharedPath = sharedPath.replace(/\\/g, "/");
+          return sharedPath;
+        }
+        currentPath = path.join(currentPath, "..");
+      }
+      throw new Error("Shared folder not found");
+    };
+
+    let s = inputScript;
+
+    const sharedPath = findSharedPath();
+
+    // Replace paths like @shared/[module] with `${sharedPath}/[module]`.
+    // This is necessary because webpack doesn't support @shared/ in the source code.
+    s = s.replace(/@shared\/([a-zA-Z0-9_\-\/]+)/g, (match, module) => {
+      let s = `${sharedPath}/${module}`;
+      return s;
+    });
+
+    return s;
   }
 }
 
