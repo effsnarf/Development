@@ -10,7 +10,7 @@ server:
     prod: [memegenerator.net]
   proxy:
     # on dev, we're querying the production database
-    dev: db.memegenerator.net
+    # dev: db.memegenerator.net
 database:
   connectionString: mongodb://localhost:27017
   query:

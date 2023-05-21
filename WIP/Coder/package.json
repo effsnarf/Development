@@ -9,8 +9,6 @@
   "name": "coder",
   "version": "1.0.0",
   "scripts": {
-    "start": "ts-node main.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "eff",
   "license": "ISC",
