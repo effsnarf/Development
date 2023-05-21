@@ -90,22 +90,23 @@ class FileSystemLogger extends LoggerBase {
   }
 
   protected async _log(items: any[]): Promise<void> {
-    let text =
-      items
-        .map((item) => {
-          const text = JSON.stringify(item.args, (key, value) => {
-            if (typeof value == "string") {
-              return value.withoutColors();
-            }
-            return value;
-          });
-          return `${new Date(item.dt).toISOString()} ${text}`;
-        })
-        .join("\n") + "\n";
+    let text = items
+      .map((item) => {
+        if (!item.args.filter((a: any) => a).length) return null;
+        const text = JSON.stringify(item.args, (key, value) => {
+          if (typeof value == "string") {
+            return value.withoutColors();
+          }
+          return value;
+        });
+        return `${new Date(item.dt).toISOString()} ${text}`;
+      })
+      .filter((a) => a)
+      .join("\n");
 
     text = text.withoutColors();
 
-    fs.appendFileSync(this.path, text);
+    if (text.trim().length) fs.appendFileSync(this.path, text + "\n");
   }
 }
 
