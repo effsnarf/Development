@@ -64,11 +64,11 @@ const animateCSS = (element, animation, prefix = 'animate__') =>
     var getExceptionKeywords = (ex) => {
       if (!ex) return null;
       var keywords = [];
-      var s = ex.toString();
+      var s = ex.message;
       var r = /\(reading '(.+)'\)/g;
-      keywords.push(...[...s.matchAllRegexes(r)].map(m => m[1]));
+      keywords.push(...([...s.matchAll(r)].map(m => m[1])));
       var r = / (.+) is not defined/g;
-      keywords.push(...[...s.matchAllRegexes(r)].map(m => m[1]));
+      keywords.push(...([...s.matchAll(r)].map(m => m[1])));
       return keywords;
     };
 
