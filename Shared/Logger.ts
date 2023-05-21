@@ -1,8 +1,28 @@
 import fs from "fs";
 import { Queue } from "./Queue";
 
-interface Logger {
-  log(...args: any[]): void | Promise<void>;
+abstract class Logger {
+  abstract log(...args: any[]): void | Promise<void>;
+
+  static new(config: any): LoggerBase {
+    if (!config) {
+      return EmptyLogger.new();
+    }
+
+    if ("enabled" in config && !config.enabled) {
+      return EmptyLogger.new();
+    }
+
+    if (Array.isArray(config)) {
+      return MultiLogger.new(config.map((c: any) => Logger.new(c)));
+    }
+
+    if (config.path) {
+      return FileSystemLogger.new(config.path);
+    }
+
+    throw new Error(`Unknown logger type: ${config.type}`);
+  }
 }
 
 abstract class LoggerBase implements Logger {
@@ -89,4 +109,4 @@ class FileSystemLogger extends LoggerBase {
   }
 }
 
-export { EmptyLogger, MultiLogger, FileSystemLogger };
+export { Logger };

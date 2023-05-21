@@ -5,7 +5,7 @@ import { Types } from "@shared/Types";
 import { Configuration } from "@shared/Configuration";
 import { Timer } from "@shared/Timer";
 import { Files } from "@shared/Files";
-import { EmptyLogger, MultiLogger, FileSystemLogger } from "@shared/Logger";
+import { Logger } from "@shared/Logger";
 import { Analytics } from "@shared/Analytics";
 import { Database } from "@shared/Database/Database";
 import {
@@ -382,9 +382,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   // #region 📃 Logging
 
   // Create a file system logger
-  const fsLog = !config.log?.enabled
-    ? EmptyLogger.new()
-    : FileSystemLogger.new(config.log.path);
+  const fsLog = Logger.new(config.log);
 
   if (config.log?.enabled) {
     mainConsoleLog.log(`Logging to ${`${config.log.path.toShortPath()}`}`);

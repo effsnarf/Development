@@ -1,3 +1,4 @@
+title: DatabaseProxy
 server:
   host:
     dev: localhost
@@ -22,3 +23,6 @@ analytics:
   database:
     prod:
       path: F:\Database\MG-Analytics
+log:
+  path:
+    prod: (env) => env.path.resolve(env.process.cwd(), `${env.config.title}.log`)
