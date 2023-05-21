@@ -1,3 +1,4 @@
+const util = require("util");
 const fs = require("fs");
 const path = require("path");
 const ts = require("typescript");
@@ -28,8 +29,11 @@ class JavaScript
 
         const tempPath = path.dirname(process.argv[1]);
         if (!fs.existsSync(tempPath)) fs.mkdirSync(tempPath);
-        
+
+        //console.log(`${`Transpiling`.gray} ${(classPaths.map((classPath) => path.basename(classPath).yellow).join(", "))}`);
+
         classPaths.forEach((classPath) => {
+            //console.log(`${`Transpiling`.gray} ${classPath.yellow}`);
             const className = path.basename(classPath).split(".")[0];
             let jsCode = transpileTypeScriptToJavaScript(fs.readFileSync(classPath, "utf8"));
             jsCode = jsCode.replace(/_1\.default\b/g, "_1");

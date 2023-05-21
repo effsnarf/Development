@@ -1,28 +1,45 @@
 const colors = require("colors");
+const fs = require("fs");
 const path = require("path");
 const { exec, spawn } = require("child_process");
 const JavaScript = require("../Shared/JavaScript.js");
 
 const inputPath = process.argv[2];
-const classPaths = ["Loading", "TypeScript"].map((className) => path.resolve(__dirname, "../Shared", `${className}.ts`));
+const classPaths = ["Extensions", "StringBuilder", "Loading", "Coder", "TypeScript"].map((className) => path.resolve(__dirname, "../Shared", `${className}.ts`));
 
 const cls = JavaScript.loadTypeScriptClasses(classPaths);
 
 (async () => {
   try {
-    const bundleCode = await cls.TypeScript.webpackify(inputPath);
+    let tsCode = await cls.TypeScript.resolveSharedAliases(fs.readFileSync(inputPath, "utf8"));
 
-    eval(bundleCode);
+    tsCode = cls.Coder.App.addDebuggingCode(tsCode);
+
+    const newFilePath = path.resolve(path.dirname(inputPath), `${path.basename(inputPath)}.temp.ts`);
+
+    fs.writeFileSync(newFilePath, tsCode, "utf8");
+
+    const onExit = () => {
+      if (fs.existsSync(newFilePath)) fs.unlinkSync(newFilePath);
+    };
+    
+    // Spawn TypeScript process (ts-node)
+    const tsNode = spawn('cmd.exe', ['/c', 'npx', 'ts-node', newFilePath, ...process.argv.slice(3)], { stdio: 'inherit' });
+    
+    tsNode.on("exit", (code) => {
+        onExit();
+    });
+    
+    for (const signal of ["SIGINT", "SIGTERM", "SIGKILL"])
+    {
+        process.on(signal, () => {
+        onExit();
+      });
+    }
   } catch (exs) {
     if (!Array.isArray(exs))  exs = [exs];
     console.log(`\n${exs.length} error(s) occurred:`);
     console.error(exs.map((ex) => ex.message).join("\n\n"));
-
-    console.log(`Press any key to continue..`);
-    process.stdin.setRawMode(true);
-    process.stdin.resume();
-    process.stdin.on("data", process.exit.bind(process, 0));
-
   }
 })();
 

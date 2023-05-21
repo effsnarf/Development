@@ -4,6 +4,7 @@ import os from "os";
 import MemoryFS from "memory-fs";
 import path from "path";
 import webpack from "webpack";
+import { Coder } from "./Coder";
 import { Loading } from "./Loading";
 
 class TypeScript {
@@ -47,7 +48,7 @@ class TypeScript {
         const fs = require('fs');
         const path = require('path');
 
-        module.exports = ${TypeScript.preprocessTypeScript
+        module.exports = ${TypeScript.resolveSharedAliases
           .toString()
           .replace(/_1/g, "")}`
       );
@@ -114,7 +115,7 @@ class TypeScript {
     });
   }
 
-  static preprocessTypeScript(inputScript: string) {
+  static resolveSharedAliases(inputScript: string) {
     // From the current folder up, find the Shared folder
     const findSharedPath = () => {
       let currentPath = path.dirname(process.argv[1]);
@@ -130,18 +131,21 @@ class TypeScript {
       throw new Error("Shared folder not found");
     };
 
-    let s = inputScript;
+    let source = inputScript;
 
     const sharedPath = findSharedPath();
 
     // Replace paths like @shared/[module] with `${sharedPath}/[module]`.
     // This is necessary because webpack doesn't support @shared/ in the source code.
-    s = s.replace(/@shared\/([a-zA-Z0-9_\-\/]+)/g, (match, module) => {
-      let s = `${sharedPath}/${module}`;
-      return s;
-    });
+    source = source.replace(
+      /@shared\/([a-zA-Z0-9_\-\/]+)/g,
+      (match, module) => {
+        let s = `${sharedPath}/${module}`;
+        return s;
+      }
+    );
 
-    return s;
+    return source;
   }
 }
 

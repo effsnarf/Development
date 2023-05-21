@@ -26,6 +26,7 @@ import { Analytics } from "@shared/Analytics";
 // #endregion
 
 (async () => {
+  // #region User
   class User {
     private constructor(public readonly data: any) {}
 
@@ -85,6 +86,7 @@ import { Analytics } from "@shared/Analytics";
       return new User(dbUser);
     };
   }
+  // #endregion
 
   // #region 📝 Configuration
   const configObj = await Configuration.new({

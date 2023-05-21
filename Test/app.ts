@@ -12,6 +12,20 @@ import { TreeScript } from "@shared/TreeScript/TreeScript";
 import { Apify } from "@shared/Apify";
 import { Console } from "@shared/Console";
 import { ChatOpenAI, Roles } from "../Apis/OpenAI/classes/ChatOpenAI";
+import { Coder } from "@shared/Coder";
+
+const log = new Coder.Log();
+
+class Test {
+  method() {
+    console.log("Hello World!".green);
+  }
+}
+
+const test = new Test();
+test.method();
+
+console.log(log.stringify());
 
 // for (var i = 0; i <= 100; i += 10) {
 //   const percent = i / 100;
