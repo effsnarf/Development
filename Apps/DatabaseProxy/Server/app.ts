@@ -7,6 +7,7 @@ import axios from "axios";
 import express from "express";
 import cookieParser from "cookie-parser";
 import "@shared/Extensions";
+import { Google } from "@shared/Google";
 import {
   Console,
   Layout,
@@ -28,10 +29,73 @@ import { Analytics } from "@shared/Analytics";
   class User {
     private constructor(public readonly data: any) {}
 
-    static get = async (req: any) => {
+    static get = async (req: any, res: any, postData: any) => {
       const database = req.params.database;
       if (!database) return null;
+
       const db = await dbs.get(database);
+
+      // Google login
+      if (postData.credential) {
+        const googleUserData = await Google.verifyIdToken(postData.credential);
+        const dbUser = (
+          await db?.find("Users", {
+            "google.email": googleUserData.email,
+          })
+        )?.first();
+
+        // If the user doesn't exist, create it
+        if (!dbUser) {
+          const dbUser = {
+            _id: await db?.getNewID(),
+            type: null,
+            ip: null,
+            created: Date.now(),
+            data: {
+              componentClasses: {
+                _ids: [],
+              },
+            },
+            google: googleUserData,
+            info: {
+              image: googleUserData.picture,
+              name: googleUserData.given_name,
+            },
+          };
+          await db?.upsert("Users", dbUser);
+        }
+
+        // Create a login token
+        // 20 character random string
+        const tokenKey = [...Array(20)]
+          .map((i) => (~~(Math.random() * 36)).toString(36))
+          .join("");
+
+        const dbToken = {
+          _id: await db?.getNewID(),
+          created: Date.now(),
+          expires: (Date.now() + 1000 * 60 * 60 * 24 * 30).toString(),
+          type: "login",
+          data: {
+            key: tokenKey,
+            user: {
+              _id: dbUser._id,
+            },
+          },
+        };
+
+        await db?.upsert("Tokens", dbToken);
+
+        // Save the token key in a cookie
+        res.cookie("userLoginTokenKey", tokenKey, {
+          maxAge: 1000 * 60 * 60 * 24 * 30,
+          httpOnly: true,
+        });
+
+        return new User(dbUser);
+      }
+
+      // Cookie login
       const userLoginTokenKey = req.cookies.userLoginTokenKey;
       if (userLoginTokenKey) {
         const token = (
@@ -40,14 +104,16 @@ import { Analytics } from "@shared/Analytics";
           })
         )?.first();
         if (token) {
-          const user = await db?.find("Users", {
+          const dbUser = await db?.find("Users", {
             _id: token.data.user._id,
           });
-          if (user) {
-            return new User(user);
+          if (dbUser) {
+            return new User(dbUser);
           }
         }
       }
+
+      // IP login
       const userIP = (
         req.headers["x-forwarded-for"] ||
         req.connection.remoteAddress ||
@@ -228,10 +294,28 @@ import { Analytics } from "@shared/Analytics";
     // #endregion
 
     // #region processRequest() helper
+    const getPostData = (req: any) => {
+      return new Promise((resolve, reject) => {
+        try {
+          let body = "";
+          req.on("data", (chunk: any) => {
+            body += chunk.toString();
+          });
+          req.on("end", () => {
+            resolve(JSON.parse(body));
+          });
+        } catch (ex: any) {
+          reject(ex);
+        }
+      });
+    };
+
     const processRequest = (handler: any) => {
       return async (req: any, res: any) => {
         try {
-          const user = await User.get(req);
+          // Get the POST data
+          const data = await getPostData(req);
+          const user = await User.get(req, res, data);
           await handler(req, res, user);
         } catch (ex: any) {
           itemsLog.log(req.url.bgRed);
@@ -309,9 +393,18 @@ import { Analytics } from "@shared/Analytics";
     // #endregion
 
     httpServer.get(
+      "/:database/get/googleLogin",
+      processRequest((req: any, res: any, user: User) => {
+        res.setHeader("Content-Type", "application/json");
+        return res.send(JSON.stringify(user?.data));
+      })
+    );
+
+    httpServer.get(
       "/:database/get/user",
       processRequest(async (req: any, res: any, user: User) => {
-        return res.send(JSON.stringify(user.data));
+        res.setHeader("Content-Type", "application/json");
+        return res.send(JSON.stringify(user?.data));
       })
     );
     // For /[database]/api, return {}

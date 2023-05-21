@@ -11,7 +11,6 @@ class Google {
   static async verifyIdToken(token: string): Promise<TokenPayload> {
     const ticket = await client.verifyIdToken({
       idToken: token,
-      audience: CLIENT_ID,
     });
 
     const payload = ticket.getPayload();
