@@ -1,5 +1,3 @@
-// #region 🛠️ Setup
-
 // #region ⚙️ Imports
 import "colors";
 import path from "path";
