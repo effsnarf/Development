@@ -12,20 +12,16 @@ import { TreeScript } from "@shared/TreeScript/TreeScript";
 import { Apify } from "@shared/Apify";
 import { Console } from "@shared/Console";
 import { ChatOpenAI, Roles } from "../Apis/OpenAI/classes/ChatOpenAI";
-import { Coder } from "@shared/Coder";
+import { Google } from "@shared/Google";
 
-const log = new Coder.Log();
+const token =
+  "eyJhbGciOiJSUzI1NiIsImtpZCI6IjJkOWE1ZWY1YjEyNjIzYzkxNjcxYTcwOTNjYjMyMzMzM2NkMDdkMDkiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJuYmYiOjE2ODQ2NzQxODcsImF1ZCI6IjM2ODAzMjg0Mjcta2FhZDhuNWI4MDhlcjVzZ3QzaWVxZHB1M3NnZGU4cDYuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIiOiIxMTE0MzU3MTIwMTM1NjYwOTMwMzMiLCJlbWFpbCI6ImZlcmVuYy5zb21vc0BnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiYXpwIjoiMzY4MDMyODQyNy1rYWFkOG41YjgwOGVyNXNndDNpZXFkcHUzc2dkZThwNi5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsIm5hbWUiOiJFZmYgRnJhbmNpcyIsInBpY3R1cmUiOiJodHRwczovL2xoMy5nb29nbGV1c2VyY29udGVudC5jb20vYS9BR05teXhicEt6TWwwUEJ5NWVEbFBzUGFwUVVhc0d0MGhKN2RiOTVpcDBQOWFnPXM5Ni1jIiwiZ2l2ZW5fbmFtZSI6IkVmZiIsImZhbWlseV9uYW1lIjoiRnJhbmNpcyIsImlhdCI6MTY4NDY3NDQ4NywiZXhwIjoxNjg0Njc4MDg3LCJqdGkiOiI1MmEyM2VhMDg3ZjI1NWJlMDA2OTJjYzk4MGI1MjQxZTMyODQzOGJmIn0.Thpzj-UcFlVIC8eodFab5nvpmfVBfa1Zspw5a9Rud3nCfC10e3rD5IHgVnVnxCaByXZCeAV1_m_GOufCt4LsB0RmZOMvBgugm34yMNoQ60Vbyw3tu7g-aUndbm_asxzpgkwEcu7UhE3pdcKdU5JbZ2FdeK7arXrmHrIGJvBlqS-onxwXCBy5XSngQvXzb30TLwHVnnxYIIr7jB06ZQm9YNNb7TjEUKTBGUUOG59zojA_tapZtXVIQ9vCAcp7lQo611qY28NZxXJ9zOvJgcgBaOPXgt2plNhnhEioNg1dTif0s9mVM_-rkcCdnqdqM2CYXUEKZ2Q6wgbLmBIkvzAeUw";
 
-class Test {
-  method() {
-    console.log("Hello World!".green);
-  }
-}
+(async () => {
+  const result = await Google.verifyIdToken(token);
 
-const test = new Test();
-test.method();
-
-console.log(log.stringify());
+  console.log(result);
+})();
 
 // for (var i = 0; i <= 100; i += 10) {
 //   const percent = i / 100;

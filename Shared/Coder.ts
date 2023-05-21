@@ -525,10 +525,6 @@ namespace Coder {
         fs.writeFileSync(tsSourcePath, tsSourceOrPath);
       }
 
-      const loading = Loading.startNew(
-        `${`Adding debugging code to`.gray} ${tsSourcePath.toShortPath()}`
-      );
-
       const code = new CodeGenerator();
       const hooker = new Hooker();
 
@@ -612,8 +608,6 @@ namespace Coder {
 
       const newSourceFile = result.transformed[0];
       const newSource = CodeGenerator.nodeToCode(newSourceFile, newSourceFile);
-
-      loading.stop();
 
       return newSource;
     }

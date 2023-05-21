@@ -259,6 +259,7 @@ interface String {
   toNumber(): number;
 
   ipToNumber(): number;
+  decodeBase64(): string;
 }
 
 interface Array<T> {
@@ -923,6 +924,10 @@ if (typeof String !== "undefined") {
       parseInt(parts[2]) * 256 +
       parseInt(parts[3])
     );
+  };
+
+  String.prototype.decodeBase64 = function (): string {
+    return Buffer.from(this, "base64").toString("ascii");
   };
 }
 // #endregion
