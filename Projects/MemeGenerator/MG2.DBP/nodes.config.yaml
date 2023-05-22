@@ -20,3 +20,5 @@ analytics:
       path: F:\Database\MG-Analytics
 severity:
   time: [50, 500, "<"]
+log:
+  path: (env) => env.path.resolve(env.process.cwd(), `..\\`, `${env.config.title}`)

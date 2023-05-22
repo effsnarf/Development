@@ -212,14 +212,14 @@ namespace Coder {
             // For classes, log the class name
             if (ts.isClassDeclaration(node)) {
               const classDeclaration = node as ts.ClassDeclaration;
-              console.log(classDeclaration.name?.getText(sourceFile));
+              //console.log(classDeclaration.name?.getText(sourceFile));
             }
 
             // For methods, log the method name and arguments
             if (ts.isMethodDeclaration(node)) {
               const method = node as ts.MethodDeclaration;
               const body = method.body;
-              console.log(method.name.getText(sourceFile));
+              //console.log(method.name.getText(sourceFile));
             }
 
             if (ts.isMethodDeclaration(node)) {
@@ -320,7 +320,7 @@ namespace Coder {
                 // Capture the return value by putting the entire method body in an arrow function
                 newBody = tsc.createBlock([
                   code.statement(
-                    `const methodBody = (() => { ${CodeGenerator.nodeToCode(
+                    `const methodBody = (async () => { ${CodeGenerator.nodeToCode(
                       newBody,
                       sourceFile
                     )} });`

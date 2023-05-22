@@ -7,6 +7,7 @@ import axios from "axios";
 import express from "express";
 import cookieParser from "cookie-parser";
 import "@shared/Extensions";
+import { Timer } from "@shared/Timer";
 import { Google } from "@shared/Google";
 import {
   Console,
@@ -18,10 +19,12 @@ import {
   Unit,
 } from "@shared/Console";
 import { Configuration } from "@shared/Configuration";
+import { Logger } from "@shared/Logger";
 import { TypeScript } from "@shared/TypeScript";
 import { Database } from "@shared/Database/Database";
 import { MongoDatabase } from "@shared/Database/MongoDatabase";
 import { Analytics } from "@shared/Analytics";
+import { debug } from "console";
 // #endregion
 
 (async () => {
@@ -37,7 +40,11 @@ import { Analytics } from "@shared/Analytics";
 
       // Google login
       if (postData?.credential) {
+        debugLog.log(
+          `Google login attempt, credential: ${postData.credential}`
+        );
         const googleUserData = await Google.verifyIdToken(postData.credential);
+        debugLog.log(`Google login attempt, data: ${googleUserData}`);
         const dbUser = (
           await db?.find("Users", {
             "google.email": googleUserData.email,
@@ -164,6 +171,7 @@ import { Analytics } from "@shared/Analytics";
   // Create the dashboard layout
   const mainLog = Log.new(config.title);
   const itemsLog = Log.new("Items");
+  const debugLog = Logger.new(config.log);
 
   const configLog = Log.new(`Configuration`);
   configLog.showDate = false;
@@ -225,6 +233,8 @@ import { Analytics } from "@shared/Analytics";
             dbs._analytics?.create("db", method, { args }, dt.elapsed);
           }
         );
+
+        debugLog.hookTo(db);
 
         dbs._dbs.set(dbName, db);
       }
@@ -297,11 +307,18 @@ import { Analytics } from "@shared/Analytics";
     const getPostData = (req: any) => {
       return new Promise((resolve, reject) => {
         try {
+          const timer = Timer.start();
+          debugLog.log(`Getting POST data from ${req.url}`);
           let body = "";
           req.on("data", (chunk: any) => {
             body += chunk.toString();
           });
           req.on("end", () => {
+            debugLog.log(
+              `(${timer.elapsed
+                ?.unitifyTime()
+                .withoutColors()}) Got POST data from ${req.url}`
+            );
             resolve(JSON.parse(body || "null"));
           });
         } catch (ex: any) {

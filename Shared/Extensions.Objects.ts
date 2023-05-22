@@ -1,4 +1,5 @@
 import "./Extensions";
+const jsyaml = require("js-yaml");
 
 class Objects {
   static is(obj: any, type: any): boolean {
@@ -80,6 +81,10 @@ class Objects {
     return JSON.stringify(obj);
   }
 
+  static yamlize(obj: any): string {
+    return jsyaml.dump(obj);
+  }
+
   static deepMerge(target: any, ...objects: any[]): any {
     const deepMerge = (tgt: any, src: any) => {
       if (typeof tgt !== "object" || typeof src !== "object") {
@@ -106,6 +111,14 @@ class Objects {
       result = deepMerge(result, object);
     }
     return result;
+  }
+
+  static try(func: Function, onCatch: (ex: any) => void) {
+    try {
+      return func();
+    } catch (ex) {
+      onCatch(ex);
+    }
   }
 }
 

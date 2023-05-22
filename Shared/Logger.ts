@@ -1,5 +1,8 @@
 import fs from "fs";
+import { Timer } from "./Timer";
 import { Queue } from "./Queue";
+import { Reflection } from "./Reflection";
+import jsyaml from "js-yaml";
 
 abstract class Logger {
   abstract log(...args: any[]): void | Promise<void>;
@@ -13,6 +16,10 @@ abstract class Logger {
       return EmptyLogger.new();
     }
 
+    if (typeof config === "function") {
+      return FunctionLogger.new(config);
+    }
+
     if (Array.isArray(config)) {
       return MultiLogger.new(config.map((c: any) => Logger.new(c)));
     }
@@ -21,7 +28,7 @@ abstract class Logger {
       return FileSystemLogger.new(config.path);
     }
 
-    throw new Error(`Unknown logger type: ${config.type}`);
+    throw new Error(`Unknown logger type:\n${jsyaml.dump(config)}`);
   }
 }
 
@@ -47,6 +54,32 @@ abstract class LoggerBase implements Logger {
     await this.queue.flush();
   }
 
+  hookTo(object: any) {
+    Reflection.bindClassMethods(
+      object,
+      (className, methodName, args) => {
+        const timer = Timer.start();
+        this.log(className, methodName, args);
+        return timer;
+      },
+      (beforeResult, className, methodName, args, returnValue) => {
+        const timer = beforeResult as Timer;
+        try {
+          returnValue = jsyaml.dump(returnValue).shorten(200);
+        } catch (ex: any) {
+          returnValue = `[${typeof returnValue}]`;
+        }
+        this.log(
+          timer.elapsed?.unitifyTime().withoutColors(),
+          className,
+          methodName,
+          args,
+          returnValue
+        );
+      }
+    );
+  }
+
   protected abstract _log(items: any[]): Promise<void>;
 }
 
@@ -60,6 +93,20 @@ class EmptyLogger extends LoggerBase {
   }
 
   protected async _log(items: any[]): Promise<void> {}
+}
+
+class FunctionLogger extends LoggerBase {
+  private constructor(private readonly func: Function) {
+    super();
+  }
+
+  static new(func: Function) {
+    return new FunctionLogger(func);
+  }
+
+  protected async _log(items: any[]): Promise<void> {
+    await this.func(items);
+  }
 }
 
 class MultiLogger extends LoggerBase {

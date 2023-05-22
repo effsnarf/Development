@@ -67,7 +67,9 @@ class Configuration {
     configPaths = Configuration.getConfigPaths(configPaths);
     const config = new Configuration(options, configPaths);
     config.log(`${configPaths.length} config file(s) found:`.gray);
-    configPaths.forEach((p) => config.log(`  ${p.toShortPath()}`.gray));
+    configPaths.forEach((p) =>
+      config.log(`  ${p.toShortPath()} ${`(${p})`.gray}`)
+    );
     config.log();
     // Load all config files into a single object
     config.data = configPaths
@@ -130,7 +132,13 @@ class Configuration {
     traverse(config.data, (node: any, key: string, value: any) => {
       if (typeof value === "string") {
         if (value.startsWith("(env) => ")) {
-          const func = eval(value);
+          let func = null;
+          try {
+            func = eval(`(${value})`);
+          } catch (ex) {
+            console.log(`Error evaluating function:\n${value}`);
+            throw ex;
+          }
           node[key] = func.apply(null, [
             { process, path, config: config.data },
           ]);

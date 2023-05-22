@@ -65,6 +65,72 @@ class Reflection {
     return resultArgs;
   }
 
+  static getMemberClasses<T extends { constructor: Function }>(
+    instance: T
+  ): string[] {
+    const members = Object.keys(instance)
+      .map((key) => (instance as any)[key])
+      .filter((prop) => prop)
+      .filter((prop) => typeof prop === `object`)
+      .filter((prop) => prop.constructor);
+    return members;
+  }
+
+  static bindClassMethods<T extends { constructor: Function }>(
+    instance: T,
+    beforeMethod:
+      | ((
+          className: string,
+          methodName: string,
+          args: any[]
+        ) => any | Promise<any>)
+      | null,
+    afterMethod:
+      | ((
+          beforeResult: any,
+          className: string,
+          methodName: string,
+          args: any[],
+          returnValue: any
+        ) => void)
+      | null,
+    deep: boolean = false
+  ): T {
+    const className = instance.constructor.name;
+
+    Reflection.getClassMethods(instance.constructor).forEach(({ name }) => {
+      const methodName = name;
+      const originalMethod = (instance as any)[methodName];
+
+      (instance as any)[methodName] = (...args: any[]) => {
+        const beforeResult = !beforeMethod
+          ? null
+          : beforeMethod(className, methodName, args);
+        const returnValue = originalMethod.apply(instance, args);
+        // If the method returns a promise, hook into the promise
+        if (returnValue?.then) {
+          returnValue.then((result: any) => {
+            if (afterMethod)
+              afterMethod(beforeResult, className, methodName, args, result);
+          });
+          return returnValue;
+        }
+        // Otherwise, just call the afterMethod handler
+        if (afterMethod)
+          afterMethod(beforeResult, className, methodName, args, returnValue);
+        return returnValue;
+      };
+    });
+
+    if (deep) {
+      const members = Reflection.getMemberClasses(instance);
+      for (const member of members)
+        this.bindClassMethods(member, beforeMethod, afterMethod, deep);
+    }
+
+    return instance;
+  }
+
   static trackPropertyValue<T>(
     obj: any,
     property: string,
