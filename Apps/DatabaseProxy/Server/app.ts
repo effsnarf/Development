@@ -316,7 +316,7 @@ import { Analytics } from "@shared/Analytics";
           // Get the POST data
           const data = await getPostData(req);
           const user = await User.get(req, res, data);
-          await handler(req, res, user);
+          await handler(req, res, user, data);
         } catch (ex: any) {
           itemsLog.log(req.url.bgRed);
           itemsLog.log(ex.message.bgRed);
@@ -394,8 +394,9 @@ import { Analytics } from "@shared/Analytics";
 
     httpServer.get(
       "/:database/get/googleLogin",
-      processRequest((req: any, res: any, user: User) => {
+      processRequest((req: any, res: any, user: User, postData: any) => {
         res.setHeader("Content-Type", "application/json");
+        if (postData?.credential) return res.send(JSON.stringify(null));
         return res.send(JSON.stringify(user?.data));
       })
     );
