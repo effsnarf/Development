@@ -396,7 +396,7 @@ import { Analytics } from "@shared/Analytics";
       "/:database/get/googleLogin",
       processRequest((req: any, res: any, user: User, postData: any) => {
         res.setHeader("Content-Type", "application/json");
-        if (postData?.credential) return res.send(JSON.stringify(null));
+        if (!postData?.credential) return res.send(JSON.stringify(null));
         return res.send(JSON.stringify(user?.data));
       })
     );
