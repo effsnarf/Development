@@ -36,7 +36,7 @@ import { Analytics } from "@shared/Analytics";
       const db = await dbs.get(database);
 
       // Google login
-      if (postData.credential) {
+      if (postData?.credential) {
         const googleUserData = await Google.verifyIdToken(postData.credential);
         const dbUser = (
           await db?.find("Users", {
