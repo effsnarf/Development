@@ -81,7 +81,7 @@ class Objects {
     return JSON.stringify(obj);
   }
 
-  static yamlize(obj: any): string {
+  static yamlify(obj: any): string {
     return jsyaml.dump(obj);
   }
 
