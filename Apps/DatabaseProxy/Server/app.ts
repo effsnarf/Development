@@ -325,6 +325,7 @@ import { debug } from "console";
     const processRequest = (handler: any) => {
       return async (req: any, res: any) => {
         try {
+          debugLog.log(req.url);
           itemsLog.log(req.url);
           // Get the POST data
           const data = await getPostData(req);
