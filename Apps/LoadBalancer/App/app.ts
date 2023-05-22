@@ -197,6 +197,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   loadBalancer.events.on("log", (data: any) => {
     const log = (data.node ? nodeLogs[data.node.index] : mainLog) as Log;
     log.log(...(data.texts || [data.text]));
+    fsLog.log(...(data.texts || [data.text]));
   });
   // Update incoming items count in the dashboard
   loadBalancer.events.on("incoming-items", (count: any) => {
