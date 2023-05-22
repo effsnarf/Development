@@ -121,6 +121,53 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
     })
   ) as Log[];
 
+  // #region 📃 Logging
+
+  // Create a file system logger
+  const fsLog = Logger.new(config.log);
+
+  if (config.log?.enabled) {
+    mainConsoleLog.log(`Logging to ${`${config.log.path.toShortPath()}`}`);
+  } else {
+    mainConsoleLog.log(
+      `File system logging is disabled. To enable it, set ${
+        `log.enabled`.yellow
+      } to ${`true`.yellow} and ${"log.path".yellow} in ${configObj.configPaths
+        .map((cp) => cp.toShortPath())
+        .join(" or ")}`
+    );
+  }
+
+  // Log all console output to the file system
+  Objects.on(mainConsoleLog, mainConsoleLog.log, (...args: any[]) => {
+    fsLog.log(...args);
+  }) as any;
+
+  // Log all node output to the file system
+  if (config.log?.requests?.min.ms) {
+    nodeLogs.forEach((nodeLog: Log, index: number) => {
+      Objects.on(nodeLog, nodeLog.log, (...args: any[]) => {
+        const ms = args
+          .find((a) => a?.getUnitClass()?.name == "Time")
+          ?.deunitifyTime();
+        if (ms && ms < config.log.requests.min.ms) return;
+        fsLog.log(...[config.nodes[index].name, ...args]);
+      });
+    });
+  }
+
+  // Log unhandled errors
+  process.on("uncaughtException", async (ex: any) => {
+    fsLog.log(`Uncaught exception:`);
+    for (const line of ex.stack.split("\n")) {
+      fsLog.log(line);
+    }
+    await fsLog.flush();
+    process.exit(1);
+  });
+
+  // #endregion
+
   // Create a health bar for each node
   const healthBars = config.nodes.map((node: any, i: number) =>
     Bar.new("", "y")
@@ -380,53 +427,6 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
     },
     (message) => mainLog.log(message)
   );
-
-  // #endregion
-
-  // #region 📃 Logging
-
-  // Create a file system logger
-  const fsLog = Logger.new(config.log);
-
-  if (config.log?.enabled) {
-    mainConsoleLog.log(`Logging to ${`${config.log.path.toShortPath()}`}`);
-  } else {
-    mainConsoleLog.log(
-      `File system logging is disabled. To enable it, set ${
-        `log.enabled`.yellow
-      } to ${`true`.yellow} and ${"log.path".yellow} in ${configObj.configPaths
-        .map((cp) => cp.toShortPath())
-        .join(" or ")}`
-    );
-  }
-
-  // Log all console output to the file system
-  Objects.on(mainConsoleLog, mainConsoleLog.log, (...args: any[]) => {
-    fsLog.log(...args);
-  }) as any;
-
-  // Log all node output to the file system
-  if (config.log?.requests?.min.ms) {
-    nodeLogs.forEach((nodeLog: Log, index: number) => {
-      Objects.on(nodeLog, nodeLog.log, (...args: any[]) => {
-        const ms = args
-          .find((a) => a?.getUnitClass()?.name == "Time")
-          ?.deunitifyTime();
-        if (ms && ms < config.log.requests.min.ms) return;
-        fsLog.log(...[config.nodes[index].name, ...args]);
-      });
-    });
-  }
-
-  // Log unhandled errors
-  process.on("uncaughtException", async (ex: any) => {
-    fsLog.log(`Uncaught exception:`);
-    for (const line of ex.stack.split("\n")) {
-      fsLog.log(line);
-    }
-    await fsLog.flush();
-    process.exit(1);
-  });
 
   // #endregion
 
