@@ -306,17 +306,11 @@ import { debug } from "console";
       return new Promise((resolve, reject) => {
         try {
           const timer = Timer.start();
-          debugLog.log(`Getting POST data from ${req.url}`);
           let body = "";
           req.on("data", (chunk: any) => {
             body += chunk.toString();
           });
           req.on("end", () => {
-            debugLog.log(
-              `(${timer.elapsed
-                ?.unitifyTime()
-                .withoutColors()}) Got POST data from ${req.url}`
-            );
             resolve(JSON.parse(body || "null"));
           });
         } catch (ex: any) {
