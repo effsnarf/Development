@@ -242,6 +242,8 @@ class LoadBalancer {
 
     const nodeItem = this.nodeSwitcher.getRandomNode();
 
+    const requestPostData = await Http.getPostData(request);
+
     const incomingItem: IncomingItem = {
       id: this.incomingItemID++, // Unique ID for this request
       isProcessing: false, // Is this request being processed?
@@ -251,7 +253,7 @@ class LoadBalancer {
       attempt: 0, // Which attempt is this?
       request, // The request object
       response, // The response object
-      requestPostData: await Http.getPostData(request), // The request body
+      requestPostData: requestPostData, // The request body
     };
 
     this.incomingItems.add(incomingItem);

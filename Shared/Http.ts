@@ -1,5 +1,6 @@
 class Http {
   static async getPostData(req: any) {
+    if (req.method !== "POST") return Promise.resolve(null);
     return new Promise((resolve, reject) => {
       try {
         let body = "";
