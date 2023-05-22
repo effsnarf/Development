@@ -303,15 +303,17 @@ import { debug } from "console";
 
     // #region processRequest() helper
     const getPostData = (req: any) => {
+      const isGoogleRequest = req.url.toLowerCase().includes("google");
       return new Promise((resolve, reject) => {
         try {
-          debugLog.log(`Getting POST data for ${req.url}`);
+          if (isGoogleRequest) debugLog.log(`Getting POST data for ${req.url}`);
           let body = "";
           req.on("data", (chunk: any) => {
             body += chunk.toString();
           });
           req.on("end", () => {
-            debugLog.log(`POST data for ${req.url} is ${body}`);
+            if (isGoogleRequest)
+              debugLog.log(`POST data for ${req.url} is ${body}`);
             resolve(JSON.parse(body || "null"));
           });
         } catch (ex: any) {
