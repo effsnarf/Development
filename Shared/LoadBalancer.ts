@@ -456,6 +456,10 @@ class LoadBalancer {
 
       timer.stop();
 
+      incomingItem.infos.push(
+        `${`Got response in`.gray} ${timer.elapsed?.unitifyTime()}`
+      );
+
       if (response.status == 200 && timer.elapsed)
         this.stats.response.times.track(timer.elapsed);
 
