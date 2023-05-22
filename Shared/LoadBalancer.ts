@@ -305,24 +305,26 @@ class LoadBalancer {
     incomingItem.response.statusCode = status;
     incomingItem.response.statusMessage = nodeResponse?.statusText || "";
 
-    const nodeCorsHeaders = Object.keys(nodeResponse?.headers || {}).filter(
-      (key) => key.toLowerCase().startsWith("access-control-")
-    );
+    const getNodeHeaders = (options: { cors: boolean }) =>
+      Object.keys(nodeResponse?.headers || {}).filter(
+        (key) =>
+          key.toLowerCase().startsWith("access-control-") === options.cors
+      );
 
     // Copy all the headers from the node response to the incoming response
     // except CORS headers
-    nodeCorsHeaders.forEach((key) => {
+    getNodeHeaders({ cors: false }).forEach((key) => {
       incomingItem.response.setHeader(
         key,
         nodeResponse?.headers[key] as string
       );
     });
     // If the node response has CORS headers, log a warning
-    if (nodeCorsHeaders.length) {
+    if (getNodeHeaders({ cors: true }).length) {
       this.logText(
-        `${
-          `Not forwarding node CORS headers`.bgYellow.black
-        }: ${nodeCorsHeaders}`
+        `${`Not forwarding node CORS headers`.bgYellow.black}: ${getNodeHeaders(
+          { cors: true }
+        )}`
       );
     }
 
