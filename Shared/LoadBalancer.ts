@@ -320,15 +320,16 @@ class LoadBalancer {
         nodeResponse?.headers[key] as string
       );
     });
+
     const nodeCorsHeaders = getNodeHeaders({ cors: true });
     // If the node response has CORS headers, log a warning
-    if (nodeCorsHeaders.length) {
-      this.logText(
-        `${`Not forwarding node CORS headers`.bgYellow.black}: ${nodeCorsHeaders
-          .map((key) => `${key}: ${nodeResponse?.headers[key]}`)
-          .join(", ")}`
-      );
-    }
+    // if (nodeCorsHeaders.length) {
+    //   this.logText(
+    //     `${`Not forwarding node CORS headers`.bgYellow.black}: ${nodeCorsHeaders
+    //       .map((key) => `${key}: ${nodeResponse?.headers[key]}`)
+    //       .join(", ")}`
+    //   );
+    // }
 
     incomingItem.infos.push(`piping data`);
 
