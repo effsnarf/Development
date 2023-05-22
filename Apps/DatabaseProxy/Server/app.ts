@@ -305,12 +305,13 @@ import { debug } from "console";
     const getPostData = (req: any) => {
       return new Promise((resolve, reject) => {
         try {
-          const timer = Timer.start();
+          debugLog.log(`Getting POST data for ${req.url}`);
           let body = "";
           req.on("data", (chunk: any) => {
             body += chunk.toString();
           });
           req.on("end", () => {
+            debugLog.log(`POST data for ${req.url} is ${body}`);
             resolve(JSON.parse(body || "null"));
           });
         } catch (ex: any) {
