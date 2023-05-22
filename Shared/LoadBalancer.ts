@@ -302,11 +302,18 @@ class LoadBalancer {
 
     incomingItem.infos.push(`writing headers`);
 
-    incomingItem.response.writeHead(
-      status,
-      nodeResponse?.statusText,
-      nodeResponse?.headers as any
-    );
+    incomingItem.response.statusCode = status;
+    incomingItem.response.statusMessage = nodeResponse?.statusText || "";
+    // Copy all the headers from the node response to the incoming response
+    // except CORS headers
+    Object.keys(nodeResponse?.headers || {})
+      .filter((key) => !key.toLowerCase().startsWith("access-control-"))
+      .forEach((key) => {
+        incomingItem.response.setHeader(
+          key,
+          nodeResponse?.headers[key] as string
+        );
+      });
 
     incomingItem.infos.push(`piping data`);
 
