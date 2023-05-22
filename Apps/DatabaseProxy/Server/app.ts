@@ -302,7 +302,7 @@ import { Analytics } from "@shared/Analytics";
             body += chunk.toString();
           });
           req.on("end", () => {
-            resolve(JSON.parse(body));
+            resolve(JSON.parse(body || "null"));
           });
         } catch (ex: any) {
           reject(ex);
