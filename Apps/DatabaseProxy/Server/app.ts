@@ -234,8 +234,6 @@ import { debug } from "console";
           }
         );
 
-        debugLog.hookTo(db);
-
         dbs._dbs.set(dbName, db);
       }
       return dbs._dbs.get(dbName);
