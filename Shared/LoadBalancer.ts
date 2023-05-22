@@ -451,7 +451,6 @@ class LoadBalancer {
       }
 
       incomingItem.infos.push(`${`Proxying request to`.gray} ${options.url}`);
-      this.log(options);
 
       const response = await axios.request(options);
 
