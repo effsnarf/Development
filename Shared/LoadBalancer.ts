@@ -450,6 +450,8 @@ class LoadBalancer {
         options.timeout = this.options.request.timeout * 1000;
       }
 
+      incomingItem.infos.push(`${`Proxying request to`.gray} ${options.url}`);
+
       const response = await axios.request(options);
 
       timer.stop();
