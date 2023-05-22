@@ -306,7 +306,7 @@ class LoadBalancer {
     incomingItem.response.statusMessage = nodeResponse?.statusText || "";
 
     const nodeCorsHeaders = Object.keys(nodeResponse?.headers || {}).filter(
-      (key) => !key.toLowerCase().startsWith("access-control-")
+      (key) => key.toLowerCase().startsWith("access-control-")
     );
 
     // Copy all the headers from the node response to the incoming response
