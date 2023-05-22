@@ -6,7 +6,6 @@ import { DatabaseBase } from "./DatabaseBase";
 import { MongoClient, ObjectId } from "mongodb";
 
 class MongoDatabase extends DatabaseBase {
-  private database: string;
   private client: MongoClient;
   public onMethodDone: ((
     method: string,
@@ -15,9 +14,8 @@ class MongoDatabase extends DatabaseBase {
     dt: any
   ) => void)[] = [];
 
-  constructor(connectionString: string, database: string) {
+  constructor(connectionString: string, private database: string) {
     super();
-    this.database = database;
     this.client = new MongoClient(connectionString);
   }
 
