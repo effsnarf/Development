@@ -7,6 +7,7 @@ import axios from "axios";
 import express from "express";
 import cookieParser from "cookie-parser";
 import "@shared/Extensions";
+import { Http } from "@shared/Http";
 import { Timer } from "@shared/Timer";
 import { Google } from "@shared/Google";
 import {
@@ -302,33 +303,13 @@ import { debug } from "console";
     // #endregion
 
     // #region processRequest() helper
-    const getPostData = (req: any) => {
-      const isGoogleRequest = req.url.toLowerCase().includes("google");
-      return new Promise((resolve, reject) => {
-        try {
-          if (isGoogleRequest) debugLog.log(`Getting POST data for ${req.url}`);
-          let body = "";
-          req.on("data", (chunk: any) => {
-            body += chunk.toString();
-          });
-          req.on("end", () => {
-            if (isGoogleRequest)
-              debugLog.log(`POST data for ${req.url} is ${body}`);
-            resolve(JSON.parse(body || "null"));
-          });
-        } catch (ex: any) {
-          reject(ex);
-        }
-      });
-    };
-
     const processRequest = (handler: any) => {
       return async (req: any, res: any) => {
         try {
           debugLog.log(req.url);
           itemsLog.log(req.url);
           // Get the POST data
-          const data = await getPostData(req);
+          const data = await Http.getPostData(req);
           const user = await User.get(req, res, data);
           await handler(req, res, user, data);
         } catch (ex: any) {

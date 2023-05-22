@@ -7,6 +7,7 @@ import { Objects } from "./Extensions.Objects";
 import { Types } from "./Types";
 import { System } from "./System";
 import { Process } from "./Process";
+import { Http } from "./Http";
 import { Events } from "./Events";
 import { HealthMonitor } from "./HealthMonitor";
 import { Timer, IntervalCounter } from "./Timer";
@@ -101,6 +102,7 @@ interface IncomingItem {
   attempt: number;
   request: http.IncomingMessage;
   response: http.ServerResponse;
+  requestPostData: any;
 }
 
 interface LoadBalancerOptions {
@@ -249,6 +251,7 @@ class LoadBalancer {
       attempt: 0, // Which attempt is this?
       request, // The request object
       response, // The response object
+      requestPostData: await Http.getPostData(request), // The request body
     };
 
     this.incomingItems.add(incomingItem);
@@ -438,7 +441,7 @@ class LoadBalancer {
         url,
         method: request.method as any,
         headers: request.headers,
-        data: (request as any).body,
+        data: incomingItem.requestPostData,
         // We want to proxy the data as-is,
         responseType: "stream",
         // We want to proxy the request as-is,
