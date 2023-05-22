@@ -320,7 +320,9 @@ class LoadBalancer {
     // If the node response has CORS headers, log a warning
     if (nodeCorsHeaders.length) {
       this.logText(
-        `${`Not forwarding node CORS headers`.bgYellow}: ${nodeCorsHeaders}`
+        `${
+          `Not forwarding node CORS headers`.bgYellow.black
+        }: ${nodeCorsHeaders}`
       );
     }
 
