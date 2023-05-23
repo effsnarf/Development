@@ -298,9 +298,9 @@ document.addEventListener("DOMContentLoaded", async function() {
           // clear ui user comp list
           this.comps.user.splice(0, this.comps.user.length);
           // get user comps from server
-          //var msg = alertify.message(`<h2>Loading user components</h2><div class="hourglass"></div>`).delay(0);
+          var msg = alertify.message(`<h2>Loading user components</h2><div class="hourglass"></div>`).delay(0);
           var userComps = (await liveData.dbp.api.componentClasses.user.get());
-          //msg.dismiss();
+          msg.dismiss();
           // we can have comps.ide and comps.user containing same comps
           // but the object reference has to be to one watched data item.
           // from the user comps, find the ide comps
