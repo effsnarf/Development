@@ -1,3 +1,4 @@
+import "./Extensions";
 import fs from "fs";
 import { Timer } from "./Timer";
 import { Queue } from "./Queue";
