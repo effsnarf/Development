@@ -160,7 +160,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   process.on("uncaughtException", async (ex: any) => {
     fsLog.log(`Uncaught exception:`);
     for (const line of ex.stack.split("\n")) {
-      fsLog.log(line);
+      //fsLog.log(line);
     }
     await fsLog.flush();
     process.exit(1);
