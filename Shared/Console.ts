@@ -380,6 +380,7 @@ class Log extends ConsoleElement {
   }
 
   log(...args: any[]) {
+    if (!args?.filter((a) => a).length) return;
     const item = {
       dt: Date.now(),
       args: args,
