@@ -59,6 +59,14 @@ String.prototype.getWords = function()
     return this.match(/\w+/g) || [];
 }
 
+String.prototype.kebabize = function()
+{
+    // Convert to kebab-case
+    let s = this.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+    s = s.replace(/[^a-z0-9-]/g, '-');
+    s = s.replace(/--+/g, '-');
+    return s;
+}
 Array.prototype.sortBy = function(getKey)
 {
     // Sort array by key
