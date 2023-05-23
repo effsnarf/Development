@@ -140,11 +140,9 @@ class FileSystemLogger extends LoggerBase {
     let text = items
       .map((item) => {
         if (!item.args.filter((a: any) => a).length) return null;
-        const text = JSON.stringify(item.args, (key, value) => {
-          if (typeof value == "string") {
-            return value.withoutColors();
-          }
-          return value;
+        const text = item.args.map((arg: any) => {
+          if (arg.is(String)) return arg.withoutColors();
+          return jsyaml.dump(arg);
         });
         return `${new Date(item.dt).toISOString()} ${text}`;
       })
