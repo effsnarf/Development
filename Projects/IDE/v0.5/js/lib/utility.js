@@ -67,6 +67,14 @@ String.prototype.kebabize = function()
     s = s.replace(/--+/g, '-');
     return s;
 }
+
+String.prototype.separateWords = function()
+{
+    // Separate words in string
+    // "helloWorld" => "hello world"
+    return this.replace(/([a-z])([A-Z])/g, '$1 $2');
+}
+
 Array.prototype.sortBy = function(getKey)
 {
     // Sort array by key
@@ -89,9 +97,30 @@ Array.prototype.removeAll = function(predicate)
     }
 }
 
+Array.prototype.distinct = function(selector)
+{
+    if (!selector) selector = (item) => item;
+    const keys = [];
+    const distinctItems = [];
+    for (const item of this)
+    {
+        const key = selector(item);
+        if (keys.indexOf(key) === -1)
+        {
+            keys.push(key);
+            distinctItems.push(item);
+        }
+    }
+    return distinctItems;
+}
+
 Array.prototype.distinctItems = function()
 {
-    return [...new Set(this)];
+    return this.distinct();
+}
+
+Array.prototype.except = function(item) {
+	return this.filter(a => (a != item));
 }
 
 var util = {

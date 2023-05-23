@@ -794,7 +794,6 @@ compiler.compileAll = async (comps, options = { fix: true }, onProgress) => {
       i++;
       let percent = (!total) ? 1 : (i / total);
       if (onProgress) onProgress(percent);
-      console.clear();
       console.log(`compileAll (${i} / ${total})`);
       console.log(`[${"#".repeat(percent*30)}${" ".repeat(30 - percent*30)}] ${Math.round(percent*100)}%`);
 

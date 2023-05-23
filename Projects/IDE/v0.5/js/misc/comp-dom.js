@@ -164,7 +164,7 @@ var compDom = {
       //compDom.fix.styles(comp);
       var nodes = compDom.get.all.nodes(comp);
       //console.log(`${nodes.length} nodes`);
-      for (node of nodes) { await compDom.fix.node(node); };
+      for (node of nodes) { await compDom.fix.node(node, comp); };
 
       var elapsed = (Date.now() - started);
       //console.log(`(${(elapsed / 1000).toFixed(2)}s)`, `Fixed ${comp.name}`);
@@ -187,7 +187,7 @@ var compDom = {
         method.options.cache = (method.options.cache || {});
       }
     },
-    node: async (node) => {
+    node: async (node, comp) => {
       //console.log(`Fixing node ${node.id}`);
       if (!node.id)
       {
@@ -975,6 +975,7 @@ var compDom = {
       with: (compID, nodePath, vue) => {
         if (typeof(compID) != `number`) throw `get.node.with() has changed signature from (compName...) to (compID...).`;
         var comp = compDom.get.comp.byID(compID);
+        if (!comp) throw `get.node.with() could not find comp with ID ${compID}.`;
         var node = viewDom.getNode(comp.view.node, nodePath);
         node = util.with(node, 'comp', comp);
         if (vue)
@@ -1279,7 +1280,10 @@ var compDom = {
 
       if (addParent)
       {
-        var compIDs = nodes.map(n => (n.comp()._id));
+        // TODO: find out why comp is missing from some nodes and fix it
+        var compIDs = nodes
+          .filter(n => n.comp)
+          .map(n => (n.comp()._id));
         // add child html element nodes
         // add parent html element nodes
         nodes.unshift(...compDom.get.nodes(el.parentElement, (addParent - 1)));
