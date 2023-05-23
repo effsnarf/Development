@@ -102,6 +102,7 @@ import { debug } from "console";
           httpOnly: true,
           sameSite: "none",
           secure: true,
+          overwrite: true,
         });
 
         return new User(dbUser);
