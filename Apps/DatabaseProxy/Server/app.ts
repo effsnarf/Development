@@ -100,7 +100,7 @@ import { debug } from "console";
         res.cookie("userLoginTokenKey", tokenKey, {
           maxAge: 1000 * 60 * 60 * 24 * 30,
           httpOnly: true,
-          saveSite: "none",
+          sameSite: "none",
         });
 
         return new User(dbUser);
