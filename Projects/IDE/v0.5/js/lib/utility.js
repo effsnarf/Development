@@ -121,5 +121,6 @@ var util = {
           }
         };
         _traverse(obj, "", obj);
-      }
+      },
+      distinctItems: (arr) => arr.distinctItems(),
 }
