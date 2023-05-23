@@ -354,7 +354,13 @@ class LoadBalancer {
       // Log the successful attempt
       this.log({
         node: { index: incomingItem.nodeItem.index },
-        texts: [statusStr, nodeResponseSize, uElapsed, url],
+        texts: [
+          incomingItem.request.method,
+          statusStr,
+          nodeResponseSize,
+          uElapsed,
+          url,
+        ],
       });
     }
 
