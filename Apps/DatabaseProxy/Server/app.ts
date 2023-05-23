@@ -483,7 +483,7 @@ import { debug } from "console";
         if (!apiMethods?.length)
           return res.status(404).send("Method not found");
         const apiMethod = apiMethods[0];
-        const funcStr = `async (user, db, db${
+        const funcStr = `async (fs, user, db, db${
           req.params.entity
         }, axios, ${apiMethod.args.join(", ")}) => { ${apiMethod.code} }`;
         const func = eval(funcStr);
@@ -497,7 +497,7 @@ import { debug } from "console";
         let result: any;
 
         try {
-          result = await func(user, db, collection, axios, ...args);
+          result = await func(fs, user, db, collection, axios, ...args);
 
           const elapsed = Date.now() - start;
 
