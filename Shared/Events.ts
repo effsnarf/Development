@@ -11,6 +11,12 @@ class Events {
   }
 
   emit(name: string, ...args: any[]) {
+    if (this.listeners["*"]) {
+      this.listeners["*"].forEach((callback) => {
+        callback(name, ...args);
+      });
+    }
+
     if (this.listeners[name]) {
       this.listeners[name].forEach((callback) => {
         callback(...args);
