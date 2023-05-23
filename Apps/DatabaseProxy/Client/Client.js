@@ -484,7 +484,7 @@ if (typeof require != "undefined") {
         );
       setTimeout(this.ensureNewIds, 200);
     };
-    //this.ensureNewIds();
+    this.ensureNewIds();
   
     this.logout = async () => {
       var url = `${dbProxy.urlBase}/logout`;
