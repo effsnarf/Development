@@ -89,6 +89,11 @@ Array.prototype.removeAll = function(predicate)
     }
 }
 
+Array.prototype.distinctItems = function()
+{
+    return [...new Set(this)];
+}
+
 var util = {
     haml: (s) => {
         // Remove empty lines
