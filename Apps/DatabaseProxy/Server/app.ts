@@ -41,11 +41,7 @@ import { debug } from "console";
 
       // Google login
       if (postData?.credential) {
-        debugLog.log(
-          `Google login attempt, credential: ${postData.credential}`
-        );
         const googleUserData = await Google.verifyIdToken(postData.credential);
-        debugLog.log(`Google login attempt, data: ${googleUserData}`);
         const dbUser = (
           await db?.find("Users", {
             "google.email": googleUserData.email,
@@ -79,6 +75,12 @@ import { debug } from "console";
           .map((i) => (~~(Math.random() * 36)).toString(36))
           .join("");
 
+        // Delete other login tokens for this user
+        await db?.delete("Tokens", {
+          "data.user._id": dbUser._id,
+        });
+
+        // Create a new login token
         const dbToken = {
           _id: await db?.getNewID(),
           created: Date.now(),
