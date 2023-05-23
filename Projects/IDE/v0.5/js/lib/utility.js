@@ -17,8 +17,9 @@ class LocalPersistedArray
 
     splice(...args)
     {
-        this.items.splice(...args);
+        const items = this.items.splice(...args);
         this.save();
+        return items;
     }
 
     get length()
