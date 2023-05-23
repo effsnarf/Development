@@ -195,7 +195,7 @@ class LoadBalancer {
   addNode(node: Node) {
     this.nodeSwitcher.add(node);
 
-    this.logText(`Added node ${node.name.green}`);
+    this.log(`Added node ${node.name.green}`);
   }
 
   getNode(index: number) {
@@ -272,7 +272,7 @@ class LoadBalancer {
     item.response.statusCode = 504;
     item.response.end();
     // Log the timeout
-    this.logText(
+    this.log(
       `${`Timed out`.bgRed} ${elapsed
         .unitifyTime()
         .severify(...this.options.severity.time)}: ${
@@ -331,7 +331,7 @@ class LoadBalancer {
     const nodeCorsHeaders = getNodeHeaders({ cors: true });
     // If the node response has CORS headers, log a warning
     // if (nodeCorsHeaders.length) {
-    //   this.logText(
+    //   this.log(
     //     `${`Not forwarding node CORS headers`.bgYellow.black}: ${nodeCorsHeaders
     //       .map((key) => `${key}: ${nodeResponse?.headers[key]}`)
     //       .join(", ")}`
@@ -520,18 +520,15 @@ class LoadBalancer {
   }
 
   private log(data: any) {
+    if (typeof data == "string") data = { text: data };
     this.events.emit("log", data);
-  }
-
-  private logText(text: string) {
-    this.log({ text });
   }
 
   start() {
     const server = http.createServer(this.handleRequest.bind(this));
 
     server.listen(this.options.address.port, this.options.address.host, () => {
-      this.logText(
+      this.log(
         `Load balancer started on ${`${Types.stringify(
           this.options.address,
           "Address"
