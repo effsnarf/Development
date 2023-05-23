@@ -358,6 +358,23 @@ interface LogOptions {
   extraSpaceForBytes: boolean;
 }
 
+class NullLog extends ConsoleElement {
+  constructor() {
+    super("");
+  }
+
+  static new() {
+    return new NullLog();
+  }
+
+  protected _draw(
+    width: string | Unit,
+    height: string | Unit
+  ): Promise<string[]> {
+    return Promise.resolve([]);
+  }
+}
+
 class Log extends ConsoleElement {
   private maxItems = 100;
   private items: LogItem[] = [];
@@ -743,4 +760,4 @@ class Console {
   }
 }
 
-export { Console, Layout, Log, ObjectLog, LargeText, Bar, Unit };
+export { Console, Layout, NullLog, Log, ObjectLog, LargeText, Bar, Unit };
