@@ -243,9 +243,6 @@ class LoadBalancer {
     const nodeItem = this.nodeSwitcher.getRandomNode();
 
     const requestPostData = await Http.getPostData(request);
-    if (requestPostData?.length) {
-      this.log(`Request body for ${request.url}: ${requestPostData}`);
-    }
 
     const incomingItem: IncomingItem = {
       id: this.incomingItemID++, // Unique ID for this request

@@ -1,5 +1,5 @@
 class Http {
-  static async getPostData(req: any): Promise<string | null> {
+  static async getPostData(req: any): Promise<any> {
     if (req.method !== "POST") return Promise.resolve(null);
     return new Promise((resolve, reject) => {
       try {
@@ -8,6 +8,9 @@ class Http {
           body += chunk.toString();
         });
         req.on("end", () => {
+          try {
+            body = JSON.parse(body);
+          } catch (ex) {}
           resolve(body);
         });
       } catch (ex: any) {
