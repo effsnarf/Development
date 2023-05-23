@@ -387,7 +387,7 @@ import { debug } from "console";
     );
     // #endregion
 
-    httpServer.get(
+    httpServer.post(
       "/:database/get/googleLogin",
       processRequest((req: any, res: any, user: User, postData: any) => {
         res.setHeader("Content-Type", "application/json");
