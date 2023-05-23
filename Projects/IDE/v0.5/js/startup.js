@@ -63,6 +63,7 @@ const animateCSS = (element, animation, prefix = 'animate__') =>
   {
     var getExceptionKeywords = (ex) => {
       if (!ex) return null;
+      if (!ex.message) return null;
       var keywords = [];
       var s = ex.message;
       var r = /\(reading '(.+)'\)/g;
