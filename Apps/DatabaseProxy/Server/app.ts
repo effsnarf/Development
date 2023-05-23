@@ -96,10 +96,11 @@ import { debug } from "console";
 
         await db?.upsert("Tokens", dbToken);
 
-        // Save the token key in a cookie
+        // Save the token key in the response cookie
         res.cookie("userLoginTokenKey", tokenKey, {
           maxAge: 1000 * 60 * 60 * 24 * 30,
           httpOnly: true,
+          saveSite: "none",
         });
 
         return new User(dbUser);
