@@ -1,5 +1,5 @@
 class Http {
-  static async getPostData(req: any): Promise<string> {
+  static async getPostData(req: any): Promise<string | null> {
     if (req.method !== "POST") return Promise.resolve(null);
     return new Promise((resolve, reject) => {
       try {
