@@ -151,7 +151,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
           .find((a) => a?.getUnitClass()?.name == "Time")
           ?.deunitifyTime();
         if (ms && ms < config.log.requests.min.ms) return;
-        fsLog.log(...[config.nodes[index].name, ...args]);
+        //fsLog.log(...[config.nodes[index].name, ...args]);
       });
     });
   }
