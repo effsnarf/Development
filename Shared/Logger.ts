@@ -43,6 +43,7 @@ abstract class LoggerBase implements Logger {
   }
 
   async log(...args: any[]) {
+    if (!args?.length) return;
     const item = {
       dt: Date.now(),
       args: args,
