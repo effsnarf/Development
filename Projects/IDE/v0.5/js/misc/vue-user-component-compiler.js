@@ -786,7 +786,6 @@ compiler.compileAll = async (comps, options = { fix: true }, onProgress) => {
 
       try { await compiler.compile(comp, options); }
       catch (ex) {
-        console.error(`Error compiling ${comp.name}`);
         console.error(comp);
         console.error(ex);
       }

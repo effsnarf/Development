@@ -123,6 +123,17 @@ Array.prototype.except = function(item) {
 	return this.filter(a => (a != item));
 }
 
+Array.prototype.sum = function(selector)
+{
+    if (!selector) selector = (item) => item;
+    let sum = 0;
+    for (const item of this)
+    {
+        sum += selector(item);
+    }
+    return sum;
+}
+
 var util = {
     haml: (s) => {
         // Remove empty lines
