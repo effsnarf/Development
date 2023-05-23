@@ -743,4 +743,4 @@ class Console {
   }
 }
 
-export { Console, Layout, NullLog, Log, ObjectLog, LargeText, Bar, Unit };
+export { Console, Layout, Log, ObjectLog, LargeText, Bar, Unit };
