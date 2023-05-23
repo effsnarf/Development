@@ -565,7 +565,7 @@ import { debug } from "console";
     httpServer.post(
       "/:database/:entity/update",
       processRequest(async (req: any, res: any) => {
-        return res.end();
+        return res.end(JSON.stringify(null));
       })
     );
     // #endregion
