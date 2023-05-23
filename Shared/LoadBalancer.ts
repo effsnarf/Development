@@ -458,8 +458,8 @@ class LoadBalancer {
       }
 
       incomingItem.infos.push(`${`Proxying request to`.gray} ${options.url}`);
-      for (const line of Objects.yamlify(options).split("\n"))
-        incomingItem.infos.push(line);
+      // for (const line of Objects.yamlify(options).split("\n"))
+      //   incomingItem.infos.push(line);
 
       const response = await axios.request(options);
 
