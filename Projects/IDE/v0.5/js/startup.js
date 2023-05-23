@@ -320,7 +320,7 @@ document.addEventListener("DOMContentLoaded", async function() {
           // global components list only contains one copy of each components
           components.push(...newComps);
           newComps.forEach(comp => liveData.watch.item("ComponentClasses", comp, { on: { changed: this.onCompChanged } }));
-          const getProgressText = (progress) => `<h2>Compiling ${newComps.length} user components ${(Math.round(progress||0)*100)}%</h2><div class="hourglass"></div>`;
+          const getProgressText = (progress) => `<h3>Compiling ${newComps.length} user components ${((progress||0)*100).toFixed(1)}%</h3><div class="hourglass"></div>`;
           var msg = alertify.message(getProgressText()).delay(0);
           await vueUserComponentCompiler.compileAll(newComps, { fix: true }, (p) => { msg.setContent(getProgressText(p)); });
           msg.dismiss();
