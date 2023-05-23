@@ -15,7 +15,7 @@ abstract class DatabaseBase {
   abstract findIterable(
     collectionName: string,
     query: any,
-    sort: any,
+    sort?: any,
     limit?: number,
     skip?: number,
     lowercaseFields?: boolean
@@ -37,6 +37,12 @@ abstract class DatabaseBase {
     doc: any,
     returnNewDoc: boolean
   ): Promise<any>;
+
+  async delete(collectionName: string, query: any): Promise<void> {
+    await this._delete(collectionName, query);
+  }
+
+  protected abstract _delete(collectionName: string, query: any): Promise<void>;
 
   abstract count(collectionName: string, query?: any): Promise<number>;
 

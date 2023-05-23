@@ -72,7 +72,7 @@ class MongoDatabase extends DatabaseBase {
   async *findIterable(
     collectionName: string,
     query: any,
-    sort: any,
+    sort?: any,
     limit?: number | undefined,
     skip?: number | undefined,
     lowercaseFields?: boolean | undefined
@@ -146,6 +146,12 @@ class MongoDatabase extends DatabaseBase {
     const newDoc = await collection.findOne({ _id: doc._id });
 
     return newDoc;
+  }
+
+  protected async _delete(collectionName: string, query: any): Promise<void> {
+    const collection = await this.getCollection(collectionName);
+
+    await collection.deleteMany(query);
   }
 
   async count(collectionName: string, query?: any) {

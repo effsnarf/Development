@@ -46,7 +46,7 @@ class FileSystemDatabase extends DatabaseBase {
   async *findIterable(
     collectionName: string,
     query: any,
-    sort: any,
+    sort?: any,
     limit?: number,
     skip?: number,
     lowercaseFields?: boolean
@@ -86,6 +86,14 @@ class FileSystemDatabase extends DatabaseBase {
     if (!returnNewDoc) return doc._id;
     return doc;
   }
+
+  protected async _delete(collectionName: string, query: any): Promise<void> {
+    for await (const doc of this.findIterable(collectionName, query)) {
+      const filePath = this.getFilePath(collectionName, doc._id);
+      fs.unlinkSync(filePath);
+    }
+  }
+
   count(collectionName: string, query?: any): Promise<number> {
     return new Promise((resolve, reject) => {
       if (query) throw new Error("Query not implemented");
