@@ -403,6 +403,15 @@ import { debug } from "console";
         return res.send(JSON.stringify(user?.data));
       })
     );
+
+    httpServer.get(
+      "/:database/set/user",
+      processRequest(async (req: any, res: any, user: User) => {
+        res.setHeader("Content-Type", "application/json");
+        return res.send(JSON.stringify(user?.data));
+      })
+    );
+
     // For /[database]/api, return {}
     httpServer.get(
       "/:database/api",
