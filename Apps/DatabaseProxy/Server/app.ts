@@ -403,6 +403,21 @@ import { debug } from "console";
       })
     );
 
+    // For /[database]/get/new/id, return a new unique ID
+    httpServer.get("/:database/get/new/id", async (req: any, res: any) => {
+      // Response type
+      res.setHeader("Content-Type", "application/json");
+
+      const count = parseInt(req.query.count || 1);
+
+      const db = await dbs.get(req.params.database);
+
+      // Get and inc [uniqueID] from _IdentityIntegers where _id = null
+      const ids = await db?.getNewIDs(count);
+
+      return res.send(JSON.stringify(ids));
+    });
+
     httpServer.get(
       "/:database/get/user",
       processRequest(async (req: any, res: any, user: User) => {
@@ -453,21 +468,6 @@ import { debug } from "console";
         return res.send(entities);
       })
     );
-
-    // For /[database]/get/new/id, return a new unique ID
-    httpServer.get("/:database/get/new/id", async (req: any, res: any) => {
-      // Response type
-      res.setHeader("Content-Type", "application/json");
-
-      const count = parseInt(req.query.count || 1);
-
-      const db = await dbs.get(req.params.database);
-
-      // Get and inc [uniqueID] from _IdentityIntegers where _id = null
-      const ids = await db?.getNewIDs(count);
-
-      return res.send(JSON.stringify(ids));
-    });
 
     // For /[database]/api/[entity]/[group]/[method], execute the method
     httpServer.get(
@@ -533,7 +533,7 @@ import { debug } from "console";
       })
     );
 
-    // #region 🔍 Document Retrieval
+    // #region 🔍 Entity CRUD
     // For /[database]/[entity]?find={...}, return the list of documents
     httpServer.get(
       "/:database/:entity",
@@ -559,6 +559,13 @@ import { debug } from "console";
         const items = await db?.aggregate(req.params.entity, pipeline);
 
         return res.send(items);
+      })
+    );
+
+    httpServer.post(
+      "/:database/:entity/update",
+      processRequest(async (req: any, res: any) => {
+        return res.end();
       })
     );
     // #endregion
