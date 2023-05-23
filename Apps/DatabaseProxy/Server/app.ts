@@ -42,7 +42,7 @@ import { debug } from "console";
       // Google login
       if (postData?.credential) {
         const googleUserData = await Google.verifyIdToken(postData.credential);
-        const dbUser = (
+        let dbUser = (
           await db?.find("Users", {
             "google.email": googleUserData.email,
           })
@@ -50,7 +50,7 @@ import { debug } from "console";
 
         // If the user doesn't exist, create it
         if (!dbUser) {
-          const dbUser = {
+          dbUser = {
             _id: await db?.getNewID(),
             type: null,
             ip: null,
@@ -117,9 +117,11 @@ import { debug } from "console";
           })
         )?.first();
         if (token) {
-          const dbUser = await db?.find("Users", {
-            _id: token.data.user._id,
-          });
+          const dbUser = (
+            await db?.find("Users", {
+              _id: token.data.user._id,
+            })
+          )?.first();
           if (dbUser) {
             return new User(dbUser);
           }
