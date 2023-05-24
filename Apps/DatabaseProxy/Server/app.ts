@@ -8,7 +8,7 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import "@shared/Extensions";
 import { Http } from "@shared/Http";
-import { Timer } from "@shared/Timer";
+import { Timer, IntervalCounter } from "@shared/Timer";
 import { Google } from "@shared/Google";
 import {
   Console,
@@ -204,7 +204,18 @@ import { debug } from "console";
   // #endregion
 
   // #region Render the dashboard
+  const uptime = Timer.start();
+  const requests = {
+    per: {
+      minute: new IntervalCounter((1).minutes()),
+    },
+  };
+
   const renderDashboard = () => {
+    mainLog.title = `${config.title} (${
+      `uptime`.gray
+    } ${uptime.elapsed?.unitifyTime()})`;
+    itemsLog.title = `Items (${requests.per.minute.count}${`/minute`.gray})`;
     layout.render();
     // Set the console window title
     process.title = `${config.title} (?)`;
@@ -324,6 +335,7 @@ import { debug } from "console";
     const processRequest = (handler: any) => {
       return async (req: any, res: any) => {
         try {
+          requests.per.minute.track(1);
           debugLog.log(req.url);
           itemsLog.log(req.url);
           // Get the POST data
