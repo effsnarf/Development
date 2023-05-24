@@ -519,7 +519,10 @@ td .ide-value-image-small
   box-shadow: -6px 6px 6px #00000080;
 }
 
-
+.ajs-message *
+{
+  text-shadow: -0.1em 0.1em 0.05em black;
+}
 
 
 
