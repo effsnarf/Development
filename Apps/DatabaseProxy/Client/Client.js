@@ -92,10 +92,9 @@ if (typeof require != "undefined") {
           Local.cache.set(url, { dt: Date.now(), data: data });
           return data;
         };
-        const existingData = (await Local.cache.get(url));
-        if (existingData) {
+        if (await Local.cache.has(url)) {
           setTimeout(fetchContent, 0);
-          return existingData?.data;
+          return (await Local.cache.get(url)).data;
         }
         else
         {

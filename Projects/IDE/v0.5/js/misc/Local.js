@@ -39,6 +39,10 @@ class Local
         set: async (key, value) => {
             // Store the new value in IndexedDB
             await Local.db.Cache.put({ key, value });
+        },
+        has: async (key) => {
+            key = md5(key);
+            return (await Local.db.Cache.where("key").equals(key).toArray()).length;
         }
     };
 }
