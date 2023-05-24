@@ -176,7 +176,8 @@ import { debug } from "console";
   // #endregion
 
   // #region 💻 Console
-  // Create the dashboard layout
+
+  // #region Create the dashboard layout
   const mainLog = Log.new(config.title);
   const itemsLog = Log.new("Items");
   const debugLog = Logger.new(config.log);
@@ -200,14 +201,24 @@ import { debug } from "console";
     [mainLog, itemsLog, configLog],
     ["25%", "50%", "25%"]
   );
+  // #endregion
 
-  // Render the dashboard
+  // #region Render the dashboard
   const renderDashboard = () => {
     layout.render();
     // Set the console window title
     process.title = `${config.title} (?)`;
   };
   setInterval(renderDashboard, 1000 / 1);
+  // #endregion
+
+  // If [q] is pressed, stop the load balancer
+  mainLog.log(`Press [q] to quit`);
+  Console.on.key("q", () => {
+    mainLog.log(`Quitting..`);
+    renderDashboard();
+    process.exit();
+  });
   // #endregion
 
   // #region 📦 Database

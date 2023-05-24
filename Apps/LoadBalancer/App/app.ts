@@ -358,8 +358,10 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
       loadBalancer.restartNode(index);
     });
   }
-  // If [esc] is pressed, stop the load balancer
+  // If [q] is pressed, stop the load balancer
   Console.on.key("q", () => {
+    mainLog.log(`Quitting..`);
+    renderDashboard();
     process.exit();
   });
 
