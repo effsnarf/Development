@@ -135,6 +135,12 @@ Array.prototype.sum = function(selector)
     return sum;
 }
 
+Array.prototype.average = function(selector)
+{
+    if (!selector) selector = (item) => item;
+    return parseFloat((this.sum(selector) / this.length).toFixed(2));
+}
+
 var util = {
     haml: (s) => {
         // Remove empty lines

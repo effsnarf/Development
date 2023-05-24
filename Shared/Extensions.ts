@@ -271,6 +271,7 @@ interface String {
 
 interface Array<T> {
   sum(): number;
+  average(): number;
   first(): any;
   last(): any;
   joinColumns(columns: (number | null)[], ellipsis?: boolean): string;
@@ -971,6 +972,10 @@ if (typeof String !== "undefined") {
 if (typeof Array !== "undefined") {
   Array.prototype.sum = function () {
     return this.reduce((a, b) => a + b, 0);
+  };
+
+  Array.prototype.average = function () {
+    return parseFloat((this.sum() / this.length).toFixed(2));
   };
 
   Array.prototype.first = function () {

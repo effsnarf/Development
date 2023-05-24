@@ -78,11 +78,29 @@ if (typeof require != "undefined") {
       items: {},
     };
   
-    this.fetchUrlJson = async (url) => {
+    this.fetchUrlJson = async (url, options) => {
       var now = new Date().valueOf();
   
       if (this.userID) {
         url += `${url.includes("?") ? "&" : "?"}userID=${userID}`;
+      }
+
+      if (options.cache) {
+        const fetchContent = async () => {
+          var str = await (await fetch(url, this.fetchOptions)).text();
+          const data = parseJSON(str);
+          Local.cache.set(url, { dt: Date.now(), data: data });
+          return data;
+        };
+        const existingData = (await Local.cache.get(url));
+        if (existingData) {
+          setTimeout(fetchContent, 0);
+          return existingData?.data;
+        }
+        else
+        {
+          return await fetchContent();
+        }
       }
   
       if (this.cache.enabled) {
@@ -399,7 +417,7 @@ if (typeof require != "undefined") {
     this.entity = (entityName) => new EntityMethods(entityName);
   
     this.getEntityNames = async () => {
-      return await this.fetchUrlJson(this.urlBase, this.fetchOptions);
+      return await this.fetchUrlJson(this.urlBase, { ...this.fetchOptions, cache: true });
     };
     this.callApiMethod = async (entity, group, method, args) => {
       var argsStr = args
@@ -414,7 +432,7 @@ if (typeof require != "undefined") {
     this.getApiMethods = async () => {
       var result = await this.fetchUrlJson(
         `${this.urlBase}/api`,
-        this.fetchOptions
+        { ...this.fetchOptions, cache: true }
       );
       return result;
     };

@@ -40,6 +40,7 @@ class Timer {
   private started: number | null = null;
   private _data: any;
   private onDone: (data: any) => void;
+  private logs: Map<string, Number[]> = new Map();
 
   private constructor(data: any, onDone: (data: any) => any) {
     this._data = data;
@@ -60,6 +61,22 @@ class Timer {
     return timer;
   }
 
+  log(key: string, value?: number) {
+    if (!value && !this.isRunning)
+      throw new Error("Timer must be running to log");
+    if (!value) value = this.elapsed || 0;
+    if (!this.logs.has(key)) this.logs.set(key, []);
+    const log = this.logs.get(key);
+    log?.push(value);
+    return this;
+  }
+
+  getLogs() {
+    return [...this.logs.entries()].map((e) => {
+      return { key: e[0], average: e[1].average() };
+    });
+  }
+
   async measure(data: any, action: () => any) {
     data = { ...this._data, ...data };
 
@@ -78,12 +95,17 @@ class Timer {
   }
 
   start() {
-    this.isRunning = true;
     this.started = Date.now();
+    this.isRunning = true;
   }
 
   stop() {
     this.isRunning = false;
+  }
+
+  restart() {
+    this.stop();
+    this.start();
   }
 
   get elapsed() {

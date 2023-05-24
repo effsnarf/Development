@@ -999,6 +999,11 @@ var compDom = {
 
         return props.map(p => util.with(p, `comp`, node.comp()));
         }
+      },
+      cache: {
+        key: (comp, node) => {
+          return `${comp._id}.${node.id}`;
+        }
       }
     },
     comp: {

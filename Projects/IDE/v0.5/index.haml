@@ -1,6 +1,6 @@
 %html
   %head
-    %title Vue Studio
+    %title Compon
     %link{rel: "stylesheet", href: "https://fonts.googleapis.com/css?family=Qwigley|Kulim+Park|Satisfy|Source+Code+Pro|Bangers|IM Fell English&display=swap"}
     %link{rel: "stylesheet", href: "./css/lib/shorthand.css"}
     %link{rel: "stylesheet", href: "./css/shorthand.css"}
@@ -14,11 +14,15 @@
     %link{rel: "icon", type: "image/x-icon", href: "/favicon.png"}
     %meta{name: "google-signin-client_id", content: "378889662397-1ubh5092vfvgto0ru5ek5l8s4abfipcg.apps.googleusercontent.com"}
     %script{src: "//accounts.google.com/gsi/client", async: true, defer: true}
+    %script{src: "https://cdn.jsdelivr.net/npm/js-md5@0.7.3/build/md5.min.js"}
+    %script{src: "https://cdnjs.cloudflare.com/ajax/libs/dexie/3.2.3/dexie.js"}
     %script{src: "/js/lib/underscore.js"}
     %script{src: "/js/lib/jszip.js"}
     %script{src: "/js/lib/utility.js"}
     %script{src: "/js/lib/haml.js"}
     %script{src: "/js/lib/handlebars.min.js"}
+    %script{src: "/js/shared/Timer.js"}
+    %script{src: "/js/misc/Local.js"}
     %script{src: "//cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"}
     %script{src: "//cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/alertify.js"}
     %script{src: "//cdnjs.cloudflare.com/ajax/libs/deep-diff/1.0.2/deep-diff.min.js"}
@@ -72,8 +76,8 @@
                 / %div
                   %img{src: "./img/logo.png", style: "width: 1.5em;"}
                 %div
-                  %h1.fs-l5.mt-1{style: "margin-bottom: -0.3em; transform: scaleY(0.9);"} Vue
-                  %div.fs-m3.text-center.opacity-50 studio
+                  %h1.fs-l5.mt-1{style: "margin-bottom: -0.3em; transform: scaleY(0.9);"} Compon
+                  %div.fs-m3.text-center.opacity-50 dev
               %div.flex.text-right
                 / ide-search-comps
                 / %meow-comp-268.m-l1.z-100

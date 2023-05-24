@@ -270,18 +270,22 @@ document.addEventListener("DOMContentLoaded", async function() {
           this.$refs.hourglass1.start();
           await liveData.dbp.createApiMethods({logToConsole: true});
           const start = Date.now();
-          this.comps.ide = await localCache.get('ide-component-classes', async () => await liveData.dbp.api.componentClasses.ide.get());
+          this.comps.ide = await liveData.componentClasses.ide.get();
+          alertify.message(`<h2>📦${this.comps.ide.length} IDE compons</h2>`);
           const end = Date.now();
           const duration = (end - start) / 1000;
           compDom.components.value.push(...this.comps.ide);
           this.comps.ide.forEach(comp => liveData.watch.item("ComponentClasses", comp, { on: { changed: this.onCompChanged } }));
-          await vueUserComponentCompiler.compileAll(this.comps.ide, { fix: false }, (p) => { this.$refs.hourglass1.progress = p; });
+          //await vueUserComponentCompiler.compileAll(this.comps.ide, { fix: false }, (p) => { this.$refs.hourglass1.progress = p; });
           this.$refs.hourglass1.stop();
           this.isIniting = false;
         },
         reload: async function() {
+          return;
+          const user = await liveData.dbp.get.user();
+
           // load user functions
-          this.funcs.user = (await liveData.dbp.api.functions.user.get());
+          this.funcs.user = []; //(await liveData.dbp.api.functions.user.get());
 
           var started = Date.now();
           // first, remove all existing user comps from global comp list
@@ -297,10 +301,7 @@ document.addEventListener("DOMContentLoaded", async function() {
           allComps.removeAll(c => userCompIDs.includes(c._id));
           // clear ui user comp list
           this.comps.user.splice(0, this.comps.user.length);
-          // get user comps from server
-          var msg = alertify.message(`<h2>Loading user components</h2><div class="hourglass"></div>`).delay(0);
-          var userComps = (await liveData.dbp.api.componentClasses.user.get());
-          msg.dismiss();
+          var userComps = await liveData.componentClasses.user.get(user);
           // we can have comps.ide and comps.user containing same comps
           // but the object reference has to be to one watched data item.
           // from the user comps, find the ide comps
@@ -320,7 +321,7 @@ document.addEventListener("DOMContentLoaded", async function() {
           // global components list only contains one copy of each components
           components.push(...newComps);
           newComps.forEach(comp => liveData.watch.item("ComponentClasses", comp, { on: { changed: this.onCompChanged } }));
-          const getProgressText = (progress) => `<h3>Compiling ${newComps.length} user components ${((progress||0)*100).toFixed(1)}%</h3><div class="hourglass"></div>`;
+          const getProgressText = (progress) => `<h2>Compiling ${newComps.length} user components ${((progress||0)*100).toFixed(1)}%</h2><div class="hourglass"></div>`;
           var msg = alertify.message(getProgressText()).delay(0);
           await vueUserComponentCompiler.compileAll(newComps, { fix: true }, (p) => { msg.setContent(getProgressText(p)); });
           msg.dismiss();

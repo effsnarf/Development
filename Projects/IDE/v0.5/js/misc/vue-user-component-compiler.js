@@ -8,8 +8,8 @@ if (typeof(require) != "undefined")
 
   var compDom = require("./comp-dom.js");
   var viewDom = require("./view-dom.js");
-}
 
+}
 
 
 
@@ -157,6 +157,8 @@ compiler.preprocess = (compClass) => {
 // meaning Vue "props" (parameters passed between components),
 // not component properties (data, computed, watches, etc)
 compiler.toVueProps = (compClass) => {
+  const timer = Timer.start();
+
   var props = compClass.props;
   var vprops = {};
 
@@ -165,6 +167,8 @@ compiler.toVueProps = (compClass) => {
     .forEach(p => {
       vprops[p.name] = toVuePropProperty(compClass, p);
     });
+
+  compileTimer2.log('toVueProps', timer.elapsed);
 
   return vprops;
 };
@@ -209,6 +213,8 @@ compiler.toVueData = (compClass, origComp) => {
 };
 
 compiler.toVueComputeds = (compClass, origComp) => {
+  const timer = Timer.start();
+
   var computeds = {};
 
   compClass.props
@@ -255,10 +261,14 @@ compiler.toVueComputeds = (compClass, origComp) => {
       computeds[p.name] = obj;
     });
 
+  compileTimer2.log('toVueComputeds', timer.elapsed);
+
   return computeds;
 };
 
 compiler.toVueAsyncComputeds = (compClass) => {
+  const timer = Timer.start();
+
   var asyncComputeds = {};
   compClass.props
     .filter(p => (p.computed?.enabled))
@@ -284,10 +294,15 @@ compiler.toVueAsyncComputeds = (compClass) => {
       }
       asyncComputeds[p.name] = obj;
     });
+
+  compileTimer2.log('toVueAsyncComputeds', timer.elapsed);
+
   return asyncComputeds;
 };
 
 compiler.toVueWatchers = (compClass, props) => {
+  const timer = Timer.start();
+
   var watch = {};
 
   if (compiler.mode == `production`)
@@ -372,11 +387,14 @@ compiler.toVueWatchers = (compClass, props) => {
     });
   }
 
+  compileTimer2.log('toVueWatchers', timer.elapsed);
 
   return watch;
 };
 
 compiler.methodToFunction = (compClass, method, origMethod) => {
+  const timer = Timer.start();
+
   var debuggerStatement = null;
   var debuggerCode = ``;
 
@@ -515,6 +533,9 @@ compiler.methodToFunction = (compClass, method, origMethod) => {
     origMethod.errors.push({ text: ex.toString(), ex: ex });
     throw ex;
   }
+  finally {
+    compileTimer2.log(`methodToFunction`, timer.elapsed);
+  }
 };
 
 compiler.toVueMethod = (compClass, method, origMethod) => {
@@ -523,6 +544,8 @@ compiler.toVueMethod = (compClass, method, origMethod) => {
 };
 
 compiler.toVueMethods = (compClass, origComp) => {
+  const timer = Timer.start();
+
   var methods = compClass.methods;
 
   var ms = {};
@@ -530,10 +553,14 @@ compiler.toVueMethods = (compClass, origComp) => {
     ms[method.name] = compiler.toVueMethod(compClass, method, origComp.methods[i]);
   });
 
+  compileTimer2.log(`toVueMethods`, timer.elapsed);
+
   return ms;
 };
 
 compiler.toVueHooks = (compClass) => {
+  const timer = Timer.start();
+
   var hooks = {};
 
   hooks.mounted = util.handlebars(compClass, `
@@ -564,13 +591,20 @@ compiler.toVueHooks = (compClass) => {
   {
     throw ex;
   }
+  finally {
+    compileTimer2.log(`toVueHooks`, timer.elapsed);
+  }
 
   return hooks;
 }
 
-compiler.toVueTemplate = (compClass, origComp) => {
+compiler.toVueTemplate = async (compClass, origComp) => {
+  const timer = Timer.start();
+
   try
   {
+    const timer2 = Timer.start();
+
     origComp.view.errors = (origComp.view.errors || []);
     origComp.view.errors.splice(0);
 
@@ -580,10 +614,31 @@ compiler.toVueTemplate = (compClass, origComp) => {
       //node.attrs.push({ name: "v-ide-debugger" });
       node.attrs?.forEach(attr => { if ((attr.name) && (!attr.value)) attr.value = emptyValuePH; });
     };
-    var haml = viewDom.nodeToHaml(compClass, compClass.view.node, 0, cbNode, true);
-    var html = null;
-    if (typeof(util) != `undefined`) html = util.haml(haml); else html = HAML.render(haml);
+
+    compileTimer2.log(`toVueTemplate.1`, timer2.elapsed);
+    timer2.restart();
+
+    const started = Date.now();
+
+    var haml = await Local.cache.get(compDom.get.node.cache.key(compClass, compClass.view.node), () => viewDom.nodeToHaml(compClass, compClass.view.node, 0, cbNode, true));
+
+    const elapsed = (Date.now() - started);
+    //console.log(elapsed);
+    //if (elapsed > 100) debugger;
+
+    compileTimer2.log(`toVueTemplate.2`, timer2.elapsed);
+    timer2.restart();
+
+    const key = haml;
+    var html = await Local.cache.get(key, () => util?.haml(haml) || HAML.render(haml));
+
+    compileTimer2.log(`toVueTemplate.3`, timer2.elapsed);
+    timer2.restart();
+
     html = html?.replaceAll(emptyValuePH, "");
+
+    compileTimer2.log(`toVueTemplate.4`, timer2.elapsed);
+    timer2.restart();
 
     // Doesn't work in node.js
     if (false)
@@ -600,6 +655,9 @@ compiler.toVueTemplate = (compClass, origComp) => {
     origComp.view.errors.push({ text: ex.toString(), ex: ex });
     if (typeof(ideVueApp) == `undefined`) throw ex; else ideVueApp.onCompError(null, [{ comp: origComp }], ex);
     //throw ex;
+  }
+  finally {
+    compileTimer2.log(`toVueTemplate`, timer.elapsed);
   }
 };
 
@@ -621,13 +679,25 @@ if (true)
 }
 
 
-compiler.toVueComponentOptions = (compClass) => {
+const compileTimer2 = Timer.start();
+
+compiler.toVueComponentOptions = async (compClass) => {
   if (!compClass) return {};
+
+  compileTimer2.restart();
 
   var origComp = compClass;
   compClass = compiler.preprocess(compClass);
 
+  compileTimer2.log(`preprocess`).restart();
+
   let vueData = compiler.toVueData(compClass, origComp);
+
+  compileTimer2.log('toVueData').restart();
+
+  const data = eval(`(function() { return ${JSON.stringify(vueData)}; })`); //.replace(/"([^"]+)":/g, '$1:')}; })`), // remove quotes from property names
+
+  compileTimer2.log('data').restart();
 
   var compOptions = {
     _ide_data: {
@@ -635,7 +705,7 @@ compiler.toVueComponentOptions = (compClass) => {
       data: vueData
     },
     props: compiler.toVueProps(compClass),
-    data: eval(`(function() { return ${JSON.stringify(vueData)}; })`),  //.replace(/"([^"]+)":/g, '$1:')}; })`), // remove quotes from property names
+    data: data,
     computed: compiler.toVueComputeds(compClass, origComp),
     asyncComputed: compiler.toVueAsyncComputeds(compClass),
     methods: compiler.toVueMethods(compClass, origComp),
@@ -643,6 +713,8 @@ compiler.toVueComponentOptions = (compClass) => {
     template: compiler.toVueTemplate(compClass, origComp),
     errorCaptured: compiler.onErrorCaptured,
   };
+
+  compileTimer2.log('compOptions').restart();
 
   if (compiler.mode == `production`) delete compOptions._ide_data;
 
@@ -734,6 +806,8 @@ compiler.toVueComponentOptions = (compClass) => {
   compOptions.mounted = compiler.toVueMethod(compClass, mountedMethod, (mounted || {errors:[]}));
   if (unmounted) compOptions.unmounted = compiler.toVueMethod(compClass, unmounted, unmounted);
 
+  compileTimer2.log('misc').restart();
+
   return compOptions;
 }
 
@@ -742,20 +816,26 @@ compiler.unregisterFromVue = (compName) => {
 }
 
 
-
+const compileTimer = Timer.start();
 
 compiler.compile = async (compClass, options = { fix: true }) => {
   var promise = new Promise(async (resolve, reject) => {
+    if (!compClass) { resolve(); return; }
     try
     {
+      compileTimer.restart();
       if (options.fix) await compDom.fix.comp(compClass);
-      if (!compClass) { resolve(); return; }
+      compileTimer.log(`fix`).restart();
       if (compClass.safeMode) { reject(`compClass is set to safe mode, not compiling.`); return; }
       if (options.fix) viewDom.fixPaths(compClass.view.node);
+      compileTimer.log(`fixPaths`).restart();
       //alertify.message(`Compiling ${compClass.name}`);
       var compName = compDom.get.comp.name.vueName(compClass);
-      var vueOptions = compiler.toVueComponentOptions(compClass);
+      compileTimer.log(`getCompName`).restart();
+      var vueOptions = await compiler.toVueComponentOptions(compClass);
+      compileTimer.log(`toVueComponentOptions`).restart();
       if (typeof(Vue) != `undefined`) var vueComp = Vue.component(compName, vueOptions);
+      compileTimer.log(`Vue.component`).restart();
       resolve(vueComp);
     }
     catch (ex)
@@ -771,6 +851,8 @@ compiler.compile = async (compClass, options = { fix: true }) => {
 compiler.compileAll = async (comps, options = { fix: true }, onProgress) => {
   var promise = new Promise(async (resolve) => {
     var started = Date.now();
+
+    let lastReport = Date.now();
 
     console.log(`starting compileAll`);
 
@@ -792,9 +874,12 @@ compiler.compileAll = async (comps, options = { fix: true }, onProgress) => {
       
       i++;
       let percent = (!total) ? 1 : (i / total);
-      if (onProgress) onProgress(percent);
-      console.log(`compileAll (${i} / ${total})`);
-      console.log(`[${"#".repeat(percent*30)}${" ".repeat(30 - percent*30)}] ${Math.round(percent*100)}%`);
+      if (onProgress && ((Date.now() - lastReport) > 1)) {
+        lastReport = Date.now();
+        onProgress(percent);
+      }
+      //console.log(`compileAll (${i} / ${total})`);
+      //console.log(`[${"#".repeat(percent*30)}${" ".repeat(30 - percent*30)}] ${Math.round(percent*100)}%`);
 
       if (comps.length <= 0)
       {

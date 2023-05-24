@@ -163,6 +163,18 @@ var viewDom = {
     cbNode(node);
     node.attrs?.forEach(attr => { if (!("enabled" in attr)) attr.enabled = true; });
 
+    const classAttr = node.attrs?.find(attr => attr.name == "class");
+    if (classAttr) {
+      let classes = classAttr.value.split(" ");
+      // Remove timestamp classes ("1684904169796") (idk how they got there)
+      const timestamps = classes
+        .filter(c => (c.length == Date.now().toString().length))
+        .filter(c => c.match(/^\d+$/));
+      classes = classes.filter(c => !timestamps.includes(c));
+      // Remove empty classes
+      classAttr.value = classes;
+    }
+
     var s = [];
 
     // "slots" node compiles to several "slot" nodes.

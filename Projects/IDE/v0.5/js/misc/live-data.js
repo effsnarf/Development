@@ -3,6 +3,41 @@
 var liveData = {
   dbp: (new anat.dev.DatabaseProxy("db.memegenerator.net", "IDE")),
   watchedItems: [],
+  componentClasses: {
+    ide: {
+      get: async() => {
+        let classes = await (Local.db.ComponentClasses.where("name").startsWith("IDE.")).toArray();
+        if (!classes.length) {
+          classes = await liveData.dbp.api.componentClasses.ide.get();
+          classes = classes.map(c => { return { _id: c._id, name: c.name, _item: c } });
+          await Local.db.ComponentClasses.bulkPut(classes);
+        }
+        return classes.map(c => c._item);
+      }
+    },
+    user: {
+      get: async(user) => {
+        const cachedUser = await Local.cache.get("User", () => user);
+        if (user._id != cachedUser._id)
+        {
+          await Local.cache.set("User", user);
+        }
+        const _ids = user.data.componentClasses._ids
+          .filter(id => id);
+        let userComps = await (Local.db.ComponentClasses.where("_id").anyOf(..._ids)).toArray();
+        const missing = (_ids.length - userComps.length);
+        if (missing) {
+          // Load user comps from the server
+          const msg = alertify.message(`<h2>Loading user compons</h2><div class="hourglass"></div><div>(${missing} missing)</div>`).delay(0);
+          userComps = (await liveData.dbp.api.componentClasses.user.get());
+          userComps = userComps.map(c => { return { _id: c._id, name: c.name, _item: c } });
+          await Local.db.ComponentClasses.bulkPut(userComps);
+          msg.dismiss();
+        }
+        return userComps.map(c => c._item);
+      }
+    }
+  },
   pause: () => {
     for (item of liveData.watchedItems) item.dataWatcher.pause();
   },
@@ -18,7 +53,7 @@ var liveData = {
   },
   get: {
     new: {
-      id: async() => { return await liveData.dbp.get.new.id(); }
+      id: async() => { return Date.now(); return await liveData.dbp.get.new.id(); }
     },
     array: (entity, sortKey, options, itemOptions) => {
       var sort = {}; sort[sortKey] = 1;
@@ -90,6 +125,7 @@ var liveData = {
   }
 };
 
+
 window.liveData = liveData;
 
 
@@ -143,7 +179,7 @@ function DataWatcher(getData, onChange)
     setTimeout(this.check, this.checkInterval);
   }
 
-  this.check();
+  //this.check();
 }
 
 function LiveData(dataPersister, options)
@@ -245,3 +281,7 @@ function DatabaseProxyDataPersister(dbp, entity, isArray, filter, sort, data)
     //alertify.message(`${entity} (${item._id}) saved`);
   }
 }
+
+
+
+
