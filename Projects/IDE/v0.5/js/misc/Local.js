@@ -37,6 +37,7 @@ class Local
             }
         },
         set: async (key, value) => {
+            key = md5(key);
             // Store the new value in IndexedDB
             await Local.db.Cache.put({ key, value });
         },
