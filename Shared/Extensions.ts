@@ -175,6 +175,13 @@ const color = {
 interface Number {
   _is(obj: any, type: any): boolean;
   is(type: any): boolean;
+  seconds(): number;
+  minutes(): number;
+  hours(): number;
+  days(): number;
+  weeks(): number;
+  months(): number;
+  years(): number;
   isBetween(min: number, max: number, strictOrder?: boolean): boolean;
   isBetweenOrEq(min: number, max: number, strictOrder?: boolean): boolean;
   pluralize(plural: string): string;
@@ -309,6 +316,34 @@ if (typeof Number !== "undefined") {
 
   Number.prototype.is = function (type: any): boolean {
     return (0)._is(this, type);
+  };
+
+  Number.prototype.seconds = function (): number {
+    return this.valueOf() * 1000;
+  };
+
+  Number.prototype.minutes = function (): number {
+    return (this.valueOf() * 60).seconds();
+  };
+
+  Number.prototype.hours = function (): number {
+    return (this.valueOf() * 60).minutes();
+  };
+
+  Number.prototype.days = function (): number {
+    return (this.valueOf() * 24).hours();
+  };
+
+  Number.prototype.weeks = function (): number {
+    return (this.valueOf() * 7).days();
+  };
+
+  Number.prototype.months = function (): number {
+    return (this.valueOf() * 30).days();
+  };
+
+  Number.prototype.years = function (): number {
+    return (this.valueOf() * 365).days();
   };
 
   Number.prototype.isBetween = function (
