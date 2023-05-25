@@ -169,9 +169,7 @@ import { debug } from "console";
   // #endregion
 
   // #region 📝 Configuration
-  const configObj = await Configuration.new({
-    quitIfChanged: [__filename.replace(".temp.ts", "")],
-  });
+  const configObj = await Configuration.new();
   const config = configObj.data;
   // #endregion
 

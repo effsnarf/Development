@@ -2,6 +2,7 @@ import path from "path";
 import * as colors from "colors";
 import * as fs from "fs";
 import * as jsyaml from "js-yaml";
+import * as moment from "moment";
 import { Objects } from "./Extensions.Objects";
 import { Types } from "./Types";
 import { ChatOpenAI, Roles } from "../Apis/OpenAI/classes/ChatOpenAI";
@@ -46,14 +47,6 @@ class Configuration {
     if (!options) options = {};
     if (!("log" in options)) options.log = true;
     this.options = options;
-  }
-
-  static async new2(filename: string) {
-    return Configuration.new({
-      quitIfChanged: [filename.replace(".temp.ts", "")],
-      toAbsolutePaths: [],
-      types: Types,
-    });
   }
 
   static async new(
@@ -146,9 +139,16 @@ class Configuration {
       }
     });
 
-    if (options.quitIfChanged) {
-      // If the source file or configuration file changes, exit the process (and restart from the cmd file)
-      [...configPaths, ...options.quitIfChanged].distinct().forEach((file) => {
+    // If the source file or configuration file changes, exit the process (and restart from the cmd file)
+    [
+      ...configPaths,
+      ...(options.quitIfChanged ?? []),
+      ...[require.main?.filename.replace(".temp.ts", "")]
+        .filter((s) => s)
+        .map((s) => path.resolve(s as string)),
+    ]
+      .distinct()
+      .forEach((file) => {
         config.log(`${`Watching`.gray} ${file.toShortPath()}`);
         fs.watchFile(file, () => {
           config.log(`${file.yellow} ${`changed, restarting...`.gray}`);
@@ -156,8 +156,47 @@ class Configuration {
         });
       });
 
+    const periodically = config.data.process?.restart?.periodically;
+    if (periodically) {
+      // Restart periodically ({ from: 00:00, every: 1h })
+      const from = moment.duration(periodically.from).asMilliseconds();
+      const every = periodically.every.deunitifyTime();
+      const startOfDay = new Date().setHours(0, 0, 0, 0).valueOf();
+      const times = (24).hours() / every;
+      const points = [];
+      for (
+        let at = startOfDay + from;
+        at < startOfDay + from + times * every;
+        at += every
+      ) {
+        points.push(at);
+      }
+      const nextPoint = points
+        .filter((p) => p > Date.now())
+        .sortBy((p) => p)
+        .first();
+
       config.log();
+      config.log(
+        `${`Restarting every`.gray} ${every.unitifyTime()} ${
+          `from`.gray
+        } ${new Date(startOfDay + from).toLocaleTimeString()}`
+      );
+      config.log(
+        `${`Next restart:`.gray} ${new Date(nextPoint).toLocaleTimeString()}`
+      );
+      const check = () => {
+        const now = new Date(new Date().setMilliseconds(0));
+        if (now.valueOf() == nextPoint) {
+          config.log(`${`Restarting at ${now}`.gray}`);
+          process.exit();
+        }
+      };
+      setInterval(check, (0.5).seconds());
     }
+
+    config.log();
+    await (5).seconds().wait({ log: true });
 
     config.yaml = Configuration.toYaml(config.data);
 

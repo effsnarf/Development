@@ -182,6 +182,7 @@ interface Number {
   weeks(): number;
   months(): number;
   years(): number;
+  wait(options?: { log: boolean }): void;
   isBetween(min: number, max: number, strictOrder?: boolean): boolean;
   isBetweenOrEq(min: number, max: number, strictOrder?: boolean): boolean;
   pluralize(plural: string): string;
@@ -345,6 +346,28 @@ if (typeof Number !== "undefined") {
 
   Number.prototype.years = function (): number {
     return (this.valueOf() * 365).days();
+  };
+
+  Number.prototype.wait = function (options = { log: false }): Promise<void> {
+    let timer: any = null;
+    let started = Date.now();
+    if (options.log) {
+      timer = setInterval(() => {
+        const elapsed = started + this.valueOf() - Date.now();
+        process.stdout.write(`\r`);
+        process.stdout.write(`${`Waiting -`.gray}${elapsed.unitifyTime()}\r`);
+      }, 100);
+    }
+    return new Promise((resolve) =>
+      setTimeout(() => {
+        if (timer) {
+          clearInterval(timer);
+          process.stdout.write("\r");
+          process.stdout.clearLine(0);
+        }
+        resolve();
+      }, this.valueOf())
+    );
   };
 
   Number.prototype.isBetween = function (

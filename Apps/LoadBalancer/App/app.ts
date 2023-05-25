@@ -22,10 +22,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
 (async () => {
   // #region Configuration
   const configObj = await Configuration.new({
-    quitIfChanged: [
-      __filename.replace(".temp.ts", ""),
-      path.resolve("../../../Shared/LoadBalancer.ts"),
-    ],
+    quitIfChanged: [path.resolve("../../../Shared/LoadBalancer.ts")],
     toAbsolutePaths: ["process"],
     types: Types,
   });

@@ -14,7 +14,7 @@ import { Progress } from "@shared/Progress";
 import { Database } from "@shared/Database/Database";
 
 (async () => {
-  const config = (await Configuration.new2(__filename)).data;
+  const config = (await Configuration.new()).data;
 
   const source = await Database.new(config.source.database);
   const target = await Database.new(config.target.database);

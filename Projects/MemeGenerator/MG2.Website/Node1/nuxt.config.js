@@ -6,6 +6,7 @@ const isDevEnv = (process.env.NODE_ENV != 'production');
 const envPort = isDevEnv ? 'http' : 'https';
 const dbProxyHost = isDevEnv ? 'localhost:4040' : 'db.memegenerator.net';
 const config = yaml.load(fs.readFileSync(path.resolve(__dirname, 'config.yaml'), 'utf8'));
+
 export default {
   ssr: false,
 
@@ -95,7 +96,8 @@ export default {
 
   // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
   buildModules: [
-    "@nuxt/typescript-build"
+    "@nuxt/typescript-build",
+    "~/server/startup.ts"
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules

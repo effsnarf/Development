@@ -15,9 +15,9 @@ class Global {
   static get: any = {
     async config() {
       if (!this._config) {
-        this._config = Configuration.new2(
-          path.join(__dirname, "../../config.yaml")
-        );
+        this._config = Configuration.new({
+          quitIfChanged: [path.join(__dirname, "../../config.yaml")],
+        });
       }
       return this._config;
     },

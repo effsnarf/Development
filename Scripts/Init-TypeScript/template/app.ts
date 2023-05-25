@@ -12,7 +12,7 @@ import {
 } from "@shared/Console";
 
 (async () => {
-  const config = (await Configuration.new2(__filename)).data;
+  const config = (await Configuration.new()).data;
 
   console.log("Hello from TypeScript!");
 })();

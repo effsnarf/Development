@@ -1,3 +1,8 @@
 title: MG.DBP.2
 server:
   port: 4042
+process:
+  restart:
+    periodically:
+      from: 01:00
+      every: 30m
