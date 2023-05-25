@@ -29,3 +29,8 @@ analytics:
 log:
   enabled: true
   path: (env) => env.path.resolve(env.process.cwd(), `${env.config.title}.log`)
+process:
+  restart:
+    periodically:
+      from: 00:00
+      every: 30m
