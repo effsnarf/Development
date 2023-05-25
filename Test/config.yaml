@@ -3,3 +3,8 @@ server:
   port: 3000
 database:
   path: (env) => env.path.join(env.process.cwd(), 'Database\\FileSystem')
+process:
+  restart:
+    periodically:
+      from: 08:00
+      every: 1m

@@ -276,7 +276,7 @@ document.addEventListener("DOMContentLoaded", async function() {
           const duration = (end - start) / 1000;
           compDom.components.value.push(...this.comps.ide);
           this.comps.ide.forEach(comp => liveData.watch.item("ComponentClasses", comp, { on: { changed: this.onCompChanged } }));
-          //await vueUserComponentCompiler.compileAll(this.comps.ide, { fix: false }, (p) => { this.$refs.hourglass1.progress = p; });
+          await vueUserComponentCompiler.compileAll(this.comps.ide, { fix: false }, (p) => { this.$refs.hourglass1.progress = p; });
           this.$refs.hourglass1.stop();
           this.isIniting = false;
         },

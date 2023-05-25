@@ -19,6 +19,7 @@
     "colors": "^1.4.0",
     "js-yaml": "^4.1.0",
     "module-alias": "^2.2.2",
+    "moment": "^2.29.4",
     "tsconfig-paths": "^4.2.0"
   }
 }
