@@ -464,29 +464,31 @@ class LoadBalancer {
     incomingItem.isProcessing = true;
 
     // Check if we have a cached response
-    if (this.isCachable(request)) {
-      const cachedResponse = (await this.cache.get(
-        request.url || ""
-      )) as CachedResponse;
-      if (cachedResponse) {
-        incomingItem.returnToClient = false;
-        this.sendToClient(incomingItem, cachedResponse);
-        this.log({
-          node: { index: incomingItem.nodeItem.index },
-          texts: [
-            incomingItem.request.method,
-            cachedResponse.status.code.toString().gray,
-            cachedResponse.body.length.unitifySize().gray,
-            timer.elapsed?.unitifyTime(),
-            incomingItem.request.url?.gray,
-          ],
-        });
-        // If the cached response is still valid, we don't need to process the request
-        if (
-          Date.now() - cachedResponse.dt <
-          this.options.cache?.max?.age?.deunitifyTime()
-        ) {
-          return;
+    if (this.cache) {
+      if (this.isCachable(request)) {
+        const cachedResponse = (await this.cache.get(
+          request.url || ""
+        )) as CachedResponse;
+        if (cachedResponse) {
+          incomingItem.returnToClient = false;
+          this.sendToClient(incomingItem, cachedResponse);
+          this.log({
+            node: { index: incomingItem.nodeItem.index },
+            texts: [
+              incomingItem.request.method,
+              cachedResponse.status.code.toString().gray,
+              cachedResponse.body.length.unitifySize().gray,
+              timer.elapsed?.unitifyTime(),
+              incomingItem.request.url?.gray,
+            ],
+          });
+          // If the cached response is still valid, we don't need to process the request
+          if (
+            Date.now() - cachedResponse.dt <
+            this.options.cache?.max?.age?.deunitifyTime()
+          ) {
+            return;
+          }
         }
       }
     }
