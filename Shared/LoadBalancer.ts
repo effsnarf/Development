@@ -331,7 +331,6 @@ class LoadBalancer {
     incomingItem.infos.push(`writing headers`);
 
     let data = nodeResponse.data;
-    if (typeof data == "function") data = await data();
     if (typeof data != "string") data = Objects.jsonify(data);
 
     if (this.cache) {
@@ -346,7 +345,16 @@ class LoadBalancer {
           headers: nodeResponse.headers,
           body: data,
         };
-        await this.cache.set(incomingItem.request.url || "", cachedResponse);
+        try {
+          await this.cache.set(incomingItem.request.url || "", cachedResponse);
+        } catch (ex: any) {
+          this.log(`${`Error caching response`}\n${ex.message}`);
+          try {
+            this.log(Objects.yamlify(cachedResponse.body));
+          } catch (ex: any) {
+            this.log(`Error yamlifying response body`);
+          }
+        }
       }
     }
 
