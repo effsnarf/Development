@@ -11,6 +11,7 @@ incoming:
       database:
         path: (env) => env.path.resolve("c:\\Database\\Cache", env.config.title)
     prod:
+      enabled: true
       database:
         path: (env) => env.path.resolve("f:\\Cache", `${env.config.title}`)
 nodes:
