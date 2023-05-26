@@ -124,7 +124,7 @@ class Files {
 
       // Count the number of files/folders in the master directory (recursively)
       if (!progress) {
-        const pathsCount = await Files.CountPaths(master, filter, recursive);
+        const pathsCount = await Files.countPaths(master, filter, recursive);
 
         // onProgress(
         //   progress!,
@@ -228,7 +228,7 @@ class Files {
   }
 
   // Count the number of files/folders in a directory (recursively)
-  static async CountPaths(
+  static async countPaths(
     directory: string,
     filter: PathFilter,
     recursive: boolean = true,
@@ -248,7 +248,7 @@ class Files {
 
         if (fs.statSync(path).isDirectory()) {
           if (recursive) {
-            count += await Files.CountPaths(path, filter, recursive);
+            count += await Files.countPaths(path, filter, recursive);
             onCount(count);
           }
         }
