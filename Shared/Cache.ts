@@ -8,6 +8,25 @@ abstract class CacheBase {
   abstract set<T>(key: string, value: T): void;
 }
 
+class MemoryCache extends CacheBase {
+  private items: { [key: string]: any } = {};
+
+  static new() {
+    return new MemoryCache();
+  }
+
+  async get<T>(key: string, getDefaultValue: () => T) {
+    if (this.items[key]) return this.items[key];
+    const value = await getDefaultValue();
+    this.items[key] = value;
+    return value;
+  }
+
+  set<T>(key: string, value: T) {
+    this.items[key] = value;
+  }
+}
+
 class OsTempFolderCache extends CacheBase {
   static new() {
     return new OsTempFolderCache();
@@ -54,4 +73,4 @@ class OsTempFolderCache extends CacheBase {
   }
 }
 
-export { OsTempFolderCache };
+export { MemoryCache, OsTempFolderCache };

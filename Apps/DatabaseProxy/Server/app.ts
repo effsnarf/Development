@@ -11,6 +11,7 @@ import { Http } from "@shared/Http";
 import { Timer, IntervalCounter } from "@shared/Timer";
 import { Reflection } from "@shared/Reflection";
 import { Google } from "@shared/Google";
+import { Cache, MemoryCache } from "@shared/Cache";
 import {
   Console,
   Layout,
@@ -28,6 +29,8 @@ import { MongoDatabase } from "@shared/Database/MongoDatabase";
 import { Analytics } from "@shared/Analytics";
 import { debug } from "console";
 // #endregion
+
+const cache = MemoryCache.new();
 
 const getResponseSize = (response: any) => {
   if (!response.headers) return null;
@@ -546,7 +549,10 @@ const getResponseSize = (response: any) => {
         // Response type
         res.setHeader("Content-Type", "application/json");
         const db = await dbs.get(req.params.database);
-        const apiMethods = await db?.find("_ApiMethods", {});
+        const apiMethods = cache.get(
+          "_ApiMethods",
+          async () => await db?.find("_ApiMethods", {})
+        );
         const entityNames = apiMethods?.map((m: any) => m.entity).distinct();
         const entities = entityNames?.map((en: any) => {
           const groups = apiMethods
