@@ -384,18 +384,30 @@ import { debug } from "console";
           itemsLog.log(
             req.method,
             res.statusCode.severifyByHttpStatus(),
-            timer.elapsed?.severify(
-              ...(config.requests.severity.time as [number, number, "<" | ">"])
-            ),
+            timer.elapsed
+              ?.unitifyTime()
+              .severify(
+                ...(config.requests.severity.time as [
+                  number,
+                  number,
+                  "<" | ">"
+                ])
+              ),
             req.url
           );
         } catch (ex: any) {
           itemsLog.log(
             req.method,
             res.statusCode.severifyByHttpStatus(),
-            timer.elapsed?.severify(
-              ...(config.requests.severity.time as [number, number, "<" | ">"])
-            ),
+            timer.elapsed
+              ?.unitifyTime()
+              .severify(
+                ...(config.requests.severity.time as [
+                  number,
+                  number,
+                  "<" | ">"
+                ])
+              ),
             req.url.bgRed,
             ex.message.bgRed
           );
