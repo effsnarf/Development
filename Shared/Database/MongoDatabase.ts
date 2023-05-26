@@ -8,7 +8,7 @@ import { MongoClient, ObjectId } from "mongodb";
 class MongoDatabase extends DatabaseBase {
   private client: MongoClient;
 
-  constructor(connectionString: string, private database: string) {
+  constructor(connectionString: string, public database: string) {
     super();
     this.client = new MongoClient(connectionString);
   }

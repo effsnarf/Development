@@ -30,7 +30,21 @@ import { Analytics } from "@shared/Analytics";
 import { debug } from "console";
 // #endregion
 
-const cache = MemoryCache.new();
+const memoryCache = MemoryCache.new();
+
+const cache = {
+  get: {
+    api: {
+      methods: async (db: MongoDatabase | undefined) => {
+        if (!db) return null;
+        return await memoryCache.get(
+          `${db.database}._ApiMethods`,
+          async () => await db?.find("_ApiMethods", {})
+        );
+      },
+    },
+  },
+};
 
 const getResponseSize = (response: any) => {
   if (!response.headers) return null;
@@ -549,10 +563,7 @@ const getResponseSize = (response: any) => {
         // Response type
         res.setHeader("Content-Type", "application/json");
         const db = await dbs.get(req.params.database);
-        const apiMethods = await cache.get(
-          "_ApiMethods",
-          async () => await db?.find("_ApiMethods", {})
-        );
+        const apiMethods = await cache.get.api.methods(db);
         const entityNames = apiMethods?.map((m: any) => m.entity).distinct();
         const entities = entityNames?.map((en: any) => {
           const groups = apiMethods
@@ -588,11 +599,12 @@ const getResponseSize = (response: any) => {
         res.setHeader("Content-Type", "application/json");
 
         const db = await dbs.get(req.params.database);
-        const apiMethods = await db?.find("_ApiMethods", {
-          entity: req.params.entity,
-          group: req.params.group,
-          name: req.params.method,
-        });
+        const apiMethods = (await cache.get.api.methods(db)).filter(
+          (m: any) =>
+            m.entity == req.params.entity &&
+            m.group == req.params.group &&
+            m.name == req.params.method
+        );
         if (!apiMethods?.length)
           return res.status(404).send("Method not found");
         const apiMethod = apiMethods[0];
