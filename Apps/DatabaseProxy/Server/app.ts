@@ -11,7 +11,7 @@ import { Http } from "@shared/Http";
 import { Timer, IntervalCounter } from "@shared/Timer";
 import { Reflection } from "@shared/Reflection";
 import { Google } from "@shared/Google";
-import { Cache, MemoryCache } from "@shared/Cache";
+import { MemoryCache } from "@shared/Cache";
 import {
   Console,
   Layout,
