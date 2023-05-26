@@ -271,7 +271,7 @@ const getResponseSize = (response: any) => {
             dbs._analytics?.create(
               className,
               methodName,
-              { args },
+              { database: { name: dbName }, args },
               timer.elapsed
             );
           }
