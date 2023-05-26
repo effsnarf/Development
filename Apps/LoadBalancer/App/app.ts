@@ -28,6 +28,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   });
 
   const config = configObj.data;
+
   // #endregion
 
   // #region Helper functions
@@ -81,7 +82,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   // #endregion
 
   // Create the load balancer
-  const loadBalancer = LoadBalancer.new(config.incoming);
+  const loadBalancer = await LoadBalancer.new(config.incoming);
 
   // #region Dashboard
 

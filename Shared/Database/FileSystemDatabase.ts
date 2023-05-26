@@ -19,6 +19,23 @@ class FileSystemDatabase extends DatabaseBase {
     return db;
   }
 
+  async get(collectionName: string, key: any): Promise<any> {
+    const filePath = await this.getFilePath(collectionName, key);
+    if (!fs.existsSync(filePath)) return null;
+    return JSON.parse(fs.readFileSync(filePath, "utf8"));
+  }
+
+  async set(collectionName: string, key: any, value: any): Promise<void> {
+    const filePath = await this.getFilePath(collectionName, key);
+    const json = JSON.stringify(value);
+    fs.writeFileSync(filePath, json);
+  }
+
+  async has(collectionName: string, key: any): Promise<boolean> {
+    const filePath = await this.getFilePath(collectionName, key);
+    return fs.existsSync(filePath);
+  }
+
   async find(
     collectionName: string,
     query: any,

@@ -3,6 +3,7 @@ import fs from "fs";
 import "colors";
 import http from "http";
 import axios, { AxiosResponse, AxiosResponseHeaders } from "axios";
+import { Cache, CacheBase } from "./Cache";
 import { Objects } from "./Extensions.Objects";
 import { Types } from "./Types";
 import { System } from "./System";
@@ -103,6 +104,17 @@ interface IncomingItem {
   request: http.IncomingMessage;
   response: http.ServerResponse;
   requestPostData: any;
+  returnToClient: boolean;
+}
+
+interface CachedResponse {
+  dt: number;
+  status: {
+    code: number;
+    text: string;
+  };
+  headers: any;
+  body: string;
 }
 
 interface LoadBalancerOptions {
@@ -118,6 +130,11 @@ interface LoadBalancerOptions {
   };
   severity: {
     time: [number, number, "<" | ">"];
+  };
+  cache: {
+    max: {
+      age: string;
+    };
   };
 }
 
@@ -153,6 +170,7 @@ class IncomingItemCollection {
 
 class LoadBalancer {
   incomingItemID: number = 1;
+  cache!: CacheBase;
   events = new Events();
   private readonly nodeSwitcher = new NodeSwitcher(this.events);
   readonly stats = {
@@ -188,8 +206,10 @@ class LoadBalancer {
 
   constructor(private options: LoadBalancerOptions) {}
 
-  static new(options: LoadBalancerOptions) {
-    return new LoadBalancer(options);
+  static async new(options: LoadBalancerOptions) {
+    const lb = new LoadBalancer(options);
+    lb.cache = await Cache.new(options.cache);
+    return lb;
   }
 
   addNode(node: Node) {
@@ -254,6 +274,7 @@ class LoadBalancer {
       request, // The request object
       response, // The response object
       requestPostData: requestPostData, // The request body
+      returnToClient: true, // Should this request be returned to the client?
     };
 
     this.incomingItems.add(incomingItem);
@@ -266,9 +287,11 @@ class LoadBalancer {
     const elapsed = Date.now() - item.dt;
     // Remove the item from the incoming items collection
     this.incomingItems.remove(item);
-    // Respond with a 504 Gateway Timeout
-    item.response.statusCode = 504;
-    item.response.end();
+    if (item.returnToClient) {
+      // Respond with a 504 Gateway Timeout
+      item.response.statusCode = 504;
+      item.response.end();
+    }
     // Log the timeout
     this.log(
       `${`Timed out`.bgRed} ${elapsed
@@ -307,38 +330,40 @@ class LoadBalancer {
 
     incomingItem.infos.push(`writing headers`);
 
-    incomingItem.response.statusCode = status;
-    incomingItem.response.statusMessage = nodeResponse?.statusText || "";
+    if (incomingItem.returnToClient) {
+      incomingItem.response.statusCode = status;
+      incomingItem.response.statusMessage = nodeResponse?.statusText || "";
 
-    const getNodeHeaders = (options: { cors: boolean }) =>
-      Object.keys(nodeResponse?.headers || {}).filter(
-        (key) =>
-          key.toLowerCase().startsWith("access-control-allow-origin") ===
-          options.cors
-      );
+      const getNodeHeaders = (options: { cors: boolean }) =>
+        Object.keys(nodeResponse?.headers || {}).filter(
+          (key) =>
+            key.toLowerCase().startsWith("access-control-allow-origin") ===
+            options.cors
+        );
 
-    // Copy all the headers from the node response to the incoming response
-    // except CORS headers
-    getNodeHeaders({ cors: false }).forEach((key) => {
-      incomingItem.response.setHeader(
-        key,
-        nodeResponse?.headers[key] as string
-      );
-    });
+      // Copy all the headers from the node response to the incoming response
+      // except CORS headers
+      getNodeHeaders({ cors: false }).forEach((key) => {
+        incomingItem.response.setHeader(
+          key,
+          nodeResponse?.headers[key] as string
+        );
+      });
 
-    const nodeCorsHeaders = getNodeHeaders({ cors: true });
-    // If the node response has CORS headers, log a warning
-    // if (nodeCorsHeaders.length) {
-    //   this.log(
-    //     `${`Not forwarding node CORS headers`.bgYellow.black}: ${nodeCorsHeaders
-    //       .map((key) => `${key}: ${nodeResponse?.headers[key]}`)
-    //       .join(", ")}`
-    //   );
-    // }
+      const nodeCorsHeaders = getNodeHeaders({ cors: true });
+      // If the node response has CORS headers, log a warning
+      // if (nodeCorsHeaders.length) {
+      //   this.log(
+      //     `${`Not forwarding node CORS headers`.bgYellow.black}: ${nodeCorsHeaders
+      //       .map((key) => `${key}: ${nodeResponse?.headers[key]}`)
+      //       .join(", ")}`
+      //   );
+      // }
 
-    incomingItem.infos.push(`piping data`);
+      incomingItem.infos.push(`piping data`);
 
-    nodeResponse.data.pipe(incomingItem.response);
+      nodeResponse.data.pipe(incomingItem.response);
+    }
 
     let nodeResponseSize = parseInt(
       nodeResponse.headers["content-length"] || 0
@@ -419,6 +444,8 @@ class LoadBalancer {
   }
 
   private async processIncomingItem(incomingItem: IncomingItem) {
+    const timer = Timer.start();
+
     const { request, response, nodeItem } = incomingItem;
 
     if (request.url == this.options.os?.restart?.url) {
@@ -436,13 +463,37 @@ class LoadBalancer {
 
     incomingItem.isProcessing = true;
 
-    incomingItem.nodeItem;
+    // Check if we have a cached response
+    if (this.isCachable(request)) {
+      const cachedResponse = (await this.cache.get(
+        request.url || ""
+      )) as CachedResponse;
+      if (cachedResponse) {
+        incomingItem.returnToClient = false;
+        this.sendToClient(incomingItem, cachedResponse);
+        this.log({
+          node: { index: incomingItem.nodeItem.index },
+          texts: [
+            incomingItem.request.method,
+            cachedResponse.status.code.toString().gray,
+            cachedResponse.body.length.unitifySize().gray,
+            timer.elapsed?.unitifyTime(),
+            incomingItem.request.url?.gray,
+          ],
+        });
+        // If the cached response is still valid, we don't need to process the request
+        if (
+          Date.now() - cachedResponse.dt <
+          this.options.cache?.max?.age?.deunitifyTime()
+        ) {
+          return;
+        }
+      }
+    }
 
     const url = `${nodeItem.node.address.protocol}://${nodeItem.node.address.host}:${nodeItem.node.address.port}${request.url}`;
 
     let logMsg = request.url || "";
-
-    const timer = Timer.start();
 
     try {
       const options = {
@@ -508,6 +559,20 @@ class LoadBalancer {
     }
   }
 
+  private async sendToClient(
+    incomingItem: IncomingItem,
+    cachedResponse: CachedResponse
+  ): Promise<void> {
+    const { response } = incomingItem;
+    const { status } = cachedResponse;
+    const { headers, body } = cachedResponse;
+
+    response.statusCode = status.code;
+    response.statusMessage = status.text;
+    response.writeHead(status.code, headers);
+    response.end(body);
+  }
+
   toggleNodeEnabled(nodeIndex: number) {
     this.nodeSwitcher.toggleEnabled(nodeIndex);
   }
@@ -520,6 +585,19 @@ class LoadBalancer {
   private log(data: any) {
     if (typeof data == "string") data = { text: data };
     this.events.emit("log", data);
+  }
+
+  private isCachable(request: http.IncomingMessage) {
+    if (!this.options.cache) return false;
+    if (request.method != "GET") return false;
+    if (!request.url) return false;
+    if (
+      [".jpg", ".jpeg", ".png", ".gif"].some((ext) =>
+        request.url?.toLowerCase().endsWith(ext)
+      )
+    )
+      return false;
+    return true;
   }
 
   start() {

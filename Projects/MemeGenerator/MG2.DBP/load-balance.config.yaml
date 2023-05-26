@@ -6,6 +6,14 @@ incoming:
   cors: [https://memegenerator.net, https://vue-studio.com, http://localhost]
   severity:
     time: [100, 500, "<"]
+  cache:
+    dev:
+      database:
+        path: (env) => env.path.resolve("c:\\Database\\Cache", env.config.title)
+    prod:
+      zero:
+        database:
+          path: (env) => "f:\\Cache", `${env.config.title}`)
 nodes:
   - name: MG.DBP 1
     address: localhost:4041

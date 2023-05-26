@@ -268,6 +268,7 @@ interface String {
 
   ipToNumber(): number;
   decodeBase64(): string;
+  hashCode(): number;
 }
 
 interface Array<T> {
@@ -286,6 +287,7 @@ interface Array<T> {
 interface Function {
   is(type: any): boolean;
   getArgumentNames(): string[];
+  postpone(ms: number): (...args: any[]) => any;
 }
 // #endregion
 
@@ -988,6 +990,20 @@ if (typeof String !== "undefined") {
   String.prototype.decodeBase64 = function (): string {
     return Buffer.from(this, "base64").toString("ascii");
   };
+
+  String.prototype.hashCode = function (): number {
+    const str = this.toString();
+    let hash = 0;
+    if (str.length === 0) {
+      return hash;
+    }
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = (hash << 5) - hash + char;
+      hash = hash & hash; // Convert to 32-bit integer
+    }
+    return hash;
+  };
 }
 // #endregion
 
@@ -1069,6 +1085,13 @@ if (typeof Function !== "undefined") {
       .slice(code.indexOf("(") + 1, code.indexOf(")"))
       .match(/([^\s,]+)/g);
     return args || [];
+  };
+
+  Function.prototype.postpone = function (delay: number) {
+    const fn = this;
+    return () => {
+      setTimeout(fn, delay);
+    };
   };
 }
 

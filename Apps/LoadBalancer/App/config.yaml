@@ -1,3 +1,4 @@
+title: LoadBalancer
 incoming:
   address:
     host: localhost
@@ -8,6 +9,10 @@ incoming:
       url: /restart/Jz0xnwG1bDv57LFpKTS6UkV8h9XQtCeBOMl2NHfRIj3yPcZYimAsrqdV4oWEaFhu
   severity:
     time: [100, 500, "<"]
+  cache:
+    database:
+      path:
+        prod: (env) => env.path.resolve(env.process.cwd(), `..\\`, `${env.config.title}.log`)
 nodes:
   - name: Website 1
     protocol: https

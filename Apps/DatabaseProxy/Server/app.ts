@@ -11,7 +11,7 @@ import { Http } from "@shared/Http";
 import { Timer, IntervalCounter } from "@shared/Timer";
 import { Reflection } from "@shared/Reflection";
 import { Google } from "@shared/Google";
-import { MemoryCache } from "@shared/Cache";
+import { Cache } from "@shared/Cache";
 import {
   Console,
   Layout,
@@ -30,7 +30,7 @@ import { Analytics } from "@shared/Analytics";
 import { debug } from "console";
 // #endregion
 
-const memoryCache = MemoryCache.new();
+const memoryCache = Cache.new({ memory: true });
 
 const cache = {
   get: {
@@ -517,7 +517,7 @@ const getResponseSize = (response: any) => {
             .status(404)
             .send(`Database ${req.params.database} not found`);
 
-        const entities = (await cache.get.collection.names(db)).filter(
+        const entities = (await cache.get.collection.names(db))?.filter(
           (e: string) => !e.startsWith("_")
         );
         return res.send(entities);
@@ -608,7 +608,7 @@ const getResponseSize = (response: any) => {
         res.setHeader("Content-Type", "application/json");
 
         const db = await dbs.get(req.params.database);
-        const apiMethods = (await cache.get.api.methods(db)).filter(
+        const apiMethods = (await cache.get.api.methods(db))?.filter(
           (m: any) =>
             m.entity == req.params.entity &&
             m.group == req.params.group &&

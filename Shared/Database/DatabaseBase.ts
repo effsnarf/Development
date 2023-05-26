@@ -6,6 +6,12 @@ import { ProducerConsumer } from "../ProducerConsumer";
 abstract class DatabaseBase {
   private newIds = new ProducerConsumer(100, this._getNewIDs.bind(this));
 
+  abstract get(collectionName: string, key: any): Promise<any>;
+
+  abstract set(collectionName: string, key: any, value: any): Promise<void>;
+
+  abstract has(collectionName: string, key: any): Promise<boolean>;
+
   abstract find(
     collectionName: string,
     query: any,
