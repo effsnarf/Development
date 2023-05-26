@@ -9,6 +9,7 @@ import cookieParser from "cookie-parser";
 import "@shared/Extensions";
 import { Http } from "@shared/Http";
 import { Timer, IntervalCounter } from "@shared/Timer";
+import { Reflection } from "@shared/Reflection";
 import { Google } from "@shared/Google";
 import {
   Console,
@@ -258,16 +259,21 @@ const getResponseSize = (response: any) => {
           dbName
         );
 
-        db.onMethodDone.push(
-          (method: string, args: any[], result: any, dt: any) => {
-            const loggedMethods = ["aggregate"];
-            if (!loggedMethods.includes(method)) return;
-            if (dt.elapsed < config.analytics.min.elapsed) return;
-            let argsJson = JSON.stringify(args);
+        Reflection.bindClassMethods(
+          db,
+          () => Timer.start(),
+          (timer, className, methodName, args) => {
+            if (timer.elapsed < config.analytics.min.elapsed) return;
             // Remove the $ from $match, $sort, etc, because it can't be stored in MongoDB
-            argsJson = argsJson.replace(/\$([a-z]+)/g, "$1");
-            args = JSON.parse(argsJson);
-            dbs._analytics?.create("db", method, { args }, dt.elapsed);
+            args = args.map((arg) =>
+              JSON.parse(JSON.stringify(arg).replace(/\$([a-z]+)/g, "$1"))
+            );
+            dbs._analytics?.create(
+              className,
+              methodName,
+              { args },
+              timer.elapsed
+            );
           }
         );
 

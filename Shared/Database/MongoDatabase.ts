@@ -7,12 +7,6 @@ import { MongoClient, ObjectId } from "mongodb";
 
 class MongoDatabase extends DatabaseBase {
   private client: MongoClient;
-  public onMethodDone: ((
-    method: string,
-    args: any[],
-    result: any,
-    dt: any
-  ) => void)[] = [];
 
   constructor(connectionString: string, private database: string) {
     super();
