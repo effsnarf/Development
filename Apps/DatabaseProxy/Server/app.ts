@@ -549,7 +549,7 @@ const getResponseSize = (response: any) => {
         // Response type
         res.setHeader("Content-Type", "application/json");
         const db = await dbs.get(req.params.database);
-        const apiMethods = cache.get(
+        const apiMethods = await cache.get(
           "_ApiMethods",
           async () => await db?.find("_ApiMethods", {})
         );
