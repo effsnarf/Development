@@ -177,7 +177,11 @@ import { debug } from "console";
 
   // #region Create the dashboard layout
   const mainLog = Log.new(config.title);
-  const itemsLog = Log.new("Items");
+  const itemsLog = Log.new("Items", {
+    columns: [4, 3, 6, 6],
+    breakLines: true,
+    extraSpaceForBytes: true,
+  });
   const debugLog = Logger.new(config.log);
 
   const configLog = Log.new(`Configuration`);
@@ -296,11 +300,7 @@ import { debug } from "console";
         const body = req.body;
         const proxyUrl = `https://${config.server.proxy}${url}`;
 
-        itemsLog.log(
-          `${`${method.yellow} ${url.gray}`.padEnd(50)} ${"->".gray} ${
-            proxyUrl.yellow
-          }`
-        );
+        const timer = Timer.start();
 
         axios({
           method: method,
@@ -308,18 +308,53 @@ import { debug } from "console";
           data: body,
         })
           .then((response: any) => {
+            itemsLog.log(
+              method,
+              response.status.severifyByHttpStatus(),
+              timer.elapsed?.severify(
+                ...(config.requests.severity.time as [
+                  number,
+                  number,
+                  "<" | ">"
+                ])
+              ),
+              proxyUrl
+            );
             res.status(response.status);
             res.send(response.data);
             res.end();
           })
           .catch((ex: any) => {
-            itemsLog.log(proxyUrl.bgRed);
             if (!ex.response) {
-              itemsLog.log(ex.message.bgRed);
+              itemsLog.log(
+                method,
+                null,
+                timer.elapsed?.severify(
+                  ...(config.requests.severity.time as [
+                    number,
+                    number,
+                    "<" | ">"
+                  ])
+                ),
+                proxyUrl.bgRed,
+                ex.message.bgRed
+              );
               return;
             }
             if (ex.response.status != 404) {
-              itemsLog.log(JSON.stringify(ex.response.data).bgRed);
+              itemsLog.log(
+                method,
+                ex.response.status.severifyByHttpStatus(),
+                timer.elapsed?.severify(
+                  ...(config.requests.severity.time as [
+                    number,
+                    number,
+                    "<" | ">"
+                  ])
+                ),
+                proxyUrl,
+                JSON.stringify(ex.response.data).bgRed
+              );
             }
             res.status(ex.response.status).send(ex.response.data);
           });
@@ -332,17 +367,32 @@ import { debug } from "console";
     // #region processRequest() helper
     const processRequest = (handler: any) => {
       return async (req: any, res: any) => {
+        const timer = Timer.start();
         try {
           requests.per.minute.track(1);
           debugLog.log(req.url);
-          itemsLog.log(req.url);
           // Get the POST data
           const data = await Http.getPostData(req);
           const user = await User.get(req, res, data);
           await handler(req, res, user, data);
+          itemsLog.log(
+            req.method,
+            res.statusCode.severifyByHttpStatus(),
+            timer.elapsed?.severify(
+              ...(config.requests.severity.time as [number, number, "<" | ">"])
+            ),
+            req.url
+          );
         } catch (ex: any) {
-          itemsLog.log(req.url.bgRed);
-          itemsLog.log(ex.message.bgRed);
+          itemsLog.log(
+            req.method,
+            res.statusCode.severifyByHttpStatus(),
+            timer.elapsed?.severify(
+              ...(config.requests.severity.time as [number, number, "<" | ">"])
+            ),
+            req.url.bgRed,
+            ex.message.bgRed
+          );
           res.status(500).send(ex.stack);
         }
       };
@@ -532,15 +582,6 @@ import { debug } from "console";
             dbs._analytics?.create("api", methodStr, { args }, elapsed);
           }
 
-          itemsLog.log(
-            `${elapsed
-              .unitifyTime()
-              .severify(50, 500, "<")
-              .padStartChars(8)} ${`${methodStr}`}(${util
-              .inspect(args, { colors: true })
-              .replace("\n", "")})`
-          );
-
           return res.send(result);
         } catch (ex: any) {
           return res
@@ -574,8 +615,6 @@ import { debug } from "console";
             $limit: config.database.query.max.docs,
           },
         ];
-
-        //itemsLog.log(pipeline);
 
         const items = await db?.aggregate(req.params.entity, pipeline);
 
