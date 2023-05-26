@@ -12,6 +12,7 @@ abstract class CacheBase {
 
 class Cache {
   static async new(config: any): Promise<CacheBase> {
+    if (config.memory) return MemoryCache.new();
     if (config.zero) {
       return ZeroCache.new(await Cache.new(config.zero));
     }
