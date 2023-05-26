@@ -13,7 +13,7 @@ incoming:
     prod:
       zero:
         database:
-          path: (env) => "f:\\Cache", `${env.config.title}`)
+          path: (env) => env.path.resolve("f:\\Cache", `${env.config.title}`)
 nodes:
   - name: MG.DBP 1
     address: localhost:4041
