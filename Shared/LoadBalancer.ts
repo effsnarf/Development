@@ -330,27 +330,29 @@ class LoadBalancer {
 
     incomingItem.infos.push(`writing headers`);
 
-    let data = nodeResponse.data;
-    if (typeof data != "string") data = Objects.jsonify(data);
-
     if (this.cache) {
       if (this.isCachable(incomingItem.request)) {
-        // Get the response data
-        const cachedResponse = {
-          dt: Date.now(),
-          status: {
-            code: nodeResponse.status,
-            text: nodeResponse.statusText,
-          },
-          headers: nodeResponse.headers,
-          body: data,
-        };
         try {
+          this.log(typeof nodeResponse.data);
+
+          let data = nodeResponse.data;
+          if (typeof data != "string") data = Objects.jsonify(data);
+
+          // Get the response data
+          const cachedResponse = {
+            dt: Date.now(),
+            status: {
+              code: nodeResponse.status,
+              text: nodeResponse.statusText,
+            },
+            headers: nodeResponse.headers,
+            body: data,
+          };
           await this.cache.set(incomingItem.request.url || "", cachedResponse);
         } catch (ex: any) {
           this.log(`${`Error caching response`}\n${ex.message}`);
           try {
-            this.log(Objects.yamlify(cachedResponse.body));
+            this.log(Objects.yamlify(nodeResponse.data));
           } catch (ex: any) {
             this.log(`Error yamlifying response body`);
           }
