@@ -60,6 +60,8 @@ const getResponseSize = (response: any) => {
       const database = req.params.database;
       if (!database) return null;
 
+      if (!(config.dbs || [])[database]?.users?.enabled) return null;
+
       const db = await dbs.get(database);
 
       // Google login

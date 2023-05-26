@@ -29,3 +29,10 @@ log:
 requests:
   severity:
     time: [100, 500, "<"]
+dbs:
+  IDE:
+    users:
+      enabled: true
+  MemeGenerator:
+    users:
+      enabled: false

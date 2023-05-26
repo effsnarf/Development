@@ -30,3 +30,11 @@ process:
     periodically:
       from: 00:00
       every: 1h
+db:
+  IDE:
+    users:
+      enabled: true
+  MemeGenerator:
+    users:
+      enabled: false
+```
