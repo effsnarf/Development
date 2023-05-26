@@ -89,7 +89,7 @@ class Objects {
     try {
       return JSON.stringify(obj, null, 2);
     } catch (ex: any) {
-      throw `Error stringifying object\n${ex.message}\n${obj.yamlify()}`;
+      throw `Error stringifying object\n${ex.message}\n${Objects.yamlify(obj)}`;
     }
   }
 
