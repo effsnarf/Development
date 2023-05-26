@@ -61,11 +61,16 @@ class FileSystemDatabase extends DatabaseBase {
     // List files in collectionPath recursively
     for (const file of Files.listFiles(collectionPath, { recursive: true })) {
       if (limit && docsYieldedCount >= limit) return;
-      let doc = JSON.parse(fs.readFileSync(file, "utf8"));
-      if (lowercaseFields) {
-        doc = Objects.toCamelCaseKeys(doc);
+      try {
+        let doc = JSON.parse(fs.readFileSync(file, "utf8"));
+        if (lowercaseFields) {
+          doc = Objects.toCamelCaseKeys(doc);
+        }
+        yield doc;
+      } catch (ex) {
+        console.error(`${`Error parsing JSON at`.bgRed} ${file.toShortPath()}`);
+        console.log();
       }
-      yield doc;
       docsYieldedCount++;
     }
     return; // No more docs
@@ -98,15 +103,13 @@ class FileSystemDatabase extends DatabaseBase {
     return new Promise((resolve, reject) => {
       if (query) throw new Error("Query not implemented");
       let count = 0;
-      for (const file of Files.listFiles(
-        path.join(this.basePath, collectionName),
-        { recursive: true }
-      )) {
+      const collectionPath = path.join(this.basePath, collectionName);
+      for (const file of Files.listFiles(collectionPath, { recursive: true })) {
         count++;
         console.log(
-          `${count.toLocaleString().green} ${`files found in`.gray} ${
-            collectionName.yellow
-          }`
+          `${count.toLocaleString().green} ${
+            `files found in`.gray
+          } ${collectionPath.toShortPath()}`
         );
         // Move the cursor up one line
         process.stdout.write("\u001B[1A");
