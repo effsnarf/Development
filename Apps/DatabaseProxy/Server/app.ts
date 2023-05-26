@@ -29,6 +29,7 @@ import { debug } from "console";
 // #endregion
 
 const getResponseSize = (response: any) => {
+  if (!response.headers) return null;
   return parseInt(response.headers["content-length"] || 0);
 };
 
