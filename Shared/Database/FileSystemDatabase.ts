@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+import "../Extensions";
 import { Objects } from "../Extensions.Objects";
 import { Files } from "../Files";
 import { DatabaseBase } from "./DatabaseBase";
@@ -161,7 +162,9 @@ class FileSystemDatabase extends DatabaseBase {
     return collectionNames;
   }
 
-  private getFilePath(collectionName: string, id: number) {
+  private getFilePath(collectionName: string, key: any) {
+    if (typeof key != "string") key = JSON.stringify(key);
+    const id = key.hashCode();
     const dir1 = Math.floor(id / 1000000).toString();
     const dir2 = Math.floor(id / 1000).toString();
     const dirPath = path.join(this.basePath, collectionName, dir1, dir2);
