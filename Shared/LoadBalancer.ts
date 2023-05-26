@@ -331,17 +331,19 @@ class LoadBalancer {
     incomingItem.infos.push(`writing headers`);
 
     if (this.cache) {
-      // Get the response data
-      const cachedResponse = {
-        dt: Date.now(),
-        status: {
-          code: nodeResponse.status,
-          text: nodeResponse.statusText,
-        },
-        headers: nodeResponse.headers,
-        body: nodeResponse.data.toString("utf8"),
-      };
-      await this.cache.set(incomingItem.request.url || "", cachedResponse);
+      if (this.isCachable(incomingItem.request)) {
+        // Get the response data
+        const cachedResponse = {
+          dt: Date.now(),
+          status: {
+            code: nodeResponse.status,
+            text: nodeResponse.statusText,
+          },
+          headers: nodeResponse.headers,
+          body: nodeResponse.data.toString("utf8"),
+        };
+        await this.cache.set(incomingItem.request.url || "", cachedResponse);
+      }
     }
 
     if (incomingItem.returnToClient) {
