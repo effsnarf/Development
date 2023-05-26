@@ -85,6 +85,14 @@ class Objects {
     return jsyaml.dump(obj);
   }
 
+  static jsonify(obj: any): string {
+    try {
+      return JSON.stringify(obj, null, 2);
+    } catch (ex: any) {
+      throw `Error stringifying object\n${ex.message}\n${obj.yamlify()}`;
+    }
+  }
+
   static deepMerge(target: any, ...objects: any[]): any {
     const deepMerge = (tgt: any, src: any) => {
       if (typeof tgt !== "object" || typeof src !== "object") {

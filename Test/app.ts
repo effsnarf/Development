@@ -3,6 +3,7 @@ import path from "path";
 import fs from "fs";
 import "colors";
 import * as moment from "moment";
+import axios from "axios";
 import "@shared/Extensions";
 import { Objects } from "@shared/Extensions.Objects";
 import { Configuration } from "@shared/Configuration";
@@ -31,7 +32,13 @@ class Malkovich {
 const malkovitch = new Malkovich();
 
 (async () => {
-  const url = `http://db.memegenerator.net/MemeGenerator`;
+  const url = `https://db.memegenerator.net/MemeGenerator`;
+
+  const response = await axios.get(url);
+
+  console.log(response.data);
+
+  process.exit();
 
   const config = (await Configuration.new()).data;
 
