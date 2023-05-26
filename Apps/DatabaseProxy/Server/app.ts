@@ -28,6 +28,10 @@ import { Analytics } from "@shared/Analytics";
 import { debug } from "console";
 // #endregion
 
+const getResponseSize = (response: any) => {
+  return parseInt(response.headers["content-length"] || 0);
+};
+
 (async () => {
   // #region User
   class User {
@@ -178,7 +182,7 @@ import { debug } from "console";
   // #region Create the dashboard layout
   const mainLog = Log.new(config.title);
   const itemsLog = Log.new("Items", {
-    columns: [4, 3, 6],
+    columns: [4, 3, 6, 6],
     breakLines: true,
     extraSpaceForBytes: true,
   });
@@ -311,6 +315,7 @@ import { debug } from "console";
             itemsLog.log(
               method,
               response.status.severifyByHttpStatus(),
+              getResponseSize(response).unitifySize(),
               timer.elapsed
                 ?.unitifyTime()
                 .severify(
@@ -331,6 +336,7 @@ import { debug } from "console";
               itemsLog.log(
                 method,
                 null,
+                null,
                 timer.elapsed
                   ?.unitifyTime()
                   .severify(
@@ -349,6 +355,7 @@ import { debug } from "console";
               itemsLog.log(
                 method,
                 ex.response.status.severifyByHttpStatus(),
+                getResponseSize(ex.response).unitifySize(),
                 timer.elapsed
                   ?.unitifyTime()
                   .severify(
@@ -384,6 +391,7 @@ import { debug } from "console";
           itemsLog.log(
             req.method,
             res.statusCode.severifyByHttpStatus(),
+            getResponseSize(res).unitifySize(),
             timer.elapsed
               ?.unitifyTime()
               .severify(
@@ -399,6 +407,7 @@ import { debug } from "console";
           itemsLog.log(
             req.method,
             res.statusCode.severifyByHttpStatus(),
+            getResponseSize(res).unitifySize(),
             timer.elapsed
               ?.unitifyTime()
               .severify(
