@@ -61,11 +61,15 @@ class FileSystemDatabase extends DatabaseBase {
     // List files in collectionPath recursively
     for (const file of Files.listFiles(collectionPath, { recursive: true })) {
       if (limit && docsYieldedCount >= limit) return;
-      let doc = JSON.parse(fs.readFileSync(file, "utf8"));
-      if (lowercaseFields) {
-        doc = Objects.toCamelCaseKeys(doc);
+      try {
+        let doc = JSON.parse(fs.readFileSync(file, "utf8"));
+        if (lowercaseFields) {
+          doc = Objects.toCamelCaseKeys(doc);
+        }
+        yield doc;
+      } catch (ex) {
+        console.error(`Error parsing JSON in ${file}`.red);
       }
-      yield doc;
       docsYieldedCount++;
     }
     return; // No more docs
