@@ -112,7 +112,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   // Create a log for each node
   const nodeLogs = config.nodes.map((node: any) =>
     Log.new(getNodeLogTitle(node), {
-      columns: [4, 3, 6, 6, null],
+      columns: [4, 3, 6, 6],
       breakLines: false,
       extraSpaceForBytes: true,
     })

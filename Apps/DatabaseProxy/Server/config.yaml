@@ -26,3 +26,6 @@ analytics:
 log:
   prod:
     path: (env) => env.path.resolve(env.process.cwd(), `${env.config.title}.log`)
+requests:
+  severity:
+    time: [100, 500, "<"]

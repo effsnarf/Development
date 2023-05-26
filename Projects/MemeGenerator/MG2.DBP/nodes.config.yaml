@@ -22,6 +22,9 @@ severity:
   time: [50, 500, "<"]
 log:
   path: (env) => env.path.resolve(env.process.cwd(), `..\\`, `${env.config.title}.log`)
+requests:
+  severity:
+    time: [100, 500, "<"]
 process:
   restart:
     periodically:
