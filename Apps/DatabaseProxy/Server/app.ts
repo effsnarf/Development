@@ -316,7 +316,7 @@ const getResponseSize = (response: any) => {
             itemsLog.log(
               method,
               response.status.severifyByHttpStatus(),
-              getResponseSize(response).unitifySize(),
+              getResponseSize(response)?.unitifySize(),
               timer.elapsed
                 ?.unitifyTime()
                 .severify(
@@ -356,7 +356,7 @@ const getResponseSize = (response: any) => {
               itemsLog.log(
                 method,
                 ex.response.status.severifyByHttpStatus(),
-                getResponseSize(ex.response).unitifySize(),
+                getResponseSize(ex.response)?.unitifySize(),
                 timer.elapsed
                   ?.unitifyTime()
                   .severify(
@@ -392,7 +392,7 @@ const getResponseSize = (response: any) => {
           itemsLog.log(
             req.method,
             res.statusCode.severifyByHttpStatus(),
-            getResponseSize(res).unitifySize(),
+            getResponseSize(res)?.unitifySize(),
             timer.elapsed
               ?.unitifyTime()
               .severify(
@@ -408,7 +408,7 @@ const getResponseSize = (response: any) => {
           itemsLog.log(
             req.method,
             res.statusCode.severifyByHttpStatus(),
-            getResponseSize(res).unitifySize(),
+            getResponseSize(res)?.unitifySize(),
             timer.elapsed
               ?.unitifyTime()
               .severify(
