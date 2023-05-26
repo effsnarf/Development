@@ -98,6 +98,14 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
       .flatMap((item: IncomingItem) => incomingItemToStrings(item))
   );
 
+  if (config.incoming.cache) {
+    mainConsoleLog.log(
+      ...["Cache:", ...Objects.yamlify(config.incoming.cache).split("\n")]
+    );
+  } else {
+    mainConsoleLog.log("No cache");
+  }
+
   // Log the start of the app
   mainConsoleLog.log(`Starting ${config.title}...`);
 
