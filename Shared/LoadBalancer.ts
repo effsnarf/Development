@@ -334,7 +334,7 @@ class LoadBalancer {
     if (this.cache) {
       if (this.isCachable(incomingItem.request)) {
         try {
-          let data = await this.getResponseStream(nodeResponse.data);
+          let data = await this.getResponseStream(nodeResponse);
           if (typeof data != "string") data = Objects.jsonify(data);
 
           // Get the response data
