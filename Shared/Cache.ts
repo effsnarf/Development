@@ -140,11 +140,11 @@ class DatabaseCache extends CacheBase {
 
   async get<T>(key: string, getDefaultValue?: () => T) {
     try {
-      const value = await this.db.get(this.collectionName, key);
+      const value = await this.db.get(key);
       if (value) return value;
       if (!getDefaultValue) return null;
       const defaultValue = await getDefaultValue();
-      await this.db.set(this.collectionName, key, defaultValue);
+      await this.db.set(key, defaultValue);
       return defaultValue;
     } catch (ex) {
       this.events.emit("error", ex);
@@ -153,11 +153,11 @@ class DatabaseCache extends CacheBase {
   }
 
   set<T>(key: string, value: T) {
-    this.db.set(this.collectionName, key, value);
+    this.db.set(key, value);
   }
 
   async has(key: string) {
-    return await this.db.get(this.collectionName, key);
+    return await this.db.get(key);
   }
 }
 

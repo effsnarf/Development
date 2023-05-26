@@ -4,13 +4,15 @@ import { Timer } from "../Timer";
 import { ProducerConsumer } from "../ProducerConsumer";
 
 abstract class DatabaseBase {
+  protected static _mapCollectionName = "_Map";
+
   private newIds = new ProducerConsumer(100, this._getNewIDs.bind(this));
 
-  abstract get(collectionName: string, key: any): Promise<any>;
+  abstract get(key: any): Promise<any>;
 
-  abstract set(collectionName: string, key: any, value: any): Promise<void>;
+  abstract set(key: any, value: any): Promise<void>;
 
-  abstract has(collectionName: string, key: any): Promise<boolean>;
+  abstract has(key: any): Promise<boolean>;
 
   abstract find(
     collectionName: string,

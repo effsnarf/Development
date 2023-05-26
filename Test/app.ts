@@ -32,11 +32,15 @@ class Malkovich {
 const malkovitch = new Malkovich();
 
 (async () => {
-  const url = `https://db.memegenerator.net/MemeGenerator`;
+  const db = await Database.new({ path: "C:\\Database\\Cache\\Test" });
 
-  const response = await axios.get(url);
+  const doc = { TestKey: "TestValue" };
 
-  console.log(response.data);
+  await db.upsert("TestCollection", doc);
+
+  await db.set("TestKey", doc);
+
+  console.log(doc);
 
   process.exit();
 

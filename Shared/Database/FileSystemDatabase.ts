@@ -20,20 +20,29 @@ class FileSystemDatabase extends DatabaseBase {
     return db;
   }
 
-  async get(collectionName: string, key: any): Promise<any> {
-    const filePath = await this.getFilePath(collectionName, key);
+  async get(key: any): Promise<any> {
+    const filePath = await this.getFilePath(
+      DatabaseBase._mapCollectionName,
+      key
+    );
     if (!fs.existsSync(filePath)) return null;
     return JSON.parse(fs.readFileSync(filePath, "utf8"));
   }
 
-  async set(collectionName: string, key: any, value: any): Promise<void> {
-    const filePath = await this.getFilePath(collectionName, key);
+  async set(key: any, value: any): Promise<void> {
+    const filePath = await this.getFilePath(
+      DatabaseBase._mapCollectionName,
+      key
+    );
     const json = JSON.stringify(value);
     fs.writeFileSync(filePath, json);
   }
 
-  async has(collectionName: string, key: any): Promise<boolean> {
-    const filePath = await this.getFilePath(collectionName, key);
+  async has(key: any): Promise<boolean> {
+    const filePath = await this.getFilePath(
+      DatabaseBase._mapCollectionName,
+      key
+    );
     return fs.existsSync(filePath);
   }
 
@@ -103,9 +112,6 @@ class FileSystemDatabase extends DatabaseBase {
     doc: any,
     returnNewDoc: boolean
   ): Promise<any> {
-    if (!doc._id) {
-      fs.writeFileSync("F:\\cache\\error.log", JSON.stringify(doc, null, 2));
-    }
     const filePath = this.getFilePath(collectionName, doc._id);
     const json = JSON.stringify(doc);
     fs.writeFileSync(filePath, json);
