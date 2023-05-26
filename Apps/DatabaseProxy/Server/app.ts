@@ -448,6 +448,7 @@ const getResponseSize = (response: any) => {
             req.url
           );
         } catch (ex: any) {
+          debugLog.log(ex.stack);
           itemsLog.log(
             req.method,
             res.statusCode.severifyByHttpStatus(),
