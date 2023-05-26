@@ -278,6 +278,11 @@ class LoadBalancer {
       returnToClient: true, // Should this request be returned to the client?
     };
 
+    // Remove &_uid=1685119338348 from the URL (uniquifies the request)
+    let url = incomingItem.request.url;
+    url = url?.replace(/&_uid=\d+/g, "");
+    incomingItem.request.url = url;
+
     this.incomingItems.add(incomingItem);
 
     this.processIncomingItem(incomingItem);
