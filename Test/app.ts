@@ -31,6 +31,8 @@ class Malkovich {
 const malkovitch = new Malkovich();
 
 (async () => {
+  const url = `http://db.memegenerator.net/MemeGenerator`;
+
   const config = (await Configuration.new()).data;
 
   const cache = await Cache.new(config.cache);
