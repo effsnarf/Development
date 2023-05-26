@@ -43,6 +43,13 @@ const cache = {
         );
       },
     },
+    collection: {
+      names: async (db: MongoDatabase | undefined) => {
+        return memoryCache.get(`${db?.database}.CollectionNames`, async () => {
+          return await db?.getCollectionNames();
+        });
+      },
+    },
   },
 };
 
@@ -510,7 +517,7 @@ const getResponseSize = (response: any) => {
             .status(404)
             .send(`Database ${req.params.database} not found`);
 
-        const entities = (await db?.getCollectionNames()).filter(
+        const entities = (await cache.get.collection.names(db)).filter(
           (e: string) => !e.startsWith("_")
         );
         return res.send(entities);
