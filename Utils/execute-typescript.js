@@ -20,7 +20,14 @@ const cls = JavaScript.loadTypeScriptClasses(classPaths);
     fs.writeFileSync(newFilePath, tsCode, "utf8");
 
     const onExit = () => {
-      if (fs.existsSync(newFilePath)) fs.unlinkSync(newFilePath);
+      try
+      {
+        if (fs.existsSync(newFilePath)) fs.unlinkSync(newFilePath);
+      }
+      catch (ex)
+      {
+
+      }
     };
     
     // Spawn TypeScript process (ts-node)
