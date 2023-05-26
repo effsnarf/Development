@@ -16,6 +16,7 @@ import { Apify } from "@shared/Apify";
 import { Console } from "@shared/Console";
 import { ChatOpenAI, Roles } from "../Apis/OpenAI/classes/ChatOpenAI";
 import { Google } from "@shared/Google";
+import { Cache } from "@shared/Cache";
 
 type malkovich = string;
 
@@ -31,6 +32,12 @@ const malkovitch = new Malkovich();
 
 (async () => {
   const config = (await Configuration.new()).data;
+
+  const cache = await Cache.new(config.cache);
+
+  const value = await cache.get("test key 1", () => "test value 1");
+
+  console.log(value);
 })();
 
 // for (var i = 0; i <= 100; i += 10) {

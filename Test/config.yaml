@@ -8,3 +8,6 @@ process:
     periodically:
       from: 08:00
       every: 1m
+cache:
+  database:
+    path: (env) => env.path.join('C:\\Database\\Cache\\Test')
