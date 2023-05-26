@@ -11,7 +11,7 @@ import { Http } from "@shared/Http";
 import { Timer, IntervalCounter } from "@shared/Timer";
 import { Reflection } from "@shared/Reflection";
 import { Google } from "@shared/Google";
-import { Cache } from "@shared/Cache";
+import { Cache, CacheBase } from "@shared/Cache";
 import {
   Console,
   Layout,
@@ -30,9 +30,15 @@ import { Analytics } from "@shared/Analytics";
 import { debug } from "console";
 // #endregion
 
-const memoryCache = Cache.new({ memory: true });
-
 const cache = {
+  _store: null as CacheBase | null,
+  _getStore: async () => {
+    if (!cache._store)
+      cache._store = await Cache.new({
+        memory: true,
+      });
+    return cache._store;
+  },
   get: {
     api: {
       methods: async (db: MongoDatabase | undefined) => {
@@ -45,9 +51,12 @@ const cache = {
     },
     collection: {
       names: async (db: MongoDatabase | undefined) => {
-        return memoryCache.get(`${db?.database}.CollectionNames`, async () => {
-          return await db?.getCollectionNames();
-        });
+        return (await cache._getStore()).get(
+          `${db?.database}.CollectionNames`,
+          async () => {
+            return await db?.getCollectionNames();
+          }
+        );
       },
     },
   },
