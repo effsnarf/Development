@@ -227,14 +227,14 @@ class LoadBalancer {
     return this.nodeSwitcher.getNodes();
   }
 
-  async getResponseStreamSize(response: AxiosResponse<any>) {
-    return new Promise<number>((resolve, reject) => {
-      let size = 0;
+  async getResponseStream(response: AxiosResponse<any>) {
+    return new Promise<string>((resolve, reject) => {
+      let data = "";
       response.data.on("data", (chunk: any) => {
-        size += chunk.length;
+        data += chunk;
       });
       response.data.on("end", () => {
-        resolve(size);
+        resolve(data);
       });
       response.data.on("error", (error: any) => {
         reject(error);
@@ -334,7 +334,7 @@ class LoadBalancer {
     if (this.cache) {
       if (this.isCachable(incomingItem.request)) {
         try {
-          let data = nodeResponse.data;
+          let data = await this.getResponseStream(nodeResponse.data);
           if (typeof data != "string") data = Objects.jsonify(data);
 
           // Get the response data
@@ -351,7 +351,7 @@ class LoadBalancer {
         } catch (ex: any) {
           this.log(`${`Error caching response`}\n${ex.message}`);
           try {
-            this.log(util.inspect(nodeResponse.data, true, 10000, false));
+            this.log(util.inspect(data, true, 10000, false));
           } catch (ex: any) {
             this.log(`Error inspecting response body`);
           }
