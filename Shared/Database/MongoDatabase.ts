@@ -106,16 +106,16 @@ class MongoDatabase extends DatabaseBase {
 
     this.removeDollarSigns(pipeline);
 
-    this.upsert(
-      "_DbAnalytics",
-      {
-        dt: Date.now(),
-        event: "aggregate",
-        collection: collectionName,
-        pipeline: pipeline,
-      },
-      false
-    );
+    // this.upsert(
+    //   "_DbAnalytics",
+    //   {
+    //     dt: Date.now(),
+    //     event: "aggregate",
+    //     collection: collectionName,
+    //     pipeline: pipeline,
+    //   },
+    //   false
+    // );
 
     return docs;
   }
