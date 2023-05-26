@@ -1,10 +1,12 @@
 import fs from "fs";
 import md5 from "md5";
 import path from "path";
+import { Events } from "./Events";
 import { Database } from "./Database/Database";
 import { DatabaseBase } from "./Database/DatabaseBase";
 
 abstract class CacheBase {
+  events: Events = new Events();
   abstract get<T>(key: string, getDefaultValue?: () => T): Promise<T>;
   abstract set<T>(key: string, value: T): void;
   abstract has(key: string): Promise<boolean>;
@@ -12,6 +14,7 @@ abstract class CacheBase {
 
 class Cache {
   static async new(config: any): Promise<CacheBase> {
+    if (!config) return await NullCache.new();
     if ("enabled" in config && !config.enabled) return await NullCache.new();
 
     if (config.memory) return MemoryCache.new();
@@ -136,12 +139,17 @@ class DatabaseCache extends CacheBase {
   }
 
   async get<T>(key: string, getDefaultValue?: () => T) {
-    const value = await this.db.get(this.collectionName, key);
-    if (value) return value;
-    if (!getDefaultValue) return null;
-    const defaultValue = await getDefaultValue();
-    await this.db.set(this.collectionName, key, defaultValue);
-    return defaultValue;
+    try {
+      const value = await this.db.get(this.collectionName, key);
+      if (value) return value;
+      if (!getDefaultValue) return null;
+      const defaultValue = await getDefaultValue();
+      await this.db.set(this.collectionName, key, defaultValue);
+      return defaultValue;
+    } catch (ex) {
+      this.events.emit("error", ex);
+      return null;
+    }
   }
 
   set<T>(key: string, value: T) {

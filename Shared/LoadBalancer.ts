@@ -209,7 +209,10 @@ class LoadBalancer {
 
   static async new(options: LoadBalancerOptions) {
     const lb = new LoadBalancer(options);
-    lb.cache = !options.cache ? null : await Cache.new(options.cache);
+    lb.cache = await Cache.new(options.cache);
+    lb.cache.events.on("error", (ex: any) => {
+      lb.events.emit("log", { text: ex.message.bgRed });
+    });
     return lb;
   }
 
