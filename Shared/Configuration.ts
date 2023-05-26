@@ -196,7 +196,7 @@ class Configuration {
     }
 
     config.log();
-    await (5).seconds().wait({ log: true });
+    //await (5).seconds().wait({ log: true });
 
     config.yaml = Configuration.toYaml(config.data);
 
