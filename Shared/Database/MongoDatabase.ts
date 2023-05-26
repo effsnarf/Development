@@ -157,11 +157,11 @@ class MongoDatabase extends DatabaseBase {
   }
 
   async getNewIDs(count: number) {
-    const collection = await this.getCollection("_IdentityIntegers");
+    const collection = await this.getCollection("_Settings");
 
     const result = await collection.findOneAndUpdate(
-      { _id: null } as any,
-      { $inc: { uniqueID: count } },
+      { name: "global.unique.id" },
+      { $inc: { value: count } },
       { upsert: true, returnOriginal: true } as any
     );
 
@@ -171,15 +171,7 @@ class MongoDatabase extends DatabaseBase {
   }
 
   async getNewID() {
-    const collection = await this.getCollection("_Settings");
-
-    const result = await collection.findOneAndUpdate(
-      { name: "global.unique.id" },
-      { $inc: { uniqueID: 1 } },
-      { upsert: true, returnOriginal: false } as any
-    );
-
-    return result.value?.uniqueID || 1;
+    return (await this.getNewIDs(1))[0];
   }
 
   async getCollectionNames() {
