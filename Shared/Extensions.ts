@@ -431,6 +431,7 @@ if (typeof Number !== "undefined") {
         return `${unitValue.toFixedRounded(2)}${u.gray}`;
       }
     }
+    if (value == 0) return `${value}${units.last().gray}`;
     return `${value.toFixed(0)}${units.last().gray}`;
   };
 
