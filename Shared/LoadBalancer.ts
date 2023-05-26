@@ -339,7 +339,7 @@ class LoadBalancer {
           text: nodeResponse.statusText,
         },
         headers: nodeResponse.headers,
-        body: nodeResponse.data,
+        body: nodeResponse.data.toString("utf8"),
       };
       await this.cache.set(incomingItem.request.url || "", cachedResponse);
     }
