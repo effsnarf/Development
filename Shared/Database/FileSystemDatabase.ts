@@ -119,14 +119,8 @@ class FileSystemDatabase extends DatabaseBase {
       resolve(count);
     });
   }
-  async getNewIDs(count: number): Promise<number[]> {
-    const ids = await Promise.all(
-      Array.from(Array(count).keys()).map(async (i) => this.getNewID())
-    );
-    ids.sort();
-    return ids;
-  }
-  async getNewID(): Promise<number> {
+
+  protected async _getNewIDs(count: number): Promise<number[]> {
     const uniqueIdFilePath = path.join(this.basePath, "uniqueID.json");
     if (!fs.existsSync(uniqueIdFilePath)) {
       fs.writeFileSync(uniqueIdFilePath, "1");
@@ -134,10 +128,11 @@ class FileSystemDatabase extends DatabaseBase {
     const uniqueID = JSON.parse(
       await fs.promises.readFile(uniqueIdFilePath, "utf8")
     );
-    const newId = uniqueID + 1;
+    const newId = uniqueID + count;
     await fs.writeFileSync(uniqueIdFilePath, newId.toString());
-    return uniqueID;
+    return Array.from(Array(count).keys()).map((i) => uniqueID + i);
   }
+
   async getCollectionNames(): Promise<string[]> {
     // List folders in basePath
     const folders = await fs.promises.readdir(this.basePath, {

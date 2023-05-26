@@ -156,7 +156,7 @@ class MongoDatabase extends DatabaseBase {
     return result;
   }
 
-  async getNewIDs(count: number) {
+  protected async _getNewIDs(count: number) {
     const collection = await this.getCollection("_Settings");
 
     const result = await collection.findOneAndUpdate(
@@ -168,10 +168,6 @@ class MongoDatabase extends DatabaseBase {
     const start = result.value?.uniqueID || 1;
     // Return an array of IDs
     return Array.from(Array(count).keys()).map((i) => start + i);
-  }
-
-  async getNewID() {
-    return (await this.getNewIDs(1))[0];
   }
 
   async getCollectionNames() {

@@ -1,8 +1,11 @@
 import * as colors from "colors";
 import "../Extensions";
 import { Timer } from "../Timer";
+import { ProducerConsumer } from "../ProducerConsumer";
 
 abstract class DatabaseBase {
+  private newIds = new ProducerConsumer(100, this._getNewIDs.bind(this));
+
   abstract find(
     collectionName: string,
     query: any,
@@ -46,9 +49,15 @@ abstract class DatabaseBase {
 
   abstract count(collectionName: string, query?: any): Promise<number>;
 
-  abstract getNewIDs(count: number): Promise<number[]>;
+  async getNewID() {
+    return (await this.getNewIDs(1))[0];
+  }
 
-  abstract getNewID(): Promise<number>;
+  async getNewIDs(count: number) {
+    return await this.newIds.get(count);
+  }
+
+  protected abstract _getNewIDs(count: number): Promise<number[]>;
 
   abstract getCollectionNames(): Promise<string[]>;
 }
