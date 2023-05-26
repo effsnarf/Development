@@ -103,6 +103,9 @@ class FileSystemDatabase extends DatabaseBase {
     doc: any,
     returnNewDoc: boolean
   ): Promise<any> {
+    if (!doc._id) {
+      fs.writeFileSync("F:\\cache\\error.log", JSON.stringify(doc, null, 2));
+    }
     const filePath = this.getFilePath(collectionName, doc._id);
     const json = JSON.stringify(doc);
     fs.writeFileSync(filePath, json);
