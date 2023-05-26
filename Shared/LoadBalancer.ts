@@ -334,9 +334,7 @@ class LoadBalancer {
     if (this.cache) {
       if (this.isCachable(incomingItem.request)) {
         try {
-          this.log(typeof nodeResponse.data);
-
-          let data = nodeResponse.data;
+          let data = nodeResponse.data.data;
           if (typeof data != "string") data = Objects.jsonify(data);
 
           // Get the response data
