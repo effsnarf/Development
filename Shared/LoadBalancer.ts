@@ -351,7 +351,7 @@ class LoadBalancer {
         } catch (ex: any) {
           this.log(`${`Error caching response`}\n${ex.message}`);
           try {
-            this.log(util.inspect(data, true, 10000, false));
+            this.log(util.inspect(nodeResponse.data, true, 10000, false));
           } catch (ex: any) {
             this.log(`Error inspecting response body`);
           }
