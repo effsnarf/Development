@@ -68,7 +68,7 @@ class FileSystemDatabase extends DatabaseBase {
         }
         yield doc;
       } catch (ex) {
-        console.error(`Error parsing JSON in ${file}`.red);
+        console.error(`${`Error parsing JSON at`.bgRed} ${file.toShortPath()}`.);
       }
       docsYieldedCount++;
     }
