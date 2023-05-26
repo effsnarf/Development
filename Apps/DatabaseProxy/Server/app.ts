@@ -178,7 +178,7 @@ import { debug } from "console";
   // #region Create the dashboard layout
   const mainLog = Log.new(config.title);
   const itemsLog = Log.new("Items", {
-    columns: [4, 3, 6, 6],
+    columns: [4, 3, 6],
     breakLines: true,
     extraSpaceForBytes: true,
   });
@@ -311,13 +311,15 @@ import { debug } from "console";
             itemsLog.log(
               method,
               response.status.severifyByHttpStatus(),
-              timer.elapsed?.severify(
-                ...(config.requests.severity.time as [
-                  number,
-                  number,
-                  "<" | ">"
-                ])
-              ),
+              timer.elapsed
+                ?.unitifyTime()
+                .severify(
+                  ...(config.requests.severity.time as [
+                    number,
+                    number,
+                    "<" | ">"
+                  ])
+                ),
               proxyUrl
             );
             res.status(response.status);
@@ -329,13 +331,15 @@ import { debug } from "console";
               itemsLog.log(
                 method,
                 null,
-                timer.elapsed?.severify(
-                  ...(config.requests.severity.time as [
-                    number,
-                    number,
-                    "<" | ">"
-                  ])
-                ),
+                timer.elapsed
+                  ?.unitifyTime()
+                  .severify(
+                    ...(config.requests.severity.time as [
+                      number,
+                      number,
+                      "<" | ">"
+                    ])
+                  ),
                 proxyUrl.bgRed,
                 ex.message.bgRed
               );
@@ -345,13 +349,15 @@ import { debug } from "console";
               itemsLog.log(
                 method,
                 ex.response.status.severifyByHttpStatus(),
-                timer.elapsed?.severify(
-                  ...(config.requests.severity.time as [
-                    number,
-                    number,
-                    "<" | ">"
-                  ])
-                ),
+                timer.elapsed
+                  ?.unitifyTime()
+                  .severify(
+                    ...(config.requests.severity.time as [
+                      number,
+                      number,
+                      "<" | ">"
+                    ])
+                  ),
                 proxyUrl,
                 JSON.stringify(ex.response.data).bgRed
               );
