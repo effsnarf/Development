@@ -249,6 +249,9 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
     log.log(...(data.texts || [data.text]));
     fsLog.log(...(data.texts || [data.text]));
   });
+  loadBalancer.events.on("error", (ex: any) => {
+    fsLog.log(ex.stack);
+  });
   // Update incoming items count in the dashboard
   loadBalancer.events.on("incoming-items", (count: any) => {
     const title = getMainTitle(
