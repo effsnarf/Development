@@ -12,6 +12,8 @@ abstract class CacheBase {
 
 class Cache {
   static async new(config: any): Promise<CacheBase> {
+    if ("enabled" in config && !config.enabled) return await NullCache.new();
+
     if (config.memory) return MemoryCache.new();
     if (config.zero) {
       return ZeroCache.new(await Cache.new(config.zero));
@@ -21,6 +23,27 @@ class Cache {
       "CacheItems"
     );
     throw new Error(`Unknown cache type: ${JSON.stringify(config)}`);
+  }
+}
+
+class NullCache extends CacheBase {
+  private constructor() {
+    super();
+    console.log(`${`NullCache`.gray}`);
+  }
+
+  static async new() {
+    return new NullCache();
+  }
+
+  async get(key: string, getDefaultValue?: () => any) {
+    return !getDefaultValue ? null : await getDefaultValue();
+  }
+
+  set<T>(key: string, value: T) {}
+
+  async has(key: string) {
+    return false;
   }
 }
 
