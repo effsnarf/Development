@@ -43,7 +43,9 @@ const cache = {
     api: {
       methods: async (db: MongoDatabase | undefined) => {
         if (!db) return null;
-        return await memoryCache.get(
+        return await (
+          await cache._getStore()
+        ).get(
           `${db.database}._ApiMethods`,
           async () => await db?.find("_ApiMethods", {})
         );
