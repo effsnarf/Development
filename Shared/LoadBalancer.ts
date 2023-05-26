@@ -170,7 +170,7 @@ class IncomingItemCollection {
 
 class LoadBalancer {
   incomingItemID: number = 1;
-  cache!: CacheBase;
+  cache!: CacheBase | null;
   events = new Events();
   private readonly nodeSwitcher = new NodeSwitcher(this.events);
   readonly stats = {
@@ -208,7 +208,7 @@ class LoadBalancer {
 
   static async new(options: LoadBalancerOptions) {
     const lb = new LoadBalancer(options);
-    lb.cache = await Cache.new(options.cache);
+    lb.cache = !options.cache ? null : await Cache.new(options.cache);
     return lb;
   }
 
@@ -588,7 +588,7 @@ class LoadBalancer {
   }
 
   private isCachable(request: http.IncomingMessage) {
-    if (!this.options.cache) return false;
+    if (!this.cache) return false;
     if (request.method != "GET") return false;
     if (!request.url) return false;
     if (
