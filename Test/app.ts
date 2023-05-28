@@ -33,8 +33,8 @@ class Malkovich {
 const malkovitch = new Malkovich();
 
 (async () => {
-  //const url = `https://db.memegenerator.net/MemeGenerator`;
-  const url = `https://memegenerator.net/api/client.js`;
+  const url = `https://db.memegenerator.net/MemeGenerator`;
+  //const url = `https://memegenerator.net/api/client.js`;
 
   for (let i = 0; i < 100; i++) {
     try {
