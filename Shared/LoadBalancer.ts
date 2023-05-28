@@ -211,7 +211,7 @@ class LoadBalancer {
     const lb = new LoadBalancer(options);
     lb.cache = await Cache.new(options.cache);
     lb.cache.events.on("error", (ex: any) => {
-      lb.events.emit("log", { text: ex.message.bgRed });
+      lb.events.emit("error", ex);
     });
     return lb;
   }
@@ -524,6 +524,10 @@ class LoadBalancer {
             ],
           });
           // If the cached response is still valid, we don't need to process the request
+          // Otherwise, we'll process the request and update the cache
+          // In any case, we'll return any available cached response to the client immediately
+          // and process the request in the background to avoid making the client wait for the response
+          // whenever possible.
           if (
             Date.now() - cachedResponse.dt <
             this.options.cache?.max?.age?.deunitifyTime()

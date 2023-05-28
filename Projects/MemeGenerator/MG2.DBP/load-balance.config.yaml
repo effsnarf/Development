@@ -13,7 +13,8 @@ incoming:
     prod:
       enabled: true
       database:
-        path: (env) => env.path.resolve("f:\\Cache", `${env.config.title}`)
+        connectionString: mongodb://localhost:37017
+        database: MG-Cache
 nodes:
   - name: MG.DBP 1
     address: localhost:4041
