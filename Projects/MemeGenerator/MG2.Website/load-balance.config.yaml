@@ -16,7 +16,7 @@ incoming:
     ignore:
       - /_nuxt/
       - /new
-      - /api
+      - /api/ip
     database:
       connectionString: mongodb://localhost:37017
       database: MG-Web-Cache
