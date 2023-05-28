@@ -1,6 +1,7 @@
 import fs from "fs";
 import md5 from "md5";
 import path from "path";
+import { Lock } from "./Lock";
 import { Events } from "./Events";
 import { Database } from "./Database/Database";
 import { DatabaseBase } from "./Database/DatabaseBase";
@@ -16,6 +17,12 @@ class Cache {
   static async new(config: any): Promise<CacheBase> {
     if (!config) return await NullCache.new();
     if ("enabled" in config && !config.enabled) return await NullCache.new();
+
+    if (Array.isArray(config)) {
+      return await MultiCache.new(
+        await Promise.all(config.map((item) => Cache.new(item)))
+      );
+    }
 
     if (config.memory) return MemoryCache.new();
     if (config.zero) {
@@ -96,8 +103,49 @@ class ZeroCache extends CacheBase {
   }
 }
 
+// A chain of caches
+// This is useful for example to have a memory cache in front of a database cache
+// The memory cache will be faster, but the database cache will be more persistent
+class MultiCache extends CacheBase {
+  private constructor(private caches: CacheBase[]) {
+    super();
+    console.log(`${`MultiCache`.gray}`);
+  }
+
+  static new(caches: CacheBase[]) {
+    return new MultiCache(caches);
+  }
+
+  async get(key: string, getDefaultValue?: () => any) {
+    for (const cache of this.caches) {
+      const value = await cache.get(key);
+      if (value) return value;
+    }
+    if (!getDefaultValue) return null;
+    const value = await getDefaultValue();
+    this.set(key, value);
+    return value;
+  }
+
+  set(key: string, value: any) {
+    for (const cache of this.caches) {
+      cache.set(key, value);
+    }
+  }
+
+  async has(key: string) {
+    for (const cache of this.caches) {
+      if (await cache.has(key)) return true;
+    }
+    return false;
+  }
+}
+
 class MemoryCache extends CacheBase {
-  private items: { [key: string]: any } = {};
+  private trimLock = new Lock();
+  private maxItems = 1000;
+  private values: { [key: string]: any } = {};
+  private accessCounts: { [key: string]: number } = {};
 
   constructor() {
     super();
@@ -109,19 +157,44 @@ class MemoryCache extends CacheBase {
   }
 
   async get(key: string, getDefaultValue?: () => any) {
-    if (this.items[key]) return this.items[key];
+    this.logAccess(key);
+    if (this.values[key]) return this.values[key];
     if (!getDefaultValue) return null;
     const value = await getDefaultValue();
-    this.items[key] = value;
+    this.set(key, value);
     return value;
   }
 
   set(key: string, value: any) {
-    this.items[key] = value;
+    this.trim();
+    this.values[key] = value;
+  }
+
+  async trim() {
+    await this.trimLock.acquire();
+    try {
+      while (Object.keys(this.values).length >= this.maxItems) {
+        const leastAccessedKey = Object.entries(this.accessCounts)
+          .sortBy((item) => item[1])
+          .first()[0];
+        this.delete(leastAccessedKey);
+      }
+    } finally {
+      this.trimLock.release();
+    }
+  }
+
+  private logAccess(key: string) {
+    this.accessCounts[key] = (this.accessCounts[key] || 0) + 1;
+  }
+
+  private delete(key: string) {
+    delete this.values[key];
+    delete this.accessCounts[key];
   }
 
   async has(key: string) {
-    return this.items[key];
+    return this.values[key];
   }
 }
 
