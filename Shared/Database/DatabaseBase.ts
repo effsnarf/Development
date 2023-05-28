@@ -10,7 +10,7 @@ abstract class DatabaseBase {
 
   abstract get(key: any): Promise<any>;
 
-  abstract set(key: any, value: any): Promise<void>;
+  abstract set(key: any, value: Object): Promise<void>;
 
   abstract has(key: any): Promise<boolean>;
 
