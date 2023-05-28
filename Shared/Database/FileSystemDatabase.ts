@@ -112,6 +112,12 @@ class FileSystemDatabase extends DatabaseBase {
     doc: any,
     returnNewDoc: boolean
   ): Promise<any> {
+    if (!doc._id)
+      throw new Error(
+        `Can't upsert because doc._id is missing (${
+          this.basePath
+        }) (${JSON.stringify(doc)})`
+      );
     const filePath = this.getFilePath(collectionName, doc._id);
     const json = JSON.stringify(doc);
     fs.writeFileSync(filePath, json);

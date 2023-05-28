@@ -348,6 +348,7 @@ class LoadBalancer {
           // Get the response data
           const cachedResponse = {
             dt: Date.now(),
+            url: incomingItem.request.url,
             status: {
               code: nodeResponse.status,
               text: nodeResponse.statusText,
@@ -514,7 +515,7 @@ class LoadBalancer {
           incomingItem.returnToClient = false;
           this.sendToClient(incomingItem, cachedResponse);
           this.log({
-            node: { index: incomingItem.nodeItem.index },
+            //node: { index: incomingItem.nodeItem.index },
             texts: [
               incomingItem.request.method,
               cachedResponse.status.code.toString().gray,
