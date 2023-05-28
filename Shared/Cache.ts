@@ -7,8 +7,11 @@ import { DatabaseBase } from "./Database/DatabaseBase";
 
 abstract class CacheBase {
   events: Events = new Events();
-  abstract get<T>(key: string, getDefaultValue?: () => T): Promise<T>;
-  abstract set<T>(key: string, value: T): void;
+  abstract get(
+    key: string,
+    getDefaultValue?: () => Object
+  ): Promise<Object | null>;
+  abstract set(key: string, value: Object): void;
   abstract has(key: string): Promise<boolean>;
 }
 
@@ -39,11 +42,11 @@ class NullCache extends CacheBase {
     return new NullCache();
   }
 
-  async get(key: string, getDefaultValue?: () => any) {
+  async get(key: string, getDefaultValue?: () => Object) {
     return !getDefaultValue ? null : await getDefaultValue();
   }
 
-  set<T>(key: string, value: T) {}
+  set(key: string, value: Object) {}
 
   async has(key: string) {
     return false;
@@ -66,7 +69,7 @@ class ZeroCache extends CacheBase {
     return new ZeroCache(cache);
   }
 
-  async get<T>(key: string, getDefaultValue?: () => T) {
+  async get(key: string, getDefaultValue?: () => Object) {
     this.enqueue(key, getDefaultValue);
     while (!(await this.cache.has(key))) {
       await new Promise((resolve) => setTimeout(resolve, 100));
@@ -74,7 +77,7 @@ class ZeroCache extends CacheBase {
     return await this.cache.get(key, getDefaultValue);
   }
 
-  set<T>(key: string, value: T) {
+  set(key: string, value: Object) {
     this.cache.set(key, value);
   }
 
@@ -82,7 +85,7 @@ class ZeroCache extends CacheBase {
     return this.cache.has(key);
   }
 
-  private enqueue<T>(key: string, getDefaultValue?: () => T) {
+  private enqueue(key: string, getDefaultValue?: () => Object) {
     if (!getDefaultValue) return;
     if (this.queue[key]) return;
 
@@ -108,7 +111,7 @@ class MemoryCache extends CacheBase {
     return new MemoryCache();
   }
 
-  async get<T>(key: string, getDefaultValue?: () => T) {
+  async get(key: string, getDefaultValue?: () => Object) {
     if (this.items[key]) return this.items[key];
     if (!getDefaultValue) return null;
     const value = await getDefaultValue();
@@ -116,7 +119,7 @@ class MemoryCache extends CacheBase {
     return value;
   }
 
-  set<T>(key: string, value: T) {
+  set(key: string, value: Object) {
     this.items[key] = value;
   }
 
@@ -138,7 +141,7 @@ class DatabaseCache extends CacheBase {
     return new DatabaseCache(db, collectionName);
   }
 
-  async get<T>(key: string, getDefaultValue?: () => T) {
+  async get(key: string, getDefaultValue?: () => Object) {
     try {
       const value = await this.db.get(key);
       if (value) return value;
@@ -152,7 +155,7 @@ class DatabaseCache extends CacheBase {
     }
   }
 
-  set<T>(key: string, value: T) {
+  set(key: string, value: Object) {
     this.db.set(key, value);
   }
 
