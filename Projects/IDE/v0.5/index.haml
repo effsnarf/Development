@@ -66,34 +66,23 @@
     .body-main
       #app
         %div{":key": "key1"}
-          %div{"v-show": "(!isIniting)"}
-            %img.hidden.ide-anim-on-load.w-l10{src: "./img/1.webp", style: "position: fixed; bottom: 0.5em;"}
-          %div{"v-show": "(!isIniting)"}
+          %div
+            %transition{name: "ide-vt-fade"}
+              %ide-system-hourglass.pt-l8{ref: "hourglass1"}
+            / ide-workspace
+            %meow-comp-171.ide-anim-on-load
+          %div
             %div.flex.ide-anim-on-load{style: "align-items: start; justify-content: space-between;"}
               %div.flex{style: "font-size: 5rem; text-shadow: -0.1em 0.1em 6px #000;"}
                 / Blue cube
                 %div.mr-l1 &#x1F9CA;
-                / %div
-                  %img{src: "./img/logo.png", style: "width: 1.5em;"}
                 %div
                   %h1.fs-l5.mt-1{style: "margin-bottom: -0.3em; transform: scaleY(0.9);"} Compon
-                  %div.fs-m3.text-center.opacity-50 dev
+                  %div.fs-m3.text-center.opacity-50 development studio
               %div.flex.text-right
                 / ide-search-comps
-                / %meow-comp-268.m-l1.z-100
+                %meow-comp-268.m-l1.z-100
                 %div.flex.z-10{style: "gap: 2em;"}
-                  / meow-support
-                  / %meow-comp-398
                   / ide-user-account
                   %meow-comp-267{ref: "ideUserAccount1"}
             / %button{"@click": "refresh"} refresh
-          %hr{"v-show": "(!isIniting)"}
-          .logo{"v-show": "(!isIniting)"}
-            / %img{src: "./img/1.png"}
-          .levitating
-          %div
-            %ide-system-splash-intro.center-screen{"v-if": "showSplashIntro"}
-            %transition{name: "ide-vt-fade"}
-              %ide-system-hourglass.pt-l8{"v-show": "isIniting", ref: "hourglass1"}
-            / ide-workspace
-            %meow-comp-171.ide-anim-on-load

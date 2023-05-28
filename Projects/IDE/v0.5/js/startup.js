@@ -127,7 +127,7 @@ document.addEventListener("DOMContentLoaded", async function() {
     },
     mounted: function() {
     },
-    template: util.haml(`%div{"v-if": "timer"}\n  %div.hourglass\n  %div\n    %progress-bar.mt-l1{":value": "progress"}\n  %div.text-center.opacity-50{"v-text": "\`\${Math.round(progress*100)}% \${(elapsed / 1000).toFixed(2)}s\`"}`)
+    template: util.haml(`%div{"v-if": "timer"}\n  %div.hourglass\n  %div\n    %progress-bar.mt-l1{":value": "progress"}\n  %div.text-center.opacity-50{"v-text": "\`\${Math.round(progress*100)}%\`"}`)
   });
 
 
@@ -154,6 +154,7 @@ document.addEventListener("DOMContentLoaded", async function() {
       el: "#app",
       data: {
         isIniting: false,
+        showHourglass: true,
         showSplashIntro: false,
         key1: 1,
         funcs: {
@@ -276,8 +277,9 @@ document.addEventListener("DOMContentLoaded", async function() {
           const duration = (end - start) / 1000;
           compDom.components.value.push(...this.comps.ide);
           this.comps.ide.forEach(comp => liveData.watch.item("ComponentClasses", comp, { on: { changed: this.onCompChanged } }));
-          await vueUserComponentCompiler.compileAll(this.comps.ide, { fix: false }, (p) => { this.$refs.hourglass1.progress = p; });
+          await vueUserComponentCompiler.compileAll(this.comps.ide, { fix: false }, (p) => { if (this.$refs.hourglass1) this.$refs.hourglass1.progress = p; });
           this.$refs.hourglass1.stop();
+          this.showHourglass = false;
           this.isIniting = false;
         },
         reload: async function() {

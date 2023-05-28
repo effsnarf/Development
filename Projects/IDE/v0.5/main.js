@@ -25,7 +25,15 @@ var getContent = (path) => {
     var encoding = textEncoding;
     if (["ico", "png", "webp", "jpeg", "jpg"].some(ext => path.endsWith(`.${ext}`))) encoding = null;
     var fileContent = fs.readFileSync(path, encoding);
-    if (path.endsWith(".haml")) return HAML.render(fileContent);
+    if (path.endsWith(".haml")) {
+      try {
+        return HAML.render(fileContent);
+      }
+      catch (ex) {
+        console.log(`${ex.toString().bgRed}`);
+        return ex.toString();
+      }
+    }
     return (fileContent);
   }
   catch (ex) {
