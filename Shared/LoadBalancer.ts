@@ -516,7 +516,7 @@ class LoadBalancer {
           this.sendToClient(incomingItem, cachedResponse);
 
           this.log({
-            //node: { index: incomingItem.nodeItem.index },
+            type: "cache",
             texts: [
               incomingItem.request.method,
               cachedResponse.status.code.toString().gray,

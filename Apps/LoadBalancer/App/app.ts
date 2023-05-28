@@ -91,7 +91,8 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   // Create the main log
   const mainConsoleLog = Log.new(config.title);
   const mainLog = mainConsoleLog;
-  const incomingItemsLog = ObjectLog.new(config.title, () =>
+  const cacheLog = Log.new("Cache hits");
+  const processedItemsLog = ObjectLog.new(config.title, () =>
     loadBalancer.incomingItems
       .getItems()
       .sort((a: IncomingItem, b: IncomingItem) => a.dt - b.dt)
@@ -183,7 +184,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   // Add the counter log
   layout1.addColumn(Unit.box("0%", "0%", "30%", "28%"), [counterLog]);
   // Add the incoming items log
-  layout1.addColumn(Unit.box("30%", "0%", "20%", "100%"), [incomingItemsLog]);
+  layout1.addColumn(Unit.box("30%", "0%", "20%", "100%"), [cacheLog]);
   // Add the nodes
   layout1.addRow(
     Unit.box("50%", "0%", "50%", "50%"),
@@ -199,7 +200,10 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   layout1.addColumn(Unit.box("0%", "30%", "30%", "70%"), [mainConsoleLog]);
   // Alternative dashboard layout
   const layout2 = Layout.new();
-  layout2.add(Unit.box("0%", "0%", "100%", "100%"), incomingItemsLog);
+  layout2.addColumn(Unit.box("0%", "0%", "100%", "100%"), [
+    cacheLog,
+    processedItemsLog,
+  ]);
   // Layout selection
   layouts.push(layout1, layout2);
   let selectedLayoutIndex = 0;
@@ -249,6 +253,14 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
       return;
     }
 
+    if (data.type) {
+      if (data.type == "cache") {
+        cacheLog.log(...(data.texts || [data.text]));
+        return;
+      }
+      throw new Error(`Unknown log type: ${data.type}`);
+    }
+
     const log = (data.node ? nodeLogs[data.node.index] : mainLog) as Log;
     log.log(...(data.texts || [data.text]));
     fsLog.log(...(data.texts || [data.text]));
@@ -267,7 +279,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
     loadBalancer.stats.requests.per.second.count.toLocaleString();
     counterLog.text =
       loadBalancer.stats.requests.per.minute.count.toLocaleString();
-    incomingItemsLog.title = `${loadBalancer.incomingItems.getItems().length}`;
+    processedItemsLog.title = `${loadBalancer.incomingItems.getItems().length}`;
   });
   // Update health check status in the dashboard
   loadBalancer.events.on(
