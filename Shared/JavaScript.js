@@ -1,5 +1,4 @@
 const util = require("util");
-const os = require("os");
 const fs = require("fs");
 const path = require("path");
 const ts = require("typescript");
@@ -28,7 +27,7 @@ class JavaScript
     static loadTypeScriptClasses(classPaths) {
         const classes = {};
 
-        const tempPath = path.resolve(os.tmpdir(), `${Date.now()}`);
+        const tempPath = path.dirname(process.argv[1]);
         if (!fs.existsSync(tempPath)) fs.mkdirSync(tempPath);
 
         //console.log(`${`Transpiling`.gray} ${(classPaths.map((classPath) => path.basename(classPath).yellow).join(", "))}`);
@@ -40,17 +39,20 @@ class JavaScript
             jsCode = jsCode.replace(/_1\.default\b/g, "_1");
             const javaScriptClassPath = path.resolve(tempPath, `${className}.js`);
             fs.writeFileSync(javaScriptClassPath, jsCode, "utf8");
-        });
-
-        // Load the JavaScript files
-        classPaths.forEach((classPath) => {
-            const className = path.basename(classPath).split(".")[0];
-            const javaScriptClassPath = path.resolve(tempPath, `${className}.js`);
             classes[className] = require(javaScriptClassPath)[className];
         });
         
-        // Delete the temporary directory
-        fs.rmdirSync(tempPath, { recursive: true });
+        // Delete the temporary JavaScript files
+        classPaths.forEach((classPath) => {
+            const className = path.basename(classPath).split(".")[0];
+            const javaScriptClassPath = path.resolve(tempPath, `${className}.js`);
+            try
+            {
+                if (fs.existsSync(javaScriptClassPath)) fs.unlinkSync(javaScriptClassPath);
+            }
+            catch (ex) {
+            }
+        });
 
         return classes;
     }
