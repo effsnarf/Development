@@ -166,7 +166,6 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   process.on("uncaughtException", async (ex: any) => {
     fsLog.log(`Uncaught exception:`, ex.stack);
     await fsLog.flush();
-    process.exit(1);
   });
 
   // #endregion
@@ -338,11 +337,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
             };
           });
         for (const item of items) {
-          try {
-            await analytics.create("loadBalancer", "processing", item);
-          } catch (ex: any) {
-            fsLog.log(ex.stack);
-          }
+          analytics.create("loadBalancer", "processing", item);
         }
       }, 1000);
     })();
