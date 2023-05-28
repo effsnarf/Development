@@ -5,6 +5,7 @@ import "colors";
 import * as moment from "moment";
 import axios from "axios";
 import "@shared/Extensions";
+import { Timer } from "@shared/Timer";
 import { Objects } from "@shared/Extensions.Objects";
 import { Configuration } from "@shared/Configuration";
 import { Logger } from "@shared/Logger";
@@ -32,6 +33,22 @@ class Malkovich {
 const malkovitch = new Malkovich();
 
 (async () => {
+  const url = `https://db.memegenerator.net/MemeGenerator`;
+
+  for (let i = 0; i < 100; i++) {
+    try {
+      const timer = Timer.start();
+      const response = await axios.get(url);
+      console.log(
+        `${response.status.severifyByHttpStatus()} ${timer.elapsed?.unitifyTime()}`
+      );
+    } catch (ex: any) {
+      console.log(ex.message.bgRed);
+    }
+  }
+
+  process.exit();
+
   const db = await Database.new({ path: "C:\\Database\\Cache\\Test" });
 
   const doc = { TestKey: "TestValue" };

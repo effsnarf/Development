@@ -166,7 +166,6 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   process.on("uncaughtException", async (ex: any) => {
     fsLog.log(`Uncaught exception:`, ex.stack);
     await fsLog.flush();
-    process.exit(1);
   });
 
   // #endregion
