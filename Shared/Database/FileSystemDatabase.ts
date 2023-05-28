@@ -121,7 +121,7 @@ class FileSystemDatabase extends DatabaseBase {
     const filePath = this.getFilePath(collectionName, doc._id);
     const json = JSON.stringify(doc);
     fs.writeFileSync(filePath, json);
-    if (!returnNewDoc) return doc._id;
+    if (!returnNewDoc) return doc;
     return doc;
   }
 
