@@ -9,6 +9,13 @@ incoming:
       url: /restart/Jz0xnwG1bDv57LFpKTS6UkV8h9XQtCeBOMl2NHfRIj3yPcZYimAsrqdV4oWEaFhu
   severity:
     time: [100, 500, "<"]
+  cache:
+    enabled: true
+    max:
+      age: 1m
+    database:
+      connectionString: mongodb://localhost:37017
+      database: MG-Web-Cache
 nodes:
   - name: MG.Website 1
     address: localhost:5051
