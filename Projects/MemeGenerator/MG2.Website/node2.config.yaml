@@ -8,8 +8,3 @@ database:
   analytics:
     prod:
       path: F:\Database\MG-Analytics
-process:
-  restart:
-    periodically:
-      from: 01:00
-      every: 30m

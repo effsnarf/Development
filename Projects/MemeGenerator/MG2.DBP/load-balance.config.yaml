@@ -14,7 +14,7 @@ incoming:
     time: [100, 500, "<"]
   cache:
     max:
-      age: 1m
+      age: 10m
     store:
       dev:
         database:

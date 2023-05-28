@@ -4,7 +4,7 @@ server:
   port:
   cors:
     dev: [localhost]
-    prod: [memegenerator.net, localhost]
+    prod: [memegenerator.net, localhost, localhost:5051]
   # on dev, we're relaying requests to the production dbp/db
   proxy:
 database:
