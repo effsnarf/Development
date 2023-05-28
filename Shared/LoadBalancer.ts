@@ -514,6 +514,7 @@ class LoadBalancer {
         if (cachedResponse) {
           incomingItem.returnToClient = false;
           this.sendToClient(incomingItem, cachedResponse);
+
           this.log({
             //node: { index: incomingItem.nodeItem.index },
             texts: [
@@ -533,6 +534,7 @@ class LoadBalancer {
             Date.now() - cachedResponse.dt <
             this.options.cache?.max?.age?.deunitifyTime()
           ) {
+            this.incomingItems.remove(incomingItem);
             return;
           }
         }
