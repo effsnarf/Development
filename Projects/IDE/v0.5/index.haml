@@ -68,10 +68,8 @@
         %div{":key": "key1"}
           %div
             %transition{name: "ide-vt-fade"}
-              %ide-system-hourglass.pt-l8{ref: "hourglass1"}
-            / ide-workspace
-            %meow-comp-171.ide-anim-on-load
-          %div
+              %ide-system-hourglass.pt-l8{ref: "hourglass1", "v-show": "isIniting"}
+          %div{"v-if": "!isIniting"}
             %div.flex.ide-anim-on-load{style: "align-items: start; justify-content: space-between;"}
               %div.flex{style: "font-size: 5rem; text-shadow: -0.1em 0.1em 6px #000;"}
                 / Blue cube
@@ -81,8 +79,10 @@
                   %div.fs-m3.text-center.opacity-50 development studio
               %div.flex.text-right
                 / ide-search-comps
-                %meow-comp-268.m-l1.z-100
+                / %meow-comp-268.m-l1.z-100
                 %div.flex.z-10{style: "gap: 2em;"}
                   / ide-user-account
                   %meow-comp-267{ref: "ideUserAccount1"}
             / %button{"@click": "refresh"} refresh
+            / ide-workspace
+            %meow-comp-171.ide-anim-on-load

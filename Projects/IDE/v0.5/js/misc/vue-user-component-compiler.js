@@ -19,6 +19,16 @@ String.prototype.doubleTrim = function(length) {
 }
 
 
+Array.prototype.sortBy = function(keySelector) {
+  return [...this].sort((a, b) => {
+    var aKey = keySelector(a);
+    var bKey = keySelector(b);
+    if (aKey < bKey) return -1;
+    if (aKey > bKey) return 1;
+    return 0;
+  });
+}
+
 
 var toArray = (s) => {
   if (!s) return [];
@@ -710,7 +720,7 @@ compiler.toVueComponentOptions = async (compClass) => {
     asyncComputed: compiler.toVueAsyncComputeds(compClass),
     methods: compiler.toVueMethods(compClass, origComp),
     watch: compiler.toVueWatchers(compClass, compClass.props),
-    template: compiler.toVueTemplate(compClass, origComp),
+    template: await compiler.toVueTemplate(compClass, origComp),
     errorCaptured: compiler.onErrorCaptured,
   };
 
@@ -859,14 +869,19 @@ compiler.compileAll = async (comps, options = { fix: true }, onProgress) => {
     let i = 0;
     let total = comps.length;
 
-    comps = [...comps];
+    console.groupCollapsed(`Compiling ${total} components..`);
+
+    comps = [...comps].sortBy(c => c._id);
     var compileNext;
     compileNext = async () => {
+      const compStarted = Date.now();
+      
       var comp = comps.shift();
 
-      //console.log(`Compiling ${comp.name}...`);
-
-      try { await compiler.compile(comp, options); }
+      try
+      {
+        await compiler.compile(comp, options);
+      }
       catch (ex) {
         console.error(comp);
         console.error(ex);
@@ -881,10 +896,14 @@ compiler.compileAll = async (comps, options = { fix: true }, onProgress) => {
       //console.log(`compileAll (${i} / ${total})`);
       //console.log(`[${"#".repeat(percent*30)}${" ".repeat(30 - percent*30)}] ${Math.round(percent*100)}%`);
 
+      const compStopped = Date.now() - compStarted;
+      console.log(`${compStopped}%cms %c${comp._id} %c${comp.name}%c`, "color: gray;", "color: white;", "color: cyan;", "color: initial;");
+
       if (comps.length <= 0)
       {
         var stopped = (Date.now() - started);
-        console.log(`compileAll ${stopped}ms`);
+        console.log(`compileAll done in ${stopped}ms`);
+        console.groupEnd();
         resolve();
       }
       else
