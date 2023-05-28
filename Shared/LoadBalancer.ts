@@ -136,6 +136,7 @@ interface LoadBalancerOptions {
     max: {
       age: string;
     };
+    store: any;
     ignore: [];
   };
 }
@@ -210,7 +211,7 @@ class LoadBalancer {
 
   static async new(options: LoadBalancerOptions) {
     const lb = new LoadBalancer(options);
-    lb.cache = await Cache.new(options.cache);
+    lb.cache = await Cache.new(options.cache.store);
     lb.cache.events.on("error", (ex: any) => {
       lb.events.emit("error", ex);
     });

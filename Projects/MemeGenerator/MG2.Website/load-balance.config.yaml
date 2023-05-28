@@ -10,16 +10,17 @@ incoming:
   severity:
     time: [100, 500, "<"]
   cache:
-    enabled: true
     max:
       age: 1m
     ignore:
       - /_nuxt/
       - /new
       - /api/ip
-    database:
-      connectionString: mongodb://localhost:37017
-      database: MG-Web-Cache
+    store:
+      - memory: true
+      - database:
+          connectionString: mongodb://localhost:37017
+          database: MG-Web-Cache
 nodes:
   - name: MG.Website 1
     address: localhost:5051

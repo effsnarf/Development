@@ -7,16 +7,17 @@ incoming:
   severity:
     time: [100, 500, "<"]
   cache:
-    dev:
-      database:
-        path: (env) => env.path.resolve("c:\\Database\\Cache", env.config.title)
-    prod:
-      enabled: true
-      max:
-        age: 1m
-      database:
-        connectionString: mongodb://localhost:37017
-        database: MG-DBP-Cache
+    max:
+      age: 1m
+    store:
+      dev:
+        database:
+          path: (env) => env.path.resolve("c:\\Database\\Cache", env.config.title)
+      prod:
+        - memory: true
+        - database:
+            connectionString: mongodb://localhost:37017
+            database: MG-DBP-Cache
 nodes:
   - name: MG.DBP 1
     address: localhost:4041
