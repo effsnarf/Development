@@ -3,7 +3,7 @@ import util from "util";
 import fs from "fs";
 import "colors";
 import http from "http";
-import axios, { AxiosResponse, AxiosResponseHeaders } from "axios";
+import axios, { Axios, AxiosResponse, AxiosResponseHeaders } from "axios";
 import { Cache, CacheBase } from "./Cache";
 import { Objects } from "./Extensions.Objects";
 import { Types } from "./Types";
@@ -342,7 +342,7 @@ class LoadBalancer {
     incomingItem.infos.push(`writing headers`);
 
     if (this.cache) {
-      if (this.isCachable(incomingItem.request)) {
+      if (this.isCachable(incomingItem.request, nodeResponse)) {
         try {
           let data = await this.getResponseStream(nodeResponse);
           if (typeof data != "string") data = Objects.jsonify(data);
@@ -643,7 +643,10 @@ class LoadBalancer {
     this.events.emit("log", data);
   }
 
-  private isCachable(request: http.IncomingMessage) {
+  private isCachable(
+    request: http.IncomingMessage,
+    response?: AxiosResponse<any, any>
+  ) {
     if (!this.cache) return false;
     if (request.method != "GET") return false;
     if (!request.url) return false;
@@ -659,6 +662,7 @@ class LoadBalancer {
       )
     )
       return false;
+    if (response && response.status != 200) return false;
     return true;
   }
 
