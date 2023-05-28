@@ -13,6 +13,8 @@ incoming:
     enabled: true
     max:
       age: 1m
+    ignore:
+      - /_nuxt/
     database:
       connectionString: mongodb://localhost:37017
       database: MG-Web-Cache

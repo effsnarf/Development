@@ -136,6 +136,7 @@ interface LoadBalancerOptions {
     max: {
       age: string;
     };
+    ignore: [];
   };
 }
 
@@ -644,8 +645,14 @@ class LoadBalancer {
     if (request.method != "GET") return false;
     if (!request.url) return false;
     if (
-      [".jpg", ".jpeg", ".png", ".gif"].some((ext) =>
+      [".jpg", ".jpeg", ".png", ".gif", ".webm", ".webp"].some((ext) =>
         request.url?.toLowerCase().endsWith(ext)
+      )
+    )
+      return false;
+    if (
+      this.options.cache?.ignore?.some((pattern: string) =>
+        request.url?.match(pattern)
       )
     )
       return false;
