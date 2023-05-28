@@ -321,7 +321,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
         );
       }, 60 * 1000);
       // Every second, track long running incoming items in analytics
-      setInterval(() => {
+      setInterval(async () => {
         const items = loadBalancer.incomingItems
           .getItems()
           .filter((item: IncomingItem) => (Date.now() - item.dt) / 1000 > 5)
@@ -338,7 +338,11 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
             };
           });
         for (const item of items) {
-          analytics.create("loadBalancer", "processing", item);
+          try {
+            await analytics.create("loadBalancer", "processing", item);
+          } catch (ex: any) {
+            fsLog.log(ex.stack);
+          }
         }
       }, 1000);
     })();
