@@ -40,7 +40,7 @@ const malkovitch = new Malkovich();
       const timer = Timer.start();
       const response = await axios.get(url);
       console.log(
-        `${response.status.severifyByHttpStatus()} ${timer.elapsed?.unitifyTime()}`
+        `${response.status.severifyByHttpStatus()} ${timer.elapsed?.unitifyTime()} ${url}`
       );
     } catch (ex: any) {
       console.log(ex.message.bgRed);
