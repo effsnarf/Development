@@ -85,7 +85,7 @@ if (typeof require != "undefined") {
         url += `${url.includes("?") ? "&" : "?"}userID=${userID}`;
       }
 
-      if (options.cache) {
+      if (options?.cache) {
         const fetchContent = async () => {
           var str = await (await fetch(url, this.fetchOptions)).text();
           const data = parseJSON(str);
