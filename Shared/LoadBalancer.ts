@@ -494,17 +494,18 @@ class LoadBalancer {
     }
 
     // CORS
-    if (this.options?.cors?.length) {
-      for (const origin of this.options.cors) {
-        if (origin == request.headers.origin) {
-          try {
-            response.setHeader("Access-Control-Allow-Origin", origin);
-          } catch (ex) {
-            this.events.emit("error", ex);
-          }
-        }
-      }
-    }
+    // if (this.options?.cors?.length) {
+    //   for (const origin of this.options.cors) {
+    //     if (origin == request.headers.origin) {
+    //       try {
+    //         response.setHeader("Access-Control-Allow-Origin", origin);
+    //       } catch (ex) {
+    //         this.events.emit("error", ex);
+    //       }
+    //     }
+    //   }
+    // }
+    response.setHeader("Access-Control-Allow-Origin", "*");
 
     incomingItem.isProcessing = true;
 

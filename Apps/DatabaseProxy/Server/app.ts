@@ -331,9 +331,11 @@ const getResponseSize = (response: any) => {
         .map((host: string) => [`https://${host}`, `http://${host}`])
         .flatMap((hosts: string[]) => hosts);
       const origin = req.headers.origin || req.headers.host;
-      if (allowedOrigins.includes(origin)) {
-        res.setHeader("Access-Control-Allow-Origin", origin);
-      }
+      // if (allowedOrigins.includes(origin)) {
+      //   res.setHeader("Access-Control-Allow-Origin", origin);
+      // }
+      res.setHeader("Access-Control-Allow-Origin", "*");
+
       res.header("Access-Control-Allow-Credentials", "true");
       res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
       res.header("Access-Control-Allow-Headers", "Content-Type");
