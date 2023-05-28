@@ -16,6 +16,7 @@ incoming:
       - /_nuxt/
       - /new
       - /api/ip
+      - /create
     store:
       - memory: true
       - database:

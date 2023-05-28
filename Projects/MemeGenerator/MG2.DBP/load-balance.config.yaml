@@ -3,7 +3,13 @@ incoming:
   address:
     dev: localhost:4040
     prod: 10.35.16.36:80
-  cors: [https://memegenerator.net, https://vue-studio.com, http://localhost]
+  cors:
+    [
+      https://memegenerator.net,
+      https://vue-studio.com,
+      http://localhost,
+      http://localhost:5051,
+    ]
   severity:
     time: [100, 500, "<"]
   cache:
