@@ -17,6 +17,7 @@ incoming:
       age: 10m
     ignore:
       - /get/new/id
+      - /googleLogin
     store:
       dev:
         database:
