@@ -519,9 +519,11 @@ class LoadBalancer {
             type: "cache",
             texts: [
               incomingItem.request.method,
-              cachedResponse.status.code.toString().gray,
+              cachedResponse.status.code.severifyByHttpStatus(),
               cachedResponse.body.length.unitifySize().gray,
-              timer.elapsed?.unitifyTime(),
+              timer.elapsed
+                ?.unitifyTime()
+                .severify(...this.options.severity.time),
               incomingItem.request.url?.gray,
             ],
           });

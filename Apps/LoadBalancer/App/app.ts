@@ -188,7 +188,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   // Add the counter log
   layout1.addColumn(Unit.box("0%", "0%", "30%", "28%"), [counterLog]);
   // Add the incoming items log
-  layout1.addColumn(Unit.box("30%", "0%", "20%", "100%"), [cacheLog]);
+  layout1.addRow(Unit.box("30%", "0%", "20%", "100%"), [cacheLog]);
   // Add the nodes
   layout1.addRow(
     Unit.box("50%", "0%", "50%", "50%"),

@@ -33,14 +33,19 @@ class Malkovich {
 const malkovitch = new Malkovich();
 
 (async () => {
-  const url = `https://db.memegenerator.net/MemeGenerator`;
+  //const url = `https://db.memegenerator.net/MemeGenerator`;
+  const url = `https://memegenerator.net/api/client.js`;
 
   for (let i = 0; i < 100; i++) {
     try {
       const timer = Timer.start();
       const response = await axios.get(url);
       console.log(
-        `${response.status.severifyByHttpStatus()} ${timer.elapsed?.unitifyTime()} ${url}`
+        `${response.status.severifyByHttpStatus()} ${timer.elapsed
+          ?.unitifyTime()
+          .padStart(6)} ${response.data.length
+          .unitifySize()
+          .padStart(6)} ${url}`
       );
     } catch (ex: any) {
       console.log(ex.message.bgRed);
