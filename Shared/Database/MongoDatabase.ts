@@ -32,7 +32,7 @@ class MongoDatabase extends DatabaseBase {
   }
 
   async get(key: any): Promise<any> {
-    return await this.find(DatabaseBase._mapCollectionName, { _id: key });
+    return (await this.find(DatabaseBase._mapCollectionName, { _id: key }))[0];
   }
 
   async set(key: any, value: any): Promise<void> {
