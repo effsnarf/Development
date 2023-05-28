@@ -358,6 +358,7 @@ class LoadBalancer {
             headers: nodeResponse.headers,
             body: data,
           };
+          delete cachedResponse.headers["access-control-allow-origin"];
           await this.cache.set(incomingItem.request.url || "", cachedResponse);
         } catch (ex: any) {
           this.log(`${`Error caching response`}\n${ex.message}`);
