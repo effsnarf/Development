@@ -12,8 +12,11 @@ incoming:
         path: (env) => env.path.resolve("c:\\Database\\Cache", env.config.title)
     prod:
       enabled: true
+      max:
+        age: 1m
       database:
-        path: (env) => env.path.resolve("f:\\Cache", `${env.config.title}`)
+        connectionString: mongodb://localhost:37017
+        database: MG-Cache
 nodes:
   - name: MG.DBP 1
     address: localhost:4041

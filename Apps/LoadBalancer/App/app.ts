@@ -244,6 +244,11 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   };
   // Log events in the dashboard
   loadBalancer.events.on("log", (data: any) => {
+    if (!data.text && !data.texts) {
+      fsLog.log(data);
+      return;
+    }
+
     const log = (data.node ? nodeLogs[data.node.index] : mainLog) as Log;
     log.log(...(data.texts || [data.text]));
     fsLog.log(...(data.texts || [data.text]));
