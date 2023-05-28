@@ -16,7 +16,7 @@ incoming:
         age: 1m
       database:
         connectionString: mongodb://localhost:37017
-        database: MG-Cache
+        database: MG-DBP-Cache
 nodes:
   - name: MG.DBP 1
     address: localhost:4041
