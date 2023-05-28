@@ -91,7 +91,11 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   // Create the main log
   const mainConsoleLog = Log.new(config.title);
   const mainLog = mainConsoleLog;
-  const cacheLog = Log.new("Cache hits");
+  const cacheLog = Log.new("Cache", {
+    columns: [4, 3, 6, 6],
+    breakLines: false,
+    extraSpaceForBytes: true,
+  });
   const processedItemsLog = ObjectLog.new(config.title, () =>
     loadBalancer.incomingItems
       .getItems()
