@@ -312,13 +312,13 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
       );
       // Every minute, track requests/minute and response times in analytics
       const rtpm = loadBalancer.stats.response.times.per.minute;
-      setInterval(() => {
-        analytics.create(
+      setInterval(async () => {
+        await analytics.create(
           "traffic",
           "requests.per.minute",
           loadBalancer.stats.requests.per.minute.count
         );
-        analytics.create(
+        await analytics.create(
           "traffic",
           "response.time.per.minute.average",
           rtpm.average
@@ -342,7 +342,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
             };
           });
         for (const item of items) {
-          analytics.create("loadBalancer", "processing", item);
+          await analytics.create("loadBalancer", "processing", item);
         }
       }, 1000);
     })();
