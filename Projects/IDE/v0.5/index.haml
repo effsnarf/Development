@@ -39,7 +39,7 @@
     %script{src: "./js/ide/GraphDatabase.js"}
     %script{src: "./js/ide/DataBinder.js"}
     %script{src: "//db.memegenerator.net/client.js"}
-    %script{src: "//unpkg.com/@babel/standalone@7.18.7/babel.min.js"}
+    / %script{src: "//unpkg.com/@babel/standalone@7.18.7/babel.min.js"}
     %script{src: "./js/misc/vue-user-component-compiler.js"}
     %script{src: "./js/misc/live-data.js"}
     %script{src: "./js/misc/drag-and-drop.js"}
@@ -66,10 +66,9 @@
     .body-main
       #app
         %div{":key": "key1"}
-          %div {{isIniting}}
-          %div{"v-if": "(!isIniting)"}
+          %div{"v-show": "(!isIniting)"}
             %img.hidden.ide-anim-on-load.w-l10{src: "./img/1.webp", style: "position: fixed; bottom: 0.5em;"}
-          %div{"v-if": "(!isIniting)"}
+          %div{"v-show": "(!isIniting)"}
             %div.flex.ide-anim-on-load{style: "align-items: start; justify-content: space-between;"}
               %div.flex{style: "font-size: 5rem; text-shadow: -0.1em 0.1em 6px #000;"}
                 / Blue cube
@@ -88,8 +87,8 @@
                   / ide-user-account
                   %meow-comp-267{ref: "ideUserAccount1"}
             / %button{"@click": "refresh"} refresh
-          %hr{"v-if": "(!isIniting)"}
-          .logo{"v-if": "(!isIniting)"}
+          %hr{"v-show": "(!isIniting)"}
+          .logo{"v-show": "(!isIniting)"}
             / %img{src: "./img/1.png"}
           .levitating
           %div
@@ -98,5 +97,3 @@
               %ide-system-hourglass.pt-l8{"v-show": "isIniting", ref: "hourglass1"}
             / ide-workspace
             %meow-comp-171.ide-anim-on-load
-        / %div{"v-if": "(!isIniting)", style: "position: fixed; right: 1em; bottom: 1em;"}
-          %iframe{src: "https://discord.com/widget?id=1007614412561055876&theme=dark", width: "350", height: "500", allowtransparency: "true", frameborder: "0", sandbox: "allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"}

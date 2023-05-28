@@ -127,7 +127,7 @@ document.addEventListener("DOMContentLoaded", async function() {
     },
     mounted: function() {
     },
-    template: util.haml(`%div{"v-if": "timer"}\n  %div.hourglass\n  %div\n    %progress-bar.mt-l1{":value": "progress"}\n  %div.hidden.text-center.opacity-50{"v-text": "\`\${(elapsed / 1000).toFixed(2)}s\`"}`)
+    template: util.haml(`%div{"v-if": "timer"}\n  %div.hourglass\n  %div\n    %progress-bar.mt-l1{":value": "progress"}\n  %div.text-center.opacity-50{"v-text": "\`\${Math.round(progress*100)}% \${(elapsed / 1000).toFixed(2)}s\`"}`)
   });
 
 
