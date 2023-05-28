@@ -29,7 +29,7 @@ class FileSystemDatabase extends DatabaseBase {
     return JSON.parse(fs.readFileSync(filePath, "utf8"));
   }
 
-  async set(key: any, value: Object): Promise<void> {
+  async set(key: any, value: any): Promise<void> {
     const filePath = await this.getFilePath(
       DatabaseBase._mapCollectionName,
       key

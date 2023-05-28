@@ -43,22 +43,24 @@ const cache = {
     api: {
       methods: async (db: MongoDatabase | undefined) => {
         if (!db) return null;
-        return await (
-          await cache._getStore()
-        ).get(
-          `${db.database}._ApiMethods`,
-          async () => await db?.find("_ApiMethods", {})
-        );
+        return (
+          await (
+            await cache._getStore()
+          ).get(`${db.database}._ApiMethods`, async () => {
+            return { apiMethods: await db?.find("_ApiMethods", {}) };
+          })
+        )?.apiMethods;
       },
     },
     collection: {
       names: async (db: MongoDatabase | undefined) => {
-        return (await cache._getStore()).get(
-          `${db?.database}.CollectionNames`,
-          async () => {
-            return await db?.getCollectionNames();
-          }
-        );
+        return (
+          await (
+            await cache._getStore()
+          ).get(`${db?.database}.CollectionNames`, async () => {
+            return { collectionNames: await db?.getCollectionNames() };
+          })
+        )?.collectionNames;
       },
     },
   },

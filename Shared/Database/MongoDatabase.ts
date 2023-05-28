@@ -35,7 +35,7 @@ class MongoDatabase extends DatabaseBase {
     return (await this.find(DatabaseBase._mapCollectionName, { _id: key }))[0];
   }
 
-  async set(key: any, value: Object): Promise<void> {
+  async set(key: any, value: any): Promise<void> {
     await this.upsert(DatabaseBase._mapCollectionName, { _id: key, ...value });
   }
 
