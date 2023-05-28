@@ -147,7 +147,7 @@ class MongoDatabase extends DatabaseBase {
       }
     );
 
-    if (!returnNewDoc) return doc._id;
+    if (!returnNewDoc) return doc;
 
     const newDoc = await collection.findOne({ _id: doc._id });
 
