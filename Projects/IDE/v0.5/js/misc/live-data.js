@@ -109,7 +109,9 @@ var liveData = {
       var item = liveData.watchedItems.find(a => a.isItem(entity, _id));
       if (!item) throw `Watched item ${entity}.${_id} not found.`;
       item.dataWatcher.stop();
-      liveData.watchedItems.remove(item);
+      // Remove the item from the watched items array
+      var index = liveData.watchedItems.indexOf(item);
+      liveData.watchedItems.splice(index, 1);
     }
   },
   create: {
