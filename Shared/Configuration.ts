@@ -134,7 +134,7 @@ class Configuration {
             throw ex;
           }
           node[key] = func.apply(null, [
-            { process, path, config: config.data },
+            Configuration.getConfigContext(config.data),
           ]);
         }
       }
@@ -290,6 +290,28 @@ class Configuration {
     }
     if (env) return env;
     throw new Error(`Invalid environment: ${env}`);
+  }
+
+  static getConfigContext(configData: any) {
+    const context = { process, path, config: configData } as any;
+    context.getLogPath = (title: string) =>
+      Configuration.getLogPath(configData, title);
+    return context;
+  }
+
+  static getLogPath(configData: any, title: string) {
+    const parts = [];
+    parts.push(process.cwd().findParentDir("Development"));
+    parts.push("Logs");
+    const now = new Date();
+    // Add yyyy\mm\dd to the log path
+    parts.push(...now.toISOString().split("T")[0].split("-").slice(0, 3));
+    // Add hh-mm to the log path
+    parts.push(...now.toISOString().split("T")[1].split(":").slice(0, 2));
+    // Add title to the log path
+    if (!title.endsWith(".log")) title += ".log";
+    parts.push(title);
+    return path.join(...parts);
   }
 
   private log(...args: any[]) {

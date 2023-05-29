@@ -269,6 +269,7 @@ interface String {
   isEqualPath(path: string): boolean;
   normalizePath(): string;
   sanitizePath(): string;
+  findParentDir(dirName: string): string;
 
   ipToNumber(): number;
   decodeBase64(): string;
@@ -1013,6 +1014,12 @@ if (typeof String !== "undefined") {
       ].join("/") + (extension ? `.${extension}` : "");
 
     return sanitized;
+  };
+
+  String.prototype.findParentDir = function (dirName: string): string {
+    const parts = this.toString().normalizePath().split("\\");
+    const index = parts.indexOf(dirName);
+    return parts.slice(0, index).join("\\");
   };
 
   String.prototype.ipToNumber = function (): number {
