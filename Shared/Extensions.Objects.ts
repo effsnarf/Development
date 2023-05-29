@@ -1,4 +1,5 @@
 import "./Extensions";
+import util from "util";
 const jsyaml = require("js-yaml");
 
 class Objects {
@@ -78,7 +79,7 @@ class Objects {
   }
 
   static stringify(obj: any): string {
-    return JSON.stringify(obj);
+    return util.inspect(obj, { depth: 4 });
   }
 
   static yamlify(obj: any): string {

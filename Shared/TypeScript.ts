@@ -7,6 +7,10 @@ import webpack from "webpack";
 import { Coder } from "./Coder";
 import { Loading } from "./Loading";
 
+interface WebpackifyOptions {
+  type: "source" | "filePath";
+}
+
 class TypeScript {
   static transpileToJavaScript(tsCode: string): string {
     // Options for the TypeScript compiler (no generators)
@@ -27,15 +31,26 @@ class TypeScript {
     return jsCode;
   }
 
-  static async webpackify(inputPath: string): Promise<string> {
+  static async webpackify(
+    input: string,
+    options: WebpackifyOptions = { type: "filePath" }
+  ): Promise<string> {
     return new Promise((resolve, reject) => {
+      if (options.type === "filePath") {
+        input = fs.readFileSync(input, "utf8");
+      }
+
+      // Get the base path of the current script
       const basePath = path.dirname(process.argv[1]);
+
+      const inputFilePath = path.resolve(basePath, `${Date.now()}.ts`);
       const memoryFs = new MemoryFS();
 
-      // Write the input file to memory
+      // Write the source to a memory input file
       // Make sure the directory exists
-      memoryFs.mkdirpSync(path.dirname(inputPath));
-      memoryFs.writeFileSync(inputPath, fs.readFileSync(inputPath, "utf8"));
+      //memoryFs.mkdirpSync(path.dirname(inputFileName));
+      //memoryFs.writeFileSync(inputFileName, input);
+      fs.writeFileSync(inputFilePath, input);
 
       const preprocessTypeScriptPath = path.resolve(
         os.tmpdir(),
@@ -60,7 +75,7 @@ class TypeScript {
       const config = {
         mode: "development",
         target: "node",
-        entry: inputPath,
+        entry: inputFilePath,
         output: {
           ...output,
         },
@@ -96,12 +111,11 @@ class TypeScript {
         ],
       } as webpack.Configuration;
 
-      const loading = Loading.startNew(
-        `${`Webpackifying`.gray} ${config.entry?.toString().green}`
-      );
+      const loading = Loading.startNew(`${`Webpackifying..`.green}`);
       webpack(config, (err: any, stats: any) => {
         loading.stop();
         if (err || stats.hasErrors()) {
+          fs.unlinkSync(inputFilePath);
           console.error(err || stats.compilation.errors);
           reject(err || stats.compilation.errors);
           return;

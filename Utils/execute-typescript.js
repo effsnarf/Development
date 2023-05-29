@@ -11,9 +11,11 @@ const cls = JavaScript.loadTypeScriptClasses(classPaths);
 
 (async () => {
   try {
-    let tsCode = await cls.TypeScript.resolveSharedAliases(fs.readFileSync(inputPath, "utf8"));
+    let tsCode = fs.readFileSync(inputPath, "utf8");
+    
+    tsCode = await cls.TypeScript.resolveSharedAliases(tsCode);
 
-    tsCode = cls.Coder.App.addDebuggingCode(tsCode);
+    //tsCode = cls.Coder.App.addDebuggingCode(tsCode);
 
     const newFilePath = path.resolve(path.dirname(inputPath), `${path.basename(inputPath)}.temp.ts`);
 

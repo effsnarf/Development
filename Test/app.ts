@@ -18,6 +18,7 @@ import { Apify } from "@shared/Apify";
 import { Console } from "@shared/Console";
 import { ChatOpenAI, Roles } from "../Apis/OpenAI/classes/ChatOpenAI";
 import { Google } from "@shared/Google";
+import { Coder } from "@shared/Coder";
 import { Cache } from "@shared/Cache";
 
 type malkovich = string;
@@ -33,46 +34,65 @@ class Malkovich {
 const malkovitch = new Malkovich();
 
 (async () => {
-  const url = `https://db.memegenerator.net/MemeGenerator`;
-  //const url = `https://memegenerator.net/api/client.js`;
+  const debugLogger = Logger.new({
+    path: `c:\\eff\\Development\\Logs\\${new Date()
+      .toLocaleString()
+      .sanitizePath()}.log`,
+  });
 
-  for (let i = 0; i < 100; i++) {
-    try {
-      const timer = Timer.start();
-      const response = await axios.get(url);
-      console.log(
-        `${response.status.severifyByHttpStatus()} ${timer.elapsed
-          ?.unitifyTime()
-          .padStart(6)} ${response.data.length
-          .unitifySize()
-          .padStart(6)} ${url}`
-      );
-    } catch (ex: any) {
-      console.log(ex.message.bgRed);
-    }
-  }
+  await debugLogger.log("test");
+
+  // const tsCode = Coder.App.addDebuggingCode(
+  //   path.resolve(`../Apps/DatabaseProxy/Server/app.ts`)
+  // );
+
+  // fs.writeFileSync(
+  //   path.resolve(path.dirname(process.argv[1]), "test.ts"),
+  //   tsCode
+  // );
 
   process.exit();
 
-  const db = await Database.new({ path: "C:\\Database\\Cache\\Test" });
+  // const url = `https://db.memegenerator.net/MemeGenerator`;
+  // //const url = `https://memegenerator.net/api/client.js`;
 
-  const doc = { TestKey: "TestValue" };
+  // for (let i = 0; i < 100; i++) {
+  //   try {
+  //     const timer = Timer.start();
+  //     const response = await axios.get(url);
+  //     console.log(
+  //       `${response.status.severifyByHttpStatus()} ${timer.elapsed
+  //         ?.unitifyTime()
+  //         .padStart(6)} ${response.data.length
+  //         .unitifySize()
+  //         .padStart(6)} ${url}`
+  //     );
+  //   } catch (ex: any) {
+  //     console.log(ex.message.bgRed);
+  //   }
+  // }
 
-  await db.upsert("TestCollection", doc);
+  // process.exit();
 
-  await db.set("TestKey", doc);
+  // const db = await Database.new({ path: "C:\\Database\\Cache\\Test" });
 
-  console.log(doc);
+  // const doc = { TestKey: "TestValue" };
 
-  process.exit();
+  // await db.upsert("TestCollection", doc);
 
-  const config = (await Configuration.new()).data;
+  // await db.set("TestKey", doc);
 
-  const cache = await Cache.new(config.cache);
+  // console.log(doc);
 
-  const value = await cache.get("test key 1", () => "test value 1");
+  // process.exit();
 
-  console.log(value);
+  // const config = (await Configuration.new()).data;
+
+  // const cache = await Cache.new(config.cache);
+
+  // const value = await cache.get("test key 1", () => "test value 1");
+
+  // console.log(value);
 })();
 
 // for (var i = 0; i <= 100; i += 10) {

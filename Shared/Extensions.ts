@@ -266,6 +266,10 @@ interface String {
   toAbsolutePath(path: any): string;
   toNumber(): number;
 
+  isEqualPath(path: string): boolean;
+  normalizePath(): string;
+  sanitizePath(): string;
+
   ipToNumber(): number;
   decodeBase64(): string;
   hashCode(): number;
@@ -976,6 +980,39 @@ if (typeof String !== "undefined") {
 
   String.prototype.toNumber = function (): number {
     return parseFloat(this.withoutColors());
+  };
+
+  String.prototype.isEqualPath = function (path: any): boolean {
+    return this.toString().normalizePath() === path.normalizePath();
+  };
+
+  String.prototype.normalizePath = function (): string {
+    return this.toString().replace(/\//g, "\\");
+  };
+
+  // Make a string safe to use as a filename or directory name
+  String.prototype.sanitizePath = function (): string {
+    const sanitizePart = (s: string) => {
+      if (s.length == 2 && s[1] == ":") return s;
+      // Invalid characters in Windows filenames: \ / : * ? " < > |
+      const invalidCharsRegex = /[\x00-\x1f\\\/:*?"<>|]/g;
+      s = s.replace(invalidCharsRegex, "_");
+      return s;
+    };
+
+    const parts = this.toString().replace(/\\/g, "/").split("/");
+
+    const dirName = parts.slice(0, -1);
+    const fileName = parts.slice(-1)[0];
+    const extension = fileName.split(".").slice(-1)[0];
+
+    const sanitized =
+      [
+        ...dirName,
+        sanitizePart(fileName.split(".").slice(0, -1).join(".")),
+      ].join("/") + (extension ? `.${extension}` : "");
+
+    return sanitized;
   };
 
   String.prototype.ipToNumber = function (): number {

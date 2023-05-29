@@ -404,7 +404,8 @@ class Log extends ConsoleElement {
         const args = [...item.args];
         if (this.logOptions?.extraSpaceForBytes) {
           args.forEach((arg, i) => {
-            if (arg?.getUnit() == "b") args[i] = arg + " ";
+            if (typeof arg == "string" && arg?.getUnit() == "b")
+              args[i] = arg + " ";
           });
         }
         const line = `${dateStr}${args.joinColumns(

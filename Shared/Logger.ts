@@ -1,13 +1,13 @@
 import "./Extensions";
 import fs from "fs";
+import path from "path";
+import { Objects } from "./Extensions.Objects";
 import { Timer } from "./Timer";
 import { Queue } from "./Queue";
 import { Reflection } from "./Reflection";
 import jsyaml from "js-yaml";
 
 abstract class Logger {
-  abstract log(...args: any[]): void | Promise<void>;
-
   static new(config: any): LoggerBase {
     if (!config) {
       return EmptyLogger.new();
@@ -41,6 +41,10 @@ abstract class LoggerBase implements Logger {
       async (items: any[]) => await this._log.apply(this, [items]),
       1000
     );
+
+    process.on("exit", async () => {
+      await this.flush();
+    });
   }
 
   async log(...args: any[]) {
@@ -112,11 +116,11 @@ class FunctionLogger extends LoggerBase {
 }
 
 class MultiLogger extends LoggerBase {
-  private constructor(private readonly loggers: Logger[]) {
+  private constructor(private readonly loggers: LoggerBase[]) {
     super();
   }
 
-  static new(loggers: Logger[]) {
+  static new(loggers: LoggerBase[]) {
     return new MultiLogger(loggers);
   }
 
@@ -130,8 +134,19 @@ class MultiLogger extends LoggerBase {
 }
 
 class FileSystemLogger extends LoggerBase {
-  private constructor(private readonly path: string) {
+  private readonly logPath: string;
+
+  private constructor(logPath: string) {
     super();
+    if (!logPath.isEqualPath(logPath.sanitizePath())) {
+      logPath = logPath.sanitizePath();
+      console.warn(`Sanitizing path: ${logPath.yellow}`);
+    }
+    const folderPath = path.dirname(logPath);
+    if (!fs.existsSync(folderPath)) {
+      fs.mkdirSync(folderPath, { recursive: true });
+    }
+    this.logPath = logPath;
   }
 
   static new(path: string) {
@@ -142,10 +157,9 @@ class FileSystemLogger extends LoggerBase {
     let text = items
       .map((item) => {
         if (!item.args.filter((a: any) => a).length) return null;
-        const text = item.args.map((arg: any) => {
-          if (typeof arg == "string") return arg.withoutColors();
-          return jsyaml.dump(arg);
-        });
+        const text = item.args
+          .map(Objects.stringify)
+          .map((s: string) => s?.withoutColors().shorten(200));
         return `${new Date(item.dt).toISOString()} ${text}`;
       })
       .filter((a) => a)
@@ -153,7 +167,8 @@ class FileSystemLogger extends LoggerBase {
 
     text = text.withoutColors();
 
-    if (text.trim().length) fs.appendFileSync(this.path, text + "\n");
+    if (text.trim().length)
+      fs.writeFileSync(this.logPath, text + "\n", { flag: "a" });
   }
 }
 

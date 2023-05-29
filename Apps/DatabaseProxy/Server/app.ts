@@ -72,147 +72,6 @@ const getResponseSize = (response: any) => {
 };
 
 (async () => {
-  // #region User
-  class User {
-    private constructor(public readonly data: any) {}
-
-    static get = async (req: any, res: any, postData: any) => {
-      const database = req.params.database;
-      if (!database) return null;
-
-      if (!(config.dbs || [])[database]?.users?.enabled) return null;
-
-      const db = await dbs.get(database);
-
-      // Google login
-      if (postData?.credential) {
-        const googleUserData = await Google.verifyIdToken(postData.credential);
-        let dbUser = (
-          await db?.find("Users", {
-            "google.email": googleUserData.email,
-          })
-        )?.first();
-
-        // If the user doesn't exist, create it
-        if (!dbUser) {
-          dbUser = {
-            _id: await db?.getNewID(),
-            type: null,
-            ip: null,
-            created: Date.now(),
-            data: {
-              componentClasses: {
-                _ids: [],
-              },
-            },
-            google: googleUserData,
-            info: {
-              image: googleUserData.picture,
-              name: googleUserData.given_name,
-            },
-          };
-          await db?.upsert("Users", dbUser);
-        }
-
-        // Create a login token
-        // 20 character random string
-        const tokenKey = [...Array(20)]
-          .map((i) => (~~(Math.random() * 36)).toString(36))
-          .join("");
-
-        // Delete other login tokens for this user
-        await db?.delete("Tokens", {
-          "data.user._id": dbUser._id,
-        });
-
-        // Create a new login token
-        const dbToken = {
-          _id: await db?.getNewID(),
-          created: Date.now(),
-          expires: (Date.now() + 1000 * 60 * 60 * 24 * 30).toString(),
-          type: "login",
-          data: {
-            key: tokenKey,
-            user: {
-              _id: dbUser._id,
-            },
-          },
-        };
-
-        await db?.upsert("Tokens", dbToken);
-
-        // Save the token key in the response cookie
-        res.cookie("userLoginTokenKey", tokenKey, {
-          maxAge: 1000 * 60 * 60 * 24 * 30,
-          httpOnly: true,
-          sameSite: "none",
-          secure: true,
-          overwrite: true,
-        });
-
-        return new User(dbUser);
-      }
-
-      // Cookie login
-      const userLoginTokenKey = req.cookies.userLoginTokenKey;
-      if (userLoginTokenKey) {
-        const token = (
-          await db?.find("Tokens", {
-            "data.key": userLoginTokenKey,
-          })
-        )?.first();
-        if (token) {
-          const dbUser = (
-            await db?.find("Users", {
-              _id: token.data.user._id,
-            })
-          )?.first();
-          if (dbUser) {
-            return new User(dbUser);
-          }
-        }
-      }
-
-      // IP login
-      const userIP = (
-        req.headers["x-forwarded-for"] ||
-        req.connection.remoteAddress ||
-        req.socket.remoteAddress ||
-        req.connection.socket.remoteAddress
-      ).ipToNumber();
-
-      let dbUser = (
-        await db?.find("Users", {
-          ip: userIP,
-        })
-      )?.first();
-
-      if (!dbUser) {
-        dbUser = {
-          _id: await db?.getNewID(),
-          type: null,
-          ip: userIP,
-          created: Date.now(),
-          data: {
-            componentClasses: {
-              _ids: [],
-            },
-          },
-          google: null,
-          info: {
-            image: null,
-            name: null,
-          },
-        };
-
-        await db?.upsert("Users", dbUser);
-      }
-
-      return new User(dbUser);
-    };
-  }
-  // #endregion
-
   // #region 📝 Configuration
   const configObj = await Configuration.new();
   const config = configObj.data;
@@ -706,6 +565,220 @@ const getResponseSize = (response: any) => {
     );
     // #endregion
   };
+  // #endregion
+
+  // #region 📝 Logging
+  const debug2Log = Logger.new({
+    path: `c:\\eff\\Development\\Logs\\${
+      config.title
+    }\\${new Date().toLocaleDateString()}\\${new Date().toLocaleTimeString()}.log`,
+  });
+
+  const debugLogger = {
+    log: (...args: any[]) => {
+      debug2Log.log(...args);
+      mainLog.log(...args);
+    },
+  };
+  // #endregion
+
+  // #region User
+  class User {
+    private constructor(public readonly data: any) {}
+
+    static get = async (req: any, res: any, postData: any) => {
+      debugLogger.log("[User.get] entered with arguments:", req, res, postData);
+
+      const database = req.params.database;
+      if (!database) {
+        debugLogger.log("[User.get] No database found. Returning null.");
+        return null;
+      }
+
+      if (!(config.dbs || [])[database]?.users?.enabled) {
+        debugLogger.log(
+          "[User.get] User not enabled in the database. Returning null."
+        );
+        return null;
+      }
+
+      const db = await dbs.get(database);
+      debugLogger.log("[User.get] Database retrieved:", db);
+
+      // Google login
+      if (postData?.credential) {
+        debugLogger.log(
+          "[User.get] Attempting Google login with credential:",
+          postData.credential
+        );
+
+        const googleUserData = await Google.verifyIdToken(postData.credential);
+        debugLogger.log(
+          "[User.get] Google user data retrieved:",
+          googleUserData
+        );
+
+        let dbUser = (
+          await db?.find("Users", {
+            "google.email": googleUserData.email,
+          })
+        )?.first();
+        debugLogger.log("[User.get] Database user retrieved:", dbUser);
+
+        // If the user doesn't exist, create it
+        if (!dbUser) {
+          debugLogger.log(
+            "[User.get] User does not exist in the database. Creating a new user."
+          );
+
+          dbUser = {
+            _id: await db?.getNewID(),
+            type: null,
+            ip: null,
+            created: Date.now(),
+            data: {
+              componentClasses: {
+                _ids: [],
+              },
+            },
+            google: googleUserData,
+            info: {
+              image: googleUserData.picture,
+              name: googleUserData.given_name,
+            },
+          };
+
+          await db?.upsert("Users", dbUser);
+          debugLogger.log(
+            "[User.get] New user created in the database:",
+            dbUser
+          );
+        }
+
+        // Create a login token
+        // 20 character random string
+        const tokenKey = [...Array(20)]
+          .map((i) => (~~(Math.random() * 36)).toString(36))
+          .join("");
+
+        debugLogger.log("[User.get] Login token key generated:", tokenKey);
+
+        // Delete other login tokens for this user
+        await db?.delete("Tokens", {
+          "data.user._id": dbUser._id,
+        });
+        debugLogger.log(
+          "[User.get] Other login tokens deleted for the user:",
+          dbUser._id
+        );
+
+        // Create a new login token
+        const dbToken = {
+          _id: await db?.getNewID(),
+          created: Date.now(),
+          expires: (Date.now() + 1000 * 60 * 60 * 24 * 30).toString(),
+          type: "login",
+          data: {
+            key: tokenKey,
+            user: {
+              _id: dbUser._id,
+            },
+          },
+        };
+
+        await db?.upsert("Tokens", dbToken);
+        debugLogger.log("[User.get] New login token created:", dbToken);
+
+        // Save the token key in the response cookie
+        res.cookie("userLoginTokenKey", tokenKey, {
+          maxAge: 1000 * 60 * 60 * 24 * 30,
+          httpOnly: true,
+          sameSite: "none",
+          secure: true,
+          overwrite: true,
+        });
+        debugLogger.log("[User.get] Token key saved in the response cookie.");
+
+        return new User(dbUser);
+      }
+
+      // Cookie login
+      const userLoginTokenKey = req.cookies.userLoginTokenKey;
+      if (userLoginTokenKey) {
+        debugLogger.log(
+          "[User.get] Attempting cookie login with token key:",
+          userLoginTokenKey
+        );
+
+        const token = (
+          await db?.find("Tokens", {
+            "data.key": userLoginTokenKey,
+          })
+        )?.first();
+        debugLogger.log("[User.get] Token retrieved from the database:", token);
+
+        if (token) {
+          const dbUser = (
+            await db?.find("Users", {
+              _id: token.data.user._id,
+            })
+          )?.first();
+          debugLogger.log(
+            "[User.get] User retrieved from the database:",
+            dbUser
+          );
+
+          if (dbUser) {
+            return new User(dbUser);
+          }
+        }
+      }
+
+      // IP login
+      const userIP = (
+        req.headers["x-forwarded-for"] ||
+        req.connection.remoteAddress ||
+        req.socket.remoteAddress ||
+        req.connection.socket.remoteAddress
+      ).ipToNumber();
+      debugLogger.log("[User.get] IP address retrieved:", userIP);
+
+      let dbUser = (
+        await db?.find("Users", {
+          ip: userIP,
+        })
+      )?.first();
+      debugLogger.log("[User.get] Database user retrieved:", dbUser);
+
+      if (!dbUser) {
+        debugLogger.log(
+          "[User.get] User does not exist in the database. Creating a new user."
+        );
+
+        dbUser = {
+          _id: await db?.getNewID(),
+          type: null,
+          ip: userIP,
+          created: Date.now(),
+          data: {
+            componentClasses: {
+              _ids: [],
+            },
+          },
+          google: null,
+          info: {
+            image: null,
+            name: null,
+          },
+        };
+
+        await db?.upsert("Users", dbUser);
+        debugLogger.log("[User.get] New user created in the database:", dbUser);
+      }
+
+      return new User(dbUser);
+    };
+  }
   // #endregion
 
   // #region 🚀 Start the server
