@@ -285,7 +285,7 @@ function DatabaseProxyDataPersister(dbp, entity, isArray, filter, sort, data)
     // Update local database
     if (["ComponentClasses"].some(e => e == entity)) {
       const items = [item].map(c => { return { _id: c._id, name: c.name, _item: c } });
-      await Local.db[entity].bulkPut(items);
+      await Local.db[entity].put(item, [item._id])
     }
     //alertify.message(`${entity} (${item._id}) saved`);
   }

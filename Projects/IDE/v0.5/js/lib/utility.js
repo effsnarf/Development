@@ -89,6 +89,11 @@ String.prototype.separateWords = function()
     return this.replace(/([a-z])([A-Z])/g, '$1 $2');
 }
 
+String.prototype.matchAllRegexes = function(regex)
+{
+    return [...(this.toString().matchAll(regex))].map(m => m[0]);
+}
+
 Array.prototype.sortBy = function(getKey)
 {
     // Sort array by key
