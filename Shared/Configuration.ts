@@ -301,16 +301,20 @@ class Configuration {
 
   static getLogPath(configData: any, title: string) {
     const parts = [];
-    parts.push(process.cwd().findParentDir("Development"));
+    parts.push(process.argv[1].findParentDir("Development"));
     parts.push("Logs");
     const now = new Date();
     // Add yyyy\mm\dd to the log path
     parts.push(...now.toISOString().split("T")[0].split("-").slice(0, 3));
     // Add hh-mm to the log path
-    parts.push(...now.toISOString().split("T")[1].split(":").slice(0, 2));
-    // Add title to the log path
-    if (!title.endsWith(".log")) title += ".log";
-    parts.push(title);
+    const time = now
+      .toISOString()
+      .split("T")[1]
+      .split(":")
+      .slice(0, 2)
+      .join("-");
+    //parts.push(`${time}.log`);
+    parts.push(`${title}.log`);
     return path.join(...parts);
   }
 
