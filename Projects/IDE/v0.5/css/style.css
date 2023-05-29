@@ -525,6 +525,21 @@ td .ide-value-image-small
 }
 
 
+.ajs-dialog, .ajs-header, .ajs-footer
+{
+  background: #ffffff30 !important;
+}
+
+.ajs-content
+{
+  font-size: 140%;
+}
+
+.ajs-warning
+{
+  background: #FFFF9960 !important;
+}
+
 
 
 

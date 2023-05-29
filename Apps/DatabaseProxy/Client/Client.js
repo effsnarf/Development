@@ -15,8 +15,22 @@ if (typeof require != "undefined") {
     
   var _fetch = fetch;
   fetch = async (...args) => {
-    var result = await _fetch(...args);
-    return result;
+    const msg = (typeof alertify == 'undefined') ? null : alertify.warning(args[0]).delay(0);
+    try
+    {
+      const result = await _fetch(...args);
+      if (msg) msg.dismiss();
+      return result;
+    }
+    catch (ex)
+    {
+      if (msg) msg.dismiss();
+      if (typeof alertify != 'undefined') alertify.error(ex.message);
+      if (confirm("Try again?"))
+      {
+        return await fetch(...args);
+      }
+    }
   };
 // #endregion
 
