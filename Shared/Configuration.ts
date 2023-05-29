@@ -4,6 +4,7 @@ import * as colors from "colors";
 import * as fs from "fs";
 import * as jsyaml from "js-yaml";
 import * as moment from "moment";
+import "./Extensions";
 import { Objects } from "./Extensions.Objects";
 import { Types } from "./Types";
 import { ChatOpenAI, Roles } from "../Apis/OpenAI/classes/ChatOpenAI";
@@ -133,9 +134,8 @@ class Configuration {
             console.log(`Error evaluating function:\n${value}`);
             throw ex;
           }
-          node[key] = func.apply(null, [
-            Configuration.getConfigContext(config.data),
-          ]);
+          const context = Configuration.getConfigContext(config.data);
+          node[key] = func.apply(null, [context]);
         }
       }
     });
