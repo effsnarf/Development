@@ -301,7 +301,7 @@ class Configuration {
 
   static getLogPath(configData: any, title: string) {
     const parts = [];
-    parts.push(process.cwd().findParentDir("Development"));
+    parts.push(process.argv[1].findParentDir("Development"));
     parts.push("Logs");
     const now = new Date();
     // Add yyyy\mm\dd to the log path
