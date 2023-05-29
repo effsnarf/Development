@@ -160,7 +160,7 @@ class FileSystemLogger extends LoggerBase {
         const text = item.args.map((arg: any) =>
           typeof arg == "string"
             ? arg
-            : Objects.stringify(arg).withoutColors().shorten(200)
+            : Objects.stringify(arg).withoutColors().shorten(50)
         );
         return `${new Date(item.dt).toISOString()} ${text}`;
       })
