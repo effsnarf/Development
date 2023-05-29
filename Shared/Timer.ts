@@ -108,6 +108,12 @@ class Timer {
     this.start();
   }
 
+  getAvrages() {
+    return [...this.logs.entries()].map((e) => {
+      return { key: e[0], average: e[1].average() };
+    });
+  }
+
   get elapsed() {
     if (!this.started) return null;
     return Date.now() - this.started;

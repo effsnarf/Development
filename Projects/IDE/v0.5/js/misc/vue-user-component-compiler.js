@@ -622,7 +622,7 @@ compiler.toVueTemplate = async (compClass, origComp) => {
     var cbNode = (node) => {
       node.attrs = (node.attrs || []);
       //node.attrs.push({ name: "v-ide-debugger" });
-      node.attrs?.forEach(attr => { if ((attr.name) && (!attr.value)) attr.value = emptyValuePH; });
+      //node.attrs?.forEach(attr => { if ((attr.name) && (!attr.value)) attr.value = emptyValuePH; });
     };
 
     compileTimer2.log(`toVueTemplate.1`, timer2.elapsed);
@@ -645,7 +645,7 @@ compiler.toVueTemplate = async (compClass, origComp) => {
     compileTimer2.log(`toVueTemplate.3`, timer2.elapsed);
     timer2.restart();
 
-    html = html?.replaceAll(emptyValuePH, "");
+    //html = html?.replaceAll(emptyValuePH, "");
 
     compileTimer2.log(`toVueTemplate.4`, timer2.elapsed);
     timer2.restart();
