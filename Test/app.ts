@@ -34,13 +34,16 @@ class Malkovich {
 const malkovitch = new Malkovich();
 
 (async () => {
-  const debugLogger = Logger.new({
-    path: `c:\\eff\\Development\\Logs\\${new Date()
-      .toLocaleString()
-      .sanitizePath()}.log`,
-  });
+  console.log(process.argv[1]);
+  console.log(process.argv[1].findParentDir("Development"));
 
-  await debugLogger.log("test");
+  // const debugLogger = Logger.new({
+  //   path: `c:\\eff\\Development\\Logs\\${new Date()
+  //     .toLocaleString()
+  //     .sanitizePath()}.log`,
+  // });
+
+  // await debugLogger.log("test");
 
   // const tsCode = Coder.App.addDebuggingCode(
   //   path.resolve(`../Apps/DatabaseProxy/Server/app.ts`)
