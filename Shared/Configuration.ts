@@ -308,7 +308,7 @@ class Configuration {
     parts.push(...now.toISOString().split("T")[0].split("-").slice(0, 3));
     // Add hh-mm to the log path
     parts.push(
-      ...now.toISOString().split("T")[1].split(":").slice(0, 2).join("-")
+      now.toISOString().split("T")[1].split(":").slice(0, 2).join("-")
     );
     // Add title to the log path
     if (!title.endsWith(".log")) title += ".log";
