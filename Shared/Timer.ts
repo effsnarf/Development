@@ -109,9 +109,11 @@ class Timer {
   }
 
   getAvrages() {
-    return [...this.logs.entries()].map((e) => {
-      return { key: e[0], average: e[1].average() };
-    });
+    return [...this.logs.entries()]
+      .map((e) => {
+        return { key: e[0], average: e[1].average() };
+      })
+      .sortByDesc((e) => e.average);
   }
 
   get elapsed() {

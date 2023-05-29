@@ -10,9 +10,10 @@ class Local
             {
                 const origKey = key;
 
-                key = md5(key);
+                key = (key);
 
                 let value = (await Local.db.Cache.where("key").equals(key).toArray())[0]?.value;
+                //let value = JSON.parse(localStorage.getItem(key));
 
                 const elapsed = Date.now() - started;
 
@@ -24,7 +25,7 @@ class Local
                 //console.log(`Cache miss ${origKey.substring(0, 10)} ${elapsed} ms`);
             
                 // Call getValue() to fetch the value
-                value = getValue();
+                value = await getValue();
             
                 Local.cache.set(key, value);
             
@@ -37,13 +38,15 @@ class Local
             }
         },
         set: async (key, value) => {
-            key = md5(key);
+            key = (key);
             // Store the new value in IndexedDB
             await Local.db.Cache.put({ key, value });
+            //localStorage.setItem(key, JSON.stringify(value));
         },
         has: async (key) => {
-            key = md5(key);
+            key = (key);
             return (await Local.db.Cache.where("key").equals(key).toArray()).length;
+            //return localStorage.getItem(key) != null;
         }
     };
 }
