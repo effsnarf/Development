@@ -94,6 +94,16 @@ String.prototype.matchAllRegexes = function(regex)
     return [...(this.toString().matchAll(regex))].map(m => m[0]);
 }
 
+String.prototype.getRegexMatches = function(regex)
+{
+    return this.matchAllRegexes(regex);
+}
+
+String.prototype.toSingular = function()
+{
+    return util.toSingular(this);
+}
+
 Array.prototype.sortBy = function(getKey)
 {
     // Sort array by key
@@ -194,5 +204,17 @@ var util = {
             // 1234567 => 1,234,567
             return n.toLocaleString();
         }
+    },
+    getProperty: (obj, path) => {
+        // Get property from object
+        // path: 'a.b.c'
+        return path.split('.').reduce((o, i) => o[i], obj);
+    },
+    toSingular: (s) => {
+        // Convert to singular
+        if (s.endsWith('ies')) return s.substring(0, s.length - 3) + 'y';
+        if (s.endsWith('es')) return s.substring(0, s.length - 2);
+        if (s.endsWith('s')) return s.substring(0, s.length - 1);
+        return s;
     }
 }
