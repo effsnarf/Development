@@ -568,14 +568,7 @@ const getResponseSize = (response: any) => {
   // #endregion
 
   // #region 📝 Logging
-  const debug2Log = Logger.new(config.log);
-
-  const debugLogger = {
-    log: (...args: any[]) => {
-      debug2Log.log(...args);
-      mainLog.log(...args);
-    },
-  };
+  const debugLogger = Logger.new(config.log);
   // #endregion
 
   // #region User
