@@ -303,6 +303,7 @@ class Configuration {
     const parts = [];
     parts.push(process.argv[1].findParentDir("Development"));
     parts.push("Logs");
+    parts.push(title);
     const now = new Date();
     // Add yyyy\mm\dd to the log path
     parts.push(...now.toISOString().split("T")[0].split("-").slice(0, 3));
@@ -313,9 +314,7 @@ class Configuration {
       .split(":")
       .slice(0, 2)
       .join("-");
-    // Add title to the log path
-    if (!title.endsWith(".log")) title += ".log";
-    parts.push(`${time}.${title}`);
+    parts.push(`${time}.log`);
     return path.join(...parts);
   }
 
