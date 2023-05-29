@@ -8,9 +8,11 @@ var liveData = {
       get: async() => {
         let classes = await (Local.db.ComponentClasses.where("name").startsWith("IDE.")).toArray();
         if (!classes.length) {
+          const msg = alertify.message(`<h2>Loading IDE compons</h2><div class="hourglass"></div>`).delay(0);
           classes = await liveData.dbp.api.componentClasses.ide.get();
           classes = classes.map(c => { return { _id: c._id, name: c.name, _item: c } });
           await Local.db.ComponentClasses.bulkPut(classes);
+          msg.dismiss();
         }
         return classes.map(c => c._item);
       }

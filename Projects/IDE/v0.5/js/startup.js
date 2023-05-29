@@ -283,9 +283,8 @@ document.addEventListener("DOMContentLoaded", async function() {
           this.isIniting = false;
         },
         reload: async function() {
-          return;
           const user = await liveData.dbp.get.user();
-
+          
           // load user functions
           this.funcs.user = []; //(await liveData.dbp.api.functions.user.get());
 
@@ -322,11 +321,13 @@ document.addEventListener("DOMContentLoaded", async function() {
           var newComps = this.comps.user.filter(c => (!components.find(c2 => (c2._id == c._id))));
           // global components list only contains one copy of each components
           components.push(...newComps);
-          newComps.forEach(comp => liveData.watch.item("ComponentClasses", comp, { on: { changed: this.onCompChanged } }));
-          const getProgressText = (progress) => `<h2>Compiling ${newComps.length} user components ${((progress||0)*100).toFixed(1)}%</h2><div class="hourglass"></div>`;
-          var msg = alertify.message(getProgressText()).delay(0);
-          await vueUserComponentCompiler.compileAll(newComps, { fix: true }, (p) => { msg.setContent(getProgressText(p)); });
-          msg.dismiss();
+          if (newComps.length) {
+            newComps.forEach(comp => liveData.watch.item("ComponentClasses", comp, { on: { changed: this.onCompChanged } }));
+            const getProgressText = (progress) => `<h2>Compiling ${newComps.length} user components ${((progress||0)*100).toFixed(1)}%</h2><div class="hourglass"></div>`;
+            var msg = alertify.message(getProgressText()).delay(0);
+            await vueUserComponentCompiler.compileAll(newComps, { fix: true }, (p) => { msg.setContent(getProgressText(p)); });
+            msg.dismiss();
+          }
         },
         refresh: function() {
           this.key1++;

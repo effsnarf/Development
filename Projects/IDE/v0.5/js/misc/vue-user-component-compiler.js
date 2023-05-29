@@ -860,6 +860,11 @@ compiler.compile = async (compClass, options = { fix: true }) => {
 
 compiler.compileAll = async (comps, options = { fix: true }, onProgress) => {
   var promise = new Promise(async (resolve) => {
+    if (!comps?.length) {
+      resolve();
+      return;
+    }
+    
     var started = Date.now();
 
     let lastReport = Date.now();
