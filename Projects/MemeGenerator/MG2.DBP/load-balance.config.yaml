@@ -49,4 +49,4 @@ analytics:
       path: F:\Database\MG-Analytics
 log:
   enabled: true
-  path: (env) => env.getlogPath(env.config.title)
+  path: (env) => env.getLogPath(env.config.title)

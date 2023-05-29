@@ -568,11 +568,7 @@ const getResponseSize = (response: any) => {
   // #endregion
 
   // #region 📝 Logging
-  const debug2Log = Logger.new({
-    path: `c:\\eff\\Development\\Logs\\${
-      config.title
-    }\\${new Date().toLocaleDateString()}\\${new Date().toLocaleTimeString()}.log`,
-  });
+  const debug2Log = Logger.new(config.log);
 
   const debugLogger = {
     log: (...args: any[]) => {
