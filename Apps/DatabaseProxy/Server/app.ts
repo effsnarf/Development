@@ -586,6 +586,7 @@ const getResponseSize = (response: any) => {
       debugLogger.log("[User.get] entered with arguments:", req, res, postData);
 
       const database = req.params.database;
+      debugLogger.log("[User.get] Retrieving database:", database);
       if (!database) {
         debugLogger.log("[User.get] No database found. Returning null.");
         return null;
@@ -700,6 +701,10 @@ const getResponseSize = (response: any) => {
 
       // Cookie login
       const userLoginTokenKey = req.cookies.userLoginTokenKey;
+      debugLogger.log(
+        "[User.get] Retrieving userLoginTokenKey from cookies:",
+        userLoginTokenKey
+      );
       if (userLoginTokenKey) {
         debugLogger.log(
           "[User.get] Attempting cookie login with token key:",
@@ -775,6 +780,7 @@ const getResponseSize = (response: any) => {
       return new User(dbUser);
     };
   }
+
   // #endregion
 
   // #region 🚀 Start the server
