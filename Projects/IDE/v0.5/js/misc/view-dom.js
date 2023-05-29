@@ -400,7 +400,12 @@ var viewDom = {
       s.push(...this.nodeToHaml(comp, child.node, indent, cbNode).split(`\n`));
       if (wrap) indent--;
     });
-    return s.join("\n");
+
+    s = s.join("\n");
+
+    s = s.replace(/ >/g, `>`);
+
+    return s;
   },
   getPathTree: function(node, indent = 0) {
     if (!node) debugger;

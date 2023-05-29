@@ -49,7 +49,20 @@ class Local
 }
 
 
-Local.db.version(1).stores({
-    ComponentClasses: '_id, name, _item',
-    Cache: 'key, value',
-});
+const collections = {
+    ComponentClasses: ['_id', 'name', '_item'],
+    Cache: ['key', 'value'],
+}
+
+Local.db.version(1).stores(Object.fromEntries(Object.entries(collections).map(([name, keys]) => [name, keys.join(",")])));
+
+
+const logify = (obj, method) => {
+    const orig = obj[method];
+    obj[method] = async (...args) => {
+        console.log(method, args);
+        return await orig.apply(obj, args);
+    }
+}
+
+logify(Local.db.ComponentClasses, "bulkPut");
