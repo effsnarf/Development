@@ -163,9 +163,9 @@ var viewDom = {
     cbNode(node);
     node.attrs?.forEach(attr => { if (!("enabled" in attr)) attr.enabled = true; });
 
-    const classAttr = node.attrs?.find(attr => attr.name == "class");
+    const classAttr = node.attrs?.find(attr => !attr.bind && attr.name == "class");
     if (classAttr) {
-      let classes = classAttr.value.split(" ");
+      let classes = classAttr.value?.split(" ") || [];
       // Remove timestamp classes ("1684904169796") (idk how they got there)
       const timestamps = classes
         .filter(c => (c.length == Date.now().toString().length))

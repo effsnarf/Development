@@ -30,7 +30,7 @@ var liveData = {
         const missing = (_ids.length - userComps.length);
         if (missing) {
           // Load user comps from the server
-          const msg = alertify.message(`<h2>Loading ${missing} missing user compons</h2><div class="hourglass"></div>`).delay(0);
+          const msg = alertify.message(`<h2>Loading ${missing} user compons</h2><div class="hourglass"></div>`).delay(0);
           userComps = (await liveData.dbp.api.componentClasses.user.get());
           userComps = userComps.map(c => { return { _id: c._id, name: c.name, _item: c } });
           await Local.db.ComponentClasses.bulkPut(userComps);
