@@ -282,6 +282,11 @@ function DatabaseProxyDataPersister(dbp, entity, isArray, filter, sort, data)
       if (typeof(o[k]) == `function`) delete o[k];
     });
     await dbp.entity(entity).update(item._id, item);
+    // Update local database
+    if (["ComponentClasses"].some(e => e == entity)) {
+      const items = [item].map(c => { return { _id: c._id, name: c.name, _item: c } });
+      await Local.db[entity].bulkPut(items);
+    }
     //alertify.message(`${entity} (${item._id}) saved`);
   }
 }
