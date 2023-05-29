@@ -30,7 +30,7 @@ process:
     periodically:
       from: 00:00
       every: 1h
-db:
+dbs:
   IDE:
     users:
       enabled: true
