@@ -628,19 +628,7 @@ compiler.toVueTemplate = async (compClass, origComp) => {
     compileTimer2.log(`toVueTemplate.1`, timer2.elapsed);
     timer2.restart();
 
-    const started = Date.now();
-
-    var haml = await Local.cache.get(compDom.get.node.cache.key(compClass, compClass.view.node), () => viewDom.nodeToHaml(compClass, compClass.view.node, 0, cbNode, true));
-
-    const elapsed = (Date.now() - started);
-    //console.log(elapsed);
-    //if (elapsed > 100) debugger;
-
-    compileTimer2.log(`toVueTemplate.2`, timer2.elapsed);
-    timer2.restart();
-
-    const key = haml;
-    var html = await Local.cache.get(key, () => util?.haml(haml) || HAML.render(haml));
+    var html = await Local.cache.get(compDom.get.node.cache.key(compClass, compClass.view.node), () => util.haml(viewDom.nodeToHaml(compClass, compClass.view.node, 0, cbNode, true)));
 
     compileTimer2.log(`toVueTemplate.3`, timer2.elapsed);
     timer2.restart();
