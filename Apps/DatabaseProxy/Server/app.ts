@@ -7,6 +7,7 @@ import axios from "axios";
 import express from "express";
 import cookieParser from "cookie-parser";
 import "@shared/Extensions";
+import { Objects } from "@shared/Extensions.Objects";
 import { Http } from "@shared/Http";
 import { Timer, IntervalCounter } from "@shared/Timer";
 import { Reflection } from "@shared/Reflection";
@@ -569,6 +570,7 @@ const getResponseSize = (response: any) => {
 
   // #region 📝 Logging
   const debugLogger = Logger.new(config.log);
+  debugLogger.log(Objects.yamlify(config));
   // #endregion
 
   // #region User
