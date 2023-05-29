@@ -183,7 +183,7 @@ function DataWatcher(getData, onChange)
     setTimeout(this.check, this.checkInterval);
   }
 
-  //this.check();
+  this.check();
 }
 
 function LiveData(dataPersister, options)

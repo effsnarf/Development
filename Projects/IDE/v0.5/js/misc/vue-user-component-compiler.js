@@ -18,6 +18,17 @@ String.prototype.doubleTrim = function(length) {
   return this.trim().substring(length, (this.length - length * 2 + 1));
 }
 
+String.prototype.hashCode = function() {
+  const str = md5(this.toString());
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const chr = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + chr;
+    hash |= 0;
+  }
+  return hash;
+}
+
 
 Array.prototype.sortBy = function(keySelector) {
   return [...this].sort((a, b) => {

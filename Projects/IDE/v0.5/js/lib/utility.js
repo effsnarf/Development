@@ -60,6 +60,13 @@ String.prototype.getWords = function()
     return this.match(/\w+/g) || [];
 }
 
+String.prototype.getNumbers = function()
+{
+    // Get numbers from string
+    // Decimal numbers only
+    return this.match(/\d+(\.\d+)?/g) || [];
+}
+
 String.prototype.kebabize = function()
 {
     // Convert to kebab-case
@@ -67,6 +74,12 @@ String.prototype.kebabize = function()
     s = s.replace(/[^a-z0-9-]/g, '-');
     s = s.replace(/--+/g, '-');
     return s;
+}
+
+String.prototype.titleize = function()
+{
+    // Convert to Title Case
+    return this.replace(/\w+/g, (s) => s.charAt(0).toUpperCase() + s.substring(1).toLowerCase());
 }
 
 String.prototype.separateWords = function()
@@ -168,6 +181,13 @@ var util = {
           }
         };
         _traverse(obj, "", obj);
-      },
-      distinctItems: (arr) => arr.distinctItems(),
+    },
+    distinctItems: (arr) => arr.distinctItems(),
+    number: {
+        commas: (n) => {
+            // Add thousands commas to number
+            // 1234567 => 1,234,567
+            return n.toLocaleString();
+        }
+    }
 }
