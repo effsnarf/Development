@@ -74,7 +74,9 @@ const getResponseSize = (response: any) => {
 
 (async () => {
   // #region 📝 Configuration
-  const configObj = await Configuration.new();
+  const configObj = await Configuration.new({
+    quitIfChanged: [path.resolve(__dirname, "../Client/Client.js")],
+  });
   const config = configObj.data;
   // #endregion
 
