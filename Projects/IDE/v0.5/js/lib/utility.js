@@ -171,6 +171,7 @@ Array.prototype.average = function(selector)
 
 var util = {
     haml: (s) => {
+        if (!s) return "";
         // Remove empty lines
         s = s.replace(/^\s*[\r\n]/gm, '');
         return HAML.compile(s)();
