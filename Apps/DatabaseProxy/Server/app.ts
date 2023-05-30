@@ -570,9 +570,10 @@ const getResponseSize = (response: any) => {
         const entity = req.params.entity;
         const _id = parseInt(req.query._id);
         const doc = postData;
+        debugLogger.log("[update] Updating", entity, _id, doc);
         if (!doc._id) doc._id = _id;
-        const diff = await db?.upsert(entity, doc, false, true);
-        return res.end(JSON.stringify(diff));
+        const result = await db?.upsert(entity, doc, true, false);
+        return res.end(JSON.stringify(result));
       })
     );
     // #endregion

@@ -265,7 +265,7 @@ function ActivityIndicator()
   setInterval(this.update, this.updateInterval);
 }
 
-// For lists, only loading,
+// For lists, only load is supported, save is not supported.
 // for single items, loading and saving
 function DatabaseProxyDataPersister(dbp, entity, isArray, filter, sort, data)
 {
@@ -283,10 +283,12 @@ function DatabaseProxyDataPersister(dbp, entity, isArray, filter, sort, data)
   }
   this.save = async(item) => {
     if (isArray) return;
+
+    // Remove functions
     util.traverse(item, (o,k) => {
       if (typeof(o[k]) == `function`) delete o[k];
     });
-    await dbp.entity(entity).update(item._id, item);
+    
     // Update local database
     if (["ComponentClasses"].some(e => e == entity)) {
       const items = [item].map(c => { return { _id: c._id, name: c.name, _item: c } });
@@ -295,6 +297,10 @@ function DatabaseProxyDataPersister(dbp, entity, isArray, filter, sort, data)
         await Local.db[entity].put(item, [item._id])
       }
     }
+
+    // Save to remote database
+    await dbp.entity(entity).update(item._id, item);
+
     //alertify.message(`${entity} (${item._id}) saved`);
   }
 }
