@@ -33,9 +33,11 @@ if (typeof require != "undefined") {
   const processFetchQueue = async (alreadyAttempted) => {
     const nextTimeout = 100;
     const item = getNextFetchItem(alreadyAttempted);
-    item.attempt++;
+    if (!item) return setTimeout(processFetchQueue, nextTimeout);
+
     try
     {
+      item.attempt++;
       const result = await fetch(...item.args);
       removeFetchItem(item.id);
       item.resolve(result);
