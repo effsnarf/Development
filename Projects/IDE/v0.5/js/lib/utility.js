@@ -180,9 +180,14 @@ var util = {
         escape: (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'),
     },
     clone: (obj) => JSON.parse(JSON.stringify(obj)),
-    with: (obj, key, value) => {
+    with: (obj, ...args) => {
         const newObj = Object.assign({}, obj);
-        newObj[key] = () => value;
+        for (let i = 0; i < args.length; i += 2)
+        {
+            const key = args[i];
+            const value = args[i + 1];
+            newObj[key] = () => value;
+        }
         return newObj;
     },
     traverse: (obj,
