@@ -157,6 +157,8 @@ var compDom = {
 
       var started = Date.now();
 
+      if (comp.data) delete comp.data;
+      
       await compDom.fix.methods(comp);
       await compDom.fix.options(comp);
       await compDom.fix.errors(comp);
