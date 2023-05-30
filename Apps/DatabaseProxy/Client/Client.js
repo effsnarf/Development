@@ -513,7 +513,7 @@ if (typeof require != "undefined") {
         this.newIds.push(
           ...(await this._getNewIDs(minNewIDs - this.newIds.length))
         );
-      setTimeout(this.ensureNewIds, 200);
+      setTimeout(this.ensureNewIds, 1000);
     };
     this.ensureNewIds();
   
