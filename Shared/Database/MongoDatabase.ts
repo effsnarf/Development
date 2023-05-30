@@ -177,7 +177,7 @@ class MongoDatabase extends DatabaseBase {
       { upsert: true, returnOriginal: true } as any
     );
 
-    const start = result.value?.uniqueID || 1;
+    const start = result.value?.value || 1;
     // Return an array of IDs
     return Array.from(Array(count).keys()).map((i) => start + i);
   }

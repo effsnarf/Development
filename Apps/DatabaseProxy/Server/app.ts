@@ -421,7 +421,6 @@ const getResponseSize = (response: any) => {
 
       const db = await dbs.get(req.params.database);
 
-      // Get and inc [uniqueID] from _IdentityIntegers where _id = null
       const ids = await db?.getNewIDs(count);
 
       return res.send(JSON.stringify(ids));
