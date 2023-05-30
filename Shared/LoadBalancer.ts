@@ -346,20 +346,24 @@ class LoadBalancer {
         try {
           let data = await this.getResponseStream(nodeResponse);
           if (typeof data != "string") data = Objects.jsonify(data);
-
-          // Get the response data
-          const cachedResponse = {
-            dt: Date.now(),
-            url: incomingItem.request.url,
-            status: {
-              code: nodeResponse.status,
-              text: nodeResponse.statusText,
-            },
-            headers: nodeResponse.headers,
-            body: data,
-          };
-          delete cachedResponse.headers["access-control-allow-origin"];
-          await this.cache.set(incomingItem.request.url || "", cachedResponse);
+          if (data.trim().length) {
+            // Get the response data
+            const cachedResponse = {
+              dt: Date.now(),
+              url: incomingItem.request.url,
+              status: {
+                code: nodeResponse.status,
+                text: nodeResponse.statusText,
+              },
+              headers: nodeResponse.headers,
+              body: data,
+            };
+            delete cachedResponse.headers["access-control-allow-origin"];
+            await this.cache.set(
+              incomingItem.request.url || "",
+              cachedResponse
+            );
+          }
         } catch (ex: any) {
           this.log(`${`Error caching response`}\n${ex.message}`);
           try {
