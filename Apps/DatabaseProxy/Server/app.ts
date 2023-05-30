@@ -565,14 +565,13 @@ const getResponseSize = (response: any) => {
     // [database]/[entity]/update
     httpServer.post(
       "/:database/:entity/update",
-      processRequest(async (req: any, res: any, postData: any) => {
+      processRequest(async (req: any, res: any, user: User, postData: any) => {
         const db = await dbs.get(req.params.database);
         const entity = req.params.entity;
         const _id = parseInt(req.query._id);
         const doc = postData;
-        debugLogger.log("[update] Updating", entity, _id, doc);
         if (!doc._id) doc._id = _id;
-        const result = await db?.upsert(entity, doc, true, false);
+        const result = await db?.upsert(entity, doc, false, true);
         return res.end(JSON.stringify(result));
       })
     );
