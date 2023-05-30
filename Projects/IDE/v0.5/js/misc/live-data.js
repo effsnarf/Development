@@ -198,15 +198,17 @@ function LiveData(dataPersister, options)
   this.is = this.dataPersister.is;
   this.isItem = this.dataPersister.isItem;
   this.onDataChanged = (newValue, oldValue) => {
-    if (options.track?.state)
+    // Track the exact changes that were made to the data
     {
       var diff1 = DeepDiff.diff(oldValue, newValue);
       var diff2 = DeepDiff.diff(newValue, oldValue);
       var path = diff1[0]?.path?.join(".");
       var icon = compDom.get.icon(path.split(".")[0]);
       path = `${icon} ${path}`;
-      alertify.warning(`LiveData data changed.`);
-      //window.stateTracker.track(this.value, path, diff1, diff2, {isDiff: true});
+      if (options.track?.state)
+      {
+        //window.stateTracker.track(this.value, path, diff1, diff2, {isDiff: true});
+      }
     }
 
     clearTimeout(this.changeCallbackTimer);
