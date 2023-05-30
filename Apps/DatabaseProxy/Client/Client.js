@@ -32,10 +32,10 @@ if (typeof require != "undefined") {
 
   const processFetchQueue = async (alreadyAttempted) => {
     const nextTimeout = 100;
+    const item = getNextFetchItem(alreadyAttempted);
+    item.attempt++;
     try
     {
-      const item = getNextFetchItem(alreadyAttempted);
-      item.attempt++;
       const result = await fetch(...item.args);
       removeFetchItem(item.id);
       item.resolve(result);
@@ -44,7 +44,7 @@ if (typeof require != "undefined") {
     {
       alertify.error(`Error fetching data: ${ex.message}.\nprocessFetchQueue(true) to retry.`);
 
-      reject(ex);
+      item.reject(ex);
     }
     finally
     {
