@@ -55,7 +55,7 @@ var liveData = {
   },
   get: {
     new: {
-      id: async() => { return Date.now(); return await liveData.dbp.get.new.id(); }
+      id: async() => { return await liveData.dbp.get.new.id(); }
     },
     array: (entity, sortKey, options, itemOptions) => {
       var sort = {}; sort[sortKey] = 1;

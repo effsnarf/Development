@@ -197,7 +197,7 @@ var compDom = {
       for (attr of node.attrs)
       {
         //delete attr.node;
-        if (!attr.id) attr.id = (await compDom.get.new.id());
+        if (!attr.id || (attr.id.toString().length == Date.now().toString().length)) attr.id = (await compDom.get.new.id());
         if (!(`bind` in attr)) attr.bind = false;
       }
 
