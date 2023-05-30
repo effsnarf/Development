@@ -96,7 +96,7 @@ class Objects {
   }
 
   static deepDiff(obj1: any, obj2: any): any {
-    return deepDiff(obj1, obj2);
+    return deepDiff(obj1, obj2) || [];
   }
 
   static deepMerge(target: any, ...objects: any[]): any {

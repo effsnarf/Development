@@ -292,7 +292,7 @@ const malkovitch = new Malkovich();
   const obj2 = Objects.clone(obj1);
   obj2.methods[0].body = "alertify.message(this.clicked.toString());";
 
-  const diff = Objects.deepDiff(obj1, obj2);
+  const diff = Objects.deepDiff(obj1, obj1);
 
   console.log(diff);
 

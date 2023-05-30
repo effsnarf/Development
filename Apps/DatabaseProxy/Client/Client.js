@@ -387,6 +387,8 @@ if (typeof require != "undefined") {
         );
   
         var json = await result.text();
+
+        if (!json?.length) return null;
   
         try {
           return JSON.parse(json);
