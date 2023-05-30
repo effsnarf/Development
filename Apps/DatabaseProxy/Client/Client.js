@@ -40,7 +40,14 @@ if (typeof require != "undefined") {
       item.attempt++;
       const result = await _fetch(...item.args);
       removeFetchItem(item.id);
-      item.resolve(result);
+      try
+      {
+        const json = await result.json();
+        item.resolve(json);
+      }
+      catch (ex) {}
+      const text = await result.text();
+      item.resolve(text);
     }
     catch (ex)
     {
