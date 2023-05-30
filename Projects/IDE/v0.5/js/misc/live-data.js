@@ -174,9 +174,10 @@ function DataWatcher(getData, onChange)
       setTimeout(this.check, this.checkInterval);
       return;
     }
-    var newData = this.dataComparer.clone(getData());
+    var newData = (getData());
     if (!this.dataComparer.areEqual(this.data, newData))
     {
+      newData = this.dataComparer.clone(newData);
       onChange(newData, this.data);
       this.data = (newData);
     }
