@@ -158,8 +158,9 @@ function DataWatcher(getData, onChange)
     this.isPaused = true;
   };
   this.resume = () => {
-    var newData = this.dataComparer.clone(getData());
+    var newData = (getData());
     if (!this.dataComparer.areEqual(this.data, newData)) console.log(`ignoring changes:`, DeepDiff.diff(this.data, newData));
+    newData = this.dataComparer.clone(newData);
     this.data = newData;
     this.isPaused = false;
   };
