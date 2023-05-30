@@ -402,6 +402,7 @@ const getResponseSize = (response: any) => {
     );
     // #endregion
 
+    // [database]/get/googleLogin
     httpServer.post(
       "/:database/get/googleLogin",
       processRequest((req: any, res: any, user: User, postData: any) => {
@@ -426,6 +427,7 @@ const getResponseSize = (response: any) => {
       return res.send(JSON.stringify(ids));
     });
 
+    // [database]/get/user (returns the user object)
     httpServer.get(
       "/:database/get/user",
       processRequest(async (req: any, res: any, user: User) => {
@@ -434,6 +436,7 @@ const getResponseSize = (response: any) => {
       })
     );
 
+    // /[database]/set/user
     httpServer.get(
       "/:database/set/user",
       processRequest(async (req: any, res: any, user: User) => {
@@ -560,10 +563,17 @@ const getResponseSize = (response: any) => {
       })
     );
 
+    // [database]/[entity]/update
     httpServer.post(
       "/:database/:entity/update",
-      processRequest(async (req: any, res: any) => {
-        return res.end(JSON.stringify(null));
+      processRequest(async (req: any, res: any, postData: any) => {
+        const db = await dbs.get(req.params.database);
+        const entity = req.params.entity;
+        const _id = parseInt(req.query._id);
+        const doc = postData;
+        if (!doc._id) doc._id = _id;
+        const newDoc = await db?.upsert(entity, doc, true);
+        return res.end(JSON.stringify(newDoc));
       })
     );
     // #endregion
