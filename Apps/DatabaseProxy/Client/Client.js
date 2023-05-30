@@ -38,7 +38,7 @@ if (typeof require != "undefined") {
     try
     {
       item.attempt++;
-      const result = await fetch(...item.args);
+      const result = await _fetch(...item.args);
       removeFetchItem(item.id);
       item.resolve(result);
     }
