@@ -18,11 +18,11 @@ class Local
                 const elapsed = Date.now() - started;
 
                 if (value) {
-                    //console.log(`Cache hit ${origKey.substring(0, 10)} ${elapsed} ms`);
+                    console.log(`Cache hit ${origKey.substring(0, 10)} ${elapsed} ms`);
                     return value;
                 }
             
-                //console.log(`Cache miss ${origKey.substring(0, 10)} ${elapsed} ms`);
+                console.log(`Cache miss ${origKey.substring(0, 10)} ${elapsed} ms`);
             
                 // Call getValue() to fetch the value
                 value = await getValue();
