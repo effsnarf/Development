@@ -44,9 +44,9 @@ if (typeof require != "undefined") {
       {
         const json = await result.json();
         item.resolve(json);
+        return;
       }
       catch (ex) {
-        debugger;
       }
       const text = await result.text();
       item.resolve(text);
