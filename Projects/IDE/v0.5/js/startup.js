@@ -327,7 +327,7 @@ document.addEventListener("DOMContentLoaded", async function() {
           if (newComps.length) {
             this.showWorkspace = false;
             newComps.forEach(comp => liveData.watch.item("ComponentClasses", comp, { on: { changed: this.onCompChanged } }));
-            const getProgressText = (progress) => `<h2>Compiling ${newComps.length} user compons ${((progress||0)*100).toFixed(1)}%</h2><div class="hourglass"></div>`;
+            const getProgressText = (progress) => `<h2>Compiling ${newComps.length} user compons</h2><div class="hourglass"></div><progress max="1" value="${progress || 0}"></progress>`;
             var msg = alertify.message(getProgressText()).delay(0);
             await vueUserComponentCompiler.compileAll(newComps, { fix: true }, (p) => { msg.setContent(getProgressText(p)); });
             msg.dismiss();
