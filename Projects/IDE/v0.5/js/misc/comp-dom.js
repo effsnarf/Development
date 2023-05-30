@@ -194,6 +194,8 @@ var compDom = {
         node.id = (await compDom.get.new.id());
       }
 
+      node.comp = () => comp;
+
       for (attr of node.attrs)
       {
         //delete attr.node;
