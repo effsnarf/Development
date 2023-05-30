@@ -524,6 +524,11 @@ td .ide-value-image-small
   text-shadow: -0.1em 0.1em 0.05em black;
 }
 
+.ajs-message progress
+{
+  margin-top: 0.5em;
+}
+
 .ajs-message progress::-webkit-progress-value
 {
   background: #ffffffa0;
