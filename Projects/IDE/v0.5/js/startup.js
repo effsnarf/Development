@@ -156,6 +156,7 @@ document.addEventListener("DOMContentLoaded", async function() {
         isIniting: false,
         showHourglass: true,
         showSplashIntro: false,
+        showWorkspace: false,
         key1: 1,
         funcs: {
           ide: [],
@@ -266,6 +267,7 @@ document.addEventListener("DOMContentLoaded", async function() {
           this.reload();
         },
         initIde: async function() {
+          this.showWorkspace = false;
           this.$on("ide-comp-changed-2", this.onCompChanged2)
           this.isIniting = true;
           this.$refs.hourglass1.start();
@@ -281,6 +283,7 @@ document.addEventListener("DOMContentLoaded", async function() {
           this.$refs.hourglass1.stop();
           this.showHourglass = false;
           this.isIniting = false;
+          this.showWorkspace = true;
         },
         reload: async function() {
           const user = await liveData.dbp.get.user();
@@ -322,11 +325,13 @@ document.addEventListener("DOMContentLoaded", async function() {
           // global components list only contains one copy of each components
           components.push(...newComps);
           if (newComps.length) {
+            this.showWorkspace = false;
             newComps.forEach(comp => liveData.watch.item("ComponentClasses", comp, { on: { changed: this.onCompChanged } }));
             const getProgressText = (progress) => `<h2>Compiling ${newComps.length} user compons ${((progress||0)*100).toFixed(1)}%</h2><div class="hourglass"></div>`;
             var msg = alertify.message(getProgressText()).delay(0);
             await vueUserComponentCompiler.compileAll(newComps, { fix: true }, (p) => { msg.setContent(getProgressText(p)); });
             msg.dismiss();
+            this.showWorkspace = true;
           }
         },
         refresh: function() {
