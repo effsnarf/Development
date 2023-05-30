@@ -181,14 +181,13 @@ var util = {
     },
     clone: (obj) => JSON.parse(JSON.stringify(obj)),
     with: (obj, ...args) => {
-        const newObj = Object.assign({}, obj);
         for (let i = 0; i < args.length; i += 2)
         {
             const key = args[i];
             const value = args[i + 1];
-            newObj[key] = () => value;
+            obj[key] = () => value;
         }
-        return newObj;
+        return obj;
     },
     traverse: (obj,
         onValue
