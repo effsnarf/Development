@@ -12,27 +12,55 @@ if (typeof require != "undefined") {
       setTimeout(resolve, ms);
     });
   }
-    
-  var _fetch = fetch;
-  fetch = async (...args) => {
-    const msg = (typeof alertify == 'undefined') ? null : alertify.warning(args[0]).delay(0);
+
+  let _fetchItemID = 1;
+  const _fetchQueue = [];
+
+  const getNextFetchItem = (alreadyAttempted) => {
+    if (alreadyAttempted) {
+      return _fetchQueue.filter(item => (item.attempt > 0))[0];
+    }
+    else {
+      return _fetchQueue.filter(item => (item.attempt == 0))[0];
+    }
+  }
+
+  const removeFetchItem = (id) => {
+    const index = _fetchQueue.findIndex(item => (item.id == id));
+    if (index >= 0) _fetchQueue.splice(index, 1);
+  }
+
+  const processFetchQueue = async (alreadyAttempted) => {
+    const nextTimeout = 100;
     try
     {
-      const result = await _fetch(...args);
-      if (msg) msg.dismiss();
-      return result;
+      const item = getNextFetchItem(alreadyAttempted);
+      item.attempt++;
+      const result = await fetch(...item.args);
+      removeFetchItem(item.id);
+      item.resolve(result);
     }
     catch (ex)
     {
-      if (msg) msg.dismiss();
-      if (typeof alertify != 'undefined') alertify.error(ex.message);
-      if (confirm("Try again?"))
-      {
-        return await fetch(...args);
-      }
+      alertify.error(`Error fetching data: ${ex.message}.\nprocessFetchQueue(true) to retry.`);
+
+      reject(ex);
+    }
+    finally
+    {
+      setTimeout(processFetchQueue, nextTimeout);
     }
   };
-// #endregion
+    
+  var _fetch = fetch;
+  fetch = (...args) => {
+    return new Promise((resolve, reject) => {
+      _fetchQueue.push({ id: _fetchItemID++, attempt: 0, args, resolve, reject });
+    });
+  };
+
+  processFetchQueue();
+  // #endregion
 
   var anat = anat || {};
   var dev = anat.dev || (anat.dev = {});
