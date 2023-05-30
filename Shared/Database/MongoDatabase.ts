@@ -132,11 +132,7 @@ class MongoDatabase extends DatabaseBase {
     return docs;
   }
 
-  protected async _upsert(
-    collectionName: string,
-    doc: any,
-    returnNewDoc: boolean = true
-  ) {
+  protected async _upsert(collectionName: string, doc: any) {
     const collection = await this.getCollection(collectionName);
 
     const result = await collection.updateOne(
@@ -146,12 +142,6 @@ class MongoDatabase extends DatabaseBase {
         upsert: true,
       }
     );
-
-    if (!returnNewDoc) return doc;
-
-    const newDoc = await collection.findOne({ _id: doc._id });
-
-    return newDoc;
   }
 
   protected async _delete(collectionName: string, query: any): Promise<void> {

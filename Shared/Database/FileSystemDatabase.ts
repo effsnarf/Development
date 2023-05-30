@@ -107,11 +107,7 @@ class FileSystemDatabase extends DatabaseBase {
     throw new Error("Method not implemented.");
   }
 
-  protected async _upsert(
-    collectionName: string,
-    doc: any,
-    returnNewDoc: boolean
-  ): Promise<any> {
+  protected async _upsert(collectionName: string, doc: any): Promise<any> {
     if (!doc._id)
       throw new Error(
         `Can't upsert because doc._id is missing (${
@@ -121,8 +117,6 @@ class FileSystemDatabase extends DatabaseBase {
     const filePath = this.getFilePath(collectionName, doc._id);
     const json = JSON.stringify(doc);
     fs.writeFileSync(filePath, json);
-    if (!returnNewDoc) return doc;
-    return doc;
   }
 
   protected async _delete(collectionName: string, query: any): Promise<void> {

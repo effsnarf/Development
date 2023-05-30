@@ -1,5 +1,6 @@
 import * as colors from "colors";
 import "../Extensions";
+import { Objects } from "../Extensions.Objects";
 import { Timer } from "../Timer";
 import { ProducerConsumer } from "../ProducerConsumer";
 
@@ -37,17 +38,29 @@ abstract class DatabaseBase {
   async upsert(
     collectionName: string,
     doc: any,
-    returnNewDoc: boolean = false
+    returnNewDoc: boolean = false,
+    returnDiff: boolean = false
   ): Promise<any> {
+    if (returnNewDoc && returnDiff)
+      throw new Error("Cannot return new doc and diff");
+
+    const oldDoc = returnDiff
+      ? await this.findOneByID(collectionName, doc._id)
+      : null;
+
     if (!doc._id) doc._id = await this.getNewID();
-    return await this._upsert(collectionName, doc, returnNewDoc);
+    await this._upsert(collectionName, doc);
+
+    if (returnNewDoc) return await this.findOneByID(collectionName, doc._id);
+
+    if (returnDiff) return Objects.deepDiff(oldDoc, doc);
   }
 
-  protected abstract _upsert(
-    collectionName: string,
-    doc: any,
-    returnNewDoc: boolean
-  ): Promise<any>;
+  async findOneByID(collectionName: string, _id: number): Promise<any> {
+    return (await this.find(collectionName, { _id }))[0];
+  }
+
+  protected abstract _upsert(collectionName: string, doc: any): Promise<any>;
 
   async delete(collectionName: string, query: any): Promise<void> {
     await this._delete(collectionName, query);

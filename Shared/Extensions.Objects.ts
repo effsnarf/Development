@@ -1,5 +1,6 @@
 import "./Extensions";
 import util from "util";
+const deepDiff = require("deep-diff").diff;
 const jsyaml = require("js-yaml");
 
 class Objects {
@@ -92,6 +93,10 @@ class Objects {
     } catch (ex: any) {
       throw `Error stringifying object\n${ex.message}\n${Objects.yamlify(obj)}`;
     }
+  }
+
+  static deepDiff(obj1: any, obj2: any): any {
+    return deepDiff(obj1, obj2);
   }
 
   static deepMerge(target: any, ...objects: any[]): any {
