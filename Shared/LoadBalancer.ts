@@ -357,7 +357,6 @@ class LoadBalancer {
               },
               headers: nodeResponse.headers,
               body: data,
-              length: data.length,
             };
             delete cachedResponse.headers["access-control-allow-origin"];
             await this.cache.set(
