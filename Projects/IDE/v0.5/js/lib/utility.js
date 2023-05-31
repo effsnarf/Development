@@ -91,7 +91,7 @@ String.prototype.separateWords = function()
 
 String.prototype.matchAllRegexes = function(regex)
 {
-    return [...(this.toString().matchAll(regex))].map(m => m[0]);
+    return [...(this.toString().matchAll(regex))].map(m => m.last());
 }
 
 String.prototype.getRegexMatches = function(regex)
@@ -168,6 +168,12 @@ Array.prototype.average = function(selector)
     if (!selector) selector = (item) => item;
     return parseFloat((this.sum(selector) / this.length).toFixed(2));
 }
+
+Array.prototype.last = function()
+{
+    return this[this.length - 1];
+}
+
 
 var util = {
     haml: (s) => {
