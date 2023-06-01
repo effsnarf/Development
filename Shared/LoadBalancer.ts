@@ -640,6 +640,7 @@ class LoadBalancer {
   }
 
   async sendRestartSignal(nodeIndex: number) {
+    this.log(`Restarting node ${nodeIndex}`.bgRed);
     const node = this.getNode(nodeIndex);
     const restartUrl = `${node.address.protocol}://${node.address.host}:${node.address.port}${node.restart.url}`;
     this.log(`Restarting: ${restartUrl.bgRed}`);
