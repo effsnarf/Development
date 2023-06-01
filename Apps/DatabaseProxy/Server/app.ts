@@ -800,6 +800,14 @@ const getResponseSize = (response: any) => {
 
   // #endregion
 
+  // #region Log unhandled errors
+  process.on("uncaughtException", async (ex: any) => {
+    mainLog.log(`Uncaught exception:`, ex.stack);
+    debugLog.log(`Uncaught exception:`, ex.stack);
+    await debugLog.flush();
+  });
+  // #endregion
+
   // #region 🚀 Start the server
   const start = () => {
     // Create the express app

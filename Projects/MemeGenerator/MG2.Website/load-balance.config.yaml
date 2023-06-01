@@ -25,10 +25,12 @@ incoming:
 nodes:
   - name: MG.Website 1
     address: localhost:5051
+    process: .\Node1\start.cmd
     restart:
       url: /restart/Jz0xnwG1bDv57LFpKTS6UkV8h9XQtCeBOMl2NHfRIj3yPcZYimAsrqdV4oWEaFhu
   - name: MG.Website 2
     address: localhost:5052
+    process: .\Node2\start.cmd
     restart:
       url: /restart/Jz0xnwG1bDv57LFpKTS6UkV8h9XQtCeBOMl2NHfRIj3yPcZYimAsrqdV4oWEaFhu
 sync:
@@ -42,7 +44,7 @@ request:
   timeout: 10 # Timeout requests after 10 seconds
 log:
   enabled: true
-  path: (env) => env.path.resolve(env.process.cwd(), `${env.config.title}.log`)
+  path: (env) => env.getLogPath(env.config.title)
   requests:
     min:
       ms: 5000
