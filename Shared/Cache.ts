@@ -114,7 +114,7 @@ class ZeroCache extends CacheBase {
 // This is useful for example to have a memory cache in front of a database cache
 // The memory cache will be faster, but the database cache will be more persistent
 class MultiCache extends CacheBase {
-  private constructor(private caches: CacheBase[]) {
+  private constructor(public caches: CacheBase[]) {
     super();
     console.log(`${`MultiCache`.gray}`);
   }
@@ -157,6 +157,7 @@ class MemoryCache extends CacheBase {
   private maxItems = 1000;
   private values: { [key: string]: any } = {};
   private accessCounts: { [key: string]: number } = {};
+  public count = 0;
 
   constructor() {
     super();
@@ -182,6 +183,7 @@ class MemoryCache extends CacheBase {
 
   set(key: string, value: any) {
     this.trim();
+    if (!this.values[key]) this.count++;
     this.values[key] = value;
   }
 
@@ -208,6 +210,7 @@ class MemoryCache extends CacheBase {
   private delete(key: string) {
     delete this.values[key];
     delete this.accessCounts[key];
+    this.count--;
   }
 
   async has(key: string) {
@@ -255,4 +258,4 @@ class DatabaseCache extends CacheBase {
   }
 }
 
-export { Cache, CacheBase };
+export { Cache, CacheBase, MultiCache, MemoryCache };

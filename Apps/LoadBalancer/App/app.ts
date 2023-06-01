@@ -7,6 +7,7 @@ import { System } from "@shared/System";
 import { Timer } from "@shared/Timer";
 import { Files } from "@shared/Files";
 import { Logger } from "@shared/Logger";
+import { MultiCache, MemoryCache } from "@shared/Cache";
 import { Analytics } from "@shared/Analytics";
 import { Database } from "@shared/Database/Database";
 import {
@@ -38,7 +39,8 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   const getMainTitle = (
     count: number = 0,
     countPerSecond: number = 0,
-    countPerMinute: number = 0
+    countPerMinute: number = 0,
+    memoryCacheItems: number = 0
   ) => {
     const title = config.title;
     // const title = `${
@@ -46,10 +48,14 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
     // } ─ ${config.incoming.address.stringifyAddress()}`;
     const items = count;
     return `${title} ─ (${
-      `uptime`.gray
+      `up`.gray
     } ${uptime.elapsed?.unitifyTime()}) (${items.severify(10, 30, "<")} ${
       `reqs`.gray
-    }) (cpu ${System.usage.cpu.unitifyPercent()}, ${System.usage.memory.unitifySize()})`;
+    }) (${
+      `cpu`.gray
+    } ${System.usage.cpu.unitifyPercent()}) (${System.usage.memory.unitifySize()}) (${
+      `mc`.gray
+    } ${memoryCacheItems})`;
   };
 
   const getNodeLogTitle = (
@@ -297,10 +303,15 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   });
   // Update incoming items count in the dashboard
   loadBalancer.events.on("incoming-items", (count: any) => {
+    const memoryCache = (loadBalancer.cache as MultiCache).caches.find(
+      (c) => c instanceof MemoryCache
+    ) as MemoryCache;
+
     const title = getMainTitle(
       count,
       loadBalancer.stats.requests.per.second.count,
-      loadBalancer.stats.requests.per.minute.count
+      loadBalancer.stats.requests.per.minute.count,
+      memoryCache.count
     );
     counterLog.title = title;
     loadBalancer.stats.requests.per.second.count.toLocaleString();
