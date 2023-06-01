@@ -9,12 +9,14 @@ interface Attempt {
 class HealthMonitor {
   private maxItems = 1000;
   private attempts: Attempt[] = [];
+  private successes: number = 0;
   successRate: number = 0;
 
   constructor() {}
 
   track(success: boolean) {
     this.attempts.push({ dt: Date.now(), success });
+    if (success) this.successes++;
     this.onChanged();
   }
 
@@ -24,17 +26,18 @@ class HealthMonitor {
 
   cleanup() {
     while (this.attempts.length > this.maxItems) {
-      this.attempts.shift();
+      const attempt = this.attempts.shift();
+      if (attempt?.success) this.successes--;
     }
   }
 
   // Recalculate the success rate
   recalc() {
     this.cleanup();
-    const attempts = [...this.attempts];
-    if (attempts.length) {
-      const successes = attempts.filter((a) => a.success).length;
-      this.successRate = successes / attempts.length;
+    if (this.attempts.length) {
+      this.successRate = this.successes / this.attempts.length;
+    } else {
+      this.successRate = 0;
     }
   }
 }
