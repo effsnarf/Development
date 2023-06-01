@@ -31,9 +31,13 @@ nodes:
   - name: MG.DBP 1
     address: localhost:4041
     process: ./Node1/start.cmd
+    restart:
+      url: /restart/Jz0xnwG1bDv57LFpKTS6UkV8h9XQtCeBOMl2NHfRIj3yPcZYimAsrqdV4oWEaFhu
   - name: MG.DBP 2
     address: localhost:4042
     process: ./Node2/start.cmd
+    restart:
+      url: /restart/Jz0xnwG1bDv57LFpKTS6UkV8h9XQtCeBOMl2NHfRIj3yPcZYimAsrqdV4oWEaFhu
 sync:
   exclude: [node_modules, config.yaml, nuxt.config.js, .nuxt, dist]
 node:

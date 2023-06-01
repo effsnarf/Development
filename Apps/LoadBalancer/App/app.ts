@@ -135,9 +135,9 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   // #region 📃 Logging
 
   // Create a file system logger
-  const fsLog = Logger.new(config.log);
-  fsLog.log(`Configuration loaded from ${configObj.configPaths.join(", ")}`);
-  fsLog.log(Objects.yamlify(config));
+  const debugLog = Logger.new(config.log);
+  debugLog.log(`Configuration loaded from ${configObj.configPaths.join(", ")}`);
+  debugLog.log(Objects.yamlify(config));
 
   if (config.log?.enabled) {
     mainConsoleLog.log(`Logging to ${`${config.log.path.toShortPath()}`}`);
@@ -153,7 +153,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
 
   // Log all console output to the file system
   Objects.on(mainConsoleLog, mainConsoleLog.log, (...args: any[]) => {
-    fsLog.log(...args);
+    debugLog.log(...args);
   }) as any;
 
   // Log all node output to the file system
@@ -171,8 +171,9 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
 
   // Log unhandled errors
   process.on("uncaughtException", async (ex: any) => {
-    fsLog.log(`Uncaught exception:`, ex.stack);
-    await fsLog.flush();
+    mainLog.log(`Uncaught exception:`, ex.stack.bgRed);
+    debugLog.log(`Uncaught exception:`, ex.stack);
+    await debugLog.flush();
   });
 
   // #endregion
@@ -255,7 +256,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   // Log events in the dashboard
   loadBalancer.events.on("log", (data: any) => {
     if (!data.text && !data.texts) {
-      fsLog.log(data);
+      debugLog.log(data);
       return;
     }
 
@@ -269,10 +270,10 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
 
     const log = (data.node ? nodeLogs[data.node.index] : mainLog) as Log;
     log.log(...(data.texts || [data.text]));
-    fsLog.log(...(data.texts || [data.text]));
+    debugLog.log(...(data.texts || [data.text]));
   });
   loadBalancer.events.on("error", (ex: any) => {
-    fsLog.log(ex.stack);
+    debugLog.log(ex.stack);
   });
   // Update incoming items count in the dashboard
   loadBalancer.events.on("incoming-items", (count: any) => {
@@ -343,7 +344,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
             rtpm.average
           );
         } catch (ex: any) {
-          fsLog.log(ex.stack);
+          debugLog.log(ex.stack);
         }
       }, 60 * 1000);
       // Every second, track long running incoming items in analytics
@@ -367,7 +368,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
           try {
             await analytics.create("loadBalancer", "processing", item);
           } catch (ex: any) {
-            fsLog.log(ex.stack);
+            debugLog.log(ex.stack);
           }
         }
       }, 1000);
