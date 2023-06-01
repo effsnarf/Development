@@ -577,6 +577,7 @@ const getResponseSize = (response: any) => {
     );
 
     if (config.restart?.url) {
+      mainLog.log("Restart URL:", config.restart.url);
       httpServer.get(config.restart.url, (req: any, res: any) => {
         res.end("Restarting...");
         process.exit(0);
