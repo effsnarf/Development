@@ -25,7 +25,7 @@ class Global {
       if (!this._analyticsApify) {
         const config = (await this.config()).data;
         Analytics.defaults.database = await Database.new(
-          config.database.analytics
+          config.database.analytics.write
         );
 
         this._analyticsApify = new Apify.Server(
@@ -78,8 +78,13 @@ const dbs = {
       if (!database) return null;
       if (!this._dbs.has(database)) {
         // Find which connection string to use by the database name
-        const dbEntry = Object.values(config.database).find(
-          (db: any) => db.name == database
+        const databases = [
+          config.database.content,
+          config.database.analytics.read,
+          config.database.analytics.write,
+        ];
+        const dbEntry = Object.values(databases).find(
+          (db: any) => db.database == database
         ) as any;
         if (!dbEntry)
           throw new Error(`Database ${database} not found in config.yaml`);
@@ -104,10 +109,10 @@ export default async function (req: any, res: any, next: any) {
     // CORS
     res.setHeader("Access-Control-Allow-Origin", "*");
     const dbEvents = (await dbs.get(
-      config.database.analytics?.name
+      config.database.analytics?.read.database
     )) as DatabaseBase;
     const dbContent = (await dbs.get(
-      config.database.content?.name
+      config.database.content?.database
     )) as DatabaseBase;
     const ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
     if (req.url == "/ip") {
