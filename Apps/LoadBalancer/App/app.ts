@@ -65,12 +65,9 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
 
     return `${node.name} ─ ${`${node.address.host.yellow}:${
       node.address.port.toString().green
-    }`} ${successRate?.toProgressBar(
-      30,
-      0.9,
-      0.8,
-      ">"
-    )}───${elapsedAverageStr}`;
+    }`} ${successRate?.toProgressBar(30, 0.9, 0.8, ">")}${
+      `───`.gray
+    }${elapsedAverageStr}`;
   };
 
   const incomingItemToStrings = (item: IncomingItem) => {
