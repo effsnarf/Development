@@ -41,7 +41,7 @@ class NodeSwitcher {
         ? Process.new(node.name, node.process as unknown as string, this.events)
         : node.process;
     node.enabled = true;
-    node.health = new HealthMonitor(1000 * 60 * 1);
+    node.health = new HealthMonitor();
     this.nodes.push(node as Node);
     Objects.on(node, "enabled", (enabled: boolean) =>
       this.emitNodeEvent(node, "enabled", enabled)

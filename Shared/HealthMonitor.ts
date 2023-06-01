@@ -7,10 +7,11 @@ interface Attempt {
 }
 
 class HealthMonitor {
+  private maxItems = 100;
   private attempts: Attempt[] = [];
   successRate: number = 0;
 
-  constructor(private readonly timeSpan: number) {
+  constructor() {
     this.recalc();
   }
 
@@ -25,8 +26,7 @@ class HealthMonitor {
   }
 
   cleanup() {
-    const cutoff = Date.now() - this.timeSpan;
-    while (this.attempts.length > 0 && this.attempts[0].dt < cutoff) {
+    while (this.attempts.length > this.maxItems) {
       this.attempts.shift();
     }
   }
