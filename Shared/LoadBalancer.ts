@@ -403,14 +403,19 @@ class LoadBalancer {
       });
 
       const nodeCorsHeaders = getNodeHeaders({ cors: true });
-      // If the node response has CORS headers, log a warning
-      // if (nodeCorsHeaders.length) {
-      //   this.log(
-      //     `${`Not forwarding node CORS headers`.bgYellow.black}: ${nodeCorsHeaders
-      //       .map((key) => `${key}: ${nodeResponse?.headers[key]}`)
-      //       .join(", ")}`
-      //   );
-      // }
+      // CORS
+      if (this.options?.cors?.length) {
+        if (incomingItem.attempt == 0) {
+          for (const origin of this.options.cors) {
+            if (origin == incomingItem.request.headers.origin) {
+              incomingItem.response.setHeader(
+                "Access-Control-Allow-Origin",
+                origin
+              );
+            }
+          }
+        }
+      }
 
       incomingItem.infos.push(`piping data`);
 
@@ -502,21 +507,6 @@ class LoadBalancer {
 
     if (request.url == this.options.os?.restart?.url) {
       await System.restartComputer();
-    }
-
-    // CORS
-    if (this.options?.cors?.length) {
-      if (incomingItem.attempt == 0) {
-        for (const origin of this.options.cors) {
-          if (origin == request.headers.origin) {
-            try {
-              response.setHeader("Access-Control-Allow-Origin", origin);
-            } catch (ex) {
-              this.events.emit("error", ex);
-            }
-          }
-        }
-      }
     }
 
     incomingItem.isProcessing = true;
@@ -634,6 +624,15 @@ class LoadBalancer {
     const { response } = incomingItem;
     const { status } = cachedResponse;
     const { headers, body } = cachedResponse;
+
+    // CORS
+    if (this.options?.cors?.length) {
+      for (const origin of this.options.cors) {
+        if (origin == incomingItem.request.headers.origin) {
+          headers["access-control-allow-origin"] = origin;
+        }
+      }
+    }
 
     response.statusCode = status.code;
     response.statusMessage = status.text;
