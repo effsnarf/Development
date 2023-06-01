@@ -393,7 +393,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
 
       await syncNodeVersions(config.nodes[0], config.nodes[index]);
       mainLog.log(`Restarting node ${index + 1}..`);
-      loadBalancer.sendRestartSignal(index);
+      await loadBalancer.sendRestartSignal(index);
     });
   }
   // If [q] is pressed, stop the load balancer
