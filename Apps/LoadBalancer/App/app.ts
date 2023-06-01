@@ -49,7 +49,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
       `uptime`.gray
     } ${uptime.elapsed?.unitifyTime()}) (${items.severify(10, 30, "<")} ${
       `reqs`.gray
-    }) (cpu ${System.usage.cpu.unitifyPercent()}) (${System.usage.memory.unitifySize()})`;
+    }) (cpu ${System.usage.cpu.unitifyPercent()}, ${System.usage.memory.unitifySize()})`;
   };
 
   const getNodeLogTitle = (
