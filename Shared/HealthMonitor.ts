@@ -13,13 +13,8 @@ class HealthMonitor {
 
   constructor() {}
 
-  trackSuccess() {
-    this.attempts.push({ dt: Date.now(), success: true });
-    this.onChanged();
-  }
-
-  trackFailure() {
-    this.attempts.push({ dt: Date.now(), success: false });
+  track(success: boolean) {
+    this.attempts.push({ dt: Date.now(), success });
     this.onChanged();
   }
 

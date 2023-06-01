@@ -327,10 +327,10 @@ class LoadBalancer {
       }`
     );
 
-    if (elapsed < 50) {
-      incomingItem.nodeItem.node.health.trackSuccess();
+    if (elapsed < 100) {
+      incomingItem.nodeItem.node.health.track(true);
     } else {
-      incomingItem.nodeItem.node.health.trackFailure();
+      incomingItem.nodeItem.node.health.track(false);
     }
 
     const uElapsed = elapsed
@@ -447,7 +447,7 @@ class LoadBalancer {
     logMsg: string,
     elapsed: number
   ) {
-    incomingItem.nodeItem.node.health.trackFailure();
+    incomingItem.nodeItem.node.health.track(false);
 
     const uElapsed = elapsed
       .unitifyTime()

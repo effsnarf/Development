@@ -3,11 +3,13 @@ import md5 from "md5";
 import path from "path";
 import { Lock } from "./Lock";
 import { Events } from "./Events";
+import { HealthMonitor } from "./HealthMonitor";
 import { Database } from "./Database/Database";
 import { DatabaseBase } from "./Database/DatabaseBase";
 
 abstract class CacheBase {
   events: Events = new Events();
+  health: HealthMonitor = new HealthMonitor();
   abstract get(key: string, getDefaultValue?: () => any): Promise<any>;
   abstract set(key: string, value: any): void;
   abstract has(key: string): Promise<boolean>;
@@ -47,6 +49,7 @@ class NullCache extends CacheBase {
   }
 
   async get(key: string, getDefaultValue?: () => any) {
+    this.health.track(false);
     return !getDefaultValue ? null : await getDefaultValue();
   }
 
@@ -75,8 +78,12 @@ class ZeroCache extends CacheBase {
 
   async get(key: string, getDefaultValue?: () => any) {
     this.enqueue(key, getDefaultValue);
-    while (!(await this.cache.has(key))) {
+    let hasValue = await this.cache.has(key);
+    this.health.track(hasValue);
+    // If the cache doesn't have the value yet, wait for it
+    while (!hasValue) {
       await new Promise((resolve) => setTimeout(resolve, 100));
+      hasValue = await this.cache.has(key);
     }
     return await this.cache.get(key, getDefaultValue);
   }
@@ -119,8 +126,12 @@ class MultiCache extends CacheBase {
   async get(key: string, getDefaultValue?: () => any) {
     for (const cache of this.caches) {
       const value = await cache.get(key);
-      if (value) return value;
+      if (value) {
+        this.health.track(true);
+        return value;
+      }
     }
+    this.health.track(false);
     if (!getDefaultValue) return null;
     const value = await getDefaultValue();
     this.set(key, value);
@@ -158,7 +169,11 @@ class MemoryCache extends CacheBase {
 
   async get(key: string, getDefaultValue?: () => any) {
     this.logAccess(key);
-    if (this.values[key]) return this.values[key];
+    if (this.values[key]) {
+      this.health.track(true);
+      return this.values[key];
+    }
+    this.health.track(false);
     if (!getDefaultValue) return null;
     const value = await getDefaultValue();
     this.set(key, value);
@@ -214,7 +229,11 @@ class DatabaseCache extends CacheBase {
   async get(key: string, getDefaultValue?: () => any) {
     try {
       const value = await this.db.get(key);
-      if (value) return value;
+      if (value) {
+        this.health.track(true);
+        return value;
+      }
+      this.health.track(false);
       if (!getDefaultValue) return null;
       const defaultValue = await getDefaultValue();
       await this.db.set(key, defaultValue);

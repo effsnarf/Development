@@ -54,9 +54,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   const getNodeLogTitle = (node: any, successRate?: number) => {
     return `${node.name} ─ ${`${node.address.host.yellow}:${
       node.address.port.toString().green
-    }`} (${
-      successRate ? successRate?.unitifyPercent().severify(0.9, 0.8, ">") : ""
-    })`;
+    }`} ${successRate?.toProgressBar(30, 0.9, 0.8, ">")}`;
   };
 
   const incomingItemToStrings = (item: IncomingItem) => {
@@ -83,6 +81,14 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
 
   // Create the load balancer
   const loadBalancer = await LoadBalancer.new(config.incoming);
+
+  Objects.on(
+    loadBalancer.cache?.health,
+    "successRate",
+    (successRate: number) => {
+      cacheLog.title = `Cache ${successRate.toProgressBar(30, 0.8, 0.6, ">")}`;
+    }
+  );
 
   // #region Dashboard
 
@@ -247,7 +253,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
           mainLog.log(`Node ${i + 1}: Restarting..`.bgRed);
 
           await syncNodeVersions(config.nodes[0], config.nodes[i]);
-          loadBalancer.sendRestartSignal(i);
+          //loadBalancer.sendRestartSignal(i);
         }
       }
     }

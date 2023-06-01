@@ -41,7 +41,6 @@ class Time {
     return this.units[this.units.indexOf(unit) + 1];
   }
 }
-
 class Size {
   static readonly units: string[] = [
     "b",
@@ -75,7 +74,6 @@ class Size {
     return this.units[this.units.indexOf(unit) + 1];
   }
 }
-
 class Percentage {
   static readonly units: string[] = ["%"];
 
@@ -91,6 +89,8 @@ class Percentage {
     return this.units[this.units.indexOf(unit) + 1];
   }
 }
+
+const UnitClasses = [Time, Size, Percentage];
 
 const color = {
   fromNumber: {
@@ -194,7 +194,7 @@ interface Number {
   unitifyTime(unit?: string[] | string): string;
   unitifySize(unit?: string[] | string): string;
   unitifyPercent(): string;
-  toProgressBar(barLength?: number): string;
+  toProgressBar(barLength?: number, ...severifyArgs: any[]): string;
   severify(green: number, yellow: number, direction: "<" | ">"): string;
   severifyByHttpStatus(): string;
   getSeverityColor(
@@ -453,7 +453,10 @@ if (typeof Number !== "undefined") {
     //return `${Math.round(this.valueOf() * 100)}${`%`.gray}`;
   };
 
-  Number.prototype.toProgressBar = function (barLength?: number): string {
+  Number.prototype.toProgressBar = function (
+    barLength?: number,
+    ...severifyArgs: any[]
+  ): string {
     const value = this.valueOf();
     if (!barLength) barLength = 50;
     barLength = barLength - ` 100%`.length;
@@ -461,7 +464,16 @@ if (typeof Number !== "undefined") {
     const bar = "█".repeat(progressLength);
     const emptyLength = barLength - progressLength;
     const empty = emptyLength <= 0 ? "" : "█".repeat(emptyLength).gray;
-    return `${bar}${empty} ${value.unitifyPercent().withoutColors()}`;
+    let s = `${bar}${empty} ${value.unitifyPercent().withoutColors()}`;
+    if (severifyArgs.length)
+      s = s.colorize(
+        value.getSeverityColor(
+          severifyArgs[0],
+          severifyArgs[1],
+          severifyArgs[2]
+        )
+      );
+    return s;
   };
 
   Number.prototype.severify = function (
@@ -608,10 +620,11 @@ if (typeof String !== "undefined") {
     yellow: number,
     direction: "<" | ">"
   ): string {
-    const unitClass = this.getUnitClass();
+    const valueStr = this.toString();
+    const unitClass = valueStr.getUnitClass();
     if (!unitClass) throw new Error("No unit class found");
-    const value = this.deunitify(unitClass);
-    const unit = this.getUnit();
+    const value = valueStr.deunitify(unitClass);
+    const unit = valueStr.getUnit();
     const color = value.getSeverityColor(green, yellow, direction, true);
     return `${value.unitify(unitClass).withoutUnit().colorize(color)}${
       unit.gray
