@@ -47,7 +47,10 @@ class NodeSwitcher {
       this.emitNodeEvent(node, "enabled", enabled)
     );
     Objects.on(node.health, "successRate", (successRate: number) => {
-      this.emitNodeEvent(node, "successRate", successRate);
+      this.emitNodeEvent(node, "success-rate", successRate);
+    });
+    Objects.on(node.health, "average", (average: number) => {
+      this.emitNodeEvent(node, "elapsed-average", average);
     });
   }
 
@@ -332,6 +335,7 @@ class LoadBalancer {
     } else {
       incomingItem.nodeItem.node.health.track(false);
     }
+    incomingItem.nodeItem.node.health.track(elapsed);
 
     const uElapsed = elapsed
       .unitifyTime()

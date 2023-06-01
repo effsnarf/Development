@@ -51,10 +51,26 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
     }) (${countPerSecond}${`/s`.gray}) (${countPerMinute}${`/m`.gray})`;
   };
 
-  const getNodeLogTitle = (node: any, successRate?: number) => {
+  const getNodeLogTitle = (
+    node: any,
+    successRate: number = 0,
+    elapsedAverage: number = 0
+  ) => {
+    elapsedAverage = Math.round(elapsedAverage);
+    const elapsedAverageStr = elapsedAverage
+      .unitifyTime()
+      .severify(
+        ...(config.incoming.severity.time as [number, number, "<" | ">"])
+      );
+
     return `${node.name} ─ ${`${node.address.host.yellow}:${
       node.address.port.toString().green
-    }`} ${successRate?.toProgressBar(30, 0.9, 0.8, ">")}`;
+    }`} ${successRate?.toProgressBar(
+      30,
+      0.9,
+      0.8,
+      ">"
+    )}───${elapsedAverageStr}`;
   };
 
   const incomingItemToStrings = (item: IncomingItem) => {
@@ -296,12 +312,13 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   });
   // Update health check status in the dashboard
   loadBalancer.events.on(
-    "node-successRate",
+    "node-success-rate",
     (index: number, successRate: number) => {
       // Update the node title
       nodeLogs[index].title = getNodeLogTitle(
         loadBalancer.getNode(index),
-        successRate
+        successRate,
+        loadBalancer.getNode(index).health.average
       );
       // Update the node health bar
       healthBars[index].value = successRate;
@@ -314,6 +331,16 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
       counterLog.color = averageHealth
         .getSeverityColor(0.8, 0.5, ">")
         .replace("green", "white");
+    }
+  );
+  loadBalancer.events.on(
+    "node-elapsed-average",
+    (index: number, elapsedAverage: number) => {
+      nodeLogs[index].title = getNodeLogTitle(
+        loadBalancer.getNode(index),
+        loadBalancer.getNode(index).health.successRate,
+        elapsedAverage
+      );
     }
   );
   // Check the nodes' health periodically
