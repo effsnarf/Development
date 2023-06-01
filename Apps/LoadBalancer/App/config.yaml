@@ -18,11 +18,15 @@ nodes:
     protocol: https
     host: api.memegenerator.net
     port: 443
+    restart:
+      url: /restart/Jz0xnwG1bDv57LFpKTS6UkV8h9XQtCeBOMl2NHfRIj3yPcZYimAsrqdV4oWEaFhu
     enabled: true
   - name: Website 2
     protocol: https
     host: localhost
     port: 80
+    restart:
+      url: /restart/Jz0xnwG1bDv57LFpKTS6UkV8h9XQtCeBOMl2NHfRIj3yPcZYimAsrqdV4oWEaFhu
     enabled: false
 sync:
   exclude: [node_modules, config.yaml, nuxt.config.js, .nuxt, dist]

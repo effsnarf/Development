@@ -20,6 +20,9 @@ interface Node {
   process: Process;
   enabled: boolean;
   health: HealthMonitor;
+  restart: {
+    url: string;
+  };
 }
 
 interface NodeItem {
@@ -636,9 +639,9 @@ class LoadBalancer {
     this.nodeSwitcher.toggleEnabled(nodeIndex);
   }
 
-  async restartNode(nodeIndex: number) {
+  async sendRestartSignal(nodeIndex: number) {
     const node = this.getNode(nodeIndex);
-    await node.process.restart();
+    await axios.get(node.restart.url);
   }
 
   private log(data: any) {

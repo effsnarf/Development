@@ -244,7 +244,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
           mainLog.log(`Node ${i + 1}: Restarting..`.bgRed);
 
           await syncNodeVersions(config.nodes[0], config.nodes[i]);
-          loadBalancer.restartNode(i);
+          loadBalancer.sendRestartSignal(i);
         }
       }
     }
@@ -381,7 +381,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   mainConsoleLog.log("Press [`] to switch layouts".bgWhite.black);
   mainConsoleLog.log("Press [1, 2, ..] to enable/disable nodes".bgWhite.black);
   mainConsoleLog.log(
-    "Press shift+[1, 2, ..] to start node processes".bgWhite.black
+    "Press shift+[1, 2, ..] to restart node processes".bgWhite.black
   );
   for (var i = 0; i < config.nodes.length; i++) {
     const char = (i + 1).toString();
@@ -392,7 +392,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
       const index = [...shift12345678].findIndex((c) => c == char);
 
       await syncNodeVersions(config.nodes[0], config.nodes[index]);
-      loadBalancer.restartNode(index);
+      loadBalancer.sendRestartSignal(index);
     });
   }
   // If [q] is pressed, stop the load balancer

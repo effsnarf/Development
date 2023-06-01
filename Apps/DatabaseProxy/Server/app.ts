@@ -575,6 +575,11 @@ const getResponseSize = (response: any) => {
         return res.end(JSON.stringify(result));
       })
     );
+
+    httpServer.get(config.node.restart.url, (req: any, res: any) => {
+      res.end("Restarting...");
+      process.exit(0);
+    });
     // #endregion
   };
   // #endregion
