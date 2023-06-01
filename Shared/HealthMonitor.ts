@@ -11,18 +11,20 @@ class HealthMonitor {
   private attempts: Attempt[] = [];
   successRate: number = 0;
 
-  constructor() {
-    this.recalc();
-  }
+  constructor() {}
 
   trackSuccess() {
     this.attempts.push({ dt: Date.now(), success: true });
-    this.cleanup();
+    this.onChanged();
   }
 
   trackFailure() {
     this.attempts.push({ dt: Date.now(), success: false });
-    this.cleanup();
+    this.onChanged();
+  }
+
+  onChanged() {
+    this.recalc();
   }
 
   cleanup() {
@@ -33,12 +35,12 @@ class HealthMonitor {
 
   // Recalculate the success rate
   recalc() {
+    this.cleanup();
     const attempts = [...this.attempts];
     if (attempts.length) {
       const successes = attempts.filter((a) => a.success).length;
       this.successRate = successes / attempts.length;
     }
-    setTimeout(this.recalc.bind(this), 1000);
   }
 }
 
