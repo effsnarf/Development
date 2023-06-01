@@ -7,7 +7,7 @@ interface Attempt {
 }
 
 class HealthMonitor {
-  private maxItems = 100;
+  private maxItems = 1000;
   private attempts: Attempt[] = [];
   successRate: number = 0;
 
