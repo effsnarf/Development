@@ -636,7 +636,7 @@ export default async ({ app }, inject) => {
 
   const protocol = (isDevEnv ? "http" : "https");
   // Go to the production database from the development environment
-  const host = (isDevEnv ? "localhost:4040" : "db.memegenerator.net");
+  const host = (isDevEnv ? "localhost:4041" : "db.memegenerator.net");
   
   let dbp = new anat.dev.DatabaseProxy(host, `MemeGenerator`, protocol);
   await dbp.createEntityMethods();

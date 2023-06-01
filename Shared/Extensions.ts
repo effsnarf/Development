@@ -1032,8 +1032,8 @@ if (typeof String !== "undefined") {
   String.prototype.findParentDir = function (dirName: string): string {
     const parts = this.toString().normalizePath().split("\\");
     const index = parts.indexOf(dirName);
-    if (index === -1) throw new Error(`Could not find ${dirName} in path`);
-    return parts.slice(0, index + 1).join("\\");
+    if (index != -1) return parts.slice(0, index + 1).join("\\");
+    throw new Error(`Could not find ${dirName} in ${this}`);
   };
 
   String.prototype.ipToNumber = function (): number {

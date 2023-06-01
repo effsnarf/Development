@@ -40,6 +40,19 @@ const pathFilterToFunction = (filter: PathFilter) => {
 };
 
 class Files {
+  static findParentFolder(baseFolder: string, folderName: string) {
+    let currentFolder = path.resolve(baseFolder);
+    while (true) {
+      if (fs.existsSync(path.join(currentFolder, folderName)))
+        return path.join(currentFolder, folderName);
+
+      const parentFolder = path.dirname(currentFolder);
+      if (parentFolder == currentFolder) return null;
+
+      currentFolder = parentFolder;
+    }
+  }
+
   static *listFiles(
     folder: string,
     options?: { recursive?: boolean }

@@ -4,7 +4,7 @@ import * as yaml from "js-yaml";
 
 const isDevEnv = (process.env.NODE_ENV != 'production');
 const envPort = isDevEnv ? 'http' : 'https';
-const dbProxyHost = isDevEnv ? 'localhost:4040' : 'db.memegenerator.net';
+const dbProxyHost = isDevEnv ? 'localhost:4041' : 'db.memegenerator.net';
 const config = yaml.load(fs.readFileSync(path.resolve(__dirname, 'config.yaml'), 'utf8'));
 
 export default {
@@ -25,6 +25,7 @@ export default {
       { name: "format-detection", content: "telephone=no" },
     ],
     script: [
+      { src: "/js/Extensions.js"},
       { src: `https://www.googletagmanager.com/gtag/js?id=G-P952PRPTTR`, async: true },
       { src: `https://code.jquery.com/jquery-3.6.1.js` },
       { src: `${envPort}://${dbProxyHost}/utility.js` },
@@ -126,6 +127,7 @@ export default {
   },
 
   serverMiddleware: [
+    { path: "/js", handler: '~/server/middleware/js' },
     { path: "/api", handler: '~/server/middleware/api' },
     { path: "/img", handler: '~/server/middleware/img' },
   ],
