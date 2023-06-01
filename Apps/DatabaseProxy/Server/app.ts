@@ -336,6 +336,17 @@ const getResponseSize = (response: any) => {
     };
     // #endregion
 
+    // #region Restart
+    if (config.restart?.url) {
+      mainLog.log("Restart URL:", config.restart.url.bgRed);
+      httpServer.get(config.restart.url, (req: any, res: any) => {
+        mainLog.log("Restarting...");
+        res.end("Restarting...");
+        process.exit(0);
+      });
+    }
+    // #endregion
+
     // #region 📝 File Transpilation
     httpServer.get(
       "/*.js",
@@ -575,14 +586,6 @@ const getResponseSize = (response: any) => {
         return res.end(JSON.stringify(result));
       })
     );
-
-    if (config.restart?.url) {
-      mainLog.log("Restart URL:", config.restart.url.bgRed);
-      httpServer.get(config.restart.url, (req: any, res: any) => {
-        res.end("Restarting...");
-        process.exit(0);
-      });
-    }
     // #endregion
   };
   // #endregion
