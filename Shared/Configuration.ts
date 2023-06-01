@@ -303,6 +303,8 @@ class Configuration {
     const parts = [];
     parts.push(process.argv[1].findParentDir("Development"));
     parts.push("Logs");
+    // Add the title to the log path
+    parts.push(`${title}.log`);
     const now = new Date();
     // Add yyyy\mm\dd to the log path
     parts.push(...now.toISOString().split("T")[0].split("-").slice(0, 3));
@@ -313,8 +315,19 @@ class Configuration {
       .split(":")
       .slice(0, 2)
       .join("-");
-    //parts.push(`${time}.log`);
-    parts.push(`${title}.log`);
+    // Add time to the log path
+    // We want to separate one day's logs into multiple folders and files
+    // One folder per hour would result in 24 folders per day
+    // We want to keep at most 5-6 folders per folder to ease navigation
+    // So we'll create a folder every 4 hours (24 / 4 = 6)
+    // Inside each folder which holds 6 hours of logs, we'll subdivide further into 6 folders (one per hour)
+    // Inside each folder which holds 1 hour of logs, we'll subdivide further into 6 folders (one per 10 minutes)
+    const hour = now.getHours();
+    const minute = now.getMinutes();
+    const hourFolder = Math.floor(hour / 4) * 4;
+    const minuteFolder = Math.floor(minute / 10) * 10;
+    parts.push(`${hourFolder}-${hourFolder + 4}`);
+    parts.push(`${minuteFolder}-${minuteFolder + 10}.log`);
     return path.join(...parts);
   }
 
