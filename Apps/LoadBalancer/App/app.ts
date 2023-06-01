@@ -171,7 +171,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
 
   // Log unhandled errors
   process.on("uncaughtException", async (ex: any) => {
-    mainLog.log(`Uncaught exception:`, ex.stack);
+    mainLog.log(`Uncaught exception:`, ex.stack.bgRed);
     debugLog.log(`Uncaught exception:`, ex.stack);
     await debugLog.flush();
   });
