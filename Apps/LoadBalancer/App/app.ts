@@ -137,7 +137,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   // Create a file system logger
   const fsLog = Logger.new(config.log);
   fsLog.log(`Configuration loaded from ${configObj.configPaths.join(", ")}`);
-  fsLog.log(config);
+  fsLog.log(config.yamlify());
 
   if (config.log?.enabled) {
     mainConsoleLog.log(`Logging to ${`${config.log.path.toShortPath()}`}`);
