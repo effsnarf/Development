@@ -24,3 +24,5 @@ class Refreshing {
     setTimeout(this.refresh.bind(this), this.interval);
   }
 }
+
+export { Refreshing };
