@@ -65,12 +65,9 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
 
     return `${node.name} ─ ${`${node.address.host.yellow}:${
       node.address.port.toString().green
-    }`} ${successRate?.toProgressBar(
-      30,
-      0.9,
-      0.8,
-      ">"
-    )}───${elapsedAverageStr}`;
+    }`} ${successRate?.toProgressBar(30, 0.9, 0.8, ">")}${
+      `───`.gray
+    }${elapsedAverageStr}`;
   };
 
   const incomingItemToStrings = (item: IncomingItem) => {
@@ -351,6 +348,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   // Update the node status (enabled/disabled) in the dashboard
   loadBalancer.events.on("node-enabled", (index: number, enabled: boolean) => {
     nodeLogs[index].options.isDimmed = !enabled;
+    healthBars[index].options.isDimmed = !enabled;
   });
   // #endregion
 
