@@ -6,5 +6,3 @@ process:
     periodically:
       from: 00:00
       every: 30m
-restart:
-  url: /restart/Jz0xnwG1bDv57LFpKTS6UkV8h9XQtCeBOMl2NHfRIj3yPcZYimAsrqdV4oWEaFhu

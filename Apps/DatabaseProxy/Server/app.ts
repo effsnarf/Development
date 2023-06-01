@@ -576,10 +576,12 @@ const getResponseSize = (response: any) => {
       })
     );
 
-    httpServer.get(config.node.restart.url, (req: any, res: any) => {
-      res.end("Restarting...");
-      process.exit(0);
-    });
+    if (config.restart?.url) {
+      httpServer.get(config.restart.url, (req: any, res: any) => {
+        res.end("Restarting...");
+        process.exit(0);
+      });
+    }
     // #endregion
   };
   // #endregion
