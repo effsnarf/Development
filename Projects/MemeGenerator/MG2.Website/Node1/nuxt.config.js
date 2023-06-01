@@ -8,7 +8,7 @@ const dbProxyHost = isDevEnv ? 'localhost:4040' : 'db.memegenerator.net';
 const config = yaml.load(fs.readFileSync(path.resolve(__dirname, 'config.yaml'), 'utf8'));
 
 export default {
-  ssr: false,
+  ssr: true,
 
   server: config.server,
 

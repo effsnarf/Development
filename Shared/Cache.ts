@@ -188,10 +188,12 @@ class MemoryCache extends CacheBase {
   async trim() {
     await this.trimLock.acquire();
     try {
-      while (Object.keys(this.values).length >= this.maxItems) {
-        const leastAccessedKey = Object.entries(this.accessCounts)
-          .sortBy((item) => item[1])
-          .first()[0];
+      const entries = Object.entries(this.accessCounts).sortBy(
+        (item) => item[1]
+      );
+
+      while (entries.length >= this.maxItems) {
+        const leastAccessedKey = (entries.shift() || [""])[0];
         this.delete(leastAccessedKey);
       }
     } finally {

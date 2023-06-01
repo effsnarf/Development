@@ -348,6 +348,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   // Update the node status (enabled/disabled) in the dashboard
   loadBalancer.events.on("node-enabled", (index: number, enabled: boolean) => {
     nodeLogs[index].options.isDimmed = !enabled;
+    healthBars[index].options.isDimmed = !enabled;
   });
   // #endregion
 
