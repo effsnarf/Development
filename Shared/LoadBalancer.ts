@@ -641,7 +641,8 @@ class LoadBalancer {
 
   async sendRestartSignal(nodeIndex: number) {
     const node = this.getNode(nodeIndex);
-    await axios.get(node.restart.url);
+    const restartUrl = `${node.address.protocol}://${node.address.host}:${node.address.port}${node.restart.url}`;
+    await axios.get(restartUrl);
   }
 
   private log(data: any) {
