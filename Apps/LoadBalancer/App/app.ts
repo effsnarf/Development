@@ -136,6 +136,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
 
   // Create a file system logger
   const fsLog = Logger.new(config.log);
+  fsLog.log(config);
 
   if (config.log?.enabled) {
     mainConsoleLog.log(`Logging to ${`${config.log.path.toShortPath()}`}`);
