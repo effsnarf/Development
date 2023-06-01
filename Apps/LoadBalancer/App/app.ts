@@ -392,6 +392,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
       const index = [...shift12345678].findIndex((c) => c == char);
 
       await syncNodeVersions(config.nodes[0], config.nodes[index]);
+      mainLog.log(`Restarting node ${index + 1}..`);
       loadBalancer.sendRestartSignal(index);
     });
   }
