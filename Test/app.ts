@@ -34,6 +34,9 @@ class Malkovich {
 const malkovitch = new Malkovich();
 
 (async () => {
+  console.log(process.memoryUsage().heapUsed.unitifySize());
+  console.log(process.cpuUsage());
+
   const obj1 = {
     _id: 25676,
     name: "Demo.Counter",

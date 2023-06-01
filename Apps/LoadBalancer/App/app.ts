@@ -3,6 +3,7 @@ import "@shared/Extensions";
 import { Objects } from "@shared/Extensions.Objects";
 import { Types } from "@shared/Types";
 import { Configuration } from "@shared/Configuration";
+import { System } from "@shared/System";
 import { Timer } from "@shared/Timer";
 import { Files } from "@shared/Files";
 import { Logger } from "@shared/Logger";
@@ -48,7 +49,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
       `uptime`.gray
     } ${uptime.elapsed?.unitifyTime()}) (${items.severify(10, 30, "<")} ${
       `reqs`.gray
-    }) (${countPerSecond}${`/s`.gray}) (${countPerMinute}${`/m`.gray})`;
+    }) (cpu ${System.usage.cpu.unitifyPercent()}) (${System.usage.memory.unitifyPercent()})`;
   };
 
   const getNodeLogTitle = (
