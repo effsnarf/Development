@@ -314,7 +314,6 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
       memoryCache.count
     );
     counterLog.title = title;
-    loadBalancer.stats.requests.per.second.count.toLocaleString();
     counterLog.text =
       loadBalancer.stats.requests.per.minute.count.toLocaleString();
     processedItemsLog.title = `${loadBalancer.incomingItems.getItems().length}`;
