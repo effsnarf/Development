@@ -566,11 +566,14 @@ class LoadBalancer {
         maxRedirects: 0,
       } as any;
 
+      incomingItem.infos.push(`${`Fetching`.gray} ${options.url}`);
       if (this.options.request?.timeout) {
         options.timeout = this.options.request.timeout * 1000;
+        incomingItem.infos.push(
+          `${`Timeout`.gray} ${options.timeout.unitifyTime()}`
+        );
       }
 
-      incomingItem.infos.push(`${`Proxying request to`.gray} ${options.url}`);
       // for (const line of Objects.yamlify(options).split("\n"))
       //   incomingItem.infos.push(line);
 
