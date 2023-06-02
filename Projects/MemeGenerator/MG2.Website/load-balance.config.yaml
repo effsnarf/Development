@@ -48,3 +48,8 @@ log:
   requests:
     min:
       ms: 5000
+process:
+  restart:
+    periodically:
+      from: 00:00
+      every: 30m

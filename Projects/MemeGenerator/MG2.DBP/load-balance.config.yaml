@@ -54,3 +54,8 @@ analytics:
 log:
   enabled: true
   path: (env) => env.getLogPath(env.config.title)
+process:
+  restart:
+    periodically:
+      from: 00:15
+      every: 30m
