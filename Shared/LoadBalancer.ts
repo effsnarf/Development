@@ -623,7 +623,7 @@ class LoadBalancer {
       // Some HTTP status codes are not errors (304 Not Modified, 404 Not Found, etc.)
       // Axios throws an error for these status codes
       // We're handling them as successes
-      if (ex.response) {
+      if (ex.response && ex.response.status < 500) {
         this.nodeResponseSuccess(incomingItem, ex.response, timer.elapsed!);
         return;
       } else {
