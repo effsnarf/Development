@@ -1,0 +1,7 @@
+title: Analytics.Api
+server:
+  host: localhost
+  port: 6000
+database:
+  connectionString: mongodb://localhost:47017
+  database: MG-Analytics
