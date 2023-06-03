@@ -157,6 +157,12 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
     );
   }
 
+  if (config.incoming.database?.analytics) {
+    mainLog.log(`Analytics database: ${config.incoming.database.analytics}`);
+  } else {
+    mainLog.log(`No analytics database`);
+  }
+
   const counterLog = LargeText.new("Requests per minute");
   counterLog.text = "0";
 

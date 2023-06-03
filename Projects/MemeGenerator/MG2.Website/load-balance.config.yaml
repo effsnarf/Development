@@ -24,6 +24,10 @@ incoming:
           database: MG-Web-Cache
   request:
     timeout: 5 # Timeout node requests
+  database:
+    analytics:
+      prod:
+        path: F:\Database\MG-Analytics
 nodes:
   - name: MG.Website 1
     address: localhost:5051

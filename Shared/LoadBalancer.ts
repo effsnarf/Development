@@ -462,9 +462,11 @@ class LoadBalancer {
     // Successfully processed the incoming item
     this.incomingItems.remove(incomingItem);
 
-    this.db.analytics?.create("LoadBalancer", "request", {
-      title: this.options.title,
-    });
+    (async () => {
+      this.db.analytics?.create("LoadBalancer", "request", {
+        title: this.options.title,
+      });
+    })();
   }
 
   private nodeResponseFailure(
