@@ -10,5 +10,5 @@ debug:
     enabled: true
     path: (env) => env.getLogPath(env.config.title)
 routes:
-  - name: Test
-    path: /test
+  - name: default
+    path: /

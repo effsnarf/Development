@@ -111,7 +111,7 @@ const getResponseSize = (response: any) => {
   // #endregion
 
   // #region 📦 Database
-
+  const db = await Database.new(config.database);
   // #endregion
 
   // #region 🔍 Request Handling
