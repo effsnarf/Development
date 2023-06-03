@@ -152,7 +152,7 @@ class Configuration {
       .forEach((file) => {
         config.log(`${`Watching`.gray} ${file.toShortPath()}`);
         fs.watchFile(file, () => {
-          config.log(`${file.yellow} ${`changed, restarting...`.gray}`);
+          config.log(`${file.toShortPath()} ${`changed, restarting...`.gray}`);
           process.exit();
         });
       });

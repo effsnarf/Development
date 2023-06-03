@@ -473,12 +473,22 @@ class LoadBalancer {
     this.log({
       node: { index: incomingItem.nodeItem.index },
       texts: [
+        incomingItem.request.method,
         (ex.status || "").toString().bgRed,
-        null, // sizeKB,
+        incomingItem.attempt.ordinalize(),
         uElapsed,
-        `(${incomingItem.attempt.ordinalize()} attempt) ${
-          logMsg.bgWhite.black
-        }`,
+        `${logMsg.bgRed}`,
+      ],
+    });
+
+    this.log({
+      node: { index: incomingItem.nodeItem.index },
+      texts: [
+        incomingItem.request.method,
+        (ex.status || "").toString().bgRed,
+        null,
+        null,
+        `${ex.stack?.bgRed}`,
       ],
     });
 
