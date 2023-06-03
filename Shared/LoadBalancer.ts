@@ -149,7 +149,7 @@ interface LoadBalancerOptions {
     store: any;
     ignore: [];
   };
-  db: {
+  database: {
     analytics: any;
   };
 }
@@ -232,7 +232,7 @@ class LoadBalancer {
       lb.events.emit("error", ex);
     });
     lb.db.analytics = await Analytics.new(
-      await Database.new(options.db.analytics)
+      await Database.new(options.database?.analytics)
     );
     return lb;
   }
