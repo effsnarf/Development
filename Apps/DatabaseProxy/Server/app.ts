@@ -139,6 +139,14 @@ const getResponseSize = (response: any) => {
     renderDashboard();
     process.exit();
   });
+
+  if (configObj.nextRestartTime) {
+    mainLog.log(
+      `Next restart: ${configObj.nextRestartTime.toLocaleTimeString().bgRed} (${
+        `every`.gray
+      } ${config.process.restart.periodically.every})`
+    );
+  }
   // #endregion
 
   // #region 📦 Database

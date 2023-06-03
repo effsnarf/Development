@@ -146,6 +146,14 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
       .join(", ")}`
   );
 
+  if (configObj.nextRestartTime) {
+    mainLog.log(
+      `Next restart at ${
+        configObj.nextRestartTime.toLocaleTimeString().bgRed
+      } (${`every`.gray} ${config.process.restart.periodically.every})`
+    );
+  }
+
   const counterLog = LargeText.new("Requests per minute");
   counterLog.text = "0";
 

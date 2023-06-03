@@ -26,11 +26,6 @@ log:
 requests:
   severity:
     time: [100, 500, "<"]
-process:
-  restart:
-    periodically:
-      from: 00:00
-      every: 1h
 dbs:
   IDE:
     users:
@@ -39,4 +34,4 @@ dbs:
     users:
       enabled: false
 restart:
-  url: /api/restart/Jz0xnwG1bDv57LFpKTS6UkV8h9XQtCeBOMl2NHfRIj3yPcZYimAsrqdV4oWEaFhu
+  url: /restart/Jz0xnwG1bDv57LFpKTS6UkV8h9XQtCeBOMl2NHfRIj3yPcZYimAsrqdV4oWEaFhu

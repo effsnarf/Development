@@ -41,6 +41,7 @@ class Configuration {
   options: ConfigurationOptions;
   data: any;
   yaml!: string;
+  nextRestartTime: Date | null = null;
 
   constructor(
     options: ConfigurationOptions,
@@ -157,45 +158,6 @@ class Configuration {
         });
       });
 
-    const periodically = config.data.process?.restart?.periodically;
-    if (periodically) {
-      // Restart periodically ({ from: 00:00, every: 1h })
-      const from = moment.duration(periodically.from).asMilliseconds();
-      const every = periodically.every.deunitifyTime();
-      const startOfDay = new Date().setHours(0, 0, 0, 0).valueOf();
-      const times = (24).hours() / every;
-      const points = [];
-      for (
-        let at = startOfDay + from;
-        at < startOfDay + from + times * every;
-        at += every
-      ) {
-        points.push(at);
-      }
-      const nextPoint = points
-        .filter((p) => p > Date.now())
-        .sortBy((p) => p)
-        .first();
-
-      config.log();
-      config.log(
-        `${`Restarting every`.gray} ${every.unitifyTime()} ${
-          `from`.gray
-        } ${new Date(startOfDay + from).toLocaleTimeString()}`
-      );
-      config.log(
-        `${`Next restart:`.gray} ${new Date(nextPoint).toLocaleTimeString()}`
-      );
-      const check = () => {
-        const now = new Date(new Date().setMilliseconds(0));
-        if (now.valueOf() == nextPoint) {
-          config.log(`${`Restarting at ${now}`.gray}`);
-          process.exit();
-        }
-      };
-      setInterval(check, (0.5).seconds());
-    }
-
     config.log();
     //await (5).seconds().wait({ log: true });
 
@@ -205,7 +167,52 @@ class Configuration {
 
     config.log(desc);
 
+    config.init();
+
     return config;
+  }
+
+  private init() {
+    this.nextRestartTime = this.getNextRestartTime();
+    if (this.nextRestartTime) {
+      setTimeout(() => {
+        this.log(`Restarting...`.bgRed);
+        process.exit();
+      }, this.nextRestartTime.valueOf() - Date.now());
+    }
+  }
+
+  private getNextRestartTime() {
+    const periodically = this.data.process?.restart?.periodically;
+    if (!periodically) return null;
+    // Restart periodically ({ from: 00:00, every: 1h })
+    const from = moment.duration(periodically.from).asMilliseconds();
+    const every = periodically.every.deunitifyTime();
+    const startOfDay = new Date().setHours(0, 0, 0, 0).valueOf();
+    const times = (24).hours() / every;
+    const points = [];
+    for (
+      let at = startOfDay + from;
+      at < startOfDay + from + times * every;
+      at += every
+    ) {
+      points.push(at);
+    }
+    const nextPoint = points
+      .filter((p) => p > Date.now())
+      .sortBy((p) => p)
+      .first();
+
+    this.log();
+    this.log(
+      `${`Restarting every`.gray} ${every.unitifyTime()} ${
+        `from`.gray
+      } ${new Date(startOfDay + from).toLocaleTimeString()}`
+    );
+    this.log(
+      `${`Next restart:`.gray} ${new Date(nextPoint).toLocaleTimeString()}`
+    );
+    return new Date(nextPoint);
   }
 
   private static async getConfigDescription(data: any) {
