@@ -424,7 +424,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   mainConsoleLog.log("Press [`] to switch layouts".bgWhite.black);
   mainConsoleLog.log("Press [1, 2, ..] to enable/disable nodes".bgWhite.black);
   mainConsoleLog.log(
-    "Press shift+[1, 2, ..] to restart node processes".bgWhite.black
+    "Press shift+[1, 2, ..] to send restart signal".bgWhite.black
   );
   for (var i = 0; i < config.nodes.length; i++) {
     const char = (i + 1).toString();

@@ -119,6 +119,11 @@ export default async function (req: any, res: any, next: any) {
       res.end(ip);
       return;
     }
+    if (req.url == config.restart.url.replace("/api/", "/")) {
+      res.end("Restarting...");
+      process.exit(0);
+      return;
+    }
     // /events?filter={e:"visit","v.dt.end":{$gte:1600000000000}}
     // /Instances/[sinceMinutes]/[intervalMinutes]
     if (req.url.startsWith("/instances")) {
@@ -351,7 +356,7 @@ export default async function (req: any, res: any, next: any) {
     }
     return;
   };
-  const process = async (data: any) => {
+  const processReq = async (data: any) => {
     try {
       await processRequest(data);
     } catch (ex: any) {
@@ -359,14 +364,14 @@ export default async function (req: any, res: any, next: any) {
     }
   };
   if (req.method === "GET") {
-    process(null);
+    processReq(null);
   } else if (req.method === "POST") {
     let body = "";
     req.on("data", (data: any) => {
       body += data;
     });
     req.on("end", async () => {
-      process(body);
+      processReq(body);
     });
   } else {
     res.end("Unsupported method");

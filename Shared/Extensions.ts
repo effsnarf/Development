@@ -222,7 +222,7 @@ interface String {
   antonym(): string;
 
   severify(green: number, yellow: number, direction: "<" | ">"): string;
-  severifyByHttpStatus(statusCode?: number): string;
+  severifyByHttpStatus(statusCode?: number, bgRed?: boolean): string;
   deunitify(unitClass: UnitClass): number;
   deunitifyTime(): number;
   deunitifySize(): number;
@@ -632,14 +632,15 @@ if (typeof String !== "undefined") {
   };
 
   String.prototype.severifyByHttpStatus = function (
-    statusCode?: number
+    statusCode?: number,
+    bgRed?: boolean
   ): string {
     if (!statusCode)
       statusCode = this.split(" ")
         .map((s) => parseInt(s))
         .find((n) => !isNaN(n));
     if (!statusCode) return this.toString();
-    return this.colorize(statusCode.getSeverityColor(200, 400, "<"));
+    return this.colorize(statusCode.getSeverityColor(200, 400, "<", bgRed));
   };
 
   String.prototype.deunitify = function (unitClass: UnitClass): number {

@@ -20,7 +20,12 @@ export default async function (req: any, res: any, next: any) {
 
   if (!classes.includes(className)) return next();
 
-  res.setHeader("Content-Type", "application/javascript");
+  try {
+    res.setHeader("Content-Type", "application/javascript");
+  } catch (ex: any) {
+    console.log(`Error setting header for ${className}`);
+    console.log(ex.stack);
+  }
 
   const tsCode = fs.readFileSync(`${sharedPath}/${className}.ts`, "utf8");
   const jsCode = TypeScript.transpileToJavaScript(tsCode);

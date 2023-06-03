@@ -344,7 +344,7 @@ class LoadBalancer {
 
     let statusStr = status.severifyByHttpStatus();
 
-    const url = incomingItem.request.url?.severifyByHttpStatus(status);
+    const url = incomingItem.request.url?.severifyByHttpStatus(status, true);
 
     incomingItem.infos.push(`writing headers`);
 

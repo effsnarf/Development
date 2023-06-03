@@ -315,20 +315,30 @@ class Configuration {
       .split(":")
       .slice(0, 2)
       .join("-");
-    // Add time to the log path
+    const hour = parseInt(time.split("-")[0]);
+    const minute = parseInt(time.split("-")[1]);
     // We want to separate one day's logs into multiple folders and files
     // One folder per hour would result in 24 folders per day
     // We want to keep at most 5-6 folders per folder to ease navigation
-    // So we'll create a folder every 4 hours (24 / 4 = 6)
-    // Inside each folder which holds 6 hours of logs, we'll subdivide further into 6 folders (one per hour)
-    // Inside each folder which holds 1 hour of logs, we'll subdivide further into 6 folders (one per 10 minutes)
-    const hour = now.getHours();
-    const minute = now.getMinutes();
-    const hourFolder = Math.floor(hour / 4) * 4;
-    const minuteFolder = Math.floor(minute / 10) * 10;
-    parts.push(`${hourFolder}-${hourFolder + 4}`);
-    parts.push(`${minuteFolder}-${minuteFolder + 10}.log`);
-    return path.join(...parts);
+    // So we'll divide the day into 6 parts of 4 hours each
+    const folders = [];
+    folders.push(Math.floor(hour / 4));
+    // subdivide every 4 hour folder further into 1 hour folders
+    folders.push(Math.floor(hour % 4));
+    // subdivide every 1 hour folder further into 6 10-minute folders
+    folders.push(Math.floor(minute / 10));
+    // subdivide every 10-minute folder further into 5 2-minute folders
+    folders.push(Math.floor((minute % 10) / 2));
+    // and finally, subdivide every 2-minute folder further into 4 30-second log files
+    folders.push(Math.floor((minute % 2) / 0.5) * 60);
+    // Folderception
+    const filename = `${folders.pop()}.log`;
+    parts.push(...folders);
+    // Create the log folder if it doesn't exist
+    const folderPath = path.join(...parts.map((p) => p.toString()));
+    fs.mkdirSync(folderPath, { recursive: true });
+    const filePath = path.join(folderPath, filename);
+    return filePath;
   }
 
   private log(...args: any[]) {
