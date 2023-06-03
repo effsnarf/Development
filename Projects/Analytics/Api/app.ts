@@ -41,6 +41,7 @@ const getResponseSize = (response: any) => {
   const config = configObj.data;
   // #endregion
 
+  const debugLog = await Logger.new(config.debug.log);
   // #region 💻 Console
 
   // #region Create the dashboard layout
@@ -50,7 +51,6 @@ const getResponseSize = (response: any) => {
     breakLines: true,
     extraSpaceForBytes: true,
   });
-  const debugLog = Logger.new(config.log);
 
   const configLog = Log.new(`Configuration`);
   configLog.showDate = false;
@@ -206,14 +206,6 @@ const getResponseSize = (response: any) => {
         config.server.port.toString().green
       }`.gray
     );
-
-    const allowedOrigins = config.server.cors
-      .map((host: string) => [`https://${host}`, `http://${host}`])
-      .flatMap((hosts: string[]) => hosts);
-
-    for (const origin of allowedOrigins) {
-      mainLog.log(`CORS: ${origin.green}`);
-    }
   };
 
   process.title = config.title;
