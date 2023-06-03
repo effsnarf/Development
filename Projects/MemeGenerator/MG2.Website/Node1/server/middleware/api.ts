@@ -25,7 +25,7 @@ class Global {
       if (!this._analyticsApify) {
         const config = (await this.config()).data;
         Analytics.defaults.database = await Database.new(
-          config.database.analytics.write
+          config.database.analytics?.write
         );
 
         this._analyticsApify = new Apify.Server(
@@ -120,8 +120,11 @@ export default async function (req: any, res: any, next: any) {
       return;
     }
     if (req.url == config.restart.url.replace("/api/", "/")) {
-      res.end("Restarting...");
-      process.exit(0);
+      res.end("Restarting..");
+      setTimeout(() => {
+        console.log("Restarting..");
+        process.exit(0);
+      }, 1000);
       return;
     }
     // /events?filter={e:"visit","v.dt.end":{$gte:1600000000000}}

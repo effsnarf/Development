@@ -39,4 +39,4 @@ dbs:
     users:
       enabled: false
 restart:
-  url: /restart/Jz0xnwG1bDv57LFpKTS6UkV8h9XQtCeBOMl2NHfRIj3yPcZYimAsrqdV4oWEaFhu
+  url: /api/restart/Jz0xnwG1bDv57LFpKTS6UkV8h9XQtCeBOMl2NHfRIj3yPcZYimAsrqdV4oWEaFhu

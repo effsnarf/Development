@@ -1,5 +1,7 @@
 @echo off
 
+:start
+
 title MG2.Web
 
 rem Delete the .nuxt and dist folders
@@ -12,7 +14,5 @@ if "%NODE_ENV%"=="development" (
   call npm run build
   call npm run start
 )
-
-:start
 
 goto start

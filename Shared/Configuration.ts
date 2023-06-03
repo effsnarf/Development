@@ -209,7 +209,10 @@ class Configuration {
   }
 
   private static async getConfigDescription(data: any) {
-    return Configuration.toYaml(data).gray;
+    const yaml = Configuration.toYaml(data);
+    // Console colors don't work for some reason in Nuxt
+    if (process.env.NODE_ENV) return yaml;
+    return yaml.gray;
   }
 
   static setAbsolutePaths(
