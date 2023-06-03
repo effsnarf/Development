@@ -100,7 +100,10 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   // #endregion
 
   // Create the load balancer
-  const loadBalancer = await LoadBalancer.new(config.incoming);
+  const loadBalancer = await LoadBalancer.new({
+    title: config.title,
+    ...config.incoming,
+  });
 
   Objects.on(
     loadBalancer.cache?.health,
