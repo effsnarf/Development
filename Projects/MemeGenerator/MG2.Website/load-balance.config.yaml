@@ -56,4 +56,4 @@ process:
   restart:
     periodically:
       from: 00:00
-      every: 30m
+      every: 10m
