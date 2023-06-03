@@ -57,5 +57,5 @@ log:
 process:
   restart:
     periodically:
-      from: 00:15
+      from: 00:00
       every: 30m
