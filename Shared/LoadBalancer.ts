@@ -13,6 +13,9 @@ import { Http } from "./Http";
 import { Events } from "./Events";
 import { HealthMonitor } from "./HealthMonitor";
 import { Timer, IntervalCounter } from "./Timer";
+import { Analytics } from "./Analytics";
+import { Database } from "./Database/Database";
+import { DatabaseBase } from "./Database/DatabaseBase";
 
 interface Node {
   name: string;
@@ -125,6 +128,7 @@ interface CachedResponse {
 }
 
 interface LoadBalancerOptions {
+  title: string;
   address: Types.Address;
   cors: string[];
   os: {
@@ -144,6 +148,9 @@ interface LoadBalancerOptions {
     };
     store: any;
     ignore: [];
+  };
+  db: {
+    analytics: any;
   };
 }
 
@@ -181,6 +188,9 @@ class LoadBalancer {
   incomingItemID: number = 1;
   cache!: CacheBase | null;
   events = new Events();
+  db = {
+    analytics: null as unknown as Analytics,
+  };
   private readonly nodeSwitcher = new NodeSwitcher(this.events);
   readonly stats = {
     // Incoming requests from web users
@@ -221,6 +231,9 @@ class LoadBalancer {
     lb.cache.events.on("error", (ex: any) => {
       lb.events.emit("error", ex);
     });
+    lb.db.analytics = await Analytics.new(
+      await Database.new(options.db.analytics)
+    );
     return lb;
   }
 
@@ -448,6 +461,10 @@ class LoadBalancer {
 
     // Successfully processed the incoming item
     this.incomingItems.remove(incomingItem);
+
+    this.db.analytics?.create("LoadBalancer", "request", {
+      title: this.options.title,
+    });
   }
 
   private nodeResponseFailure(
