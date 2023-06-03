@@ -1,5 +1,11 @@
 import { DatabaseBase } from "./Database/DatabaseBase";
 
+enum ItemType {
+  Undefined = 0,
+  Count = 1,
+  Average = 2,
+  Method = 3,
+}
 class Analytics {
   private db!: DatabaseBase;
 
@@ -19,23 +25,22 @@ class Analytics {
   }
 
   async create(
+    type: ItemType = ItemType.Undefined,
     app: string,
     category: string,
     event: string,
-    value: any,
-    elapsed?: number
+    value: any
   ) {
     const dt = Date.now();
 
     const data = {
       d: dt,
+      t: type,
       a: app,
       c: category,
       e: event,
       v: value,
     } as any;
-
-    if (elapsed != undefined) data["elp"] = elapsed;
 
     const doc = await this.db.upsert("Events", data);
 
@@ -52,4 +57,4 @@ class Analytics {
   }
 }
 
-export { Analytics };
+export { Analytics, ItemType };

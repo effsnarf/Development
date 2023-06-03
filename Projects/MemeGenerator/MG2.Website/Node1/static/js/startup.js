@@ -73,7 +73,7 @@ const initApi = (async() => {
     };
 
     // Create a new visit
-    const visit = (await analytics.create("MG.Web", "user", "visit", {
+    const visit = (await analytics.create(null, "MG.Web", "user", "visit", {
       user: user,
       ui: {
         e: Object.fromEntries(capturedUiEvents.map((e) => [e, 0])),

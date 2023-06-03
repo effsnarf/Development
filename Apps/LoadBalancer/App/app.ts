@@ -8,7 +8,7 @@ import { Timer } from "@shared/Timer";
 import { Files } from "@shared/Files";
 import { Logger } from "@shared/Logger";
 import { MultiCache, MemoryCache } from "@shared/Cache";
-import { Analytics } from "@shared/Analytics";
+import { Analytics, ItemType } from "@shared/Analytics";
 import { Database } from "@shared/Database/Database";
 import {
   Console,
@@ -391,15 +391,17 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
       setInterval(async () => {
         try {
           await analytics.create(
+            ItemType.Count,
             config.title,
             "LoadBalancer",
             "requests.per.minute",
             loadBalancer.stats.requests.per.minute.count
           );
           await analytics.create(
+            ItemType.Average,
             config.title,
             "LoadBalancer",
-            "response.time.per.minute.average",
+            "response.time.per.minute",
             rtpm.average
           );
         } catch (ex: any) {
@@ -425,12 +427,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
           });
         for (const item of items) {
           try {
-            await analytics.create(
-              config.title,
-              "LoadBalancer",
-              "processing",
-              item
-            );
+            // Track long running incoming items in analytics?
           } catch (ex: any) {
             debugLog.log(ex.stack);
           }

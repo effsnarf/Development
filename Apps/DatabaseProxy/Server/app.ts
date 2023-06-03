@@ -27,7 +27,7 @@ import { Logger } from "@shared/Logger";
 import { TypeScript } from "@shared/TypeScript";
 import { Database } from "@shared/Database/Database";
 import { MongoDatabase } from "@shared/Database/MongoDatabase";
-import { Analytics } from "@shared/Analytics";
+import { Analytics, ItemType } from "@shared/Analytics";
 import { debug } from "console";
 // #endregion
 
@@ -177,13 +177,14 @@ const getResponseSize = (response: any) => {
             args = args.map((arg) =>
               JSON.parse(JSON.stringify(arg).replace(/\$([a-z]+)/g, "$1"))
             );
-            dbs._analytics?.create(
-              config.title,
-              className,
-              methodName,
-              { database: { name: dbName }, args },
-              timer.elapsed
-            );
+            // dbs._analytics?.create(
+            //   ItemType.Undefined,
+            //   config.title,
+            //   className,
+            //   methodName,
+            //   { database: { name: dbName }, args }
+            //   // timer.elapsed
+            // );
           }
         );
 
@@ -539,13 +540,14 @@ const getResponseSize = (response: any) => {
           if (elapsed < config.analytics.min.elapsed) {
             methodStr = methodStr.gray;
           } else {
-            dbs._analytics?.create(
-              config.title,
-              "api",
-              methodStr,
-              { args },
-              elapsed
-            );
+            // dbs._analytics?.create(
+            //   ItemType.Unknown,
+            //   config.title,
+            //   "api",
+            //   methodStr,
+            //   { args },
+            //   elapsed
+            // );
           }
 
           return res.send(result);

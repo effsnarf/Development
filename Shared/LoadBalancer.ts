@@ -13,7 +13,7 @@ import { Http } from "./Http";
 import { Events } from "./Events";
 import { HealthMonitor } from "./HealthMonitor";
 import { Timer, IntervalCounter } from "./Timer";
-import { Analytics } from "./Analytics";
+import { Analytics, ItemType } from "./Analytics";
 import { Database } from "./Database/Database";
 import { DatabaseBase } from "./Database/DatabaseBase";
 
@@ -464,6 +464,7 @@ class LoadBalancer {
 
     (async () => {
       this.db.analytics?.create(
+        ItemType.Count,
         this.options.title,
         "LoadBalancer",
         "request",
