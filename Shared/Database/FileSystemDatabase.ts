@@ -172,8 +172,8 @@ class FileSystemDatabase extends DatabaseBase {
   }
 
   private getFilePath(collectionName: string, key: any) {
-    if (typeof key != "string") key = JSON.stringify(key);
-    const id = key.hashCode();
+    if (typeof key != "number") throw new Error("Key must be a number");
+    const id = key as number;
     const dir1 = Math.floor(id / 1000000).toString();
     const dir2 = Math.floor(id / 1000).toString();
     const dirPath = path.join(this.basePath, collectionName, dir1, dir2);

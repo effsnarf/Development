@@ -18,11 +18,18 @@ class Analytics {
     return analytics;
   }
 
-  async create(category: string, event: string, value: any, elapsed?: number) {
+  async create(
+    app: string,
+    category: string,
+    event: string,
+    value: any,
+    elapsed?: number
+  ) {
     const dt = Date.now();
 
     const data = {
       d: dt,
+      a: app,
       c: category,
       e: event,
       v: value,

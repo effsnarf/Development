@@ -178,6 +178,7 @@ const getResponseSize = (response: any) => {
               JSON.parse(JSON.stringify(arg).replace(/\$([a-z]+)/g, "$1"))
             );
             dbs._analytics?.create(
+              config.title,
               className,
               methodName,
               { database: { name: dbName }, args },
@@ -538,7 +539,13 @@ const getResponseSize = (response: any) => {
           if (elapsed < config.analytics.min.elapsed) {
             methodStr = methodStr.gray;
           } else {
-            dbs._analytics?.create("api", methodStr, { args }, elapsed);
+            dbs._analytics?.create(
+              config.title,
+              "api",
+              methodStr,
+              { args },
+              elapsed
+            );
           }
 
           return res.send(result);

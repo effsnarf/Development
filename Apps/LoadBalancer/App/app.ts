@@ -391,12 +391,14 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
       setInterval(async () => {
         try {
           await analytics.create(
-            "traffic",
+            config.title,
+            "LoadBalancer",
             "requests.per.minute",
             loadBalancer.stats.requests.per.minute.count
           );
           await analytics.create(
-            "traffic",
+            config.title,
+            "LoadBalancer",
             "response.time.per.minute.average",
             rtpm.average
           );
@@ -423,7 +425,12 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
           });
         for (const item of items) {
           try {
-            await analytics.create("loadBalancer", "processing", item);
+            await analytics.create(
+              config.title,
+              "LoadBalancer",
+              "processing",
+              item
+            );
           } catch (ex: any) {
             debugLog.log(ex.stack);
           }
