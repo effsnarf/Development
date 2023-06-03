@@ -463,9 +463,12 @@ class LoadBalancer {
     this.incomingItems.remove(incomingItem);
 
     (async () => {
-      this.db.analytics?.create("LoadBalancer", "request", {
-        title: this.options.title,
-      });
+      this.db.analytics?.create(
+        this.options.title,
+        "LoadBalancer",
+        "request",
+        1
+      );
     })();
   }
 
