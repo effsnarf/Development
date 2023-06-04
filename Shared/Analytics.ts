@@ -1,3 +1,5 @@
+import { Cache, CacheBase } from "./Cache";
+import { Database } from "./Database/Database";
 import { DatabaseBase } from "./Database/DatabaseBase";
 
 enum ItemType {
@@ -17,8 +19,59 @@ interface Interval {
   average: number;
 }
 
+// HTTP API for analytics
+class Api {
+  private cache!: CacheBase;
+  private constructor(private analytics: Analytics) {}
+
+  static async new(analytics: Analytics, config: any) {
+    const api = new Api(analytics);
+    api.cache = await Cache.new(config?.cache);
+    return api;
+  }
+
+  async handleRequest(req: any, res: any) {
+    let url = req.url;
+    if (url.startsWith("/analytics/")) url = url.substr("/analytics".length);
+
+    const { data } = await this.cache.get(url, async () => {
+      return { data: await this._handleRequest(url) };
+    });
+
+    return res.end(JSON.stringify(data));
+  }
+
+  async _handleRequest(url: string) {
+    // /:app/:category/:event/last/:last/every/:every/:type
+
+    if (url.match(/\/.+\/.+\/.+\/last\/.+\/every\/.+\/\w+/)) {
+      const parts = url.split("/");
+      const [app, category, event] = parts.slice(1, 4);
+      const [last, every] = [parts[5], parts[7]].map((p: string) =>
+        p.deunitifyTime()
+      );
+      const type = parts[8].parseEnum(ItemType);
+      if (!type) throw new Error("Invalid type: " + parts[7] + ` (${url})`);
+      const to = Date.now();
+      const from = to - last;
+      const intervals = await this.analytics.aggregate(
+        app,
+        category,
+        event,
+        from,
+        to,
+        every,
+        type
+      );
+      return intervals;
+    }
+    throw new Error("Invalid request: " + url);
+  }
+}
+
 class Analytics {
   private db!: DatabaseBase;
+  api!: Api;
 
   static defaults = {
     database: null as DatabaseBase | null,
@@ -26,12 +79,14 @@ class Analytics {
 
   constructor() {}
 
-  static async new(database: DatabaseBase) {
-    if (!database) {
-      if (Analytics.defaults.database) database = Analytics.defaults.database;
-    }
+  static async new(config: any) {
+    let database =
+      (!config.database
+        ? Analytics.defaults.database
+        : await Database.new(config.database)) || (await Database.new(null));
     const analytics = new Analytics();
     analytics.db = database;
+    analytics.api = await Api.new(analytics, config.api);
     return analytics;
   }
 
