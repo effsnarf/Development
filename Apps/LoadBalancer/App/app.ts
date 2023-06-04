@@ -386,28 +386,6 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
       const analytics = await Analytics.new(
         await Database.new(config.analytics.database)
       );
-      // Every minute, track requests/minute and response times in analytics
-      const rtpm = loadBalancer.stats.response.times.per.minute;
-      setInterval(async () => {
-        try {
-          await analytics.create(
-            ItemType.Count,
-            config.title,
-            "LoadBalancer",
-            "requests.per.minute",
-            loadBalancer.stats.requests.per.minute.count
-          );
-          await analytics.create(
-            ItemType.Average,
-            config.title,
-            "LoadBalancer",
-            "response.time.per.minute",
-            rtpm.average
-          );
-        } catch (ex: any) {
-          debugLog.log(ex.stack);
-        }
-      }, 60 * 1000);
       // Every second, track long running incoming items in analytics
       setInterval(async () => {
         const items = loadBalancer.incomingItems

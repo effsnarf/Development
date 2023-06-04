@@ -188,9 +188,7 @@ class LoadBalancer {
   incomingItemID: number = 1;
   cache!: CacheBase | null;
   events = new Events();
-  db = {
-    analytics: null as unknown as Analytics,
-  };
+  analytics = null as unknown as Analytics;
   private readonly nodeSwitcher = new NodeSwitcher(this.events);
   readonly stats = {
     // Incoming requests from web users
@@ -223,7 +221,7 @@ class LoadBalancer {
     10
   );
 
-  constructor(private options: LoadBalancerOptions) {}
+  private constructor(private options: LoadBalancerOptions) {}
 
   static async new(options: LoadBalancerOptions) {
     const lb = new LoadBalancer(options);
@@ -231,9 +229,27 @@ class LoadBalancer {
     lb.cache.events.on("error", (ex: any) => {
       lb.events.emit("error", ex);
     });
-    lb.db.analytics = await Analytics.new(
+    lb.analytics = await Analytics.new(
       await Database.new(options.database?.analytics)
     );
+    // Every minute, track requests/minute and response times in analytics
+    const rtpm = lb.stats.response.times.per.minute;
+    setInterval(async () => {
+      await lb.analytics.create(
+        ItemType.Count,
+        options.title,
+        "LoadBalancer",
+        "requests.per.minute",
+        lb.stats.requests.per.minute.count
+      );
+      await lb.analytics.create(
+        ItemType.Average,
+        options.title,
+        "LoadBalancer",
+        "response.time.per.minute",
+        rtpm.average
+      );
+    }, (1).minutes());
     return lb;
   }
 
@@ -461,16 +477,6 @@ class LoadBalancer {
 
     // Successfully processed the incoming item
     this.incomingItems.remove(incomingItem);
-
-    (async () => {
-      this.db.analytics?.create(
-        ItemType.Count,
-        this.options.title,
-        "LoadBalancer",
-        "request",
-        1
-      );
-    })();
   }
 
   private nodeResponseFailure(
