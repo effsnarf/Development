@@ -119,6 +119,9 @@ const getResponseSize = (response: any) => {
 
   // #region 🔍 Request Handling
   const init = (httpServer: express.Express) => {
+    const getDateTimes = (obj: any) =>
+      Objects.mapValues(obj, (v) => parseInt(v) || Date.now());
+
     // #region 🌐 CORS
     httpServer.use(function (req: any, res: any, next: any) {
       res.setHeader("Access-Control-Allow-Origin", "*");
@@ -232,12 +235,27 @@ const getResponseSize = (response: any) => {
       `/:app/:category/:event/from/:from/to/:to/every/:every/:type`.toLowerCase(),
       processRequest(async (req: any, res: any) => {
         const { type, app, category, event } = req.params;
-        const { from, to, every } = Object.fromEntries(
-          Object.entries(req.params).map((e) => [
-            e[0],
-            parseInt(e[1] as string) || Date.now(),
-          ])
+        const { from, to, every } = getDateTimes(req.params);
+        const intervals = await analytics.aggregate(
+          app,
+          category,
+          event,
+          from,
+          to,
+          every,
+          type
         );
+        return intervals;
+      })
+    );
+
+    httpServer.get(
+      `/:app/:category/:event/last/:last/every/:every/:type`.toLowerCase(),
+      processRequest(async (req: any, res: any) => {
+        const { type, app, category, event } = req.params;
+        const { last, every } = getDateTimes(req.params);
+        const to = Date.now();
+        const from = to - last;
         const intervals = await analytics.aggregate(
           app,
           category,

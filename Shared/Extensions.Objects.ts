@@ -127,6 +127,19 @@ class Objects {
     return result;
   }
 
+  static map(obj: any, func: (key: string, value: any) => [string, any]): any {
+    const result = {} as any;
+    for (const key of Object.keys(obj)) {
+      const [newKey, newValue] = func(key, obj[key]);
+      result[newKey] = newValue;
+    }
+    return result;
+  }
+
+  static mapValues(obj: any, func: (value: any) => any) {
+    return Objects.map(obj, (key, value) => [key, func(value)]);
+  }
+
   static try(func: Function, onCatch: (ex: any) => void) {
     try {
       return func();
