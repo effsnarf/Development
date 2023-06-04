@@ -27,10 +27,20 @@ incoming:
         - database:
             connectionString: mongodb://localhost:37017
             database: MG-DBP-Cache
-  database:
-    analytics:
-      prod:
-        path: F:\Database\MG-Analytics
+  analytics:
+    prod:
+      api:
+        cache:
+          zero:
+            database:
+              connectionString: mongodb://localhost:37017
+              database: MG-Analytics-Cache
+      database:
+        write:
+          path: F:\Database\MG-Analytics
+        read:
+          connectionString: mongodb://localhost:47017
+          database: MG-Analytics
 nodes:
   - name: MG.DBP 1
     address: localhost:4041
@@ -51,10 +61,6 @@ node:
     timeout: 5 # and it has been unhealthy for N minutes
 request:
   timeout: 10 # Timeout requests after 10 seconds
-analytics:
-  database:
-    prod:
-      path: F:\Database\MG-Analytics
 log:
   enabled: true
   path: (env) => env.getLogPath(env.config.title)

@@ -149,9 +149,7 @@ interface LoadBalancerOptions {
     store: any;
     ignore: [];
   };
-  database: {
-    analytics: any;
-  };
+  analytics: any;
 }
 
 class IncomingItemCollection {
@@ -229,9 +227,7 @@ class LoadBalancer {
     lb.cache.events.on("error", (ex: any) => {
       lb.events.emit("error", ex);
     });
-    lb.analytics = await Analytics.new(
-      await Database.new(options.database?.analytics)
-    );
+    lb.analytics = await Analytics.new(options.analytics);
     // Every minute, track requests/minute and response times in analytics
     const rtpm = lb.stats.response.times.per.minute;
     setInterval(async () => {
@@ -295,6 +291,9 @@ class LoadBalancer {
     request: http.IncomingMessage,
     response: http.ServerResponse
   ) {
+    if (request.url?.startsWith("/analytics/"))
+      return this.analytics.api.handleRequest(request, response);
+
     this.stats.requests.track();
 
     if (this.ignoreRequest(request)) {

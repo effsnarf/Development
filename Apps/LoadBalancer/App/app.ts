@@ -157,12 +157,6 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
     );
   }
 
-  if (config.incoming.database?.analytics) {
-    mainLog.log(`Analytics database: ${config.incoming.database.analytics}`);
-  } else {
-    mainLog.log(`No analytics database`);
-  }
-
   const counterLog = LargeText.new("Requests per minute");
   counterLog.text = "0";
 
@@ -378,41 +372,6 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
   });
   // #endregion
 
-  // #endregion
-
-  // #region Analytics
-  if (config.analytics?.database) {
-    (async () => {
-      const analytics = await Analytics.new(
-        await Database.new(config.analytics.database)
-      );
-      // Every second, track long running incoming items in analytics
-      setInterval(async () => {
-        const items = loadBalancer.incomingItems
-          .getItems()
-          .filter((item: IncomingItem) => (Date.now() - item.dt) / 1000 > 5)
-          .sort((a: IncomingItem, b: IncomingItem) => b.dt - a.dt)
-          .map((item: IncomingItem) => {
-            return {
-              dt: {
-                started: item.dt,
-                elapsed: Date.now() - item.dt,
-              },
-              isProcessing: item.isProcessing,
-              attempt: item.attempt,
-              url: item.request.url,
-            };
-          });
-        for (const item of items) {
-          try {
-            // Track long running incoming items in analytics?
-          } catch (ex: any) {
-            debugLog.log(ex.stack);
-          }
-        }
-      }, 1000);
-    })();
-  }
   // #endregion
 
   // #region ⌨ Console keys
