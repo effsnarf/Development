@@ -12,7 +12,7 @@ import { Logger } from "@shared/Logger";
 import { Files } from "@shared/Files";
 import { Progress } from "@shared/Progress";
 import { Database } from "@shared/Database/Database";
-import { Analytics } from "@shared/Analytics";
+import { Analytics, ItemType } from "@shared/Analytics";
 import { TreeScript } from "@shared/TreeScript/TreeScript";
 import { Apify } from "@shared/Apify";
 import { Console } from "@shared/Console";
@@ -34,6 +34,8 @@ class Malkovich {
 const malkovitch = new Malkovich();
 
 (async () => {
+  console.log("sum".parseEnum(ItemType));
+
   console.log(process.memoryUsage().heapUsed.unitifySize());
   console.log(process.cpuUsage());
 
