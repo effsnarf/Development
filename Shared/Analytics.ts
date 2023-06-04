@@ -40,7 +40,8 @@ class Analytics {
     app: string,
     category: string,
     event: string,
-    value: any
+    value: any,
+    unit: string | null = null
   ) {
     const dt = Date.now();
 
@@ -51,6 +52,7 @@ class Analytics {
       c: category,
       e: event,
       v: value,
+      u: unit,
     } as any;
 
     const doc = await this.db.upsert("Events", data);

@@ -247,7 +247,8 @@ class LoadBalancer {
         options.title,
         "LoadBalancer",
         "response.time.per.minute",
-        rtpm.average
+        rtpm.average,
+        "ms"
       );
     }, (1).minutes());
     return lb;
