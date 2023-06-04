@@ -171,7 +171,7 @@ export default {
 <style scoped>
 h2
 {
-    font-size: 200%;
+    font-size: 140%;
     margin-bottom: 0.5em;
 }
 canvas
@@ -182,7 +182,7 @@ canvas
 .total
 {
     text-align: center;
-    font-size: 400%;
+    font-size: 200%;
     margin-left: 1em;
 }
 .title
