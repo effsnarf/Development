@@ -34,6 +34,9 @@ class Api {
     let url = req.url;
     if (url.startsWith("/analytics/")) url = url.substr("/analytics".length);
 
+    // CORS: *
+    res.setHeader("Access-Control-Allow-Origin", "*");
+
     const { data } = await this.cache.get(url, async () => {
       return { data: await this._handleRequest(url) };
     });
