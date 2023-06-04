@@ -27,6 +27,10 @@ incoming:
         - database:
             connectionString: mongodb://localhost:37017
             database: MG-DBP-Cache
+  database:
+    analytics:
+      prod:
+        path: F:\Database\MG-Analytics
 nodes:
   - name: MG.DBP 1
     address: localhost:4041

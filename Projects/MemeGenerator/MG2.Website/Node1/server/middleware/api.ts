@@ -10,7 +10,8 @@ import { Analytics } from "../../../../../../Shared/Analytics";
 
 class Global {
   private static _config: Promise<Configuration>;
-  private static _analyticsApify: Promise<Apify.Server>;
+  private static _analytics: Analytics;
+  private static _analyticsApify: Apify.Server;
 
   static get: any = {
     async config() {
@@ -38,6 +39,15 @@ class Global {
         );
       }
       return this._analyticsApify;
+    },
+    async analytics() {
+      if (!this._analytics) {
+        const config = (await this.config()).data;
+        this._analytics = await Analytics.new(
+          await Database.new(config.database.analytics?.read)
+        );
+      }
+      return this._analytics;
     },
   };
 }
@@ -106,6 +116,8 @@ export default async function (req: any, res: any, next: any) {
   const config = (await Global.get.config()).data;
   const analyticsApify = await Global.get.analyticsApify();
   const processRequest = async (data: any) => {
+    const analytics = await Global.get.analytics();
+
     // CORS
     res.setHeader("Access-Control-Allow-Origin", "*");
     const dbEvents = (await dbs.get(
@@ -127,6 +139,7 @@ export default async function (req: any, res: any, next: any) {
       }, 1000);
       return;
     }
+
     // /events?filter={e:"visit","v.dt.end":{$gte:1600000000000}}
     // /Instances/[sinceMinutes]/[intervalMinutes]
     if (req.url.startsWith("/instances")) {

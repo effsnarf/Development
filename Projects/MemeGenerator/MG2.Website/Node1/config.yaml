@@ -7,7 +7,11 @@ database:
     connectionString: mongodb://localhost:27017
   analytics:
     prod:
-      path: F:\Database\MG-Analytics
+      read:
+        connectionString: mongodb://localhost:47017
+        database: MG-Analytics
+      write:
+        path: F:\Database\MG-Analytics
 restart:
   url: /api/restart/Jz0xnwG1bDv57LFpKTS6UkV8h9XQtCeBOMl2NHfRIj3yPcZYimAsrqdV4oWEaFhu
 process:

@@ -134,6 +134,16 @@ class Objects {
       onCatch(ex);
     }
   }
+
+  static json = {
+    parse: (str: string) => {
+      try {
+        return JSON.parse(str);
+      } catch (ex: any) {
+        throw `Error parsing JSON\n${ex.message}\n${str}`;
+      }
+    },
+  };
 }
 
 export { Objects };

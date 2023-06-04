@@ -89,7 +89,6 @@ const getResponseSize = (response: any) => {
     breakLines: true,
     extraSpaceForBytes: true,
   });
-  const debugLog = Logger.new(config.log);
 
   const configLog = Log.new(`Configuration`);
   configLog.showDate = false;
@@ -110,6 +109,11 @@ const getResponseSize = (response: any) => {
     [mainLog, itemsLog, configLog],
     ["25%", "50%", "25%"]
   );
+  // #endregion
+
+  // #region 📝 Logging
+  const debugLogger = Logger.new(config.log);
+  debugLogger.log(Objects.yamlify(config));
   // #endregion
 
   // #region Render the dashboard
@@ -175,7 +179,9 @@ const getResponseSize = (response: any) => {
             if (timer.elapsed < config.analytics.min.elapsed) return;
             // Remove the $ from $match, $sort, etc, because it can't be stored in MongoDB
             args = args.map((arg) =>
-              JSON.parse(JSON.stringify(arg).replace(/\$([a-z]+)/g, "$1"))
+              Objects.json.parse(
+                JSON.stringify(arg).replace(/\$([a-z]+)/g, "$1")
+              )
             );
             // dbs._analytics?.create(
             //   ItemType.Undefined,
@@ -302,7 +308,7 @@ const getResponseSize = (response: any) => {
         const timer = Timer.start();
         try {
           requests.per.minute.track(1);
-          debugLog.log(req.url);
+          debugLogger.log(req.url);
           // Get the POST data
           const data = await Http.getPostData(req);
           const user = await User.get(req, res, data);
@@ -323,7 +329,8 @@ const getResponseSize = (response: any) => {
             req.url
           );
         } catch (ex: any) {
-          debugLog.log(ex.stack);
+          res.status(500);
+          debugLogger.log(ex.stack || ex);
           itemsLog.log(
             req.method,
             res.statusCode.severifyByHttpStatus(),
@@ -338,9 +345,9 @@ const getResponseSize = (response: any) => {
                 ])
               ),
             req.url.bgRed,
-            ex.message.bgRed
+            ex.message?.bgRed
           );
-          res.status(500).send(ex.stack);
+          res.send(ex.stack || ex);
         }
       };
     };
@@ -523,7 +530,7 @@ const getResponseSize = (response: any) => {
         const func = eval(funcStr);
         const collection = await db?.getCollection(req.params.entity);
         const args = apiMethod.args.map((arg: any) =>
-          JSON.parse(req.query[arg] || "null")
+          Objects.json.parse(req.query[arg] || "null")
         );
 
         const start = Date.now();
@@ -552,12 +559,18 @@ const getResponseSize = (response: any) => {
 
           return res.send(result);
         } catch (ex: any) {
+          if (typeof ex == "string") {
+            if (ex.includes("not found")) {
+              return res.status(404).send(ex);
+            }
+          }
+          debugLogger.log(ex.stack);
           return res
             .status(500)
             .send(
               `${args}\n\n${funcStr}\n\n${JSON.stringify(
                 apiMethod
-              )}\n\n${result}\n\n${ex.stack}`
+              )}\n\n${result}\n\n${ex}\n\n${ex.stack}`
             );
         }
       })
@@ -573,7 +586,7 @@ const getResponseSize = (response: any) => {
 
         const db = await dbs.get(req.params.database);
         const getArg = (name: string) => {
-          if (req.query[name]) return JSON.parse(req.query[name]);
+          if (req.query[name]) return Objects.json.parse(req.query[name]);
           return null;
         };
 
@@ -607,61 +620,34 @@ const getResponseSize = (response: any) => {
   };
   // #endregion
 
-  // #region 📝 Logging
-  const debugLogger = Logger.new(config.log);
-  debugLogger.log(Objects.yamlify(config));
-  // #endregion
-
   // #region User
   class User {
     private constructor(public readonly data: any) {}
 
     static get = async (req: any, res: any, postData: any) => {
-      debugLogger.log("[User.get] entered with arguments:", req, res, postData);
-
       const database = req.params.database;
-      debugLogger.log("[User.get] Retrieving database:", database);
       if (!database) {
-        debugLogger.log("[User.get] No database found. Returning null.");
         return null;
       }
 
       if (!(config.dbs || [])[database]?.users?.enabled) {
-        debugLogger.log(
-          "[User.get] User not enabled in the database. Returning null."
-        );
         return null;
       }
 
       const db = await dbs.get(database);
-      debugLogger.log("[User.get] Database retrieved:", db);
 
       // Google login
       if (postData?.credential) {
-        debugLogger.log(
-          "[User.get] Attempting Google login with credential:",
-          postData.credential
-        );
-
         const googleUserData = await Google.verifyIdToken(postData.credential);
-        debugLogger.log(
-          "[User.get] Google user data retrieved:",
-          googleUserData
-        );
 
         let dbUser = (
           await db?.find("Users", {
             "google.email": googleUserData.email,
           })
         )?.first();
-        debugLogger.log("[User.get] Database user retrieved:", dbUser);
 
         // If the user doesn't exist, create it
         if (!dbUser) {
-          debugLogger.log(
-            "[User.get] User does not exist in the database. Creating a new user."
-          );
-
           dbUser = {
             _id: await db?.getNewID(),
             type: null,
@@ -680,10 +666,6 @@ const getResponseSize = (response: any) => {
           };
 
           await db?.upsert("Users", dbUser);
-          debugLogger.log(
-            "[User.get] New user created in the database:",
-            dbUser
-          );
         }
 
         // Create a login token
@@ -692,17 +674,10 @@ const getResponseSize = (response: any) => {
           .map((i) => (~~(Math.random() * 36)).toString(36))
           .join("");
 
-        debugLogger.log("[User.get] Login token key generated:", tokenKey);
-
         // Delete other login tokens for this user
         await db?.delete("Tokens", {
           "data.user._id": dbUser._id,
         });
-        debugLogger.log(
-          "[User.get] Other login tokens deleted for the user:",
-          dbUser._id
-        );
-
         // Create a new login token
         const dbToken = {
           _id: await db?.getNewID(),
@@ -718,7 +693,6 @@ const getResponseSize = (response: any) => {
         };
 
         await db?.upsert("Tokens", dbToken);
-        debugLogger.log("[User.get] New login token created:", dbToken);
 
         // Save the token key in the response cookie
         res.cookie("userLoginTokenKey", tokenKey, {
@@ -728,29 +702,18 @@ const getResponseSize = (response: any) => {
           secure: true,
           overwrite: true,
         });
-        debugLogger.log("[User.get] Token key saved in the response cookie.");
 
         return new User(dbUser);
       }
 
       // Cookie login
       const userLoginTokenKey = req.cookies.userLoginTokenKey;
-      debugLogger.log(
-        "[User.get] Retrieving userLoginTokenKey from cookies:",
-        userLoginTokenKey
-      );
       if (userLoginTokenKey) {
-        debugLogger.log(
-          "[User.get] Attempting cookie login with token key:",
-          userLoginTokenKey
-        );
-
         const token = (
           await db?.find("Tokens", {
             "data.key": userLoginTokenKey,
           })
         )?.first();
-        debugLogger.log("[User.get] Token retrieved from the database:", token);
 
         if (token) {
           const dbUser = (
@@ -758,10 +721,6 @@ const getResponseSize = (response: any) => {
               _id: token.data.user._id,
             })
           )?.first();
-          debugLogger.log(
-            "[User.get] User retrieved from the database:",
-            dbUser
-          );
 
           if (dbUser) {
             return new User(dbUser);
@@ -776,20 +735,14 @@ const getResponseSize = (response: any) => {
         req.socket.remoteAddress ||
         req.connection.socket.remoteAddress
       ).ipToNumber();
-      debugLogger.log("[User.get] IP address retrieved:", userIP);
 
       let dbUser = (
         await db?.find("Users", {
           ip: userIP,
         })
       )?.first();
-      debugLogger.log("[User.get] Database user retrieved:", dbUser);
 
       if (!dbUser) {
-        debugLogger.log(
-          "[User.get] User does not exist in the database. Creating a new user."
-        );
-
         dbUser = {
           _id: await db?.getNewID(),
           type: null,
@@ -808,7 +761,6 @@ const getResponseSize = (response: any) => {
         };
 
         await db?.upsert("Users", dbUser);
-        debugLogger.log("[User.get] New user created in the database:", dbUser);
       }
 
       return new User(dbUser);
@@ -820,8 +772,8 @@ const getResponseSize = (response: any) => {
   // #region Log unhandled errors
   process.on("uncaughtException", async (ex: any) => {
     mainLog.log(`Uncaught exception:`, ex.stack.bgRed);
-    debugLog.log(`Uncaught exception:`, ex.stack);
-    await debugLog.flush();
+    debugLogger.log(`Uncaught exception:`, ex.stack);
+    await debugLogger.flush();
   });
   // #endregion
 

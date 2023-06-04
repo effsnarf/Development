@@ -26,7 +26,7 @@ import { Logger } from "@shared/Logger";
 import { TypeScript } from "@shared/TypeScript";
 import { Database } from "@shared/Database/Database";
 import { MongoDatabase } from "@shared/Database/MongoDatabase";
-import { Analytics } from "@shared/Analytics";
+import { Analytics, ItemType } from "@shared/Analytics";
 import { debug } from "console";
 // #endregion
 
@@ -40,6 +40,8 @@ const getResponseSize = (response: any) => {
   const configObj = await Configuration.new();
   const config = configObj.data;
   // #endregion
+
+  const analytics = await Analytics.new(await Database.new(config.database));
 
   const debugLog = await Logger.new(config.debug.log);
   // #region 💻 Console
@@ -112,6 +114,7 @@ const getResponseSize = (response: any) => {
 
   // #region 📦 Database
   const db = await Database.new(config.database);
+  const cache = await Cache.new(config.cache);
   // #endregion
 
   // #region 🔍 Request Handling
@@ -135,21 +138,25 @@ const getResponseSize = (response: any) => {
           debugLog.log(req.url);
           // Get the POST data
           const data = await Http.getPostData(req);
-          await handler(req, res, data);
+          const cacheKey = req.url;
+          const isCached = await cache.has(cacheKey);
+          let result = (
+            (await cache.get(cacheKey, async () => {
+              return { data: await handler(req, res, data) };
+            })) as any
+          ).data;
+          if (typeof result === "object") {
+            result = JSON.stringify(result);
+            // application/json
+            res.setHeader("Content-Type", "application/json");
+          }
+          res.end(result);
           itemsLog.log(
             req.method,
             res.statusCode.severifyByHttpStatus(),
             getResponseSize(res)?.unitifySize(),
-            timer.elapsed
-              ?.unitifyTime()
-              .severify(
-                ...(config.requests.severity.time as [
-                  number,
-                  number,
-                  "<" | ">"
-                ])
-              ),
-            req.url
+            timer.elapsed?.unitifyTime(),
+            isCached ? req.url.gray : req.url
           );
         } catch (ex: any) {
           debugLog.log(ex.stack);
@@ -176,9 +183,73 @@ const getResponseSize = (response: any) => {
     // #endregion
 
     // For /, return the list of routes
-    httpServer.get("/", (req: any, res: any) => {
-      return res.send(config.routes.map((r: any) => r.path));
-    });
+    httpServer.get(
+      "/",
+      processRequest(async (req: any, res: any) => {
+        return config.routes.map((r: any) => r.path);
+      })
+    );
+
+    // /count
+    // Returns a list of distinct apps, categories, events, of type [count]
+    httpServer.get(
+      `/${ItemType.Count.toString()}`.toLowerCase(),
+      processRequest(async (req: any, res: any) => {
+        const docs = await db.aggregate("Events", [
+          {
+            $match: {
+              t: 1,
+            },
+          },
+          {
+            $project: {
+              a: 1,
+              c: 1,
+              e: 1,
+            },
+          },
+          {
+            $group: {
+              _id: {
+                a: "$a",
+                c: "$c",
+                e: "$e",
+              },
+              docs: { $first: "$$ROOT" },
+            },
+          },
+          {
+            $replaceRoot: {
+              newRoot: "$docs",
+            },
+          },
+        ]);
+        return docs;
+      })
+    );
+
+    httpServer.get(
+      `/:app/:category/:event/from/:from/to/:to/every/:every/:type`.toLowerCase(),
+      processRequest(async (req: any, res: any) => {
+        const { type, app, category, event } = req.params;
+        const { from, to, every } = Object.fromEntries(
+          Object.entries(req.params).map((e) => [
+            e[0],
+            parseInt(e[1] as string) || Date.now(),
+          ])
+        );
+        const intervals = await analytics.aggregate(
+          app,
+          category,
+          event,
+          from,
+          to,
+          every,
+          type
+        );
+        return intervals;
+      })
+    );
   };
   // #endregion
 

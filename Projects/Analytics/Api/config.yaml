@@ -5,6 +5,12 @@ server:
 database:
   connectionString: mongodb://localhost:47017
   database: MG-Analytics
+cache:
+  zero:
+    prod:
+      database:
+        connectionString: mongodb://localhost:37017
+        database: MG-Analytics-Cache
 debug:
   log:
     enabled: true

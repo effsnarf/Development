@@ -203,6 +203,7 @@ interface Number {
     direction: "<" | ">",
     bgRed?: boolean
   ): string;
+  getHttpSeverityColor(): string;
   toFixedRounded(places: number): string;
   ordinalize(): string;
 }
@@ -274,6 +275,8 @@ interface String {
   ipToNumber(): number;
   decodeBase64(): string;
   hashCode(): number;
+
+  parseEnum<T>(enumType: T): T[keyof T] | null;
 }
 
 interface Array<T> {
@@ -488,7 +491,7 @@ if (typeof Number !== "undefined") {
 
   Number.prototype.severifyByHttpStatus = function (): string {
     const value = this.valueOf();
-    return value.severify(200, 400, "<");
+    return value.toString().colorize(value.getHttpSeverityColor());
   };
 
   Number.prototype.getSeverityColor = function (
@@ -509,6 +512,12 @@ if (typeof Number !== "undefined") {
       return bgRed ? "bgRed" : "red";
     }
     throw new Error(`Invalid direction: ${direction}`);
+  };
+
+  Number.prototype.getHttpSeverityColor = function () {
+    const value = this.valueOf();
+    if (value == 404) return "yellow";
+    return value.getSeverityColor(200, 400, "<", true);
   };
 
   Number.prototype.toFixedRounded = function (places: number): string {
@@ -640,7 +649,7 @@ if (typeof String !== "undefined") {
         .map((s) => parseInt(s))
         .find((n) => !isNaN(n));
     if (!statusCode) return this.toString();
-    return this.colorize(statusCode.getSeverityColor(200, 400, "<", bgRed));
+    return this.colorize(statusCode.getHttpSeverityColor());
   };
 
   String.prototype.deunitify = function (unitClass: UnitClass): number {
@@ -1063,6 +1072,15 @@ if (typeof String !== "undefined") {
       hash = hash & hash; // Convert to 32-bit integer
     }
     return hash;
+  };
+
+  // Case insensitive
+  String.prototype.parseEnum = function (enumType: any): any {
+    const str = this.toString();
+    for (const key in enumType) {
+      if (key.toLowerCase() == str.toLowerCase()) return enumType[key];
+    }
+    return null;
   };
 }
 // #endregion
