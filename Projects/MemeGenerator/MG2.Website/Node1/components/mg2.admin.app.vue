@@ -3,13 +3,13 @@
         h2 Admin
         div.bars
             div.bar
-                admin-chart2(app="MG.Web", category="LoadBalancer", event="requests.per.minute", last="1d", every="30m", type="sum")
-                admin-chart2(app="MG.Web", category="LoadBalancer", event="requests.per.minute", last="1h", every="1m", type="sum")
-                admin-chart2(app="MG.Web", category="LoadBalancer", event="requests.per.minute", last="10m", every="1m", type="sum")
+                admin-chart2(app="MG.Web", category="LoadBalancer", event="requests", last="1d", every="30m", type="sum")
+                admin-chart2(app="MG.Web", category="LoadBalancer", event="requests", last="1h", every="1m", type="sum")
+                admin-chart2(app="MG.Web", category="LoadBalancer", event="requests", last="10m", every="1m", type="sum")
             div.bar
-                admin-chart2(app="MG.DBP", category="LoadBalancer", event="requests.per.minute", last="1d", every="30m", type="sum")
-                admin-chart2(app="MG.DBP", category="LoadBalancer", event="requests.per.minute", last="1h", every="1m", type="sum")
-                admin-chart2(app="MG.DBP", category="LoadBalancer", event="requests.per.minute", last="10m", every="1m", type="sum")
+                admin-chart2(app="MG.DBP", category="LoadBalancer", event="requests", last="1d", every="30m", type="sum")
+                admin-chart2(app="MG.DBP", category="LoadBalancer", event="requests", last="1h", every="1m", type="sum")
+                admin-chart2(app="MG.DBP", category="LoadBalancer", event="requests", last="10m", every="1m", type="sum")
 </template>
 
 <script>

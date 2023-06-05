@@ -1,5 +1,5 @@
 <template lang="pug">
-    admin-chart(:header="`${app} ${category}`", :title="`last ${last} every ${every}`", :data="values", :total="values.average().toFixed(0)")
+    admin-chart(:header="`${app} ${category}`", :title="`last ${last} every ${every}`", :data="values", :total="values.average()")
 </template>
 
 <script>
@@ -39,7 +39,8 @@ export default {
     },
     computed: {
         url() {
-            return `https://db.memegenerator.net/analytics/MG.Web/LoadBalancer/requests.per.minute/last/${this.last}/every/${this.every}/${this.type}`;
+            const { app, category, event, last, every, type } = this;
+            return `https://db.memegenerator.net/analytics/${app}/${category}/${event}/last/${last}/every/${every}/${type}`;
         },
     },
 }
