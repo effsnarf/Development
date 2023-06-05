@@ -191,9 +191,7 @@ class Analytics {
       interval.docs = docs;
     }
 
-    return intervals.map((intr) =>
-      intr.docs.map((d: any) => d.v).average();
-    );
+    return intervals.map((intr) => intr.docs.map((d: any) => d.v).average());
   }
 
   // Returns an array of intervals between the specified dates
