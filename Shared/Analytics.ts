@@ -178,7 +178,8 @@ class Analytics {
       interval.docs = docs;
     }
 
-    const reduceFunc = type.getEnumName(ItemType).toLowerCase();
+    let reduceFunc = type.getEnumName(ItemType).toLowerCase();
+    if (reduceFunc == "count") reduceFunc = "sum";
 
     return intervals.map((intr) =>
       intr.docs.map((d: any) => d.v)[reduceFunc]()

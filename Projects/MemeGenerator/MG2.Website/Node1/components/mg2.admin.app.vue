@@ -1,21 +1,33 @@
 <template lang="pug">
-    div.app
-        h2 Admin
-        div.bars
-            div.bar
-                admin-chart2(app="MG.Web", category="LoadBalancer", event="requests", last="1d", every="30m", type="sum")
-                admin-chart2(app="MG.Web", category="LoadBalancer", event="requests", last="1h", every="1m", type="sum")
-                admin-chart2(app="MG.Web", category="LoadBalancer", event="requests", last="10m", every="1m", type="sum")
-            div.bar
-                admin-chart2(app="MG.DBP", category="LoadBalancer", event="requests", last="1d", every="30m", type="sum")
-                admin-chart2(app="MG.DBP", category="LoadBalancer", event="requests", last="1h", every="1m", type="sum")
-                admin-chart2(app="MG.DBP", category="LoadBalancer", event="requests", last="10m", every="1m", type="sum")
+div.app
+  div.column
+    admin-select(:options="app.options" v-model="app.value")
+  div.column
+    admin-select(:options="last.options" v-model="last.value")
+  div
+    div.bars
+      div.bar
+        admin-chart2(:app="app.value", category="LoadBalancer", event="requests", :last="last.value", :every="every", type="count")
+        admin-chart2(:app="app.value", category="LoadBalancer", event="response.time", :last="last.value", :every="every", type="average")
 </template>
 
 <script>
+import "../../../../../Shared/Extensions";
+
 export default {
     data() {
         return {
+            app: {
+                options: ["MG.DBP", "MG.Web"],
+                value: "MG.DBP"
+            },
+            last: {
+                options: ["1 month", "1 week", "1 day", "1 hour", "10 minutes"],
+                value: "1 hour"
+            },
+            bars: {
+                value: 60
+            }
         };
     },
     async mounted() {
@@ -23,16 +35,28 @@ export default {
     methods: {
     },
     computed: {
+        every() {
+            return (this.last.value.deunitify() / this.bars.value).unitifyTime().withoutColors();
+        }
     }
 };
 </script>
 
 <style scoped>
 .app {
+    display: flex;
+    gap: 1em;
+    padding: 1em;
     height: 100vh;
     overflow-x: hidden;
     overflow-y: scroll;
 }
+
+.column
+{
+    width: 10%;
+}
+
 
 .bars {
     display: flex;

@@ -232,8 +232,9 @@ interface Number {
   ): string;
   getHttpSeverityColor(): string;
   toFixedRounded(places: number): string;
-  ordinalize(): string;
   getEnumName(enumType: any): string;
+  ordinalize(): string;
+  humanize(): string;
 }
 
 interface String {
@@ -245,6 +246,7 @@ interface String {
   nextChar(): string;
   getChars(): Generator<string, void, unknown>;
 
+  c(color: string): string;
   colorize(color: string): string;
   singularize(): string;
   pluralize(): string;
@@ -306,6 +308,8 @@ interface String {
 
 interface Array<T> {
   sum(): number;
+  min(): number;
+  max(): number;
   average(): number;
   first(): any;
   last(): any;
@@ -390,7 +394,9 @@ if (typeof Number !== "undefined") {
       timer = setInterval(() => {
         const elapsed = started + this.valueOf() - Date.now();
         process.stdout.write(`\r`);
-        process.stdout.write(`${`Waiting -`.gray}${elapsed.unitifyTime()}\r`);
+        process.stdout.write(
+          `${`Waiting -`.c("gray")}${elapsed.unitifyTime()}\r`
+        );
       }, 100);
     }
     return new Promise((resolve) =>
@@ -444,13 +450,14 @@ if (typeof Number !== "undefined") {
     if (!unit?.length) unit = unitClass.units;
     let value = this.valueOf();
     // Percent is a special case
-    if (unitClass == Percentage) return `${Math.round(value * 100)}${`%`.gray}`;
+    if (unitClass == Percentage)
+      return `${Math.round(value * 100)}${`%`.c("gray")}`;
 
     const units = !Array.isArray(unit)
       ? [unit]
       : unit.sortByDesc((u) => unitClass.unitToValue[u]);
 
-    if (this == 0) return `0${units.last()}`.gray;
+    if (this == 0) return `0${units.last()}`.c("gray");
 
     for (const u of units) {
       const currentUnitValue = unitClass.unitToValue[u];
@@ -459,13 +466,13 @@ if (typeof Number !== "undefined") {
         const unitValue = value / currentUnitValue;
 
         if (unitValue >= 10 || u == units.last()) {
-          return `${unitValue.toFixed(0)}${u.gray}`;
+          return `${unitValue.toFixed(0)}${u.c("gray")}`;
         }
-        return `${unitValue.toFixedRounded(2)}${u.gray}`;
+        return `${unitValue.toFixedRounded(2)}${u.c("gray")}`;
       }
     }
-    if (value == 0) return `${value}${units.last().gray}`;
-    return `${value.toFixed(0)}${units.last().gray}`;
+    if (value == 0) return `${value}${units.last().c("gray")}`;
+    return `${value.toFixed(0)}${units.last().c("gray")}`;
   };
 
   Number.prototype.unitifyTime = function (unit?: string[] | string): string {
@@ -478,7 +485,7 @@ if (typeof Number !== "undefined") {
 
   Number.prototype.unitifyPercent = function (): string {
     return this.unitify(Percentage);
-    //return `${Math.round(this.valueOf() * 100)}${`%`.gray}`;
+    //return `${Math.round(this.valueOf() * 100)}${`%`.c("gray")}`;
   };
 
   Number.prototype.toProgressBar = function (
@@ -491,7 +498,7 @@ if (typeof Number !== "undefined") {
     const progressLength = Math.round(value * barLength);
     const bar = "█".repeat(progressLength);
     const emptyLength = barLength - progressLength;
-    const empty = emptyLength <= 0 ? "" : "█".repeat(emptyLength).gray;
+    const empty = emptyLength <= 0 ? "" : "█".repeat(emptyLength).c("gray");
     let s = `${bar}${empty} ${value.unitifyPercent().withoutColors()}`;
     if (severifyArgs.length)
       s = s.colorize(
@@ -553,6 +560,15 @@ if (typeof Number !== "undefined") {
     return str;
   };
 
+  Number.prototype.getEnumName = function (enumType: any): string {
+    const value = this.valueOf();
+    const keys = Object.keys(enumType);
+    for (const key of keys) {
+      if (enumType[key] == value) return key;
+    }
+    return "";
+  };
+
   Number.prototype.ordinalize = function (): string {
     const number = this.valueOf();
 
@@ -574,13 +590,14 @@ if (typeof Number !== "undefined") {
     }
   };
 
-  Number.prototype.getEnumName = function (enumType: any): string {
+  Number.prototype.humanize = function (): string {
     const value = this.valueOf();
-    const keys = Object.keys(enumType);
-    for (const key of keys) {
-      if (enumType[key] == value) return key;
-    }
-    return "";
+    if (value < 0) return `-${(-value).humanize()}`;
+    if (value < 10) return value.toFixed(2);
+    if (value < 1000) return value.toFixed(0);
+    if (value < 1000000) return `${(value / 1000).toFixed(1)}k`;
+    if (value < 1000000000) return `${(value / 1000000).toFixed(1)}m`;
+    return `${(value / 1000000000).toFixed(1)}b`;
   };
 }
 // #endregion
@@ -624,7 +641,12 @@ if (typeof String !== "undefined") {
     }
   };
 
+  String.prototype.c = function (color: string): string {
+    return this.colorize(color);
+  };
+
   String.prototype.colorize = function (color: string): string {
+    if (!(String.prototype as any)[color]) return this.toString();
     return eval(`this.${color}`);
   };
 
@@ -635,6 +657,7 @@ if (typeof String !== "undefined") {
   };
 
   String.prototype.pluralize = function (): string {
+    if (this.endsWith("ay")) return this + "s";
     if (this.endsWith("y")) return this.slice(0, -1) + "ies";
     if (this.endsWith("s")) return this.toString();
     return this + "s";
@@ -669,9 +692,9 @@ if (typeof String !== "undefined") {
     const value = valueStr.deunitify();
     const unit = valueStr.getUnit();
     const color = value.getSeverityColor(green, yellow, direction, true);
-    return `${value.unitify(unitClass).withoutUnit().colorize(color)}${
-      unit.gray
-    }`;
+    return `${value.unitify(unitClass).withoutUnit().colorize(color)}${unit.c(
+      "gray"
+    )}`;
   };
 
   String.prototype.severifyByHttpStatus = function (
@@ -703,7 +726,9 @@ if (typeof String !== "undefined") {
   String.prototype.getUnit = function (
     options: { throw: boolean } = { throw: true }
   ): string {
-    let word = this.withoutColors().replace(/[0-9\.]/g, "");
+    let word = this.withoutColors()
+      .replace(/[0-9\.]/g, "")
+      .trim();
     if (word.length > 2) word = word.pluralize();
     // Search for the long unit name ("seconds", "bytes", "percentages")
     for (const unitClass of UnitClasses) {
@@ -731,7 +756,9 @@ if (typeof String !== "undefined") {
   };
 
   String.prototype.withoutUnit = function (): string {
-    return this.withoutColors().replace(/[^0-9.-]/g, "");
+    return this.withoutColors()
+      .replace(/[^0-9.-]/g, "")
+      .trim();
   };
 
   String.prototype.padStartChars = function (
@@ -1018,9 +1045,9 @@ if (typeof String !== "undefined") {
     const allParts = path.split("/");
     // Return the last 2 parts of the path
     const parts = allParts.slice(Math.max(allParts.length - 2, 0));
-    let s = `${parts[0].yellow}${`\\`.gray}${parts[1]}`;
+    let s = `${parts[0].yellow}${`\\`.c("gray")}${parts[1]}`;
     if (parts.length > 2) {
-      s = `${s} (${parts.slice(0, -2).join("\\")})`.gray;
+      s = `${s} (${parts.slice(0, -2).join("\\")})`.c("gray");
     }
     if (comparePath) {
       const compareParts = comparePath.replace(/\\/g, "/").split("/");
@@ -1028,10 +1055,10 @@ if (typeof String !== "undefined") {
         return part !== compareParts[index];
       });
       if (diffs.length > 0) {
-        s = `${diffs.join("\\").gray}..\\${s}`;
+        s = `${diffs.join("\\").c("gray")}..\\${s}`;
       }
     }
-    s = `${`..\\`.gray}${s}`;
+    s = `${`..\\`.c("gray")}${s}`;
     return s;
   };
 
@@ -1133,6 +1160,14 @@ if (typeof String !== "undefined") {
 if (typeof Array !== "undefined") {
   Array.prototype.sum = function () {
     return this.reduce((a, b) => a + b, 0);
+  };
+
+  Array.prototype.min = function () {
+    return Math.min.apply(null, this);
+  };
+
+  Array.prototype.max = function () {
+    return Math.max.apply(null, this);
   };
 
   Array.prototype.average = function () {

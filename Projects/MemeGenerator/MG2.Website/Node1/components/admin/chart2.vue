@@ -1,5 +1,7 @@
 <template lang="pug">
-    admin-chart(:header="`${app} ${category}`", :title="`last ${last} every ${every}`", :data="values", :total="values.average()")
+div
+    admin-chart(:class="cssClass", :header="`${event}`", :title="`last ${last} every ${every}`", :data="values", :color="color")
+    admin-table(:data="values.sortBy(v => -v)")
 </template>
 
 <script>
@@ -28,20 +30,46 @@ export default {
     },
     data: () => ({
         values: [],
+        isBusy: 0
     }),
     mounted() {
         this.fetchData();
     },
     methods: {
         async fetchData() {
-            this.values = (await (await fetch(this.url)).json());
+            this.isBusy++;
+            this.values = await (await fetch(this.url)).json();
+            this.isBusy--;
         },
     },
     computed: {
         url() {
-            const { app, category, event, last, every, type } = this;
-            return `https://db.memegenerator.net/analytics/${app}/${category}/${event}/last/${last}/every/${every}/${type}`;
+            let { app, category, event, last, every, type } = this;
+            last = last.deunitify().unitifyTime();
+            every = every.deunitify().unitifyTime();
+            let url = `https://db.memegenerator.net/analytics/${app}/${category}/${event}/last/${last}/every/${every}/${type}`;
+            url = url.withoutColors();
+            return url;
         },
+        color() {
+            return {
+                "requests": "green",
+                "response.time": "blue",
+            }[this.event] || "";
+        },
+        cssClass() {
+            const cls = {};
+            if (this.isBusy) cls["opacity-70"] = true;
+            return cls;
+        }
     },
+    watch: {
+        url: {
+            handler() {
+                this.fetchData();
+            },
+            immediate: true
+        }
+    }
 }
 </script>
