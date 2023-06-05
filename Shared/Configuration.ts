@@ -176,7 +176,7 @@ class Configuration {
     this.nextRestartTime = this.getNextRestartTime();
     if (this.nextRestartTime) {
       setTimeout(() => {
-        this.log(`Restarting...`.bgRed);
+        this.log(`Restarting.. (restart time ${this.nextRestartTime})`.bgRed);
         process.exit();
       }, this.nextRestartTime.valueOf() - Date.now());
     }
@@ -187,7 +187,7 @@ class Configuration {
     if (!periodically) return null;
     // Restart periodically ({ from: 00:00, every: 1h })
     const from = moment.duration(periodically.from).asMilliseconds();
-    const every = periodically.every.deunitifyTime();
+    const every = periodically.every.deunitify();
     const startOfDay = new Date().setHours(0, 0, 0, 0).valueOf();
     const times = (24).hours() / every;
     const points = [];
@@ -205,13 +205,11 @@ class Configuration {
 
     this.log();
     this.log(
-      `${`Restarting every`.gray} ${every.unitifyTime()} ${
-        `from`.gray
-      } ${new Date(startOfDay + from).toLocaleTimeString()}`
+      `${`Restarting every`} ${every.unitifyTime()} ${`from`} ${new Date(
+        startOfDay + from
+      ).toLocaleTimeString()}`
     );
-    this.log(
-      `${`Next restart:`.gray} ${new Date(nextPoint).toLocaleTimeString()}`
-    );
+    this.log(`${`Next restart:`} ${new Date(nextPoint).toLocaleTimeString()}`);
     return new Date(nextPoint);
   }
 

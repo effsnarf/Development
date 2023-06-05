@@ -16,8 +16,21 @@ class Time {
     "w",
     "M",
     "y",
-    "decade",
-    "century",
+    "de",
+    "ce",
+  ];
+
+  static readonly longUnits: string[] = [
+    "milliseconds",
+    "seconds",
+    "minutes",
+    "hours",
+    "days",
+    "weeks",
+    "months",
+    "years",
+    "decades",
+    "centuries",
   ];
 
   static readonly unitToValue: { [key: string]: number } = {
@@ -54,6 +67,18 @@ class Size {
     "yb",
   ];
 
+  static readonly longUnits: string[] = [
+    "bytes",
+    "kilobytes",
+    "megabytes",
+    "gigabytes",
+    "terabytes",
+    "petabytes",
+    "exabytes",
+    "zettabytes",
+    "yottabytes",
+  ];
+
   static readonly unitToValue: { [key: string]: number } = {
     b: 1,
     kb: 1000,
@@ -76,6 +101,8 @@ class Size {
 }
 class Percentage {
   static readonly units: string[] = ["%"];
+
+  static readonly longUnits: string[] = ["percent"];
 
   static readonly unitToValue: { [key: string]: number } = {
     "%": 100,
@@ -224,10 +251,7 @@ interface String {
 
   severify(green: number, yellow: number, direction: "<" | ">"): string;
   severifyByHttpStatus(statusCode?: number, bgRed?: boolean): string;
-  deunitify(unitClass: UnitClass): number;
-  deunitifyTime(): number;
-  deunitifySize(): number;
-  deunitifyPercent(): number;
+  deunitify(): number;
 
   getUnit(): string;
   getUnitClass(): UnitClass | null;
@@ -632,7 +656,7 @@ if (typeof String !== "undefined") {
     const valueStr = this.toString();
     const unitClass = valueStr.getUnitClass();
     if (!unitClass) throw new Error("No unit class found");
-    const value = valueStr.deunitify(unitClass);
+    const value = valueStr.deunitify();
     const unit = valueStr.getUnit();
     const color = value.getSeverityColor(green, yellow, direction, true);
     return `${value.unitify(unitClass).withoutUnit().colorize(color)}${
@@ -652,7 +676,9 @@ if (typeof String !== "undefined") {
     return this.colorize(statusCode.getHttpSeverityColor());
   };
 
-  String.prototype.deunitify = function (unitClass: UnitClass): number {
+  String.prototype.deunitify = function (): number {
+    const unitClass = this.getUnitClass();
+    if (!unitClass) throw new Error(`No unit class found for ${this}`);
     // Percentages are special, because they are relative to 100
     if (unitClass === Percentage) {
       const value = parseFloat(this.withoutUnit());
@@ -664,20 +690,20 @@ if (typeof String !== "undefined") {
     return value * (unit ? unitClass.unitToValue[unit] : 1);
   };
 
-  String.prototype.deunitifyTime = function (): number {
-    return this.deunitify(Time);
-  };
-
-  String.prototype.deunitifySize = function (): number {
-    return this.deunitify(Size);
-  };
-
-  String.prototype.deunitifyPercent = function (): number {
-    return this.deunitify(Percentage);
-  };
-
   String.prototype.getUnit = function (): string {
-    return this.withoutColors().replace(/[0-9\.]/g, "");
+    let word = this.withoutColors().replace(/[0-9\.]/g, "");
+    if (word.length > 2) word = word.pluralize();
+    // Search for the long unit name ("seconds", "bytes", "percentages")
+    for (const unitClass of UnitClasses) {
+      let index = unitClass.longUnits.indexOf(word);
+      if (index != -1) return unitClass.units[index];
+    }
+    // Search for the short unit name ("s", "B", "%")
+    for (const unitClass of UnitClasses) {
+      let index = unitClass.units.indexOf(word);
+      if (index != -1) return unitClass.units[index];
+    }
+    throw new Error(`No unit found for "${word}"`);
   };
 
   String.prototype.getUnitClass = function (): UnitClass | null {
@@ -1077,6 +1103,8 @@ if (typeof String !== "undefined") {
   // Case insensitive
   String.prototype.parseEnum = function (enumType: any): any {
     const str = this.toString();
+    // If the string is a number, return the number
+    if (str.match(/^\d+$/)) return parseInt(str);
     for (const key in enumType) {
       if (key.toLowerCase() == str.toLowerCase()) return enumType[key];
     }

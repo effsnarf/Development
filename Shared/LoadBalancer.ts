@@ -579,7 +579,7 @@ class LoadBalancer {
           // whenever possible.
           if (
             Date.now() - cachedResponse.dt <
-            this.options.cache?.max?.age?.deunitifyTime()
+            this.options.cache?.max?.age?.deunitify()
           ) {
             this.incomingItems.remove(incomingItem);
             return;

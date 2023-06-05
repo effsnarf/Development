@@ -199,7 +199,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
       Objects.on(nodeLog, nodeLog.log, (...args: any[]) => {
         const ms = args
           .find((a) => a?.getUnitClass()?.name == "Time")
-          ?.deunitifyTime();
+          ?.deunitify();
         if (ms && ms < config.log.requests.min.ms) return;
         //fsLog.log(...[config.nodes[index].name, ...args]);
       });

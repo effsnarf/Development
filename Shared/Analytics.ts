@@ -51,7 +51,7 @@ class Api {
       const parts = url.split("/");
       const [app, category, event] = parts.slice(1, 4);
       const [last, every] = [parts[5], parts[7]].map((p: string) =>
-        p.deunitifyTime()
+        p.deunitify()
       );
       const type = parts[8].parseEnum(ItemType);
       if (!type) throw new Error("Invalid type: " + parts[7] + ` (${url})`);

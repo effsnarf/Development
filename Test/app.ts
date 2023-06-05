@@ -34,7 +34,7 @@ class Malkovich {
 const malkovitch = new Malkovich();
 
 (async () => {
-  console.log("sum".parseEnum(ItemType));
+  console.log("10m".deunitify());
 
   console.log(process.memoryUsage().heapUsed.unitifySize());
   console.log(process.cpuUsage());
@@ -365,7 +365,7 @@ const malkovitch = new Malkovich();
 // for (var i = 0; i <= 100; i += 10) {
 //   const percent = i / 100;
 //   const value = i * 1000;
-//   //console.log(value.unitifyTime(), value.unitifyTime().deunitifyTime());
+//   //console.log(value.unitifyTime(), value.unitifyTime().deunitify());
 
 //   console.log(
 //     percent.unitifyPercent(),
