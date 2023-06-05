@@ -102,12 +102,11 @@ class Analytics {
     value: any,
     unit: string | null = null
   ) {
-    return;
     const now = Date.now();
     const since = now - inTheLast;
 
     const data = {
-      dt: [since, now],
+      dt: { f: since, t: now },
       a: app,
       c: category,
       e: event,
@@ -145,25 +144,45 @@ class Analytics {
     const intervals = Analytics.getIntervals(from, to, every);
 
     for (const interval of intervals) {
-      interval.docs = await this.db.find("Events", {
-        t: ItemType.Count,
+      const docs = await this.db.find("Events", {
+        t: type,
         a: app,
         c: category,
         e: event,
-        "dt[0]": {
-          $gte: interval.from,
-          $lte: interval.to,
-        },
-        "dt[1]": {
-          $gte: interval.from,
-          $lte: interval.to,
-        },
+        $or: [
+          {
+            "dt.f": {
+              $gte: interval.from,
+              $lte: interval.to,
+            },
+          },
+          {
+            "dt.t": {
+              $gte: interval.from,
+              $lte: interval.to,
+            },
+          },
+        ],
       });
+
+      // Some of the docs fall only partially in the interval
+      // We need to adjust their values to the relative space they occupy in the interval
+      for (const doc of docs) {
+        const { f, t } = doc.dt;
+        const intervalLength = interval.to - interval.from + 1;
+        const docLength = t - f + 1;
+        const ratio = docLength / intervalLength;
+        doc.v *= ratio;
+      }
+
+      interval.docs = docs;
     }
 
-    if (type == ItemType.Sum) {
-      return intervals.map((intr) => intr.docs.map((d: any) => d.v).sum());
-    }
+    const reduceFunc = type.getEnumName(ItemType).toLowerCase();
+
+    return intervals.map((intr) =>
+      intr.docs.map((d: any) => d.v)[reduceFunc]()
+    );
   }
 
   // Returns an array of intervals between the specified dates

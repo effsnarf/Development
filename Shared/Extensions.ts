@@ -233,6 +233,7 @@ interface Number {
   getHttpSeverityColor(): string;
   toFixedRounded(places: number): string;
   ordinalize(): string;
+  getEnumName(enumType: any): string;
 }
 
 interface String {
@@ -572,6 +573,15 @@ if (typeof Number !== "undefined") {
       return number + "th";
     }
   };
+
+  Number.prototype.getEnumName = function (enumType: any): string {
+    const value = this.valueOf();
+    const keys = Object.keys(enumType);
+    for (const key of keys) {
+      if (enumType[key] == value) return key;
+    }
+    return "";
+  };
 }
 // #endregion
 
@@ -713,7 +723,7 @@ if (typeof String !== "undefined") {
   };
 
   String.prototype.getUnitClass = function (): UnitClass | null {
-    const unit = this.getUnit();
+    const unit = this.getUnit({ throw: false });
     if (Time.units.includes(unit)) return Time;
     if (Size.units.includes(unit)) return Size;
     if (Percentage.units.includes(unit)) return Percentage;
