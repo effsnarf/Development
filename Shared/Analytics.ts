@@ -191,11 +191,8 @@ class Analytics {
       interval.docs = docs;
     }
 
-    const reduce = type == ItemType.Count ? ItemType.Sum : type;
-    const reduceFunc = reduce.getEnumName(ItemType).toLowerCase();
-
     return intervals.map((intr) =>
-      intr.docs.map((d: any) => d.v)[reduceFunc]()
+      intr.docs.map((d: any) => d.v).average();
     );
   }
 
