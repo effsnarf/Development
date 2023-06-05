@@ -1,3 +1,4 @@
+import fs from "fs";
 import path from "path";
 import bodyParser from "body-parser";
 import "../../../../../../Shared/Extensions";
@@ -16,9 +17,7 @@ class Global {
   static get: any = {
     async config() {
       if (!this._config) {
-        this._config = Configuration.new({
-          quitIfChanged: [path.join(__dirname, "../../config.yaml")],
-        });
+        this._config = Configuration.new();
       }
       return this._config;
     },
@@ -26,7 +25,7 @@ class Global {
       if (!this._analyticsApify) {
         const config = (await this.config()).data;
         Analytics.defaults.database = await Database.new(
-          config.database.analytics?.write
+          config.analytics.database
         );
 
         this._analyticsApify = new Apify.Server(
@@ -43,9 +42,7 @@ class Global {
     async analytics() {
       if (!this._analytics) {
         const config = (await this.config()).data;
-        this._analytics = await Analytics.new(
-          await Database.new(config.database.analytics?.read)
-        );
+        this._analytics = await Analytics.new(config.analytics);
       }
       return this._analytics;
     },
@@ -90,8 +87,8 @@ const dbs = {
         // Find which connection string to use by the database name
         const databases = [
           config.database.content,
-          config.database.analytics.read,
-          config.database.analytics.write,
+          config.analytics.database.read,
+          config.analytics.database.write,
         ];
         const dbEntry = Object.values(databases).find(
           (db: any) => db.database == database
@@ -121,7 +118,7 @@ export default async function (req: any, res: any, next: any) {
     // CORS
     res.setHeader("Access-Control-Allow-Origin", "*");
     const dbEvents = (await dbs.get(
-      config.database.analytics?.read.database
+      config.analytics.database.read
     )) as DatabaseBase;
     const dbContent = (await dbs.get(
       config.database.content?.database
@@ -368,7 +365,8 @@ export default async function (req: any, res: any, next: any) {
         await analyticsApify.processUrl(ip, req.url, data, { stringify: true })
       );
     } catch (ex: any) {
-      console.log(ex.message);
+      res.status(500).end(ex.stack);
+      console.log(ex.stack);
     }
     return;
   };

@@ -5,8 +5,9 @@ database:
   content:
     name: MemeGenerator
     connectionString: mongodb://localhost:27017
-  analytics:
-    prod:
+analytics:
+  prod:
+    database:
       read:
         connectionString: mongodb://localhost:47017
         database: MG-Analytics

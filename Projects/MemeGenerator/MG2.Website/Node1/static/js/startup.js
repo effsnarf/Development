@@ -128,7 +128,7 @@ const initApi = (async() => {
 
 
 
-when(() => (window.Apify.Client), initApi);
+//when(() => (window.Apify.Client), initApi);
 
 
 window.dataLayer = window.dataLayer || [];
