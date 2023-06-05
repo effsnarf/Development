@@ -1,7 +1,7 @@
 <template lang="pug">
 div
-    admin-chart(:class="cssClass", :header="`${event}`", :title="`last ${last} every ${every}`", :data="values", :color="color")
-    admin-table(:data="values.sortBy(v => -v)")
+    admin-chart(:class="cssClass", :header="`${event}`", :title="`last ${last}`", :data="values", :color="color")
+    // admin-table(:data="values.sortBy(v => -v)")
 </template>
 
 <script>

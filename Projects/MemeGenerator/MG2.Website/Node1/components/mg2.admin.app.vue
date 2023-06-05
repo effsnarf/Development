@@ -22,7 +22,7 @@ export default {
                 value: "MG.DBP"
             },
             last: {
-                options: ["1 month", "1 week", "1 day", "1 hour", "10 minutes"],
+                options: ["1 month", "1 week", "1 day", "1 hour"],
                 value: "1 hour"
             },
             bars: {
