@@ -1136,7 +1136,7 @@ if (typeof Array !== "undefined") {
   };
 
   Array.prototype.average = function () {
-    return parseFloat((this.sum() / this.length).toFixed(2));
+    return this.sum() / this.length;
   };
 
   Array.prototype.first = function () {
