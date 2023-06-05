@@ -73,19 +73,20 @@ const initApi = (async() => {
     };
 
     // Create a new visit
-    const visit = (await analytics.create(null, "MG.Web", "user", "visit", {
-      user: user,
-      ui: {
-        e: Object.fromEntries(capturedUiEvents.map((e) => [e, 0])),
-        total: 0
-      },
-      dt: {
-        start: Date.now(),
-        end: Date.now(),
-        length: 0,
-        active: 0
-      }
-    }));
+    const visit = null;
+    // const visit = (await analytics.create(null, "MG.Web", "user", "visit", {
+    //   user: user,
+    //   ui: {
+    //     e: Object.fromEntries(capturedUiEvents.map((e) => [e, 0])),
+    //     total: 0
+    //   },
+    //   dt: {
+    //     start: Date.now(),
+    //     end: Date.now(),
+    //     length: 0,
+    //     active: 0
+    //   }
+    // }));
 
     if (visit)
     {

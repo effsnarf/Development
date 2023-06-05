@@ -233,6 +233,7 @@ interface Number {
   getHttpSeverityColor(): string;
   toFixedRounded(places: number): string;
   ordinalize(): string;
+  getEnumName(enumType: any): string;
 }
 
 interface String {
@@ -253,7 +254,7 @@ interface String {
   severifyByHttpStatus(statusCode?: number, bgRed?: boolean): string;
   deunitify(): number;
 
-  getUnit(): string;
+  getUnit(options?: { throw: boolean }): string;
   getUnitClass(): UnitClass | null;
   withoutUnit(): string;
 
@@ -572,6 +573,15 @@ if (typeof Number !== "undefined") {
       return number + "th";
     }
   };
+
+  Number.prototype.getEnumName = function (enumType: any): string {
+    const value = this.valueOf();
+    const keys = Object.keys(enumType);
+    for (const key of keys) {
+      if (enumType[key] == value) return key;
+    }
+    return "";
+  };
 }
 // #endregion
 
@@ -690,7 +700,9 @@ if (typeof String !== "undefined") {
     return value * (unit ? unitClass.unitToValue[unit] : 1);
   };
 
-  String.prototype.getUnit = function (): string {
+  String.prototype.getUnit = function (
+    options: { throw: boolean } = { throw: true }
+  ): string {
     let word = this.withoutColors().replace(/[0-9\.]/g, "");
     if (word.length > 2) word = word.pluralize();
     // Search for the long unit name ("seconds", "bytes", "percentages")
@@ -703,11 +715,15 @@ if (typeof String !== "undefined") {
       let index = unitClass.units.indexOf(word);
       if (index != -1) return unitClass.units[index];
     }
-    throw new Error(`No unit found for "${word}"`);
+    if (options.throw) {
+      throw new Error(`No unit found for "${word}"`);
+    } else {
+      return "";
+    }
   };
 
   String.prototype.getUnitClass = function (): UnitClass | null {
-    const unit = this.getUnit();
+    const unit = this.getUnit({ throw: false });
     if (Time.units.includes(unit)) return Time;
     if (Size.units.includes(unit)) return Size;
     if (Percentage.units.includes(unit)) return Percentage;
