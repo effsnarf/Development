@@ -232,17 +232,19 @@ class LoadBalancer {
     const rtpm = lb.stats.response.times.per.minute;
     setInterval(async () => {
       await lb.analytics.create(
-        ItemType.Count,
         options.title,
         "LoadBalancer",
-        "requests.per.minute",
+        "requests",
+        ItemType.Count,
+        (1).minutes(),
         lb.stats.requests.per.minute.count
       );
       await lb.analytics.create(
-        ItemType.Average,
         options.title,
         "LoadBalancer",
-        "response.time.per.minute",
+        "response.time",
+        ItemType.Average,
+        (1).minutes(),
         rtpm.average,
         "ms"
       );

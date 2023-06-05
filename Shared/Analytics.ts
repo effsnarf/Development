@@ -94,21 +94,24 @@ class Analytics {
   }
 
   async create(
-    type: ItemType = ItemType.Undefined,
     app: string,
     category: string,
     event: string,
+    type: ItemType = ItemType.Undefined,
+    inTheLast: number,
     value: any,
     unit: string | null = null
   ) {
-    const dt = Date.now();
+    return;
+    const now = Date.now();
+    const since = now - inTheLast;
 
     const data = {
-      d: dt,
-      t: type,
+      dt: [since, now],
       a: app,
       c: category,
       e: event,
+      t: type,
       v: value,
       u: unit,
     } as any;
@@ -147,12 +150,17 @@ class Analytics {
         a: app,
         c: category,
         e: event,
-        d: {
+        "dt[0]": {
+          $gte: interval.from,
+          $lte: interval.to,
+        },
+        "dt[1]": {
           $gte: interval.from,
           $lte: interval.to,
         },
       });
     }
+
     if (type == ItemType.Sum) {
       return intervals.map((intr) => intr.docs.map((d: any) => d.v).sum());
     }
