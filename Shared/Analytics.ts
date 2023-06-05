@@ -167,11 +167,24 @@ class Analytics {
 
       // Some of the docs fall only partially in the interval
       // We need to adjust their values to the relative space they occupy in the interval
-      for (const doc of docs) {
+      const isIn = (value: number, interval: Interval) =>
+        value.isBetween(interval.from, interval.to);
+
+      const isFullDoc = (doc: any, interval: Interval) =>
+        isIn(doc.dt.f, interval) && isIn(doc.dt.t, interval);
+
+      const isPartialDoc = (doc: any, interval: Interval) =>
+        !isFullDoc(doc, interval);
+
+      const partialDocs = docs.filter((d: any) => isPartialDoc(d, interval));
+      for (const doc of partialDocs) {
         const { f, t } = doc.dt;
-        const intervalLength = interval.to - interval.from + 1;
-        const docLength = t - f + 1;
-        const ratio = docLength / intervalLength;
+        const intervalLength = interval.to - interval.from;
+        const overlap = f.isBetween(interval.from, interval.to)
+          ? interval.to - f
+          : t - interval.from;
+
+        const ratio = overlap / intervalLength;
         doc.v *= ratio;
       }
 
