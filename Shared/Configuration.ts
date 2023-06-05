@@ -189,7 +189,7 @@ class Configuration {
     const from = moment.duration(periodically.from).asMilliseconds();
     const every = periodically.every.deunitify();
     const startOfDay = new Date().setHours(0, 0, 0, 0).valueOf();
-    const times = (24).hours() / every;
+    const times = (24).hours() / every + 1;
     const points = [];
     for (
       let at = startOfDay + from;
@@ -198,6 +198,7 @@ class Configuration {
     ) {
       points.push(at);
     }
+
     const nextPoint = points
       .filter((p) => p > Date.now())
       .sortBy((p) => p)
