@@ -49,7 +49,7 @@ export default {
         getCssClass() {
             const cls = {};
             if (!this.data?.length) cls.empty = true;
-            if (this.color) cls[this.color] = true;
+            if (this.color) cls[`chart-${this.color}`] = true;
             return cls;
         },
         drawChart(data) {
@@ -203,6 +203,7 @@ h2
 }
 canvas
 {
+    filter: drop-shadow(-3px 3px 1px black);
     border: 2px solid white;
     border-radius: 0.5em;
 }
@@ -231,13 +232,13 @@ canvas
     font-size: 160%;
 }
 
-.green
+.chart-green
 {
     background: #80ff8060;
 }
-.blue
+.chart-blue
 {
-    background: #8080ff60;
+    background: #40a0ffa0;
 }
 
 .empty
