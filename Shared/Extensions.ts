@@ -313,6 +313,7 @@ interface Array<T> {
   average(): number;
   first(): any;
   last(): any;
+  back(): any;
   joinColumns(columns: (number | null)[], ellipsis?: boolean): string;
   distinct(project?: ((item: T) => any) | null): T[];
   except(...items: T[]): T[];
@@ -1180,6 +1181,10 @@ if (typeof Array !== "undefined") {
 
   Array.prototype.last = function () {
     return this[this.length - 1];
+  };
+
+  Array.prototype.back = function () {
+    return this.slice(0, this.length - 1);
   };
 
   Array.prototype.joinColumns = function (

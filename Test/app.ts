@@ -20,6 +20,7 @@ import { ChatOpenAI, Roles } from "../Apis/OpenAI/classes/ChatOpenAI";
 import { Google } from "@shared/Google";
 import { Coder } from "@shared/Coder";
 import { Cache } from "@shared/Cache";
+import { LiveTree } from "@shared/LiveTree";
 
 type malkovich = string;
 
@@ -34,7 +35,47 @@ class Malkovich {
 const malkovitch = new Malkovich();
 
 (async () => {
-  console.log((1440000).unitifyTime().withoutColors());
+  let path = [];
+
+  const nodes = await LiveTree.Node.getSubNodes([]);
+
+  //console.log(nodes.map((n) => n.title));
+
+  const shared = nodes.find((n) => n.title.text == "Shared");
+
+  //console.log(shared?.title);
+
+  const traverseSubNodes = async (node?: LiveTree.Types.Node, indent = 0) => {
+    let padding = " ".repeat(indent * 2);
+
+    console.log(`${padding}`, node?.title);
+
+    const subNodes = await LiveTree.Node.getSubNodes(node?.path);
+
+    indent++;
+    padding = " ".repeat(indent * 2);
+
+    for (const subNode of subNodes) {
+      await traverseSubNodes(subNode, indent + 1);
+    }
+  };
+
+  await traverseSubNodes(shared);
+
+  // const sharedNodes = await LiveTree.Node.getSubNodes(shared?.path);
+
+  // const classFile = sharedNodes.find((n) => n.title.text == "Analytics.ts");
+
+  // console.log(classFile?.title);
+
+  // const classes = await LiveTree.Node.getSubNodes(classFile?.path);
+
+  // console.log(classes.map((t) => t.title));
+  // const class1 = classes[0];
+
+  // const methods = await LiveTree.Node.getSubNodes(class1?.path);
+
+  // console.log(methods.map((t) => t.title));
 
   // const debugLogger = Logger.new({
   //   path: `c:\\eff\\Development\\Logs\\${new Date()

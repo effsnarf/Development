@@ -25,7 +25,7 @@ class Global {
       if (!this._analyticsApify) {
         const config = (await this.config()).data;
         Analytics.defaults.database = await Database.new(
-          config.analytics.database
+          config.analytics?.database
         );
 
         this._analyticsApify = new Apify.Server(

@@ -12,6 +12,54 @@ interface WebpackifyOptions {
 }
 
 class TypeScript {
+  static parse(code: string) {
+    const sourceFile = ts.createSourceFile(
+      "example.ts",
+      code,
+      ts.ScriptTarget.Latest,
+      /* setParentNodes */ true
+    );
+    return sourceFile;
+  }
+
+  private static *traverse(ast: ts.Node): Generator<ts.Node, void, unknown> {
+    yield ast;
+
+    for (const childNode of ast.getChildren()) {
+      yield* this.traverse(childNode);
+    }
+  }
+
+  static find = {
+    classes: (ast: ts.Node) => {
+      return [...TypeScript.traverse(ast)]
+        .filter((node) => node.kind === ts.SyntaxKind.ClassDeclaration)
+        .map((c) => c as ts.ClassDeclaration);
+    },
+
+    class: (ast: ts.Node, className: string) => {
+      const class1 = TypeScript.find
+        .classes(ast)
+        .find((c) => c.name?.getText() === className);
+      if (!class1) throw new Error(`Class not found: ${className}`);
+      return class1;
+    },
+
+    methods: (ast: ts.Node) => {
+      return [...TypeScript.traverse(ast)].filter(
+        (node) => node.kind === ts.SyntaxKind.MethodDeclaration
+      ) as ts.MethodDeclaration[];
+    },
+
+    method: (ast: ts.Node, methodName: string) => {
+      const method = TypeScript.find
+        .methods(ast)
+        .find((m) => m.name?.getText() === methodName);
+      if (!method) throw new Error(`Method not found: ${methodName}`);
+      return method;
+    },
+  };
+
   static transpileToJavaScript(tsCode: string): string {
     // Options for the TypeScript compiler (no generators)
     const compilerOptions: ts.CompilerOptions = {
