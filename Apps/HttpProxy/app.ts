@@ -6,6 +6,7 @@ import { Configuration } from "@shared/Configuration";
 import { Timer, IntervalCounter } from "@shared/Timer";
 import { Cache } from "@shared/Cache";
 import { Http } from "@shared/Http";
+import { Analytics, ItemType } from "@shared/Analytics";
 import {
   Console,
   Layout,
@@ -163,7 +164,7 @@ const logNewLine = (...args: any[]) => {
     tryRequest();
   });
 
-  // Every second, display stats
+  // Every once in a while, display stats
   setInterval(() => {
     logNewLine(
       `${stats.successes.count.humanize()} ${
@@ -171,6 +172,19 @@ const logNewLine = (...args: any[]) => {
       } ${stats.cache.hits.count.humanize()} ${
         `cache hits per`.gray
       } ${stats.interval.unitifyTime()}`
+    );
+  }, stats.interval);
+
+  // Every minute, track requests/minute and response times in analytics
+  const analytics = await Analytics.new(config.analytics);
+  setInterval(async () => {
+    await analytics.create(
+      config.title,
+      "LoadBalancer",
+      "requests",
+      ItemType.Count,
+      stats.interval,
+      stats.successes.count
     );
   }, stats.interval);
 

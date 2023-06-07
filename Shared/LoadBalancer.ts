@@ -228,17 +228,9 @@ class LoadBalancer {
       lb.events.emit("error", ex);
     });
     lb.analytics = await Analytics.new(options.analytics);
-    // Every minute, track requests/minute and response times in analytics
+    // Every minute, track analytics
     const rtpm = lb.stats.response.times.per.minute;
     setInterval(async () => {
-      await lb.analytics.create(
-        options.title,
-        "LoadBalancer",
-        "requests",
-        ItemType.Count,
-        (1).minutes(),
-        lb.stats.requests.per.minute.count
-      );
       await lb.analytics.create(
         options.title,
         "LoadBalancer",

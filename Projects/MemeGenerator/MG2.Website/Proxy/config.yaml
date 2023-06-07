@@ -1,3 +1,4 @@
+title: MG.Web
 incoming:
   server:
     prod:
@@ -14,6 +15,19 @@ target:
     again:
       retries: 30
       delay: 1s
+analytics:
+  prod:
+    api:
+      cache:
+        database:
+          connectionString: mongodb://localhost:37017
+          database: MG-Analytics-Cache
+    database:
+      write:
+        path: F:\Database\MG-Analytics
+      read:
+        connectionString: mongodb://localhost:47017
+        database: MG-Analytics
 cache:
   ignore:
     - /_nuxt/
