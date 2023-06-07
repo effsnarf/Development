@@ -16,6 +16,12 @@ import {
   Unit,
 } from "@shared/Console";
 
+const logLine = (...args: any[]) => {
+  process.stdout.write("\r");
+  process.stdout.clearLine(0);
+  process.stdout.write(args.join(" "));
+};
+
 (async () => {
   const config = (await Configuration.new()).data;
 
@@ -80,7 +86,7 @@ import {
         response.data.pipe(res);
         // When the response ends
         response.data.on("end", async () => {
-          //console.log(`${elapsed?.unitifyTime()} ${options.url.gray}`);
+          logLine(`${elapsed?.unitifyTime()} ${options.url.gray}`);
           stats.successes.track(1);
         });
       } catch (ex: any) {
@@ -90,11 +96,11 @@ import {
 
         // If target is not down, target returned a real error and we should return it
         if (!targetIsDown) {
-          // console.log(
-          //   `${timer.elapsed?.unitifyTime()} ${ex.message.yellow} ${
-          //     options.url.gray
-          //   }`
-          // );
+          logLine(
+            `${timer.elapsed?.unitifyTime()} ${ex.message.yellow} ${
+              options.url.gray
+            }`
+          );
           res.status(ex.response.status);
           res.set(ex.response.headers);
           return res.end(ex.response.data.data);
@@ -110,7 +116,7 @@ import {
               const cachedResponse = await cache.get(cacheKey);
               if (cachedResponse) {
                 stats.cache.hits.track(1);
-                console.log(
+                logLine(
                   `${
                     `Cache hit`.yellow.bold
                   } ${cachedResponse.body.length.unitifySize()} ${
@@ -144,10 +150,10 @@ import {
   setInterval(() => {
     console.log(
       `${stats.successes.count.humanize()} ${
-        `successful proxied requests`.gray
-      } and ${stats.cache.hits.count.humanize()} ${
-        `cache hits`.gray
-      } per ${stats.interval.unitifyTime()}`
+        `successful proxied requests and`.gray
+      } ${stats.cache.hits.count.humanize()} ${
+        `cache hits per`.gray
+      } ${stats.interval.unitifyTime()}`
     );
   }, stats.interval);
 
