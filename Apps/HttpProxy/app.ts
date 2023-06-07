@@ -85,16 +85,21 @@ import {
         if (targetIsDown) {
           // Try the cache
           if (await cache.has(cacheKey)) {
-            const cachedResponse = await cache.get(cacheKey);
-            if (cachedResponse) {
-              console.log(
-                `${
-                  `Target server is down, using cache`.yellow
-                } ${cachedResponse.body.length.unitifySize()}`
-              );
-              res.status(cachedResponse.status.code);
-              res.set(cachedResponse.headers);
-              return res.end(cachedResponse.body);
+            const isCachable = !config.cache.ignore.find((c: any) =>
+              options.url.startsWith(c)
+            );
+            if (isCachable) {
+              const cachedResponse = await cache.get(cacheKey);
+              if (cachedResponse) {
+                console.log(
+                  `${
+                    `Target server is down, using cache`.yellow
+                  } ${cachedResponse.body.length.unitifySize()}`
+                );
+                res.status(cachedResponse.status.code);
+                res.set(cachedResponse.headers);
+                return res.end(cachedResponse.body);
+              }
             }
           }
 
@@ -116,9 +121,9 @@ import {
 
   app.listen(config.incoming.server.port, () => {
     console.log(
-      `${`HTTP Proxy`.green} ${`listening on port`.gray} ${
-        config.incoming.server.port.toString().yellow
-      }`
+      `${`HTTP Proxy`.green} ${`listening on `.gray} ${
+        config.incoming.server.host.toString().green
+      }:${config.incoming.server.port.toString().yellow}`
     );
     console.log(
       `${`Target`.green} ${`URL`.gray} ${config.target.base.url.yellow}`

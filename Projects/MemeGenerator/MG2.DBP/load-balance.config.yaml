@@ -1,7 +1,7 @@
 title: MG.DBP
 incoming:
   address:
-    dev: localhost:4040
+    dev: localhost:4045
     prod: 10.35.16.36:80
   cors:
     [

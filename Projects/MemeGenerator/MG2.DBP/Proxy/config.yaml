@@ -1,0 +1,26 @@
+incoming:
+  server:
+    prod:
+      host: 10.35.16.36
+      port: 80
+    dev:
+      host: localhost
+      port: 4040
+target:
+  base:
+    url: http://localhost:4045
+  timeout: 1s
+  try:
+    again:
+      retries: 30
+      delay: 1s
+cache:
+  ignore:
+    - /get/new/id
+    - /googleLogin
+  store:
+    prod:
+      - memory: true
+      - database:
+          connectionString: mongodb://localhost:37017
+          database: MG-DBP-Cache
