@@ -24,3 +24,6 @@ cache:
       - database:
           connectionString: mongodb://localhost:37017
           database: MG-DBP-Cache
+display:
+  stats:
+    every: 1s

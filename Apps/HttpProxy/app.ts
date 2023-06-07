@@ -20,10 +20,11 @@ import {
   const config = (await Configuration.new()).data;
 
   const stats = {
-    successes: new IntervalCounter((1).minutes()),
-    cache: {
-      hits: new IntervalCounter((1).minutes()),
-    },
+    interval: config.display.stats.every.deunitify(),
+  } as any;
+  stats.successes = new IntervalCounter(stats.interval);
+  stats.cache = {
+    hits: new IntervalCounter(stats.interval),
   };
 
   const cache = await Cache.new(config.cache.store);
@@ -67,7 +68,7 @@ import {
       }
 
       if (attempt == 1) {
-        console.log(`${`Trying again`.yellow} ${options.url.gray}`);
+        //console.log(`${`Trying again`.yellow} ${options.url.gray}`);
       }
       try {
         // We're only interested in the time it took us to get the response from the target,
@@ -79,7 +80,7 @@ import {
         response.data.pipe(res);
         // When the response ends
         response.data.on("end", async () => {
-          console.log(`${elapsed?.unitifyTime()} ${options.url.gray}`);
+          //console.log(`${elapsed?.unitifyTime()} ${options.url.gray}`);
           stats.successes.track(1);
         });
       } catch (ex: any) {
@@ -89,11 +90,11 @@ import {
 
         // If target is not down, target returned a real error and we should return it
         if (!targetIsDown) {
-          console.log(
-            `${timer.elapsed?.unitifyTime()} ${ex.message.yellow} ${
-              options.url.gray
-            }`
-          );
+          // console.log(
+          //   `${timer.elapsed?.unitifyTime()} ${ex.message.yellow} ${
+          //     options.url.gray
+          //   }`
+          // );
           res.status(ex.response.status);
           res.set(ex.response.headers);
           return res.end(ex.response.data.data);
@@ -138,6 +139,15 @@ import {
 
     tryRequest();
   });
+
+  // Every second, display stats
+  setInterval(() => {
+    console.log(
+      `${stats.successes.count} ${`successful proxied requests`.gray} and ${
+        stats.cache.hits.count
+      } ${`cache hits`.gray} per ${stats.interval.unitify()}`
+    );
+  }, stats.interval.unitify());
 
   app.listen(config.incoming.server.port, () => {
     console.log(
