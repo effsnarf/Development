@@ -38,32 +38,16 @@ const malkovitch = new Malkovich();
 (async () => {
   //const config = (await Configuration.new()).data;
 
-  const part = await LiveTree.Api.getFolder("c:/eff/Development");
+  const root = await LiveTree.Api.getFolder("c:/eff/Development");
 
-  console.log(part);
+  const parts1 = await root.getSubParts([
+    "Shared",
+    "LoadBalancer.ts",
+    "LoadBalancer",
+    "sendToClient",
+  ]);
 
-  const parts = await part.getSubParts();
-
-  const part2 = parts.find((p) => p.text == "Shared");
-
-  console.log(part2);
-
-  const parts2 = await part2?.getSubParts();
-
-  //console.log(parts2);
-
-  const part3 = parts2?.find((p) => p.text == "Timer.ts");
-
-  console.log(part3);
-
-  const parts3 = await part3?.getSubParts();
-
-  console.log(parts3);
-
-  for (const classPart of parts3 || []) {
-    const methods = await classPart.getSubParts();
-    console.log(methods);
-  }
+  console.log(parts1);
 
   // // Create the express app
   // const httpServer = express();

@@ -14,7 +14,18 @@ namespace LiveTree {
   abstract class Part {
     constructor(public text: string) {}
 
-    async getSubParts(): Promise<Part[]> {
+    async getSubParts(subPath?: string[]): Promise<Part[]> {
+      if (subPath?.length) {
+        let subParts = await this.getSubParts();
+        while (subPath.length) {
+          const partText = subPath.shift();
+          const part = subParts.find((p) => p.text == partText);
+          if (!part) throw new Error(`Part not found: ${partText}`);
+          subParts = await part.getSubParts();
+        }
+        return subParts;
+      }
+
       let subParts = await this._getSubParts();
       subParts = subParts.sortBy((p) => p.text);
       return subParts;
@@ -24,6 +35,20 @@ namespace LiveTree {
   }
 
   class Folder extends Part {
+    private ignore = [
+      "node_modules",
+      ".git",
+      ".vscode",
+      "dist",
+      "build",
+      "out",
+      "obj",
+      "bin",
+      "logs",
+      "temp",
+      "tmp",
+    ];
+
     constructor(private path: string[]) {
       super(path.last());
     }
@@ -36,7 +61,7 @@ namespace LiveTree {
       const path = this.path.join("/");
       const files = fs.readdirSync(path);
       const parts: Part[] = [];
-      for (const fileName of files) {
+      for (const fileName of files.filter((f) => !this.ignore.includes(f))) {
         const filePath = path + "/" + fileName;
         const stat = fs.statSync(filePath);
         if (stat.isDirectory()) {
@@ -78,7 +103,7 @@ namespace LiveTree {
         const parts: Part[] = [];
         for (const class1 of classes) {
           const className = class1.name?.getText();
-          if (!className) throw new Error("Class name not found");
+          if (!className) throw new Error(`Class name not found`);
           parts.push(new TypeScript.Class(this.path, className));
         }
         return parts;
@@ -117,7 +142,10 @@ namespace LiveTree {
       protected _getAst(): ts.Node {
         const ast = super._getAst();
         const class1 = TypeScript1.find.class(ast, this.className);
-        if (!class1) throw new Error("Class not found");
+        if (!class1)
+          throw new Error(
+            `Class not found: ${this.className} (${this.path.join("/")})`
+          );
         return class1;
       }
     }
@@ -129,6 +157,20 @@ namespace LiveTree {
         private methodName: string
       ) {
         super(path, className, methodName);
+      }
+
+      protected async _getSubParts(): Promise<Part[]> {
+        return [];
+      }
+
+      protected _getAst(): ts.Node {
+        const ast = super._getAst();
+        const method = TypeScript1.find.method(ast, this.methodName);
+        if (!method)
+          throw new Error(
+            `Method not found: ${this.methodName} (${this.className})`
+          );
+        return method;
       }
     }
   }
