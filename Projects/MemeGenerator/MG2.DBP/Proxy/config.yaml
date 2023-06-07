@@ -26,4 +26,4 @@ cache:
           database: MG-DBP-Cache
 display:
   stats:
-    every: 1s
+    every: 1m
