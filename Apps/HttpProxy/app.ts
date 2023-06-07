@@ -21,6 +21,7 @@ const logLine = (...args: any[]) => {
   process.stdout.write("\r");
   process.stdout.clearLine(0);
   process.stdout.write(args.join(" "));
+  process.stdout.write("\r");
 };
 
 (async () => {
