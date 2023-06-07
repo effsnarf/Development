@@ -19,7 +19,12 @@ import {
 (async () => {
   const config = (await Configuration.new()).data;
 
-  const successesPerMinute = new IntervalCounter((1).minutes());
+  const stats = {
+    successes: new IntervalCounter((1).minutes()),
+    cache: {
+      hits: new IntervalCounter((1).minutes()),
+    },
+  };
 
   const cache = await Cache.new(config.cache.store);
 
@@ -30,7 +35,10 @@ import {
   // Catch all requests
   app.all("*", async (req: any, res: any) => {
     const targetUrl = `${config.target.base.url}${req.url}`;
-    const cacheKey = req.url;
+    // Remove &_uid=1685119338348 from the URL (uniquifies the request)
+    let cacheKey = req.url;
+    cacheKey = cacheKey?.replace(/&_uid=\d+/g, "");
+
     const postData = req.method == "POST" ? await Http.getPostData(req) : null;
     const options = {
       url: targetUrl,
@@ -62,14 +70,17 @@ import {
         console.log(`${`Trying again`.yellow} ${options.url.gray}`);
       }
       try {
+        // We're only interested in the time it took us to get the response from the target,
+        // not the time it took us to send the response to the client
+        const elapsed = timer.elapsed;
         const response = await axios.request(options);
         res.status(response.status);
         res.set(response.headers);
         response.data.pipe(res);
         // When the response ends
         response.data.on("end", async () => {
-          console.log(`${timer.elapsed?.unitifyTime()} ${options.url.gray}`);
-          successesPerMinute.track(1);
+          console.log(`${elapsed?.unitifyTime()} ${options.url.gray}`);
+          stats.successes.track(1);
         });
       } catch (ex: any) {
         // Some HTTP status codes are not errors (304 Not Modified, 404 Not Found, etc.)
@@ -97,6 +108,7 @@ import {
             if (isCachable) {
               const cachedResponse = await cache.get(cacheKey);
               if (cachedResponse) {
+                stats.cache.hits.track(1);
                 console.log(
                   `${
                     `Cache hit`.yellow.bold
