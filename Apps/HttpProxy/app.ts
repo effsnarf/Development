@@ -17,7 +17,7 @@ import {
 } from "@shared/Console";
 
 const logLine = (...args: any[]) => {
-  args = [new Date().toLocaleTimeString().cyan, ...args];
+  args = [new Date().toLocaleTimeString().blue.bold, ...args];
   process.stdout.write("\r");
   process.stdout.clearLine(0);
   process.stdout.write(args.join(" "));
@@ -25,7 +25,7 @@ const logLine = (...args: any[]) => {
 };
 
 const logNewLine = (...args: any[]) => {
-  args = [new Date().toLocaleTimeString().cyan, ...args];
+  args = [new Date().toLocaleTimeString().blue.bold, ...args];
   process.stdout.write("\r");
   process.stdout.clearLine(0);
   console.log(...args);

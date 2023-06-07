@@ -38,6 +38,8 @@ const malkovitch = new Malkovich();
 (async () => {
   //const config = (await Configuration.new()).data;
 
+  console.log("test".blue.bold);
+
   const root = await LiveTree.Api.getFolder("c:/eff/Development");
 
   const parts1 = await root.getSubParts([
