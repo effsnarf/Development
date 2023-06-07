@@ -99,8 +99,10 @@ import {
               if (cachedResponse) {
                 console.log(
                   `${
-                    `Target server is down, using cache`.yellow
-                  } ${cachedResponse.body.length.unitifySize()}`
+                    `Cache hit`.yellow.bold
+                  } ${cachedResponse.body.length.unitifySize()} ${
+                    options.url.gray
+                  }`
                 );
                 res.status(cachedResponse.status.code);
                 res.set(cachedResponse.headers);
