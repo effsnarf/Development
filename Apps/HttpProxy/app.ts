@@ -17,11 +17,18 @@ import {
 } from "@shared/Console";
 
 const logLine = (...args: any[]) => {
-  args = [new Date().toLocaleTimeString(), ...args];
+  args = [new Date().toLocaleTimeString().cyan, ...args];
   process.stdout.write("\r");
   process.stdout.clearLine(0);
   process.stdout.write(args.join(" "));
   process.stdout.write("\r");
+};
+
+const logNewLine = (...args: any[]) => {
+  args = [new Date().toLocaleTimeString().cyan, ...args];
+  process.stdout.write("\r");
+  process.stdout.clearLine(0);
+  console.log(...args);
 };
 
 (async () => {
@@ -66,7 +73,7 @@ const logLine = (...args: any[]) => {
     const tryRequest = async (attempt: number = 0) => {
       if (attempt >= config.target.try.again.retries) {
         // Temporarily unavailable
-        console.log(
+        logNewLine(
           `${timer.elapsed?.unitifyTime()} ${
             config.target.try.again.retries.toString().yellow
           } ${`attempts failed`.red.bold} ${options.url.gray}`
@@ -76,7 +83,7 @@ const logLine = (...args: any[]) => {
       }
 
       if (attempt == 1) {
-        //console.log(`${`Trying again`.yellow} ${options.url.gray}`);
+        //logNewLine(`${`Trying again`.yellow} ${options.url.gray}`);
       }
       try {
         // We're only interested in the time it took us to get the response from the target,
@@ -133,7 +140,7 @@ const logLine = (...args: any[]) => {
           }
 
           if (attempt >= config.target.try.again.retries - 1) {
-            console.log(`${ex.message.red.bold} ${options.url.gray}`);
+            logNewLine(`${ex.message.red.bold} ${options.url.gray}`);
           }
 
           // Try again
@@ -150,7 +157,7 @@ const logLine = (...args: any[]) => {
 
   // Every second, display stats
   setInterval(() => {
-    console.log(
+    logNewLine(
       `${stats.successes.count.humanize()} ${
         `successful proxied requests and`.gray
       } ${stats.cache.hits.count.humanize()} ${
@@ -160,12 +167,12 @@ const logLine = (...args: any[]) => {
   }, stats.interval);
 
   app.listen(config.incoming.server.port, () => {
-    console.log(
+    logNewLine(
       `${`HTTP Proxy`.green} ${`listening on `.gray} ${
         config.incoming.server.host.toString().green
       }:${config.incoming.server.port.toString().yellow}`
     );
-    console.log(
+    logNewLine(
       `${`Target`.green} ${`URL`.gray} ${config.target.base.url.yellow}`
     );
   });
