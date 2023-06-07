@@ -1,8 +1,6 @@
 title: MG.DBP
 incoming:
-  address:
-    dev: localhost:4045
-    prod: 10.35.16.36:80
+  address: localhost:4045
   cors:
     [
       https://memegenerator.net,
