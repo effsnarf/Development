@@ -35,32 +35,11 @@ class Malkovich {
 const malkovitch = new Malkovich();
 
 (async () => {
-  let path = [];
+  const nodes = await LiveTree.Node.getSubNodes();
 
-  const nodes = await LiveTree.Node.getSubNodes([]);
+  const nodes2 = await LiveTree.Node.getSubNodes(nodes[0].path);
 
-  //console.log(nodes.map((n) => n.title));
-
-  const shared = nodes.find((n) => n.title.text == "Shared");
-
-  //console.log(shared?.title);
-
-  const traverseSubNodes = async (node?: LiveTree.Types.Node, indent = 0) => {
-    let padding = " ".repeat(indent * 2);
-
-    console.log(`${padding}`, node?.title);
-
-    const subNodes = await LiveTree.Node.getSubNodes(node?.path);
-
-    indent++;
-    padding = " ".repeat(indent * 2);
-
-    for (const subNode of subNodes) {
-      await traverseSubNodes(subNode, indent + 1);
-    }
-  };
-
-  await traverseSubNodes(shared);
+  console.log(nodes2.map((n) => n.path));
 
   // const sharedNodes = await LiveTree.Node.getSubNodes(shared?.path);
 

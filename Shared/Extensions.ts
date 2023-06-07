@@ -314,11 +314,12 @@ interface Array<T> {
   first(): any;
   last(): any;
   back(): any;
+  skip(count: number): T[];
   joinColumns(columns: (number | null)[], ellipsis?: boolean): string;
   distinct(project?: ((item: T) => any) | null): T[];
   except(...items: T[]): T[];
-  sortBy(project: (item: T) => any): T[];
-  sortByDesc(project: (item: T) => any): T[];
+  sortBy(...projects: ((item: T) => any)[]): T[];
+  sortByDesc(...projects: ((item: T) => any)[]): T[];
   stringify(): string;
 }
 
@@ -1187,6 +1188,10 @@ if (typeof Array !== "undefined") {
     return this.slice(0, this.length - 1);
   };
 
+  Array.prototype.skip = function (count: number) {
+    return this.slice(count);
+  };
+
   Array.prototype.joinColumns = function (
     columns: (number | null)[],
     ellipsis?: boolean
@@ -1215,18 +1220,20 @@ if (typeof Array !== "undefined") {
     return this.filter((item) => !items.includes(item));
   };
 
-  Array.prototype.sortBy = function (project: (item: any) => any) {
-    return [...this].sort((a, b) => {
-      const aKey = project(a);
-      const bKey = project(b);
-      if (aKey < bKey) return -1;
-      if (aKey > bKey) return 1;
+  Array.prototype.sortBy = function (...projects: ((item: any) => any)[]) {
+    return this.sort((a, b) => {
+      for (const project of [...projects].reverse()) {
+        const aVal = project(a);
+        const bVal = project(b);
+        if (aVal > bVal) return 1;
+        if (aVal < bVal) return -1;
+      }
       return 0;
     });
   };
 
-  Array.prototype.sortByDesc = function (project: (item: any) => any) {
-    return [...this.sortBy(project)].reverse();
+  Array.prototype.sortByDesc = function (...projects: ((item: any) => any)[]) {
+    return [...this.sortBy(...projects)].reverse();
   };
 
   Array.prototype.stringify = function (): any {

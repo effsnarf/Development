@@ -23,44 +23,75 @@ namespace LiveTree {
     }
   }
 
+  export class Api {
+    static async getNode(path: string[]): Promise<Types.Node> {
+      const nodePath = [] as Types.Path;
+      const part = path.shift() as string;
+      nodePath.push({ type: "FileSystem.Folder", text: part });
+      let node = null as Types.Node | null;
+      while (path.length) {
+        node = await Node.findSubNode(nodePath, path.shift() as string);
+        nodePath.push(node.path.last());
+      }
+      if (!node) throw new Error(`Node not found: ${path}`);
+      return node;
+    }
+  }
+
   export abstract class Node {
     protected abstract getContent(path: Types.Path): Promise<any>;
     protected abstract getSubNodes(path: Types.Path): Promise<Types.Node[]>;
+
+    private static basePath = [
+      Node.part("FileSystem.Folder", "c:"),
+      Node.part("FileSystem.Folder", "eff"),
+      Node.part("FileSystem.Folder", "Development"),
+    ];
 
     static async getSubNodes(
       path?: Types.Path,
       type?: string
     ): Promise<Types.Node[]> {
-      path = Node.getFullPath(path);
+      path = Node.toAbsolutePath(path);
       const inst = Node.getInstance(path, type);
       let nodes = await inst.getSubNodes(path);
-      //nodes = nodes.sortBy((n: any) => n.title.text);
+      for (const node of nodes) {
+        node.path = Node.toRelativePath(node.path);
+      }
+      nodes = nodes.sortBy(
+        (n: any) => n.title.text,
+        (n: any) => Node.getTypeOrder(n.type)
+      );
       return nodes;
     }
 
+    static async findSubNode(path: Types.Path, text: string) {
+      const nodes = await Node.getSubNodes(path);
+      const node = nodes.find((n) => n.title.text == text);
+      if (!node) throw new Error(`Node not found: ${text}`);
+      return node;
+    }
+
     static getContent(path?: Types.Path, type?: string): Promise<any> {
-      path = Node.getFullPath(path);
+      path = Node.toAbsolutePath(path);
       const inst = Node.getInstance(path, type);
       return inst.getContent(path);
     }
 
     private static getInstance(path?: Types.Path, type?: string): Node {
-      path = Node.getFullPath(path);
+      path = Node.toAbsolutePath(path);
       if (!type) type = path.last().type as string;
       const cls = Node.findClass(type);
       const inst = new (cls as any)();
       return inst;
     }
 
-    private static getFullPath(path?: Types.Path): Types.Path {
-      if (!path?.length)
-        path = [
-          Node.part("FileSystem.Folder", "c:"),
-          Node.part("FileSystem.Folder", "eff"),
-          Node.part("FileSystem.Folder", "Development"),
-        ];
-      const fullPath = [...path];
-      return fullPath;
+    private static toAbsolutePath(path?: Types.Path): Types.Path {
+      return [...Node.basePath, ...(path || [])];
+    }
+
+    private static toRelativePath(path: Types.Path): Types.Path {
+      return path.slice(Node.basePath.length);
     }
 
     protected static from(
@@ -106,6 +137,18 @@ namespace LiveTree {
 
     protected static part(type: string, text: string): Types.Part {
       return { type, text };
+    }
+
+    private static getTypeOrder(type: string) {
+      const orders = [
+        "FileSystem.Folder",
+        "FileSystem.File",
+        "Language.TypeScript.File",
+        "Language.TypeScript.Class",
+        "Language.TypeScript.Method",
+      ];
+      const index = orders.indexOf(type);
+      return index == -1 ? orders.length : index;
     }
   }
 
