@@ -95,7 +95,11 @@ const logNewLine = (...args: any[]) => {
         response.data.pipe(res);
         // When the response ends
         response.data.on("end", async () => {
-          logLine(`${elapsed?.unitifyTime()} ${options.url.gray}`);
+          logLine(
+            `${elapsed?.unitifyTime()} ${response.status.toString().yellow} ${
+              options.url.gray
+            }`
+          );
           stats.successes.track(1);
         });
       } catch (ex: any) {
@@ -105,11 +109,15 @@ const logNewLine = (...args: any[]) => {
 
         // If target is not down, target returned a real error and we should return it
         if (!targetIsDown) {
+          const isError = !ex.response.status.isBetween(200, 500);
           logLine(
-            `${timer.elapsed?.unitifyTime()} ${ex.message.yellow} ${
-              options.url.gray
-            }`
+            `${timer.elapsed?.unitifyTime()} ${
+              !isError
+                ? ex.response.status.toString().yellow
+                : ex.message.yellow
+            } ${options.url.gray}`
           );
+
           res.status(ex.response.status);
           res.set(ex.response.headers);
           return res.end(ex.response.data.data);
@@ -166,11 +174,13 @@ const logNewLine = (...args: any[]) => {
     );
   }, stats.interval);
 
-  app.listen(config.incoming.server.host, config.incoming.server.port, () => {
+  const server = config.incoming.server;
+
+  app.listen(server.port, server.host, () => {
     logNewLine(
       `${`HTTP Proxy`.green} ${`listening on `.gray} ${
-        config.incoming.server.host.toString().green
-      }:${config.incoming.server.port.toString().yellow}`
+        server.host.toString().green
+      }:${server.port.toString().yellow}`
     );
     logNewLine(
       `${`Target`.green} ${`URL`.gray} ${config.target.base.url.yellow}`

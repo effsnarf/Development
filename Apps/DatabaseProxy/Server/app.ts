@@ -790,7 +790,7 @@ const getResponseSize = (response: any) => {
     httpServer.listen(config.server.port, config.server.host);
 
     mainLog.log(
-      `HTTP server running on ${config.server.host.yellow}:${
+      `HTTP server: ${config.server.host.yellow}:${
         config.server.port.toString().green
       }`.gray
     );
