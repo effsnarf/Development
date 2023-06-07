@@ -145,9 +145,9 @@ import {
     console.log(
       `${stats.successes.count} ${`successful proxied requests`.gray} and ${
         stats.cache.hits.count
-      } ${`cache hits`.gray} per ${stats.interval}`
+      } ${`cache hits`.gray} per ${stats.interval.unitifyTime()}`
     );
-  }, stats.interval.deunitify());
+  }, stats.interval);
 
   app.listen(config.incoming.server.port, () => {
     console.log(
