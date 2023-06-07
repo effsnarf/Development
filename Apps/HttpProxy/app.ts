@@ -143,9 +143,11 @@ import {
   // Every second, display stats
   setInterval(() => {
     console.log(
-      `${stats.successes.count} ${`successful proxied requests`.gray} and ${
-        stats.cache.hits.count
-      } ${`cache hits`.gray} per ${stats.interval.unitifyTime()}`
+      `${stats.successes.count.humanize()} ${
+        `successful proxied requests`.gray
+      } and ${stats.cache.hits.count.humanize()} ${
+        `cache hits`.gray
+      } per ${stats.interval.unitifyTime()}`
     );
   }, stats.interval);
 
