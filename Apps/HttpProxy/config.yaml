@@ -1,0 +1,22 @@
+incoming:
+  server:
+    host: localhost
+    port: 3000
+target:
+  base:
+    url: http://localhost:4041
+  timeout: 1s
+  try:
+    again:
+      retries: 30
+      delay: 1s
+cache:
+  ignore:
+    - /get/new/id
+    - /googleLogin
+  store:
+    prod:
+      - memory: true
+      - database:
+          connectionString: mongodb://localhost:37017
+          database: MG-DBP-Cache

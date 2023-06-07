@@ -20,8 +20,7 @@ incoming:
       - /googleLogin
     store:
       dev:
-        database:
-          path: (env) => env.path.resolve("c:\\Database\\Cache", env.config.title)
+        path: (env) => env.path.resolve("c:\\Database\\Cache", env.config.title)
       prod:
         - memory: true
         - database:
