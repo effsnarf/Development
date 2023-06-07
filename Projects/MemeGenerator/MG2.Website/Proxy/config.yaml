@@ -1,0 +1,31 @@
+incoming:
+  server:
+    prod:
+      host: 10.35.16.35
+      port: 80
+    dev:
+      host: localhost
+      port: 5050
+target:
+  base:
+    url: http://localhost:5055
+  timeout: 1s
+  try:
+    again:
+      retries: 30
+      delay: 1s
+cache:
+  ignore:
+    - /_nuxt/
+    - /new
+    - /api/ip
+    - /create
+  store:
+    prod:
+      - memory: true
+      - database:
+          connectionString: mongodb://localhost:37017
+          database: MG-Web-Cache
+display:
+  stats:
+    every: 1m
