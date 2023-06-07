@@ -2,6 +2,7 @@ const util = require("util");
 import path from "path";
 import fs from "fs";
 import "colors";
+import express from "express";
 import * as moment from "moment";
 import axios from "axios";
 import "@shared/Extensions";
@@ -35,159 +36,52 @@ class Malkovich {
 const malkovitch = new Malkovich();
 
 (async () => {
-  const nodes = await LiveTree.Node.getSubNodes();
+  //const config = (await Configuration.new()).data;
 
-  const nodes2 = await LiveTree.Node.getSubNodes(nodes[0].path);
+  const part = await LiveTree.Api.getFolder("c:/eff/Development");
 
-  console.log(nodes2.map((n) => n.path));
+  console.log(part);
 
-  // const sharedNodes = await LiveTree.Node.getSubNodes(shared?.path);
+  const parts = await part.getSubParts();
 
-  // const classFile = sharedNodes.find((n) => n.title.text == "Analytics.ts");
+  const part2 = parts.find((p) => p.text == "Shared");
 
-  // console.log(classFile?.title);
+  console.log(part2);
 
-  // const classes = await LiveTree.Node.getSubNodes(classFile?.path);
+  const parts2 = await part2?.getSubParts();
 
-  // console.log(classes.map((t) => t.title));
-  // const class1 = classes[0];
+  //console.log(parts2);
 
-  // const methods = await LiveTree.Node.getSubNodes(class1?.path);
+  const part3 = parts2?.find((p) => p.text == "Timer.ts");
 
-  // console.log(methods.map((t) => t.title));
+  console.log(part3);
 
-  // const debugLogger = Logger.new({
-  //   path: `c:\\eff\\Development\\Logs\\${new Date()
-  //     .toLocaleString()
-  //     .sanitizePath()}.log`,
-  // });
+  const parts3 = await part3?.getSubParts();
 
-  // await debugLogger.log("test");
+  console.log(parts3);
 
-  // const tsCode = Coder.App.addDebuggingCode(
-  //   path.resolve(`../Apps/DatabaseProxy/Server/app.ts`)
-  // );
+  for (const classPart of parts3 || []) {
+    const methods = await classPart.getSubParts();
+    console.log(methods);
+  }
 
-  // fs.writeFileSync(
-  //   path.resolve(path.dirname(process.argv[1]), "test.ts"),
-  //   tsCode
-  // );
+  // // Create the express app
+  // const httpServer = express();
+  // httpServer.use(express.json());
 
-  process.exit();
-
-  // const url = `https://db.memegenerator.net/MemeGenerator`;
-  // //const url = `https://memegenerator.net/api/client.js`;
-
-  // for (let i = 0; i < 100; i++) {
+  // const handleRequest = async (req: any, res: any) => {
   //   try {
-  //     const timer = Timer.start();
-  //     const response = await axios.get(url);
-  //     console.log(
-  //       `${response.status.severifyByHttpStatus()} ${timer.elapsed
-  //         ?.unitifyTime()
-  //         .padStart(6)} ${response.data.length
-  //         .unitifySize()
-  //         .padStart(6)} ${url}`
-  //     );
+  //     const path = req.url.split("/").slice(2);
+  //     const nodes = await LiveTree.Api.getSubNodes(path);
+  //     return res.end(JSON.stringify(nodes.map((n) => n.title)));
   //   } catch (ex: any) {
-  //     console.log(ex.message.bgRed);
+  //     return res.status(500).end(ex.message);
   //   }
-  // }
+  // };
 
-  // process.exit();
+  // httpServer.get("/tree", handleRequest);
+  // httpServer.get("/tree/*", handleRequest);
 
-  // const db = await Database.new({ path: "C:\\Database\\Cache\\Test" });
-
-  // const doc = { TestKey: "TestValue" };
-
-  // await db.upsert("TestCollection", doc);
-
-  // await db.set("TestKey", doc);
-
-  // console.log(doc);
-
-  // process.exit();
-
-  // const config = (await Configuration.new()).data;
-
-  // const cache = await Cache.new(config.cache);
-
-  // const value = await cache.get("test key 1", () => "test value 1");
-
-  // console.log(value);
+  // // Start the server
+  // httpServer.listen(config.server.port, config.server.host);
 })();
-
-// for (var i = 0; i <= 100; i += 10) {
-//   const percent = i / 100;
-//   const value = i * 1000;
-//   //console.log(value.unitifyTime(), value.unitifyTime().deunitify());
-
-//   console.log(
-//     percent.unitifyPercent(),
-//     percent.unitifyPercent().severify(0.9, 0.8, ">")
-//   );
-// }
-
-// const progress = Progress.newAutoDisplay(100, { skipped: 0, modifieds: [] });
-
-// (async () => {
-//   for (let i = 0; i < 100; i++) {
-//     progress.increment();
-//     await new Promise((resolve) => setTimeout(resolve, 100));
-//   }
-// })();
-
-// const path1 = `C:\\eff\\Development\\${
-//   `Projects`.green
-// }\\MemeGenerator\\MG2.Website\\Node1\\`;
-
-// console.log(path1.splitOnWidth(22).join("\n"));
-
-// process.exit();
-
-// (async () => {
-//   Files.watch(
-//     [path1],
-//     { recursive: true, exclude: ["node_modules"] },
-//     (paths) => {
-//       console.log(paths);
-//     },
-//     (message) => console.log(message)
-//   );
-// })();
-
-// (async () => {
-//   //const configPath = `../Apps/DatabaseProxy/Server/config.yaml`;
-//   const configPath = `./config.yaml`;
-
-//   const config = (await Configuration.new({}, configPath)).data;
-
-//   //const db = await Database.newDb(config.database);
-
-//   const analytics = await Analytics.new(await Database.new(config.database));
-
-//   await analytics.create("category", "event", { value: 1 });
-
-//   console.log(`test string`.bgRed);
-// })();
-
-// const tsSourcePath = path.resolve(
-//   __dirname,
-//   "../Shared/TreeScript/test.ts.yaml"
-// );
-
-// const source = fs.readFileSync(tsSourcePath, "utf8");
-// const trs = TreeScript.new(source);
-
-// console.log(tsSourcePath.toShortPath());
-// console.log();
-
-// console.log(trs.output);
-
-// process.exit();
-
-// (async () => {
-//   const chat = await ChatOpenAI.new(Roles.ChatGPT, true);
-
-//   const reply = await chat.send("Hello, how are you?");
-// })();

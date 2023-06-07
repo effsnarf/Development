@@ -295,6 +295,7 @@ interface String {
   toNumber(): number;
 
   isEqualPath(path: string): boolean;
+  splitPath(): string[];
   normalizePath(): string;
   sanitizePath(): string;
   findParentDir(dirName: string): string;
@@ -1079,6 +1080,10 @@ if (typeof String !== "undefined") {
 
   String.prototype.isEqualPath = function (path: any): boolean {
     return this.toString().normalizePath() === path.normalizePath();
+  };
+
+  String.prototype.splitPath = function (): string[] {
+    return this.toString().replace(/\\/g, "/").split("/");
   };
 
   String.prototype.normalizePath = function (): string {

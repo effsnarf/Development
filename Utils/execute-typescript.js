@@ -33,7 +33,9 @@ const cls = JavaScript.loadTypeScriptClasses(classPaths);
     };
     
     // Spawn TypeScript process (ts-node)
-    const tsNode = spawn('cmd.exe', ['/c', 'npx', 'ts-node', newFilePath, ...process.argv.slice(3)], { stdio: 'inherit' });
+    const args = ['/c', 'npx', 'ts-node', newFilePath, ...process.argv.slice(3)];
+    //console.log(args);
+    const tsNode = spawn('cmd.exe', args, { stdio: 'inherit' });
     
     tsNode.on("exit", (code) => {
         onExit();
