@@ -166,7 +166,7 @@ const logNewLine = (...args: any[]) => {
     );
   }, stats.interval);
 
-  app.listen(config.incoming.server.port, () => {
+  app.listen(config.incoming.server.host, config.incoming.server.port, () => {
     logNewLine(
       `${`HTTP Proxy`.green} ${`listening on `.gray} ${
         config.incoming.server.host.toString().green
