@@ -3,7 +3,7 @@ import "colors";
 import express from "express";
 import axios from "axios";
 import { Configuration } from "@shared/Configuration";
-import { Timer } from "@shared/Timer";
+import { Timer, IntervalCounter } from "@shared/Timer";
 import { Cache } from "@shared/Cache";
 import { Http } from "@shared/Http";
 import {
@@ -18,6 +18,8 @@ import {
 
 (async () => {
   const config = (await Configuration.new()).data;
+
+  const successesPerMinute = new IntervalCounter((1).minutes());
 
   const cache = await Cache.new(config.cache.store);
 
@@ -61,10 +63,14 @@ import {
       }
       try {
         const response = await axios.request(options);
-        console.log(`${timer.elapsed?.unitifyTime()} ${options.url.gray}`);
         res.status(response.status);
         res.set(response.headers);
         response.data.pipe(res);
+        // When the response ends
+        response.data.on("end", async () => {
+          console.log(`${timer.elapsed?.unitifyTime()} ${options.url.gray}`);
+          successesPerMinute.track(1);
+        });
       } catch (ex: any) {
         // Some HTTP status codes are not errors (304 Not Modified, 404 Not Found, etc.)
         const targetIsDown =
