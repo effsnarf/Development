@@ -17,12 +17,16 @@ if (typeof require != "undefined") {
   const _fetchQueue = [];
 
   const getNextFetchItem = (alreadyAttempted) => {
-    if (alreadyAttempted) {
-      return _fetchQueue.filter(item => (item.attempt > 0))[0];
+    const getItem = () => {
+      if (alreadyAttempted) {
+        return _fetchQueue.filter(item => (item.attempt > 0))[0];
+      }
+      else {
+        return _fetchQueue.filter(item => (item.attempt == 0))[0];
+      }
     }
-    else {
-      return _fetchQueue.filter(item => (item.attempt == 0))[0];
-    }
+    const item = getItem();
+    console.log(item);
   }
 
   const removeFetchItem = (id) => {
@@ -44,7 +48,7 @@ if (typeof require != "undefined") {
     }
     catch (ex)
     {
-      alertify.error(`Error fetching data: ${ex.message}.\nprocessFetchQueue(true) to retry.`);
+      alertify.error(`<h3>${item.args[0]}</h3>Error fetching data:\n${ex.message}.\nprocessFetchQueue(true) to retry.`);
 
       item.reject(ex);
     }
