@@ -596,6 +596,7 @@ class LoadBalancer {
         // Add the url to the cache queue
         this.cacheQueue.set(url, true);
       }
+      this.events.emit("cache-queue", this.cacheQueue.size);
     }
 
     let logMsg = request.url || "";

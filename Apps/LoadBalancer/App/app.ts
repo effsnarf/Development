@@ -21,6 +21,8 @@ import {
 } from "@shared/Console";
 import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
 
+let cacheQueueSize = 0;
+
 (async () => {
   // #region Configuration
   const configObj = await Configuration.new({
@@ -55,7 +57,7 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
       `cpu`.gray
     } ${System.usage.cpu.unitifyPercent()}) (${System.usage.memory.unitifySize()}) (${
       `mc`.gray
-    } ${memoryCacheItems})`;
+    } ${memoryCacheItems}) ${`cq`.gray}} ${cacheQueueSize}`;
   };
 
   const getNodeLogTitle = (
@@ -328,6 +330,9 @@ import { LoadBalancer, IncomingItem } from "@shared/LoadBalancer";
     counterLog.text =
       loadBalancer.stats.requests.per.minute.count.toLocaleString();
     processedItemsLog.title = `${loadBalancer.incomingItems.getItems().length}`;
+  });
+  loadBalancer.events.on("cache-queue", (count: any) => {
+    cacheQueueSize = count;
   });
   // Update health check status in the dashboard
   loadBalancer.events.on(
