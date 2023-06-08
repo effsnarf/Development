@@ -185,6 +185,7 @@ class IncomingItemCollection {
 class LoadBalancer {
   incomingItemID: number = 1;
   cache!: CacheBase | null;
+  cacheQueue: Map<string, boolean> = new Map();
   events = new Events();
   analytics = null as unknown as Analytics;
   private readonly nodeSwitcher = new NodeSwitcher(this.events);
@@ -583,6 +584,19 @@ class LoadBalancer {
     }
 
     const url = `${nodeItem.node.address.protocol}://${nodeItem.node.address.host}:${nodeItem.node.address.port}${request.url}`;
+
+    // If we're just background processing the request to update the cache
+    if (!incomingItem.returnToClient) {
+      // If the cache queue already has this url
+      if (this.cacheQueue.has(url)) {
+        // Remove the item from the queue
+        this.incomingItems.remove(incomingItem);
+        return;
+      } else {
+        // Add the url to the cache queue
+        this.cacheQueue.set(url, true);
+      }
+    }
 
     let logMsg = request.url || "";
 
