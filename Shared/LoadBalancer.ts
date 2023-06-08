@@ -589,14 +589,15 @@ class LoadBalancer {
 
     // If we're just background processing the request to update the cache
     if (!incomingItem.returnToClient) {
+      const cacheKey = request.url || "";
       // If the cache queue already has this url
-      if (this.cacheQueue.has(url)) {
+      if (this.cacheQueue.has(cacheKey)) {
         // Remove the item from the queue
         this.incomingItems.remove(incomingItem);
         return;
       } else {
         // Add the url to the cache queue
-        this.cacheQueue.set(url, true);
+        this.cacheQueue.set(cacheKey, true);
       }
       this.events.emit("cache-queue", this.cacheQueue.size);
     }
