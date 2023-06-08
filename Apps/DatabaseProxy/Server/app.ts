@@ -348,7 +348,7 @@ const getResponseSize = (response: any) => {
             req.url.bgRed,
             ex.message?.bgRed
           );
-          res.send(ex.stack || ex);
+          res.end(ex.stack || ex);
         }
       };
     };
