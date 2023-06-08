@@ -5,6 +5,9 @@ import { Timer } from "../Timer";
 import { DatabaseBase } from "./DatabaseBase";
 import { MongoClient, ObjectId } from "mongodb";
 
+interface MongoDatabaseOptions {
+  verifyDatabaseExists: boolean;
+}
 class MongoDatabase extends DatabaseBase {
   private client: MongoClient;
 
@@ -13,10 +16,24 @@ class MongoDatabase extends DatabaseBase {
     this.client = new MongoClient(connectionString);
   }
 
-  public static async new(connectionString: string, database: string) {
-    // console.log("Connecting to MongoDB...".gray);
-    // console.log(`  ${connectionString.yellow}`);
-    // console.log(`  ${database.green}`);
+  public static async new(
+    connectionString: string,
+    database: string,
+    options: MongoDatabaseOptions = {
+      verifyDatabaseExists: false,
+    }
+  ) {
+    if (options.verifyDatabaseExists) {
+      // Check whether the database exists
+      const databaseNames = await MongoDatabase.getDatabaseNames(
+        connectionString
+      );
+      if (!databaseNames.find((d) => d === database)) {
+        throw new Error(
+          `Database ${database} not found (${connectionString})).`
+        );
+      }
+    }
 
     const db = new MongoDatabase(connectionString, database);
     await db.client.connect();

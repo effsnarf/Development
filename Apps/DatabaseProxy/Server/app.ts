@@ -169,7 +169,8 @@ const getResponseSize = (response: any) => {
       if (!dbs._dbs.has(dbName)) {
         const db = await MongoDatabase.new(
           config.database.connectionString,
-          dbName
+          dbName,
+          { verifyDatabaseExists: true }
         );
 
         Reflection.bindClassMethods(
