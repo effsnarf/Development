@@ -38,8 +38,6 @@ let cacheQueueSize = 0;
   // #region Helper functions
   const uptime = Timer.start();
 
-  // test
-
   const getMainTitle = (
     count: number = 0,
     countPerSecond: number = 0,
