@@ -19,11 +19,6 @@ var liveData = {
     },
     user: {
       get: async(user) => {
-        const cachedUser = await Local.cache.get("User", () => user);
-        if (user._id != cachedUser._id)
-        {
-          await Local.cache.set("User", user);
-        }
         const _ids = user.data.componentClasses._ids
           .filter(id => id);
         let userComps = await (Local.db.ComponentClasses.where("_id").anyOf(..._ids)).toArray();
