@@ -46,7 +46,6 @@ const malkovitch = new Malkovich();
     "Shared",
     "LoadBalancer.ts",
     "LoadBalancer",
-    "sendToClient",
   ]);
 
   console.log(parts1);

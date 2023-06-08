@@ -234,7 +234,7 @@ const getResponseSize = (response: any) => {
         axios({
           method: method,
           url: proxyUrl,
-          data: body,
+          //data: body,
         })
           .then((response: any) => {
             itemsLog.log(
@@ -291,10 +291,10 @@ const getResponseSize = (response: any) => {
                     ])
                   ),
                 proxyUrl,
-                JSON.stringify(ex.response.data).bgRed
+                ex.message.bgRed
               );
             }
-            res.status(ex.response.status).send(ex.response.data);
+            res.status(ex.response.status).send(ex.message);
           });
         return;
       });
