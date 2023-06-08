@@ -330,7 +330,6 @@ const getResponseSize = (response: any) => {
             req.url
           );
         } catch (ex: any) {
-          res.status(500);
           debugLogger.log(ex.stack || ex);
           itemsLog.log(
             req.method,
@@ -345,10 +344,24 @@ const getResponseSize = (response: any) => {
                   "<" | ">"
                 ])
               ),
-            req.url.bgRed,
+            req.url.bgRed
+          );
+          itemsLog.log(
+            req.method,
+            res.statusCode.severifyByHttpStatus(),
+            getResponseSize(res)?.unitifySize(),
+            timer.elapsed
+              ?.unitifyTime()
+              .severify(
+                ...(config.requests.severity.time as [
+                  number,
+                  number,
+                  "<" | ">"
+                ])
+              ),
             ex.message?.bgRed
           );
-          res.end(ex.stack || ex);
+          return res.status(500).end(ex.stack || ex);
         }
       };
     };
