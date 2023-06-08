@@ -49,15 +49,15 @@ let cacheQueueSize = 0;
     //   config.title
     // } ─ ${config.incoming.address.stringifyAddress()}`;
     const items = count;
-    return `${title} ─ (${
+    return `${title} ─ ${
       `up`.gray
-    } ${uptime.elapsed?.unitifyTime()}) (${items.severify(10, 30, "<")} ${
-      `reqs`.gray
-    }) (${
+    }${uptime.elapsed?.unitifyTime()} ${items.severify(10, 30, "<")}${
+      `rq`.gray
+    } ${
       `cpu`.gray
-    } ${System.usage.cpu.unitifyPercent()}) (${System.usage.memory.unitifySize()}) (${
+    }${System.usage.cpu.unitifyPercent()} ${System.usage.memory.unitifySize()} ${
       `mc`.gray
-    } ${memoryCacheItems}) ${`cq`.gray}} ${cacheQueueSize}`;
+    }${memoryCacheItems} ${`cq`.gray}${cacheQueueSize}`;
   };
 
   const getNodeLogTitle = (

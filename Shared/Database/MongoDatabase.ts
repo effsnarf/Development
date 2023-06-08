@@ -18,14 +18,6 @@ class MongoDatabase extends DatabaseBase {
     // console.log(`  ${connectionString.yellow}`);
     // console.log(`  ${database.green}`);
 
-    // Check whether the database exists
-    const databaseNames = await MongoDatabase.getDatabaseNames(
-      connectionString
-    );
-    if (!databaseNames.find((d) => d === database)) {
-      throw new Error(`Database ${database} not found (${connectionString})).`);
-    }
-
     const db = new MongoDatabase(connectionString, database);
     await db.client.connect();
     return db;
