@@ -394,6 +394,7 @@ class LoadBalancer {
               incomingItem.request.url || "",
               cachedResponse
             );
+            this.cacheQueue.delete(incomingItem.request.url || "");
           }
         } catch (ex: any) {
           this.log(`${`Error caching response`}\n${ex.message}`);
@@ -531,6 +532,7 @@ class LoadBalancer {
       // We've reached the maximum number of attempts
       // Remove the item from the queue
       this.removeIncomingItem(incomingItem, ex.status);
+      this.cacheQueue.delete(incomingItem.request.url || "");
     }
   }
 
