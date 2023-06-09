@@ -1621,6 +1621,13 @@ var compDom = {
       return attr.name.getWords()[0];
     }
   },
+  stringify: {
+    css: {
+      rules: (rules) => {
+        return rules.map(r => `${r.selectors.join(', ')}\n{\n${r.declarations.map(d => `  ${d.property}: ${d.value};`).join('\n')}\n}`).join('\n\n');
+      }
+    }
+  },
   resolve: (obj) => {
     if (!obj) return obj;
     obj = JSON.parse(JSON.stringify(obj));
