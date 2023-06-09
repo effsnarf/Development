@@ -135,8 +135,7 @@ if (typeof require != "undefined") {
 
       if (options?.cache) {
         const fetchContent = async () => {
-          var str = await (await fetch(url, this.fetchOptions)).text();
-          const data = parseJSON(str);
+          var data = await (await fetch(url, this.fetchOptions)).json();
           Local.cache.set(url, { dt: Date.now(), data: data });
           return data;
         };
@@ -162,19 +161,11 @@ if (typeof require != "undefined") {
       }
   
       if (this.logToConsole) console.log(`fetching ${url}`, this.fetchOptions);
-      var str = await (await fetch(url, this.fetchOptions)).text();
-      try {
-        var data = parseJSON(str);
-  
-        if (this.cache.enabled) this.cache.items[url] = { dt: now, data: data };
-  
+      var data = await (await fetch(url, this.fetchOptions)).json();
+      if (this.cache.enabled) this.cache.items[url] = { dt: now, data: data };
         //if (this.logToConsole) console.log(data, ` returned from `, url);
-  
-        return data;
-      } catch (ex) {
-        throw str;
-      }
-    };
+      return data;
+  };
 
     // #endregion
   

@@ -150,19 +150,11 @@ anat.dev.DatabaseProxy = function (host, database, protocol, userID) {
     }
 
     if (this.logToConsole) console.log(`fetching ${url}`, this.fetchOptions);
-    var str = await (await fetch(url, this.fetchOptions)).text();
-    try {
-      var data = parseJSON(str);
-
-      if (this.cache.enabled) this.cache.items[url] = { dt: now, data: data };
-
-      //if (this.logToConsole) console.log(data, ` returned from `, url);
-
-      return data;
-    } catch (ex) {
-      throw str;
-    }
-  };
+    var data = await (await fetch(url, this.fetchOptions)).json();
+    if (this.cache.enabled) this.cache.items[url] = { dt: now, data: data };
+    //if (this.logToConsole) console.log(data, ` returned from `, url);
+    return data;
+};
 
   var StoreQueue = function () {
     this.items = {};
