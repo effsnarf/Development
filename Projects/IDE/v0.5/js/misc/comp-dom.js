@@ -160,6 +160,7 @@ var compDom = {
       if (comp.data) delete comp.data;
       
       await compDom.fix.methods(comp);
+      await compDom.fix.styles(comp);
       await compDom.fix.options(comp);
       await compDom.fix.errors(comp);
       for (let prop of comp.props) await compDom.fix.prop(prop);
@@ -187,6 +188,17 @@ var compDom = {
         method.options = (method.options || {});
         method.options.rateLimit = (method.options.rateLimit || { enabled: false, delay: 400 });
         method.options.cache = (method.options.cache || {});
+      }
+    },
+    styles: async (comp) => {
+      for (style of comp.styles)
+      {
+        if (!style.id) style.id = (await compDom.get.new.id());
+        if (!style.rules)
+        {
+          const rules = css.parse(style.css).stylesheet.rules.filter(r => (r.type == `rule`));
+          style.rules = rules.map(r => { return { selectors: r.selectors, declarations: r.declarations.filter(d => (d.type=='declaration')).map(d => { return { property: d.property, value: d.value, enabled: true } } ) } });
+        }
       }
     },
     node: async (node, comp) => {
