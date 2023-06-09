@@ -190,17 +190,6 @@ var compDom = {
         method.options.cache = (method.options.cache || {});
       }
     },
-    styles: async (comp) => {
-      for (style of comp.styles)
-      {
-        if (!style.id) style.id = (await compDom.get.new.id());
-        if (!style.rules)
-        {
-          const rules = css.parse(style.css).stylesheet.rules.filter(r => (r.type == `rule`));
-          style.rules = rules.map(r => { return { selectors: r.selectors, declarations: r.declarations.filter(d => (d.type=='declaration')).map(d => { return { property: d.property, value: d.value, enabled: true } } ) } });
-        }
-      }
-    },
     node: async (node, comp) => {
       //console.log(`Fixing node ${node.id}`);
       if (!node.id)
@@ -273,10 +262,20 @@ var compDom = {
       delete obj[key];
       obj[key] = value;
     },
-    styles: (comp) => {
+    styles: async (comp) => {
       comp.styles = (comp.styles || []);
-      if (!comp.styles.length) comp.styles.push({ name: "default", css: null });
-    }
+      if (!comp.styles.length) comp.styles.push({ name: "default", rules: [] });
+
+      for (style of comp.styles)
+      {
+        if (!style.id) style.id = (await compDom.get.new.id());
+        if (!style.rules)
+        {
+          const rules = css.parse(style.css||"").stylesheet.rules.filter(r => (r.type == `rule`));
+          style.rules = rules.map(r => { return { selectors: r.selectors, declarations: r.declarations.filter(d => (d.type=='declaration')).map(d => { return { property: d.property, value: d.value, enabled: true } } ) } });
+        }
+      }
+    },
   },
   item: {
     to: {
