@@ -639,7 +639,16 @@ compiler.toVueTemplate = async (compClass, origComp) => {
     compileTimer2.log(`toVueTemplate.1`, timer2.elapsed);
     timer2.restart();
 
-    var html = await Local.cache.get(compDom.get.node.cache.key(compClass, compClass.view.node), () => util.haml(viewDom.nodeToHaml(compClass, compClass.view.node, 0, cbNode, true)));
+    var viewNodeKey = compDom.get.node.cache.key(compClass, compClass.view.node);
+    var computeHtml = () => util.haml(viewDom.nodeToHaml(compClass, compClass.view.node, 0, cbNode, true));
+    var html = null;
+    if (ideVueApp.isIniting) {
+      html = await Local.cache.get(viewNodeKey, computeHtml);
+    }
+    else {
+      html = computeHtml();
+      await Local.cache.set(viewNodeKey, html);
+    }
 
     compileTimer2.log(`toVueTemplate.3`, timer2.elapsed);
     timer2.restart();
