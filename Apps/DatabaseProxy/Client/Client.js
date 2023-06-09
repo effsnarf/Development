@@ -32,7 +32,9 @@ if (typeof require != "undefined") {
   }
 
   const processFetchQueue = async () => {
-    ideVueApp.fetchQueueLength = _fetchQueue.length;
+    if (window.ideVueApp) {
+      ideVueApp.fetchQueueLength = _fetchQueue.length;
+    }
     const nextTimeout = 100;
     const item = getNextFetchItem();
     if (!item) return setTimeout(processFetchQueue, nextTimeout);
