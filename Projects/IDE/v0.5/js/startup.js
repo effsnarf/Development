@@ -158,6 +158,7 @@ document.addEventListener("DOMContentLoaded", async function() {
         showSplashIntro: false,
         showWorkspace: false,
         key1: 1,
+        fetchQueueLength: 0,
         funcs: {
           ide: [],
           user: []

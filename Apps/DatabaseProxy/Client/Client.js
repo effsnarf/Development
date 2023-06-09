@@ -16,14 +16,11 @@ if (typeof require != "undefined") {
   let _fetchItemID = 1;
   const _fetchQueue = [];
 
-  const getNextFetchItem = (alreadyAttempted) => {
+  const getNextFetchItem = () => {
     const getItem = () => {
-      if (alreadyAttempted) {
-        return _fetchQueue.filter(item => (item.attempt > 0))[0];
-      }
-      else {
-        return _fetchQueue.filter(item => (item.attempt == 0))[0];
-      }
+      //  Sort by attempt descending
+      _fetchQueue.sort((a, b) => (b.attempt - a.attempt));
+      return _fetchQueue[0];
     }
     const item = getItem();
     return item;
@@ -34,9 +31,10 @@ if (typeof require != "undefined") {
     if (index >= 0) _fetchQueue.splice(index, 1);
   }
 
-  const processFetchQueue = async (alreadyAttempted) => {
+  const processFetchQueue = async () => {
+    ideVueApp.fetchQueueLength = _fetchQueue.length;
     const nextTimeout = 100;
-    const item = getNextFetchItem(alreadyAttempted);
+    const item = getNextFetchItem();
     if (!item) return setTimeout(processFetchQueue, nextTimeout);
 
     try
@@ -48,9 +46,8 @@ if (typeof require != "undefined") {
     }
     catch (ex)
     {
-      alertify.error(`<h3>${item.args[0]}</h3>Error fetching data:\n${ex.message}.\nprocessFetchQueue(true) to retry.`);
-
-      item.reject(ex);
+      //alertify.error(`<h3>${item.args[0]}</h3>Error fetching data:\n${ex.message}.\nprocessFetchQueue(true) to retry.`);
+      //item.reject(ex);
     }
     finally
     {
