@@ -134,8 +134,7 @@ const isCachable = (options: any, config: any) => {
         if (targetIsDown) {
           // Try the cache
           if (await cache.has(cacheKey)) {
-            const isCachable = isCachable(options, config);
-            if (isCachable) {
+            if (isCachable(options, config)) {
               const cachedResponse = await cache.get(cacheKey);
               if (cachedResponse) {
                 stats.cache.hits.track(1);
