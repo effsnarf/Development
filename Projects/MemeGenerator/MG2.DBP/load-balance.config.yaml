@@ -14,7 +14,7 @@ incoming:
     max:
       age: 10m
     ignore:
-      - /api/
+      - /create/
       - /get/new/id
       - /googleLogin
     store:
