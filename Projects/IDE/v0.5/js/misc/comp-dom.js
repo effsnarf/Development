@@ -241,6 +241,14 @@ var compDom = {
         var propTypeComp = ideVueApp.getIdeComp(prop.type);
         if (propTypeComp) prop.type = { comp: { _id: propTypeComp._id } };
       }
+      if (prop.watch.handler && !prop.watch.method)
+      {
+        prop.watch.method = {
+          args: "value, oldValue",
+          body: prop.watch.handler,
+        }
+        delete prop.watch.handler;
+      }
       prop.errors = (prop.errors || []);
       if (!("routeParam" in prop)) prop.routeParam = {enabled: false};
       if (!("example" in prop)) prop.example = { enabled: false, value: null };
