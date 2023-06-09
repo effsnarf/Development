@@ -32,11 +32,12 @@ const logNewLine = (...args: any[]) => {
   console.log(...args);
 };
 
-const isCachable = (options: any, config: any) {
+const isCachable = (options: any, config: any) => {
   if (options.method != "GET") return false;
-  if (config.cache.ignore.find((c: any) => options.url.startsWith(c))) return false;
+  if (config.cache.ignore.find((c: any) => options.url.startsWith(c)))
+    return false;
   return true;
-}
+};
 
 (async () => {
   const config = (await Configuration.new()).data;
