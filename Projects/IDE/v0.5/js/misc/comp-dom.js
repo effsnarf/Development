@@ -160,11 +160,10 @@ var compDom = {
       if (comp.data) delete comp.data;
       
       await compDom.fix.methods(comp);
-      await compDom.fix.styles(comp);
       await compDom.fix.options(comp);
       await compDom.fix.errors(comp);
       for (let prop of comp.props) await compDom.fix.prop(prop);
-      //compDom.fix.styles(comp);
+      await compDom.fix.styles(comp);
       var nodes = compDom.get.all.nodes(comp);
       //console.log(`${nodes.length} nodes`);
       for (node of nodes) { await compDom.fix.node(node, comp); };

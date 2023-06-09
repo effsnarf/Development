@@ -32,6 +32,12 @@ const logNewLine = (...args: any[]) => {
   console.log(...args);
 };
 
+const isCachable = (options: any, config: any) {
+  if (options.method != "GET") return false;
+  if (config.cache.ignore.find((c: any) => options.url.startsWith(c))) return false;
+  return true;
+}
+
 (async () => {
   const config = (await Configuration.new()).data;
 
@@ -127,9 +133,7 @@ const logNewLine = (...args: any[]) => {
         if (targetIsDown) {
           // Try the cache
           if (await cache.has(cacheKey)) {
-            const isCachable = !config.cache.ignore.find((c: any) =>
-              options.url.startsWith(c)
-            );
+            const isCachable = isCachable(options, config);
             if (isCachable) {
               const cachedResponse = await cache.get(cacheKey);
               if (cachedResponse) {
