@@ -26,7 +26,7 @@ if (typeof require != "undefined") {
       }
     }
     const item = getItem();
-    console.log(item);
+    return item;
   }
 
   const removeFetchItem = (id) => {
