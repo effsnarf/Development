@@ -265,7 +265,9 @@ document.addEventListener("DOMContentLoaded", async function() {
           }
           $(`.body-background`).fadeIn(3000);
           //this.refresh();
-          this.reload();
+          ideVueApp.isIniting = true;
+          await this.reload();
+          ideVueApp.isIniting = false;
         },
         initIde: async function() {
           this.showWorkspace = false;
