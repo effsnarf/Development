@@ -1624,6 +1624,7 @@ var compDom = {
   stringify: {
     css: {
       rules: (rules) => {
+        if (!rules?.length) return null;
         return rules.map(r => `${r.selectors.join(', ')}\n{\n${r.declarations.map(d => `  ${d.property}: ${d.value};`).join('\n')}\n}`).join('\n\n');
       }
     }
