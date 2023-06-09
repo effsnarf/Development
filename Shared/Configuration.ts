@@ -302,7 +302,7 @@ class Configuration {
   }
 
   static getConfigContext(configData: any) {
-    const context = { process, path, config: configData } as any;
+    const context = { os, process, path, config: configData } as any;
     context.getLogPath = (title: string) =>
       Configuration.getLogPath(configData, title);
     return context;

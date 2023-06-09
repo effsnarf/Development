@@ -1,1 +1,1 @@
-node main.js
+ts-node main.ts

@@ -172,7 +172,7 @@ class FileSystemDatabase extends DatabaseBase {
   }
 
   private getFilePath(collectionName: string, key: any) {
-    if (typeof key != "number") throw new Error("Key must be a number");
+    key = key.toString().hashCode();
     const id = key as number;
     const dir1 = Math.floor(id / 1000000).toString();
     const dir2 = Math.floor(id / 1000).toString();

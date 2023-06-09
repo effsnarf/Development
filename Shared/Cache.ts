@@ -232,21 +232,16 @@ class DatabaseCache extends CacheBase {
   }
 
   async get(key: string, getDefaultValue?: () => any) {
-    try {
-      const value = await this.db.get(key);
-      if (value) {
-        this.health.track(true);
-        return value;
-      }
-      this.health.track(false);
-      if (!getDefaultValue) return null;
-      const defaultValue = await getDefaultValue();
-      await this.db.set(key, defaultValue);
-      return defaultValue;
-    } catch (ex) {
-      this.events.emit("error", ex);
-      return null;
+    const value = await this.db.get(key);
+    if (value) {
+      this.health.track(true);
+      return value;
     }
+    this.health.track(false);
+    if (!getDefaultValue) return null;
+    const defaultValue = await getDefaultValue();
+    await this.db.set(key, defaultValue);
+    return defaultValue;
   }
 
   set(key: string, value: any) {

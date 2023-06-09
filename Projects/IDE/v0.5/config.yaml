@@ -1,0 +1,4 @@
+title: IDE
+cache:
+  database:
+    path: (env) => env.path.resolve(env.os.tmpdir(), "Cache", env.config.title)
