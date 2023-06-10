@@ -38,17 +38,25 @@ const malkovitch = new Malkovich();
 (async () => {
   //const config = (await Configuration.new()).data;
 
-  console.log("test".blue.bold);
-
   const root = await LiveTree.Api.getFolder("c:/eff/Development");
 
-  const parts1 = await root.getSubParts([
-    "Shared",
-    "LoadBalancer.ts",
-    "LoadBalancer",
-  ]);
+  const path = ["Shared", "Timer.ts", "Timer"];
 
-  console.log(parts1);
+  let node = root as LiveTree.Node | undefined;
+  while (path.length) {
+    await node?.populate();
+    node = await node?.find(path.shift() || "");
+  }
+  await node?.populate();
+
+  console.log(
+    util.inspect(
+      await root.select((n) => {
+        return { title: n.title, info: n.info };
+      }),
+      { depth: 10, colors: true }
+    )
+  );
 
   // // Create the express app
   // const httpServer = express();
