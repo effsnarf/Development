@@ -1,0 +1,6 @@
+dom:
+  div:
+    layout.header:
+    div:
+      layout.sidebar:
+      layout.main:

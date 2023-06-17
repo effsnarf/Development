@@ -87,6 +87,10 @@ class Objects {
     return jsyaml.dump(obj);
   }
 
+  static parseYaml(str: string): any {
+    return jsyaml.load(str);
+  }
+
   static jsonify(obj: any): string {
     try {
       return JSON.stringify(obj, null, 2);

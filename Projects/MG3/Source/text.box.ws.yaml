@@ -1,0 +1,14 @@
+dom:
+  input:
+    type: text
+    value: value
+    @input: onInput
+props:
+  value:
+  hint:
+methods:
+  onInput: | #ts
+    function(e) {
+      this.value = e.target.value;
+      this.$emit('input', this.value);
+    }

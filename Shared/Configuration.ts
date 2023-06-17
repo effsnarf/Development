@@ -75,7 +75,7 @@ class Configuration {
       })
       .map((cp) => {
         // Parse the YAML content
-        return { ...cp, data: jsyaml.load(cp.yaml) as any };
+        return { ...cp, data: (jsyaml.load(cp.yaml) as any) || {} };
       })
       .map((cp) =>
         // Replace all relative paths with absolute paths

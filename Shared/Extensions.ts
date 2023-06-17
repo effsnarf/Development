@@ -322,6 +322,7 @@ interface Array<T> {
   sortBy(...projects: ((item: T) => any)[]): T[];
   sortByDesc(...projects: ((item: T) => any)[]): T[];
   stringify(): string;
+  onlyTruthy<T>(): T[];
 }
 
 interface Function {
@@ -1243,6 +1244,10 @@ if (typeof Array !== "undefined") {
 
   Array.prototype.stringify = function (): any {
     return JSON.stringify(this);
+  };
+
+  Array.prototype.onlyTruthy = function (): any {
+    return this.filter((item) => !!item);
   };
 }
 // #endregion

@@ -1,0 +1,7 @@
+dom:
+  - search.box:
+      v-model: $global.search.generator.query
+  - list:
+      v-model: $global.search.generator.list
+      item-type: generator.small
+      bindType: all

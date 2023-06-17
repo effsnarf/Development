@@ -1,0 +1,16 @@
+dom:
+  ul:
+    li:
+      v-for: item in items
+      component:
+        v-if: (bindType='all')
+        :is: itemType
+        v-bind: item
+      component:
+        v-if: (bindType!='all')
+        :is: itemType
+        value: item
+props:
+  itemType:
+  items: []
+  bindType: null

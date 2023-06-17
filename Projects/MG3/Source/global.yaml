@@ -1,0 +1,12 @@
+data:
+  search:
+    generator:
+      query:
+        value: ''
+      list: []
+
+@watch:
+  search.generator.query: | #ts
+    function (newValue) {
+      $global.search.generator.list = await $api.generator.search(newValue);
+    }

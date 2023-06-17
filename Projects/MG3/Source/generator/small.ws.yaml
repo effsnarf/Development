@@ -1,0 +1,14 @@
+dom:
+  link:
+    :url: /${urlName}
+    layout.horizontal.1:
+      image:
+        :url: $urls.image(imageID)
+      layout.vertical.1:
+        text: displayName
+        number: instancesCount
+props:
+  imageID:
+  urlName:
+  displayName:
+  instancesCount:

@@ -1,0 +1,34 @@
+<template lang="pug">
+{{{dom dom}}}
+</template>
+
+<script>
+export default {
+  props: {
+    {{#each props}}
+    {{@key}}: {{or this "null"}},
+    {{/each}}
+  },
+  data () {
+    return {
+        {{#each data}}
+        {{@key}}: {{or this "null"}},
+        {{/each}}
+    }
+  },
+  methods: {
+    {{#each methods}}
+    {{@key}}: {{{this}}}
+    {{/each}}
+  },
+  computed: {
+
+  },
+  watch: {
+
+  },
+  mounted () {
+
+  }
+}
+</script>

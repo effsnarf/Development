@@ -18,8 +18,7 @@ namespace LiveTree {
   }
 
   export interface NodeInfo {
-    namespace: string | null;
-    type: string;
+    type: string[];
     args: any[];
   }
 
@@ -40,7 +39,10 @@ namespace LiveTree {
     children!: Node[];
 
     constructor(namespace: string | null, args: any[], public title: Title) {
-      this.info = { namespace, type: this.constructor.name, args };
+      this.info = {
+        type: [namespace, this.constructor.name].onlyTruthy<string>(),
+        args,
+      };
     }
 
     abstract getParent(): Promise<Node | null>;

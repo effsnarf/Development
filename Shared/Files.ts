@@ -75,6 +75,38 @@ class Files {
     yield* traverseDirectory(folder);
   }
 
+  static getFiles(folder: string, options?: { recursive?: boolean }) {
+    const { recursive = true } = options || {};
+    const files: string[] = [];
+    Files.traverseDirectory(
+      folder,
+      (folder, entry) => {
+        if (entry.isFile()) {
+          files.push(path.join(folder, entry.name));
+        }
+      },
+      options
+    );
+    return files;
+  }
+
+  static traverseDirectory(
+    folder: string,
+    callback: (folder: string, entry: fs.Dirent) => void,
+    options?: { recursive?: boolean }
+  ) {
+    const { recursive = true } = options || {};
+    let currentPath = path.resolve(folder);
+    const entries = fs.readdirSync(currentPath, { withFileTypes: true });
+
+    for (const entry of entries) {
+      callback(currentPath, entry);
+      if (entry.isDirectory() && recursive) {
+        this.traverseDirectory(path.join(currentPath, entry.name), callback);
+      }
+    }
+  }
+
   static watch(
     paths: string[],
     options: { recursive: boolean; exclude: string[] } = {
