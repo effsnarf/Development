@@ -62,9 +62,8 @@ class HttpServer {
       if (!ex.message.includes("favicon.ico")) {
         console.log(`${ex.message?.bgRed}`);
       }
-      if (ex.status) {
-        res.status = ex.status;
-      }
+      // Set status code 500
+      res.statusCode = ex.status || 500;
       res.end(ex.message);
     }
   }

@@ -18,6 +18,8 @@ class ClientContext {
       lock.release();
     }
   }
+
+  static _fetch: any;
   // #endregion
 
   db!: ClientDatabase;
@@ -50,6 +52,9 @@ class ClientContext {
   }
 
   private async init() {
+    ClientContext._fetch = window.fetch.bind(null);
+    (window as any).fetch = ClientContext.fetch;
+
     this.db = await ClientDatabase.new("IDE", {
       ModifiedItems: ["key", "modifiedAt", "item"],
     });
@@ -141,7 +146,30 @@ class ClientContext {
 
   async updateComponent(comp: any) {
     const url = `/component/update`;
-    return await (await fetch(url, { method: "post", body: comp })).text();
+    await fetch(url, { method: "post", body: comp });
+  }
+
+  private static async fetch(...args: any[]) {
+    try {
+      const result = await ClientContext._fetch(...args);
+      if (result.status < 500) return result;
+      const text = await result.text();
+      throw new Error(text);
+    } catch (ex: any) {
+      const url = args[0];
+      ClientContext.alertify
+        .error(`<h3>${ex.message}</h3><pre>${url}</pre>`)
+        .delay(0);
+      throw ex;
+    }
+  }
+
+  static get alertify() {
+    return (window as any).alertify;
+  }
+
+  get alertify() {
+    return ClientContext.alertify;
   }
 }
 
