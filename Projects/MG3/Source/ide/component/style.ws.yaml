@@ -11,7 +11,7 @@ computed:
     function() {
       if (!this.component?.source?.style) return "";
 
-      const template = this.$root.templates.style;
+      const template = this.$root.client.templates.style;
       const css = Handlebars.compile(template)(this.component);
 
       return css;
