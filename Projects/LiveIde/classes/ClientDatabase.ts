@@ -7,7 +7,7 @@ class ClientDatabase {
   //   ComponentClasses: ["_id", "name", "_item"],
   //   Cache: ["key", "value"],
   // };
-  constructor(dbName: string, collections: any) {
+  private constructor(dbName: string, collections: any) {
     this.db = new Dexie(dbName);
 
     this.db
@@ -22,6 +22,18 @@ class ClientDatabase {
       );
   }
 
+  static async new(dbName: string, collections: any) {
+    const db = new ClientDatabase(dbName, collections);
+    return db;
+  }
+
+  async pop(collection: string) {
+    const item = await this.db[collection].toCollection().first();
+    if (!item) return null;
+    await this.db[collection].delete(item.key);
+    return item;
+  }
+
   async upsert(collection: string, item: any) {
     await this.db[collection].put(item);
   }
@@ -30,3 +42,5 @@ class ClientDatabase {
     await this.db[collection].bulkPut(items);
   }
 }
+
+export { ClientDatabase };

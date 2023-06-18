@@ -1,3 +1,5 @@
+import { RepeatingTaskQueue } from "./RepeatingTaskQueue";
+
 class DefaultDataComparer {
   clone(o1: any): any {
     if (o1 == null) return null;
@@ -11,38 +13,53 @@ class DefaultDataComparer {
 }
 
 class DataWatcher {
-  private isRunning: boolean = false;
-  private checkInterval: number = 1000;
+  // #region Global
+  private static get _queue() {
+    return (window as any)._dataWatcherQueue as RepeatingTaskQueue;
+  }
+
+  private static set _queue(value) {
+    (window as any)._dataWatcherQueue = value;
+  }
+
+  static get queue() {
+    if (!DataWatcher._queue) {
+      DataWatcher._queue = RepeatingTaskQueue.new();
+    }
+    return DataWatcher._queue;
+  }
+  // #endregion
+
   private dataComparer: DefaultDataComparer = new DefaultDataComparer();
   private data: any;
 
-  constructor(
+  private constructor(
     private getData: () => any,
     private onChange: (newData: any, oldData: any) => Promise<void>
   ) {
     this.data = this.dataComparer.clone(getData());
 
-    this.start();
+    DataWatcher.queue.enqueue(this.check.bind(this));
   }
 
-  start() {
-    if (this.isRunning) return;
-    this.isRunning = true;
-    this.check();
-  }
-
-  stop() {
-    this.isRunning = false;
+  static async new(
+    getData: () => any,
+    onChange: (newData: any, oldData: any) => Promise<void>
+  ) {
+    const watcher = new DataWatcher(getData, onChange);
+    return watcher;
   }
 
   private async check() {
-    if (!this.isRunning) return;
-    const newData = this.getData();
+    const newData = this.dataComparer.clone(this.getData());
     if (!this.dataComparer.areEqual(this.data, newData)) {
-      await this.onChange(newData, this.data);
+      try {
+        await this.onChange(newData, this.data);
+      } catch (ex) {
+        console.error(ex);
+      }
       this.data = newData;
     }
-    setTimeout(this.check, this.checkInterval);
   }
 }
 

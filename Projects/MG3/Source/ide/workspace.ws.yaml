@@ -1,7 +1,6 @@
 dom:
   div:
     class: flex
-    style: "gap: 2em;"
 
     ide.component.editor:
       :component: selectedComponent

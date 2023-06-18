@@ -11,7 +11,7 @@ import { ClientContext } from "../../classes/ClientContext";
     el: "#app",
     data: {
       comps: client.Vue.ref(client.comps),
-      client: client,
+      templates: client.templates,
       key1: 1,
     },
     async mounted() {},

@@ -1,19 +1,26 @@
+import { Lock } from "../../../Shared/Lock";
 import toTemplate from "../../../Shared/WebScript/to.template";
 import { Component } from "./Component";
 import { ComponentManager } from "./ComponentManager";
+import { ClientDatabase } from "./ClientDatabase";
 
 class ClientContext {
   // #region Globals
-  private static instance: ClientContext;
-
   static async get() {
-    if (!ClientContext.instance) {
-      ClientContext.instance = await ClientContext.new();
+    const lock = ((window as any)._clientContextLock ||
+      ((window as any)._clientContextLock = new Lock())) as Lock;
+    await lock.acquire();
+    try {
+      return ((window as any)._clientContext ||
+        ((window as any)._clientContext =
+          await ClientContext.new())) as ClientContext;
+    } finally {
+      lock.release();
     }
-    return ClientContext.instance;
   }
-
   // #endregion
+
+  db!: ClientDatabase;
 
   private componentManager!: ComponentManager;
 
@@ -36,13 +43,17 @@ class ClientContext {
 
   private constructor() {}
 
-  static async new() {
+  private static async new() {
     const context = new ClientContext();
     await context.init();
     return context;
   }
 
   private async init() {
+    this.db = await ClientDatabase.new("IDE", {
+      ModifiedItems: ["key", "modifiedAt", "item"],
+    });
+
     this.componentManager = await ComponentManager.get();
 
     this.helpers = (
@@ -126,6 +137,11 @@ class ClientContext {
   async pugToHtml(pug: string) {
     const url = `/pug`;
     return await (await fetch(url, { method: "post", body: pug })).text();
+  }
+
+  async updateComponent(comp: any) {
+    const url = `/component/update`;
+    return await (await fetch(url, { method: "post", body: comp })).text();
   }
 }
 

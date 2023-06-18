@@ -52,6 +52,13 @@ import { TypeScript } from "@shared/TypeScript";
           });
         return res.end(JSON.stringify(comps));
       }
+      if (req.url == "/component/update") {
+        const comp = JSON.parse(data);
+        const compPath = path.join(config.project.folder, comp.path);
+        const yaml = Objects.yamlify(comp.source);
+        fs.writeFileSync(compPath, yaml);
+        return res.end("ok");
+      }
       if (req.url == "/pug") {
         let html = Objects.pugToHtml(data);
         // Vue:
