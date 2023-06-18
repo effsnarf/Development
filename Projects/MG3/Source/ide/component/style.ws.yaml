@@ -1,5 +1,5 @@
 dom:
-  div:
+  style:
     v-if: style
     v-html: style
 

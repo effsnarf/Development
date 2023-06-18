@@ -7,7 +7,7 @@ dom:
       :component: selectedComponent
 
     ui.tree:
-      :root: vueApp
+      :root: () => $root
       :getChildren: "getVueChildren"
       item-type: ide-vue-node
       @node-select: onNodeSelect
@@ -15,16 +15,16 @@ dom:
       @node-hover: onNodeHover
       @node-unhover: onNodeUnhover
 
-    ui.list:
-      v-slot: slotProps
-      :items: comps
-      template:
-        ide.component.style:
-          :component: slotProps.item
+    div:
+      ui.list:
+        v-slot: slotProps
+        :items: comps
+        template:
+          ide.component.style:
+            :component: slotProps.item
 
 props:
   comps:
-  vueApp:
 
 data:
   selectedNode:
@@ -42,7 +42,7 @@ methods:
 
   onNodeClick: | #ts
     function(node) {
-      console.log(node());
+      //console.log(node());
     }
 
   onNodeHover: | #ts

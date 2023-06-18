@@ -1,0 +1,24 @@
+dom:
+  textarea:
+    :value: value
+    @input: "$emit('input', $event.target.value)"
+    @focus: "$emit('focus')"
+    @blur: "$emit('blur')"
+    @keydown: onKeyDown
+
+props:
+  value:
+
+methods:
+  onKeyDown: | #ts
+    (e) => {
+      if (e.key == 'Tab') {
+        e.preventDefault();
+        let start = e.target.selectionStart;
+        let end = e.target.selectionEnd;
+        let value = e.target.value;
+        e.target.value = value.substring(0, start) + "  " + value.substring(end);
+        e.target.selectionStart = e.target.selectionEnd = start + 2;
+      }
+      return false;
+    }

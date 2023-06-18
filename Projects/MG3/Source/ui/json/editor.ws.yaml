@@ -1,0 +1,60 @@
+dom:
+  div:
+    ui.textarea:
+      v-model: yaml
+      @focus: isFocused = true
+      @blur: isFocused = false
+    .error:
+      v-if: error
+      v-text: error
+
+props:
+  value:
+
+data:
+  yaml: ""
+  isFocused: false
+  error: 
+
+methods:
+  updateYamlFromObject: | #ts
+    function() {
+      let yaml = jsyaml.dump(this.value);
+      yaml = yaml.replace(/ null/g, "");
+      this.yaml = yaml;
+    }
+
+watch:
+  value: | #ts
+    {
+      handler: function() {
+        if (this.isFocused) return;
+        this.updateYamlFromObject();
+      },
+      immediate: true
+    }
+  yaml: | #ts
+    {
+      handler() {
+        try
+        {
+          this.error = null;
+          let jso = jsyaml.load(this.yaml);
+          this.$emit('input', jso);
+        }
+        catch (ex)
+        {
+          this.error = ex.message;
+        }
+      }
+    }
+  isFocused: | #ts
+    {
+      handler(newValue) {
+        if (newValue) return;
+        // While editing, we're not updating the YAML from the object
+        // because that would cause the cursor to jump around
+        // When we lose focus, we update the YAML from the object
+        this.updateYamlFromObject();
+      }
+    }

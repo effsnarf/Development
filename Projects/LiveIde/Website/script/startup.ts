@@ -59,17 +59,15 @@ const Vue = (window as any).Vue;
     if (name == "slot") return false;
     if (
       [
-        "h1",
-        "h2",
-        "h3",
-        "h4",
-        "h5",
-        "h6",
+        "style",
+        ...[1, 2, 3, 4, 5, 6].map((i) => `h${i}`),
         "pre",
         "div",
         "span",
         "ul",
         "li",
+        "input",
+        "textarea",
         "component",
       ].includes(name)
     )
@@ -95,9 +93,15 @@ const Vue = (window as any).Vue;
     (c: any) => new Component(c)
   ) as Component[];
 
-  for (const comp of comps) {
-    await compileComp(comp);
-  }
+  const compileAll = async (
+    filter: (comp: Component) => boolean = (c) => true
+  ) => {
+    for (const comp of comps.filter(filter)) {
+      await compileComp(comp);
+    }
+  };
+
+  await compileAll();
 
   const ideVueApp = new Vue({
     el: "#app",
@@ -107,10 +111,21 @@ const Vue = (window as any).Vue;
       templates: {
         style: styleTemplate,
       },
+      key1: 1,
+    },
+    async mounted() {},
+    methods: {
+      async compileApp() {
+        const isIdeComponent = (c: Component) =>
+          ["ui", "ide"].some((p) => c.name.startsWith(`${p}.`));
+        await compileAll((c: Component) => !isIdeComponent(c));
+        this.refresh();
+      },
+      refresh() {
+        (this as any).key1++;
+      },
     },
   });
-
-  ideVueApp.vueApp = () => ideVueApp;
 
   (window as any).ideVueApp = ideVueApp;
 })();

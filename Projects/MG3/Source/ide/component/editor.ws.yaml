@@ -9,16 +9,14 @@ dom:
       :options: "['📁 dom', '🟢 style']"
       template#1:
         v-slot: tab0
-        ide.json.editor: component.source.dom
+        ui.json.editor:
+          v-model: component.source.dom
       template#2:
         v-slot: tab1
-        ide.json.editor: component.source.style
+        ui.json.editor:
+          v-model: component.source.style
 
 props:
   component:
 
 methods:
-  getComponentSource: | #ts
-    function() {
-      return JSON.stringify(this.component?.source, null, 2);
-    }

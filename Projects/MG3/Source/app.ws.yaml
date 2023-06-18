@@ -1,2 +1,8 @@
 dom:
   site:
+
+style:
+  div:
+    background: >-
+      linear-gradient(142deg, rgba(6,43,95,1) 0%, rgba(0,19,48,1) 22%,
+      rgba(0,86,159,1) 100%)

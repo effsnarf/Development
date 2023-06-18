@@ -1,10 +1,11 @@
 dom:
   div:
-    class: image
+    div:
+      class: image
 
 style:
   .image:
-    background: url("/img/banners/(7).jpg")
+    background: url("https://memegenerator.net/img/banners/(7).jpg")
     width: calc(100% - 4em)
     height: calc(100% - 1em)
     min-width: 20em

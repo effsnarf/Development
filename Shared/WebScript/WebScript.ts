@@ -95,17 +95,15 @@ class WebScript {
     if (name == "slot") return false;
     if (
       [
-        "h1",
-        "h2",
-        "h3",
-        "h4",
-        "h5",
-        "h6",
+        "style",
+        ...[1, 2, 3, 4, 5, 6].map((i) => `h${i}`),
         "pre",
         "div",
         "span",
         "ul",
         "li",
+        "input",
+        "textarea",
         "component",
       ].includes(name)
     )
