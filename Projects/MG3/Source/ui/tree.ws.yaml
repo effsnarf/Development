@@ -1,0 +1,42 @@
+dom:
+  ul:
+    li:
+      ui.tree.node:
+        :item: root
+        :item-type: itemType
+        :getChildren: getChildren
+        :selected-node: selectedNode
+        @node-click: onChildClick
+        @node-hover: onChildHover
+        @node-unhover: onChildUnhover
+
+props:
+  root:
+  itemType:
+  getChildren:
+
+data:
+  selectedNode:
+
+methods:
+  onChildClick: | #ts
+    function(child) {
+      this.$emit('node-click', child);
+      this.selectedNode = (child == this.selectedNode) ? null : child;
+    }
+
+  onChildHover: | #ts
+    function (child) {
+      this.$emit('node-hover', child);
+    }
+
+  onChildUnhover: | #ts
+    function (child) {
+      this.$emit('node-unhover', child);
+    }
+
+watch:
+  selectedNode: | #ts
+    function(newVal, oldVal) {
+      this.$emit('node-select', newVal);
+    }

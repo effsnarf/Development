@@ -60,11 +60,14 @@ class TypeScript {
     },
   };
 
-  static transpileToJavaScript(tsCode: string): string {
+  static transpileToJavaScript(
+    tsCode: string,
+    module: ts.ModuleKind = ts.ModuleKind.CommonJS
+  ): string {
     // Options for the TypeScript compiler (no generators)
     const compilerOptions: ts.CompilerOptions = {
-      module: ts.ModuleKind.CommonJS,
-      target: ts.ScriptTarget.ES5,
+      module: module,
+      target: ts.ScriptTarget.ES3,
       lib: ["es2015", "es2016", "es2017", "es2018", "es2019", "es2020"],
       strict: true,
     };
@@ -84,6 +87,8 @@ class TypeScript {
     options: WebpackifyOptions = { type: "filePath" }
   ): Promise<string> {
     return new Promise((resolve, reject) => {
+      const inputPath = input;
+
       if (options.type === "filePath") {
         input = fs.readFileSync(input, "utf8");
       }
@@ -91,10 +96,13 @@ class TypeScript {
       // Get the base path of the current script
       const basePath = path.dirname(process.argv[1]);
 
-      const inputFilePath = path.resolve(basePath, `${Date.now()}.ts`);
+      const inputFilePath = path.resolve(
+        path.dirname(inputPath),
+        `${Date.now()}.ts`
+      );
       const memoryFs = new MemoryFS();
 
-      // Write the source to a memory input file
+      // Write the source to a temp file
       // Make sure the directory exists
       //memoryFs.mkdirpSync(path.dirname(inputFileName));
       //memoryFs.writeFileSync(inputFileName, input);
@@ -113,7 +121,12 @@ class TypeScript {
 
         module.exports = ${TypeScript.resolveSharedAliases
           .toString()
-          .replace(/_1/g, "")}`
+          .replace(/_1/g, "")
+          .replace(/\.default./g, ".")
+          .replace(
+            "resolveSharedAliases(inputScript) {",
+            "(inputScript) => {"
+          )}`
       );
 
       const output = {
@@ -157,13 +170,14 @@ class TypeScript {
             },
           },
         ],
+        devtool: false,
       } as webpack.Configuration;
 
       const loading = Loading.startNew(`${`Webpackifying..`.green}`);
       webpack(config, (err: any, stats: any) => {
+        fs.unlinkSync(inputFilePath);
         loading.stop();
         if (err || stats.hasErrors()) {
-          fs.unlinkSync(inputFilePath);
           console.error(err || stats.compilation.errors);
           reject(err || stats.compilation.errors);
           return;

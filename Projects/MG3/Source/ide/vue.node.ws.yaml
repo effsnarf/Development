@@ -1,0 +1,20 @@
+dom:
+  ui.title:
+    icon: 🎲
+    :text: getText()
+    :number: item?.$children.length
+
+props:
+  value:
+
+methods:
+  getText: | #ts
+    function() {
+      return (this.item?.$options?._componentTag || this.item?._vnode.tag);
+    }
+
+computed:
+  item: | #ts
+    function() {
+      return (!this.value) ? null : this.value();
+    }

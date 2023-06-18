@@ -1,7 +1,0 @@
-handlebars:
-  helpers:
-    or: (context, a, b) => (a || b)
-    dom: | #ts
-      (context, dom) => {
-        return context.toTemplate(dom).join("\n");
-      }

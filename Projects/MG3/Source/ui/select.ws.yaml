@@ -1,0 +1,15 @@
+dom:
+  div:
+    ui.list:
+      v-slot: slotProps
+      :items: options
+      template:
+        div:
+          v-text: slotProps.item
+      @input: "$emit('input', $event)"
+
+props:
+  options:
+  value:
+
+methods:

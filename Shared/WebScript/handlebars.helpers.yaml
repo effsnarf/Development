@@ -1,0 +1,14 @@
+helpers:
+  or: | #ts
+    (context: any, a: any, b: any) => a || b;
+  dom: | #ts
+    (context: any, dom: any, compName: string) => {
+      return context.toTemplate(context, dom, 0, compName).join("\n");
+    };
+  prefixCssSelectors: | #ts
+    (context: any, compName: string, selectors: string) => {
+      const scopeClass = `comp-${compName.replace(/\./g, "-")}`;
+      return selectors.split(",").map(s => s.trim()).map(s => {
+        return `.${scopeClass} ${s}`;
+      }).join(", ");
+    };

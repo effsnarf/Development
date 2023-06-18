@@ -1,0 +1,9 @@
+dom:
+  div:
+    ui.title:
+      icon: "📦"
+      :value: name
+
+props:
+  name:
+  source:

@@ -1,0 +1,24 @@
+dom:
+  div:
+    v-if: component
+    ui.title:
+      class: fs-m3
+      icon: "📦"
+      :text: component?.name
+    ui.tabs:
+      :options: "['📁 dom', '🟢 style']"
+      template#1:
+        v-slot: tab0
+        ide.json.editor: component.source.dom
+      template#2:
+        v-slot: tab1
+        ide.json.editor: component.source.style
+
+props:
+  component:
+
+methods:
+  getComponentSource: | #ts
+    function() {
+      return JSON.stringify(this.component?.source, null, 2);
+    }

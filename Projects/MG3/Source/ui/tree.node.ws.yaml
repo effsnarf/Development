@@ -1,0 +1,91 @@
+dom:
+  div:
+    div:
+      :class: getCssClass()
+      component:
+        :is: itemType
+        :value: item
+      @click: onNodeClick
+      @mouseenter: onMouseEnter
+      @mouseleave: onMouseLeave
+    ul:
+      class: ml-l1
+      li:
+        v-for: child in children
+        ui.tree.node:
+          :item: child
+          :item-type: itemType
+          :getChildren: getChildren
+          :selected-node: selectedNode
+          @node-click: onChildClick
+          @node-hover: onChildHover
+          @node-unhover: onChildUnhover
+
+props:
+  item:
+  itemType:
+  getChildren:
+  selectedNode:
+
+data:
+  isExpanded:
+  children:
+
+methods:
+  getCssClass: | #ts
+    function() {
+      return {
+        hoverable: true,
+        selected: this.isSelected,
+      };
+    }
+
+  onNodeClick: | #ts
+    function() {
+      if (this.isSelected)
+      {
+          this.isExpanded = false;
+          this.children = null;
+      }
+      else
+      {
+        this.isExpanded = true;        
+        this.children = this.getChildren(this.item);
+      }
+      this.$emit('node-click', this.item);
+    }
+
+  onMouseEnter: | #ts
+    function() {
+      this.$emit('node-hover', this.item);
+    }
+  
+  onMouseLeave: | #ts
+    function() {
+      this.$emit('node-unhover', this.item);
+    }
+
+  onChildClick: | #ts
+    function(child) {
+      this.$emit('node-click', child);
+    }
+
+  onChildHover: | #ts
+    function (child) {
+      this.$emit('node-hover', child);
+    }
+
+  onChildUnhover: | #ts
+    function (child) {
+      this.$emit('node-unhover', child);
+    }
+
+computed:
+  childItems: | #ts
+    function() {
+      return this.children || [];
+    }
+  isSelected: | #ts
+    function() {
+      return (this.item == this.selectedNode);
+    }

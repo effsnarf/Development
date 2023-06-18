@@ -1,8 +1,8 @@
 dom:
-  link:
-    :url: /${urlName}
+  ui.link:
+    :url: "$urls.generator(urlName)"
     layout.horizontal.1:
-      image:
+      ui.image:
         :url: $urls.image(imageID)
       layout.vertical.1:
         text: displayName

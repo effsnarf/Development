@@ -1,0 +1,12 @@
+<style>
+    {{#each source.style}}
+    {{prefixCssSelectors ../name @key}}
+    {
+        {{#each this}}
+        {{#if @key}}
+        {{@key}}: {{this}};
+        {{/if}}
+        {{/each}}
+    }
+    {{/each}}
+</style>

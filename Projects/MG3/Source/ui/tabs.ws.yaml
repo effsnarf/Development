@@ -1,0 +1,17 @@
+dom:
+  div:
+    ui.select:
+      :options: options
+      v-model: selectedTabIndex
+    div:
+      div:
+        v-for: (option, index) in options
+        div:
+          v-show: (index == selectedTabIndex)
+          slot:
+            :name: "'tab' + index"
+props:
+  options:
+
+data:
+  selectedTabIndex: 0

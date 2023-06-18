@@ -1,0 +1,18 @@
+dom:
+  div:
+    v-if: style
+    v-html: style
+
+props:
+  component:
+
+computed:
+  style: | #ts
+    function() {
+      if (!this.component?.source?.style) return "";
+
+      const template = this.$root.templates.style;
+      const css = Handlebars.compile(template)(this.component);
+
+      return css;
+    }

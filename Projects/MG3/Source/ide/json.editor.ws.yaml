@@ -1,0 +1,20 @@
+dom:
+  textarea:
+    v-model: yaml
+
+props:
+  value:
+
+data:
+  yaml: ""
+
+watch:
+  value: | #ts
+    {
+      handler: function() {
+        let yaml = jsyaml.dump(this.value);
+        yaml = yaml.replace(/ null/g, "");
+        this.yaml = yaml;
+      },
+      immediate: true
+    }

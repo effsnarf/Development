@@ -20,8 +20,10 @@
     "jsonwebtoken": "^9.0.0",
     "md5": "^2.3.0",
     "memory-fs": "^0.5.0",
+    "mime-types": "^2.1.35",
     "moment": "^2.29.4",
     "mongodb": "^5.1.0",
+    "pug": "^3.0.2",
     "tree-kill": "^1.2.2",
     "typescript": "^4.9.5",
     "webpack": "^5.83.1"
@@ -35,6 +37,8 @@
     "@types/jsonwebtoken": "^9.0.2",
     "@types/md5": "^2.3.2",
     "@types/memory-fs": "^0.3.3",
+    "@types/mime-types": "^2.1.1",
+    "@types/pug": "^2.0.6",
     "colors": "^1.4.0"
   }
 }

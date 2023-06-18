@@ -1,0 +1,16 @@
+dom:
+  div:
+    class: image
+
+style:
+  .image:
+    background: url("/img/banners/(7).jpg")
+    width: calc(100% - 4em)
+    height: calc(100% - 1em)
+    min-width: 20em
+    min-height: 4em
+    margin: 0.3em 0 0 3em
+    filter: grayscale(1)
+    border-radius: 0.5em
+    background-size: cover!important
+    background-position: 50% 30%!important

@@ -1,0 +1,21 @@
+dom:
+  div:
+    div#1:
+      class: meme
+      v-text: "'Meme'"
+    div#2:
+      class: generator
+      v-text: "'Generator'"
+
+style:
+  .meme:
+    font-size: 6vh
+  .generator:
+    font-size: 3vh
+  div:
+    font-family: impact
+    text-transform: uppercase
+    line-height: 1em
+    text-align: center
+    top: -0.1rem
+    text-shadow: -1px 5px 3px #80808080

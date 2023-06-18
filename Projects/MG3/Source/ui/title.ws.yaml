@@ -1,0 +1,24 @@
+dom:
+  div:
+    class: flex
+    div:
+      v-text: getText()
+    .ml-1.opacity-50:
+      v-if: number
+      v-text: getNumberText()
+
+props:
+  icon:
+  text:
+  value:
+  number:
+
+methods:
+  getText: | #ts
+    function() {
+      return [this.icon, this.text, this.value].filter(s => s).join(' ');
+    }
+  getNumberText: | #ts
+    function() {
+      return !this.number ? '' : `(${this.number})`;
+    }

@@ -1,0 +1,66 @@
+dom:
+  div:
+    class: flex
+    style: "gap: 2em;"
+
+    ide.component.editor:
+      :component: selectedComponent
+
+    ui.tree:
+      :root: vueApp
+      :getChildren: "getVueChildren"
+      item-type: ide-vue-node
+      @node-select: onNodeSelect
+      @node-click: onNodeClick
+      @node-hover: onNodeHover
+      @node-unhover: onNodeUnhover
+
+    ui.list:
+      v-slot: slotProps
+      :items: comps
+      template:
+        ide.component.style:
+          :component: slotProps.item
+
+props:
+  comps:
+  vueApp:
+
+data:
+  selectedNode:
+
+methods:
+  getVueChildren: | #ts
+    function(vue) {
+      return !vue ? [] : vue().$children?.map(c => (() => c));
+    }
+
+  onNodeSelect: | #ts
+    function(node) {
+      this.selectedNode = node;
+    }
+
+  onNodeClick: | #ts
+    function(node) {
+      console.log(node());
+    }
+
+  onNodeHover: | #ts
+    function (node) {
+      node()?.$el.classList?.add('highlighted');
+    }
+  
+  onNodeUnhover: | #ts
+    function (node) {
+      node()?.$el.classList?.remove('highlighted');
+    }
+
+computed:
+  selectedComponent: | #ts
+    function() {
+      if (!this.selectedNode) return null;
+      const vue = this.selectedNode();
+      const compName = vue?.$options?._componentTag?.replace(/-/g, '.');
+      const comp = this.comps.find(c => c.name == compName);
+      return comp;
+    }

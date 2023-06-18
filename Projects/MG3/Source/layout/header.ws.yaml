@@ -1,0 +1,5 @@
+dom:
+  div:
+    class: flex
+    layout.logo:
+    main.banner:

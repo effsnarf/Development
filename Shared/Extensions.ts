@@ -261,6 +261,7 @@ interface String {
   withoutUnit(): string;
 
   padStartChars(maxLength: number, fillString?: string): string;
+  padEndChars(maxLength: number, fillString?: string): string;
   sliceChars(start: number | undefined, end?: number | undefined): string;
   alignRight(): string;
   shorten(maxLength: number, ellipsis?: boolean): string;
@@ -773,6 +774,18 @@ if (typeof String !== "undefined") {
     let result = this;
     while (result.getCharsCount() < maxLength) {
       result = fillString + result;
+    }
+    return result.toString();
+  };
+
+  String.prototype.padEndChars = function (
+    maxLength: number,
+    fillString?: string
+  ): string {
+    if (fillString === undefined) fillString = " ";
+    let result = this;
+    while (result.getCharsCount() < maxLength) {
+      result += fillString;
     }
     return result.toString();
   };

@@ -1,5 +1,6 @@
 import "./Extensions";
 import util from "util";
+import pug from "pug";
 const deepDiff = require("deep-diff").diff;
 const jsyaml = require("js-yaml");
 
@@ -89,6 +90,11 @@ class Objects {
 
   static parseYaml(str: string): any {
     return jsyaml.load(str);
+  }
+
+  static pugToHtml(str: string, options?: any): string {
+    let html = pug.render(str, options);
+    return html;
   }
 
   static jsonify(obj: any): string {
