@@ -146,7 +146,7 @@ class ClientContext {
 
   async updateComponent(comp: any) {
     const url = `/component/update`;
-    await fetch(url, { method: "post", body: comp });
+    await fetch(url, { method: "post", body: JSON.stringify(comp) });
   }
 
   private static async fetch(...args: any[]) {
