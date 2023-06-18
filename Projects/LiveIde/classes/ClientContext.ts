@@ -158,7 +158,7 @@ class ClientContext {
     } catch (ex: any) {
       const url = args[0];
       ClientContext.alertify
-        .error(`<h3>${ex.message}</h3><pre>${url}</pre>`)
+        .error(`<h3>${url}</h3><pre>${ex.message}</pre>`)
         .delay(0);
       throw ex;
     }

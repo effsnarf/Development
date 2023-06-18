@@ -64,7 +64,7 @@ class HttpServer {
       }
       // Set status code 500
       res.statusCode = ex.status || 500;
-      res.end(ex.message);
+      res.end(ex.stack);
     }
   }
 

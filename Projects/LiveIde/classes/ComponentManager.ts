@@ -49,8 +49,20 @@ class ComponentManager {
   private async saveModifiedItems() {
     const client = await ClientContext.get();
 
+    // Item needs to be not modified for this time to be saved
+    // This is to throtte typing etc
+    // This can be a bit longer time because we're saving the changed in IndexedDB
+    // So if the user closes the browser, the changes will be saved next time
+    const delay = 1000 * 1;
+
     let modifiedItem: any;
-    while ((modifiedItem = await client.db.pop("ModifiedItems"))) {
+    while (
+      (modifiedItem = await client.db.find(
+        "ModifiedItems",
+        (item) => item.modifiedAt > Date.now() - delay
+      ))
+    ) {
+      await client.db.delete("ModifiedItems", modifiedItem.key);
       await client.updateComponent(modifiedItem.item);
     }
 

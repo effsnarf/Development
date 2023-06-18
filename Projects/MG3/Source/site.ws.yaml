@@ -1,6 +1,8 @@
 dom:
   div:
-    layout.header:
+    layout.header: null
     div:
-      layout.sidebar:
-      layout.main:
+      layout.sidebar: null
+      layout.main: null
+name: site
+style: test

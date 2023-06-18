@@ -34,12 +34,24 @@ class ClientDatabase {
     return item;
   }
 
+  async filter(collection: string, filter: (item: any) => boolean) {
+    return await this.db[collection].filter(filter).toArray();
+  }
+
+  async find(collection: string, filter: (item: any) => boolean) {
+    return (await this.filter(collection, filter))[0];
+  }
+
   async upsert(collection: string, item: any) {
     await this.db[collection].put(item);
   }
 
   async upsertMany(collection: string, items: any[]) {
     await this.db[collection].bulkPut(items);
+  }
+
+  async delete(collection: string, key: any) {
+    await this.db[collection].delete(key);
   }
 }
 

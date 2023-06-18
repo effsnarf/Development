@@ -5,6 +5,9 @@
 /Projects/MemeGenerator/MG2.Website/Node2
 Test/Database
 
+# Temp folders
+Temp
+
 # Logs
 logs
 *.log

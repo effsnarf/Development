@@ -53,7 +53,19 @@ import { TypeScript } from "@shared/TypeScript";
         return res.end(JSON.stringify(comps));
       }
       if (req.url == "/component/update") {
-        const comp = JSON.parse(data);
+        // Save a log of updates, just in case
+        const updateLogFolder = path.join(
+          config.project.folder,
+          "../",
+          "Temp/Component/Updates",
+          new Date().toISOString().substring(0, 10)
+        );
+        fs.mkdirSync(updateLogFolder, { recursive: true });
+        const fileName = `${Date.now()}.json`;
+        const updateLogFilePath = path.join(updateLogFolder, fileName);
+        fs.writeFileSync(updateLogFilePath, JSON.stringify(data, null, 2));
+
+        const comp = data;
         const compPath = path.join(config.project.folder, comp.path);
         const yaml = Objects.yamlify(comp.source);
         fs.writeFileSync(compPath, yaml);
