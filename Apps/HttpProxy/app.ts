@@ -142,7 +142,7 @@ const isCachable = (options: any, config: any) => {
                 stats.cache.hits.track(1);
                 logLine(
                   `${
-                    `Cache hit`.yellow.bold
+                    `Fallback cache hit`.yellow.bold
                   } ${cachedResponse.body.length.unitifySize()} ${
                     options.url.gray
                   }`
