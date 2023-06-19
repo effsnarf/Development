@@ -102,7 +102,10 @@ const isCachable = (options: any, config: any) => {
         // debug-proxy-source:
         // - forwarded
         // - cache
-        res.set("debug-proxy-source", "forwarded");
+        res.set(
+          "debug-proxy-source",
+          `forwarded (${attempt.ordinalize()} attempt)`
+        );
         // Add access-control-allow-origin *
         res.status(response.status);
         res.set(response.headers);
