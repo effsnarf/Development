@@ -178,12 +178,13 @@ const isCachable = (options: any, config: any) => {
 
   // Every once in a while, display stats
   setInterval(() => {
+    const successRate = stats.cache.hits.count / stats.successes.count;
     logNewLine(
       `${stats.successes.count.humanize()} ${
         `successful proxied requests and`.gray
       } ${stats.cache.hits.count.humanize()} ${
         `fallback cache hits per`.gray
-      } ${stats.interval.unitifyTime()}`
+      } ${stats.interval.unitifyTime()} (${successRate.unitifyPercent()} online)`
     );
   }, stats.interval);
 
