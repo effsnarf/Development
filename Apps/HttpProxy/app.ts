@@ -178,7 +178,7 @@ const isCachable = (options: any, config: any) => {
 
   // Every once in a while, display stats
   setInterval(() => {
-    const successRate = stats.cache.hits.count / stats.successes.count;
+    const successRate = 1 - stats.cache.hits.count / stats.successes.count;
     logNewLine(
       `${stats.successes.count.humanize()} ${
         `successful proxied requests and`.gray
