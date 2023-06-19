@@ -1,0 +1,37 @@
+title:
+server:
+  host: localhost
+  port:
+  cors:
+    dev: [localhost, localhost:5051]
+    prod: [memegenerator.net, localhost, localhost:5051]
+  # on dev, we're relaying requests to the production dbp/db
+  proxy:
+    dev: db.memegenerator.net
+database:
+  connectionString: mongodb://localhost:27017
+  query:
+    max:
+      docs: 50
+analytics:
+  min:
+    elapsed: 50
+  database:
+    prod:
+      path: F:\Database\MG-Analytics
+severity:
+  time: [50, 500, "<"]
+log:
+  path: (env) => env.getLogPath(env.config.title)
+requests:
+  severity:
+    time: [100, 500, "<"]
+dbs:
+  IDE:
+    users:
+      enabled: true
+  MemeGenerator:
+    users:
+      enabled: false
+restart:
+  url: /restart/Jz0xnwG1bDv57LFpKTS6UkV8h9XQtCeBOMl2NHfRIj3yPcZYimAsrqdV4oWEaFhu

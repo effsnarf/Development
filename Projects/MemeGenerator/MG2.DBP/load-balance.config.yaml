@@ -1,0 +1,71 @@
+title: MG.DBP
+incoming:
+  address: localhost:4045
+  cors:
+    [
+      https://memegenerator.net,
+      https://vue-studio.com,
+      http://localhost,
+      http://localhost:5051,
+      http://localhost:3000,
+    ]
+  severity:
+    time: [100, 500, "<"]
+  cache:
+    max:
+      age: 10m
+    ignore:
+      - /api/
+      - /create/
+      - /get/
+      - /googleLogin
+    store:
+      dev:
+        path: (env) => env.path.resolve("c:\\Database\\Cache", env.config.title)
+      prod:
+        - memory: true
+        - database:
+            connectionString: mongodb://localhost:37017
+            database: MG-DBP-Cache
+  analytics:
+    prod:
+      api:
+        cache:
+          zero:
+            database:
+              connectionString: mongodb://localhost:37017
+              database: MG-Analytics-Cache
+      database:
+        write:
+          path: F:\Database\MG-Analytics
+        read:
+          connectionString: mongodb://localhost:47017
+          database: MG-Analytics
+nodes:
+  - name: MG.DBP 1
+    address: localhost:4041
+    process: ./Node1/start.cmd
+    restart:
+      url: /restart/Jz0xnwG1bDv57LFpKTS6UkV8h9XQtCeBOMl2NHfRIj3yPcZYimAsrqdV4oWEaFhu
+  - name: MG.DBP 2
+    address: localhost:4042
+    process: ./Node2/start.cmd
+    restart:
+      url: /restart/Jz0xnwG1bDv57LFpKTS6UkV8h9XQtCeBOMl2NHfRIj3yPcZYimAsrqdV4oWEaFhu
+sync:
+  exclude: [node_modules, config.yaml, nuxt.config.js, .nuxt, dist]
+node:
+  restart:
+    enabled: false # Restart the node if it crashes
+    health: 0.5 # Restart the node if the health is below 50%
+    timeout: 5 # and it has been unhealthy for N minutes
+request:
+  timeout: 10 # Timeout requests after 10 seconds
+log:
+  enabled: true
+  path: (env) => env.getLogPath(env.config.title)
+process:
+  restart:
+    periodically:
+      from: 00:00
+      every: 10m
