@@ -176,7 +176,7 @@ const isCachable = (options: any, config: any) => {
       `${stats.successes.count.humanize()} ${
         `successful proxied requests and`.gray
       } ${stats.cache.hits.count.humanize()} ${
-        `cache hits per`.gray
+        `fallback cache hits per`.gray
       } ${stats.interval.unitifyTime()}`
     );
   }, stats.interval);
