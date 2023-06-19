@@ -43,7 +43,6 @@ class DatabaseProxy {
       return await (await fetch(url)).json();
     }
     // Check the local cache
-    debugger;
     const cachedItem = JSON.parse(localStorage.getItem(url) || "null");
     if (cachedItem) options.$set[0][options.$set[1]] = cachedItem;
     // Fetch in the background
@@ -58,13 +57,13 @@ class DatabaseProxy {
     entity: string,
     group: string,
     method: string,
-    args: any[]
+    args: any[],
+    extraArgs: any[]
   ): Promise<any> {
     // We're using { $set: [obj, prop] } as a callback syntax
     // This is because sometimes we use the local cache and also fetch in the background
     // in which case we'll need to resolve twice which is not possible with a promise
-    const options = args.find((a) => a.$set) || {};
-    args = args.filter((a) => !a.$set);
+    const options = extraArgs.find((a) => a.$set) || {};
 
     const argsStr = args
       .map((a) => `${a.name}=${JSON.stringify(a.value || null)}`)
@@ -90,7 +89,8 @@ class DatabaseProxy {
               m.name,
               (m.args || []).map((a: any, i: number) => {
                 return { name: a, value: args[i] };
-              })
+              }),
+              args.slice((m.args || []).length)
             );
 
             if (m.then) {
