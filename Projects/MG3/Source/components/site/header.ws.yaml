@@ -1,0 +1,52 @@
+dom:
+  div:
+    .header:
+      site.logo: null
+    div:
+      class: header-spacer
+name: site-header
+mounted: |
+  function() {
+    this.init();
+  }
+methods:
+  init: |
+    function() {
+      const header = document.querySelector('.header');
+      const initialHeight = header.clientHeight / window.innerHeight * 100;
+      const scrollRate = 0.1;
+      // Slowly scroll the header to be smaller as the user scrolls
+      window.addEventListener('scroll', function() {
+        const scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+        // Calculate the new height of the header based on scroll position
+        const newHeight = Math.max(initialHeight - scrollPosition * scrollRate, 10);
+        // Apply the new height to the header
+        const heightVh = `${newHeight}vh`;
+        header.style.height = heightVh;
+      });
+    }
+style:
+  .comp-ui-large-title:
+    position: absolute;
+    bottom: 2rem
+  .header-spacer:
+    height: 30vh
+  .header:
+    width: 60vw
+    height: 30vh
+    position: fixed
+    display: flex
+    padding: 1rem
+    "-webkit-mask-image": >-
+      -webkit-gradient(linear, left top, left bottom, color-stop(0%, rgba(0, 0,
+      0, 1)), color-stop(80%, rgba(0, 0, 0, 1)), color-stop(100%, rgba(0, 0, 0,
+      0)))
+    background-image: >-
+      linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0),
+      rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 1)),
+      url('https://media.discordapp.net/attachments/1063065918080569384/1120058571552464967/eff2729_Socially_Awkward_Penguin_sitting_on_a_park_bench_surrou_b8736a30-8376-4ede-b581-645bdcd42bf0.png?width=914&height=609')
+    background-repeat: no-repeat
+    background-size: cover
+    background-position: center
+    transition: 0s
+    z-index: 10

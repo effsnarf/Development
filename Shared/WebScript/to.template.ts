@@ -19,16 +19,27 @@ export default (context: any, dom: any, indent?: number, compName?: string) => {
     dom[rootKey] = root;
   }
 
+  const stringToArray = (s: string) => {
+    if (!s) return [];
+    if (Array.isArray(s)) return s;
+    return s.split(" ").filter((s: string) => s);
+  };
+
   // If the dom is { div.opacity: {} }, then we want to render it as { div: { class: "opacity", ...{} } }
   for (const child of Object.entries(dom || {})) {
     const tag = child[0];
     if (!child[1]) continue;
+
+    if (Array.isArray(dom[tag].class))
+      dom[tag].class = dom[tag].class.join(" ");
+
     if (tag.startsWith(".")) {
       const parts = tag.split(".");
       const newTag = parts[0] || "div";
       const classNames = parts.slice(1);
-      dom[newTag] = dom[tag];
-      dom[newTag].class = dom[newTag].class || [];
+      dom[newTag] = JSON.parse(JSON.stringify(dom[tag]));
+      dom[newTag].class = [];
+      dom[newTag].class.push(...stringToArray(dom[tag].class));
       dom[newTag].class.push(...classNames);
       dom[newTag].class = dom[newTag].class.join(" ");
       delete dom[tag];
@@ -44,7 +55,10 @@ export default (context: any, dom: any, indent?: number, compName?: string) => {
           return { key: a[0], value: a[1] };
         })
         .filter((a) => a.value)
-        .map((a: any) => `"${a.key}"="${a.value}"`) as string[]
+        .map((a: any) => {
+          const valueStr = typeof a.value == "string" ? a.value : a.value;
+          return `"${a.key}"="${valueStr}"`;
+        }) as string[]
     ).join(", ")})`;
   };
 

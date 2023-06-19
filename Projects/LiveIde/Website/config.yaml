@@ -3,3 +3,5 @@ server:
   port: 3000
 project:
   folder: (env) => env.path.resolve(env.process.cwd(), '../../MG3/Source')
+webscript:
+  folder: (env) => env.path.join(env.process.cwd(), "../../../Shared/WebScript")

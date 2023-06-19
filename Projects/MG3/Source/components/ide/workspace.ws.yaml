@@ -1,61 +1,50 @@
 dom:
   div:
-    class: flex
-
+    class: workspace
     ide.component.editor:
-      :component: selectedComponent
-
+      ':component': selectedComponent
     ui.tree:
-      :root: () => $root
-      :getChildren: "getVueChildren"
+      ':root': () => $root
+      ':getChildren': getVueChildren
       item-type: ide-vue-node
-      @node-select: onNodeSelect
-      @node-click: onNodeClick
-      @node-hover: onNodeHover
-      @node-unhover: onNodeUnhover
-
+      on_node-select: onNodeSelect
+      on_node-click: onNodeClick
+      on_node-hover: onNodeHover
+      on_node-unhover: onNodeUnhover
     div:
       ui.list:
         v-slot: slotProps
-        :items: comps
+        ':items': comps
         template:
           ide.component.style:
-            :component: slotProps.item
-
+            ':component': slotProps.item
 props:
-  comps:
-
+  comps: null
 data:
-  selectedNode:
-
+  selectedNode: null
 methods:
-  getVueChildren: | #ts
+  getVueChildren: |
     function(vue) {
       return !vue ? [] : vue().$children?.map(c => (() => c));
     }
-
-  onNodeSelect: | #ts
+  onNodeSelect: |
     function(node) {
       this.selectedNode = node;
     }
-
-  onNodeClick: | #ts
+  onNodeClick: |
     function(node) {
       //console.log(node());
     }
-
-  onNodeHover: | #ts
+  onNodeHover: |
     function (node) {
       node()?.$el.classList?.add('highlighted');
     }
-  
-  onNodeUnhover: | #ts
+  onNodeUnhover: |
     function (node) {
       node()?.$el.classList?.remove('highlighted');
     }
-
 computed:
-  selectedComponent: | #ts
+  selectedComponent: |
     function() {
       if (!this.selectedNode) return null;
       const vue = this.selectedNode();
@@ -63,3 +52,12 @@ computed:
       const comp = this.comps.find(c => c.name == compName);
       return comp;
     }
+name: ide-workspace
+style:
+  .comp-ide-workspace:
+    position: fixed
+    right: 0
+    display: flex
+    flex-direction: column
+    gap: 3em
+    z-index: 100

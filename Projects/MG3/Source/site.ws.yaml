@@ -1,8 +1,0 @@
-dom:
-  div:
-    layout.header: null
-    div:
-      layout.sidebar: null
-      layout.main: null
-name: site
-style: test

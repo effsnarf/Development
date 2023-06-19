@@ -7,6 +7,7 @@ incoming:
       https://vue-studio.com,
       http://localhost,
       http://localhost:5051,
+      http://localhost:3000,
     ]
   severity:
     time: [100, 500, "<"]

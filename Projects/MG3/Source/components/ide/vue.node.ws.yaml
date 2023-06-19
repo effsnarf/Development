@@ -1,6 +1,6 @@
 dom:
   ui.title:
-    icon: 🎲
+    icon: 📦
     :text: getText()
     :number: item?.$children.length
 

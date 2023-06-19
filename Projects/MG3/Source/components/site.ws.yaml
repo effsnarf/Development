@@ -1,0 +1,14 @@
+dom:
+  div:
+    site.header: null
+    div:
+      site.sidebar: null
+      site.main: null
+name: site
+style:
+  .comp-site:
+    position: relative
+    margin: auto
+    width: 1000px
+    height: 5000vh
+    padding: 0

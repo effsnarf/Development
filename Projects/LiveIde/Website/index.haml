@@ -1,5 +1,6 @@
 %html
   %head
+    %link{rel: "stylesheet", href: "https://fonts.googleapis.com/css?family=Tangerine|Oswald&display=swap"}
     %link{rel: "stylesheet", href: "https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/css/alertify.css"}
     %link{rel: "stylesheet", href: "https://cdn.jsdelivr.net/npm/shorthandcss@1.1.1/dist/shorthand.min.css"}
     %link{rel: "stylesheet", href: "/css/defaults.css"}
@@ -13,5 +14,5 @@
   %body
     %div
       %div.flex{id: "app"}
-        %app.flex-grow-1{":key": "key1"}
+        %app{":key": "key1"}
         %ide-workspace{":comps": "comps"}

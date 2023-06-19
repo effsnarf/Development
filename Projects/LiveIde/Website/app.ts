@@ -5,15 +5,18 @@ import path from "path";
 import { Configuration } from "@shared/Configuration";
 import { Objects } from "@shared/Extensions.Objects";
 import { Files } from "@shared/Files";
+import { Http } from "@shared/Http";
 import { HttpServer } from "@shared/HttpServer";
 import { TypeScript } from "@shared/TypeScript";
 
 (async () => {
   const config = (await Configuration.new()).data;
 
+  const componentsFolder = path.join(config.project.folder, "Components");
+
   const getCompName = (path: string) => {
     return path
-      .replace(config.project.folder, "")
+      .replace(componentsFolder, "")
       .replace(".ws.yaml", "")
       .replace(/\\/g, ".")
       .substring(1);
@@ -24,27 +27,25 @@ import { TypeScript } from "@shared/TypeScript";
     return yaml;
   };
 
+  const staticFileFolders = [
+    process.cwd(),
+    config.project.folder,
+    config.webscript.folder,
+  ];
+
   const httpServer = await HttpServer.new(
     config.server.port,
     config.server.host,
     async (req, res, data) => {
-      if (req.url.endsWith(".js")) {
-        const tsPath = path.join(process.cwd(), req.url.replace(".js", ".ts"));
-        if (fs.existsSync(tsPath)) {
-          //const tsCode = fs.readFileSync(tsPath, "utf8");
-          const jsCode = await TypeScript.webpackify(tsPath);
-          return res.end(jsCode);
-        }
-      }
       if (req.url == "/components") {
-        const comps = Files.getFiles(config.project.folder, {
+        const comps = Files.getFiles(componentsFolder, {
           recursive: true,
         })
           .filter((s) => s.endsWith(".ws.yaml"))
           .map((s) => {
             return {
               name: getCompName(s),
-              path: s.replace(config.project.folder, ""),
+              path: s.replace(componentsFolder, ""),
               source: Objects.parseYaml(
                 preProcessYaml(fs.readFileSync(s, "utf8"))
               ),
@@ -66,7 +67,7 @@ import { TypeScript } from "@shared/TypeScript";
         fs.writeFileSync(updateLogFilePath, JSON.stringify(data, null, 2));
 
         const comp = data;
-        const compPath = path.join(config.project.folder, comp.path);
+        const compPath = path.join(componentsFolder, comp.path);
         const yaml = Objects.yamlify(comp.source);
         fs.writeFileSync(compPath, yaml);
         return res.end("ok");
@@ -81,17 +82,28 @@ import { TypeScript } from "@shared/TypeScript";
         }
         return res.end(html);
       }
+      // Serve static files
       if (req.url.length > 1) {
-        const staticPath = path.join(
-          __dirname,
-          "../../../Shared/WebScript",
-          req.url
-        );
-        if (fs.existsSync(staticPath)) {
-          let content = fs.readFileSync(staticPath, "utf8");
-          if (staticPath.endsWith(".yaml"))
-            content = JSON.stringify(Objects.parseYaml(content));
-          return res.end(content);
+        for (const folder of staticFileFolders) {
+          const filePath = path.join(folder, req.url.replace(".js", ".ts"));
+          if (fs.existsSync(filePath)) {
+            // If TypeScript file, serve as compiled JavaScript
+            if (path.extname(filePath) == ".ts")
+              return res.end(await TypeScript.webpackify(filePath));
+            if (filePath.endsWith(".yaml"))
+              return res.end(
+                JSON.stringify(
+                  Objects.parseYaml(fs.readFileSync(filePath, "utf8"))
+                )
+              );
+            // If image file, serve as binary
+            if (Http.isImageFile(filePath)) {
+              res.setHeader("Content-Type", "image/png");
+              return res.end(fs.readFileSync(filePath));
+            }
+            // Otherwise, serve as text
+            return res.end(fs.readFileSync(filePath, "utf8"));
+          }
         }
       }
     }

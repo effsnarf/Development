@@ -1,0 +1,16 @@
+dom:
+  .list:
+    badge.generator.wide#1:
+      ":generator": "{ imageID: 1058 }"
+    badge.generator.wide#2:
+      ":generator": "{ imageID: 4367294 }"
+    badge.generator.wide#3:
+      ":generator": "{ imageID: 565919 }"
+    badge.generator.wide#4:
+      ":generator": "{ imageID: 1255 }"
+name: content-recommendations
+style:
+  .list:
+    display: flex
+    flex-direction: column
+    gap: 1rem

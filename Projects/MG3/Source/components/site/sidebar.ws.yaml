@@ -1,0 +1,5 @@
+dom:
+  div:
+    ui.list:
+      item-type: generator.small
+name: site-sidebar

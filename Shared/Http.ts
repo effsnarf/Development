@@ -1,3 +1,5 @@
+import mime from "mime-types";
+
 class Http {
   static async getPostData(req: any): Promise<any> {
     if (req.method !== "POST") return Promise.resolve(null);
@@ -17,6 +19,17 @@ class Http {
         reject(ex);
       }
     });
+  }
+
+  static getMimeType(filePath: string): string {
+    return mime.lookup(filePath) || "application/octet-stream";
+  }
+
+  static isImageFile(filePath: string): boolean {
+    return (
+      Http.getMimeType(filePath).startsWith("image/") ||
+      filePath.endsWith(".svg")
+    );
   }
 }
 

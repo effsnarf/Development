@@ -1,0 +1,13 @@
+name: site-main
+dom:
+  div:
+    content.article: null
+    .columns:
+      div: null
+      content.stream: null
+      content.recommendations: null
+style:
+  .columns:
+    display: grid
+    grid-template: 1fr / 1fr 2fr 1fr
+    gap: 2rem

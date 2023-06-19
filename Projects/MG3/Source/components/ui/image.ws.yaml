@@ -1,0 +1,6 @@
+dom:
+  img:
+    :src: url
+
+props:
+  url:

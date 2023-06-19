@@ -1,0 +1,28 @@
+dom:
+  .box:
+    .line:
+      v-for: (line, index) in lines
+      ':class': getLineCssClass(index)
+      v-text: line
+props:
+  lines: null
+methods:
+  getLineCssClass: |
+    function(index) {
+      if (!index) return null;
+      return `ml-l${index}`;
+    }
+name: content-poem
+style:
+  .box:
+    display: none
+    margin: auto
+    width: fit-content
+    padding: 1rem
+    '-webkit-mask-image': >-
+      -webkit-gradient(linear, left top, left bottom, from(rgba(0,0,0,0.4)),
+      to(rgba(0,0,0,1)))
+  .line:
+    line-height: 0.8em
+    font-size: 300%
+    font-family: '''Tangerine'', cursive'

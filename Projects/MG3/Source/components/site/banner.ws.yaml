@@ -2,10 +2,8 @@ dom:
   div:
     div:
       class: image
-
 style:
   .image:
-    background: url("https://memegenerator.net/img/banners/(7).jpg")
     width: calc(100% - 4em)
     height: calc(100% - 1em)
     min-width: 20em
@@ -15,3 +13,4 @@ style:
     border-radius: 0.5em
     background-size: cover!important
     background-position: 50% 30%!important
+name: site-banner

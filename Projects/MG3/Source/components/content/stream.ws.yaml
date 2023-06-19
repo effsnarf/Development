@@ -1,0 +1,37 @@
+dom:
+  .stream:
+    content.poem#1:
+      ":lines": >-
+        ['In a realm where grace and ease reside,', 'There exists a penguin with
+        a timid stride,', 'A creature of social awkwardness, so profound,',
+        'With every step, uncertainty is found.']
+    content.instance#1:
+      :url: "'https://media.discordapp.net/attachments/1063065918080569384/1120202807199399956/eff2729_socially_awkward_penguin_in_socially_awkward_situations_328e7fa2-e563-4ac6-bbfd-de0f19817931.png?width=609&height=609' || 'https://img.memegenerator.net/instances/23772238.jpg'"
+    content.poem#2:
+      ":lines": >-
+        ['Oh, Socially Awkward Penguin, so endearingly shy,', 'Navigating a
+        world where connections multiply,', 'In crowded gatherings, your heart
+        skips a beat,', 'As you stumble through conversations, finding
+        retreat.']
+    content.instance#2:
+      :url: "'https://media.discordapp.net/attachments/1063065918080569384/1120202825083920414/eff2729_socially_awkward_penguin_ea5744d5-e775-4cd3-a6e1-d218c569fb1e.png?width=609&height=609' || 'https://img.memegenerator.net/instances/11042099.jpg'"
+    content.poem#3:
+      ":lines": >-
+        ['With feathers ruffled and eyes cast down,', 'You yearn for acceptance,
+        yet wear a frown,', 'But within your awkwardness, a charm unfolds,', 'A
+        vulnerability that captures hearts in its hold.']
+    content.instance#3:
+      :url: "'https://media.discordapp.net/attachments/1063065918080569384/1120202847317934140/eff2729_socially_awkward_penguin_860e2624-37d3-4280-822d-0bb1b1a76c1c.png?width=609&height=609' || 'https://img.memegenerator.net/instances/11632379.jpg'"
+    content.poem#4:
+      ":lines": >-
+        ['Your hesitant words, like a hesitant dance,', 'Draw smiles and
+        laughter, by happenstance,', 'For in your stumbling, we see our own
+        plight,', 'And through your bumbling, our own fears take flight.']
+    content.instance#4:
+      :url: "'https://media.discordapp.net/attachments/1063065918080569384/1120202798945017946/eff2729_socially_awkward_penguin_in_socially_awkward_situations_cf466e43-8f0c-441d-a2a5-bc3163bdc081.png?width=609&height=609' || 'https://img.memegenerator.net/instances/15117541.jpg'"
+name: content-stream
+style:
+  .stream:
+    display: flex
+    flex-direction: column
+    gap: 4rem

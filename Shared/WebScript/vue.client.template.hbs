@@ -11,6 +11,9 @@
         {{/each}}
     }
   },
+  {{#if mounted}}
+  mounted: {{{mounted}}},
+  {{/if}}
   methods: {
     {{#each methods}}
     {{@key}}: {{{this}}},

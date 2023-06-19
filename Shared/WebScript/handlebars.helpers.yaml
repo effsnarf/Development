@@ -7,8 +7,12 @@ helpers:
     };
   prefixCssSelectors: | #ts
     (context: any, compName: string, selectors: string) => {
+      const s = [];
       const scopeClass = `comp-${compName.replace(/\./g, "-")}`;
-      return selectors.split(",").map(s => s.trim()).map(s => {
-        return `.${scopeClass} ${s}`;
-      }).join(", ");
+      const classSelectors = selectors.split(',').map(s => s.trim()).filter(s => s.startsWith("."));
+      const otherSelectors = selectors.split(',').map(s => s.trim()).filter(s => !s.startsWith("."));
+      s.push(...classSelectors.map(s => `.${scopeClass}${s}`));
+      s.push(...classSelectors.map(s => `.${scopeClass} ${s}`));
+      s.push(...otherSelectors.map(s => `.${scopeClass} ${s}`));
+      return s.join(", ");
     };

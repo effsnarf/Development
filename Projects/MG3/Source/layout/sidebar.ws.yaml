@@ -1,7 +1,0 @@
-dom:
-  div:
-    search.box:
-      #v-model: $global.search.generator.query
-    ui.list:
-      #v-model: $global.search.generator.list
-      item-type: generator.small

@@ -22,3 +22,7 @@ methods:
     function() {
       return !this.number ? '' : `(${this.number})`;
     }
+
+style:
+  div:
+    white-space: nowrap

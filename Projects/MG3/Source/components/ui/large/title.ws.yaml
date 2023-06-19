@@ -1,0 +1,21 @@
+dom:
+  .title:
+    v-text: text
+props:
+  text: null
+style:
+  .title:
+    width: auto
+    font-size: 8vh
+    font-family: Times
+    line-height: 0.8
+    padding: 0 0 0.2em
+    '-webkit-mask-image': >-
+      -webkit-gradient(linear, left top, left bottom, color-stop(0%, rgba(0, 0,
+      0, 0.4)), color-stop(40%, rgba(0, 0, 0, 1)), color-stop(100%, rgba(0, 0,
+      0, 0.4)))
+    white-space: normal
+    text-shadow: '-3px 3px 3px black'
+  .title:hover:
+    background: none
+name: ui-large-title

@@ -17,6 +17,8 @@ body
   background: black;
   overflow-y: scroll;
   font-family: Arial, Helvetica, sans-serif;
+  background: linear-gradient(0deg, #000000e0, #000000);
+  background-attachment: fixed;
 }
 
 .grid
@@ -592,6 +594,11 @@ progress
   height: 100%;
   background: #ffffff60;
   transition: 0.6s;
+}
+
+p
+{
+  margin: 1em 0;
 }
 
 

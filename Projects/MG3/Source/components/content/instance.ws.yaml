@@ -1,0 +1,10 @@
+dom:
+  div:
+    class: image
+    ui.image:
+      ':url': url
+name: content-instance
+props:
+  url: null
+style:
+  .image: null
