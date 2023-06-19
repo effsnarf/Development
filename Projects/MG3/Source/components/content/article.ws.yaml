@@ -4,7 +4,7 @@ dom:
       url: >-
         https://media.discordapp.net/attachments/1063065918080569384/1120202807199399956/eff2729_socially_awkward_penguin_in_socially_awkward_situations_328e7fa2-e563-4ac6-bbfd-de0f19817931.png?width=609&height=609
     ui.large.title:
-      ":text": "'Socially Awkward Penguin'"
+      ":text": "$root.params.data.generator.value"
     .text:
       p#1:
         v-text: >-

@@ -1,5 +1,11 @@
 // This version is for public clients like Meme Generator
 // Doesn't have direct access to the database, but can still use the API
+
+// Lowercase the first letter of a string
+(String.prototype as any).untitleize = function () {
+  return this.charAt(0).toLowerCase() + this.slice(1);
+};
+
 class DatabaseProxy {
   private constructor(private urlBase: string) {}
 

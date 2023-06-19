@@ -1,0 +1,14 @@
+params:
+  urlName:
+    get: | #ts
+      function(url) {
+        return "Socially-Awkward-Penguin";
+      }
+    watch:
+      handler: | #ts
+        async function(newUrlName) {
+          this.data.generator.value = (!newUrlName) ? null : await this.$root.dbp.generators.select.one(null, newUrlName);
+        }
+      immediate: true
+data:
+  generator:

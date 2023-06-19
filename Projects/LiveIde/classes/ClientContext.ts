@@ -37,6 +37,11 @@ class ClientContext {
     vue: string;
     style: string;
   };
+
+  config!: {
+    params: any;
+  };
+
   private helpers: any;
 
   private compilation!: {
@@ -67,6 +72,9 @@ class ClientContext {
     this.templates = {} as any;
     this.templates.vue = await (await fetch(`/vue.client.template.hbs`)).text();
     this.templates.style = await (await fetch(`/style.template.hbs`)).text();
+
+    this.config = {} as any;
+    this.config.params = await (await fetch(`/params.yaml`)).json();
 
     this.Handlebars = (window as any).Handlebars;
     this.Vue = (window as any).Vue;

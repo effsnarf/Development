@@ -1,9 +1,0 @@
-dom:
-  site:
-    class: justify-center
-
-computed:
-  generator: | #ts
-    async function () {
-      return null;
-    }

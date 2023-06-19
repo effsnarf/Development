@@ -98,6 +98,8 @@ const isCachable = (options: any, config: any) => {
         // not the time it took us to send the response to the client
         const elapsed = timer.elapsed;
         const response = await axios.request(options);
+        // Add access-control-allow-origin *
+        response.headers["access-control-allow-origin"] = "*";
         res.status(response.status);
         res.set(response.headers);
         response.data.pipe(res);

@@ -1,4 +1,3 @@
 dom:
-  site:
-    class: justify-center
+  page.generator:
 name: app
