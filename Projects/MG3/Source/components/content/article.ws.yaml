@@ -1,34 +1,11 @@
 dom:
   div:
     ui.image:
-      url: >-
-        https://media.discordapp.net/attachments/1063065918080569384/1120202807199399956/eff2729_socially_awkward_penguin_in_socially_awkward_situations_328e7fa2-e563-4ac6-bbfd-de0f19817931.png?width=609&height=609
+      :url: $root.url.image($root.generator?.imageID)
     ui.large.title:
-      ":text": "$root.params.data.generator.value"
+      ":text": "$root.generator?.displayName"
     .text:
-      p#1:
-        v-text: >-
-          'In a world filled with social norms and expectations, there exists a
-          delightful creature known as the Socially Awkward Penguin. This
-          endearing penguin has captured the hearts of many, serving as a reminder
-          that embracing our unique quirks and navigating social situations can be
-          both challenging and liberating. Join us as we delve into the world of
-          the Socially Awkward Penguin and explore the valuable lessons it
-          imparts.'
-      p#2:
-        v-text: >-
-          'Socially Awkward Penguin finds itself in a constant battle with
-          uncomfortable social encounters. From awkward small talk to stumbling
-          over words, this charming penguin knows the trials and tribulations of
-          feeling out of place. But within these struggles lies an opportunity for
-          growth and self-discovery.'
-      p#3:
-        v-text: >-
-          'What makes Socially Awkward Penguin truly remarkable is its unwavering
-          authenticity. Rather than attempting to conform to societal
-          expectations, this penguin embraces its unique personality. By accepting
-          its quirks and idiosyncrasies, it teaches us that self-acceptance is the
-          first step towards personal growth and genuine connections.'
+      v-html: $root.generator?.htmlDescription
 style:
   .comp-ui-image:
     width: 30%

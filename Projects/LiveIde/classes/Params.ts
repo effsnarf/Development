@@ -10,7 +10,6 @@ interface ParamItem {
 
 class Params {
   private _items: ParamItem[] = [];
-  data: any = {};
 
   private constructor(public $root: any, private _config: any) {}
 
@@ -22,10 +21,6 @@ class Params {
   }
 
   private async init() {
-    for (const dataVar of Object.entries(this._config.data)) {
-      this.data[dataVar[0]] = Vue.ref(dataVar[1]);
-    }
-
     for (const param of Object.entries(this._config.params)) {
       const paramConf = param[1] as any;
       const get = eval(`(${paramConf.get})`);

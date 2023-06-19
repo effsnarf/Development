@@ -7,6 +7,17 @@
   border-radius: 0.5em;
 }
 
+a
+{
+  color: #e0e0a0;
+  text-decoration: none;
+}
+
+a:hover
+{
+  text-decoration: underline;
+}
+
 div
 {
   position: relative;

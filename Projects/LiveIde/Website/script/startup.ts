@@ -28,6 +28,7 @@ const helpers = {
       comps: client.Vue.ref(client.comps),
       templates: client.templates,
       key1: 1,
+      generator: null,
     },
     async mounted() {},
     methods: {

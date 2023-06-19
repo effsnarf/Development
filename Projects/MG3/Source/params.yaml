@@ -7,8 +7,7 @@ params:
     watch:
       handler: | #ts
         async function(newUrlName) {
-          this.data.generator.value = (!newUrlName) ? null : await this.$root.dbp.generators.select.one(null, newUrlName);
+          if (!newUrlName) { this.$root.generator = null; return; }
+          await this.$root.dbp.generators.select.one(null, newUrlName, { $set: [this.$root, "generator"] });
         }
       immediate: true
-data:
-  generator:
