@@ -30,7 +30,7 @@ analytics:
         database: MG-Analytics
 cache:
   ignore:
-    - /api/
+    - /create/
     - /get/new/id
     - /googleLogin
   store:
