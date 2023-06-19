@@ -98,6 +98,11 @@ const isCachable = (options: any, config: any) => {
         // not the time it took us to send the response to the client
         const elapsed = timer.elapsed;
         const response = await axios.request(options);
+        // Add debug headers
+        // debug-proxy-source:
+        // - forwarded
+        // - cache
+        res.set("debug-proxy-source", "forwarded");
         // Add access-control-allow-origin *
         res.status(response.status);
         res.set(response.headers);
@@ -147,6 +152,7 @@ const isCachable = (options: any, config: any) => {
                     options.url.gray
                   }`
                 );
+                res.set("debug-proxy-source", "cache");
                 res.status(cachedResponse.status.code);
                 res.set(cachedResponse.headers);
                 return res.end(cachedResponse.body);
