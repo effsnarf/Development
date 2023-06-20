@@ -37,7 +37,7 @@ computed:
       return sizes;
     }
 style:
-  .comp-ui-image, .text:
+  .comp-ui-image, .texts, .text:
     position: absolute
   .spacer, .texts:
     width: 100%

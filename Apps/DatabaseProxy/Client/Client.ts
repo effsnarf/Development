@@ -39,10 +39,11 @@ class DatabaseProxy {
         // to update for the next time
         const fetchItem = async () => {
           const item = await (await fetch(url)).json();
-          localStorage.setItem(url, JSON.stringify(item));
+          //localStorage.setItem(url, JSON.stringify(item));
           return item;
         };
-        const cachedItem = JSON.parse(localStorage.getItem(url) || "null");
+        //const cachedItem = JSON.parse(localStorage.getItem(url) || "null");
+        const cachedItem = null;
         if (!cachedItem) return await fetchItem();
         // Fetch in the background
         fetchItem();
@@ -51,12 +52,13 @@ class DatabaseProxy {
       return await (await fetch(url)).json();
     }
     // Check the local cache
-    const cachedItem = JSON.parse(localStorage.getItem(url) || "null");
+    //const cachedItem = JSON.parse(localStorage.getItem(url) || "null");
+    const cachedItem = null;
     if (cachedItem) DatabaseProxy.setValue(options.$set, cachedItem);
     // Fetch in the background
     const item = await (await fetch(url)).json();
     // Update the local cache
-    localStorage.setItem(url, JSON.stringify(item));
+    //localStorage.setItem(url, JSON.stringify(item));
     DatabaseProxy.setValue(options.$set, item);
     return item;
   }

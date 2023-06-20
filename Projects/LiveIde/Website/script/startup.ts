@@ -69,13 +69,15 @@ interface MgParams {
 
   ideVueApp.params = params;
 
-  dbp.generators.select.one(null, params.urlName, {
-    $set: [ideVueApp, "generator"],
-  });
+  if (params.urlName) {
+    dbp.generators.select.one(null, params.urlName, {
+      $set: [ideVueApp, "generator"],
+    });
 
-  dbp.generators.select.related(params.urlName, {
-    $set: [ideVueApp, "generators"],
-  });
+    dbp.generators.select.related(params.urlName, {
+      $set: [ideVueApp, "generators"],
+    });
+  }
 
   (window as any).ideVueApp = ideVueApp;
 })();
