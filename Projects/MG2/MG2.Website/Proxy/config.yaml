@@ -10,11 +10,11 @@ incoming:
 target:
   base:
     url: http://localhost:5055
-  timeout: 1s
+  timeout: 10s
   try:
     again:
-      retries: 30
-      delay: 1s
+      retries: 3
+      delay: 0s
 analytics:
   prod:
     api:

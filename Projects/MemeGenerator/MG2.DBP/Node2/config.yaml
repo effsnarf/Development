@@ -1,8 +1,0 @@
-title: MG.DBP.2
-server:
-  port: 4042
-process:
-  restart:
-    periodically:
-      from: 00:05
-      every: 10m
