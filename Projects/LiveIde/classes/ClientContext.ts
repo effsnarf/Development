@@ -159,18 +159,24 @@ class ClientContext {
     await fetch(url, { method: "post", body: JSON.stringify(comp) });
   }
 
-  private static async fetch(...args: any[]) {
+  private static async fetch(...args: any[]): Promise<any> {
     try {
       const result = await ClientContext._fetch(...args);
       if (result.status < 500) return result;
       const text = await result.text();
       throw new Error(text);
     } catch (ex: any) {
+      // Try again
       const url = args[0];
-      ClientContext.alertify
-        .error(`<h3>${url}</h3><pre>${ex.message}</pre>`)
-        .delay(0);
-      throw ex;
+      console.error(`Error fetching ${url}`);
+      console.error(ex);
+      if (window.location.hostname == "localhost") {
+        ClientContext.alertify
+          .error(`<h3>${url}</h3><pre>${ex.message}</pre>`)
+          .delay(0);
+      }
+      // Try again
+      return await ClientContext.fetch(...args);
     }
   }
 

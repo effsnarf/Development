@@ -112,9 +112,10 @@ const isCachable = (options: any, config: any) => {
         // Add access-control-allow-origin *
         // Get the origin of the request
         const origin = req.headers.origin || "*";
+        response.headers["access-control-allow-origin"] = origin;
         res.status(response.status);
         res.set(response.headers);
-        res.set("access-control-allow-origin", origin);
+
         response.data.pipe(res);
         // When the response ends
         response.data.on("end", async () => {
