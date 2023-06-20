@@ -113,6 +113,7 @@ const isCachable = (options: any, config: any) => {
         // Get the origin of the request
         const origin = req.headers.origin || "*";
         response.headers["access-control-allow-origin"] = origin;
+        response.headers["x-test"] = Date.now().toString();
         res.status(response.status);
         res.set(response.headers);
 
