@@ -305,7 +305,7 @@ select:hover
 }
 input:hover, textarea:hover
 {
-  background: #60606060;
+  background: #000000;
   transition: 0s;
 }
 

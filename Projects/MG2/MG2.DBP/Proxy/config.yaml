@@ -9,7 +9,10 @@ incoming:
       port: 4040
 target:
   base:
-    url: http://localhost:4050
+    urls:
+      - http://localhost:4050
+      - http://localhost:4041
+      - http://localhost:4042
   timeout: 1s
   try:
     again:

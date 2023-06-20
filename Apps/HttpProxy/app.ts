@@ -57,34 +57,37 @@ const isCachable = (options: any, config: any) => {
 
   const cache = await Cache.new(config.cache.store);
 
-  // Forward all incoming HTTP requests to config.target.base.url/..
+  // Forward all incoming HTTP requests to config.target.base.urls/..
   // If a request fails (target is down), try the cache first
-  // If the cache doesn't have the response, try again up to cache.target.try.again.retries times
+  // If the cache doesn't have the response, try backup urls up to target.try.again.retries times
   const app = express();
   // Catch all requests
   app.all("*", async (req: any, res: any) => {
-    const targetUrl = `${config.target.base.url}${req.url}`;
     // Remove &_uid=1685119338348 from the URL (uniquifies the request)
     let cacheKey = req.url;
     cacheKey = cacheKey?.replace(/&_uid=\d+/g, "");
 
     const postData = req.method == "POST" ? await Http.getPostData(req) : null;
-    const options = {
-      url: targetUrl,
-      method: req.method as any,
-      headers: req.headers,
-      data: postData,
-      // We want to proxy the data as-is,
-      responseType: "stream",
-      // We want to proxy the request as-is,
-      // let the client handle the redirects
-      maxRedirects: 0,
-      timeout: config.target.timeout.deunitify(),
-    } as any;
 
     const timer = Timer.start();
 
     const tryRequest = async (attempt: number = 0) => {
+      const nodeIndex = attempt % config.target.base.urls.length;
+
+      const targetUrl = `${config.target.base.urls[nodeIndex]}${req.url}`;
+      const options = {
+        url: targetUrl,
+        method: req.method as any,
+        headers: req.headers,
+        data: postData,
+        // We want to proxy the data as-is,
+        responseType: "stream",
+        // We want to proxy the request as-is,
+        // let the client handle the redirects
+        maxRedirects: 0,
+        timeout: config.target.timeout.deunitify(),
+      } as any;
+
       if (attempt >= config.target.try.again.retries) {
         // Temporarily unavailable
         logNewLine(

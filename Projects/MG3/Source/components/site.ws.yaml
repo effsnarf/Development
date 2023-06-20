@@ -11,3 +11,19 @@ style:
     margin: auto
     width: 1000px
     padding: 0
+  .comp-site-header:
+    position: sticky
+    top: 0
+    height: 12vh
+    '-webkit-mask-image': >-
+      -webkit-gradient(linear, left top, left bottom, color-stop(0%, rgba(0, 0,
+      0, 1)), color-stop(80%, rgba(0, 0, 0, 1)), color-stop(100%, rgba(0, 0, 0,
+      0)))
+    background-image: >-
+      linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0),
+      rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 1))
+    background-repeat: no-repeat
+    background-size: cover
+    background-position: center
+    transition: 0s
+    z-index: 10

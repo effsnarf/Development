@@ -6,23 +6,22 @@ dom:
     .ml-1.opacity-50:
       v-if: number
       v-text: getNumberText()
-
 props:
-  icon:
-  text:
-  value:
-  number:
-
+  icon: null
+  text: null
+  value: null
+  number: null
 methods:
-  getText: | #ts
+  getText: |
     function() {
       return [this.icon, this.text, this.value].filter(s => s).join(' ');
     }
-  getNumberText: | #ts
+  getNumberText: |
     function() {
       return !this.number ? '' : `(${this.number})`;
     }
-
 style:
   div:
-    white-space: nowrap
+    white-space: wrap
+    text-wrap: wrap
+name: ui-title
