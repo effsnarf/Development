@@ -106,8 +106,6 @@ var mgApi = {
 
       const elapsed = (Date.now() - started);
 
-      if (window.api) api.analytics.create("api", "method", { name, args, dt: { started, elapsed } });
-
       if (res.success) resolve(res.result);
       else reject(res.errorMessage);
 

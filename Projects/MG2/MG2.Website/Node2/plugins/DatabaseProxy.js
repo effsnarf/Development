@@ -150,19 +150,11 @@ anat.dev.DatabaseProxy = function (host, database, protocol, userID) {
     }
 
     if (this.logToConsole) console.log(`fetching ${url}`, this.fetchOptions);
-    var str = await (await fetch(url, this.fetchOptions)).text();
-    try {
-      var data = parseJSON(str);
-
-      if (this.cache.enabled) this.cache.items[url] = { dt: now, data: data };
-
-      //if (this.logToConsole) console.log(data, ` returned from `, url);
-
-      return data;
-    } catch (ex) {
-      throw str;
-    }
-  };
+    var data = await (await fetch(url, this.fetchOptions)).json();
+    if (this.cache.enabled) this.cache.items[url] = { dt: now, data: data };
+    //if (this.logToConsole) console.log(data, ` returned from `, url);
+    return data;
+};
 
   var StoreQueue = function () {
     this.items = {};
@@ -636,7 +628,7 @@ export default async ({ app }, inject) => {
 
   const protocol = (isDevEnv ? "http" : "https");
   // Go to the production database from the development environment
-  const host = (isDevEnv ? "localhost:4040" : "db.memegenerator.net");
+  const host = (isDevEnv ? "localhost:4041" : "db.memegenerator.net");
   
   let dbp = new anat.dev.DatabaseProxy(host, `MemeGenerator`, protocol);
   await dbp.createEntityMethods();

@@ -1,3 +1,4 @@
+import fs from "fs";
 import path from "path";
 import bodyParser from "body-parser";
 import "../../../../../../Shared/Extensions";
@@ -10,14 +11,13 @@ import { Analytics } from "../../../../../../Shared/Analytics";
 
 class Global {
   private static _config: Promise<Configuration>;
-  private static _analyticsApify: Promise<Apify.Server>;
+  private static _analytics: Analytics;
+  private static _analyticsApify: Apify.Server;
 
   static get: any = {
     async config() {
       if (!this._config) {
-        this._config = Configuration.new2(
-          path.join(__dirname, "../../config.yaml")
-        );
+        this._config = Configuration.new();
       }
       return this._config;
     },
@@ -25,7 +25,7 @@ class Global {
       if (!this._analyticsApify) {
         const config = (await this.config()).data;
         Analytics.defaults.database = await Database.new(
-          config.database.analytics
+          config.analytics?.database
         );
 
         this._analyticsApify = new Apify.Server(
@@ -38,6 +38,13 @@ class Global {
         );
       }
       return this._analyticsApify;
+    },
+    async analytics() {
+      if (!this._analytics) {
+        const config = (await this.config()).data;
+        this._analytics = await Analytics.new(config.analytics);
+      }
+      return this._analytics;
     },
   };
 }
@@ -78,8 +85,13 @@ const dbs = {
       if (!database) return null;
       if (!this._dbs.has(database)) {
         // Find which connection string to use by the database name
-        const dbEntry = Object.values(config.database).find(
-          (db: any) => db.name == database
+        const databases = [
+          config.database.content,
+          config.analytics.database.read,
+          config.analytics.database.write,
+        ];
+        const dbEntry = Object.values(databases).find(
+          (db: any) => db.database == database
         ) as any;
         if (!dbEntry)
           throw new Error(`Database ${database} not found in config.yaml`);
@@ -101,19 +113,30 @@ export default async function (req: any, res: any, next: any) {
   const config = (await Global.get.config()).data;
   const analyticsApify = await Global.get.analyticsApify();
   const processRequest = async (data: any) => {
+    const analytics = await Global.get.analytics();
+
     // CORS
     res.setHeader("Access-Control-Allow-Origin", "*");
     const dbEvents = (await dbs.get(
-      config.database.analytics?.name
+      config.analytics.database.read
     )) as DatabaseBase;
     const dbContent = (await dbs.get(
-      config.database.content?.name
+      config.database.content?.database
     )) as DatabaseBase;
     const ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
     if (req.url == "/ip") {
       res.end(ip);
       return;
     }
+    if (req.url == config.restart.url.replace("/api/", "/")) {
+      res.end("Restarting..");
+      setTimeout(() => {
+        console.log("Restarting..");
+        process.exit(0);
+      }, 1000);
+      return;
+    }
+
     // /events?filter={e:"visit","v.dt.end":{$gte:1600000000000}}
     // /Instances/[sinceMinutes]/[intervalMinutes]
     if (req.url.startsWith("/instances")) {
@@ -342,11 +365,12 @@ export default async function (req: any, res: any, next: any) {
         await analyticsApify.processUrl(ip, req.url, data, { stringify: true })
       );
     } catch (ex: any) {
-      console.log(ex.message);
+      res.status(500).end(ex.stack);
+      console.log(ex.stack);
     }
     return;
   };
-  const process = async (data: any) => {
+  const processReq = async (data: any) => {
     try {
       await processRequest(data);
     } catch (ex: any) {
@@ -354,14 +378,14 @@ export default async function (req: any, res: any, next: any) {
     }
   };
   if (req.method === "GET") {
-    process(null);
+    processReq(null);
   } else if (req.method === "POST") {
     let body = "";
     req.on("data", (data: any) => {
       body += data;
     });
     req.on("end", async () => {
-      process(body);
+      processReq(body);
     });
   } else {
     res.end("Unsupported method");

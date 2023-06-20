@@ -1,10 +1,12 @@
 <template lang="pug">
 div.flex
-    div {{ formatNumber(value) }}
-    div.letter {{ getLetter(value) }}
+    div {{ number }}
+    div.letter {{ unit }}
 </template>
 
 <script>
+import "../../../../../../Shared/Extensions";
+
 export default {
     props: {
         value: {
@@ -16,25 +18,20 @@ export default {
         }
     },
     methods: {
-        formatNumber(number) {
-            if (number == null) return null;
-            if (typeof number == 'string') number = parseFloat(number);
-            
-            if (number < 1000) return number;
-            if (number < 1000000) return (number / 1000).toFixed(1);
-            if (number < 1000000000) return (number / 1000000).toFixed(1);
-            return (number / 1000000000).toFixed(1);
-        },
-        getLetter(number) {
-            if (number == null) return null;
-            if (typeof number == 'string') number = parseFloat(number);
-            
-            if (number < 1000) return '';
-            if (number < 1000000) return 'k';
-            if (number < 1000000000) return 'm';
-            return 'b';
-        },
     },
+    computed: {
+        humanized() {
+            return this.value?.humanize();
+        },
+        number() {
+            // Extract the number (and places) from the humanized string
+            return this.humanized?.match(/(\d+)(\.\d+)?/)?.first();
+        },
+        unit() {
+            // Extract the unit from the humanized string
+            return this.humanized?.match(/[a-zA-Z]+/)?.first();
+        }
+    }
 }
 </script>
 

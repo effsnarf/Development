@@ -3,8 +3,9 @@
         h2.header(v-if="header") {{ header }}
         div.chart.flex
             div.column
-                div.min {{ min }}
-                admin-num(:value="max")
+                admin-num.opacity-50(:value="minValue")
+                admin-num(:value="middleValue")
+                admin-num.opacity-50(:value="maxValue")
             div
                 canvas.ml-l1(ref="canvas1", width="400", height="200", @mousemove="onMouseMove", @mouseout="onMouseOut")
         div.flex.justify-center.items-center
@@ -37,10 +38,9 @@ export default {
             type: Array,
             default: () => []
         },
-        hoveredData: {
-            type: Object,
-            default: () => ({})
-        }
+        color: {
+            type: String,
+        },
     },
     data: () => ({
         hoveredIndex: null
@@ -49,6 +49,7 @@ export default {
         getCssClass() {
             const cls = {};
             if (!this.data?.length) cls.empty = true;
+            if (this.color) cls[`chart-${this.color}`] = true;
             return cls;
         },
         drawChart(data) {
@@ -80,6 +81,7 @@ export default {
             this.hoveredIndex = i;
         },
         onMouseOut(e) {
+            this.hoveredIndex = null;
         }
     },
     watch: {
@@ -153,12 +155,37 @@ export default {
             },
             deep: true
         },
+        minValue: {
+            get: function () {
+                return (this.data||[]).filter(v => v).min();
+            },
+            deep: true
+        },
+        averageValue: {
+            get: function () {
+                return (this.data||[]).filter(v => v).average();
+            },
+            deep: true
+        },
+        middleValue: {
+            get: function () {
+                return (this.minValue + this.maxValue) / 2;
+            },
+            deep: true
+        },
+        maxValue: {
+            get: function () {
+                return (this.data||[]).filter(v => v).max();
+            },
+            deep: true
+        },        
         range() {
             return this.max - this.min;
         },
         hoveredData() {
             if (this.hoveredIndex === null) return null;
-            return this.data[this.hoveredIndex];
+            const value = this.data[this.hoveredIndex];
+            return value;
         },
         hoveredX() {
             if (this.hoveredIndex === null) return null;
@@ -171,18 +198,19 @@ export default {
 <style scoped>
 h2
 {
-    font-size: 200%;
+    font-size: 140%;
     margin-bottom: 0.5em;
 }
 canvas
 {
+    filter: drop-shadow(-3px 3px 1px black);
     border: 2px solid white;
     border-radius: 0.5em;
 }
 .total
 {
     text-align: center;
-    font-size: 400%;
+    font-size: 200%;
     margin-left: 1em;
 }
 .title
@@ -203,6 +231,16 @@ canvas
     text-align: center;
     font-size: 160%;
 }
+
+.chart-green
+{
+    background: #80ff8060;
+}
+.chart-blue
+{
+    background: #40a0ffa0;
+}
+
 .empty
 {
     opacity: 0.4;
