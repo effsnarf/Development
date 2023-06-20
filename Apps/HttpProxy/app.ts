@@ -79,6 +79,7 @@ const isCachable = (options: any, config: any) => {
       // We want to proxy the request as-is,
       // let the client handle the redirects
       maxRedirects: 0,
+      timeout: config.target.timeout.deunitify(),
     } as any;
 
     const timer = Timer.start();
@@ -125,6 +126,8 @@ const isCachable = (options: any, config: any) => {
           stats.successes.track(1);
         });
       } catch (ex: any) {
+        logLine(timer.elapsed?.unitifyTime(), ex.stack, options);
+
         // Some HTTP status codes are not errors (304 Not Modified, 404 Not Found, etc.)
         const targetIsDown =
           !ex.response || ex.message.includes("ECONNREFUSED");
