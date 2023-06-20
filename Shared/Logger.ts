@@ -71,7 +71,7 @@ abstract class LoggerBase implements Logger {
       (beforeResult, className, methodName, args, returnValue) => {
         const timer = beforeResult as Timer;
         try {
-          returnValue = jsyaml.dump(returnValue).shorten(200);
+          returnValue = jsyaml.dump(returnValue);
         } catch (ex: any) {
           returnValue = `[${typeof returnValue}]`;
         }
@@ -158,9 +158,7 @@ class FileSystemLogger extends LoggerBase {
       .map((item) => {
         if (!item.args.filter((a: any) => a).length) return null;
         const text = item.args.map((arg: any) =>
-          typeof arg == "string"
-            ? arg
-            : Objects.stringify(arg).withoutColors().shorten(50)
+          typeof arg == "string" ? arg : Objects.stringify(arg).withoutColors()
         );
         return `${new Date(item.dt).toISOString()} ${text}`;
       })
