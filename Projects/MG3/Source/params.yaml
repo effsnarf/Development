@@ -4,10 +4,21 @@ params:
       function(url) {
         return "Socially-Awkward-Penguin";
       }
+
     watch:
       handler: | #ts
         async function(newUrlName) {
-          if (!newUrlName) { this.$root.generator = null; return; }
-          await this.$root.dbp.generators.select.one(null, newUrlName, { $set: [this.$root, "generator"] });
+          if (!newUrlName) { this.generator = null; return; }
+          ;
         }
       immediate: true
+data:
+  generator:
+    watch:
+      handler: | #ts
+        async function(newGenerator) {
+          if (!newGenerator) { this.instances = null; return; }
+          await this.dbp.instances.select.popular("en", 0, newGenerator.urlName, { $set: this.instances })
+        }
+      immediate: true
+  instances:
