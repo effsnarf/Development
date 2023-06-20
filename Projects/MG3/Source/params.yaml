@@ -2,14 +2,14 @@ params:
   urlName:
     get: | #ts
       function(url) {
-        return "Socially-Awkward-Penguin";
+        if (url.startsWith("/instance/")) return null;
+        return url.split("/")[1];
       }
 
     watch:
       handler: | #ts
         async function(newUrlName) {
           if (!newUrlName) { this.generator = null; return; }
-          ;
         }
       immediate: true
 data:

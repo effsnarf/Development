@@ -1,6 +1,58 @@
 dom:
-  img:
-    :src: url
+  div:
+    class: image
+    img:
+      ref: image1
+      :class: getCssClass()
+      :src: (src || emptySrc)
+      @load: onLoad
 
 props:
+  imageID:
   url:
+
+data:
+  width:
+  height:
+
+mounted: | #ts
+  function () {
+    window.addEventListener(`resize`, function(event) {
+      this.recalc();
+    }.bind(this));
+  }
+
+methods:
+  onLoad: | #ts
+    function () {
+      this.recalc();
+      this.$emit("load");
+    }
+  recalc: | #ts
+    function () {
+      if (!this.$refs.image1) return;
+      let rect = this.$refs.image1.getBoundingClientRect();
+      this.width = Math.round(rect.width);
+      this.height = Math.round(rect.height);
+    }
+  getCssClass: | #ts
+    function () {
+      return { empty: !this.src };
+    }
+
+computed:
+  src: | #ts
+    function () {
+      if (this.url) return this.url;
+      if (this.imageID) return this.$root.url.image(this.imageID);
+      return null;
+    }
+  emptySrc: | #ts
+    function () {
+      return '/img/empty.png';
+    }
+
+style:
+  .image, img:
+    width: 100%
+    

@@ -93,8 +93,12 @@ class Objects {
   }
 
   static pugToHtml(str: string, options?: any): string {
-    let html = pug.render(str, options);
-    return html;
+    try {
+      let html = pug.render(str, options);
+      return html;
+    } catch (ex: any) {
+      throw new Error(`Error rendering pug\n${ex.message}\n${str}`);
+    }
   }
 
   static jsonify(obj: any): string {

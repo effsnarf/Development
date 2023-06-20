@@ -1,0 +1,27 @@
+dom:
+  div:
+    :style: getStyle()
+    slot:
+
+data:
+
+mounted: | #ts
+  function() {
+  }
+
+methods:
+  getStyle: | #ts
+    function() {
+      return {
+        top: this.top
+      };
+    }
+
+props:
+  top:
+
+computed:
+
+style:
+  .comp-ui-sticky:
+    position: sticky

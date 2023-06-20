@@ -1,1 +1,9 @@
 dom:
+  a:
+    :href: url
+    slot:
+
+props:
+  url:
+
+style:

@@ -30,6 +30,7 @@ class HttpServer {
   }
 
   private async requestListener(req: any, res: any) {
+    const rootPath = "./index.haml";
     try {
       const data = await Http.getPostData(req);
 
@@ -41,8 +42,13 @@ class HttpServer {
       var path = req.url;
 
       var mimeType = HttpServer.getMimeType(path);
-      if (path == "/") path = "./index.haml";
+      if (path == "/") path = rootPath;
       else path = `.${path}`;
+
+      if (!fs.existsSync(path)) {
+        path = rootPath;
+      }
+
       res.writeHead(200, { "Content-Type": `${mimeType}; charset=utf-8` });
 
       if (typeof mimeType == `string` && mimeType.startsWith(`video`)) {

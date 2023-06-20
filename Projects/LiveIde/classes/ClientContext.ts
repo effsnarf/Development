@@ -133,6 +133,7 @@ class ClientContext {
         ...[1, 2, 3, 4, 5, 6].map((i) => `h${i}`),
         "pre",
         "p",
+        "img",
         "div",
         "span",
         "ul",

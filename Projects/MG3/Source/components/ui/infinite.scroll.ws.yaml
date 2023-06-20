@@ -1,0 +1,20 @@
+dom:
+  div:
+    slot:
+
+mounted: | #ts
+  function() {
+    window.addEventListener('scroll', this.onScroll);
+    this.$nextTick(() => {
+      this.$emit('scroll');
+    });
+  }
+
+methods:
+  onScroll: | #ts
+    function() {
+      const distanceToBottom = document.documentElement.offsetHeight - (window.scrollY + window.innerHeight);
+      if (distanceToBottom < window.innerHeight) {
+        this.$emit('scroll');
+      }
+    }

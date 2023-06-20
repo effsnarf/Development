@@ -3,10 +3,14 @@ dom:
   div:
     content.article: null
     .columns:
-      div: null
+      div#1: null
       content.stream:
-        items: $root.instances
-      content.recommendations: null
+        :getMoreItems: $root.getMoreInstances
+      div:
+        ui.sticky:
+          top: 140px
+          content.recommendations:
+            :items: $root.generators
 style:
   .columns:
     display: grid

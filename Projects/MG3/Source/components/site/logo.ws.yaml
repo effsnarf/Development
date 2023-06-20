@@ -1,9 +1,11 @@
 dom:
-  div:
-    .meme:
-      v-text: "'meme'"
-    .generator:
-      v-text: "'generator'"
+  ui.link:
+    url: /
+    div:
+      .meme:
+        v-text: '''meme'''
+      .generator:
+        v-text: '''generator'''
 style:
   .meme:
     font-size: 6vh
@@ -14,7 +16,7 @@ style:
     text-transform: uppercase
     line-height: 1em
     text-align: center
-    top: "-0.1rem"
-    text-shadow: "-6px 6px 3px #000"
-    opacity: 0.4
+    top: '-0.1rem'
+    text-shadow: '-6px 6px 3px #000'
+    opacity: 1
 name: site-logo

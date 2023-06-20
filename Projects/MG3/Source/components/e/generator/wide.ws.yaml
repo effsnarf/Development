@@ -1,0 +1,23 @@
+name: badge-generator-wide
+dom:
+  ui.link:
+    :url: url
+    div:
+      ui.image:
+        :imageID: item.imageID
+      ui.title:
+        :text: item.displayName
+props:
+  item:
+
+style:
+  img:
+    aspect-ratio: 4 / 1
+    width: 100%
+    object-fit: cover
+
+computed:
+  url: | #ts
+    function() {
+      return `/${this.item.urlName}`;
+    }

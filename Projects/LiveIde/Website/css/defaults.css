@@ -9,13 +9,20 @@
 
 a
 {
-  color: #e0e0a0;
+  color: #fff;
   text-decoration: none;
+  filter: grayscale(1);
+  opacity: 0.7;
+  cursor: pointer;
+  transition: 0.3s;
 }
 
 a:hover
 {
-  text-decoration: underline;
+  text-decoration: none;
+  filter: none;
+  opacity: 1;
+  transition: 0s;
 }
 
 div
@@ -157,11 +164,6 @@ div.padded, table.padded td, table.padded th
 {
   background: none;
 }
-.title:hover
-{
-  background-color: #ffffff40;
-  transition: 0s;
-}
 .tree .selected > .title,
 .tree .selected > .title:hover
 {
@@ -246,7 +248,7 @@ input, textarea, select, option, .ide-checkbox
 {
   width: 100%;
   padding: 0.5em 0.5em !important;
-  background: #80808060;
+  background: #202020ff;
   font-family: monospace !important;
   border: 1px solid gray;
   color: #ffffff80;
@@ -613,6 +615,8 @@ p
 }
 
 
+
+
 [tooltip]::before {
   content: attr(tooltip);
   position: absolute;
@@ -643,4 +647,15 @@ p
 svg
 {
   z-index: 100;
+}
+
+
+.empty, .title:empty
+{
+  background-color: #80808040;
+}
+
+img[src=""]
+{
+  background: #80808040;
 }

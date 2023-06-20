@@ -1,0 +1,61 @@
+dom:
+  div:
+    ui.image:
+      ref: image1
+      :imageID: imageID
+      @load: onImageLoad
+    .texts:
+      .text:
+        v-for: (text, index) in [text0, text1]
+        v-text: text
+        :style: "{ fontSize: fontSizes[index] }"
+    div:
+      class: spacer
+name: e-instance
+props:
+  imageID:
+  text0:
+  text1:
+data:
+  width:
+methods:
+  getFontSize: | #ts
+    function (s) {
+      if (!s) return 0;
+      if (!this.width) return 0;
+      const size = Math.max(14, (36 - (s.length / 6))) / 50 *  this.width / 150;
+      return `${size}em`;
+    }
+  onImageLoad: | #ts
+    function () {
+      this.width = this.$refs.image1.width;
+    }
+computed:
+  fontSizes: | #ts
+    function () {
+      const sizes = [this.getFontSize(this.text0), this.getFontSize(this.text1)];
+      return sizes;
+    }
+style:
+  .comp-ui-image, .text:
+    position: absolute
+  .spacer, .texts:
+    width: 100%
+    aspect-ratio: 1
+  .text:
+    text-align: center
+    display: block
+    width: 100%
+    top: 0
+    overflow: hidden
+    color: "#fff"
+    line-height: 1.2em
+    font-family: Impact,Oswald
+    text-transform: uppercase
+    text-shadow: "-2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000"
+    -webkit-font-smoothing: antialiased
+    box-sizing: border-box
+    padding: 0.3em
+  .text:nth-child(2):
+    top: auto
+    bottom: 0

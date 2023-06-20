@@ -1,13 +1,13 @@
 {
   props: {
     {{#each props}}
-    {{@key}}: {{or this "null"}},
+    {{@key}}: {{{or this null}}},
     {{/each}}
   },
   data: function () {
     return {
         {{#each data}}
-        {{@key}}: {{or this "null"}},
+        {{@key}}: {{{or this null}}},
         {{/each}}
     }
   },

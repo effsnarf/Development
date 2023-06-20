@@ -22,11 +22,16 @@ class Component {
     console.groupCollapsed(this.name);
     console.log(this);
     let json = client.Handlebars.compile(client.templates.vue)(this.source);
-    const vueOptions = eval(`(${json})`);
-    console.log(vueOptions);
-    const vueName = Component.toVueName(this.name);
-    vueOptions.template = await client.pugToHtml(vueOptions.template);
-    client.Vue.component(vueName, vueOptions);
+    try {
+      const vueOptions = eval(`(${json})`);
+      console.log(vueOptions);
+      const vueName = Component.toVueName(this.name);
+      vueOptions.template = await client.pugToHtml(vueOptions.template);
+      client.Vue.component(vueName, vueOptions);
+    } catch (ex) {
+      debugger;
+      throw ex;
+    }
     console.groupEnd();
   }
 
