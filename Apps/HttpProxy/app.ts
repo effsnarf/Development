@@ -96,6 +96,8 @@ const isCachable = (options: any, config: any) => {
         return res.end();
       }
 
+      const origin = req.headers.origin || "*";
+
       try {
         // We're only interested in the time it took us to get the response from the target,
         // not the time it took us to send the response to the client
@@ -109,9 +111,6 @@ const isCachable = (options: any, config: any) => {
           "x-debug-proxy-source",
           `forwarded (${attempt.ordinalize()} attempt)`
         );
-        // Add access-control-allow-origin *
-        // Get the origin of the request
-        const origin = req.headers.origin || "*";
         res.status(response.status);
         res.set(response.headers);
         res.set("access-control-allow-origin", origin);
