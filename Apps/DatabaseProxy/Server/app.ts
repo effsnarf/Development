@@ -309,7 +309,6 @@ const getResponseSize = (response: any) => {
         const timer = Timer.start();
         try {
           requests.per.minute.track(1);
-          debugLogger.log(req.url);
           // Get the POST data
           const data = await Http.getPostData(req);
           const user = await User.get(req, res, data);
@@ -330,6 +329,7 @@ const getResponseSize = (response: any) => {
             req.url
           );
         } catch (ex: any) {
+          debugLogger.log(`${timer.elapsed?.unitifyTime()} ${req.url}`);
           debugLogger.log(ex.stack || ex);
           itemsLog.log(
             req.method,
@@ -362,6 +362,8 @@ const getResponseSize = (response: any) => {
             ex.message?.bgRed
           );
           return res.status(500).end(ex.stack || ex);
+        } finally {
+          debugLogger.log(`${timer.elapsed?.unitifyTime()} ${req.url}`);
         }
       };
     };
