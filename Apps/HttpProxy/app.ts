@@ -128,7 +128,12 @@ const isCachable = (options: any, config: any) => {
           stats.successes.track(1);
         });
       } catch (ex: any) {
-        logLine(timer.elapsed?.unitifyTime(), ex.stack, options);
+        logLine(
+          timer.elapsed?.unitifyTime(),
+          ex.message.bgRed,
+          options.url.gray
+          //options
+        );
 
         // Some HTTP status codes are not errors (304 Not Modified, 404 Not Found, etc.)
         const targetIsDown =
