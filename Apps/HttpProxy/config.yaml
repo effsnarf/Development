@@ -4,7 +4,8 @@ incoming:
     port: 3000
 target:
   base:
-    url: http://localhost:4041
+    urls:
+      - http://localhost:4041
   timeout: 1s
   try:
     again:
