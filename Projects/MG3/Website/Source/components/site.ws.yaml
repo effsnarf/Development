@@ -3,8 +3,17 @@ dom:
     site.header: null
     div:
       site.sidebar: null
-      site.main: null
+      site.main:
+        :get-more-items: getMoreItems
+        :recommendation-items: recommendationItems
+        template:
+          v-slot: article
+          slot:
+            name: article
 name: site
+props:
+  getMoreItems:
+  recommendationItems:
 style:
   .comp-site:
     position: relative
@@ -15,7 +24,7 @@ style:
     position: sticky
     top: 0
     height: 12vh
-    '-webkit-mask-image': >-
+    "-webkit-mask-image": >-
       -webkit-gradient(linear, left top, left bottom, color-stop(0%, rgba(0, 0,
       0, 1)), color-stop(80%, rgba(0, 0, 0, 1)), color-stop(100%, rgba(0, 0, 0,
       0)))

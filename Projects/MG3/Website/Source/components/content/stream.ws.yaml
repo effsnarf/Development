@@ -40,6 +40,7 @@ data:
 methods:
   loadMore: | #ts
     async function() {
+      if (!this.getMoreItems) return;
       if (this.isLoading) return;
       this.isLoading = true;
       const newItems = await this.getMoreItems(this.pageIndex);

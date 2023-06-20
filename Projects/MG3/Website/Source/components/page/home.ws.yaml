@@ -1,0 +1,22 @@
+dom:
+  site:
+    template:
+      v-slot: article
+      .gallery:
+        e.generator.wide:
+          v-for: generator in generators
+          :item: generator
+
+data:
+  generators: []
+
+mounted: | #ts
+  async function() {
+    this.generators = await this.$root.dbp.generators.select.popular();
+  }
+
+style:
+  .gallery:
+    display: grid
+    grid-template: 1fr 1fr 1fr 1fr / 1fr
+    gap: 2rem

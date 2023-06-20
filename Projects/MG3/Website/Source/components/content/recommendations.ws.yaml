@@ -4,6 +4,7 @@ dom:
     e.generator.wide:
       v-for: generator in items
       :item: generator
+      :key: generator.generatorID
 style:
   .list:
     display: flex

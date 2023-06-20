@@ -1,0 +1,17 @@
+dom:
+  site:
+    :get-more-items: $root.getMoreInstances
+    :recommendation-items: recommendationItems
+    template:
+      v-slot: article
+      content.article:
+
+data:
+  recommendationItems: []
+
+mounted: | #ts
+  async function() {
+    if (!this.$root.params.urlName) return;
+    const items = await this.$root.dbp.generators.select.related(this.$root.params.urlName);
+    this.recommendationItems = items;
+  }

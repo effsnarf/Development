@@ -38,7 +38,7 @@ interface MgParams {
     el: "#app",
     data: {
       dbp,
-      params: null as any,
+      params: params,
       url: helpers.url,
       comps: client.Vue.ref(client.comps),
       templates: client.templates,
@@ -66,8 +66,6 @@ interface MgParams {
       },
     },
   });
-
-  ideVueApp.params = params;
 
   if (params.urlName) {
     dbp.generators.select.one(null, params.urlName, {

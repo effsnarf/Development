@@ -1,16 +1,22 @@
 name: site-main
 dom:
   div:
-    content.article: null
+    slot:
+      name: article
     .columns:
       div#1: null
       content.stream:
-        :getMoreItems: $root.getMoreInstances
+        :getMoreItems: getMoreItems
       div:
         ui.sticky:
           top: 140px
           content.recommendations:
-            :items: $root.generators
+            :items: recommendationItems
+
+props:
+  getMoreItems:
+  recommendationItems:
+
 style:
   .columns:
     display: grid
