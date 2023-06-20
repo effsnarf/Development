@@ -3,56 +3,50 @@ dom:
     class: image
     img:
       ref: image1
-      :class: getCssClass()
-      :src: (src || emptySrc)
-      @load: onLoad
-
+      ':class': getCssClass()
+      ':src': (src || emptySrc)
+      '@load': onLoad
 props:
-  imageID:
-  url:
-
+  imageID: null
+  url: null
 data:
-  width:
-  height:
-
-mounted: | #ts
+  width: null
+  height: null
+mounted: |
   function () {
     window.addEventListener(`resize`, function(event) {
       this.recalc();
     }.bind(this));
   }
-
 methods:
-  onLoad: | #ts
+  onLoad: |
     function () {
       this.recalc();
       this.$emit("load");
     }
-  recalc: | #ts
+  recalc: |
     function () {
       if (!this.$refs.image1) return;
       let rect = this.$refs.image1.getBoundingClientRect();
       this.width = Math.round(rect.width);
       this.height = Math.round(rect.height);
     }
-  getCssClass: | #ts
+  getCssClass: |
     function () {
       return { empty: !this.src };
     }
-
 computed:
-  src: | #ts
+  src: |
     function () {
       if (this.url) return this.url;
       if (this.imageID) return this.$root.url.image(this.imageID);
       return null;
     }
-  emptySrc: | #ts
+  emptySrc: |
     function () {
       return '/img/empty.png';
     }
-
 style:
   .image, img:
     width: 100%
-    
+name: ui-image

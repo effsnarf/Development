@@ -39,6 +39,7 @@ computed:
 style:
   .comp-ui-image, img:
     aspect-ratio: 1
+    object-fit: cover
   .comp-ui-image, .texts, .text:
     position: absolute
   .spacer, .texts:

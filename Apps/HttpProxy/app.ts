@@ -53,7 +53,7 @@ const isCachable = (options: any, config: any) => {
   const cache = await Cache.new(config.cache.store);
 
   // Forward all incoming HTTP requests to config.target.base.url/..
-  // If a request times out, try the cache first
+  // If a request fails (target is down), try the cache first
   // If the cache doesn't have the response, try again up to cache.target.try.again.retries times
   const app = express();
   // Catch all requests
@@ -90,9 +90,6 @@ const isCachable = (options: any, config: any) => {
         return res.end();
       }
 
-      if (attempt == 1) {
-        //logNewLine(`${`Trying again`.yellow} ${options.url.gray}`);
-      }
       try {
         // We're only interested in the time it took us to get the response from the target,
         // not the time it took us to send the response to the client
