@@ -221,8 +221,8 @@ const isCachable = (options: any, config: any) => {
         server.host.toString().green
       }:${server.port.toString().yellow}`
     );
-    logNewLine(
-      `${`Target`.green} ${`URL`.gray} ${config.target.base.url.yellow}`
-    );
+    for (const url of config.target.base.urls) {
+      logNewLine(`${`Target`.green} ${`URL`.gray} ${url.yellow}`);
+    }
   });
 })();
