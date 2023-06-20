@@ -372,41 +372,6 @@ class LoadBalancer {
 
     incomingItem.infos.push(`writing headers`);
 
-    if (this.cache) {
-      if (this.isCachable(incomingItem.request, nodeResponse)) {
-        try {
-          let data = await this.getResponseStream(nodeResponse);
-          if (typeof data != "string") data = Objects.jsonify(data);
-          if (data.trim().length) {
-            // Get the response data
-            const cachedResponse = {
-              dt: Date.now(),
-              url: incomingItem.request.url,
-              status: {
-                code: nodeResponse.status,
-                text: nodeResponse.statusText,
-              },
-              headers: nodeResponse.headers,
-              body: data,
-            };
-            delete cachedResponse.headers["access-control-allow-origin"];
-            await this.cache.set(
-              incomingItem.request.url || "",
-              cachedResponse
-            );
-            this.cacheQueue.delete(incomingItem.request.url || "");
-          }
-        } catch (ex: any) {
-          this.log(`${`Error caching response`}\n${ex.message}`);
-          try {
-            this.log(util.inspect(nodeResponse.data, true, 10000, false));
-          } catch (ex: any) {
-            this.log(`Error inspecting response body`);
-          }
-        }
-      }
-    }
-
     if (incomingItem.returnToClient) {
       incomingItem.response.statusCode = status;
       incomingItem.response.statusMessage = nodeResponse?.statusText || "";
@@ -445,6 +410,41 @@ class LoadBalancer {
       incomingItem.infos.push(`piping data`);
 
       nodeResponse.data.pipe(incomingItem.response);
+    }
+
+    if (this.cache) {
+      if (this.isCachable(incomingItem.request, nodeResponse)) {
+        try {
+          let data = await this.getResponseStream(nodeResponse);
+          if (typeof data != "string") data = Objects.jsonify(data);
+          if (data.trim().length) {
+            // Get the response data
+            const cachedResponse = {
+              dt: Date.now(),
+              url: incomingItem.request.url,
+              status: {
+                code: nodeResponse.status,
+                text: nodeResponse.statusText,
+              },
+              headers: nodeResponse.headers,
+              body: data,
+            };
+            delete cachedResponse.headers["access-control-allow-origin"];
+            await this.cache.set(
+              incomingItem.request.url || "",
+              cachedResponse
+            );
+            this.cacheQueue.delete(incomingItem.request.url || "");
+          }
+        } catch (ex: any) {
+          this.log(`${`Error caching response`}\n${ex.message}`);
+          try {
+            this.log(util.inspect(nodeResponse.data, true, 10000, false));
+          } catch (ex: any) {
+            this.log(`Error inspecting response body`);
+          }
+        }
+      }
     }
 
     let nodeResponseSize = parseInt(
@@ -503,6 +503,8 @@ class LoadBalancer {
         incomingItem.attempt.ordinalize(),
         uElapsed,
         `${logMsg.bgRed}`,
+        incomingItem.request.url,
+        incomingItem.nodeItem.node.address.port.toString(),
       ],
     });
 
@@ -514,6 +516,8 @@ class LoadBalancer {
         null,
         null,
         `${ex.stack?.bgRed}`,
+        incomingItem.request.url,
+        incomingItem.nodeItem.node.address.port.toString(),
       ],
     });
 
@@ -527,7 +531,7 @@ class LoadBalancer {
         incomingItem.nodeItem.index
       );
       // Try again
-      setTimeout(() => this.processIncomingItem.bind(this)(incomingItem), 1000);
+      setTimeout(() => this.processIncomingItem.bind(this)(incomingItem), 0);
     } else {
       // We've reached the maximum number of attempts
       // Remove the item from the queue

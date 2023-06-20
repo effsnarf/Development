@@ -1,6 +1,6 @@
 title: MG.DBP.LB
 incoming:
-  address: localhost:4045
+  address: localhost:4050
   cors:
     [
       https://memegenerator.net,
