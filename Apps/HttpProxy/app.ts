@@ -112,10 +112,9 @@ const isCachable = (options: any, config: any) => {
         // Add access-control-allow-origin *
         // Get the origin of the request
         const origin = req.headers.origin || "*";
-        response.headers["access-control-allow-origin"] = origin;
-        response.headers["x-test"] = Date.now().toString();
         res.status(response.status);
         res.set(response.headers);
+        res.set("access-control-allow-origin", origin);
 
         response.data.pipe(res);
         // When the response ends
@@ -172,6 +171,7 @@ const isCachable = (options: any, config: any) => {
                 res.set("x-debug-proxy-source", "cache");
                 res.status(cachedResponse.status.code);
                 res.set(cachedResponse.headers);
+                res.set("access-control-allow-origin", "*");
                 return res.end(cachedResponse.body);
               }
             }
