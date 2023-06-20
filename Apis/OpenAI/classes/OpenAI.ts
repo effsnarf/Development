@@ -153,7 +153,7 @@ class OpenAI {
     } catch (ex: any) {
       let msg = ex.response?.data?.error?.message;
       this.log();
-      this.log(colors.red(msg));
+      this.log(msg.red);
       throw msg || ex;
     } finally {
       this.loading.stop();
