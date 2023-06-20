@@ -171,7 +171,7 @@ const isCachable = (options: any, config: any) => {
                 res.set("x-debug-proxy-source", "cache");
                 res.status(cachedResponse.status.code);
                 res.set(cachedResponse.headers);
-                res.set("access-control-allow-origin", "*");
+                res.set("access-control-allow-origin", origin);
                 return res.end(cachedResponse.body);
               }
             }
