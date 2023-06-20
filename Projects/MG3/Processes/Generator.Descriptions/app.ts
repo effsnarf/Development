@@ -11,14 +11,17 @@ import { Database } from "@shared/Database/Database";
   const batchSize = 10;
 
   console.log(`Getting generators..`.gray);
+
   const generators = await db.find(
     "Generators",
-    { Description: null },
+    {},
     { InstancesCount: -1 },
     batchSize,
     0,
     true
   );
+
+  console.log(`Found ${generators.length} generators`.gray);
 
   for (const generator of generators) {
     console.log(`${generator.displayName.green}`);

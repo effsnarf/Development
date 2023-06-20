@@ -1,7 +1,7 @@
 database:
   content:
-    name: MemeGenerator
+    database: MemeGenerator
     connectionString: mongodb://localhost:27017
   analytics:
-    name: MG-Analytics
+    database: MG-Analytics
     connectionString: mongodb://localhost:47017

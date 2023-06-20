@@ -60,7 +60,7 @@ class MongoDatabase extends DatabaseBase {
     skip?: number | undefined,
     lowercaseFields?: boolean | undefined
   ) {
-    let docs = await this.aggregate(collectionName, [
+    const pipeline = [
       {
         $match: query,
       },
@@ -73,7 +73,9 @@ class MongoDatabase extends DatabaseBase {
       {
         $limit: limit,
       },
-    ]);
+    ];
+
+    let docs = await this.aggregate(collectionName, pipeline);
 
     if (lowercaseFields)
       docs = docs.map((d) => {
