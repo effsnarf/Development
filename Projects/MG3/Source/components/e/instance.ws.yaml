@@ -37,6 +37,8 @@ computed:
       return sizes;
     }
 style:
+  .comp-ui-image, img:
+    aspect-ratio: 1
   .comp-ui-image, .texts, .text:
     position: absolute
   .spacer, .texts:
