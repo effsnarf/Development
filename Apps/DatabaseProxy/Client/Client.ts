@@ -22,6 +22,14 @@ class DatabaseProxy {
     }
   }
 
+  private static setValue(obj: any, value: any) {
+    if (Array.isArray(obj)) {
+      obj[0][obj[1]] = value;
+    } else {
+      obj.value = value;
+    }
+  }
+
   private static async fetchJson(url: string, options: any = {}) {
     // $set also implies cached
     if (!options.$set) {
@@ -44,12 +52,12 @@ class DatabaseProxy {
     }
     // Check the local cache
     const cachedItem = JSON.parse(localStorage.getItem(url) || "null");
-    if (cachedItem) options.$set[0][options.$set[1]] = cachedItem;
+    if (cachedItem) DatabaseProxy.setValue(options.$set, cachedItem);
     // Fetch in the background
     const item = await (await fetch(url)).json();
     // Update the local cache
     localStorage.setItem(url, JSON.stringify(item));
-    options.$set[0][options.$set[1]] = item;
+    DatabaseProxy.setValue(options.$set, item);
     return item;
   }
 

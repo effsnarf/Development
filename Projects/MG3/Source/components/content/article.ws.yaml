@@ -1,19 +1,19 @@
 dom:
   div:
     ui.image:
-      :url: $root.url.image($root.generator?.imageID)
+      ":url": $root.url.image($root.generator?.imageID)
     ui.large.title:
-      ":text": "$root.generator?.displayName"
+      ":text": $root.generator?.displayName
     .text:
-      v-html: $root.generator?.htmlDescription
+      p:
+        v-for: paragraph in $root.generator?.description
+        v-text: paragraph
 style:
   .comp-ui-image:
-    width: 30%
+    width: 15%
     margin: 0 1em
     float: left
   .text:
     "-webkit-mask-image": >-
-      -webkit-gradient(linear, left top, left bottom, color-stop(0%, rgba(0, 0,
-      0, 1)), color-stop(40%, rgba(0, 0, 0, 1)), color-stop(100%, rgba(0, 0,
-      0, 0.4)))
+      #-webkit-gradient(linear, left top, left bottom, color-stop(0%, rgba(0, 0, #0, 1)), color-stop(40%, rgba(0, 0, 0, 1)), color-stop(100%, rgba(0, 0, 0, #0.4)))
 name: content-article

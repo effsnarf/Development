@@ -4,7 +4,8 @@ dom:
     content.article: null
     .columns:
       div: null
-      content.stream: null
+      content.stream:
+        items: $root.instances
       content.recommendations: null
 style:
   .columns:

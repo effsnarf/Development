@@ -109,7 +109,6 @@ const isCachable = (options: any, config: any) => {
         // Add access-control-allow-origin *
         res.status(response.status);
         res.set(response.headers);
-        res.set("access-control-allow-origin", "*");
         response.data.pipe(res);
         // When the response ends
         response.data.on("end", async () => {

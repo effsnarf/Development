@@ -2,9 +2,11 @@ dom:
   div:
     class: image
     ui.image:
-      ':url': url
+      ":url": $root.url.image(imageID)
 name: content-instance
 props:
-  url: null
+  imageID:
+  text0:
+  text1:
 style:
   .image: null

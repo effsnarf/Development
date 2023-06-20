@@ -9,44 +9,43 @@ interface ParamItem {
 }
 
 class Params {
+  dataNames: string[] = [];
   private _items: ParamItem[] = [];
 
-  private constructor(public $root: any, private _config: any) {}
+  private constructor(private getRootVue: () => any, private _config: any) {
+    this.dataNames = Object.keys(_config.data);
+  }
 
-  static async new(rootVue: any, config: any, url: string) {
-    const params = new Params(rootVue, config);
+  static async new(getRootVue: () => any, config: any, url: string) {
+    const params = new Params(getRootVue, config);
     await params.init();
     await params.refresh(url);
     return params;
   }
 
-  private async init() {
+  async init() {
     for (const param of Object.entries(this._config.params)) {
       const paramConf = param[1] as any;
       const get = eval(`(${paramConf.get})`);
       const watch = eval(`(${paramConf.watch.handler})`);
       const immediate = paramConf.watch.immediate;
+      const ref = Vue.ref({ value: null });
 
       const paramItem = {
         name: param[0],
         get,
         watch,
         immediate,
-        ref: Vue.ref(),
+        ref,
       };
       this._items.push(paramItem);
       (this as any)[paramItem.name] = paramItem.ref;
-      Vue.watch(
-        paramItem.ref,
-        async (newValue: any) => {
-          await paramItem.watch.apply(this, [newValue]);
-        },
-        { immediate: paramItem.immediate }
-      );
+
+      const rootVue = this.getRootVue();
     }
   }
 
-  private async refresh(url: string) {
+  async refresh(url: string) {
     for (const item of this._items) {
       item.ref.value = await item.get.apply(this, [url]);
     }
