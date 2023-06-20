@@ -42,7 +42,6 @@ methods:
     async function() {
       if (this.isLoading) return;
       this.isLoading = true;
-      alertify.message(`Loading page ${this.pageIndex}...`);
       const newItems = await this.getMoreItems(this.pageIndex);
       this.pageIndex++;
       this.items.push(...newItems);
