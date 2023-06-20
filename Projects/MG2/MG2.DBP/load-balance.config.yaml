@@ -1,4 +1,4 @@
-title: MG.DBP
+title: MG.DBP.LB
 incoming:
   address: localhost:4045
   cors:

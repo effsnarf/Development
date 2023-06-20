@@ -1,4 +1,4 @@
-title: MG.DBP
+title: MG.DBP.Proxy
 incoming:
   server:
     prod:
@@ -39,6 +39,9 @@ cache:
       - database:
           connectionString: mongodb://localhost:37017
           database: MG-DBP-Cache
+log:
+  enabled: true
+  path: (env) => env.getLogPath(env.config.title)
 display:
   stats:
     every: 1m

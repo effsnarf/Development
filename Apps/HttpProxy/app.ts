@@ -7,6 +7,7 @@ import { Timer, IntervalCounter } from "@shared/Timer";
 import { Cache } from "@shared/Cache";
 import { Http } from "@shared/Http";
 import { Analytics, ItemType } from "@shared/Analytics";
+import { Logger } from "@shared/Logger";
 import {
   Console,
   Layout,
@@ -17,21 +18,6 @@ import {
   Unit,
 } from "@shared/Console";
 
-const logLine = (...args: any[]) => {
-  args = [new Date().toLocaleTimeString().blue.bold, ...args];
-  process.stdout.write("\r");
-  process.stdout.clearLine(0);
-  process.stdout.write(args.join(" "));
-  process.stdout.write("\r");
-};
-
-const logNewLine = (...args: any[]) => {
-  args = [new Date().toLocaleTimeString().blue.bold, ...args];
-  process.stdout.write("\r");
-  process.stdout.clearLine(0);
-  console.log(...args);
-};
-
 const isCachable = (options: any, config: any) => {
   if (options.method != "GET") return false;
   if (config.cache.ignore.find((c: any) => options.url.startsWith(c)))
@@ -41,6 +27,25 @@ const isCachable = (options: any, config: any) => {
 
 (async () => {
   const config = (await Configuration.new()).data;
+
+  const debugLogger = Logger.new(config.log);
+
+  const logLine = (...args: any[]) => {
+    args = [new Date().toLocaleTimeString().blue.bold, ...args];
+    process.stdout.write("\r");
+    process.stdout.clearLine(0);
+    process.stdout.write(args.join(" "));
+    process.stdout.write("\r");
+    debugLogger.log(...args);
+  };
+
+  const logNewLine = (...args: any[]) => {
+    args = [new Date().toLocaleTimeString().blue.bold, ...args];
+    process.stdout.write("\r");
+    process.stdout.clearLine(0);
+    console.log(...args);
+    debugLogger.log(...args);
+  };
 
   const stats = {
     interval: config.display.stats.every.deunitify(),
