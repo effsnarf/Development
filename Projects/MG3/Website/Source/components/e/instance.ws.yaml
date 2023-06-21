@@ -1,21 +1,21 @@
 dom:
-  div:
-    ui.image:
-      ref: image1
-      :imageID: imageID
-      @load: onImageLoad
-    .texts:
-      .text:
-        v-for: (text, index) in [text0, text1]
-        v-text: text
-        :style: "{ fontSize: fontSizes[index] }"
+  ui.link:
+    :url: $root.url.instance(item)
     div:
-      class: spacer
+      ui.image:
+        ref: image1
+        :imageID: item.imageID
+        @load: onImageLoad
+      .texts:
+        .text:
+          v-for: (text, index) in [item.text0, item.text1]
+          v-text: text
+          :style: "{ fontSize: fontSizes[index] }"
+      div:
+        class: spacer
 name: e-instance
 props:
-  imageID:
-  text0:
-  text1:
+  item:
 data:
   width:
 methods:
@@ -23,8 +23,8 @@ methods:
     function (s) {
       if (!s) return 0;
       if (!this.width) return 0;
-      const size = Math.max(14, (36 - (s.length / 6))) / 50 *  this.width / 150;
-      return `${size}em`;
+      const size = Math.min(3, Math.max(14, (36 - (s.length / 6))) / 50 *  this.width / 150);
+      return `${size*2}vh`;
     }
   onImageLoad: | #ts
     function () {
@@ -33,10 +33,12 @@ methods:
 computed:
   fontSizes: | #ts
     function () {
-      const sizes = [this.getFontSize(this.text0), this.getFontSize(this.text1)];
+      const sizes = [this.getFontSize(this.item.text0), this.getFontSize(this.item.text1)];
       return sizes;
     }
 style:
+  .comp-e-instance:
+    box-shadow: "-10px 10px 2px #000"
   .comp-ui-image, img:
     aspect-ratio: 1
     object-fit: cover
@@ -59,6 +61,8 @@ style:
     -webkit-font-smoothing: antialiased
     box-sizing: border-box
     padding: 0.3em
+    filter: "drop-shadow(-2px 4px 2px #00000060)"
+    transition: 0s
   .text:nth-child(2):
     top: auto
     bottom: 0

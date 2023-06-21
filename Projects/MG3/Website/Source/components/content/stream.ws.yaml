@@ -37,22 +37,31 @@ props:
   gridClass:
 
 data:
-  isLoading: false
   pageIndex: 0
   items: []
+  queue: []
 
 methods:
   loadMore: | #ts
     async function() {
       if (!this.getMoreItems) return;
-      if (this.isLoading) return;
-      this.isLoading = true;
-      const newItems = await this.getMoreItems(this.pageIndex);
-      this.pageIndex++;
-      this.items.push(...newItems);
-      this.isLoading = false;
-      return;
+      const pageIndex = this.pageIndex++;
+      this.queue.push(async () => {
+        const newItems = await this.getMoreItems(pageIndex);
+        this.items.push(...newItems);
+      });
     }
+  processQueue: | #ts
+    async function() {
+      const next = this.queue.shift();
+      if (next) await next();
+      setTimeout(this.processQueue.bind(this), 300);
+    }
+
+mounted: | #ts
+  function() {
+    this.processQueue();
+  }
 
 style:
   .stream:

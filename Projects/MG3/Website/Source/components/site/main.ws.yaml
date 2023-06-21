@@ -5,8 +5,9 @@ dom:
       name: article
     .columns:
       div#1: null
-      content.stream:
-        :getMoreItems: getMoreItems
+      div#2:
+        slot:
+          name: middle
       div:
         ui.sticky:
           top: 140px
@@ -14,10 +15,11 @@ dom:
             :items: recommendationItems
 
 props:
-  getMoreItems:
   recommendationItems:
 
 style:
+  .comp-site-main:
+    margin-top: 3rem
   .columns:
     display: grid
     grid-template: 1fr / 1fr 2fr 1fr

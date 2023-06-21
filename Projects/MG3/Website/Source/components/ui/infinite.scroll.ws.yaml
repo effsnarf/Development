@@ -5,9 +5,8 @@ dom:
 mounted: | #ts
   function() {
     window.addEventListener('scroll', this.onScroll);
-    this.$nextTick(() => {
-      this.$emit('scroll');
-    });
+    this.onScroll();
+    this.onScroll();
   }
 
 methods:

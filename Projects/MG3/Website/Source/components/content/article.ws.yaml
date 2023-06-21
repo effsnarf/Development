@@ -1,31 +1,14 @@
 dom:
   div:
-    ui.image:
-      ':url': $root.url.image($root.generator?.imageID)
-    ui.large.title:
-      ':text': $root.generator?.displayName
     .text:
-      p:
-        v-for: paragraph in getParagraphs($root.generator?.description)
-        v-text: paragraph
+      slot:
+        name: content
+
 methods:
-  getParagraphs: |
-    function (text) {
-      if (typeof text == 'string') return text.split(`\n`).slice(0, 4);
-      if (Array.isArray(text)) return text.slice(0, 4);
-      return [];
-    }
 style:
-  .comp-ui-image img:
-    aspect-ratio: 1
-    object-fit: cover
-  .comp-ui-image:
-    width: 15% !important
-    margin: 0 1em
-    float: left
   .text:
     min-height: 10rem
-    '-webkit-mask-image': >-
+    "-webkit-mask-image": >-
       #-webkit-gradient(linear, left top, left bottom, color-stop(0%, rgba(0, 0,
       #0, 1)), color-stop(40%, rgba(0, 0, 0, 1)), color-stop(100%, rgba(0, 0, 0,
       #0.4)))

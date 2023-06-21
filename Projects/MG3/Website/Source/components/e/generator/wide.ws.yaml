@@ -1,18 +1,24 @@
 name: badge-generator-wide
 dom:
   ui.link:
+    class: grayish
     :url: url
-    div:
+    .show-on-hover-container:
       ui.image:
+        class: z-10
         :imageID: item.imageID
       ui.title:
         :text: item.displayName
-      content.poem2:
-        :lines: item.
+      content.poem.stanza:
+        class: show-on-hover
+        :item: $root.getRandomStanza(item.desc?.poem)
 props:
   item:
 
 style:
+  .comp-ui-image:hover img:
+    transform: scale(1.5)
+    aspect-ratio: 4 / 2
   img:
     aspect-ratio: 4 / 1
     width: 100%

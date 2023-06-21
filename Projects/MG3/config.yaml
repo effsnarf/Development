@@ -5,3 +5,24 @@ database:
   analytics:
     database: MG-Analytics
     connectionString: mongodb://localhost:47017
+template:
+  get: | #ts
+    async function(dbp, req) {
+      const getTitle = async () => {
+        if (req.url.startsWith("/instance/")) {
+          const instanceID = parseInt(req.url.split("/")[2]);
+          const inst = await dbp.instances.select.one(instanceID);
+          const gen = await dbp.generators.select.one(inst.generatorID);
+          return [[inst.text0, inst.text1].filter(a => a).join(", "), gen.displayName].filter(a => a).join(" - ");
+        }
+        const urlName = req.url.split("/")[1];
+        const gen = await dbp.generators.select.one(null, urlName);
+        return gen.displayName;
+      }
+
+      return {
+        title: [await getTitle(), `Meme Generator`].filter(a => a).join(" - "),
+      }
+    }
+databaseProxy:
+  url: https://db.memegenerator.net/MemeGenerator

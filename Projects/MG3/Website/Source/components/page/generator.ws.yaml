@@ -2,16 +2,71 @@ dom:
   site:
     :get-more-items: $root.getMoreInstances
     :recommendation-items: recommendationItems
-    template:
+    template#1:
       v-slot: article
+      content.title:
+        :imageID: generator?.imageID
+        :title: generator?.displayName
       content.article:
+        template:
+          v-slot: content
+          .poem:
+            content.poem.stanza:
+              v-for: stanza in getRandomStanzas(generator?.desc?.poem)
+              :item: stanza
+          div:
+            class: float-clear
+
+    template#2:
+      v-slot: middle
+      content.stream:
+        item-type: e.instance
+        :get-more-items: getMoreInstances
+        grid-class: grid-1
 
 data:
+  generator:
   recommendationItems: []
 
 mounted: | #ts
   async function() {
-    if (!this.$root.params.urlName) return;
-    const items = await this.$root.dbp.generators.select.related(this.$root.params.urlName);
-    this.recommendationItems = items;
+    const dbp = this.$root.dbp;
+    let { instanceID, urlName } = this.$root.params;
+    const instance = (!instanceID ? null : await dbp.instances.select.one(instanceID));
+    urlName = urlName || instance?.urlName;
+    this.generator = !urlName ? null : await dbp.generators.select.one(null, urlName);
+    this.urlName = urlName;
+    this.recommendationItems = await dbp.generators.select.related(urlName);
   }
+
+methods:
+  getMoreInstances: | #ts
+    async function(pageIndex) {
+      const items = await this.$root.dbp.instances.select.popular("en", pageIndex, this.urlName)
+      debugger;
+      return items;
+    }
+  getRandomStanzas: | #ts
+    function(poem) {
+      if (!poem) return [];
+      // Return 3 random stanzas
+      const stanzas = [...poem];
+      const result = [];
+      for (let i = 0; i < 3; i++) {
+        const index = Math.floor(Math.random() * stanzas.length);
+        result.push(stanzas[index]);
+        stanzas.splice(index, 1);
+      }
+      return result;
+    }
+
+style:
+  .poem:
+    float: clear
+  .poem .comp-content-poem-stanza:
+    float: left
+    margin: 1rem
+  .poem .line:nth-child(1):
+    font-size: 160%
+  .float-clear:
+    clear: both

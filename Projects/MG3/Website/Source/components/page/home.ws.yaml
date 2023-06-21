@@ -3,7 +3,7 @@ dom:
     template:
       v-slot: article
       content.stream:
-        item-type: "e.generator.wide"
+        item-type: e.generator.wide
         :getMoreItems: $root.dbp.generators.select.popular
         grid-class: grid-3
 

@@ -12,7 +12,8 @@ class HttpServer {
   private constructor(
     port: number,
     ip: string,
-    private handler: (req: any, res: any, data: any) => any
+    private handler: (req: any, res: any, data: any) => any,
+    private getIndexPageTemplateData: (req: any) => any
   ) {
     const server = http.createServer(this.requestListener.bind(this));
     server.listen(port, ip, () => {
@@ -23,9 +24,10 @@ class HttpServer {
   static async new(
     port: number,
     ip: string,
-    handler: (req: any, res: any, data: any) => any
+    handler: (req: any, res: any, data: any) => any,
+    getIndexPageTemplateData: (req: any) => Promise<any>
   ) {
-    const server = new HttpServer(port, ip, handler);
+    const server = new HttpServer(port, ip, handler, getIndexPageTemplateData);
     return server;
   }
 
@@ -55,7 +57,7 @@ class HttpServer {
         let readStream = fs.createReadStream(path);
         readStream.pipe(res);
       } else {
-        const content = await HttpServer.getContent(path);
+        const content = await this.getContent(req, path);
         if (typeof content == `string`) {
           res.write(content, "utf-8");
         } else {
@@ -65,7 +67,7 @@ class HttpServer {
       }
       return;
     } catch (ex: any) {
-      if (!ex.message.includes("favicon.ico")) {
+      if (!ex.message?.includes("favicon.ico")) {
         console.log(`${ex.message?.bgRed}`);
       }
       // Set status code 500
@@ -79,7 +81,7 @@ class HttpServer {
     return mime.lookup(path);
   }
 
-  private static getContent(path: string) {
+  private async getContent(req: any, path: string) {
     try {
       if (
         ["ico", "png", "webp", "jpeg", "jpg"].some((ext) =>
@@ -91,9 +93,12 @@ class HttpServer {
         return bytes;
       }
 
-      const fileContent = fs.readFileSync(path, "utf-8");
+      let fileContent = fs.readFileSync(path, "utf-8");
       if (path.endsWith(".haml")) {
         try {
+          fileContent = Handlebars.compile(fileContent)(
+            await this.getIndexPageTemplateData(req)
+          );
           return HAML.render(fileContent);
         } catch (ex: any) {
           console.log(`${ex.stack.bgRed}`);

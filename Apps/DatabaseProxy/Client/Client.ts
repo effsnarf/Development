@@ -7,10 +7,21 @@
 };
 
 class DatabaseProxy {
-  private constructor(private urlBase: string) {}
+  private fetchAsJson: (url: string) => Promise<any>;
 
-  static async new(urlBase: string) {
-    const dbp = new DatabaseProxy(urlBase);
+  private constructor(
+    private urlBase: string,
+    _fetchAsJson?: (url: string) => Promise<any>
+  ) {
+    this.fetchAsJson =
+      _fetchAsJson || (async (url: string) => await (await fetch(url)).json());
+  }
+
+  static async new(
+    urlBase: string,
+    _fetchAsJson?: (url: string) => Promise<any>
+  ) {
+    const dbp = new DatabaseProxy(urlBase, _fetchAsJson);
     await dbp.init();
     return dbp;
   }
@@ -30,7 +41,7 @@ class DatabaseProxy {
     }
   }
 
-  private static async fetchJson(url: string, options: any = {}) {
+  private async fetchJson(url: string, options: any = {}) {
     // $set also implies cached
     if (!options.$set) {
       if (options.cached) {
@@ -38,7 +49,7 @@ class DatabaseProxy {
         // we still want to fetch in the background
         // to update for the next time
         const fetchItem = async () => {
-          const item = await (await fetch(url)).json();
+          const item = await this.fetchAsJson(url);
           //localStorage.setItem(url, JSON.stringify(item));
           return item;
         };
@@ -49,14 +60,14 @@ class DatabaseProxy {
         fetchItem();
         return cachedItem;
       }
-      return await (await fetch(url)).json();
+      return await this.fetchAsJson(url);
     }
     // Check the local cache
     //const cachedItem = JSON.parse(localStorage.getItem(url) || "null");
     const cachedItem = null;
     if (cachedItem) DatabaseProxy.setValue(options.$set, cachedItem);
     // Fetch in the background
-    const item = await (await fetch(url)).json();
+    const item = await this.fetchAsJson(url);
     // Update the local cache
     //localStorage.setItem(url, JSON.stringify(item));
     DatabaseProxy.setValue(options.$set, item);
@@ -79,7 +90,7 @@ class DatabaseProxy {
       .map((a) => `${a.name}=${JSON.stringify(a.value || null)}`)
       .join("&");
     const url = `${this.urlBase}/api/${entity}/${group}/${method}?${argsStr}`;
-    const result = await DatabaseProxy.fetchJson(url, options);
+    const result = await this.fetchJson(url, options);
     return result;
   }
 
@@ -124,7 +135,7 @@ class DatabaseProxy {
   }
 
   private async getApiMethods(): Promise<any> {
-    const result = await DatabaseProxy.fetchJson(`${this.urlBase}/api`, {
+    const result = await this.fetchJson(`${this.urlBase}/api`, {
       cached: true,
     });
     return result;

@@ -1,0 +1,39 @@
+dom:
+  site:
+    :recommendation-items: recommendationItems
+    template#1:
+      v-slot: article
+      content.title:
+        :imageID: generator?.imageID
+        :title: generator?.displayName
+
+    template#2:
+      v-slot: middle
+      content.stream:
+        item-type: e.instance
+        :get-more-items: getMoreInstances
+        grid-class: grid-1
+
+data:
+  instance:
+  generator:
+  recommendationItems: []
+
+mounted: | #ts
+  async function() {
+    const dbp = this.$root.dbp;
+    let { instanceID } = this.$root.params;
+    this.instance = (!instanceID ? null : await dbp.instances.select.one(instanceID));
+    urlName = urlName || this.instance?.urlName;
+    this.generator = !urlName ? null : await dbp.generators.select.one(null, urlName);
+    this.urlName = urlName;
+    this.recommendationItems = await dbp.generators.select.related(urlName);
+  }
+
+methods:
+  getMoreInstances: | #ts
+    async function(pageIndex) {
+      return this.$root.dbp.instances.select.popular("en", pageIndex)
+    }
+
+style:

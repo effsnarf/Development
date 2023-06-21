@@ -1,7 +1,9 @@
 dom:
   div:
     page.home:
+      v-if: $root.params.page == 'home'
     page.generator:
+      v-if: $root.params.page == 'generator'
 name: app
 
 style:

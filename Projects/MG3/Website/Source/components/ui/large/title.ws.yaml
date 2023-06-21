@@ -17,4 +17,6 @@ style:
       0, 0.4)))
     white-space: normal
     text-shadow: "-3px 3px 3px black"
+    z-index: 30
+    transition: 1s
 name: ui-large-title
