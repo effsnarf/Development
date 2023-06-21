@@ -64,6 +64,11 @@ interface MgParams {
       refresh() {
         (this as any).key1++;
       },
+      getKey(item: any) {
+        if (item.instanceID) return item.instanceID;
+        if (item.generatorID) return item.generatorID;
+        return null;
+      },
     },
   });
 

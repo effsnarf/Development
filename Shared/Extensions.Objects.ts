@@ -73,9 +73,11 @@ class Objects {
   }
 
   static toCamelCaseKeys(obj: any): any {
-    const result = {};
+    const result = {} as any;
     for (const key of Object.keys(obj)) {
-      (result as any)[key.toCamelCase()] = obj[key];
+      let value = obj[key];
+      if (typeof value === "object") value = Objects.toCamelCaseKeys(value);
+      result[key.toCamelCase()] = value;
     }
     return result;
   }
