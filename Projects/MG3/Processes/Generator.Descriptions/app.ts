@@ -7,7 +7,20 @@ import { ChatOpenAI, Roles } from "../../../../Apis/OpenAI/classes/ChatOpenAI";
 
 const wait = (ms: number) => {
   const loading = Loading.startNew(`Waiting ${ms.unitifyTime()}..`);
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  //return new Promise((resolve) => setTimeout(resolve, ms));
+};
+
+var isLetter = (str: string) => {
+  return str.length === 1 && str.match(/[a-z]/i);
+};
+
+var removeCamelCaseKeys = (obj: any) => {
+  const ret = {} as any;
+  for (const key of Object.keys(obj)) {
+    if (isLetter(key[0]) && key[0].toLowerCase() == key[0]) continue;
+    ret[key] = obj[key];
+  }
+  return ret;
 };
 
 const convertKeysToTitleCase = (obj: any) => {
@@ -28,34 +41,43 @@ const convertKeysToTitleCase = (obj: any) => {
 
     console.log(`Getting generators..`.gray);
 
-    const generators = await db.find(
-      "Generators",
-      { Desc: null },
-      { InstancesCount: -1 },
-      batchSize,
-      0,
-      true
-    );
+    const generators = (
+      await db.find(
+        "Generators",
+        // {
+        //   UrlName: {
+        //     $in: ["Courage-Wolf", "Forever-Alone", "Socially-Awkward-Penguin"],
+        //   },
+        // },
+        {},
+        // { Desc: null },
+        { InstancesCount: -1 },
+        batchSize,
+        0,
+        false
+      )
+    ).map((g: any) => removeCamelCaseKeys(g));
 
     console.log(`Found ${generators.length} generators`.gray);
 
-    console.log(generators.map((g) => g.displayName.green).join("\n"));
+    console.log(generators.map((g) => g.DisplayName.green).join("\n"));
 
     for (const generator of generators) {
       let instancesCount = maxInstancesCount;
-      const desc = {} as any;
+      const desc = generator.Desc || {};
+
       while (
         (instancesCount > 0 && !Object.values(desc).length) ||
         Object.values(desc).some((a) => !a)
       ) {
         try {
-          console.log(`${generator.displayName.green}`);
+          console.log(`${generator.DisplayName.green}`);
           console.log(
-            `Getting ${generator.displayName.green} instances..`.gray
+            `Getting ${generator.DisplayName.green} instances..`.gray
           );
           const instances = await db.find(
             "Instances",
-            { LanguageCode: "en", GeneratorID: generator.generatorID },
+            { LanguageCode: "en", GeneratorID: generator.GeneratorID },
             { TotalVotesScore: -1 },
             instancesCount,
             0,
@@ -64,15 +86,17 @@ const convertKeysToTitleCase = (obj: any) => {
           console.log(`Found ${instances.length} instances`.gray);
 
           const tasks = {
-            haiku: "Write a haiku about this meme",
-            poem: "Write a poem exactly 9 verses long about this meme",
+            //Haiku: "Write a haiku about this meme",
+            Poem: "Write a poem about this meme, with 9 stanzas, 4 lines each",
+            //aiInstances: "Write 10 examples of this meme in the topic of artificial intelligence",
           } as any;
 
           for (const task of Object.entries(tasks)) {
+            if (desc[task[0]]) continue;
+
             const message = `${task[1]}
-        , based on its name and sayings.
   
-        ${generator.displayName}
+        ${generator.DisplayName}
   
         ${instances.map((inst) =>
           [inst.text0, inst.text1].filter((a) => a).join(", ")
@@ -85,7 +109,19 @@ const convertKeysToTitleCase = (obj: any) => {
 
             console.log(reply);
 
-            desc[task[0]] = reply;
+            if (task[0] == "Haiku") {
+              desc[task[0]] = reply.split("\n").map((a) => a.trim());
+            }
+
+            if (task[0] === "Poem") {
+              desc[task[0]] = reply
+                .split("\n\n")
+                .map((a) => a.trim())
+                .filter((a) => a)
+                .map((a) => a.split("\n").map((a) => a.trim()));
+            } else {
+              desc[task[0]] = reply;
+            }
           }
         } catch (ex: any) {
           instancesCount -= 5;
@@ -95,9 +131,9 @@ const convertKeysToTitleCase = (obj: any) => {
         }
       }
 
-      generator.desc = desc;
+      generator.Desc = desc;
 
-      db.upsert("Generators", convertKeysToTitleCase(generator));
+      await db.upsert("Generators", generator);
     }
   }
 })();
