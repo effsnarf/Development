@@ -2,8 +2,6 @@ const util = require("util");
 import path from "path";
 import fs from "fs";
 import "colors";
-import express from "express";
-import * as moment from "moment";
 import axios from "axios";
 import "@shared/Extensions";
 import { Timer } from "@shared/Timer";
@@ -37,46 +35,4 @@ const malkovitch = new Malkovich();
 
 (async () => {
   console.log(Configuration.getEnvironment());
-
-  //const config = (await Configuration.new()).data;
-
-  const root = await LiveTree.Api.getFolder("c:/eff/Development");
-
-  const path = ["Shared", "Timer.ts", "Timer"];
-
-  let node = root as LiveTree.Node | undefined;
-  while (path.length) {
-    await node?.populate();
-    node = await node?.find(path.shift() || "");
-  }
-  await node?.populate();
-
-  console.log(
-    util.inspect(
-      await root.select((n) => {
-        return { title: n.title, info: n.info };
-      }),
-      { depth: 10, colors: true }
-    )
-  );
-
-  // // Create the express app
-  // const httpServer = express();
-  // httpServer.use(express.json());
-
-  // const handleRequest = async (req: any, res: any) => {
-  //   try {
-  //     const path = req.url.split("/").slice(2);
-  //     const nodes = await LiveTree.Api.getSubNodes(path);
-  //     return res.end(JSON.stringify(nodes.map((n) => n.title)));
-  //   } catch (ex: any) {
-  //     return res.status(500).end(ex.message);
-  //   }
-  // };
-
-  // httpServer.get("/tree", handleRequest);
-  // httpServer.get("/tree/*", handleRequest);
-
-  // // Start the server
-  // httpServer.listen(config.server.port, config.server.host);
 })();
