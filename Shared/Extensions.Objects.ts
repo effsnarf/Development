@@ -63,7 +63,7 @@ class Objects {
   ): void {
     const traverse = function (node: any, key: string, value: any) {
       onValue(node, key, value);
-      if (value && typeof value === "object") {
+      if (value && !Array.isArray(value) && typeof value === "object") {
         for (const k of Object.keys(value)) {
           traverse(value, k, value[k]);
         }
@@ -76,7 +76,8 @@ class Objects {
     const result = {} as any;
     for (const key of Object.keys(obj)) {
       let value = obj[key];
-      if (typeof value === "object") value = Objects.toCamelCaseKeys(value);
+      if (value && !Array.isArray(value) && typeof value === "object")
+        value = Objects.toCamelCaseKeys(value);
       result[key.toCamelCase()] = value;
     }
     return result;
