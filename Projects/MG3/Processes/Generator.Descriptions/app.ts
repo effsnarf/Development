@@ -32,13 +32,14 @@ const convertKeysToTitleCase = (obj: any) => {
 };
 
 (async () => {
+  const config = (await Configuration.new()).data;
+  const db = await Database.new(config.database.content);
+
+  let pageIndex = 0;
+  const batchSize = 10;
+  const maxInstancesCount = 100;
+
   while (true) {
-    const config = (await Configuration.new()).data;
-    const db = await Database.new(config.database.content);
-
-    const batchSize = 10;
-    const maxInstancesCount = 100;
-
     console.log(`Getting generators..`.gray);
 
     const generators = (
@@ -53,16 +54,18 @@ const convertKeysToTitleCase = (obj: any) => {
         // { Desc: null },
         { InstancesCount: -1 },
         batchSize,
-        0,
+        batchSize * pageIndex,
         false
       )
     ).map((g: any) => removeCamelCaseKeys(g));
 
     console.log(`Found ${generators.length} generators`.gray);
 
-    console.log(generators.map((g) => g.DisplayName.green).join("\n"));
+    console.log(generators.map((g) => g.DisplayName.gray).join("\n"));
 
     for (const generator of generators) {
+      console.log(generator.DisplayName.green);
+
       let instancesCount = maxInstancesCount;
       const desc = generator.Desc || {};
 
@@ -107,7 +110,7 @@ const convertKeysToTitleCase = (obj: any) => {
             const chat = await ChatOpenAI.new(Roles.ChatGPT, false);
             const reply = await chat.send(message);
 
-            console.log(reply);
+            console.log(reply.shorten(100).green);
 
             if (task[0] == "Haiku") {
               desc[task[0]] = reply.split("\n").map((a) => a.trim());
@@ -135,5 +138,7 @@ const convertKeysToTitleCase = (obj: any) => {
 
       await db.upsert("Generators", generator);
     }
+
+    pageIndex++;
   }
 })();

@@ -324,7 +324,7 @@ let cacheQueueSize = 0;
       count,
       loadBalancer.stats.requests.per.second.count,
       loadBalancer.stats.requests.per.minute.count,
-      memoryCache.count
+      memoryCache?.count
     );
     counterLog.title = title;
     counterLog.text =
