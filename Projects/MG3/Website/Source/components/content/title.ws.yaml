@@ -5,6 +5,7 @@ dom:
       class: background
     div:
       ui.image:
+        v-if: imageID
         :imageID: imageID
         :url: url
       ui.large.title:
