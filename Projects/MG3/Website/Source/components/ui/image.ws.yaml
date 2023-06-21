@@ -3,9 +3,9 @@ dom:
     class: image
     img:
       ref: image1
-      ':class': getCssClass()
-      ':src': (src || emptySrc)
-      '@load': onLoad
+      ":class": getCssClass()
+      ":src": (src || emptySrc)
+      "@load": onLoad
 props:
   imageID: null
   url: null
@@ -17,12 +17,16 @@ mounted: |
     window.addEventListener(`resize`, function(event) {
       this.recalc();
     }.bind(this));
+    // Detect if the image element changes its size
+    let resizeObserver = new ResizeObserver(function(entries) {
+      this.recalc();
+    }.bind(this.$refs.image1));
   }
 methods:
   onLoad: |
     function () {
       this.recalc();
-      this.$emit("load");
+      [1,2,3].forEach(i => setTimeout(this.recalc.bind(this), i * 100))
     }
   recalc: |
     function () {
@@ -30,6 +34,7 @@ methods:
       let rect = this.$refs.image1.getBoundingClientRect();
       this.width = Math.round(rect.width);
       this.height = Math.round(rect.height);
+      this.$emit("load");
     }
   getCssClass: |
     function () {
@@ -49,4 +54,6 @@ computed:
 style:
   .image, img:
     width: 100%
+  .image:
+    overflow: hidden
 name: ui-image

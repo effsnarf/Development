@@ -4,30 +4,31 @@ dom:
     div:
       site.sidebar: null
       site.main:
-        :get-more-items: getMoreItems
-        :recommendation-items: recommendationItems
-        template:
+        ":get-more-items": getMoreItems
+        ":recommendation-items": recommendationItems
+        template#1:
           v-slot: article
           slot:
             name: article
+        template#2:
+          v-slot: middle
+          slot:
+            name: middle
 name: site
 props:
-  getMoreItems:
-  recommendationItems:
+  getMoreItems: null
+  recommendationItems: null
 style:
   .comp-site:
     position: relative
     margin: auto
-    width: 1000px
+    max-width: 1000px
     padding: 0
   .comp-site-header:
     position: sticky
     top: 0
-    height: 12vh
-    "-webkit-mask-image": >-
-      -webkit-gradient(linear, left top, left bottom, color-stop(0%, rgba(0, 0,
-      0, 1)), color-stop(80%, rgba(0, 0, 0, 1)), color-stop(100%, rgba(0, 0, 0,
-      0)))
+    margin: 0 0 1rem
+    box-shadow: "-2rem 2rem 2rem #000"
     background-image: >-
       linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0),
       rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 1))

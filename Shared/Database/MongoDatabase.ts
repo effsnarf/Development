@@ -100,7 +100,11 @@ class MongoDatabase extends DatabaseBase {
     }
   }
 
-  async aggregate(collectionName: string, pipeline: any[]) {
+  async aggregate(
+    collectionName: string,
+    pipeline: any[],
+    lowercaseFields?: boolean | undefined
+  ) {
     // Remove any empty stages (e.g. { $match: null } or { $match: {} } or { $sort: {} })
     pipeline = pipeline.filter((p) => {
       const values = Object.values(p);
@@ -123,7 +127,7 @@ class MongoDatabase extends DatabaseBase {
     const timer = Timer.start();
 
     const collection = await this.getCollection(collectionName);
-    const docs = await (await collection.aggregate(pipeline)).toArray();
+    let docs = await (await collection.aggregate(pipeline)).toArray();
 
     timer.stop();
 
@@ -139,6 +143,12 @@ class MongoDatabase extends DatabaseBase {
     //   },
     //   false
     // );
+
+    if (lowercaseFields)
+      docs = docs.map((d) => {
+        if (typeof d == "object") return Objects.toCamelCaseKeys(d);
+        return d;
+      });
 
     return docs;
   }

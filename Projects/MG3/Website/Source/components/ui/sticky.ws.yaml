@@ -25,3 +25,4 @@ computed:
 style:
   .comp-ui-sticky:
     position: sticky
+    z-index: 10

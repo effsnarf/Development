@@ -1,10 +1,8 @@
 dom:
   div:
     .header:
-      ':style': getStyle()
+      ":style": getStyle()
       site.logo: null
-    div:
-      class: header-spacer
 name: site-header
 mounted: |
   function() {
@@ -13,6 +11,7 @@ mounted: |
 methods:
   init: |
     function() {
+      return;
       const header = document.querySelector('.header');
       const initialHeight = header.clientHeight / window.innerHeight * 100;
       const scrollRate = 0.1;
@@ -31,17 +30,16 @@ methods:
       // get a random number between 0 and 20 inclusive
       const index = Math.floor(Math.random() * 21);
       return {
-        backgroundImage: `url('https://memegenerator.net/img/banners/(${index}).jpg')`
+        backgroundImage: `url('/img/banners/(${index}).jpg')`
       };
     }
 style:
   .comp-ui-large-title:
     position: absolute;
     bottom: 2rem
-  .header-spacer:
-    height: 15vh
   .header:
     width: 100%
     display: flex
     padding: 1rem
     filter: grayscale(1) brightness(0.8)
+    background-color: black

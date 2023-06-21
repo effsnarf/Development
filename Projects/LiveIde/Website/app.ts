@@ -1,6 +1,7 @@
 import ts from "typescript";
 import fs from "fs";
 import "colors";
+import axios from "axios";
 import path from "path";
 import { Configuration } from "@shared/Configuration";
 import { Objects } from "@shared/Extensions.Objects";
@@ -8,11 +9,28 @@ import { Files } from "@shared/Files";
 import { Http } from "@shared/Http";
 import { HttpServer } from "@shared/HttpServer";
 import { TypeScript } from "@shared/TypeScript";
+import { DatabaseProxy } from "../../../Apps/DatabaseProxy/Client/DbpClient";
+
+const _fetchAsJson = async (url: string) => {
+  const res = await axios.get(url);
+  return res.data;
+};
 
 (async () => {
   const config = (await Configuration.new()).data;
+  const projectConfig = (
+    await Configuration.new(
+      {},
+      path.join(config.project.folder, "../../", "config.yaml")
+    )
+  ).data;
 
   const componentsFolder = path.join(config.project.folder, "Components");
+
+  const dbp = await DatabaseProxy.new(
+    projectConfig.databaseProxy.url,
+    _fetchAsJson
+  );
 
   const getCompName = (path: string) => {
     return path
@@ -106,6 +124,7 @@ import { TypeScript } from "@shared/TypeScript";
           }
         }
       }
-    }
+    },
+    (req: any) => eval(`(${projectConfig.template.get})`)(dbp, req)
   );
 })();

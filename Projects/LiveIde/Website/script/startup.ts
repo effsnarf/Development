@@ -2,13 +2,17 @@ import { Component } from "../../classes/Component";
 import { DataWatcher } from "../../../../Shared/DataWatcher";
 import { ClientContext } from "../../classes/ClientContext";
 import { Params } from "../../classes/Params";
-import { DatabaseProxy } from "../../../../Apps/DatabaseProxy/Client/Client";
+import { DatabaseProxy } from "../../../../Apps/DatabaseProxy/Client/DbpClient";
 
 const helpers = {
   url: {
     image: (imageID: number) => {
       if (!imageID) return null;
       return `https://img.memegenerator.net/images/${imageID}.jpg`;
+    },
+    instance: (instance: any) => {
+      if (!instance) return null;
+      return `/instance/${instance.instanceID}`;
     },
   },
 };
@@ -68,6 +72,12 @@ interface MgParams {
         if (item.instanceID) return item.instanceID;
         if (item.generatorID) return item.generatorID;
         return null;
+      },
+      getRandomStanza(poem: any) {
+        if (!poem?.length) return null;
+        const count = poem.length;
+        const index = Math.floor(Math.random() * count);
+        return poem[index];
       },
     },
   });
