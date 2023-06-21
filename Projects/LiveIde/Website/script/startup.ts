@@ -6,13 +6,17 @@ import { DatabaseProxy } from "../../../../Apps/DatabaseProxy/Client/DbpClient";
 
 const helpers = {
   url: {
-    image: (imageID: number) => {
-      if (!imageID) return null;
-      return `https://img.memegenerator.net/images/${imageID}.jpg`;
+    generator: (generator: any) => {
+      if (!generator) return null;
+      return `/generator/${generator.urlName}`;
     },
     instance: (instance: any) => {
       if (!instance) return null;
       return `/instance/${instance.instanceID}`;
+    },
+    image: (imageID: number) => {
+      if (!imageID) return null;
+      return `https://img.memegenerator.net/images/${imageID}.jpg`;
     },
   },
 };

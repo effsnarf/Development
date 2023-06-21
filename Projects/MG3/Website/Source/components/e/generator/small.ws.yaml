@@ -1,14 +1,11 @@
 dom:
   ui.link:
-    :url: "$urls.generator(urlName)"
+    :url: "$root.url.generator(item.urlName)"
     layout.horizontal.1:
       ui.image:
-        :url: $urls.image(imageID)
+        :imageID: item.imageID
       layout.vertical.1:
-        text: displayName
-        number: instancesCount
+        text: item.displayName
+        number: item.instancesCount
 props:
-  imageID:
-  urlName:
-  displayName:
-  instancesCount:
+  item:

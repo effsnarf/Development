@@ -2,10 +2,6 @@ dom:
   site:
     :recommendation-items: recommendationItems
     template#1:
-      v-slot: article
-      content.title:
-        :imageID: generator?.imageID
-        :title: generator?.displayName
 
     template#2:
       v-slot: middle
@@ -18,22 +14,29 @@ data:
   instance:
   generator:
   recommendationItems: []
+  isInited: false
 
 mounted: | #ts
   async function() {
-    const dbp = this.$root.dbp;
-    let { instanceID } = this.$root.params;
-    this.instance = (!instanceID ? null : await dbp.instances.select.one(instanceID));
-    urlName = urlName || this.instance?.urlName;
-    this.generator = !urlName ? null : await dbp.generators.select.one(null, urlName);
-    this.urlName = urlName;
-    this.recommendationItems = await dbp.generators.select.related(urlName);
+    await this.init();
   }
 
 methods:
+  init: | #ts
+    async function() {
+      if (this.isInited) return;
+      const dbp = this.$root.dbp;
+      this.instance = await dbp.instances.select.one(this.$root.params.instanceID);
+      this.generator = await dbp.generators.select.one(this.instance.generatorID);
+      this.recommendationItems = await dbp.generators.select.related(this.generator.urlName);
+      this.isInited = true;
+    }
+
   getMoreInstances: | #ts
     async function(pageIndex) {
-      return this.$root.dbp.instances.select.popular("en", pageIndex)
+      const items = await this.$root.dbp.instances.select.popular("en", pageIndex)
+      if (pageIndex == 0) items.unshift(this.instance);
+      return items;
     }
 
 style:

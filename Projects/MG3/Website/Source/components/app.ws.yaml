@@ -4,6 +4,8 @@ dom:
       v-if: $root.params.page == 'home'
     page.generator:
       v-if: $root.params.page == 'generator'
+    page.instance:
+      v-if: $root.params.page == 'instance'
 name: app
 
 style:

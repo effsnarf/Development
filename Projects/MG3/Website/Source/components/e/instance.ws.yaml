@@ -1,21 +1,26 @@
 dom:
-  ui.link:
-    :url: $root.url.instance(item)
-    div:
-      ui.image:
-        ref: image1
-        :imageID: item.imageID
-        @load: onImageLoad
-      .texts:
-        .text:
-          v-for: (text, index) in [item.text0, item.text1]
-          v-text: text
-          :style: "{ fontSize: fontSizes[index] }"
+  div:
+    ui.link:
+      :url: $root.url.instance(item)
       div:
-        class: spacer
+        ui.image:
+          ref: image1
+          :imageID: item.imageID
+          @load: onImageLoad
+        .texts:
+          .text:
+            v-for: (text, index) in [item.text0, item.text1]
+            v-text: text
+            :style: "{ fontSize: fontSizes[index] }"
+        div:
+          class: spacer
+    e.generator.small:
+      :item: item
+
 name: e-instance
 props:
   item:
+  showGenerator: true
 data:
   width:
 methods:
