@@ -150,8 +150,18 @@ class ClientContext {
   }
 
   async pugToHtml(pug: string) {
-    const url = `/pug`;
-    return await (await fetch(url, { method: "post", body: pug })).text();
+    const key = `${pug}.${ClientContext.getStringHashCode(pug)}`;
+    const item =
+      localStorage.getItem(key) ||
+      (await (async () => {
+        const url = `/pug`;
+        const item = await (
+          await fetch(url, { method: "post", body: pug })
+        ).text();
+      })()) ||
+      "";
+    localStorage.setItem(key, item);
+    return item;
   }
 
   async updateComponent(comp: any) {
@@ -176,8 +186,23 @@ class ClientContext {
           .delay(0);
       }
       // Try again
+      // Wait a bit
+      await new Promise((resolve) => setTimeout(resolve, 100));
       return await ClientContext.fetch(...args);
     }
+  }
+
+  static getStringHashCode(str: string) {
+    let hash = 0;
+    if (str.length === 0) {
+      return hash;
+    }
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = (hash << 5) - hash + char;
+      hash = hash & hash; // Convert to 32-bit integer
+    }
+    return hash;
   }
 
   static get alertify() {

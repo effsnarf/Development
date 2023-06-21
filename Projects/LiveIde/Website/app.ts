@@ -10,6 +10,9 @@ import { Http } from "@shared/Http";
 import { HttpServer } from "@shared/HttpServer";
 import { TypeScript } from "@shared/TypeScript";
 import { DatabaseProxy } from "../../../Apps/DatabaseProxy/Client/DbpClient";
+import { MemoryCache } from "@shared/Cache";
+
+const memoryCache = new MemoryCache();
 
 const _fetchAsJson = async (url: string) => {
   const res = await axios.get(url);
@@ -71,13 +74,15 @@ const _fetchAsJson = async (url: string) => {
         })
           .filter((s) => s.endsWith(".ws.yaml"))
           .map((s) => {
-            return {
+            const comp = {
               name: getCompName(s),
               path: s.replace(componentsFolder, ""),
               source: Objects.parseYaml(
                 preProcessYaml(fs.readFileSync(s, "utf8"))
               ),
-            };
+            } as any;
+            comp.template = Objects.pugToHtml(comp.source.dom);
+            return comp;
           });
         return res.end(JSON.stringify(comps));
       }
@@ -102,7 +107,10 @@ const _fetchAsJson = async (url: string) => {
         return res.end("ok");
       }
       if (req.url == "/pug") {
-        let html = Objects.pugToHtml(data);
+        const cacheKey = data.hashCode();
+        let html = await memoryCache.get(cacheKey, () =>
+          Objects.pugToHtml(data)
+        );
         // Vue:
         // Replace v-slot="value" with v-slot:[value], meaning we're selecting a slot
         // unless it's v-slot="slotProps", which means we're passing scope
