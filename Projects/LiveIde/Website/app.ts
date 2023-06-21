@@ -55,6 +55,16 @@ const _fetchAsJson = async (url: string) => {
     config.server.port,
     config.server.host,
     async (req, res, data) => {
+      if (req.url.startsWith("/images/")) {
+        // Redirect to img.memegenerator.net
+        const url = `https://img.memegenerator.net${req.url}`;
+        // Return HTTP Moved Permanently (301) to the client
+        res.writeHead(301, {
+          Location: url,
+        });
+        return res.end();
+      }
+
       if (req.url == "/components") {
         const comps = Files.getFiles(componentsFolder, {
           recursive: true,
