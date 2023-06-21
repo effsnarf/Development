@@ -15,6 +15,7 @@ incoming:
     max:
       age: 10m
     ignore:
+      - /api/Instances/select/popular
       - /create/
       - /get/
       - /googleLogin
