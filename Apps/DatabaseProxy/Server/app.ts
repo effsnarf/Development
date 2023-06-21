@@ -34,10 +34,10 @@ import { debug } from "console";
 const cache = {
   _store: null as CacheBase | null,
   _getStore: async () => {
-    if (!cache._store)
-      cache._store = await Cache.new({
-        memory: true,
-      });
+    if (!cache._store) cache._store = await Cache.new(null);
+    // cache._store = await Cache.new({
+    //   memory: true,
+    // });
     return cache._store;
   },
   get: {
