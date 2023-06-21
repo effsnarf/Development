@@ -12,15 +12,19 @@ dom:
         ui.sticky:
           top: 140px
           content.recommendations:
-            :items: recommendationItems
-
+            ':items': recommendationItems
 props:
-  recommendationItems:
-
+  recommendationItems: null
 style:
-  .comp-site-main:
+  .comp-site-main: null
   .columns:
     display: grid
     grid-template: 1fr / 1fr 2fr 1fr
     gap: 2rem
     margin-top: 2rem
+template: >-
+  <div class="comp-site-main"><slot name="article"></slot><div
+  class="columns"><div></div><div><slot
+  name="middle"></slot></div><div><ui-sticky
+  top="140px"><content-recommendations
+  :items="recommendationItems"></content-recommendations></ui-sticky></div></div></div>

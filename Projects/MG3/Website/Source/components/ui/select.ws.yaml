@@ -2,14 +2,17 @@ dom:
   div:
     ui.list:
       v-slot: slotProps
-      :items: options
+      ':items': options
       template:
         div:
           v-text: slotProps.item
-      @input: "$emit('input', $event)"
-
+      on_input: $emit('input', $event)
 props:
-  options:
-  value:
-
-methods:
+  options: null
+  value: null
+methods: null
+name: ui-select
+template: >-
+  <div class="comp-ui-select"><ui-list v-slot="slotProps" :items="options"
+  @input="$emit('input', $event)"><template><div
+  v-text="slotProps.item"></div></template></ui-list></div>

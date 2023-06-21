@@ -1,46 +1,42 @@
 dom:
   div:
     div:
-      :class: getCssClass()
+      ':class': getCssClass()
       component:
-        :is: itemType
-        :value: item
-      @click: onNodeClick
-      @mouseenter: onMouseEnter
-      @mouseleave: onMouseLeave
+        ':is': itemType
+        ':value': item
+      on_click: onNodeClick
+      on_mouseenter: onMouseEnter
+      on_mouseleave: onMouseLeave
     ul:
       class: ml-l1
       li:
         v-for: child in children
         ui.tree.node:
-          :item: child
-          :item-type: itemType
-          :getChildren: getChildren
-          :selected-node: selectedNode
-          @node-click: onChildClick
-          @node-hover: onChildHover
-          @node-unhover: onChildUnhover
-
+          ':item': child
+          ':item-type': itemType
+          ':getChildren': getChildren
+          ':selected-node': selectedNode
+          on_node-click: onChildClick
+          on_node-hover: onChildHover
+          on_node-unhover: onChildUnhover
 props:
-  item:
-  itemType:
-  getChildren:
-  selectedNode:
-
+  item: null
+  itemType: null
+  getChildren: null
+  selectedNode: null
 data:
-  isExpanded:
-  children:
-
+  isExpanded: null
+  children: null
 methods:
-  getCssClass: | #ts
+  getCssClass: |
     function() {
       return {
         hoverable: true,
         selected: this.isSelected,
       };
     }
-
-  onNodeClick: | #ts
+  onNodeClick: |
     function() {
       if (this.isSelected)
       {
@@ -54,38 +50,42 @@ methods:
       }
       this.$emit('node-click', this.item);
     }
-
-  onMouseEnter: | #ts
+  onMouseEnter: |
     function() {
       this.$emit('node-hover', this.item);
     }
-  
-  onMouseLeave: | #ts
+  onMouseLeave: |
     function() {
       this.$emit('node-unhover', this.item);
     }
-
-  onChildClick: | #ts
+  onChildClick: |
     function(child) {
       this.$emit('node-click', child);
     }
-
-  onChildHover: | #ts
+  onChildHover: |
     function (child) {
       this.$emit('node-hover', child);
     }
-
-  onChildUnhover: | #ts
+  onChildUnhover: |
     function (child) {
       this.$emit('node-unhover', child);
     }
-
 computed:
-  childItems: | #ts
+  childItems: |
     function() {
       return this.children || [];
     }
-  isSelected: | #ts
+  isSelected: |
     function() {
       return (this.item == this.selectedNode);
     }
+name: ui-tree-node
+template: >-
+  <div class="comp-ui-tree-node"><div :class="getCssClass()"
+  @click="onNodeClick" @mouseenter="onMouseEnter"
+  @mouseleave="onMouseLeave"><component :is="itemType"
+  :value="item"></component></div><ul class="ml-l1"><li v-for="child in
+  children"><ui-tree-node :item="child" :item-type="itemType"
+  :getChildren="getChildren" :selected-node="selectedNode"
+  @node-click="onChildClick" @node-hover="onChildHover"
+  @node-unhover="onChildUnhover"></ui-tree-node></li></ul></div>

@@ -3,28 +3,29 @@ dom:
     class: menu3
     li:
       v-for: (item, index) in items
-      :class: getCssClass(index)
+      ':class': getCssClass(index)
       slot:
-        :index: index
-        :item: item
-      @click: () => onItemClick({ item, index })
-
+        ':index': index
+        ':item': item
+      on_click: () => onItemClick({ item, index })
 props:
-  items:
-
+  items: null
 data:
-  selectedIndex:
-
+  selectedIndex: null
 methods:
-  onItemClick: | #ts
+  onItemClick: |
     function(e) {
       this.selectedIndex = (e.index == this.selectedIndex) ? null : e.index;
       this.$emit('input', this.selectedIndex);
     }
-
-  getCssClass: | #ts
+  getCssClass: |
     function(index) {
       return {
         selected: (index == this.selectedIndex),
       };
     }
+name: ui-list
+template: >-
+  <ul class="comp-ui-list menu3"><li v-for="(item, index) in items"
+  :class="getCssClass(index)" @click="() =&gt; onItemClick({ item, index
+  })"><slot :index="index" :item="item"></slot></li></ul>

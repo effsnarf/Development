@@ -1,28 +1,24 @@
 dom:
   site:
-    :recommendation-items: recommendationItems
-    template#1:
-
+    ':recommendation-items': recommendationItems
+    template#1: null
     template#2:
       v-slot: middle
       content.stream:
         item-type: e.instance
-        :get-more-items: getMoreInstances
+        ':get-more-items': getMoreInstances
         grid-class: grid-1
-
 data:
-  instance:
-  generator:
+  instance: null
+  generator: null
   recommendationItems: []
   isInited: false
-
-mounted: | #ts
+mounted: |
   async function() {
     await this.init();
   }
-
 methods:
-  init: | #ts
+  init: |
     async function() {
       if (this.isInited) return;
       const dbp = this.$root.dbp;
@@ -31,12 +27,17 @@ methods:
       this.recommendationItems = await dbp.generators.select.related(this.generator.urlName);
       this.isInited = true;
     }
-
-  getMoreInstances: | #ts
+  getMoreInstances: |
     async function(pageIndex) {
       const items = await this.$root.dbp.instances.select.popular("en", pageIndex)
       if (pageIndex == 0) items.unshift(this.instance);
       return items;
     }
-
-style:
+style: null
+name: page-instance
+template: >-
+  <site class="comp-page-instance"
+  :recommendation-items="recommendationItems"><template></template><template
+  v-slot:middle><content-stream item-type="e.instance"
+  :get-more-items="getMoreInstances"
+  grid-class="grid-1"></content-stream></template></site>

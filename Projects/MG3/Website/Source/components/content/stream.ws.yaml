@@ -1,48 +1,24 @@
 dom:
   ui.infinite.scroll:
     .stream:
-      :class: gridClass
+      ':class': gridClass
       component:
-        :is: itemType.kebabize()
+        ':is': itemType.kebabize()
         v-for: item in items
-        :item: item
-        :key: $root.getKey(item)
-    @scroll: loadMore
-      # content.poem#1:
-      #   ":lines": >-
-      #     ['In a realm where grace and ease reside,', 'There exists a penguin with
-      #     a timid stride,', 'A creature of social awkwardness, so profound,',
-      #     'With every step, uncertainty is found.']
-      # content.poem#2:
-      #   ":lines": >-
-      #     ['Oh, Socially Awkward Penguin, so endearingly shy,', 'Navigating a
-      #     world where connections multiply,', 'In crowded gatherings, your heart
-      #     skips a beat,', 'As you stumble through conversations, finding
-      #     retreat.']
-      # content.poem#3:
-      #   ":lines": >-
-      #     ['With feathers ruffled and eyes cast down,', 'You yearn for acceptance,
-      #     yet wear a frown,', 'But within your awkwardness, a charm unfolds,', 'A
-      #     vulnerability that captures hearts in its hold.']
-      # content.poem#4:
-      #   ":lines": >-
-      #     ['Your hesitant words, like a hesitant dance,', 'Draw smiles and
-      #     laughter, by happenstance,', 'For in your stumbling, we see our own
-      #     plight,', 'And through your bumbling, our own fears take flight.']
+        ':item': item
+        ':key': $root.getKey(item)
+    on_scroll: loadMore
 name: content-stream
-
 props:
-  itemType:
-  getMoreItems:
-  gridClass:
-
+  itemType: null
+  getMoreItems: null
+  gridClass: null
 data:
   pageIndex: 0
   items: []
   queue: []
-
 methods:
-  loadMore: | #ts
+  loadMore: |
     async function() {
       if (!this.getMoreItems) return;
       const pageIndex = this.pageIndex++;
@@ -51,19 +27,22 @@ methods:
         this.items.push(...newItems);
       });
     }
-  processQueue: | #ts
+  processQueue: |
     async function() {
       const next = this.queue.shift();
       if (next) await next();
       setTimeout(this.processQueue.bind(this), 300);
     }
-
-mounted: | #ts
+mounted: |
   function() {
     this.processQueue();
   }
-
 style:
   .stream:
     display: grid
     gap: 1rem
+template: >-
+  <ui-infinite-scroll class="comp-content-stream" @scroll="loadMore"><div
+  class="stream" :class="gridClass"><component :is="itemType.kebabize()"
+  v-for="item in items" :item="item"
+  :key="$root.getKey(item)"></component></div></ui-infinite-scroll>

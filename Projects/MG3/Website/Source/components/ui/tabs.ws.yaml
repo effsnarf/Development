@@ -1,7 +1,7 @@
 dom:
   div:
     ui.select:
-      :options: options
+      ':options': options
       v-model: selectedTabIndex
     div:
       div:
@@ -9,9 +9,14 @@ dom:
         div:
           v-show: (index == selectedTabIndex)
           slot:
-            :name: "'tab' + index"
+            ':name': '''tab'' + index'
 props:
-  options:
-
+  options: null
 data:
   selectedTabIndex: 0
+name: ui-tabs
+template: >-
+  <div class="comp-ui-tabs"><ui-select :options="options"
+  v-model="selectedTabIndex"></ui-select><div><div v-for="(option, index) in
+  options"><div v-show="(index == selectedTabIndex)"><slot :name="'tab' +
+  index"></slot></div></div></div></div>

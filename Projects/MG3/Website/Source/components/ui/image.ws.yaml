@@ -1,12 +1,12 @@
 dom:
   ui.link:
     class: image
-    :url: url
+    ':url': url
     img:
       ref: image1
-      ":class": getCssClass()
-      ":src": (src || emptySrc)
-      "@load": onLoad
+      ':class': getCssClass()
+      ':src': (src || emptySrc)
+      on_load: onLoad
 props:
   imageID: null
   url: null
@@ -57,3 +57,6 @@ style:
   .image:
     overflow: hidden
 name: ui-image
+template: >-
+  <ui-link class="comp-ui-image image" :url="url"><img ref="image1"
+  :class="getCssClass()" :src="(src || emptySrc)" @load="onLoad"/></ui-link>

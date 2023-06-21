@@ -2,6 +2,7 @@ dom:
   div:
     div:
       v-text: value
-
 props:
-  value:
+  value: null
+name: ui-number
+template: <div class="comp-ui-number"><div v-text="value"></div></div>

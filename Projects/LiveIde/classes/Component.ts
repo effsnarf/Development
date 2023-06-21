@@ -26,15 +26,20 @@ class Component {
       const vueOptions = eval(`(${json})`);
       console.log(vueOptions);
       const vueName = Component.toVueName(this.name);
-      if (this.source.template) {
-        vueOptions.template = this.source.template;
-      } else {
-        this.source.template = vueOptions.template = await client.pugToHtml(
-          vueOptions.template
-        );
-        client.updateComponent(this);
+      if (this.source) {
+        if (this.source.template) {
+          let html = this.source.template;
+          html = html.replace(/on_/g, "@");
+          vueOptions.template = html;
+        } else {
+          const pug = vueOptions.template;
+          let html = await client.pugToHtml(pug);
+          html = html.replace(/on_/g, "@");
+          vueOptions.template = html;
+          this.source.template = html;
+          client.updateComponent(this);
+        }
       }
-      this.source.template = vueOptions.template;
       client.Vue.component(vueName, vueOptions);
     } catch (ex) {
       debugger;

@@ -1,16 +1,14 @@
 dom:
   textarea:
-    :value: value
-    @input: "$emit('input', $event.target.value)"
-    @focus: "$emit('focus')"
-    @blur: "$emit('blur')"
-    @keydown: onKeyDown
-
+    ':value': value
+    on_input: $emit('input', $event.target.value)
+    on_focus: $emit('focus')
+    on_blur: $emit('blur')
+    on_keydown: onKeyDown
 props:
-  value:
-
+  value: null
 methods:
-  onKeyDown: | #ts
+  onKeyDown: |
     (e) => {
       if (e.key == 'Tab') {
         e.preventDefault();
@@ -22,3 +20,8 @@ methods:
       }
       return false;
     }
+name: ui-textarea
+template: >-
+  <textarea class="comp-ui-textarea" :value="value" @input="$emit('input',
+  $event.target.value)" @focus="$emit('focus')" @blur="$emit('blur')"
+  @keydown="onKeyDown"></textarea>

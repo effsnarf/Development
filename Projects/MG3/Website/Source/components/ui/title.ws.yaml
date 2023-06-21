@@ -25,3 +25,6 @@ style:
     white-space: wrap
     text-wrap: wrap
 name: ui-title
+template: >-
+  <div class="comp-ui-title flex"><div v-text="getText()"></div><div class="ml-1
+  opacity-50" v-if="number" v-text="getNumberText()"></div></div>

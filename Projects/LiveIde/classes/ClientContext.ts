@@ -150,17 +150,8 @@ class ClientContext {
   }
 
   async pugToHtml(pug: string) {
-    const key = `${pug}.${ClientContext.getStringHashCode(pug)}`;
-    const item =
-      localStorage.getItem(key) ||
-      (await (async () => {
-        const url = `/pug`;
-        const item = await (
-          await fetch(url, { method: "post", body: pug })
-        ).text();
-      })()) ||
-      "";
-    localStorage.setItem(key, item);
+    const url = `/pug`;
+    const item = await (await fetch(url, { method: "post", body: pug })).text();
     return item;
   }
 

@@ -14,3 +14,4 @@ style:
     background-size: cover!important
     background-position: 50% 30%!important
 name: site-banner
+template: <div class="comp-site-banner"><div class="image"></div></div>

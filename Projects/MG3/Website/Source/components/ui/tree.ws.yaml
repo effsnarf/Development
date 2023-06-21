@@ -2,41 +2,41 @@ dom:
   ul:
     li:
       ui.tree.node:
-        :item: root
-        :item-type: itemType
-        :getChildren: getChildren
-        :selected-node: selectedNode
-        @node-click: onChildClick
-        @node-hover: onChildHover
-        @node-unhover: onChildUnhover
-
+        ':item': root
+        ':item-type': itemType
+        ':getChildren': getChildren
+        ':selected-node': selectedNode
+        on_node-click: onChildClick
+        on_node-hover: onChildHover
+        on_node-unhover: onChildUnhover
 props:
-  root:
-  itemType:
-  getChildren:
-
+  root: null
+  itemType: null
+  getChildren: null
 data:
-  selectedNode:
-
+  selectedNode: null
 methods:
-  onChildClick: | #ts
+  onChildClick: |
     function(child) {
       this.$emit('node-click', child);
       this.selectedNode = (child == this.selectedNode) ? null : child;
     }
-
-  onChildHover: | #ts
+  onChildHover: |
     function (child) {
       this.$emit('node-hover', child);
     }
-
-  onChildUnhover: | #ts
+  onChildUnhover: |
     function (child) {
       this.$emit('node-unhover', child);
     }
-
 watch:
-  selectedNode: | #ts
+  selectedNode: |
     function(newVal, oldVal) {
       this.$emit('node-select', newVal);
     }
+name: ui-tree
+template: >-
+  <ul class="comp-ui-tree"><li><ui-tree-node :item="root" :item-type="itemType"
+  :getChildren="getChildren" :selected-node="selectedNode"
+  @node-click="onChildClick" @node-hover="onChildHover"
+  @node-unhover="onChildUnhover"></ui-tree-node></li></ul>

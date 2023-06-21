@@ -4,7 +4,7 @@ dom:
     div:
       site.sidebar: null
       site.main:
-        ":recommendation-items": recommendationItems
+        ':recommendation-items': recommendationItems
         template#1:
           v-slot: article
           slot:
@@ -27,7 +27,7 @@ style:
     position: sticky
     top: 0
     margin: 0 0 1rem
-    box-shadow: "-2rem 2rem 2rem #000"
+    box-shadow: '-2rem 2rem 2rem #000'
     background-image: >-
       linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0),
       rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 1))
@@ -36,3 +36,9 @@ style:
     background-position: center
     transition: 0s
     z-index: 10
+template: >-
+  <div
+  class="comp-site"><site-header></site-header><div><site-sidebar></site-sidebar><site-main
+  :recommendation-items="recommendationItems"><template v-slot:article><slot
+  name="article"></slot></template><template v-slot:middle><slot
+  name="middle"></slot></template></site-main></div></div>

@@ -3,10 +3,10 @@ dom:
     v-if: component
     ui.title:
       class: fs-m3
-      icon: "📦"
-      :text: component?.name
+      icon: 📦
+      ':text': component?.name
     ui.tabs:
-      :options: "['📁 dom', '🟢 style']"
+      ':options': '[''📁 dom'', ''🟢 style'']'
       template#1:
         v-slot: tab0
         ui.json.editor:
@@ -15,8 +15,14 @@ dom:
         v-slot: tab1
         ui.json.editor:
           v-model: component.source.style
-
 props:
-  component:
-
-methods:
+  component: null
+methods: null
+name: ide-component-editor
+template: >-
+  <div class="comp-ide-component-editor" v-if="component"><ui-title
+  class="fs-m3" icon="📦" :text="component?.name"></ui-title><ui-tabs
+  :options="['📁 dom', '🟢 style']"><template v-slot:tab0><ui-json-editor
+  v-model="component.source.dom"></ui-json-editor></template><template
+  v-slot:tab1><ui-json-editor
+  v-model="component.source.style"></ui-json-editor></template></ui-tabs></div>

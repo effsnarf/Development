@@ -3,13 +3,15 @@ dom:
     .text:
       slot:
         name: content
-
-methods:
+methods: null
 style:
   .text:
     min-height: 10rem
-    "-webkit-mask-image": >-
+    '-webkit-mask-image': >-
       #-webkit-gradient(linear, left top, left bottom, color-stop(0%, rgba(0, 0,
       #0, 1)), color-stop(40%, rgba(0, 0, 0, 1)), color-stop(100%, rgba(0, 0, 0,
       #0.4)))
 name: content-article
+template: >-
+  <div class="comp-content-article"><div class="text"><slot
+  name="content"></slot></div></div>

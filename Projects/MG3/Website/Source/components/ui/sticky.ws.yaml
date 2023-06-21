@@ -1,28 +1,24 @@
 dom:
   div:
-    :style: getStyle()
-    slot:
-
-data:
-
-mounted: | #ts
+    ':style': getStyle()
+    slot: null
+data: null
+mounted: |
   function() {
   }
-
 methods:
-  getStyle: | #ts
+  getStyle: |
     function() {
       return {
         top: this.top
       };
     }
-
 props:
-  top:
-
-computed:
-
+  top: null
+computed: null
 style:
   .comp-ui-sticky:
     position: sticky
     z-index: 10
+name: ui-sticky
+template: <div class="comp-ui-sticky" :style="getStyle()"><slot></slot></div>

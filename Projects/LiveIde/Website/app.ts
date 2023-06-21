@@ -81,9 +81,13 @@ const _fetchAsJson = async (url: string) => {
                 preProcessYaml(fs.readFileSync(s, "utf8"))
               ),
             } as any;
+
             if (Configuration.getEnvironment() == "dev") {
-              delete comp.source.template;
+              if (comp.source) {
+                delete comp.source.template;
+              }
             }
+
             return comp;
           });
         return res.end(JSON.stringify(comps));
@@ -109,10 +113,8 @@ const _fetchAsJson = async (url: string) => {
         return res.end("ok");
       }
       if (req.url == "/pug") {
-        const cacheKey = data.hashCode();
-        let html = await memoryCache.get(cacheKey, () =>
-          Objects.pugToHtml(data)
-        );
+        let html = Objects.pugToHtml(data);
+        html = html.replace(/on_/g, "@");
         // Vue:
         // Replace v-slot="value" with v-slot:[value], meaning we're selecting a slot
         // unless it's v-slot="slotProps", which means we're passing scope

@@ -20,3 +20,7 @@ style:
     text-shadow: '-6px 6px 3px #000'
     opacity: 1
 name: site-logo
+template: >-
+  <ui-link class="comp-site-logo" url="/"><div><div class="meme"
+  v-text="'meme'"></div><div class="generator"
+  v-text="'generator'"></div></div></ui-link>

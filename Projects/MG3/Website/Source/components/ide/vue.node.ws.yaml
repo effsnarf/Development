@@ -1,20 +1,21 @@
 dom:
   ui.title:
     icon: 📦
-    :text: getText()
-    :number: item?.$children.length
-
+    ':text': getText()
+    ':number': item?.$children.length
 props:
-  value:
-
+  value: null
 methods:
-  getText: | #ts
+  getText: |
     function() {
       return (this.item?.$options?._componentTag || this.item?._vnode.tag);
     }
-
 computed:
-  item: | #ts
+  item: |
     function() {
       return (!this.value) ? null : this.value();
     }
+name: ide-vue-node
+template: >-
+  <ui-title class="comp-ide-vue-node" icon="📦" :text="getText()"
+  :number="item?.$children.length"></ui-title>

@@ -1,7 +1,7 @@
 dom:
   div:
     .header:
-      ":style": getStyle()
+      ':style': getStyle()
       site.logo: null
 name: site-header
 mounted: |
@@ -43,3 +43,6 @@ style:
     padding: 1rem
     filter: grayscale(1) brightness(0.8)
     background-color: black
+template: >-
+  <div class="comp-site-header"><div class="header"
+  :style="getStyle()"><site-logo></site-logo></div></div>

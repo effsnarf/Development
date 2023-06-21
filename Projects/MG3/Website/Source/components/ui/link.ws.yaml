@@ -1,9 +1,9 @@
 dom:
   a:
-    :href: url
-    slot:
-
+    ':href': url
+    slot: null
 props:
-  url:
-
-style:
+  url: null
+style: null
+name: ui-link
+template: <a class="comp-ui-link" :href="url"><slot></slot></a>

@@ -1,59 +1,54 @@
 dom:
   div:
-    :class: getCssClass()
+    ':class': getCssClass()
     div#1:
       class: background
     div:
       ui.image:
         v-if: imageID
-        :imageID: imageID
-        :url: url
+        ':imageID': imageID
+        ':url': url
       ui.large.title:
-        ":text": title
-
+        ':text': title
 props:
-  imageID:
-  title:
-  url:
-
+  imageID: null
+  title: null
+  url: null
 data:
   isStuck: false
-
 methods:
-  onScroll: | #ts
+  onScroll: |
     function() {
       const scrollTop = window.scrollY;
       this.isStuck = scrollTop > 0;
     }
-  getCssClass: | #ts
+  getCssClass: |
     function() {
       return { stuck: this.isStuck };
     }
-
-mounted: | #ts
+mounted: |
   function() {
     window.addEventListener('scroll', this.onScroll);
   }
-
 style:
   .stuck .title:
     font-size: 6vh
     transform: translateX(-6rem)
   .background:
-    background: "linear-gradient(rgba(0, 0, 0, 1), rgba(0, 0, 0, 0))"
+    background: linear-gradient(rgba(0, 0, 0, 1), rgba(0, 0, 0, 0))
     position: absolute
     width: 100%
     height: 10rem
   .comp-content-title:
     position: sticky
     top: 8rem
-    background: "#000000"
+    background: '#000000'
     z-index: 10
   .comp-ui-image:
     width: 15% !important
     margin: 0 1em
     float: left
-    box-shadow: "-0.5rem 0.5rem 0.5rem #000000"
+    box-shadow: '-0.5rem 0.5rem 0.5rem #000000'
     z-index: 20
   .comp-ui-large-title:
     padding-top: 0.4em !important
@@ -61,3 +56,9 @@ style:
   .comp-ui-image img:
     aspect-ratio: 1
     object-fit: cover
+name: content-title
+template: >-
+  <div class="comp-content-title" :class="getCssClass()"><div
+  class="background"></div><div><ui-image v-if="imageID" :imageID="imageID"
+  :url="url"></ui-image><ui-large-title
+  :text="title"></ui-large-title></div></div>

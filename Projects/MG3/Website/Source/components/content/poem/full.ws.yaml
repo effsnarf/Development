@@ -12,7 +12,7 @@ methods:
       if (!index) return null;
       return `ml-l${index}`;
     }
-name: content-poem
+name: content-poem-full
 style:
   .box:
     margin: auto
@@ -25,3 +25,6 @@ style:
     line-height: 1em
     font-size: 200%
     font-family: Old Standard TT
+template: >-
+  <div class="comp-content-poem-full box"><div class="line" v-for="(line, index)
+  in lines" :class="getLineCssClass(index)" v-text="line"></div></div>

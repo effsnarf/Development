@@ -5,15 +5,16 @@ dom:
       .line.mono:
         v-for: line in item
         v-text: line
-
 props:
-  item:
-
-methods:
-
+  item: null
+methods: null
 style:
   .comp-content-poem-stanza:
-    background: "#ffffff30"
+    background: '#ffffff30'
     width: fit-content
   .lines:
     padding: 1rem
+name: content-poem-stanza
+template: >-
+  <div class="comp-content-poem-stanza" v-if="item"><div class="lines"><div
+  class="line mono" v-for="line in item" v-text="line"></div></div></div>

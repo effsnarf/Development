@@ -2,54 +2,53 @@ dom:
   div:
     ui.link:
       class: instance
-      :url: $root.url.instance(item)
+      ':url': $root.url.instance(item)
       div:
         ui.image:
           ref: image1
-          :imageID: item.imageID
-          @load: onImageLoad
+          ':imageID': item.imageID
+          on_load: onImageLoad
         .texts:
           .text:
             v-for: (text, index) in [item.text0, item.text1]
             v-text: text
-            :style: "{ fontSize: fontSizes[index] }"
+            ':style': '{ fontSize: fontSizes[index] }'
         div:
           class: spacer
     e.generator.small:
       v-if: showGenerator
-      :item: item
-
+      ':item': item
 name: e-instance
 props:
-  item:
+  item: null
 data:
-  width:
+  width: null
 methods:
-  getFontSize: | #ts
+  getFontSize: |
     function (s) {
       if (!s) return 0;
       if (!this.width) return 0;
       const size = Math.min(3, Math.max(14, (36 - (s.length / 6))) / 50 *  this.width / 150);
       return `${size*2}vh`;
     }
-  onImageLoad: | #ts
+  onImageLoad: |
     function () {
       this.width = this.$refs.image1.width;
     }
 computed:
-  showGenerator: | #ts
+  showGenerator: |
     function () {
       if (this.item.urlName == this.$root.params.urlName) return false;
       return true;
     }
-  fontSizes: | #ts
+  fontSizes: |
     function () {
       const sizes = [this.getFontSize(this.item.text0), this.getFontSize(this.item.text1)];
       return sizes;
     }
 style:
   .instance:
-    box-shadow: "-10px 10px 2px #000"
+    box-shadow: '-10px 10px 2px #000'
   .comp-ui-image, img:
     aspect-ratio: 1
     object-fit: cover
@@ -64,16 +63,24 @@ style:
     width: 100%
     top: 0
     overflow: hidden
-    color: "#fff"
+    color: '#fff'
     line-height: 1.2em
     font-family: Impact,Oswald
     text-transform: uppercase
-    text-shadow: "-2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000"
-    -webkit-font-smoothing: antialiased
+    text-shadow: '-2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000'
+    '-webkit-font-smoothing': antialiased
     box-sizing: border-box
     padding: 0.3em
-    filter: "drop-shadow(-2px 4px 2px #00000060)"
+    filter: 'drop-shadow(-2px 4px 2px #00000060)'
     transition: 0s
   .text:nth-child(2):
     top: auto
     bottom: 0
+template: >-
+  <div class="comp-e-instance"><ui-link class="instance"
+  :url="$root.url.instance(item)"><div><ui-image ref="image1"
+  :imageID="item.imageID" @load="onImageLoad"></ui-image><div class="texts"><div
+  class="text" v-for="(text, index) in [item.text0, item.text1]" v-text="text"
+  :style="{ fontSize: fontSizes[index] }"></div></div><div
+  class="spacer"></div></div></ui-link><e-generator-small v-if="showGenerator"
+  :item="item"></e-generator-small></div>

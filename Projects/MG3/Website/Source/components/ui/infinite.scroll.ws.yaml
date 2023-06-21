@@ -1,19 +1,19 @@
 dom:
   div:
-    slot:
-
-mounted: | #ts
+    slot: null
+mounted: |
   function() {
     window.addEventListener('scroll', this.onScroll);
     this.onScroll();
     this.onScroll();
   }
-
 methods:
-  onScroll: | #ts
+  onScroll: |
     function() {
       const distanceToBottom = document.documentElement.offsetHeight - (window.scrollY + window.innerHeight * 3);
       if (distanceToBottom < window.innerHeight) {
         this.$emit('scroll');
       }
     }
+name: ui-infinite-scroll
+template: <div class="comp-ui-infinite-scroll"><slot></slot></div>

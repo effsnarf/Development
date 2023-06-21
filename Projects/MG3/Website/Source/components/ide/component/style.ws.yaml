@@ -2,12 +2,10 @@ dom:
   style:
     v-if: style
     v-html: style
-
 props:
-  component:
-
+  component: null
 computed:
-  style: | #ts
+  style: |
     function() {
       if (!this.component?.source?.style) return "";
 
@@ -16,3 +14,5 @@ computed:
 
       return css;
     }
+name: ide-component-style
+template: <style class="comp-ide-component-style" v-if="style" v-html="style"></style>
