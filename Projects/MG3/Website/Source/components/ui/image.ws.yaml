@@ -1,6 +1,7 @@
 dom:
-  div:
+  ui.link:
     class: image
+    :url: url
     img:
       ref: image1
       ":class": getCssClass()
@@ -43,7 +44,6 @@ methods:
 computed:
   src: |
     function () {
-      if (this.url) return this.url;
       if (this.imageID) return this.$root.url.image(this.imageID);
       return null;
     }

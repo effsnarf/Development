@@ -6,6 +6,7 @@ dom:
       content.title:
         :imageID: generator?.imageID
         :title: generator?.displayName
+        :url: $root.url.generator(generator)
       content.article:
         template:
           v-slot: content

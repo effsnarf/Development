@@ -5,13 +5,15 @@ dom:
       class: background
     div:
       ui.image:
-        ":url": $root.url.image(imageID)
+        :imageID: imageID
+        :url: url
       ui.large.title:
         ":text": title
 
 props:
   imageID:
   title:
+  url:
 
 data:
   isStuck: false
@@ -43,14 +45,18 @@ style:
     height: 10rem
   .comp-content-title:
     position: sticky
-    top: 7.5rem
+    top: 8rem
     background: "#000000"
     z-index: 10
   .comp-ui-image:
     width: 15% !important
     margin: 0 1em
     float: left
+    box-shadow: "-0.5rem 0.5rem 0.5rem #000000"
     z-index: 20
+  .comp-ui-large-title:
+    padding-top: 0.4em !important
+    z-index: 10
   .comp-ui-image img:
     aspect-ratio: 1
     object-fit: cover

@@ -1,1 +1,7 @@
 dom:
+  div:
+    div:
+      v-text: value
+
+props:
+  value:

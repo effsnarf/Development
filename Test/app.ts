@@ -36,6 +36,8 @@ class Malkovich {
 const malkovitch = new Malkovich();
 
 (async () => {
+  console.log(Configuration.getEnvironment());
+
   //const config = (await Configuration.new()).data;
 
   const root = await LiveTree.Api.getFolder("c:/eff/Development");

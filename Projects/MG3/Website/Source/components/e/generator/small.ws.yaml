@@ -1,11 +1,19 @@
 dom:
   ui.link:
-    :url: "$root.url.generator(item.urlName)"
-    layout.horizontal.1:
+    class: grayish
+    :url: "$root.url.generator(item)"
+    .badge:
       ui.image:
         :imageID: item.imageID
-      layout.vertical.1:
-        text: item.displayName
-        number: item.instancesCount
 props:
   item:
+
+style:
+  .title:
+    font-size: 120%
+  .badge:
+    display: flex
+    margin-top: 1rem
+  .comp-ui-image:
+    width: 20% !important
+    margin-right: 1rem

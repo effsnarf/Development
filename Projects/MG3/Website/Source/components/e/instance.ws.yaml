@@ -1,6 +1,7 @@
 dom:
   div:
     ui.link:
+      class: instance
       :url: $root.url.instance(item)
       div:
         ui.image:
@@ -15,12 +16,12 @@ dom:
         div:
           class: spacer
     e.generator.small:
+      v-if: showGenerator
       :item: item
 
 name: e-instance
 props:
   item:
-  showGenerator: true
 data:
   width:
 methods:
@@ -36,18 +37,23 @@ methods:
       this.width = this.$refs.image1.width;
     }
 computed:
+  showGenerator: | #ts
+    function () {
+      if (this.item.urlName == this.$root.params.urlName) return false;
+      return true;
+    }
   fontSizes: | #ts
     function () {
       const sizes = [this.getFontSize(this.item.text0), this.getFontSize(this.item.text1)];
       return sizes;
     }
 style:
-  .comp-e-instance:
+  .instance:
     box-shadow: "-10px 10px 2px #000"
   .comp-ui-image, img:
     aspect-ratio: 1
     object-fit: cover
-  .comp-ui-image, .texts, .text:
+  .instance .comp-ui-image, .texts, .text:
     position: absolute
   .spacer, .texts:
     width: 100%

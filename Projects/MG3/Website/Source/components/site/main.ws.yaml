@@ -19,7 +19,6 @@ props:
 
 style:
   .comp-site-main:
-    margin-top: 3rem
   .columns:
     display: grid
     grid-template: 1fr / 1fr 2fr 1fr

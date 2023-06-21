@@ -8,7 +8,7 @@ const helpers = {
   url: {
     generator: (generator: any) => {
       if (!generator) return null;
-      return `/generator/${generator.urlName}`;
+      return `/${generator.urlName}`;
     },
     instance: (instance: any) => {
       if (!instance) return null;

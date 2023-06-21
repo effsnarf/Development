@@ -72,6 +72,7 @@ const _fetchAsJson = async (url: string) => {
         return res.end(JSON.stringify(comps));
       }
       if (req.url == "/component/update") {
+        if (Configuration.getEnvironment() != "dev") return res.end("ok");
         // Save a log of updates, just in case
         const updateLogFolder = path.join(
           config.project.folder,

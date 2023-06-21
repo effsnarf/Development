@@ -17,6 +17,8 @@ props:
   item:
 
 style:
+  .comp-ui-image:
+    display: block
   .comp-ui-image:hover img:
     transform: scale(1.5)
     aspect-ratio: 4 / 2
