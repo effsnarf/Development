@@ -76,7 +76,7 @@ class Objects {
     const result = {} as any;
     for (const key of Object.keys(obj)) {
       let value = obj[key];
-      if (value && typeof value === "object")
+      if (value && !Array.isArray(value) && typeof value === "object")
         value = Objects.toCamelCaseKeys(value);
       result[key.toCamelCase()] = value;
     }
