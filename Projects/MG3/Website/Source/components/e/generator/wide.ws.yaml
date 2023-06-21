@@ -7,6 +7,8 @@ dom:
         :imageID: item.imageID
       ui.title:
         :text: item.displayName
+      content.poem2:
+        :lines: item.
 props:
   item:
 

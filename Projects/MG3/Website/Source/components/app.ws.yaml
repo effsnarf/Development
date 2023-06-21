@@ -1,4 +1,9 @@
 dom:
-  page.home:
-  page.generator:
+  div:
+    page.home:
+    page.generator:
 name: app
+
+style:
+  .comp-app:
+    margin: auto
