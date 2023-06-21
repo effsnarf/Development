@@ -4,7 +4,6 @@ dom:
     div:
       site.sidebar: null
       site.main:
-        ":get-more-items": getMoreItems
         ":recommendation-items": recommendationItems
         template#1:
           v-slot: article

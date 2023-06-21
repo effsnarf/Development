@@ -21,7 +21,7 @@ dom:
       v-slot: middle
       content.stream:
         item-type: e.instance
-        :get-more-items: getMoreItems
+        :get-more-items: getMoreInstances
         grid-class: grid-1
 
 data:
@@ -40,9 +40,11 @@ mounted: | #ts
   }
 
 methods:
-  getMoreItems: | #ts
+  getMoreInstances: | #ts
     async function(pageIndex) {
-      return this.$root.dbp.instances.select.popular("en", pageIndex, this.urlName)
+      const items = await this.$root.dbp.instances.select.popular("en", pageIndex, this.urlName)
+      debugger;
+      return items;
     }
   getRandomStanzas: | #ts
     function(poem) {
