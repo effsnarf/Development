@@ -15,7 +15,7 @@ import { ChatOpenAI, Roles } from "../../../../Apis/OpenAI/classes/ChatOpenAI";
 
   const generators = await db.find(
     "Generators",
-    { Desc: null },
+    {}, // { Desc: null },
     { InstancesCount: -1 },
     batchSize,
     0,
@@ -47,13 +47,14 @@ import { ChatOpenAI, Roles } from "../../../../Apis/OpenAI/classes/ChatOpenAI";
         console.log(`Found ${instances.length} instances`.gray);
 
         const tasks = {
-          haiku: "Write a haiku about this meme",
-          poem: "Write a poem exactly 9 verses long about this meme",
+          //haiku: "Write a haiku about this meme",
+          //poem: "Write a poem exactly 9 verses long about this meme",
+          aiInstances:
+            "Write 10 examples of this meme in the topic of cryptocurrency",
         } as any;
 
         for (const task of Object.entries(tasks)) {
           const message = `${task[1]}
-        , based on its name and sayings.
   
         ${generator.displayName}
   
@@ -78,6 +79,6 @@ import { ChatOpenAI, Roles } from "../../../../Apis/OpenAI/classes/ChatOpenAI";
 
     generator.desc = desc;
 
-    db.upsert("Generators", generator);
+    //db.upsert("Generators", generator);
   }
 })();
