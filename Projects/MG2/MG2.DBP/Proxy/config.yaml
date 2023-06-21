@@ -38,7 +38,7 @@ cache:
     - /googleLogin
   store:
     prod:
-      - memory: true
+      #- memory: true
       - database:
           connectionString: mongodb://localhost:37017
           database: MG-DBP-Cache
