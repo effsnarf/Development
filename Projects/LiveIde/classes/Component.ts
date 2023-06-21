@@ -26,7 +26,15 @@ class Component {
       const vueOptions = eval(`(${json})`);
       console.log(vueOptions);
       const vueName = Component.toVueName(this.name);
-      vueOptions.template = await client.pugToHtml(vueOptions.template);
+      if (this.source.template) {
+        vueOptions.template = this.source.template;
+      } else {
+        this.source.template = vueOptions.template = await client.pugToHtml(
+          vueOptions.template
+        );
+        client.updateComponent(this);
+      }
+      this.source.template = vueOptions.template;
       client.Vue.component(vueName, vueOptions);
     } catch (ex) {
       debugger;

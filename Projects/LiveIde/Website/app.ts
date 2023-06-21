@@ -81,7 +81,9 @@ const _fetchAsJson = async (url: string) => {
                 preProcessYaml(fs.readFileSync(s, "utf8"))
               ),
             } as any;
-            comp.template = Objects.pugToHtml(comp.source.dom);
+            if (Configuration.getEnvironment() == "dev") {
+              delete comp.source.template;
+            }
             return comp;
           });
         return res.end(JSON.stringify(comps));
