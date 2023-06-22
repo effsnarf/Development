@@ -129,9 +129,12 @@ const _fetchAsJson = async (url: string) => {
     config.server.port,
     config.server.host,
     async (req, res, data) => {
-      if (req.url.startsWith("/images/")) {
+      if (req.url.startsWith("/img/")) {
         // Redirect to img.memegenerator.net
-        const url = `https://img.memegenerator.net${req.url}`;
+        const url = `https://img.memegenerator.net${req.url.replace(
+          "/img/",
+          ""
+        )}`;
         // Return HTTP Moved Permanently (301) to the client
         res.writeHead(301, {
           Location: url,
