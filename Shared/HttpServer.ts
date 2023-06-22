@@ -8,12 +8,16 @@ const HAML = require("./haml");
 const Handlebars = require("Handlebars");
 const http = require("http");
 
+Handlebars.registerHelper("json", function (obj: any) {
+  return JSON.stringify(obj);
+});
+
 class HttpServer {
   private constructor(
     port: number,
     ip: string,
     private handler: (req: any, res: any, data: any) => any,
-    private getIndexPageTemplateData: (req: any) => any
+    private getIndexPageTemplateData: (req: any) => Promise<any>
   ) {
     const server = http.createServer(this.requestListener.bind(this));
     server.listen(port, ip, () => {
@@ -96,13 +100,19 @@ class HttpServer {
       let fileContent = fs.readFileSync(path, "utf-8");
       if (path.endsWith(".haml")) {
         try {
-          fileContent = Handlebars.compile(fileContent)(
-            await this.getIndexPageTemplateData(req)
-          );
-          return HAML.render(fileContent);
+          let templateData = await this.getIndexPageTemplateData(req);
+          fileContent = Handlebars.compile(fileContent)(templateData);
+          fileContent = HAML.render(fileContent);
+          for (const key of Object.keys(templateData)) {
+            fileContent = fileContent.replace(
+              `(((${key})))`,
+              JSON.stringify(templateData[key])
+            );
+          }
+          return fileContent;
         } catch (ex: any) {
           console.log(`${ex.stack.bgRed}`);
-          return ex.toString();
+          return ex.stack;
         }
       }
       return fileContent;

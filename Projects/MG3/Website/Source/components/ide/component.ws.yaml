@@ -1,12 +1,12 @@
 dom:
   div:
     ui.title:
-      icon: 📦
+      icon: ðŸ“¦
       ':value': name
 props:
   name: null
   source: null
 name: ide-component
 template: >-
-  <div class="comp-ide-component"><ui-title icon="📦"
+  <div class="comp-ide-component"><ui-title icon="ðŸ“¦"
   :value="name"></ui-title></div>

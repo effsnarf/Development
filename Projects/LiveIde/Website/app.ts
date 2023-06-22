@@ -30,6 +30,40 @@ const _fetchAsJson = async (url: string) => {
 
   const componentsFolder = path.join(config.project.folder, "Components");
 
+  const getComponents = async () => {
+    const comps = Files.getFiles(componentsFolder, {
+      recursive: true,
+    })
+      .filter((s) => s.endsWith(".ws.yaml"))
+      .map((s) => {
+        const comp = {
+          name: getCompName(s),
+          path: s.replace(componentsFolder, ""),
+          source: Objects.parseYaml(preProcessYaml(fs.readFileSync(s, "utf8"))),
+        } as any;
+
+        if (Configuration.getEnvironment() == "dev") {
+          if (comp.source) {
+            delete comp.source.template;
+          }
+        }
+
+        return comp;
+      });
+    return comps;
+  };
+
+  const getProjectPageTemplateObject = async (req: any) => {
+    const components = await getComponents();
+
+    const obj = {
+      ...(await eval(`(${projectConfig.template.get})`)(dbp, req)),
+      components,
+    };
+
+    return obj;
+  };
+
   const dbp = await DatabaseProxy.new(
     projectConfig.databaseProxy.url,
     _fetchAsJson
@@ -69,27 +103,7 @@ const _fetchAsJson = async (url: string) => {
       }
 
       if (req.url == "/components") {
-        const comps = Files.getFiles(componentsFolder, {
-          recursive: true,
-        })
-          .filter((s) => s.endsWith(".ws.yaml"))
-          .map((s) => {
-            const comp = {
-              name: getCompName(s),
-              path: s.replace(componentsFolder, ""),
-              source: Objects.parseYaml(
-                preProcessYaml(fs.readFileSync(s, "utf8"))
-              ),
-            } as any;
-
-            if (Configuration.getEnvironment() == "dev") {
-              if (comp.source) {
-                delete comp.source.template;
-              }
-            }
-
-            return comp;
-          });
+        const comps = await getComponents();
         return res.end(JSON.stringify(comps));
       }
       if (req.url == "/component/update") {
@@ -148,6 +162,6 @@ const _fetchAsJson = async (url: string) => {
         }
       }
     },
-    (req: any) => eval(`(${projectConfig.template.get})`)(dbp, req)
+    async (req: any) => await getProjectPageTemplateObject(req)
   );
 })();

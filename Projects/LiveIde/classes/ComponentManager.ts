@@ -31,9 +31,15 @@ class ComponentManager {
   }
 
   async init() {
-    this.comps = (await (await fetch("/components")).json()).map(
-      (c: any) => new Component(c)
-    ) as Component[];
+    if (false && window.location.hostname == "localhost") {
+      this.comps = (await (await fetch("/components")).json()).map(
+        (c: any) => new Component(c)
+      ) as Component[];
+    } else {
+      this.comps = (window as any).components.map(
+        (c: any) => new Component(c)
+      ) as Component[];
+    }
 
     const watchers = await Promise.all(
       this.comps.map((c) =>
