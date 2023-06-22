@@ -180,8 +180,20 @@ const _fetchAsJson = async (url: string) => {
           const filePath = path.join(folder, req.url.replace(".js", ".ts"));
           if (fs.existsSync(filePath)) {
             // If TypeScript file, serve as compiled JavaScript
-            if (path.extname(filePath) == ".ts")
-              return res.end(await TypeScript.webpackify(filePath));
+            if (path.extname(filePath) == ".ts") {
+              const precompiledPath = filePath.replace(
+                ".ts",
+                ".precompiled.js"
+              );
+              if (Configuration.getEnvironment() != "dev") {
+                if (fs.existsSync(precompiledPath)) {
+                  return res.end(fs.readFileSync(precompiledPath, "utf8"));
+                }
+              }
+              const compiledJsCode = await TypeScript.webpackify(filePath);
+              fs.writeFileSync(precompiledPath, compiledJsCode);
+              return res.end(compiledJsCode);
+            }
             if (filePath.endsWith(".yaml"))
               return res.end(
                 JSON.stringify(

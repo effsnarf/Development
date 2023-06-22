@@ -33,7 +33,7 @@ class Component {
           vueOptions.template = html;
         } else {
           const pug = vueOptions.template;
-          let html = await client.pugToHtml(pug);
+          let html = (await client.pugToHtml(pug)) || "";
           html = html.replace(/on_/g, "@");
           vueOptions.template = html;
           this.source.template = html;
