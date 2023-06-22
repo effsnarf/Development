@@ -8,6 +8,10 @@ database:
 template:
   get: | #ts
     async function(dbp, req) {
+      return {
+        title: "Meme Generator",
+      };
+
       const getTitle = async () => {
         if (req.url.startsWith("/instance/")) {
           const instanceID = parseInt(req.url.split("/")[2]);
