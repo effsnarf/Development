@@ -53,12 +53,49 @@ const _fetchAsJson = async (url: string) => {
     return comps;
   };
 
+  const getTemplates = async () => {
+    return {
+      vue: fs.readFileSync(
+        path.join(config.webscript.folder, "vue.client.template.hbs"),
+        "utf8"
+      ),
+      style: fs.readFileSync(
+        path.join(config.webscript.folder, "style.template.hbs"),
+        "utf8"
+      ),
+    };
+  };
+
+  const getHelpers = async () => {
+    return Objects.parseYaml(
+      fs.readFileSync(
+        path.join(config.webscript.folder, "handlebars.helpers.yaml"),
+        "utf8"
+      )
+    ).helpers;
+  };
+
+  const getClientConfig = async () => {
+    const params = Objects.parseYaml(
+      fs.readFileSync(path.join(config.project.folder, "params.yaml"), "utf8")
+    );
+    return {
+      params,
+    };
+  };
+
   const getProjectPageTemplateObject = async (req: any) => {
     const components = await getComponents();
+    const templates = await getTemplates();
+    const helpers = await getHelpers();
+    const config = await getClientConfig();
 
     const obj = {
       ...(await eval(`(${projectConfig.template.get})`)(dbp, req)),
       components,
+      templates,
+      helpers,
+      config,
     };
 
     return obj;

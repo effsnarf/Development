@@ -57,6 +57,8 @@ class ClientContext {
   }
 
   private async init() {
+    const isDevEnv = window.location.hostname == "localhost";
+
     ClientContext._fetch = window.fetch.bind(null);
     (window as any).fetch = ClientContext.fetch;
 
@@ -66,15 +68,12 @@ class ClientContext {
 
     this.componentManager = await ComponentManager.get();
 
-    this.helpers = (
-      await (await fetch(`/handlebars.helpers.yaml`)).json()
-    ).helpers;
     this.templates = {} as any;
-    this.templates.vue = await (await fetch(`/vue.client.template.hbs`)).text();
-    this.templates.style = await (await fetch(`/style.template.hbs`)).text();
-
     this.config = {} as any;
-    this.config.params = await (await fetch(`/params.yaml`)).json();
+
+    this.helpers = (window as any).helpers;
+    this.templates = (window as any).templates;
+    this.config = (window as any).config;
 
     this.Handlebars = (window as any).Handlebars;
     this.Vue = (window as any).Vue;
@@ -100,7 +99,7 @@ class ClientContext {
       },
     };
 
-    for (const helper of Object.entries(this.helpers)) {
+    for (const helper of Object.entries(this.helpers || {})) {
       const func = eval(
         (helper[1] as string).replace(/: any/g, "").replace(/: string/g, "")
       );
