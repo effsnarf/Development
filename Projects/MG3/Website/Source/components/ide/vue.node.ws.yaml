@@ -1,8 +1,8 @@
 dom:
   ui.title:
-    icon: ðŸ“¦
-    ':text': getText()
-    ':number': item?.$children.length
+    icon: 📦
+    ":text": getText()
+    ":number": item?.$children.length
 props:
   value: null
 methods:
@@ -17,5 +17,5 @@ computed:
     }
 name: ide-vue-node
 template: >-
-  <ui-title class="comp-ide-vue-node" icon="ðŸ“¦" :text="getText()"
+  <ui-title class="comp-ide-vue-node" icon="📦" :text="getText()"
   :number="item?.$children.length"></ui-title>
