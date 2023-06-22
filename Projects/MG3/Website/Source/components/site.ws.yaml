@@ -13,6 +13,10 @@ dom:
           v-slot: middle
           slot:
             name: middle
+        template#3:
+          v-slot: right
+          slot:
+            name: right
 name: site
 props:
   getMoreItems: null
@@ -41,4 +45,5 @@ template: >-
   class="comp-site"><site-header></site-header><div><site-sidebar></site-sidebar><site-main
   :recommendation-items="recommendationItems"><template v-slot:article><slot
   name="article"></slot></template><template v-slot:middle><slot
-  name="middle"></slot></template></site-main></div></div>
+  name="middle"></slot></template><template v-slot:right><slot
+  name="right"></slot></template></site-main></div></div>

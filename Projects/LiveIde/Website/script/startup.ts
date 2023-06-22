@@ -1,5 +1,5 @@
 import { Component } from "../../classes/Component";
-import { DataWatcher } from "../../../../Shared/DataWatcher";
+import { AnalyticsTracker } from "../../classes/AnalyticsTracker";
 import { ClientContext } from "../../classes/ClientContext";
 import { Params } from "../../classes/Params";
 import { DatabaseProxy } from "../../../../Apps/DatabaseProxy/Client/DbpClient";
@@ -36,27 +36,33 @@ interface MgParams {
     "https://db.memegenerator.net/MemeGenerator"
   )) as any;
 
-  const params = (await Params.new(
-    () => ideVueApp,
-    client.config.params,
-    window.location.pathname
-  )) as unknown as MgParams;
+  const getNewParams = async () => {
+    return (await Params.new(
+      () => ideVueApp,
+      client.config.params,
+      window.location.pathname
+    )) as unknown as MgParams;
+  };
+
+  const params = await getNewParams();
 
   ideVueApp = new client.Vue({
     el: "#app",
     data: {
       dbp,
+      analytics: await AnalyticsTracker.new(),
       params: params,
       url: helpers.url,
       comps: client.Vue.ref(client.comps),
       templates: client.templates,
       key1: 1,
-      generator: null,
-      generators: null,
-      instances: null,
     },
     async mounted() {},
     methods: {
+      async navigateTo(url: string) {
+        window.history.pushState({}, "", url);
+        await this.refresh();
+      },
       async compileApp() {
         await client.compileApp();
         this.refresh();
@@ -69,7 +75,9 @@ interface MgParams {
           self.params.urlName
         );
       },
-      refresh() {
+      async refresh() {
+        const self = this as any;
+        self.params = await getNewParams();
         (this as any).key1++;
       },
       getKey(item: any) {
@@ -86,15 +94,9 @@ interface MgParams {
     },
   });
 
-  if (params.urlName) {
-    dbp.generators.select.one(null, params.urlName, {
-      $set: [ideVueApp, "generator"],
-    });
-
-    dbp.generators.select.related(params.urlName, {
-      $set: [ideVueApp, "generators"],
-    });
-  }
+  window.addEventListener("popstate", async function (event) {
+    await ideVueApp.refresh();
+  });
 
   (window as any).ideVueApp = ideVueApp;
 })();

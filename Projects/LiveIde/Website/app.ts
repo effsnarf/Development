@@ -11,6 +11,9 @@ import { HttpServer } from "@shared/HttpServer";
 import { TypeScript } from "@shared/TypeScript";
 import { DatabaseProxy } from "../../../Apps/DatabaseProxy/Client/DbpClient";
 import { MemoryCache } from "@shared/Cache";
+import { Analytics, ItemType } from "@shared/Analytics";
+
+const isDevEnv = Configuration.getEnvironment() == "dev";
 
 const memoryCache = new MemoryCache();
 
@@ -27,6 +30,8 @@ const _fetchAsJson = async (url: string) => {
       path.join(config.project.folder, "../../", "config.yaml")
     )
   ).data;
+
+  const analytics = await Analytics.new(config.analytics);
 
   const componentsFolder = path.join(config.project.folder, "Components");
 
@@ -85,21 +90,22 @@ const _fetchAsJson = async (url: string) => {
   };
 
   const getProjectPageTemplateObject = async (req: any) => {
-    const data = await memoryCache.get(
-      "projectPageTemplateObject_data",
-      async () => {
-        const components = await getComponents();
-        const templates = await getTemplates();
-        const helpers = await getHelpers();
-        const config = await getClientConfig();
-        return {
-          components,
-          templates,
-          helpers,
-          config,
-        };
-      }
-    );
+    const getData = async () => {
+      const components = await getComponents();
+      const templates = await getTemplates();
+      const helpers = await getHelpers();
+      const config = await getClientConfig();
+      return {
+        components,
+        templates,
+        helpers,
+        config,
+      };
+    };
+
+    const data = isDevEnv
+      ? await getData()
+      : await memoryCache.get("projectPageTemplateObject_data", getData);
 
     const obj = {
       ...(await eval(`(${projectConfig.template.get})`)(dbp, req)),
@@ -184,6 +190,17 @@ const _fetchAsJson = async (url: string) => {
           html = html.replace(/v-slot="([^"]+)"/g, "v-slot:$1");
         }
         return res.end(html);
+      }
+      if (req.url == "/analytics") {
+        analytics.create(
+          "MG.Web",
+          "Site",
+          "timeOnSite",
+          ItemType.Count,
+          data.timeOnSite,
+          data.timeOnSite,
+          "ms"
+        );
       }
       // Serve static files
       if (req.url.length > 1) {

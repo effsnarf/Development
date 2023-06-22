@@ -151,9 +151,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "./script/1687407847190.ts":
+/***/ "./script/1687415256302.ts":
 /*!*********************************!*\
-  !*** ./script/1687407847190.ts ***!
+  !*** ./script/1687415256302.ts ***!
   \*********************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -168,6 +168,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+const AnalyticsTracker_1 = __webpack_require__(/*! ../../classes/AnalyticsTracker */ "../classes/AnalyticsTracker.ts");
 const ClientContext_1 = __webpack_require__(/*! ../../classes/ClientContext */ "../classes/ClientContext.ts");
 const Params_1 = __webpack_require__(/*! ../../classes/Params */ "../classes/Params.ts");
 const DbpClient_1 = __webpack_require__(/*! ../../../../Apps/DatabaseProxy/Client/DbpClient */ "../../../Apps/DatabaseProxy/Client/DbpClient.ts");
@@ -195,24 +196,31 @@ const helpers = {
     yield client.compileAll();
     let ideVueApp = null;
     const dbp = (yield DbpClient_1.DatabaseProxy.new("https://db.memegenerator.net/MemeGenerator"));
-    const params = (yield Params_1.Params.new(() => ideVueApp, client.config.params, window.location.pathname));
+    const getNewParams = () => __awaiter(void 0, void 0, void 0, function* () {
+        return (yield Params_1.Params.new(() => ideVueApp, client.config.params, window.location.pathname));
+    });
+    const params = yield getNewParams();
     ideVueApp = new client.Vue({
         el: "#app",
         data: {
             dbp,
+            analytics: yield AnalyticsTracker_1.AnalyticsTracker.new(),
             params: params,
             url: helpers.url,
             comps: client.Vue.ref(client.comps),
             templates: client.templates,
             key1: 1,
-            generator: null,
-            generators: null,
-            instances: null,
         },
         mounted() {
             return __awaiter(this, void 0, void 0, function* () { });
         },
         methods: {
+            navigateTo(url) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    window.history.pushState({}, "", url);
+                    yield this.refresh();
+                });
+            },
             compileApp() {
                 return __awaiter(this, void 0, void 0, function* () {
                     yield client.compileApp();
@@ -226,7 +234,11 @@ const helpers = {
                 });
             },
             refresh() {
-                this.key1++;
+                return __awaiter(this, void 0, void 0, function* () {
+                    const self = this;
+                    self.params = yield getNewParams();
+                    this.key1++;
+                });
             },
             getKey(item) {
                 if (item.instanceID)
@@ -244,16 +256,78 @@ const helpers = {
             },
         },
     });
-    if (params.urlName) {
-        dbp.generators.select.one(null, params.urlName, {
-            $set: [ideVueApp, "generator"],
+    window.addEventListener("popstate", function (event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield ideVueApp.refresh();
         });
-        dbp.generators.select.related(params.urlName, {
-            $set: [ideVueApp, "generators"],
-        });
-    }
+    });
     window.ideVueApp = ideVueApp;
 }))();
+
+
+/***/ }),
+
+/***/ "../classes/AnalyticsTracker.ts":
+/*!**************************************!*\
+  !*** ../classes/AnalyticsTracker.ts ***!
+  \**************************************/
+/***/ (function(__unused_webpack_module, exports) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.AnalyticsTracker = void 0;
+class AnalyticsTracker {
+    constructor() {
+        this.isPaused = false;
+        this.trackInterval = 100;
+        this.timeOnSite = 0;
+        // If the user is not looking at the page, pause tracking
+        document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === "visible") {
+                this.isPaused = false;
+            }
+            else {
+                this.isPaused = true;
+            }
+        });
+        // Send a beacon when the user closes the website
+        window.addEventListener("beforeunload", (event) => {
+            const data = {
+                timeOnSite: this.timeOnSite,
+            };
+            // Create and send a beacon
+            navigator.sendBeacon("/analytics", JSON.stringify(data));
+        });
+        this.trackTick();
+    }
+    static new() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return new AnalyticsTracker();
+        });
+    }
+    trackTick() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.isPaused)
+                yield this.track();
+            setTimeout(this.trackTick.bind(this), this.trackInterval);
+        });
+    }
+    track() {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.timeOnSite += this.trackInterval;
+        });
+    }
+}
+exports.AnalyticsTracker = AnalyticsTracker;
 
 
 /***/ }),
@@ -1085,7 +1159,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("./script/1687407847190.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("./script/1687415256302.ts");
 /******/ 	
 /******/ })()
 ;

@@ -13,6 +13,9 @@ dom:
           top: 140px
           content.recommendations:
             ':items': recommendationItems
+        div:
+          slot:
+            name: right
 props:
   recommendationItems: null
 style:
@@ -27,4 +30,5 @@ template: >-
   class="columns"><div></div><div><slot
   name="middle"></slot></div><div><ui-sticky
   top="140px"><content-recommendations
-  :items="recommendationItems"></content-recommendations></ui-sticky></div></div></div>
+  :items="recommendationItems"></content-recommendations></ui-sticky><div><slot
+  name="right"></slot></div></div></div></div>
