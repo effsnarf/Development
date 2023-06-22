@@ -4,6 +4,8 @@ import { Component } from "./Component";
 import { ComponentManager } from "./ComponentManager";
 import { ClientDatabase } from "./ClientDatabase";
 
+const isDevEnv = window.location.hostname == "localhost";
+
 class ClientContext {
   // #region Globals
   static async get() {
@@ -57,8 +59,6 @@ class ClientContext {
   }
 
   private async init() {
-    const isDevEnv = window.location.hostname == "localhost";
-
     ClientContext._fetch = window.fetch.bind(null);
     (window as any).fetch = ClientContext.fetch;
 
@@ -149,12 +149,14 @@ class ClientContext {
   }
 
   async pugToHtml(pug: string) {
+    if (!isDevEnv) return null;
     const url = `/pug`;
     const item = await (await fetch(url, { method: "post", body: pug })).text();
     return item;
   }
 
   async updateComponent(comp: any) {
+    if (!isDevEnv) return;
     const url = `/component/update`;
     await fetch(url, { method: "post", body: JSON.stringify(comp) });
   }
