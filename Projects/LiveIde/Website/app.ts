@@ -85,17 +85,25 @@ const _fetchAsJson = async (url: string) => {
   };
 
   const getProjectPageTemplateObject = async (req: any) => {
-    const components = await getComponents();
-    const templates = await getTemplates();
-    const helpers = await getHelpers();
-    const config = await getClientConfig();
+    const data = await memoryCache.get(
+      "projectPageTemplateObject_data",
+      async () => {
+        const components = await getComponents();
+        const templates = await getTemplates();
+        const helpers = await getHelpers();
+        const config = await getClientConfig();
+        return {
+          components,
+          templates,
+          helpers,
+          config,
+        };
+      }
+    );
 
     const obj = {
       ...(await eval(`(${projectConfig.template.get})`)(dbp, req)),
-      components,
-      templates,
-      helpers,
-      config,
+      ...data,
     };
 
     return obj;

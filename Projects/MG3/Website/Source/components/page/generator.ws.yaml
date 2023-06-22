@@ -1,26 +1,26 @@
 dom:
   site:
-    ":recommendation-items": recommendationItems
+    ':recommendation-items': recommendationItems
     template#1:
       v-slot: article
       content.title:
-        ":imageID": generator?.imageID
-        ":title": generator?.displayName
-        ":url": $root.url.generator(generator)
+        ':imageID': generator?.imageID
+        ':title': generator?.displayName
+        ':url': $root.url.generator(generator)
       content.article:
         template:
           v-slot: content
           .poem:
             content.poem.stanza:
               v-for: stanza in getRandomStanzas(generator?.desc?.poem)
-              ":item": stanza
+              ':item': stanza
           div:
             class: float-clear
     template#2:
       v-slot: middle
       content.stream:
         item-type: e.instance
-        ":get-more-items": getMoreInstances
+        ':get-more-items': getMoreInstances
         grid-class: grid-1
 data:
   generator: null
