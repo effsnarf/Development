@@ -129,7 +129,7 @@ const _fetchAsJson = async (url: string) => {
     config.server.port,
     config.server.host,
     async (req, res, data) => {
-      if (req.url.startsWith("/img/")) {
+      if (req.url.startsWith("/img/") && !req.url.startsWith("/img/banners/")) {
         // Redirect to img.memegenerator.net
         const url = `https://img.memegenerator.net${req.url.replace(
           "/img/",
