@@ -312,7 +312,7 @@ interface Array<T> {
   sum(): number;
   min(): number;
   max(): number;
-  average(): number;
+  average(): number | null;
   first(): any;
   last(): any;
   back(): any;
@@ -715,6 +715,9 @@ if (typeof String !== "undefined") {
   };
 
   String.prototype.deunitify = function (): number {
+    const thisStr = this.toString();
+    if (this == parseInt(thisStr).toString()) return parseInt(thisStr);
+    if (this == parseFloat(thisStr).toString()) return parseFloat(thisStr);
     const unitClass = this.getUnitClass();
     if (!unitClass) throw new Error(`No unit class found for ${this}`);
     // Percentages are special, because they are relative to 100
@@ -1192,6 +1195,7 @@ if (typeof Array !== "undefined") {
   };
 
   Array.prototype.average = function () {
+    if (!this.length) return null;
     return this.sum() / this.length;
   };
 

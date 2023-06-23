@@ -228,10 +228,23 @@ class LoadBalancer {
     lb.cache.events.on("error", (ex: any) => {
       lb.events.emit("error", ex);
     });
+
     lb.analytics = await Analytics.new(options.analytics);
+
     // Every minute, track analytics
+    const rpm = lb.stats.requests.per.minute;
     const rtpm = lb.stats.response.times.per.minute;
     setInterval(async () => {
+      await lb.analytics.create(
+        options.title,
+        "LoadBalancer",
+        "requests",
+        ItemType.Count,
+        (1).minutes(),
+        rpm.count,
+        "ms"
+      );
+
       await lb.analytics.create(
         options.title,
         "LoadBalancer",
@@ -286,8 +299,13 @@ class LoadBalancer {
     request: http.IncomingMessage,
     response: http.ServerResponse
   ) {
-    if (request.url?.startsWith("/analytics/"))
-      return this.analytics.api.handleRequest(request, response);
+    if (request.url?.startsWith("/analytics/")) {
+      try {
+        return await this.analytics.api.handleRequest(request, response);
+      } catch (ex: any) {
+        return ex.stack;
+      }
+    }
 
     this.stats.requests.track();
 

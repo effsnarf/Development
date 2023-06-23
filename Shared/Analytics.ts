@@ -141,10 +141,19 @@ class Analytics {
     if (typeof type == "string") type = type.parseEnum(ItemType);
     if (!type) throw new Error(`Invalid type: ${type}`);
 
+    const isIn = (value: number, interval: Interval) =>
+      value.isBetween(interval.from, interval.to);
+
+    const isFullDoc = (doc: any, interval: Interval) =>
+      isIn(doc.dt.f, interval) && isIn(doc.dt.t, interval);
+
+    const isPartialDoc = (doc: any, interval: Interval) =>
+      !isFullDoc(doc, interval);
+
     const intervals = Analytics.getIntervals(from, to, every);
 
     for (const interval of intervals) {
-      const docs = await this.db.find("Events", {
+      const filter = {
         t: type,
         a: app,
         c: category,
@@ -163,18 +172,12 @@ class Analytics {
             },
           },
         ],
-      });
+      };
+
+      const docs = await this.db.find("Events", filter);
 
       // Some of the docs fall only partially in the interval
       // We need to adjust their values to the relative space they occupy in the interval
-      const isIn = (value: number, interval: Interval) =>
-        value.isBetween(interval.from, interval.to);
-
-      const isFullDoc = (doc: any, interval: Interval) =>
-        isIn(doc.dt.f, interval) && isIn(doc.dt.t, interval);
-
-      const isPartialDoc = (doc: any, interval: Interval) =>
-        !isFullDoc(doc, interval);
 
       const partialDocs = docs.filter((d: any) => isPartialDoc(d, interval));
       for (const doc of partialDocs) {
@@ -191,7 +194,45 @@ class Analytics {
       interval.docs = docs;
     }
 
-    return intervals.map((intr) => intr.docs.map((d: any) => d.v).average());
+    // Some of the docs may span multiple intervals
+    // First, we get them all
+    const multiIntervalDocs = await this.db.find("Events", {
+      t: type,
+      a: app,
+      c: category,
+      e: event,
+      "dt.f": { $gte: from, $lte: to },
+      "dt.t": { $gte: from, $lte: to },
+    });
+
+    // For each of them, we calculate the intervals they span
+    for (const doc of multiIntervalDocs) {
+      const { f, t } = doc.dt;
+      for (const interval of intervals) {
+        if (isIn(f, interval) || isIn(t, interval)) {
+          // Calculate the overlap
+          const intervalLength = interval.to - interval.from;
+          const { df, dt } = f.isBetween(interval.from, interval.to)
+            ? { df: f, dt: interval.to }
+            : { df: interval.from, dt: t };
+          const overlap = dt - df;
+          // Calculate the ratio
+          const ratio = overlap / intervalLength;
+          // Add the doc to the interval
+          interval.docs.push({
+            ...doc,
+            dt: { f: df, t: dt },
+            v: doc.v * ratio,
+          });
+        }
+      }
+    }
+
+    const values = intervals
+      .map((intr) => intr.docs.map((d: any) => d.v).average())
+      .map((v) => Math.round(v));
+
+    return values;
   }
 
   // Returns an array of intervals between the specified dates
