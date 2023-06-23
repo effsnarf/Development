@@ -205,7 +205,7 @@ const isCachable = (options: any, config: any) => {
   setInterval(async () => {
     await analytics.create(
       config.title,
-      "LoadBalancer",
+      "Proxy",
       "requests",
       ItemType.Count,
       stats.interval,
