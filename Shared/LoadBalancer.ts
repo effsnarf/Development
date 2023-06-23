@@ -238,15 +238,6 @@ class LoadBalancer {
       await lb.analytics.create(
         options.title,
         "LoadBalancer",
-        "requests",
-        ItemType.Count,
-        (1).minutes(),
-        rpm.count
-      );
-
-      await lb.analytics.create(
-        options.title,
-        "LoadBalancer",
         "response.time",
         ItemType.Average,
         (1).minutes(),
