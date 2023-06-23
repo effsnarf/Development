@@ -241,8 +241,7 @@ class LoadBalancer {
         "requests",
         ItemType.Count,
         (1).minutes(),
-        rpm.count,
-        "ms"
+        rpm.count
       );
 
       await lb.analytics.create(
