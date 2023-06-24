@@ -17,7 +17,8 @@ class HttpServer {
     port: number,
     ip: string,
     private handler: (req: any, res: any, data: any) => any,
-    private getIndexPageTemplateData: (req: any) => Promise<any>
+    private getIndexPageTemplateData: (req: any) => Promise<any>,
+    private indexPagePath?: string
   ) {
     const server = http.createServer(this.requestListener.bind(this));
     server.listen(port, ip, () => {
@@ -29,14 +30,21 @@ class HttpServer {
     port: number,
     ip: string,
     handler: (req: any, res: any, data: any) => any,
-    getIndexPageTemplateData: (req: any) => Promise<any>
+    getIndexPageTemplateData: (req: any) => Promise<any>,
+    indexPagePath?: string
   ) {
-    const server = new HttpServer(port, ip, handler, getIndexPageTemplateData);
+    const server = new HttpServer(
+      port,
+      ip,
+      handler,
+      getIndexPageTemplateData,
+      indexPagePath
+    );
     return server;
   }
 
   private async requestListener(req: any, res: any) {
-    const rootPath = "./index.haml";
+    const rootPath = this.indexPagePath;
     try {
       const data = await Http.getPostData(req);
 

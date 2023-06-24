@@ -248,6 +248,7 @@ const _fetchAsJson = async (url: string) => {
         }
       }
     },
-    async (req: any) => await getProjectPageTemplateObject(req)
+    async (req: any) => await getProjectPageTemplateObject(req),
+    path.join(process.cwd(), "index.haml")
   );
 })();
