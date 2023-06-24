@@ -204,8 +204,8 @@ const isCachable = (options: any, config: any) => {
   const analytics = await Analytics.new(config.analytics);
   setInterval(async () => {
     await analytics.create(
-      config.title,
-      "Proxy",
+      config.title.split(".").first(),
+      "network",
       "requests",
       ItemType.Count,
       stats.interval,
