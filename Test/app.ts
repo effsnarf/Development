@@ -38,25 +38,43 @@ const malkovitch = new Malkovich();
 (async () => {
   console.log(Configuration.getEnvironment());
 
+  const obj = [
+    {
+      $match: {
+        cunt: true,
+      },
+    },
+  ];
+  Objects.traverse(obj, (node: any, key: string, value: any) => {
+    if (key.startsWith("$")) {
+      node[key.substring(1)] = value;
+      delete node[key];
+    }
+  });
+
+  console.log(obj);
+
+  process.exit();
+
   //const config = (await Configuration.new()).data;
 
-  const root = await LiveTree.Api.getFolder("c:/eff/Development");
+  // const root = await LiveTree.Api.getFolder("c:/eff/Development");
 
-  const path = ["Shared", "Timer.ts", "Timer"];
+  // const path = ["Shared", "Timer.ts", "Timer"];
 
-  let node = root as LiveTree.Node | undefined;
-  while (path.length) {
-    await node?.populate();
-    node = await node?.find(path.shift() || "");
-  }
-  await node?.populate();
+  // let node = root as LiveTree.Node | undefined;
+  // while (path.length) {
+  //   await node?.populate();
+  //   node = await node?.find(path.shift() || "");
+  // }
+  // await node?.populate();
 
-  console.log(
-    util.inspect(
-      await root.select((n) => {
-        return { title: n.title, info: n.info };
-      }),
-      { depth: 10, colors: true }
-    )
-  );
+  // console.log(
+  //   util.inspect(
+  //     await root.select((n) => {
+  //       return { title: n.title, info: n.info };
+  //     }),
+  //     { depth: 10, colors: true }
+  //   )
+  // );
 })();

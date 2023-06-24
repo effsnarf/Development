@@ -1,8 +1,9 @@
 dom:
-  ui.title:
-    icon: 📦
-    ":text": getText()
-    ":number": item?.$children.length
+  div:
+    ui.title:
+      icon: 📦
+      ":text": getText()
+      ":number": item?.$children.length
 props:
   value: null
 methods:

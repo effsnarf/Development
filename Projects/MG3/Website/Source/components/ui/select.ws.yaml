@@ -3,6 +3,7 @@ dom:
     ui.list:
       v-slot: slotProps
       ":items": options
+      :selected-index: valueIndex
       template:
         div:
           v-text: slotProps.item
@@ -16,6 +17,12 @@ methods:
     function(index) {
       const value = this.inputType === "index" ? index : this.options[index];
       this.$emit("input", value);
+    }
+computed:
+  valueIndex: |
+    function() {
+      if (this.inputType === "index") return this.value;
+      return this.options.indexOf(this.value);
     }
 name: ui-select
 template: >-

@@ -3,20 +3,19 @@ dom:
     class: menu3
     li:
       v-for: (item, index) in items
-      ':class': getCssClass(index)
+      ":class": getCssClass(index)
       slot:
-        ':index': index
-        ':item': item
+        ":index": index
+        ":item": item
       on_click: () => onItemClick({ item, index })
 props:
   items: null
-data:
   selectedIndex: null
 methods:
   onItemClick: |
     function(e) {
-      this.selectedIndex = (e.index == this.selectedIndex) ? null : e.index;
-      this.$emit('input', this.selectedIndex);
+      const newIndex = (e.index == this.selectedIndex) ? null : e.index;
+      this.$emit('input', newIndex);
     }
   getCssClass: |
     function(index) {

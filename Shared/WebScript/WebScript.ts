@@ -95,11 +95,16 @@ class WebScript {
     if (name == "slot") return false;
     if (
       [
+        "a",
         "style",
         ...[1, 2, 3, 4, 5, 6].map((i) => `h${i}`),
         "pre",
         "p",
         "img",
+        "table",
+        "tr",
+        "th",
+        "td",
         "div",
         "span",
         "ul",

@@ -11,6 +11,8 @@ dom:
       on_node-click: onNodeClick
       on_node-hover: onNodeHover
       on_node-unhover: onNodeUnhover
+    ide.component.info:
+      ":item": selectedNode
     div:
       ide.component.style:
         v-for: comp in comps

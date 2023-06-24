@@ -1,5 +1,5 @@
 dom:
-  div:
+  .w-100pc:
     v-if: every
     ui.chart:
       :class: cssClass
@@ -8,6 +8,10 @@ dom:
       :data: values
       :color: color
       :scale: scale
+    a:
+      v-text: url
+      :href: url
+      target: _blank
 
 props:
   app:
@@ -44,12 +48,19 @@ methods:
 computed:
   url: |
     function() {
-      let { app, category, event, last, every, type } = this;
-      last = last.deunitify().unitifyTime();
-      every = every.deunitify().unitifyTime();
-      let url = `https://db.memegenerator.net/analytics/${app}/${category}/${event}/last/${last}/every/${every}/${type}`;
-      url = url.withoutColors();
-      return url;
+      try
+      {
+        let { app, category, event, last, every, type } = this;
+        last = last.deunitify().unitifyTime();
+        every = every.deunitify().unitifyTime();
+        let url = `https://db.memegenerator.net/analytics/${app}/${category}/${event}/last/${last}/every/${every}/${type}`;
+        url = url.withoutColors();
+        return url;
+      }
+      catch (ex)
+      {
+        return null;
+      }
     }
 
   color: |

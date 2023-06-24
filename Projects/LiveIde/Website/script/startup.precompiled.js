@@ -151,9 +151,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "./script/1687525677307.ts":
+/***/ "./script/1687597438173.ts":
 /*!*********************************!*\
-  !*** ./script/1687525677307.ts ***!
+  !*** ./script/1687597438173.ts ***!
   \*********************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -464,11 +464,16 @@ class ClientContext {
         if (name == "slot")
             return false;
         if ([
+            "a",
             "style",
             ...[1, 2, 3, 4, 5, 6].map((i) => `h${i}`),
             "pre",
             "p",
             "img",
+            "table",
+            "tr",
+            "th",
+            "td",
             "div",
             "span",
             "ul",
@@ -2192,7 +2197,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("./script/1687525677307.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("./script/1687597438173.ts");
 /******/ 	
 /******/ })()
 ;

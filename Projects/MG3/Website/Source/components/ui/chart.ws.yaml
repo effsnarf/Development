@@ -6,7 +6,7 @@ dom:
       v-if: header
       v-text: header
     .chart.flex:
-      .column:
+      .column1:
         ui.num#1:
           class: opacity-50
           ":value": scaled(minValue)
@@ -19,8 +19,8 @@ dom:
         canvas:
           ref: canvas1
           class: ml-l1
-          width: 400
-          height: 200
+          :width: canvasWidth
+          :height: (canvasWidth / 2)
           on_mousemove: onMouseMove
           on_mouseout: onMouseOut
     .flex.justify-center.items-center:
@@ -41,6 +41,7 @@ props:
   scale: 1
   color:
 data:
+  canvasWidth: 400
   hoveredIndex: null
 methods:
   getCssClass: |
@@ -76,8 +77,10 @@ methods:
     }
   onMouseMove: |
     function(e) {
+      const rect = this.canvas.getBoundingClientRect();
+      const scaleX = this.canvas.width / rect.width;
       const x = e.offsetX;
-      const i = Math.floor((x - this.paddingX) / this.step);
+      const i = Math.floor((x - this.paddingX) / this.step * scaleX);
       this.hoveredIndex = i;
     }
   onMouseOut: |
@@ -172,6 +175,8 @@ computed:
     }
 name: ui-chart
 style:
+  column1:
+    width: 10%
   .chart > div:
     flex-grow: 1
   canvas:

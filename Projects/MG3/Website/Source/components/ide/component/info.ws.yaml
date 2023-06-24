@@ -1,0 +1,38 @@
+dom:
+  div:
+    table:
+      tr:
+        v-for: prop in getItemProperties()
+        td#0:
+          :class: prop.class
+          v-text: "'🧊'"
+        td#1:
+          v-text: prop.name
+        td#2:
+          v-text: JSON.stringify(prop.value)?.shorten(20)
+
+props:
+  item: null
+
+methods:
+  getItemProperties: | #js
+    function() {
+      const props = [];
+      if (!this.item) return props;
+      props.push(...this.getItemProps(this.item().$data));
+      props.push(...this.getItemProps(this.item().$props));
+      props.push(...this.getItemProps(this.item().$options.computed));
+      return props;
+    }
+  getItemProps: | #js
+    function(collection) {
+      if (!collection) return [];
+      const props = [];
+      for (const name of Object.keys(collection)) {
+        props.push({
+          name,
+          value: (name in collection) ? collection[name] : this.item()[name],
+        });
+      }
+      return props;
+    }
