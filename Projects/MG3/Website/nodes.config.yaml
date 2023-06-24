@@ -3,7 +3,7 @@ server:
 project:
   folder: (env) => env.path.resolve(env.process.cwd(), '../../Source')
 webscript:
-  folder: (env) => env.path.join(env.process.cwd(), "../../../Shared/WebScript")
+  folder: (env) => env.path.join(env.process.cwd(), "../../../../Shared/WebScript")
 analytics:
   prod:
     database:
