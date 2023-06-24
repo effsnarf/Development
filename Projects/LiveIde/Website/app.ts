@@ -249,6 +249,6 @@ const _fetchAsJson = async (url: string) => {
       }
     },
     async (req: any) => await getProjectPageTemplateObject(req),
-    path.join(process.cwd(), "index.haml")
+    path.join(config.project.folder, "../../LiveIde/Website", "index.haml")
   );
 })();
