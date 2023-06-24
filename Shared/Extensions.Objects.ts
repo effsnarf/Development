@@ -62,6 +62,10 @@ class Objects {
     onValue: (node: any, key: string, value: any) => void
   ): void {
     const traverse = function (node: any, key: string, value: any) {
+      if (Array.isArray(value)) {
+        for (const item of value) traverse(item, key, item);
+        return;
+      }
       onValue(node, key, value);
       if (value && !Array.isArray(value) && typeof value === "object") {
         for (const k of Object.keys(value)) {
