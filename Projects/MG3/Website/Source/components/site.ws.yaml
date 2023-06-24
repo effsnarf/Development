@@ -4,7 +4,7 @@ dom:
     div:
       site.sidebar: null
       site.main:
-        ':recommendation-items': recommendationItems
+        ":recommendation-items": recommendationItems
         template#1:
           v-slot: article
           slot:
@@ -31,14 +31,14 @@ style:
     position: sticky
     top: 0
     margin: 0 0 1rem
-    box-shadow: '-2rem 2rem 2rem #000'
+    box-shadow: "-2rem 2rem 2rem #000"
     background-image: >-
       linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0),
       rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 1))
     background-repeat: no-repeat
     background-size: cover
     background-position: center
-    transition: 0s
+    transition: 0s !important
     z-index: 10
 template: >-
   <div

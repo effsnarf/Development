@@ -1,11 +1,12 @@
 dom:
-  ui.link:
+  component:
+    :is: getCompType()
     class: image
-    ':url': url
+    :url: url
     img:
       ref: image1
-      ':class': getCssClass()
-      ':src': (src || emptySrc)
+      ":class": getCssClass()
+      ":src": (src || emptySrc)
       on_load: onLoad
 props:
   imageID: null
@@ -40,6 +41,11 @@ methods:
   getCssClass: |
     function () {
       return { empty: !this.src };
+    }
+  getCompType: |
+    function () {
+      if (!this.url) return `div`;
+      return `ui-link`;
     }
 computed:
   src: |

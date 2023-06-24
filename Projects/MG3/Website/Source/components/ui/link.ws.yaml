@@ -1,9 +1,18 @@
 dom:
   a:
-    ':href': url
-    slot: null
+    :href: url
+    on_click: onClick
+    slot:
 props:
-  url: null
+  url:
+methods:
+  onClick: |
+    function(e) {
+      if (!this.url) return;
+      e.preventDefault();
+      e.stopPropagation();
+      this.$root.navigateTo(this.url);
+    }
 style: null
 name: ui-link
 template: <a class="comp-ui-link" :href="url"><slot></slot></a>

@@ -1,7 +1,7 @@
 dom:
   div:
     .header:
-      ':style': getStyle()
+      ":style": getStyle()
       site.logo: null
 name: site-header
 mounted: |
@@ -34,6 +34,8 @@ methods:
       };
     }
 style:
+  .comp-site-header:
+    z-index: 1000
   .comp-ui-large-title:
     position: absolute;
     bottom: 2rem

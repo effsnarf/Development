@@ -2,17 +2,17 @@ name: e-generator-wide
 dom:
   ui.link:
     class: grayish
-    ':url': url
+    :url: url
     .show-on-hover-container:
       ui.image:
         class: z-10
-        ':imageID': item.imageID
+        ":imageID": item.imageID
       ui.title:
-        ':text': item.displayName
+        ":text": item.displayName
       content.poem.stanza:
         v-if: item.desc?.poem
         class: show-on-hover
-        ':item': $root.getRandomStanza(item.desc?.poem)
+        ":item": $root.getRandomStanza(item.desc?.poem)
 props:
   item: null
 style:
