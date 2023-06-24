@@ -135,6 +135,8 @@ class ClientContext {
         "p",
         "img",
         "table",
+        "thead",
+        "tbody",
         "tr",
         "th",
         "td",

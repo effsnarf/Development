@@ -58,9 +58,10 @@ class Configuration {
       toAbsolutePaths: [],
       types: Types,
     },
-    configPaths?: ConfigPaths
+    configPaths?: ConfigPaths,
+    findConfigPaths: boolean = true
   ) {
-    configPaths = Configuration.getConfigPaths(configPaths);
+    configPaths = Configuration.getConfigPaths(configPaths, findConfigPaths);
     const config = new Configuration(options, configPaths);
     config.log(`${configPaths.length} config file(s) found:`.gray);
     configPaths.forEach((p) =>
@@ -253,7 +254,17 @@ class Configuration {
     return jsyaml.dump(config);
   }
 
-  private static getConfigPaths(configPaths?: ConfigPaths) {
+  private static getConfigPaths(
+    configPaths?: ConfigPaths,
+    findConfigPaths: boolean = true
+  ) {
+    if (!findConfigPaths) {
+      if (typeof configPaths === "string")
+        return [configPaths.toAbsolutePath(path)];
+      if (Array.isArray(configPaths))
+        return configPaths.map((p) => p.toAbsolutePath(path));
+      return [];
+    }
     const isConfigPath = (filePath: string) => {
       if (filePath.endsWith(".config.yaml")) return true;
       if (path.basename(filePath) === "config.yaml") return true;

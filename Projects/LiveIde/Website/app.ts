@@ -27,9 +27,13 @@ const _fetchAsJson = async (url: string) => {
   const projectConfig = (
     await Configuration.new(
       {},
-      path.join(config.project.folder, "../../", "config.yaml")
+      path.join(config.project.folder, "config.yaml"),
+      false
     )
   ).data;
+
+  console.log(config);
+  console.log(projectConfig);
 
   const analytics = await Analytics.new(config.analytics);
 

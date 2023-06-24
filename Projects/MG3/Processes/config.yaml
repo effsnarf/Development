@@ -1,6 +1,6 @@
 server:
   host: localhost
-  port: 5051
+  port: 5052
 project:
   folder: (env) => env.path.resolve(env.process.cwd(), '../../MG3/Source')
 webscript:

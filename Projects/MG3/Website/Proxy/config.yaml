@@ -1,0 +1,44 @@
+title: MG.Web.Proxy
+incoming:
+  server:
+    prod:
+      host: 10.35.16.35
+      port: 80
+    dev:
+      host: localhost
+      port: 5050
+target:
+  base:
+    urls:
+      - http://localhost:5055
+      - http://localhost:5051
+      - http://localhost:5052
+  timeout: 10s
+  try:
+    again:
+      retries: 3
+      delay: 0s
+analytics:
+  prod:
+    api:
+      cache:
+        database:
+          connectionString: mongodb://localhost:37017
+          database: MG-Analytics-Cache
+    database:
+      path: F:\Database\MG-Analytics
+cache:
+  ignore:
+    - /_nuxt/
+    - /new
+    - /api/ip
+    - /create
+  store:
+    prod:
+      - memory: true
+      - database:
+          connectionString: mongodb://localhost:37017
+          database: MG-Web-Cache
+display:
+  stats:
+    every: 1m

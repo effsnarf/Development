@@ -1,8 +1,7 @@
 server:
   host: localhost
-  port: 5051
 project:
-  folder: (env) => env.path.resolve(env.process.cwd(), '../../MG3/Source')
+  folder: (env) => env.path.resolve(env.process.cwd(), '../../Source')
 webscript:
   folder: (env) => env.path.join(env.process.cwd(), "../../../Shared/WebScript")
 analytics:
