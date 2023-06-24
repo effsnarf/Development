@@ -1,0 +1,46 @@
+dom:
+  .flex:
+    div:
+      v-text: value
+    .letter:
+      v-text: unit
+
+props:
+  value:
+
+data:
+
+computed:
+  humanized: |
+    function() {
+      return this.value?.humanize();
+    }
+
+  number: |
+    function() {
+      return this.humanized?.match(/(\d+)(\.\d+)?/)?.first();
+    }
+
+  unit: |
+    function() {
+      return this.humanized?.match(/[a-zA-Z]+/)?.first();
+    }
+
+methods:
+  humanize: |
+    function(value) {
+      if (value < 0) return `-${(-value).humanize()}`;
+      if (value < 10) return value.toFixed(2);
+      if (value < 1000) return value.toFixed(0);
+      if (value < 1000000) return `${(value / 1000).toFixed(1)}k`;
+      if (value < 1000000000) return `${(value / 1000000).toFixed(1)}m`;
+      return `${(value / 1000000000).toFixed(1)}b`;
+    }
+
+style:
+  .flex:
+    align-items: baseline;
+
+  .letter:
+    font-size: 70%;
+    opacity: 0.4;

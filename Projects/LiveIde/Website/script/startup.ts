@@ -1,3 +1,4 @@
+import "../../../../Shared/Extensions";
 import { Component } from "../../classes/Component";
 import { AnalyticsTracker } from "../../classes/AnalyticsTracker";
 import { ClientContext } from "../../classes/ClientContext";
@@ -27,6 +28,12 @@ interface MgParams {
 
 (async () => {
   const client = await ClientContext.get();
+
+  client.Vue.directive("html-raw", {
+    bind(el: HTMLElement, binding: any) {
+      el.innerHTML = binding.value;
+    },
+  });
 
   await client.compileAll();
 
@@ -90,6 +97,16 @@ interface MgParams {
         const count = poem.length;
         const index = Math.floor(Math.random() * count);
         return poem[index];
+      },
+      getWorkspaceStyle() {
+        const style = {} as any;
+        if (!this.isDevEnv()) {
+          style.display = "none";
+        }
+        return style;
+      },
+      isDevEnv() {
+        return window.location.hostname == "localhost";
       },
     },
   });

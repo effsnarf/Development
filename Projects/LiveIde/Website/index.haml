@@ -24,7 +24,7 @@
     %script{src: "/script/startup.js"}
   %body
     %div
-      %div.flex{id: "app"}
+      %div{id: "app"}
         %app{ref: "app"}
-        %ide-workspace{":comps": "comps", "style": "display: none"}
+        %ide-workspace{":comps": "comps", ":style": "getWorkspaceStyle()"}
         

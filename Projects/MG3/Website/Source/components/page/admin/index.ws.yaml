@@ -1,0 +1,68 @@
+dom:
+  .app:
+    .column#1:
+      ui.select:
+        :options: Object.keys(options)
+        v-model: catValue
+        input-type: value
+    .column#2:
+      ui.select:
+        :options: options[catValue]
+        v-model: eventValue
+        input-type: value
+    .column#3:
+      ui.select:
+        :options: lastOptions
+        v-model: lastValue
+        input-type: value
+    div:
+      .bars:
+        .bar:
+          ui.chart2#1:
+            app: MG
+            category: catValue
+            event: eventValue
+            :last: lastValue
+            :every: every
+            type: sum
+data:
+  options: { network: ["requests", "response.time"], site: ["time.on.site"] }
+  catValue: network
+  eventValue: requests
+  lastOptions: ["1 month", "1 week", "1 day", "1 hour"]
+  lastValue: "1 hour"
+  barsValue: 60
+computed:
+  chartData: |
+    function() {
+      return Array.from({ length: 10 }, (v, i) => i + 1);
+    }
+  every: |
+    function() {
+      if (!this.lastValue || !this.barsValue) return null;
+      return (this.lastValue.deunitify() / this.barsValue).unitifyTime().withoutColors();
+    }
+style:
+  .app:
+    width: 1200px
+    margin: auto
+    display: flex
+    gap: 1em
+    padding: 1em
+  .app > div:not(.column):
+    flex-grow: 1
+  .column:
+    width: 10%
+  .bars:
+    display: flex
+    flex-direction: column
+    gap: 1rem
+  .bar:
+    display: flex
+    margin: auto
+    gap: 1rem
+name: page-admin-index
+template: >-
+  <div class="comp-page-admin-index"><div v-text="chartData"></div><h2
+  v-text="'Admin'"></h2><ui-chart title="Chart"
+  :data="chartData"></ui-chart></div>

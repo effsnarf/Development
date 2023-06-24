@@ -2,17 +2,26 @@ dom:
   div:
     ui.list:
       v-slot: slotProps
-      ':items': options
+      ":items": options
       template:
         div:
           v-text: slotProps.item
-      on_input: $emit('input', $event)
+      on_input: onInput($event)
 props:
   options: null
   value: null
-methods: null
+  inputType: index
+methods:
+  onInput: |
+    function(index) {
+      const value = this.inputType === "index" ? index : this.options[index];
+      this.$emit("input", value);
+    }
 name: ui-select
 template: >-
   <div class="comp-ui-select"><ui-list v-slot="slotProps" :items="options"
   @input="$emit('input', $event)"><template><div
   v-text="slotProps.item"></div></template></ui-list></div>
+style:
+  li:
+    padding: 0.2em 0.5em

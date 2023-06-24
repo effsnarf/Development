@@ -2,7 +2,7 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 import colors from "colors";
-import mime from "mime-types";
+const mime = require("mime") as any;
 import { Http } from "./Http";
 const HAML = require("./haml");
 const Handlebars = require("Handlebars");
@@ -48,6 +48,9 @@ class HttpServer {
       var path = req.url;
 
       var mimeType = HttpServer.getMimeType(path);
+
+      console.log(mimeType);
+
       if (path == "/") path = rootPath;
       else path = `.${path}`;
 
@@ -61,7 +64,7 @@ class HttpServer {
         let readStream = fs.createReadStream(path);
         readStream.pipe(res);
       } else {
-        const content = await this.getContent(req, path);
+        const content = await this.getContent(req, res, path);
         if (typeof content == `string`) {
           res.write(content, "utf-8");
         } else {
@@ -72,7 +75,7 @@ class HttpServer {
       return;
     } catch (ex: any) {
       if (!ex.message?.includes("favicon.ico")) {
-        console.log(`${ex.message?.bgRed}`);
+        console.log(`${ex.stack?.bgRed}`);
       }
       // Set status code 500
       res.statusCode = ex.status || 500;
@@ -80,12 +83,19 @@ class HttpServer {
     }
   }
 
-  private static getMimeType(path: string) {
-    if (path.toLowerCase().endsWith(".haml")) return mime.lookup("html");
-    return mime.lookup(path);
+  private static getMimeType(filePath: string) {
+    let extension = path.extname(filePath).substring(1);
+    if (extension == "haml") extension = "html";
+    if (!extension) extension = "html";
+    // let types = Object.keys(mime.types);
+    // types.sortBy((a) => a);
+    // types = types.filter((a) => a.startsWith("h"));
+    // console.log(types);
+    // console.log(extension);
+    return mime.types[extension];
   }
 
-  private async getContent(req: any, path: string) {
+  private async getContent(req: any, res: any, path: string) {
     try {
       if (
         ["ico", "png", "webp", "jpeg", "jpg"].some((ext) =>
@@ -98,6 +108,7 @@ class HttpServer {
       }
 
       let fileContent = fs.readFileSync(path, "utf-8");
+
       if (path.endsWith(".haml")) {
         try {
           let templateData = await this.getIndexPageTemplateData(req);
@@ -115,10 +126,11 @@ class HttpServer {
           return ex.stack;
         }
       }
+
       return fileContent;
     } catch (ex: any) {
-      console.log(`File not found: ${path}`.bgRed);
-      throw { status: 404, message: `File not found: ${path}` };
+      console.log(ex.stack?.bgRed);
+      throw { status: 500, message: ex.stack };
     }
   }
 }

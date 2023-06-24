@@ -23,6 +23,7 @@ class Component {
     console.log(this);
     let json = client.Handlebars.compile(client.templates.vue)(this.source);
     try {
+      //console.log(json);
       const vueOptions = eval(`(${json})`);
       console.log(vueOptions);
       const vueName = Component.toVueName(this.name);

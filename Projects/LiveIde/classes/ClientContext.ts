@@ -138,6 +138,7 @@ class ClientContext {
         "ul",
         "li",
         "input",
+        "canvas",
         "textarea",
         "component",
       ].includes(name)

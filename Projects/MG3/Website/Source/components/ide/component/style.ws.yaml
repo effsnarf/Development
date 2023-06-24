@@ -1,9 +1,15 @@
 dom:
   style:
-    v-if: style
-    v-html: style
+    :class: component.name
+    v-html: htmlDecode(style)
 props:
-  component: null
+  component:
+methods:
+  htmlDecode: |
+    function(input) {
+      var doc = new DOMParser().parseFromString(input, "text/html");
+      return doc.documentElement.textContent;
+    }
 computed:
   style: |
     function() {

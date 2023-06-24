@@ -1,7 +1,9 @@
 {
   props: {
     {{#each props}}
-    {{@key}}: {{{or this null}}},
+    {{@key}}: {
+      default: {{{or this null}}}
+    },
     {{/each}}
   },
   data: function () {
@@ -21,12 +23,26 @@
   },
   computed: {
     {{#each computed}}
+    {{#if get}}
+    {{@key}}: {
+      get: {{{get}}},
+    },
+    {{else}}
     {{@key}}: {{{this}}},
+    {{/if}}
     {{/each}}
   },
   watch: {
     {{#each watch}}
+    {{#if handler}}
+    {{@key}}: {
+      handler: {{{handler}}},
+      immediate: {{{or immediate false}}},
+      deep: {{{or deep false}}},
+    },
+    {{else}}
     {{@key}}: {{{this}}},
+    {{/if}}
     {{/each}}
   },
   template: `{{{dom dom name}}}`

@@ -145,7 +145,7 @@ class Analytics {
 
     for (const interval of intervals) {
       const docs = await this.db.find("Events", {
-        t: type,
+        //t: type,
         a: app,
         c: category,
         e: event,

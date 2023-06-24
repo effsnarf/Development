@@ -47,6 +47,13 @@ export default (context: any, dom: any, indent?: number, compName?: string) => {
   }
 
   const domNode = (tag: string, attrs: any, indent: number) => {
+    // Remove #1, #2, etc. from class names
+    if (attrs.class) {
+      attrs.class = stringToArray(attrs.class)
+        .map((c: string) => c.split("#")[0])
+        .join(" ");
+    }
+
     tag = tag.replace(/\./g, "-");
     const indentStr = "  ".repeat(indent);
     return `${indentStr}${tag}(${(

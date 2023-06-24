@@ -1,0 +1,44 @@
+dom:
+  div.card:
+    table:
+      thead:
+        th:
+          v-for: key in Object.keys(tableData[0])
+          v-text: key
+      tbody:
+        tr:
+          v-for: item in tableData
+          on_click: itemClick(item)
+          td:
+            v-for: key in Object.keys(item)
+            div.content:
+              v-text: item[key]
+props:
+  icon: null
+  title: null
+  data:
+    default: []
+methods:
+  itemClick: |
+    function(item) {
+      this.$emit('item-click', item);
+    }
+computed:
+  tableData: |
+    function() {
+      if (!this.data?.length) return [];
+      if (this.data.map(v => typeof v).find(t => t === 'number')) {
+        return this.data.map(value => ({ value }));
+      }
+      return this.data;
+    }
+style:
+  .content:
+    height: 1.5em
+    overflow: hidden
+  tr:hover:
+    background-color: null
+  td:
+    padding-right: 1em
+name: ui-table
+template: <div-card class="comp-ui-table" table="[object Object]"></div-card>

@@ -105,6 +105,7 @@ class WebScript {
         "ul",
         "li",
         "input",
+        "canvas",
         "textarea",
         "component",
       ].includes(name)

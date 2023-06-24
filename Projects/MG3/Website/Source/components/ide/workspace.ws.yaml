@@ -2,22 +2,19 @@ dom:
   div:
     class: workspace
     ide.component.editor:
-      ':component': selectedComponent
+      ":component": selectedComponent
     ui.tree:
-      ':root': () => $root
-      ':getChildren': getVueChildren
+      ":root": () => $root
+      ":getChildren": getVueChildren
       item-type: ide-vue-node
       on_node-select: onNodeSelect
       on_node-click: onNodeClick
       on_node-hover: onNodeHover
       on_node-unhover: onNodeUnhover
     div:
-      ui.list:
-        v-slot: slotProps
-        ':items': comps
-        template:
-          ide.component.style:
-            ':component': slotProps.item
+      ide.component.style:
+        v-for: comp in comps
+        :component: comp
 props:
   comps: null
 data:
@@ -56,7 +53,8 @@ name: ide-workspace
 style:
   .comp-ide-workspace:
     position: fixed
-    right: 0
+    top: 1rem
+    right: 1rem
     display: flex
     flex-direction: column
     gap: 3em

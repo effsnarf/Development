@@ -1,8 +1,50 @@
 dom:
-  div:
-    div:
-      v-text: value
+  div.card:
+    div.top:
+      div.icon:
+        v-text: icon
+      div.number:
+        v-text: formatNumber(value)
+      div.unit:
+        v-text: unit
+    div.text:
+      v-text: text
 props:
   value: null
+  icon: null
+  text: null
+  unit: null
+methods:
+  formatNumber: |
+    function(number) {
+      if (number == null) return null;
+      if (typeof number === 'string') number = parseFloat(number);
+      return number.toLocaleString();
+    }
+style:
+  .card:
+    line-height: 1
+  .card > div:
+    text-align: center
+  .top:
+    display: flex
+    align-items: baseline
+    margin: auto
+    width: min-content
+    white-space: nowrap
+  .number:
+    font-size: 500%
+  .unit:
+    font-size: 400%
+    opacity: 0.4
+  .icon:
+    font-size: 200%
+    margin: auto
+  .text:
+    font-size: 120%
+    opacity: 0.6
+    line-height: 1.2em
 name: ui-number
-template: <div class="comp-ui-number"><div v-text="value"></div></div>
+template: >-
+  <div-card class="comp-ui-number" div.top="[object Object]" div.text="[object
+  Object]"></div-card>

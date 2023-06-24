@@ -1,5 +1,7 @@
 dom:
   div:
+    page.admin.index:
+      v-if: $root.params.page == 'admin'
     page.home:
       v-if: $root.params.page == 'home'
     page.generator:
@@ -11,7 +13,8 @@ style:
   .comp-app:
     margin: auto
 template: >-
-  <div class="comp-app"><page-home v-if="$root.params.page ==
+  <div class="comp-app"><page-admin-index v-if="$root.params.page ==
+  'admin'"></page-admin-index><page-home v-if="$root.params.page ==
   'home'"></page-home><page-generator v-if="$root.params.page ==
   'generator'"></page-generator><page-instance v-if="$root.params.page ==
   'instance'"></page-instance></div>

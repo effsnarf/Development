@@ -151,9 +151,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "./script/1687415256302.ts":
+/***/ "./script/1687525677307.ts":
 /*!*********************************!*\
-  !*** ./script/1687415256302.ts ***!
+  !*** ./script/1687525677307.ts ***!
   \*********************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -168,6 +168,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+__webpack_require__(/*! ../../../../Shared/Extensions */ "../../../Shared/Extensions.ts");
 const AnalyticsTracker_1 = __webpack_require__(/*! ../../classes/AnalyticsTracker */ "../classes/AnalyticsTracker.ts");
 const ClientContext_1 = __webpack_require__(/*! ../../classes/ClientContext */ "../classes/ClientContext.ts");
 const Params_1 = __webpack_require__(/*! ../../classes/Params */ "../classes/Params.ts");
@@ -193,6 +194,11 @@ const helpers = {
 };
 (() => __awaiter(void 0, void 0, void 0, function* () {
     const client = yield ClientContext_1.ClientContext.get();
+    client.Vue.directive("html-raw", {
+        bind(el, binding) {
+            el.innerHTML = binding.value;
+        },
+    });
     yield client.compileAll();
     let ideVueApp = null;
     const dbp = (yield DbpClient_1.DatabaseProxy.new("https://db.memegenerator.net/MemeGenerator"));
@@ -253,6 +259,16 @@ const helpers = {
                 const count = poem.length;
                 const index = Math.floor(Math.random() * count);
                 return poem[index];
+            },
+            getWorkspaceStyle() {
+                const style = {};
+                if (!this.isDevEnv()) {
+                    style.display = "none";
+                }
+                return style;
+            },
+            isDevEnv() {
+                return window.location.hostname == "localhost";
             },
         },
     });
@@ -458,6 +474,7 @@ class ClientContext {
             "ul",
             "li",
             "input",
+            "canvas",
             "textarea",
             "component",
         ].includes(name))
@@ -651,6 +668,7 @@ class Component {
             console.log(this);
             let json = client.Handlebars.compile(client.templates.vue)(this.source);
             try {
+                //console.log(json);
                 const vueOptions = eval(`(${json})`);
                 console.log(vueOptions);
                 const vueName = Component.toVueName(this.name);
@@ -922,6 +940,1015 @@ exports.DataWatcher = DataWatcher;
 
 /***/ }),
 
+/***/ "../../../Shared/Extensions.ts":
+/*!*************************************!*\
+  !*** ../../../Shared/Extensions.ts ***!
+  \*************************************/
+/***/ (() => {
+
+
+class Time {
+    static prevUnit(unit) {
+        return this.units[this.units.indexOf(unit) - 1];
+    }
+    static nextUnit(unit) {
+        return this.units[this.units.indexOf(unit) + 1];
+    }
+}
+Time.units = [
+    "ms",
+    "s",
+    "m",
+    "h",
+    "d",
+    "w",
+    "M",
+    "y",
+    "de",
+    "ce",
+];
+Time.longUnits = [
+    "milliseconds",
+    "seconds",
+    "minutes",
+    "hours",
+    "days",
+    "weeks",
+    "months",
+    "years",
+    "decades",
+    "centuries",
+];
+Time.unitToValue = {
+    ms: 1,
+    s: 1000,
+    m: 1000 * 60,
+    h: 1000 * 60 * 60,
+    d: 1000 * 60 * 60 * 24,
+    w: 1000 * 60 * 60 * 24 * 7,
+    M: 1000 * 60 * 60 * 24 * 30,
+    y: 1000 * 60 * 60 * 24 * 30 * 365,
+    decade: 1000 * 60 * 60 * 24 * 30 * 365 * 10,
+    century: 1000 * 60 * 60 * 24 * 30 * 365 * 100,
+};
+class Size {
+    static prevUnit(unit) {
+        return this.units[this.units.indexOf(unit) - 1];
+    }
+    static nextUnit(unit) {
+        return this.units[this.units.indexOf(unit) + 1];
+    }
+}
+Size.units = [
+    "b",
+    "kb",
+    "mb",
+    "gb",
+    "tb",
+    "pb",
+    "eb",
+    "zb",
+    "yb",
+];
+Size.longUnits = [
+    "bytes",
+    "kilobytes",
+    "megabytes",
+    "gigabytes",
+    "terabytes",
+    "petabytes",
+    "exabytes",
+    "zettabytes",
+    "yottabytes",
+];
+Size.unitToValue = {
+    b: 1,
+    kb: 1000,
+    mb: 1000 * 1000,
+    gb: 1000 * 1000 * 1000,
+    tb: 1000 * 1000 * 1000 * 1000,
+    pb: 1000 * 1000 * 1000 * 1000 * 1000,
+    eb: 1000 * 1000 * 1000 * 1000 * 1000 * 1000,
+    zb: 1000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000,
+    yb: 1000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000,
+};
+class Percentage {
+    static prevUnit(unit) {
+        return this.units[this.units.indexOf(unit) - 1];
+    }
+    static nextUnit(unit) {
+        return this.units[this.units.indexOf(unit) + 1];
+    }
+}
+Percentage.units = ["%"];
+Percentage.longUnits = ["percent"];
+Percentage.unitToValue = {
+    "%": 100,
+};
+const UnitClasses = [Time, Size, Percentage];
+const color = {
+    fromNumber: {
+        0: "reset",
+        1: "bright",
+        2: "dim",
+        4: "underscore",
+        5: "blink",
+        7: "reverse",
+        8: "hidden",
+        30: "black",
+        31: "red",
+        32: "green",
+        33: "yellow",
+        34: "blue",
+        35: "magenta",
+        36: "cyan",
+        37: "white",
+        40: "bgBlack",
+        41: "bgRed",
+        42: "bgGreen",
+        43: "bgYellow",
+        44: "bgBlue",
+        45: "bgMagenta",
+        46: "bgCyan",
+        47: "bgWhite",
+    },
+    toNumber: {
+        reset: "0",
+        bright: "1",
+        dim: "2",
+        underscore: "4",
+        blink: "5",
+        reverse: "7",
+        hidden: "8",
+        black: "30",
+        red: "31",
+        green: "32",
+        yellow: "33",
+        blue: "34",
+        magenta: "35",
+        cyan: "36",
+        white: "37",
+        bgBlack: "40",
+        bgRed: "41",
+        bgGreen: "42",
+        bgYellow: "43",
+        bgBlue: "44",
+        bgMagenta: "45",
+        bgCyan: "46",
+        bgWhite: "47",
+    },
+    toChar: {
+        reset: "\x1b[0m",
+        bright: "\x1b[1m",
+        dim: "\x1b[2m",
+        underscore: "\x1b[4m",
+        blink: "\x1b[5m",
+        reverse: "\x1b[7m",
+        hidden: "\x1b[8m",
+        black: "\x1b[30m",
+        red: "\x1b[31m",
+        green: "\x1b[32m",
+        yellow: "\x1b[33m",
+        blue: "\x1b[34m",
+        magenta: "\x1b[35m",
+        cyan: "\x1b[36m",
+        white: "\x1b[37m",
+        bgBlack: "\x1b[40m",
+        bgRed: "\x1b[41m",
+        bgGreen: "\x1b[42m",
+        bgYellow: "\x1b[43m",
+        bgBlue: "\x1b[44m",
+        bgMagenta: "\x1b[45m",
+        bgCyan: "\x1b[46m",
+        bgWhite: "\x1b[47m",
+    },
+};
+// #endregion
+// #region Number
+if (typeof Number !== "undefined") {
+    // #warning This is a hack to save the _is function somewhere we can access it
+    // This is needed because we can't export or import anything from Extensions.ts
+    // Usage: (0)._is([obj], [type])
+    // Examples:
+    //   (0)._is(5, Number) // true
+    //   (0)._is(5, String) // false
+    //   (0)._is("5", String) // true
+    //   (0)._is("5", Number) // false
+    Number.prototype._is = function (obj, type) {
+        switch (type) {
+            case String:
+                return typeof obj === "string" || obj instanceof String;
+            case Number:
+                return typeof obj === "number" && isFinite(obj);
+            case Boolean:
+                return typeof obj === "boolean";
+            case Array:
+                return Array.isArray(obj);
+            case Object:
+                return obj !== null && typeof obj === "object" && !Array.isArray(obj);
+            default:
+                return obj instanceof type;
+        }
+    };
+    Number.prototype.is = function (type) {
+        return (0)._is(this, type);
+    };
+    Number.prototype.seconds = function () {
+        return this.valueOf() * 1000;
+    };
+    Number.prototype.minutes = function () {
+        return (this.valueOf() * 60).seconds();
+    };
+    Number.prototype.hours = function () {
+        return (this.valueOf() * 60).minutes();
+    };
+    Number.prototype.days = function () {
+        return (this.valueOf() * 24).hours();
+    };
+    Number.prototype.weeks = function () {
+        return (this.valueOf() * 7).days();
+    };
+    Number.prototype.months = function () {
+        return (this.valueOf() * 30).days();
+    };
+    Number.prototype.years = function () {
+        return (this.valueOf() * 365).days();
+    };
+    Number.prototype.wait = function (options = { log: false }) {
+        let timer = null;
+        let started = Date.now();
+        if (options.log) {
+            timer = setInterval(() => {
+                const elapsed = started + this.valueOf() - Date.now();
+                process.stdout.write(`\r`);
+                process.stdout.write(`${`Waiting -`.c("gray")}${elapsed.unitifyTime()}\r`);
+            }, 100);
+        }
+        return new Promise((resolve) => setTimeout(() => {
+            if (timer) {
+                clearInterval(timer);
+                process.stdout.write("\r");
+                process.stdout.clearLine(0);
+            }
+            resolve();
+        }, this.valueOf()));
+    };
+    Number.prototype.isBetween = function (min, max, strictOrder) {
+        // strictOrder: if false, max could be min and vice versa
+        const value = this.valueOf();
+        if (strictOrder)
+            return value > min && value < max;
+        return (value > min && value < max) || (value > max && value < min);
+    };
+    Number.prototype.isBetweenOrEq = function (min, max, strictOrder) {
+        // strictOrder: if false, max could be min and vice versa
+        const value = this.valueOf();
+        if (strictOrder)
+            return value >= min && value <= max;
+        return (value >= min && value <= max) || (value >= max && value <= min);
+    };
+    Number.prototype.pluralize = function (plural) {
+        const singular = plural.singularize();
+        if (this.valueOf() === 1)
+            return `${this} ${singular}`;
+        return `${this} ${plural}`;
+    };
+    Number.prototype.unitify = function (unitClass, unit) {
+        // ["m", "s", "ms"] should:
+        // return "230ms" if value is < 1000
+        // return "1.23s" if value is < 60000 and > 1000
+        // return "1.23m" if value is > 60000
+        if (!(unit === null || unit === void 0 ? void 0 : unit.length))
+            unit = unitClass.units;
+        let value = this.valueOf();
+        // Percent is a special case
+        if (unitClass == Percentage)
+            return `${Math.round(value * 100)}${`%`.c("gray")}`;
+        const units = !Array.isArray(unit)
+            ? [unit]
+            : unit.sortByDesc((u) => unitClass.unitToValue[u]);
+        if (this == 0)
+            return `0${units.last()}`.c("gray");
+        for (const u of units) {
+            const currentUnitValue = unitClass.unitToValue[u];
+            const nextUnitValue = unitClass.unitToValue[unitClass.nextUnit(u)];
+            if (value.isBetweenOrEq(currentUnitValue, nextUnitValue)) {
+                const unitValue = value / currentUnitValue;
+                if (unitValue >= 10 || u == units.last()) {
+                    return `${unitValue.toFixed(0)}${u.c("gray")}`;
+                }
+                return `${unitValue.toFixedRounded(2)}${u.c("gray")}`;
+            }
+        }
+        if (value == 0)
+            return `${value}${units.last().c("gray")}`;
+        return `${value.toFixed(0)}${units.last().c("gray")}`;
+    };
+    Number.prototype.unitifyTime = function (unit) {
+        return this.unitify(Time, unit);
+    };
+    Number.prototype.unitifySize = function (unit) {
+        return this.unitify(Size, unit);
+    };
+    Number.prototype.unitifyPercent = function () {
+        return this.unitify(Percentage);
+        //return `${Math.round(this.valueOf() * 100)}${`%`.c("gray")}`;
+    };
+    Number.prototype.toProgressBar = function (barLength, ...severifyArgs) {
+        const value = this.valueOf();
+        if (!barLength)
+            barLength = 50;
+        barLength = barLength - ` 100%`.length;
+        const progressLength = Math.round(value * barLength);
+        const bar = "█".repeat(progressLength);
+        const emptyLength = barLength - progressLength;
+        const empty = emptyLength <= 0 ? "" : "█".repeat(emptyLength).c("gray");
+        let s = `${bar}${empty} ${value.unitifyPercent().withoutColors()}`;
+        if (severifyArgs.length)
+            s = s.colorize(value.getSeverityColor(severifyArgs[0], severifyArgs[1], severifyArgs[2]));
+        return s;
+    };
+    Number.prototype.severify = function (green, yellow, direction) {
+        return this.toString().colorize(this.getSeverityColor(green, yellow, direction, true));
+    };
+    Number.prototype.severifyByHttpStatus = function () {
+        const value = this.valueOf();
+        return value.toString().colorize(value.getHttpSeverityColor());
+    };
+    Number.prototype.getSeverityColor = function (green, yellow, direction, bgRed) {
+        const value = this.valueOf();
+        if (direction == "<") {
+            if (value <= green)
+                return "green";
+            if (value <= yellow)
+                return "yellow";
+            return bgRed ? "bgRed" : "red";
+        }
+        if (direction == ">") {
+            if (value >= green)
+                return "green";
+            if (value >= yellow)
+                return "yellow";
+            return bgRed ? "bgRed" : "red";
+        }
+        throw new Error(`Invalid direction: ${direction}`);
+    };
+    Number.prototype.getHttpSeverityColor = function () {
+        const value = this.valueOf();
+        if (value == 404)
+            return "yellow";
+        return value.getSeverityColor(200, 400, "<", true);
+    };
+    Number.prototype.toFixedRounded = function (places) {
+        const value = this.valueOf();
+        let str = value.toFixed(places);
+        while (str.endsWith("0"))
+            str = str.slice(0, -1);
+        if (str.endsWith("."))
+            str = str.slice(0, -1);
+        return str;
+    };
+    Number.prototype.getEnumName = function (enumType) {
+        const value = this.valueOf();
+        const keys = Object.keys(enumType);
+        for (const key of keys) {
+            if (enumType[key] == value)
+                return key;
+        }
+        return "";
+    };
+    Number.prototype.ordinalize = function () {
+        const number = this.valueOf();
+        if (number === 0) {
+            return "0"; // No ordinal representation for 0
+        }
+        const suffixes = ["th", "st", "nd", "rd"];
+        const mod100 = number % 100;
+        const mod10 = number % 10;
+        if (mod10 === 1 && mod100 !== 11) {
+            return number + "st";
+        }
+        else if (mod10 === 2 && mod100 !== 12) {
+            return number + "nd";
+        }
+        else if (mod10 === 3 && mod100 !== 13) {
+            return number + "rd";
+        }
+        else {
+            return number + "th";
+        }
+    };
+    Number.prototype.humanize = function () {
+        const value = this.valueOf();
+        if (value < 0)
+            return `-${(-value).humanize()}`;
+        if (value < 10)
+            return value.toFixed(2);
+        if (value < 1000)
+            return value.toFixed(0);
+        if (value < 1000000)
+            return `${(value / 1000).toFixed(1)}k`;
+        if (value < 1000000000)
+            return `${(value / 1000000).toFixed(1)}m`;
+        return `${(value / 1000000000).toFixed(1)}b`;
+    };
+}
+// #endregion
+// #region String
+if (typeof String !== "undefined") {
+    String.prototype.is = function (type) {
+        return (0)._is(this, type);
+    };
+    String.prototype.isColorCode = function () {
+        return this.startsWith("\x1b[");
+    };
+    String.prototype.pad = function (align, fillString) {
+        if (!align)
+            align = "left";
+        if (align === "left")
+            return `${fillString}${this}`;
+        return `${this}${fillString}`;
+    };
+    // Returns the next character in the string ("abcd" => "a")
+    // In case of console color codes, it returns the whole color code
+    String.prototype.nextChar = function () {
+        const s = this.toString();
+        if (s.isColorCode()) {
+            return s.slice(0, 5);
+        }
+        return s[0];
+    };
+    // "[red]ab[/reset]cdef" -> ["[red]", "a", "b", "[reset]", "c", "d", "e", "f"]
+    String.prototype.getChars = function* () {
+        let s = this.toString();
+        while (s.length > 0) {
+            const char = s.nextChar();
+            yield char;
+            s = s.slice(char.length);
+        }
+    };
+    String.prototype.c = function (color) {
+        return this.colorize(color);
+    };
+    String.prototype.colorize = function (color) {
+        if (!String.prototype[color])
+            return this.toString();
+        return eval(`this.${color}`);
+    };
+    String.prototype.singularize = function () {
+        if (this.endsWith("ies"))
+            return this.slice(0, -3) + "y";
+        if (this.endsWith("s"))
+            return this.slice(0, -1);
+        return this.toString();
+    };
+    String.prototype.pluralize = function () {
+        if (this.endsWith("ay"))
+            return this + "s";
+        if (this.endsWith("y"))
+            return this.slice(0, -1) + "ies";
+        if (this.endsWith("s"))
+            return this.toString();
+        return this + "s";
+    };
+    String.prototype.antonym = function () {
+        const antonyms = [
+            ["up", "down"],
+            ["left", "right"],
+            ["top", "bottom"],
+            ["start", "end"],
+            ["before", "after"],
+            ["above", "below"],
+            ["first", "last"],
+            ["front", "back"],
+        ];
+        for (const [a, b] of antonyms) {
+            if (this === a)
+                return b;
+            if (this === b)
+                return a;
+        }
+        return this.toString();
+    };
+    String.prototype.severify = function (green, yellow, direction) {
+        const valueStr = this.toString();
+        const unitClass = valueStr.getUnitClass();
+        if (!unitClass)
+            throw new Error("No unit class found");
+        const value = valueStr.deunitify();
+        const unit = valueStr.getUnit();
+        const color = value.getSeverityColor(green, yellow, direction, true);
+        return `${value.unitify(unitClass).withoutUnit().colorize(color)}${unit.c("gray")}`;
+    };
+    String.prototype.severifyByHttpStatus = function (statusCode, bgRed) {
+        if (!statusCode)
+            statusCode = this.split(" ")
+                .map((s) => parseInt(s))
+                .find((n) => !isNaN(n));
+        if (!statusCode)
+            return this.toString();
+        return this.colorize(statusCode.getHttpSeverityColor());
+    };
+    String.prototype.deunitify = function () {
+        const unitClass = this.getUnitClass();
+        if (!unitClass)
+            throw new Error(`No unit class found for ${this}`);
+        // Percentages are special, because they are relative to 100
+        if (unitClass === Percentage) {
+            const value = parseFloat(this.withoutUnit());
+            return value / 100;
+        }
+        const s = this.withoutColors();
+        const unit = s.getUnit();
+        const value = parseFloat(s.withoutUnit());
+        return value * (unit ? unitClass.unitToValue[unit] : 1);
+    };
+    String.prototype.getUnit = function (options = { throw: true }) {
+        let word = this.withoutColors()
+            .replace(/[0-9\.]/g, "")
+            .trim();
+        if (word.length > 2)
+            word = word.pluralize();
+        // Search for the long unit name ("seconds", "bytes", "percentages")
+        for (const unitClass of UnitClasses) {
+            let index = unitClass.longUnits.indexOf(word);
+            if (index != -1)
+                return unitClass.units[index];
+        }
+        // Search for the short unit name ("s", "B", "%")
+        for (const unitClass of UnitClasses) {
+            let index = unitClass.units.indexOf(word);
+            if (index != -1)
+                return unitClass.units[index];
+        }
+        if (options.throw) {
+            throw new Error(`No unit found for "${word}"`);
+        }
+        else {
+            return "";
+        }
+    };
+    String.prototype.getUnitClass = function () {
+        const unit = this.getUnit({ throw: false });
+        if (Time.units.includes(unit))
+            return Time;
+        if (Size.units.includes(unit))
+            return Size;
+        if (Percentage.units.includes(unit))
+            return Percentage;
+        return null;
+    };
+    String.prototype.withoutUnit = function () {
+        return this.withoutColors()
+            .replace(/[^0-9.-]/g, "")
+            .trim();
+    };
+    String.prototype.padStartChars = function (maxLength, fillString) {
+        if (fillString === undefined)
+            fillString = " ";
+        let result = this;
+        while (result.getCharsCount() < maxLength) {
+            result = fillString + result;
+        }
+        return result.toString();
+    };
+    String.prototype.padEndChars = function (maxLength, fillString) {
+        if (fillString === undefined)
+            fillString = " ";
+        let result = this;
+        while (result.getCharsCount() < maxLength) {
+            result += fillString;
+        }
+        return result.toString();
+    };
+    // Slice a string by character count instead of by byte count
+    // Copies color codes too but doesn't count them in the character count
+    String.prototype.sliceChars = function (start, end) {
+        if (start === undefined)
+            start = 0;
+        if (end === undefined)
+            end = this.length;
+        let result = "";
+        let charCount = 0;
+        for (let i = 0; i < this.length; i++) {
+            const char = this[i];
+            if (char === "\u001b") {
+                const colorCode = this.slice(i, i + 9);
+                result += colorCode;
+                i += colorCode.length - 1;
+                continue;
+            }
+            if (charCount >= start && charCount < end)
+                result += char;
+            charCount++;
+        }
+        return result;
+    };
+    String.prototype.alignRight = function () {
+        const width = process.stdout.columns;
+        const padding = " ".repeat(Math.max(width - this.length, 0));
+        return `${padding}${this}`;
+    };
+    String.prototype.shorten = function (maxLength, ellipsis = true) {
+        if (maxLength == null)
+            return this.toString();
+        if (ellipsis)
+            maxLength -= 2;
+        let s = this.toString();
+        if (s.getCharsCount() > maxLength) {
+            s = s.sliceChars(0, maxLength);
+            if (ellipsis)
+                s += "..";
+        }
+        return s;
+    };
+    String.prototype.toLength = function (length, ellipsis, align) {
+        if (!align)
+            align = "left";
+        let s = (this || "").toString().shorten(length, ellipsis);
+        if (length)
+            s = s.pad(align.antonym(), " ".repeat(Math.max(0, length - s.getCharsCount())));
+        return s;
+    };
+    String.prototype.splitOnWidth = function (width) {
+        const lines = [];
+        let currentLine = "";
+        let colorStack = [];
+        for (const char of this.getChars()) {
+            if (char.isColorCode())
+                colorStack.push(char);
+            if (currentLine.getCharsCount() >= width) {
+                // new line
+                if (colorStack.length > 0)
+                    // reset the color
+                    currentLine += color.toChar.reset;
+                lines.push(currentLine);
+                currentLine = "";
+                colorStack.forEach((c) => (currentLine += c));
+                colorStack = [];
+            }
+            currentLine += char;
+        }
+        if (currentLine.length > 0)
+            lines.push(currentLine);
+        return lines;
+    };
+    String.prototype.trimAll = function () {
+        return this.replace(/[\t\n]/g, "").trim();
+    };
+    // Trim double quotes from a string if they exist
+    String.prototype.trimDoubleQuotes = function () {
+        if (this.startsWith('"') && this.endsWith('"'))
+            return this.slice(1, -1);
+        return this.toString();
+    };
+    String.prototype.stripHtmlTags = function () {
+        return (this
+            // Replace <br /> with a new line
+            .replace(/<br\s*[\/]?>/gi, "\n")
+            // Remove HTML tags
+            .replace(/(<([^>]+)>)/gi, " "));
+    };
+    String.prototype.decodeHtml = function () {
+        return (this.replace(/&amp;/g, "&")
+            .replace(/&lt;/g, "<")
+            .replace(/&gt;/g, ">")
+            .replace(/&quot;/g, '"')
+            // Replace &#[number]; with the unicode character
+            .replace(/&#(\d+);/g, (match, dec) => String.fromCharCode(dec))
+            // Replace &#x[number]; with the unicode character
+            .replace(/&#x([0-9a-f]+);/gi, (match, hex) => String.fromCharCode(parseInt(hex, 16))));
+    };
+    String.prototype.getWords = function () {
+        // Get the words using a regex
+        return this.match(/\w+/g) || [];
+    };
+    String.prototype.toCamelCase = function () {
+        // Lowercase the first letter
+        return this.charAt(0).toLowerCase() + this.slice(1);
+    };
+    String.prototype.parseJSON = function () {
+        return JSON.parse(this.toString());
+    };
+    String.prototype.truncate = function (maxLength) {
+        if (this.getCharsCount() <= maxLength)
+            return this.toString();
+        const ellipsis = "..";
+        maxLength = Math.max(0, maxLength - ellipsis.length);
+        // Strip the color codes from the string
+        //const stripped = this.replace(/\x1b\[[0-9;]*m/g, "");
+        // Truncate the string
+        //return stripped.slice(0, maxLength) + ellipsis;
+        // Construct a new string with the max length
+        // Copy the characters from the original string
+        // Include the color codes but count only the characters that are not color codes
+        // Add ".." to the end of the string
+        let result = "";
+        let charsCount = 0;
+        for (let i = 0; i < this.length; i++) {
+            const char = this.charAt(i);
+            result += char;
+            if (char === "\x1b") {
+                // Skip the color code
+                while (this.charAt(i) !== "m") {
+                    i++;
+                    result += this.charAt(i);
+                }
+            }
+            else {
+                charsCount++;
+            }
+            if (charsCount >= maxLength)
+                break;
+        }
+        // At the end of the string, add the ellipsis
+        result += ellipsis;
+        // At the end of the string, reset the color
+        result += "\x1b[0m";
+        return result;
+    };
+    String.prototype.getCharsCount = function () {
+        return this.length - this.getColorCodesLength();
+    };
+    String.prototype.getColorCodesLength = function () {
+        const colorCodeRegex = /\x1b\[[0-9;]*m/g; // matches all ANSI escape sequences for console color codes
+        const matches = this.match(colorCodeRegex);
+        return matches ? matches.join("").length : 0;
+    };
+    String.prototype.withoutColors = function () {
+        return this.replace(/\x1b\[[0-9;]*m/g, "");
+    };
+    String.prototype.showColorCodes = function () {
+        return this.replace(/\x1B\[/g, "\\x1B[");
+    };
+    String.prototype.colorsToHandleBars = function () {
+        // Create a regular expression pattern to match each console color escape sequence and replace it with the corresponding handlebars-style syntax
+        const pattern = /\x1B\[(\d+)m(.+?)\x1B\[(\d+)m/g;
+        const result = this.replace(pattern, (match, colorCode, content) => {
+            const colorName = color.fromNumber[colorCode.toNumber()];
+            if (colorName) {
+                return `{{#${colorName}}}${content}{{/${colorName}}}`;
+            }
+            else {
+                return content;
+            }
+        });
+        if (result.includes("\x1B")) {
+            return result.colorsToHandleBars();
+        }
+        return result;
+    };
+    String.prototype.handlebarsColorsToHtml = function () {
+        const pattern = /\{\{\#([^\{\}]*?)\}\}([\s\S]*?)\{\{\/\1\}\}/g;
+        const result = this.replace(pattern, (match, color, content) => {
+            if (!color.colorToCodeNum[color])
+                return content;
+            return `<span class="${color}">${content.handleBarsColorsToHtml()}</span>`;
+        });
+        // If pattern is found, call the function recursively
+        if (result.match(pattern)) {
+            return result.handlebarsColorsToHtml();
+        }
+        return result;
+    };
+    String.prototype.handlebarsColorsToConsole = function () {
+        // {{#red}}Hello {{#green}}World{{/green}}!{{/red}}
+        // {{#red}}
+        const pattern = /\{\{\#([^\{\}]*?)\}\}([\s\S]*?)\{\{\/\1\}\}/g;
+        // {{/red}}
+        let result = this.replace(pattern, (match, color, content) => {
+            if (!color.colorToCodeChar[color])
+                return content;
+            return `${color.colorToCodeChar[color]}${content.handlebarsColorsToConsole()}${color.colorToCodeChar["reset"]}`;
+        });
+        // If pattern is found, call the function recursively
+        if (result.match(pattern)) {
+            return result.handlebarsColorsToConsole();
+        }
+        return result;
+    };
+    String.prototype.colorsToHtml = function () {
+        return this.colorsToHandleBars().handlebarsColorsToHtml();
+    };
+    String.prototype.parseColorCodes = function () {
+        const escapeRegex = /\x1b\[(\d+)m/g; // matches escape sequences in the form \x1b[<number>m
+        const resetCode = "\x1b[0m"; // reset code to remove all colors and styles
+        return this.replace(escapeRegex, (_, code) => {
+            const colorCode = {
+                30: "\x1b[30m",
+                31: "\x1b[31m",
+                32: "\x1b[32m",
+                33: "\x1b[33m",
+                34: "\x1b[34m",
+                35: "\x1b[35m",
+                36: "\x1b[36m",
+                37: "\x1b[37m", // white
+            }[code];
+            return colorCode ? colorCode : resetCode;
+        });
+    };
+    String.prototype.toShortPath = function (comparePath) {
+        const path = this.toString().replace(/\\/g, "/");
+        const allParts = path.split("/");
+        // Return the last 2 parts of the path
+        const parts = allParts.slice(Math.max(allParts.length - 2, 0));
+        let s = `${parts[0].yellow}${`\\`.c("gray")}${parts[1]}`;
+        if (parts.length > 2) {
+            s = `${s} (${parts.slice(0, -2).join("\\")})`.c("gray");
+        }
+        if (comparePath) {
+            const compareParts = comparePath.replace(/\\/g, "/").split("/");
+            const diffs = allParts.filter((part, index) => {
+                return part !== compareParts[index];
+            });
+            if (diffs.length > 0) {
+                s = `${diffs.join("\\").c("gray")}..\\${s}`;
+            }
+        }
+        s = `${`..\\`.c("gray")}${s}`;
+        return s;
+    };
+    // Convert a relative path to an absolute path
+    // If the path is already absolute, return it as is
+    // If the path is relative, convert from the current working directory
+    // If the path contains ..\, resolve the path
+    String.prototype.toAbsolutePath = function (path) {
+        if (path.isAbsolute(this.toString()))
+            return path.resolve(this.toString());
+        return path.resolve(path.join(process.cwd(), this.toString()));
+    };
+    String.prototype.toNumber = function () {
+        return parseFloat(this.withoutColors());
+    };
+    String.prototype.isEqualPath = function (path) {
+        return this.toString().normalizePath() === path.normalizePath();
+    };
+    String.prototype.splitPath = function () {
+        return this.toString().replace(/\\/g, "/").split("/");
+    };
+    String.prototype.normalizePath = function () {
+        return this.toString().replace(/\//g, "\\");
+    };
+    // Make a string safe to use as a filename or directory name
+    String.prototype.sanitizePath = function () {
+        const sanitizePart = (s) => {
+            if (s.length == 2 && s[1] == ":")
+                return s;
+            // Invalid characters in Windows filenames: \ / : * ? " < > |
+            const invalidCharsRegex = /[\x00-\x1f\\\/:*?"<>|]/g;
+            s = s.replace(invalidCharsRegex, "_");
+            return s;
+        };
+        const parts = this.toString().replace(/\\/g, "/").split("/");
+        const dirName = parts.slice(0, -1);
+        const fileName = parts.slice(-1)[0];
+        const extension = fileName.split(".").slice(-1)[0];
+        const sanitized = [
+            ...dirName,
+            sanitizePart(fileName.split(".").slice(0, -1).join(".")),
+        ].join("/") + (extension ? `.${extension}` : "");
+        return sanitized;
+    };
+    String.prototype.findParentDir = function (dirName) {
+        const parts = this.toString().normalizePath().split("\\");
+        const index = parts.indexOf(dirName);
+        if (index != -1)
+            return parts.slice(0, index + 1).join("\\");
+        throw new Error(`Could not find ${dirName} in ${this}`);
+    };
+    String.prototype.ipToNumber = function () {
+        let parts = this.split(".");
+        return (parseInt(parts[0]) * 256 * 256 * 256 +
+            parseInt(parts[1]) * 256 * 256 +
+            parseInt(parts[2]) * 256 +
+            parseInt(parts[3]));
+    };
+    String.prototype.decodeBase64 = function () {
+        return Buffer.from(this, "base64").toString("ascii");
+    };
+    String.prototype.hashCode = function () {
+        const str = this.toString();
+        let hash = 0;
+        if (str.length === 0) {
+            return hash;
+        }
+        for (let i = 0; i < str.length; i++) {
+            const char = str.charCodeAt(i);
+            hash = (hash << 5) - hash + char;
+            hash = hash & hash; // Convert to 32-bit integer
+        }
+        return hash;
+    };
+    // Case insensitive
+    String.prototype.parseEnum = function (enumType) {
+        const str = this.toString();
+        // If the string is a number, return the number
+        if (str.match(/^\d+$/))
+            return parseInt(str);
+        for (const key in enumType) {
+            if (key.toLowerCase() == str.toLowerCase())
+                return enumType[key];
+        }
+        return null;
+    };
+}
+// #endregion
+// #region Array
+if (typeof Array !== "undefined") {
+    Array.prototype.sum = function () {
+        return this.reduce((a, b) => a + b, 0);
+    };
+    Array.prototype.min = function () {
+        return Math.min.apply(null, this);
+    };
+    Array.prototype.max = function () {
+        return Math.max.apply(null, this);
+    };
+    Array.prototype.average = function () {
+        return this.sum() / this.length;
+    };
+    Array.prototype.first = function () {
+        return this[0];
+    };
+    Array.prototype.last = function () {
+        return this[this.length - 1];
+    };
+    Array.prototype.back = function () {
+        return this.slice(0, this.length - 1);
+    };
+    Array.prototype.skip = function (count) {
+        return this.slice(count);
+    };
+    Array.prototype.joinColumns = function (columns, ellipsis) {
+        if (!columns.length)
+            return this.join(" ");
+        return this.map((item, i) => `${(item || "").toLength(columns[i], ellipsis, "right")}`).join(" ");
+    };
+    Array.prototype.distinct = function (project) {
+        if (!project)
+            project = (item) => item;
+        const result = [];
+        const map = new Map();
+        for (const item of this) {
+            const key = project ? project(item) : item;
+            if (!map.has(key)) {
+                map.set(key, true);
+                result.push(item);
+            }
+        }
+        return result;
+    };
+    Array.prototype.except = function (...items) {
+        return this.filter((item) => !items.includes(item));
+    };
+    Array.prototype.sortBy = function (...projects) {
+        return this.sort((a, b) => {
+            for (const project of [...projects].reverse()) {
+                const aVal = project(a);
+                const bVal = project(b);
+                if (aVal > bVal)
+                    return 1;
+                if (aVal < bVal)
+                    return -1;
+            }
+            return 0;
+        });
+    };
+    Array.prototype.sortByDesc = function (...projects) {
+        return [...this.sortBy(...projects)].reverse();
+    };
+    Array.prototype.stringify = function () {
+        return JSON.stringify(this);
+    };
+    Array.prototype.onlyTruthy = function () {
+        return this.filter((item) => !!item);
+    };
+}
+// #endregion
+// #region Function
+if (typeof Function !== "undefined") {
+    Function.prototype.is = function (type) {
+        return (0)._is(this, type);
+    };
+    Function.prototype.getArgumentNames = function () {
+        const code = this.toString();
+        const args = code
+            .slice(code.indexOf("(") + 1, code.indexOf(")"))
+            .match(/([^\s,]+)/g);
+        return args || [];
+    };
+    Function.prototype.postpone = function (delay) {
+        const fn = this;
+        return () => {
+            setTimeout(fn, delay);
+        };
+    };
+}
+// #endregion
+
+
+/***/ }),
+
 /***/ "../../../Shared/Lock.ts":
 /*!*******************************!*\
   !*** ../../../Shared/Lock.ts ***!
@@ -1069,6 +2096,12 @@ exports["default"] = (context, dom, indent, compName) => {
         }
     }
     const domNode = (tag, attrs, indent) => {
+        // Remove #1, #2, etc. from class names
+        if (attrs.class) {
+            attrs.class = stringToArray(attrs.class)
+                .map((c) => c.split("#")[0])
+                .join(" ");
+        }
         tag = tag.replace(/\./g, "-");
         const indentStr = "  ".repeat(indent);
         return `${indentStr}${tag}(${Object.entries(attrs)
@@ -1159,7 +2192,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("./script/1687415256302.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("./script/1687525677307.ts");
 /******/ 	
 /******/ })()
 ;

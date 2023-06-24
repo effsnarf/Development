@@ -176,8 +176,13 @@ const _fetchAsJson = async (url: string) => {
 
         const comp = data;
         const compPath = path.join(componentsFolder, comp.path);
-        const yaml = Objects.yamlify(comp.source);
-        fs.writeFileSync(compPath, yaml);
+        const existingComp = Objects.parseYaml(
+          fs.readFileSync(compPath, "utf8")
+        );
+        if ("editable" in existingComp && !existingComp.editable) {
+          const yaml = Objects.yamlify(comp.source);
+          fs.writeFileSync(compPath, yaml);
+        }
         return res.end("ok");
       }
       if (req.url == "/pug") {

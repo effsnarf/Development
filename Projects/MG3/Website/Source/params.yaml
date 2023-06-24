@@ -3,6 +3,7 @@ params:
     get: | #ts
       function(url) {
         if (url == "/") return "home";
+        if (url == "/admin") return "admin";
         if (url.startsWith("/instance/")) return "instance";
         return "generator";
       }
