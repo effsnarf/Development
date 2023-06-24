@@ -1,4 +1,4 @@
-title: MG.Web
+title: MG.Web.Proxy
 incoming:
   server:
     prod:
