@@ -585,6 +585,7 @@ class LoadBalancer {
             this.incomingItems.remove(incomingItem);
             return;
           }
+        } else {
         }
       }
     }

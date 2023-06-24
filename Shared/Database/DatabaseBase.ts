@@ -61,7 +61,7 @@ abstract class DatabaseBase {
   }
 
   async findOneByID(collectionName: string, _id: number): Promise<any> {
-    return (await this.find(collectionName, { _id }))[0];
+    return (await this.find(collectionName, { _id: _id }, null, 1))[0];
   }
 
   protected abstract _upsert(collectionName: string, doc: any): Promise<any>;
