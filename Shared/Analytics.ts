@@ -148,7 +148,10 @@ class Analytics {
       isIn(doc.dt.f, interval) && isIn(doc.dt.t, interval);
 
     const isPartialDoc = (doc: any, interval: Interval) =>
-      !isFullDoc(doc, interval);
+      isIn(doc.dt.f, interval) || isIn(doc.dt.t, interval);
+
+    const isWrappingDoc = (doc: any, interval: Interval) =>
+      doc.dt.f < interval.from && doc.dt.t > interval.to;
 
     const intervals = Analytics.getIntervals(from, to, every);
 
@@ -171,61 +174,61 @@ class Analytics {
               $lte: interval.to,
             },
           },
+          {
+            $and: [
+              {
+                "dt.f": {
+                  $lte: interval.from,
+                },
+              },
+              {
+                "dt.t": {
+                  $gte: interval.to,
+                },
+              },
+            ],
+          },
         ],
       };
 
-      const docs = await this.db.find("Events", filter);
+      const relevantDocs = await this.db.find("Events", filter);
 
       // Some of the docs fall only partially in the interval
       // We need to adjust their values to the relative space they occupy in the interval
-
-      const partialDocs = docs.filter((d: any) => isPartialDoc(d, interval));
-      for (const doc of partialDocs) {
-        const { f, t } = doc.dt;
-        const intervalLength = interval.to - interval.from;
-        const overlap = f.isBetween(interval.from, interval.to)
-          ? interval.to - f
-          : t - interval.from;
-
-        const ratio = overlap / intervalLength;
-        doc.v *= ratio;
-      }
-
-      interval.docs = docs;
-    }
-
-    // Some of the docs may span multiple intervals
-    // First, we get them all
-    const multiIntervalDocs = await this.db.find("Events", {
-      t: type,
-      a: app,
-      c: category,
-      e: event,
-      "dt.f": { $gte: from, $lte: to },
-      "dt.t": { $gte: from, $lte: to },
-    });
-
-    // For each of them, we calculate the intervals they span
-    for (const doc of multiIntervalDocs) {
-      const { f, t } = doc.dt;
-      for (const interval of intervals) {
-        if (isIn(f, interval) || isIn(t, interval)) {
-          // Calculate the overlap
-          const intervalLength = interval.to - interval.from;
-          const { df, dt } = f.isBetween(interval.from, interval.to)
-            ? { df: f, dt: interval.to }
-            : { df: interval.from, dt: t };
-          const overlap = dt - df;
-          // Calculate the ratio
-          const ratio = overlap / intervalLength;
-          // Add the doc to the interval
-          interval.docs.push({
-            ...doc,
-            dt: { f: df, t: dt },
-            v: doc.v * ratio,
-          });
+      // Either:
+      // The doc's dt.f or dt.t are inside the interval
+      // of the entire doc wraps the interval
+      // For each doc we calculate how much of the interval it occupies
+      // and adjust the value accordingly
+      // Each interval has a list of docs that fall in it
+      const intervalDocs = [];
+      for (const doc of relevantDocs) {
+        if (isFullDoc(doc, interval)) {
+          intervalDocs.push(doc);
+          continue;
         }
+        let ratio = 1;
+        if (isPartialDoc(doc, interval)) {
+          const { f, t } = doc.dt;
+          const intervalLength = interval.to - interval.from;
+          const overlap = f.isBetween(interval.from, interval.to)
+            ? interval.to - f
+            : t - interval.from;
+          ratio = overlap / intervalLength;
+        }
+        // Doc is longer than the interval
+        if (isWrappingDoc(doc, interval)) {
+          const { f, t } = doc.dt;
+          const intervalLength = interval.to - interval.from;
+          const docLength = t - f;
+          ratio = intervalLength / docLength;
+        }
+        doc.v *= ratio;
+        intervalDocs.push(doc);
+        continue;
       }
+
+      interval.docs = intervalDocs;
     }
 
     const values = intervals

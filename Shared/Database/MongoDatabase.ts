@@ -41,7 +41,7 @@ class MongoDatabase extends DatabaseBase {
   }
 
   async get(key: any): Promise<any> {
-    return (await this.find(DatabaseBase._mapCollectionName, { _id: key }))[0];
+    return await this.findOneByID(DatabaseBase._mapCollectionName, key);
   }
 
   async set(key: any, value: any): Promise<void> {
@@ -135,16 +135,17 @@ class MongoDatabase extends DatabaseBase {
 
     this.removeDollarSigns(pipeline);
 
-    // this.upsert(
-    //   "_DbAnalytics",
-    //   {
-    //     dt: Date.now(),
-    //     event: "aggregate",
-    //     collection: collectionName,
-    //     pipeline: pipeline,
-    //   },
-    //   false
-    // );
+    this.upsert(
+      "_DbAnalytics",
+      {
+        dt: Date.now(),
+        elapsed: timer.elapsed,
+        event: "aggregate",
+        collection: collectionName,
+        pipeline: pipeline,
+      },
+      false
+    );
 
     if (lowercaseFields)
       docs = docs.map((d) => {

@@ -105,7 +105,16 @@ const isCachable = (options: any, config: any) => {
         // We're only interested in the time it took us to get the response from the target,
         // not the time it took us to send the response to the client
         const elapsed = timer.elapsed;
+        const responseTimer = Timer.start();
+        const responseInterval = setInterval(() => {
+          // logLine(
+          //   "fetching",
+          //   responseTimer.elapsed?.unitifyTime(),
+          //   options.url
+          // );
+        }, 1000);
         const response = await axios.request(options);
+        clearInterval(responseInterval);
         // Add debug headers
         // debug-proxy-source:
         // - forwarded
