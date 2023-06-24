@@ -39,6 +39,15 @@ import { Database } from "@shared/Database/Database";
       undefined,
       true
     )) {
+      if (doc.a.startsWith("MG.")) doc.a = "MG";
+      if (doc.c.toLowerCase() == "site") {
+        doc.c = "site";
+      } else {
+        doc.c = "network";
+      }
+      if (doc.e == "timeOnSite") doc.e = "time.on.site";
+
+      source.upsert("Events", doc);
       await target.upsert("Events", doc);
       progress.increment();
     }
