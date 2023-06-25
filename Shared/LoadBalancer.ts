@@ -640,7 +640,8 @@ class LoadBalancer {
       // Some HTTP status codes are not errors (304 Not Modified, 404 Not Found, etc.)
       // Axios throws an error for these status codes
       // We're handling them as successes
-      if (ex.response && ex.response.status < 500) {
+      const targetIsDown = !ex.response || ex.message.includes("ECONNREFUSED");
+      if (!targetIsDown) {
         this.nodeResponseSuccess(incomingItem, ex.response, timer.elapsed!);
         return;
       } else {
