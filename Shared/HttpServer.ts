@@ -52,7 +52,7 @@ class HttpServer {
       const customResult = await this.handler(req, res, data);
       if (customResult) {
         console.log(
-          `${customResult.status.severifyByHttpStatus()} ${req.url.green}`
+          `${customResult.statusCode?.severifyByHttpStatus()} ${req.url.green}`
         );
         return;
       }

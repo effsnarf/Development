@@ -157,6 +157,7 @@ const _fetchAsJson = async (url: string) => {
           ""
         )}`;
         // Return HTTP Moved Permanently (301) to the client
+        res.statusCode = 301;
         res.writeHead(301, {
           Location: url,
         });
