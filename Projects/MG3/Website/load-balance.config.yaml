@@ -18,11 +18,11 @@ incoming:
       - /api/ip
       - /create
     store:
-      - database:
-          path: F:\Database\MG-Web-Cache
       # - database:
-      #     connectionString: mongodb://localhost:37017
-      #     database: MG-Web-Cache
+      #     path: F:\Database\MG-Web-Cache
+      - database:
+          connectionString: mongodb://localhost:37017
+          database: MG-Web-Cache
   analytics:
     prod:
       api:
@@ -65,4 +65,4 @@ process:
   restart:
     periodically:
       from: 00:00
-      every: 10m
+      every: 60m

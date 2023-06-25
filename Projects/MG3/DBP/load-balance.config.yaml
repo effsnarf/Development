@@ -26,11 +26,11 @@ incoming:
         path: (env) => env.path.resolve("c:\\Database\\Cache", env.config.title)
       prod:
         # - memory: true
-        # - database:
-        #     connectionString: mongodb://localhost:37017
-        #     database: MG-DBP-Cache
         - database:
-            path: F:\Database\MG-DBP-Cache
+            connectionString: mongodb://localhost:37017
+            database: MG-DBP-Cache
+        # - database:
+        #     path: F:\Database\MG-DBP-Cache
   analytics:
     prod:
       api:
@@ -72,4 +72,4 @@ process:
   restart:
     periodically:
       from: 00:00
-      every: 10m
+      every: 60m

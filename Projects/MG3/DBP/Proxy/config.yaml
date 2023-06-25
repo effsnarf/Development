@@ -40,11 +40,11 @@ cache:
   store:
     prod:
       #- memory: true
-      # - database:
-      #     connectionString: mongodb://localhost:37017
-      #     database: MG-DBP-Cachea
       - database:
-          path: F:\Database\MG-DBP-Cache
+          connectionString: mongodb://localhost:37017
+          database: MG-DBP-Cache
+      # - database:
+      #     path: F:\Database\MG-DBP-Cache
 log:
   enabled: true
   path: (env) => env.getLogPath(env.config.title)
