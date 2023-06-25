@@ -57,8 +57,6 @@ class HttpServer {
 
       var mimeType = HttpServer.getMimeType(path);
 
-      console.log(mimeType);
-
       if (path == "/") path = rootPath;
       else path = `.${path}`;
 

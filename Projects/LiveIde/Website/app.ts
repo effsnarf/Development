@@ -141,7 +141,10 @@ const _fetchAsJson = async (url: string) => {
     process.cwd(),
     config.project.folder,
     config.webscript.folder,
+    config.website.folder,
   ];
+
+  console.log("staticFileFolders", staticFileFolders);
 
   const httpServer = await HttpServer.new(
     config.server.port,
