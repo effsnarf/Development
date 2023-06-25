@@ -15,8 +15,8 @@ Handlebars.registerHelper("json", function (obj: any) {
 
 class HttpServer {
   private constructor(
-    port: number,
-    ip: string,
+    private port: number,
+    private ip: string,
     private handler: (req: any, res: any, data: any) => any,
     private getIndexPageTemplateData: (req: any) => Promise<any>,
     private indexPagePath?: string
@@ -98,7 +98,9 @@ class HttpServer {
 
   private logResponse(req: any, res?: any) {
     console.log(
-      `${res.statusCode?.severifyByHttpStatus()} ${req.url.severifyByHttpStatus(
+      `${
+        `${this.ip}:${this.port}`.gray
+      } ${res.statusCode?.severifyByHttpStatus()} ${req.url.severifyByHttpStatus(
         res.statusCode
       )}`
     );
