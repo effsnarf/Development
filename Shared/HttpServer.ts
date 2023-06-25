@@ -4,6 +4,7 @@ import path from "path";
 import colors from "colors";
 const mime = require("mime") as any;
 import { Http } from "./Http";
+import { Timer } from "./Timer";
 const HAML = require("./haml");
 const Handlebars = require("Handlebars");
 const http = require("http");
@@ -46,12 +47,15 @@ class HttpServer {
 
   private async requestListener(req: any, res: any) {
     const rootPath = this.indexPagePath;
+
+    const timer = Timer.start();
+
     try {
       const data = await Http.getPostData(req);
 
       const customResult = await this.handler(req, res, data);
       if (customResult) {
-        this.logResponse(req, customResult);
+        this.logResponse(timer, req, customResult);
         return;
       }
 
@@ -82,25 +86,29 @@ class HttpServer {
         }
         res.end();
       }
-      this.logResponse(req, res);
+      this.logResponse(timer, req, res);
       return;
     } catch (ex: any) {
-      this.logResponse(req);
+      this.logResponse(timer, req);
       // Set status code 500
       res.statusCode = ex.status || 500;
       res.end(ex.stack);
       if (!ex.message?.includes("favicon.ico")) {
-        this.logResponse(req, res);
+        this.logResponse(timer, req, res);
         console.log(`${ex.stack?.bgRed}`);
       }
     }
   }
 
-  private logResponse(req: any, res?: any) {
+  private logResponse(timer: Timer, req: any, res?: any) {
     console.log(
-      `${
-        `${this.ip}:${this.port}`.gray
-      } ${res.statusCode?.severifyByHttpStatus()} ${req.url.severifyByHttpStatus(
+      `${`${this.ip}:${this.port}`.gray} ${timer.elapsed
+        ?.unitifyTime()
+        .severify(
+          100,
+          500,
+          "<"
+        )} ${res.statusCode?.severifyByHttpStatus()} ${req.url.severifyByHttpStatus(
         res.statusCode
       )}`
     );
