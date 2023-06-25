@@ -115,7 +115,6 @@ const isCachable = (options: any, config: any) => {
           // );
         }, 1000);
         const response = await axios.request(options);
-        const elapsed = timer.elapsed;
         clearInterval(responseInterval);
         // Add debug headers
         // debug-proxy-source:
@@ -133,11 +132,11 @@ const isCachable = (options: any, config: any) => {
         // When the response ends
         response.data.on("end", async () => {
           logLine(
-            `${elapsed?.unitifyTime()} ${response.status.toString().yellow} ${
-              options.url.gray
-            }`
+            `${timer.elapsed?.unitifyTime()} ${
+              response.status.toString().yellow
+            } ${options.url.gray}`
           );
-          stats.response.times.track(elapsed);
+          stats.response.times.track(timer.elapsed);
           stats.successes.track(1);
         });
       } catch (ex: any) {
