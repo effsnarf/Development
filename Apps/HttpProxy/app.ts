@@ -33,7 +33,7 @@ const isCachable = (options: any, config: any) => {
   const logLine = (...args: any[]) => {
     args = [
       new Date().toLocaleTimeString().blue.bold,
-      currentRequests.severify(10, 20, ">"),
+      currentRequests.severify(10, 20, "<"),
       ...args,
     ];
     process.stdout.write("\r");
