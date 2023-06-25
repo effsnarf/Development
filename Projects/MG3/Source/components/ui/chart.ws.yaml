@@ -23,7 +23,7 @@ dom:
           :height: (canvasWidth / 2)
           on_mousemove: onMouseMove
           on_mouseout: onMouseOut
-    .flex.justify-center.items-center:
+    .flex.flex-column.justify-center.items-center:
       .title:
         .icon:
           v-text: icon
@@ -192,6 +192,15 @@ style:
     background: "#ff000040"
   .blue:
     background: "#00a0ff40"
+  .comp-ui-num, .title:
+    font-size: 140%
+  .column1 .comp-ui-num:nth-child(2):
+    position: absolute
+    top: 50%
+    transform: translateY(-50%)
+  .column1 .comp-ui-num:nth-child(1):
+    position: absolute
+    bottom: 0
 
 template: >-
   <div-card class="comp-ui-chart" :class="getCssClass()"><h2 class="header"

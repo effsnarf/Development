@@ -151,9 +151,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "../../../LiveIde/Website/script/1687662109364.ts":
+/***/ "../../../LiveIde/Website/script/1687666904982.ts":
 /*!********************************************************!*\
-  !*** ../../../LiveIde/Website/script/1687662109364.ts ***!
+  !*** ../../../LiveIde/Website/script/1687666904982.ts ***!
   \********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -1352,12 +1352,12 @@ if (typeof Number !== "undefined") {
         if (value < 10)
             return value.toFixed(2);
         if (value < 1000)
-            return value.toFixed(0);
+            return Math.round(value).toLocaleString();
         if (value < 1000000)
-            return `${(value / 1000).toFixed(1)}k`;
+            return `${(value / 1000).toLocaleString()}k`;
         if (value < 1000000000)
-            return `${(value / 1000000).toFixed(1)}m`;
-        return `${(value / 1000000000).toFixed(1)}b`;
+            return `${(value / 1000000).toLocaleString()}m`;
+        return `${(value / 1000000000).toLocaleString()}b`;
     };
 }
 // #endregion
@@ -2199,7 +2199,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("../../../LiveIde/Website/script/1687662109364.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("../../../LiveIde/Website/script/1687666904982.ts");
 /******/ 	
 /******/ })()
 ;

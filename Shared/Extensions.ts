@@ -599,10 +599,10 @@ if (typeof Number !== "undefined") {
     const value = this.valueOf();
     if (value < 0) return `-${(-value).humanize()}`;
     if (value < 10) return value.toFixed(2);
-    if (value < 1000) return value.toFixed(0);
-    if (value < 1000000) return `${(value / 1000).toFixed(1)}k`;
-    if (value < 1000000000) return `${(value / 1000000).toFixed(1)}m`;
-    return `${(value / 1000000000).toFixed(1)}b`;
+    if (value < 1000) return Math.round(value).toLocaleString();
+    if (value < 1000000) return `${(value / 1000).toLocaleString()}k`;
+    if (value < 1000000000) return `${(value / 1000000).toLocaleString()}m`;
+    return `${(value / 1000000000).toLocaleString()}b`;
   };
 }
 // #endregion
