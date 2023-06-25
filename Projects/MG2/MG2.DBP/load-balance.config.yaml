@@ -1,6 +1,8 @@
 title: MG.DBP.LB
 incoming:
   address: localhost:4050
+  request:
+    timeout: 1 # Timeout node requests
   cors:
     [
       https://memegenerator.net,
@@ -62,7 +64,7 @@ node:
     health: 0.5 # Restart the node if the health is below 50%
     timeout: 5 # and it has been unhealthy for N minutes
 request:
-  timeout: 10 # Timeout requests after 10 seconds
+  timeout: 1 # Timeout requests after 10 seconds
 log:
   enabled: true
   path: (env) => env.getLogPath(env.config.title)

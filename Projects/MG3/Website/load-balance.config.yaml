@@ -1,6 +1,8 @@
 title: MG.Web
 incoming:
   address: localhost:5055
+  request:
+    timeout: 1 # Timeout node requests
   cors: [http://localhost:5055, http://localhost:5050, http://localhost:5051]
   os:
     restart: # memegenerator.net/restart/.. will restart the server
@@ -21,8 +23,6 @@ incoming:
       # - database:
       #     connectionString: mongodb://localhost:37017
       #     database: MG-Web-Cache
-  request:
-    timeout: 1 # Timeout node requests
   analytics:
     prod:
       api:
