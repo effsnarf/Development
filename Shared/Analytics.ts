@@ -53,8 +53,8 @@ class Api {
       const [last, every] = [parts[5], parts[7]].map((p: string) =>
         p.deunitify()
       );
-      const type = parts[8].parseEnum(ItemType);
-      if (!type) throw new Error("Invalid type: " + parts[7] + ` (${url})`);
+      //const type = parts[8].parseEnum(ItemType);
+      //if (!type) throw new Error("Invalid type: " + parts[7] + ` (${url})`);
       const to = Date.now();
       const from = to - last;
       const intervals = await this.analytics.aggregate(
@@ -63,8 +63,7 @@ class Api {
         event,
         from,
         to,
-        every,
-        type
+        every
       );
       return intervals;
     }
@@ -135,12 +134,8 @@ class Analytics {
     event: string,
     from: number,
     to: number,
-    every: number,
-    type: ItemType | string | null
+    every: number
   ) {
-    if (typeof type == "string") type = type.parseEnum(ItemType);
-    if (!type) throw new Error(`Invalid type: ${type}`);
-
     const isIn = (value: number, interval: Interval) =>
       value.isBetween(interval.from, interval.to);
 
@@ -148,7 +143,8 @@ class Analytics {
       isIn(doc.dt.f, interval) && isIn(doc.dt.t, interval);
 
     const isPartialDoc = (doc: any, interval: Interval) =>
-      isIn(doc.dt.f, interval) || isIn(doc.dt.t, interval);
+      !isFullDoc(doc, interval) &&
+      (isIn(doc.dt.f, interval) || isIn(doc.dt.t, interval));
 
     const isWrappingDoc = (doc: any, interval: Interval) =>
       doc.dt.f < interval.from && doc.dt.t > interval.to;
@@ -178,12 +174,12 @@ class Analytics {
             $and: [
               {
                 "dt.f": {
-                  $lte: interval.from,
+                  $lt: interval.from,
                 },
               },
               {
                 "dt.t": {
-                  $gte: interval.to,
+                  $gt: interval.to,
                 },
               },
             ],
@@ -223,7 +219,10 @@ class Analytics {
           const docLength = t - f;
           ratio = intervalLength / docLength;
         }
-        doc.v *= ratio;
+        // Adjust the value
+        // If the type is count, we need to adjust the value
+        // If the type is average, we don't need to adjust the value
+        if (doc.t == ItemType.Count) doc.v *= ratio;
         intervalDocs.push(doc);
         continue;
       }
@@ -231,8 +230,13 @@ class Analytics {
       interval.docs = intervalDocs;
     }
 
+    const type = intervals[0].docs[0].t;
+
     const values = intervals
-      .map((intr) => intr.docs.map((d: any) => d.v).average())
+      .map((intr) => intr.docs.map((d: any) => d.v))
+      .map((values) =>
+        type == ItemType.Average ? values.average() : values.sum()
+      )
       .map((v) => Math.round(v));
 
     return values;
