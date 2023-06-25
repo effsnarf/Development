@@ -35,8 +35,9 @@ const isCachable = (options: any, config: any) => {
       new Date().toLocaleTimeString().blue.bold,
       currentRequests.severify(10, 20, "<"),
       `queue`.gray,
-      stats.successes.count,
-      `${``.gray}${stats.successes.timeSpan.unitifyTime()}`,
+      `${stats.successes.count}${
+        `/`.gray
+      }${stats.successes.timeSpan.unitifyTime()}`,
       ...args,
     ];
     process.stdout.write("\r");
