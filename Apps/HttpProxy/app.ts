@@ -31,7 +31,11 @@ const isCachable = (options: any, config: any) => {
   const debugLogger = Logger.new(config.log);
 
   const logLine = (...args: any[]) => {
-    args = [new Date().toLocaleTimeString().blue.bold, ...args];
+    args = [
+      new Date().toLocaleTimeString().blue.bold,
+      currentRequests.severify(10, 20, ">"),
+      ...args,
+    ];
     process.stdout.write("\r");
     process.stdout.clearLine(0);
     process.stdout.write(args.join(" "));
@@ -40,11 +44,8 @@ const isCachable = (options: any, config: any) => {
   };
 
   const logNewLine = (...args: any[]) => {
-    args = [new Date().toLocaleTimeString().blue.bold, ...args];
-    process.stdout.write("\r");
-    process.stdout.clearLine(0);
-    console.log(...args);
-    debugLogger.log(...args);
+    logLine(...args);
+    console.log();
   };
 
   const interval = config.stats.every.deunitify();
@@ -62,6 +63,8 @@ const isCachable = (options: any, config: any) => {
 
   const cache = await Cache.new(config.cache.store);
 
+  let currentRequests = 0;
+
   // Forward all incoming HTTP requests to config.target.base.urls/..
   // If a request fails (target is down), try the cache first
   // If the cache doesn't have the response, try backup urls up to target.try.again.retries times
@@ -75,6 +78,7 @@ const isCachable = (options: any, config: any) => {
     const postData = req.method == "POST" ? await Http.getPostData(req) : null;
 
     const timer = Timer.start();
+    currentRequests++;
 
     const tryRequest = async (attempt: number = 0) => {
       const nodeIndex = attempt % config.target.base.urls.length;
@@ -138,6 +142,7 @@ const isCachable = (options: any, config: any) => {
           );
           stats.response.times.track(timer.elapsed);
           stats.successes.track(1);
+          currentRequests--;
         });
       } catch (ex: any) {
         // Some HTTP status codes are not errors (304 Not Modified, 404 Not Found, etc.)
@@ -148,7 +153,6 @@ const isCachable = (options: any, config: any) => {
         if (!targetIsDown) {
           const isError = !ex.response.status.isBetween(200, 500);
           const elapsed = timer.elapsed;
-          stats.response.times.track(elapsed);
           logLine(
             `${elapsed?.unitifyTime()} ${
               !isError
@@ -156,6 +160,10 @@ const isCachable = (options: any, config: any) => {
                 : ex.message.yellow
             } ${options.url.gray}`
           );
+
+          stats.response.times.track(elapsed);
+          stats.successes.track(1);
+          currentRequests--;
 
           res.status(ex.response.status);
           res.set(ex.response.headers);
@@ -170,6 +178,7 @@ const isCachable = (options: any, config: any) => {
               if (cachedResponse) {
                 stats.cache.hits.track(1);
                 stats.response.times.track(timer.elapsed);
+                currentRequests--;
                 logLine(
                   `${timer.elapsed?.unitifyTime()} ${
                     `Fallback cache hit`.yellow.bold
