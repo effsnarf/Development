@@ -104,10 +104,9 @@ class HttpServer {
     console.log(
       `${`${this.ip}:${this.port}`.gray} ${timer.elapsed
         ?.unitifyTime()
-        .severify(
-          100,
-          500,
-          "<"
+        .severify(100, 500, "<")
+        .padStartChars(
+          6
         )} ${res.statusCode?.severifyByHttpStatus()} ${req.url.severifyByHttpStatus(
         res.statusCode
       )}`

@@ -35,7 +35,9 @@ cache:
     - /create
   store:
     prod:
-      - memory: true
+      # - memory: true
+      # - database:
+      #     path: F:\Database\MG-Web-Cache
       - database:
           connectionString: mongodb://localhost:37017
           database: MG-Web-Cache
