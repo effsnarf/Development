@@ -16,12 +16,13 @@ incoming:
       - /api/ip
       - /create
     store:
-      - memory: true
       - database:
-          connectionString: mongodb://localhost:37017
-          database: MG-Web-Cache
+          path: F:\Database\MG-Web-Cache
+      # - database:
+      #     connectionString: mongodb://localhost:37017
+      #     database: MG-Web-Cache
   request:
-    timeout: 5 # Timeout node requests
+    timeout: 1 # Timeout node requests
   analytics:
     prod:
       api:

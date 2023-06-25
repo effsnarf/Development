@@ -9,7 +9,9 @@ class IntervalCounter {
 
   constructor(private readonly timeSpan: number) {}
 
-  track(value: number) {
+  track(value: number | null) {
+    if (value == null) return;
+
     const dt = Date.now();
 
     this.items.push({ dt, value });

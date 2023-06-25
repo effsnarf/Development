@@ -47,12 +47,17 @@ const isCachable = (options: any, config: any) => {
     debugLogger.log(...args);
   };
 
+  const interval = config.stats.every.deunitify();
+
   const stats = {
-    interval: config.display.stats.every.deunitify(),
-  } as any;
-  stats.successes = new IntervalCounter(stats.interval);
-  stats.cache = {
-    hits: new IntervalCounter(stats.interval),
+    interval,
+    successes: new IntervalCounter(interval),
+    cache: {
+      hits: new IntervalCounter(interval),
+    },
+    response: {
+      times: new IntervalCounter(interval),
+    },
   };
 
   const cache = await Cache.new(config.cache.store);
@@ -102,10 +107,6 @@ const isCachable = (options: any, config: any) => {
       const origin = req.headers.origin || "*";
 
       try {
-        // We're only interested in the time it took us to get the response from the target,
-        // not the time it took us to send the response to the client
-        const elapsed = timer.elapsed;
-        const responseTimer = Timer.start();
         const responseInterval = setInterval(() => {
           // logLine(
           //   "fetching",
@@ -114,6 +115,7 @@ const isCachable = (options: any, config: any) => {
           // );
         }, 1000);
         const response = await axios.request(options);
+        const elapsed = timer.elapsed;
         clearInterval(responseInterval);
         // Add debug headers
         // debug-proxy-source:
@@ -135,6 +137,7 @@ const isCachable = (options: any, config: any) => {
               options.url.gray
             }`
           );
+          stats.response.times.track(elapsed);
           stats.successes.track(1);
         });
       } catch (ex: any) {
@@ -145,8 +148,10 @@ const isCachable = (options: any, config: any) => {
         // If target is not down, target returned a real error and we should return it
         if (!targetIsDown) {
           const isError = !ex.response.status.isBetween(200, 500);
+          const elapsed = timer.elapsed;
+          stats.response.times.track(elapsed);
           logLine(
-            `${timer.elapsed?.unitifyTime()} ${
+            `${elapsed?.unitifyTime()} ${
               !isError
                 ? ex.response.status.toString().yellow
                 : ex.message.yellow
@@ -165,8 +170,9 @@ const isCachable = (options: any, config: any) => {
               const cachedResponse = await cache.get(cacheKey);
               if (cachedResponse) {
                 stats.cache.hits.track(1);
+                stats.response.times.track(timer.elapsed);
                 logLine(
-                  `${
+                  `${timer.elapsed?.unitifyTime()} ${
                     `Fallback cache hit`.yellow.bold
                   } ${cachedResponse.body.length.unitifySize()} ${
                     options.url.gray
@@ -219,6 +225,15 @@ const isCachable = (options: any, config: any) => {
       ItemType.Count,
       stats.interval,
       stats.successes.count
+    );
+    await analytics.create(
+      config.title.split(".").first(),
+      "network",
+      "response.time",
+      ItemType.Average,
+      (1).minutes(),
+      stats.response.times.average,
+      "ms"
     );
   }, stats.interval);
 
