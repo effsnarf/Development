@@ -51,9 +51,7 @@ class HttpServer {
 
       const customResult = await this.handler(req, res, data);
       if (customResult) {
-        console.log(
-          `${customResult.statusCode?.severifyByHttpStatus()} ${req.url.green}`
-        );
+        this.logResponse(req, customResult);
         return;
       }
 
@@ -84,17 +82,26 @@ class HttpServer {
         }
         res.end();
       }
-      console.log(`${status.toString().gray} ${req.url.green}`);
+      this.logResponse(req, res);
       return;
     } catch (ex: any) {
-      console.log(req.url.bgRed);
-      if (!ex.message?.includes("favicon.ico")) {
-        console.log(`${ex.stack?.bgRed}`);
-      }
+      this.logResponse(req);
       // Set status code 500
       res.statusCode = ex.status || 500;
       res.end(ex.stack);
+      if (!ex.message?.includes("favicon.ico")) {
+        this.logResponse(req, res);
+        console.log(`${ex.stack?.bgRed}`);
+      }
     }
+  }
+
+  private logResponse(req: any, res?: any) {
+    console.log(
+      `${res.statusCode?.severifyByHttpStatus()} ${req.url.severifyByHttpStatus(
+        res.statusCode
+      )}`
+    );
   }
 
   private static getMimeType(filePath: string) {
