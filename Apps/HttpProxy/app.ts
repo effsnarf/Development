@@ -71,7 +71,6 @@ const isCachable = (
     process.stdout.write(args.join(" "));
     process.stdout.write("\r");
     debugLogger.log(...args);
-    console.log();
   };
 
   const logNewLine = (...args: any[]) => {

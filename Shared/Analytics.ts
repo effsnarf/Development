@@ -19,6 +19,17 @@ interface Interval {
   average: number;
 }
 
+interface AnalyticsEvent {
+  _id: number;
+  dt: { f: number; t: number };
+  a: string;
+  c: string;
+  e: string;
+  t: ItemType;
+  v: any;
+  u: string;
+}
+
 // HTTP API for analytics
 class Api {
   private cache!: CacheBase;
@@ -136,6 +147,28 @@ class Analytics {
     to: number,
     every: number
   ) {
+    const getOverlapRatio = (doc: AnalyticsEvent, interval: Interval) => {
+      if (isFullDoc(doc, interval)) {
+        return 1;
+      }
+      if (isPartialDoc(doc, interval)) {
+        const { f, t } = doc.dt;
+        const intervalLength = interval.to - interval.from;
+        const overlap = f.isBetween(interval.from, interval.to)
+          ? interval.to - f
+          : t - interval.from;
+        return overlap / intervalLength;
+      }
+      if (isWrappingDoc(doc, interval)) {
+        const { f, t } = doc.dt;
+        const intervalLength = interval.to - interval.from;
+        const docLength = t - f;
+        return intervalLength / docLength;
+      }
+      // no overlap
+      return 0;
+    };
+
     const isIn = (value: number, interval: Interval) =>
       value.isBetween(interval.from, interval.to);
 
@@ -149,7 +182,7 @@ class Analytics {
     const isWrappingDoc = (doc: any, interval: Interval) =>
       doc.dt.f < interval.from && doc.dt.t > interval.to;
 
-    const intervals = Analytics.getIntervals(from, to, every);
+    let intervals = Analytics.getIntervals(from, to, every);
 
     for (const interval of intervals) {
       const filter = {
@@ -198,27 +231,13 @@ class Analytics {
       // and adjust the value accordingly
       // Each interval has a list of docs that fall in it
       const intervalDocs = [];
+
       for (const doc of relevantDocs) {
         if (isFullDoc(doc, interval)) {
           intervalDocs.push(doc);
           continue;
         }
-        let ratio = 1;
-        if (isPartialDoc(doc, interval)) {
-          const { f, t } = doc.dt;
-          const intervalLength = interval.to - interval.from;
-          const overlap = f.isBetween(interval.from, interval.to)
-            ? interval.to - f
-            : t - interval.from;
-          ratio = overlap / intervalLength;
-        }
-        // Doc is longer than the interval
-        if (isWrappingDoc(doc, interval)) {
-          const { f, t } = doc.dt;
-          const intervalLength = interval.to - interval.from;
-          const docLength = t - f;
-          ratio = intervalLength / docLength;
-        }
+        const ratio = getOverlapRatio(doc, interval);
         // Adjust the value
         // If the type is count, we need to adjust the value
         // If the type is average, we don't need to adjust the value
@@ -231,13 +250,13 @@ class Analytics {
     }
 
     const type = intervals[0].docs[0]?.t || ItemType.Undefined;
+    const aggFunc = type == ItemType.Average ? "average" : "sum";
 
-    const values = intervals
-      .map((intr) => intr.docs.map((d: any) => d.v))
-      .map((values) =>
-        type == ItemType.Average ? values.average() : values.sum()
-      )
-      .map((v) => Math.round(v));
+    intervals = intervals.map((intr) => {
+      return { ...intr, values: intr.docs.map((d: any) => d.v) };
+    });
+
+    const values = intervals.map((intr) => intr.values[aggFunc]());
 
     return values;
   }
