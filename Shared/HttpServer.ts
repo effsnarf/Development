@@ -7,6 +7,7 @@ import { Http } from "./Http";
 const HAML = require("./haml");
 const Handlebars = require("Handlebars");
 const http = require("http");
+import "../Shared/Extensions";
 
 Handlebars.registerHelper("json", function (obj: any) {
   return JSON.stringify(obj);
@@ -48,10 +49,13 @@ class HttpServer {
     try {
       const data = await Http.getPostData(req);
 
-      console.log(req.url.green);
-
       const customResult = await this.handler(req, res, data);
-      if (customResult) return;
+      if (customResult) {
+        console.log(
+          `${customResult.status.severifyByHttpStatus()} ${req.url.green}`
+        );
+        return;
+      }
 
       var path = req.url;
 
@@ -64,7 +68,9 @@ class HttpServer {
         path = rootPath;
       }
 
-      res.writeHead(200, { "Content-Type": `${mimeType}; charset=utf-8` });
+      const status = 200;
+
+      res.writeHead(status, { "Content-Type": `${mimeType}; charset=utf-8` });
 
       if (typeof mimeType == `string` && mimeType.startsWith(`video`)) {
         let readStream = fs.createReadStream(path);
@@ -78,8 +84,10 @@ class HttpServer {
         }
         res.end();
       }
+      console.log(`${status.toString().gray} ${req.url.green}`);
       return;
     } catch (ex: any) {
+      console.log(req.url.bgRed);
       if (!ex.message?.includes("favicon.ico")) {
         console.log(`${ex.stack?.bgRed}`);
       }
