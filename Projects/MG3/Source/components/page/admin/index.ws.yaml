@@ -24,7 +24,6 @@ dom:
             :event: eventValue
             :last: lastValue
             :every: every
-            type: sum
 
 data:
   options:
@@ -47,6 +46,7 @@ computed:
   every: |
     function() {
       if (!this.lastValue || !this.barsValue) return null;
+      if (this.lastValue.endsWith("hour")) return (1).minutes().unitifyTime().withoutColors();
       return (this.lastValue.deunitify() / this.barsValue).unitifyTime().withoutColors();
     }
 style:

@@ -3,8 +3,8 @@ dom:
     v-if: every
     ui.chart:
       :class: cssClass
-      :header: event
-      :title: last
+      :header: getHeader()
+      :title:
       :data: values
       :color: color
       :scale: scale
@@ -21,7 +21,6 @@ props:
   event:
   last:
   every:
-  type:
   scale:
 
 data:
@@ -46,16 +45,20 @@ methods:
         this.isBusy--;
       }
     }
+  getHeader: |
+    function() {
+      return `${this.event} every ${this.every} in the last ${this.last}`;
+    }
 
 computed:
   url: |
     function() {
       try
       {
-        let { app, category, event, last, every, type } = this;
+        let { app, category, event, last, every } = this;
         last = last.deunitify().unitifyTime();
         every = every.deunitify().unitifyTime();
-        let url = `https://db.memegenerator.net/analytics/${app}/${category}/${event}/last/${last}/every/${every}/${type}`;
+        let url = `https://db.memegenerator.net/analytics/${app}/${category}/${event}/last/${last}/every/${every}`;
         url = url.withoutColors();
         return url;
       }
