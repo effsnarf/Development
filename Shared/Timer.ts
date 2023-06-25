@@ -7,7 +7,7 @@ class IntervalCounter {
   private _sum: number = 0;
   private items: Item[] = [];
 
-  constructor(private readonly timeSpan: number) {}
+  constructor(public readonly timeSpan: number) {}
 
   track(value: number | null) {
     if (value == null) return;
