@@ -21,24 +21,32 @@ import { Database } from "@shared/Database/Database";
 
   let collIndex = 0;
   for (const collectionName of config.collections) {
-    const count = await source.count(collectionName);
+    const targetMaxID = (
+      await target.find(collectionName, {}, { _id: -1 }, 1)
+    )[0]._id;
 
     console.log(
-      `${`Importing`.gray} ${count.toLocaleString().green} ${
-        `documents from`.gray
-      } ${collectionName.yellow} (${++collIndex}/${config.collections.length})`
+      `${`Importing`.gray} ${`documents from`.gray} ${
+        collectionName.yellow
+      } (${++collIndex}/${config.collections.length}) starting from ID ${
+        targetMaxID.toLocaleString().yellow
+      }`
     );
 
-    const progress = Progress.newAutoDisplay(count);
+    //const progress = Progress.newAutoDisplay(count);
+
+    let importedCount = 0;
 
     for await (const doc of source.findIterable(
-      "Events",
+      collectionName,
       undefined,
       undefined,
       undefined,
       undefined,
       true
     )) {
+      if (doc._id <= targetMaxID) continue;
+
       if (doc.a.startsWith("MG.")) doc.a = "MG";
       if (doc.c.toLowerCase() == "site") {
         doc.c = "site";
@@ -47,11 +55,18 @@ import { Database } from "@shared/Database/Database";
       }
       if (doc.e == "timeOnSite") doc.e = "time.on.site";
 
-      source.upsert("Events", doc);
-      await target.upsert("Events", doc);
-      progress.increment();
+      source.upsert(collectionName, doc);
+      await target.upsert(collectionName, doc);
+      //progress.increment();
+      importedCount++;
     }
-    progress.done();
+    //progress.done();
+    console.log();
+    console.log(
+      `Imported ${importedCount.toLocaleString().green} documents in the ${
+        collectionName.yellow
+      } collection.`
+    );
   }
 
   console.log("Done".green);

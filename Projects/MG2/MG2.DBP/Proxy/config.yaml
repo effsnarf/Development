@@ -48,6 +48,5 @@ cache:
 log:
   enabled: true
   path: (env) => env.getLogPath(env.config.title)
-display:
-  stats:
-    every: 1m
+stats:
+  every: 1m
