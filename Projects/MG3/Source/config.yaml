@@ -9,6 +9,7 @@ template:
   get: | #ts
     async function(dbp, req) {
       const getTitle = async () => {
+        if (req.url == "/") return null;
         if (req.url.startsWith("/instance/")) {
           const instanceID = parseInt(req.url.split("/")[2]);
           const inst = await dbp.instances.select.one(instanceID);
