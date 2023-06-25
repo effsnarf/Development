@@ -109,6 +109,7 @@ const isCachable = (options: any, config: any) => {
           } ${`attempts failed`.red.bold} ${options.url.gray}`
         );
         res.status(503);
+        currentRequests--;
         return res.end();
       }
 
@@ -146,8 +147,9 @@ const isCachable = (options: any, config: any) => {
           );
           stats.response.times.track(timer.elapsed);
           stats.successes.track(1);
-          currentRequests--;
         });
+        currentRequests--;
+        return;
       } catch (ex: any) {
         // Some HTTP status codes are not errors (304 Not Modified, 404 Not Found, etc.)
         const targetIsDown =
@@ -167,10 +169,10 @@ const isCachable = (options: any, config: any) => {
 
           stats.response.times.track(elapsed);
           stats.successes.track(1);
-          currentRequests--;
 
           res.status(ex.response.status);
           res.set(ex.response.headers);
+          currentRequests--;
           return res.end(ex.response.data.data);
         }
 
@@ -182,7 +184,6 @@ const isCachable = (options: any, config: any) => {
               if (cachedResponse) {
                 stats.cache.hits.track(1);
                 stats.response.times.track(timer.elapsed);
-                currentRequests--;
                 logLine(
                   `${timer.elapsed?.unitifyTime()} ${
                     `Fallback cache hit`.yellow.bold
@@ -194,6 +195,7 @@ const isCachable = (options: any, config: any) => {
                 res.status(cachedResponse.status.code);
                 res.set(cachedResponse.headers);
                 res.set("access-control-allow-origin", origin);
+                currentRequests--;
                 return res.end(cachedResponse.body);
               }
             }
@@ -208,6 +210,7 @@ const isCachable = (options: any, config: any) => {
             () => tryRequest(attempt + 1),
             config.target.try.again.delay.deunitify()
           );
+          return;
         }
       }
     };
