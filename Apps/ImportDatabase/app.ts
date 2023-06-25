@@ -32,7 +32,7 @@ import { Database } from "@shared/Database/Database";
       }`
     );
 
-    //const progress = Progress.newAutoDisplay(count);
+    const progress = Progress.newAutoDisplay();
 
     let importedCount = 0;
 
@@ -56,10 +56,10 @@ import { Database } from "@shared/Database/Database";
 
       source.upsert(collectionName, doc);
       await target.upsert(collectionName, doc);
-      //progress.increment();
+      progress.increment();
       importedCount++;
     }
-    //progress.done();
+    progress.done();
     console.log();
     console.log(
       `Imported ${importedCount.toLocaleString().green} documents in the ${

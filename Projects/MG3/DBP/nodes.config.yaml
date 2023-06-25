@@ -18,7 +18,11 @@ analytics:
     elapsed: 50
   database:
     prod:
-      path: F:\Database\MG-Analytics
+      write:
+        path: F:\Database\MG-Analytics
+      read:
+        connectionString: mongodb://localhost:47017
+        database: MG-Analytics
 severity:
   time: [50, 500, "<"]
 log:

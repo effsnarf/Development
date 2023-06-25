@@ -249,21 +249,6 @@ class LoadBalancer {
     return this.nodeSwitcher.getNodes();
   }
 
-  async getResponseStream(response: AxiosResponse<any>) {
-    return new Promise<string>((resolve, reject) => {
-      let data = "";
-      response.data.on("data", (chunk: any) => {
-        data += chunk;
-      });
-      response.data.on("end", () => {
-        resolve(data);
-      });
-      response.data.on("error", (error: any) => {
-        reject(error);
-      });
-    });
-  }
-
   ignoreRequest(request: http.IncomingMessage) {
     if (request.url?.startsWith("/api/Analytics/")) {
       if (!request.url.startsWith("/api/Analytics/new")) return true;
@@ -405,7 +390,7 @@ class LoadBalancer {
     if (this.cache) {
       if (this.isCachable(incomingItem.request, nodeResponse)) {
         try {
-          let data = await this.getResponseStream(nodeResponse);
+          let data = await Http.getResponseStream(nodeResponse);
           if (typeof data != "string") data = Objects.jsonify(data);
           if (data.trim().length) {
             // Get the response data

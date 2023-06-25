@@ -7,13 +7,13 @@ class Progress {
   private displayProgress = false;
 
   private constructor(
-    public readonly total: number,
+    public readonly total: number | null,
     public readonly data: any,
     private readonly onProgress: (percent: number) => void,
     private readonly started = Date.now()
   ) {}
 
-  static newAutoDisplay(total: number, data: any = {}) {
+  static newAutoDisplay(total: number | null = null, data: any = {}) {
     const progress = new Progress(total, data, (percent) => {});
     progress.displayProgress = true;
     return progress;
@@ -29,11 +29,12 @@ class Progress {
   }
 
   done() {
-    this.processed = this.total;
+    if (this.total != null) this.processed = this.total;
     this.displayProgressBar();
   }
 
   get isDone() {
+    if (this.total == null) return false;
     return this.processed >= this.total;
   }
 
@@ -65,10 +66,12 @@ class Progress {
 
   // Between 0 and 1
   get progress() {
+    if (this.total == null) return null;
     return this.processed / this.total;
   }
 
   get msLeft() {
+    if (this.progress == null) return null;
     const elapsed = Date.now() - this.started;
     const percent = this.progress;
     return (elapsed / percent) * (1 - percent);
@@ -79,13 +82,15 @@ class Progress {
 
     return (
       `${this.processed.toLocaleString().yellow} / ${
-        this.total.toLocaleString().green
+        !this.total ? "?" : this.total.toLocaleString().green
       }` +
       tab +
-      this.progress.toProgressBar() +
-      tab +
-      `-${this.msLeft.unitifyTime()}` +
-      tab
+      (this.progress == null
+        ? ""
+        : this.progress?.toProgressBar() +
+          tab +
+          `-${this.msLeft?.unitifyTime()}` +
+          tab)
     );
   }
 }

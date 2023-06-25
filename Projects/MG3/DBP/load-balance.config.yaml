@@ -63,8 +63,6 @@ node:
     enabled: false # Restart the node if it crashes
     health: 0.5 # Restart the node if the health is below 50%
     timeout: 5 # and it has been unhealthy for N minutes
-request:
-  timeout: 1 # Timeout requests after 10 seconds
 log:
   enabled: true
   path: (env) => env.getLogPath(env.config.title)

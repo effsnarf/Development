@@ -12,7 +12,7 @@ import { Http } from "@shared/Http";
 import { Timer, IntervalCounter } from "@shared/Timer";
 import { Reflection } from "@shared/Reflection";
 import { Google } from "@shared/Google";
-import { Cache, CacheBase } from "@shared/Cache";
+import { Cache, CacheBase, MemoryCache } from "@shared/Cache";
 import {
   Console,
   Layout,
@@ -34,7 +34,7 @@ import { debug } from "console";
 const cache = {
   _store: null as CacheBase | null,
   _getStore: async () => {
-    if (!cache._store) cache._store = await Cache.new(null);
+    if (!cache._store) cache._store = await MemoryCache.new();
     // cache._store = await Cache.new({
     //   memory: true,
     // });
@@ -124,10 +124,16 @@ const getResponseSize = (response: any) => {
     },
   };
 
+  let currentRequests = 0;
+
   const renderDashboard = () => {
     mainLog.title = `${config.title} (${
       `uptime`.gray
-    } ${uptime.elapsed?.unitifyTime()})`;
+    } ${uptime.elapsed?.unitifyTime()}) (${currentRequests.severify(
+      10,
+      20,
+      "<"
+    )} ${`requests`.gray})`;
     itemsLog.title = `Items (${requests.per.minute.count}${`/minute`.gray})`;
     layout.render();
     // Set the console window title
@@ -160,9 +166,7 @@ const getResponseSize = (response: any) => {
     get: async (dbName: string) => {
       if (!dbs._analytics) {
         if (config.analytics.database) {
-          dbs._analytics = await Analytics.new(
-            await Database.new(config.analytics.database)
-          );
+          dbs._analytics = await Analytics.new(config.analytics);
         }
       }
 
@@ -225,6 +229,8 @@ const getResponseSize = (response: any) => {
     if (config.server.proxy) {
       // Proxy GET, POST and all requests to the host specified in config.server.proxy
       httpServer.all("*", (req: any, res: any) => {
+        currentRequests++;
+
         const url = req.url;
         const method = req.method;
         const body = req.body;
@@ -296,6 +302,9 @@ const getResponseSize = (response: any) => {
               );
             }
             res.status(ex.response.status).send(ex.message);
+          })
+          .finally(() => {
+            currentRequests--;
           });
         return;
       });
@@ -306,6 +315,7 @@ const getResponseSize = (response: any) => {
     // #region processRequest() helper
     const processRequest = (handler: any) => {
       return async (req: any, res: any) => {
+        currentRequests++;
         const timer = Timer.start();
         try {
           requests.per.minute.track(1);
@@ -364,6 +374,7 @@ const getResponseSize = (response: any) => {
           return res.status(500).end(ex.stack || ex);
         } finally {
           debugLogger.log(`${timer.elapsed?.unitifyTime()} ${req.url}`);
+          currentRequests--;
         }
       };
     };
@@ -400,7 +411,7 @@ const getResponseSize = (response: any) => {
           // Transpile the TypeScript code
           const jsCode = TypeScript.transpileToJavaScript(tsCode);
           // Return the JavaScript code
-          return res.send(jsCode);
+          return res.end(jsCode);
         }
         // Get [__dirname]/Client/[fileName].js
         const jsFilePath = path.join(__dirname, "../Client", fileName);
@@ -408,7 +419,7 @@ const getResponseSize = (response: any) => {
           // Read the JavaScript file
           const jsCode = fs.readFileSync(jsFilePath, "utf8");
           // Return the JavaScript code
-          return res.send(jsCode);
+          return res.end(jsCode);
         }
         // If the file doesn't exist, return 404
         return res.status(404).send(`${jsFilePath} not found`);
@@ -416,9 +427,18 @@ const getResponseSize = (response: any) => {
     );
     // #endregion
 
+    // #region 📑 Analytics
+    httpServer.get(
+      "/analytics/*",
+      processRequest(async (req: any, res: any) => {
+        return dbs._analytics?.api.handleRequest(req, res);
+      })
+    );
+    // #endregion
+
     // For /, return "Add a database name to the URL: /[database]"
     httpServer.get("/", (req: any, res: any) => {
-      return res.send("Add a database name to the URL: /[database]");
+      return res.end("Add a database name to the URL: /[database]");
     });
 
     // #region 📑 Entity Listing
@@ -441,7 +461,7 @@ const getResponseSize = (response: any) => {
         const entities = (await cache.get.collection.names(db))?.filter(
           (e: string) => !e.startsWith("_")
         );
-        return res.send(entities);
+        return res.end(JSON.stringify(entities));
       })
     );
     // #endregion
@@ -451,8 +471,8 @@ const getResponseSize = (response: any) => {
       "/:database/get/googleLogin",
       processRequest((req: any, res: any, user: User, postData: any) => {
         res.setHeader("Content-Type", "application/json");
-        if (!postData?.credential) return res.send(JSON.stringify(null));
-        return res.send(JSON.stringify(user?.data));
+        if (!postData?.credential) return res.end(JSON.stringify(null));
+        return res.end(JSON.stringify(user?.data));
       })
     );
 
@@ -467,7 +487,7 @@ const getResponseSize = (response: any) => {
 
       const ids = await db?.getNewIDs(count);
 
-      return res.send(JSON.stringify(ids));
+      return res.end(JSON.stringify(ids));
     });
 
     // [database]/get/user (returns the user object)
@@ -475,7 +495,7 @@ const getResponseSize = (response: any) => {
       "/:database/get/user",
       processRequest(async (req: any, res: any, user: User) => {
         res.setHeader("Content-Type", "application/json");
-        return res.send(JSON.stringify(user?.data));
+        return res.end(JSON.stringify(user?.data));
       })
     );
 
@@ -484,7 +504,7 @@ const getResponseSize = (response: any) => {
       "/:database/set/user",
       processRequest(async (req: any, res: any, user: User) => {
         res.setHeader("Content-Type", "application/json");
-        return res.send(JSON.stringify(user?.data));
+        return res.end(JSON.stringify(user?.data));
       })
     );
 
@@ -519,7 +539,7 @@ const getResponseSize = (response: any) => {
             groups: groups,
           };
         });
-        return res.send(entities);
+        return res.end(JSON.stringify(entities));
       })
     );
 
@@ -573,7 +593,7 @@ const getResponseSize = (response: any) => {
             // );
           }
 
-          return res.send(result);
+          return res.end(JSON.stringify(result));
         } catch (ex: any) {
           if (typeof ex == "string") {
             if (ex.includes("not found")) {
@@ -615,7 +635,7 @@ const getResponseSize = (response: any) => {
 
         const items = await db?.aggregate(req.params.entity, pipeline);
 
-        return res.send(items);
+        return res.end(JSON.stringify(items));
       })
     );
 

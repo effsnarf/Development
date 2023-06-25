@@ -47,7 +47,7 @@ class Api {
   async _handleRequest(url: string) {
     // /:app/:category/:event/last/:last/every/:every/:type
 
-    if (url.match(/\/.+\/.+\/.+\/last\/.+\/every\/.+\/\w+/)) {
+    if (url.match(/\/.+\/.+\/.+\/last\/.+\/every\/.+/)) {
       const parts = url.split("/");
       const [app, category, event] = parts.slice(1, 4);
       const [last, every] = [parts[5], parts[7]].map((p: string) =>
@@ -230,7 +230,7 @@ class Analytics {
       interval.docs = intervalDocs;
     }
 
-    const type = intervals[0].docs[0].t;
+    const type = intervals[0].docs[0]?.t || ItemType.Undefined;
 
     const values = intervals
       .map((intr) => intr.docs.map((d: any) => d.v))
