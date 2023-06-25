@@ -21,9 +21,8 @@ import { Database } from "@shared/Database/Database";
 
   let collIndex = 0;
   for (const collectionName of config.collections) {
-    const targetMaxID = (
-      await target.find(collectionName, {}, { _id: -1 }, 1)
-    )[0]._id;
+    const targetMaxID =
+      (await target.find(collectionName, {}, { _id: -1 }, 1))[0]?._id || 0;
 
     console.log(
       `${`Importing`.gray} ${`documents from`.gray} ${

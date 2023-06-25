@@ -1,6 +1,6 @@
 import fs from "fs";
 import "colors";
-import express from "express";
+import express, { response } from "express";
 import axios from "axios";
 import { Configuration } from "@shared/Configuration";
 import { Timer, IntervalCounter } from "@shared/Timer";
@@ -173,7 +173,8 @@ const isCachable = (options: any, config: any) => {
           res.status(ex.response.status);
           res.set(ex.response.headers);
           currentRequests--;
-          return res.end(ex.response.data.data);
+          ex.response.data.pipe(res);
+          return;
         }
 
         if (targetIsDown) {
