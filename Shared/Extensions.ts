@@ -232,6 +232,7 @@ interface Number {
   ): string;
   getHttpSeverityColor(): string;
   toFixedRounded(places: number): string;
+  roundTo(places: number): number;
   getEnumName(enumType: any): string;
   ordinalize(): string;
   humanize(): string;
@@ -309,10 +310,13 @@ interface String {
 }
 
 interface Array<T> {
-  sum(): number;
+  sum(getValue?: (item: T) => number, getWeight?: (item: T) => number): number;
   min(): number;
   max(): number;
-  average(): number;
+  average(
+    getValue?: (item: any) => number,
+    getWeight?: (item: any) => number
+  ): number;
   first(): any;
   last(): any;
   back(): any;
@@ -563,6 +567,10 @@ if (typeof Number !== "undefined") {
     while (str.endsWith("0")) str = str.slice(0, -1);
     if (str.endsWith(".")) str = str.slice(0, -1);
     return str;
+  };
+
+  Number.prototype.roundTo = function (places: number): number {
+    return parseFloat(this.toFixed(places));
   };
 
   Number.prototype.getEnumName = function (enumType: any): string {
@@ -1179,8 +1187,20 @@ if (typeof String !== "undefined") {
 
 // #region Array
 if (typeof Array !== "undefined") {
-  Array.prototype.sum = function () {
-    return this.reduce((a, b) => a + b, 0);
+  Array.prototype.sum = function (
+    getValue?: (item: any) => number,
+    getWeight?: (item: any) => number
+  ) {
+    if (!getValue) getValue = (item) => item;
+    if (!getWeight) getWeight = (item) => 1;
+
+    let sum = 0;
+
+    for (const item of this) {
+      sum += getValue(item) * getWeight(item);
+    }
+
+    return sum;
   };
 
   Array.prototype.min = function () {
@@ -1191,8 +1211,18 @@ if (typeof Array !== "undefined") {
     return Math.max.apply(null, this);
   };
 
-  Array.prototype.average = function () {
-    return this.sum() / this.length;
+  Array.prototype.average = function (
+    getValue?: (item: any) => number,
+    getWeight?: (item: any) => number
+  ) {
+    if (this.length === 0) {
+      return 0;
+    }
+
+    let sum = this.sum(getValue, getWeight);
+    let weightSum = this.sum(getWeight);
+
+    return (sum / weightSum).roundTo(3);
   };
 
   Array.prototype.first = function () {

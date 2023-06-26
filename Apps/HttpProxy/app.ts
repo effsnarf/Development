@@ -202,11 +202,11 @@ const isCachable = (
         currentRequests--;
         return;
       } catch (ex: any) {
-        // Some HTTP status codes are not errors (304 Not Modified, 404 Not Found, etc.)
+        // Some HTTP status codes are not errors (304 not modified, 404 not found, etc.)
         const targetIsDown =
           !ex.response || ex.message.includes("ECONNREFUSED");
 
-        // If target is not down, target returned a real error and we should return it
+        // If target is not down, target returned some http status and we should return it
         if (!targetIsDown) {
           const isError = !ex.response.status.isBetween(200, 500);
           const elapsed = timer.elapsed;
@@ -218,7 +218,9 @@ const isCachable = (
             } ${options.url.gray}`
           );
 
-          stats.response.times.track(elapsed);
+          // We don't track response time for (304 not modified, 404 not found, etc) because
+          // there is no processing time to measure
+          //stats.response.times.track(elapsed);
           stats.successes.track(1);
 
           res.status(ex.response.status);
@@ -235,7 +237,9 @@ const isCachable = (
               const cachedResponse = await cache.get(cacheKey);
               if (cachedResponse) {
                 stats.cache.hits.track(1);
-                stats.response.times.track(timer.elapsed);
+                // We don't track response time for cached results
+                // because we're interested in optimizing slow requests
+                //stats.response.times.track(timer.elapsed);
                 logLine(
                   `${timer.elapsed?.unitifyTime().severify(100, 500, "<")} ${
                     `Fallback cache hit`.yellow.bold
@@ -300,7 +304,10 @@ const isCachable = (
       "response.time",
       ItemType.Average,
       (1).minutes(),
-      stats.response.times.average,
+      {
+        count: stats.response.times.count,
+        average: stats.response.times.average,
+      },
       "ms"
     );
   }, stats.interval);

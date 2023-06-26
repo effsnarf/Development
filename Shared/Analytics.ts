@@ -5,9 +5,7 @@ import { DatabaseBase } from "./Database/DatabaseBase";
 enum ItemType {
   Undefined = 0,
   Count = 1,
-  Sum = 2,
   Average = 3,
-  Method = 4,
 }
 
 interface Interval {
@@ -82,6 +80,76 @@ class Api {
   }
 }
 
+const isIn = (value: number, interval: Interval) =>
+  value.isBetween(interval.from, interval.to);
+
+const docIsInside = (doc: any, interval: Interval) =>
+  isIn(doc.dt.f, interval) && isIn(doc.dt.t, interval);
+
+const docPartiallyCovers = (doc: any, interval: Interval) =>
+  !docIsInside(doc, interval) &&
+  (isIn(doc.dt.f, interval) || isIn(doc.dt.t, interval));
+
+const docIsWrapping = (doc: any, interval: Interval) =>
+  doc.dt.f < interval.from && doc.dt.t > interval.to;
+
+const filters = {
+  somehowOverlap(
+    interval: Interval,
+    app: string,
+    category: string,
+    event: string
+  ) {
+    const filter = {
+      //t: type,
+      a: app,
+      c: category,
+      e: event,
+      $or: [
+        {
+          "dt.f": {
+            $gte: interval.from,
+            $lte: interval.to,
+          },
+        },
+        {
+          "dt.t": {
+            $gte: interval.from,
+            $lte: interval.to,
+          },
+        },
+        {
+          $and: [
+            {
+              "dt.f": {
+                $lt: interval.from,
+              },
+            },
+            {
+              "dt.t": {
+                $gt: interval.to,
+              },
+            },
+          ],
+        },
+      ],
+    };
+    return filter;
+  },
+  endIn(interval: Interval, app: string, category: string, event: string) {
+    const filter = {
+      a: app,
+      c: category,
+      e: event,
+      "dt.t": {
+        $gte: interval.from,
+        $lte: interval.to,
+      },
+    };
+    return filter;
+  },
+};
+
 class Analytics {
   private db!: DatabaseBase;
   api!: Api;
@@ -147,11 +215,12 @@ class Analytics {
     to: number,
     every: number
   ) {
-    const getOverlapRatio = (doc: AnalyticsEvent, interval: Interval) => {
-      if (isFullDoc(doc, interval)) {
+    // What's the overlap ratio where the value represents a count
+    const getOverlapRatioForSum = (doc: AnalyticsEvent, interval: Interval) => {
+      if (docIsInside(doc, interval)) {
         return 1;
       }
-      if (isPartialDoc(doc, interval)) {
+      if (docPartiallyCovers(doc, interval)) {
         const { f, t } = doc.dt;
         const intervalLength = interval.to - interval.from;
         const overlap = f.isBetween(interval.from, interval.to)
@@ -159,7 +228,7 @@ class Analytics {
           : t - interval.from;
         return overlap / intervalLength;
       }
-      if (isWrappingDoc(doc, interval)) {
+      if (docIsWrapping(doc, interval)) {
         const { f, t } = doc.dt;
         const intervalLength = interval.to - interval.from;
         const docLength = t - f;
@@ -169,96 +238,99 @@ class Analytics {
       return 0;
     };
 
-    const isIn = (value: number, interval: Interval) =>
-      value.isBetween(interval.from, interval.to);
+    // What's the overlap ratio where the value represents an average
+    const getOverlapRatioForAverage = (
+      doc: AnalyticsEvent,
+      interval: Interval
+    ) => {
+      if (docIsInside(doc, interval)) {
+        const { f, t } = doc.dt;
+        const intervalLength = interval.to - interval.from;
+        const docLength = t - f;
+        return docLength / intervalLength;
+      }
+      // otherwise, same as sum
+      return getOverlapRatioForSum(doc, interval);
+    };
 
-    const isFullDoc = (doc: any, interval: Interval) =>
-      isIn(doc.dt.f, interval) && isIn(doc.dt.t, interval);
-
-    const isPartialDoc = (doc: any, interval: Interval) =>
-      !isFullDoc(doc, interval) &&
-      (isIn(doc.dt.f, interval) || isIn(doc.dt.t, interval));
-
-    const isWrappingDoc = (doc: any, interval: Interval) =>
-      doc.dt.f < interval.from && doc.dt.t > interval.to;
+    // Get an example doc to know the type
+    const exampleDoc = (
+      await this.db.find(
+        "Events",
+        {
+          a: app,
+          c: category,
+          e: event,
+        },
+        { _id: -1 }
+      )
+    )[0];
 
     let intervals = Analytics.getIntervals(from, to, every);
 
-    for (const interval of intervals) {
-      const filter = {
-        //t: type,
-        a: app,
-        c: category,
-        e: event,
-        $or: [
-          {
-            "dt.f": {
-              $gte: interval.from,
-              $lte: interval.to,
-            },
-          },
-          {
-            "dt.t": {
-              $gte: interval.from,
-              $lte: interval.to,
-            },
-          },
-          {
-            $and: [
-              {
-                "dt.f": {
-                  $lt: interval.from,
-                },
-              },
-              {
-                "dt.t": {
-                  $gt: interval.to,
-                },
-              },
-            ],
-          },
-        ],
-      };
+    // Aggregation is different according to the unit and type (count or average)
 
-      const relevantDocs = await this.db.find("Events", filter);
-
-      // Some of the docs fall only partially in the interval
-      // We need to adjust their values to the relative space they occupy in the interval
-      // Either:
-      // The doc's dt.f or dt.t are inside the interval
-      // of the entire doc wraps the interval
-      // For each doc we calculate how much of the interval it occupies
-      // and adjust the value accordingly
-      // Each interval has a list of docs that fall in it
-      const intervalDocs = [];
-
-      for (const doc of relevantDocs) {
-        if (isFullDoc(doc, interval)) {
-          intervalDocs.push(doc);
+    // * requests is count, unit is null
+    // In this case, we get all the docs that somehow overlap in the interval,
+    // and sum their count * overlap ratios
+    if (exampleDoc.u === null && exampleDoc.t === ItemType.Count) {
+      for (const interval of intervals) {
+        interval.docs = [];
+        for (const doc of await this.db.find(
+          "Events",
+          filters.somehowOverlap(interval, app, category, event)
+        )) {
+          doc.v = doc.v * getOverlapRatioForSum(doc, interval);
+          interval.docs.push(doc);
           continue;
         }
-        const ratio = getOverlapRatio(doc, interval);
-        // Adjust the value
-        // If the type is count, we need to adjust the value
-        // If the type is average, we don't need to adjust the value
-        if (doc.t == ItemType.Count) doc.v *= ratio;
-        intervalDocs.push(doc);
-        continue;
       }
-
-      interval.docs = intervalDocs;
+      return intervals.map((intr) => intr.docs.sum((d: any) => d.v));
     }
 
-    const type = intervals[0].docs[0]?.t || ItemType.Undefined;
-    const aggFunc = type == ItemType.Average ? "average" : "sum";
+    // * response.time is average, unit is ms, value is { count, average }
+    // In this case, we get all the docs that somehow overlap in the interval,
+    // take their [average] values, and weighted average them according to their counts and overlap ratios
+    // so the weight is (count * overlap ratio)
+    if (exampleDoc.u === "ms" && exampleDoc.t === ItemType.Average) {
+      for (const interval of intervals) {
+        interval.docs = [];
+        for (const doc of await this.db.find(
+          "Events",
+          filters.somehowOverlap(interval, app, category, event)
+        )) {
+          doc.weight = doc.v.count * getOverlapRatioForAverage(doc, interval);
+          interval.docs.push(doc);
+          continue;
+        }
+      }
 
-    intervals = intervals.map((intr) => {
-      return { ...intr, values: intr.docs.map((d: any) => d.v) };
-    });
+      return intervals.map((intr) =>
+        intr.docs.average(
+          (d: any) => d.v.average,
+          (d: any) => d.weight
+        )
+      );
+    }
 
-    const values = intervals.map((intr) => intr.values[aggFunc]());
+    // * active.time is count, unit is ms
+    // In this case, we get all the docs that *end* in the interval,
+    // and average their values
+    if (exampleDoc.u === "ms" && exampleDoc.t === ItemType.Count) {
+      for (const interval of intervals) {
+        interval.docs = [];
+        for (const doc of await this.db.find(
+          "Events",
+          filters.endIn(interval, app, category, event)
+        )) {
+          interval.docs.push(doc);
+          continue;
+        }
+      }
+      return intervals.map((intr) => intr.docs.average((d: any) => d.v));
+    }
 
-    return values;
+    throw new Error("Unsupported aggregation");
   }
 
   // Returns an array of intervals between the specified dates
