@@ -1,4 +1,5 @@
 import mime from "mime-types";
+import axios, { Axios, AxiosResponse, AxiosResponseHeaders } from "axios";
 
 class Http {
   static async getPostData(req: any): Promise<any> {
@@ -18,6 +19,21 @@ class Http {
       } catch (ex: any) {
         reject(ex);
       }
+    });
+  }
+
+  static async getResponseStream(response: AxiosResponse<any>) {
+    return new Promise<string>((resolve, reject) => {
+      let data = "";
+      response.data.on("data", (chunk: any) => {
+        data += chunk;
+      });
+      response.data.on("end", () => {
+        resolve(data);
+      });
+      response.data.on("error", (error: any) => {
+        reject(error);
+      });
     });
   }
 

@@ -1,8 +1,9 @@
 import fs from "fs";
 import "colors";
 import express, { response } from "express";
-import axios from "axios";
+import axios, { Axios, AxiosResponse, AxiosResponseHeaders } from "axios";
 import { Configuration } from "@shared/Configuration";
+import { Objects } from "@shared/Extensions.Objects";
 import { Timer, IntervalCounter } from "@shared/Timer";
 import { Cache } from "@shared/Cache";
 import { Http } from "@shared/Http";
@@ -18,10 +19,35 @@ import {
   Unit,
 } from "@shared/Console";
 
-const isCachable = (options: any, config: any) => {
+interface CachedResponse {
+  dt: number;
+  status: {
+    code: number;
+    text: string;
+  };
+  headers: any;
+  body: string;
+}
+
+const isCachable = (
+  options: any,
+  config: any,
+  req?: any,
+  response?: AxiosResponse<any, any>
+) => {
   if (options.method != "GET") return false;
-  if (config.cache.ignore.find((c: any) => options.url.startsWith(c)))
+  if (!options.url) return false;
+  if (
+    [".jpg", ".jpeg", ".png", ".gif", ".webm", ".webp"].some((ext) =>
+      options.url?.toLowerCase().endsWith(ext)
+    )
+  )
     return false;
+  if (
+    config.cache?.ignore?.some((pattern: string) => options.url?.match(pattern))
+  )
+    return false;
+  if (response && response.status != 200) return false;
   return true;
 };
 
@@ -104,7 +130,7 @@ const isCachable = (options: any, config: any) => {
       if (attempt >= config.target.try.again.retries) {
         // Temporarily unavailable
         logNewLine(
-          `${timer.elapsed?.unitifyTime()} ${
+          `${timer.elapsed?.unitifyTime().severify(100, 500, "<")} ${
             config.target.try.again.retries.toString().yellow
           } ${`attempts failed`.red.bold} ${options.url.gray}`
         );
@@ -123,7 +149,7 @@ const isCachable = (options: any, config: any) => {
           //   options.url
           // );
         }, 1000);
-        const response = await axios.request(options);
+        const nodeResponse = await axios.request(options);
         clearInterval(responseInterval);
         // Add debug headers
         // debug-proxy-source:
@@ -133,21 +159,46 @@ const isCachable = (options: any, config: any) => {
           "x-debug-proxy-source",
           `forwarded (${attempt.ordinalize()} attempt)`
         );
-        res.status(response.status);
-        res.set(response.headers);
+        res.status(nodeResponse.status);
+        res.set(nodeResponse.headers);
         res.set("access-control-allow-origin", origin);
 
-        response.data.pipe(res);
+        nodeResponse.data.pipe(res);
+
         // When the response ends
-        response.data.on("end", async () => {
+        nodeResponse.data.on("end", async () => {
           logLine(
-            `${timer.elapsed?.unitifyTime()} ${
-              response.status.toString().yellow
+            `${timer.elapsed?.unitifyTime().severify(100, 500, "<")} ${
+              nodeResponse.status.toString().yellow
             } ${options.url.gray}`
           );
           stats.response.times.track(timer.elapsed);
           stats.successes.track(1);
         });
+
+        if (cache) {
+          if (isCachable(options, config, req, nodeResponse)) {
+            let data = await Http.getResponseStream(nodeResponse);
+            if (typeof data != "string") data = Objects.jsonify(data);
+            if (data.trim().length) {
+              //console.log("caching", options.url);
+              // Get the response data
+              const cachedResponse = {
+                dt: Date.now(),
+                url: req.url,
+                status: {
+                  code: nodeResponse.status,
+                  text: nodeResponse.statusText,
+                },
+                headers: nodeResponse.headers,
+                body: data,
+              };
+              delete cachedResponse.headers["access-control-allow-origin"];
+              await cache.set(req.url || "", cachedResponse);
+            }
+          }
+        }
+
         currentRequests--;
         return;
       } catch (ex: any) {
@@ -160,7 +211,7 @@ const isCachable = (options: any, config: any) => {
           const isError = !ex.response.status.isBetween(200, 500);
           const elapsed = timer.elapsed;
           logLine(
-            `${elapsed?.unitifyTime()} ${
+            `${elapsed?.unitifyTime().severify(100, 500, "<")} ${
               !isError
                 ? ex.response.status.toString().yellow
                 : ex.message.yellow
@@ -186,7 +237,7 @@ const isCachable = (options: any, config: any) => {
                 stats.cache.hits.track(1);
                 stats.response.times.track(timer.elapsed);
                 logLine(
-                  `${timer.elapsed?.unitifyTime()} ${
+                  `${timer.elapsed?.unitifyTime().severify(100, 500, "<")} ${
                     `Fallback cache hit`.yellow.bold
                   } ${cachedResponse.body.length.unitifySize()} ${
                     options.url.gray

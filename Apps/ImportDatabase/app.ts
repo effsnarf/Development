@@ -22,7 +22,8 @@ import { Database } from "@shared/Database/Database";
   let collIndex = 0;
   for (const collectionName of config.collections) {
     const targetMaxID =
-      (await target.find(collectionName, {}, { _id: -1 }, 1))[0]?._id || 0;
+      ((await target.find(collectionName, {}, { _id: -1 }, 1))[0]?._id || 0) -
+      100000;
 
     console.log(
       `${`Importing`.gray} ${`documents from`.gray} ${
@@ -32,7 +33,7 @@ import { Database } from "@shared/Database/Database";
       }`
     );
 
-    //const progress = Progress.newAutoDisplay(count);
+    const progress = Progress.newAutoDisplay();
 
     let importedCount = 0;
 
@@ -57,10 +58,10 @@ import { Database } from "@shared/Database/Database";
 
       source.upsert(collectionName, doc);
       await target.upsert(collectionName, doc);
-      //progress.increment();
+      progress.increment();
       importedCount++;
     }
-    //progress.done();
+    progress.done();
     console.log();
     console.log(
       `Imported ${importedCount.toLocaleString().green} documents in the ${
