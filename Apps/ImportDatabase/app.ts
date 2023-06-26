@@ -53,6 +53,7 @@ import { Database } from "@shared/Database/Database";
         doc.c = "network";
       }
       if (doc.e == "timeOnSite") doc.e = "time.on.site";
+      if (doc.e == "time.on.site") doc.e = "active.time";
 
       source.upsert(collectionName, doc);
       await target.upsert(collectionName, doc);

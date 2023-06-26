@@ -26,8 +26,7 @@ dom:
             :every: every
 
 data:
-  options:
-    { "network": ["requests", "response.time"], "site": ["time.on.site"] }
+  options: { "network": ["requests", "response.time"], "site": ["active.time"] }
   catValue: network
   eventValue: requests
   lastOptions: ["1 month", "1 week", "1 day", "1 hour"]

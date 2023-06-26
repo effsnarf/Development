@@ -206,9 +206,9 @@ const _fetchAsJson = async (url: string) => {
       }
       if (req.url == "/analytics") {
         analytics.create(
-          "MG.Web",
-          "Site",
-          "time.on.site",
+          "MG",
+          "site",
+          "active.time",
           ItemType.Count,
           data.timeOnSite,
           data.timeOnSite,

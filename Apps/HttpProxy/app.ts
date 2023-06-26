@@ -240,7 +240,8 @@ const isCachable = (options: any, config: any) => {
       "requests",
       ItemType.Count,
       stats.interval,
-      stats.successes.count
+      stats.successes.count,
+      null
     );
     await analytics.create(
       config.title.split(".").first(),
