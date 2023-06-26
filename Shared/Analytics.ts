@@ -266,6 +266,8 @@ class Analytics {
       )
     )[0];
 
+    if (!exampleDoc) return [];
+
     let intervals = Analytics.getIntervals(from, to, every);
 
     // Aggregation is different according to the unit and type (count or average)
