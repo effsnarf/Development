@@ -1,5 +1,6 @@
 dom:
   div:
+    v-if: (pageName == $root.params.page)
     site.header: null
     div:
       site.sidebar: null
@@ -21,6 +22,7 @@ name: site
 props:
   getMoreItems: null
   recommendationItems: null
+  pageName: null
 style:
   .comp-site:
     position: relative
@@ -41,8 +43,8 @@ style:
     transition: 0s !important
     z-index: 10
 template: >-
-  <div
-  class="comp-site"><site-header></site-header><div><site-sidebar></site-sidebar><site-main
+  <div class="comp-site" v-if="(pageName ==
+  $root.params.page)"><site-header></site-header><div><site-sidebar></site-sidebar><site-main
   :recommendation-items="recommendationItems"><template v-slot:article><slot
   name="article"></slot></template><template v-slot:middle><slot
   name="middle"></slot></template><template v-slot:right><slot

@@ -1,5 +1,6 @@
 dom:
   site:
+    page-name: instance
     ':recommendation-items': recommendationItems
     template#1: null
     template#2:
@@ -15,12 +16,18 @@ data:
   isInited: false
 mounted: |
   async function() {
-    await this.init();
+    this.$watch(() => this.$root.params.instanceID, {
+      handler: async () => {
+        await this.init();
+      },
+      immediate: true
+    });
   }
 methods:
   init: |
     async function() {
       if (this.isInited) return;
+      if (!this.$root.params.instanceID) return;
       const dbp = this.$root.dbp;
       this.instance = await dbp.instances.select.one(this.$root.params.instanceID);
       this.generator = await dbp.generators.select.one(this.instance.generatorID);
@@ -36,7 +43,7 @@ methods:
 style: null
 name: page-instance
 template: >-
-  <site class="comp-page-instance"
+  <site class="comp-page-instance" page-name="instance"
   :recommendation-items="recommendationItems"><template></template><template
   v-slot:middle><content-stream item-type="e.instance"
   :get-more-items="getMoreInstances"

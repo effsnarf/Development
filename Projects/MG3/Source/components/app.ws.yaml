@@ -1,20 +1,13 @@
 dom:
   div:
-    page.admin.index:
-      v-if: $root.params.page == 'admin'
-    page.home:
-      v-if: $root.params.page == 'home'
-    page.generator:
-      v-if: $root.params.page == 'generator'
-    page.instance:
-      v-if: $root.params.page == 'instance'
+    page.admin.index: null
+    page.home: null
+    page.generator: null
+    page.instance: null
 name: app
 style:
   .comp-app:
     margin: auto
 template: >-
-  <div class="comp-app"><page-admin-index v-if="$root.params.page ==
-  'admin'"></page-admin-index><page-home v-if="$root.params.page ==
-  'home'"></page-home><page-generator v-if="$root.params.page ==
-  'generator'"></page-generator><page-instance v-if="$root.params.page ==
-  'instance'"></page-instance></div>
+  <div
+  class="comp-app"><page-admin-index></page-admin-index><page-home></page-home><page-generator></page-generator><page-instance></page-instance></div>

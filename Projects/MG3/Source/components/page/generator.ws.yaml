@@ -1,5 +1,6 @@
 dom:
   site:
+    page-name: generator
     ':recommendation-items': recommendationItems
     template#1:
       v-slot: article
@@ -28,7 +29,12 @@ data:
   isInited: false
 mounted: |
   async function() {
-    await this.init();
+    this.$watch(() => this.$root.params.urlName, {
+      handler: async () => {
+        await this.init();
+      },
+      immediate: true
+    });
   }
 methods:
   init: |
@@ -71,7 +77,7 @@ style:
     clear: both
 name: page-generator
 template: >-
-  <site class="comp-page-generator"
+  <site class="comp-page-generator" page-name="generator"
   :recommendation-items="recommendationItems"><template
   v-slot:article><content-title :imageID="generator?.imageID"
   :title="generator?.displayName"

@@ -1,5 +1,6 @@
 dom:
   site:
+    page-name: home
     template:
       v-slot: article
       content.title:
@@ -16,8 +17,8 @@ mounted: |
 style: null
 name: page-home
 template: >-
-  <site class="comp-page-home"><template v-slot:article><content-title
-  title="Ars Longa, Vita Brevis"></content-title><content-stream
-  item-type="e.generator.wide"
+  <site class="comp-page-home" page-name="home"><template
+  v-slot:article><content-title title="Ars Longa, Vita
+  Brevis"></content-title><content-stream item-type="e.generator.wide"
   :getMoreItems="$root.dbp.generators.select.popular"
   grid-class="grid-3"></content-stream></template></site>

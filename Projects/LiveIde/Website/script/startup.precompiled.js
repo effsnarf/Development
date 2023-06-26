@@ -151,9 +151,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "../../../LiveIde/Website/script/1687769009980.ts":
+/***/ "../../../LiveIde/Website/script/1687769310546.ts":
 /*!********************************************************!*\
-  !*** ../../../LiveIde/Website/script/1687769009980.ts ***!
+  !*** ../../../LiveIde/Website/script/1687769310546.ts ***!
   \********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -1315,6 +1315,9 @@ if (typeof Number !== "undefined") {
             str = str.slice(0, -1);
         return str;
     };
+    Number.prototype.roundTo = function (places) {
+        return parseFloat(this.toFixed(places));
+    };
     Number.prototype.getEnumName = function (enumType) {
         const value = this.valueOf();
         const keys = Object.keys(enumType);
@@ -1862,8 +1865,16 @@ if (typeof String !== "undefined") {
 // #endregion
 // #region Array
 if (typeof Array !== "undefined") {
-    Array.prototype.sum = function () {
-        return this.reduce((a, b) => a + b, 0);
+    Array.prototype.sum = function (getValue, getWeight) {
+        if (!getValue)
+            getValue = (item) => item;
+        if (!getWeight)
+            getWeight = (item) => 1;
+        let sum = 0;
+        for (const item of this) {
+            sum += getValue(item) * getWeight(item);
+        }
+        return sum;
     };
     Array.prototype.min = function () {
         return Math.min.apply(null, this);
@@ -1871,8 +1882,13 @@ if (typeof Array !== "undefined") {
     Array.prototype.max = function () {
         return Math.max.apply(null, this);
     };
-    Array.prototype.average = function () {
-        return this.sum() / this.length;
+    Array.prototype.average = function (getValue, getWeight) {
+        if (this.length === 0) {
+            return 0;
+        }
+        let sum = this.sum(getValue, getWeight);
+        let weightSum = this.sum(getWeight);
+        return (sum / weightSum).roundTo(3);
     };
     Array.prototype.first = function () {
         return this[0];
@@ -2199,7 +2215,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("../../../LiveIde/Website/script/1687769009980.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("../../../LiveIde/Website/script/1687769310546.ts");
 /******/ 	
 /******/ })()
 ;

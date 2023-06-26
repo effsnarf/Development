@@ -1,5 +1,6 @@
 dom:
   .app:
+    v-if: $root.params.page == 'admin'
     .column#1:
       ui.select:
         ':options': Object.keys(options)
@@ -78,10 +79,10 @@ style:
     gap: 1rem
 name: page-admin-index
 template: >-
-  <div class="comp-page-admin-index app"><div class="column"><ui-select
-  :options="Object.keys(options)" v-model="catValue"
-  input-type="value"></ui-select></div><div class="column"><ui-select
-  :options="options[catValue]" v-model="eventValue"
+  <div class="comp-page-admin-index app" v-if="$root.params.page ==
+  'admin'"><div class="column"><ui-select :options="Object.keys(options)"
+  v-model="catValue" input-type="value"></ui-select></div><div
+  class="column"><ui-select :options="options[catValue]" v-model="eventValue"
   input-type="value"></ui-select></div><div class="column"><ui-select
   :options="lastOptions" v-model="lastValue"
   input-type="value"></ui-select></div><div><div class="bars"><div
