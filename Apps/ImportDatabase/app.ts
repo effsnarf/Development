@@ -55,6 +55,12 @@ import { Database } from "@shared/Database/Database";
       }
       if (doc.e == "timeOnSite") doc.e = "time.on.site";
       if (doc.e == "time.on.site") doc.e = "active.time";
+      if (doc.e == "response.time" && typeof doc.v == "number") {
+        doc.v = {
+          count: 500,
+          average: doc.v,
+        };
+      }
 
       source.upsert(collectionName, doc);
       await target.upsert(collectionName, doc);
