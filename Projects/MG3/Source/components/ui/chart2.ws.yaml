@@ -2,36 +2,32 @@ dom:
   .w-100pc:
     v-if: every
     ui.chart:
-      :class: cssClass
-      :header: getHeader()
-      :title:
-      :data: values
-      :color: color
-      :scale: scale
+      ':class': cssClass
+      ':header': getHeader()
+      ':title': null
+      ':data': values
+      ':color': color
+      ':scale': scale
     a:
       v-text: url
-      :href: url
+      ':href': url
       target: _blank
     div:
       v-text: values
-
 props:
-  app:
-  category:
-  event:
-  last:
-  every:
-  scale:
-
+  app: null
+  category: null
+  event: null
+  last: null
+  every: null
+  scale: null
 data:
   values: []
   isBusy: 0
-
-mounted: | #ts
+mounted: |
   function() {
     this.fetchData();
   }
-
 methods:
   fetchData: |
     async function() {
@@ -49,7 +45,6 @@ methods:
     function() {
       return `${this.event} every ${this.every} in the last ${this.last}`;
     }
-
 computed:
   url: |
     function() {
@@ -67,7 +62,6 @@ computed:
         return null;
       }
     }
-
   color: |
     function() {
       return {
@@ -75,7 +69,6 @@ computed:
         "response.time": "blue",
       }[this.event] || "";
     }
-
   cssClass: |
     function() {
       const cls = {};
@@ -83,7 +76,6 @@ computed:
       if (this.isBusy) cls["opacity-40"] = true;
       return cls;
     }
-
 watch:
   url:
     handler: |
@@ -91,3 +83,9 @@ watch:
         await this.fetchData();
       }
     immediate: true
+name: ui-chart2
+template: >-
+  <div class="comp-ui-chart2 w-100pc" v-if="every"><ui-chart :class="cssClass"
+  :header="getHeader()" :data="values" :color="color"
+  :scale="scale"></ui-chart><a v-text="url" :href="url" target="_blank"></a><div
+  v-text="values"></div></div>

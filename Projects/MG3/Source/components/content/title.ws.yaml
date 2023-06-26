@@ -1,15 +1,15 @@
 dom:
   div:
-    ":class": getCssClass()
+    ':class': getCssClass()
     div#1:
       class: background
     div:
       ui.image:
         v-if: imageID
-        ":imageID": imageID
-        ":url": url
+        ':imageID': imageID
+        ':url': url
       ui.large.title:
-        ":text": title
+        ':text': title
 props:
   imageID: null
   title: null
@@ -42,7 +42,7 @@ style:
   .comp-content-title:
     position: sticky
     top: 7rem
-    background: "#000000"
+    background: '#000000'
     z-index: 10
     margin-bottom: 4rem
     border-radius: 0
@@ -50,7 +50,7 @@ style:
     width: 15% !important
     margin: 0 1em
     float: left
-    box-shadow: "-0.5rem 0.5rem 0.5rem #000000"
+    box-shadow: '-0.5rem 0.5rem 0.5rem #000000'
     z-index: 20
   .comp-ui-large-title:
     padding-top: 0.4em !important

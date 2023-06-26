@@ -1,6 +1,6 @@
 dom:
   .card:
-    ":class": getCssClass()
+    ':class': getCssClass()
     h2:
       class: header
       v-if: header
@@ -9,18 +9,18 @@ dom:
       .column1:
         ui.num#1:
           class: opacity-50
-          ":value": scaled(minValue)
+          ':value': scaled(minValue)
         ui.num#2:
-          ":value": scaled(middleValue)
+          ':value': scaled(middleValue)
         ui.num#3:
           class: opacity-50
-          ":value": scaled(maxValue)
+          ':value': scaled(maxValue)
       div:
         canvas:
           ref: canvas1
           class: ml-l1
-          :width: canvasWidth
-          :height: (canvasWidth / 2)
+          ':width': canvasWidth
+          ':height': (canvasWidth / 2)
           on_mousemove: onMouseMove
           on_mouseout: onMouseOut
     .flex.flex-column.justify-center.items-center:
@@ -30,7 +30,7 @@ dom:
         .text:
           v-text: title
       ui.num:
-        ":value": scaled(hoveredData || total)
+        ':value': scaled(hoveredData || total)
 props:
   icon: null
   header: null
@@ -39,7 +39,7 @@ props:
   getValue: x => x
   data: []
   scale: 1
-  color:
+  color: null
 data:
   canvasWidth: 400
   hoveredIndex: null
@@ -183,15 +183,15 @@ style:
     width: 100%
   .card:
     padding: 0.5rem 1rem
-    background-color: "#ffffff30"
-    border: "1px solid #e5e5e5"
+    background-color: '#ffffff30'
+    border: '1px solid #e5e5e5'
     border-radius: 0.5em
   .green:
-    background: "#00ff0040"
+    background: '#00ff0040'
   .red:
-    background: "#ff000040"
+    background: '#ff000040'
   .blue:
-    background: "#00a0ff40"
+    background: '#00a0ff40'
   .comp-ui-num, .title:
     font-size: 140%
   .column1 .comp-ui-num:nth-child(2):
@@ -201,14 +201,16 @@ style:
   .column1 .comp-ui-num:nth-child(1):
     position: absolute
     bottom: 0
-
 template: >-
-  <div-card class="comp-ui-chart" :class="getCssClass()"><h2 class="header"
+  <div class="comp-ui-chart card" :class="getCssClass()"><h2 class="header"
   v-if="header" v-text="header"></h2><div class="chart flex"><div
-  class="column"><ui-num class="opacity-50" :value="minValue"></ui-num><ui-num
-  :value="middleValue"></ui-num><ui-num class="opacity-50"
-  :value="maxValue"></ui-num></div><div canvas="[object
-  Object]"></div></div><div class="flex justify-center items-center"
-  ui.num="[object Object]"><div class="title"><div class="icon"
-  v-text="icon"></div><div class="text"
-  v-text="title"></div></div></div></div-card>
+  class="column1"><ui-num class="opacity-50"
+  :value="scaled(minValue)"></ui-num><ui-num
+  :value="scaled(middleValue)"></ui-num><ui-num class="opacity-50"
+  :value="scaled(maxValue)"></ui-num></div><div><canvas class="ml-l1"
+  ref="canvas1" :width="canvasWidth" :height="(canvasWidth / 2)"
+  @mousemove="onMouseMove" @mouseout="onMouseOut"></canvas></div></div><div
+  class="flex flex-column justify-center items-center"><div class="title"><div
+  class="icon" v-text="icon"></div><div class="text"
+  v-text="title"></div></div><ui-num :value="scaled(hoveredData ||
+  total)"></ui-num></div></div>

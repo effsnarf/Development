@@ -2,35 +2,43 @@ dom:
   .app:
     .column#1:
       ui.select:
-        :options: Object.keys(options)
+        ':options': Object.keys(options)
         v-model: catValue
         input-type: value
     .column#2:
       ui.select:
-        :options: options[catValue]
+        ':options': options[catValue]
         v-model: eventValue
         input-type: value
     .column#3:
       ui.select:
-        :options: lastOptions
+        ':options': lastOptions
         v-model: lastValue
         input-type: value
     div:
       .bars:
         .bar:
           ui.chart2#1:
-            :app: "'MG'"
-            :category: catValue
-            :event: eventValue
-            :last: lastValue
-            :every: every
-
+            ':app': '''MG'''
+            ':category': catValue
+            ':event': eventValue
+            ':last': lastValue
+            ':every': every
 data:
-  options: { "network": ["requests", "response.time"], "site": ["active.time"] }
+  options:
+    network:
+      - requests
+      - response.time
+    site:
+      - active.time
   catValue: network
   eventValue: requests
-  lastOptions: ["1 month", "1 week", "1 day", "1 hour"]
-  lastValue: "1 hour"
+  lastOptions:
+    - 1 month
+    - 1 week
+    - 1 day
+    - 1 hour
+  lastValue: 1 hour
   barsValue: 100
 methods:
   getCatOptions: |
@@ -70,6 +78,12 @@ style:
     gap: 1rem
 name: page-admin-index
 template: >-
-  <div class="comp-page-admin-index"><div v-text="chartData"></div><h2
-  v-text="'Admin'"></h2><ui-chart title="Chart"
-  :data="chartData"></ui-chart></div>
+  <div class="comp-page-admin-index app"><div class="column"><ui-select
+  :options="Object.keys(options)" v-model="catValue"
+  input-type="value"></ui-select></div><div class="column"><ui-select
+  :options="options[catValue]" v-model="eventValue"
+  input-type="value"></ui-select></div><div class="column"><ui-select
+  :options="lastOptions" v-model="lastValue"
+  input-type="value"></ui-select></div><div><div class="bars"><div
+  class="bar"><ui-chart2 :app="'MG'" :category="catValue" :event="eventValue"
+  :last="lastValue" :every="every"></ui-chart2></div></div></div></div>

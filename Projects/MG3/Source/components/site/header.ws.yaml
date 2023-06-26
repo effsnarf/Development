@@ -1,7 +1,7 @@
 dom:
   div:
     .header:
-      ":style": getStyle()
+      ':style': getStyle()
       site.logo: null
 name: site-header
 mounted: |

@@ -187,7 +187,7 @@ const _fetchAsJson = async (url: string) => {
         const existingComp = Objects.parseYaml(
           fs.readFileSync(compPath, "utf8")
         );
-        if ("editable" in existingComp && !existingComp.editable) {
+        if (!("editable" in existingComp) || existingComp.editable) {
           const yaml = Objects.yamlify(comp.source);
           fs.writeFileSync(compPath, yaml);
         }

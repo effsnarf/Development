@@ -1,9 +1,9 @@
 dom:
   style:
-    :class: component.name
+    ':class': component.name
     v-html: htmlDecode(style)
 props:
-  component:
+  component: null
 methods:
   htmlDecode: |
     function(input) {
@@ -21,4 +21,6 @@ computed:
       return css;
     }
 name: ide-component-style
-template: <style class="comp-ide-component-style" v-if="style" v-html="style"></style>
+template: >-
+  <style class="comp-ide-component-style" :class="component.name"
+  v-html="htmlDecode(style)"></style>

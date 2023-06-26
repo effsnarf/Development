@@ -4,18 +4,16 @@ dom:
       tr:
         v-for: prop in getItemProperties()
         td#0:
-          :class: prop.class
-          v-text: "'🧊'"
+          ':class': prop.class
+          v-text: '''🧊'''
         td#1:
           v-text: prop.name
         td#2:
           v-text: JSON.stringify(prop.value)?.shorten(20)
-
 props:
   item: null
-
 methods:
-  getItemProperties: | #js
+  getItemProperties: |
     function() {
       const props = [];
       if (!this.item) return props;
@@ -24,7 +22,7 @@ methods:
       props.push(...this.getItemProps(this.item().$options.computed));
       return props;
     }
-  getItemProps: | #js
+  getItemProps: |
     function(collection) {
       if (!collection) return [];
       const props = [];
@@ -36,3 +34,9 @@ methods:
       }
       return props;
     }
+name: ide-component-info
+template: >-
+  <div class="comp-ide-component-info"><table><tr v-for="prop in
+  getItemProperties()"><td :class="prop.class" v-text="'🧊'"></td><td
+  v-text="prop.name"></td><td
+  v-text="JSON.stringify(prop.value)?.shorten(20)"></td></tr></table></div>

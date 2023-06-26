@@ -1,12 +1,12 @@
 dom:
   component:
-    :is: getCompType()
+    ':is': getCompType()
     class: image
-    :url: url
+    ':url': url
     img:
       ref: image1
-      ":class": getCssClass()
-      ":src": (src || emptySrc)
+      ':class': getCssClass()
+      ':src': (src || emptySrc)
       on_load: onLoad
 props:
   imageID: null
@@ -64,5 +64,6 @@ style:
     overflow: hidden
 name: ui-image
 template: >-
-  <ui-link class="comp-ui-image image" :url="url"><img ref="image1"
-  :class="getCssClass()" :src="(src || emptySrc)" @load="onLoad"/></ui-link>
+  <component class="comp-ui-image image" :is="getCompType()" :url="url"><img
+  ref="image1" :class="getCssClass()" :src="(src || emptySrc)"
+  @load="onLoad"/></component>

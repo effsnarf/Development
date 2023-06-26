@@ -1,10 +1,10 @@
 dom:
   a:
-    :href: url
+    ':href': url
     on_click: onClick
-    slot:
+    slot: null
 props:
-  url:
+  url: null
 methods:
   onClick: |
     function(e) {
@@ -15,4 +15,4 @@ methods:
     }
 style: null
 name: ui-link
-template: <a class="comp-ui-link" :href="url"><slot></slot></a>
+template: <a class="comp-ui-link" :href="url" @click="onClick"><slot></slot></a>

@@ -3,10 +3,10 @@ dom:
     class: menu3
     li:
       v-for: (item, index) in items
-      ":class": getCssClass(index)
+      ':class': getCssClass(index)
       slot:
-        ":index": index
-        ":item": item
+        ':index': index
+        ':item': item
       on_click: () => onItemClick({ item, index })
 props:
   items: null

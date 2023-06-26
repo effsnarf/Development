@@ -41,4 +41,8 @@ style:
   td:
     padding-right: 1em
 name: ui-table
-template: <div-card class="comp-ui-table" table="[object Object]"></div-card>
+template: >-
+  <div class="comp-ui-table card"><table><thead><th v-for="key in
+  Object.keys(tableData[0])" v-text="key"></th></thead><tbody><tr v-for="item in
+  tableData" @click="itemClick(item)"><td v-for="key in Object.keys(item)"><div
+  class="content" v-text="item[key]"></div></td></tr></tbody></table></div>

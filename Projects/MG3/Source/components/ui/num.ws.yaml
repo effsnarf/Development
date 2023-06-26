@@ -4,35 +4,31 @@ dom:
       v-text: number
     .letter:
       v-text: unit
-
 props:
-  value:
-
-data:
-
+  value: null
+data: null
 computed:
   humanized: |
     function() {
       return this.value?.humanize();
     }
-
   number: |
     function() {
       // Get everything except the unit
       return this.humanized?.match(/[^a-zA-Z]+/)?.first();
     }
-
   unit: |
     function() {
       return this.humanized?.match(/[a-zA-Z]+/)?.first();
     }
-
-methods:
-
+methods: null
 style:
   .flex:
     align-items: baseline;
-
   .letter:
     font-size: 70%;
     opacity: 0.4;
+name: ui-num
+template: >-
+  <div class="comp-ui-num flex"><div v-text="number"></div><div class="letter"
+  v-text="unit"></div></div>

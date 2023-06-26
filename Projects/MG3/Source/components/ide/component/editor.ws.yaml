@@ -4,9 +4,9 @@ dom:
     ui.title:
       class: fs-m3
       icon: 📦
-      ":text": component?.name
+      ':text': component?.name
     ui.tabs:
-      ":options": "['📁 dom', '🟢 style']"
+      ':options': '[''📁 dom'', ''🟢 style'']'
       template#1:
         v-slot: tab0
         ui.json.editor:
