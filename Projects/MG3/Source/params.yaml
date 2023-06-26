@@ -10,6 +10,7 @@ params:
   urlName:
     get: | #ts
       function(url) {
+        if (url == "/admin") return null;
         if (url.startsWith("/instance/")) return null;
         return url.split("/")[1];
       }
