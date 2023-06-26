@@ -1219,10 +1219,13 @@ if (typeof Array !== "undefined") {
       return 0;
     }
 
-    let sum = this.sum(getValue, getWeight);
-    let weightSum = this.sum(getWeight);
+    if (!getValue) getValue = (item) => item;
+    if (!getWeight) getWeight = (item) => 1;
 
-    return (sum / weightSum).roundTo(3);
+    let sum = this.map(
+      (n) => (getValue as any)(n) * (getWeight as any)(n)
+    ).sum();
+    return sum / this.length;
   };
 
   Array.prototype.first = function () {
