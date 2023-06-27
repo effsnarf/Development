@@ -4,6 +4,8 @@ dom:
     v-show: (pageName == $root.params.page)
     site.header:
       class: site-width
+    div#1:
+      class: header-spacer
     div:
       site.sidebar: null
       site.main:
@@ -45,10 +47,12 @@ style:
     background-position: center
     transition: 0s !important
     z-index: 10
+  .header-spacer:
+    height: 8rem
 template: >-
   <div class="comp-site site-width" v-show="(pageName ==
-  $root.params.page)"><site-header
-  class="site-width"></site-header><div><site-sidebar></site-sidebar><site-main
+  $root.params.page)"><site-header class="site-width"></site-header><div
+  class="header-spacer"></div><div><site-sidebar></site-sidebar><site-main
   :recommendation-items="recommendationItems"><template v-slot:article><slot
   name="article"></slot></template><template v-slot:middle><slot
   name="middle"></slot></template><template v-slot:right><slot

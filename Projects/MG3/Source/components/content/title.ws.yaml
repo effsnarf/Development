@@ -42,13 +42,13 @@ style:
     background: linear-gradient(rgba(0, 0, 0, 1), rgba(0, 0, 0, 0))
     position: absolute
     width: 100%
-    height: 10rem
+    height: 7.5rem
+    top: '-1rem'
   .comp-content-title:
     position: sticky
     top: 7rem
     background: '#000000'
     z-index: 10
-    margin-bottom: 7rem
     border-radius: 0
     transition: 0s !important
   .comp-ui-image:
