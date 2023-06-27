@@ -3,13 +3,17 @@ dom:
     ':class': getCssClass()
     div#1:
       class: background
-    div:
-      ui.image:
-        v-if: imageID
-        ':imageID': imageID
-        ':url': url
-      ui.large.title:
-        ':text': title
+    transition.group:
+      name: list
+      tag: ul
+      li:
+        ui.image:
+          v-if: imageID
+          ':imageID': imageID
+          ':url': url
+        ui.large.title:
+          ':text': title
+        ':key': title
 props:
   imageID: null
   title: null
@@ -44,23 +48,26 @@ style:
     top: 7rem
     background: '#000000'
     z-index: 10
-    margin-bottom: 4rem
+    margin-bottom: 7rem
     border-radius: 0
+    transition: 0s !important
   .comp-ui-image:
-    width: 15% !important
+    max-width: 15% !important
     margin: 0 1em
     float: left
     box-shadow: '-0.5rem 0.5rem 0.5rem #000000'
     z-index: 20
-  .comp-ui-large-title:
-    padding-top: 0.4em !important
-    z-index: 10
   .comp-ui-image img:
     aspect-ratio: 1
     object-fit: cover
+    max-height: 7rem
+  .comp-ui-large-title:
+    padding-top: 0.4em !important
+    z-index: 10
 name: content-title
 template: >-
   <div class="comp-content-title" :class="getCssClass()"><div
-  class="background"></div><div><ui-image v-if="imageID" :imageID="imageID"
+  class="background"></div><transition-group name="list" tag="ul"><li
+  :key="title"><ui-image v-if="imageID" :imageID="imageID"
   :url="url"></ui-image><ui-large-title
-  :text="title"></ui-large-title></div></div>
+  :text="title"></ui-large-title></li></transition-group></div>

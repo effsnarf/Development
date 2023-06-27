@@ -84,10 +84,16 @@ interface MgParams {
       },
       async refresh() {
         const self = this as any;
-        self.params = await getNewParams();
-        (this as any).key1++;
+        const newParams = (await getNewParams()) as any;
+        for (const key in newParams) {
+          if ("value" in newParams[key])
+            self.params[key] = newParams[key].value;
+        }
+        //(this as any).key1++;
+        window.scrollTo({ top: 0, behavior: "smooth" });
       },
       getKey(item: any) {
+        if (!item) return null;
         if (item.instanceID) return item.instanceID;
         if (item.generatorID) return item.generatorID;
         return null;

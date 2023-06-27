@@ -151,9 +151,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "../../../LiveIde/Website/script/1687769310546.ts":
+/***/ "../../../LiveIde/Website/script/1687877716330.ts":
 /*!********************************************************!*\
-  !*** ../../../LiveIde/Website/script/1687769310546.ts ***!
+  !*** ../../../LiveIde/Website/script/1687877716330.ts ***!
   \********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -242,11 +242,18 @@ const helpers = {
             refresh() {
                 return __awaiter(this, void 0, void 0, function* () {
                     const self = this;
-                    self.params = yield getNewParams();
-                    this.key1++;
+                    const newParams = (yield getNewParams());
+                    for (const key in newParams) {
+                        if ("value" in newParams[key])
+                            self.params[key] = newParams[key].value;
+                    }
+                    //(this as any).key1++;
+                    window.scrollTo({ top: 0, behavior: "smooth" });
                 });
             },
             getKey(item) {
+                if (!item)
+                    return null;
                 if (item.instanceID)
                     return item.instanceID;
                 if (item.generatorID)
@@ -455,6 +462,8 @@ class ClientContext {
         });
     }
     isAttributeName(componentNames, name) {
+        if (name.includes("."))
+            return false;
         if (name.startsWith(":"))
             return true;
         if (name.includes("#"))
@@ -951,9 +960,18 @@ exports.DataWatcher = DataWatcher;
 /*!****************************************!*\
   !*** ../../../../Shared/Extensions.ts ***!
   \****************************************/
-/***/ (() => {
+/***/ (function() {
 
 
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 class Time {
     static prevUnit(unit) {
         return this.units[this.units.indexOf(unit) - 1];
@@ -1865,6 +1883,63 @@ if (typeof String !== "undefined") {
 // #endregion
 // #region Array
 if (typeof Array !== "undefined") {
+    Array.prototype.contains = function (item, getItemKey) {
+        if (getItemKey) {
+            const key = getItemKey(item);
+            return this.find((i) => getItemKey(i) == key) != null;
+        }
+        return this.indexOf(item) != -1;
+    };
+    Array.prototype.removeAt = function (index) {
+        this.splice(index, 1);
+    };
+    Array.prototype.insertAt = function (index, item, appendToEnd) {
+        if (appendToEnd && index > this.length)
+            index = this.length;
+        this.splice(index, 0, item);
+    };
+    Array.prototype.clear = function (stagger = 0) {
+        const removeOne = () => {
+            if (this.length > 0) {
+                this.pop();
+                setTimeout(removeOne, stagger);
+            }
+        };
+        removeOne();
+    };
+    Array.prototype.add = function (items, stagger = 0) {
+        return __awaiter(this, void 0, void 0, function* () {
+            items = [...items];
+            const addOne = () => __awaiter(this, void 0, void 0, function* () {
+                if (items.length > 0) {
+                    this.push(items.shift());
+                    setTimeout(addOne, stagger);
+                }
+            });
+            addOne();
+        });
+    };
+    Array.prototype.replace = function (getNewItems, stagger = 0, getItemKey) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (getItemKey) {
+                let newItems = yield getNewItems();
+                const processNext = (i) => __awaiter(this, void 0, void 0, function* () {
+                    if (i > Math.max(this.length, newItems.length))
+                        return;
+                    if (this[i] && !newItems.contains(this[i], getItemKey))
+                        this.removeAt(i);
+                    if (newItems[i] && !this.contains(newItems[i], getItemKey))
+                        this.insertAt(i, newItems[i], true);
+                    setTimeout(() => processNext(i + 1), stagger);
+                });
+                processNext(0);
+            }
+            else {
+                this.clear(stagger);
+                this.add(yield getNewItems(), stagger);
+            }
+        });
+    };
     Array.prototype.sum = function (getValue, getWeight) {
         if (!getValue)
             getValue = (item) => item;
@@ -1886,9 +1961,12 @@ if (typeof Array !== "undefined") {
         if (this.length === 0) {
             return 0;
         }
-        let sum = this.sum(getValue, getWeight);
-        let weightSum = this.sum(getWeight);
-        return (sum / weightSum).roundTo(3);
+        if (!getValue)
+            getValue = (item) => item;
+        if (!getWeight)
+            getWeight = (item) => 1;
+        let sum = this.map((n) => getValue(n) * getWeight(n)).sum();
+        return sum / this.length;
     };
     Array.prototype.first = function () {
         return this[0];
@@ -1923,6 +2001,12 @@ if (typeof Array !== "undefined") {
     };
     Array.prototype.except = function (...items) {
         return this.filter((item) => !items.includes(item));
+    };
+    Array.prototype.exceptBy = function (items, getItemKey) {
+        if (!getItemKey)
+            getItemKey = (item) => item;
+        const itemKeys = items.map(getItemKey);
+        return this.filter((item) => !itemKeys.includes(getItemKey(item)));
     };
     Array.prototype.sortBy = function (...projects) {
         return this.sort((a, b) => {
@@ -2215,7 +2299,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("../../../LiveIde/Website/script/1687769310546.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("../../../LiveIde/Website/script/1687877716330.ts");
 /******/ 	
 /******/ })()
 ;

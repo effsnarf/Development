@@ -1,10 +1,14 @@
 name: content-recommendations
 dom:
   .list:
-    e.generator.wide:
-      v-for: generator in items
-      ':item': generator
-      ':key': generator.generatorID
+    transition.group:
+      tag: ul
+      name: list
+      li:
+        v-for: generator in items
+        e.generator.wide:
+          ':item': generator
+        ':key': generator.generatorID
 style:
   .list:
     display: flex
@@ -13,6 +17,7 @@ style:
 props:
   items: null
 template: >-
-  <div class="comp-content-recommendations list"><e-generator-wide
-  v-for="generator in items" :item="generator"
-  :key="generator.generatorID"></e-generator-wide></div>
+  <div class="comp-content-recommendations list"><transition-group tag="ul"
+  name="list"><li v-for="generator in items"
+  :key="generator.generatorID"><e-generator-wide
+  :item="generator"></e-generator-wide></li></transition-group></div>

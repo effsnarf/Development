@@ -12,21 +12,25 @@ dom:
         template:
           v-slot: content
           .poem:
-            content.poem.stanza:
-              v-for: stanza in getRandomStanzas(generator?.desc?.poem)
-              ':item': stanza
+            transition.group:
+              name: list
+              content.poem.stanza:
+                v-for: stanza in getRandomStanzas(poem)
+                ':item': stanza
+                ':key': stanza.map(l => l.substring(0, 5)).join('-')
           div:
             class: float-clear
     template#2:
       v-slot: middle
       content.stream:
+        ref: contentStream1
         item-type: e.instance
         ':get-more-items': getMoreInstances
         grid-class: grid-1
 data:
   generator: null
+  poem: null
   recommendationItems: []
-  isInited: false
 mounted: |
   async function() {
     this.$watch(() => this.$root.params.urlName, {
@@ -39,16 +43,27 @@ mounted: |
 methods:
   init: |
     async function() {
-      if (this.isInited) return;
+      if (this.urlName == this.$root.params.urlName) return;
       const dbp = this.$root.dbp;
       this.urlName = this.$root.params.urlName;
+      if (!this.urlName) {
+        this.generator = null;
+        this.poem = null;
+        this.recommendationItems = [];
+        this.$refs.contentStream1?.reset();
+        return;
+      }
       this.generator = !this.urlName ? null : await dbp.generators.select.one(null, this.urlName);
-      this.recommendationItems = await dbp.generators.select.related(this.urlName);
-      this.isInited = true;
+      this.recommendationItems.replace(async() => await dbp.generators.select.related(this.urlName), 500, gen => gen.generatorID);
+      this.$refs.contentStream1?.reset();
+      setTimeout(() => {
+        this.poem = this.generator?.desc?.poem;
+      }, 500);
     }
   getMoreInstances: |
     async function(pageIndex) {
       await this.init();
+      if (!this.urlName) return [];
       const items = await this.$root.dbp.instances.select.popular("en", pageIndex, this.urlName)
       return items;
     }
@@ -66,11 +81,9 @@ methods:
       return result;
     }
 style:
-  .poem:
-    float: clear
+  .poem: null
   .poem .comp-content-poem-stanza:
-    float: left
-    margin: 1rem
+    margin: 1rem auto
   .poem .line:nth-child(1):
     font-size: 160%
   .float-clear:
@@ -82,10 +95,11 @@ template: >-
   v-slot:article><content-title :imageID="generator?.imageID"
   :title="generator?.displayName"
   :url="$root.url.generator(generator)"></content-title><content-article><template
-  v-slot:content><div class="poem"><content-poem-stanza v-for="stanza in
-  getRandomStanzas(generator?.desc?.poem)"
-  :item="stanza"></content-poem-stanza></div><div
+  v-slot:content><div class="poem"><transition-group
+  name="list"><content-poem-stanza v-for="stanza in getRandomStanzas(poem)"
+  :item="stanza" :key="stanza.map(l =&gt; l.substring(0,
+  5)).join('-')"></content-poem-stanza></transition-group></div><div
   class="float-clear"></div></template></content-article></template><template
-  v-slot:middle><content-stream item-type="e.instance"
+  v-slot:middle><content-stream ref="contentStream1" item-type="e.instance"
   :get-more-items="getMoreInstances"
   grid-class="grid-1"></content-stream></template></site>
