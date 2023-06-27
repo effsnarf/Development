@@ -1225,7 +1225,7 @@ if (typeof Array !== "undefined") {
     let sum = this.map(
       (n) => (getValue as any)(n) * (getWeight as any)(n)
     ).sum();
-    return sum / this.length;
+    return (sum / this.length).roundTo(3);
   };
 
   Array.prototype.first = function () {
