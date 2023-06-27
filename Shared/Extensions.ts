@@ -310,6 +310,16 @@ interface String {
 }
 
 interface Array<T> {
+  contains(item: T, getItemKey?: (item: T) => any): boolean;
+  removeAt(index: number): void;
+  insertAt(index: number, item: T, appendToEnd: boolean): void;
+  clear(stagger: number): void;
+  add(items: any[], stagger: number): void;
+  replace(
+    getNewItems: () => Promise<any[]>,
+    stagger: number,
+    getItemKey?: (item: any) => any
+  ): void;
   sum(getValue?: (item: T) => number, getWeight?: (item: T) => number): number;
   min(): number;
   max(): number;
@@ -324,6 +334,7 @@ interface Array<T> {
   joinColumns(columns: (number | null)[], ellipsis?: boolean): string;
   distinct(project?: ((item: T) => any) | null): T[];
   except(...items: T[]): T[];
+  exceptBy(items: T[], getItemKey?: (item: T) => any): T[];
   sortBy(...projects: ((item: T) => any)[]): T[];
   sortByDesc(...projects: ((item: T) => any)[]): T[];
   stringify(): string;
@@ -1187,6 +1198,73 @@ if (typeof String !== "undefined") {
 
 // #region Array
 if (typeof Array !== "undefined") {
+  Array.prototype.contains = function (
+    item: any,
+    getItemKey?: (item: any) => any
+  ) {
+    if (getItemKey) {
+      const key = getItemKey(item);
+      return this.find((i) => getItemKey(i) == key) != null;
+    }
+    return this.indexOf(item) != -1;
+  };
+
+  Array.prototype.removeAt = function (index: number) {
+    this.splice(index, 1);
+  };
+
+  Array.prototype.insertAt = function (
+    index: number,
+    item: any,
+    appendToEnd: boolean
+  ) {
+    if (appendToEnd && index > this.length) index = this.length;
+    this.splice(index, 0, item);
+  };
+
+  Array.prototype.clear = function (stagger: number = 0) {
+    const removeOne = () => {
+      if (this.length > 0) {
+        this.pop();
+        setTimeout(removeOne, stagger);
+      }
+    };
+    removeOne();
+  };
+
+  Array.prototype.add = async function (items: any[], stagger: number = 0) {
+    items = [...items];
+    const addOne = async () => {
+      if (items.length > 0) {
+        this.push(items.shift());
+        setTimeout(addOne, stagger);
+      }
+    };
+    addOne();
+  };
+
+  Array.prototype.replace = async function (
+    getNewItems: () => Promise<any[]>,
+    stagger: number = 0,
+    getItemKey?: (item: any) => string
+  ) {
+    if (getItemKey) {
+      let newItems = await getNewItems();
+      const processNext = async (i: number) => {
+        if (i > Math.max(this.length, newItems.length)) return;
+        if (this[i] && !newItems.contains(this[i], getItemKey))
+          this.removeAt(i);
+        if (newItems[i] && !this.contains(newItems[i], getItemKey))
+          this.insertAt(i, newItems[i], true);
+        setTimeout(() => processNext(i + 1), stagger);
+      };
+      processNext(0);
+    } else {
+      this.clear(stagger);
+      this.add(await getNewItems(), stagger);
+    }
+  };
+
   Array.prototype.sum = function (
     getValue?: (item: any) => number,
     getWeight?: (item: any) => number
@@ -1270,6 +1348,15 @@ if (typeof Array !== "undefined") {
 
   Array.prototype.except = function (...items: any[]) {
     return this.filter((item) => !items.includes(item));
+  };
+
+  Array.prototype.exceptBy = function (
+    items: any[],
+    getItemKey?: (item: any) => any
+  ) {
+    if (!getItemKey) getItemKey = (item) => item;
+    const itemKeys = items.map(getItemKey);
+    return this.filter((item) => !itemKeys.includes((getItemKey as any)(item)));
   };
 
   Array.prototype.sortBy = function (...projects: ((item: any) => any)[]) {

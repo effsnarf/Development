@@ -89,6 +89,7 @@ class WebScript {
   }
 
   private static isAttributeName(componentNames: string[], name: string) {
+    if (name.includes(".")) return false;
     if (name.startsWith(":")) return true;
     if (name.includes("#")) return false;
     if (name.startsWith("template")) return false;

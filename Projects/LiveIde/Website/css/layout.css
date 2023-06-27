@@ -18,4 +18,5 @@
 .grid-3
 {
     grid-template: 1fr / 1fr 1fr 1fr;
+    gap: 1rem !important;
 }

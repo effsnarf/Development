@@ -107,8 +107,8 @@ class HttpServer {
         .severify(100, 500, "<")
         .padStartChars(
           6
-        )} ${res.statusCode?.severifyByHttpStatus()} ${req.url.severifyByHttpStatus(
-        res.statusCode
+        )} ${res?.statusCode?.severifyByHttpStatus()} ${req.url.severifyByHttpStatus(
+        res?.statusCode
       )}`
     );
   }

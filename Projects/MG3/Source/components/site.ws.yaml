@@ -1,7 +1,9 @@
 dom:
   div:
-    v-if: (pageName == $root.params.page)
-    site.header: null
+    class: site-width
+    v-show: (pageName == $root.params.page)
+    site.header:
+      class: site-width
     div:
       site.sidebar: null
       site.main:
@@ -24,13 +26,14 @@ props:
   recommendationItems: null
   pageName: null
 style:
+  .site-width:
+    width: min(1000px, 90vw)
   .comp-site:
     position: relative
     margin: auto
-    max-width: 1000px
     padding: 0
   .comp-site-header:
-    position: sticky
+    position: fixed
     top: 0
     margin: 0 0 1rem
     box-shadow: '-2rem 2rem 2rem #000'
@@ -43,8 +46,9 @@ style:
     transition: 0s !important
     z-index: 10
 template: >-
-  <div class="comp-site" v-if="(pageName ==
-  $root.params.page)"><site-header></site-header><div><site-sidebar></site-sidebar><site-main
+  <div class="comp-site site-width" v-show="(pageName ==
+  $root.params.page)"><site-header
+  class="site-width"></site-header><div><site-sidebar></site-sidebar><site-main
   :recommendation-items="recommendationItems"><template v-slot:article><slot
   name="article"></slot></template><template v-slot:middle><slot
   name="middle"></slot></template><template v-slot:right><slot

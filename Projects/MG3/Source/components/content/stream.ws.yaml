@@ -1,12 +1,15 @@
 dom:
   ui.infinite.scroll:
-    .stream:
+    transition.group:
+      tag: ul
+      name: list
       ':class': gridClass
-      component:
-        ':is': itemType.kebabize()
+      li:
         v-for: item in items
-        ':item': item
         ':key': $root.getKey(item)
+        component:
+          ':is': itemType.kebabize()
+          ':item': item
     on_scroll: loadMore
 name: content-stream
 props:
@@ -18,6 +21,12 @@ data:
   items: []
   queue: []
 methods:
+  reset: |
+    function() {
+      this.pageIndex = 0;
+      this.items = [];
+      this.loadMore();
+    }
   loadMore: |
     async function() {
       if (!this.getMoreItems) return;
@@ -38,11 +47,12 @@ mounted: |
     this.processQueue();
   }
 style:
-  .stream:
+  ul:
     display: grid
-    gap: 1rem
+    gap: 5rem
 template: >-
-  <ui-infinite-scroll class="comp-content-stream" @scroll="loadMore"><div
-  class="stream" :class="gridClass"><component :is="itemType.kebabize()"
-  v-for="item in items" :item="item"
-  :key="$root.getKey(item)"></component></div></ui-infinite-scroll>
+  <ui-infinite-scroll class="comp-content-stream"
+  @scroll="loadMore"><transition-group tag="ul" name="list"
+  :class="gridClass"><li v-for="item in items"
+  :key="$root.getKey(item)"><component :is="itemType.kebabize()"
+  :item="item"></component></li></transition-group></ui-infinite-scroll>

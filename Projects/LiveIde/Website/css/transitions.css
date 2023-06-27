@@ -1,0 +1,26 @@
+.list-enter-active,
+.list-leave-active,
+.list-move {
+  transition: 1s cubic-bezier(0.59, 0.12, 0.34, 0.95);
+  transition-property: opacity, transform;
+  transform-origin: center top;
+}
+
+.list-enter {
+  opacity: 0;
+  transform: translateY(50%);
+}
+
+.list-enter-to {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.list-leave-active {
+  position: absolute;
+}
+
+.list-leave-to {
+  opacity: 0;
+  transform: translateY(0);
+}

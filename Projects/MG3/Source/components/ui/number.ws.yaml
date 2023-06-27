@@ -46,5 +46,8 @@ style:
     line-height: 1.2em
 name: ui-number
 template: >-
-  <div-card class="comp-ui-number" div.top="[object Object]" div.text="[object
-  Object]"></div-card>
+  <div-card class="comp-ui-number"><div-top><div-icon
+  v-text="icon"></div-icon><div-number
+  v-text="formatNumber(value)"></div-number><div-unit
+  v-text="unit"></div-unit></div-top><div-text
+  v-text="text"></div-text></div-card>
