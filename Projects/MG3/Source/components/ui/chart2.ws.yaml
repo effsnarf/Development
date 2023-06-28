@@ -12,8 +12,6 @@ dom:
       v-text: url
       ':href': url
       target: _blank
-    div:
-      v-text: values
 props:
   app: null
   category: null
@@ -32,6 +30,7 @@ methods:
   fetchData: |
     async function() {
       this.isBusy++;
+      this.values.clear();
       try
       {
         this.values = await (await fetch(this.url)).json();
@@ -87,5 +86,5 @@ name: ui-chart2
 template: >-
   <div class="comp-ui-chart2 w-100pc" v-if="every"><ui-chart :class="cssClass"
   :header="getHeader()" :data="values" :color="color"
-  :scale="scale"></ui-chart><a v-text="url" :href="url" target="_blank"></a><div
-  v-text="values"></div></div>
+  :scale="scale"></ui-chart><a v-text="url" :href="url"
+  target="_blank"></a></div>
