@@ -601,13 +601,17 @@ const getResponseSize = (response: any) => {
             }
           }
           debugLogger.log(ex.stack);
-          return res
-            .status(500)
-            .send(
-              `${args}\n\n${funcStr}\n\n${JSON.stringify(
-                apiMethod
-              )}\n\n${result}\n\n${ex}\n\n${ex.stack}`
-            );
+          if (req.query.debug) {
+            return res
+              .status(500)
+              .send(
+                `${args}\n\n${funcStr}\n\n${JSON.stringify(
+                  apiMethod
+                )}\n\n${result}\n\n${ex}\n\n${ex.stack}`
+              );
+          } else {
+            return res.status(500).send(ex);
+          }
         }
       })
     );

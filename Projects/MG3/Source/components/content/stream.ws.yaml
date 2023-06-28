@@ -6,7 +6,7 @@ dom:
       name: list
       ':class': gridClass
       li:
-        v-for: item in items
+        v-for: (item, index) in items
         ':key': $root.getKey(item)
         component:
           ':is': itemType.kebabize()
@@ -20,7 +20,45 @@ data:
   pageIndex: 0
   items: []
   queue: []
+  visibleItemIndex: null
+mounted: |
+  function() {
+    this.processQueue();
+    this.reset();
+    document.addEventListener('scroll', this.onScroll.bind(this));
+  }
 methods:
+  add: |
+    function(item) {
+      this.scrollTo(this.visibleItemIndex);
+      this.items.insertAt(this.visibleItemIndex, item, true);
+    }
+  scrollTo: |
+    function(index) {
+      const items = this.$el.querySelectorAll('li');
+      const item = items[index];
+      if (!item) return;
+      const rect = item.getBoundingClientRect();
+      const topMargin = 250;
+      const top = rect.top + window.scrollY - topMargin;
+      window.scrollTo({ top, behavior: 'smooth' });
+    }
+  onScroll: |
+    function() {
+      this.updateVisibleItemIndex();
+    }
+  updateVisibleItemIndex: |
+    function() {
+      const items = this.$el.querySelectorAll('li');
+      const visibleItemIndex = Array.from(items).findIndex(this.isOnScreen.bind(this));
+      this.visibleItemIndex = visibleItemIndex;
+    }
+  isOnScreen: |
+    function(item) {
+      const rect = item.getBoundingClientRect();
+      const viewHeight = Math.max(document.documentElement.clientHeight, window.innerHeight);
+      return (rect.top > 0) && (rect.bottom < viewHeight);
+    }
   reset: |
     async function() {
       this.pageIndex = 0;
@@ -36,6 +74,7 @@ methods:
           let newItems = await this.getMoreItems(pageIndex);
           newItems = newItems.exceptBy(this.items, this.$root.getKey);
           this.items.push(...newItems);
+          this.updateVisibleItemIndex();
           resolve();
         });
       });
@@ -46,11 +85,6 @@ methods:
       if (next) await next();
       setTimeout(this.processQueue.bind(this), 300);
     }
-mounted: |
-  function() {
-    this.processQueue();
-    this.reset();
-  }
 style:
   ul:
     display: grid
@@ -58,6 +92,6 @@ style:
 template: >-
   <ui-infinite-scroll class="comp-content-stream"
   @scroll="loadMore"><transition-group tag="ul" name="list"
-  :class="gridClass"><li v-for="item in items"
+  :class="gridClass"><li v-for="(item, index) in items"
   :key="$root.getKey(item)"><component :is="itemType.kebabize()"
   :item="item"></component></li></transition-group></ui-infinite-scroll>

@@ -18,10 +18,14 @@ dom:
               slot:
                 name: article
             template#2:
+              v-slot: left
+              slot:
+                name: left
+            template#3:
               v-slot: middle
               slot:
                 name: middle
-            template#3:
+            template#4:
               v-slot: right
               slot:
                 name: right
@@ -66,6 +70,7 @@ template: >-
   class="site-width"></site-header><div
   class="header-spacer"></div><div><site-sidebar></site-sidebar><site-main
   :recommendation-items="recommendationItems"><template v-slot:article><slot
-  name="article"></slot></template><template v-slot:middle><slot
+  name="article"></slot></template><template v-slot:left><slot
+  name="left"></slot></template><template v-slot:middle><slot
   name="middle"></slot></template><template v-slot:right><slot
   name="right"></slot></template></site-main></div></div></transition></div>

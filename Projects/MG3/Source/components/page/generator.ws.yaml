@@ -30,6 +30,13 @@ dom:
         item-type: e.instance
         ':get-more-items': getMoreInstances
         grid-class: grid-1
+    template#3:
+      v-slot: left
+      ui.sticky:
+        top: 250px
+        e.instance.create:
+          ':generator': generator
+          on_instance-created: onInstanceCreated
 data:
   generator: null
   poem: null
@@ -57,6 +64,9 @@ methods:
       setTimeout(() => {
         this.poem = this.generator?.desc?.poem;
       }, 500);
+      if (this.$root.params.page == "generator") {
+        this.$root.setDocumentTitle(this.generator?.displayName);
+      }
     }
   clear: |
     function() {
@@ -85,6 +95,10 @@ methods:
       }
       return result;
     }
+  onInstanceCreated: |
+    function(instance) {
+      this.$refs.contentStream1?.add(instance);
+    }
 style:
   .poem: null
   .poem .comp-content-poem-stanza:
@@ -108,4 +122,6 @@ template: >-
   class="float-clear"></div></template></content-article></template><template
   v-slot:middle><content-stream ref="contentStream1" item-type="e.instance"
   :get-more-items="getMoreInstances"
-  grid-class="grid-1"></content-stream></template></site>
+  grid-class="grid-1"></content-stream></template><template
+  v-slot:left><ui-sticky top="250px"><e-instance-create :generator="generator"
+  @instance-created="onInstanceCreated"></e-instance-create></ui-sticky></template></site>

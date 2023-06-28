@@ -113,6 +113,7 @@ class WebScript {
         "ul",
         "li",
         "input",
+        "button",
         "canvas",
         "textarea",
         "component",

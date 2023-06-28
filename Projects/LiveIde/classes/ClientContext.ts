@@ -146,6 +146,7 @@ class ClientContext {
         "ul",
         "li",
         "input",
+        "button",
         "canvas",
         "textarea",
         "component",

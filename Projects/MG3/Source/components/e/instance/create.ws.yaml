@@ -1,0 +1,71 @@
+dom:
+  div:
+    v-if: generator
+    div:
+      input#1:
+        v-model: text0
+        placeholder: top text
+      input#2:
+        v-model: text1
+        placeholder: bottom text
+      transition:
+        name: fade
+        ui.button:
+          v-if: hasText
+          text: create
+          ':is-loading': isCreating
+          on_click: create
+props:
+  generator: null
+data:
+  text0: null
+  text1: null
+  isCreating: false
+methods:
+  create: |
+    async function() {
+      this.isCreating = true;
+      try
+      {
+        const newInstance = await this.$root.dbp.instances.create.one(null, this.generator.generatorID, null, this.text0, this.text1);
+        this.clear();
+        this.$emit("instance-created", newInstance);
+      }
+      catch (ex)
+      {
+        alertify.error(ex.message);
+      }
+      finally
+      {
+        this.isCreating = false;
+      }
+    }
+  clear: |
+    function() {
+      this.text0 = null;
+      this.text1 = null;
+    }
+computed:
+  hasText: |
+    function() {
+      return this.text0 || this.text1;
+    }
+name: e-instance-create
+style:
+  img:
+    margin-bottom: 1rem
+  input:
+    text-align: center
+    text-transform: uppercase
+    padding: 0.3em 0.5em !important
+    margin-bottom: 0.5rem
+  button:
+    display: block
+    width: 70%
+    margin: 0.5rem auto
+template: >-
+  <div class="comp-e-instance-create" v-if="generator"><div><input
+  v-model="text0" placeholder="top text"/><input v-model="text1"
+  placeholder="bottom text"/><transition name="fade"><ui-button v-if="hasText"
+  text="create" :is-loading="isCreating"
+  @click="create"></ui-button></transition></div></div>

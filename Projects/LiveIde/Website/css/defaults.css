@@ -262,7 +262,7 @@ input, textarea, select, option, .ide-checkbox
   background: #202020ff;
   font-family: monospace !important;
   border: 1px solid gray;
-  color: #ffffff80;
+  color: #ffffff;
   text-shadow: none;
 }
 input:focus, textarea:focus, select:focus

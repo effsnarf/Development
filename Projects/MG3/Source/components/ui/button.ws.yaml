@@ -1,0 +1,23 @@
+dom:
+  div:
+    button:
+      v-if: '!isLoading'
+      v-text: text
+      on_click: $emit('click')
+    img:
+      v-if: isLoading
+      src: >-
+        https://upload.wikimedia.org/wikipedia/commons/b/b9/Youtube_loading_symbol_1_(wobbly).gif
+props:
+  text: null
+  isLoading: null
+style:
+  img:
+    display: block
+    width: 2rem
+    margin: auto
+name: ui-button
+template: >-
+  <div class="comp-ui-button"><button v-if="!isLoading" v-text="text"
+  @click="$emit('click')"></button><img v-if="isLoading"
+  src="https://upload.wikimedia.org/wikipedia/commons/b/b9/Youtube_loading_symbol_1_(wobbly).gif"/></div>

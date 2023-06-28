@@ -92,6 +92,13 @@ interface MgParams {
         //(this as any).key1++;
         window.scrollTo({ top: 0, behavior: "smooth" });
       },
+      getInstanceText(instance: any) {
+        if (!instance) return null;
+        return [instance.text0, instance.text1].filter((a) => a).join(", ");
+      },
+      setDocumentTitle(title: string) {
+        document.title = [title, "Meme Generator"].filter((a) => a).join(" - ");
+      },
       getKey(item: any) {
         if (!item) return null;
         if (item.instanceID) return item.instanceID;

@@ -26,13 +26,14 @@ mounted: |
 methods:
   init: |
     async function() {
-      if (this.isInited) return;
       if (!this.$root.params.instanceID) return;
       const dbp = this.$root.dbp;
       this.instance = await dbp.instances.select.one(this.$root.params.instanceID);
       this.generator = await dbp.generators.select.one(this.instance.generatorID);
       this.recommendationItems = await dbp.generators.select.related(this.generator.urlName);
-      this.isInited = true;
+      if (this.$root.params.page == "instance") {
+        this.$root.setDocumentTitle(this.$root.getInstanceText(instance));
+      }
     }
   getMoreInstances: |
     async function(pageIndex) {

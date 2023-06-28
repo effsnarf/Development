@@ -13,7 +13,21 @@ data:
   generators: []
 mounted: |
   async function() {
+    this.$watch(() => this.$root.params.page, {
+      handler: async () => {
+        await this.init();
+      },
+      immediate: true
+    });
   }
+methods:
+  init: |
+    async function() {
+      if (this.$root.params.page == "home")
+      {
+        this.$root.setDocumentTitle(null);
+      }
+    }
 style: null
 name: page-home
 template: >-

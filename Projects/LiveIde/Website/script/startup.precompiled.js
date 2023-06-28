@@ -151,9 +151,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "../../../LiveIde/Website/script/1687948427670.ts":
+/***/ "../../../LiveIde/Website/script/1687957931267.ts":
 /*!********************************************************!*\
-  !*** ../../../LiveIde/Website/script/1687948427670.ts ***!
+  !*** ../../../LiveIde/Website/script/1687957931267.ts ***!
   \********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -250,6 +250,14 @@ const helpers = {
                     //(this as any).key1++;
                     window.scrollTo({ top: 0, behavior: "smooth" });
                 });
+            },
+            getInstanceText(instance) {
+                if (!instance)
+                    return null;
+                return [instance.text0, instance.text1].filter((a) => a).join(", ");
+            },
+            setDocumentTitle(title) {
+                document.title = [title, "Meme Generator"].filter((a) => a).join(" - ");
             },
             getKey(item) {
                 if (!item)
@@ -490,6 +498,7 @@ class ClientContext {
             "ul",
             "li",
             "input",
+            "button",
             "canvas",
             "textarea",
             "component",
@@ -2300,7 +2309,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("../../../LiveIde/Website/script/1687948427670.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("../../../LiveIde/Website/script/1687957931267.ts");
 /******/ 	
 /******/ })()
 ;
