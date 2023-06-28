@@ -35,7 +35,7 @@ computed:
     }
 template: >-
   <ui-link class="comp-e-generator-wide" :url="url"><ui-card1
-  class="grayish"><div class="show-on-hover-container"><ui-image class="z-10"
+  class="grayish"><div class="show-on-hover-container"><ui-image
   :imageID="item.imageID"></ui-image><ui-title
   :text="item.displayName"></ui-title><content-poem-stanza class="show-on-hover"
   v-if="item.desc?.poem"
