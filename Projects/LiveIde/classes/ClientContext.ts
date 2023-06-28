@@ -149,6 +149,7 @@ class ClientContext {
         "canvas",
         "textarea",
         "component",
+        "transition",
       ].includes(name)
     )
       return false;

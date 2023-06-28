@@ -10,7 +10,7 @@ dom:
         component:
           ':is': itemType.kebabize()
           ':item': item
-    on_scroll: loadMore
+      on_scroll: loadMore
 name: content-stream
 props:
   itemType: null
@@ -32,7 +32,8 @@ methods:
       if (!this.getMoreItems) return;
       const pageIndex = this.pageIndex++;
       this.queue.push(async () => {
-        const newItems = await this.getMoreItems(pageIndex);
+        let newItems = await this.getMoreItems(pageIndex);
+        newItems = newItems.exceptBy(this.items, this.$root.getKey);
         this.items.push(...newItems);
       });
     }
@@ -45,14 +46,14 @@ methods:
 mounted: |
   function() {
     this.processQueue();
+    this.reset();
   }
 style:
   ul:
     display: grid
     gap: 5rem
 template: >-
-  <ui-infinite-scroll class="comp-content-stream"
-  @scroll="loadMore"><transition-group tag="ul" name="list"
-  :class="gridClass"><li v-for="item in items"
+  <ui-infinite-scroll class="comp-content-stream"><transition-group tag="ul"
+  name="list" :class="gridClass" @scroll="loadMore"><li v-for="item in items"
   :key="$root.getKey(item)"><component :is="itemType.kebabize()"
   :item="item"></component></li></transition-group></ui-infinite-scroll>

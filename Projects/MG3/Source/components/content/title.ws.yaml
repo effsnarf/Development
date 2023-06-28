@@ -1,19 +1,23 @@
 dom:
   div:
     ':class': getCssClass()
-    div#1:
-      class: background
-    transition.group:
-      name: list
-      tag: ul
-      li:
-        ui.image:
-          v-if: imageID
-          ':imageID': imageID
-          ':url': url
-        ui.large.title:
-          ':text': title
-        ':key': title
+    div:
+      class: content-title site-width
+      div#1:
+        class: background
+      transition.group:
+        name: list
+        tag: ul
+        li:
+          ':key': title||Date.now()
+          ui.image:
+            v-if: imageID
+            ':imageID': imageID
+            ':url': url
+          ui.large.title:
+            ':text': title
+    div#2:
+      class: spacer
 props:
   imageID: null
   title: null
@@ -37,17 +41,15 @@ mounted: |
 style:
   .stuck .title:
     font-size: 6vh
-    transform: translateX(-6rem)
   .background:
     background: linear-gradient(rgba(0, 0, 0, 1), rgba(0, 0, 0, 0))
     position: absolute
     width: 100%
     height: 7.5rem
-    top: '-1rem'
-  .comp-content-title:
-    position: sticky
+    top: 0
+  .content-title:
+    position: fixed
     top: 7rem
-    background: '#000000'
     z-index: 10
     border-radius: 0
     transition: 0s !important
@@ -64,10 +66,14 @@ style:
   .comp-ui-large-title:
     padding-top: 0.4em !important
     z-index: 10
+  .spacer:
+    height: 6rem
 name: content-title
 template: >-
   <div class="comp-content-title" :class="getCssClass()"><div
+  class="content-title site-width"><div
   class="background"></div><transition-group name="list" tag="ul"><li
-  :key="title"><ui-image v-if="imageID" :imageID="imageID"
+  :key="title||Date.now()"><ui-image v-if="imageID" :imageID="imageID"
   :url="url"></ui-image><ui-large-title
-  :text="title"></ui-large-title></li></transition-group></div>
+  :text="title"></ui-large-title></li></transition-group></div><div
+  class="spacer"></div></div>

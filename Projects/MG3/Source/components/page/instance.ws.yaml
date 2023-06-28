@@ -37,7 +37,7 @@ methods:
   getMoreInstances: |
     async function(pageIndex) {
       const items = await this.$root.dbp.instances.select.popular("en", pageIndex)
-      if (pageIndex == 0) items.unshift(this.instance);
+      if ((pageIndex == 0) && (this.instance)) items.unshift(this.instance);
       return items;
     }
 style: null

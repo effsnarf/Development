@@ -4,10 +4,13 @@ dom:
     ':recommendation-items': recommendationItems
     template#1:
       v-slot: article
-      content.title:
-        ':imageID': generator?.imageID
-        ':title': generator?.displayName
-        ':url': $root.url.generator(generator)
+      transition:
+        name: fade
+        content.title:
+          ':imageID': generator?.imageID
+          ':title': generator?.displayName
+          ':url': $root.url.generator(generator)
+          ':key': generator?.generatorID
       content.article:
         template:
           v-slot: content
@@ -43,22 +46,24 @@ mounted: |
 methods:
   init: |
     async function() {
-      if (this.urlName == this.$root.params.urlName) return;
       const dbp = this.$root.dbp;
+      if (this.urlName == this.$root.params.urlName) return;
       this.urlName = this.$root.params.urlName;
-      if (!this.urlName) {
-        this.generator = null;
-        this.poem = null;
-        this.recommendationItems = [];
-        this.$refs.contentStream1?.reset();
-        return;
-      }
+      if (!this.urlName) return;
+      this.clear();
       this.generator = !this.urlName ? null : await dbp.generators.select.one(null, this.urlName);
       this.recommendationItems.replace(async() => await dbp.generators.select.related(this.urlName), 500, gen => gen.generatorID);
       this.$refs.contentStream1?.reset();
       setTimeout(() => {
         this.poem = this.generator?.desc?.poem;
       }, 500);
+    }
+  clear: |
+    function() {
+      this.generator = null;
+      this.poem = null;
+      this.recommendationItems = [];
+      this.$refs.contentStream1?.reset();
     }
   getMoreInstances: |
     async function(pageIndex) {
@@ -92,9 +97,10 @@ name: page-generator
 template: >-
   <site class="comp-page-generator" page-name="generator"
   :recommendation-items="recommendationItems"><template
-  v-slot:article><content-title :imageID="generator?.imageID"
-  :title="generator?.displayName"
-  :url="$root.url.generator(generator)"></content-title><content-article><template
+  v-slot:article><transition name="fade"><content-title
+  :imageID="generator?.imageID" :title="generator?.displayName"
+  :url="$root.url.generator(generator)"
+  :key="generator?.generatorID"></content-title></transition><content-article><template
   v-slot:content><div class="poem"><transition-group
   name="list"><content-poem-stanza v-for="stanza in getRandomStanzas(poem)"
   :item="stanza" :key="stanza.map(l =&gt; l.substring(0,

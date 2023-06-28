@@ -151,9 +151,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "../../../LiveIde/Website/script/1687877716330.ts":
+/***/ "../../../LiveIde/Website/script/1687948427670.ts":
 /*!********************************************************!*\
-  !*** ../../../LiveIde/Website/script/1687877716330.ts ***!
+  !*** ../../../LiveIde/Website/script/1687948427670.ts ***!
   \********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -493,6 +493,7 @@ class ClientContext {
             "canvas",
             "textarea",
             "component",
+            "transition",
         ].includes(name))
             return false;
         if (name.startsWith("."))
@@ -1966,7 +1967,7 @@ if (typeof Array !== "undefined") {
         if (!getWeight)
             getWeight = (item) => 1;
         let sum = this.map((n) => getValue(n) * getWeight(n)).sum();
-        return sum / this.length;
+        return (sum / this.length).roundTo(3);
     };
     Array.prototype.first = function () {
         return this[0];
@@ -2299,7 +2300,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("../../../LiveIde/Website/script/1687877716330.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("../../../LiveIde/Website/script/1687948427670.ts");
 /******/ 	
 /******/ })()
 ;

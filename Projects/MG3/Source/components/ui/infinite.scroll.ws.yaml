@@ -16,4 +16,5 @@ methods:
       }
     }
 name: ui-infinite-scroll
+style: null
 template: <div class="comp-ui-infinite-scroll"><slot></slot></div>

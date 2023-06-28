@@ -1,24 +1,28 @@
 name: e-generator-wide
 dom:
   ui.link:
-    class: grayish
     ':url': url
-    .show-on-hover-container:
-      ui.image:
-        class: z-10
-        ':imageID': item.imageID
-      ui.title:
-        ':text': item.displayName
-      content.poem.stanza:
-        v-if: item.desc?.poem
-        class: show-on-hover
-        ':item': $root.getRandomStanza(item.desc?.poem)
+    ui.card1:
+      class: grayish
+      .show-on-hover-container:
+        ui.image:
+          class: z-10
+          ':imageID': item.imageID
+        ui.title:
+          ':text': item.displayName
+        content.poem.stanza:
+          v-if: item.desc?.poem
+          class: show-on-hover
+          ':item': $root.getRandomStanza(item.desc?.poem)
 props:
   item: null
 style:
+  .comp-e-generator-wide:
+    display: block
+    margin-bottom: 1rem
   .comp-ui-image:
     display: block
-  .comp-ui-image:hover img:
+  .show-on-hover-container:hover img:
     transform: scale(1.5)
     aspect-ratio: 4 / 2
   img:
@@ -31,9 +35,9 @@ computed:
       return `/${this.item.urlName}`;
     }
 template: >-
-  <ui-link class="comp-e-generator-wide grayish" :url="url"><div
-  class="show-on-hover-container"><ui-image class="z-10"
+  <ui-link class="comp-e-generator-wide" :url="url"><ui-card1
+  class="grayish"><div class="show-on-hover-container"><ui-image class="z-10"
   :imageID="item.imageID"></ui-image><ui-title
   :text="item.displayName"></ui-title><content-poem-stanza class="show-on-hover"
   v-if="item.desc?.poem"
-  :item="$root.getRandomStanza(item.desc?.poem)"></content-poem-stanza></div></ui-link>
+  :item="$root.getRandomStanza(item.desc?.poem)"></content-poem-stanza></div></ui-card1></ui-link>

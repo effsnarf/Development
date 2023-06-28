@@ -1,35 +1,46 @@
 dom:
   div:
-    class: site-width
-    v-show: (pageName == $root.params.page)
-    site.header:
-      class: site-width
-    div#1:
-      class: header-spacer
-    div:
-      site.sidebar: null
-      site.main:
-        ':recommendation-items': recommendationItems
-        template#1:
-          v-slot: article
-          slot:
-            name: article
-        template#2:
-          v-slot: middle
-          slot:
-            name: middle
-        template#3:
-          v-slot: right
-          slot:
-            name: right
+    transition:
+      name: fade
+      div:
+        ':class': getCssClass()
+        v-show: (this.pageName == $root.params.page)
+        site.header:
+          class: site-width
+        div#1:
+          class: header-spacer
+        div:
+          site.sidebar: null
+          site.main:
+            ':recommendation-items': recommendationItems
+            template#1:
+              v-slot: article
+              slot:
+                name: article
+            template#2:
+              v-slot: middle
+              slot:
+                name: middle
+            template#3:
+              v-slot: right
+              slot:
+                name: right
 name: site
 props:
   getMoreItems: null
   recommendationItems: null
   pageName: null
+methods:
+  getCssClass: |
+    function() {
+      const cls = {};
+      cls['site-width'] = true;
+      return cls;
+    }
 style:
   .site-width:
     width: min(1000px, 90vw)
+    margin: auto
   .comp-site:
     position: relative
     margin: auto
@@ -50,10 +61,11 @@ style:
   .header-spacer:
     height: 8rem
 template: >-
-  <div class="comp-site site-width" v-show="(pageName ==
-  $root.params.page)"><site-header class="site-width"></site-header><div
+  <div class="comp-site"><transition name="fade"><div :class="getCssClass()"
+  v-show="(this.pageName == $root.params.page)"><site-header
+  class="site-width"></site-header><div
   class="header-spacer"></div><div><site-sidebar></site-sidebar><site-main
   :recommendation-items="recommendationItems"><template v-slot:article><slot
   name="article"></slot></template><template v-slot:middle><slot
   name="middle"></slot></template><template v-slot:right><slot
-  name="right"></slot></template></site-main></div></div>
+  name="right"></slot></template></site-main></div></div></transition></div>

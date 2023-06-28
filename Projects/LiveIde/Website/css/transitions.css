@@ -18,9 +18,26 @@
 
 .list-leave-active {
   position: absolute;
+  width: 100%;
 }
 
 .list-leave-to {
   opacity: 0;
   transform: translateY(0);
+}
+
+
+.fade-enter-active,
+.fade-leave-active,
+.fade-move {
+  transition: 1s cubic-bezier(0.59, 0.12, 0.34, 0.95);
+  transition-property: opacity;
+}
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+.fade-enter-to,
+.fade-leave {
+  opacity: 1;
 }
