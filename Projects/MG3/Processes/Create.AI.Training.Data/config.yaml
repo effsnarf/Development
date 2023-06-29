@@ -4,3 +4,6 @@ server:
 database:
   connectionString: mongodb://localhost
   database: MemeGenerator
+data:
+  set:
+    path: (env) => env.path.resolve(env.process.cwd(), 'data.set.jsonl')
