@@ -4,13 +4,13 @@ dom:
     slot:
       name: article
     .columns:
-      div#1:
+      .left:
         slot:
           name: left
-      div#2:
+      .middle:
         slot:
           name: middle
-      div:
+      .right:
         ui.sticky:
           top: 140px
           div:
@@ -22,14 +22,9 @@ props:
   recommendationItems: null
 style:
   .comp-site-main: null
-  .columns:
-    display: grid
-    grid-template: 1fr / 1fr 2fr 1fr
-    gap: 2rem
-    margin-top: 2rem
 template: >-
   <div class="comp-site-main"><slot name="article"></slot><div
-  class="columns"><div><slot name="left"></slot></div><div><slot
-  name="middle"></slot></div><div><ui-sticky top="140px"><div><slot
-  name="right"></slot></div><content-recommendations
+  class="columns"><div class="left"><slot name="left"></slot></div><div
+  class="middle"><slot name="middle"></slot></div><div class="right"><ui-sticky
+  top="140px"><div><slot name="right"></slot></div><content-recommendations
   :items="recommendationItems"></content-recommendations></ui-sticky></div></div></div>
