@@ -14,9 +14,13 @@ dom:
             ':style': '{ fontSize: fontSizes[index] }'
         div:
           class: spacer
-    e.generator.small:
-      v-if: showGenerator
-      ':item': item
+    .flex:
+      v-if: item.instanceID
+      e.generator.small:
+        v-if: showGenerator
+        ':item': item
+      ui.share:
+        ':instance': item
 name: e-instance
 props:
   item: null
@@ -47,7 +51,11 @@ computed:
     }
 style:
   .instance:
-    box-shadow: '-10px 10px 2px #000'
+    display: block
+    box-shadow: '0px 24px 14px #000'
+  .flex:
+    margin-top: 1rem
+    justify-content: center
   .comp-ui-image, img:
     aspect-ratio: 1
     object-fit: cover
@@ -80,5 +88,7 @@ template: >-
   ref="image1" :imageID="item.imageID" @load="onImageLoad"></ui-image><div
   class="texts"><div class="text" v-for="(text, index) in [item.text0,
   item.text1]" v-text="text" :style="{ fontSize: fontSizes[index]
-  }"></div></div><div class="spacer"></div></div></ui-link><e-generator-small
-  v-if="showGenerator" :item="item"></e-generator-small></div>
+  }"></div></div><div class="spacer"></div></div></ui-link><div class="flex"
+  v-if="item.instanceID"><e-generator-small v-if="showGenerator"
+  :item="item"></e-generator-small><ui-share
+  :instance="item"></ui-share></div></div>

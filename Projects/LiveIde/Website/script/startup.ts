@@ -7,17 +7,29 @@ import { DatabaseProxy } from "../../../../Apps/DatabaseProxy/Client/DbpClient";
 
 const helpers = {
   url: {
-    generator: (generator: any) => {
+    generator: (generator: any, full: boolean = false) => {
       if (!generator) return null;
-      return `/${generator.urlName}`;
+      return helpers.url.full(`/${generator.urlName}`, full);
     },
-    instance: (instance: any) => {
+    instance: (instance: any, full: boolean = false) => {
       if (!instance) return null;
-      return `/instance/${instance.instanceID}`;
+      return helpers.url.full(`/instance/${instance.instanceID}`, full);
     },
-    image: (imageID: number) => {
+    instanceImage: (instance: any) => {
+      if (!instance) return null;
+      return `https://img.memegenerator.net/instances/${instance.instanceID}.jpg`;
+    },
+    image: (imageID: number, full: boolean = false) => {
       if (!imageID) return null;
-      return `https://img.memegenerator.net/images/${imageID}.jpg`;
+      return helpers.url.full(
+        `https://img.memegenerator.net/images/${imageID}.jpg`,
+        full
+      );
+    },
+    full: (path: string, full: boolean = false) => {
+      if (!path) return null;
+      if (full) return `https://memegenerator.net${path}`;
+      return path;
     },
   },
 };

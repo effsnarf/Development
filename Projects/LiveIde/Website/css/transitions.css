@@ -2,7 +2,6 @@
 .list-leave-active,
 .list-move {
   transition: 1s cubic-bezier(0.59, 0.12, 0.34, 0.95);
-  transition-property: opacity, transform;
   transform-origin: center top;
 }
 
@@ -27,6 +26,8 @@
 }
 
 
+
+
 .fade-enter-active,
 .fade-leave-active,
 .fade-move {
@@ -40,4 +41,40 @@
 .fade-enter-to,
 .fade-leave {
   opacity: 1;
+}
+
+
+
+.slide-enter-active,
+.slide-leave-active,
+.slide-move {
+  transition: 1s cubic-bezier(0.59, 0.12, 0.34, 0.95);
+}
+.slide-enter,
+.slide-leave-to {
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+}
+.slide-enter-to,
+.slide-leave {
+  opacity: 1;
+  max-height: 15rem;
+  overflow: hidden;
+}
+
+
+.fade
+{
+  animation: fade 1s cubic-bezier(0.59, 0.12, 0.34, 0.95);
+}
+
+@keyframes fade {
+  0% {
+    opacity: 0;
+    transform: translateY(50%);
+  }
+  100% {
+    opacity: 1;
+  }
 }

@@ -11,6 +11,7 @@ dom:
 props:
   imageID: null
   url: null
+  square: null
 data:
   width: null
   height: null
@@ -40,7 +41,7 @@ methods:
     }
   getCssClass: |
     function () {
-      return { empty: !this.src };
+      return { empty: !this.src, square: this.square };
     }
   getCompType: |
     function () {
@@ -62,6 +63,9 @@ style:
     width: 100%
   .image:
     overflow: hidden
+  .square:
+    aspect-ratio: 1
+    object-fit: cover
 name: ui-image
 template: >-
   <component class="comp-ui-image image" :is="getCompType()" :url="url"><img

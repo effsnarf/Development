@@ -183,11 +183,17 @@ class ClientContext {
       const url = args[0];
       console.error(`Error fetching ${url}`);
       console.error(ex);
-      if (window.location.hostname == "localhost") {
+      //if (window.location.hostname == "localhost") {
+      if (
+        !ex.message.includes(
+          "Object reference not set to an instance of an object"
+        )
+      ) {
         ClientContext.alertify
           .error(`<h3>${url}</h3><pre>${ex.message}</pre>`)
           .delay(0);
       }
+      //}
       // Try again
       // Wait a bit
       await new Promise((resolve) => setTimeout(resolve, 100));

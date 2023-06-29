@@ -1,0 +1,22 @@
+dom:
+  .sharethis-inline-share-buttons:
+    ':data-url': url
+    ':data-image': imageUrl
+props:
+  instance: null
+mounted: |
+  function() {
+  }
+computed:
+  url: |
+    function() {
+      return this.$root.url.instance(this.instance, true);
+    }
+  imageUrl: |
+    function() {
+      return this.$root.url.instanceImage(this.instance);
+    }
+name: ui-share
+template: >-
+  <div class="comp-ui-share sharethis-inline-share-buttons" :data-url="url"
+  :data-image="imageUrl"></div>

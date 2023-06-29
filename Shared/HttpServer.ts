@@ -153,6 +153,7 @@ class HttpServer {
           return fileContent;
         } catch (ex: any) {
           console.log(`${ex.stack.bgRed}`);
+          console.log(fileContent.bgRed);
           return ex.stack;
         }
       }

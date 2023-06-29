@@ -5,6 +5,7 @@ dom:
       tag: ul
       name: list
       ':class': gridClass
+      ':style': '{ gap: gap }'
       li:
         v-for: (item, index) in items
         ':key': $root.getKey(item)
@@ -16,6 +17,7 @@ props:
   itemType: null
   getMoreItems: null
   gridClass: null
+  gap: null
 data:
   pageIndex: 0
   items: []
@@ -75,6 +77,9 @@ methods:
           newItems = newItems.exceptBy(this.items, this.$root.getKey);
           this.items.push(...newItems);
           this.updateVisibleItemIndex();
+          this.$nextTick(() => {
+            window.__sharethis__.initialize();
+          });
           resolve();
         });
       });
@@ -88,10 +93,9 @@ methods:
 style:
   ul:
     display: grid
-    gap: 5rem
 template: >-
   <ui-infinite-scroll class="comp-content-stream"
-  @scroll="loadMore"><transition-group tag="ul" name="list"
-  :class="gridClass"><li v-for="(item, index) in items"
+  @scroll="loadMore"><transition-group tag="ul" name="list" :class="gridClass"
+  :style="{ gap: gap }"><li v-for="(item, index) in items"
   :key="$root.getKey(item)"><component :is="itemType.kebabize()"
   :item="item"></component></li></transition-group></ui-infinite-scroll>

@@ -1,13 +1,19 @@
 %html
   %head
+    %meta{content: "width=device-width, initial-scale=1", "data-n-head": "ssr", name: "viewport"}
+    %meta{property: "og:title", content: "{{title}}"}
+    %meta{property: "og:type", content: "article"}
+    %meta{property: "og:url", content: "{{url}}"}
+    %meta{property: "og:image", content: "{{imageUrl}}"}
+    %meta{property: "og:description", content: "{{description}}"}
     %title {{title}}
-    %script{async: "true", src: "https://www.googletagmanager.com/gtag/js?id=G-P952PRPTTR"}
+    %script{async: "async", src: "https://www.googletagmanager.com/gtag/js?id=G-P952PRPTTR"}
+    %script{async: "async", src: "https://platform-api.sharethis.com/js/sharethis.js#property=649c4438bbc62e0012c54851&product=inline-share-buttons&source=platform"}
     %script
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
       gtag('config', 'G-P952PRPTTR');
-    %meta{content: "width=device-width, initial-scale=1", "data-n-head": "ssr", name: "viewport"}
     %link{rel: "stylesheet", href: "https://fonts.googleapis.com/css?family=Old Standard TT|Oswald&display=swap"}
     %link{rel: "stylesheet", href: "https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/css/alertify.css"}
     %link{rel: "stylesheet", href: "https://cdn.jsdelivr.net/npm/shorthandcss@1.1.1/dist/shorthand.min.css"}

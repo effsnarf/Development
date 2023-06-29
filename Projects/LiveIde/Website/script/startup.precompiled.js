@@ -151,9 +151,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "../../../LiveIde/Website/script/1687957931267.ts":
+/***/ "../../../LiveIde/Website/script/1688029428632.ts":
 /*!********************************************************!*\
-  !*** ../../../LiveIde/Website/script/1687957931267.ts ***!
+  !*** ../../../LiveIde/Website/script/1688029428632.ts ***!
   \********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -175,20 +175,32 @@ const Params_1 = __webpack_require__(/*! ../../classes/Params */ "../../../LiveI
 const DbpClient_1 = __webpack_require__(/*! ../../../../Apps/DatabaseProxy/Client/DbpClient */ "../../../../Apps/DatabaseProxy/Client/DbpClient.ts");
 const helpers = {
     url: {
-        generator: (generator) => {
+        generator: (generator, full = false) => {
             if (!generator)
                 return null;
-            return `/${generator.urlName}`;
+            return helpers.url.full(`/${generator.urlName}`, full);
         },
-        instance: (instance) => {
+        instance: (instance, full = false) => {
             if (!instance)
                 return null;
-            return `/instance/${instance.instanceID}`;
+            return helpers.url.full(`/instance/${instance.instanceID}`, full);
         },
-        image: (imageID) => {
+        instanceImage: (instance) => {
+            if (!instance)
+                return null;
+            return `https://img.memegenerator.net/instances/${instance.instanceID}.jpg`;
+        },
+        image: (imageID, full = false) => {
             if (!imageID)
                 return null;
-            return `https://img.memegenerator.net/images/${imageID}.jpg`;
+            return helpers.url.full(`https://img.memegenerator.net/images/${imageID}.jpg`, full);
+        },
+        full: (path, full = false) => {
+            if (!path)
+                return null;
+            if (full)
+                return `https://memegenerator.net${path}`;
+            return path;
         },
     },
 };
@@ -542,11 +554,13 @@ class ClientContext {
                 const url = args[0];
                 console.error(`Error fetching ${url}`);
                 console.error(ex);
-                if (window.location.hostname == "localhost") {
+                //if (window.location.hostname == "localhost") {
+                if (!ex.message.includes("Object reference not set to an instance of an object")) {
                     ClientContext.alertify
                         .error(`<h3>${url}</h3><pre>${ex.message}</pre>`)
                         .delay(0);
                 }
+                //}
                 // Try again
                 // Wait a bit
                 yield new Promise((resolve) => setTimeout(resolve, 100));
@@ -1929,6 +1943,9 @@ if (typeof Array !== "undefined") {
             addOne();
         });
     };
+    Array.prototype.take = function (count) {
+        return this.slice(0, count);
+    };
     Array.prototype.replace = function (getNewItems, stagger = 0, getItemKey) {
         return __awaiter(this, void 0, void 0, function* () {
             if (getItemKey) {
@@ -2309,7 +2326,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("../../../LiveIde/Website/script/1687957931267.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("../../../LiveIde/Website/script/1688029428632.ts");
 /******/ 	
 /******/ })()
 ;

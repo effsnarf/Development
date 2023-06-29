@@ -8,20 +8,61 @@ database:
 template:
   get: | #ts
     async function(dbp, req) {
-      const getTitle = async () => {
+      const instance = (await (async() => {
+        if (!req.url.startsWith("/instance/")) return null;
+        const instanceID = parseInt(req.url.split("/")[2]);
+        const inst = await dbp.instances.select.one(instanceID);
+        return inst;
+      })());
+
+      const urlName = (await (async() => {
+        if (instance) return instance.urlName;
         if (req.url == "/") return null;
-        if (req.url.startsWith("/instance/")) {
-          const instanceID = parseInt(req.url.split("/")[2]);
-          const inst = await dbp.instances.select.one(instanceID);
-          return [[inst.text0, inst.text1].filter(a => a).join(", "), inst.displayName].filter(a => a).join(" - ");
-        }
         const urlName = req.url.split("/")[1];
+        return urlName;
+      })());
+
+      const generator = (await (async() => {
+        if (!urlName) return null;
         const gen = await dbp.generators.select.one(null, urlName);
-        return gen.displayName;
-      }
+        return gen;
+      })());
+
+      const imageUrl = (await (async () => {
+        if (instance) return `https://img.memegenerator.net/instances/${instance.instanceID}.jpg`;
+        if (generator) return `https://img.memegenerator.net/images/${generator.imageID}.jpg`;
+        return null;
+      })());
+
+      const description = (await (async () => {
+        if (instance) return [[instance.text0, instance.text1].filter(a => a).join(", "), instance.displayName].filter(a => a).join(" - ");
+        if (generator) {
+          const poem = generator.desc?.poem;
+          if (poem) {
+            const randomStanzaIndex = Math.floor(Math.random() * poem.length);
+            const stanza = poem[randomStanzaIndex];
+            return stanza.join(" ");
+          }
+          return generator.displayName;
+        }
+        return null;
+      })());
+
+      const title = (await (async () => {
+        if (instance) return description;
+        if (generator) return generator.displayName;
+        return null;
+      })());
+
+      const url = (await (async () => {
+        return `https://memegenerator.net${req.url}`;
+      })());
 
       return {
-        title: [await getTitle(), `Meme Generator`].filter(a => a).join(" - "),
+        title: [title, `Meme Generator`].filter(a => a).join(" - "),
+        imageUrl: imageUrl,
+        description: description,
+        url: url
       }
     }
 databaseProxy:

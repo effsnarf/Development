@@ -668,6 +668,19 @@ p
 }
 
 
+.st-btn
+{
+  background: none !important;
+  transition: 0s !important;
+}
+
+.st-btn:hover
+{
+  border: 1px solid #aaa !important;
+  background: #333 !important;
+  top: 0 !important;
+}
+
 
 svg
 {
@@ -684,3 +697,4 @@ img[src=""]
 {
   background: #80808040;
 }
+

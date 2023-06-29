@@ -61,7 +61,7 @@ style:
     background-size: cover
     background-position: center
     transition: 0s !important
-    z-index: 10
+    z-index: 1000000
   .header-spacer:
     height: 8rem
 template: >-

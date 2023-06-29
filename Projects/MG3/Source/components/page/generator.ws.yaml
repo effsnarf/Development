@@ -35,12 +35,14 @@ dom:
       ui.sticky:
         top: 250px
         e.instance.create:
+          v-if: showCreateInstance
           ':generator': generator
           on_instance-created: onInstanceCreated
 data:
   generator: null
   poem: null
   recommendationItems: []
+  showCreateInstance: false
 mounted: |
   async function() {
     this.$watch(() => this.$root.params.urlName, {
@@ -99,6 +101,18 @@ methods:
     function(instance) {
       this.$refs.contentStream1?.add(instance);
     }
+watch:
+  generator: |
+    function(newGenerator) {
+      if (!newGenerator)
+      {
+        this.showCreateInstance = false;
+        return;
+      }
+      setTimeout(() => {
+        this.showCreateInstance = true;
+      }, 2000);
+    }
 style:
   .poem: null
   .poem .comp-content-poem-stanza:
@@ -123,5 +137,6 @@ template: >-
   v-slot:middle><content-stream ref="contentStream1" item-type="e.instance"
   :get-more-items="getMoreInstances"
   grid-class="grid-1"></content-stream></template><template
-  v-slot:left><ui-sticky top="250px"><e-instance-create :generator="generator"
+  v-slot:left><ui-sticky top="250px"><e-instance-create
+  v-if="showCreateInstance" :generator="generator"
   @instance-created="onInstanceCreated"></e-instance-create></ui-sticky></template></site>

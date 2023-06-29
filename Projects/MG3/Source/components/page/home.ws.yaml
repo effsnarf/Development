@@ -28,7 +28,9 @@ methods:
         this.$root.setDocumentTitle(null);
       }
     }
-style: null
+style:
+  .comp-e-generator-wide img:
+    aspect-ratio: 2 / 1
 name: page-home
 template: >-
   <site class="comp-page-home" page-name="home"><template

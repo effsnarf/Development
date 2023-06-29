@@ -315,6 +315,7 @@ interface Array<T> {
   insertAt(index: number, item: T, appendToEnd: boolean): void;
   clear(stagger: number): void;
   add(items: any[], stagger: number): void;
+  take(count: number): T[];
   replace(
     getNewItems: () => Promise<any[]>,
     stagger: number,
@@ -1241,6 +1242,10 @@ if (typeof Array !== "undefined") {
       }
     };
     addOne();
+  };
+
+  Array.prototype.take = function (count: number) {
+    return this.slice(0, count);
   };
 
   Array.prototype.replace = async function (

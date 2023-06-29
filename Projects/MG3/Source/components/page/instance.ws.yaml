@@ -1,5 +1,6 @@
 dom:
   site:
+    v-if: $root.params.page=='instance'
     page-name: instance
     ':recommendation-items': recommendationItems
     template#1: null
@@ -44,7 +45,8 @@ methods:
 style: null
 name: page-instance
 template: >-
-  <site class="comp-page-instance" page-name="instance"
+  <site class="comp-page-instance" v-if="$root.params.page=='instance'"
+  page-name="instance"
   :recommendation-items="recommendationItems"><template></template><template
   v-slot:middle><content-stream item-type="e.instance"
   :get-more-items="getMoreInstances"

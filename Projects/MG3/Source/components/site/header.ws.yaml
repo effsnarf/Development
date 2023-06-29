@@ -34,8 +34,6 @@ methods:
       };
     }
 style:
-  .comp-site-header:
-    z-index: 1000
   .comp-ui-large-title:
     position: absolute;
     bottom: 2rem
