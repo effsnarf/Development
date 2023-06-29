@@ -139,3 +139,4 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
+Projects/MG3/Processes/Create.AI.Training.Data/data.set.jsonl
