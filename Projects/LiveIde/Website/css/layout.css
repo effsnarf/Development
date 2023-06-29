@@ -4,6 +4,27 @@
 }
 
 
+.comp-site-main .columns
+{
+    display: grid;
+    grid-template: 1fr / 1fr 2fr 1fr;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+@media (max-width: 768px) {
+    .comp-site-main .columns
+    {
+        grid-template: 1fr / 3fr 1fr;
+    }
+
+    .comp-site-main .columns .left
+    {
+        display: none;
+    }
+  }
+
+
 .grid-1
 {
     display: grid;
