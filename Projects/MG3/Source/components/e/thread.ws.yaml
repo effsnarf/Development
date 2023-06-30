@@ -1,0 +1,22 @@
+dom:
+  div:
+    v-if: item
+    h3:
+      v-text: item.title
+    ul:
+      li:
+        v-for: post in item.posts
+        e.post:
+          ':item': post
+props:
+  item: null
+style:
+  ul:
+    max-width: 60vw
+    margin: auto
+  li:
+    margin-bottom: 4vh
+name: e-thread
+template: >-
+  <div class="comp-e-thread" v-if="item"><h3 v-text="item.title"></h3><ul><li
+  v-for="post in item.posts"><e-post :item="post"></e-post></li></ul></div>

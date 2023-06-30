@@ -17,13 +17,10 @@ data:
   height: null
 mounted: |
   function () {
-    window.addEventListener(`resize`, function(event) {
-      this.recalc();
-    }.bind(this));
+    window.addEventListener(`resize`, this.recalc.bind(this));
     // Detect if the image element changes its size
-    let resizeObserver = new ResizeObserver(function(entries) {
-      this.recalc();
-    }.bind(this.$refs.image1));
+    let resizeObserver = new ResizeObserver(this.recalc.bind(this));
+    resizeObserver.observe(this.$refs.image1);
   }
 methods:
   onLoad: |
@@ -37,7 +34,7 @@ methods:
       let rect = this.$refs.image1.getBoundingClientRect();
       this.width = Math.round(rect.width);
       this.height = Math.round(rect.height);
-      this.$emit("load");
+      this.$emit("change");
     }
   getCssClass: |
     function () {

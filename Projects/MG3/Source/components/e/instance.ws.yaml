@@ -6,7 +6,7 @@ dom:
         ui.image:
           ref: image1
           ':imageID': item.imageID
-          on_load: onImageLoad
+          on_change: updateImageSize
         .texts:
           .text:
             v-for: (text, index) in [item.text0, item.text1]
@@ -14,7 +14,7 @@ dom:
             ':style': '{ fontSize: fontSizes[index] }'
         div:
           class: spacer
-    .flex:
+    .footer:
       v-if: item.instanceID
       e.generator.small:
         v-if: showGenerator
@@ -34,7 +34,7 @@ methods:
       const size = Math.min(3, Math.max(14, (36 - (s.length / 6))) / 50 *  this.width / 150);
       return `${size*2}vh`;
     }
-  onImageLoad: |
+  updateImageSize: |
     function () {
       this.width = this.$refs.image1.width;
     }
@@ -52,8 +52,9 @@ computed:
 style:
   .instance:
     display: block
-    box-shadow: '0px 24px 14px #000'
-  .flex:
+    box-shadow: '0px 24px 14px #000000a0'
+  .footer:
+    display: flex
     margin-top: 1rem
     justify-content: center
   .comp-ui-image, img:
@@ -85,10 +86,10 @@ style:
     bottom: 0
 template: >-
   <div class="comp-e-instance"><ui-link class="instance"><div><ui-image
-  ref="image1" :imageID="item.imageID" @load="onImageLoad"></ui-image><div
+  ref="image1" :imageID="item.imageID" @change="updateImageSize"></ui-image><div
   class="texts"><div class="text" v-for="(text, index) in [item.text0,
   item.text1]" v-text="text" :style="{ fontSize: fontSizes[index]
-  }"></div></div><div class="spacer"></div></div></ui-link><div class="flex"
+  }"></div></div><div class="spacer"></div></div></ui-link><div class="footer"
   v-if="item.instanceID"><e-generator-small v-if="showGenerator"
   :item="item"></e-generator-small><ui-share
   :instance="item"></ui-share></div></div>
