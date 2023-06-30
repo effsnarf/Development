@@ -29,7 +29,6 @@ import { Database } from "@shared/Database/Database";
     });
     if (gen.instancesCount !== instancesCount) {
       fixed++;
-      console.log(gen);
       console.log(gen.displayName, instancesCount - gen.instancesCount);
     }
     progress.increment();
