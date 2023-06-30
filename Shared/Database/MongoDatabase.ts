@@ -97,7 +97,14 @@ class MongoDatabase extends DatabaseBase {
     lowercaseFields?: boolean | undefined
   ): AsyncGenerator<any, any, unknown> {
     if (skip) {
-      const docs = await this.find(collectionName, query, sort, limit, skip);
+      const docs = await this.find(
+        collectionName,
+        query,
+        sort,
+        limit,
+        skip,
+        lowercaseFields
+      );
       for (const doc of docs) {
         yield doc;
       }
@@ -105,13 +112,27 @@ class MongoDatabase extends DatabaseBase {
       if (!sort) throw new Error("Sort is required.");
       const batchSize = 100;
       let skip = 0;
-      let docs = await this.find(collectionName, query, sort, batchSize, skip);
+      let docs = await this.find(
+        collectionName,
+        query,
+        sort,
+        batchSize,
+        skip,
+        lowercaseFields
+      );
       while (docs.length > 0) {
         for (const doc of docs) {
           yield doc;
         }
         skip += batchSize;
-        docs = await this.find(collectionName, query, sort, batchSize, skip);
+        docs = await this.find(
+          collectionName,
+          query,
+          sort,
+          batchSize,
+          skip,
+          lowercaseFields
+        );
       }
     }
   }
