@@ -9,11 +9,21 @@ import { Database } from "@shared/Database/Database";
   const config = (await Configuration.new()).data;
   const db = await Database.new(config.database);
 
+  let fixed = 0;
+
   const generatorsCount = await db.count("Generators");
 
+  console.log(`Fixing ${`Generators`.green}.${`InstancesCount`.yellow}..`);
   const progress = Progress.newAutoDisplay(generatorsCount);
 
   for await (const gen of db.findIterable("Generators", {}, { _id: 1 })) {
+    const instancesCount = await db.count("Instances", {
+      GeneratorID: gen._id,
+    });
+    if (gen.instancesCount !== instancesCount) {
+      fixed++;
+      console.log(gen.displayName);
+    }
     progress.increment();
   }
 
