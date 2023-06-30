@@ -8,40 +8,55 @@ import { Database } from "@shared/Database/Database";
 (async () => {
   const config = (await Configuration.new()).data;
   const db = await Database.new(config.database);
-  fs.unlinkSync(config.data.set.path);
+
+  if (fs.existsSync(config.data.set.path)) fs.unlinkSync(config.data.set.path);
 
   console.clear();
 
-  const filter = {
-    LanguageCode: "en",
-    UrlName: "Insanity-Wolf",
-  };
+  let loading = Loading.startNew(`Finding generators..`);
 
-  const sort = {
-    TotalVotesScore: -1,
-  };
+  const gens = await db.find(
+    "Generators",
+    { IsQuality: true },
+    { InstancesCount: -1 },
+    500,
+    0,
+    true
+  );
 
-  const limit = 500;
-  const skip = 0;
+  loading.stop(`Found ${gens.length} generators.`);
 
-  const loading = Loading.startNew(`Finding instances...`);
+  const genProgress = Progress.newAutoDisplay(gens.length, {});
 
-  let insts = await db.find("Instances", filter, sort, limit, skip, true);
-  insts = insts.filter((inst) => inst.text0?.length && inst.text1?.length);
+  for (const gen of gens) {
+    let insts = await db.find(
+      "Instances",
+      { LanguageCode: "en", GeneratorID: gen.generatorID },
+      { TotalVotesScore: -1 },
+      500,
+      0,
+      true
+    );
+    insts = insts.filter((inst) => inst.text0?.length && inst.text1?.length);
 
-  loading.stop(`Found ${insts.length} instances.`);
+    const lines = [];
+    for (const inst of insts) {
+      const line = {
+        prompt: ``,
+        completion: ` ${inst.displayName}\n${inst.text0}\n${inst.text1} ###`,
+      };
+      lines.push(line);
+    }
 
-  const progress = Progress.newAutoDisplay(insts.length, {});
+    fs.appendFileSync(
+      config.data.set.path,
+      lines.map((l) => JSON.stringify(l)).join("\n") + "\n"
+    );
 
-  for (const inst of insts) {
-    const line = {
-      prompt: inst.displayName,
-      completion: `${inst.text0}\n${inst.text1}###`,
-    };
-    fs.appendFileSync(config.data.set.path, JSON.stringify(line) + "\n");
-    progress.increment();
+    genProgress.increment();
   }
 
-  progress.done();
+  genProgress.done();
+
   console.log();
 })();

@@ -6,4 +6,4 @@ database:
   database: MemeGenerator
 data:
   set:
-    path: (env) => env.path.resolve(env.process.cwd(), 'data.set.jsonl')
+    path: (env) => env.path.join(env.process.cwd(), 'Data.Sets', 'instances.jsonl')
