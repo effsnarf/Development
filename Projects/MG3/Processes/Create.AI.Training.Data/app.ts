@@ -1,29 +1,47 @@
 import fs from "fs";
 import "colors";
 import { Configuration } from "@shared/Configuration";
+import { Loading } from "@shared/Loading";
+import { Progress } from "@shared/Progress";
 import { Database } from "@shared/Database/Database";
 
 (async () => {
   const config = (await Configuration.new()).data;
-
   const db = await Database.new(config.database);
+  fs.unlinkSync(config.data.set.path);
+
+  console.clear();
 
   const filter = {
-    UrlName: "Courage-Wolf",
+    LanguageCode: "en",
+    UrlName: "Insanity-Wolf",
   };
 
   const sort = {
-    InstancesCount: -1,
+    TotalVotesScore: -1,
   };
 
-  const limit = 10;
+  const limit = 500;
   const skip = 0;
 
-  const insts = await db.find("Instances", filter, sort, limit, skip);
+  const loading = Loading.startNew(`Finding instances...`);
 
-  console.log(`Found ${insts.length} instances.`.green);
+  let insts = await db.find("Instances", filter, sort, limit, skip, true);
+  insts = insts.filter((inst) => inst.text0?.length && inst.text1?.length);
 
-  console.log(
-    insts.map((inst) => [inst.text0, inst.text].onlyTruthy().join(", "))
-  );
+  loading.stop(`Found ${insts.length} instances.`);
+
+  const progress = Progress.newAutoDisplay(insts.length, {});
+
+  for (const inst of insts) {
+    const line = {
+      prompt: inst.displayName,
+      completion: `${inst.text0}\n${inst.text1}###`,
+    };
+    fs.appendFileSync(config.data.set.path, JSON.stringify(line) + "\n");
+    progress.increment();
+  }
+
+  progress.done();
+  console.log();
 })();

@@ -311,6 +311,7 @@ interface String {
 
 interface Array<T> {
   contains(item: T, getItemKey?: (item: T) => any): boolean;
+  reversed(): T[];
   removeAt(index: number): void;
   insertAt(index: number, item: T, appendToEnd: boolean): void;
   clear(stagger: number): void;
@@ -1208,6 +1209,10 @@ if (typeof Array !== "undefined") {
       return this.find((i) => getItemKey(i) == key) != null;
     }
     return this.indexOf(item) != -1;
+  };
+
+  Array.prototype.reversed = function () {
+    return this.slice().reverse();
   };
 
   Array.prototype.removeAt = function (index: number) {

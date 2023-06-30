@@ -18,19 +18,23 @@ class Loading {
     this.showInfo();
   }
 
-  stop() {
+  stop(info?: string) {
     if (!this.isRunning) return;
+    const elapsedTime = Date.now() - this.startTime!;
     this.isRunning = false;
     this.startTime = null;
     process.stdout.write("\r");
     process.stdout.clearLine(0);
+    if (info) console.log(elapsedTime.unitifyTime(), info.gray);
   }
 
   private showInfo() {
     if (!this.isRunning) return;
     const elapsedTime = Date.now() - this.startTime!;
     process.stdout.write(`\r`);
-    process.stdout.write(`${elapsedTime.unitifyTime()} ${this.info || ""}`);
+    process.stdout.write(
+      `${elapsedTime.unitifyTime()} ${(this.info || "").gray}`
+    );
     if (this.isRunning) {
       setTimeout(this.showInfo.bind(this), 100);
     }
