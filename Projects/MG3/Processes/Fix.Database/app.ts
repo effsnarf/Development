@@ -16,7 +16,14 @@ import { Database } from "@shared/Database/Database";
   console.log(`Fixing ${`Generators`.green}.${`InstancesCount`.yellow}..`);
   const progress = Progress.newAutoDisplay(generatorsCount);
 
-  for await (const gen of db.findIterable("Generators", {}, { _id: 1 })) {
+  for await (const gen of db.findIterable(
+    "Generators",
+    {},
+    { _id: 1 },
+    undefined,
+    undefined,
+    true
+  )) {
     const instancesCount = await db.count("Instances", {
       GeneratorID: gen._id,
     });
