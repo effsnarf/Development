@@ -9,10 +9,6 @@ import { Database } from "@shared/Database/Database";
   const config = (await Configuration.new()).data;
   const db = await Database.new(config.database);
 
-  const loading = Loading.startNew(
-    `Fixing ${`Generators`.green}.${`InstancesCount`.yellow}..`
-  );
-
   const generatorsCount = await db.count("Generators");
 
   const progress = Progress.newAutoDisplay(generatorsCount);
