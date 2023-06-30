@@ -96,9 +96,23 @@ class MongoDatabase extends DatabaseBase {
     skip?: number | undefined,
     lowercaseFields?: boolean | undefined
   ): AsyncGenerator<any, any, unknown> {
-    const docs = await this.find(collectionName, query, sort, limit, skip);
-    for (const doc of docs) {
-      yield doc;
+    if (skip) {
+      const docs = await this.find(collectionName, query, sort, limit, skip);
+      for (const doc of docs) {
+        yield doc;
+      }
+    } else {
+      if (!sort) throw new Error("Sort is required.");
+      const batchSize = 100;
+      let skip = 0;
+      let docs = await this.find(collectionName, query, sort, batchSize, skip);
+      while (docs.length > 0) {
+        for (const doc of docs) {
+          yield doc;
+        }
+        skip += batchSize;
+        docs = await this.find(collectionName, query, sort, batchSize, skip);
+      }
     }
   }
 

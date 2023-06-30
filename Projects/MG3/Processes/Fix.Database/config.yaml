@@ -1,0 +1,3 @@
+database:
+  connectionString: mongodb://localhost
+  database: MemeGenerator

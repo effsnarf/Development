@@ -61,6 +61,8 @@ computed:
     }
 name: e-instance-create
 style:
+  .comp-e-instance:
+    margin-bottom: 2rem
   img:
     margin-bottom: 1rem
   input:

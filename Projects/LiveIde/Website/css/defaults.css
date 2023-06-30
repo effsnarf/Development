@@ -32,7 +32,7 @@ a:hover
 
 .grayish:hover
 {
-  filter: grayscale(0.7);
+  filter: none;
   opacity: 1;
 }
 
