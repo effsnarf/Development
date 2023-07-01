@@ -1,0 +1,52 @@
+dom:
+  .container:
+    div:
+      e.instance.create:
+        ref: createInstance1
+        layout: horizontal
+        ':show-create-button': 'false'
+        on_has-content: hasInstanceContent = $event
+    ui.textarea:
+      hint: what's on your mind?
+      v-model: text
+    transition:
+      name: slide
+      ui.button:
+        v-if: canPost
+        text: post
+        on_click: post
+props: null
+data:
+  text: null
+  hasInstanceContent: false
+mounted: |
+  async function() {
+  }
+methods:
+  post: |
+    function() {
+      debugger;
+    }
+computed:
+  canPost: |
+    function() {
+      if (this.hasInstanceContent) return true;
+      if (this.text) return true;
+      return false;
+    }
+style:
+  .container:
+    display: flex
+    flex-direction: column
+    align-items: center
+    max-width: 25em
+    margin: auto
+    gap: 1em
+name: e-post-create
+template: >-
+  <div class="comp-e-post-create container"><div><e-instance-create
+  ref="createInstance1" layout="horizontal" :show-create-button="false"
+  @has-content="hasInstanceContent =
+  $event"></e-instance-create></div><ui-textarea hint="what's on your mind?"
+  v-model="text"></ui-textarea><transition name="slide"><ui-button
+  v-if="canPost" text="post" @click="post"></ui-button></transition></div>

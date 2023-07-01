@@ -1,16 +1,19 @@
 dom:
   input:
-    type: text
-    value: value
+    ':type': type
+    ':placeholder': hint
+    ':value': value
     on_input: onInput
 props:
+  type: text
   value: null
   hint: null
 methods:
   onInput: |
     function(e) {
-      this.value = e.target.value;
-      this.$emit('input', this.value);
+      this.$emit('input', e.target.value);
     }
 name: ui-text-box
-template: <input class="comp-ui-text-box" type="text" value="value" @input="onInput"/>
+template: >-
+  <input class="comp-ui-text-box" :type="type" :placeholder="hint"
+  :value="value" @input="onInput"/>

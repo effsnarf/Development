@@ -45,13 +45,10 @@ style:
   .comp-e-instance .footer:
     display: none
   .post-text:
-    width: 65%
-    display: inline-block
     padding: 1rem
   .enlarged .post-media:
-    width: 60%
-  .enlarged .post-text:
-    width: 35%
+    width: 100%
+  .enlarged .post-text: null
 name: e-post
 template: >-
   <div class="comp-e-post" :class="getCssClass()"><div class="post-media"

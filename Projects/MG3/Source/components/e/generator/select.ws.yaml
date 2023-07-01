@@ -1,0 +1,41 @@
+dom:
+  div:
+    .grid:
+      ui.image:
+        v-for: generator in generators
+        ':tooltip': generator.displayName
+        ':square': 'true'
+        ':imageID': generator.imageID
+        ':key': generator.generatorID
+        on_click: () => onClick(generator)
+data:
+  query: null
+  generators: null
+mounted: |
+  async function() {
+    this.generators = await this.$root.dbp.generators.select.popular();
+  }
+methods:
+  onClick: |
+    function (generator) {
+      this.$emit('input', generator)
+    }
+style:
+  .grid:
+    grid-template: 1fr / repeat(5, auto)
+    gap: 0.5em
+  .comp-ui-image:
+    filter: grayscale(1)
+    opacity: 0.5
+    cursor: pointer
+    transition: 0.3s
+  .comp-ui-image:hover:
+    filter: grayscale(0)
+    opacity: 1
+    transition: 0s
+name: e-generator-select
+template: >-
+  <div class="comp-e-generator-select"><div class="grid"><ui-image
+  v-for="generator in generators" :tooltip="generator.displayName"
+  :square="true" :imageID="generator.imageID" :key="generator.generatorID"
+  @click="() =&gt; onClick(generator)"></ui-image></div></div>

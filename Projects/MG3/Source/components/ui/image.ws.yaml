@@ -8,6 +8,7 @@ dom:
       ':class': getCssClass()
       ':src': (src || emptySrc)
       on_load: onLoad
+    on_click: $emit('click')
 props:
   imageID: null
   url: null
@@ -58,13 +59,11 @@ computed:
 style:
   .image, img:
     width: 100%
-  .image:
-    overflow: hidden
   .square:
     aspect-ratio: 1
     object-fit: cover
 name: ui-image
 template: >-
-  <component class="comp-ui-image image" :is="getCompType()" :url="url"><img
-  ref="image1" :class="getCssClass()" :src="(src || emptySrc)"
-  @load="onLoad"/></component>
+  <component class="comp-ui-image image" :is="getCompType()" :url="url"
+  @click="$emit('click')"><img ref="image1" :class="getCssClass()" :src="(src ||
+  emptySrc)" @load="onLoad"/></component>

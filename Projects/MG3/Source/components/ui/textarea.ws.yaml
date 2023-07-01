@@ -1,13 +1,23 @@
 dom:
   textarea:
     ':value': value
-    on_input: $emit('input', $event.target.value)
+    ':placeholder': hint
+    on_input: onInput
     on_focus: $emit('focus')
     on_blur: $emit('blur')
     on_keydown: onKeyDown
 props:
   value: null
+  hint: null
 methods:
+  onInput: |
+    function(e) {
+      const heightLimit = 200;
+      const textarea = e.target;
+      this.$emit('input', textarea.value);
+      textarea.style.height = "";
+      textarea.style.height = Math.min(textarea.scrollHeight, heightLimit) + "px";
+    }
   onKeyDown: |
     (e) => {
       if (e.key == 'Tab') {
@@ -22,6 +32,6 @@ methods:
     }
 name: ui-textarea
 template: >-
-  <textarea class="comp-ui-textarea" :value="value" @input="$emit('input',
-  $event.target.value)" @focus="$emit('focus')" @blur="$emit('blur')"
+  <textarea class="comp-ui-textarea" :value="value" :placeholder="hint"
+  @input="onInput" @focus="$emit('focus')" @blur="$emit('blur')"
   @keydown="onKeyDown"></textarea>

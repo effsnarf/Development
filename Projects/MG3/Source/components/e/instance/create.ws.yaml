@@ -1,30 +1,46 @@
 dom:
   div:
-    v-if: generator
-    div:
-      transition#1:
-        name: slide
-        e.instance:
-          v-if: hasText
-          ':item': tempInstance
-      input#1:
-        v-model: text0
-        placeholder: top text
-      input#2:
-        v-model: text1
-        placeholder: bottom text
-      transition:
-        name: slide
-        ui.button:
-          v-if: hasText
-          text: create
-          ':is-loading': isCreating
-          on_click: create
+    transition:
+      name: slide
+      e.generator.select:
+        v-show: showGeneratorSelect
+        v-model: myGenerator
+        on_input: showGeneratorSelect = false
+    .container:
+      ':class': layout
+      div:
+        transition#1:
+          name: slide
+          e.instance:
+            v-if: ((layout == 'horizontal') || hasText)
+            ':item': tempInstance
+            ':key': myGenerator?.generatorID
+            on_click: showGeneratorSelect = true
+      .inputs:
+        input#1:
+          v-model: text0
+          placeholder: top text
+          on_focus: onFocus
+        input#2:
+          v-model: text1
+          placeholder: bottom text
+          on_focus: onFocus
+        transition:
+          name: slide
+          ui.button:
+            v-if: showCreateButton && hasText
+            text: create
+            ':is-loading': isCreating
+            on_click: create
 props:
   generator: null
+  layout: null
+  showCreateButton: true
 data:
+  myGenerator: null
   text0: null
   text1: null
+  showGeneratorSelect: false
   isCreating: false
 methods:
   create: |
@@ -32,7 +48,7 @@ methods:
       this.isCreating = true;
       try
       {
-        const newInstance = await this.$root.dbp.instances.create.one(null, this.generator.generatorID, null, this.text0, this.text1);
+        const newInstance = await this.$root.dbp.instances.create.one(null, this.myGenerator.generatorID, null, this.text0, this.text1);
         this.clear();
         this.$emit("instance-created", newInstance);
       }
@@ -46,26 +62,57 @@ methods:
       this.text0 = null;
       this.text1 = null;
     }
+  onFocus: |
+    function(e) {
+      if (!this.myGenerator) this.showGeneratorSelect = true;
+    }
 computed:
   tempInstance: |
     function() {
       return {
         text0: this.text0,
         text1: this.text1,
-        imageID: this.generator.imageID,
+        imageID: this.myGenerator?.imageID,
       };
+    }
+  hasContent: |
+    function() {
+      return (this.hasGenerator && this.hasText) ? true : false;
+    }
+  hasGenerator: |
+    function() {
+      return !!this.myGenerator;
     }
   hasText: |
     function() {
       return this.text0 || this.text1;
     }
+watch:
+  generator: |
+    function(newGenerator) {
+      this.myGenerator = newGenerator;
+    }
+  hasContent: |
+    function() {
+      this.$emit("has-content", this.hasContent);
+    }
 name: e-instance-create
 style:
   .comp-e-instance:
+    opacity: 0.7
+    cursor: pointer
+  .comp-e-instance:hover:
+    opacity: 1
+    transition: 0s
+  .container:
     margin-bottom: 2rem
+  .horizontal:
+    display: grid !important
+    grid-template: 1fr / 1fr 3fr
+    gap: 1rem
   img:
     margin-bottom: 1rem
-  input:
+  .inputs input:
     text-align: center
     text-transform: uppercase
     padding: 0.3em 0.5em !important
@@ -75,9 +122,16 @@ style:
     width: 70%
     margin: 0.5rem auto
 template: >-
-  <div class="comp-e-instance-create" v-if="generator"><div><transition
-  name="slide"><e-instance v-if="hasText"
-  :item="tempInstance"></e-instance></transition><input v-model="text0"
-  placeholder="top text"/><input v-model="text1" placeholder="bottom
-  text"/><transition name="slide"><ui-button v-if="hasText" text="create"
-  :is-loading="isCreating" @click="create"></ui-button></transition></div></div>
+  <div class="comp-e-instance-create"><transition
+  name="slide"><e-generator-select v-show="showGeneratorSelect"
+  v-model="myGenerator" @input="showGeneratorSelect =
+  false"></e-generator-select></transition><div class="container"
+  :class="layout"><div><transition name="slide"><e-instance v-if="((layout ==
+  'horizontal') || hasText)" :item="tempInstance"
+  :key="myGenerator?.generatorID" @click="showGeneratorSelect =
+  true"></e-instance></transition></div><div class="inputs"><input
+  v-model="text0" placeholder="top text" @focus="onFocus"/><input
+  v-model="text1" placeholder="bottom text" @focus="onFocus"/><transition
+  name="slide"><ui-button v-if="showCreateButton &amp;&amp; hasText"
+  text="create" :is-loading="isCreating"
+  @click="create"></ui-button></transition></div></div></div>

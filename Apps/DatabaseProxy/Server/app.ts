@@ -31,42 +31,6 @@ import { Analytics, ItemType } from "@shared/Analytics";
 import { debug } from "console";
 // #endregion
 
-const cache = {
-  _store: null as CacheBase | null,
-  _getStore: async () => {
-    if (!cache._store) cache._store = await MemoryCache.new();
-    // cache._store = await Cache.new({
-    //   memory: true,
-    // });
-    return cache._store;
-  },
-  get: {
-    api: {
-      methods: async (db: MongoDatabase | undefined) => {
-        if (!db) return null;
-        return (
-          await (
-            await cache._getStore()
-          ).get(`${db.database}._ApiMethods`, async () => {
-            return { apiMethods: await db?.find("_ApiMethods", {}) };
-          })
-        )?.apiMethods;
-      },
-    },
-    collection: {
-      names: async (db: MongoDatabase | undefined) => {
-        return (
-          await (
-            await cache._getStore()
-          ).get(`${db?.database}.CollectionNames`, async () => {
-            return { collectionNames: await db?.getCollectionNames() };
-          })
-        )?.collectionNames;
-      },
-    },
-  },
-};
-
 const getResponseSize = (response: any) => {
   if (!response.headers) return null;
   return parseInt(response.headers["content-length"] || 0);
@@ -79,6 +43,54 @@ const getResponseSize = (response: any) => {
   });
   const config = configObj.data;
   // #endregion
+
+  const cache = {
+    _store: null as CacheBase | null,
+    _getStore: async () => {
+      if (!cache._store) cache._store = await MemoryCache.new();
+      // cache._store = await Cache.new({
+      //   memory: true,
+      // });
+      return cache._store;
+    },
+    get: {
+      api: {
+        methods: async (db: MongoDatabase | undefined) => {
+          if (!db) return null;
+          let apiMethods = (
+            await (
+              await cache._getStore()
+            ).get(`${db.database}._ApiMethods`, async () => {
+              return { apiMethods: await db?.find("_ApiMethods", {}) };
+            })
+          )?.apiMethods;
+          for (const apiMethodKey of config.api.methods) {
+            const key = apiMethodKey.split(".");
+            const apiMethod = config.api.methods[apiMethodKey];
+            apiMethods.push({
+              entity: key[0],
+              group: key[1],
+              name: key[2],
+              args: apiMethod.args,
+              code: apiMethod.code,
+            });
+          }
+          return apiMethods;
+        },
+      },
+      collection: {
+        names: async (db: MongoDatabase | undefined) => {
+          return (
+            await (
+              await cache._getStore()
+            ).get(`${db?.database}.CollectionNames`, async () => {
+              return { collectionNames: await db?.getCollectionNames() };
+            })
+          )?.collectionNames;
+        },
+      },
+    },
+  };
 
   // #region 💻 Console
 

@@ -39,3 +39,9 @@ dbs:
       enabled: false
 restart:
   url: /restart/Jz0xnwG1bDv57LFpKTS6UkV8h9XQtCeBOMl2NHfRIj3yPcZYimAsrqdV4oWEaFhu
+api:
+  methods:
+    Threads.select.suggestions:
+      args: []
+      code: |
+        return "fuck this anal cunt"
