@@ -33,6 +33,7 @@ analytics:
         database: MG-Analytics
 cache:
   ignore:
+    - /api/Threads
     - /api/Instances/select/popular
     - /create/
     - /get/new/id

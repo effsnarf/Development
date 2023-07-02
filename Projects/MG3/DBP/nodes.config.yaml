@@ -1,4 +1,8 @@
 title:
+admin:
+  ips:
+    #- 127.0.0.1
+    - 2a02:ab88:c8b:fb00:ad3a:73d6:a5ba:7772
 server:
   host: localhost
   port:
@@ -41,7 +45,145 @@ restart:
   url: /restart/Jz0xnwG1bDv57LFpKTS6UkV8h9XQtCeBOMl2NHfRIj3yPcZYimAsrqdV4oWEaFhu
 api:
   methods:
-    Threads.select.suggestions:
+    Generators.select.related:
+      args: [urlName]
+      code: | #js
+        if (!urlName) return [];
+
+        if (urlName == "Forever-Alone")
+        {
+          const gens = [await db.findOne("Generators", { UrlName: "Depression-Dog" })];
+          return gens;
+        }
+
+        if (urlName == "Socially-Awkward-Penguin") {
+          const displayName = urlName.replace(/-/g, ' ');
+          const regex = new RegExp(`penguin`, 'gi');
+          var gens = await db.find('Generators', { DisplayName: { $regex: regex, $ne: displayName } }, { InstancesCount: -1 }, 10, 0, true);
+          return gens;
+        }
+
+        var gen = (await db.findOne('Generators', { UrlName: urlName }));
+
+        if (!gen) return [];
+
+        var displayName = gen.displayName;
+        var words = displayName.split(' ');
+        var regex = new RegExp(`(${words.join("|")})`, 'gi');
+        var gens = await db.find('Generators', { DisplayName: { $regex: regex, $ne: displayName } }, { InstancesCount: -1 }, 10, 0, true);
+
+        return gens;
+    Instances.delete.one:
+      admin: true
+      args: [instanceID]
+      code: | #js
+        await db.delete("Instances", { _id: instanceID });
+    Instances.sample.popular:
+      args: [urlName, count]
+      code: | #js
+        const gen = await db.findOne("Generators", { UrlName: urlName });
+
+        const instances = await db.aggregate("Instances",
+          [
+            { $match: { LanguageCode: "en", GeneratorID: gen._id, TotalVotesScore: { $gt: 20 } } },
+            { $sample: { size: count } }
+          ]
+        );
+
+        return instances;
+    Threads.create.one:
       args: []
-      code: |
-        return "fuck this anal cunt"
+      code: | #js
+        let thread = {
+          PostsCount: 0,
+          Created: Date.now(),
+        };
+        thread = await db.upsert("Threads", thread, true);
+        return thread;
+    Threads.select.one:
+      args: [threadID]
+      code: | #js
+        const thread = await db.findOne("Threads", { _id: threadID });
+        if (!thread) throw new Error(`Thread not found`);
+        thread.posts = await db.find("Posts", { ThreadID: thread._id }, { }, 1000, null, true);
+        return thread;
+    Threads.select.all:
+      args: []
+      code: | #js
+        let threads = await db.find("Threads", {}, { LastPostCreated: -1 }, 1000, null, true);
+        threads = await Promise.all(threads.map(t => dbp.threads.select.one(t._id)));
+        return threads;
+    Posts.create.one:
+      args: [threadID, larpGeneratorID, text, instance]
+      code: | #js
+        const now = Date.now();
+
+        let thread = null;
+
+        if (threadID)
+        {
+          thread = await db.findOne("Threads", { _id: threadID });
+        }
+        else
+        {
+          thread = await dbp.threads.create.one();
+        }
+        if (!instance) instance = null;
+
+        if (instance)
+        {
+          instance = await dbp.instances.create.one("en", instance.generatorID, null, instance.text0, instance.text1);
+          instance = {
+            _id: instance.instanceID,
+            GeneratorID: instance.generatorID,
+            DisplayName: instance.displayName,
+            UrlName: instance.urlName,
+            ImageID: instance.imageID,
+            Text0: instance.text0,
+            Text1: instance.text1,
+          };
+          instance._id = instance.instanceID;
+        }
+
+        let larpGenerator = (!larpGeneratorID) ? null : await db.findOne("Generators", { _id: larpGeneratorID });
+        if (larpGenerator)
+        {
+          larpGenerator = {
+            _id: larpGenerator._id,
+            DisplayName: larpGenerator.displayName,
+            UrlName: larpGenerator.urlName,
+            ImageID: larpGenerator.imageID,
+          };
+        }
+
+        let post = {
+          ThreadID: thread._id,
+          LarpGenerator: larpGenerator,
+          Text: text,
+          Instance: instance,
+          Created: now,
+        };
+
+        post = await db.upsert("Posts", post, true);
+
+        thread.postsCount++;
+        thread.lastPostCreated = now;
+        await db.upsert("Threads", thread);
+
+        return post;
+    Posts.delete.one:
+      admin: true
+      args: [postID]
+      code: | #js
+        const post = await db.findOne("Posts", { _id: postID });
+        if (!post) return;
+        const thread = await dbp.threads.select.one(post.threadID);
+        await db.delete("Posts", { _id: postID });
+        // Delete the thread if this is the first post
+        if (post._id == thread.posts[0]._id)
+        {
+          await db.delete("Threads", { _id: thread._id });
+          return;
+        }
+        thread.postsCount--;
+        await db.upsert("Threads", thread);

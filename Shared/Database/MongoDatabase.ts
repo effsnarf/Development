@@ -7,11 +7,16 @@ import { MongoClient, ObjectId } from "mongodb";
 
 interface MongoDatabaseOptions {
   verifyDatabaseExists: boolean;
+  lowercaseFields: boolean | undefined;
 }
 class MongoDatabase extends DatabaseBase {
   private client: MongoClient;
 
-  constructor(connectionString: string, public database: string) {
+  constructor(
+    connectionString: string,
+    public database: string,
+    private options: MongoDatabaseOptions
+  ) {
     super();
     this.client = new MongoClient(connectionString);
   }
@@ -21,6 +26,7 @@ class MongoDatabase extends DatabaseBase {
     database: string,
     options: MongoDatabaseOptions = {
       verifyDatabaseExists: false,
+      lowercaseFields: undefined,
     }
   ) {
     if (options.verifyDatabaseExists) {
@@ -35,7 +41,7 @@ class MongoDatabase extends DatabaseBase {
       }
     }
 
-    const db = new MongoDatabase(connectionString, database);
+    const db = new MongoDatabase(connectionString, database, options);
     await db.client.connect();
     return db;
   }
@@ -142,6 +148,9 @@ class MongoDatabase extends DatabaseBase {
     pipeline: any[],
     lowercaseFields?: boolean | undefined
   ) {
+    if (typeof lowercaseFields != "boolean")
+      lowercaseFields = this.options.lowercaseFields;
+
     // Remove any empty stages (e.g. { $match: null } or { $match: {} } or { $sort: {} })
     pipeline = pipeline.filter((p) => {
       const values = Object.values(p);
@@ -164,7 +173,9 @@ class MongoDatabase extends DatabaseBase {
     const timer = Timer.start();
 
     const collection = await this.getCollection(collectionName);
-    let docs = await (await collection.aggregate(pipeline)).toArray();
+    let docs = await (
+      await collection.aggregate(pipeline, { maxTimeMS: 5000 })
+    ).toArray();
 
     timer.stop();
 
@@ -192,6 +203,9 @@ class MongoDatabase extends DatabaseBase {
   }
 
   protected async _upsert(collectionName: string, doc: any) {
+    if (this.options.lowercaseFields)
+      doc = Objects.toTitleCaseKeys(Objects.clone(doc));
+
     const collection = await this.getCollection(collectionName);
 
     const result = await collection.updateOne(

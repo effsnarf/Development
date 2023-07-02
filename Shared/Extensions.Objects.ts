@@ -89,6 +89,17 @@ class Objects {
     return result;
   }
 
+  static toTitleCaseKeys(obj: any): any {
+    const result = {} as any;
+    for (const key of Object.keys(obj)) {
+      let value = obj[key];
+      if (value && !Array.isArray(value) && typeof value === "object")
+        value = Objects.toTitleCaseKeys(value);
+      result[key.toTitleCase()] = value;
+    }
+    return result;
+  }
+
   static stringify(obj: any): string {
     return util.inspect(obj, { depth: 4 });
   }

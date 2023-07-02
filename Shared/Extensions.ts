@@ -342,6 +342,7 @@ interface Array<T> {
   sortByDesc(...projects: ((item: T) => any)[]): T[];
   stringify(): string;
   onlyTruthy<T>(): T[];
+  shuffle(): T[];
 }
 
 interface Function {
@@ -1400,6 +1401,10 @@ if (typeof Array !== "undefined") {
 
   Array.prototype.onlyTruthy = function (): any {
     return this.filter((item) => !!item);
+  };
+
+  Array.prototype.shuffle = function (): any {
+    return this.sortBy(() => Math.random() - 0.5);
   };
 }
 // #endregion

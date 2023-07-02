@@ -42,8 +42,8 @@ import { Database } from "@shared/Database/Database";
     const lines = [];
     for (const inst of insts) {
       const line = {
-        prompt: ``,
-        completion: ` ${inst.displayName}\n${inst.text0}\n${inst.text1} ###`,
+        prompt: `${inst.displayName}:\n${inst.text0}`,
+        completion: ` ${inst.text1} ###`,
       };
       lines.push(line);
     }
