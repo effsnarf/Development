@@ -1,7 +1,13 @@
 dom:
-  img:
-    src: https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/images/loading.gif
+  .center:
+    img:
+      src: >-
+        https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/images/loading.gif
+style:
+  .center:
+    display: flex
+    justify-content: center
 name: ui-loading
 template: >-
-  <img class="comp-ui-loading"
-  src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/images/loading.gif"/>
+  <div class="comp-ui-loading center"><img
+  src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/images/loading.gif"/></div>

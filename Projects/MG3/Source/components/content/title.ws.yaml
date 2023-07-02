@@ -41,6 +41,7 @@ mounted: |
 style:
   .stuck .title:
     font-size: 6vh
+    transform: translateX(-10%)
   .background:
     background: linear-gradient(rgba(0, 0, 0, 1), rgba(0, 0, 0, 0))
     position: absolute
@@ -54,6 +55,8 @@ style:
     border-radius: 0
     transition: 0s !important
   .comp-ui-image:
+    position: relative
+    top: 1rem
     max-width: 15% !important
     margin: 0 1em
     float: left

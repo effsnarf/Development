@@ -95,9 +95,17 @@ interface MgParams {
     },
     async mounted() {},
     methods: {
-      async navigateTo(url: string) {
+      async navigateTo(item: any) {
+        const url = this.itemToUrl(item);
+        const self = this as any;
+        self.error = null;
         window.history.pushState({}, "", url);
         await this.refresh();
+      },
+      itemToUrl(item: any) {
+        if (typeof item == "string") return item;
+        if (item.threadID) return helpers.url.thread({ _id: item.threadID });
+        throw new Error("Unknown item type");
       },
       async compileApp() {
         await client.compileApp();
@@ -132,6 +140,11 @@ interface MgParams {
         //(this as any).key1++;
         window.scrollTo({ top: 0, behavior: "smooth" });
       },
+      instanceToGenerator(instance: any) {
+        let gen = JSON.parse(JSON.stringify(instance));
+        gen._id = gen.generatorID;
+        return gen;
+      },
       getInstanceText(instance: any) {
         if (!instance) return null;
         return [instance.text0, instance.text1].filter((a) => a).join(", ");
@@ -141,9 +154,8 @@ interface MgParams {
       },
       getKey(item: any) {
         if (!item) return null;
-        if (item.instanceID) return item.instanceID;
-        if (item.generatorID) return item.generatorID;
-        return null;
+        if (item._id) return item._id;
+        return item;
       },
       getRandomStanza(poem: any) {
         if (!poem?.length) return null;

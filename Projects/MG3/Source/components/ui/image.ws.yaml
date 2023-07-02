@@ -59,6 +59,8 @@ computed:
       return '/img/empty.png';
     }
 style:
+  .comp-ui-image:
+    overflow: hidden
   .image, img:
     width: 100%
   .square:

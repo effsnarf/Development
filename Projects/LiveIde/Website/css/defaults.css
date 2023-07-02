@@ -24,6 +24,11 @@ a:hover
   text-decoration: none;
 }
 
+a:not([href])
+{
+  cursor: default;
+}
+
 .grayish
 {
   filter: grayscale(1);
@@ -323,6 +328,14 @@ input, input[type=text], select
 {
   font-size: 120%;
 }
+
+input[type="color"]
+{
+  padding: 0 !important;
+  min-height: 3em;
+  cursor: pointer;
+}
+
 .ide-checkbox
 {
   background: #666666;
@@ -605,6 +618,7 @@ select, input[type=range]
 }
 .error
 {
+  text-align: center;
   text-shadow: -3px 3px 1px #000;
   background: #b03030;
   padding: 0.5em;

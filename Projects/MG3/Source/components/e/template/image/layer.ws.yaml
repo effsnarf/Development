@@ -1,0 +1,10 @@
+dom:
+  ui.image:
+    v-if: item
+    ':imageID': item.imageID
+props:
+  item: null
+name: e-template-image-layer
+template: >-
+  <ui-image class="comp-e-template-image-layer" v-if="item"
+  :imageID="item.imageID"></ui-image>

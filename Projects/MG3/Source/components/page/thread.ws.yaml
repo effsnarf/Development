@@ -8,9 +8,11 @@ dom:
       v-slot: middle
       e.thread:
         v-model: thread
+      e.post.create:
+        v-if: threadNotFound
 data:
   thread: null
-  error: null
+  threadNotFound: false
 computed:
   threadID: |
     function() {
@@ -20,31 +22,34 @@ mounted: |
   async function() {
   }
 watch:
-  threadID: |
-    {
-      handler: async function() {
+  threadID:
+    handler: |
+      async function() {
         if (this.$root.params.page != "thread") return;
         try
         {
           this.$root.isLoading = true;
-          this.error = null;
+          this.threadNotFound = false;
           this.thread = (!this.threadID) ? null : (await this.$root.dbp.threads.select.one(this.threadID));
-        }
-        catch (ex)
-        {
-          this.$root.error = ex;
+          this.threadNotFound = (this.threadID && !this.thread);
         }
         finally
         {
           this.$root.isLoading = false;
         }
-      },
-      immediate: true
-    }
+      }
+    immediate: true
+  threadNotFound:
+    handler: |
+      function(newTNF) {
+        this.$root.error = (!newTNF ? null : "Thread not found");
+      }
+    immediate: true
 methods: null
 name: page-thread
 style: null
 template: >-
   <site class="comp-page-thread" page-name="thread"><template
   v-slot:left><e-thread-list></e-thread-list></template><template
-  v-slot:middle><e-thread v-model="thread"></e-thread></template></site>
+  v-slot:middle><e-thread v-model="thread"></e-thread><e-post-create
+  v-if="threadNotFound"></e-post-create></template></site>

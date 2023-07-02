@@ -1,8 +1,11 @@
 dom:
-  ul:
+  transition.group:
+    tag: ul
+    name: list
     class: menu3
     li:
       v-for: (item, index) in items
+      ':key': $root.getKey(item)
       ':class': getCssClass(index)
       slot:
         ':index': index
@@ -24,7 +27,9 @@ methods:
       };
     }
 name: ui-list
+style: null
 template: >-
-  <ul class="comp-ui-list menu3"><li v-for="(item, index) in items"
+  <transition-group class="comp-ui-list menu3" tag="ul" name="list"><li
+  v-for="(item, index) in items" :key="$root.getKey(item)"
   :class="getCssClass(index)" @click="() =&gt; onItemClick({ item, index
-  })"><slot :index="index" :item="item"></slot></li></ul>
+  })"><slot :index="index" :item="item"></slot></li></transition-group>

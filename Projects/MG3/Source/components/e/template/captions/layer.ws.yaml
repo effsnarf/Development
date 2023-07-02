@@ -1,0 +1,90 @@
+dom:
+  div:
+    v-if: item
+    div:
+      class: container
+      div:
+        class: size-ref
+        ref: sizeRef1
+        .texts:
+          .text:
+            v-for: (text, index) in [item.texts[0], item.texts[1]]
+            v-text: text
+            ':style': '{ fontSize: fontSizes[index] }'
+        div:
+          class: spacer
+name: e-template-captions-layer
+props:
+  item: null
+  showCreatePost: true
+data:
+  width: null
+mounted: |
+  function () {
+    window.addEventListener(`resize`, this.recalc.bind(this));
+    // Detect if the image element changes its size
+    let resizeObserver = new ResizeObserver(this.recalc.bind(this));
+    resizeObserver.observe(this.$refs.sizeRef1);
+  }
+methods:
+  onLoad: |
+    function () {
+      this.recalc();
+      [1,2,3].forEach(i => setTimeout(this.recalc.bind(this), i * 100))
+    }
+  recalc: |
+    function () {
+      if (!this.$refs.sizeRef1) return;
+      let rect = this.$refs.sizeRef1.getBoundingClientRect();
+      this.width = Math.round(rect.width);
+      this.height = Math.round(rect.height);
+      this.$emit("change");
+    }
+  getFontSize: |
+    function (s) {
+      if (!s) return 0;
+      if (!this.width) return 0;
+      const size = Math.min(3, Math.max(14, (36 - (s.length / 6))) / 50 *  this.width / 150);
+      return `${size*2.5}vh`;
+    }
+computed:
+  fontSizes: |
+    function () {
+      const sizes = [this.getFontSize(this.item.texts[0]), this.getFontSize(this.item.texts[1])];
+      return sizes;
+    }
+style:
+  .container, .size-ref, img:
+    width: 100%
+    aspect-ratio: 1
+    object-fit: cover
+  .container .size-ref, .texts, .text:
+    position: absolute
+  .spacer, .texts:
+    width: 100%
+    aspect-ratio: 1
+  .text:
+    text-align: center
+    display: block
+    width: 100%
+    top: 0
+    overflow: hidden
+    color: '#fff'
+    line-height: 1.2em
+    font-family: Impact,Oswald
+    text-transform: uppercase
+    text-shadow: '-2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000'
+    '-webkit-font-smoothing': antialiased
+    box-sizing: border-box
+    padding: 0.3em
+    filter: 'drop-shadow(-2px 4px 2px #00000060)'
+    transition: 0s
+  .text:nth-child(2):
+    top: auto
+    bottom: 0
+template: >-
+  <div class="comp-e-template-captions-layer" v-if="item"><div
+  class="container"><div class="size-ref" ref="sizeRef1"><div class="texts"><div
+  class="text" v-for="(text, index) in [item.texts[0], item.texts[1]]"
+  v-text="text" :style="{ fontSize: fontSizes[index] }"></div></div><div
+  class="spacer"></div></div></div></div>

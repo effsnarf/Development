@@ -1,0 +1,26 @@
+dom:
+  .flex:
+    .poster:
+      transition#1:
+        name: slide
+        e.generator.square:
+          ':show-tooltip': 'false'
+          ':show-anonymous': 'true'
+    ui.textarea:
+      hint: what's on your mind?
+      ':value': value
+      on_input: $emit('input', $event)
+props:
+  value: null
+style:
+  .flex:
+    gap: 1em
+  .poster:
+    width: 6em
+name: e-comment-create
+template: >-
+  <div class="comp-e-comment-create flex"><div class="poster"><transition
+  name="slide"><e-generator-square :show-tooltip="false"
+  :show-anonymous="true"></e-generator-square></transition></div><ui-textarea
+  hint="what's on your mind?" :value="value" @input="$emit('input',
+  $event)"></ui-textarea></div>

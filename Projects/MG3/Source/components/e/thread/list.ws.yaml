@@ -1,16 +1,17 @@
 dom:
   div:
     ui.loading:
-      v-if: isLoading
+      v-if: isLoading && !threads.length
     ui.list:
       v-slot: slotProps
       ':items': threads
       ui.link:
+        ':class': '{ selected: isCurrentThread(slotProps.item) }'
         ':url': $root.url.thread(slotProps.item)
         .grid:
           div#1:
             e.instance:
-              ':item': slotProps.item.posts[0].instance
+              ':item': firstPost(slotProps.item)?.instance
           ui.title:
             ':number': slotProps.item.posts.length
           div:
@@ -20,24 +21,37 @@ data:
   isLoading: false
 mounted: |
   async function() {
-    this.isLoading = true;
-    try
-    {
-        this.threads = await this.$root.dbp.threads.select.all();
-    }
-    finally
-    {
-      this.isLoading = false;
-    }
+    this.$watch(() => this.$root.params.url, this.init.bind(this), { immediate: true });
   }
 methods:
+  init: |
+    async function() {
+      this.isLoading = true;
+      try
+      {
+          this.threads = await this.$root.dbp.threads.select.all();
+      }
+      finally
+      {
+        this.isLoading = false;
+      }
+    }
+  isCurrentThread: |
+    function(thread) {
+      return this.$root.params.url == this.$root.url.thread(thread);
+    }
   getThreadTitle: |
     function(thread) {
       const post = thread.posts[0];
+      if (!post) return null;
       return post.text ||
         post.instance?.text1 ||
         post.instance?.text0 ||
         post.instance?.displayName;
+    }
+  firstPost: |
+    function(thread) {
+      return thread.posts[0];
     }
 name: e-thread-list
 style:
@@ -45,10 +59,10 @@ style:
     grid-template: 1fr / 2rem 2rem 1fr
     gap: 0.5rem
 template: >-
-  <div class="comp-e-thread-list"><ui-loading
-  v-if="isLoading"></ui-loading><ui-list v-slot="slotProps"
-  :items="threads"><ui-link :url="$root.url.thread(slotProps.item)"><div
-  class="grid"><div><e-instance
-  :item="slotProps.item.posts[0].instance"></e-instance></div><ui-title
+  <div class="comp-e-thread-list"><ui-loading v-if="isLoading &amp;&amp;
+  !threads.length"></ui-loading><ui-list v-slot="slotProps"
+  :items="threads"><ui-link :class="{ selected: isCurrentThread(slotProps.item)
+  }" :url="$root.url.thread(slotProps.item)"><div class="grid"><div><e-instance
+  :item="firstPost(slotProps.item)?.instance"></e-instance></div><ui-title
   :number="slotProps.item.posts.length"></ui-title><div
   v-text="getThreadTitle(slotProps.item)"></div></div></ui-link></ui-list></div>

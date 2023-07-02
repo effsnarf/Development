@@ -1,10 +1,21 @@
 name: site-main
 dom:
   div:
+    transition:
+      name: fade
+      content.title:
+        v-if: titleText
+        ':imageID': titleImageId
+        ':title': titleText
+        ':url': titleUrl
+        ':key': titleKey
+    div:
+      slot:
+        name: article
     .columns:
       .left:
         ui.sticky:
-          top: 160px
+          ':top': leftStickyTop
           slot:
             name: left
       .middle:
@@ -20,17 +31,29 @@ dom:
               name: right
             content.recommendations:
               ':items': recommendationItems
-    slot:
-      name: article
 props:
+  titleImageId: null
+  titleText: null
+  titleUrl: null
+  titleKey: null
   recommendationItems: null
+computed:
+  leftStickyTop: |
+    function() {
+      if (this.titleText) return "250px";
+      return "160px";
+    }
 style:
   .comp-site-main: null
+  .error:
+    margin-bottom: 3rem
 template: >-
-  <div class="comp-site-main"><div class="columns"><div class="left"><ui-sticky
-  top="160px"><slot name="left"></slot></ui-sticky></div><div
+  <div class="comp-site-main"><transition name="fade"><content-title
+  v-if="titleText" :imageID="titleImageId" :title="titleText" :url="titleUrl"
+  :key="titleKey"></content-title></transition><div><slot
+  name="article"></slot></div><div class="columns"><div class="left"><ui-sticky
+  :top="leftStickyTop"><slot name="left"></slot></ui-sticky></div><div
   class="middle"><ui-error :error="$root.error"></ui-error><slot
   name="middle"></slot></div><div class="right"><ui-sticky
   top="140px"><div><slot name="right"></slot><content-recommendations
-  :items="recommendationItems"></content-recommendations></div></ui-sticky></div></div><slot
-  name="article"></slot></div>
+  :items="recommendationItems"></content-recommendations></div></ui-sticky></div></div></div>

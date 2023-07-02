@@ -1,0 +1,107 @@
+dom:
+  div:
+    v-if: temp
+    .div1:
+      ui.select:
+        ':options': temp.layers.map((layer) => getLayerTypeIcon(layer.type))
+        v-model: selectedLayerIndex
+      .div2:
+        div:
+          div:
+            component#1:
+              ':is': selectedLayerEditorType
+              ':item': selectedLayer
+          .layers:
+            component#2:
+              class: layer
+              v-for: layer in temp.layers
+              ':is': getLayerType(layer)
+              ':item': layer
+props: null
+data:
+  temp: null
+  selectedLayerIndex: 0
+mounted: |
+  async function() {
+    await this.init();
+  }
+methods:
+  init: |
+    async function() {
+      const filters = {
+          blur: 0,
+          opacity: 1,
+          grayscale: 0
+        };
+
+      this.temp = {
+        layers: []
+      };
+
+      this.temp.layers.add({
+        type: 'rainbow',
+        pattern: 'pizza',
+        colors: ['#ff0000', '#00ff00', '#0000ff', '#ff0000', '#00ff00', '#0000ff'],
+        colorsCount: 3,
+        slices: 3,
+        filters
+      });
+
+      this.temp.layers.add({
+        type: 'image',
+        imageID: 880976,
+        filters
+      });
+
+      this.temp.layers.add({
+        type: 'captions',
+        texts: ['Hello', 'World'],
+        filters
+      });
+
+    }
+  getLayerType: |
+    function(layer) {
+      return `e-template-${layer.type}-layer`;
+    }
+  getLayerTypeIcon: |
+    function(type) {
+      return {
+        'image': '🖼️',
+        'captions': '📝',
+        'rainbow': '🌈'
+      }[type];
+    }
+computed:
+  selectedLayer: |
+    function() {
+      return this.temp.layers[this.selectedLayerIndex];
+    }
+  selectedLayerEditorType: |
+    function() {
+      return `e-template-${this.selectedLayer.type}-editor`;
+    }
+name: e-template-editor
+style:
+  .div1:
+    display: grid
+    grid-template: 1fr / 1fr 3fr
+    margin-bottom: 5rem
+  .div2:
+    aspect-ratio: 1 / 1
+  .layers:
+    aspect-ratio: 1 / 1
+  .layer:
+    position: absolute
+    top: 0
+    left: 0
+    width: 100%
+    height: 100%
+template: >-
+  <div class="comp-e-template-editor" v-if="temp"><div class="div1"><ui-select
+  :options="temp.layers.map((layer) =&gt; getLayerTypeIcon(layer.type))"
+  v-model="selectedLayerIndex"></ui-select><div
+  class="div2"><div><div><component :is="selectedLayerEditorType"
+  :item="selectedLayer"></component></div><div class="layers"><component
+  class="layer" v-for="layer in temp.layers" :is="getLayerType(layer)"
+  :item="layer"></component></div></div></div></div></div>

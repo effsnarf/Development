@@ -1,0 +1,12 @@
+dom:
+  div:
+    v-if: item
+    ui.image.select:
+      v-model: item.imageID
+props:
+  item: null
+style: null
+name: e-template-image-editor
+template: >-
+  <div class="comp-e-template-image-editor" v-if="item"><ui-image-select
+  v-model="item.imageID"></ui-image-select></div>

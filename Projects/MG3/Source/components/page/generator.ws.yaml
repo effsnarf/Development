@@ -1,17 +1,15 @@
 dom:
   site:
     page-name: generator
+    ':title-image-id': generator?.imageID
+    ':title-text': generator?.displayName
+    ':title-url': $root.url.generator(generator)
+    ':title-key': generator?.generatorID
     ':recommendation-items': recommendationItems
     template#1:
       v-slot: article
-      transition:
-        name: fade
-        content.title:
-          ':imageID': generator?.imageID
-          ':title': generator?.displayName
-          ':url': $root.url.generator(generator)
-          ':key': generator?.generatorID
       content.article:
+        v-if: poem
         template:
           v-slot: content
           .poem:
@@ -32,13 +30,12 @@ dom:
         grid-class: grid-1
     template#3:
       v-slot: left
-      ui.sticky:
-        top: 250px
-        e.instance.create:
-          v-if: showCreateInstance
-          ':generator': generator
-          on_instance-created: onInstanceCreated
+      e.instance.create:
+        v-if: showCreateInstance
+        ':generator': generator
+        on_instance-created: onInstanceCreated
 data:
+  urlName: null
   generator: null
   poem: null
   recommendationItems: []
@@ -60,14 +57,22 @@ methods:
       this.urlName = this.$root.params.urlName;
       if (!this.urlName) return;
       this.clear();
-      this.generator = !this.urlName ? null : await dbp.generators.select.one(null, this.urlName);
-      this.recommendationItems.replace(async() => await dbp.generators.select.related(this.urlName), 500, gen => gen.generatorID);
-      this.$refs.contentStream1?.reset();
-      setTimeout(() => {
-        this.poem = this.generator?.desc?.poem;
-      }, 500);
-      if (this.$root.params.page == "generator") {
-        this.$root.setDocumentTitle(this.generator?.displayName);
+      try
+      {
+        this.$root.isLoading = true;
+        this.generator = !this.urlName ? null : await dbp.generators.select.one(null, this.urlName);
+        this.recommendationItems.replace(async() => await dbp.generators.select.related(this.urlName), 500, gen => gen.generatorID);
+        this.$refs.contentStream1?.reset();
+        setTimeout(() => {
+          this.poem = this.generator?.desc?.poem;
+        }, 500);
+        if (this.$root.params.page == "generator") {
+          this.$root.setDocumentTitle(this.generator?.displayName);
+        }
+      }
+      finally
+      {
+        this.$root.isLoading = false;
       }
     }
   clear: |
@@ -124,19 +129,19 @@ style:
 name: page-generator
 template: >-
   <site class="comp-page-generator" page-name="generator"
+  :title-image-id="generator?.imageID" :title-text="generator?.displayName"
+  :title-url="$root.url.generator(generator)"
+  :title-key="generator?.generatorID"
   :recommendation-items="recommendationItems"><template
-  v-slot:article><transition name="fade"><content-title
-  :imageID="generator?.imageID" :title="generator?.displayName"
-  :url="$root.url.generator(generator)"
-  :key="generator?.generatorID"></content-title></transition><content-article><template
-  v-slot:content><div class="poem"><transition-group
-  name="list"><content-poem-stanza v-for="stanza in getRandomStanzas(poem)"
-  :item="stanza" :key="stanza.map(l =&gt; l.substring(0,
+  v-slot:article><content-article v-if="poem"><template v-slot:content><div
+  class="poem"><transition-group name="list"><content-poem-stanza v-for="stanza
+  in getRandomStanzas(poem)" :item="stanza" :key="stanza.map(l =&gt;
+  l.substring(0,
   5)).join('-')"></content-poem-stanza></transition-group></div><div
   class="float-clear"></div></template></content-article></template><template
   v-slot:middle><content-stream ref="contentStream1" item-type="e.instance"
   :get-more-items="getMoreInstances"
   grid-class="grid-1"></content-stream></template><template
-  v-slot:left><ui-sticky top="250px"><e-instance-create
-  v-if="showCreateInstance" :generator="generator"
-  @instance-created="onInstanceCreated"></e-instance-create></ui-sticky></template></site>
+  v-slot:left><e-instance-create v-if="showCreateInstance"
+  :generator="generator"
+  @instance-created="onInstanceCreated"></e-instance-create></template></site>

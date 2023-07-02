@@ -1,0 +1,103 @@
+dom:
+  .flex:
+    ui.image:
+      ':imageID': value
+    .dropzone:
+      ref: dropArea1
+      class: hoverable
+      v-text: dropAreaText
+      form:
+        input:
+          type: file
+          ref: file1
+          multiple: true
+          accept: image/*
+          onchange: (e) => handleFiles(e.files)
+props:
+  value: null
+data:
+  isUploading: false
+mounted: |
+  function() {
+    const dropArea = this.$refs.dropArea1;
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      dropArea.addEventListener(eventName, this.preventDefaults, false);
+    });
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropArea.addEventListener(eventName, this.highlight.bind(this), false);
+    });
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropArea.addEventListener(eventName, this.unhighlight.bind(this), false);
+    });
+    dropArea.addEventListener('drop', this.handleDrop.bind(this), false);
+  }
+methods:
+  handleDrop: |
+    function (e) {
+      let dt = e.dataTransfer;
+      let files = dt.files;
+      this.handleFiles(files);
+    }
+  handleFiles: |
+    function (files) {
+      ([...files]).forEach(this.uploadFile.bind(this));
+    }
+  uploadFile: |
+    async function(file) {
+      let url = "https://img.memegenerator.net/images/upload";
+
+      this.isUploading = true;
+
+      var xhr = new XMLHttpRequest();
+      var formData = new FormData();
+      xhr.open('POST', url, true);
+
+      xhr.addEventListener('readystatechange', function(e) {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+          this.isUploading = false;
+        }
+        else if (xhr.readyState == 4 && xhr.status != 200) {
+          this.isUploading = false;
+          alertify.error("An error occurred while uploading the file.");
+        }
+      }.bind(this));
+
+      formData.append('file', file);
+      xhr.send(formData);
+    }
+  preventDefaults: |
+    function (e) {
+      e.preventDefault()
+      e.stopPropagation()
+    }
+  highlight: |
+    function (e) {
+      this.$refs.dropArea1.classList.add('highlighted');
+    }
+  unhighlight: |
+    function (e) {
+      this.$refs.dropArea1.classList.remove('highlighted');
+    }
+computed:
+  dropAreaText: |
+    function () {
+      if (this.isUploading) return "uploading…";
+      return "drop image here";
+    }
+style:
+  .flex:
+    gap: 0.5rem
+  .comp-ui-image:
+    width: 15% !important
+  .dropzone:
+    width: 85% !important
+    border: '0.5rem dashed #ffffff'
+    font-size: 160%
+    text-align: center
+    font-family: monospace
+    opacity: 0.5
+name: ui-image-select
+template: >-
+  <div class="comp-ui-image-select flex"><ui-image
+  :imageID="value"></ui-image><div class="hoverable dropzone" ref="dropArea1"
+  v-text="dropAreaText" form="[object Object]"></div></div>

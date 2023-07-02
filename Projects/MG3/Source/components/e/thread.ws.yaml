@@ -25,6 +25,8 @@ methods:
   refresh: |
     async function() {
       const updatedThread = await this.$root.dbp.threads.select.one(this.thread._id);
+      // Thread was deleted
+      if (!updatedThread) return this.$root.navigateTo('/');
       this.$emit('input', updatedThread);
     }
 watch:

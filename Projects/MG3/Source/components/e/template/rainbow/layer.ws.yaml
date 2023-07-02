@@ -1,0 +1,94 @@
+dom:
+  div:
+    canvas:
+      ref: canvas1
+      width: 1000
+      height: 1000
+props:
+  item: null
+data:
+  drawTimer: null
+mounted: |
+  function () {
+    window.addEventListener(`resize`, this.draw.bind(this));
+    // Detect if the image element changes its size
+    let resizeObserver = new ResizeObserver(this.draw.bind(this));
+    resizeObserver.observe(this.$refs.canvas1);
+  }
+methods:
+  draw: |
+    function () {
+      const canvas = this.$refs.canvas1;
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+      const width = canvas.width;
+      const height = canvas.height;
+      const slices = this.item.slices;
+      const colors = this.item.colors;
+      const colorsCount = this.item.colorsCount;
+      const pattern = this.item.pattern?.toTitleCase();
+      if (!pattern) return;
+      this[`draw${pattern}`](ctx, width, height, slices, colors, colorsCount);
+    }
+  drawRadial: |
+    function (ctx, width, height, slices, colors, colorsCount) {
+      const grd = ctx.createRadialGradient(width / 2, height / 2, 0, width / 2, height / 2, width * 2);
+      for (let i = 0; i < slices; i++) {
+        grd.addColorStop(i / slices, colors[i % colorsCount]);
+      }
+      grd.addColorStop(1, colors[0]);
+      ctx.fillStyle = grd;
+      ctx.fillRect(0, 0, width, height);
+    }
+  drawLines: |
+    function (ctx, width, height, slices, colors, colorsCount) {
+      const grd = ctx.createLinearGradient(0, 0, width, height);
+      for (let i = 0; i < slices; i++) {
+        grd.addColorStop(i / slices, colors[i % colorsCount]);
+      }
+      grd.addColorStop(1, colors[0]);
+      ctx.fillStyle = grd;
+      ctx.fillRect(0, 0, width, height);
+    }
+  drawCheckers: |
+    function (ctx, width, height, slices, colors, colorsCount) {
+      // Slice the canvas into slices, like a pizza
+      const sliceWidth = width / slices;
+      const sliceHeight = height / slices;
+      for (let i = 0; i < slices; i++) {
+        for (let j = 0; j < slices; j++) {
+          ctx.fillStyle = colors[(i + j) % colorsCount];
+          ctx.fillRect(i * sliceWidth, j * sliceHeight, sliceWidth, sliceHeight);
+        }
+      }
+    }
+  drawPizza: |
+    function (ctx, width, height, slices, colors, colorsCount) {
+      const center = { x: width / 2, y: height / 2 };
+      const angle = 2 * Math.PI / slices;
+      const radius = Math.max(width, height);
+      for (let i = 0; i < slices; i++) {
+        ctx.beginPath();
+        ctx.moveTo(center.x, center.y);
+        ctx.arc(center.x, center.y, radius, i * angle, (i + 1) * angle);
+        ctx.closePath();
+        ctx.fillStyle = colors[i % colorsCount];
+        ctx.fill();
+      }
+    }
+watch:
+  item:
+    handler: |
+      function () {
+        this.$nextTick(this.draw.bind(this));
+      }
+    immediate: true
+    deep: true
+style:
+  canvas:
+    width: 100%
+    height: 100%
+name: e-template-rainbow-layer
+template: >-
+  <div class="comp-e-template-rainbow-layer"><canvas ref="canvas1" width="1000"
+  height="1000"></canvas></div>

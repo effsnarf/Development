@@ -5,8 +5,11 @@ dom:
     ui.card1:
       class: grayish
       .show-on-hover-container:
-        ui.image:
-          ':imageID': item.imageID
+        .grid:
+          ui.image:
+            ':imageID': item.imageID
+          div:
+            v-text: item.displayName
         content.poem.stanza:
           v-if: item.desc?.poem
           class: show-on-hover
@@ -21,9 +24,11 @@ style:
     display: block
   .show-on-hover-container:hover img:
     transform: scale(1.5)
-    aspect-ratio: 4 / 2
+  .grid:
+    grid-template: 1fr / 1fr 3fr
+    gap: 1rem
   img:
-    aspect-ratio: 3 / 1
+    aspect-ratio: 1
     width: 100%
     object-fit: cover
 computed:
@@ -33,7 +38,8 @@ computed:
     }
 template: >-
   <ui-link class="comp-e-generator-wide" :url="url"><ui-card1
-  class="grayish"><div class="show-on-hover-container"><ui-image
-  :imageID="item.imageID"></ui-image><content-poem-stanza class="show-on-hover"
-  v-if="item.desc?.poem"
+  class="grayish"><div class="show-on-hover-container"><div
+  class="grid"><ui-image :imageID="item.imageID"></ui-image><div
+  v-text="item.displayName"></div></div><content-poem-stanza
+  class="show-on-hover" v-if="item.desc?.poem"
   :item="$root.getRandomStanza(item.desc?.poem)"></content-poem-stanza></div></ui-card1></ui-link>

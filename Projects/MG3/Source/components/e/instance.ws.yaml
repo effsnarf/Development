@@ -15,22 +15,15 @@ dom:
             ':style': '{ fontSize: fontSizes[index] }'
         div:
           class: spacer
-    .footer:
-      v-if: item.instanceID
-      e.generator.small:
-        v-if: showGenerator
-        ':item': item
-      ui.share:
-        ':instance': item
-    .admin-footer:
-      v-if: item?.instanceID
-      ui.button:
-        text: ❌
-        ':click': $root.dbp.instances.delete.one(item._id)
     on_click: $emit('click')
+    e.post.create:
+      v-if: showCreatePost
+      ':generator': $root.instanceToGenerator(item)
+      ':entityID': item._id
 name: e-instance
 props:
   item: null
+  showCreatePost: true
 data:
   width: null
 methods:
@@ -68,6 +61,8 @@ style:
     display: flex
     justify-content: center
     margin-top: 1rem
+  .comp-e-post-create:
+    margin-top: 1rem !important
   .comp-ui-image, img:
     aspect-ratio: 1
     object-fit: cover
@@ -101,9 +96,6 @@ template: >-
   item.generator?.imageID" @change="updateImageSize"></ui-image><div
   class="texts"><div class="text" v-for="(text, index) in [item.text0,
   item.text1]" v-text="text" :style="{ fontSize: fontSizes[index]
-  }"></div></div><div class="spacer"></div></div></ui-link><div class="footer"
-  v-if="item.instanceID"><e-generator-small v-if="showGenerator"
-  :item="item"></e-generator-small><ui-share
-  :instance="item"></ui-share></div><div class="admin-footer"
-  v-if="item?.instanceID"><ui-button text="❌"
-  :click="$root.dbp.instances.delete.one(item._id)"></ui-button></div></div>
+  }"></div></div><div class="spacer"></div></div></ui-link><e-post-create
+  v-if="showCreatePost" :generator="$root.instanceToGenerator(item)"
+  :entityID="item._id"></e-post-create></div>

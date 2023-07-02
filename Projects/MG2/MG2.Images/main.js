@@ -91,6 +91,9 @@ const requestListener = async function (req, res)
     var mimeType = mime.lookup(path);
     res.writeHead(200, { "Content-Type": `${mimeType}; charset=utf-8` });
 
+    // access control
+    res.setHeader("Access-Control-Allow-Origin", "*");
+
     log(path);
 
     let serveFromOldMgImages = (path.endsWith(`.jpg`));

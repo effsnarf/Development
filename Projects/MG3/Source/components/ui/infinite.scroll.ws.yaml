@@ -6,14 +6,12 @@ data:
 mounted: |
   function() {
     window.addEventListener('scroll', () => this.onScroll());
-    this.onScroll(true);
-    this.onScroll(true);
   }
 methods:
   onScroll: |
     function(force) {
       if ((!force) && (this.lastEmit) && ((Date.now() - this.lastEmit) < 400)) return;
-      const distanceToBottom = document.documentElement.offsetHeight - (window.scrollY + window.innerHeight * 3);
+      const distanceToBottom = document.documentElement.scrollHeight - (window.scrollY + window.innerHeight);
       if (distanceToBottom < window.innerHeight) {
         this.lastEmit = Date.now();
         this.$emit('scroll');

@@ -4,11 +4,18 @@ dom:
     template#1:
       v-slot: left
       e.thread.list: null
-    template:
+    template#2:
       v-slot: middle
+      e.template.editor: null
+      content.stream:
+        ref: stream1
+        item-type: e.instance
+        ':get-more-items': getMoreInstances
+        grid-class: grid-1
+    template:
+      v-slot: right
       div:
-        div#1:
-          e.post.create: null
+        e.post.create: null
 data:
   generators: []
   uniqueID: 1
@@ -29,11 +36,12 @@ methods:
       if (this.$root.params.page == "home")
       {
         this.$root.setDocumentTitle(null);
+        this.$refs.stream1.reset();
       }
     }
   getMoreInstances: |
     async function(pageIndex) {
-      const items = await this.$root.dbp.instances.select.new("en", pageIndex)
+      const items = await this.$root.dbp.instances.sample.popular(null, 15);
       return items;
     }
 style:
@@ -45,4 +53,7 @@ name: page-home
 template: >-
   <site class="comp-page-home" page-name="home"><template
   v-slot:left><e-thread-list></e-thread-list></template><template
-  v-slot:middle><div><div><e-post-create></e-post-create></div></div></template></site>
+  v-slot:middle><e-template-editor></e-template-editor><content-stream
+  ref="stream1" item-type="e.instance" :get-more-items="getMoreInstances"
+  grid-class="grid-1"></content-stream></template><template
+  v-slot:right><div><e-post-create></e-post-create></div></template></site>

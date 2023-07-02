@@ -27,3 +27,8 @@ params:
         if (!url.startsWith("/t/")) return null;
         return parseInt(url.split("/")[2]);
       }
+  url:
+    get: | #ts
+      function() {
+        return window.location.pathname;
+      }

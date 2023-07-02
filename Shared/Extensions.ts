@@ -279,6 +279,7 @@ interface String {
   getMatches(regex: RegExp): string[];
   getWords(): string[];
   toCamelCase(): string;
+  toTitleCase(): string;
   parseJSON(): any;
   truncate(maxLength: number): string;
   getCharsCount(): number;
@@ -939,6 +940,13 @@ if (typeof String !== "undefined") {
     return this.charAt(0).toLowerCase() + this.slice(1);
   };
 
+  String.prototype.toTitleCase = function (): string {
+    // Uppercase the first letter of each word
+    return this.replace(/\w\S*/g, (txt: string) => {
+      return txt.charAt(0).toUpperCase() + txt.substring(1);
+    });
+  };
+
   String.prototype.parseJSON = function (): string {
     return JSON.parse(this.toString());
   };
@@ -1239,6 +1247,7 @@ if (typeof Array !== "undefined") {
   };
 
   Array.prototype.add = async function (items: any[], stagger: number = 0) {
+    if (!Array.isArray(items)) items = [items];
     items = [...items];
     const addOne = async () => {
       if (items.length > 0) {

@@ -1,10 +1,18 @@
 dom:
-  .error:
-    v-if: error
-    v-text: error.message || error
+  transition:
+    name: slide
+    .error:
+      v-if: errorText
+      v-text: errorText
+      ':key': errorText
 props:
   error: null
+computed:
+  errorText: |
+    function() {
+      return this.error?.message || this.error;
+    }
 name: ui-error
 template: >-
-  <div class="comp-ui-error error" v-if="error" v-text="error.message ||
-  error"></div>
+  <transition class="comp-ui-error" name="slide"><div class="error"
+  v-if="errorText" v-text="errorText" :key="errorText"></div></transition>

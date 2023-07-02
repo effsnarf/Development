@@ -14,7 +14,17 @@ class DatabaseProxy {
     _fetchAsJson?: (url: string) => Promise<any>
   ) {
     this.fetchAsJson =
-      _fetchAsJson || (async (url: string) => await (await fetch(url)).json());
+      _fetchAsJson ||
+      (async (url: string) => {
+        const response = await fetch(url);
+        const text = await response.text();
+        if (!text?.length) return null;
+        try {
+          return JSON.parse(text);
+        } catch (e) {
+          throw new Error(text);
+        }
+      });
   }
 
   static async new(

@@ -30,7 +30,19 @@ class DatabaseProxy {
     constructor(urlBase, _fetchAsJson) {
         this.urlBase = urlBase;
         this.fetchAsJson =
-            _fetchAsJson || ((url) => __awaiter(this, void 0, void 0, function* () { return yield (yield fetch(url)).json(); }));
+            _fetchAsJson ||
+                ((url) => __awaiter(this, void 0, void 0, function* () {
+                    const response = yield fetch(url);
+                    const text = yield response.text();
+                    if (!(text === null || text === void 0 ? void 0 : text.length))
+                        return null;
+                    try {
+                        return JSON.parse(text);
+                    }
+                    catch (e) {
+                        throw new Error(text);
+                    }
+                }));
     }
     static new(urlBase, _fetchAsJson) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -151,9 +163,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "../../../LiveIde/Website/script/1688281860095.ts":
+/***/ "../../../LiveIde/Website/script/1688311040304.ts":
 /*!********************************************************!*\
-  !*** ../../../LiveIde/Website/script/1688281860095.ts ***!
+  !*** ../../../LiveIde/Website/script/1688311040304.ts ***!
   \********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -251,11 +263,21 @@ const helpers = {
             return __awaiter(this, void 0, void 0, function* () { });
         },
         methods: {
-            navigateTo(url) {
+            navigateTo(item) {
                 return __awaiter(this, void 0, void 0, function* () {
+                    const url = this.itemToUrl(item);
+                    const self = this;
+                    self.error = null;
                     window.history.pushState({}, "", url);
                     yield this.refresh();
                 });
+            },
+            itemToUrl(item) {
+                if (typeof item == "string")
+                    return item;
+                if (item.threadID)
+                    return helpers.url.thread({ _id: item.threadID });
+                throw new Error("Unknown item type");
             },
             compileApp() {
                 return __awaiter(this, void 0, void 0, function* () {
@@ -293,6 +315,11 @@ const helpers = {
                     window.scrollTo({ top: 0, behavior: "smooth" });
                 });
             },
+            instanceToGenerator(instance) {
+                let gen = JSON.parse(JSON.stringify(instance));
+                gen._id = gen.generatorID;
+                return gen;
+            },
             getInstanceText(instance) {
                 if (!instance)
                     return null;
@@ -304,11 +331,9 @@ const helpers = {
             getKey(item) {
                 if (!item)
                     return null;
-                if (item.instanceID)
-                    return item.instanceID;
-                if (item.generatorID)
-                    return item.generatorID;
-                return null;
+                if (item._id)
+                    return item._id;
+                return item;
             },
             getRandomStanza(poem) {
                 if (!(poem === null || poem === void 0 ? void 0 : poem.length))
@@ -1712,6 +1737,12 @@ if (typeof String !== "undefined") {
         // Lowercase the first letter
         return this.charAt(0).toLowerCase() + this.slice(1);
     };
+    String.prototype.toTitleCase = function () {
+        // Uppercase the first letter of each word
+        return this.replace(/\w\S*/g, (txt) => {
+            return txt.charAt(0).toUpperCase() + txt.substring(1);
+        });
+    };
     String.prototype.parseJSON = function () {
         return JSON.parse(this.toString());
     };
@@ -1969,6 +2000,8 @@ if (typeof Array !== "undefined") {
     };
     Array.prototype.add = function (items, stagger = 0) {
         return __awaiter(this, void 0, void 0, function* () {
+            if (!Array.isArray(items))
+                items = [items];
             items = [...items];
             const addOne = () => __awaiter(this, void 0, void 0, function* () {
                 if (items.length > 0) {
@@ -2362,7 +2395,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("../../../LiveIde/Website/script/1688281860095.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("../../../LiveIde/Website/script/1688311040304.ts");
 /******/ 	
 /******/ })()
 ;

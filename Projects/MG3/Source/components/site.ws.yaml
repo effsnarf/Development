@@ -8,6 +8,10 @@ dom:
         div:
           site.sidebar: null
           site.main:
+            ':title-image-id': titleImageId
+            ':title-text': titleText
+            ':title-url': titleUrl
+            ':title-key': titleKey
             ':recommendation-items': recommendationItems
             template#1:
               v-slot: article
@@ -27,6 +31,10 @@ dom:
                 name: right
 name: site
 props:
+  titleImageId: null
+  titleText: null
+  titleUrl: null
+  titleKey: null
   getMoreItems: null
   recommendationItems: null
   pageName: null
@@ -46,8 +54,9 @@ template: >-
   <div class="comp-site"><transition name="fade"><div :class="getCssClass()"
   v-show="(this.pageName ==
   $root.params.page)"><div><site-sidebar></site-sidebar><site-main
-  :recommendation-items="recommendationItems"><template v-slot:article><slot
-  name="article"></slot></template><template v-slot:left><slot
-  name="left"></slot></template><template v-slot:middle><slot
+  :title-image-id="titleImageId" :title-text="titleText" :title-url="titleUrl"
+  :title-key="titleKey" :recommendation-items="recommendationItems"><template
+  v-slot:article><slot name="article"></slot></template><template
+  v-slot:left><slot name="left"></slot></template><template v-slot:middle><slot
   name="middle"></slot></template><template v-slot:right><slot
   name="right"></slot></template></site-main></div></div></transition></div>

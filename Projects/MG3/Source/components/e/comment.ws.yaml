@@ -1,0 +1,28 @@
+dom:
+  .comment:
+    .comment-text:
+      v-text: item.text
+    .vote-score:
+      v-text: item.totalVotesScore
+props:
+  item: null
+style:
+  .comment:
+    display: grid
+    grid-template: 1fr / 1fr 4em
+    max-height: 2em
+    overflow: hidden
+    background: '#ffffff30'
+    padding: 0.3em 0.6em
+  .comment:hover:
+    max-height: 10em
+  .vote-score:
+    text-align: right
+    opacity: 0.5
+  .vote-score:before:
+    content: +
+name: e-comment
+template: >-
+  <div class="comp-e-comment comment"><div class="comment-text"
+  v-text="item.text"></div><div class="vote-score"
+  v-text="item.totalVotesScore"></div></div>

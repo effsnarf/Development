@@ -3,8 +3,8 @@ dom:
     transition:
       name: slide
       e.generator.select:
-        v-show: showGeneratorSelect
-        v-model: tempInstance.generator
+        v-show: '!generator && showGeneratorSelect'
+        v-model: generator || tempInstance.generator
         on_input: showGeneratorSelect = false
     .container:
       ':class': layout
@@ -12,10 +12,11 @@ dom:
         transition#1:
           name: slide
           e.instance:
-            class: clickable
+            class: '{ clickable: !generator  }'
             v-if: ((layout == 'horizontal') || hasText)
             ':item': tempInstance
             ':key': tempInstance.generator?.generatorID
+            ':show-create-post': 'false'
             on_click: showGeneratorSelect = !showGeneratorSelect
       .inputs:
         input#1:
@@ -35,6 +36,7 @@ dom:
             on_click: create
 props:
   value: null
+  generator: null
   layout: null
   showCreateButton: true
 data:
@@ -89,6 +91,12 @@ watch:
         this.tempInstance = newValue || this.getNewTempInstance();
       }
     immediate: true
+  generator:
+    handler: |
+      function(newGenerator) {
+        this.tempInstance.generator = newGenerator;
+      }
+    immediate: true
   tempInstance:
     handler: |
       function(newTempInstance) {
@@ -120,12 +128,13 @@ style:
     margin: 0.5rem auto
 template: >-
   <div class="comp-e-instance-create"><transition
-  name="slide"><e-generator-select v-show="showGeneratorSelect"
-  v-model="tempInstance.generator" @input="showGeneratorSelect =
-  false"></e-generator-select></transition><div class="container"
-  :class="layout"><div><transition name="slide"><e-instance class="clickable"
-  v-if="((layout == 'horizontal') || hasText)" :item="tempInstance"
-  :key="tempInstance.generator?.generatorID" @click="showGeneratorSelect =
+  name="slide"><e-generator-select v-show="!generator &amp;&amp;
+  showGeneratorSelect" v-model="generator || tempInstance.generator"
+  @input="showGeneratorSelect = false"></e-generator-select></transition><div
+  class="container" :class="layout"><div><transition name="slide"><e-instance
+  class="{ clickable: !generator }" v-if="((layout == 'horizontal') || hasText)"
+  :item="tempInstance" :key="tempInstance.generator?.generatorID"
+  :show-create-post="false" @click="showGeneratorSelect =
   !showGeneratorSelect"></e-instance></transition></div><div
   class="inputs"><input v-model="tempInstance.text0" placeholder="top text"
   @focus="onFocus"/><input v-model="tempInstance.text1" placeholder="bottom

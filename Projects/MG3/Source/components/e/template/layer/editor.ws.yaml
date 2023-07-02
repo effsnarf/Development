@@ -1,0 +1,7 @@
+dom:
+  div:
+    v-text: item
+props:
+  item: null
+name: e-template-layer-editor
+template: <div class="comp-e-template-layer-editor" v-text="item"></div>
