@@ -89,10 +89,11 @@ const requestListener = async function (req, res)
     var path = req.url;
     var ps = path.split(`/`).flatMap(a => a.split(`.`));
     var mimeType = mime.lookup(path);
-    res.writeHead(200, { "Content-Type": `${mimeType}; charset=utf-8` });
 
     // access control
     res.setHeader("Access-Control-Allow-Origin", "*");
+
+    res.writeHead(200, { "Content-Type": `${mimeType}; charset=utf-8` });
 
     log(path);
 
