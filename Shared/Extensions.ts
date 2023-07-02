@@ -279,6 +279,7 @@ interface String {
   getMatches(regex: RegExp): string[];
   getWords(): string[];
   toCamelCase(): string;
+  toTitleCase(): string;
   parseJSON(): any;
   truncate(maxLength: number): string;
   getCharsCount(): number;
@@ -341,6 +342,7 @@ interface Array<T> {
   sortByDesc(...projects: ((item: T) => any)[]): T[];
   stringify(): string;
   onlyTruthy<T>(): T[];
+  shuffle(): T[];
 }
 
 interface Function {
@@ -939,6 +941,10 @@ if (typeof String !== "undefined") {
     return this.charAt(0).toLowerCase() + this.slice(1);
   };
 
+  String.prototype.toTitleCase = function (): string {
+    return this.charAt(0).toUpperCase() + this.slice(1);
+  };
+
   String.prototype.parseJSON = function (): string {
     return JSON.parse(this.toString());
   };
@@ -1391,6 +1397,10 @@ if (typeof Array !== "undefined") {
 
   Array.prototype.onlyTruthy = function (): any {
     return this.filter((item) => !!item);
+  };
+
+  Array.prototype.shuffle = function (): any {
+    return this.sortBy(() => Math.random() - 0.5);
   };
 }
 // #endregion

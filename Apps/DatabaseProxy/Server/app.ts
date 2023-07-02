@@ -2,7 +2,7 @@
 import "colors";
 import path from "path";
 import fs from "fs";
-import util from "util";
+import util, { debuglog } from "util";
 import axios from "axios";
 import express from "express";
 import cookieParser from "cookie-parser";
@@ -29,11 +29,29 @@ import { Database } from "@shared/Database/Database";
 import { MongoDatabase } from "@shared/Database/MongoDatabase";
 import { Analytics, ItemType } from "@shared/Analytics";
 import { debug } from "console";
+import { DatabaseProxy } from "../Client/DbpClient";
 // #endregion
 
 const getResponseSize = (response: any) => {
   if (!response.headers) return null;
   return parseInt(response.headers["content-length"] || 0);
+};
+
+const loadApiMethods = async (db: MongoDatabase, config: any) => {
+  const apiMethods = await db?.find("_ApiMethods", {});
+  for (const apiMethodKey of Object.keys(config.api.methods)) {
+    const key = apiMethodKey.split(".");
+    const apiMethod = config.api.methods[apiMethodKey];
+    apiMethods.push({
+      entity: key[0],
+      group: key[1],
+      name: key[2],
+      admin: apiMethod.admin || false,
+      args: apiMethod.args || [],
+      code: apiMethod.code,
+    });
+  }
+  return apiMethods;
 };
 
 (async () => {
@@ -43,6 +61,16 @@ const getResponseSize = (response: any) => {
   });
   const config = configObj.data;
   // #endregion
+
+  let dbps = {} as any;
+  setTimeout(async () => {
+    for (const dbName of Object.keys(config.dbs)) {
+      dbps[dbName] = await DatabaseProxy.new(
+        `http://${config.server.host}:${config.server.port}/${dbName}`,
+        async (url) => (await axios.get(url)).data
+      );
+    }
+  }, 1000);
 
   const cache = {
     _store: null as CacheBase | null,
@@ -57,25 +85,13 @@ const getResponseSize = (response: any) => {
       api: {
         methods: async (db: MongoDatabase | undefined) => {
           if (!db) return null;
-          let apiMethods = (
+          return (
             await (
               await cache._getStore()
             ).get(`${db.database}._ApiMethods`, async () => {
-              return { apiMethods: await db?.find("_ApiMethods", {}) };
+              return { apiMethods: await loadApiMethods(db, config) };
             })
           )?.apiMethods;
-          for (const apiMethodKey of config.api.methods) {
-            const key = apiMethodKey.split(".");
-            const apiMethod = config.api.methods[apiMethodKey];
-            apiMethods.push({
-              entity: key[0],
-              group: key[1],
-              name: key[2],
-              args: apiMethod.args,
-              code: apiMethod.code,
-            });
-          }
-          return apiMethods;
         },
       },
       collection: {
@@ -186,7 +202,7 @@ const getResponseSize = (response: any) => {
         const db = await MongoDatabase.new(
           config.database.connectionString,
           dbName,
-          { verifyDatabaseExists: true }
+          { verifyDatabaseExists: true, lowercaseFields: true }
         );
 
         Reflection.bindClassMethods(
@@ -572,7 +588,13 @@ const getResponseSize = (response: any) => {
         if (!apiMethods?.length)
           return res.status(404).send("Method not found");
         const apiMethod = apiMethods[0];
-        const funcStr = `async (fs, user, db, db${
+        const userIP =
+          req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+        const isAdmin = config.admin.ips.includes(userIP);
+        if (apiMethod.admin && !isAdmin) {
+          return res.status(500).send("You are not authorized to do this.");
+        }
+        const funcStr = `async (dbp, fs, user, db, db${
           req.params.entity
         }, axios, ${apiMethod.args.join(", ")}) => { ${apiMethod.code} }`;
         const func = eval(funcStr);
@@ -586,7 +608,9 @@ const getResponseSize = (response: any) => {
         let result: any;
 
         try {
-          result = await func(fs, user, db, collection, axios, ...args);
+          const dbp = dbps[req.params.database];
+
+          result = await func(dbp, fs, user, db, collection, axios, ...args);
 
           const elapsed = Date.now() - start;
 
@@ -622,7 +646,7 @@ const getResponseSize = (response: any) => {
                 )}\n\n${result}\n\n${ex}\n\n${ex.stack}`
               );
           } else {
-            return res.status(500).send(ex);
+            return res.status(500).send(ex.message || ex);
           }
         }
       })

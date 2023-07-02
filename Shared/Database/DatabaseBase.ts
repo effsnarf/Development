@@ -24,6 +24,34 @@ abstract class DatabaseBase {
     lowercaseFields?: boolean
   ): Promise<any[]>;
 
+  async findOne(
+    collectionName: string,
+    query: any,
+    sort?: any,
+    lowercaseFields?: boolean
+  ): Promise<any> {
+    const docs = await this.find(
+      collectionName,
+      query,
+      sort,
+      1,
+      undefined,
+      lowercaseFields
+    );
+    return docs[0];
+  }
+
+  findAll(collectionName: string): AsyncGenerator<any, void, unknown> {
+    return this.findIterable(
+      collectionName,
+      {},
+      { _id: 1 },
+      undefined,
+      undefined,
+      true
+    );
+  }
+
   abstract findIterable(
     collectionName: string,
     query: any,
@@ -43,8 +71,11 @@ abstract class DatabaseBase {
     collectionName: string,
     doc: any,
     returnNewDoc: boolean = false,
-    returnDiff: boolean = false
+    returnDiff: boolean = false,
+    uppercaseFields: boolean = false
   ): Promise<any> {
+    if (uppercaseFields) doc = Objects.toTitleCaseKeys(doc);
+
     if (returnNewDoc && returnDiff)
       throw new Error("Cannot return new doc and diff");
 
@@ -60,8 +91,10 @@ abstract class DatabaseBase {
     if (returnDiff) return Objects.deepDiff(oldDoc, doc);
   }
 
-  async findOneByID(collectionName: string, _id: number): Promise<any> {
-    return (await this.find(collectionName, { _id: _id }, null, 1))[0];
+  async findOneByID(collectionName: string, _id: any): Promise<any> {
+    return (
+      await this.find(collectionName, { _id: _id }, null, 1, undefined, true)
+    )[0];
   }
 
   protected abstract _upsert(collectionName: string, doc: any): Promise<any>;
