@@ -151,9 +151,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "../../../LiveIde/Website/script/1688106238544.ts":
+/***/ "../../../LiveIde/Website/script/1688281860095.ts":
 /*!********************************************************!*\
-  !*** ../../../LiveIde/Website/script/1688106238544.ts ***!
+  !*** ../../../LiveIde/Website/script/1688281860095.ts ***!
   \********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -173,8 +173,24 @@ const AnalyticsTracker_1 = __webpack_require__(/*! ../../classes/AnalyticsTracke
 const ClientContext_1 = __webpack_require__(/*! ../../classes/ClientContext */ "../../../LiveIde/classes/ClientContext.ts");
 const Params_1 = __webpack_require__(/*! ../../classes/Params */ "../../../LiveIde/classes/Params.ts");
 const DbpClient_1 = __webpack_require__(/*! ../../../../Apps/DatabaseProxy/Client/DbpClient */ "../../../../Apps/DatabaseProxy/Client/DbpClient.ts");
+const htmlEncode = (s) => {
+    if (!s)
+        return null;
+    // HTML encode
+    s = s.replace(/&/g, "&amp;");
+    s = s.replace(/</g, "&lt;");
+    s = s.replace(/>/g, "&gt;");
+    s = s.replace(/"/g, "&quot;");
+    s = s.replace(/'/g, "&#39;");
+    return s;
+};
 const helpers = {
     url: {
+        thread: (thread, full = false) => {
+            if (!thread)
+                return null;
+            return helpers.url.full(`/t/${thread._id}`, full);
+        },
         generator: (generator, full = false) => {
             if (!generator)
                 return null;
@@ -227,6 +243,8 @@ const helpers = {
             url: helpers.url,
             comps: client.Vue.ref(client.comps),
             templates: client.templates,
+            isLoading: false,
+            error: null,
             key1: 1,
         },
         mounted() {
@@ -250,6 +268,18 @@ const helpers = {
                     const self = this;
                     return yield self.dbp.instances.select.popular("en", pageIndex, self.params.urlName);
                 });
+            },
+            textToHtml(text) {
+                if (!text)
+                    return null;
+                var s = text;
+                // HTML encode
+                s = htmlEncode(s) || "";
+                // >greentext
+                s = s.replace(/^&gt;(.*)$/gm, "<span class='greentext'>&gt;$1</span>");
+                // line breaks
+                s = s.replace(/\n/g, "<br />");
+                return s;
             },
             refresh() {
                 return __awaiter(this, void 0, void 0, function* () {
@@ -550,15 +580,18 @@ class ClientContext {
                 throw new Error(text);
             }
             catch (ex) {
-                // Try again
                 const url = args[0];
                 console.error(`Error fetching ${url}`);
                 console.error(ex);
+                if (ex.message.includes("You are not authorized")) {
+                    ClientContext.alertify.error(`<h3>${ex.message}</h3>`);
+                    return;
+                }
                 //if (window.location.hostname == "localhost") {
                 if (!ex.message.includes("Object reference not set to an instance of an object")) {
-                    ClientContext.alertify
-                        .error(`<h3>${url}</h3><pre>${ex.message}</pre>`)
-                        .delay(0);
+                    // ClientContext.alertify
+                    //   .error(`<h3>${url}</h3><pre>${ex.message}</pre>`)
+                    //   .delay(0);
                 }
                 //}
                 // Try again
@@ -1914,6 +1947,9 @@ if (typeof Array !== "undefined") {
         }
         return this.indexOf(item) != -1;
     };
+    Array.prototype.reversed = function () {
+        return this.slice().reverse();
+    };
     Array.prototype.removeAt = function (index) {
         this.splice(index, 1);
     };
@@ -2326,7 +2362,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("../../../LiveIde/Website/script/1688106238544.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("../../../LiveIde/Website/script/1688281860095.ts");
 /******/ 	
 /******/ })()
 ;

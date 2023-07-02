@@ -3,6 +3,7 @@ dom:
     ui.list:
       item-type: generator.small
 name: site-sidebar
+style: null
 template: >-
   <div class="comp-site-sidebar"><ui-list
   item-type="generator.small"></ui-list></div>

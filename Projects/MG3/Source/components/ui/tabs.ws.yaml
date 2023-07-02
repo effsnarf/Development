@@ -1,7 +1,8 @@
 dom:
   div:
     ui.select:
-      ':options': options
+      ':options': options.map(option => getOptionText(option))
+      ':getUrl': getUrl
       v-model: selectedTabIndex
     div:
       div:
@@ -12,11 +13,28 @@ dom:
             ':name': '''tab'' + index'
 props:
   options: null
+  getText: null
+  getUrl: null
 data:
-  selectedTabIndex: 0
+  selectedTabIndex: m
+watch:
+  selectedTabIndex: |
+    {
+      handler: function(newIndex) {
+        this.$emit('input', this.options[newIndex]);
+      },
+      immediate: true
+    }
+methods:
+  getOptionText: |
+    function(option) {
+      if (this.getText) return this.getText(option);
+      return option;
+    }
 name: ui-tabs
 template: >-
-  <div class="comp-ui-tabs"><ui-select :options="options"
+  <div class="comp-ui-tabs"><ui-select :options="options.map(option =&gt;
+  getOptionText(option))" :getUrl="getUrl"
   v-model="selectedTabIndex"></ui-select><div><div v-for="(option, index) in
   options"><div v-show="(index == selectedTabIndex)"><slot :name="'tab' +
   index"></slot></div></div></div></div>

@@ -1,22 +1,50 @@
 dom:
   div:
-    v-if: item
+    v-if: thread
     h3:
-      v-text: item.title
-    ul:
+      v-text: thread.title
+    transition.group:
+      tag: ul
+      name: list
       li:
-        v-for: post in item.posts
+        v-for: post in [...thread.posts,null]
+        ':key': post?._id||0
         e.post:
+          v-if: post
           ':item': post
+          on_refresh-thread: refresh
+        e.post.create:
+          v-else-if: '!post'
+          ':threadID': thread?._id
+          on_created: refresh
 props:
-  item: null
+  value: null
+data:
+  thread: null
+methods:
+  refresh: |
+    async function() {
+      const updatedThread = await this.$root.dbp.threads.select.one(this.thread._id);
+      this.$emit('input', updatedThread);
+    }
+watch:
+  value: |
+    {
+      handler: function(newValue) {
+        this.thread = newValue;
+      },
+      immediate: true
+    }
 style:
   ul:
-    max-width: 60vw
     margin: auto
   li:
-    margin-bottom: 4vh
+    margin-bottom: 2vh
 name: e-thread
 template: >-
-  <div class="comp-e-thread" v-if="item"><h3 v-text="item.title"></h3><ul><li
-  v-for="post in item.posts"><e-post :item="post"></e-post></li></ul></div>
+  <div class="comp-e-thread" v-if="thread"><h3
+  v-text="thread.title"></h3><transition-group tag="ul" name="list"><li
+  v-for="post in [...thread.posts,null]" :key="post?._id||0"><e-post v-if="post"
+  :item="post" @refresh-thread="refresh"></e-post><e-post-create
+  v-else-if="!post" :threadID="thread?._id"
+  @created="refresh"></e-post-create></li></transition-group></div>

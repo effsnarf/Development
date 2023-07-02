@@ -1,11 +1,12 @@
 dom:
   div:
+    v-if: item
     ui.link:
       class: instance
       div:
         ui.image:
           ref: image1
-          ':imageID': item.imageID
+          ':imageID': item.imageID || item.generator?.imageID
           on_change: updateImageSize
         .texts:
           .text:
@@ -21,6 +22,11 @@ dom:
         ':item': item
       ui.share:
         ':instance': item
+    .admin-footer:
+      v-if: item?.instanceID
+      ui.button:
+        text: ❌
+        ':click': $root.dbp.instances.delete.one(item._id)
     on_click: $emit('click')
 name: e-instance
 props:
@@ -33,7 +39,7 @@ methods:
       if (!s) return 0;
       if (!this.width) return 0;
       const size = Math.min(3, Math.max(14, (36 - (s.length / 6))) / 50 *  this.width / 150);
-      return `${size*2}vh`;
+      return `${size*2.5}vh`;
     }
   updateImageSize: |
     function () {
@@ -58,6 +64,10 @@ style:
     display: flex
     margin-top: 1rem
     justify-content: center
+  .admin-footer:
+    display: flex
+    justify-content: center
+    margin-top: 1rem
   .comp-ui-image, img:
     aspect-ratio: 1
     object-fit: cover
@@ -86,12 +96,14 @@ style:
     top: auto
     bottom: 0
 template: >-
-  <div class="comp-e-instance" @click="$emit('click')"><ui-link
-  class="instance"><div><ui-image ref="image1" :imageID="item.imageID"
-  @change="updateImageSize"></ui-image><div class="texts"><div class="text"
-  v-for="(text, index) in [item.text0, item.text1]" v-text="text" :style="{
-  fontSize: fontSizes[index] }"></div></div><div
-  class="spacer"></div></div></ui-link><div class="footer"
+  <div class="comp-e-instance" v-if="item" @click="$emit('click')"><ui-link
+  class="instance"><div><ui-image ref="image1" :imageID="item.imageID ||
+  item.generator?.imageID" @change="updateImageSize"></ui-image><div
+  class="texts"><div class="text" v-for="(text, index) in [item.text0,
+  item.text1]" v-text="text" :style="{ fontSize: fontSizes[index]
+  }"></div></div><div class="spacer"></div></div></ui-link><div class="footer"
   v-if="item.instanceID"><e-generator-small v-if="showGenerator"
   :item="item"></e-generator-small><ui-share
-  :instance="item"></ui-share></div></div>
+  :instance="item"></ui-share></div><div class="admin-footer"
+  v-if="item?.instanceID"><ui-button text="❌"
+  :click="$root.dbp.instances.delete.one(item._id)"></ui-button></div></div>

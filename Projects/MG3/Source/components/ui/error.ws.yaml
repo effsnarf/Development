@@ -1,0 +1,10 @@
+dom:
+  .error:
+    v-if: error
+    v-text: error.message || error
+props:
+  error: null
+name: ui-error
+template: >-
+  <div class="comp-ui-error error" v-if="error" v-text="error.message ||
+  error"></div>

@@ -518,6 +518,7 @@ select, input[type=range]
   cursor: pointer;
 }
 
+
 progress
 {
   width: 100%;

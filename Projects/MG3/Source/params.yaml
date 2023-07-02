@@ -5,18 +5,25 @@ params:
         if (url == "/") return "home";
         if (url == "/admin") return "admin";
         if (url.startsWith("/instance/")) return "instance";
+        if (url.startsWith("/t/")) return "thread";
         return "generator";
       }
   urlName:
     get: | #ts
       function(url) {
         if (url == "/admin") return null;
-        if (url.startsWith("/instance/")) return null;
+        if (["instance", "t"].some(a => url.startsWith(`/${a}/`))) return null;
         return url.split("/")[1];
       }
   instanceID:
     get: | #ts
       function(url) {
         if (!url.startsWith("/instance/")) return null;
+        return parseInt(url.split("/")[2]);
+      }
+  threadID:
+    get: | #ts
+      function(url) {
+        if (!url.startsWith("/t/")) return null;
         return parseInt(url.split("/")[2]);
       }

@@ -646,7 +646,9 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
                 )}\n\n${result}\n\n${ex}\n\n${ex.stack}`
               );
           } else {
-            return res.status(500).send(ex.message || ex);
+            if (ex?.message?.includes("not found"))
+              return res.status(404).send(ex.message);
+            return res.status(500).send(ex);
           }
         }
       })

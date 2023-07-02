@@ -1,25 +1,36 @@
 dom:
-  ui.link:
-    ':url': url
-    ui.card1:
-      class: grayish
-      .show-on-hover-container:
-        ui.image:
-          ':imageID': item.imageID
-          ':square': true
-        ui.title:
-          ':text': item.displayName
-        content.poem.stanza:
-          v-if: item.desc?.poem
-          class: show-on-hover
-          ':item': $root.getRandomStanza(item.desc?.poem)
+  ui.image#1:
+    v-if: '!generator'
+    class: anonymous
+    tooltip: Anonymous
+    ':src': >-
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Anonymous_emblem.svg/1200px-Anonymous_emblem.svg.png'
+    on_click: $emit('click', null)
+  ui.image:
+    v-else-if: generator
+    ':tooltip': showTooltip && generator.displayName
+    ':imageID': generator.imageID
+    ':key': generator.generatorID
+    ':square': 'true'
+    on_click: $emit('click', generator)
 props:
-  item: null
+  value: null
+  showTooltip: true
+  showAnonymous: false
+computed:
+  generator: |
+    function() {
+      return this.value;
+    }
+style:
+  .anonymous:
+    opacity: 0.5
 name: e-generator-square
 template: >-
-  <ui-link class="comp-e-generator-square" :url="url"><ui-card1
-  class="grayish"><div class="show-on-hover-container"><ui-image
-  :imageID="item.imageID" :square="true"></ui-image><ui-title
-  :text="item.displayName"></ui-title><content-poem-stanza class="show-on-hover"
-  v-if="item.desc?.poem"
-  :item="$root.getRandomStanza(item.desc?.poem)"></content-poem-stanza></div></ui-card1></ui-link>
+  <ui-image class="comp-e-generator-square anonymous" v-if="!generator"
+  tooltip="Anonymous"
+  :src="'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Anonymous_emblem.svg/1200px-Anonymous_emblem.svg.png'"
+  @click="$emit('click', null)"></ui-image><ui-image v-else-if="generator"
+  :tooltip="showTooltip &amp;&amp; generator.displayName"
+  :imageID="generator.imageID" :key="generator.generatorID" :square="true"
+  @click="$emit('click', generator)"></ui-image>

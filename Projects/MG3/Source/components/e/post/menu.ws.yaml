@@ -1,0 +1,28 @@
+dom:
+  div:
+    .center:
+      ui.time:
+        ':value': item.created
+    .post-menu:
+      ui.button:
+        text: ❌
+        ':click': onDelete
+props:
+  item: null
+methods:
+  onDelete: |
+    function () {
+      this.$root.dbp.posts.delete.one(this.item._id);
+      this.$emit("refresh-thread");
+    }
+style:
+  .comp-e-post-menu:
+    margin-bottom: 0.5rem
+  .center, .post-menu:
+    display: flex
+    justify-content: center
+name: e-post-menu
+template: >-
+  <div class="comp-e-post-menu"><div class="center"><ui-time
+  :value="item.created"></ui-time></div><div class="post-menu"><ui-button
+  text="❌" :click="onDelete"></ui-button></div></div>

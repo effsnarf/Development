@@ -77,6 +77,12 @@ li
   margin: 0;
 }
 
+.dimmed
+{
+  opacity: 0.5;
+  transition: 0.3s;
+}
+
 .hover-highlight:hover
 {
   background: #ffffff20;
@@ -104,6 +110,36 @@ li
 {
   background: #ffffff60;
 }
+
+.clickable
+{
+  cursor: pointer;
+  opacity: 0.7;
+  transition: 0s;
+}
+.clickable:hover
+{
+  opacity: 1;
+  transition: 0s;
+}
+
+.clickable2
+{
+  display: block;
+  cursor: pointer;
+}
+.clickable2:hover
+{
+  background: #ffffff30;
+  transition: 0s;
+}
+
+li .clickable2:hover
+{
+  background: none;
+}
+
+
 
 .hoverable
 {
@@ -632,7 +668,7 @@ p
   text-align: center;
   border-radius: 0.5em;
   padding: 0.5em 1em;
-  z-index: 1;
+  z-index: 100;
   left: 50%;
   opacity: 0;
   transform: translate(-50%, -180%);

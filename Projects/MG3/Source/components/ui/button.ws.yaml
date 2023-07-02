@@ -1,16 +1,34 @@
 dom:
-  div:
+  transition:
+    name: slide
     button:
       v-if: '!isLoading'
       v-text: text
-      on_click: $emit('click')
-    img:
+      on_click: onClick
+    ui.loading:
       v-if: isLoading
-      src: >-
-        https://upload.wikimedia.org/wikipedia/commons/b/b9/Youtube_loading_symbol_1_(wobbly).gif
 props:
   text: null
+  click: null
+data:
   isLoading: null
+methods:
+  onClick: |
+    async function() {
+      this.$emit('click');
+      if (this.click)
+      {
+        this.isLoading = true;
+        try
+        {
+          await this.click();
+        }
+        finally
+        {
+          this.isLoading = false;
+        }
+      }
+    }
 style:
   img:
     display: block
@@ -18,6 +36,6 @@ style:
     margin: auto
 name: ui-button
 template: >-
-  <div class="comp-ui-button"><button v-if="!isLoading" v-text="text"
-  @click="$emit('click')"></button><img v-if="isLoading"
-  src="https://upload.wikimedia.org/wikipedia/commons/b/b9/Youtube_loading_symbol_1_(wobbly).gif"/></div>
+  <transition class="comp-ui-button" name="slide"><button v-if="!isLoading"
+  v-text="text" @click="onClick"></button><ui-loading
+  v-if="isLoading"></ui-loading></transition>

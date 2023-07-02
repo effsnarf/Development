@@ -1,0 +1,54 @@
+dom:
+  div:
+    ui.loading:
+      v-if: isLoading
+    ui.list:
+      v-slot: slotProps
+      ':items': threads
+      ui.link:
+        ':url': $root.url.thread(slotProps.item)
+        .grid:
+          div#1:
+            e.instance:
+              ':item': slotProps.item.posts[0].instance
+          ui.title:
+            ':number': slotProps.item.posts.length
+          div:
+            v-text: getThreadTitle(slotProps.item)
+data:
+  threads: []
+  isLoading: false
+mounted: |
+  async function() {
+    this.isLoading = true;
+    try
+    {
+        this.threads = await this.$root.dbp.threads.select.all();
+    }
+    finally
+    {
+      this.isLoading = false;
+    }
+  }
+methods:
+  getThreadTitle: |
+    function(thread) {
+      const post = thread.posts[0];
+      return post.text ||
+        post.instance?.text1 ||
+        post.instance?.text0 ||
+        post.instance?.displayName;
+    }
+name: e-thread-list
+style:
+  .grid:
+    grid-template: 1fr / 2rem 2rem 1fr
+    gap: 0.5rem
+template: >-
+  <div class="comp-e-thread-list"><ui-loading
+  v-if="isLoading"></ui-loading><ui-list v-slot="slotProps"
+  :items="threads"><ui-link :url="$root.url.thread(slotProps.item)"><div
+  class="grid"><div><e-instance
+  :item="slotProps.item.posts[0].instance"></e-instance></div><ui-title
+  :number="slotProps.item.posts.length"></ui-title><div
+  v-text="getThreadTitle(slotProps.item)"></div></div></ui-link></ui-list></div>

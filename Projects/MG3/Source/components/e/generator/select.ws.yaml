@@ -1,21 +1,30 @@
 dom:
   div:
     .grid:
-      ui.image:
+      e.generator.square:
         v-for: generator in generators
-        ':tooltip': generator.displayName
-        ':square': 'true'
-        ':imageID': generator.imageID
-        ':key': generator.generatorID
+        ':value': generator
+        ':key': generator?.generatorID
+        ':show-anonymous': 'true'
         on_click: () => onClick(generator)
+props:
+  allowAnonymous: false
 data:
   query: null
   generators: null
 mounted: |
   async function() {
-    this.generators = await this.$root.dbp.generators.select.popular();
+    await this.init();
   }
 methods:
+  init: |
+    async function () {
+      this.generators = (await this.$root.dbp.generators.select.popular());
+      if (this.allowAnonymous) {
+        this.generators.unshift(null);
+        this.generators.pop();
+      }
+    }
   onClick: |
     function (generator) {
       this.$emit('input', generator)
@@ -35,7 +44,7 @@ style:
     transition: 0s
 name: e-generator-select
 template: >-
-  <div class="comp-e-generator-select"><div class="grid"><ui-image
-  v-for="generator in generators" :tooltip="generator.displayName"
-  :square="true" :imageID="generator.imageID" :key="generator.generatorID"
-  @click="() =&gt; onClick(generator)"></ui-image></div></div>
+  <div class="comp-e-generator-select"><div class="grid"><e-generator-square
+  v-for="generator in generators" :value="generator"
+  :key="generator?.generatorID" :show-anonymous="true" @click="() =&gt;
+  onClick(generator)"></e-generator-square></div></div>
