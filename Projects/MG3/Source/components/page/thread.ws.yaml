@@ -1,0 +1,50 @@
+dom:
+  site:
+    page-name: thread
+    template#1:
+      v-slot: left
+      e.thread.list: null
+    template#2:
+      v-slot: middle
+      e.thread:
+        v-model: thread
+data:
+  thread: null
+  error: null
+computed:
+  threadID: |
+    function() {
+      return this.$root.params.threadID;
+    }
+mounted: |
+  async function() {
+  }
+watch:
+  threadID: |
+    {
+      handler: async function() {
+        if (this.$root.params.page != "thread") return;
+        try
+        {
+          this.$root.isLoading = true;
+          this.error = null;
+          this.thread = (!this.threadID) ? null : (await this.$root.dbp.threads.select.one(this.threadID));
+        }
+        catch (ex)
+        {
+          this.$root.error = ex;
+        }
+        finally
+        {
+          this.$root.isLoading = false;
+        }
+      },
+      immediate: true
+    }
+methods: null
+name: page-thread
+style: null
+template: >-
+  <site class="comp-page-thread" page-name="thread"><template
+  v-slot:left><e-thread-list></e-thread-list></template><template
+  v-slot:middle><e-thread v-model="thread"></e-thread></template></site>

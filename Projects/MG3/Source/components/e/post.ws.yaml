@@ -1,15 +1,22 @@
 dom:
   div:
-    ':class': getCssClass()
+    ':class': '{ post: true, enlarged }'
     .post-media:
       v-if: item.instance
       e.instance:
         ':item': item.instance
       on_click: onInstanceClick
     .post-text:
-      v-text: item.text
+      e.generator.square:
+        class: larping-generator
+        ':value': item.larpGenerator
+      div:
+        v-html: $root.textToHtml(item.text)
     div:
       class: clear-both
+    e.post.menu:
+      ':item': item
+      on_refresh-thread: $emit('refresh-thread')
 props:
   item: null
 data:
@@ -19,21 +26,31 @@ methods:
     function () {
       this.enlarged = !this.enlarged;
     }
-  getCssClass: |
-    function () {
-      const cls = { post: true, enlarged: this.enlarged };
-      return cls;
-    }
 style:
   .post:
     background: '#ffffff20'
     border: 2px solid gray
     box-shadow: 'inset -6px 6px 2px #000'
     z-index: 10
+  .post .post-menu:
+    max-height: 0
+    overflow: hidden
+    opacity: 0
+    transform: translateY(-1em)
+  .post:hover .post-menu:
+    max-height: 5em
+    transition: 0.5s linear
+    opacity: 1
+    transform: translateY(0)
   .post .instance:hover:
     border: '1px solid #000000a0'
     transition: 0s !important
   .instance: null
+  .larping-generator:
+    width: 4rem !important
+    float: left
+    margin-right: 1em
+    margin-bottom: 1em
   .post-media:
     float: left
     width: 35%
@@ -46,12 +63,21 @@ style:
     display: none
   .post-text:
     padding: 1rem
+    opacity: 0.9
   .enlarged .post-media:
     width: 100%
   .enlarged .post-text: null
+  .anonymous:
+    display: none
+  .greentext:
+    color: '#35c735'
 name: e-post
 template: >-
-  <div class="comp-e-post" :class="getCssClass()"><div class="post-media"
-  v-if="item.instance" @click="onInstanceClick"><e-instance
-  :item="item.instance"></e-instance></div><div class="post-text"
-  v-text="item.text"></div><div class="clear-both"></div></div>
+  <div class="comp-e-post" :class="{ post: true, enlarged }"><div
+  class="post-media" v-if="item.instance" @click="onInstanceClick"><e-instance
+  :item="item.instance"></e-instance></div><div
+  class="post-text"><e-generator-square class="larping-generator"
+  :value="item.larpGenerator"></e-generator-square><div
+  v-html="$root.textToHtml(item.text)"></div></div><div
+  class="clear-both"></div><e-post-menu :item="item"
+  @refresh-thread="$emit('refresh-thread')"></e-post-menu></div>

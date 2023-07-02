@@ -1,0 +1,7 @@
+dom:
+  img:
+    src: https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/images/loading.gif
+name: ui-loading
+template: >-
+  <img class="comp-ui-loading"
+  src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/images/loading.gif"/>

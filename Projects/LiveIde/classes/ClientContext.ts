@@ -179,19 +179,23 @@ class ClientContext {
       const text = await result.text();
       throw new Error(text);
     } catch (ex: any) {
-      // Try again
       const url = args[0];
       console.error(`Error fetching ${url}`);
       console.error(ex);
+      if (ex.message.includes("You are not authorized")) {
+        ClientContext.alertify.error(`<h3>${ex.message}</h3>`);
+        return;
+      }
+
       //if (window.location.hostname == "localhost") {
       if (
         !ex.message.includes(
           "Object reference not set to an instance of an object"
         )
       ) {
-        ClientContext.alertify
-          .error(`<h3>${url}</h3><pre>${ex.message}</pre>`)
-          .delay(0);
+        // ClientContext.alertify
+        //   .error(`<h3>${url}</h3><pre>${ex.message}</pre>`)
+        //   .delay(0);
       }
       //}
       // Try again

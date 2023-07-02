@@ -6,12 +6,13 @@ dom:
     img:
       ref: image1
       ':class': getCssClass()
-      ':src': (src || emptySrc)
+      ':src': src1
       on_load: onLoad
     on_click: $emit('click')
 props:
   imageID: null
   url: null
+  src: null
   square: null
 data:
   width: null
@@ -47,10 +48,11 @@ methods:
       return `ui-link`;
     }
 computed:
-  src: |
+  src1: |
     function () {
       if (this.imageID) return this.$root.url.image(this.imageID);
-      return null;
+      if (this.src) return this.src;
+      return this.emptySrc;
     }
   emptySrc: |
     function () {
@@ -65,5 +67,5 @@ style:
 name: ui-image
 template: >-
   <component class="comp-ui-image image" :is="getCompType()" :url="url"
-  @click="$emit('click')"><img ref="image1" :class="getCssClass()" :src="(src ||
-  emptySrc)" @load="onLoad"/></component>
+  @click="$emit('click')"><img ref="image1" :class="getCssClass()" :src="src1"
+  @load="onLoad"/></component>

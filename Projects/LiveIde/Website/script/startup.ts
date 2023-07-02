@@ -5,8 +5,23 @@ import { ClientContext } from "../../classes/ClientContext";
 import { Params } from "../../classes/Params";
 import { DatabaseProxy } from "../../../../Apps/DatabaseProxy/Client/DbpClient";
 
+const htmlEncode = (s: string) => {
+  if (!s) return null;
+  // HTML encode
+  s = s.replace(/&/g, "&amp;");
+  s = s.replace(/</g, "&lt;");
+  s = s.replace(/>/g, "&gt;");
+  s = s.replace(/"/g, "&quot;");
+  s = s.replace(/'/g, "&#39;");
+  return s;
+};
+
 const helpers = {
   url: {
+    thread: (thread: any, full: boolean = false) => {
+      if (!thread) return null;
+      return helpers.url.full(`/t/${thread._id}`, full);
+    },
     generator: (generator: any, full: boolean = false) => {
       if (!generator) return null;
       return helpers.url.full(`/${generator.urlName}`, full);
@@ -74,6 +89,8 @@ interface MgParams {
       url: helpers.url,
       comps: client.Vue.ref(client.comps),
       templates: client.templates,
+      isLoading: false,
+      error: null,
       key1: 1,
     },
     async mounted() {},
@@ -93,6 +110,17 @@ interface MgParams {
           pageIndex,
           self.params.urlName
         );
+      },
+      textToHtml(text: string) {
+        if (!text) return null;
+        var s = text;
+        // HTML encode
+        s = htmlEncode(s) || "";
+        // >greentext
+        s = s.replace(/^&gt;(.*)$/gm, "<span class='greentext'>&gt;$1</span>");
+        // line breaks
+        s = s.replace(/\n/g, "<br />");
+        return s;
       },
       async refresh() {
         const self = this as any;

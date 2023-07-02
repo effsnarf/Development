@@ -1,31 +1,84 @@
 dom:
   .container:
+    h3:
+      v-if: '!threadID'
+      v-text: '''Start a new thread'''
     div:
       e.instance.create:
+        v-if: showInstanceCreate
         ref: createInstance1
         layout: horizontal
         ':show-create-button': 'false'
+        v-model: tempInstance
         on_has-content: hasInstanceContent = $event
-    ui.textarea:
-      hint: what's on your mind?
-      v-model: text
+    transition#1:
+      name: slide
+      div:
+        v-show: showLarpGeneratorSelect
+        h3:
+          v-text: '''Larping as'''
+        e.generator.select:
+          v-model: larpGenerator
+          ':allow-anonymous': 'true'
+          on_input: showLarpGeneratorSelect = false;
+    .post-content:
+      div:
+        class: clickable
+        transition#1:
+          name: slide
+          e.generator.square:
+            v-model: larpGenerator
+            ':key': larpGenerator?.generatorID
+            ':show-tooltip': 'false'
+            ':show-anonymous': 'true'
+        ':tooltip': larpGeneratorTooltip
+        on_click: () => showLarpGeneratorSelect = !showLarpGeneratorSelect
+      ui.textarea:
+        hint: what's on your mind?
+        v-model: text
     transition:
       name: slide
       ui.button:
         v-if: canPost
         text: post
-        on_click: post
-props: null
+        ':click': post
+props:
+  threadID: null
 data:
+  larpGenerator: null
+  tempInstance: null
   text: null
   hasInstanceContent: false
+  showInstanceCreate: true
+  showLarpGeneratorSelect: false
+  isLoading: false
 mounted: |
   async function() {
   }
 methods:
   post: |
+    async function() {
+      const { generator, text0, text1 } = (this.tempInstance || {});
+      const instance = !generator ? null : { generatorID: generator.generatorID, text0, text1 };
+      const post = await this.$root.dbp.posts.create.one(this.threadID, this.larpGenerator?._id, this.text, instance);
+      this.clear();
+      this.$emit('created', post);
+    }
+  clear: |
     function() {
-      debugger;
+      this.text = null;
+      this.tempInstance = null;
+    }
+watch:
+  tempInstance: |
+    function() {
+    }
+  threadID: |
+    {
+      handler: function() {
+        //this.showInstanceCreate = !this.threadID;
+      },
+      immediate: true
     }
 computed:
   canPost: |
@@ -33,6 +86,10 @@ computed:
       if (this.hasInstanceContent) return true;
       if (this.text) return true;
       return false;
+    }
+  larpGeneratorTooltip: |
+    function() {
+      return `Larping as ${this.larpGenerator?.displayName || 'Anonymous'}`;
     }
 style:
   .container:
@@ -42,11 +99,31 @@ style:
     max-width: 25em
     margin: auto
     gap: 1em
+  .post-content:
+    display: flex
+    width: 100%
+    gap: 1em
+  .post-content > div:nth-child(1):
+    width: 6em
+    cursor: pointer
+  h3:
+    text-align: center
 name: e-post-create
 template: >-
-  <div class="comp-e-post-create container"><div><e-instance-create
+  <div class="comp-e-post-create container"><h3 v-if="!threadID" v-text="'Start
+  a new thread'"></h3><div><e-instance-create v-if="showInstanceCreate"
   ref="createInstance1" layout="horizontal" :show-create-button="false"
-  @has-content="hasInstanceContent =
-  $event"></e-instance-create></div><ui-textarea hint="what's on your mind?"
-  v-model="text"></ui-textarea><transition name="slide"><ui-button
-  v-if="canPost" text="post" @click="post"></ui-button></transition></div>
+  v-model="tempInstance" @has-content="hasInstanceContent =
+  $event"></e-instance-create></div><transition name="slide"><div
+  v-show="showLarpGeneratorSelect"><h3 v-text="'Larping
+  as'"></h3><e-generator-select v-model="larpGenerator" :allow-anonymous="true"
+  @input="showLarpGeneratorSelect =
+  false;"></e-generator-select></div></transition><div class="post-content"><div
+  class="clickable" :tooltip="larpGeneratorTooltip" @click="() =&gt;
+  showLarpGeneratorSelect = !showLarpGeneratorSelect"><transition
+  name="slide"><e-generator-square v-model="larpGenerator"
+  :key="larpGenerator?.generatorID" :show-tooltip="false"
+  :show-anonymous="true"></e-generator-square></transition></div><ui-textarea
+  hint="what's on your mind?" v-model="text"></ui-textarea></div><transition
+  name="slide"><ui-button v-if="canPost" text="post"
+  :click="post"></ui-button></transition></div>

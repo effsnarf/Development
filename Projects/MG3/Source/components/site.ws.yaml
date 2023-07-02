@@ -5,10 +5,6 @@ dom:
       div:
         ':class': getCssClass()
         v-show: (this.pageName == $root.params.page)
-        site.header:
-          class: site-width
-        div#1:
-          class: header-spacer
         div:
           site.sidebar: null
           site.main:
@@ -42,33 +38,14 @@ methods:
       return cls;
     }
 style:
-  .site-width:
-    width: min(1000px, 90vw)
-    margin: auto
   .comp-site:
     position: relative
     margin: auto
     padding: 0
-  .comp-site-header:
-    position: fixed
-    top: 0
-    margin: 0 0 1rem
-    box-shadow: '-2rem 2rem 2rem #000'
-    background-image: >-
-      linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0),
-      rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 1))
-    background-repeat: no-repeat
-    background-size: cover
-    background-position: center
-    transition: 0s !important
-    z-index: 1000000
-  .header-spacer:
-    height: 8rem
 template: >-
   <div class="comp-site"><transition name="fade"><div :class="getCssClass()"
-  v-show="(this.pageName == $root.params.page)"><site-header
-  class="site-width"></site-header><div
-  class="header-spacer"></div><div><site-sidebar></site-sidebar><site-main
+  v-show="(this.pageName ==
+  $root.params.page)"><div><site-sidebar></site-sidebar><site-main
   :recommendation-items="recommendationItems"><template v-slot:article><slot
   name="article"></slot></template><template v-slot:left><slot
   name="left"></slot></template><template v-slot:middle><slot

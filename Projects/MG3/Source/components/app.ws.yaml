@@ -1,13 +1,53 @@
 dom:
   div:
-    page.admin.index: null
-    page.home: null
-    page.generator: null
-    page.instance: null
+    div:
+      .site-loading:
+        ui.loading:
+          v-if: $root.isLoading
+      site.header:
+        class: site-width
+      div#1:
+        class: header-spacer
+    .pages:
+      ':class': '{ ''site-width'': true }'
+      page.admin.index: null
+      page.home: null
+      page.thread: null
+      page.generator: null
+      page.instance: null
 name: app
 style:
-  .comp-app:
+  .site-loading:
+    position: fixed
+    top: 50%
+    left: 50%
+  .site-width:
+    width: min(1000px, 90vw)
     margin: auto
+  .pages > div:
+    position: absolute
+    top: 0
+    padding-bottom: 20vh
+  .comp-site-header:
+    position: fixed
+    top: 0
+    margin: 0 0 1rem
+    box-shadow: '-2rem 2rem 2rem #000'
+    background-image: >-
+      linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0),
+      rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 1))
+    background-repeat: no-repeat
+    background-size: cover
+    background-position: center
+    transition: 0s !important
+    left: 50%
+    transform: translateX(-50%)
+    z-index: 1000000
+  .header-spacer:
+    height: 8rem
 template: >-
-  <div
-  class="comp-app"><page-admin-index></page-admin-index><page-home></page-home><page-generator></page-generator><page-instance></page-instance></div>
+  <div class="comp-app"><div><div class="site-loading"><ui-loading
+  v-if="$root.isLoading"></ui-loading></div><site-header
+  class="site-width"></site-header><div class="header-spacer"></div></div><div
+  class="pages" :class="{ 'site-width': true
+  }"><page-admin-index></page-admin-index><page-home></page-home><page-thread></page-thread><page-generator></page-generator><page-instance></page-instance></div></div>

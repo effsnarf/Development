@@ -1,22 +1,20 @@
 dom:
   site:
     page-name: home
+    template#1:
+      v-slot: left
+      e.thread.list: null
     template:
-      v-slot: article
-      e.post.create: null
-      e.thread:
-        ':item': thread
-      content.stream:
-        item-type: e.generator.wide
-        ':getMoreItems': $root.dbp.generators.select.popular
-        grid-class: grid-3
+      v-slot: middle
+      div:
+        div#1:
+          e.post.create: null
 data:
   generators: []
-  thread: null
   uniqueID: 1
 mounted: |
   async function() {
-    this.thread = await this.getThread();
+    this.threads = await this.$root.dbp.threads.select.all();
     
     this.$watch(() => this.$root.params.page, {
       handler: async () => {
@@ -33,32 +31,6 @@ methods:
         this.$root.setDocumentTitle(null);
       }
     }
-  getThread: |
-    async function() {
-      const insts = await this.$root.dbp.instances.select.popular();
-      const thread = {
-        id: this.uniqueID++,
-        dt: Date.now(),
-        title: "Ars Longa, Vita Brevis",
-        posts: Array.from({length: 10}).map((a, i) => this.getPost(insts, i))
-      };
-      return thread;
-    }
-  getPost: |
-    function(insts, index) {
-      // Select a random instance
-      const inst = insts[Math.floor(Math.random() * insts.length)];
-      const hasInstance = (!index) ? true : Math.random() < 0.5;
-      let text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In dignissim tellus in malesuada imperdiet. Integer tristique, lacus non tristique rutrum, ex nisl imperdiet erat, ut iaculis lacus orci ac eros. Curabitur efficitur faucibus turpis, eu efficitur sem tristique eget. Suspendisse feugiat, arcu ac rutrum condimentum, felis enim semper tortor, ac interdum est velit ac ipsum. Vestibulum at auctor magna. Fusce bibendum congue purus et finibus. Nulla placerat ac mi nec auctor. Sed ac efficitur elit, a pulvinar ligula. Vestibulum eros velit, sagittis quis tincidunt in, tempor vitae metus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.";
-      const texts = text.split(", ");
-      text = texts.slice(0, Math.floor(Math.random() * texts.length)).join(". ");
-      return {
-        id: this.uniqueID++,
-        dt: Date.now(),
-        text: text,
-        instance: !hasInstance ? null : inst
-      }
-    }
   getMoreInstances: |
     async function(pageIndex) {
       const items = await this.$root.dbp.instances.select.new("en", pageIndex)
@@ -72,7 +44,5 @@ style:
 name: page-home
 template: >-
   <site class="comp-page-home" page-name="home"><template
-  v-slot:article><e-post-create></e-post-create><e-thread
-  :item="thread"></e-thread><content-stream item-type="e.generator.wide"
-  :getMoreItems="$root.dbp.generators.select.popular"
-  grid-class="grid-3"></content-stream></template></site>
+  v-slot:left><e-thread-list></e-thread-list></template><template
+  v-slot:middle><div><div><e-post-create></e-post-create></div></div></template></site>

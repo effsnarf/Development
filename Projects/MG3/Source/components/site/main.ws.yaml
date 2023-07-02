@@ -3,9 +3,13 @@ dom:
   div:
     .columns:
       .left:
-        slot:
-          name: left
+        ui.sticky:
+          top: 160px
+          slot:
+            name: left
       .middle:
+        ui.error:
+          ':error': $root.error
         slot:
           name: middle
       .right:
@@ -14,8 +18,8 @@ dom:
           div:
             slot:
               name: right
-          content.recommendations:
-            ':items': recommendationItems
+            content.recommendations:
+              ':items': recommendationItems
     slot:
       name: article
 props:
@@ -23,9 +27,10 @@ props:
 style:
   .comp-site-main: null
 template: >-
-  <div class="comp-site-main"><div class="columns"><div class="left"><slot
-  name="left"></slot></div><div class="middle"><slot
+  <div class="comp-site-main"><div class="columns"><div class="left"><ui-sticky
+  top="160px"><slot name="left"></slot></ui-sticky></div><div
+  class="middle"><ui-error :error="$root.error"></ui-error><slot
   name="middle"></slot></div><div class="right"><ui-sticky
-  top="140px"><div><slot name="right"></slot></div><content-recommendations
-  :items="recommendationItems"></content-recommendations></ui-sticky></div></div><slot
+  top="140px"><div><slot name="right"></slot><content-recommendations
+  :items="recommendationItems"></content-recommendations></div></ui-sticky></div></div><slot
   name="article"></slot></div>
