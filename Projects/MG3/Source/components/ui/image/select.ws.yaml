@@ -46,7 +46,7 @@ methods:
     }
   uploadFile: |
     async function(file) {
-      let url = "http://localhost:8080/upload";
+      let url = "https://img.memegenerator.net/upload";
 
       this.isUploading = true;
 
