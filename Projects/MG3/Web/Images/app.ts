@@ -60,7 +60,7 @@ const debug = (...args: any[]) => {
             Created: Date.now(),
             Md5: imageMd5,
           });
-          const newFilePath = path.join(os.tmpdir(), `${image._id}.jpg`);
+          const newFilePath = getSplitDirImagePath(image._id, "jpg", false);
           fs.renameSync(tempFilePath, newFilePath);
         }
         // debug(`${`Saved`.gray} ${newFilePath.yellow}`);
@@ -80,6 +80,18 @@ const debug = (...args: any[]) => {
     }
   };
 
+  const getSplitDirImagePath = (
+    imageID: number,
+    ext: string,
+    noBg: boolean
+  ) => {
+    const noBgStr = noBg ? ".nobg" : "";
+    const f1 = Math.floor(imageID / 1024 / 1024);
+    const f2 = Math.floor(imageID / 1024);
+    const imagePath = `${config.folders.images}\\${f1}\\${f2}\\${imageID}${noBgStr}.${ext}`;
+    return imagePath;
+  };
+
   const getImagePath = async (ps: string[]) => {
     const noBg = ps.includes("nobg");
     const noBgStr = noBg ? ".nobg" : "";
@@ -94,9 +106,9 @@ const debug = (...args: any[]) => {
       const height = parseInt(size[1]);
       imageID = parseInt(ps[3]);
     }
-    const f1 = Math.floor(imageID / 1024 / 1024);
-    const f2 = Math.floor(imageID / 1024);
-    let imagePath = `${config.folders.images}\\${f1}\\${f2}\\${imageID}${noBgStr}.${ext}`;
+
+    let imagePath = getSplitDirImagePath(imageID, ext, noBg);
+
     if (fs.existsSync(imagePath)) {
       // debug(`Returning ${imagePath}`);
       return imagePath;
