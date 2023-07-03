@@ -13,6 +13,7 @@ import "@shared/Extensions";
 import { Configuration } from "@shared/Configuration";
 import { Loading } from "@shared/Loading";
 import { Database } from "@shared/Database/Database";
+import { MongoDatabase } from "@shared/Database/MongoDatabase";
 
 const debug = (...args: any[]) => {
   args = args.map((a) => (typeof a == "string" ? a.gray : a));
@@ -21,7 +22,8 @@ const debug = (...args: any[]) => {
 
 (async () => {
   const config = (await Configuration.new()).data;
-  const db = await Database.new(config.database);
+  const db = (await Database.new(config.database)) as MongoDatabase;
+  db.options.lowercaseFields = true;
 
   const getFileContent = async (filePath: string) => {
     // debug(`${`Reading`.gray} ${filePath})}`);
@@ -56,10 +58,14 @@ const debug = (...args: any[]) => {
         if (image) {
           fs.unlinkSync(tempFilePath);
         } else {
-          image = await db.upsert("MgImages", {
-            Created: Date.now(),
-            Md5: imageMd5,
-          });
+          image = await db.upsert(
+            "MgImages",
+            {
+              Created: Date.now(),
+              Md5: imageMd5,
+            },
+            true
+          );
           const newFilePath = path.join(os.tmpdir(), `${image._id}.jpg`);
           fs.renameSync(tempFilePath, newFilePath);
         }
@@ -70,9 +76,9 @@ const debug = (...args: any[]) => {
         loading.stop();
 
         console.log(
-          `${loading.elapsed.unitifyTime()}\t${size.unitifySize()}Uploaded\t${util.inspect(
-            image
-          )}`
+          `${loading.elapsed.unitifyTime()}\t${size.unitifySize()}Uploaded\t${
+            image._id
+          }`
         );
       });
     } finally {
@@ -192,7 +198,7 @@ const debug = (...args: any[]) => {
   ) => {
     const url = `${config.old.images.server}${req.url}`;
     try {
-      debug("Processing serve from old server");
+      // debug("Processing serve from old server");
       const started = Date.now();
       const response = await axios.get(url, { responseType: "arraybuffer" });
       const size = parseInt(response.headers["content-length"]);
