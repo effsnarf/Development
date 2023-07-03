@@ -81,6 +81,42 @@ api:
     Instances.sample.popular:
       args: [urlName, count]
       code: | #js
+        if (!urlName)
+        {
+          if (false)
+          {
+            const commentEntities = await db.find("CommentEntities", { }, { CommentsCount: -1 }, 100, undefined, true);
+            const ids = commentEntities.take(count).map(c => c.entityID);
+            const insts = await db.find("Instances", { _id: { $in: ids } }, { }, count, undefined, true);
+            return insts;
+          }
+
+          const gens = await db.find("Generators", { IsQuality: true }, {}, 100, undefined, true);
+          const genIDs = gens.shuffle().take(count).map(g => g._id);
+
+          const getOneInstance = async (genID, minScore) => {
+            const instances = (await db.aggregate("Instances",
+              [
+                { $match: { LanguageCode: "en", GeneratorID: genID, TotalVotesScore: { $gt: minScore } } },
+                { $sample: { size: 1 } }
+              ]
+            ));
+            return instances[0];
+          };
+
+          const getGoodInstance = async (genID) => {
+            for (const score of [20, 10, 5, 0])
+            {
+              const instance = await getOneInstance(genID, score);
+              if (instance) return instance;
+            }
+          };
+
+          const instances = await Promise.all(genIDs.map(async (gid) => await getGoodInstance(gid)));
+
+          return instances;
+        }
+
         const gen = await db.findOne("Generators", { UrlName: urlName });
 
         const instances = await db.aggregate("Instances",
@@ -91,6 +127,44 @@ api:
         );
 
         return instances;
+    Instances.select.popular:
+      args: [languageCode, pageIndex, urlName]
+      code: | #js
+        const pageSize = 15;
+        const skip = pageIndex * pageSize;
+
+        if (!urlName) {
+          return await db.aggregate(
+            'Instances',
+            [
+              {
+                $match: {
+                  LanguageCode: "en",
+                  TotalVotesScore: { $gt: 30 }
+                }
+              },
+              { $sample: { size: pageSize } }
+            ],
+            true
+          );
+        }
+
+        const gens = (await db.find('Generators', { UrlName: urlName }, {}, 1));
+
+        if (!gens.length) return [];
+
+        const gen = gens[0];
+
+        const insts = await db.find(
+          'Instances',
+          { LanguageCode: languageCode, GeneratorID: gen._id },
+          { TotalVotesScore: -1 },
+          pageSize,
+          skip,
+          true
+        );
+
+        return insts;
     Threads.create.one:
       args: []
       code: | #js
@@ -104,7 +178,7 @@ api:
       args: [threadID]
       code: | #js
         const thread = await db.findOne("Threads", { _id: threadID });
-        if (!thread) throw new Error(`Thread not found`);
+        if (!thread) return null;
         thread.posts = await db.find("Posts", { ThreadID: thread._id }, { }, 1000, null, true);
         return thread;
     Threads.select.all:
@@ -187,3 +261,10 @@ api:
         }
         thread.postsCount--;
         await db.upsert("Threads", thread);
+    Comments.select.by:
+      args: [entityID]
+      code: | #js
+        let comments = await db.find("Comments", { EntityType: 1, EntityID: entityID }, { }, 1000, null, true);
+        comments = comments.sortBy(c => c._id);
+        for (const comment of comments) comment.created = comment.created.valueOf();
+        return comments;

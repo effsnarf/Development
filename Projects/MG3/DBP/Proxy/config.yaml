@@ -33,8 +33,9 @@ analytics:
         database: MG-Analytics
 cache:
   ignore:
-    - /api/Threads
-    - /api/Instances/select/popular
+    - /api/Threads/
+    - /api/Posts/
+    - /api/Instances/
     - /create/
     - /get/new/id
     - /googleLogin
