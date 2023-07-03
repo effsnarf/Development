@@ -79,6 +79,7 @@ computed:
     }
   selectedLayerEditorType: |
     function() {
+      if (!this.selectedLayer) return;
       return `e-template-${this.selectedLayer.type}-editor`;
     }
 name: e-template-editor
@@ -97,6 +98,8 @@ style:
     left: 0
     width: 100%
     height: 100%
+  .div1 > .comp-ui-select:
+    font-size: 160%
 template: >-
   <div class="comp-e-template-editor" v-if="temp"><div class="div1"><ui-select
   :options="temp.layers.map((layer) =&gt; getLayerTypeIcon(layer.type))"

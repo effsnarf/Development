@@ -3,6 +3,12 @@ import * as colors from "colors";
 class Loading {
   private isRunning: boolean = false;
   private startTime: number | null = null;
+  private _lastElapsed: number = 0;
+
+  get elapsed(): number {
+    if (this.isRunning) return Date.now() - this.startTime!;
+    return this._lastElapsed;
+  }
 
   constructor(private info?: string) {}
 
@@ -20,12 +26,12 @@ class Loading {
 
   stop(info?: string) {
     if (!this.isRunning) return;
-    const elapsedTime = Date.now() - this.startTime!;
+    this._lastElapsed = Date.now() - this.startTime!;
     this.isRunning = false;
     this.startTime = null;
     process.stdout.write("\r");
     process.stdout.clearLine(0);
-    if (info) console.log(elapsedTime.unitifyTime(), info.gray);
+    if (info) console.log(this._lastElapsed.unitifyTime(), info.gray);
   }
 
   private showInfo() {
