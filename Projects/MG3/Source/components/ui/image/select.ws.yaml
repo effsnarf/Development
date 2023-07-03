@@ -16,6 +16,8 @@ dom:
 props:
   value: null
 data:
+  imageID: null
+  noBgImageID: null
   isUploading: false
 mounted: |
   function() {
@@ -44,7 +46,7 @@ methods:
     }
   uploadFile: |
     async function(file) {
-      let url = "https://img.memegenerator.net/images/upload";
+      let url = "http://localhost:8080/upload";
 
       this.isUploading = true;
 
@@ -55,6 +57,8 @@ methods:
       xhr.addEventListener('readystatechange', function(e) {
         if (xhr.readyState == 4 && xhr.status == 200) {
           this.isUploading = false;
+          const image = JSON.parse(xhr.responseText);
+          this.$emit('input', image._id);
         }
         else if (xhr.readyState == 4 && xhr.status != 200) {
           this.isUploading = false;
@@ -62,7 +66,7 @@ methods:
         }
       }.bind(this));
 
-      formData.append('file', file);
+      formData.append('image', file);
       xhr.send(formData);
     }
   preventDefaults: |

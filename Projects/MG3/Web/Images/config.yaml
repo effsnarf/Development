@@ -1,0 +1,13 @@
+server:
+  host: localhost
+  port: 8080
+old:
+  images:
+    server: http://jsonvisualizer.net
+folders:
+  images:
+    dev: C:\eff\Development\Temp
+    prod: F:\MemeGenerator\Images
+database:
+  connectionString: mongodb://localhost
+  database: MemeGenerator

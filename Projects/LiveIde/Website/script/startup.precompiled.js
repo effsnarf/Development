@@ -163,9 +163,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "../../../LiveIde/Website/script/1688311040304.ts":
+/***/ "../../../LiveIde/Website/script/1688376646945.ts":
 /*!********************************************************!*\
-  !*** ../../../LiveIde/Website/script/1688311040304.ts ***!
+  !*** ../../../LiveIde/Website/script/1688376646945.ts ***!
   \********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -2126,6 +2126,9 @@ if (typeof Array !== "undefined") {
     Array.prototype.onlyTruthy = function () {
         return this.filter((item) => !!item);
     };
+    Array.prototype.shuffle = function () {
+        return this.sortBy(() => Math.random() - 0.5);
+    };
 }
 // #endregion
 // #region Function
@@ -2395,7 +2398,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("../../../LiveIde/Website/script/1688311040304.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("../../../LiveIde/Website/script/1688376646945.ts");
 /******/ 	
 /******/ })()
 ;
