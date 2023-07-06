@@ -1,7 +1,7 @@
 dom:
   textarea:
-    ':value': value
-    ':placeholder': hint
+    ":value": value
+    ":placeholder": hint
     on_input: onInput
     on_focus: $emit('focus')
     on_blur: $emit('blur')
@@ -10,7 +10,7 @@ props:
   value: null
   hint: null
 methods:
-  onInput: |
+  onInput: | #js
     function(e) {
       const heightLimit = 200;
       const textarea = e.target;
@@ -18,7 +18,7 @@ methods:
       textarea.style.height = "";
       textarea.style.height = Math.min(textarea.scrollHeight, heightLimit) + "px";
     }
-  onKeyDown: |
+  onKeyDown: | #js
     (e) => {
       if (e.key == 'Tab') {
         e.preventDefault();
