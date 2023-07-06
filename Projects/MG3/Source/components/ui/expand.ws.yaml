@@ -1,0 +1,32 @@
+dom:
+  .flex:
+    class: hoverable
+    on_click: $emit('input', !value)
+    .icon:
+      v-text: icon
+    label:
+      v-text: text
+props:
+  value: null
+  text: null
+watch: null
+computed:
+  icon: | #js
+
+    function() {
+      return !this.value ? '➕' : '➖';
+    }
+style:
+  .flex > *:
+    font-size: 120%
+    cursor: pointer
+  .icon:
+    margin-right: 0.3rem
+    border: 1px solid gray
+  label:
+    flex-grow: 1
+name: ui-expand
+template: >-
+  <div class="comp-ui-expand hoverable flex" @click="$emit('input',
+  !value)"><div class="icon" v-text="icon"></div><label
+  v-text="text"></label></div>

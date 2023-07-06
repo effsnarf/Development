@@ -19,7 +19,7 @@ props:
   showCreatePost: true
 data:
   width: null
-mounted: |
+mounted: | #js
   function () {
     window.addEventListener(`resize`, this.recalc.bind(this));
     // Detect if the image element changes its size
@@ -27,12 +27,14 @@ mounted: |
     resizeObserver.observe(this.$refs.sizeRef1);
   }
 methods:
-  onLoad: |
+  onLoad: | #js
+
     function () {
       this.recalc();
       [1,2,3].forEach(i => setTimeout(this.recalc.bind(this), i * 100))
     }
-  recalc: |
+  recalc: | #js
+
     function () {
       if (!this.$refs.sizeRef1) return;
       let rect = this.$refs.sizeRef1.getBoundingClientRect();
@@ -40,7 +42,8 @@ methods:
       this.height = Math.round(rect.height);
       this.$emit("change");
     }
-  getFontSize: |
+  getFontSize: | #js
+
     function (s) {
       if (!s) return 0;
       if (!this.width) return 0;
@@ -48,7 +51,8 @@ methods:
       return `${size*2.5}vh`;
     }
 computed:
-  fontSizes: |
+  fontSizes: | #js
+
     function () {
       const sizes = [this.getFontSize(this.item.texts[0]), this.getFontSize(this.item.texts[1])];
       return sizes;

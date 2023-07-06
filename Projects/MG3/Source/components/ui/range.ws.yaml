@@ -1,0 +1,18 @@
+dom:
+  input:
+    type: range
+    ':value': value
+    ':min': min
+    ':max': max
+    ':step': step
+    on_input: $emit('input', parseFloat($event.target.value))
+props:
+  value: null
+  min: null
+  max: null
+  step: null
+style: null
+name: ui-range
+template: >-
+  <input class="comp-ui-range" type="range" :value="value" :min="min" :max="max"
+  :step="step" @input="$emit('input', parseFloat($event.target.value))"/>

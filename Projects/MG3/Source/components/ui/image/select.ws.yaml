@@ -2,49 +2,29 @@ dom:
   .flex:
     ui.image:
       ':imageID': value
-    .dropzone:
-      ref: dropArea1
-      class: hoverable
-      v-text: dropAreaText
-      form:
-        input:
-          type: file
-          ref: file1
-          multiple: true
-          accept: image/*
-          onchange: (e) => handleFiles(e.files)
+      ':square': true
+    ui.file.dropzone:
+      on_file-drop: onFileDrop
+      .dropzone:
+        .flex:
+          class: justify-center
+          div:
+            v-text: dropAreaText
+          div#2:
+            ui.loading: null
+            v-if: isUploading
 props:
   value: null
 data:
   imageID: null
   noBgImageID: null
   isUploading: false
-mounted: |
-  function() {
-    const dropArea = this.$refs.dropArea1;
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-      dropArea.addEventListener(eventName, this.preventDefaults, false);
-    });
-    ['dragenter', 'dragover'].forEach(eventName => {
-      dropArea.addEventListener(eventName, this.highlight.bind(this), false);
-    });
-    ['dragleave', 'drop'].forEach(eventName => {
-      dropArea.addEventListener(eventName, this.unhighlight.bind(this), false);
-    });
-    dropArea.addEventListener('drop', this.handleDrop.bind(this), false);
-  }
 methods:
-  handleDrop: |
-    function (e) {
-      let dt = e.dataTransfer;
-      let files = dt.files;
-      this.handleFiles(files);
-    }
-  handleFiles: |
+  onFileDrop: | #js
     function (files) {
       ([...files]).forEach(this.uploadFile.bind(this));
     }
-  uploadFile: |
+  uploadFile: | #js
     async function(file) {
       let url = "https://img.memegenerator.net/upload";
 
@@ -69,39 +49,34 @@ methods:
       formData.append('image', file);
       xhr.send(formData);
     }
-  preventDefaults: |
-    function (e) {
-      e.preventDefault()
-      e.stopPropagation()
-    }
-  highlight: |
-    function (e) {
-      this.$refs.dropArea1.classList.add('highlighted');
-    }
-  unhighlight: |
-    function (e) {
-      this.$refs.dropArea1.classList.remove('highlighted');
-    }
 computed:
-  dropAreaText: |
+  dropAreaText: | #js
     function () {
       if (this.isUploading) return "uploading…";
       return "drop image here";
+    }
+watch:
+  isUploading: | #js
+    function (isUploading) {
+      this.$emit('uploading', isUploading);
     }
 style:
   .flex:
     gap: 0.5rem
   .comp-ui-image:
     width: 15% !important
-  .dropzone:
+  .comp-ui-file-dropzone:
     width: 85% !important
-    border: '0.5rem dashed #ffffff'
     font-size: 160%
     text-align: center
     font-family: monospace
-    opacity: 0.5
+  .dropzone:
+    border: 6px dashed white
+    opacity: 0.3
 name: ui-image-select
 template: >-
-  <div class="comp-ui-image-select flex"><ui-image
-  :imageID="value"></ui-image><div class="hoverable dropzone" ref="dropArea1"
-  v-text="dropAreaText" form="[object Object]"></div></div>
+  <div class="comp-ui-image-select flex"><ui-image :imageID="value"
+  :square="true"></ui-image><ui-file-dropzone @file-drop="onFileDrop"><div
+  class="dropzone"><div class="justify-center flex"><div
+  v-text="dropAreaText"></div><div
+  v-if="isUploading"><ui-loading></ui-loading></div></div></div></ui-file-dropzone></div>

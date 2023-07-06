@@ -18,7 +18,8 @@ props:
 data:
   selectedTabIndex: m
 watch:
-  selectedTabIndex: |
+  selectedTabIndex: | #js
+
     {
       handler: function(newIndex) {
         this.$emit('input', this.options[newIndex]);
@@ -26,7 +27,8 @@ watch:
       immediate: true
     }
 methods:
-  getOptionText: |
+  getOptionText: | #js
+
     function(option) {
       if (this.getText) return this.getText(option);
       return option;

@@ -2,18 +2,25 @@ dom:
   div:
     table:
       tr:
+        class: hoverable
         v-for: prop in getItemProperties()
+        on_click: onPropertyClick(prop)
         td#0:
           ':class': prop.class
           v-text: '''🧊'''
         td#1:
           v-text: prop.name
         td#2:
-          v-text: JSON.stringify(prop.value)?.shorten(20)
+          pre:
+            v-text: previewValue(prop.value)
 props:
   item: null
 methods:
-  getItemProperties: |
+  onPropertyClick: | #js
+    function(prop) {
+      console.log(prop.value);
+    }
+  getItemProperties: | #js
     function() {
       const props = [];
       if (!this.item) return props;
@@ -22,11 +29,12 @@ methods:
       props.push(...this.getItemProps(this.item().$options.computed));
       return props;
     }
-  getItemProps: |
+  getItemProps: | #js
     function(collection) {
       if (!collection) return [];
       const props = [];
       for (const name of Object.keys(collection)) {
+        if (["$", "_"].some(s => name.startsWith(s))) continue;
         props.push({
           name,
           value: (name in collection) ? collection[name] : this.item()[name],
@@ -34,9 +42,32 @@ methods:
       }
       return props;
     }
+  previewValue: | #js
+    function(value) {
+      if (typeof value == "function") return value.toString();
+      try
+      {
+        return jsyaml.dump(value);
+      }
+      catch (ex)
+      {
+        return ex.message;
+      }
+    }
+style:
+  td:
+    font-size: 1rem
+  pre:
+    font-size: 1rem
+    max-width: 20rem
+    max-height: 5rem
+    overflow: auto
+    opacity: 0.5
+    padding: 0.5em
+    border: 1px solid gray
 name: ide-component-info
 template: >-
-  <div class="comp-ide-component-info"><table><tr v-for="prop in
-  getItemProperties()"><td :class="prop.class" v-text="'🧊'"></td><td
-  v-text="prop.name"></td><td
-  v-text="JSON.stringify(prop.value)?.shorten(20)"></td></tr></table></div>
+  <div class="comp-ide-component-info"><table><tr class="hoverable" v-for="prop
+  in getItemProperties()" @click="onPropertyClick(prop)"><td :class="prop.class"
+  v-text="'🧊'"></td><td v-text="prop.name"></td><td><pre
+  v-text="previewValue(prop.value)"></pre></td></tr></table></div>

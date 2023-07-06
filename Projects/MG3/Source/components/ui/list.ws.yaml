@@ -15,12 +15,12 @@ props:
   items: null
   selectedIndex: null
 methods:
-  onItemClick: |
+  onItemClick: | #js
     function(e) {
       const newIndex = (e.index == this.selectedIndex) ? null : e.index;
       this.$emit('input', newIndex);
     }
-  getCssClass: |
+  getCssClass: | #js
     function(index) {
       return {
         selected: (index == this.selectedIndex),

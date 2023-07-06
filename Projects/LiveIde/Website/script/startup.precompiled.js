@@ -163,9 +163,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "../../../LiveIde/Website/script/1688376646945.ts":
+/***/ "../../../LiveIde/Website/script/1688579198097.ts":
 /*!********************************************************!*\
-  !*** ../../../LiveIde/Website/script/1688376646945.ts ***!
+  !*** ../../../LiveIde/Website/script/1688579198097.ts ***!
   \********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -181,6 +181,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 __webpack_require__(/*! ../../../../Shared/Extensions */ "../../../../Shared/Extensions.ts");
+const StateTracker_1 = __webpack_require__(/*! ../../classes/StateTracker */ "../../../LiveIde/classes/StateTracker.ts");
 const AnalyticsTracker_1 = __webpack_require__(/*! ../../classes/AnalyticsTracker */ "../../../LiveIde/classes/AnalyticsTracker.ts");
 const ClientContext_1 = __webpack_require__(/*! ../../classes/ClientContext */ "../../../LiveIde/classes/ClientContext.ts");
 const Params_1 = __webpack_require__(/*! ../../classes/Params */ "../../../LiveIde/classes/Params.ts");
@@ -218,14 +219,17 @@ const helpers = {
                 return null;
             return `https://img.memegenerator.net/instances/${instance.instanceID}.jpg`;
         },
-        image: (imageID, full = false) => {
+        image: (imageID, full = false, removeBackground = false) => {
             if (!imageID)
                 return null;
-            return helpers.url.full(`https://img.memegenerator.net/images/${imageID}.jpg`, full);
+            const noBg = removeBackground ? ".nobg" : "";
+            return helpers.url.full(`https://img.memegenerator.net/images/${imageID}${noBg}.jpg`, full);
         },
         full: (path, full = false) => {
             if (!path)
                 return null;
+            if (path.startsWith("http"))
+                return path;
             if (full)
                 return `https://memegenerator.net${path}`;
             return path;
@@ -249,8 +253,11 @@ const helpers = {
     ideVueApp = new client.Vue({
         el: "#app",
         data: {
+            vues: {},
+            ideWatches: {},
             dbp,
             analytics: yield AnalyticsTracker_1.AnalyticsTracker.new(),
+            stateTracker: new StateTracker_1.StateTracker(client),
             params: params,
             url: helpers.url,
             comps: client.Vue.ref(client.comps),
@@ -263,6 +270,21 @@ const helpers = {
             return __awaiter(this, void 0, void 0, function* () { });
         },
         methods: {
+            vue(uid) {
+                if (!uid)
+                    return null;
+                const vue = this.vues[uid];
+                if (!vue)
+                    return null;
+                return vue();
+            },
+            ideWatch(uid, name) {
+                const ideWatches = this.ideWatches;
+                const key = `${uid}-${name}`;
+                if (ideWatches[key])
+                    return;
+                ideWatches[key] = { uid, name };
+            },
             navigateTo(item) {
                 return __awaiter(this, void 0, void 0, function* () {
                     const url = this.itemToUrl(item);
@@ -564,6 +586,7 @@ class ClientContext {
             "span",
             "ul",
             "li",
+            "label",
             "input",
             "button",
             "canvas",
@@ -956,6 +979,61 @@ class Params {
     }
 }
 exports.Params = Params;
+
+
+/***/ }),
+
+/***/ "../../../LiveIde/classes/StateTracker.ts":
+/*!************************************************!*\
+  !*** ../../../LiveIde/classes/StateTracker.ts ***!
+  \************************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.StateTracker = void 0;
+const Queue_1 = __webpack_require__(/*! ../../../Shared/Queue */ "../../../../Shared/Queue.ts");
+class StateTracker {
+    constructor(client) {
+        this.client = client;
+        this.id = 1;
+        this.maxItems = 100;
+        this.queue = Queue_1.Queue.new(this.processQueue.bind(this), 10);
+        this.items = client.Vue.observable([]);
+    }
+    log(getVue, compName, key, newValue, oldValue) {
+        if (compName.startsWith("ide-"))
+            return;
+        this.queue.add(() => this.items.push({
+            id: this.id++,
+            getVue,
+            compName,
+            key,
+            newValue,
+            oldValue,
+        }));
+    }
+    clear() {
+        this.queue.add(() => this.items.splice(0, this.items.length));
+    }
+    processQueue(queueItems) {
+        return __awaiter(this, void 0, void 0, function* () {
+            for (const queueItem of queueItems) {
+                yield queueItem();
+            }
+        });
+    }
+}
+exports.StateTracker = StateTracker;
 
 
 /***/ }),
@@ -2149,6 +2227,42 @@ if (typeof Function !== "undefined") {
             setTimeout(fn, delay);
         };
     };
+    /**
+     * If the original function is called multiple times within the specified delay,
+     * the function will only be executed once at the end.
+     */
+    Function.prototype.debounce = function (delay) {
+        const fn = this;
+        let timeout;
+        return function (...args) {
+            const context = this;
+            clearTimeout(timeout);
+            timeout = setTimeout(function () {
+                return __awaiter(this, void 0, void 0, function* () {
+                    yield fn.apply(context, args);
+                });
+            }, delay);
+        };
+    };
+    /**
+     * If the original function is called multiple times within the specified delay,
+     * it will execute once every delay time.
+     */
+    Function.prototype.throttle = function (delay) {
+        const fn = this;
+        let timeout;
+        return function (...args) {
+            const context = this;
+            if (!timeout) {
+                timeout = setTimeout(function () {
+                    return __awaiter(this, void 0, void 0, function* () {
+                        yield fn.apply(context, args);
+                        timeout = null;
+                    });
+                }, delay);
+            }
+        };
+    };
 }
 // #endregion
 
@@ -2195,6 +2309,61 @@ class Lock {
     }
 }
 exports.Lock = Lock;
+
+
+/***/ }),
+
+/***/ "../../../../Shared/Queue.ts":
+/*!***********************************!*\
+  !*** ../../../../Shared/Queue.ts ***!
+  \***********************************/
+/***/ (function(__unused_webpack_module, exports) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Queue = void 0;
+class Queue {
+    constructor(callback, interval) {
+        this.callback = callback;
+        this.interval = interval;
+        this.items = [];
+    }
+    static new(callback, interval = 1000) {
+        const queue = new Queue(callback, interval);
+        queue.start();
+        return queue;
+    }
+    start() {
+        this.process();
+    }
+    process() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.items.length)
+                yield this.flush();
+            setTimeout(this.process.bind(this), this.interval);
+        });
+    }
+    add(item) {
+        this.items.push(item);
+    }
+    flush() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const items = this.items;
+            this.items = [];
+            yield this.callback(items);
+        });
+    }
+}
+exports.Queue = Queue;
 
 
 /***/ }),
@@ -2398,7 +2567,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("../../../LiveIde/Website/script/1688376646945.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("../../../LiveIde/Website/script/1688579198097.ts");
 /******/ 	
 /******/ })()
 ;

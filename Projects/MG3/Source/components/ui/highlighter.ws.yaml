@@ -1,0 +1,21 @@
+dom:
+  div:
+    class: hoverable
+    on_mouseenter: onMouseEnter
+    on_mouseleave: onMouseLeave
+    slot: null
+props:
+  getElement: null
+methods:
+  onMouseEnter: | #js
+    function() {
+      this.getElement().classList.add("highlighted");
+    }
+  onMouseLeave: | #js
+    function() {
+      this.getElement().classList.remove("highlighted");
+    }
+name: ui-highlighter
+template: >-
+  <div class="comp-ui-highlighter hoverable" @mouseenter="onMouseEnter"
+  @mouseleave="onMouseLeave"><slot></slot></div>

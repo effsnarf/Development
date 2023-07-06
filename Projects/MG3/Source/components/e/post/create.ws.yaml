@@ -44,11 +44,12 @@ data:
   hasInstanceContent: false
   showLarpGeneratorSelect: false
   isLoading: false
-mounted: |
+mounted: | #js
   async function() {
   }
 methods:
-  post: |
+  post: | #js
+
     async function() {
       const { generator, text0, text1 } = (this.tempInstance || {});
       const instance = !generator ? null : { generatorID: generator.generatorID, text0, text1 };
@@ -62,16 +63,19 @@ methods:
       }
       this.$emit('created', post);
     }
-  clear: |
+  clear: | #js
+
     function() {
       this.text = null;
       this.tempInstance = null;
     }
 watch:
-  tempInstance: |
+  tempInstance: | #js
+
     function() {
     }
-  threadID: |
+  threadID: | #js
+
     {
       handler: function() {
         //this.showInstanceCreate = !this.threadID;
@@ -79,25 +83,30 @@ watch:
       immediate: true
     }
 computed:
-  showInstanceCreate: |
+  showInstanceCreate: | #js
+
     function() {
       return !this.hasCommentContent;
     }
-  showCommentCreate: |
+  showCommentCreate: | #js
+
     function() {
       return !this.hasInstanceContent;
     }
-  hasCommentContent: |
+  hasCommentContent: | #js
+
     function() {
       return !!this.text;
     }
-  canPost: |
+  canPost: | #js
+
     function() {
       if (this.hasInstanceContent) return true;
       if (this.text) return true;
       return false;
     }
-  larpGeneratorTooltip: |
+  larpGeneratorTooltip: | #js
+
     function() {
       return `Larping as ${this.larpGenerator?.displayName || 'Anonymous'}`;
     }

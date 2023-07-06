@@ -44,7 +44,8 @@ data:
   showGeneratorSelect: false
   isCreating: false
 methods:
-  create: |
+  create: | #js
+
     async function() {
       this.isCreating = true;
       try
@@ -58,52 +59,62 @@ methods:
         this.isCreating = false;
       }
     }
-  clear: |
+  clear: | #js
+
     function() {
       this.tempInstance.text0 = null;
       this.tempInstance.text1 = null;
     }
-  onFocus: |
+  onFocus: | #js
+
     function(e) {
       if (!this.tempInstance.generator) this.showGeneratorSelect = true;
     }
-  getNewTempInstance: |
+  getNewTempInstance: | #js
+
     function() {
       return { generator: null, imageID: null, text0: null, text1: null };
     }
 computed:
-  hasContent: |
+  hasContent: | #js
+
     function() {
       return (this.hasGenerator && this.hasText) ? true : false;
     }
-  hasGenerator: |
+  hasGenerator: | #js
+
     function() {
       return !!this.tempInstance.generator;
     }
-  hasText: |
+  hasText: | #js
+
     function() {
       return !!this.tempInstance.text0 || !!this.tempInstance.text1;
     }
 watch:
   value:
-    handler: |
+    handler: | #js
+
       function(newValue) {
         this.tempInstance = newValue || this.getNewTempInstance();
       }
     immediate: true
   generator:
-    handler: |
+    handler: | #js
+
       function(newGenerator) {
         this.tempInstance.generator = newGenerator;
       }
     immediate: true
   tempInstance:
-    handler: |
+    handler: | #js
+
       function(newTempInstance) {
         this.$emit("input", newTempInstance);
       }
     deep: true
-  hasContent: |
+  hasContent: | #js
+
     function(newHasContent) {
       this.$emit("has-content", newHasContent);
     }

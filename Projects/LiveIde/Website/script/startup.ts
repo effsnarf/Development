@@ -1,5 +1,6 @@
 import "../../../../Shared/Extensions";
 import { Component } from "../../classes/Component";
+import { StateTracker } from "../../classes/StateTracker";
 import { AnalyticsTracker } from "../../classes/AnalyticsTracker";
 import { ClientContext } from "../../classes/ClientContext";
 import { Params } from "../../classes/Params";
@@ -34,15 +35,21 @@ const helpers = {
       if (!instance) return null;
       return `https://img.memegenerator.net/instances/${instance.instanceID}.jpg`;
     },
-    image: (imageID: number, full: boolean = false) => {
+    image: (
+      imageID: number,
+      full: boolean = false,
+      removeBackground: boolean = false
+    ) => {
       if (!imageID) return null;
+      const noBg = removeBackground ? ".nobg" : "";
       return helpers.url.full(
-        `https://img.memegenerator.net/images/${imageID}.jpg`,
+        `https://img.memegenerator.net/images/${imageID}${noBg}.jpg`,
         full
       );
     },
     full: (path: string, full: boolean = false) => {
       if (!path) return null;
+      if (path.startsWith("http")) return path;
       if (full) return `https://memegenerator.net${path}`;
       return path;
     },
@@ -83,8 +90,11 @@ interface MgParams {
   ideVueApp = new client.Vue({
     el: "#app",
     data: {
+      vues: {},
+      ideWatches: {},
       dbp,
       analytics: await AnalyticsTracker.new(),
+      stateTracker: new StateTracker(client),
       params: params,
       url: helpers.url,
       comps: client.Vue.ref(client.comps),
@@ -95,6 +105,18 @@ interface MgParams {
     },
     async mounted() {},
     methods: {
+      vue(uid: number) {
+        if (!uid) return null;
+        const vue = (this as any).vues[uid];
+        if (!vue) return null;
+        return vue();
+      },
+      ideWatch(uid: number, name: string) {
+        const ideWatches = (this as any).ideWatches;
+        const key = `${uid}-${name}`;
+        if (ideWatches[key]) return;
+        ideWatches[key] = { uid, name };
+      },
       async navigateTo(item: any) {
         const url = this.itemToUrl(item);
         const self = this as any;

@@ -1,6 +1,8 @@
 dom:
   div:
     class: workspace
+    ide.state.tracker:
+      ':stateTracker': $root.stateTracker
     ide.component.editor:
       ':component': selectedComponent
     ui.tree:
@@ -22,28 +24,28 @@ props:
 data:
   selectedNode: null
 methods:
-  getVueChildren: |
+  getVueChildren: | #js
     function(vue) {
       return !vue ? [] : vue().$children?.map(c => (() => c));
     }
-  onNodeSelect: |
+  onNodeSelect: | #js
     function(node) {
       this.selectedNode = node;
     }
-  onNodeClick: |
+  onNodeClick: | #js
     function(node) {
       //console.log(node());
     }
-  onNodeHover: |
+  onNodeHover: | #js
     function (node) {
       node()?.$el.classList?.add('highlighted');
     }
-  onNodeUnhover: |
+  onNodeUnhover: | #js
     function (node) {
       node()?.$el.classList?.remove('highlighted');
     }
 computed:
-  selectedComponent: |
+  selectedComponent: | #js
     function() {
       if (!this.selectedNode) return null;
       const vue = this.selectedNode();
@@ -60,9 +62,21 @@ style:
     display: flex
     flex-direction: column
     gap: 3em
-    z-index: 100
+    background: '#303030'
+    padding: 1rem
+    box-shadow: 'inset -5px 5px 5px #000'
+    border: 1px solid gray
+    opacity: 0.1
+    max-width: 5rem
+    overflow: hidden
+    z-index: 1000000
+    transition: 1s
+  .comp-ide-workspace:hover:
+    max-width: 50rem
+    opacity: 1
 template: >-
-  <div class="comp-ide-workspace workspace"><ide-component-editor
+  <div class="comp-ide-workspace workspace"><ide-state-tracker
+  :stateTracker="$root.stateTracker"></ide-state-tracker><ide-component-editor
   :component="selectedComponent"></ide-component-editor><ui-tree :root="() =&gt;
   $root" :getChildren="getVueChildren" item-type="ide-vue-node"
   @node-select="onNodeSelect" @node-click="onNodeClick"

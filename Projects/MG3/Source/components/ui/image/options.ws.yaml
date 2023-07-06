@@ -1,0 +1,60 @@
+dom:
+  .options:
+    ':tooltip': filter
+    v-if: imageID
+    ui.image:
+      class: option
+      v-for: i in 10
+      ':class': getClass(i)
+      ':img-style': getStyle(i)
+      ':imageID': imageID
+      ':square': true
+      on_click: onClick(i)
+props:
+  imageID: null
+  filter: null
+  value: null
+methods:
+  onClick: | #js
+
+    function(i) {
+      if (i/10 == this.value) i = null;
+      this.$emit('input', i/10);
+    }
+  getClass: | #js
+
+    function(i) {
+      const cls = {};
+      cls['selected'] = (i/10 == this.value);
+      return cls;
+    }
+  getStyle: | #js
+
+    function(i) {
+      return `filter: ${this.filter}(${this.getValue(i)})`;
+    }
+  getValue: | #js
+
+    function(i) {
+      const value = (this.filter == 'blur') ? `${i}px` : (i/10).toFixed(2);
+      return value;
+    }
+style:
+  .options:
+    display: grid
+    grid-template: 1fr / repeat(10, 1fr)
+  .option:
+    cursor: pointer
+    border: 2px solid transparent
+    transition: 0s
+  .option:hover:
+    border: '2px solid #ffffff40'
+  .selected:
+    background: none
+    border: 2px solid
+name: ui-image-options
+template: >-
+  <div class="comp-ui-image-options options" :tooltip="filter"
+  v-if="imageID"><ui-image class="option" v-for="i in 10" :class="getClass(i)"
+  :img-style="getStyle(i)" :imageID="imageID" :square="true"
+  @click="onClick(i)"></ui-image></div>

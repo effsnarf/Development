@@ -1,0 +1,103 @@
+dom:
+  div:
+    ui.keyboard:
+      on_ctrl: onCtrlKey
+    ui.mouse:
+      on_hovered-element: onHoveredElement
+      ':global': true
+    ui.context:
+      ref: context1
+      ':global': true
+      ':visible': showPicker
+      template:
+        h2:
+          ui.title:
+            icon: 📦
+            ':value': getTitle(hoveredVue)
+        hr: null
+        ide.component.runtime:
+          v-for: uid in parentChain
+          ':item': $root.vues[uid]
+props: null
+data:
+  hoveredElement: null
+  hoveredVue: null
+  parentChain: null
+  showPicker: false
+methods:
+  onCtrlKey: | #js
+    function(ctrl) {
+      this.showPicker = ctrl;
+    }
+  getTitle: | #js
+    function(vue) {
+      return this.$root.vue(vue)?.$options._componentTag;
+    }
+  onHoveredElement: | #js
+    function(el) {
+      if (this.$refs.context1.isPinned) return;
+      this.hoveredElement = el;
+    }
+  getParentChain: | #js
+    function(vue) {
+      let chain = [];
+      let parent = vue;
+      while (parent) {
+        chain.push(parent._uid);
+        parent = this.getParentVue(parent);
+      }
+      chain = chain.reverse();
+      return chain;
+    }
+  getParentVue: | #js
+    function(vue) {
+      return this.getVueFromVnode(vue.$parent);
+    }
+  getVueFromElement: | #js
+    function(el) {
+      return this.getVueFromVnode(this.getVnodeFromElement(el));
+    }
+  getVnodeFromElement: | #js
+    function(el) {
+      if (!el) return null;
+      if (el.__vue__) return el.__vue__;
+      return this.getVnodeFromElement(el.parentElement);
+    }
+  getVueFromVnode: | #js
+    // Skip vnodes like <keep-alive>, <transition>, etc.
+    function(vnode) {
+      if (!vnode) return null;
+      if (this.vNodeIsVue(vnode)) return vnode;
+      return this.getVueFromVnode(vnode.$parent);
+    }
+  vNodeIsVue: | #js
+    function(vnode) {
+      if ([`transition`, `transition-group`, `keep-alive`].includes(vnode.$options._componentTag)) return false;
+      return true;
+    }
+computed: null
+watch:
+  hoveredElement: | #js
+    function(newEl, oldEl) {
+      const vue = this.getVueFromElement(newEl);
+      this.hoveredVue = vue?._uid;
+      const parentChain = this.getParentChain(vue);
+      this.parentChain = parentChain;
+    }
+  hoveredVue: | #js
+    function(newVue, oldVue) {
+      if (oldVue) this.$root.vue(oldVue)?.$el.classList.remove(`highlighted`);
+      if (newVue) this.$root.vue(newVue)?.$el.classList.add(`highlighted`);
+    }
+style:
+  div:
+    font-family: monospace
+name: ide-component-picker
+template: >-
+  <div class="comp-ide-component-picker"><ui-keyboard
+  @ctrl="onCtrlKey"></ui-keyboard><ui-mouse @hovered-element="onHoveredElement"
+  :global="true"></ui-mouse><ui-context ref="context1" :global="true"
+  :visible="showPicker"><template><h2><ui-title icon="📦"
+  :value="getTitle(hoveredVue)"></ui-title></h2><ide-component-runtime
+  v-for="uid in parentChain"
+  :item="$root.vues[uid]"></ide-component-runtime></template></ui-context></div>

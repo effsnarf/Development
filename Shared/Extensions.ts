@@ -349,6 +349,8 @@ interface Function {
   is(type: any): boolean;
   getArgumentNames(): string[];
   postpone(ms: number): (...args: any[]) => any;
+  debounce(ms: number): (...args: any[]) => any;
+  throttle(ms: number): (...args: any[]) => any;
 }
 // #endregion
 
@@ -1427,6 +1429,40 @@ if (typeof Function !== "undefined") {
     const fn = this;
     return () => {
       setTimeout(fn, delay);
+    };
+  };
+
+  /**
+   * If the original function is called multiple times within the specified delay,
+   * the function will only be executed once at the end.
+   */
+  Function.prototype.debounce = function (delay: number) {
+    const fn = this;
+    let timeout: any;
+    return function (this: any, ...args) {
+      const context = this;
+      clearTimeout(timeout);
+      timeout = setTimeout(async function () {
+        await fn.apply(context, args);
+      }, delay);
+    };
+  };
+
+  /**
+   * If the original function is called multiple times within the specified delay,
+   * it will execute once every delay time.
+   */
+  Function.prototype.throttle = function (delay: number) {
+    const fn = this;
+    let timeout: any;
+    return function (this: any, ...args) {
+      const context = this;
+      if (!timeout) {
+        timeout = setTimeout(async function () {
+          await fn.apply(context, args);
+          timeout = null;
+        }, delay);
+      }
     };
   };
 }

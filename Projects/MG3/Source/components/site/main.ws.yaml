@@ -38,7 +38,8 @@ props:
   titleKey: null
   recommendationItems: null
 computed:
-  leftStickyTop: |
+  leftStickyTop: | #js
+
     function() {
       if (this.titleText) return "250px";
       return "160px";

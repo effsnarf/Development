@@ -1,6 +1,6 @@
 dom:
   transition:
-    name: slide
+    name: slide2
     button:
       v-if: '!isLoading'
       v-text: text
@@ -13,7 +13,8 @@ props:
 data:
   isLoading: null
 methods:
-  onClick: |
+  onClick: | #js
+
     async function() {
       this.$emit('click');
       if (this.click)
@@ -36,6 +37,6 @@ style:
     margin: auto
 name: ui-button
 template: >-
-  <transition class="comp-ui-button" name="slide"><button v-if="!isLoading"
+  <transition class="comp-ui-button" name="slide2"><button v-if="!isLoading"
   v-text="text" @click="onClick"></button><ui-loading
   v-if="isLoading"></ui-loading></transition>

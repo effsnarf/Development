@@ -19,12 +19,13 @@ dom:
 data:
   threads: []
   isLoading: false
-mounted: |
+mounted: | #js
   async function() {
     this.$watch(() => this.$root.params.url, this.init.bind(this), { immediate: true });
   }
 methods:
-  init: |
+  init: | #js
+
     async function() {
       this.isLoading = true;
       try
@@ -36,11 +37,13 @@ methods:
         this.isLoading = false;
       }
     }
-  isCurrentThread: |
+  isCurrentThread: | #js
+
     function(thread) {
       return this.$root.params.url == this.$root.url.thread(thread);
     }
-  getThreadTitle: |
+  getThreadTitle: | #js
+
     function(thread) {
       const post = thread.posts[0];
       if (!post) return null;
@@ -49,7 +52,8 @@ methods:
         post.instance?.text0 ||
         post.instance?.displayName;
     }
-  firstPost: |
+  firstPost: | #js
+
     function(thread) {
       return thread.posts[0];
     }

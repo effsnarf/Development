@@ -1,12 +1,88 @@
 dom:
-  div:
+  .items:
     v-if: item
+    transition#1:
+      name: slide2
+      ui.checkbox:
+        v-if: (!removingBackground)
+        text: remove background
+        v-model: item.removeBackground
     ui.image.select:
+      ref: imageSelect1
       v-model: item.imageID
+      on_uploading: onImageUploading
+    transition#2:
+      name: slide2
+      .message:
+        v-if: removingBackground
+        div:
+          v-text: '''Removing background'''
+        ui.loading: null
 props:
   item: null
-style: null
+data:
+  removingBackground: false
+  showMoveScale: false
+  processingNewImage: false
+style:
+  .items:
+    display: flex
+    flex-direction: column
+    gap: 1rem
+mounted: | #js
+  async function() {
+    this.$watch('item.removeBackground', async (removeBackground) => {
+      this.removingBackground = removeBackground;
+    });
+  }
+methods:
+  onFileDrop: | #js
+    function(files) {
+      this.$refs.imageSelect1.onFileDrop(files);
+    }
+  onImageUploading: | #js
+    function(isUploading) {
+      if (isUploading) {
+        this.processingNewImage = true;
+        this.item.removeBackground = false;
+      }
+      this.$emit('toggle-disabled', isUploading);
+    }
+  onLayerImageLoad: | #js
+    function(src) {
+      if (src.includes(".nobg."))
+      {
+        this.removingBackground = false;
+        this.processingNewImage = false;
+      }
+      else
+      {
+        if (this.processingNewImage)
+        {
+          // After a user uploads a new image,
+          // we wait until the browser loads the image
+          // and then mark the checkbox to remove the background.
+          this.item.trans.pos.x = 0.5;
+          this.item.trans.pos.y = 0.5;
+          this.item.trans.scale = 1;
+          setTimeout(() => {
+            this.item.removeBackground = true;
+          }, 100);
+        }
+      }
+    }
+watch:
+  processingNewImage: | #js
+    async function(newValue) {
+      this.$emit('toggle-disabled', newValue);
+    }
 name: e-template-image-editor
 template: >-
-  <div class="comp-e-template-image-editor" v-if="item"><ui-image-select
-  v-model="item.imageID"></ui-image-select></div>
+  <div class="comp-e-template-image-editor items" v-if="item"><transition
+  name="slide2"><ui-checkbox v-if="(!removingBackground)" text="remove
+  background"
+  v-model="item.removeBackground"></ui-checkbox></transition><ui-image-select
+  ref="imageSelect1" v-model="item.imageID"
+  @uploading="onImageUploading"></ui-image-select><transition name="slide2"><div
+  class="message" v-if="removingBackground"><div v-text="'Removing
+  background'"></div><ui-loading></ui-loading></div></transition></div>

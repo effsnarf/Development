@@ -8,6 +8,17 @@ helpers:
     (context: any, dom: any, compName: string) => {
       return context.toTemplate(context, dom, 0, compName).join("\n");
     };
+  addCode: | #ts
+    (context: any, methodBody: string, code: string) => {
+      if (!methodBody) methodBody = "function() {}";
+      methodBody = methodBody.replace(/\{/, `{\n${code}\n`);
+      return methodBody;
+    };
+  addLogMethod: | #ts
+    (context: any, methodName: string, methodBody: string) => {
+      methodBody = methodBody.replace(/\{/, `{\n this._log_method("${methodName}", [...arguments]); \n `);
+      return methodBody;
+    };
   prefixCssSelectors: | #ts
     (context: any, compName: string, selectors: string) => {
       const s = [];

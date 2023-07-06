@@ -22,12 +22,13 @@ props:
 data:
   values: []
   isBusy: 0
-mounted: |
+mounted: | #js
   function() {
     this.fetchData();
   }
 methods:
-  fetchData: |
+  fetchData: | #js
+
     async function() {
       this.isBusy++;
       this.values.clear();
@@ -40,12 +41,14 @@ methods:
         this.isBusy--;
       }
     }
-  getHeader: |
+  getHeader: | #js
+
     function() {
       return `${this.event} every ${this.every} in the last ${this.last}`;
     }
 computed:
-  url: |
+  url: | #js
+
     function() {
       try
       {
@@ -61,14 +64,16 @@ computed:
         return null;
       }
     }
-  color: |
+  color: | #js
+
     function() {
       return {
         "requests": "green",
         "response.time": "blue",
       }[this.event] || "";
     }
-  cssClass: |
+  cssClass: | #js
+
     function() {
       const cls = {};
       return cls;
@@ -77,7 +82,8 @@ computed:
     }
 watch:
   url:
-    handler: |
+    handler: | #js
+
       async function() {
         await this.fetchData();
       }

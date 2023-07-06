@@ -8,16 +8,19 @@ props:
   value: null
 data: null
 computed:
-  humanized: |
+  humanized: | #js
+
     function() {
       return this.value?.humanize();
     }
-  number: |
+  number: | #js
+
     function() {
       // Get everything except the unit
       return this.humanized?.match(/[^a-zA-Z]+/)?.first();
     }
-  unit: |
+  unit: | #js
+
     function() {
       return this.humanized?.match(/[a-zA-Z]+/)?.first();
     }

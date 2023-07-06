@@ -22,7 +22,8 @@ props:
 data:
   enlarged: false
 methods:
-  onInstanceClick: |
+  onInstanceClick: | #js
+
     function () {
       this.enlarged = !this.enlarged;
     }

@@ -44,14 +44,16 @@ data:
   canvasWidth: 400
   hoveredIndex: null
 methods:
-  getCssClass: |
+  getCssClass: | #js
+
     function() {
       const cls = {};
       if (!this.data?.length) cls.empty = true;
       if (this.color) cls[`${this.color}`] = true;
       return cls;
     }
-  drawChart: |
+  drawChart: | #js
+
     function(data) {
       if (!this.data?.length) return;
 
@@ -69,13 +71,15 @@ methods:
       this.ctx.strokeStyle = '#ffffff80';
       this.ctx.stroke();
     }
-  drawBar: |
+  drawBar: | #js
+
     function(x, value, color) {
       const y = this.paddingY + this.chartHeight - (value - this.min) * this.stepY;
       this.ctx.fillStyle = color;
       this.ctx.fillRect(x, y, this.step, this.chartHeight - y + this.paddingY);
     }
-  onMouseMove: |
+  onMouseMove: | #js
+
     function(e) {
       const rect = this.canvas.getBoundingClientRect();
       const scaleX = this.canvas.width / rect.width;
@@ -83,24 +87,28 @@ methods:
       const i = Math.floor((x - this.paddingX) / this.step * scaleX);
       this.hoveredIndex = i;
     }
-  onMouseOut: |
+  onMouseOut: | #js
+
     function(e) {
       this.hoveredIndex = null;
     }
-  getValueFunc: |
+  getValueFunc: | #js
+
     function(value) {
       let func = this.getValue;
       if (typeof func === 'string') func = eval(func);
       return func(value);
     }
-  scaled: |
+  scaled: | #js
+
     function(value) {
       return value;
       return Math.round(value * this.scale);
     }
 watch:
   data:
-    handler: |
+    handler: | #js
+
       async function(data) {
         await this.$nextTick();
         this.drawChart(data);
@@ -108,7 +116,8 @@ watch:
     immediate: true
     deep: true
   hoveredIndex:
-    handler: |
+    handler: | #js
+
       async function(newIndex, oldIndex) {
         if (newIndex === oldIndex) return;
         await this.$nextTick();
@@ -132,43 +141,52 @@ computed:
   chartHeight: function () { return this.height - this.paddingY * 2; }
   step: function() { return this.chartWidth / this.data.length; }
   stepY: function() { return this.chartHeight / this.range; }
-  min: |
+  min: | #js
+
     function() {
       if (!this.data?.length) return 0;
       return Math.round(Math.min(...this.data.map(x => this.getValueFunc(x))));
     }
-  max: |
+  max: | #js
+
     function() {
       if (!this.data?.length) return 0;
       return Math.round(Math.max(...this.data.map(x => this.getValueFunc(x))) * 1.1);
     }
-  minValue: |
+  minValue: | #js
+
     function() {
       return (this.data||[]).filter(v => v).min();
     }
-  averageValue: |
+  averageValue: | #js
+
     function() {
       return (this.data||[]).filter(v => v).average();
     }
-  middleValue: |
+  middleValue: | #js
+
     function() {
       return (this.minValue + this.maxValue) / 2;
     }
-  maxValue: |
+  maxValue: | #js
+
     function() {
       return (this.data||[]).filter(v => v).max();
     }
-  range: |
+  range: | #js
+
     function() {
       return this.max - this.min;
     }
-  hoveredData: |
+  hoveredData: | #js
+
     function() {
       if (this.hoveredIndex === null) return null;
       const value = this.data[this.hoveredIndex];
       return value;
     }
-  hoveredX: |
+  hoveredX: | #js
+
     function() {
       if (this.hoveredIndex === null) return null;
       return this.paddingX + this.hoveredIndex * this.step;

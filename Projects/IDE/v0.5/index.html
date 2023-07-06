@@ -1,0 +1,118 @@
+<html>
+  <head>
+    <title>Compon</title>
+    <link href="https://fonts.googleapis.com/css?family=Qwigley|Kulim+Park|Satisfy|Source+Code+Pro|Bangers|IM Fell English&display=swap" rel="stylesheet"></link>
+    <link href="./css/lib/shorthand.css" rel="stylesheet"></link>
+    <link href="./css/shorthand.css" rel="stylesheet"></link>
+    <link href="./css/defaults.css" rel="stylesheet"></link>
+    <link href="./css/default-controls.css" rel="stylesheet"></link>
+    <link href="./css/hourglass.css" rel="stylesheet"></link>
+    <link href="./css/animations.css" rel="stylesheet"></link>
+    <link href="./css/animations-stagger.css" rel="stylesheet"></link>
+    <link href="./css/style.css" rel="stylesheet"></link>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/css/alertify.css" rel="stylesheet"></link>
+    <link href="/favicon.png" rel="icon" type="image/x-icon"></link>
+    <meta content="378889662397-1ubh5092vfvgto0ru5ek5l8s4abfipcg.apps.googleusercontent.com" name="google-signin-client_id"/>
+    <script async="<%= true %>" defer="<%= true %>" src="//accounts.google.com/gsi/client"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-md5@0.7.3/build/md5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dexie/3.2.3/dexie.js"></script>
+    <script src="/js/lib/underscore.js"></script>
+    <script src="/js/lib/jszip.js"></script>
+    <script src="/js/lib/utility.js"></script>
+    <script src="/js/lib/haml.js"></script>
+    <script src="/js/lib/handlebars.min.js"></script>
+    <script src="/js/shared/Timer.js"></script>
+    <script src="/js/misc/Local.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/alertify.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/deep-diff/1.0.2/deep-diff.min.js"></script>
+    <script src="//www.gstatic.com/charts/loader.js"></script>
+    <script src="./js/misc/localStorage.js"></script>
+    <script src="./js/misc/memegenerator.js"></script>
+    <script src="./js/lib/jquery.js"></script>
+    <script src="./js/lib/jquery-ui.min.js"></script>
+    <script src="./js/lib/jshint.js"></script>
+    <script src="./js/lib/css.js"></script>
+    <script src="./js/lib/leader-line/leader-line.min.js"></script>
+    <script src="./js/lib/vue.js"></script>
+    <script src="./js/lib/vue-async-computed.js"></script>
+    <script src="./js/ide/GraphDatabase.js"></script>
+    <script src="./js/ide/DataBinder.js"></script>
+    <script src="//db.memegenerator.net/client.js"></script>
+    <!-- %script{src: "//unpkg.com/@babel/standalone@7.18.7/babel.min.js"}
+    -->
+    <script src="./js/misc/vue-user-component-compiler.js"></script>
+    <script src="./js/misc/live-data.js"></script>
+    <script src="./js/misc/drag-and-drop.js"></script>
+    <script src="./js/misc/animation.js"></script>
+    <script src="./js/misc/state-tracker.js"></script>
+    <script src="./js/misc/auto-grow-list.js"></script>
+    <script src="./js/misc/ide.js"></script>
+    <script src="./js/misc/comp-dom.js"></script>
+    <script src="./js/misc/view-dom.js"></script>
+    <script src="./js/misc/vue-dom.js"></script>
+    <script src="./js/startup.js"></script>
+    <!-- Share Widget
+    -->
+    <!-- %script{async: true, src: "https://platform-api.sharethis.com/js/sharethis.js#property=6334844fb22a350012c876fb&product=sop"}
+    -->
+    <!-- Google tag (gtag.js)
+    -->
+    <script async="<%= true %>" src="https://www.googletagmanager.com/gtag/js?id=G-7SQVHMPQCY"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-7SQVHMPQCY');
+    </script>
+  </head>
+  <body>
+    <div class="body-background"></div>
+    <div class="body-main">
+      <div id="app">
+        <div>
+          <div>
+            <transition name="ide-vt-fade">
+              <ide-system-hourglass class="pt-l8" ref="hourglass1" v-show="isIniting"></ide-system-hourglass>
+            </transition>
+          </div>
+          <div v-if="!isIniting">
+            <div class="flex ide-anim-on-load" style="align-items: start; justify-content: space-between;">
+              <div class="flex" style="font-size: 5rem; text-shadow: -0.1em 0.1em 6px #000;">
+                <!-- Blue cube
+                -->
+                <div class="mr-l1">&#x1F9CA;</div>
+                <div>
+                  <h1 class="fs-l5 mt-1" style="margin-bottom: -0.3em; transform: scaleY(0.9);">Compon</h1>
+                  <div class="fs-m3 text-center opacity-50">
+                    <span>development studio</span>
+                    <span class="opacity-50" v-if="fetchQueueLength">
+                      <span>({{fetchQueueLength}})</span>
+                      <img src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/images/loading.gif"/>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="flex text-right">
+                <!-- ide-search-comps
+                -->
+                <!-- %meow-comp-268.m-l1.z-100
+                -->
+                <div class="flex z-10" style="gap: 2em;">
+                  <!-- ide-user-account
+                  -->
+                  <meow><ide-comp-267 ref="ideUserAccount1"></ide-comp-267></meow>
+                </div>
+              </div>
+            </div>
+            <!-- %button{"@click": "refresh"} refresh
+            -->
+            <!-- ide-workspace
+            -->
+            <meow><ide-comp-171 class="ide-anim-on-load" v-if="showWorkspace"></ide-comp-171></meow>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

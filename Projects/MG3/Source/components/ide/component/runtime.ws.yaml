@@ -1,0 +1,39 @@
+dom:
+  div:
+    v-if: vue
+    ui.highlighter:
+      ':get-element': () => vue.$el
+      div:
+        ui.context:
+          h2:
+            ui.title:
+              icon: 📦
+              ':value': vue.$options._componentTag
+            ide.component.info:
+              ':item': () => vue
+        div:
+          on_click: onClick
+          ui.title:
+            icon: 📦
+            ':value': vue.$options._componentTag
+props:
+  item: null
+methods:
+  onClick: | #js
+    function() {
+      console.log(this.vue);
+    }
+computed:
+  vue: | #js
+    function() {
+      if (!this.item) return null;
+      return this.item();
+    }
+name: ide-component-runtime
+template: >-
+  <div class="comp-ide-component-runtime" v-if="vue"><ui-highlighter
+  :get-element="() =&gt; vue.$el"><div><ui-context><h2><ui-title icon="📦"
+  :value="vue.$options._componentTag"></ui-title><ide-component-info :item="()
+  =&gt; vue"></ide-component-info></h2></ui-context><div
+  @click="onClick"><ui-title icon="📦"
+  :value="vue.$options._componentTag"></ui-title></div></div></ui-highlighter></div>

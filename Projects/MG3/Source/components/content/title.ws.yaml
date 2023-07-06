@@ -25,16 +25,18 @@ props:
 data:
   isStuck: false
 methods:
-  onScroll: |
+  onScroll: | #js
+
     function() {
       const scrollTop = window.scrollY;
       this.isStuck = scrollTop > 0;
     }
-  getCssClass: |
+  getCssClass: | #js
+
     function() {
       return { stuck: this.isStuck };
     }
-mounted: |
+mounted: | #js
   function() {
     window.addEventListener('scroll', this.onScroll);
   }

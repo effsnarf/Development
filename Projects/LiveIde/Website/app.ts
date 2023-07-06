@@ -134,6 +134,35 @@ const _fetchAsJson = async (url: string) => {
 
   const preProcessYaml = (yaml: string) => {
     yaml = yaml.replace(/@/g, "on_");
+    if (false) {
+      // Find duplicate lines
+      let k = 100;
+      const lines = yaml.split("\n").map((s, i) => {
+        return { index: i, s: s };
+      });
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        const otherLines = lines.filter((l) => l.index != line.index);
+        const dupLines = otherLines.filter((l) => l.s == line.s);
+        for (let j = 0; j < dupLines.length; j++) {
+          const dupLine = dupLines[j];
+          const key = dupLine.s.split(":")[0];
+          if (key.includes("#")) continue;
+          dupLine.s = dupLine.s.replace(key, `${key}#${k++}`);
+        }
+      }
+      yaml = lines.map((l) => l.s).join("\n");
+    }
+    return yaml;
+  };
+
+  const postProcessYaml = (yaml: string) => {
+    // Add "# js" after method keys (  onLayerImageLoad: |)
+    // Regex is two whitespaces, then a key, then a colon, then a space, then a pipe
+    yaml = yaml.replace(/  (\w+): \|/g, "  $1: | #js");
+    // Also replace:
+    // mounted: |
+    yaml = yaml.replace(/mounted: \|/g, "mounted: | #js");
     return yaml;
   };
 
@@ -188,7 +217,8 @@ const _fetchAsJson = async (url: string) => {
           fs.readFileSync(compPath, "utf8")
         );
         if (!("editable" in existingComp) || existingComp.editable) {
-          const yaml = Objects.yamlify(comp.source);
+          let yaml = Objects.yamlify(comp.source);
+          yaml = postProcessYaml(yaml);
           fs.writeFileSync(compPath, yaml);
         }
         return res.end("ok");

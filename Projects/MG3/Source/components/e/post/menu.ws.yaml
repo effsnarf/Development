@@ -10,7 +10,8 @@ dom:
 props:
   item: null
 methods:
-  onDelete: |
+  onDelete: | #js
+
     function () {
       this.$root.dbp.posts.delete.one(this.item._id);
       this.$emit("refresh-thread");

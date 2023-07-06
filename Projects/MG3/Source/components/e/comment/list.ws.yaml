@@ -12,13 +12,15 @@ props:
 data:
   comments: []
 computed:
-  topComments: |
+  topComments: | #js
+
     function() {
       return this.comments?.sortBy(c => -c.totalVotesScore).take(30);
     }
 watch:
   entityID:
-    handler: |
+    handler: | #js
+
       async function() {
         this.comments = await this.$root.dbp.comments.select.by(this.entityID);
       }

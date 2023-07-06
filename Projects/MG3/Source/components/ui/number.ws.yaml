@@ -15,7 +15,8 @@ props:
   text: null
   unit: null
 methods:
-  formatNumber: |
+  formatNumber: | #js
+
     function(number) {
       if (number == null) return null;
       if (typeof number === 'string') number = parseFloat(number);

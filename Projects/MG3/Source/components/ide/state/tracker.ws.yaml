@@ -1,0 +1,53 @@
+dom:
+  div:
+    div:
+      button:
+        v-text: '''❌'''
+        on_click: clear
+    transition.group:
+      tag: ul
+      name: list
+      li:
+        v-for: item in stateTracker.items.take(20)
+        class: hoverable
+        ':key': item.id
+        on_click: () => onItemClick(item)
+        on_mouseenter: () => onMouseEnter(item)
+        on_mouseleave: () => onMouseLeave(item)
+        ide.state.tracker.item:
+          ':item': item
+props:
+  stateTracker: null
+methods:
+  onItemClick: | #js
+    function(item) {
+      const vue = item.getVue();
+      vue.$el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      console.log(vue);
+    }
+  onMouseEnter: | #js
+    function(item) {
+      const vue = item.getVue();
+      vue.$el.classList.add('highlighted');
+    }
+  onMouseLeave: | #js
+    function(item) {
+      const vue = item.getVue();
+      vue.$el.classList.remove('highlighted');
+    }
+  clear: | #js
+    function() {
+      this.stateTracker.clear();
+    }
+style:
+  ul:
+    display: flex
+    flex-direction: column-reverse
+name: ide-state-tracker
+template: >-
+  <div class="comp-ide-state-tracker"><div><button v-text="'❌'"
+  @click="clear"></button></div><transition-group tag="ul" name="list"><li
+  class="hoverable" v-for="item in stateTracker.items.take(20)" :key="item.id"
+  @click="() =&gt; onItemClick(item)" @mouseenter="() =&gt; onMouseEnter(item)"
+  @mouseleave="() =&gt; onMouseLeave(item)"><ide-state-tracker-item
+  :item="item"></ide-state-tracker-item></li></transition-group></div>

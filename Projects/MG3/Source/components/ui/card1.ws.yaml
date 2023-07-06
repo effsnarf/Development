@@ -9,20 +9,23 @@ dom:
       class: glow
 data:
   bounds: null
-mounted: |
+mounted: | #js
   function() {
   }
 methods:
-  onMouseEnter: |
+  onMouseEnter: | #js
+
     function(e) {
       this.bounds = this.$refs.card.getBoundingClientRect();
     }
-  onMouseLeave: |
+  onMouseLeave: | #js
+
     function(e) {
       this.$refs.card.style.transform = '';
       this.$refs.card.style.background = '';
     }
-  onMouseMove: |
+  onMouseMove: | #js
+
     function(e) {
       const $card = this.$refs.card;
 

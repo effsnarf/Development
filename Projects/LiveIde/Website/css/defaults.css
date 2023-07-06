@@ -95,13 +95,13 @@ li
 }
 .highlighted
 {
-  background: #ffffff40;
-  border: 2px dashed white;
+  border: 2px dashed yellow;
   box-shadow: inset -4px 4px 2px #000;
+  transition: 0s;
 }
 .highlighted:hover
 {
-  background: #ffffff70;
+  transition: 0s;
 }
 .tree .title.highlighted:hover
 {
@@ -601,7 +601,6 @@ select, input[type=range]
 {
   filter: grayscale(1) contrast(0.8) brightness(0.8);
   pointer-events: none;
-  text-decoration: line-through;
 }
 .disabled2
 {
@@ -684,17 +683,17 @@ p
   padding: 0.5em 1em;
   z-index: 100;
   left: 50%;
+  bottom: 0;
   opacity: 0;
-  transform: translate(-50%, -180%);
-  transition: 0.3s;
+  transform: translate(-50%, 110%);
+  transition: 0.1s !important;
 }
 
 /* Show the tooltip text when hovering over the element */
 [tooltip]:hover::before {
   visibility: visible;
   opacity: 1;
-  transform: translate(-50%, -140%);
-  transition: 0.3s;
+  transition: 0.1s !important;
 }
 
 
@@ -729,6 +728,17 @@ img[src=""]
 }
 
 
+.message
+{
+  width: 100%;
+  background: #424242;
+  padding: 0.5rem 1rem;
+  border: 1px solid #ffffff80;
+  margin: 0.5rem auto;
+  text-align: center;
+}
+
+
 
 [tooltip]:hover::before {
   content: attr(tooltip);
@@ -740,7 +750,8 @@ img[src=""]
   border-radius: 0.5em;
   padding: 0.5em 1em;
   left: 50%;
-  transform: translate(-50%, -110%);
+  bottom: 0;
+  transform: translate(-50%, 110%);
   box-shadow: -8px 8px 6px #000;
 }
 

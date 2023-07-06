@@ -42,15 +42,18 @@ data:
   lastValue: 1 hour
   barsValue: 100
 methods:
-  getCatOptions: |
+  getCatOptions: | #js
+
     function() {
     }
 computed:
-  chartData: |
+  chartData: | #js
+
     function() {
       return Array.from({ length: 10 }, (v, i) => i + 1);
     }
-  every: |
+  every: | #js
+
     function() {
       if (!this.lastValue || !this.barsValue) return null;
       if (this.lastValue.endsWith("hour")) return (1).minutes().unitifyTime().withoutColors();

@@ -1,42 +1,47 @@
 dom:
   div:
-    div:
+    .tree-node:
       ':class': getCssClass()
+      ui.expand:
+        v-model: isExpanded
       component:
-        ':is': itemType
-        ':value': item
+        v-if: itemType
+        ':is': getItemType()
+        ':item': getItem(node)
       on_click: onNodeClick
       on_mouseenter: onMouseEnter
       on_mouseleave: onMouseLeave
+      slot: null
     ul:
       class: ml-l1
       li:
-        v-for: child in children
+        v-for: child in getChildItems(node)
         ui.tree.node:
-          ':item': child
-          ':item-type': itemType
-          ':getChildren': getChildren
+          ':node': child
+          ':item-type': getItemType()
+          ':get-item': getItem
+          ':get-children': getChildren
           ':selected-node': selectedNode
           on_node-click: onChildClick
           on_node-hover: onChildHover
           on_node-unhover: onChildUnhover
 props:
-  item: null
+  node: null
   itemType: null
+  getItem: null
   getChildren: null
   selectedNode: null
 data:
   isExpanded: null
-  children: null
 methods:
-  getCssClass: |
+  getCssClass: | #js
     function() {
       return {
         hoverable: true,
         selected: this.isSelected,
       };
     }
-  onNodeClick: |
+  onNodeClick: | #js
     function() {
       if (this.isSelected)
       {
@@ -46,46 +51,60 @@ methods:
       else
       {
         this.isExpanded = true;        
-        this.children = this.getChildren(this.item);
+        this.children = this.getChildren(this.node);
       }
-      this.$emit('node-click', this.item);
+      this.$emit('node-click', this.node);
     }
-  onMouseEnter: |
+  onMouseEnter: | #js
     function() {
-      this.$emit('node-hover', this.item);
+      this.$emit('node-hover', this.node);
     }
-  onMouseLeave: |
+  onMouseLeave: | #js
     function() {
-      this.$emit('node-unhover', this.item);
+      this.$emit('node-unhover', this.node);
     }
-  onChildClick: |
+  onChildClick: | #js
     function(child) {
       this.$emit('node-click', child);
     }
-  onChildHover: |
+  onChildHover: | #js
     function (child) {
       this.$emit('node-hover', child);
     }
-  onChildUnhover: |
+  onChildUnhover: | #js
     function (child) {
       this.$emit('node-unhover', child);
     }
+  getItemType: | #js
+    function() {
+      return this.itemType?.replace(/\./g, '-');
+    }
+  getChildItems: | #js
+    function(node) {
+      if (!this.isExpanded) return [];
+      return this.getChildren(node);
+    }
 computed:
-  childItems: |
+  isSelected: | #js
     function() {
-      return this.children || [];
+      return (this.node == this.selectedNode);
     }
-  isSelected: |
-    function() {
-      return (this.item == this.selectedNode);
-    }
+style:
+  .tree-node:
+    display: grid
+    grid-template: 1fr / 2em 1fr
+  .comp-ui-expand .icon:
+    font-size: 100% !important
+    border: none !important
 name: ui-tree-node
 template: >-
-  <div class="comp-ui-tree-node"><div :class="getCssClass()"
+  <div class="comp-ui-tree-node"><div class="tree-node" :class="getCssClass()"
   @click="onNodeClick" @mouseenter="onMouseEnter"
-  @mouseleave="onMouseLeave"><component :is="itemType"
-  :value="item"></component></div><ul class="ml-l1"><li v-for="child in
-  children"><ui-tree-node :item="child" :item-type="itemType"
-  :getChildren="getChildren" :selected-node="selectedNode"
+  @mouseleave="onMouseLeave"><ui-expand
+  v-model="isExpanded"></ui-expand><component v-if="itemType"
+  :is="getItemType()" :item="getItem(node)"></component><slot></slot></div><ul
+  class="ml-l1"><li v-for="child in getChildItems(node)"><ui-tree-node
+  :node="child" :item-type="getItemType()" :get-item="getItem"
+  :get-children="getChildren" :selected-node="selectedNode"
   @node-click="onChildClick" @node-hover="onChildHover"
   @node-unhover="onChildUnhover"></ui-tree-node></li></ul></div>

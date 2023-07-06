@@ -1,0 +1,48 @@
+dom:
+  div:
+    slot: null
+props:
+  global: false
+data:
+  pos:
+    x: 0
+    'y': 0
+  hoveredElement: null
+mounted: | #js
+  function() {
+    const element = this.global ? window : this.$el;
+    element.addEventListener("mousemove", this.onMouseMove);
+    element.addEventListener("contextmenu", this.onContextMenu);
+  }
+methods:
+  onMouseMove: | #js
+    function(e) {
+      this.pos.x = e.clientX;
+      this.pos.y = e.clientY;
+    }
+  onContextMenu: | #js
+    function(e) {
+      if (e.ctrlKey) return;
+      e.preventDefault();
+      e.stopPropagation();
+      this.$emit("right-click");
+    }
+  updateHoveredElement: | #js
+    function(pos) {
+      var el = document.elementFromPoint(pos.x, pos.y);
+      this.hoveredElement = el;
+    }.throttle(200)
+watch:
+  pos:
+    handler: | #js
+      function() {
+        this.$emit("move", this.pos);
+        this.updateHoveredElement(this.pos);
+      }
+    deep: true
+  hoveredElement: | #js
+    function() {
+      this.$emit("hovered-element", this.hoveredElement);
+    }
+name: ui-mouse
+template: <div class="comp-ui-mouse"><slot></slot></div>

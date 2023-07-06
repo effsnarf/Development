@@ -9,7 +9,8 @@ props:
   item: null
   lines: null
 methods:
-  getLines: |
+  getLines: | #js
+
     function() {
       if (!this.lines) return this.item;
       return this.item.take(this.lines);

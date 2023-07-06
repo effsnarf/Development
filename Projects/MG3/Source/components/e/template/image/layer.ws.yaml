@@ -1,10 +1,33 @@
 dom:
   ui.image:
+    ':style': getStyle(item)
     v-if: item
     ':imageID': item.imageID
+    ':remove-background': item.removeBackground
+    ':square': true
+    on_load: onImageLoad
 props:
   item: null
+methods:
+  onImageLoad: | #js
+    function(e) {
+      this.$emit('image-load', e);
+    }
+  getStyle: | #js
+    function(item) {
+      if (!item) return;
+      let style = {};
+      style.transform = `translate(${(-0.5 + item.trans.pos.x) * 100}%, ${(0.5 - item.trans.pos.y) * 100}%) scale(${item.trans.scale})`;
+      const { filters } = item;
+      const cssFilters = [];
+      if (filters.blur) cssFilters.push(`blur(${filters.blur*10}px)`);
+      if (filters.opacity) cssFilters.push(`opacity(${filters.opacity})`);
+      if (filters.grayscale) cssFilters.push(`grayscale(${filters.grayscale})`);
+      style.filter = cssFilters.join(' ');
+      return style;
+    }
 name: e-template-image-layer
 template: >-
-  <ui-image class="comp-e-template-image-layer" v-if="item"
-  :imageID="item.imageID"></ui-image>
+  <ui-image class="comp-e-template-image-layer" :style="getStyle(item)"
+  v-if="item" :imageID="item.imageID" :remove-background="item.removeBackground"
+  :square="true" @load="onImageLoad"></ui-image>

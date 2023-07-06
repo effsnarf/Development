@@ -1,110 +1,203 @@
 dom:
   div:
     v-if: temp
+    ':class': getCssClass()
     .div1:
-      ui.select:
-        ':options': temp.layers.map((layer) => getLayerTypeIcon(layer.type))
-        v-model: selectedLayerIndex
+      ul:
+        class: tabs
+        li:
+          v-for: (layer, index) in temp.layers
+          ':class': getTabClass(index)
+          .flex:
+            ui.checkbox:
+              v-model: layer.visible
+            e.template.layer.icon:
+              ':layer': layer
+              on_click: selectLayer(index)
       .div2:
-        div:
-          div:
-            component#1:
-              ':is': selectedLayerEditorType
-              ':item': selectedLayer
-          .layers:
-            component#2:
-              class: layer
-              v-for: layer in temp.layers
-              ':is': getLayerType(layer)
-              ':item': layer
+        ui.movable:
+          v-model: temp.layers[1].trans
+          ui.file.dropzone:
+            on_file-drop: (files) => onFileDrop(files)
+            .layers:
+              component#2:
+                v-for: layer in temp.layers
+                ':class': getLayerClass(layer)
+                ':is': getLayerType(layer)
+                ':item': layer
+                on_image-load: (src) => onLayerImageLoad(layer, src)
+        transition:
+          name: slide
+          component#1:
+            ref: selectedLayerEditor1
+            ':is': selectedLayerEditorType
+            ':item': selectedLayer
+            on_toggle-disabled: toggleDisabled($event)
+        e.template.layer.filters:
+          ':imageID': selectedLayer.imageID
+          v-model: selectedLayer.filters
 props: null
 data:
   temp: null
   selectedLayerIndex: 0
-mounted: |
+  disabled: 0
+mounted: | #js
   async function() {
     await this.init();
   }
 methods:
-  init: |
+  init: | #js
     async function() {
       const filters = {
-          blur: 0,
-          opacity: 1,
-          grayscale: 0
+          blur: null,
+          opacity: null,
+          grayscale: null
         };
-
       this.temp = {
         layers: []
       };
-
       this.temp.layers.add({
         type: 'rainbow',
+        visible: true,
         pattern: 'pizza',
-        colors: ['#ff0000', '#00ff00', '#0000ff', '#ff0000', '#00ff00', '#0000ff'],
+        colors: ['#000080', '#0000FF', '#4169E1', '#6495ED', '#87CEEB', '#B0E0E6'],
         colorsCount: 3,
         slices: 3,
-        filters
+        filters: {...filters}
       });
-
       this.temp.layers.add({
         type: 'image',
+        visible: true,
         imageID: 880976,
-        filters
+        removeBackground: false,
+        trans: {
+          pos: {
+            x: 0.5,
+            y: 0.5
+          },
+          scale: 1
+        },
+        filters: {...filters}
       });
-
       this.temp.layers.add({
         type: 'captions',
+        visible: true,
         texts: ['Hello', 'World'],
-        filters
+        filters: {...filters}
       });
-
     }
-  getLayerType: |
+  getCssClass: | #js
+    function() {
+      return {
+        disabled: (this.disabled > 0)
+      };
+    }
+  selectLayer: | #js
+    function(index) {
+      this.selectedLayerIndex = index;
+    }
+  onFileDrop: | #js
+    async function(files) {
+      // If there is only one image layer
+      if (this.imageLayers.length == 1)
+      {
+        // Select the image layer
+        this.selectedLayerIndex = this.temp.layers.findIndex(layer => layer.type == 'image');
+        // Drop the files
+        await this.$nextTick();
+        this.$refs.selectedLayerEditor1.onFileDrop(files);
+      }
+      if (this.imageLayers.length > 1)
+      {
+        alertify.error("There is more than one image layer.<br />Please select the image layer first.").delay(10);
+      }
+    }
+  onLayerImageLoad: | #js
+    function(layer, src) {
+      const handler = this.$refs.selectedLayerEditor1?.onLayerImageLoad;
+      if (handler) handler(src);
+    }
+  getLayerType: | #js
     function(layer) {
       return `e-template-${layer.type}-layer`;
     }
-  getLayerTypeIcon: |
-    function(type) {
+  getTabClass: | #js
+    function(index) {
       return {
-        'image': '🖼️',
-        'captions': '📝',
-        'rainbow': '🌈'
-      }[type];
+        clickable: true,
+        'selected': index === this.selectedLayerIndex
+      };
+    }
+  getLayerClass: | #js
+    function(layer) {
+      return {
+        'layer': true,
+        'selected': layer === this.selectedLayer,
+        'hidden': !layer.visible
+      };
+    }
+  toggleDisabled: | #js
+    function(disabled) {
+      if (disabled) this.disabled++;
+      else this.disabled--;
     }
 computed:
-  selectedLayer: |
+  selectedLayer: | #js
     function() {
       return this.temp.layers[this.selectedLayerIndex];
     }
-  selectedLayerEditorType: |
+  selectedLayerEditorType: | #js
     function() {
       if (!this.selectedLayer) return;
       return `e-template-${this.selectedLayer.type}-editor`;
+    }
+  imageLayers: | #js
+    function() {
+      return this.temp.layers.filter(layer => layer.type === 'image');
     }
 name: e-template-editor
 style:
   .div1:
     display: grid
-    grid-template: 1fr / 1fr 3fr
+    grid-template: 1fr / 3.7em 1fr
     margin-bottom: 5rem
+    gap: 1em
   .div2:
-    aspect-ratio: 1 / 1
+    display: flex
+    flex-direction: column
+    gap: 1em
+  .tabs:
+    display: flex
+    flex-direction: column-reverse
+    align-items: end;
+    justify-content: start;
+  .tabs input[type="checkbox"]:
+    position: relative
+    top: 0.1em
+    transform: scale(0.7)
   .layers:
     aspect-ratio: 1 / 1
+    overflow: hidden
   .layer:
     position: absolute
     top: 0
     left: 0
     width: 100%
     height: 100%
-  .div1 > .comp-ui-select:
-    font-size: 160%
 template: >-
-  <div class="comp-e-template-editor" v-if="temp"><div class="div1"><ui-select
-  :options="temp.layers.map((layer) =&gt; getLayerTypeIcon(layer.type))"
-  v-model="selectedLayerIndex"></ui-select><div
-  class="div2"><div><div><component :is="selectedLayerEditorType"
-  :item="selectedLayer"></component></div><div class="layers"><component
-  class="layer" v-for="layer in temp.layers" :is="getLayerType(layer)"
-  :item="layer"></component></div></div></div></div></div>
+  <div class="comp-e-template-editor" v-if="temp" :class="getCssClass()"><div
+  class="div1"><ul class="tabs"><li v-for="(layer, index) in temp.layers"
+  :class="getTabClass(index)"><div class="flex"><ui-checkbox
+  v-model="layer.visible"></ui-checkbox><e-template-layer-icon :layer="layer"
+  @click="selectLayer(index)"></e-template-layer-icon></div></li></ul><div
+  class="div2"><ui-movable v-model="temp.layers[1].trans"><ui-file-dropzone
+  @file-drop="(files) =&gt; onFileDrop(files)"><div class="layers"><component
+  v-for="layer in temp.layers" :class="getLayerClass(layer)"
+  :is="getLayerType(layer)" :item="layer" @image-load="(src) =&gt;
+  onLayerImageLoad(layer,
+  src)"></component></div></ui-file-dropzone></ui-movable><transition
+  name="slide"><component ref="selectedLayerEditor1"
+  :is="selectedLayerEditorType" :item="selectedLayer"
+  @toggle-disabled="toggleDisabled($event)"></component></transition><e-template-layer-filters
+  :imageID="selectedLayer.imageID"
+  v-model="selectedLayer.filters"></e-template-layer-filters></div></div></div>

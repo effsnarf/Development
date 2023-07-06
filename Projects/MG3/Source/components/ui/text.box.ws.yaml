@@ -9,7 +9,8 @@ props:
   value: null
   hint: null
 methods:
-  onInput: |
+  onInput: | #js
+
     function(e) {
       this.$emit('input', e.target.value);
     }

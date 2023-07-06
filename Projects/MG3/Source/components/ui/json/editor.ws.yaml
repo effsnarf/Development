@@ -14,14 +14,16 @@ data:
   isFocused: false
   error: null
 methods:
-  updateYamlFromObject: |
+  updateYamlFromObject: | #js
+
     function() {
       let yaml = jsyaml.dump(this.value);
       yaml = yaml.replace(/ null/g, "");
       this.yaml = yaml;
     }
 watch:
-  value: |
+  value: | #js
+
     {
       handler: function() {
         if (this.isFocused) return;
@@ -29,7 +31,8 @@ watch:
       },
       immediate: true
     }
-  yaml: |
+  yaml: | #js
+
     {
       handler() {
         try
@@ -44,7 +47,8 @@ watch:
         }
       }
     }
-  isFocused: |
+  isFocused: | #js
+
     {
       handler(newValue) {
         if (newValue) return;

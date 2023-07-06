@@ -32,7 +32,8 @@ style:
     width: 100%
     object-fit: cover
 computed:
-  url: |
+  url: | #js
+
     function() {
       return `/${this.item.urlName}`;
     }

@@ -8,7 +8,8 @@ dom:
 props:
   error: null
 computed:
-  errorText: |
+  errorText: | #js
+
     function() {
       return this.error?.message || this.error;
     }

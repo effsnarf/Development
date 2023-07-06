@@ -1,0 +1,52 @@
+dom:
+  .file-dropzone:
+    ref: dropArea1
+    slot: null
+mounted: | #js
+  function() {
+    const dropArea = this.$refs.dropArea1;
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      dropArea.addEventListener(eventName, this.preventDefaults, false);
+    });
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropArea.addEventListener(eventName, this.highlight.bind(this), false);
+    });
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropArea.addEventListener(eventName, this.unhighlight.bind(this), false);
+    });
+    dropArea.addEventListener('drop', this.handleDrop.bind(this), false);
+  }
+methods:
+  handleDrop: | #js
+    function (e) {
+      let dt = e.dataTransfer;
+      let files = dt.files;
+      this.$emit('file-drop', files);
+    }
+  highlight: | #js
+    function (e) {
+      this.$refs.dropArea1.classList.add('drop-possible');
+      // Add tooltip attribute
+      this.$refs.dropArea1.setAttribute('tooltip', 'Drop image here');      
+    }
+  unhighlight: | #js
+    function (e) {
+      this.$refs.dropArea1.classList.remove('drop-possible');
+      // Remove tooltip attribute
+      this.$refs.dropArea1.removeAttribute('tooltip');
+    }
+  preventDefaults: | #js
+    function (e) {
+      e.preventDefault()
+      e.stopPropagation()
+    }
+style:
+  .file-dropzone: null
+  .drop-possible:
+    border: '2px dashed #ccc'
+    padding: 0.5rem
+    transition: 0.3s
+name: ui-file-dropzone
+template: >-
+  <div class="comp-ui-file-dropzone file-dropzone"
+  ref="dropArea1"><slot></slot></div>

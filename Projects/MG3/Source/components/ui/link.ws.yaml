@@ -11,7 +11,8 @@ props:
   text: null
   url: null
 methods:
-  onClick: |
+  onClick: | #js
+
     function(e) {
       if (!this.url) return;
       e.preventDefault();

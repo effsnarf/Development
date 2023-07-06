@@ -39,7 +39,8 @@ props:
   recommendationItems: null
   pageName: null
 methods:
-  getCssClass: |
+  getCssClass: | #js
+
     function() {
       const cls = {};
       cls['site-width'] = true;

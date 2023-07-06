@@ -4,15 +4,17 @@ dom:
     ':data-image': imageUrl
 props:
   instance: null
-mounted: |
+mounted: | #js
   function() {
   }
 computed:
-  url: |
+  url: | #js
+
     function() {
       return this.$root.url.instance(this.instance, true);
     }
-  imageUrl: |
+  imageUrl: | #js
+
     function() {
       return this.$root.url.instanceImage(this.instance);
     }

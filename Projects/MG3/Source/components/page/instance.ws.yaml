@@ -15,7 +15,7 @@ data:
   generator: null
   recommendationItems: []
   isInited: false
-mounted: |
+mounted: | #js
   async function() {
     this.$watch(() => this.$root.params.instanceID, {
       handler: async () => {
@@ -25,7 +25,8 @@ mounted: |
     });
   }
 methods:
-  init: |
+  init: | #js
+
     async function() {
       if (!this.$root.params.instanceID) return;
       const dbp = this.$root.dbp;
@@ -36,7 +37,8 @@ methods:
         this.$root.setDocumentTitle(this.$root.getInstanceText(instance));
       }
     }
-  getMoreInstances: |
+  getMoreInstances: | #js
+
     async function(pageIndex) {
       const items = await this.$root.dbp.instances.select.popular("en", pageIndex)
       if ((pageIndex == 0) && (this.instance)) items.unshift(this.instance);

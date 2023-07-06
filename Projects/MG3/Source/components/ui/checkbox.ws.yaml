@@ -1,0 +1,24 @@
+dom:
+  .flex:
+    class: hoverable
+    input:
+      type: checkbox
+      ':checked': value
+      on_change: $emit('input', !value)
+    span:
+      class: clickable
+      v-text: text
+      on_click: $emit('input', !value)
+props:
+  value: null
+  text: null
+watch: null
+style:
+  span:
+    flex-grow: 1
+    font-size: 120%
+name: ui-checkbox
+template: >-
+  <div class="comp-ui-checkbox hoverable flex"><input type="checkbox"
+  :checked="value" @change="$emit('input', !value)"/><span class="clickable"
+  v-text="text" @click="$emit('input', !value)"></span></div>

@@ -1,0 +1,39 @@
+dom:
+  .grid:
+    div#1:
+      v-text: '''🧊'''
+    .comp-name:
+      v-text: item.compName
+    div#3:
+      v-text: item.key
+    .newValue:
+      v-text: valueToString(item.newValue)
+props:
+  item: null
+methods:
+  valueToString: | #js
+    function(value) {
+      if (value == undefined) return "undefined";
+      if (value == null) return "null";
+      if (typeof value == "string") return `"${value.shorten(20)}"`;
+      if (typeof value == "number") return value.toString();
+      if (typeof value == "boolean") return value.toString();
+      if (typeof value == "function") return value.toString();
+      if (typeof value == "object") return JSON.stringify(value).shorten(20);
+      return value.toString();
+    }
+style:
+  .grid:
+    grid-template: 1fr / 2em 1fr 1fr 1fr
+  .comp-name:
+    opacity: 0.5
+  .newValue:
+    color: cyan
+  .oldValue:
+    opacity: 0.5
+name: ide-state-tracker-item
+template: >-
+  <div class="comp-ide-state-tracker-item grid"><div v-text="'🧊'"></div><div
+  class="comp-name" v-text="item.compName"></div><div
+  v-text="item.key"></div><div class="newValue"
+  v-text="valueToString(item.newValue)"></div></div>

@@ -145,6 +145,7 @@ class ClientContext {
         "span",
         "ul",
         "li",
+        "label",
         "input",
         "button",
         "canvas",

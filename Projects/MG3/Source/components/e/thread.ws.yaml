@@ -22,7 +22,8 @@ props:
 data:
   thread: null
 methods:
-  refresh: |
+  refresh: | #js
+
     async function() {
       const updatedThread = await this.$root.dbp.threads.select.one(this.thread._id);
       // Thread was deleted
@@ -30,7 +31,8 @@ methods:
       this.$emit('input', updatedThread);
     }
 watch:
-  value: |
+  value: | #js
+
     {
       handler: function(newValue) {
         this.thread = newValue;

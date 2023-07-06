@@ -13,12 +13,14 @@ props:
   value: null
   inputType: index
 methods:
-  onInput: |
+  onInput: | #js
+
     function(index) {
       const value = this.inputType === "index" ? index : this.options[index];
       this.$emit("input", value);
     }
-  getItemText: |
+  getItemText: | #js
+
     function(text) {
       const icons = {
         network: "🌐",
@@ -34,7 +36,8 @@ methods:
       return [icon, text].filter(a => a).join(" ");
     }
 computed:
-  valueIndex: |
+  valueIndex: | #js
+
     function() {
       if (this.inputType === "index") return this.value;
       return this.options.indexOf(this.value);

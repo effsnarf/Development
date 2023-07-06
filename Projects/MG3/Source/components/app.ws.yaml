@@ -1,5 +1,6 @@
 dom:
   div:
+    ide.component.picker: null
     div:
       .site-loading:
         ui.loading:
@@ -46,7 +47,8 @@ style:
   .header-spacer:
     height: 8rem
 template: >-
-  <div class="comp-app"><div><div class="site-loading"><ui-loading
+  <div class="comp-app"><ide-component-picker></ide-component-picker><div><div
+  class="site-loading"><ui-loading
   v-if="$root.isLoading"></ui-loading></div><site-header
   class="site-width"></site-header><div class="header-spacer"></div></div><div
   class="pages" :class="{ 'site-width': true

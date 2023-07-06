@@ -1,0 +1,149 @@
+dom:
+  div:
+    ui.mouse:
+      on_move: mousePos = $event
+    .context-menu:
+      ref: menu1
+      ":class": "{ pinned: isPinned, inited: isInited, visible: isVisible }"
+      ":style": getStyle()
+      div:
+        v-text: pos
+      slot: null
+props:
+  global: false
+  visible: null
+data:
+  space: 20
+  mousePos: "{ x: 0, y: 0 }"
+  isInited: false
+  isPinned: false
+  isDragging: false
+  dragStart: null
+  isInsideContextElement: false
+mounted: | #js
+  function() {
+    this.$el.addEventListener("mousedown", this.onMouseDown);
+    this.$el.addEventListener("mouseup", this.onMouseUp);
+    const element = (this.global ? window : this.$el.parentElement);
+    window.addEventListener("mousemove", this.onMouseMove);
+    element.addEventListener("mouseenter", this.onMouseEnterContext);
+    element.addEventListener("mouseleave", this.onMouseLeaveContext);
+    element.addEventListener("contextmenu", this.onRightClick);
+  }
+methods:
+  onMouseEnterContext: | #js
+    function(e) {
+      this.isInsideContextElement = true;
+    }
+  onMouseLeaveContext: | #js
+    function() {
+      this.isInsideContextElement = false;
+    }
+  onMouseDown: | #js
+    function(e) {
+      if (e.button !== 0) return;
+      e.preventDefault();
+      e.stopPropagation();
+      this.isDragging = true;
+      this.dragStart = { x: e.clientX, y: e.clientY };
+    }
+  onMouseUp: | #js
+    function() {
+      this.isDragging = false;
+    }
+  onMouseMove: | #js
+    function(e) {
+      const globalPos = { x: e.clientX, y: e.clientY };
+      const localPos = { x: e.offsetX, y: e.offsetY };
+      const pos = this.global ? globalPos : localPos;
+      //const pos = globalPos;
+      if (this.isDragging)
+      {
+        const dx = globalPos.x - this.dragStart.x;
+        const dy = globalPos.y - this.dragStart.y;
+        this.moveBy(dx, dy);
+        this.dragStart = globalPos;
+        return;
+      }
+      if (this.isPinned) return;
+      this.isInited = true;
+      this.moveTo(pos.x, pos.y);
+    }
+  onRightClick: | #js
+    function(e) {
+      if (!e.ctrlKey) return;
+      if (!this.isVisible) return;
+      e.preventDefault();
+      e.stopPropagation();
+      this.isPinned = !this.isPinned;
+    }
+  moveTo: | #js
+    function(x, y, space)
+    {
+      //if (!space) space = (this.isPinned ? 0 : this.space);
+      space = this.space;
+      this.pos = { x, y };
+    }.throttle(200)
+  moveBy: | #js
+    function(dx, dy)
+    {
+      if (!this.$refs.menu1) return;
+      const x = parseInt(this.$refs.menu1.style.left);
+      const y = parseInt(this.$refs.menu1.style.top);
+      this.moveTo(x + dx, y + dy, 0);
+    }
+  getLocalPos: | #js
+    function()
+    {
+      if (this.global) return this.pos;
+      const parent = this.$el.parentElement;
+      const rect = parent.getBoundingClientRect();
+      const x = this.pos.x - rect.left;
+      const y = this.pos.y - rect.top;
+      return { x, y };
+    }
+  getStyle: | #js
+    function()
+    {
+      const style = {};
+      style.position = (this.global ? "fixed" : "absolute");
+      const pos = this.getLocalPos();
+      style.left = ((pos.x + this.space) + "px");
+      style.top = ((pos.y + this.space) + "px");
+      return style;
+    }
+computed:
+  isVisible: | #js
+    function() {
+      if (this.isPinned) return true;
+      // .visible prop allows controlling the visibility from outside
+      if (this.visible != null) return this.visible;
+      if (this.global) return true;
+      if (this.isInsideContextElement) return true;
+      return false;
+    }
+style:
+  .context-menu.visible:
+    display: block
+  .context-menu:
+    display: none
+    min-width: 20rem
+    padding: 1rem
+    background: "linear-gradient(to right, #303030, #101010)"
+    opacity: 0.7
+    transition: 0s !important
+    cursor: move
+    pointer-events: none
+    z-index: 1000
+  .context-menu.pinned:
+    opacity: 1
+    border: "1px solid #ffffff60"
+    box-shadow: "-12px 12px 6px #000000"
+    transform: translateY(-5em)
+    transition: transform 0.3s !important
+    pointer-events: all
+name: ui-context
+template: >-
+  <div class="comp-ui-context"><div class="context-menu" ref="menu1" :class="{
+  pinned: isPinned, inited: isInited, visible: isVisible }"
+  :style="getStyle()"><div v-text="pos"></div><slot></slot></div></div>

@@ -19,7 +19,7 @@ dom:
 data:
   generators: []
   uniqueID: 1
-mounted: |
+mounted: | #js
   async function() {
     this.threads = await this.$root.dbp.threads.select.all();
     
@@ -31,7 +31,8 @@ mounted: |
     });
   }
 methods:
-  init: |
+  init: | #js
+
     async function() {
       if (this.$root.params.page == "home")
       {
@@ -39,7 +40,8 @@ methods:
         this.$refs.stream1.reset();
       }
     }
-  getMoreInstances: |
+  getMoreInstances: | #js
+
     async function(pageIndex) {
       const items = await this.$root.dbp.instances.sample.popular(null, 15);
       return items;

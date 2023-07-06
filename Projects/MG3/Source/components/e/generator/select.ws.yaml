@@ -12,12 +12,13 @@ props:
 data:
   query: null
   generators: null
-mounted: |
+mounted: | #js
   async function() {
     await this.init();
   }
 methods:
-  init: |
+  init: | #js
+
     async function () {
       this.generators = (await this.$root.dbp.generators.select.popular());
       if (this.allowAnonymous) {
@@ -25,7 +26,8 @@ methods:
         this.generators.pop();
       }
     }
-  onClick: |
+  onClick: | #js
+
     function (generator) {
       this.$emit('input', generator)
     }

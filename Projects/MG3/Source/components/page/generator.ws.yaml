@@ -40,7 +40,7 @@ data:
   poem: null
   recommendationItems: []
   showCreateInstance: false
-mounted: |
+mounted: | #js
   async function() {
     this.$watch(() => this.$root.params.urlName, {
       handler: async () => {
@@ -50,7 +50,8 @@ mounted: |
     });
   }
 methods:
-  init: |
+  init: | #js
+
     async function() {
       const dbp = this.$root.dbp;
       if (this.urlName == this.$root.params.urlName) return;
@@ -75,21 +76,24 @@ methods:
         this.$root.isLoading = false;
       }
     }
-  clear: |
+  clear: | #js
+
     function() {
       this.generator = null;
       this.poem = null;
       this.recommendationItems = [];
       this.$refs.contentStream1?.reset();
     }
-  getMoreInstances: |
+  getMoreInstances: | #js
+
     async function(pageIndex) {
       await this.init();
       if (!this.urlName) return [];
       const items = await this.$root.dbp.instances.select.popular("en", pageIndex, this.urlName)
       return items;
     }
-  getRandomStanzas: |
+  getRandomStanzas: | #js
+
     function(poem) {
       if (!poem) return [];
       // Return random stanzas
@@ -102,12 +106,14 @@ methods:
       }
       return result;
     }
-  onInstanceCreated: |
+  onInstanceCreated: | #js
+
     function(instance) {
       this.$refs.contentStream1?.add(instance);
     }
 watch:
-  generator: |
+  generator: | #js
+
     function(newGenerator) {
       if (!newGenerator)
       {

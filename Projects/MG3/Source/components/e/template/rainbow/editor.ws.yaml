@@ -3,6 +3,14 @@ dom:
     div#2:
       table:
         tbody:
+          tr#2:
+            th:
+              v-text: '''pattern'''
+            td:
+              ui.select:
+                ':options': styleOptions
+                input-type: value
+                v-model: item.pattern
           tr#1:
             th:
               v-text: '''detail'''
@@ -12,14 +20,6 @@ dom:
                 min: 2
                 max: 36
                 v-model: item.slices
-          tr#2:
-            th:
-              v-text: '''pattern'''
-            td:
-              ui.select:
-                ':options': styleOptions
-                input-type: value
-                v-model: item.pattern
           tr#4:
             th:
               v-text: '''colors'''
@@ -45,16 +45,16 @@ data:
     - checkers
     - pizza
 methods:
-  onColorChange: |
+  onColorChange: | #js
     function (index, value) {
       this.item.colors[index] = value;
     }
-  addColor: |
+  addColor: | #js
     function () {
       if (this.item.colorsCount >= this.item.colors.length) return;
       this.item.colorsCount++;
     }
-  removeColor: |
+  removeColor: | #js
     function () {
       this.item.colorsCount--;
     }
@@ -68,12 +68,11 @@ style:
 name: e-template-rainbow-editor
 template: >-
   <div class="comp-e-template-rainbow-editor"><div><table><tbody><tr><th
-  v-text="'detail'"></th><td><input type="range" min="2" max="36"
-  v-model="item.slices"/></td></tr><tr><th
   v-text="'pattern'"></th><td><ui-select :options="styleOptions"
   input-type="value" v-model="item.pattern"></ui-select></td></tr><tr><th
-  v-text="'colors'"></th><td><div class="flex"><ui-button v-text="'➖'"
-  :click="removeColor"></ui-button><input class="clickable" type="color"
-  v-for="index in item.colorsCount" v-model="item.colors[index-1]"/><ui-button
-  v-text="'➕'"
+  v-text="'detail'"></th><td><input type="range" min="2" max="36"
+  v-model="item.slices"/></td></tr><tr><th v-text="'colors'"></th><td><div
+  class="flex"><ui-button v-text="'➖'" :click="removeColor"></ui-button><input
+  class="clickable" type="color" v-for="index in item.colorsCount"
+  v-model="item.colors[index-1]"/><ui-button v-text="'➕'"
   :click="addColor"></ui-button></div></td></tr></tbody></table></div></div>

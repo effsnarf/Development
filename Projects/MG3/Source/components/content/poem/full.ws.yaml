@@ -7,7 +7,8 @@ dom:
 props:
   lines: null
 methods:
-  getLineCssClass: |
+  getLineCssClass: | #js
+
     function(index) {
       if (!index) return null;
       return `ml-l${index}`;

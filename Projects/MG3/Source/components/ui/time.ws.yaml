@@ -7,7 +7,8 @@ style:
   .comp-ui-time:
     text-shadow: '-2px 2px 1px #000000'
 methods:
-  timeAgo: |
+  timeAgo: | #js
+
     function (dt) {
       dt = new Date(dt);
       const now = new Date();

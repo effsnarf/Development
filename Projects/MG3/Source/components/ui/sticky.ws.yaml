@@ -3,11 +3,12 @@ dom:
     ':style': getStyle()
     slot: null
 data: null
-mounted: |
+mounted: | #js
   function() {
   }
 methods:
-  getStyle: |
+  getStyle: | #js
+
     function() {
       return {
         top: this.top

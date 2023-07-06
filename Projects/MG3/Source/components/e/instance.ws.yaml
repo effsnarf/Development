@@ -27,24 +27,28 @@ props:
 data:
   width: null
 methods:
-  getFontSize: |
+  getFontSize: | #js
+
     function (s) {
       if (!s) return 0;
       if (!this.width) return 0;
       const size = Math.min(3, Math.max(14, (36 - (s.length / 6))) / 50 *  this.width / 150);
       return `${size*2.5}vh`;
     }
-  updateImageSize: |
+  updateImageSize: | #js
+
     function () {
       this.width = this.$refs.image1.width;
     }
 computed:
-  showGenerator: |
+  showGenerator: | #js
+
     function () {
       if (this.item.urlName == this.$root.params.urlName) return false;
       return true;
     }
-  fontSizes: |
+  fontSizes: | #js
+
     function () {
       const sizes = [this.getFontSize(this.item.text0), this.getFontSize(this.item.text1)];
       return sizes;

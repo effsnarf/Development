@@ -13,13 +13,46 @@
         {{/each}}
     }
   },
-  {{#if mounted}}
-  mounted: {{{mounted}}},
-  {{/if}}
+  mounted: {{{addCode mounted "this.$root.vues[this._uid] = () => this;"}}},
+  unmounted: {{{addCode unmounted "delete this.$root.vues[this._uid];"}}},
   methods: {
     {{#each methods}}
-    {{@key}}: {{{this}}},
+    {{@key}}: {{{addLogMethod @key this}}},
     {{/each}}
+    _log_method: function (methodName, args) {
+      if ([`processQueue`, `recalc`, `getFontSize`,
+        `onMouseMove`, `onMouseUp`,
+        `preventDefaults`,
+        `highlight`, `unhighlight`,
+        `getCssClass`, `getTabClass`, `getLayerClass`, `getLayerType`
+        ].includes(methodName)) return;
+      if ([`draw`].some(s => methodName.includes(s))) return;
+      const compName = `{{name}}`;
+      console.log(
+        `🧊 %c${compName} %c${methodName} %o`,
+        'color: green;',
+        'color: yellow;',
+        args);
+    },
+    _log_data: function (key, newValue, oldValue) {
+      if ([`queue`, `width`, `height`, `generators`, `items`].includes(key)) return;
+      if (!newValue && !oldValue) return;
+      const compName = `{{name}}`;
+      const was = `(was)`;
+      if (!oldValue)
+      {
+        const self = this;
+        this.$root.stateTracker.log(() => self, compName, key, newValue, oldValue);
+        if (false)
+        {
+          console.log(
+            `🧊 %c${compName} %c${key} %o`,
+            'color: green;',
+            'color: cyan;',
+            newValue);
+        }
+      }
+    },
   },
   computed: {
     {{#each computed}}
@@ -33,6 +66,24 @@
     {{/each}}
   },
   watch: {
+    {{#each data}}
+    {{@key}}: {
+      handler: function (newValue, oldValue) {
+        this._log_data(`{{@key}}`, newValue, oldValue);
+      },
+      immediate: true,
+    },
+    {{/each}}
+    
+    {{#each props}}
+    {{@key}}: {
+      handler: function (newValue, oldValue) {
+        this._log_data(`{{@key}}`, newValue, oldValue);
+      },
+      immediate: true,
+    },
+    {{/each}}
+
     {{#each watch}}
     {{#if handler}}
     {{@key}}: {

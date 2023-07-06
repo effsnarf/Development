@@ -19,12 +19,14 @@ props:
   data:
     default: []
 methods:
-  itemClick: |
+  itemClick: | #js
+
     function(item) {
       this.$emit('item-click', item);
     }
 computed:
-  tableData: |
+  tableData: | #js
+
     function() {
       if (!this.data?.length) return [];
       if (this.data.map(v => typeof v).find(t => t === 'number')) {

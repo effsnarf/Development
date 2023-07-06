@@ -18,7 +18,8 @@ props:
   showTooltip: true
   showAnonymous: false
 computed:
-  generator: |
+  generator: | #js
+
     function() {
       return this.value;
     }

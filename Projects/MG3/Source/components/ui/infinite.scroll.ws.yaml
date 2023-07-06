@@ -3,12 +3,13 @@ dom:
     slot: null
 data:
   lastEmit: null
-mounted: |
+mounted: | #js
   function() {
     window.addEventListener('scroll', () => this.onScroll());
   }
 methods:
-  onScroll: |
+  onScroll: | #js
+
     function(force) {
       if ((!force) && (this.lastEmit) && ((Date.now() - this.lastEmit) < 400)) return;
       const distanceToBottom = document.documentElement.scrollHeight - (window.scrollY + window.innerHeight);
