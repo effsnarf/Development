@@ -15,7 +15,7 @@ class MongoDatabase extends DatabaseBase {
   constructor(
     connectionString: string,
     public database: string,
-    private options: MongoDatabaseOptions
+    public options: MongoDatabaseOptions
   ) {
     super();
     this.client = new MongoClient(connectionString);
