@@ -13,20 +13,19 @@ props:
   number: null
 methods:
   getText: | #js
-
     function() {
       return [this.icon, this.text, this.value].filter(s => s).join(' ');
     }
   getNumberText: | #js
-
     function() {
       return !this.number ? '' : `(${this.number})`;
     }
 style:
   div:
-    white-space: wrap
-    text-wrap: wrap
+    white-space: nowrap
+    text-wrap: nowrap
 name: ui-title
 template: >-
-  <div class="comp-ui-title flex"><div v-text="getText()"></div><div class="ml-1
-  opacity-50" v-if="number" v-text="getNumberText()"></div></div>
+  <div class="comp-ui-title flex" path="-2123702658."><div v-text="getText()"
+  path="-2123702658.0"></div><div class="ml-1 opacity-50" v-if="number"
+  v-text="getNumberText()" path="-2123702658.1"></div></div>

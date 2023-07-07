@@ -48,5 +48,5 @@ style:
     transition: 0.3s
 name: ui-file-dropzone
 template: >-
-  <div class="comp-ui-file-dropzone file-dropzone"
-  ref="dropArea1"><slot></slot></div>
+  <div class="comp-ui-file-dropzone file-dropzone" ref="dropArea1"
+  path="1956569459."><slot></slot></div>

@@ -74,11 +74,14 @@ style:
     color: '#35c735'
 name: e-post
 template: >-
-  <div class="comp-e-post" :class="{ post: true, enlarged }"><div
-  class="post-media" v-if="item.instance" @click="onInstanceClick"><e-instance
-  :item="item.instance"></e-instance></div><div
-  class="post-text"><e-generator-square class="larping-generator"
-  :value="item.larpGenerator"></e-generator-square><div
-  v-html="$root.textToHtml(item.text)"></div></div><div
-  class="clear-both"></div><e-post-menu :item="item"
-  @refresh-thread="$emit('refresh-thread')"></e-post-menu></div>
+  <div class="comp-e-post" :class="{ post: true, enlarged }"
+  path="-1357494135."><div class="post-media" v-if="item.instance"
+  @click="onInstanceClick" path="-1357494135.0"><e-instance
+  :item="item.instance" path="-1357494135.0.0"></e-instance></div><div
+  class="post-text" path="-1357494135.1"><e-generator-square
+  class="larping-generator" :value="item.larpGenerator"
+  path="-1357494135.1.0"></e-generator-square><div
+  v-html="$root.textToHtml(item.text)" path="-1357494135.1.1"></div></div><div
+  class="clear-both" path="-1357494135.2"></div><e-post-menu :item="item"
+  @refresh-thread="$emit('refresh-thread')"
+  path="-1357494135.3"></e-post-menu></div>

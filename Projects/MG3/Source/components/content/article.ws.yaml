@@ -13,5 +13,6 @@ style:
       #0.4)))
 name: content-article
 template: >-
-  <div class="comp-content-article"><div class="text"><slot
-  name="content"></slot></div></div>
+  <div class="comp-content-article" path="191531137."><div class="text"
+  path="191531137.0"><slot name="content"
+  path="191531137.0.0"></slot></div></div>

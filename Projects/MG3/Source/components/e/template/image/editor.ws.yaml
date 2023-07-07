@@ -78,11 +78,13 @@ watch:
     }
 name: e-template-image-editor
 template: >-
-  <div class="comp-e-template-image-editor items" v-if="item"><transition
-  name="slide2"><ui-checkbox v-if="(!removingBackground)" text="remove
-  background"
-  v-model="item.removeBackground"></ui-checkbox></transition><ui-image-select
-  ref="imageSelect1" v-model="item.imageID"
-  @uploading="onImageUploading"></ui-image-select><transition name="slide2"><div
-  class="message" v-if="removingBackground"><div v-text="'Removing
-  background'"></div><ui-loading></ui-loading></div></transition></div>
+  <div class="comp-e-template-image-editor items" v-if="item"
+  path="1046603147."><transition name="slide2" path="1046603147.0"><ui-checkbox
+  v-if="(!removingBackground)" text="remove background"
+  v-model="item.removeBackground"
+  path="1046603147.0.0"></ui-checkbox></transition><ui-image-select
+  ref="imageSelect1" v-model="item.imageID" @uploading="onImageUploading"
+  path="1046603147.1"></ui-image-select><transition name="slide2"
+  path="1046603147.2"><div class="message" v-if="removingBackground"
+  path="1046603147.2.0"><div v-text="'Removing background'"
+  path="1046603147.2.0.0"></div><ui-loading></ui-loading></div></transition></div>

@@ -45,9 +45,12 @@ style:
     flex-direction: column-reverse
 name: ide-state-tracker
 template: >-
-  <div class="comp-ide-state-tracker"><div><button v-text="'❌'"
-  @click="clear"></button></div><transition-group tag="ul" name="list"><li
-  class="hoverable" v-for="item in stateTracker.items.take(20)" :key="item.id"
-  @click="() =&gt; onItemClick(item)" @mouseenter="() =&gt; onMouseEnter(item)"
-  @mouseleave="() =&gt; onMouseLeave(item)"><ide-state-tracker-item
-  :item="item"></ide-state-tracker-item></li></transition-group></div>
+  <div class="comp-ide-state-tracker" path="-483235177."><div
+  path="-483235177.0"><button v-text="'❌'" @click="clear"
+  path="-483235177.0.0"></button></div><transition-group tag="ul" name="list"
+  path="-483235177.1"><li class="hoverable" v-for="item in
+  stateTracker.items.take(20)" :key="item.id" @click="() =&gt;
+  onItemClick(item)" @mouseenter="() =&gt; onMouseEnter(item)" @mouseleave="()
+  =&gt; onMouseLeave(item)" path="-483235177.1.0"><ide-state-tracker-item
+  :item="item"
+  path="-483235177.1.0.0"></ide-state-tracker-item></li></transition-group></div>

@@ -27,6 +27,7 @@ style:
     flex-grow: 1
 name: ui-expand
 template: >-
-  <div class="comp-ui-expand hoverable flex" @click="$emit('input',
-  !value)"><div class="icon" v-text="icon"></div><label
-  v-text="text"></label></div>
+  <div class="comp-ui-expand hoverable flex" @click="$emit('input', !value)"
+  path="-1825986764."><div class="icon" v-text="icon"
+  path="-1825986764.0"></div><label v-text="text"
+  path="-1825986764.1"></label></div>

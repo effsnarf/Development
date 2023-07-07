@@ -1,4 +1,5 @@
-dom: null
+dom:
+  div: null
 data:
   ctrl: false
 mounted: | #js
@@ -18,4 +19,4 @@ watch:
       this.$emit('ctrl', ctrl);
     }
 name: ui-keyboard
-template: ''
+template: <div class="comp-ui-keyboard"></div>

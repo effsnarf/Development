@@ -23,6 +23,7 @@ style:
     content: +
 name: e-comment
 template: >-
-  <div class="comp-e-comment comment"><div class="comment-text"
-  v-text="item.text"></div><div class="vote-score"
-  v-text="item.totalVotesScore"></div></div>
+  <div class="comp-e-comment comment" path="1645988310."><div
+  class="comment-text" v-text="item.text" path="1645988310.0"></div><div
+  class="vote-score" v-text="item.totalVotesScore"
+  path="1645988310.1"></div></div>

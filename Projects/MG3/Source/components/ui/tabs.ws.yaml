@@ -35,8 +35,10 @@ methods:
     }
 name: ui-tabs
 template: >-
-  <div class="comp-ui-tabs"><ui-select :options="options.map(option =&gt;
-  getOptionText(option))" :getUrl="getUrl"
-  v-model="selectedTabIndex"></ui-select><div><div v-for="(option, index) in
-  options"><div v-show="(index == selectedTabIndex)"><slot :name="'tab' +
-  index"></slot></div></div></div></div>
+  <div class="comp-ui-tabs" path="-484156776."><ui-select
+  :options="options.map(option =&gt; getOptionText(option))" :getUrl="getUrl"
+  v-model="selectedTabIndex" path="-484156776.0"></ui-select><div
+  path="-484156776.1"><div v-for="(option, index) in options"
+  path="-484156776.1.0"><div v-show="(index == selectedTabIndex)"
+  path="-484156776.1.0.0"><slot :name="'tab' + index"
+  path="-484156776.1.0.0.0"></slot></div></div></div></div>

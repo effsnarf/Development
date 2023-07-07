@@ -20,5 +20,6 @@ computed:
     }
 name: ide-vue-node
 template: >-
-  <div class="comp-ide-vue-node"><ui-title icon="📦" :text="getText()"
-  :number="item?.$children.length"></ui-title></div>
+  <div class="comp-ide-vue-node" path="345070638."><ui-title icon="📦"
+  :text="getText()" :number="item?.$children.length"
+  path="345070638.0"></ui-title></div>

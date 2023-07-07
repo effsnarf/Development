@@ -35,7 +35,8 @@ style:
     font-size: 160%
 name: e-template-layer-icon
 template: >-
-  <div class="comp-e-template-layer-icon icon" @click="$emit('click')"><div
-  v-if="hasImage"><ui-image :imageID="layer.imageID"
-  :square="true"></ui-image></div><div v-if="(!hasImage)"
-  v-text="getLayerTypeIcon(layer.type)"></div></div>
+  <div class="comp-e-template-layer-icon icon" @click="$emit('click')"
+  path="-1276424735."><div v-if="hasImage" path="-1276424735.0"><ui-image
+  :imageID="layer.imageID" :square="true"
+  path="-1276424735.0.0"></ui-image></div><div v-if="(!hasImage)"
+  v-text="getLayerTypeIcon(layer.type)" path="-1276424735.1"></div></div>

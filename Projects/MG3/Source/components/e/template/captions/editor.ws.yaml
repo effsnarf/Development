@@ -4,13 +4,28 @@ dom:
       input#1:
         v-model: item.texts[0]
         placeholder: top text
+        path:
+          - 0
+          - 0
+          - 0
       input#2:
         v-model: item.texts[1]
         placeholder: bottom text
+        path:
+          - 0
+          - 0
+          - 1
+      path:
+        - 0
+        - 0
+    path:
+      - 0
+  path: []
 props:
   item: null
 name: e-template-captions-editor
 template: >-
-  <div class="comp-e-template-captions-editor"><div class="inputs"><input
-  v-model="item.texts[0]" placeholder="top text"/><input v-model="item.texts[1]"
-  placeholder="bottom text"/></div></div>
+  <div class="comp-e-template-captions-editor" path="-1978901725."><div
+  class="inputs" path="-1978901725.0"><input v-model="item.texts[0]"
+  placeholder="top text" path="-1978901725.0.0"/><input v-model="item.texts[1]"
+  placeholder="bottom text" path="-1978901725.0.1"/></div></div><path></path>

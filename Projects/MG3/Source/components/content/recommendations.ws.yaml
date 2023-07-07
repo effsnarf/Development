@@ -17,7 +17,9 @@ style:
 props:
   items: null
 template: >-
-  <div class="comp-content-recommendations list"><transition-group tag="ul"
-  name="list"><li v-for="generator in items"
-  :key="generator.generatorID"><e-generator-wide
-  :item="generator"></e-generator-wide></li></transition-group></div>
+  <div class="comp-content-recommendations list"
+  path="-1482246043."><transition-group tag="ul" name="list"
+  path="-1482246043.0"><li v-for="generator in items"
+  :key="generator.generatorID" path="-1482246043.0.0"><e-generator-wide
+  :item="generator"
+  path="-1482246043.0.0.0"></e-generator-wide></li></transition-group></div>

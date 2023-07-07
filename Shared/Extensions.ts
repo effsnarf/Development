@@ -311,11 +311,12 @@ interface String {
 }
 
 interface Array<T> {
+  toMap(getKey: (item: T) => any): object;
   contains(item: T, getItemKey?: (item: T) => any): boolean;
   reversed(): T[];
   removeAt(index: number): void;
   insertAt(index: number, item: T, appendToEnd: boolean): void;
-  clear(stagger: number): void;
+  clear(stagger?: number): void;
   add(items: any[], stagger: number): void;
   take(count: number): T[];
   replace(
@@ -1211,6 +1212,18 @@ if (typeof String !== "undefined") {
 
 // #region Array
 if (typeof Array !== "undefined") {
+  Array.prototype.toMap = function (
+    getKey: (item: any) => any,
+    getValue?: (item: any) => any
+  ) {
+    if (!getValue) getValue = (item) => item;
+    const map = {} as any;
+    this.forEach((item) => {
+      map[getKey(item)] = getValue!(item);
+    });
+    return map;
+  };
+
   Array.prototype.contains = function (
     item: any,
     getItemKey?: (item: any) => any
@@ -1239,7 +1252,8 @@ if (typeof Array !== "undefined") {
     this.splice(index, 0, item);
   };
 
-  Array.prototype.clear = function (stagger: number = 0) {
+  Array.prototype.clear = function (stagger?: number) {
+    if (!stagger) stagger = 0;
     const removeOne = () => {
       if (this.length > 0) {
         this.pop();
@@ -1456,10 +1470,11 @@ if (typeof Function !== "undefined") {
     const fn = this;
     let timeout: any;
     return function (this: any, ...args) {
+      fn.prototype.nextArgs = args;
       const context = this;
       if (!timeout) {
         timeout = setTimeout(async function () {
-          await fn.apply(context, args);
+          await fn.apply(context, fn.prototype.nextArgs);
           timeout = null;
         }, delay);
       }

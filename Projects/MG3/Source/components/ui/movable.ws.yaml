@@ -69,5 +69,5 @@ style:
 name: ui-movable
 template: >-
   <div class="comp-ui-movable movable" @mousedown="onMouseDown"
-  @mousemove="onMouseMove" @mouseup="onMouseUp"
-  @mouseout="onMouseUp"><slot></slot></div>
+  @mousemove="onMouseMove" @mouseup="onMouseUp" @mouseout="onMouseUp"
+  path="1781914900."><slot></slot></div>

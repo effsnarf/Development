@@ -1,58 +1,19 @@
 dom:
   div:
     class: workspace
-    ide.state.tracker:
-      ':stateTracker': $root.stateTracker
-    ide.component.editor:
-      ':component': selectedComponent
-    ui.tree:
-      ':root': () => $root
-      ':getChildren': getVueChildren
-      item-type: ide-vue-node
-      on_node-select: onNodeSelect
-      on_node-click: onNodeClick
-      on_node-hover: onNodeHover
-      on_node-unhover: onNodeUnhover
-    ide.component.info:
-      ':item': selectedNode
+    h3:
+      ui.title:
+        icon: 🎄
+        ':value': $root.vuesCount.toLocaleString()
     div:
       ide.component.style:
         v-for: comp in comps
         ':component': comp
 props:
   comps: null
-data:
-  selectedNode: null
-methods:
-  getVueChildren: | #js
-    function(vue) {
-      return !vue ? [] : vue().$children?.map(c => (() => c));
-    }
-  onNodeSelect: | #js
-    function(node) {
-      this.selectedNode = node;
-    }
-  onNodeClick: | #js
-    function(node) {
-      //console.log(node());
-    }
-  onNodeHover: | #js
-    function (node) {
-      node()?.$el.classList?.add('highlighted');
-    }
-  onNodeUnhover: | #js
-    function (node) {
-      node()?.$el.classList?.remove('highlighted');
-    }
-computed:
-  selectedComponent: | #js
-    function() {
-      if (!this.selectedNode) return null;
-      const vue = this.selectedNode();
-      const compName = vue?.$options?._componentTag?.replace(/-/g, '.');
-      const comp = this.comps.find(c => c.name == compName);
-      return comp;
-    }
+data: null
+methods: null
+computed: null
 name: ide-workspace
 style:
   .comp-ide-workspace:
@@ -66,21 +27,16 @@ style:
     padding: 1rem
     box-shadow: 'inset -5px 5px 5px #000'
     border: 1px solid gray
-    opacity: 0.1
-    max-width: 5rem
+    max-width: 20rem
     overflow: hidden
     z-index: 1000000
     transition: 1s
   .comp-ide-workspace:hover:
     max-width: 50rem
-    opacity: 1
 template: >-
-  <div class="comp-ide-workspace workspace"><ide-state-tracker
-  :stateTracker="$root.stateTracker"></ide-state-tracker><ide-component-editor
-  :component="selectedComponent"></ide-component-editor><ui-tree :root="() =&gt;
-  $root" :getChildren="getVueChildren" item-type="ide-vue-node"
-  @node-select="onNodeSelect" @node-click="onNodeClick"
-  @node-hover="onNodeHover"
-  @node-unhover="onNodeUnhover"></ui-tree><ide-component-info
-  :item="selectedNode"></ide-component-info><div><ide-component-style
-  v-for="comp in comps" :component="comp"></ide-component-style></div></div>
+  <div class="comp-ide-workspace workspace" path="-1163457967."><h3
+  path="-1163457967.0"><ui-title icon="🎄"
+  :value="$root.vuesCount.toLocaleString()"
+  path="-1163457967.0.0"></ui-title></h3><div
+  path="-1163457967.1"><ide-component-style v-for="comp in comps"
+  :component="comp" path="-1163457967.1.0"></ide-component-style></div></div>

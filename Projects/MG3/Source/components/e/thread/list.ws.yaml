@@ -63,10 +63,16 @@ style:
     grid-template: 1fr / 2rem 2rem 1fr
     gap: 0.5rem
 template: >-
-  <div class="comp-e-thread-list"><ui-loading v-if="isLoading &amp;&amp;
-  !threads.length"></ui-loading><ui-list v-slot="slotProps"
-  :items="threads"><ui-link :class="{ selected: isCurrentThread(slotProps.item)
-  }" :url="$root.url.thread(slotProps.item)"><div class="grid"><div><e-instance
-  :item="firstPost(slotProps.item)?.instance"></e-instance></div><ui-title
-  :number="slotProps.item.posts.length"></ui-title><div
-  v-text="getThreadTitle(slotProps.item)"></div></div></ui-link></ui-list></div>
+  <div class="comp-e-thread-list" path="-335521287."><ui-loading v-if="isLoading
+  &amp;&amp; !threads.length" path="-335521287.0"></ui-loading><ui-list
+  v-slot="slotProps" :items="threads" path="-335521287.1"><ui-link :class="{
+  selected: isCurrentThread(slotProps.item) }"
+  :url="$root.url.thread(slotProps.item)" path="-335521287.1.0"><div
+  class="grid" path="-335521287.1.0.0"><div
+  path="-335521287.1.0.0.0"><e-instance
+  :item="firstPost(slotProps.item)?.instance"
+  path="-335521287.1.0.0.0.0"></e-instance></div><ui-title
+  :number="slotProps.item.posts.length"
+  path="-335521287.1.0.0.1"></ui-title><div
+  v-text="getThreadTitle(slotProps.item)"
+  path="-335521287.1.0.0.2"></div></div></ui-link></ui-list></div>

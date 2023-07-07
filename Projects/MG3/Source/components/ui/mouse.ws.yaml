@@ -4,45 +4,80 @@ dom:
 props:
   global: false
 data:
-  pos:
-    x: 0
-    'y': 0
+  pos: '{ x: 0, y: 0 }'
   hoveredElement: null
+  posQueue: []
+  updateInterval: 50
+  isMounted: false
+  dragStart: null
 mounted: | #js
   function() {
-    const element = this.global ? window : this.$el;
-    element.addEventListener("mousemove", this.onMouseMove);
+    this.isMounted = true;
+    const element = this.global ? window : this.$el.parentElement;
+    element.addEventListener("mousedown", this.onMouseDown);
+    element.addEventListener("mouseup", this.onMouseUp);
+    window.addEventListener("mousemove", this.onMouseMove);
     element.addEventListener("contextmenu", this.onContextMenu);
+    this.update();
+  }
+unmounted: | #js
+  function() {
+    this.isMounted = false;
+    alertify.message("unmounted");
   }
 methods:
-  onMouseMove: | #js
+  onMouseDown: | #js
     function(e) {
-      this.pos.x = e.clientX;
-      this.pos.y = e.clientY;
+      if (e.button != 0) return;
+      if (this.dragStart) return;
+      this.dragStart = { x: e.clientX, y: e.clientY };
+    }
+  onMouseUp: | #js
+    function(e) {
+      if (e.button != 0) return;
+      this.dragStart = null;
+    }
+  onMouseMove: | #js
+    function(e) {     
+      const pos = { x: e.clientX, y: e.clientY };
+      this.posQueue.push(pos);
     }
   onContextMenu: | #js
     function(e) {
-      if (e.ctrlKey) return;
+      if (!e.ctrlKey) return;
       e.preventDefault();
       e.stopPropagation();
-      this.$emit("right-click");
+      this.$emit("right-click", e);
     }
   updateHoveredElement: | #js
     function(pos) {
       var el = document.elementFromPoint(pos.x, pos.y);
       this.hoveredElement = el;
-    }.throttle(200)
+    }
+  update: | #js
+    async function() {
+      if (!this.isMounted) return;
+      const pos = this.posQueue.pop();
+      if (pos) this.pos = pos;
+      this.posQueue = [];
+      setTimeout(this.update.bind(this), this.updateInterval);
+    }
 watch:
   pos:
     handler: | #js
       function() {
         this.$emit("move", this.pos);
+        if (this.dragStart) {
+          const delta = { dx: this.pos.x - this.dragStart.x, dy: this.pos.y - this.dragStart.y };
+          this.dragStart = this.pos;
+          this.$emit("drag", delta);
+        }
         this.updateHoveredElement(this.pos);
       }
     deep: true
   hoveredElement: | #js
-    function() {
-      this.$emit("hovered-element", this.hoveredElement);
+    function(newHoveredElement) {
+      this.$emit("hovered-element", newHoveredElement);
     }
 name: ui-mouse
-template: <div class="comp-ui-mouse"><slot></slot></div>
+template: <div class="comp-ui-mouse" path="-2129987381."><slot></slot></div>

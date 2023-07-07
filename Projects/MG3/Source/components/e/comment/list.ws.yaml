@@ -30,6 +30,7 @@ style:
     gap: 3px
 name: e-comment-list
 template: >-
-  <div class="comp-e-comment-list"><h3 v-text="comments.length + '
-  comments'"></h3><ui-list :items="topComments" v-slot="slotProps"><e-comment
-  :item="slotProps.item"></e-comment></ui-list></div>
+  <div class="comp-e-comment-list" path="616682934."><h3 v-text="comments.length
+  + ' comments'" path="616682934.0"></h3><ui-list :items="topComments"
+  v-slot="slotProps" path="616682934.1"><e-comment :item="slotProps.item"
+  path="616682934.1.0"></e-comment></ui-list></div>

@@ -18,4 +18,4 @@ methods:
 name: ui-highlighter
 template: >-
   <div class="comp-ui-highlighter hoverable" @mouseenter="onMouseEnter"
-  @mouseleave="onMouseLeave"><slot></slot></div>
+  @mouseleave="onMouseLeave" path="71025671."><slot></slot></div>

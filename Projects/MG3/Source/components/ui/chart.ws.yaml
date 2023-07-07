@@ -220,15 +220,18 @@ style:
     position: absolute
     bottom: 0
 template: >-
-  <div class="comp-ui-chart card" :class="getCssClass()"><h2 class="header"
-  v-if="header" v-text="header"></h2><div class="chart flex"><div
-  class="column1"><ui-num class="opacity-50"
-  :value="scaled(minValue)"></ui-num><ui-num
-  :value="scaled(middleValue)"></ui-num><ui-num class="opacity-50"
-  :value="scaled(maxValue)"></ui-num></div><div><canvas class="ml-l1"
-  ref="canvas1" :width="canvasWidth" :height="(canvasWidth / 2)"
-  @mousemove="onMouseMove" @mouseout="onMouseOut"></canvas></div></div><div
-  class="flex flex-column justify-center items-center"><div class="title"><div
-  class="icon" v-text="icon"></div><div class="text"
-  v-text="title"></div></div><ui-num :value="scaled(hoveredData ||
-  total)"></ui-num></div></div>
+  <div class="comp-ui-chart card" :class="getCssClass()" path="-2139450364."><h2
+  class="header" v-if="header" v-text="header" path="-2139450364.0"></h2><div
+  class="chart flex" path="-2139450364.1"><div class="column1"
+  path="-2139450364.1.0"><ui-num class="opacity-50" :value="scaled(minValue)"
+  path="-2139450364.1.0.0"></ui-num><ui-num :value="scaled(middleValue)"
+  path="-2139450364.1.0.1"></ui-num><ui-num class="opacity-50"
+  :value="scaled(maxValue)" path="-2139450364.1.0.2"></ui-num></div><div
+  path="-2139450364.1.1"><canvas class="ml-l1" ref="canvas1"
+  :width="canvasWidth" :height="(canvasWidth / 2)" @mousemove="onMouseMove"
+  @mouseout="onMouseOut" path="-2139450364.1.1.0"></canvas></div></div><div
+  class="flex flex-column justify-center items-center" path="-2139450364.2"><div
+  class="title" path="-2139450364.2.0"><div class="icon" v-text="icon"
+  path="-2139450364.2.0.0"></div><div class="text" v-text="title"
+  path="-2139450364.2.0.1"></div></div><ui-num :value="scaled(hoveredData ||
+  total)" path="-2139450364.2.1"></ui-num></div></div>

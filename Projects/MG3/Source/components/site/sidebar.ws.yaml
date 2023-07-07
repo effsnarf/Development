@@ -5,5 +5,5 @@ dom:
 name: site-sidebar
 style: null
 template: >-
-  <div class="comp-site-sidebar"><ui-list
-  item-type="generator.small"></ui-list></div>
+  <div class="comp-site-sidebar" path="-576601163."><ui-list
+  item-type="generator.small" path="-576601163.0"></ui-list></div>

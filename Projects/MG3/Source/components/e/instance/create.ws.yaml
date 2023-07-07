@@ -138,18 +138,21 @@ style:
     width: 70%
     margin: 0.5rem auto
 template: >-
-  <div class="comp-e-instance-create"><transition
-  name="slide"><e-generator-select v-show="!generator &amp;&amp;
-  showGeneratorSelect" v-model="generator || tempInstance.generator"
-  @input="showGeneratorSelect = false"></e-generator-select></transition><div
-  class="container" :class="layout"><div><transition name="slide"><e-instance
-  class="{ clickable: !generator }" v-if="((layout == 'horizontal') || hasText)"
+  <div class="comp-e-instance-create" path="-903297812."><transition
+  name="slide" path="-903297812.0"><e-generator-select v-show="!generator
+  &amp;&amp; showGeneratorSelect" v-model="generator || tempInstance.generator"
+  @input="showGeneratorSelect = false"
+  path="-903297812.0.0"></e-generator-select></transition><div class="container"
+  :class="layout" path="-903297812.1"><div path="-903297812.1.0"><transition
+  name="slide" path="-903297812.1.0.0"><e-instance class="{ clickable:
+  !generator }" v-if="((layout == 'horizontal') || hasText)"
   :item="tempInstance" :key="tempInstance.generator?.generatorID"
-  :show-create-post="false" @click="showGeneratorSelect =
-  !showGeneratorSelect"></e-instance></transition></div><div
-  class="inputs"><input v-model="tempInstance.text0" placeholder="top text"
-  @focus="onFocus"/><input v-model="tempInstance.text1" placeholder="bottom
-  text" @focus="onFocus"/><transition name="slide"><ui-button
-  v-if="showCreateButton &amp;&amp; hasText" text="create"
-  :is-loading="isCreating"
-  @click="create"></ui-button></transition></div></div></div>
+  :show-create-post="false" @click="showGeneratorSelect = !showGeneratorSelect"
+  path="-903297812.1.0.0.0"></e-instance></transition></div><div class="inputs"
+  path="-903297812.1.1"><input v-model="tempInstance.text0" placeholder="top
+  text" @focus="onFocus" path="-903297812.1.1.0"/><input
+  v-model="tempInstance.text1" placeholder="bottom text" @focus="onFocus"
+  path="-903297812.1.1.1"/><transition name="slide"
+  path="-903297812.1.1.2"><ui-button v-if="showCreateButton &amp;&amp; hasText"
+  text="create" :is-loading="isCreating" @click="create"
+  path="-903297812.1.1.2.0"></ui-button></transition></div></div></div>

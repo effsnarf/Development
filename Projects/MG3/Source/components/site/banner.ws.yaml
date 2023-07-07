@@ -14,4 +14,6 @@ style:
     background-size: cover!important
     background-position: 50% 30%!important
 name: site-banner
-template: <div class="comp-site-banner"><div class="image"></div></div>
+template: >-
+  <div class="comp-site-banner" path="1842927539."><div class="image"
+  path="1842927539.0"></div></div>

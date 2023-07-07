@@ -96,5 +96,5 @@ style:
     height: 100%
 name: e-template-rainbow-layer
 template: >-
-  <div class="comp-e-template-rainbow-layer"><canvas ref="canvas1" width="1000"
-  height="1000"></canvas></div>
+  <div class="comp-e-template-rainbow-layer" path="-388674482."><canvas
+  ref="canvas1" width="1000" height="1000" path="-388674482.0"></canvas></div>

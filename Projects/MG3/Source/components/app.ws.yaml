@@ -47,9 +47,11 @@ style:
   .header-spacer:
     height: 8rem
 template: >-
-  <div class="comp-app"><ide-component-picker></ide-component-picker><div><div
-  class="site-loading"><ui-loading
-  v-if="$root.isLoading"></ui-loading></div><site-header
-  class="site-width"></site-header><div class="header-spacer"></div></div><div
-  class="pages" :class="{ 'site-width': true
-  }"><page-admin-index></page-admin-index><page-home></page-home><page-thread></page-thread><page-generator></page-generator><page-instance></page-instance></div></div>
+  <div class="comp-app"
+  path="96801."><ide-component-picker></ide-component-picker><div
+  path="96801.1"><div class="site-loading" path="96801.1.0"><ui-loading
+  v-if="$root.isLoading" path="96801.1.0.0"></ui-loading></div><site-header
+  class="site-width" path="96801.1.1"></site-header><div class="header-spacer"
+  path="96801.1.2"></div></div><div class="pages" :class="{ 'site-width': true
+  }"
+  path="96801.2"><page-admin-index></page-admin-index><page-home></page-home><page-thread></page-thread><page-generator></page-generator><page-instance></page-instance></div></div>

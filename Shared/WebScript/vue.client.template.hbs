@@ -11,10 +11,16 @@
         {{#each data}}
         {{@key}}: {{{or this null}}},
         {{/each}}
+        _: {
+          comp: {
+            name: `{{unkebabize name}}`,
+          },
+          state: StateTracker.new(this._uid, this.$root.client),
+        }
     }
   },
-  mounted: {{{addCode mounted "this.$root.vues[this._uid] = () => this;"}}},
-  unmounted: {{{addCode unmounted "delete this.$root.vues[this._uid];"}}},
+  mounted: {{{addCode mounted "this.$root.onVueMounted(this);"}}},
+  unmounted: {{{addCode unmounted "this.$root.onVueUnmounted(this);"}}},
   methods: {
     {{#each methods}}
     {{@key}}: {{{addLogMethod @key this}}},
@@ -28,6 +34,7 @@
         ].includes(methodName)) return;
       if ([`draw`].some(s => methodName.includes(s))) return;
       const compName = `{{name}}`;
+      return;
       console.log(
         `🧊 %c${compName} %c${methodName} %o`,
         'color: green;',
@@ -37,16 +44,13 @@
     _log_data: function (key, newValue, oldValue) {
       if ([`queue`, `width`, `height`, `generators`, `items`].includes(key)) return;
       if (!newValue && !oldValue) return;
-      const compName = `{{name}}`;
-      const was = `(was)`;
+      this.$data._.state.log(key, newValue, oldValue);
       if (!oldValue)
       {
-        const self = this;
-        this.$root.stateTracker.log(() => self, compName, key, newValue, oldValue);
         if (false)
         {
           console.log(
-            `🧊 %c${compName} %c${key} %o`,
+            `🧊 %c${this._.comp.name} %c${key} %o`,
             'color: green;',
             'color: cyan;',
             newValue);

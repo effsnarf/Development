@@ -74,5 +74,6 @@ style:
 name: ui-image
 template: >-
   <component class="comp-ui-image image" :is="getCompType()" :url="url"
-  @click="$emit('click')"><img ref="image1" :class="getCssClass()"
-  :style="imgStyle" :src="src1" @load="onLoad"/></component>
+  @click="$emit('click')" path="-2133760639."><img ref="image1"
+  :class="getCssClass()" :style="imgStyle" :src="src1" @load="onLoad"
+  path="-2133760639.0"/></component>

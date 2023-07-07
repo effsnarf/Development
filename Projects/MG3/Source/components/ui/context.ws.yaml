@@ -1,36 +1,54 @@
 dom:
   div:
-    ui.mouse:
+    ui.mouse#1:
+      ':global': true
       on_move: mousePos = $event
+      on_right-click: e => onRightClick(e, true)
     .context-menu:
+      v-if: isVisible
       ref: menu1
-      ":class": "{ pinned: isPinned, inited: isInited, visible: isVisible }"
-      ":style": getStyle()
+      ':class': '{ pinned: isPinned, inited: isInited, visible: isVisible }'
+      ':style': style
+      h2:
+        ui.mouse:
+          on_drag: onDrag
+          on_right-click: onRightClick
+        slot:
+          name: title
       div:
-        v-text: pos
-      slot: null
+        slot:
+          name: content
 props:
   global: false
   visible: null
 data:
+  lastUpdate: 0
   space: 20
-  mousePos: "{ x: 0, y: 0 }"
+  mousePos: '{ x: 0, y: 0 }'
+  globalPos: '{ x: 0, y: 0 }'
   isInited: false
   isPinned: false
-  isDragging: false
-  dragStart: null
   isInsideContextElement: false
 mounted: | #js
   function() {
-    this.$el.addEventListener("mousedown", this.onMouseDown);
-    this.$el.addEventListener("mouseup", this.onMouseUp);
     const element = (this.global ? window : this.$el.parentElement);
-    window.addEventListener("mousemove", this.onMouseMove);
     element.addEventListener("mouseenter", this.onMouseEnterContext);
     element.addEventListener("mouseleave", this.onMouseLeaveContext);
-    element.addEventListener("contextmenu", this.onRightClick);
   }
 methods:
+  onDrag: | #js
+    function(dpos) {
+      this.globalPos.x += dpos.dx;
+      this.globalPos.y += dpos.dy;
+      // Since child context menus are positioned relative to the parent
+      // we need to update their position in the other direction when dragging the parent
+      const childContexts = this.$root.getDescendants(this, "ui.context");
+      for (const child of childContexts) {
+        // I have no idea what's going on here
+        child.globalPos.x -= 0.0001;
+        child.globalPos.y -= 0.0001;
+      }
+    }
   onMouseEnterContext: | #js
     function(e) {
       this.isInsideContextElement = true;
@@ -39,78 +57,16 @@ methods:
     function() {
       this.isInsideContextElement = false;
     }
-  onMouseDown: | #js
-    function(e) {
-      if (e.button !== 0) return;
-      e.preventDefault();
-      e.stopPropagation();
-      this.isDragging = true;
-      this.dragStart = { x: e.clientX, y: e.clientY };
-    }
-  onMouseUp: | #js
-    function() {
-      this.isDragging = false;
-    }
-  onMouseMove: | #js
-    function(e) {
-      const globalPos = { x: e.clientX, y: e.clientY };
-      const localPos = { x: e.offsetX, y: e.offsetY };
-      const pos = this.global ? globalPos : localPos;
-      //const pos = globalPos;
-      if (this.isDragging)
-      {
-        const dx = globalPos.x - this.dragStart.x;
-        const dy = globalPos.y - this.dragStart.y;
-        this.moveBy(dx, dy);
-        this.dragStart = globalPos;
-        return;
-      }
-      if (this.isPinned) return;
-      this.isInited = true;
-      this.moveTo(pos.x, pos.y);
-    }
   onRightClick: | #js
-    function(e) {
+    function(e, global) {
       if (!e.ctrlKey) return;
       if (!this.isVisible) return;
+      // We unpin it by right clicking the title
+      // Global right click is ignored if the menu is pinned
+      if (global && this.isPinned) return;
       e.preventDefault();
       e.stopPropagation();
       this.isPinned = !this.isPinned;
-    }
-  moveTo: | #js
-    function(x, y, space)
-    {
-      //if (!space) space = (this.isPinned ? 0 : this.space);
-      space = this.space;
-      this.pos = { x, y };
-    }.throttle(200)
-  moveBy: | #js
-    function(dx, dy)
-    {
-      if (!this.$refs.menu1) return;
-      const x = parseInt(this.$refs.menu1.style.left);
-      const y = parseInt(this.$refs.menu1.style.top);
-      this.moveTo(x + dx, y + dy, 0);
-    }
-  getLocalPos: | #js
-    function()
-    {
-      if (this.global) return this.pos;
-      const parent = this.$el.parentElement;
-      const rect = parent.getBoundingClientRect();
-      const x = this.pos.x - rect.left;
-      const y = this.pos.y - rect.top;
-      return { x, y };
-    }
-  getStyle: | #js
-    function()
-    {
-      const style = {};
-      style.position = (this.global ? "fixed" : "absolute");
-      const pos = this.getLocalPos();
-      style.left = ((pos.x + this.space) + "px");
-      style.top = ((pos.y + this.space) + "px");
-      return style;
     }
 computed:
   isVisible: | #js
@@ -122,6 +78,35 @@ computed:
       if (this.isInsideContextElement) return true;
       return false;
     }
+  localPos: | #js
+    function() {
+      const pos = { ...this.globalPos };
+      if (this.global) return pos;
+      if (!this.$el) return pos;
+      const rect = this.$el.parentElement.getBoundingClientRect();
+      pos.x -= rect.left;
+      pos.y -= rect.top;
+      return pos;
+    }
+  style: | #js
+    function()
+    {
+      const style = {};
+      style.position = (this.global ? "fixed" : "absolute");
+      const pos = (this.global ? this.globalPos : this.localPos);
+      style.left = ((pos.x + this.space) + "px");
+      style.top = ((pos.y + this.space) + "px");
+      return style;
+    }
+watch:
+  mousePos:
+    handler: | #js
+      function() {
+        // When the mouse moves, update the position of the context menu
+        if (this.isPinned) return;
+        this.globalPos = this.mousePos;
+      }
+    deep: true
 style:
   .context-menu.visible:
     display: block
@@ -129,7 +114,7 @@ style:
     display: none
     min-width: 20rem
     padding: 1rem
-    background: "linear-gradient(to right, #303030, #101010)"
+    background: 'linear-gradient(to right, #303030, #101010)'
     opacity: 0.7
     transition: 0s !important
     cursor: move
@@ -137,13 +122,21 @@ style:
     z-index: 1000
   .context-menu.pinned:
     opacity: 1
-    border: "1px solid #ffffff60"
-    box-shadow: "-12px 12px 6px #000000"
+    border: '1px solid #ffffff60'
+    box-shadow: '-12px 12px 6px #000000'
     transform: translateY(-5em)
     transition: transform 0.3s !important
     pointer-events: all
+  h2:
+    user-select: none
 name: ui-context
 template: >-
-  <div class="comp-ui-context"><div class="context-menu" ref="menu1" :class="{
-  pinned: isPinned, inited: isInited, visible: isVisible }"
-  :style="getStyle()"><div v-text="pos"></div><slot></slot></div></div>
+  <div class="comp-ui-context" path="1489993813."><ui-mouse :global="true"
+  @move="mousePos = $event" @right-click="e =&gt; onRightClick(e, true)"
+  path="1489993813.0"></ui-mouse><div class="context-menu" v-if="isVisible"
+  ref="menu1" :class="{ pinned: isPinned, inited: isInited, visible: isVisible
+  }" :style="style" path="1489993813.1"><h2 path="1489993813.1.0"><ui-mouse
+  @drag="onDrag" @right-click="onRightClick"
+  path="1489993813.1.0.0"></ui-mouse><slot name="title"
+  path="1489993813.1.0.1"></slot></h2><div path="1489993813.1.1"><slot
+  name="content" path="1489993813.1.1.0"></slot></div></div></div>

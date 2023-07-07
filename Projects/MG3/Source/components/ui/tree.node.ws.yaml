@@ -3,6 +3,7 @@ dom:
     .tree-node:
       ':class': getCssClass()
       ui.expand:
+        v-if: expandable
         v-model: isExpanded
       component:
         v-if: itemType
@@ -13,11 +14,13 @@ dom:
       on_mouseleave: onMouseLeave
       slot: null
     ul:
-      class: ml-l1
+      class: ml-3
       li:
         v-for: child in getChildItems(node)
         ui.tree.node:
           ':node': child
+          ':initial-expanded': initialExpanded
+          ':expandable': expandable
           ':item-type': getItemType()
           ':get-item': getItem
           ':get-children': getChildren
@@ -27,11 +30,14 @@ dom:
           on_node-unhover: onChildUnhover
 props:
   node: null
+  initialExpanded: false
+  expandable: true
   itemType: null
   getItem: null
   getChildren: null
   selectedNode: null
 data:
+  isInited: false
   isExpanded: null
 methods:
   getCssClass: | #js
@@ -39,6 +45,7 @@ methods:
       return {
         hoverable: true,
         selected: this.isSelected,
+        expandable: this.expandable,
       };
     }
   onNodeClick: | #js
@@ -89,22 +96,36 @@ computed:
     function() {
       return (this.node == this.selectedNode);
     }
+watch:
+  initialExpanded:
+    handler: | #js
+      function(newVal, oldVal) {
+        if (this.isInited) return;
+        this.isInited = true;
+        this.isExpanded = newVal;
+      }
+    immediate: true
 style:
   .tree-node:
+    display: block
+  .tree.node.expandable:
     display: grid
-    grid-template: 1fr / 2em 1fr
+    grid-template: 1fr / 1.5em 1fr
   .comp-ui-expand .icon:
     font-size: 100% !important
     border: none !important
 name: ui-tree-node
 template: >-
-  <div class="comp-ui-tree-node"><div class="tree-node" :class="getCssClass()"
-  @click="onNodeClick" @mouseenter="onMouseEnter"
-  @mouseleave="onMouseLeave"><ui-expand
-  v-model="isExpanded"></ui-expand><component v-if="itemType"
-  :is="getItemType()" :item="getItem(node)"></component><slot></slot></div><ul
-  class="ml-l1"><li v-for="child in getChildItems(node)"><ui-tree-node
-  :node="child" :item-type="getItemType()" :get-item="getItem"
-  :get-children="getChildren" :selected-node="selectedNode"
-  @node-click="onChildClick" @node-hover="onChildHover"
-  @node-unhover="onChildUnhover"></ui-tree-node></li></ul></div>
+  <div class="comp-ui-tree-node" path="2053324664."><div class="tree-node"
+  :class="getCssClass()" @click="onNodeClick" @mouseenter="onMouseEnter"
+  @mouseleave="onMouseLeave" path="2053324664.0"><ui-expand v-if="expandable"
+  v-model="isExpanded" path="2053324664.0.0"></ui-expand><component
+  v-if="itemType" :is="getItemType()" :item="getItem(node)"
+  path="2053324664.0.1"></component><slot></slot></div><ul class="ml-3"
+  path="2053324664.1"><li v-for="child in getChildItems(node)"
+  path="2053324664.1.0"><ui-tree-node :node="child"
+  :initial-expanded="initialExpanded" :expandable="expandable"
+  :item-type="getItemType()" :get-item="getItem" :get-children="getChildren"
+  :selected-node="selectedNode" @node-click="onChildClick"
+  @node-hover="onChildHover" @node-unhover="onChildUnhover"
+  path="2053324664.1.0.0"></ui-tree-node></li></ul></div>

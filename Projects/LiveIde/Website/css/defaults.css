@@ -29,6 +29,11 @@ a:not([href])
   cursor: default;
 }
 
+.focused
+{
+  box-shadow: 0 0 0 max(100vh, 100vw) rgba(0, 0, 0, 0.9);
+}
+
 .grayish
 {
   filter: grayscale(1);
@@ -93,16 +98,22 @@ li
   background: #ffffff20;
   transition: 0s;
 }
+
 .highlighted
 {
   border: 2px dashed yellow;
+}
+.highlighted2
+{
+  border: 2px dashed cyan;
+}
+
+.highlighted, .highlighted2
+{
   box-shadow: inset -4px 4px 2px #000;
   transition: 0s;
 }
-.highlighted:hover
-{
-  transition: 0s;
-}
+
 .tree .title.highlighted:hover
 {
   background: #ffffff70;
@@ -192,6 +203,7 @@ table.bordered td, table.bordered th
 {
   border: 1px solid #ffffff40;
 }
+
 div.padded, table.padded td, table.padded th
 {
   padding: 0.3em 0.6em;
@@ -300,7 +312,8 @@ input, textarea, select, option, .ide-checkbox
 {
   width: 100%;
   padding: 0.5em 0.5em !important;
-  background: #202020ff;
+  background: linear-gradient(to left, #303030, #101010);
+  box-shadow: inset -2px 2px 2px #000;
   font-size: 120%;
   font-family: monospace !important;
   border: 1px solid gray;
@@ -757,19 +770,19 @@ img[src=""]
 
 
 
-/* textarea scrollbars */
-textarea::-webkit-scrollbar {
+/* scrollbars */
+::-webkit-scrollbar {
   width: 0.5em;
 }
 
-textarea::-webkit-scrollbar-track {
+::-webkit-scrollbar-track {
   background: #80808040;
 }
 
-textarea::-webkit-scrollbar-thumb {
+::-webkit-scrollbar-thumb {
   background: #80808080;
 }
 
-textarea::-webkit-scrollbar-thumb:hover {
+::-webkit-scrollbar-thumb:hover {
   background: #808080;
 }

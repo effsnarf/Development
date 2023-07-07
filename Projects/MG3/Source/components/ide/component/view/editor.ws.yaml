@@ -1,0 +1,42 @@
+dom:
+  div:
+    v-if: component
+    ui.tree:
+      ':root': '[null, dom]'
+      ':initial-expanded': true
+      item-type: ide.component.view.node
+      ':get-item': (node) => node
+      ':get-children': (node) => $root.getViewChildNodes(node)
+      on_node-hover: onNodeHover
+      on_node-unhover: onNodeUnhover
+props:
+  component: null
+data:
+  dom: null
+watch:
+  component:
+    handler: | #js
+      function(component) {
+        this.dom = this.$root.addPaths(component.name, component.source.dom);
+      }
+    immediate: true
+methods:
+  onNodeHover: | #js
+    function(node) {
+      const els = this.$root.getElementsFromViewNode(node);
+      els.forEach(el => el.classList.add('focused'));
+    }
+  onNodeUnhover: | #js
+    function(node) {
+      const els = this.$root.getElementsFromViewNode(node);
+      els.forEach(el => el.classList.remove('focused'));
+    }
+style: null
+name: ide-component-view-editor
+template: >-
+  <div class="comp-ide-component-view-editor" v-if="component"
+  path="-1512907487."><ui-tree :root="[null, dom]" :initial-expanded="true"
+  item-type="ide.component.view.node" :get-item="(node) =&gt; node"
+  :get-children="(node) =&gt; $root.getViewChildNodes(node)"
+  @node-hover="onNodeHover" @node-unhover="onNodeUnhover"
+  path="-1512907487.0"></ui-tree></div>

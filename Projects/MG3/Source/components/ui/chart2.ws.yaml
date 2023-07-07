@@ -90,7 +90,7 @@ watch:
     immediate: true
 name: ui-chart2
 template: >-
-  <div class="comp-ui-chart2 w-100pc" v-if="every"><ui-chart :class="cssClass"
-  :header="getHeader()" :data="values" :color="color"
-  :scale="scale"></ui-chart><a v-text="url" :href="url"
-  target="_blank"></a></div>
+  <div class="comp-ui-chart2 w-100pc" v-if="every" path="-1898451794."><ui-chart
+  :class="cssClass" :header="getHeader()" :data="values" :color="color"
+  :scale="scale" path="-1898451794.0"></ui-chart><a v-text="url" :href="url"
+  target="_blank" path="-1898451794.1"></a></div>

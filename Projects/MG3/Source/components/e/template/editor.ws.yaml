@@ -185,19 +185,24 @@ style:
     width: 100%
     height: 100%
 template: >-
-  <div class="comp-e-template-editor" v-if="temp" :class="getCssClass()"><div
-  class="div1"><ul class="tabs"><li v-for="(layer, index) in temp.layers"
-  :class="getTabClass(index)"><div class="flex"><ui-checkbox
-  v-model="layer.visible"></ui-checkbox><e-template-layer-icon :layer="layer"
-  @click="selectLayer(index)"></e-template-layer-icon></div></li></ul><div
-  class="div2"><ui-movable v-model="temp.layers[1].trans"><ui-file-dropzone
-  @file-drop="(files) =&gt; onFileDrop(files)"><div class="layers"><component
-  v-for="layer in temp.layers" :class="getLayerClass(layer)"
-  :is="getLayerType(layer)" :item="layer" @image-load="(src) =&gt;
-  onLayerImageLoad(layer,
-  src)"></component></div></ui-file-dropzone></ui-movable><transition
-  name="slide"><component ref="selectedLayerEditor1"
+  <div class="comp-e-template-editor" v-if="temp" :class="getCssClass()"
+  path="-650358312."><div class="div1" path="-650358312.0"><ul class="tabs"
+  path="-650358312.0.0"><li v-for="(layer, index) in temp.layers"
+  :class="getTabClass(index)" path="-650358312.0.0.0"><div class="flex"
+  path="-650358312.0.0.0.0"><ui-checkbox v-model="layer.visible"
+  path="-650358312.0.0.0.0.0"></ui-checkbox><e-template-layer-icon
+  :layer="layer" @click="selectLayer(index)"
+  path="-650358312.0.0.0.0.1"></e-template-layer-icon></div></li></ul><div
+  class="div2" path="-650358312.0.1"><ui-movable v-model="temp.layers[1].trans"
+  path="-650358312.0.1.0"><ui-file-dropzone @file-drop="(files) =&gt;
+  onFileDrop(files)" path="-650358312.0.1.0.0"><div class="layers"
+  path="-650358312.0.1.0.0.0"><component v-for="layer in temp.layers"
+  :class="getLayerClass(layer)" :is="getLayerType(layer)" :item="layer"
+  @image-load="(src) =&gt; onLayerImageLoad(layer, src)"
+  path="-650358312.0.1.0.0.0.0"></component></div></ui-file-dropzone></ui-movable><transition
+  name="slide" path="-650358312.0.1.1"><component ref="selectedLayerEditor1"
   :is="selectedLayerEditorType" :item="selectedLayer"
-  @toggle-disabled="toggleDisabled($event)"></component></transition><e-template-layer-filters
-  :imageID="selectedLayer.imageID"
-  v-model="selectedLayer.filters"></e-template-layer-filters></div></div></div>
+  @toggle-disabled="toggleDisabled($event)"
+  path="-650358312.0.1.1.0"></component></transition><e-template-layer-filters
+  :imageID="selectedLayer.imageID" v-model="selectedLayer.filters"
+  path="-650358312.0.1.2"></e-template-layer-filters></div></div></div>

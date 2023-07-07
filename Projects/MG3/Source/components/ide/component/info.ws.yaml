@@ -1,24 +1,97 @@
 dom:
   div:
+    div#0:
+      ui.button:
+        ':text': '''refresh'''
+        ':click': updateChanges
     table:
       tr:
         class: hoverable
-        v-for: prop in getItemProperties()
-        on_click: onPropertyClick(prop)
-        td#0:
-          ':class': prop.class
-          v-text: '''🧊'''
+        v-for: change in changes
+        on_mouseenter: onItemHover(change)
+        on_mouseleave: onItemUnhover(change)
+        on_click: onItemClick(change)
         td#1:
-          v-text: prop.name
+          class: opacity-50
+          v-text: change.id
         td#2:
-          pre:
-            v-text: previewValue(prop.value)
+          v-text: '''📦'''
+        td#3:
+          class: opacity-50
+          v-text: getItemCompName(change)
+        td#5:
+          class: clickable
+          v-text: '''📌'''
+          on_click: onClickHideField(change)
+        td#4:
+          v-text: '''🧊'''
+        td#6:
+          class: opacity-30
+          v-text: change.key
+        td#7:
+          div:
+            ':class': getValueType(change.newValue)
+            v-text: previewValue(change.newValue)
+        td#8:
+          class: opacity-30
+          div:
+            ':class': getValueType(change.newValue)
+            v-text: previewValue(change.oldValue)
 props:
   item: null
+data:
+  changes: []
+  hoveredItem: null
+  hiddenFields: []
 methods:
-  onPropertyClick: | #js
-    function(prop) {
-      console.log(prop.value);
+  onClickHideField: | #js
+    function(change) {
+      const compName = this.getItemCompName(change);
+      const key = change.key;
+      this.hiddenFields.push({ compName, key });
+      this.updateChanges();
+    }
+  onItemHover: | #js
+    function(change) {
+      this.hoveredItem = change;
+    }
+  onItemUnhover: | #js
+    function(change) {
+      this.hoveredItem = null;
+    }
+  isHiddenField: | #js
+    function(change) {
+      const compName = this.getItemCompName(change);
+      return this.hiddenFields.some(item => item.compName == compName && item.key == change.key);
+    }
+  getItemCompName: | #js
+    function(change) {
+      return this.$root.vues[change.uid]()?.$options?._componentTag;
+    }
+  updateChanges: | #js
+    function() {
+      this.changes = this.getChanges();
+    }
+  getChanges: | #js
+    function() {
+      if (!this.item) return [];
+      let items = this.getStateChanges(this.item());
+      items = items.sortBy(item => item.id);
+      items = [...items].reverse();
+      return items;
+    }
+  getStateChanges: | #js
+    function(vue) {
+      if (!vue) return [];
+      let items = [];
+      items.push(...(vue.$data._?.state.items||[]));
+      items = items.filter(item => !this.isHiddenField(item));
+      items.push(...((vue.$children||[]).flatMap(c => this.getStateChanges(c))));
+      return items;
+    }
+  onItemClick: | #js
+    function(change) {
+      console.log(change);
     }
   getItemProperties: | #js
     function() {
@@ -54,20 +127,56 @@ methods:
         return ex.message;
       }
     }
+  getValueType: | #js
+    function(value) {
+      return typeof value;
+    }
+watch:
+  hoveredItem: | #js
+    function(newItem, oldItem) {
+      const newVue = (!newItem) ? null : this.$root.vues[newItem.uid]();
+      const oldVue = (!oldItem) ? null : this.$root.vues[oldItem.uid]();
+      console.log(newVue);
+      newVue?.$el.classList.add("highlighted2");
+      oldVue?.$el.classList.remove("highlighted2");
+    }
 style:
+  .comp-ide-component-info:
+    max-width: 40em
+    max-height: 30em
+    overflow: auto
   td:
     font-size: 1rem
-  pre:
-    font-size: 1rem
+    white-space: pre
+    padding: 0 0.3rem
+  .object:
     max-width: 20rem
     max-height: 5rem
     overflow: auto
     opacity: 0.5
     padding: 0.5em
     border: 1px solid gray
+  .clickable:
+    filter: grayscale(1)
+  .clickable:hover:
+    filter: none
 name: ide-component-info
 template: >-
-  <div class="comp-ide-component-info"><table><tr class="hoverable" v-for="prop
-  in getItemProperties()" @click="onPropertyClick(prop)"><td :class="prop.class"
-  v-text="'🧊'"></td><td v-text="prop.name"></td><td><pre
-  v-text="previewValue(prop.value)"></pre></td></tr></table></div>
+  <div class="comp-ide-component-info" path="-1793052989."><div
+  path="-1793052989.0"><ui-button :text="'refresh'" :click="updateChanges"
+  path="-1793052989.0.0"></ui-button></div><table path="-1793052989.1"><tr
+  class="hoverable" v-for="change in changes" @mouseenter="onItemHover(change)"
+  @mouseleave="onItemUnhover(change)" @click="onItemClick(change)"
+  path="-1793052989.1.0"><td class="opacity-50" v-text="change.id"
+  path="-1793052989.1.0.0"></td><td v-text="'📦'"
+  path="-1793052989.1.0.1"></td><td class="opacity-50"
+  v-text="getItemCompName(change)" path="-1793052989.1.0.2"></td><td
+  class="clickable" v-text="'📌'" @click="onClickHideField(change)"
+  path="-1793052989.1.0.3"></td><td v-text="'🧊'"
+  path="-1793052989.1.0.4"></td><td class="opacity-30" v-text="change.key"
+  path="-1793052989.1.0.5"></td><td path="-1793052989.1.0.6"><div
+  :class="getValueType(change.newValue)" v-text="previewValue(change.newValue)"
+  path="-1793052989.1.0.6.0"></div></td><td class="opacity-30"
+  path="-1793052989.1.0.7"><div :class="getValueType(change.newValue)"
+  v-text="previewValue(change.oldValue)"
+  path="-1793052989.1.0.7.0"></div></td></tr></table></div>

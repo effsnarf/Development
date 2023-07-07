@@ -44,4 +44,6 @@ methods:
       return Math.round(days / 365) + " years ago";
     }
 name: ui-time
-template: <div class="comp-ui-time opacity-20" v-text="timeAgo(value)"></div>
+template: >-
+  <div class="comp-ui-time opacity-20" v-text="timeAgo(value)"
+  path="-484148761."></div>

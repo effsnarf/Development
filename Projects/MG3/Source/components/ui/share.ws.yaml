@@ -21,4 +21,4 @@ computed:
 name: ui-share
 template: >-
   <div class="comp-ui-share sharethis-inline-share-buttons" :data-url="url"
-  :data-image="imageUrl"></div>
+  :data-image="imageUrl" path="-2124674043."></div>

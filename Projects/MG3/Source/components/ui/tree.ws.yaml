@@ -3,6 +3,8 @@ dom:
     li:
       ui.tree.node:
         ':node': root
+        ':initial-expanded': initialExpanded
+        ':expandable': '!initialExpanded'
         ':item-type': itemType
         ':get-item': getItem || ((node) => node.item)
         ':get-children': getChildren || ((node) => node.children||[])
@@ -12,6 +14,8 @@ dom:
         on_node-unhover: onChildUnhover
 props:
   root: null
+  initialExpanded: false
+  expandable: true
   itemType: null
   getItem: null
   getChildren: null
@@ -38,8 +42,11 @@ watch:
     }
 name: ui-tree
 template: >-
-  <ul class="comp-ui-tree"><li><ui-tree-node :node="root" :item-type="itemType"
-  :get-item="getItem || ((node) =&gt; node.item)" :get-children="getChildren ||
-  ((node) =&gt; node.children||[])" :selected-node="selectedNode"
-  @node-click="onChildClick" @node-hover="onChildHover"
-  @node-unhover="onChildUnhover"></ui-tree-node></li></ul>
+  <ul class="comp-ui-tree" path="-484140360."><li
+  path="-484140360.0"><ui-tree-node :node="root"
+  :initial-expanded="initialExpanded" :expandable="!initialExpanded"
+  :item-type="itemType" :get-item="getItem || ((node) =&gt; node.item)"
+  :get-children="getChildren || ((node) =&gt; node.children||[])"
+  :selected-node="selectedNode" @node-click="onChildClick"
+  @node-hover="onChildHover" @node-unhover="onChildUnhover"
+  path="-484140360.0.0"></ui-tree-node></li></ul>

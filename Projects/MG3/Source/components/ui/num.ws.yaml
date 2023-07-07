@@ -33,5 +33,6 @@ style:
     opacity: 0.4;
 name: ui-num
 template: >-
-  <div class="comp-ui-num flex"><div v-text="number"></div><div class="letter"
-  v-text="unit"></div></div>
+  <div class="comp-ui-num flex" path="-846907092."><div v-text="number"
+  path="-846907092.0"></div><div class="letter" v-text="unit"
+  path="-846907092.1"></div></div>

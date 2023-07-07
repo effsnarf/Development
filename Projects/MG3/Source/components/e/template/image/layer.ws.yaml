@@ -30,4 +30,4 @@ name: e-template-image-layer
 template: >-
   <ui-image class="comp-e-template-image-layer" :style="getStyle(item)"
   v-if="item" :imageID="item.imageID" :remove-background="item.removeBackground"
-  :square="true" @load="onImageLoad"></ui-image>
+  :square="true" @load="onImageLoad" path="-1206774413."></ui-image>

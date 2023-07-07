@@ -1,3 +1,5 @@
+import addPaths from "./add.paths";
+
 export default (context: any, dom: any, indent?: number, compName?: string) => {
   if (!dom) return [];
 
@@ -5,6 +7,11 @@ export default (context: any, dom: any, indent?: number, compName?: string) => {
   if (!indent) indent = 0;
 
   dom = JSON.parse(JSON.stringify(dom));
+
+  if (compName) {
+    // Traverse the tree and for each object node (not attribute), add a path attribute
+    dom = addPaths(context, compName, dom);
+  }
 
   // Add the component name as a class to the root element
   if (!indent && compName) {

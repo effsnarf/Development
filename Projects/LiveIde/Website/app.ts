@@ -170,8 +170,8 @@ const _fetchAsJson = async (url: string) => {
     process.cwd(),
     config.project.folder,
     config.webscript.folder,
-    config.website.folder,
-  ];
+    config.website?.folder,
+  ].filter((s) => s);
 
   console.log("staticFileFolders", staticFileFolders);
 

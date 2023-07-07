@@ -102,8 +102,9 @@ style:
   ul:
     display: grid
 template: >-
-  <ui-infinite-scroll class="comp-content-stream"
-  @scroll="loadMore"><transition-group tag="ul" name="list" :class="gridClass"
-  :style="{ gap: gap }"><li v-for="(item, index) in items"
-  :key="$root.getKey(item)"><component :is="itemType.kebabize()"
-  :item="item"></component></li></transition-group></ui-infinite-scroll>
+  <ui-infinite-scroll class="comp-content-stream" @scroll="loadMore"
+  path="-30902635."><transition-group tag="ul" name="list" :class="gridClass"
+  :style="{ gap: gap }" path="-30902635.0"><li v-for="(item, index) in items"
+  :key="$root.getKey(item)" path="-30902635.0.0"><component
+  :is="itemType.kebabize()" :item="item"
+  path="-30902635.0.0.0"></component></li></transition-group></ui-infinite-scroll>

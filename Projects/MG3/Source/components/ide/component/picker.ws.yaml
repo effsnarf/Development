@@ -9,19 +9,23 @@ dom:
       ref: context1
       ':global': true
       ':visible': showPicker
-      template:
-        h2:
-          ui.title:
-            icon: 📦
-            ':value': getTitle(hoveredVue)
-        hr: null
-        ide.component.runtime:
-          v-for: uid in parentChain
-          ':item': $root.vues[uid]
+      template#1:
+        v-slot: title
+        ui.title:
+          icon: 📦
+          ':value': getTitle(hoveredVueUID)
+      template#2:
+        v-slot: content
+        ide.component.editor:
+          ':vue-uid': hoveredVueUID
+        .parent-chain:
+          ide.component.title:
+            v-for: uid in parentChain
+            ':item': $root.vues[uid]
 props: null
 data:
   hoveredElement: null
-  hoveredVue: null
+  hoveredVueUID: null
   parentChain: null
   showPicker: false
 methods:
@@ -31,7 +35,7 @@ methods:
     }
   getTitle: | #js
     function(vue) {
-      return this.$root.vue(vue)?.$options._componentTag;
+      return this.$root.getVue(vue)?.$options._componentTag;
     }
   onHoveredElement: | #js
     function(el) {
@@ -40,9 +44,10 @@ methods:
     }
   getParentChain: | #js
     function(vue) {
+      const maxChainLength = 4;
       let chain = [];
       let parent = vue;
-      while (parent) {
+      while (parent && (chain.length < maxChainLength)) {
         chain.push(parent._uid);
         parent = this.getParentVue(parent);
       }
@@ -80,24 +85,40 @@ watch:
   hoveredElement: | #js
     function(newEl, oldEl) {
       const vue = this.getVueFromElement(newEl);
-      this.hoveredVue = vue?._uid;
+      this.hoveredVueUID = vue?._uid;
       const parentChain = this.getParentChain(vue);
       this.parentChain = parentChain;
     }
-  hoveredVue: | #js
-    function(newVue, oldVue) {
-      if (oldVue) this.$root.vue(oldVue)?.$el.classList.remove(`highlighted`);
-      if (newVue) this.$root.vue(newVue)?.$el.classList.add(`highlighted`);
+  hoveredVueUID: | #js
+    function(newVueUID, oldVueUID) {
+      if (oldVueUID) this.$root.getVue(oldVueUID)?.$el.classList.remove(`highlighted2`);
+      if (newVueUID) this.$root.getVue(newVueUID)?.$el.classList.add(`highlighted2`);
     }
 style:
   div:
     font-family: monospace
+  .parent-chain: null
+  .parent-chain > :nth-child(1):
+    margin-left: 1em
+  .parent-chain > :nth-child(2):
+    margin-left: 2em
+  .parent-chain > :nth-child(3):
+    margin-left: 3em
+  .parent-chain > :nth-child(4):
+    margin-left: 4em
+  .parent-chain > :nth-child(5):
+    margin-left: 5em
 name: ide-component-picker
 template: >-
-  <div class="comp-ide-component-picker"><ui-keyboard
-  @ctrl="onCtrlKey"></ui-keyboard><ui-mouse @hovered-element="onHoveredElement"
-  :global="true"></ui-mouse><ui-context ref="context1" :global="true"
-  :visible="showPicker"><template><h2><ui-title icon="📦"
-  :value="getTitle(hoveredVue)"></ui-title></h2><ide-component-runtime
-  v-for="uid in parentChain"
-  :item="$root.vues[uid]"></ide-component-runtime></template></ui-context></div>
+  <div class="comp-ide-component-picker" path="-646340253."><ui-keyboard
+  @ctrl="onCtrlKey" path="-646340253.0"></ui-keyboard><ui-mouse
+  @hovered-element="onHoveredElement" :global="true"
+  path="-646340253.1"></ui-mouse><ui-context ref="context1" :global="true"
+  :visible="showPicker" path="-646340253.2"><template v-slot:title
+  path="-646340253.2.0"><ui-title icon="📦" :value="getTitle(hoveredVueUID)"
+  path="-646340253.2.0.0"></ui-title></template><template v-slot:content
+  path="-646340253.2.1"><ide-component-editor :vue-uid="hoveredVueUID"
+  path="-646340253.2.1.0"></ide-component-editor><div class="parent-chain"
+  path="-646340253.2.1.1"><ide-component-title v-for="uid in parentChain"
+  :item="$root.vues[uid]"
+  path="-646340253.2.1.1.0"></ide-component-title></div></template></ui-context></div>

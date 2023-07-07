@@ -138,16 +138,19 @@ template: >-
   :title-image-id="generator?.imageID" :title-text="generator?.displayName"
   :title-url="$root.url.generator(generator)"
   :title-key="generator?.generatorID"
-  :recommendation-items="recommendationItems"><template
-  v-slot:article><content-article v-if="poem"><template v-slot:content><div
-  class="poem"><transition-group name="list"><content-poem-stanza v-for="stanza
-  in getRandomStanzas(poem)" :item="stanza" :key="stanza.map(l =&gt;
-  l.substring(0,
-  5)).join('-')"></content-poem-stanza></transition-group></div><div
-  class="float-clear"></div></template></content-article></template><template
-  v-slot:middle><content-stream ref="contentStream1" item-type="e.instance"
-  :get-more-items="getMoreInstances"
-  grid-class="grid-1"></content-stream></template><template
-  v-slot:left><e-instance-create v-if="showCreateInstance"
-  :generator="generator"
-  @instance-created="onInstanceCreated"></e-instance-create></template></site>
+  :recommendation-items="recommendationItems" path="-38884812."><template
+  v-slot:article path="-38884812.0"><content-article v-if="poem"
+  path="-38884812.0.0"><template v-slot:content path="-38884812.0.0.0"><div
+  class="poem" path="-38884812.0.0.0.0"><transition-group name="list"
+  path="-38884812.0.0.0.0.0"><content-poem-stanza v-for="stanza in
+  getRandomStanzas(poem)" :item="stanza" :key="stanza.map(l =&gt; l.substring(0,
+  5)).join('-')"
+  path="-38884812.0.0.0.0.0.0"></content-poem-stanza></transition-group></div><div
+  class="float-clear"
+  path="-38884812.0.0.0.1"></div></template></content-article></template><template
+  v-slot:middle path="-38884812.1"><content-stream ref="contentStream1"
+  item-type="e.instance" :get-more-items="getMoreInstances" grid-class="grid-1"
+  path="-38884812.1.0"></content-stream></template><template v-slot:left
+  path="-38884812.2"><e-instance-create v-if="showCreateInstance"
+  :generator="generator" @instance-created="onInstanceCreated"
+  path="-38884812.2.0"></e-instance-create></template></site>

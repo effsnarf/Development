@@ -26,10 +26,14 @@ data:
   showFilters: false
 name: e-template-layer-filters
 template: >-
-  <div class="comp-e-template-layer-filters"><ui-expand text="effects"
-  v-model="showFilters"></ui-expand><transition name="slide2"><div
-  v-if="showFilters"><ui-image-options :imageID="imageID" filter="blur"
-  v-model="value.blur"></ui-image-options><ui-image-options :imageID="imageID"
-  filter="opacity" v-model="value.opacity"></ui-image-options><ui-image-options
-  :imageID="imageID" filter="grayscale"
-  v-model="value.grayscale"></ui-image-options></div></transition></div>
+  <div class="comp-e-template-layer-filters" path="-822068845."><ui-expand
+  text="effects" v-model="showFilters"
+  path="-822068845.0"></ui-expand><transition name="slide2"
+  path="-822068845.1"><div v-if="showFilters"
+  path="-822068845.1.0"><ui-image-options :imageID="imageID" filter="blur"
+  v-model="value.blur"
+  path="-822068845.1.0.0"></ui-image-options><ui-image-options
+  :imageID="imageID" filter="opacity" v-model="value.opacity"
+  path="-822068845.1.0.1"></ui-image-options><ui-image-options
+  :imageID="imageID" filter="grayscale" v-model="value.grayscale"
+  path="-822068845.1.0.2"></ui-image-options></div></transition></div>

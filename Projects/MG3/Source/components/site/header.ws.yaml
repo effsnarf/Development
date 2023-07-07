@@ -46,5 +46,5 @@ style:
     filter: grayscale(1) brightness(0.8)
     background-color: black
 template: >-
-  <div class="comp-site-header"><div class="header"
-  :style="getStyle()"><site-logo></site-logo></div></div>
+  <div class="comp-site-header" path="2017999636."><div class="header"
+  :style="getStyle()" path="2017999636.0"><site-logo></site-logo></div></div>

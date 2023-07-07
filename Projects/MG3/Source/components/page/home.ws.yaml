@@ -53,9 +53,12 @@ style:
     aspect-ratio: 2 / 1
 name: page-home
 template: >-
-  <site class="comp-page-home" page-name="home"><template
-  v-slot:left><e-thread-list></e-thread-list></template><template
-  v-slot:middle><e-template-editor></e-template-editor><content-stream
+  <site class="comp-page-home" page-name="home" path="838274270."><template
+  v-slot:left
+  path="838274270.0"><e-thread-list></e-thread-list></template><template
+  v-slot:middle
+  path="838274270.1"><e-template-editor></e-template-editor><content-stream
   ref="stream1" item-type="e.instance" :get-more-items="getMoreInstances"
-  grid-class="grid-1"></content-stream></template><template
-  v-slot:right><div><e-post-create></e-post-create></div></template></site>
+  grid-class="grid-1" path="838274270.1.1"></content-stream></template><template
+  v-slot:right path="838274270.2"><div
+  path="838274270.2.0"><e-post-create></e-post-create></div></template></site>

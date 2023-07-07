@@ -47,8 +47,9 @@ style:
     line-height: 1.2em
 name: ui-number
 template: >-
-  <div-card class="comp-ui-number"><div-top><div-icon
-  v-text="icon"></div-icon><div-number
-  v-text="formatNumber(value)"></div-number><div-unit
-  v-text="unit"></div-unit></div-top><div-text
-  v-text="text"></div-text></div-card>
+  <div-card class="comp-ui-number" path="-1571183645."><div-top
+  path="-1571183645.0"><div-icon v-text="icon"
+  path="-1571183645.0.0"></div-icon><div-number v-text="formatNumber(value)"
+  path="-1571183645.0.1"></div-number><div-unit v-text="unit"
+  path="-1571183645.0.2"></div-unit></div-top><div-text v-text="text"
+  path="-1571183645.1"></div-text></div-card>

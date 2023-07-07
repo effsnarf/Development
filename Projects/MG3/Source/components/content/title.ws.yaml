@@ -75,10 +75,12 @@ style:
     height: 6rem
 name: content-title
 template: >-
-  <div class="comp-content-title" :class="getCssClass()"><div
-  class="content-title site-width"><div
-  class="background"></div><transition-group name="list" tag="ul"><li
-  :key="title||Date.now()"><ui-image v-if="imageID" :imageID="imageID"
-  :url="url"></ui-image><ui-large-title
-  :text="title"></ui-large-title></li></transition-group></div><div
-  class="spacer"></div></div>
+  <div class="comp-content-title" :class="getCssClass()"
+  path="-1385872221."><div class="content-title site-width"
+  path="-1385872221.0"><div class="background"
+  path="-1385872221.0.0"></div><transition-group name="list" tag="ul"
+  path="-1385872221.0.1"><li :key="title||Date.now()"
+  path="-1385872221.0.1.0"><ui-image v-if="imageID" :imageID="imageID"
+  :url="url" path="-1385872221.0.1.0.0"></ui-image><ui-large-title :text="title"
+  path="-1385872221.0.1.0.1"></ui-large-title></li></transition-group></div><div
+  class="spacer" path="-1385872221.1"></div></div>

@@ -28,13 +28,11 @@ mounted: | #js
   }
 methods:
   onLoad: | #js
-
     function () {
       this.recalc();
       [1,2,3].forEach(i => setTimeout(this.recalc.bind(this), i * 100))
     }
   recalc: | #js
-
     function () {
       if (!this.$refs.sizeRef1) return;
       let rect = this.$refs.sizeRef1.getBoundingClientRect();
@@ -43,7 +41,6 @@ methods:
       this.$emit("change");
     }
   getFontSize: | #js
-
     function (s) {
       if (!s) return 0;
       if (!this.width) return 0;
@@ -52,7 +49,6 @@ methods:
     }
 computed:
   fontSizes: | #js
-
     function () {
       const sizes = [this.getFontSize(this.item.texts[0]), this.getFontSize(this.item.texts[1])];
       return sizes;
@@ -87,8 +83,10 @@ style:
     top: auto
     bottom: 0
 template: >-
-  <div class="comp-e-template-captions-layer" v-if="item"><div
-  class="container"><div class="size-ref" ref="sizeRef1"><div class="texts"><div
-  class="text" v-for="(text, index) in [item.texts[0], item.texts[1]]"
-  v-text="text" :style="{ fontSize: fontSizes[index] }"></div></div><div
-  class="spacer"></div></div></div></div>
+  <div class="comp-e-template-captions-layer" v-if="item"
+  path="-1997108005."><div class="container" path="-1997108005.0"><div
+  class="size-ref" ref="sizeRef1" path="-1997108005.0.0"><div class="texts"
+  path="-1997108005.0.0.0"><div class="text" v-for="(text, index) in
+  [item.texts[0], item.texts[1]]" v-text="text" :style="{ fontSize:
+  fontSizes[index] }" path="-1997108005.0.0.0.0"></div></div><div class="spacer"
+  path="-1997108005.0.0.1"></div></div></div></div>

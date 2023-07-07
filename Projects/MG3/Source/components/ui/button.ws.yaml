@@ -37,6 +37,7 @@ style:
     margin: auto
 name: ui-button
 template: >-
-  <transition class="comp-ui-button" name="slide2"><button v-if="!isLoading"
-  v-text="text" @click="onClick"></button><ui-loading
-  v-if="isLoading"></ui-loading></transition>
+  <transition class="comp-ui-button" name="slide2" path="-1914507316."><button
+  v-if="!isLoading" v-text="text" @click="onClick"
+  path="-1914507316.0"></button><ui-loading v-if="isLoading"
+  path="-1914507316.1"></ui-loading></transition>

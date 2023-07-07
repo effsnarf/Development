@@ -28,5 +28,6 @@ style:
     text-shadow: '-5px 5px 3px #000'
 name: content-poem-stanza
 template: >-
-  <div class="comp-content-poem-stanza" v-if="item"><div class="lines"><div
-  class="line mono" v-for="line in getLines()" v-text="line"></div></div></div>
+  <div class="comp-content-poem-stanza" v-if="item" path="-1353349913."><div
+  class="lines" path="-1353349913.0"><div class="line mono" v-for="line in
+  getLines()" v-text="line" path="-1353349913.0.0"></div></div></div>

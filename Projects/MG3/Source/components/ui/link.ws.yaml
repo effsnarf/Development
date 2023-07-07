@@ -22,5 +22,6 @@ methods:
 style: null
 name: ui-link
 template: >-
-  <a class="comp-ui-link clickable2" :href="url" @click="onClick"><div
-  v-if="text" v-text="text"></div><slot></slot></a>
+  <a class="comp-ui-link clickable2" :href="url" @click="onClick"
+  path="-484387052."><div v-if="text" v-text="text"
+  path="-484387052.0"></div><slot></slot></a>

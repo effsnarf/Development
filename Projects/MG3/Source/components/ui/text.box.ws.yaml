@@ -17,4 +17,4 @@ methods:
 name: ui-text-box
 template: >-
   <input class="comp-ui-text-box" :type="type" :placeholder="hint"
-  :value="value" @input="onInput"/>
+  :value="value" @input="onInput" path="-1492297820."/>

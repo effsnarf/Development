@@ -1,10 +1,8 @@
 dom:
   div:
     v-if: component
-    ui.title:
-      class: fs-m3
-      icon: 📦
-      ':text': component?.name
+    ide.component.view.editor:
+      ':component': component
     ui.tabs:
       ':options': '[''📁 dom'', ''🟢 style'']'
       template#1:
@@ -16,13 +14,22 @@ dom:
         ui.json.editor:
           v-model: component.source.style
 props:
+  vueUid: null
+data:
   component: null
 methods: null
+watch:
+  vueUid: | #js
+    function(vueUid) {
+      this.component = !vueUid ? null : this.$root.getComponent(vueUid);
+    }
 name: ide-component-editor
 template: >-
-  <div class="comp-ide-component-editor" v-if="component"><ui-title
-  class="fs-m3" icon="📦" :text="component?.name"></ui-title><ui-tabs
-  :options="['📁 dom', '🟢 style']"><template v-slot:tab0><ui-json-editor
-  v-model="component.source.dom"></ui-json-editor></template><template
-  v-slot:tab1><ui-json-editor
-  v-model="component.source.style"></ui-json-editor></template></ui-tabs></div>
+  <div class="comp-ide-component-editor" v-if="component"
+  path="-965690814."><ide-component-view-editor :component="component"
+  path="-965690814.0"></ide-component-view-editor><ui-tabs :options="['📁 dom',
+  '🟢 style']" path="-965690814.1"><template v-slot:tab0
+  path="-965690814.1.0"><ui-json-editor v-model="component.source.dom"
+  path="-965690814.1.0.0"></ui-json-editor></template><template v-slot:tab1
+  path="-965690814.1.1"><ui-json-editor v-model="component.source.style"
+  path="-965690814.1.1.0"></ui-json-editor></template></ui-tabs></div>

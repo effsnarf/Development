@@ -46,9 +46,10 @@ style:
     margin-bottom: 2vh
 name: e-thread
 template: >-
-  <div class="comp-e-thread" v-if="thread"><h3
-  v-text="thread.title"></h3><transition-group tag="ul" name="list"><li
-  v-for="post in [...thread.posts,null]" :key="post?._id||0"><e-post v-if="post"
-  :item="post" @refresh-thread="refresh"></e-post><e-post-create
-  v-else-if="!post" :threadID="thread?._id"
-  @created="refresh"></e-post-create></li></transition-group></div>
+  <div class="comp-e-thread" v-if="thread" path="1226205107."><h3
+  v-text="thread.title" path="1226205107.0"></h3><transition-group tag="ul"
+  name="list" path="1226205107.1"><li v-for="post in [...thread.posts,null]"
+  :key="post?._id||0" path="1226205107.1.0"><e-post v-if="post" :item="post"
+  @refresh-thread="refresh" path="1226205107.1.0.0"></e-post><e-post-create
+  v-else-if="!post" :threadID="thread?._id" @created="refresh"
+  path="1226205107.1.0.1"></e-post-create></li></transition-group></div>

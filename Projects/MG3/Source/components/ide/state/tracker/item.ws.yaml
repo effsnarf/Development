@@ -33,7 +33,8 @@ style:
     opacity: 0.5
 name: ide-state-tracker-item
 template: >-
-  <div class="comp-ide-state-tracker-item grid"><div v-text="'🧊'"></div><div
-  class="comp-name" v-text="item.compName"></div><div
-  v-text="item.key"></div><div class="newValue"
-  v-text="valueToString(item.newValue)"></div></div>
+  <div class="comp-ide-state-tracker-item grid" path="841306122."><div
+  v-text="'🧊'" path="841306122.0"></div><div class="comp-name"
+  v-text="item.compName" path="841306122.1"></div><div v-text="item.key"
+  path="841306122.2"></div><div class="newValue"
+  v-text="valueToString(item.newValue)" path="841306122.3"></div></div>

@@ -15,4 +15,5 @@ style: null
 name: ui-range
 template: >-
   <input class="comp-ui-range" type="range" :value="value" :min="min" :max="max"
-  :step="step" @input="$emit('input', parseFloat($event.target.value))"/>
+  :step="step" @input="$emit('input', parseFloat($event.target.value))"
+  path="-2125793949."/>

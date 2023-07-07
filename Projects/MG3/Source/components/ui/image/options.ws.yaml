@@ -54,7 +54,7 @@ style:
     border: 2px solid
 name: ui-image-options
 template: >-
-  <div class="comp-ui-image-options options" :tooltip="filter"
-  v-if="imageID"><ui-image class="option" v-for="i in 10" :class="getClass(i)"
-  :img-style="getStyle(i)" :imageID="imageID" :square="true"
-  @click="onClick(i)"></ui-image></div>
+  <div class="comp-ui-image-options options" :tooltip="filter" v-if="imageID"
+  path="907340593."><ui-image class="option" v-for="i in 10"
+  :class="getClass(i)" :img-style="getStyle(i)" :imageID="imageID"
+  :square="true" @click="onClick(i)" path="907340593.0"></ui-image></div>

@@ -46,7 +46,8 @@ style:
     transition: 0s
 name: e-generator-select
 template: >-
-  <div class="comp-e-generator-select"><div class="grid"><e-generator-square
-  v-for="generator in generators" :value="generator"
-  :key="generator?.generatorID" :show-anonymous="true" @click="() =&gt;
-  onClick(generator)"></e-generator-square></div></div>
+  <div class="comp-e-generator-select" path="-928114976."><div class="grid"
+  path="-928114976.0"><e-generator-square v-for="generator in generators"
+  :value="generator" :key="generator?.generatorID" :show-anonymous="true"
+  @click="() =&gt; onClick(generator)"
+  path="-928114976.0.0"></e-generator-square></div></div>

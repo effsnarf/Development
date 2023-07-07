@@ -75,8 +75,10 @@ style:
     opacity: 0.3
 name: ui-image-select
 template: >-
-  <div class="comp-ui-image-select flex"><ui-image :imageID="value"
-  :square="true"></ui-image><ui-file-dropzone @file-drop="onFileDrop"><div
-  class="dropzone"><div class="justify-center flex"><div
-  v-text="dropAreaText"></div><div
-  v-if="isUploading"><ui-loading></ui-loading></div></div></div></ui-file-dropzone></div>
+  <div class="comp-ui-image-select flex" path="-1667730935."><ui-image
+  :imageID="value" :square="true"
+  path="-1667730935.0"></ui-image><ui-file-dropzone @file-drop="onFileDrop"
+  path="-1667730935.1"><div class="dropzone" path="-1667730935.1.0"><div
+  class="justify-center flex" path="-1667730935.1.0.0"><div
+  v-text="dropAreaText" path="-1667730935.1.0.0.0"></div><div v-if="isUploading"
+  path="-1667730935.1.0.0.1"><ui-loading></ui-loading></div></div></div></ui-file-dropzone></div>

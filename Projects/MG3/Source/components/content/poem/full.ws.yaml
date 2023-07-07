@@ -27,5 +27,6 @@ style:
     font-size: 200%
     font-family: Old Standard TT
 template: >-
-  <div class="comp-content-poem-full box"><div class="line" v-for="(line, index)
-  in lines" :class="getLineCssClass(index)" v-text="line"></div></div>
+  <div class="comp-content-poem-full box" path="1035076097."><div class="line"
+  v-for="(line, index) in lines" :class="getLineCssClass(index)" v-text="line"
+  path="1035076097.0"></div></div>

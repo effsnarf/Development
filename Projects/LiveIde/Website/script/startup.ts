@@ -1,10 +1,17 @@
 import "../../../../Shared/Extensions";
 import { Component } from "../../classes/Component";
+import { Objects } from "../../../../Shared/Extensions.Objects.Client";
 import { StateTracker } from "../../classes/StateTracker";
 import { AnalyticsTracker } from "../../classes/AnalyticsTracker";
 import { ClientContext } from "../../classes/ClientContext";
 import { Params } from "../../classes/Params";
 import { DatabaseProxy } from "../../../../Apps/DatabaseProxy/Client/DbpClient";
+import addPaths from "../../../../Shared/WebScript/add.paths";
+
+// To make it accessible to client code
+const win = window as any;
+win.StateTracker = StateTracker;
+win.Objects = Objects;
 
 const htmlEncode = (s: string) => {
   if (!s) return null;
@@ -91,13 +98,16 @@ interface MgParams {
     el: "#app",
     data: {
       vues: {},
+      vuesCount: 0,
       ideWatches: {},
+      client,
       dbp,
       analytics: await AnalyticsTracker.new(),
-      stateTracker: new StateTracker(client),
       params: params,
       url: helpers.url,
       comps: client.Vue.ref(client.comps),
+      compsDic: client.comps.toMap((c: Component) => c.name.hashCode()),
+      compNames: client.comps.map((c: Component) => c.name),
       templates: client.templates,
       isLoading: false,
       error: null,
@@ -105,17 +115,58 @@ interface MgParams {
     },
     async mounted() {},
     methods: {
-      vue(uid: number) {
+      getVue(uid: number) {
         if (!uid) return null;
         const vue = (this as any).vues[uid];
         if (!vue) return null;
         return vue();
+      },
+      getComponent(uid: number) {
+        const vue = this.getVue(uid);
+        if (!vue) return null;
+        const compName = vue.$data._.comp.name;
+        if (!compName) return null;
+        const comp = (this as any).compsDic[compName.hashCode()];
+        return comp;
+      },
+      isComponentName(name: string) {
+        if (!name) return false;
+        const self = this as any;
+        return !!self.compsDic[name.hashCode()];
+      },
+      getElementsFromViewNode(node: [string, any]) {
+        return document.querySelectorAll(`[path="${node[1].path}"]`);
+      },
+      getViewChildNodes(node: [string, any]) {
+        if (typeof node[1] != "object") return [];
+        let children = Object.entries(node[1]);
+        children = children.filter((c) => !this.isAttributeName(c[0]));
+        return children;
+      },
+      addPaths(compName: string, dom: any) {
+        return addPaths(this, compName, dom);
       },
       ideWatch(uid: number, name: string) {
         const ideWatches = (this as any).ideWatches;
         const key = `${uid}-${name}`;
         if (ideWatches[key]) return;
         ideWatches[key] = { uid, name };
+      },
+      isAttributeName(name: string) {
+        const self = this as any;
+        return client.isAttributeName(self.compNames, name);
+      },
+      getDescendants(vue: any, filter: any): any[] {
+        if (typeof filter == "string") {
+          const compName = filter;
+          filter = (vue: any) => vue.$data._?.comp.name == compName;
+        }
+        const vues = [];
+        for (const child of vue.$children) {
+          if (filter(child)) vues.push(child);
+          vues.push(...this.getDescendants(child, filter));
+        }
+        return vues;
       },
       async navigateTo(item: any) {
         const url = this.itemToUrl(item);
@@ -191,6 +242,18 @@ interface MgParams {
           style.display = "none";
         }
         return style;
+      },
+      onVueMounted(vue: any) {
+        const self = this as any;
+        const uid = vue._uid;
+        self.vues[uid] = () => vue;
+        self.vuesCount++;
+      },
+      onVueUnMounted(vue: any) {
+        const self = this as any;
+        const uid = vue._uid;
+        delete self.vues[uid];
+        self.vuesCount--;
       },
       isDevEnv() {
         return window.location.hostname == "localhost";
