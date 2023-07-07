@@ -15,17 +15,30 @@
           comp: {
             name: `{{unkebabize name}}`,
           },
-          state: StateTracker.new(this._uid, this.$root.client),
+          state: StateTracker.new(this._uid, "{{name}}", this.$root.client),
         }
     }
   },
-  mounted: {{{addCode mounted "this.$root.onVueMounted(this);"}}},
-  unmounted: {{{addCode unmounted "this.$root.onVueUnmounted(this);"}}},
+  mounted: {{{addCode mounted "this._log_method('mounted', arguments); this.$root.onVueMounted(this); this.$emit = this._getNewEmit(this.$emit);"}}},
+  unmounted: {{{addCode unmounted "this._log_method('unmounted', arguments); this.$root.onVueUnmounted(this);"}}},
   methods: {
     {{#each methods}}
-    {{@key}}: {{{addLogMethod @key this}}},
+    {{@key}}: {{{addMethodCode @key this}}},
     {{/each}}
+    _getNewEmit: function (emit) {
+      return function (event, ...args) {
+        this._log_emit(event, args);
+        emit.call(this, event, ...args);
+      }
+    },
+
+    _log_emit: function(event, args) {
+      this.$data._.state.log('e', event, args);
+    },
+
     _log_method: function (methodName, args) {
+      if (!this.$data._.state.isTrackingMethods) return;
+
       if ([`processQueue`, `recalc`, `getFontSize`,
         `onMouseMove`, `onMouseUp`,
         `preventDefaults`,
@@ -33,18 +46,21 @@
         `getCssClass`, `getTabClass`, `getLayerClass`, `getLayerType`
         ].includes(methodName)) return;
       if ([`draw`].some(s => methodName.includes(s))) return;
-      const compName = `{{name}}`;
+
+      this.$data._.state.log('m', methodName);
+
       return;
+
       console.log(
-        `🧊 %c${compName} %c${methodName} %o`,
+        `🧊 %c{{name}} %c${methodName} %o`,
         'color: green;',
         'color: yellow;',
         args);
     },
-    _log_data: function (key, newValue, oldValue) {
+    _log_state: function (type, key, newValue, oldValue) {
       if ([`queue`, `width`, `height`, `generators`, `items`].includes(key)) return;
       if (!newValue && !oldValue) return;
-      this.$data._.state.log(key, newValue, oldValue);
+      this.$data._.state.log(type, key, newValue, oldValue);
       if (!oldValue)
       {
         if (false)
@@ -73,7 +89,7 @@
     {{#each data}}
     {{@key}}: {
       handler: function (newValue, oldValue) {
-        this._log_data(`{{@key}}`, newValue, oldValue);
+        this._log_state('d', `{{@key}}`, newValue, oldValue);
       },
       immediate: true,
     },
@@ -82,7 +98,7 @@
     {{#each props}}
     {{@key}}: {
       handler: function (newValue, oldValue) {
-        this._log_data(`{{@key}}`, newValue, oldValue);
+        this._log_state('p', `{{@key}}`, newValue, oldValue);
       },
       immediate: true,
     },

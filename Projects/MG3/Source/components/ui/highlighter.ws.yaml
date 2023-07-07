@@ -5,15 +5,21 @@ dom:
     on_mouseleave: onMouseLeave
     slot: null
 props:
-  getElement: null
+  getElements: null
 methods:
+  getElementsArray: | #js
+    function() {
+      const elements = this.getElements();
+      if (Array.isArray(elements)) return elements;
+      return [elements];
+    }
   onMouseEnter: | #js
     function() {
-      this.getElement().classList.add("highlighted");
+      this.getElementsArray().forEach(el => el.classList.add("highlighted"));
     }
   onMouseLeave: | #js
     function() {
-      this.getElement().classList.remove("highlighted");
+      this.getElementsArray().forEach(el => el.classList.remove("highlighted"));
     }
 name: ui-highlighter
 template: >-

@@ -1,40 +1,96 @@
 dom:
-  .grid:
-    div#1:
-      v-text: '''🧊'''
-    .comp-name:
-      v-text: item.compName
-    div#3:
-      v-text: item.key
-    .newValue:
-      v-text: valueToString(item.newValue)
+  div:
+    ui.context:
+      v-if: (item.type == 'm')
+      template#1:
+        v-slot: title
+        .flex:
+          ui.title:
+            icon: 🔴
+            ":text": item.key
+          ui.checkbox:
+            text: pause
+            v-model: stateTracker.methods.pause[item.key]
+      template#2:
+        v-slot: content
+        pre:
+          code:
+            v-html: getMethodBodyColored(item.compName, item.key)
+        ui.textarea:
+          ":value": getMethodBody(item.compName, item.key)
+    .grid:
+      ":class": item.type
+      div#1:
+        v-text: getIcon(item.type)
+      .comp-name:
+        v-text: item.compName
+      div#3:
+        v-text: item.key
+      .newValue:
+        ui.value.any:
+          ":value": item.newValue
 props:
   item: null
+  stateTracker: null
 methods:
-  valueToString: | #js
-    function(value) {
-      if (value == undefined) return "undefined";
-      if (value == null) return "null";
-      if (typeof value == "string") return `"${value.shorten(20)}"`;
-      if (typeof value == "number") return value.toString();
-      if (typeof value == "boolean") return value.toString();
-      if (typeof value == "function") return value.toString();
-      if (typeof value == "object") return JSON.stringify(value).shorten(20);
-      return value.toString();
+  getIcon: | #js
+    function(type) {
+      return {
+        'm': '🔴',
+        'e': '⚡',
+        'p': '🧊',
+        'd': '🧊',
+      }[type] || '❔';
+    }
+  getMethodBodyColored: | #js
+    function(compName, methodName) {
+      let methodBody = this.getMethodBody(compName, methodName);
+      methodBody = Prism.highlight(methodBody, Prism.languages.javascript, 'javascript');
+      return methodBody;
+    }
+  getMethodBody: | #js
+    function(compName, methodName) {
+      const comp = this.$root.getComponent(compName);
+      if (!comp) return null;
+      const methodBody = comp.source.methods[methodName] || comp.source[methodName];
+      if (!methodBody) return null;
+      return methodBody;
     }
 style:
   .grid:
-    grid-template: 1fr / 2em 1fr 1fr 1fr
+    grid-template: 1fr / 1.5em 1fr 1fr 2fr
+    gap: 1em
+    width: min-content;
+    text-wrap: nowrap;
   .comp-name:
     opacity: 0.5
   .newValue:
     color: cyan
   .oldValue:
     opacity: 0.5
+  .p:
+    filter: grayscale(1)
+    opacity: 0.5
+  .comp-ui-textarea:
+    width: 40em
+    height: 20em
+    font-size: 110%
 name: ide-state-tracker-item
 template: >-
-  <div class="comp-ide-state-tracker-item grid" path="841306122."><div
-  v-text="'🧊'" path="841306122.0"></div><div class="comp-name"
-  v-text="item.compName" path="841306122.1"></div><div v-text="item.key"
-  path="841306122.2"></div><div class="newValue"
-  v-text="valueToString(item.newValue)" path="841306122.3"></div></div>
+  <div class="comp-ide-state-tracker-item" path="841306122."><ui-context
+  v-if="(item.type == 'm')" path="841306122.0"><template v-slot:title
+  path="841306122.0.0"><div class="flex" path="841306122.0.0.0"><ui-title
+  icon="🔴" :text="item.key" path="841306122.0.0.0.0"></ui-title><ui-checkbox
+  v-model="stateTracker.methods.pause[item.key]"
+  path="841306122.0.0.0.1"></ui-checkbox></div></template><template
+  v-slot:content path="841306122.0.1"><pre path="841306122.0.1.0"><code
+  v-html="getMethodBodyColored(item.compName, item.key)"
+  path="841306122.0.1.0.0"></code></pre><ui-textarea
+  :value="getMethodBody(item.compName, item.key)"
+  path="841306122.0.1.1"></ui-textarea></template></ui-context><div class="grid"
+  :class="item.type" path="841306122.1"><div v-text="getIcon(item.type)"
+  path="841306122.1.0"></div><div class="comp-name" v-text="item.compName"
+  path="841306122.1.1"></div><div v-text="item.key"
+  path="841306122.1.2"></div><div class="newValue"
+  path="841306122.1.3"><ui-value-any :value="item.newValue"
+  path="841306122.1.3.0"></ui-value-any></div></div></div>

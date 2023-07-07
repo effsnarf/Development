@@ -7,8 +7,6 @@ dom:
       item-type: ide.component.view.node
       ':get-item': (node) => node
       ':get-children': (node) => $root.getViewChildNodes(node)
-      on_node-hover: onNodeHover
-      on_node-unhover: onNodeUnhover
 props:
   component: null
 data:
@@ -20,17 +18,7 @@ watch:
         this.dom = this.$root.addPaths(component.name, component.source.dom);
       }
     immediate: true
-methods:
-  onNodeHover: | #js
-    function(node) {
-      const els = this.$root.getElementsFromViewNode(node);
-      els.forEach(el => el.classList.add('focused'));
-    }
-  onNodeUnhover: | #js
-    function(node) {
-      const els = this.$root.getElementsFromViewNode(node);
-      els.forEach(el => el.classList.remove('focused'));
-    }
+methods: null
 style: null
 name: ide-component-view-editor
 template: >-
@@ -38,5 +26,4 @@ template: >-
   path="-1512907487."><ui-tree :root="[null, dom]" :initial-expanded="true"
   item-type="ide.component.view.node" :get-item="(node) =&gt; node"
   :get-children="(node) =&gt; $root.getViewChildNodes(node)"
-  @node-hover="onNodeHover" @node-unhover="onNodeUnhover"
   path="-1512907487.0"></ui-tree></div>

@@ -307,18 +307,17 @@ button /* .ide-button:hover */
   opacity: 1;
 }
 
-
-input, textarea, select, option, .ide-checkbox
+pre, input, textarea, select, option, .ide-checkbox
 {
-  width: 100%;
   padding: 0.5em 0.5em !important;
   background: linear-gradient(to left, #303030, #101010);
   box-shadow: inset -2px 2px 2px #000;
-  font-size: 120%;
+  text-shadow: -3px 3px 2px #000;
   font-family: monospace !important;
+  font-size: 110%;
   border: 1px solid gray;
+  width: 100%;
   color: #ffffff;
-  text-shadow: none;
 }
 input:focus, textarea:focus, select:focus
 {

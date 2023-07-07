@@ -1,24 +1,14 @@
 dom:
   div:
+    on_click: $emit('click')
     v-if: vue
     ui.highlighter:
-      ':get-element': () => vue.$el
+      ':get-elements': () => vue.$el
       div:
-        ui.context:
-          template#1:
-            v-slot: title
-            ui.title:
-              icon: 📦
-              ':value': vue.$options._componentTag
-          template#2:
-            v-slot: content
-            ide.component.info:
-              ':item': () => vue
-        div:
-          on_click: onClick
-          ui.title:
-            icon: 📦
-            ':value': vue.$options._componentTag
+        on_click: onClick
+        ui.title:
+          icon: 📦
+          ':value': vue.$options._componentTag
 props:
   item: null
 methods:
@@ -34,15 +24,8 @@ computed:
     }
 name: ide-component-title
 template: >-
-  <div class="comp-ide-component-title" v-if="vue"
-  path="259955427."><ui-highlighter :get-element="() =&gt; vue.$el"
-  path="259955427.0"><div path="259955427.0.0"><ui-context
-  path="259955427.0.0.0"><template v-slot:title
-  path="259955427.0.0.0.0"><ui-title icon="📦"
-  :value="vue.$options._componentTag"
-  path="259955427.0.0.0.0.0"></ui-title></template><template v-slot:content
-  path="259955427.0.0.0.1"><ide-component-info :item="() =&gt; vue"
-  path="259955427.0.0.0.1.0"></ide-component-info></template></ui-context><div
-  @click="onClick" path="259955427.0.0.1"><ui-title icon="📦"
-  :value="vue.$options._componentTag"
-  path="259955427.0.0.1.0"></ui-title></div></div></ui-highlighter></div>
+  <div class="comp-ide-component-title" @click="$emit('click')" v-if="vue"
+  path="259955427."><ui-highlighter :get-elements="() =&gt; vue.$el"
+  path="259955427.0"><div @click="onClick" path="259955427.0.0"><ui-title
+  icon="📦" :value="vue.$options._componentTag"
+  path="259955427.0.0.0"></ui-title></div></ui-highlighter></div>

@@ -121,13 +121,23 @@ interface MgParams {
         if (!vue) return null;
         return vue();
       },
-      getComponent(uid: number) {
-        const vue = this.getVue(uid);
-        if (!vue) return null;
-        const compName = vue.$data._.comp.name;
-        if (!compName) return null;
-        const comp = (this as any).compsDic[compName.hashCode()];
-        return comp;
+      getComponent(uidOrName: number | string) {
+        const uid = typeof uidOrName == "number" ? uidOrName : null;
+        let name = typeof uidOrName == "string" ? uidOrName : null;
+        if (name) name = name.replace(/-/g, ".");
+        if (!uid && !name) return null;
+        if (uid) {
+          const vue = this.getVue(uid);
+          if (!vue) return null;
+          const compName = vue.$data._.comp.name;
+          if (!compName) return null;
+          const comp = (this as any).compsDic[compName.hashCode()];
+          return comp;
+        }
+        if (name) {
+          const comp = (this as any).compsDic[name.hashCode()];
+          return comp;
+        }
       },
       isComponentName(name: string) {
         if (!name) return false;
@@ -138,6 +148,7 @@ interface MgParams {
         return document.querySelectorAll(`[path="${node[1].path}"]`);
       },
       getViewChildNodes(node: [string, any]) {
+        if (!node[1]) return [];
         if (typeof node[1] != "object") return [];
         let children = Object.entries(node[1]);
         children = children.filter((c) => !this.isAttributeName(c[0]));

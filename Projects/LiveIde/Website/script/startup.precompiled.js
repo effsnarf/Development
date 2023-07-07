@@ -163,9 +163,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "./script/1688728738421.ts":
+/***/ "./script/1688741597220.ts":
 /*!*********************************!*\
-  !*** ./script/1688728738421.ts ***!
+  !*** ./script/1688741597220.ts ***!
   \*********************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -290,15 +290,27 @@ const helpers = {
                     return null;
                 return vue();
             },
-            getComponent(uid) {
-                const vue = this.getVue(uid);
-                if (!vue)
+            getComponent(uidOrName) {
+                const uid = typeof uidOrName == "number" ? uidOrName : null;
+                let name = typeof uidOrName == "string" ? uidOrName : null;
+                if (name)
+                    name = name.replace(/-/g, ".");
+                if (!uid && !name)
                     return null;
-                const compName = vue.$data._.comp.name;
-                if (!compName)
-                    return null;
-                const comp = this.compsDic[compName.hashCode()];
-                return comp;
+                if (uid) {
+                    const vue = this.getVue(uid);
+                    if (!vue)
+                        return null;
+                    const compName = vue.$data._.comp.name;
+                    if (!compName)
+                        return null;
+                    const comp = this.compsDic[compName.hashCode()];
+                    return comp;
+                }
+                if (name) {
+                    const comp = this.compsDic[name.hashCode()];
+                    return comp;
+                }
             },
             isComponentName(name) {
                 if (!name)
@@ -310,6 +322,8 @@ const helpers = {
                 return document.querySelectorAll(`[path="${node[1].path}"]`);
             },
             getViewChildNodes(node) {
+                if (!node[1])
+                    return [];
                 if (typeof node[1] != "object")
                     return [];
                 let children = Object.entries(node[1]);
@@ -644,6 +658,7 @@ class ClientContext {
             "style",
             ...[1, 2, 3, 4, 5, 6].map((i) => `h${i}`),
             "pre",
+            "code",
             "p",
             "img",
             "table",
@@ -1063,25 +1078,38 @@ exports.Params = Params;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StateTracker = void 0;
 class StateTracker {
-    constructor(uid, client) {
+    constructor(uid, compName, client) {
         this.uid = uid;
+        this.compName = compName;
         this.client = client;
+        this.isTrackingMethods = false;
+        this.isPaused = false;
+        this.methods = {
+            pause: {},
+        };
         this.items = client.Vue.observable([]);
     }
-    static new(uid, client) {
-        const st = new StateTracker(uid, client);
+    static new(uid, compName, client) {
+        const st = new StateTracker(uid, compName, client);
         return st;
     }
-    log(key, newValue, oldValue) {
+    log(type, key, newValue, oldValue) {
+        if (this.isPaused)
+            return;
+        const isState = type == "p" || type == "d";
+        const isMethod = type == "m";
         // Create an initial empty item
-        if (!oldValue) {
+        if (isState && !oldValue) {
             const prevItemOfThisKey = [...this.items]
                 .reverse()
                 .find((item) => item.key == key);
             if (!prevItemOfThisKey) {
                 this.items.push({
                     id: StateTracker.nextID++,
+                    dt: Date.now(),
                     uid: this.uid,
+                    compName: this.compName,
+                    type: type,
                     key,
                     newValue: oldValue,
                     oldValue: oldValue,
@@ -1090,7 +1118,10 @@ class StateTracker {
         }
         const item = {
             id: StateTracker.nextID++,
+            dt: Date.now(),
             uid: this.uid,
+            compName: this.compName,
+            type: type,
             key,
             newValue,
             oldValue,
@@ -1108,6 +1139,11 @@ class StateTracker {
             this.items.shift();
     }
     isGroupable(newItem, prevItem) {
+        const timePassed = newItem.dt - prevItem.dt;
+        if (timePassed > 1000)
+            return false;
+        if (newItem.type != "p" && newItem.type != "d")
+            return false;
         if (!prevItem.newValue && !prevItem.oldValue)
             return false;
         if (newItem.key != prevItem.key)
@@ -1123,6 +1159,12 @@ class StateTracker {
             newItem.oldValue.slice(0, minLength))
             return false;
         return true;
+    }
+    pause() {
+        this.isPaused = true;
+    }
+    resume() {
+        this.isPaused = false;
     }
     clear() {
         this.items.clear();
@@ -2851,7 +2893,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("./script/1688728738421.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("./script/1688741597220.ts");
 /******/ 	
 /******/ })()
 ;

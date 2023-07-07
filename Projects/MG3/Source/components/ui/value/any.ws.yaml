@@ -1,0 +1,27 @@
+dom:
+  div:
+    ':class': getCssClass(value)
+    v-text: valueToString(value)
+props:
+  value: null
+methods:
+  getCssClass: | #js
+    function(value) {
+      if ([undefined, null].includes(value)) return "opacity-30";
+      return null;
+    }
+  valueToString: | #js
+    function(value) {
+      if (value == undefined) return "undefined";
+      if (value == null) return "null";
+      if (typeof value == "string") return `"${value.shorten(20)}"`;
+      if (typeof value == "number") return value.toString();
+      if (typeof value == "boolean") return value.toString();
+      if (typeof value == "function") return value.toString();
+      if (typeof value == "object") return JSON.stringify(value).shorten(20);
+      return value.toString();
+    }
+name: ui-value-any
+template: >-
+  <div class="comp-ui-value-any" :class="getCssClass(value)"
+  v-text="valueToString(value)" path="1299909909."></div>

@@ -1,6 +1,8 @@
 dom:
   div:
     v-if: item
+    ui.highlighter:
+      ':get-elements': () => $root.getElementsFromViewNode(item[1])
     ui.title:
       ':icon': icon
       ':text': item[0]
@@ -35,10 +37,12 @@ watch:
 name: ide-component-view-node
 template: >-
   <div class="comp-ide-component-view-node" v-if="item"
-  path="-971127114."><ui-title :icon="icon" :text="item[0]"
-  path="-971127114.0"></ui-title><ui-context path="-971127114.1"><template
-  v-slot:title path="-971127114.1.0"><ui-title :icon="icon" :text="item[0]"
-  path="-971127114.1.0.0"></ui-title></template><template v-slot:content
-  path="-971127114.1.1"><ide-component-view-attribute v-for="attr in
+  path="-971127114."><ui-highlighter :get-elements="() =&gt;
+  $root.getElementsFromViewNode(item[1])"
+  path="-971127114.0"></ui-highlighter><ui-title :icon="icon" :text="item[0]"
+  path="-971127114.1"></ui-title><ui-context path="-971127114.2"><template
+  v-slot:title path="-971127114.2.0"><ui-title :icon="icon" :text="item[0]"
+  path="-971127114.2.0.0"></ui-title></template><template v-slot:content
+  path="-971127114.2.1"><ide-component-view-attribute v-for="attr in
   Object.entries(item[1])" :item="attr"
-  path="-971127114.1.1.0"></ide-component-view-attribute></template></ui-context></div>
+  path="-971127114.2.1.0"></ide-component-view-attribute></template></ui-context></div>

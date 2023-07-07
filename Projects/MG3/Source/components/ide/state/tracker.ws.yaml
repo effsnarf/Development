@@ -1,39 +1,43 @@
 dom:
   div:
-    div:
-      button:
-        v-text: '''❌'''
-        on_click: clear
-    transition.group:
-      tag: ul
+    div#0:
+      ui.checkbox:
+        text: track methods
+        v-model: stateTracker.isTrackingMethods
+    ul:
       name: list
       li:
         v-for: item in stateTracker.items.take(20)
         class: hoverable
-        ':key': item.id
+        ":key": item.id
         on_click: () => onItemClick(item)
         on_mouseenter: () => onMouseEnter(item)
         on_mouseleave: () => onMouseLeave(item)
         ide.state.tracker.item:
-          ':item': item
+          ":state-tracker": stateTracker
+          ":item": item
+    div:
+      button:
+        v-text: "'❌'"
+        on_click: clear
 props:
   stateTracker: null
 methods:
   onItemClick: | #js
-    function(item) {
-      const vue = item.getVue();
-      vue.$el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      console.log(vue);
+    async function(item) {
+      console.log(item);
+      this.stateTracker.pause();
+      const vue = this.$root.getVue(this.stateTracker.uid);
+      vue[item.key] = item.newValue;
+      await this.$nextTick();
+      this.stateTracker.resume();
+      //vue.$el.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   onMouseEnter: | #js
     function(item) {
-      const vue = item.getVue();
-      vue.$el.classList.add('highlighted');
     }
   onMouseLeave: | #js
     function(item) {
-      const vue = item.getVue();
-      vue.$el.classList.remove('highlighted');
     }
   clear: | #js
     function() {
@@ -46,11 +50,14 @@ style:
 name: ide-state-tracker
 template: >-
   <div class="comp-ide-state-tracker" path="-483235177."><div
-  path="-483235177.0"><button v-text="'❌'" @click="clear"
-  path="-483235177.0.0"></button></div><transition-group tag="ul" name="list"
+  path="-483235177.0"><ui-checkbox text="Track methods"
+  v-model="stateTracker.isTrackingMethods"
+  path="-483235177.0.0"></ui-checkbox></div><ul name="list"
   path="-483235177.1"><li class="hoverable" v-for="item in
   stateTracker.items.take(20)" :key="item.id" @click="() =&gt;
   onItemClick(item)" @mouseenter="() =&gt; onMouseEnter(item)" @mouseleave="()
   =&gt; onMouseLeave(item)" path="-483235177.1.0"><ide-state-tracker-item
-  :item="item"
-  path="-483235177.1.0.0"></ide-state-tracker-item></li></transition-group></div>
+  :state-tracker="stateTracker" :item="item"
+  path="-483235177.1.0.0"></ide-state-tracker-item></li></ul><div
+  path="-483235177.2"><button v-text="'❌'" @click="clear"
+  path="-483235177.2.0"></button></div></div>
