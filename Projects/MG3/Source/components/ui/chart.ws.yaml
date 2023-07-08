@@ -21,8 +21,8 @@ dom:
           class: ml-l1
           ':width': canvasWidth
           ':height': (canvasWidth / 2)
-          on_mousemove: onMouseMove
-          on_mouseout: onMouseOut
+          @mousemove: onMouseMove
+          @mouseout: onMouseOut
     .flex.flex-column.justify-center.items-center:
       .title:
         .icon:

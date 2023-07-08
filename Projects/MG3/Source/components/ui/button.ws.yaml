@@ -4,7 +4,7 @@ dom:
     button:
       v-if: '!isLoading'
       v-text: text
-      on_click: onClick
+      @click: onClick
     ui.loading:
       v-if: isLoading
 props:

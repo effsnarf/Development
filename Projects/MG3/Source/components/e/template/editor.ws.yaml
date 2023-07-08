@@ -13,26 +13,26 @@ dom:
               v-model: layer.visible
             e.template.layer.icon:
               ':layer': layer
-              on_click: selectLayer(index)
+              @click: selectLayer(index)
       .div2:
         ui.movable:
           v-model: temp.layers[1].trans
           ui.file.dropzone:
-            on_file-drop: (files) => onFileDrop(files)
+            @file-drop: (files) => onFileDrop(files)
             .layers:
               component#2:
                 v-for: layer in temp.layers
                 ':class': getLayerClass(layer)
                 ':is': getLayerType(layer)
                 ':item': layer
-                on_image-load: (src) => onLayerImageLoad(layer, src)
+                @image-load: (src) => onLayerImageLoad(layer, src)
         transition:
           name: slide
           component#1:
             ref: selectedLayerEditor1
             ':is': selectedLayerEditorType
             ':item': selectedLayer
-            on_toggle-disabled: toggleDisabled($event)
+            @toggle-disabled: toggleDisabled($event)
         e.template.layer.filters:
           ':imageID': selectedLayer.imageID
           v-model: selectedLayer.filters

@@ -2,7 +2,7 @@ dom:
   a:
     class: clickable2
     ':href': url
-    on_click: onClick
+    @click: onClick
     div:
       v-if: text
       v-text: text

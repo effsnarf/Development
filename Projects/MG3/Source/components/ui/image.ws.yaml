@@ -8,8 +8,8 @@ dom:
       ':class': getCssClass()
       ':style': imgStyle
       ':src': src1
-      on_load: onLoad
-    on_click: $emit('click')
+      @load: onLoad
+    @click: $emit('click')
 props:
   imageID: null
   url: null

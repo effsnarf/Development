@@ -5,14 +5,14 @@ dom:
     tooltip: Anonymous
     ':src': >-
       'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Anonymous_emblem.svg/1200px-Anonymous_emblem.svg.png'
-    on_click: $emit('click',)
+    @click: $emit('click',)
   ui.image:
     v-else-if: generator
     ':tooltip': showTooltip && generator.displayName
     ':imageID': generator.imageID
     ':key': generator.generatorID
     ':square': 'true'
-    on_click: $emit('click', generator)
+    @click: $emit('click', generator)
 props:
   value: null
   showTooltip: true

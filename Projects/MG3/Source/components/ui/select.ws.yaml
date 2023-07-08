@@ -7,7 +7,7 @@ dom:
       template:
         div:
           v-text: getItemText(slotProps.item)
-      on_input: onInput($event)
+      @input: onInput($event)
 props:
   options: null
   value: null

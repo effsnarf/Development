@@ -4,7 +4,7 @@ dom:
       ':imageID': value
       ':square': true
     ui.file.dropzone:
-      on_file-drop: onFileDrop
+      @file-drop: onFileDrop
       .dropzone:
         .flex:
           class: justify-center

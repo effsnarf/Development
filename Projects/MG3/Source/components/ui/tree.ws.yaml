@@ -9,9 +9,9 @@ dom:
         ':get-item': getItem || ((node) => node.item)
         ':get-children': getChildren || ((node) => node.children||[])
         ':selected-node': selectedNode
-        on_node-click: onChildClick
-        on_node-hover: onChildHover
-        on_node-unhover: onChildUnhover
+        @node-click: onChildClick
+        @node-hover: onChildHover
+        @node-unhover: onChildUnhover
 props:
   root: null
   initialExpanded: false

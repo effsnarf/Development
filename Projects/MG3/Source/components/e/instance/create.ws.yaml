@@ -5,7 +5,7 @@ dom:
       e.generator.select:
         v-show: '!generator && showGeneratorSelect'
         v-model: generator || tempInstance.generator
-        on_input: showGeneratorSelect = false
+        @input: showGeneratorSelect = false
     .container:
       ':class': layout
       div:
@@ -17,23 +17,23 @@ dom:
             ':item': tempInstance
             ':key': tempInstance.generator?.generatorID
             ':show-create-post': 'false'
-            on_click: showGeneratorSelect = !showGeneratorSelect
+            @click: showGeneratorSelect = !showGeneratorSelect
       .inputs:
         input#1:
           v-model: tempInstance.text0
           placeholder: top text
-          on_focus: onFocus
+          @focus: onFocus
         input#2:
           v-model: tempInstance.text1
           placeholder: bottom text
-          on_focus: onFocus
+          @focus: onFocus
         transition:
           name: slide
           ui.button:
             v-if: showCreateButton && hasText
             text: create
             ':is-loading': isCreating
-            on_click: create
+            @click: create
 props:
   value: null
   generator: null

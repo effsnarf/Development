@@ -1,6 +1,6 @@
 dom:
   .icon:
-    on_click: $emit('click')
+    @click: $emit('click')
     div:
       v-if: hasImage
       ui.image:

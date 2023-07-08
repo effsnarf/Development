@@ -2,8 +2,8 @@ dom:
   div:
     ui.textarea:
       v-model: yaml
-      on_focus: isFocused = true
-      on_blur: isFocused = false
+      @focus: isFocused = true
+      @blur: isFocused = false
     .error:
       v-if: error
       v-text: error

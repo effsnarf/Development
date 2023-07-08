@@ -9,17 +9,17 @@ dom:
       li:
         v-for: item in stateTracker.items.take(20)
         class: hoverable
-        ":key": item.id
-        on_click: () => onItemClick(item)
-        on_mouseenter: () => onMouseEnter(item)
-        on_mouseleave: () => onMouseLeave(item)
+        ':key': item.id
+        @click: () => onItemClick(item)
+        @mouseenter: () => onMouseEnter(item)
+        @mouseleave: () => onMouseLeave(item)
         ide.state.tracker.item:
-          ":state-tracker": stateTracker
-          ":item": item
+          ':state-tracker': stateTracker
+          ':item': item
     div:
       button:
-        v-text: "'❌'"
-        on_click: clear
+        v-text: '''❌'''
+        @click: clear
 props:
   stateTracker: null
 methods:
@@ -50,7 +50,7 @@ style:
 name: ide-state-tracker
 template: >-
   <div class="comp-ide-state-tracker" path="-483235177."><div
-  path="-483235177.0"><ui-checkbox text="Track methods"
+  path="-483235177.0"><ui-checkbox text="track methods"
   v-model="stateTracker.isTrackingMethods"
   path="-483235177.0.0"></ui-checkbox></div><ul name="list"
   path="-483235177.1"><li class="hoverable" v-for="item in

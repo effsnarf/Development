@@ -12,11 +12,11 @@ dom:
         e.post:
           v-if: post
           ':item': post
-          on_refresh-thread: refresh
+          @refresh-thread: refresh
         e.post.create:
           v-else-if: '!post'
           ':threadID': thread?._id
-          on_created: refresh
+          @created: refresh
 props:
   value: null
 data:

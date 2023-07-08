@@ -9,9 +9,9 @@ dom:
         v-if: itemType
         ':is': getItemType()
         ':item': getItem(node)
-      on_click: onNodeClick
-      on_mouseenter: onMouseEnter
-      on_mouseleave: onMouseLeave
+      @click: onNodeClick
+      @mouseenter: onMouseEnter
+      @mouseleave: onMouseLeave
       slot: null
     ul:
       class: ml-3
@@ -25,9 +25,9 @@ dom:
           ':get-item': getItem
           ':get-children': getChildren
           ':selected-node': selectedNode
-          on_node-click: onChildClick
-          on_node-hover: onChildHover
-          on_node-unhover: onChildUnhover
+          @node-click: onChildClick
+          @node-hover: onChildHover
+          @node-unhover: onChildUnhover
 props:
   node: null
   initialExpanded: false

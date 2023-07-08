@@ -106,15 +106,22 @@ interface MgParams {
       params: params,
       url: helpers.url,
       comps: client.Vue.ref(client.comps),
-      compsDic: client.comps.toMap((c: Component) => c.name.hashCode()),
-      compNames: client.comps.map((c: Component) => c.name),
+      compsDic: {},
+      compNames: [],
       templates: client.templates,
       isLoading: false,
       error: null,
       key1: 1,
     },
-    async mounted() {},
+    async mounted() {
+      await this.init();
+    },
     methods: {
+      async init() {
+        const self = this as any;
+        self.compsDic = client.comps.toMap((c: Component) => c.name.hashCode());
+        self.compNames = client.comps.map((c: Component) => c.name);
+      },
       getVue(uid: number) {
         if (!uid) return null;
         const vue = (this as any).vues[uid];
@@ -195,6 +202,11 @@ interface MgParams {
         await client.compileApp();
         this.refresh();
       },
+      async reloadComponentsFromServer() {
+        await client.reloadComponentsFromServer();
+        await this.init();
+        await this.refreshComponents();
+      },
       async getMoreInstances(pageIndex: number) {
         const self = this as any;
         return await self.dbp.instances.select.popular(
@@ -223,6 +235,10 @@ interface MgParams {
         }
         //(this as any).key1++;
         window.scrollTo({ top: 0, behavior: "smooth" });
+      },
+      async refreshComponents() {
+        const self = this as any;
+        self.key1++;
       },
       instanceToGenerator(instance: any) {
         let gen = JSON.parse(JSON.stringify(instance));

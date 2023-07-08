@@ -5,6 +5,10 @@ dom:
       ui.title:
         icon: 🎄
         ':value': $root.vuesCount.toLocaleString()
+      ui.button:
+        icon: ♻
+        text: refresh
+        @click: $root.reloadComponentsFromServer()
     div:
       ide.component.style:
         v-for: comp in comps
@@ -37,6 +41,8 @@ template: >-
   <div class="comp-ide-workspace workspace" path="-1163457967."><h3
   path="-1163457967.0"><ui-title icon="🎄"
   :value="$root.vuesCount.toLocaleString()"
-  path="-1163457967.0.0"></ui-title></h3><div
+  path="-1163457967.0.0"></ui-title><ui-button icon="♻" text="refresh"
+  @click="$root.reloadComponentsFromServer()"
+  path="-1163457967.0.1"></ui-button></h3><div
   path="-1163457967.1"><ide-component-style v-for="comp in comps"
   :component="comp" path="-1163457967.1.0"></ide-component-style></div></div>

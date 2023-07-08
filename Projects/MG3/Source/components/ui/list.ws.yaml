@@ -10,7 +10,7 @@ dom:
       slot:
         ':index': index
         ':item': item
-      on_click: () => onItemClick({ item, index })
+      @click: () => onItemClick({ item, index })
 props:
   items: null
   selectedIndex: null

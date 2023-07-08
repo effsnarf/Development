@@ -163,9 +163,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "./script/1688741597220.ts":
+/***/ "./script/1688801179619.ts":
 /*!*********************************!*\
-  !*** ./script/1688741597220.ts ***!
+  !*** ./script/1688801179619.ts ***!
   \*********************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -271,17 +271,26 @@ const helpers = {
             params: params,
             url: helpers.url,
             comps: client.Vue.ref(client.comps),
-            compsDic: client.comps.toMap((c) => c.name.hashCode()),
-            compNames: client.comps.map((c) => c.name),
+            compsDic: {},
+            compNames: [],
             templates: client.templates,
             isLoading: false,
             error: null,
             key1: 1,
         },
         mounted() {
-            return __awaiter(this, void 0, void 0, function* () { });
+            return __awaiter(this, void 0, void 0, function* () {
+                yield this.init();
+            });
         },
         methods: {
+            init() {
+                return __awaiter(this, void 0, void 0, function* () {
+                    const self = this;
+                    self.compsDic = client.comps.toMap((c) => c.name.hashCode());
+                    self.compNames = client.comps.map((c) => c.name);
+                });
+            },
             getVue(uid) {
                 if (!uid)
                     return null;
@@ -379,6 +388,13 @@ const helpers = {
                     this.refresh();
                 });
             },
+            reloadComponentsFromServer() {
+                return __awaiter(this, void 0, void 0, function* () {
+                    yield client.reloadComponentsFromServer();
+                    yield this.init();
+                    yield this.refreshComponents();
+                });
+            },
             getMoreInstances(pageIndex) {
                 return __awaiter(this, void 0, void 0, function* () {
                     const self = this;
@@ -407,6 +423,12 @@ const helpers = {
                     }
                     //(this as any).key1++;
                     window.scrollTo({ top: 0, behavior: "smooth" });
+                });
+            },
+            refreshComponents() {
+                return __awaiter(this, void 0, void 0, function* () {
+                    const self = this;
+                    self.key1++;
                 });
             },
             instanceToGenerator(instance) {
@@ -640,6 +662,12 @@ class ClientContext {
         return __awaiter(this, void 0, void 0, function* () {
             const isIdeComponent = (c) => ["ui", "ide"].some((p) => c.name.startsWith(`${p}.`));
             yield this.compileAll((c) => !isIdeComponent(c));
+        });
+    }
+    reloadComponentsFromServer() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.componentManager.reloadComponentsFromServer();
+            yield this.compileAll((c) => !["app"].includes(c.name));
         });
     }
     isAttributeName(componentNames, name) {
@@ -929,6 +957,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ComponentManager = void 0;
+__webpack_require__(/*! ../../../Shared/Extensions */ "../../../Shared/Extensions.ts");
 const Lock_1 = __webpack_require__(/*! ../../../Shared/Lock */ "../../../Shared/Lock.ts");
 const DataWatcher_1 = __webpack_require__(/*! ../../../Shared/DataWatcher */ "../../../Shared/DataWatcher.ts");
 const Component_1 = __webpack_require__(/*! ./Component */ "../classes/Component.ts");
@@ -964,7 +993,11 @@ class ComponentManager {
     }
     init() {
         return __awaiter(this, void 0, void 0, function* () {
-            if (false) {}
+            if (window.location.hostname == "localhost") {
+                const newComps = (yield (yield fetch("/components")).json()).map((c) => new Component_1.Component(c));
+                this.comps.clear();
+                this.comps.add(newComps);
+            }
             else {
                 this.comps = window.components.map((c) => new Component_1.Component(c));
             }
@@ -997,6 +1030,11 @@ class ComponentManager {
                 modifiedAt: Date.now(),
                 item: newComp,
             });
+        });
+    }
+    reloadComponentsFromServer() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.init();
         });
     }
 }
@@ -2405,8 +2443,10 @@ if (typeof Array !== "undefined") {
         this.splice(index, 0, item);
     };
     Array.prototype.clear = function (stagger) {
-        if (!stagger)
-            stagger = 0;
+        if (!stagger) {
+            this.splice(0, this.length);
+            return;
+        }
         const removeOne = () => {
             if (this.length > 0) {
                 this.pop();
@@ -2420,6 +2460,10 @@ if (typeof Array !== "undefined") {
             if (!Array.isArray(items))
                 items = [items];
             items = [...items];
+            if (!stagger) {
+                this.push(...items);
+                return;
+            }
             const addOne = () => __awaiter(this, void 0, void 0, function* () {
                 if (items.length > 0) {
                     this.push(items.shift());
@@ -2893,7 +2937,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("./script/1688741597220.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("./script/1688801179619.ts");
 /******/ 	
 /******/ })()
 ;

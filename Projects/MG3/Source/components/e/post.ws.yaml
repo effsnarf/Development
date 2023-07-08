@@ -5,7 +5,7 @@ dom:
       v-if: item.instance
       e.instance:
         ':item': item.instance
-      on_click: onInstanceClick
+      @click: onInstanceClick
     .post-text:
       e.generator.square:
         class: larping-generator
@@ -16,7 +16,7 @@ dom:
       class: clear-both
     e.post.menu:
       ':item': item
-      on_refresh-thread: $emit('refresh-thread')
+      @refresh-thread: $emit('refresh-thread')
 props:
   item: null
 data:

@@ -9,7 +9,7 @@ dom:
       ':img-style': getStyle(i)
       ':imageID': imageID
       ':square': true
-      on_click: onClick(i)
+      @click: onClick(i)
 props:
   imageID: null
   filter: null

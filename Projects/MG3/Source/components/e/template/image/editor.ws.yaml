@@ -10,7 +10,7 @@ dom:
     ui.image.select:
       ref: imageSelect1
       v-model: item.imageID
-      on_uploading: onImageUploading
+      @uploading: onImageUploading
     transition#2:
       name: slide2
       .message:

@@ -8,9 +8,9 @@ dom:
       tr:
         class: hoverable
         v-for: change in changes
-        on_mouseenter: onItemHover(change)
-        on_mouseleave: onItemUnhover(change)
-        on_click: onItemClick(change)
+        @mouseenter: onItemHover(change)
+        @mouseleave: onItemUnhover(change)
+        @click: onItemClick(change)
         td#1:
           class: opacity-50
           v-text: change.id
@@ -22,7 +22,7 @@ dom:
         td#5:
           class: clickable
           v-text: '''📌'''
-          on_click: onClickHideField(change)
+          @click: onClickHideField(change)
         td#4:
           v-text: '''🧊'''
         td#6:

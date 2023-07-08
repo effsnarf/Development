@@ -1,8 +1,8 @@
 dom:
   .card:
-    on_mouseenter: onMouseEnter
-    on_mouseleave: onMouseLeave
-    on_mousemove: onMouseMove
+    @mouseenter: onMouseEnter
+    @mouseleave: onMouseLeave
+    @mousemove: onMouseMove
     ref: card
     slot: null
     div:

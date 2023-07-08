@@ -121,6 +121,11 @@ class ClientContext {
     await this.compileAll((c: Component) => !isIdeComponent(c));
   }
 
+  async reloadComponentsFromServer() {
+    await this.componentManager.reloadComponentsFromServer();
+    await this.compileAll((c: Component) => !["app"].includes(c.name));
+  }
+
   isAttributeName(componentNames: string[], name: string) {
     if (name.includes(".")) return false;
     if (name.startsWith(":")) return true;

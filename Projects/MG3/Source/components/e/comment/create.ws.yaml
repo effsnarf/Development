@@ -9,7 +9,7 @@ dom:
     ui.textarea:
       hint: what's on your mind?
       ':value': value
-      on_input: $emit('input', $event)
+      @input: $emit('input', $event)
 props:
   value: null
 style:

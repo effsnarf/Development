@@ -1,6 +1,6 @@
 dom:
   ui.infinite.scroll:
-    on_scroll: loadMore
+    @scroll: loadMore
     transition.group:
       tag: ul
       name: list

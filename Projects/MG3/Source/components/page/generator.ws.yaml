@@ -33,7 +33,7 @@ dom:
       e.instance.create:
         v-if: showCreateInstance
         ':generator': generator
-        on_instance-created: onInstanceCreated
+        @instance-created: onInstanceCreated
 data:
   urlName: null
   generator: null

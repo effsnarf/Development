@@ -1,3 +1,4 @@
+import "../../../Shared/Extensions";
 import { Lock } from "../../../Shared/Lock";
 import { DataWatcher } from "../../../Shared/DataWatcher";
 import { Component } from "./Component";
@@ -31,10 +32,12 @@ class ComponentManager {
   }
 
   async init() {
-    if (false && window.location.hostname == "localhost") {
-      this.comps = (await (await fetch("/components")).json()).map(
+    if (window.location.hostname == "localhost") {
+      const newComps = (await (await fetch("/components")).json()).map(
         (c: any) => new Component(c)
       ) as Component[];
+      this.comps.clear();
+      this.comps.add(newComps);
     } else {
       this.comps = (window as any).components.map(
         (c: any) => new Component(c)
@@ -83,6 +86,10 @@ class ComponentManager {
       modifiedAt: Date.now(),
       item: newComp,
     });
+  }
+
+  async reloadComponentsFromServer() {
+    await this.init();
   }
 }
 

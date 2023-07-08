@@ -2,8 +2,8 @@ dom:
   div:
     ui.mouse#1:
       ':global': true
-      on_move: mousePos = $event
-      on_right-click: e => onRightClick(e, true)
+      @move: mousePos = $event
+      @right-click: e => onRightClick(e, true)
     .context-menu:
       v-if: isVisible
       ref: menu1
@@ -11,8 +11,8 @@ dom:
       ':style': style
       h2:
         ui.mouse:
-          on_drag: onDrag
-          on_right-click: onRightClick
+          @drag: onDrag
+          @right-click: onRightClick
         slot:
           name: title
       div:

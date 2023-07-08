@@ -157,6 +157,8 @@ const _fetchAsJson = async (url: string) => {
   };
 
   const postProcessYaml = (yaml: string) => {
+    // Replace on_ with @
+    yaml = yaml.replace(/\bon_/g, "@");
     // Add "# js" after method keys (  onLayerImageLoad: |)
     // Regex is two whitespaces, then a key, then a colon, then a space, then a pipe
     yaml = yaml.replace(/  (\w+): \|/g, "  $1: | #js");
@@ -214,7 +216,7 @@ const _fetchAsJson = async (url: string) => {
         const comp = data;
         const compPath = path.join(componentsFolder, comp.path);
         const existingComp = Objects.parseYaml(
-          fs.readFileSync(compPath, "utf8")
+          preProcessYaml(fs.readFileSync(compPath, "utf8"))
         );
         if (!("editable" in existingComp) || existingComp.editable) {
           let yaml = Objects.yamlify(comp.source);

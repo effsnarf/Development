@@ -3,7 +3,7 @@ dom:
     ':type': type
     ':placeholder': hint
     ':value': value
-    on_input: onInput
+    @input: onInput
 props:
   type: text
   value: null

@@ -5,7 +5,7 @@ dom:
     ':imageID': item.imageID
     ':remove-background': item.removeBackground
     ':square': true
-    on_load: onImageLoad
+    @load: onImageLoad
 props:
   item: null
 methods:

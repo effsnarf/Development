@@ -5,7 +5,7 @@ dom:
     ':min': min
     ':max': max
     ':step': step
-    on_input: $emit('input', parseFloat($event.target.value))
+    @input: $emit('input', parseFloat($event.target.value))
 props:
   value: null
   min: null

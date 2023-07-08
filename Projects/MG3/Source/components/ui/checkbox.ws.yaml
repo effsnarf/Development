@@ -4,11 +4,11 @@ dom:
     input:
       type: checkbox
       ':checked': value
-      on_change: $emit('input', !value)
+      @change: $emit('input', !value)
     span:
       class: clickable
       v-text: text
-      on_click: $emit('input', !value)
+      @click: $emit('input', !value)
 props:
   value: null
   text: null

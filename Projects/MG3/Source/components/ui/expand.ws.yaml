@@ -1,7 +1,7 @@
 dom:
   .flex:
     class: hoverable
-    on_click: $emit('input', !value)
+    @click: $emit('input', !value)
     .icon:
       v-text: icon
     label:

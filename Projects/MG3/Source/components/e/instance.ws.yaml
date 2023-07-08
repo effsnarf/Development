@@ -7,7 +7,7 @@ dom:
         ui.image:
           ref: image1
           ':imageID': item.imageID || item.generator?.imageID
-          on_change: updateImageSize
+          @change: updateImageSize
         .texts:
           .text:
             v-for: (text, index) in [item.text0, item.text1]
@@ -15,7 +15,7 @@ dom:
             ':style': '{ fontSize: fontSizes[index] }'
         div:
           class: spacer
-    on_click: $emit('click')
+    @click: $emit('click')
     e.post.create:
       v-if: showCreatePost
       ':generator': $root.instanceToGenerator(item)

@@ -7,7 +7,7 @@ dom:
         .flex:
           ui.title:
             icon: 🔴
-            ":text": item.key
+            ':text': item.key
           ui.checkbox:
             text: pause
             v-model: stateTracker.methods.pause[item.key]
@@ -17,9 +17,12 @@ dom:
           code:
             v-html: getMethodBodyColored(item.compName, item.key)
         ui.textarea:
-          ":value": getMethodBody(item.compName, item.key)
+          ':value': getMethodBody(item.compName, item.key)
     .grid:
-      ":class": item.type
+      ':class': item.type
+      ui.checkbox:
+        text: pause
+        v-model: stateTracker.methods.pause[item.key]
       div#1:
         v-text: getIcon(item.type)
       .comp-name:
@@ -28,7 +31,7 @@ dom:
         v-text: item.key
       .newValue:
         ui.value.any:
-          ":value": item.newValue
+          ':value': item.newValue
 props:
   item: null
   stateTracker: null
@@ -58,7 +61,7 @@ methods:
     }
 style:
   .grid:
-    grid-template: 1fr / 1.5em 1fr 1fr 2fr
+    grid-template: 1fr / 2em 1.5em 1fr 1fr 2fr
     gap: 1em
     width: min-content;
     text-wrap: nowrap;
@@ -81,16 +84,18 @@ template: >-
   v-if="(item.type == 'm')" path="841306122.0"><template v-slot:title
   path="841306122.0.0"><div class="flex" path="841306122.0.0.0"><ui-title
   icon="🔴" :text="item.key" path="841306122.0.0.0.0"></ui-title><ui-checkbox
-  v-model="stateTracker.methods.pause[item.key]"
+  text="pause" v-model="stateTracker.methods.pause[item.key]"
   path="841306122.0.0.0.1"></ui-checkbox></div></template><template
   v-slot:content path="841306122.0.1"><pre path="841306122.0.1.0"><code
   v-html="getMethodBodyColored(item.compName, item.key)"
   path="841306122.0.1.0.0"></code></pre><ui-textarea
   :value="getMethodBody(item.compName, item.key)"
   path="841306122.0.1.1"></ui-textarea></template></ui-context><div class="grid"
-  :class="item.type" path="841306122.1"><div v-text="getIcon(item.type)"
-  path="841306122.1.0"></div><div class="comp-name" v-text="item.compName"
-  path="841306122.1.1"></div><div v-text="item.key"
-  path="841306122.1.2"></div><div class="newValue"
-  path="841306122.1.3"><ui-value-any :value="item.newValue"
-  path="841306122.1.3.0"></ui-value-any></div></div></div>
+  :class="item.type" path="841306122.1"><ui-checkbox text="pause"
+  v-model="stateTracker.methods.pause[item.key]"
+  path="841306122.1.0"></ui-checkbox><div v-text="getIcon(item.type)"
+  path="841306122.1.1"></div><div class="comp-name" v-text="item.compName"
+  path="841306122.1.2"></div><div v-text="item.key"
+  path="841306122.1.3"></div><div class="newValue"
+  path="841306122.1.4"><ui-value-any :value="item.newValue"
+  path="841306122.1.4.0"></ui-value-any></div></div></div>

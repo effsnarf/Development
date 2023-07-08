@@ -2,10 +2,10 @@ dom:
   textarea:
     ':value': value
     ':placeholder': hint
-    on_input: onInput
-    on_focus: $emit('focus')
-    on_blur: $emit('blur')
-    on_keydown: onKeyDown
+    @input: onInput
+    @focus: $emit('focus')
+    @blur: $emit('blur')
+    @keydown: onKeyDown
 props:
   value: null
   hint: null

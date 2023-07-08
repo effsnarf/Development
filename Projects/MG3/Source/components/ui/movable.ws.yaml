@@ -1,9 +1,9 @@
 dom:
   .movable:
-    on_mousedown: onMouseDown
-    on_mousemove: onMouseMove
-    on_mouseup: onMouseUp
-    on_mouseout: onMouseUp
+    @mousedown: onMouseDown
+    @mousemove: onMouseMove
+    @mouseup: onMouseUp
+    @mouseout: onMouseUp
     slot: null
 mounted: | #js
   function() {

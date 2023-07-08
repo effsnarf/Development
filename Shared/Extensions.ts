@@ -317,7 +317,7 @@ interface Array<T> {
   removeAt(index: number): void;
   insertAt(index: number, item: T, appendToEnd: boolean): void;
   clear(stagger?: number): void;
-  add(items: any[], stagger: number): void;
+  add(items: any[], stagger?: number): void;
   take(count: number): T[];
   replace(
     getNewItems: () => Promise<any[]>,
@@ -1253,7 +1253,10 @@ if (typeof Array !== "undefined") {
   };
 
   Array.prototype.clear = function (stagger?: number) {
-    if (!stagger) stagger = 0;
+    if (!stagger) {
+      this.splice(0, this.length);
+      return;
+    }
     const removeOne = () => {
       if (this.length > 0) {
         this.pop();
@@ -1266,6 +1269,10 @@ if (typeof Array !== "undefined") {
   Array.prototype.add = async function (items: any[], stagger: number = 0) {
     if (!Array.isArray(items)) items = [items];
     items = [...items];
+    if (!stagger) {
+      this.push(...items);
+      return;
+    }
     const addOne = async () => {
       if (items.length > 0) {
         this.push(items.shift());

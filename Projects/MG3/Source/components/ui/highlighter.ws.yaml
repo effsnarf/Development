@@ -1,8 +1,8 @@
 dom:
   div:
     class: hoverable
-    on_mouseenter: onMouseEnter
-    on_mouseleave: onMouseLeave
+    @mouseenter: onMouseEnter
+    @mouseleave: onMouseLeave
     slot: null
 props:
   getElements: null

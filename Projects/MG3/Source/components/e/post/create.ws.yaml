@@ -10,7 +10,7 @@ dom:
           ':show-create-button': 'false'
           v-model: tempInstance
           ':generator': generator
-          on_has-content: hasInstanceContent = $event
+          @has-content: hasInstanceContent = $event
     transition#2:
       name: slide
       div:
@@ -20,7 +20,7 @@ dom:
         e.generator.select:
           v-model: larpGenerator
           ':allow-anonymous': 'true'
-          on_input: showLarpGeneratorSelect = false;
+          @input: showLarpGeneratorSelect = false;
     transition#3:
       name: slide
       div:

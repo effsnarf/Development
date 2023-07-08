@@ -1,9 +1,9 @@
 dom:
   div:
     ui.keyboard:
-      on_ctrl: onCtrlKey
+      @ctrl: onCtrlKey
     ui.mouse:
-      on_hovered-element: onHoveredElement
+      @hovered-element: onHoveredElement
       ':global': true
     ui.context:
       ref: context1
@@ -22,7 +22,7 @@ dom:
               v-for: uid in parentChain
               ':item': $root.vues[uid]
               ':class': '{ ''selected'': uid === selectedVueUID }'
-              on_click: selectComponent(uid)
+              @click: selectComponent(uid)
           ide.component.editor:
             ':vue-uid': selectedVueUID||hoveredVueUID
 props: null

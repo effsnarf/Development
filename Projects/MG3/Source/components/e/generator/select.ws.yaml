@@ -6,7 +6,7 @@ dom:
         ':value': generator
         ':key': generator?.generatorID
         ':show-anonymous': 'true'
-        on_click: () => onClick(generator)
+        @click: () => onClick(generator)
 props:
   allowAnonymous: false
 data:
