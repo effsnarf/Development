@@ -18,15 +18,18 @@ dom:
         ui.file.dropzone:
           @file-drop: (files) => onFileDrop(files)
           .layers:
-            component#2:
+            transition:
+              name: fade
               v-for: layer in temp.layers
-              ':class': getLayerClass(layer)
-              ':style': getLayerStyle(layer)
-              ':is': getLayerType(layer)
-              ':item': layer
-              @image-load: (src) => onLayerImageLoad(layer, src)
-              @drag-by: ({ dx, dy }) => onLayerDragBy(layer, dx, dy)
-              @scale-by: (ds) => onLayerScaleBy(layer, ds)
+              component#2:
+                v-show: layer.visible
+                ':class': getLayerClass(layer)
+                ':style': getLayerStyle(layer)
+                ':is': getLayerType(layer)
+                ':item': layer
+                @image-load: (src) => onLayerImageLoad(layer, src)
+                @drag-by: ({ dx, dy }) => onLayerDragBy(layer, dx, dy)
+                @scale-by: (ds) => onLayerScaleBy(layer, ds)
         ui.section#1:
           :title: "selectedLayer.type"
           v-model: showFilters
@@ -89,6 +92,27 @@ methods:
       this.temp.layers.add({
         "type": "image",
         "visible": true,
+        "imageID": 679668901,
+        "removeBackground": true,
+        "trans": {
+            "pos": {
+                "x": 0.5,
+                "y": 0.5
+            },
+            "scale": 0.9
+        },
+        shadow: {
+          x: -0.1,
+          y: 0.1,
+          blur: 0.01,
+          color: '#000000',
+          opacity: 1
+        },
+        filters: {...filters}
+      });
+      this.temp.layers.add({
+        "type": "image",
+        "visible": true,
         "imageID": 679668891,
         "removeBackground": true,
         "trans": {
@@ -143,14 +167,15 @@ methods:
       {
         // Select the image layer
         this.selectedLayerIndex = this.temp.layers.findIndex(layer => layer.type == 'image');
-        // Drop the files
-        await this.$nextTick();
-        this.$refs.selectedLayerEditor1.onFileDrop(files);
       }
-      if (this.imageLayers.length > 1)
+      else if (this.selectedLayer.type != 'image')
       {
         alertify.error("There is more than one image layer.<br />Please select the image layer first.").delay(10);
+        return;
       }
+      // Drop the files
+      await this.$nextTick();
+      this.$refs.selectedLayerEditor1.onFileDrop(files);
     }
   onLayerChange: | #js
     function(layer) {
@@ -184,7 +209,6 @@ methods:
       return {
         'layer': true,
         'selected': (layer === this.selectedLayer),
-        'hidden': !layer.visible
       };
     }
   toggleDisabled: | #js
@@ -220,12 +244,17 @@ style:
   .tabs:
     display: flex
     flex-direction: column-reverse
-    align-items: end;
-    justify-content: start;
+    align-items: end
+    justify-content: start
   .tabs input[type="checkbox"]:
     position: relative
     top: 0.1em
     transform: scale(0.7)
+  .tabs li:
+    transition: 0.3s;  
+  .tabs li.selected:
+    transform: scale(1.5);
+    margin: 1em;
   .layers:
     aspect-ratio: 1 / 1
     overflow: hidden

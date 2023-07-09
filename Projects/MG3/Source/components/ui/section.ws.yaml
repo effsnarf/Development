@@ -7,7 +7,7 @@ dom:
     transition:
       name: slide2
       div:
-        v-if: "(opposite ^ value)"
+        v-show: "(opposite ^ value)"
         slot:
 
 props:

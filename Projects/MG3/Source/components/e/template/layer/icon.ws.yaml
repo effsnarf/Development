@@ -17,7 +17,7 @@ methods:
     function(type) {
       return {
         'image': '🖼️',
-        'captions': '📝',
+        'captions': '✏️',
         'rainbow': '🌈'
       }[type];
     }
