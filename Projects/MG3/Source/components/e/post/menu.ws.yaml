@@ -2,16 +2,15 @@ dom:
   div:
     .center:
       ui.time:
-        ':value': item.created
+        ":value": item.created
     .post-menu:
       ui.button:
         text: ❌
-        ':click': onDelete
+        ":click": onDelete
 props:
   item: null
 methods:
   onDelete: | #js
-
     function () {
       this.$root.dbp.posts.delete.one(this.item._id);
       this.$emit("refresh-thread");

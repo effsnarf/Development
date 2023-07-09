@@ -31,12 +31,16 @@ class ComponentManager {
     return manager;
   }
 
-  async init() {
+  async init(options: any = {}) {
+    const url = options.onlyChanged ? "/changed/components" : "/components";
     if (window.location.hostname == "localhost") {
-      const newComps = (await (await fetch("/components")).json()).map(
+      const newComps = (await (await fetch(url)).json()).map(
         (c: any) => new Component(c)
       ) as Component[];
-      this.comps.clear();
+      for (const newComp of newComps) {
+        const index = this.comps.findIndex((c) => c.name == newComp.name);
+        if (index != -1) this.comps.removeAt(index);
+      }
       this.comps.add(newComps);
     } else {
       this.comps = (window as any).components.map(
@@ -89,7 +93,7 @@ class ComponentManager {
   }
 
   async reloadComponentsFromServer() {
-    await this.init();
+    await this.init({ onlyChanged: true });
   }
 }
 

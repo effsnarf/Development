@@ -242,6 +242,8 @@ interface String {
   is(type: any): boolean;
   isColorCode(): boolean;
 
+  isLowerCase(): boolean;
+
   pad(align: "left" | "right", fillString: string): string;
 
   nextChar(): string;
@@ -278,6 +280,7 @@ interface String {
   decodeHtml(): string;
   getMatches(regex: RegExp): string[];
   getWords(): string[];
+  getCaseWords(): string[];
   toCamelCase(): string;
   toTitleCase(): string;
   parseJSON(): any;
@@ -643,6 +646,10 @@ if (typeof String !== "undefined") {
     return this.startsWith("\x1b[");
   };
 
+  String.prototype.isLowerCase = function (): boolean {
+    return this.toLowerCase() === this.toString();
+  };
+
   String.prototype.pad = function (
     align: "left" | "right",
     fillString: string
@@ -937,6 +944,11 @@ if (typeof String !== "undefined") {
   String.prototype.getWords = function (): string[] {
     // Get the words using a regex
     return this.match(/\w+/g) || [];
+  };
+
+  String.prototype.getCaseWords = function (): string[] {
+    // Split "titleCaseString" into "title case string"
+    return this.replace(/([A-Z])/g, " $1").split(" ");
   };
 
   String.prototype.toCamelCase = function (): string {
@@ -1404,13 +1416,9 @@ if (typeof Array !== "undefined") {
 
   Array.prototype.sortBy = function (...projects: ((item: any) => any)[]) {
     return this.sort((a, b) => {
-      for (const project of [...projects].reverse()) {
-        const aVal = project(a);
-        const bVal = project(b);
-        if (aVal > bVal) return 1;
-        if (aVal < bVal) return -1;
-      }
-      return 0;
+      const aVal = projects.map((project) => project(a)).join("/");
+      const bVal = projects.map((project) => project(b)).join("/");
+      return aVal.localeCompare(bVal);
     });
   };
 

@@ -39,7 +39,19 @@ const _fetchAsJson = async (url: string) => {
 
   const componentsFolder = path.join(config.project.folder, "Components");
 
+  const compInfos = new Map<string, any>();
+  const compIsModified = (comp: any) => {
+    const info = compInfos.get(comp.name);
+    if (!info) return true;
+    const lastModified = fs.statSync(
+      path.join(componentsFolder, comp.path)
+    ).mtimeMs;
+    return lastModified > info.last.served;
+  };
+
   const getComponents = async () => {
+    const now = Date.now();
+
     const comps = Files.getFiles(componentsFolder, {
       recursive: true,
     })
@@ -57,9 +69,28 @@ const _fetchAsJson = async (url: string) => {
           }
         }
 
+        if (!compInfos.has(comp.name)) {
+          compInfos.set(comp.name, {
+            last: {
+              served: now,
+            },
+          });
+        }
+
         return comp;
       });
     return comps;
+  };
+
+  const getChangedComponents = async () => {
+    const now = Date.now();
+    const comps = await getComponents();
+    const changedComps = comps.filter(compIsModified);
+    changedComps.forEach((c) => {
+      const info = compInfos.get(c.name);
+      info.last.served = now;
+    });
+    return changedComps;
   };
 
   const getTemplates = async () => {
@@ -197,6 +228,10 @@ const _fetchAsJson = async (url: string) => {
 
       if (req.url == "/components") {
         const comps = await getComponents();
+        return res.end(JSON.stringify(comps));
+      }
+      if (req.url == "/changed/components") {
+        const comps = await getChangedComponents();
         return res.end(JSON.stringify(comps));
       }
       if (req.url == "/component/update") {

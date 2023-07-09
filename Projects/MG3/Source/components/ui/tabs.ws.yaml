@@ -1,24 +1,26 @@
 dom:
   div:
     ui.select:
-      ':options': options.map(option => getOptionText(option))
-      ':getUrl': getUrl
+      ":options": options.map(option => getOptionText(option))
+      ":getUrl": getUrl
+      :direction: direction
       v-model: selectedTabIndex
     div:
-      .flex:
-        ':class': direction
+      div:
         v-for: (option, index) in options
-        div:
-          v-show: (index == selectedTabIndex)
-          slot:
-            ':name': '''tab'' + index'
+        transition:
+          name: slide2
+          div:
+            v-show: (index == selectedTabIndex)
+            slot:
+              ":name": "'tab' + index"
 props:
   options: null
   getText: null
   getUrl: null
   direction: vertical
 data:
-  selectedTabIndex: m
+  selectedTabIndex: 0
 watch:
   selectedTabIndex: | #js
     {
@@ -34,10 +36,9 @@ methods:
       return option;
     }
 style:
-  .horizontal:
-    flex-direction: row
-  .vertical:
-    flex-direction: column
+  .comp-ui-select:
+    border-bottom: "1px solid #000000"
+    margin-bottom: 1em
 name: ui-tabs
 template: >-
   <div class="comp-ui-tabs" path="-484156776."><ui-select

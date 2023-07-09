@@ -1,52 +1,63 @@
 dom:
   div:
-    div#0:
-      ui.checkbox:
-        text: track methods
-        v-model: stateTracker.isTrackingMethods
-    ul:
-      name: list
-      li:
-        v-for: item in stateTracker.items.take(20)
-        class: hoverable
-        ':key': item.id
-        @click: () => onItemClick(item)
-        @mouseenter: () => onMouseEnter(item)
-        @mouseleave: () => onMouseLeave(item)
-        ide.state.tracker.item:
-          ':state-tracker': stateTracker
-          ':item': item
-    div:
-      button:
-        v-text: '''❌'''
-        @click: clear
+    .flex.items-baseline:
+      div#2:
+        h3:
+          ui.title:
+            text: Changes
+        ul#2:
+          class: changes
+          li:
+            v-for: change in $root.state.getRefChanges(uid)?.take(20)
+            class: hoverable
+            ':key': item.id
+            @mouseenter: () => onMouseEnter(item)
+            @mouseleave: () => onMouseLeave(item)
+            ide.state.tracker.item:
+              :uid: uid
+              :item: change
+              :key: item.id
+      div#1:
+        h3:
+          ui.title:
+            text: State
+        ul#1:
+          li:
+            v-for: field in $root.vm.getFields(uid)
+            ide.state.tracker.item:
+              :uid: uid
+              :item: field
+              :key: "uid+'.'+field.key"
+      div#3:
 props:
-  stateTracker: null
+  uid: null
+data:
+  key1: 1
+mounted: | #js
+  async function() {
+  }
 methods:
-  onItemClick: | #js
-    async function(item) {
-      console.log(item);
-      this.stateTracker.pause();
-      const vue = this.$root.getVue(this.stateTracker.uid);
-      vue[item.key] = item.newValue;
-      await this.$nextTick();
-      this.stateTracker.resume();
-      //vue.$el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
   onMouseEnter: | #js
     function(item) {
+      this.$root.state.apply(this.uid, item);
     }
   onMouseLeave: | #js
     function(item) {
     }
-  clear: | #js
-    function() {
-      this.stateTracker.clear();
-    }
 style:
+  .comp-ui-title:
+    border-radius: 0
+    border-bottom: "1px solid #000"
+  .flex:
+    gap: 1em
   ul:
     display: flex
     flex-direction: column-reverse
+  ul:not(.changes) .grid:
+    opacity: 0.5
+  li:hover:
+    background: "#ffffff30"
+    transition: 0s
 name: ide-state-tracker
 template: >-
   <div class="comp-ide-state-tracker" path="-483235177."><div

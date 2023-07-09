@@ -1,0 +1,13 @@
+dom:
+  ui.title:
+    :icon: getIcon(value)
+    ":text": (value)
+
+props:
+  value:
+
+methods:
+  getIcon: | #js
+    function(value) {
+      return value ? "✔️" : "❌";
+    }

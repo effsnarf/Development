@@ -10,12 +10,13 @@ dom:
       content.stream:
         ref: stream1
         item-type: e.instance
-        ':get-more-items': getMoreInstances
+        ":get-more-items": getMoreInstances
         grid-class: grid-1
     template:
       v-slot: right
       div:
-        e.post.create: null
+        e.post.create:
+          ref: PostCreate1
 data:
   generators: []
   uniqueID: 1
@@ -32,16 +33,14 @@ mounted: | #js
   }
 methods:
   init: | #js
-
     async function() {
       if (this.$root.params.page == "home")
       {
         this.$root.setDocumentTitle(null);
-        this.$refs.stream1.reset();
+        this.$refs.stream1?.reset();
       }
     }
   getMoreInstances: | #js
-
     async function(pageIndex) {
       const items = await this.$root.dbp.instances.sample.popular(null, 15);
       return items;

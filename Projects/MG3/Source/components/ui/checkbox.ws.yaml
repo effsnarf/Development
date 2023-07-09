@@ -1,19 +1,53 @@
 dom:
   .flex:
-    class: hoverable
+    :class: getCssClass()
     input:
       type: checkbox
-      ':checked': value
-      @change: $emit('input', !value)
+      ':checked': checkedValue
+      @change: onInput(!checkedValue)
     span:
       class: clickable
       v-text: text
-      @click: $emit('input', !value)
+      @click: onInput(!checkedValue)
 props:
   value: null
+  valueArray: null
+  valueKey: null
   text: null
+  size: large
+methods:
+  getCssClass: | #js
+    function() {
+      return `hoverable ${this.size}`;
+    }
+  onInput: | #js
+    function(value) {
+      if (this.valueArray && this.valueKey) {
+        this.toggleArrayValue(this.valueArray, this.valueKey);
+      } else {
+        this.$emit("input", value);
+      }
+    }
+  toggleArrayValue: | #js
+    function(array, value) {
+      if (array.includes(value)) {
+        array.splice(array.indexOf(value), 1);
+      } else {
+        array.push(value);
+      }
+    }
 watch: null
+computed:
+  checkedValue: | #js
+    function() {
+      if (this.valueArray && this.valueKey)
+        return this.valueArray.includes(this.valueKey);
+      return this.value;
+    }
 style:
+  .normal input[type=checkbox]:
+    width: 1em
+    height: 1em
   span:
     flex-grow: 1
     font-size: 120%

@@ -163,9 +163,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "./script/1688801179619.ts":
+/***/ "./script/1688898150323.ts":
 /*!*********************************!*\
-  !*** ./script/1688801179619.ts ***!
+  !*** ./script/1688898150323.ts ***!
   \*********************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -190,10 +190,10 @@ const AnalyticsTracker_1 = __webpack_require__(/*! ../../classes/AnalyticsTracke
 const ClientContext_1 = __webpack_require__(/*! ../../classes/ClientContext */ "../classes/ClientContext.ts");
 const Params_1 = __webpack_require__(/*! ../../classes/Params */ "../classes/Params.ts");
 const DbpClient_1 = __webpack_require__(/*! ../../../../Apps/DatabaseProxy/Client/DbpClient */ "../../../Apps/DatabaseProxy/Client/DbpClient.ts");
+const VueManager_1 = __webpack_require__(/*! ../../classes/VueManager */ "../classes/VueManager.ts");
 const add_paths_1 = __importDefault(__webpack_require__(/*! ../../../../Shared/WebScript/add.paths */ "../../../Shared/WebScript/add.paths.ts"));
 // To make it accessible to client code
 const win = window;
-win.StateTracker = StateTracker_1.StateTracker;
 win.Objects = Extensions_Objects_Client_1.Objects;
 const htmlEncode = (s) => {
     if (!s)
@@ -259,12 +259,11 @@ const helpers = {
         return (yield Params_1.Params.new(() => ideVueApp, client.config.params, window.location.pathname));
     });
     const params = yield getNewParams();
+    const vueManager = yield VueManager_1.VueManager.new(client);
     ideVueApp = new client.Vue({
-        el: "#app",
         data: {
-            vues: {},
-            vuesCount: 0,
-            ideWatches: {},
+            state: null,
+            vm: vueManager,
             client,
             dbp,
             analytics: yield AnalyticsTracker_1.AnalyticsTracker.new(),
@@ -291,14 +290,6 @@ const helpers = {
                     self.compNames = client.comps.map((c) => c.name);
                 });
             },
-            getVue(uid) {
-                if (!uid)
-                    return null;
-                const vue = this.vues[uid];
-                if (!vue)
-                    return null;
-                return vue();
-            },
             getComponent(uidOrName) {
                 const uid = typeof uidOrName == "number" ? uidOrName : null;
                 let name = typeof uidOrName == "string" ? uidOrName : null;
@@ -307,7 +298,7 @@ const helpers = {
                 if (!uid && !name)
                     return null;
                 if (uid) {
-                    const vue = this.getVue(uid);
+                    const vue = vueManager.getVue(uid);
                     if (!vue)
                         return null;
                     const compName = vue.$data._.comp.name;
@@ -429,6 +420,8 @@ const helpers = {
                 return __awaiter(this, void 0, void 0, function* () {
                     const self = this;
                     self.key1++;
+                    yield self.$nextTick();
+                    yield self.state.restoreState();
                 });
             },
             instanceToGenerator(instance) {
@@ -465,23 +458,60 @@ const helpers = {
                 }
                 return style;
             },
-            onVueMounted(vue) {
-                const self = this;
-                const uid = vue._uid;
-                self.vues[uid] = () => vue;
-                self.vuesCount++;
-            },
-            onVueUnMounted(vue) {
-                const self = this;
-                const uid = vue._uid;
-                delete self.vues[uid];
-                self.vuesCount--;
-            },
             isDevEnv() {
                 return window.location.hostname == "localhost";
             },
+            visualizedYaml(obj) {
+                let yaml = window.jsyaml.dump(obj);
+                yaml = yaml.replace(/: true$/gm, ": ✔️");
+                yaml = yaml.replace(/: false$/gm, ": ❌");
+                // Replace colors with colored squares:
+                // '#ff0000\n' -> '🟥' (<span class="color"></span>)
+                // Works with 3, 6 and 8 digit hex colors
+                yaml = yaml.replace(/'#\w{3,8}\b'/g, (match) => {
+                    let color = match.slice(1); // Remove the '#' symbol
+                    color = color.substring(0, color.length - 1);
+                    return `<span class="color" style="background-color:${color}"></span>`;
+                });
+                // Replace "null" and "undefined" with <span class="opacity-50">null/undefined</span>
+                yaml = yaml.replace(/\b(null|undefined)\b/g, (match) => {
+                    return `<span class="opacity-30">${match}</span>`;
+                });
+                // Replace numbers (: [number]) with <span class="green">[number]</span>
+                yaml = yaml.replace(/: (\d+)/g, (match, p1) => {
+                    return `: <span class="green">${p1}</span>`;
+                });
+                // Replace strings (: [string]) with <span class="yellow">[string]</span>
+                yaml = yaml.replace(/: (\w.*)/g, (match, p1) => {
+                    return `: <span class="yellow">${p1}</span>`;
+                });
+                // Replace keys ([key]: ) with <span class="opacity-50">[key]: </span>
+                yaml = yaml.replace(/^(\s*)(\w+):/gm, (match, p1, p2) => {
+                    return `${p1}<span class="opacity-50">${p2}:</span>`;
+                });
+                return yaml;
+            },
+            getIcon(item) {
+                const stateItemIcons = {
+                    // method
+                    m: "🔴",
+                    // event
+                    e: "⚡",
+                    // prop
+                    p: "🔒",
+                    // data
+                    d: "🧊",
+                    // computed
+                    c: "✨",
+                };
+                if (item.type)
+                    return stateItemIcons[item.type] || "❔";
+                return "❔";
+            },
         },
     });
+    ideVueApp.state = yield StateTracker_1.StateTracker.new(() => ideVueApp, vueManager, client);
+    ideVueApp.$mount("#app");
     window.addEventListener("popstate", function (event) {
         return __awaiter(this, void 0, void 0, function* () {
             yield ideVueApp.refresh();
@@ -706,6 +736,7 @@ class ClientContext {
             "textarea",
             "component",
             "transition",
+            "keep.alive",
         ].includes(name))
             return false;
         if (name.startsWith("."))
@@ -727,6 +758,7 @@ class ClientContext {
         return __awaiter(this, void 0, void 0, function* () {
             if (!isDevEnv)
                 return;
+            return;
             const url = `/component/update`;
             yield fetch(url, { method: "post", body: JSON.stringify(comp) });
         });
@@ -892,11 +924,14 @@ class Component {
         this.name = obj.name;
         this.path = obj.path;
         this.source = obj.source;
+        this.isCompiled = false;
         if (this.source)
             this.source.name = this.name.replace(/\./g, "-");
     }
     compile() {
         return __awaiter(this, void 0, void 0, function* () {
+            if (this.isCompiled)
+                return;
             const client = yield ClientContext_1.ClientContext.get();
             console.groupCollapsed(this.name);
             console.log(this);
@@ -922,6 +957,7 @@ class Component {
                     }
                 }
                 client.Vue.component(vueName, vueOptions);
+                this.isCompiled = true;
             }
             catch (ex) {
                 debugger;
@@ -991,11 +1027,16 @@ class ComponentManager {
             return manager;
         });
     }
-    init() {
+    init(options = {}) {
         return __awaiter(this, void 0, void 0, function* () {
+            const url = options.onlyChanged ? "/changed/components" : "/components";
             if (window.location.hostname == "localhost") {
-                const newComps = (yield (yield fetch("/components")).json()).map((c) => new Component_1.Component(c));
-                this.comps.clear();
+                const newComps = (yield (yield fetch(url)).json()).map((c) => new Component_1.Component(c));
+                for (const newComp of newComps) {
+                    const index = this.comps.findIndex((c) => c.name == newComp.name);
+                    if (index != -1)
+                        this.comps.removeAt(index);
+                }
                 this.comps.add(newComps);
             }
             else {
@@ -1034,7 +1075,7 @@ class ComponentManager {
     }
     reloadComponentsFromServer() {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.init();
+            yield this.init({ onlyChanged: true });
         });
     }
 }
@@ -1110,71 +1151,128 @@ exports.Params = Params;
 /*!**********************************!*\
   !*** ../classes/StateTracker.ts ***!
   \**********************************/
-/***/ ((__unused_webpack_module, exports) => {
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StateTracker = void 0;
+__webpack_require__(/*! ../../../Shared/Extensions */ "../../../Shared/Extensions.ts");
+const VueHelper_1 = __webpack_require__(/*! ./VueHelper */ "../classes/VueHelper.ts");
 class StateTracker {
-    constructor(uid, compName, client) {
-        this.uid = uid;
-        this.compName = compName;
+    constructor(getApp, vm, client) {
+        this.getApp = getApp;
+        this.vm = vm;
         this.client = client;
-        this.isTrackingMethods = false;
-        this.isPaused = false;
+        this.isPaused = 0;
+        this.refChanges = new Map();
         this.methods = {
             pause: {},
         };
-        this.items = client.Vue.observable([]);
     }
-    static new(uid, compName, client) {
-        const st = new StateTracker(uid, compName, client);
+    static new(app, vueManager, client) {
+        const st = new StateTracker(app, vueManager, client);
         return st;
     }
-    log(type, key, newValue, oldValue) {
+    track(vue, type, key, newValue, oldValue) {
         if (this.isPaused)
             return;
-        const isState = type == "p" || type == "d";
-        const isMethod = type == "m";
-        // Create an initial empty item
-        if (isState && !oldValue) {
-            const prevItemOfThisKey = [...this.items]
-                .reverse()
-                .find((item) => item.key == key);
-            if (!prevItemOfThisKey) {
-                this.items.push({
-                    id: StateTracker.nextID++,
-                    dt: Date.now(),
-                    uid: this.uid,
-                    compName: this.compName,
-                    type: type,
-                    key,
-                    newValue: oldValue,
-                    oldValue: oldValue,
-                });
-            }
-        }
+        const comp = this.getApp().getComponent(vue._uid);
+        if (!comp)
+            return;
+        //if (!comp.source.config?.track?.state) return;
         const item = {
-            id: StateTracker.nextID++,
+            id: StateTracker._nextID++,
             dt: Date.now(),
-            uid: this.uid,
-            compName: this.compName,
-            type: type,
+            uid: vue._uid,
+            type,
             key,
             newValue,
             oldValue,
         };
-        // Group typing changes into one item
-        if (this.items.length) {
-            const lastItem = this.items.last();
-            if (this.isGroupable(item, lastItem)) {
-                item.oldValue = lastItem.oldValue;
-                this.items.pop();
+        this.addItem(item);
+    }
+    apply(uid, change) {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.pause();
+            const vue = this.vm.getVue(uid);
+            vue[change.key] = change.newValue;
+            yield vue.$nextTick();
+            this.resume();
+        });
+    }
+    // Sometimes when refreshing keys in the app, the vue components are recreated
+    // and lose their state.
+    // This method restores the state from the state tracker.
+    restoreState() {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.pause();
+            const refKeys = this.vm.getRefKeys();
+            const vuesByRef = VueHelper_1.VueHelper.getVuesByRef(this.getApp());
+            for (const refKey of refKeys) {
+                const vues = vuesByRef.get(refKey) || [];
+                console.group(refKey);
+                const vueChanges = this.getRefChanges(refKey);
+                // For all vues that have this ref
+                for (const vue of vues) {
+                    // Find the last change for each key
+                    const lastChanges = vueChanges.reduce((acc, cur) => {
+                        acc[cur.key] = cur;
+                        return acc;
+                    }, {});
+                    // Apply the last change for each key
+                    for (const key in lastChanges) {
+                        const change = lastChanges[key];
+                        if (change.type != "d")
+                            continue;
+                        console.log(key, change.newValue);
+                        vue.$set(vue, key, change.newValue);
+                    }
+                }
+                console.groupEnd();
+            }
+            this.vm.updateDataVariableUIDs(this.getApp());
+            yield this.getApp().$nextTick();
+            this.resume();
+        });
+    }
+    addItem(item) {
+        const isState = item.type == "p" || item.type == "d";
+        const isMethod = item.type == "m";
+        const vueItems = this.getRefChanges(item.uid);
+        // Create an initial empty item
+        if (isState && item.newValue && !item.oldValue) {
+            const prevItemOfThisKey = [...vueItems]
+                .reverse()
+                .find((existingItem) => existingItem.key == item.key);
+            if (!prevItemOfThisKey) {
+                const emptyItem = JSON.parse(JSON.stringify(item));
+                emptyItem.id = StateTracker._nextID++;
+                emptyItem.dt = Date.now();
+                emptyItem.newValue = emptyItem.oldValue;
+                this.addItem(emptyItem);
             }
         }
-        this.items.push(item);
-        if (this.items.length > StateTracker.maxItems)
-            this.items.shift();
+        // Group typing changes into one item
+        if (vueItems.length) {
+            const lastItem = vueItems.last();
+            if (this.isGroupable(item, lastItem)) {
+                item.oldValue = lastItem.oldValue;
+                vueItems.pop();
+            }
+        }
+        this.getRefChanges(item.uid).push(item);
+        if (vueItems.length > StateTracker._maxItems)
+            vueItems.shift();
+        this.getApp().$emit("state-changed", item);
     }
     isGroupable(newItem, prevItem) {
         const timePassed = newItem.dt - prevItem.dt;
@@ -1192,25 +1290,219 @@ class StateTracker {
             return false;
         if (Math.abs(newItem.newValue.length - newItem.oldValue.length) != 1)
             return false;
-        const minLength = Math.min(newItem.newValue.length, newItem.oldValue.length);
-        if (newItem.newValue.slice(0, minLength) !=
-            newItem.oldValue.slice(0, minLength))
-            return false;
         return true;
     }
+    getRefChanges(refKeyOrUID) {
+        const refKey = typeof refKeyOrUID == "string"
+            ? refKeyOrUID
+            : this.vm.getRefKey(refKeyOrUID);
+        if (!refKey)
+            return [];
+        if (!this.refChanges.has(refKey)) {
+            this.refChanges.set(refKey, []);
+            console.log("new ref", refKey);
+        }
+        return this.refChanges.get(refKey);
+    }
     pause() {
-        this.isPaused = true;
+        this.isPaused++;
     }
     resume() {
-        this.isPaused = false;
+        this.isPaused--;
     }
     clear() {
-        this.items.clear();
+        this.refChanges.clear();
     }
 }
 exports.StateTracker = StateTracker;
-StateTracker.nextID = 1;
-StateTracker.maxItems = 100;
+StateTracker._nextID = 1;
+StateTracker._maxItems = 100;
+
+
+/***/ }),
+
+/***/ "../classes/VueHelper.ts":
+/*!*******************************!*\
+  !*** ../classes/VueHelper.ts ***!
+  \*******************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.VueHelper = void 0;
+class VueHelper {
+    static getVuesByRef(rootVue) {
+        const map = new Map();
+        VueHelper.traverseVue(rootVue, (vue) => {
+            var _a;
+            for (const refKey in vue.$refs) {
+                if (!map.has(refKey)) {
+                    map.set(refKey, []);
+                }
+                (_a = map.get(refKey)) === null || _a === void 0 ? void 0 : _a.push(vue.$refs[refKey]);
+            }
+        });
+        return map;
+    }
+    static traverseVue(vue, callback) {
+        callback(vue);
+        if (vue.$children) {
+            vue.$children.forEach((c) => VueHelper.traverseVue(c, callback));
+        }
+    }
+    static getVuePath(vue) {
+        const path = [];
+        let currentVue = vue;
+        while (currentVue) {
+            const index = VueHelper.getVueChildIndex(currentVue);
+            path.push(index);
+            currentVue = currentVue.$parent;
+        }
+        return path.reverse();
+    }
+    static getVueChildIndex(vue) {
+        const parent = vue.$parent;
+        if (!parent)
+            return null;
+        const index = parent.$children.findIndex((c) => c._uid == vue._uid);
+        return index;
+    }
+}
+exports.VueHelper = VueHelper;
+
+
+/***/ }),
+
+/***/ "../classes/VueManager.ts":
+/*!********************************!*\
+  !*** ../classes/VueManager.ts ***!
+  \********************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.VueManager = void 0;
+__webpack_require__(/*! ../../../Shared/Extensions */ "../../../Shared/Extensions.ts");
+const TwoWayMap_1 = __webpack_require__(/*! ../../../Shared/TwoWayMap */ "../../../Shared/TwoWayMap.ts");
+const VueHelper_1 = __webpack_require__(/*! ./VueHelper */ "../classes/VueHelper.ts");
+class VueManager {
+    constructor(client) {
+        this.client = client;
+        this.vues = {};
+        this.vuesCount = 0;
+        // Tracking by uid or vue tree path are unreliable because vue recreates components
+        // We use $refs to track components
+        // Any ref that starts with a capital letter is a global reference
+        this.vueRefsToUIDs = new TwoWayMap_1.TwoWayMap();
+    }
+    static new(client) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const vm = new VueManager(client);
+            return vm;
+        });
+    }
+    /** Since vue UIDs might have changed, if anyone keeps a "..UID" reference
+     *  (hoveredVueUID, selectedVueUID, etc) we update them.
+     */
+    updateDataVariableUIDs(vue) {
+        VueHelper_1.VueHelper.traverseVue(vue, (vue) => {
+            const keys = Object.keys(vue.$data).filter((k) => k.endsWith("UID"));
+            for (const key of keys) {
+                let uid = vue.$data[key];
+                uid = this.toRecentVueUID(uid);
+                vue.$data[key] = uid;
+            }
+            const arrayKeys = Object.keys(vue.$data).filter((k) => k.endsWith("UIDs"));
+            for (const key of arrayKeys) {
+                let uids = vue.$data[key];
+                uids = uids.map((uid) => this.toRecentVueUID(uid));
+                vue.$data[key].clear();
+                vue.$data[key].push(...uids);
+            }
+        });
+    }
+    getVue(uid) {
+        if (uid == null || uid == undefined)
+            return null;
+        uid = this.toRecentVueUID(uid);
+        const vue = this.vues[uid];
+        if (!vue)
+            return null;
+        return vue();
+    }
+    // Vues are recreated occasionally
+    // Because we're tracking refs, in some cases we can map from the old vue to the new vue
+    toRecentVueUID(uid) {
+        const refKey = this.getRefKey(uid);
+        if (!refKey)
+            return uid;
+        const newUIDs = this.vueRefsToUIDs.get(refKey);
+        return newUIDs.last();
+    }
+    getComputedKeys(uid) {
+        const vue = this.getVue(uid);
+        if (!vue)
+            return [];
+        let keys = Object.keys(vue._computedWatchers || vue.$options._computedWatchers || {});
+        keys = keys.filter((k) => !k.startsWith("$"));
+        keys = keys.sortBy((k) => k);
+        return keys;
+    }
+    getFields(uid) {
+        const vue = this.getVue(uid);
+        if (!vue)
+            return [];
+        let fields = [];
+        fields.push(...Object.keys(vue.$data || {}).map((k) => {
+            return { type: "d", key: k, newValue: vue.$data[k] };
+        }));
+        fields.push(...Object.keys(vue.$props || {}).map((k) => {
+            return { type: "p", key: k, newValue: vue.$props[k] };
+        }));
+        fields.push(...this.getComputedKeys(uid).map((k) => {
+            return { type: "c", key: k, newValue: vue[k] };
+        }));
+        fields = fields.filter((f) => !f.key.startsWith("_"));
+        fields = fields.sortBy((f) => f.type, (f) => f.key);
+        return fields;
+    }
+    getRefKey(uid) {
+        return this.vueRefsToUIDs.getReverse(uid)[0];
+    }
+    getRefKeys() {
+        return this.vueRefsToUIDs.keys();
+    }
+    onVueMounted(vue) {
+        this.vues[vue._uid] = () => vue;
+        this.vuesCount++;
+        const compName = vue.$data._.comp.name;
+        //if (["e.", "ui."].some((prefix) => compName.startsWith(prefix))) return;
+        for (const refKey of Object.keys(vue.$refs)) {
+            if (refKey[0].isLowerCase())
+                continue;
+            this.vueRefsToUIDs.set(refKey, vue.$refs[refKey]._uid);
+        }
+    }
+    onVueUnmounted(vue) {
+        delete this.vues[vue._uid];
+        this.vuesCount--;
+        for (const refKey of Object.keys(vue.$refs)) {
+            if (refKey[0].isLowerCase())
+                continue;
+            this.vueRefsToUIDs.delete(refKey);
+        }
+    }
+}
+exports.VueManager = VueManager;
 
 
 /***/ }),
@@ -1916,6 +2208,9 @@ if (typeof String !== "undefined") {
     String.prototype.isColorCode = function () {
         return this.startsWith("\x1b[");
     };
+    String.prototype.isLowerCase = function () {
+        return this.toLowerCase() === this.toString();
+    };
     String.prototype.pad = function (align, fillString) {
         if (!align)
             align = "left";
@@ -2176,6 +2471,10 @@ if (typeof String !== "undefined") {
     String.prototype.getWords = function () {
         // Get the words using a regex
         return this.match(/\w+/g) || [];
+    };
+    String.prototype.getCaseWords = function () {
+        // Split "titleCaseString" into "title case string"
+        return this.replace(/([A-Z])/g, " $1").split(" ");
     };
     String.prototype.toCamelCase = function () {
         // Lowercase the first letter
@@ -2567,15 +2866,9 @@ if (typeof Array !== "undefined") {
     };
     Array.prototype.sortBy = function (...projects) {
         return this.sort((a, b) => {
-            for (const project of [...projects].reverse()) {
-                const aVal = project(a);
-                const bVal = project(b);
-                if (aVal > bVal)
-                    return 1;
-                if (aVal < bVal)
-                    return -1;
-            }
-            return 0;
+            const aVal = projects.map((project) => project(a)).join("/");
+            const bVal = projects.map((project) => project(b)).join("/");
+            return aVal.localeCompare(bVal);
         });
     };
     Array.prototype.sortByDesc = function (...projects) {
@@ -2742,6 +3035,88 @@ class RepeatingTaskQueue {
     }
 }
 exports.RepeatingTaskQueue = RepeatingTaskQueue;
+
+
+/***/ }),
+
+/***/ "../../../Shared/TwoWayMap.ts":
+/*!************************************!*\
+  !*** ../../../Shared/TwoWayMap.ts ***!
+  \************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.TwoWayMap = void 0;
+class TwoWayMap {
+    constructor() {
+        this.forward = new Map();
+        this.reverse = new Map();
+    }
+    set(key, value) {
+        if (!this.forward.has(key)) {
+            this.forward.set(key, []);
+        }
+        this.forward.get(key).push(value);
+        if (!this.reverse.has(value)) {
+            this.reverse.set(value, []);
+        }
+        this.reverse.get(value).push(key);
+    }
+    setReverse(value, key) {
+        if (!this.reverse.has(value)) {
+            this.reverse.set(value, []);
+        }
+        this.reverse.get(value).push(key);
+        if (!this.forward.has(key)) {
+            this.forward.set(key, []);
+        }
+        this.forward.get(key).push(value);
+    }
+    delete(key) {
+        const values = this.forward.get(key);
+        if (!values)
+            return;
+        values.forEach((value) => {
+            const keys = this.reverse.get(value);
+            if (!keys)
+                return;
+            const index = keys.indexOf(key);
+            if (index == -1)
+                return;
+            keys.splice(index, 1);
+        });
+        this.forward.delete(key);
+    }
+    deleteReverse(value) {
+        const keys = this.reverse.get(value);
+        if (!keys)
+            return;
+        keys.forEach((key) => {
+            const values = this.forward.get(key);
+            if (!values)
+                return;
+            const index = values.indexOf(value);
+            if (index == -1)
+                return;
+            values.splice(index, 1);
+        });
+        this.reverse.delete(value);
+    }
+    get(key) {
+        return this.forward.get(key) || [];
+    }
+    getReverse(value) {
+        return this.reverse.get(value) || [];
+    }
+    keys() {
+        return Array.from(this.forward.keys());
+    }
+    values() {
+        return Array.from(this.reverse.keys());
+    }
+}
+exports.TwoWayMap = TwoWayMap;
 
 
 /***/ }),
@@ -2937,7 +3312,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("./script/1688801179619.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("./script/1688898150323.ts");
 /******/ 	
 /******/ })()
 ;

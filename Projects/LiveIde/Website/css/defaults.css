@@ -348,6 +348,13 @@ input[type="color"]
   cursor: pointer;
 }
 
+span.color
+{
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+}
+
 .ide-checkbox
 {
   background: #666666;
@@ -658,6 +665,11 @@ progress
 {
 }
 
+.flex.gap-1
+{
+  gap: 1em;
+}
+
 .progress-bar
 {
   margin: auto;
@@ -767,6 +779,11 @@ img[src=""]
   box-shadow: -8px 8px 6px #000;
 }
 
+
+.cyan
+{
+  color: #0e7abd;
+}
 
 
 /* scrollbars */

@@ -20,7 +20,6 @@ dom:
         - 0
     path:
       - 0
-  path: []
 props:
   item: null
 name: e-template-captions-editor

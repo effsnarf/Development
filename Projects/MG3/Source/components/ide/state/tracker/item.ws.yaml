@@ -1,49 +1,67 @@
 dom:
   div:
-    ui.context:
+    ui.context.window:
       v-if: (item.type == 'm')
-      template#1:
-        v-slot: title
-        .flex:
-          ui.title:
-            icon: 🔴
-            ':text': item.key
-          ui.checkbox:
-            text: pause
-            v-model: stateTracker.methods.pause[item.key]
+      :icon: getIcon(item.type)
+      ":title": item.key
       template#2:
         v-slot: content
         pre:
           code:
             v-html: getMethodBodyColored(item.compName, item.key)
         ui.textarea:
-          ':value': getMethodBody(item.compName, item.key)
+          ":value": getMethodBody(item.compName, item.key)
+    ui.context.window#2:
+      v-if: showFieldContext(item)
+      :visible: isHoveringOverValue
+      :icon: $root.getIcon(item)
+      :title: item.key
+      item-type: ui-value-any
+      :bind-props: "{ value: item.newValue }"
+      :key: "uid+'-'+item.key"
     .grid:
-      ':class': item.type
-      ui.checkbox:
-        text: pause
-        v-model: stateTracker.methods.pause[item.key]
+      ":class": item.type
+      @click: onItemClick(item)
       div#1:
-        v-text: getIcon(item.type)
-      .comp-name:
-        v-text: item.compName
+        v-text: $root.getIcon(item)
       div#3:
         v-text: item.key
       .newValue:
-        ui.value.any:
-          ':value': item.newValue
+        ui.value.preview:
+          ":value": item.newValue
+        @mouseenter: onHoverValue
+        @mouseleave: onUnhoverValue
 props:
+  uid: null
   item: null
-  stateTracker: null
+data:
+  isHoveringOverValue: false
+mounted: | #js
+  function() {
+    this.$root.$on("state-changed", this.onStateChanged.bind(this));
+  }
 methods:
-  getIcon: | #js
-    function(type) {
-      return {
-        'm': '🔴',
-        'e': '⚡',
-        'p': '🧊',
-        'd': '🧊',
-      }[type] || '❔';
+  onHoverValue: | #js
+    function() {
+      this.isHoveringOverValue = true;
+      this.$root.$emit("preview-state-item", this.item);
+    }
+  onUnhoverValue: | #js
+    function() {
+      this.isHoveringOverValue = false;
+      this.$root.$emit("preview-state-item", null);
+    }
+  onItemClick: | #js
+    function(item) {
+      this.$root.$emit("watch-state-item", { uid: this.uid, key: item.key });
+      console.log(item);
+    }
+  showFieldContext: | #js
+    function(item) {
+      if (item.type == "m") return false;
+      if (typeof(item.newValue) == "boolean") return false;
+      if ([undefined, null].includes(item.newValue)) return false;
+      return true;
     }
   getMethodBodyColored: | #js
     function(compName, methodName) {
@@ -59,20 +77,25 @@ methods:
       if (!methodBody) return null;
       return methodBody;
     }
+  onStateChanged: | #js
+    function(item) {
+      //if (item.key == this.item.key) this.refresh();
+    }
+watch:
 style:
   .grid:
-    grid-template: 1fr / 2em 1.5em 1fr 1fr 2fr
+    grid-template: 1fr / 1.2em 5em 5em
     gap: 1em
-    width: min-content;
-    text-wrap: nowrap;
+    width: min-content
+    text-wrap: nowrap
+    overflow: hidden
+  .grid > *:
+    overflow: hidden
   .comp-name:
     opacity: 0.5
   .newValue:
     color: cyan
   .oldValue:
-    opacity: 0.5
-  .p:
-    filter: grayscale(1)
     opacity: 0.5
   .comp-ui-textarea:
     width: 40em

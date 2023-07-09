@@ -71,7 +71,6 @@ methods:
     }
 watch:
   tempInstance: | #js
-
     function() {
     }
   threadID: | #js
@@ -84,29 +83,24 @@ watch:
     }
 computed:
   showInstanceCreate: | #js
-
     function() {
       return !this.hasCommentContent;
     }
   showCommentCreate: | #js
-
     function() {
       return !this.hasInstanceContent;
     }
   hasCommentContent: | #js
-
     function() {
       return !!this.text;
     }
   canPost: | #js
-
     function() {
       if (this.hasInstanceContent) return true;
       if (this.text) return true;
       return false;
     }
   larpGeneratorTooltip: | #js
-
     function() {
       return `Larping as ${this.larpGenerator?.displayName || 'Anonymous'}`;
     }
@@ -120,6 +114,9 @@ style:
     gap: 1em
   h3:
     text-align: center
+config:
+  track:
+    state: true
 name: e-post-create
 template: >-
   <div class="comp-e-post-create container" path="1762525697."><div

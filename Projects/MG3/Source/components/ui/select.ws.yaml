@@ -4,6 +4,7 @@ dom:
       v-slot: slotProps
       ':items': options
       ':selected-index': valueIndex
+      :direction: direction
       template:
         div:
           v-text: getItemText(slotProps.item)
@@ -12,15 +13,14 @@ props:
   options: null
   value: null
   inputType: index
+  direction: vertical
 methods:
   onInput: | #js
-
     function(index) {
       const value = this.inputType === "index" ? index : this.options[index];
       this.$emit("input", value);
     }
   getItemText: | #js
-
     function(text) {
       const icons = {
         network: "🌐",
@@ -37,7 +37,6 @@ methods:
     }
 computed:
   valueIndex: | #js
-
     function() {
       if (this.inputType === "index") return this.value;
       return this.options.indexOf(this.value);

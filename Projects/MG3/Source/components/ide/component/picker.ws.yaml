@@ -5,35 +5,39 @@ dom:
     ui.mouse:
       @hovered-element: onHoveredElement
       ':global': true
-    ui.context:
+    ui.context.window:
       ref: context1
       ':global': true
       ':visible': showPicker
-      template#1:
-        v-slot: title
-        ui.title:
-          icon: 📦
-          ':value': getTitle(hoveredVueUID)
+      icon: 📦
+      ':title': getTitle(hoveredVueUID)
       template#2:
         v-slot: content
-        .flex:
-          .parent-chain:
-            ide.component.title:
-              v-for: uid in parentChain
-              ':item': $root.vues[uid]
-              ':class': '{ ''selected'': uid === selectedVueUID }'
-              @click: selectComponent(uid)
+        .flex.flex-column.gap-1:
           ide.component.editor:
             ':vue-uid': selectedVueUID||hoveredVueUID
+          .parent-chain:
+            ide.component.title:
+              v-for: uid in parentChainUIDs
+              ':item': $root.vm.vues[uid]
+              ':class': '{ ''selected'': uid === selectedVueUID }'
+              @click: selectVue(uid)
+          .child-chain:
+            ide.component.title:
+              v-for: uid in childChainUIDs
+              ':item': $root.vm.vues[uid]
+              ':class': '{ ''selected'': uid === selectedVueUID }'
+              @click: selectVue(uid)
 props: null
 data:
   hoveredElement: null
   hoveredVueUID: null
   selectedVueUID: null
-  parentChain: null
+  parentChainUIDs: null
+  childChainUIDs: null
   showPicker: false
 methods:
-  selectComponent: | #js
+  selectVue: | #js
     function(uid) {
       if (uid == this.selectedVueUID) uid = null;
       this.selectedVueUID = uid;
@@ -44,14 +48,14 @@ methods:
     }
   getTitle: | #js
     function(vue) {
-      return this.$root.getVue(vue)?.$options._componentTag;
+      return this.$root.vm.getVue(vue)?.$options._componentTag;
     }
   onHoveredElement: | #js
     function(el) {
       if (this.$refs.context1.isPinned) return;
       this.hoveredElement = el;
     }
-  getParentChain: | #js
+  getParentChainUIDs: | #js
     function(vue) {
       const maxChainLength = 4;
       let chain = [];
@@ -62,6 +66,10 @@ methods:
       }
       chain = chain.reverse();
       return chain;
+    }
+  getChildChainUIDs: | #js
+    function(vue) {
+      return vue?.$children?.map(c => c._uid);
     }
   getParentVue: | #js
     function(vue) {
@@ -89,24 +97,38 @@ methods:
       if ([`transition`, `transition-group`, `keep-alive`].includes(vnode.$options._componentTag)) return false;
       return true;
     }
+  updateChains: | #js
+    function(vue) {
+      this.parentChainUIDs = this.getParentChainUIDs(vue);
+      this.childChainUIDs = this.getChildChainUIDs(vue);
+    }
 computed: null
 watch:
   hoveredElement: | #js
     function(newEl, oldEl) {
       const vue = this.getVueFromElement(newEl);
       this.hoveredVueUID = vue?._uid;
-      const parentChain = this.getParentChain(vue);
-      this.parentChain = parentChain;
+      this.updateChains(vue);
     }
-  hoveredVueUID: | #js
-    function(newVueUID, oldVueUID) {
-      if (oldVueUID) this.$root.getVue(oldVueUID)?.$el.classList.remove(`highlighted2`);
-      if (newVueUID) this.$root.getVue(newVueUID)?.$el.classList.add(`highlighted2`);
-    }
+  hoveredVueUID:
+    handler: | #js
+      function(newVueUID, oldVueUID) {
+        if (oldVueUID) this.$root.vm.getVue(oldVueUID)?.$el.classList.remove(`highlighted2`);
+        if (newVueUID) this.$root.vm.getVue(newVueUID)?.$el.classList.add(`highlighted2`);
+      }
+    immediate: true
+  selectedVueUID:
+    handler: | #js
+      function(newVueUID, oldVueUID) {
+        const vue = this.$root.vm.getVue(newVueUID);
+        this.updateChains(vue);
+      }
+    immediate: true
 style:
   div:
     font-family: monospace
-  .parent-chain: null
+  .parent-chain:
+    margin-top: 2em
   .parent-chain > :nth-child(1):
     margin-left: 0.5em
   .parent-chain > :nth-child(2):
@@ -117,6 +139,8 @@ style:
     margin-left: 2em
   .parent-chain > :nth-child(5):
     margin-left: 2.5em
+  .child-chain:
+    margin-left: 4em
 name: ide-component-picker
 template: >-
   <div class="comp-ide-component-picker" path="-646340253."><ui-keyboard

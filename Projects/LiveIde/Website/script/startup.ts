@@ -6,11 +6,11 @@ import { AnalyticsTracker } from "../../classes/AnalyticsTracker";
 import { ClientContext } from "../../classes/ClientContext";
 import { Params } from "../../classes/Params";
 import { DatabaseProxy } from "../../../../Apps/DatabaseProxy/Client/DbpClient";
+import { VueManager } from "../../classes/VueManager";
 import addPaths from "../../../../Shared/WebScript/add.paths";
 
 // To make it accessible to client code
 const win = window as any;
-win.StateTracker = StateTracker;
 win.Objects = Objects;
 
 const htmlEncode = (s: string) => {
@@ -94,12 +94,12 @@ interface MgParams {
 
   const params = await getNewParams();
 
+  const vueManager = await VueManager.new(client);
+
   ideVueApp = new client.Vue({
-    el: "#app",
     data: {
-      vues: {},
-      vuesCount: 0,
-      ideWatches: {},
+      state: null as unknown as StateTracker,
+      vm: vueManager,
       client,
       dbp,
       analytics: await AnalyticsTracker.new(),
@@ -122,19 +122,13 @@ interface MgParams {
         self.compsDic = client.comps.toMap((c: Component) => c.name.hashCode());
         self.compNames = client.comps.map((c: Component) => c.name);
       },
-      getVue(uid: number) {
-        if (!uid) return null;
-        const vue = (this as any).vues[uid];
-        if (!vue) return null;
-        return vue();
-      },
       getComponent(uidOrName: number | string) {
         const uid = typeof uidOrName == "number" ? uidOrName : null;
         let name = typeof uidOrName == "string" ? uidOrName : null;
         if (name) name = name.replace(/-/g, ".");
         if (!uid && !name) return null;
         if (uid) {
-          const vue = this.getVue(uid);
+          const vue = vueManager.getVue(uid);
           if (!vue) return null;
           const compName = vue.$data._.comp.name;
           if (!compName) return null;
@@ -239,6 +233,8 @@ interface MgParams {
       async refreshComponents() {
         const self = this as any;
         self.key1++;
+        await self.$nextTick();
+        await self.state.restoreState();
       },
       instanceToGenerator(instance: any) {
         let gen = JSON.parse(JSON.stringify(instance));
@@ -270,23 +266,61 @@ interface MgParams {
         }
         return style;
       },
-      onVueMounted(vue: any) {
-        const self = this as any;
-        const uid = vue._uid;
-        self.vues[uid] = () => vue;
-        self.vuesCount++;
-      },
-      onVueUnMounted(vue: any) {
-        const self = this as any;
-        const uid = vue._uid;
-        delete self.vues[uid];
-        self.vuesCount--;
-      },
       isDevEnv() {
         return window.location.hostname == "localhost";
       },
+      visualizedYaml(obj: any) {
+        let yaml = (window as any).jsyaml.dump(obj) as string;
+        yaml = yaml.replace(/: true$/gm, ": ✔️");
+        yaml = yaml.replace(/: false$/gm, ": ❌");
+        // Replace colors with colored squares:
+        // '#ff0000\n' -> '🟥' (<span class="color"></span>)
+        // Works with 3, 6 and 8 digit hex colors
+        yaml = yaml.replace(/'#\w{3,8}\b'/g, (match) => {
+          let color = match.slice(1); // Remove the '#' symbol
+          color = color.substring(0, color.length - 1);
+          return `<span class="color" style="background-color:${color}"></span>`;
+        });
+        // Replace "null" and "undefined" with <span class="opacity-50">null/undefined</span>
+        yaml = yaml.replace(/\b(null|undefined)\b/g, (match) => {
+          return `<span class="opacity-30">${match}</span>`;
+        });
+        // Replace numbers (: [number]) with <span class="green">[number]</span>
+        yaml = yaml.replace(/: (\d+)/g, (match, p1) => {
+          return `: <span class="green">${p1}</span>`;
+        });
+        // Replace strings (: [string]) with <span class="yellow">[string]</span>
+        yaml = yaml.replace(/: (\w.*)/g, (match, p1) => {
+          return `: <span class="yellow">${p1}</span>`;
+        });
+        // Replace keys ([key]: ) with <span class="opacity-50">[key]: </span>
+        yaml = yaml.replace(/^(\s*)(\w+):/gm, (match, p1, p2) => {
+          return `${p1}<span class="opacity-50">${p2}:</span>`;
+        });
+        return yaml;
+      },
+      getIcon(item: any) {
+        const stateItemIcons = {
+          // method
+          m: "🔴",
+          // event
+          e: "⚡",
+          // prop
+          p: "🔒",
+          // data
+          d: "🧊",
+          // computed
+          c: "✨",
+        } as any;
+        if (item.type) return stateItemIcons[item.type] || "❔";
+        return "❔";
+      },
     },
   });
+
+  ideVueApp.state = await StateTracker.new(() => ideVueApp, vueManager, client);
+
+  ideVueApp.$mount("#app");
 
   window.addEventListener("popstate", async function (event) {
     await ideVueApp.refresh();

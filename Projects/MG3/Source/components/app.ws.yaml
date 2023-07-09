@@ -1,6 +1,5 @@
 dom:
   div:
-    ide.component.picker: null
     div:
       .site-loading:
         ui.loading:
@@ -10,7 +9,7 @@ dom:
       div#1:
         class: header-spacer
     .pages:
-      ':class': '{ ''site-width'': true }'
+      ":class": "{ 'site-width': true }"
       page.admin.index: null
       page.home: null
       page.thread: null
@@ -33,7 +32,7 @@ style:
     position: fixed
     top: 0
     margin: 0 0 1rem
-    box-shadow: '-2rem 2rem 2rem #000'
+    box-shadow: "-2rem 2rem 2rem #000"
     background-image: >-
       linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0),
       rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 1))

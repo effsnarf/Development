@@ -17,7 +17,7 @@ helpers:
   addMethodCode: | #ts
     (context: any, methodName: string, methodBody: string) => {
       if (!methodBody) methodBody = "function() {}";
-      methodBody = methodBody.replace(/\{/, `{\n this._log_method("${methodName}", [...arguments]); \n if (this.$data?._?.state.methods.pause.${methodName}) debugger; \n`);
+      methodBody = methodBody.replace(/\{/, `{\n this._log_method("${methodName}", [...arguments]); \n if (this.$root.state?.methods.pause.${methodName}) debugger; \n`);
       return methodBody;
     };
   prefixCssSelectors: | #ts

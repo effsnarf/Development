@@ -2,7 +2,7 @@ dom:
   div:
     ui.mouse#1:
       ':global': true
-      @move: mousePos = $event
+      @move: onMouseMove
       @right-click: e => onRightClick(e, true)
     .context-menu:
       v-if: isVisible
@@ -14,13 +14,25 @@ dom:
           @drag: onDrag
           @right-click: onRightClick
         slot:
-          name: title
+          h3:
+            ui.title:
+              :icon: icon
+              :text: title
       div:
         slot:
           name: content
+        component:
+          v-if: itemType
+          :is: itemType
+          v-bind: bindProps
+
 props:
   global: false
   visible: null
+  icon: null
+  title: null
+  itemType: null
+  bindProps: null
 data:
   lastUpdate: 0
   space: 20
@@ -34,6 +46,14 @@ mounted: | #js
     const element = (this.global ? window : this.$el.parentElement);
     element.addEventListener("mouseenter", this.onMouseEnterContext);
     element.addEventListener("mouseleave", this.onMouseLeaveContext);
+    this.$root.$emit("context-menu-mounted", this);
+  }
+unmounted: | #js
+  function() {
+    const element = (this.global ? window : this.$el.parentElement);
+    element.removeEventListener("mouseenter", this.onMouseEnterContext);
+    element.removeEventListener("mouseleave", this.onMouseLeaveContext);
+    this.$root.$emit("context-menu-unmounted", this);
   }
 methods:
   onDrag: | #js
@@ -48,6 +68,12 @@ methods:
         child.globalPos.x -= 0.0001;
         child.globalPos.y -= 0.0001;
       }
+    }
+  onMouseMove: | #js
+    function(pos) {
+      if (!this.isVisible) return;
+      if (this.isPinned) return;
+      this.mousePos = pos;
     }
   onMouseEnterContext: | #js
     function(e) {
@@ -128,6 +154,9 @@ style:
     transition: transform 0.3s !important
     pointer-events: all
   h2:
+    border-radius: 0
+    border-bottom: '1px solid #000'
+    margin-bottom: 0.5em
     user-select: none
 name: ui-context
 template: >-

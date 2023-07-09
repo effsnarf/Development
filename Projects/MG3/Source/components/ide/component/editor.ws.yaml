@@ -2,16 +2,16 @@ dom:
   div:
     v-if: component
     ui.tabs:
-      ':options': '[''📁 view'', ''🧊 state'']'
+      ":options": "['🧊 state', '📁 view']"
       direction: horizontal
       template#1:
         v-slot: tab0
-        ide.component.view.editor:
-          ':component': component
+        ide.state.tracker:
+          ":uid": vueUid
       template#2:
         v-slot: tab1
-        ide.state.tracker:
-          ':state-tracker': '!vueUid ? null : $root.getVue(vueUid).$data._?.state'
+        ide.component.view.editor:
+          ":component": component
 props:
   vueUid: null
 data:

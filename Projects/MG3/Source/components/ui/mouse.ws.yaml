@@ -4,7 +4,7 @@ dom:
 props:
   global: false
 data:
-  pos: '{ x: 0, y: 0 }'
+  pos: "{ x: 0, y: 0 }"
   hoveredElement: null
   posQueue: []
   updateInterval: 50

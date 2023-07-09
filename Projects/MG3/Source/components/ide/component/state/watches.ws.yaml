@@ -1,0 +1,35 @@
+dom:
+  div:
+    h3:
+      v-text: "'State Watches'"
+    div#1:
+      v-text: stateItems
+    div#2:
+      div:
+        v-if: previewedStateItem
+        ide.title:
+          :item: previewedStateItem
+        ui.value.any:
+          :value: previewedStateItem.newValue
+    div#3:
+      div:
+        v-for: stateItem in stateItems
+        ide.title:
+          :item: stateItem
+        ui.value.any:
+          :value: stateItem.newValue
+
+data:
+  previewedStateItem: null
+  stateItems: []
+
+mounted: | #js
+  function() {
+    this.$root.$on("preview-state-item", (stateItem) => {
+      this.previewedStateItem = stateItem;
+    });
+    this.$root.$on("watch-state-item", (stateItem) => {
+      this.stateItems.push(stateItem);
+      console.log(stateItem);
+    });
+  }

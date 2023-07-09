@@ -15,12 +15,11 @@
           comp: {
             name: `{{unkebabize name}}`,
           },
-          state: StateTracker.new(this._uid, "{{name}}", this.$root.client),
         }
     }
   },
-  mounted: {{{addCode mounted "this._log_method('mounted', arguments); this.$root.onVueMounted(this); this.$emit = this._getNewEmit(this.$emit);"}}},
-  unmounted: {{{addCode unmounted "this._log_method('unmounted', arguments); this.$root.onVueUnmounted(this);"}}},
+  mounted: {{{addCode mounted "this.$root.vm.onVueMounted(this); this._log_method('mounted', arguments); this.$emit = this._getNewEmit(this.$emit);"}}},
+  unmounted: {{{addCode unmounted "this.$root.vm.onVueUnmounted(this); this._log_method('unmounted', arguments);"}}},
   methods: {
     {{#each methods}}
     {{@key}}: {{{addMethodCode @key this}}},
@@ -33,11 +32,11 @@
     },
 
     _log_emit: function(event, args) {
-      this.$data._.state.log('e', event, args);
+      this.$root.state?.track(this, 'e', event, args);
     },
 
     _log_method: function (methodName, args) {
-      if (!this.$data._.state.isTrackingMethods) return;
+      return;
 
       if ([`processQueue`, `recalc`, `getFontSize`,
         `onMouseMove`, `onMouseUp`,
@@ -47,7 +46,7 @@
         ].includes(methodName)) return;
       if ([`draw`].some(s => methodName.includes(s))) return;
 
-      this.$data._.state.log('m', methodName);
+      this.$root.state?.track(this, 'm', methodName);
 
       return;
 
@@ -60,7 +59,7 @@
     _log_state: function (type, key, newValue, oldValue) {
       if ([`queue`, `width`, `height`, `generators`, `items`].includes(key)) return;
       if (!newValue && !oldValue) return;
-      this.$data._.state.log(type, key, newValue, oldValue);
+      this.$root.state?.track(this, type, key, newValue, oldValue);
       if (!oldValue)
       {
         if (false)
@@ -92,6 +91,7 @@
         this._log_state('d', `{{@key}}`, newValue, oldValue);
       },
       immediate: true,
+      deep: true,
     },
     {{/each}}
     
@@ -101,6 +101,7 @@
         this._log_state('p', `{{@key}}`, newValue, oldValue);
       },
       immediate: true,
+      deep: true,
     },
     {{/each}}
 

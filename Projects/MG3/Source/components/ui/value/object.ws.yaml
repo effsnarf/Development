@@ -1,0 +1,16 @@
+dom:
+  pre:
+    v-html: yaml
+
+props:
+  value:
+
+computed:
+  yaml: | #js
+    function() {
+      return this.$root.visualizedYaml(this.value);
+    }
+
+style:
+  pre:
+    font-size: 100%

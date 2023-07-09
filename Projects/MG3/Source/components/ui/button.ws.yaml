@@ -14,7 +14,6 @@ data:
   isLoading: null
 methods:
   onClick: | #js
-
     async function() {
       this.$emit('click');
       if (this.click)
