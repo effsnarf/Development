@@ -12,12 +12,20 @@ methods:
   onMouseDown: | #js
     function(e) {
       if (e.button !== 0) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+
       this.isDragging = true;
       this.dragStart = { x: e.clientX, y: e.clientY };
     }
   onMouseMove: | #js
     function(e) {
       if (!this.isDragging) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+
       const dx = e.clientX - this.dragStart.x;
       const dy = e.clientY - this.dragStart.y;
 
@@ -43,6 +51,9 @@ methods:
     }
   onMouseUp: | #js
     function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+
       this.isDragging = false;
     }
   getStyle: | #js

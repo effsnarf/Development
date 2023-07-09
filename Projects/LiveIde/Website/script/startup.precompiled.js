@@ -163,9 +163,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "./script/1688898150323.ts":
+/***/ "./script/1688908656502.ts":
 /*!*********************************!*\
-  !*** ./script/1688898150323.ts ***!
+  !*** ./script/1688908656502.ts ***!
   \*********************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -1166,6 +1166,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StateTracker = void 0;
 __webpack_require__(/*! ../../../Shared/Extensions */ "../../../Shared/Extensions.ts");
+const Extensions_Objects_Client_1 = __webpack_require__(/*! ../../../Shared/Extensions.Objects.Client */ "../../../Shared/Extensions.Objects.Client.ts");
 const VueHelper_1 = __webpack_require__(/*! ./VueHelper */ "../classes/VueHelper.ts");
 class StateTracker {
     constructor(getApp, vm, client) {
@@ -1189,6 +1190,9 @@ class StateTracker {
         if (!comp)
             return;
         //if (!comp.source.config?.track?.state) return;
+        const isEvent = type == "e";
+        newValue = isEvent ? newValue : Extensions_Objects_Client_1.Objects.clone(newValue);
+        oldValue = isEvent ? oldValue : Extensions_Objects_Client_1.Objects.clone(oldValue);
         const item = {
             id: StateTracker._nextID++,
             dt: Date.now(),
@@ -1284,12 +1288,6 @@ class StateTracker {
             return false;
         if (newItem.key != prevItem.key)
             return false;
-        if (typeof newItem.newValue != "string")
-            return false;
-        if (typeof newItem.oldValue != "string")
-            return false;
-        if (Math.abs(newItem.newValue.length - newItem.oldValue.length) != 1)
-            return false;
         return true;
     }
     getRefChanges(refKeyOrUID) {
@@ -1302,7 +1300,7 @@ class StateTracker {
             this.refChanges.set(refKey, []);
             console.log("new ref", refKey);
         }
-        return this.refChanges.get(refKey);
+        return this.refChanges.get(refKey) || [];
     }
     pause() {
         this.isPaused++;
@@ -1601,7 +1599,16 @@ class Objects {
         return (0)._is(obj, type);
     }
     static clone(obj) {
-        return JSON.parse(JSON.stringify(obj));
+        if (obj == null || obj == undefined || typeof obj != "object")
+            return obj;
+        try {
+            return JSON.parse(JSON.stringify(obj));
+        }
+        catch (ex) {
+            console.error("Error cloning object", obj, ex);
+            debugger;
+            throw ex;
+        }
     }
     static on(obj, key, callback) {
         if (typeof key === "function") {
@@ -3312,7 +3319,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("./script/1688898150323.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("./script/1688908656502.ts");
 /******/ 	
 /******/ })()
 ;

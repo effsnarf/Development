@@ -11,7 +11,14 @@ class Objects {
   }
 
   static clone(obj: any): any {
-    return JSON.parse(JSON.stringify(obj));
+    if (obj == null || obj == undefined || typeof obj != "object") return obj;
+    try {
+      return JSON.parse(JSON.stringify(obj));
+    } catch (ex) {
+      console.error("Error cloning object", obj, ex);
+      debugger;
+      throw ex;
+    }
   }
 
   static on(obj: any, key: string | Function, callback: Function): void {

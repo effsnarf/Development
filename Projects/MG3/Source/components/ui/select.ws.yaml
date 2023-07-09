@@ -6,7 +6,10 @@ dom:
       ':selected-index': valueIndex
       :direction: direction
       template:
+        slot:
+          :item: slotProps.item
         div:
+          v-if: showText
           v-text: getItemText(slotProps.item)
       @input: onInput($event)
 props:
@@ -14,6 +17,7 @@ props:
   value: null
   inputType: index
   direction: vertical
+  showText: true
 methods:
   onInput: | #js
     function(index) {

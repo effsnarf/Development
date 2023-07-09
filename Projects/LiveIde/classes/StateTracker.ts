@@ -1,4 +1,5 @@
 import "../../../Shared/Extensions";
+import { Objects } from "../../../Shared/Extensions.Objects.Client";
 import { ClientContext } from "./ClientContext";
 import { VueHelper } from "./VueHelper";
 import { VueManager } from "./VueManager";
@@ -44,6 +45,11 @@ class StateTracker {
     if (!comp) return;
 
     //if (!comp.source.config?.track?.state) return;
+
+    const isEvent = type == "e";
+
+    newValue = isEvent ? newValue : Objects.clone(newValue);
+    oldValue = isEvent ? oldValue : Objects.clone(oldValue);
 
     const item = {
       id: StateTracker._nextID++,
@@ -147,10 +153,6 @@ class StateTracker {
     if (newItem.type != "p" && newItem.type != "d") return false;
     if (!prevItem.newValue && !prevItem.oldValue) return false;
     if (newItem.key != prevItem.key) return false;
-    if (typeof newItem.newValue != "string") return false;
-    if (typeof newItem.oldValue != "string") return false;
-    if (Math.abs(newItem.newValue.length - newItem.oldValue.length) != 1)
-      return false;
     return true;
   }
 
@@ -165,7 +167,7 @@ class StateTracker {
       this.refChanges.set(refKey, []);
       console.log("new ref", refKey);
     }
-    return this.refChanges.get(refKey)!;
+    return this.refChanges.get(refKey) || [];
   }
 
   pause() {

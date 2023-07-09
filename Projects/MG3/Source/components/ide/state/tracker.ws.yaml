@@ -7,16 +7,17 @@ dom:
             text: Changes
         ul#2:
           class: changes
+          :key: key1
           li:
-            v-for: change in $root.state.getRefChanges(uid)?.take(20)
+            v-for: change in $root.state.getRefChanges(uid).take(20)
             class: hoverable
-            ':key': item.id
-            @mouseenter: () => onMouseEnter(item)
-            @mouseleave: () => onMouseLeave(item)
+            ':key': change.id
+            @mouseenter: () => onMouseEnter(change)
+            @mouseleave: () => onMouseLeave(change)
             ide.state.tracker.item:
               :uid: uid
               :item: change
-              :key: item.id
+              :key: change.id
       div#1:
         h3:
           ui.title:
@@ -35,14 +36,25 @@ data:
   key1: 1
 mounted: | #js
   async function() {
+    this.$root.$on("state-changed", this.onStateChanged.bind(this));
   }
 methods:
+  onStateChanged: | #js
+    function(stateChange) {
+      if (this.uid == stateChange.uid) {
+        this.refresh();
+      }
+    }
   onMouseEnter: | #js
     function(item) {
       this.$root.state.apply(this.uid, item);
     }
   onMouseLeave: | #js
     function(item) {
+    }
+  refresh: | #js
+    function() {
+      this.key1++;
     }
 style:
   .comp-ui-title:

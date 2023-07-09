@@ -1,14 +1,24 @@
 dom:
-  ui.image:
-    ':style': getStyle(item)
-    v-if: item
-    ':imageID': item.imageID
-    ':remove-background': item.removeBackground
-    ':square': true
-    @load: onImageLoad
+  ui.movable:
+    v-model: item.trans
+    ui.image:
+      ref: image1
+      v-if: item
+      ':style': itemStyle
+      ':imageID': item.imageID
+      ':remove-background': item.removeBackground
+      ':square': true
+      @load: onImageLoad
+      @change: refresh
 props:
   item: null
+data:
+  itemStyle: null
 methods:
+  refresh: | #js
+    function() {
+      this.itemStyle = this.getStyle(this.item);
+    }
   onImageLoad: | #js
     function(e) {
       this.$emit('image-load', e);
@@ -23,9 +33,22 @@ methods:
       if (filters.blur) cssFilters.push(`blur(${filters.blur*10}px)`);
       if (filters.opacity) cssFilters.push(`opacity(${filters.opacity})`);
       if (filters.grayscale) cssFilters.push(`grayscale(${filters.grayscale})`);
+      const image1 = this.$refs.image1;
+      if (image1 && item.shadow)
+      {
+        const dropShadow = `drop-shadow(${item.shadow.x*image1.width}px ${item.shadow.y*image1.height}px ${item.shadow.blur/10*image1.diagonal}px ${item.shadow.color})`;
+        cssFilters.push(dropShadow);
+      }
       style.filter = cssFilters.join(' ');
       return style;
     }
+watch:
+  item:
+    handler: | #js
+      function(item) {
+        this.refresh();
+      }
+    deep: true
 name: e-template-image-layer
 template: >-
   <ui-image class="comp-e-template-image-layer" :style="getStyle(item)"

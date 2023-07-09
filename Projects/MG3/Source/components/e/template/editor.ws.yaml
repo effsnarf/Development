@@ -15,17 +15,15 @@ dom:
               ':layer': layer
               @click: selectLayer(index)
       .div2:
-        ui.movable:
-          v-model: temp.layers[1].trans
-          ui.file.dropzone:
-            @file-drop: (files) => onFileDrop(files)
-            .layers:
-              component#2:
-                v-for: layer in temp.layers
-                ':class': getLayerClass(layer)
-                ':is': getLayerType(layer)
-                ':item': layer
-                @image-load: (src) => onLayerImageLoad(layer, src)
+        ui.file.dropzone:
+          @file-drop: (files) => onFileDrop(files)
+          .layers:
+            component#2:
+              v-for: layer in temp.layers
+              ':class': getLayerClass(layer)
+              ':is': getLayerType(layer)
+              ':item': layer
+              @image-load: (src) => onLayerImageLoad(layer, src)
         transition:
           name: slide
           component#1:
@@ -56,33 +54,47 @@ methods:
       this.temp = {
         layers: []
       };
+
       this.temp.layers.add({
-        type: 'rainbow',
-        visible: true,
-        pattern: 'pizza',
-        colors: ['#000080', '#0000FF', '#4169E1', '#6495ED', '#87CEEB', '#B0E0E6'],
-        colorsCount: 3,
-        slices: 3,
+        "type": "rainbow",
+        "visible": true,
+        "pattern": "pizza",
+        "colors": [
+            "#000000",
+            "#800000",
+            "#e1d441",
+            "#6495ED",
+            "#87CEEB",
+            "#B0E0E6"
+        ],
+        "colorsCount": 3,
+        "slices": "6",
         filters: {...filters}
       });
       this.temp.layers.add({
-        type: 'image',
-        visible: true,
-        imageID: 880976,
-        removeBackground: false,
-        trans: {
-          pos: {
-            x: 0.5,
-            y: 0.5
-          },
-          scale: 1
+        "type": "image",
+        "visible": true,
+        "imageID": 679668891,
+        "removeBackground": true,
+        "trans": {
+            "pos": {
+                "x": 0.49236641221374045,
+                "y": 0.42215986761637536
+            },
+            "scale": 0.9
+        },
+        shadow: {
+          x: -0.1,
+          y: 0.1,
+          blur: 0.01,
+          color: 'black'
         },
         filters: {...filters}
       });
       this.temp.layers.add({
         type: 'captions',
         visible: true,
-        texts: ['Hello', 'World'],
+        texts: ['why are you so quiet', 'anon?'],
         filters: {...filters}
       });
     }
@@ -132,7 +144,7 @@ methods:
     function(layer) {
       return {
         'layer': true,
-        'selected': false,
+        'selected': (layer === this.selectedLayer),
         'hidden': !layer.visible
       };
     }
@@ -184,6 +196,10 @@ style:
     left: 0
     width: 100%
     height: 100%
+    pointer-events: none
+  .layer.selected, .layer.selected:hover:
+    background: none !important
+    pointer-events: auto
 template: >-
   <div class="comp-e-template-editor" v-if="temp" :class="getCssClass()"
   path="-650358312."><div class="div1" path="-650358312.0"><ul class="tabs"

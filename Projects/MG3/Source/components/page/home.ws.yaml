@@ -6,7 +6,8 @@ dom:
       e.thread.list: null
     template#2:
       v-slot: middle
-      e.template.editor: null
+      e.template.editor:
+        ref: TemplateEditor1
       content.stream:
         ref: stream1
         item-type: e.instance

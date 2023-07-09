@@ -52,6 +52,10 @@ methods:
       return `ui-link`;
     }
 computed:
+  diagonal: | #js
+    function () {
+      return Math.sqrt(this.width * this.width + this.height * this.height);
+    }
   src1: | #js
     function () {
       if (this.imageID) return this.$root.url.image(this.imageID, true, this.removeBackground);

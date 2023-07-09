@@ -34,6 +34,11 @@ a:not([href])
   box-shadow: 0 0 0 max(100vh, 100vw) rgba(0, 0, 0, 0.9);
 }
 
+.grayscale
+{
+  filter: grayscale(1);
+}
+
 .grayish
 {
   filter: grayscale(1);

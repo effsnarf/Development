@@ -18,15 +18,12 @@ data:
 mounted: | #js
   function() {
     this.$root.$on("context-menu-mounted", (contextMenu) => {
-      this.contextMenus.push(() => contextMenu);
     });
     this.$root.$on("context-menu-unmounted", () => {
-      this.contextMenus = this.contextMenus.filter((cm) => cm()._uid != contextMenu._uid);
     });
   }
 
 computed:
   contextMenuOptions: | #js
     function() {
-      return this.contextMenus.map((cm, i) => { return `${i} - ${cm().title} - ${cm().mousePos?.x}/${cm().mousePos?.y}` });
     }

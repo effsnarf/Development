@@ -199,6 +199,11 @@ const _fetchAsJson = async (url: string) => {
     return yaml;
   };
 
+  const isLocalFolder = (url: string) => {
+    const localPath = path.join(process.cwd(), url);
+    return fs.existsSync(localPath);
+  };
+
   const staticFileFolders = [
     process.cwd(),
     config.project.folder,
@@ -212,7 +217,7 @@ const _fetchAsJson = async (url: string) => {
     config.server.port,
     config.server.host,
     async (req, res, data) => {
-      if (req.url.startsWith("/img/") && !req.url.startsWith("/img/banners/")) {
+      if (req.url.startsWith("/img/") && !isLocalFolder(req.url)) {
         // Redirect to img.memegenerator.net
         const url = `https://img.memegenerator.net/${req.url.replace(
           "/img/",
