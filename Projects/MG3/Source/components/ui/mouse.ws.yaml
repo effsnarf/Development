@@ -4,7 +4,7 @@ dom:
 props:
   global: false
 data:
-  pos: "{ x: 0, y: 0 }"
+  pos: {}
   hoveredElement: null
   posQueue: []
   updateInterval: 50
@@ -65,14 +65,14 @@ methods:
 watch:
   pos:
     handler: | #js
-      function() {
-        this.$emit("move", this.pos);
+      function(pos) {
+        this.$emit("move", pos);
         if (this.dragStart) {
-          const delta = { dx: this.pos.x - this.dragStart.x, dy: this.pos.y - this.dragStart.y };
-          this.dragStart = this.pos;
+          const delta = { dx: pos.x - this.dragStart.x, dy: pos.y - this.dragStart.y };
+          this.dragStart = pos;
           this.$emit("drag", delta);
         }
-        this.updateHoveredElement(this.pos);
+        this.updateHoveredElement(pos);
       }
     deep: true
   hoveredElement: | #js

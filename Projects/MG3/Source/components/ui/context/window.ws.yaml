@@ -36,8 +36,8 @@ props:
 data:
   lastUpdate: 0
   space: 20
-  mousePos: '{ x: 0, y: 0 }'
-  globalPos: '{ x: 0, y: 0 }'
+  mousePos: { x: 0, y: 0 }
+  globalPos: { x: 0, y: 0 }
   isInited: false
   isPinned: false
   isInsideContextElement: false
@@ -62,7 +62,7 @@ methods:
       this.globalPos.y += dpos.dy;
       // Since child context menus are positioned relative to the parent
       // we need to update their position in the other direction when dragging the parent
-      const childContexts = this.$root.getDescendants(this, "ui.context");
+      const childContexts = this.$root.getDescendants(this, this.$data._.comp.name);
       for (const child of childContexts) {
         // I have no idea what's going on here
         child.globalPos.x -= 0.0001;
