@@ -41,7 +41,8 @@ methods:
     }
   getValue: | #js
     function(i) {
-      const value = (this.filter == 'blur') ? `${i}px` : (i/10).toFixed(2);
+      const ratio = (this.imageID ? 3 : 1);
+      const value = (this.filter == 'blur') ? `${i/ratio}px` : (i/10).toFixed(2);
       return value;
     }
 style:

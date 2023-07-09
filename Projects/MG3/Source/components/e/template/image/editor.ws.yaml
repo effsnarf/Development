@@ -37,7 +37,7 @@ dom:
           v-if: showShadowEditor
           .message:
             div#1:
-              v-text: '''You can also drag the shadow to move it'''
+              v-text: '''Drag the shadow to move it'''
             div#2:
               v-text: '''Ctrl-drag up/down to change the blur'''
           ui.range#1:
