@@ -11,15 +11,16 @@ methods:
     function() {
       const elements = this.getElements();
       if (Array.isArray(elements)) return elements;
+      if (typeof elements[Symbol.iterator] === 'function') return [...elements];
       return [elements];
     }
   onMouseEnter: | #js
     function() {
-      this.getElementsArray().forEach(el => el.classList?.add("highlighted"));
+      this.getElementsArray().forEach(el => el.classList.add("highlighted"));
     }
   onMouseLeave: | #js
     function() {
-      this.getElementsArray().forEach(el => el.classList?.remove("highlighted"));
+      this.getElementsArray().forEach(el => el.classList.remove("highlighted"));
     }
 name: ui-highlighter
 template: >-

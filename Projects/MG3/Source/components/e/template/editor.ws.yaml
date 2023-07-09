@@ -132,7 +132,7 @@ methods:
     function(layer) {
       return {
         'layer': true,
-        'selected': layer === this.selectedLayer,
+        'selected': false,
         'hidden': !layer.visible
       };
     }

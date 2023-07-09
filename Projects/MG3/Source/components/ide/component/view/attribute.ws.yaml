@@ -3,8 +3,8 @@ dom:
     .opacity-50:
       v-text: item[0]
     div:
-      ui.textarea:
-        value: item[1]
+      ui.value.any:
+        :value: item[1]
 props:
   item: null
 style:

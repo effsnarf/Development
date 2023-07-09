@@ -1,6 +1,10 @@
 dom:
   div:
     class: flex
+    .icon:
+      :class: getIconClass()
+      v-if: icon
+      v-text: icon
     div:
       v-text: getText()
     .ml-1.opacity-50:
@@ -14,13 +18,20 @@ props:
 methods:
   getText: | #js
     function() {
-      return [this.icon, this.text, this.value].filter(s => s).join(' ');
+      return [this.text, this.value].filter(s => s).join(' ');
     }
   getNumberText: | #js
     function() {
       return !this.number ? '' : `(${this.number})`;
     }
+  getIconClass: | #js
+    function() {
+      if (this.icon == "📁") return "opacity-50";
+      return null;
+    }
 style:
+  .flex:
+    gap: 0.5em
   div:
     white-space: nowrap
     text-wrap: nowrap
