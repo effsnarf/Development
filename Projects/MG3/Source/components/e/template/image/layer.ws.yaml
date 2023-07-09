@@ -1,6 +1,7 @@
 dom:
   ui.movable:
-    v-model: item.trans
+    @drag-by: $emit('drag-by', $event)
+    @scale-by: $emit('scale-by', $event)
     ui.image:
       ref: image1
       v-if: item
@@ -18,7 +19,7 @@ methods:
   refresh: | #js
     function() {
       this.itemStyle = this.getStyle(this.item);
-    }
+    }.throttle(50)
   onImageLoad: | #js
     function(e) {
       this.$emit('image-load', e);
@@ -27,16 +28,23 @@ methods:
     function(item) {
       if (!item) return;
       let style = {};
-      style.transform = `translate(${(-0.5 + item.trans.pos.x) * 100}%, ${(0.5 - item.trans.pos.y) * 100}%) scale(${item.trans.scale})`;
-      const { filters } = item;
+      style.transform = `translate(${(-0.5 + item.trans.pos.x) * 100}%, ${(-0.5 + item.trans.pos.y) * 100}%) scale(${item.trans.scale})`;
       const cssFilters = [];
-      if (filters.blur) cssFilters.push(`blur(${filters.blur*10}px)`);
-      if (filters.opacity) cssFilters.push(`opacity(${filters.opacity})`);
-      if (filters.grayscale) cssFilters.push(`grayscale(${filters.grayscale})`);
       const image1 = this.$refs.image1;
       if (image1 && item.shadow)
       {
-        const dropShadow = `drop-shadow(${item.shadow.x*image1.width}px ${item.shadow.y*image1.height}px ${item.shadow.blur/10*image1.diagonal}px ${item.shadow.color})`;
+        // Apply the opacity to the shadow color
+        const color = item.shadow.color.replace(/#(..)(..)(..)/, (match, r, g, b) => {
+          const opacity = Math.round(item.shadow.opacity*255).toString(16);
+          return `#${r}${g}${b}${opacity}`;
+        });
+        const values = {
+          x: (item.shadow.x*image1.width).toFixed(2),
+          y: (item.shadow.y*image1.height).toFixed(2),
+          blur: item.shadow.blur/20*image1.diagonal.toFixed(2),
+          color: color
+        };
+        const dropShadow = `drop-shadow(${values.x}px ${values.y}px ${values.blur}px ${values.color})`;
         cssFilters.push(dropShadow);
       }
       style.filter = cssFilters.join(' ');

@@ -1,51 +1,62 @@
 dom:
   .options:
+    :class: "filter+'-options'"
     ':tooltip': filter
-    v-if: imageID
-    ui.image:
+    div:
       class: option
       v-for: i in 10
       ':class': getClass(i)
-      ':img-style': getStyle(i)
-      ':imageID': imageID
-      ':square': true
       @click: onClick(i)
+      ui.image:
+        v-if: imageID
+        ':img-style': getStyle(i)
+        ':imageID': imageID
+        ':square': true
+      div:
+        v-if: "!imageID"
+        class: box
+        ':style': getStyle(i)
 props:
   imageID: null
   filter: null
+  reverse: false
   value: null
 methods:
   onClick: | #js
-
     function(i) {
       if (i/10 == this.value) i = null;
       this.$emit('input', i/10);
     }
   getClass: | #js
-
     function(i) {
       const cls = {};
       cls['selected'] = (i/10 == this.value);
       return cls;
     }
   getStyle: | #js
-
     function(i) {
-      return `filter: ${this.filter}(${this.getValue(i)})`;
+      const valueFunc = (this.reverse) ? (i) => 10-i : (i) => i;
+      i = valueFunc(i);
+      return `filter: ${this.filter}(${(this.getValue(i))})`;
     }
   getValue: | #js
-
     function(i) {
       const value = (this.filter == 'blur') ? `${i}px` : (i/10).toFixed(2);
       return value;
     }
 style:
+  .box:
+    aspect-ratio: 1/1
+    background: "#ffff0080"
   .options:
     display: grid
     grid-template: 1fr / repeat(10, 1fr)
+  .options:not(.grayscale-options):
+    filter: grayscale(1)
   .option:
     cursor: pointer
     border: 2px solid transparent
+    overflow: hidden
     transition: 0s
   .option:hover:
     border: '2px solid #ffffff40'

@@ -272,7 +272,7 @@ tr:hover > td:last-child
 }
 .selected:hover
 {
-  background: #ffffff80 !important;
+  background: #ffffff60 !important;
 }
 
 .parent .visible-if-parent-hover

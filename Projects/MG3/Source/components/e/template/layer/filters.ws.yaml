@@ -1,29 +1,23 @@
 dom:
   div:
-    ui.expand:
-      text: effects
-      v-model: showFilters
-    transition:
-      name: slide2
-      div:
-        v-if: showFilters
-        ui.image.options#1:
-          ':imageID': imageID
-          filter: blur
-          v-model: value.blur
-        ui.image.options#2:
-          ':imageID': imageID
-          filter: opacity
-          v-model: value.opacity
-        ui.image.options#3:
-          ':imageID': imageID
-          filter: grayscale
-          v-model: value.grayscale
+    ui.image.options#1:
+      ":imageID": imageID
+      filter: blur
+      v-model: value.blur
+    ui.image.options#2:
+      ":imageID": imageID
+      filter: opacity
+      :reverse: true
+      v-model: value.transparent
+    ui.image.options#3:
+      ":imageID": imageID
+      filter: grayscale
+      v-model: value.grayscale
 props:
   imageID: null
   value: null
 data:
-  showFilters: false
+methods:
 name: e-template-layer-filters
 template: >-
   <div class="comp-e-template-layer-filters" path="-822068845."><ui-expand
