@@ -6,7 +6,7 @@ dom:
     ':title-url': $root.url.generator(generator)
     ':title-key': generator?.generatorID
     ':recommendation-items': recommendationItems
-    template#1:
+    template:
       v-slot: article
       ui.image:
         class: mb-l2
@@ -14,7 +14,7 @@ dom:
         :aspect-ratio: "5/1"
         object-position: top
       div:
-        div#1:
+        div:
           class: float-left mr-l1
           :style: "{ width: '30%' }"
           e.instance:
@@ -46,14 +46,14 @@ dom:
                 ':key': stanza.map(l => l.substring(0, 5)).join('-')
           div:
             class: float-clear
-    template#2:
+    template:
       v-slot: middle
       content.stream:
         ref: contentStream1
         item-type: e.instance
         ':get-more-items': getMoreInstances
         grid-class: grid-1
-    template#3:
+    template:
       v-slot: left
       e.instance.create:
         v-if: showCreateInstance

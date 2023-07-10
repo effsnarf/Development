@@ -170,21 +170,26 @@ const _fetchAsJson = async (url: string) => {
     //   div:
     //   div:
     // have the same indent and key, so we add #1, #2, etc to the end of the keys
-    const lines = yaml.split("\n");
-    const duplicateLines = new Map<string, number>();
-    lines.forEach((line) => {
-      const match = line.match(/^(\s*)(\w+):/);
-      if (match) {
-        const indent = match[1];
-        const key = match[2];
-        const duplicateCount = duplicateLines.get(key) || 0;
-        duplicateLines.set(key, duplicateCount + 1);
-        if (duplicateCount > 0) {
-          const newKey = `${key}#${duplicateCount}`;
-          yaml = yaml.replace(`${indent}${key}:`, `${indent}${newKey}:`);
+    // Crop everything from "dom:\n" to the first line that starts with a letter
+    let domSection =
+      (yaml.match(/dom:\n([\s\S]*?)(?=\n[a-zA-Z])/m) || [])[0] || "";
+    const afterDomSection = yaml.replace(domSection, "");
+    const keyLines = [...yaml.matchAll(/^(\s+)[\w.]+:/gm)]
+      .flatMap((a) => a)
+      .filter((a) => !a.startsWith("\n"))
+      .filter((a) => a.trim().length);
+    for (const keyLine of keyLines) {
+      const key = keyLine.replace(":", "");
+      const keyRegex = new RegExp(keyLine, "gm");
+      const matches = [...domSection.matchAll(keyRegex)];
+      if (matches.length > 1) {
+        for (let i = 0; i < matches.length; i++) {
+          const match = matches[i];
+          domSection = domSection.replace(match[0], `${key}#${i + 1}:`);
         }
       }
-    });
+    }
+    yaml = `${domSection}${afterDomSection}`;
     return yaml;
   };
 

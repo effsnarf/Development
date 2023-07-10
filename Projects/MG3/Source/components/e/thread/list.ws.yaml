@@ -9,7 +9,7 @@ dom:
         ':class': '{ selected: isCurrentThread(slotProps.item) }'
         ':url': $root.url.thread(slotProps.item)
         .grid:
-          div#1:
+          div:
             e.instance:
               ':item': firstPost(slotProps.item)?.instance
           ui.title:

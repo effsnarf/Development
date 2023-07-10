@@ -66,7 +66,7 @@ export default (context: any, dom: any, indent?: number, compName?: string) => {
     return `${indentStr}${tag}(${(
       Object.entries(attrs)
         .map((a) => {
-          return { key: a[0], value: a[1] };
+          return { key: a[0].split("#")[0], value: a[1] };
         })
         .filter((a) => a.value)
         .map((a: any) => {
