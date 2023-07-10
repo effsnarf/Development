@@ -1,16 +1,19 @@
 dom:
-  ui.movable:
-    @drag-by: $emit('drag-by', $event)
-    @scale-by: $emit('scale-by', $event)
-    ui.image:
-      ref: image1
-      v-if: item
-      ':style': itemStyle
-      ':imageID': item.imageID
-      ':remove-background': item.removeBackground
-      ':square': true
-      @load: onImageLoad
-      @change: refresh
+  div:
+    ui.movable:
+      @drag-by: $emit('drag-by', $event)
+      @scale-by: $emit('scale-by', $event)
+      ui.image:
+        ref: image1
+        v-if: item
+        ':style': itemStyle
+        ':imageID': item.imageID
+        ':remove-background': item.removeBackground
+        @load: onImageLoad
+        @change: refresh
+    e.template.caption.layer:
+      v-if: item.caption
+      :item: item.caption
 props:
   item: null
 data:
@@ -57,6 +60,13 @@ watch:
         this.refresh();
       }
     deep: true
+style:
+  .comp-e-template-caption-layer:
+    position: absolute
+    top: 0
+    width: 100%
+    height: 100%
+    pointer-events: none
 name: e-template-image-layer
 template: >-
   <ui-image class="comp-e-template-image-layer" :style="getStyle(item)"

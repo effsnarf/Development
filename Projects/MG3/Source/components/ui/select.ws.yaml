@@ -1,6 +1,15 @@
 dom:
   div:
+    select:
+      v-if: (type=='dropdown')
+      option:
+        v-for: (item, index) in options
+        ':value': index
+        v-text: item
+      :value: valueIndex
+      @input: onInput($event.target.value)
     ui.list:
+      v-if: (type=='list')
       v-slot: slotProps
       ':items': options
       ':selected-index': valueIndex
@@ -18,6 +27,7 @@ props:
   inputType: index
   direction: vertical
   showText: true
+  type: list
 methods:
   onInput: | #js
     function(index) {

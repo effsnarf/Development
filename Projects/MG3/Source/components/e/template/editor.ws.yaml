@@ -15,9 +15,21 @@ dom:
               ':layer': layer
               @click: selectLayer(index)
       .div2:
+        ui.select#1:
+          :options: "['layers', 'vertical']"
+          input-type: value
+          type: dropdown
+          v-model: temp.layout
+        ui.select#2:
+          :options: "['2/3', '1/1', '3/2', '4/3', '5/4', '16/9', '16/10', '21/9']"
+          input-type: value
+          type: dropdown
+          v-model: temp.aspectRatio
         ui.file.dropzone:
           @file-drop: (files) => onFileDrop(files)
-          .layers:
+          div:
+            :class: "'layout-' + temp.layout"
+            :style: getLayoutStyle(temp)
             transition:
               name: fade
               v-for: layer in temp.layers
@@ -43,6 +55,7 @@ dom:
               @toggle-disabled: toggleDisabled($event)
               :key: selectedLayerIndex
         ui.section#2:
+          v-if: (selectedLayer?.type!='caption')
           title: effects
           v-model: showFilters
           e.template.layer.filters:
@@ -70,6 +83,8 @@ methods:
         };
 
       this.temp = {
+        aspectRatio: "2/3",
+        layout: "layers",
         layers: []
       };
 
@@ -89,60 +104,53 @@ methods:
         "slices": "6",
         filters: {...filters}
       });
-      this.temp.layers.add({
-        "type": "image",
-        "visible": true,
-        "imageID": 679668901,
-        "removeBackground": true,
-        "trans": {
-            "pos": {
-                "x": 0.5,
-                "y": 0.5
+
+      for (let i = 0; i < 3; i++)
+      {
+        this.temp.layers.add({
+          "type": "image",
+          "visible": true,
+          "imageID": 679668909,
+          "removeBackground": false,
+          "trans": {
+              "pos": {
+                  "x": 0.5,
+                  "y": 0.5
+              },
+              "scale": 1
+          },
+          shadow: {
+            x: -0.1,
+            y: 0.1,
+            blur: 0.01,
+            color: '#000000',
+            opacity: 1
+          },
+          caption: {
+            visible: true,
+            text: 'Skip the dinner,\nwake up thinner.',
+            font: 'Special Elite',
+            color: 'black',
+            align: {
+              h: "center",
+              v: "bottom"
             },
-            "scale": 0.9
-        },
-        shadow: {
-          x: -0.1,
-          y: 0.1,
-          blur: 0.01,
-          color: '#000000',
-          opacity: 1
-        },
-        filters: {...filters}
-      });
-      this.temp.layers.add({
-        "type": "image",
-        "visible": true,
-        "imageID": 679668891,
-        "removeBackground": true,
-        "trans": {
-            "pos": {
-                "x": 0.5,
-                "y": 0.5
-            },
-            "scale": 0.9
-        },
-        shadow: {
-          x: -0.1,
-          y: 0.1,
-          blur: 0.01,
-          color: '#000000',
-          opacity: 1
-        },
-        filters: {...filters}
-      });
-      this.temp.layers.add({
-        type: 'captions',
-        visible: true,
-        texts: ['why are you so quiet', 'anon?'],
-        filters: {...filters}
-      });
+            uppercase: true,
+          },
+          filters: {...filters}
+        });
+      }
     }
   getCssClass: | #js
     function() {
       return {
         disabled: (this.disabled > 0)
       };
+    }
+  getLayoutStyle: | #js
+    function(temp) {
+      if (temp.layout == 'layers') return { aspectRatio: eval(temp.aspectRatio) };
+      return {};
     }
   getLayerStyle: | #js
     function(layer) {
@@ -154,6 +162,7 @@ methods:
       if (filters.transparent) cssFilters.push(`opacity(${1-filters.transparent})`);
       if (filters.grayscale) cssFilters.push(`grayscale(${filters.grayscale})`);
       style.filter = cssFilters.join(' ');
+      if (this.temp.layout != 'layers') style.aspectRatio = eval(this.temp.aspectRatio);
       return style;
     }
   selectLayer: | #js
@@ -216,6 +225,10 @@ methods:
       if (disabled) this.disabled++;
       else this.disabled--;
     }
+  eval: | #js
+    function(s) {
+      return eval(s);
+    }
 computed:
   selectedLayer: | #js
     function() {
@@ -258,12 +271,22 @@ style:
   .layers:
     aspect-ratio: 1 / 1
     overflow: hidden
-  .layer:
+  .layers .layer:
     position: absolute
     top: 0
     left: 0
     width: 100%
     height: 100%
+    pointer-events: none
+  .layout-vertical:
+    border: "2px solid #ffffff60"
+    display: flex
+    flex-direction: column-reverse
+  .layout-vertical .layer:
+    width: 100%
+  .layout-vertical, .layout-vertical .layer:
+    overflow: hidden
+  .layer:
     pointer-events: none
   .layer.selected, .layer.selected:hover:
     background: none !important

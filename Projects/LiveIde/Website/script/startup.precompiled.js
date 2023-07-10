@@ -163,9 +163,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "./script/1688908656502.ts":
+/***/ "./script/1688978553288.ts":
 /*!*********************************!*\
-  !*** ./script/1688908656502.ts ***!
+  !*** ./script/1688978553288.ts ***!
   \*********************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -611,6 +611,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ClientContext = void 0;
 const Lock_1 = __webpack_require__(/*! ../../../Shared/Lock */ "../../../Shared/Lock.ts");
 const to_template_1 = __importDefault(__webpack_require__(/*! ../../../Shared/WebScript/to.template */ "../../../Shared/WebScript/to.template.ts"));
+const is_attribute_name_1 = __importDefault(__webpack_require__(/*! ../../../Shared/WebScript/is.attribute.name */ "../../../Shared/WebScript/is.attribute.name.ts"));
 const ComponentManager_1 = __webpack_require__(/*! ./ComponentManager */ "../classes/ComponentManager.ts");
 const ClientDatabase_1 = __webpack_require__(/*! ./ClientDatabase */ "../classes/ClientDatabase.ts");
 const isDevEnv = window.location.hostname == "localhost";
@@ -701,49 +702,7 @@ class ClientContext {
         });
     }
     isAttributeName(componentNames, name) {
-        if (name.includes("."))
-            return false;
-        if (name.startsWith(":"))
-            return true;
-        if (name.includes("#"))
-            return false;
-        if (name.startsWith("template"))
-            return false;
-        if (name == "slot")
-            return false;
-        if ([
-            "a",
-            "style",
-            ...[1, 2, 3, 4, 5, 6].map((i) => `h${i}`),
-            "pre",
-            "code",
-            "p",
-            "img",
-            "table",
-            "thead",
-            "tbody",
-            "tr",
-            "th",
-            "td",
-            "div",
-            "span",
-            "ul",
-            "li",
-            "label",
-            "input",
-            "button",
-            "canvas",
-            "textarea",
-            "component",
-            "transition",
-            "keep.alive",
-        ].includes(name))
-            return false;
-        if (name.startsWith("."))
-            return false;
-        if (componentNames.find((c) => c == name.replace(":", "")))
-            return false;
-        return true;
+        return (0, is_attribute_name_1.default)(componentNames, name);
     }
     pugToHtml(pug) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -3161,6 +3120,65 @@ exports["default"] = (context, compName, dom) => {
 
 /***/ }),
 
+/***/ "../../../Shared/WebScript/is.attribute.name.ts":
+/*!******************************************************!*\
+  !*** ../../../Shared/WebScript/is.attribute.name.ts ***!
+  \******************************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports["default"] = (componentNames, name) => {
+    if (name.includes("."))
+        return false;
+    if (name.startsWith(":"))
+        return true;
+    if (name.includes("#"))
+        return false;
+    if (name.startsWith("template"))
+        return false;
+    if (name == "slot")
+        return false;
+    if ([
+        "a",
+        "style",
+        ...[1, 2, 3, 4, 5, 6].map((i) => `h${i}`),
+        "pre",
+        "code",
+        "p",
+        "img",
+        "table",
+        "thead",
+        "tbody",
+        "tr",
+        "th",
+        "td",
+        "div",
+        "span",
+        "ul",
+        "li",
+        "label",
+        "input",
+        "button",
+        "select",
+        "option",
+        "canvas",
+        "textarea",
+        "component",
+        "transition",
+        "keep.alive",
+    ].includes(name))
+        return false;
+    if (name.startsWith("."))
+        return false;
+    if (componentNames.find((c) => c == name.replace(":", "")))
+        return false;
+    return true;
+};
+
+
+/***/ }),
+
 /***/ "../../../Shared/WebScript/to.template.ts":
 /*!************************************************!*\
   !*** ../../../Shared/WebScript/to.template.ts ***!
@@ -3319,7 +3337,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("./script/1688908656502.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("./script/1688978553288.ts");
 /******/ 	
 /******/ })()
 ;

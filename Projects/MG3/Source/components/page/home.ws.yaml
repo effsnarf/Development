@@ -1,6 +1,23 @@
 dom:
   site:
     page-name: home
+    template#0:
+      v-slot: article
+      .grid-3:
+        e.teaser#1:
+          imageID: 32
+          title: Advice
+          url: /c/advice-animals
+        e.teaser#2:
+          imageID: 679668918
+          title: Movies
+          url: /c/movies
+        e.teaser#3:
+          imageID: 679668921
+          title: Anonymous Times
+        e.teaser#4:
+          imageID: 679668909
+          title: YouTube
     template#1:
       v-slot: left
       e.thread.list: null

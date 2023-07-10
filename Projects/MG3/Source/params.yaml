@@ -5,6 +5,7 @@ params:
         if (url == "/") return "home";
         if (url == "/admin") return "admin";
         if (url.startsWith("/instance/")) return "instance";
+        if (url.startsWith("/c/")) return "category";
         if (url.startsWith("/t/")) return "thread";
         return "generator";
       }
@@ -13,6 +14,7 @@ params:
       function(url) {
         if (url == "/admin") return null;
         if (["instance", "t"].some(a => url.startsWith(`/${a}/`))) return null;
+        if (["c"].some(a => url.startsWith(`/${a}/`))) return url.split("/")[2];
         return url.split("/")[1];
       }
   instanceID:

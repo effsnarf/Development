@@ -1,0 +1,13 @@
+dom:
+  ui.link:
+    :url: url
+    ui.image:
+      :imageID: imageID
+      aspect-ratio: 2 / 1
+    h3:
+      v-text: title
+
+props:
+  imageID: null
+  title: null
+  url: null

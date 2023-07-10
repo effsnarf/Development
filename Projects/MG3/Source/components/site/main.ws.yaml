@@ -4,23 +4,24 @@ dom:
     transition:
       name: fade
       content.title:
+        class: hidden
         v-if: titleText
-        ':imageID': titleImageId
-        ':title': titleText
-        ':url': titleUrl
-        ':key': titleKey
+        ":imageID": titleImageId
+        ":title": titleText
+        ":url": titleUrl
+        ":key": titleKey
     div:
       slot:
         name: article
     .columns:
       .left:
         ui.sticky:
-          ':top': leftStickyTop
+          ":top": leftStickyTop
           slot:
             name: left
       .middle:
         ui.error:
-          ':error': $root.error
+          ":error": $root.error
         slot:
           name: middle
       .right:
@@ -30,7 +31,7 @@ dom:
             slot:
               name: right
             content.recommendations:
-              ':items': recommendationItems
+              ":items": recommendationItems
 props:
   titleImageId: null
   titleText: null
@@ -39,6 +40,7 @@ props:
   recommendationItems: null
 computed:
   leftStickyTop: | #js
+
 
     function() {
       if (this.titleText) return "250px";

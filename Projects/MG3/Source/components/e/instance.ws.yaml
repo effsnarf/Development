@@ -1,16 +1,16 @@
 dom:
   div:
-    v-if: item
+    v-if: instance
     ui.link:
       class: instance
       div:
         ui.image:
           ref: image1
-          ':imageID': item.imageID || item.generator?.imageID
+          ':imageID': instance.imageID || instance.generator?.imageID
           @change: updateImageSize
         .texts:
           .text:
-            v-for: (text, index) in [item.text0, item.text1]
+            v-for: (text, index) in [instance.text0, instance.text1]
             v-text: text
             ':style': '{ fontSize: fontSizes[index] }'
         div:
@@ -18,17 +18,18 @@ dom:
     @click: $emit('click')
     e.post.create:
       v-if: showCreatePost
-      ':generator': $root.instanceToGenerator(item)
-      ':entityID': item._id
+      ':generator': $root.instanceToGenerator(instance)
+      ':entityID': instance._id
 name: e-instance
 props:
   item: null
   showCreatePost: true
+  instanceID: null
 data:
   width: null
+  instance: null
 methods:
   getFontSize: | #js
-
     function (s) {
       if (!s) return 0;
       if (!this.width) return 0;
@@ -36,23 +37,34 @@ methods:
       return `${size*2.5}vh`;
     }
   updateImageSize: | #js
-
     function () {
       this.width = this.$refs.image1.width;
     }
 computed:
   showGenerator: | #js
-
     function () {
       if (this.item.urlName == this.$root.params.urlName) return false;
       return true;
     }
   fontSizes: | #js
-
     function () {
-      const sizes = [this.getFontSize(this.item.text0), this.getFontSize(this.item.text1)];
+      if (!this.instance) return [0, 0];
+      const sizes = [this.getFontSize(this.instance.text0), this.getFontSize(this.instance.text1)];
       return sizes;
     }
+watch:
+  item:
+    handler: | #js
+      function (item) {
+        this.instance = item;
+      }
+    immediate: true
+  instanceID:
+    handler: | #js
+      async function (instanceID) {
+        this.instance = !instanceID ? null : await this.$root.dbp.instances.select.one(instanceID);
+      }
+    immediate: true
 style:
   .instance:
     display: block

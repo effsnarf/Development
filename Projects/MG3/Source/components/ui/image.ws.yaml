@@ -16,7 +16,8 @@ props:
   src: null
   square: null
   removeBackground: false
-  imgStyle: null
+  aspectRatio: null
+  objectPosition: null
 data:
   width: null
   height: null
@@ -66,15 +67,22 @@ computed:
     function () {
       return '/img/empty.png';
     }
+  imgStyle: | #js
+    function () {
+      const style = {};
+      style.aspectRatio = this.aspectRatio;
+      style.objectPosition = this.objectPosition;
+      return style;
+    }
 style:
   .comp-ui-image:
     overflow: hidden
     transition: 0s
   .image, img:
     width: 100%
+    object-fit: cover
   .square:
     aspect-ratio: 1
-    object-fit: cover
 name: ui-image
 template: >-
   <component class="comp-ui-image image" :is="getCompType()" :url="url"

@@ -13,6 +13,7 @@ dom:
       page.admin.index: null
       page.home: null
       page.thread: null
+      page.category: null
       page.generator: null
       page.instance: null
 name: app

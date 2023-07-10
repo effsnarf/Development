@@ -1,5 +1,6 @@
 import { Lock } from "../../../Shared/Lock";
 import toTemplate from "../../../Shared/WebScript/to.template";
+import isAttributeName from "../../../Shared/WebScript/is.attribute.name";
 import { Component } from "./Component";
 import { ComponentManager } from "./ComponentManager";
 import { ClientDatabase } from "./ClientDatabase";
@@ -127,44 +128,7 @@ class ClientContext {
   }
 
   isAttributeName(componentNames: string[], name: string) {
-    if (name.includes(".")) return false;
-    if (name.startsWith(":")) return true;
-    if (name.includes("#")) return false;
-    if (name.startsWith("template")) return false;
-    if (name == "slot") return false;
-    if (
-      [
-        "a",
-        "style",
-        ...[1, 2, 3, 4, 5, 6].map((i) => `h${i}`),
-        "pre",
-        "code",
-        "p",
-        "img",
-        "table",
-        "thead",
-        "tbody",
-        "tr",
-        "th",
-        "td",
-        "div",
-        "span",
-        "ul",
-        "li",
-        "label",
-        "input",
-        "button",
-        "canvas",
-        "textarea",
-        "component",
-        "transition",
-        "keep.alive",
-      ].includes(name)
-    )
-      return false;
-    if (name.startsWith(".")) return false;
-    if (componentNames.find((c) => c == name.replace(":", ""))) return false;
-    return true;
+    return isAttributeName(componentNames, name);
   }
 
   async pugToHtml(pug: string) {

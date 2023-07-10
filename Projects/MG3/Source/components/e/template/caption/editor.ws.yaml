@@ -1,0 +1,34 @@
+dom:
+  div:
+    ui.textarea:
+      :hint: item.hint
+      v-model: item.text
+    ui.select#1:
+      ":options": "['Oswald', 'Special Elite']"
+      type: dropdown
+      input-type: value
+      v-model: item.font
+    ui.select#2:
+      ":options": "['white', 'black']"
+      type: dropdown
+      input-type: value
+      v-model: item.color
+    ui.select#3:
+      ":options": "['left', 'center', 'right']"
+      type: dropdown
+      input-type: value
+      v-model: item.align.h
+    ui.select#4:
+      ":options": "['top', 'center', 'bottom']"
+      type: dropdown
+      input-type: value
+      v-model: item.align.v
+props:
+  item: null
+  hint: null
+name: e-template-caption-editor
+template: >-
+  <div class="comp-e-template-caption-editor" path="-1978901725."><div
+  class="inputs" path="-1978901725.0"><input v-model="item.texts[0]"
+  placeholder="top text" path="-1978901725.0.0"/><input v-model="item.texts[1]"
+  placeholder="bottom text" path="-1978901725.0.1"/></div></div><path></path>

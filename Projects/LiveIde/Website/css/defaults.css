@@ -324,6 +324,11 @@ pre, input, textarea, select, option, .ide-checkbox
   width: 100%;
   color: #ffffff;
 }
+option
+{
+  background: #303030;
+  cursor: pointer;
+}
 input:focus, textarea:focus, select:focus
 {
   color: white;

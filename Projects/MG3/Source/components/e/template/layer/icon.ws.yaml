@@ -13,17 +13,15 @@ props:
   layer: null
 methods:
   getLayerTypeIcon: | #js
-
     function(type) {
       return {
         'image': '🖼️',
-        'captions': '✏️',
+        'caption': '✏️',
         'rainbow': '🌈'
       }[type];
     }
 computed:
   hasImage: | #js
-
     function() {
       if (!this.layer) return false;
       return (this.layer.type == 'image') && this.layer.imageID;

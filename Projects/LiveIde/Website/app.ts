@@ -165,25 +165,26 @@ const _fetchAsJson = async (url: string) => {
 
   const preProcessYaml = (yaml: string) => {
     yaml = yaml.replace(/@/g, "on_");
-    if (false) {
-      // Find duplicate lines
-      let k = 100;
-      const lines = yaml.split("\n").map((s, i) => {
-        return { index: i, s: s };
-      });
-      for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
-        const otherLines = lines.filter((l) => l.index != line.index);
-        const dupLines = otherLines.filter((l) => l.s == line.s);
-        for (let j = 0; j < dupLines.length; j++) {
-          const dupLine = dupLines[j];
-          const key = dupLine.s.split(":")[0];
-          if (key.includes("#")) continue;
-          dupLine.s = dupLine.s.replace(key, `${key}#${k++}`);
+    // Find duplicate lines
+    // example:
+    //   div:
+    //   div:
+    // have the same indent and key, so we add #1, #2, etc to the end of the keys
+    const lines = yaml.split("\n");
+    const duplicateLines = new Map<string, number>();
+    lines.forEach((line) => {
+      const match = line.match(/^(\s*)(\w+):/);
+      if (match) {
+        const indent = match[1];
+        const key = match[2];
+        const duplicateCount = duplicateLines.get(key) || 0;
+        duplicateLines.set(key, duplicateCount + 1);
+        if (duplicateCount > 0) {
+          const newKey = `${key}#${duplicateCount}`;
+          yaml = yaml.replace(`${indent}${key}:`, `${indent}${newKey}:`);
         }
       }
-      yaml = lines.map((l) => l.s).join("\n");
-    }
+    });
     return yaml;
   };
 
@@ -196,6 +197,8 @@ const _fetchAsJson = async (url: string) => {
     // Also replace:
     // mounted: |
     yaml = yaml.replace(/mounted: \|/g, "mounted: | #js");
+    // Remove #1, #2, etc from the end of keys (div#1: -> div:)
+    yaml = yaml.replace(/(\w+)#\d+: /g, "$1: ");
     return yaml;
   };
 
