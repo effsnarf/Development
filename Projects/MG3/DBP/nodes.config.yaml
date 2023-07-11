@@ -184,8 +184,9 @@ api:
     Threads.select.all:
       args: []
       code: | #js
+        return [];
         let threads = await db.find("Threads", {}, { LastPostCreated: -1 }, 1000, null, true);
-        threads = await Promise.all(threads.map(t => dbp.threads.select.one(t._id)));
+        threads = await Promise.all(threads.map(async t => await dbp.threads.select.one(t._id)));
         return threads;
     Posts.create.one:
       args: [threadID, larpGeneratorID, text, instance]
