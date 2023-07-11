@@ -2,8 +2,8 @@ dom:
   div:
     ui.textarea:
       v-model: yaml
-      on_focus: isFocused = true
-      on_blur: isFocused = false
+      @focus: isFocused = true
+      @blur: isFocused = false
     .error:
       v-if: error
       v-text: error
@@ -14,14 +14,16 @@ data:
   isFocused: false
   error: null
 methods:
-  updateYamlFromObject: |
+  updateYamlFromObject: | #js
+
     function() {
       let yaml = jsyaml.dump(this.value);
       yaml = yaml.replace(/ null/g, "");
       this.yaml = yaml;
     }
 watch:
-  value: |
+  value: | #js
+
     {
       handler: function() {
         if (this.isFocused) return;
@@ -29,7 +31,8 @@ watch:
       },
       immediate: true
     }
-  yaml: |
+  yaml: | #js
+
     {
       handler() {
         try
@@ -44,7 +47,8 @@ watch:
         }
       }
     }
-  isFocused: |
+  isFocused: | #js
+
     {
       handler(newValue) {
         if (newValue) return;
@@ -56,6 +60,7 @@ watch:
     }
 name: ui-json-editor
 template: >-
-  <div class="comp-ui-json-editor"><ui-textarea v-model="yaml" @focus="isFocused
-  = true" @blur="isFocused = false"></ui-textarea><div class="error"
-  v-if="error" v-text="error"></div></div>
+  <div class="comp-ui-json-editor" path="-208761639."><ui-textarea
+  v-model="yaml" @focus="isFocused = true" @blur="isFocused = false"
+  path="-208761639.0"></ui-textarea><div class="error" v-if="error"
+  v-text="error" path="-208761639.1"></div></div>

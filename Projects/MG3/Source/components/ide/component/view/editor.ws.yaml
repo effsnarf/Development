@@ -1,0 +1,29 @@
+dom:
+  div:
+    v-if: component
+    ui.tree:
+      ':root': '[null, dom]'
+      ':initial-expanded': true
+      item-type: ide.component.view.node
+      ':get-item': (node) => node
+      ':get-children': (node) => $root.getViewChildNodes(node)
+props:
+  component: null
+data:
+  dom: null
+watch:
+  component:
+    handler: | #js
+      function(component) {
+        this.dom = this.$root.addPaths(component.name, component.source.dom);
+      }
+    immediate: true
+methods: null
+style: null
+name: ide-component-view-editor
+template: >-
+  <div class="comp-ide-component-view-editor" v-if="component"
+  path="-1512907487."><ui-tree :root="[null, dom]" :initial-expanded="true"
+  item-type="ide.component.view.node" :get-item="(node) =&gt; node"
+  :get-children="(node) =&gt; $root.getViewChildNodes(node)"
+  path="-1512907487.0"></ui-tree></div>

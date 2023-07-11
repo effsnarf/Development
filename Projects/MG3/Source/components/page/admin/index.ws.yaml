@@ -42,15 +42,18 @@ data:
   lastValue: 1 hour
   barsValue: 100
 methods:
-  getCatOptions: |
+  getCatOptions: | #js
+
     function() {
     }
 computed:
-  chartData: |
+  chartData: | #js
+
     function() {
       return Array.from({ length: 10 }, (v, i) => i + 1);
     }
-  every: |
+  every: | #js
+
     function() {
       if (!this.lastValue || !this.barsValue) return null;
       if (this.lastValue.endsWith("hour")) return (1).minutes().unitifyTime().withoutColors();
@@ -78,12 +81,16 @@ style:
     gap: 1rem
 name: page-admin-index
 template: >-
-  <div class="comp-page-admin-index app" v-if="$root.params.page ==
-  'admin'"><div class="column"><ui-select :options="Object.keys(options)"
-  v-model="catValue" input-type="value"></ui-select></div><div
-  class="column"><ui-select :options="options[catValue]" v-model="eventValue"
-  input-type="value"></ui-select></div><div class="column"><ui-select
-  :options="lastOptions" v-model="lastValue"
-  input-type="value"></ui-select></div><div><div class="bars"><div
-  class="bar"><ui-chart2 :app="'MG'" :category="catValue" :event="eventValue"
-  :last="lastValue" :every="every"></ui-chart2></div></div></div></div>
+  <div class="comp-page-admin-index app" v-if="$root.params.page == 'admin'"
+  path="-1156850540."><div class="column" path="-1156850540.0"><ui-select
+  :options="Object.keys(options)" v-model="catValue" input-type="value"
+  path="-1156850540.0.0"></ui-select></div><div class="column"
+  path="-1156850540.1"><ui-select :options="options[catValue]"
+  v-model="eventValue" input-type="value"
+  path="-1156850540.1.0"></ui-select></div><div class="column"
+  path="-1156850540.2"><ui-select :options="lastOptions" v-model="lastValue"
+  input-type="value" path="-1156850540.2.0"></ui-select></div><div
+  path="-1156850540.3"><div class="bars" path="-1156850540.3.0"><div class="bar"
+  path="-1156850540.3.0.0"><ui-chart2 :app="'MG'" :category="catValue"
+  :event="eventValue" :last="lastValue" :every="every"
+  path="-1156850540.3.0.0.0"></ui-chart2></div></div></div></div>

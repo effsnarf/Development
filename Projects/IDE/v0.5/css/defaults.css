@@ -566,8 +566,9 @@ progress
   padding: 0.5em 1em;
   z-index: 1;
   left: 50%;
+  bottom: 0;
   opacity: 0;
-  transform: translate(-50%, -180%);
+  transform: translate(-50%, 110%);
   transition: 0.3s;
 }
 
@@ -575,7 +576,6 @@ progress
 [tooltip]:hover::before {
   visibility: visible;
   opacity: 1;
-  transform: translate(-50%, -140%);
   transition: 0.3s;
 }
 

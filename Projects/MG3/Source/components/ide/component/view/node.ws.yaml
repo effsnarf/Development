@@ -1,0 +1,51 @@
+dom:
+  div:
+    v-if: item
+    ui.highlighter:
+      ":get-elements": () => $root.getElementsFromViewNode(item)
+      ui.title:
+        ":icon": icon
+        ":text": item[0]
+    ui.context.window:
+      ":icon": icon
+      ":title": item[0]
+      template#2:
+        v-slot: content
+        ide.component.view.attribute:
+          v-for: attr in getAttributes(item)
+          ":item": attr
+props:
+  item: null
+data:
+  icon: null
+methods:
+  getAttributes: | #js
+    function(item) {
+      return Object.entries(item[1])
+        .filter(e => (e[0] != "path"))
+        .filter(e => (typeof e[1] != 'object'));
+    }
+  getIcon: | #js
+    function(item) {
+      if (this.$root.isComponentName(item[0])) return '📦';
+      return '📁';
+    }
+watch:
+  item:
+    handler: | #js
+      function(item) {
+        this.icon = this.getIcon(item);
+      }
+    immediate: true
+name: ide-component-view-node
+template: >-
+  <div class="comp-ide-component-view-node" v-if="item"
+  path="-971127114."><ui-highlighter :get-elements="() =&gt;
+  $root.getElementsFromViewNode(item[1])"
+  path="-971127114.0"></ui-highlighter><ui-title :icon="icon" :text="item[0]"
+  path="-971127114.1"></ui-title><ui-context path="-971127114.2"><template
+  v-slot:title path="-971127114.2.0"><ui-title :icon="icon" :text="item[0]"
+  path="-971127114.2.0.0"></ui-title></template><template v-slot:content
+  path="-971127114.2.1"><ide-component-view-attribute v-for="attr in
+  Object.entries(item[1])" :item="attr"
+  path="-971127114.2.1.0"></ide-component-view-attribute></template></ui-context></div>

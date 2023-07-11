@@ -1,0 +1,31 @@
+dom:
+  div:
+    @click: $emit('click')
+    v-if: vue
+    ui.highlighter:
+      ':get-elements': () => vue.$el
+      div:
+        @click: onClick
+        ui.title:
+          icon: 📦
+          ':value': vue.$options._componentTag
+props:
+  item: null
+methods:
+  onClick: | #js
+    function() {
+      console.log(this.vue);
+    }
+computed:
+  vue: | #js
+    function() {
+      if (!this.item) return null;
+      return this.item();
+    }
+name: ide-component-title
+template: >-
+  <div class="comp-ide-component-title" @click="$emit('click')" v-if="vue"
+  path="259955427."><ui-highlighter :get-elements="() =&gt; vue.$el"
+  path="259955427.0"><div @click="onClick" path="259955427.0.0"><ui-title
+  icon="📦" :value="vue.$options._componentTag"
+  path="259955427.0.0.0"></ui-title></div></ui-highlighter></div>

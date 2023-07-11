@@ -12,6 +12,7 @@ import { TypeScript } from "@shared/TypeScript";
 import { DatabaseProxy } from "../../../Apps/DatabaseProxy/Client/DbpClient";
 import { MemoryCache } from "@shared/Cache";
 import { Analytics, ItemType } from "@shared/Analytics";
+import isAttributeName from "@shared/WebScript/is.attribute.name";
 
 const isDevEnv = Configuration.getEnvironment() == "dev";
 
@@ -39,7 +40,19 @@ const _fetchAsJson = async (url: string) => {
 
   const componentsFolder = path.join(config.project.folder, "Components");
 
+  const compInfos = new Map<string, any>();
+  const compIsModified = (comp: any) => {
+    const info = compInfos.get(comp.name);
+    if (!info) return true;
+    const lastModified = fs.statSync(
+      path.join(componentsFolder, comp.path)
+    ).mtimeMs;
+    return lastModified > info.last.served;
+  };
+
   const getComponents = async () => {
+    const now = Date.now();
+
     const comps = Files.getFiles(componentsFolder, {
       recursive: true,
     })
@@ -57,9 +70,28 @@ const _fetchAsJson = async (url: string) => {
           }
         }
 
+        if (!compInfos.has(comp.name)) {
+          compInfos.set(comp.name, {
+            last: {
+              served: now,
+            },
+          });
+        }
+
         return comp;
       });
     return comps;
+  };
+
+  const getChangedComponents = async () => {
+    const now = Date.now();
+    const comps = await getComponents();
+    const changedComps = comps.filter(compIsModified);
+    changedComps.forEach((c) => {
+      const info = compInfos.get(c.name);
+      info.last.served = now;
+    });
+    return changedComps;
   };
 
   const getTemplates = async () => {
@@ -134,15 +166,60 @@ const _fetchAsJson = async (url: string) => {
 
   const preProcessYaml = (yaml: string) => {
     yaml = yaml.replace(/@/g, "on_");
+    // Find duplicate lines
+    // example:
+    //   div:
+    //   div:
+    // have the same indent and key, so we add #1, #2, etc to the end of the keys
+    // Crop everything from "dom:\n" to the first line that starts with a letter
+    let domSection =
+      (yaml.match(/dom:\n([\s\S]*?)(?=\n[a-zA-Z])/m) || [])[0] || "";
+    const afterDomSection = yaml.replace(domSection, "");
+    const keyLines = [...yaml.matchAll(/^(\s+)[\w.]+:/gm)]
+      .flatMap((a) => a)
+      .filter((a) => !a.startsWith("\n"))
+      .filter((a) => a.trim().length);
+    for (const keyLine of keyLines) {
+      const key = keyLine.replace(":", "");
+      if (isAttributeName([], key.trim())) continue;
+      const keyRegex = new RegExp(keyLine, "gm");
+      const matches = [...domSection.matchAll(keyRegex)];
+      if (matches.length > 1) {
+        for (let i = 0; i < matches.length; i++) {
+          const match = matches[i];
+          domSection = domSection.replace(match[0], `${key}#${i + 1}:`);
+        }
+      }
+    }
+    yaml = `${domSection}${afterDomSection}`;
     return yaml;
+  };
+
+  const postProcessYaml = (yaml: string) => {
+    // Replace on_ with @
+    yaml = yaml.replace(/\bon_/g, "@");
+    // Add "# js" after method keys (  onLayerImageLoad: |)
+    // Regex is two whitespaces, then a key, then a colon, then a space, then a pipe
+    yaml = yaml.replace(/  (\w+): \|/g, "  $1: | #js");
+    // Also replace:
+    // mounted: |
+    yaml = yaml.replace(/mounted: \|/g, "mounted: | #js");
+    // Remove #1, #2, etc from the end of keys (div#1: -> div:)
+    yaml = yaml.replace(/(\w+)#\d+: /g, "$1: ");
+    return yaml;
+  };
+
+  const isLocalFolder = (url: string) => {
+    const localPath = path.join(process.cwd(), url);
+    return fs.existsSync(localPath);
   };
 
   const staticFileFolders = [
     process.cwd(),
     config.project.folder,
     config.webscript.folder,
-    config.website.folder,
-  ];
+    config.website?.folder,
+  ].filter((s) => s);
 
   console.log("staticFileFolders", staticFileFolders);
 
@@ -150,7 +227,7 @@ const _fetchAsJson = async (url: string) => {
     config.server.port,
     config.server.host,
     async (req, res, data) => {
-      if (req.url.startsWith("/img/") && !req.url.startsWith("/img/banners/")) {
+      if (req.url.startsWith("/img/") && !isLocalFolder(req.url)) {
         // Redirect to img.memegenerator.net
         const url = `https://img.memegenerator.net/${req.url.replace(
           "/img/",
@@ -166,6 +243,10 @@ const _fetchAsJson = async (url: string) => {
 
       if (req.url == "/components") {
         const comps = await getComponents();
+        return res.end(JSON.stringify(comps));
+      }
+      if (req.url == "/changed/components") {
+        const comps = await getChangedComponents();
         return res.end(JSON.stringify(comps));
       }
       if (req.url == "/component/update") {
@@ -185,10 +266,11 @@ const _fetchAsJson = async (url: string) => {
         const comp = data;
         const compPath = path.join(componentsFolder, comp.path);
         const existingComp = Objects.parseYaml(
-          fs.readFileSync(compPath, "utf8")
+          preProcessYaml(fs.readFileSync(compPath, "utf8"))
         );
         if (!("editable" in existingComp) || existingComp.editable) {
-          const yaml = Objects.yamlify(comp.source);
+          let yaml = Objects.yamlify(comp.source);
+          yaml = postProcessYaml(yaml);
           fs.writeFileSync(compPath, yaml);
         }
         return res.end("ok");

@@ -3,6 +3,7 @@ import path from "path";
 import Handlebars from "handlebars";
 import { Objects } from "../Extensions.Objects";
 import toTemplate from "./to.template";
+import isAttributeName from "../../Shared/WebScript/is.attribute.name";
 
 class WebScript {
   // #region Globals
@@ -89,41 +90,7 @@ class WebScript {
   }
 
   private static isAttributeName(componentNames: string[], name: string) {
-    if (name.includes(".")) return false;
-    if (name.startsWith(":")) return true;
-    if (name.includes("#")) return false;
-    if (name.startsWith("template")) return false;
-    if (name == "slot") return false;
-    if (
-      [
-        "a",
-        "style",
-        ...[1, 2, 3, 4, 5, 6].map((i) => `h${i}`),
-        "pre",
-        "p",
-        "img",
-        "table",
-        "thead",
-        "tbody",
-        "tr",
-        "th",
-        "td",
-        "div",
-        "span",
-        "ul",
-        "li",
-        "input",
-        "button",
-        "canvas",
-        "textarea",
-        "component",
-        "transition",
-      ].includes(name)
-    )
-      return false;
-    if (name.startsWith(".")) return false;
-    if (componentNames.find((c) => c == name.replace(":", ""))) return false;
-    return true;
+    return isAttributeName(componentNames, name);
   }
 }
 

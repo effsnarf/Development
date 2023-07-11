@@ -1,0 +1,21 @@
+dom:
+  component:
+    :is: getComponentType(value)
+    :value: value
+props:
+  value: null
+methods:
+  getComponentType: | #js
+    function(value) {
+      const getType = (value) => {
+        let typeofValue = typeof value;
+        if (typeofValue == "string") typeofValue = "object";
+        if (["object", "boolean"].find(v => v == typeofValue)) return typeofValue;
+        return "preview";
+      };
+      return `ui.value.${getType(value)}`.replace(/\./g, "-");
+    }
+name: ui-value-any
+template: >-
+  <div class="comp-ui-value-any" :class="getCssClass(value)"
+  v-text="valueToString(value)" path="1299909909."></div>

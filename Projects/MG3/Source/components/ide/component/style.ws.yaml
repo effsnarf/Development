@@ -1,26 +1,33 @@
 dom:
   style:
     ':class': component.name
-    v-html: htmlDecode(style)
+    v-html: css
 props:
   component: null
+data:
+  css: null
 methods:
-  htmlDecode: |
+  getCss: | #js
+    function(component) {
+      if (!component?.source?.style) return null;
+      const template = this.$root.templates.style;
+      let css = Handlebars.compile(template)(component);
+      css = this.htmlDecode(css);
+      return css;
+    }
+  htmlDecode: | #js
     function(input) {
       var doc = new DOMParser().parseFromString(input, "text/html");
       return doc.documentElement.textContent;
     }
-computed:
-  style: |
-    function() {
-      if (!this.component?.source?.style) return "";
-
-      const template = this.$root.templates.style;
-      const css = Handlebars.compile(template)(this.component);
-
-      return css;
-    }
+watch:
+  component:
+    handler: | #js
+      function(component) {
+        this.css = this.getCss(component);
+      }
+    immediate: true
 name: ide-component-style
 template: >-
-  <style class="comp-ide-component-style" :class="component.name"
-  v-html="htmlDecode(style)"></style>
+  <style class="comp-ide-component-style" :class="component.name" v-html="css"
+  path="259364412."></style>

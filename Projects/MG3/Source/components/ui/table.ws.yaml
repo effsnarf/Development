@@ -8,7 +8,7 @@ dom:
       tbody:
         tr:
           v-for: item in tableData
-          on_click: itemClick(item)
+          @click: itemClick(item)
           td:
             v-for: key in Object.keys(item)
             .content:
@@ -19,12 +19,14 @@ props:
   data:
     default: []
 methods:
-  itemClick: |
+  itemClick: | #js
+
     function(item) {
       this.$emit('item-click', item);
     }
 computed:
-  tableData: |
+  tableData: | #js
+
     function() {
       if (!this.data?.length) return [];
       if (this.data.map(v => typeof v).find(t => t === 'number')) {
@@ -42,7 +44,11 @@ style:
     padding-right: 1em
 name: ui-table
 template: >-
-  <div class="comp-ui-table card"><table><thead><th v-for="key in
-  Object.keys(tableData[0])" v-text="key"></th></thead><tbody><tr v-for="item in
-  tableData" @click="itemClick(item)"><td v-for="key in Object.keys(item)"><div
-  class="content" v-text="item[key]"></div></td></tr></tbody></table></div>
+  <div class="comp-ui-table card" path="-2123958284."><table
+  path="-2123958284.0"><thead path="-2123958284.0.0"><th v-for="key in
+  Object.keys(tableData[0])" v-text="key"
+  path="-2123958284.0.0.0"></th></thead><tbody path="-2123958284.0.1"><tr
+  v-for="item in tableData" @click="itemClick(item)"
+  path="-2123958284.0.1.0"><td v-for="key in Object.keys(item)"
+  path="-2123958284.0.1.0.0"><div class="content" v-text="item[key]"
+  path="-2123958284.0.1.0.0.0"></div></td></tr></tbody></table></div>

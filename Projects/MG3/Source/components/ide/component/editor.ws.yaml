@@ -1,28 +1,34 @@
 dom:
   div:
     v-if: component
-    ui.title:
-      class: fs-m3
-      icon: 📦
-      ':text': component?.name
     ui.tabs:
-      ':options': '[''📁 dom'', ''🟢 style'']'
+      ":options": "['🧊 state', '📁 view']"
+      direction: horizontal
       template#1:
         v-slot: tab0
-        ui.json.editor:
-          v-model: component.source.dom
+        ide.state.tracker:
+          ":uid": vueUid
       template#2:
         v-slot: tab1
-        ui.json.editor:
-          v-model: component.source.style
+        ide.component.view.editor:
+          ":component": component
 props:
+  vueUid: null
+data:
   component: null
 methods: null
+watch:
+  vueUid: | #js
+    function(vueUid) {
+      this.component = !vueUid ? null : this.$root.getComponent(vueUid);
+    }
 name: ide-component-editor
 template: >-
-  <div class="comp-ide-component-editor" v-if="component"><ui-title
-  class="fs-m3" icon="📦" :text="component?.name"></ui-title><ui-tabs
-  :options="['📁 dom', '🟢 style']"><template v-slot:tab0><ui-json-editor
-  v-model="component.source.dom"></ui-json-editor></template><template
-  v-slot:tab1><ui-json-editor
-  v-model="component.source.style"></ui-json-editor></template></ui-tabs></div>
+  <div class="comp-ide-component-editor" v-if="component"
+  path="-965690814."><ui-tabs :options="['📁 view', '🧊 state']"
+  direction="horizontal" path="-965690814.0"><template v-slot:tab0
+  path="-965690814.0.0"><ide-component-view-editor :component="component"
+  path="-965690814.0.0.0"></ide-component-view-editor></template><template
+  v-slot:tab1 path="-965690814.0.1"><ide-state-tracker :state-tracker="!vueUid ?
+  null : $root.getVue(vueUid).$data._?.state"
+  path="-965690814.0.1.0"></ide-state-tracker></template></ui-tabs></div>

@@ -3,61 +3,74 @@ dom:
     div#2:
       table:
         tbody:
+          tr#2:
+            th:
+              v-text: "'pattern'"
+            td:
+              ui.select:
+                v-slot: slotProps
+                ":options": patternOptions
+                input-type: value
+                v-model: item.pattern
+                :show-text: "false"
+                template:
+                  img:
+                    class: pattern-image
+                    :src: "'/img/rainbow/patterns/'+slotProps.item+'.png'"
           tr#1:
             th:
-              v-text: '''detail'''
+              v-text: "'detail'"
             td:
               input:
                 type: range
                 min: 2
                 max: 36
                 v-model: item.slices
-          tr#2:
-            th:
-              v-text: '''pattern'''
-            td:
-              ui.select:
-                ':options': styleOptions
-                input-type: value
-                v-model: item.pattern
           tr#4:
             th:
-              v-text: '''colors'''
+              v-text: "'colors'"
             td:
               .flex:
                 ui.button#1:
-                  v-text: '''➖'''
-                  ':click': removeColor
+                  v-text: "'➖'"
+                  ":click": removeColor
                 input:
                   class: clickable
                   type: color
                   v-for: index in item.colorsCount
                   v-model: item.colors[index-1]
                 ui.button#2:
-                  v-text: '''➕'''
-                  ':click': addColor
+                  v-text: "'➕'"
+                  ":click": addColor
 props:
   item: null
 data:
-  styleOptions:
+  patternOptions:
     - radial
     - lines
     - checkers
     - pizza
 methods:
-  onColorChange: |
+  onColorChange: | #js
     function (index, value) {
       this.item.colors[index] = value;
     }
-  addColor: |
+  addColor: | #js
     function () {
       if (this.item.colorsCount >= this.item.colors.length) return;
       this.item.colorsCount++;
+      if (this.item.colorsCount > this.item.slices) this.item.slices = this.item.colorsCount;
     }
-  removeColor: |
+  removeColor: | #js
     function () {
       this.item.colorsCount--;
     }
+watch:
+  item:
+    handler: | #js
+      function(item) {
+      }
+    deep: true
 style:
   ul:
     display: flex
@@ -65,15 +78,24 @@ style:
     flex-grow: 1
   li > div:
     text-align: center
+  .pattern-image:
+    filter: grayscale(1) contrast(1) brightness(1.5)
 name: e-template-rainbow-editor
 template: >-
-  <div class="comp-e-template-rainbow-editor"><div><table><tbody><tr><th
-  v-text="'detail'"></th><td><input type="range" min="2" max="36"
-  v-model="item.slices"/></td></tr><tr><th
-  v-text="'pattern'"></th><td><ui-select :options="styleOptions"
-  input-type="value" v-model="item.pattern"></ui-select></td></tr><tr><th
-  v-text="'colors'"></th><td><div class="flex"><ui-button v-text="'➖'"
-  :click="removeColor"></ui-button><input class="clickable" type="color"
-  v-for="index in item.colorsCount" v-model="item.colors[index-1]"/><ui-button
-  v-text="'➕'"
-  :click="addColor"></ui-button></div></td></tr></tbody></table></div></div>
+  <div class="comp-e-template-rainbow-editor" path="637897232."><div
+  path="637897232.0"><table path="637897232.0.0"><tbody
+  path="637897232.0.0.0"><tr path="637897232.0.0.0.0"><th v-text="'pattern'"
+  path="637897232.0.0.0.0.0"></th><td path="637897232.0.0.0.0.1"><ui-select
+  :options="styleOptions" input-type="value" v-model="item.pattern"
+  path="637897232.0.0.0.0.1.0"></ui-select></td></tr><tr
+  path="637897232.0.0.0.1"><th v-text="'detail'"
+  path="637897232.0.0.0.1.0"></th><td path="637897232.0.0.0.1.1"><input
+  type="range" min="2" max="36" v-model="item.slices"
+  path="637897232.0.0.0.1.1.0"/></td></tr><tr path="637897232.0.0.0.2"><th
+  v-text="'colors'" path="637897232.0.0.0.2.0"></th><td
+  path="637897232.0.0.0.2.1"><div class="flex"
+  path="637897232.0.0.0.2.1.0"><ui-button v-text="'➖'" :click="removeColor"
+  path="637897232.0.0.0.2.1.0.0"></ui-button><input class="clickable"
+  type="color" v-for="index in item.colorsCount" v-model="item.colors[index-1]"
+  path="637897232.0.0.0.2.1.0.1"/><ui-button v-text="'➕'" :click="addColor"
+  path="637897232.0.0.0.2.1.0.2"></ui-button></div></td></tr></tbody></table></div></div>

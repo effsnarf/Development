@@ -19,5 +19,6 @@ style:
 name: e-generator-small
 template: >-
   <ui-link class="comp-e-generator-small grayish"
-  :url="$root.url.generator(item)"><div class="badge"><ui-image
-  :imageID="item.imageID"></ui-image></div></ui-link>
+  :url="$root.url.generator(item)" path="524478115."><div class="badge"
+  path="524478115.0"><ui-image :imageID="item.imageID"
+  path="524478115.0.0"></ui-image></div></ui-link>

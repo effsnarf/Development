@@ -1,26 +1,26 @@
-name: site-main
 dom:
   div:
     transition:
       name: fade
       content.title:
+        class: hidden
         v-if: titleText
-        ':imageID': titleImageId
-        ':title': titleText
-        ':url': titleUrl
-        ':key': titleKey
+        ":imageID": titleImageId
+        ":title": titleText
+        ":url": titleUrl
+        ":key": titleKey
     div:
       slot:
         name: article
     .columns:
       .left:
         ui.sticky:
-          ':top': leftStickyTop
+          ":top": leftStickyTop
           slot:
             name: left
       .middle:
         ui.error:
-          ':error': $root.error
+          ":error": $root.error
         slot:
           name: middle
       .right:
@@ -30,7 +30,7 @@ dom:
             slot:
               name: right
             content.recommendations:
-              ':items': recommendationItems
+              ":items": recommendationItems
 props:
   titleImageId: null
   titleText: null
@@ -38,7 +38,7 @@ props:
   titleKey: null
   recommendationItems: null
 computed:
-  leftStickyTop: |
+  leftStickyTop: | #js
     function() {
       if (this.titleText) return "250px";
       return "160px";
@@ -48,12 +48,20 @@ style:
   .error:
     margin-bottom: 3rem
 template: >-
-  <div class="comp-site-main"><transition name="fade"><content-title
-  v-if="titleText" :imageID="titleImageId" :title="titleText" :url="titleUrl"
-  :key="titleKey"></content-title></transition><div><slot
-  name="article"></slot></div><div class="columns"><div class="left"><ui-sticky
-  :top="leftStickyTop"><slot name="left"></slot></ui-sticky></div><div
-  class="middle"><ui-error :error="$root.error"></ui-error><slot
-  name="middle"></slot></div><div class="right"><ui-sticky
-  top="140px"><div><slot name="right"></slot><content-recommendations
-  :items="recommendationItems"></content-recommendations></div></ui-sticky></div></div></div>
+  <div class="comp-site-main" path="-578759680."><transition name="fade"
+  path="-578759680.0"><content-title v-if="titleText" :imageID="titleImageId"
+  :title="titleText" :url="titleUrl" :key="titleKey"
+  path="-578759680.0.0"></content-title></transition><div
+  path="-578759680.1"><slot name="article"
+  path="-578759680.1.0"></slot></div><div class="columns"
+  path="-578759680.2"><div class="left" path="-578759680.2.0"><ui-sticky
+  :top="leftStickyTop" path="-578759680.2.0.0"><slot name="left"
+  path="-578759680.2.0.0.0"></slot></ui-sticky></div><div class="middle"
+  path="-578759680.2.1"><ui-error :error="$root.error"
+  path="-578759680.2.1.0"></ui-error><slot name="middle"
+  path="-578759680.2.1.1"></slot></div><div class="right"
+  path="-578759680.2.2"><ui-sticky top="140px" path="-578759680.2.2.0"><div
+  path="-578759680.2.2.0.0"><slot name="right"
+  path="-578759680.2.2.0.0.0"></slot><content-recommendations
+  :items="recommendationItems"
+  path="-578759680.2.2.0.0.1"></content-recommendations></div></ui-sticky></div></div></div>

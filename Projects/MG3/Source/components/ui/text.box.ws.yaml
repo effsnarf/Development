@@ -3,17 +3,17 @@ dom:
     ':type': type
     ':placeholder': hint
     ':value': value
-    on_input: onInput
+    @input: onInput
 props:
   type: text
   value: null
   hint: null
 methods:
-  onInput: |
+  onInput: | #js
     function(e) {
       this.$emit('input', e.target.value);
     }
 name: ui-text-box
 template: >-
   <input class="comp-ui-text-box" :type="type" :placeholder="hint"
-  :value="value" @input="onInput"/>
+  :value="value" @input="onInput" path="-1492297820."/>

@@ -3,11 +3,12 @@ dom:
     ':style': getStyle()
     slot: null
 data: null
-mounted: |
+mounted: | #js
   function() {
   }
 methods:
-  getStyle: |
+  getStyle: | #js
+
     function() {
       return {
         top: this.top
@@ -21,4 +22,6 @@ style:
     position: sticky
     z-index: 10
 name: ui-sticky
-template: <div class="comp-ui-sticky" :style="getStyle()"><slot></slot></div>
+template: >-
+  <div class="comp-ui-sticky" :style="getStyle()"
+  path="-1429079421."><slot></slot></div>

@@ -1,0 +1,111 @@
+dom:
+  div:
+    v-if: item
+    div:
+      class: size-ref
+      ref: sizeRef1
+      .text:
+        v-html: $root.textToHtml(item.text)
+        :class: getCssClass(item)
+        ":style": itemStyle
+name: e-template-caption-layer
+props:
+  item: null
+  showCreatePost: true
+data:
+  width: null
+mounted: | #js
+  function () {
+    window.addEventListener(`resize`, this.recalc.bind(this));
+    // Detect if the image element changes its size
+    let resizeObserver = new ResizeObserver(this.recalc.bind(this));
+    resizeObserver.observe(this.$refs.sizeRef1);
+  }
+methods:
+  onLoad: | #js
+    function () {
+      this.recalc();
+      [1,2,3].forEach(i => setTimeout(this.recalc.bind(this), i * 100))
+    }
+  recalc: | #js
+    function () {
+      if (!this.$refs.sizeRef1) return;
+      let rect = this.$refs.sizeRef1.getBoundingClientRect();
+      this.width = Math.round(rect.width);
+      this.height = Math.round(rect.height);
+      this.$emit("change");
+    }
+  getCssClass: | #js
+    function(item) {
+      const cls = {};
+      cls[`h-${item.align.h}`] = true;
+      cls[`v-${item.align.v}`] = true;
+      return cls;
+    }
+  getStyle: | #js
+    function(item) {
+      const style = {};
+      style.fontSize = this.getFontSize(item.text);
+      style.fontFamily = item.font;
+      if (item.uppercase) style.textTransform = "uppercase";
+      style.color = item.color;
+      const isDark = (item.color == "black");
+      const outlineColor = (isDark ? "white" : "black");
+      let outlineWidth = Math.max(1, Math.round(this.width/400));
+      outlineWidth = `${(isDark ? outlineWidth : outlineWidth*2)}px`;
+      style.textShadow = `-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000`
+        .replace(/1px/g, outlineWidth)
+        .replace(/#000/g, outlineColor);
+      return style;
+    }
+  getFontSize: | #js
+    function (s) {
+      if (!s) return 0;
+      if (!this.width) return 0;
+      const size = Math.min(3, Math.max(14, (36 - (s.length / 6))) / 50 *  this.width / 150);
+      return `${size*2.5}vh`;
+    }
+computed:
+  itemStyle: | #js
+    function () {
+      return this.getStyle(this.item);
+    }
+style:
+  .size-ref, .text:
+    width: 100%
+    object-fit: cover
+    position: absolute
+  .size-ref:
+    height: 100%
+  .text.h-left:
+    text-align: left
+  .text.h-center:
+    text-align: center
+  .text.h-right:
+    text-align: right
+  .text.v-top:
+    top: 0
+  .text.v-center:
+    top: 50%
+    transform: translateY(-50%)
+  .text.v-bottom:
+    bottom: 0
+  .text:
+    display: block
+    overflow: hidden
+    color: "#fff"
+    line-height: 1.2em
+    font-family: Impact,Oswald
+    "-webkit-font-smoothing": antialiased
+    box-sizing: border-box
+    padding: 0.3em
+    filter: "drop-shadow(-2px 4px 2px #00000080)"
+    transition: 0s
+template: >-
+  <div class="comp-e-template-captions-layer" v-if="item"
+  path="-1997108005."><div class="container" path="-1997108005.0"><div
+  class="size-ref" ref="sizeRef1" path="-1997108005.0.0"><div class="texts"
+  path="-1997108005.0.0.0"><div class="text" v-for="(text, index) in
+  [item.texts[0], item.texts[1]]" v-text="text" :style="{ fontSize:
+  fontSizes[index] }" path="-1997108005.0.0.0.0"></div></div><div class="spacer"
+  path="-1997108005.0.0.1"></div></div></div></div>

@@ -1,6 +1,10 @@
 dom:
   div:
     class: flex
+    .icon:
+      :class: getIconClass()
+      v-if: icon
+      v-text: icon
     div:
       v-text: getText()
     .ml-1.opacity-50:
@@ -12,19 +16,27 @@ props:
   value: null
   number: null
 methods:
-  getText: |
+  getText: | #js
     function() {
-      return [this.icon, this.text, this.value].filter(s => s).join(' ');
+      return [this.text, this.value].filter(s => s).join(' ');
     }
-  getNumberText: |
+  getNumberText: | #js
     function() {
       return !this.number ? '' : `(${this.number})`;
     }
+  getIconClass: | #js
+    function() {
+      if (this.icon == "📁") return "opacity-50";
+      return null;
+    }
 style:
+  .flex:
+    gap: 0.5em
   div:
-    white-space: wrap
-    text-wrap: wrap
+    white-space: nowrap
+    text-wrap: nowrap
 name: ui-title
 template: >-
-  <div class="comp-ui-title flex"><div v-text="getText()"></div><div class="ml-1
-  opacity-50" v-if="number" v-text="getNumberText()"></div></div>
+  <div class="comp-ui-title flex" path="-2123702658."><div v-text="getText()"
+  path="-2123702658.0"></div><div class="ml-1 opacity-50" v-if="number"
+  v-text="getNumberText()" path="-2123702658.1"></div></div>

@@ -1,28 +1,31 @@
 dom:
   .card:
-    on_mouseenter: onMouseEnter
-    on_mouseleave: onMouseLeave
-    on_mousemove: onMouseMove
+    @mouseenter: onMouseEnter
+    @mouseleave: onMouseLeave
+    @mousemove: onMouseMove
     ref: card
     slot: null
     div:
       class: glow
 data:
   bounds: null
-mounted: |
+mounted: | #js
   function() {
   }
 methods:
-  onMouseEnter: |
+  onMouseEnter: | #js
+
     function(e) {
       this.bounds = this.$refs.card.getBoundingClientRect();
     }
-  onMouseLeave: |
+  onMouseLeave: | #js
+
     function(e) {
       this.$refs.card.style.transform = '';
       this.$refs.card.style.background = '';
     }
-  onMouseMove: |
+  onMouseMove: | #js
+
     function(e) {
       const $card = this.$refs.card;
 
@@ -82,5 +85,6 @@ style:
 name: ui-card1
 template: >-
   <div class="comp-ui-card1 card" @mouseenter="onMouseEnter"
-  @mouseleave="onMouseLeave" @mousemove="onMouseMove"
-  ref="card"><slot></slot><div class="glow"></div></div>
+  @mouseleave="onMouseLeave" @mousemove="onMouseMove" ref="card"
+  path="-2139643065."><slot></slot><div class="glow"
+  path="-2139643065.1"></div></div>

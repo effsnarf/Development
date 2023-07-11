@@ -1,54 +1,72 @@
 dom:
   div:
-    v-if: item
+    v-if: instance
     ui.link:
       class: instance
       div:
         ui.image:
           ref: image1
-          ':imageID': item.imageID || item.generator?.imageID
-          on_change: updateImageSize
+          ':imageID': instance.imageID || instance.generator?.imageID
+          @change: updateImageSize
         .texts:
           .text:
-            v-for: (text, index) in [item.text0, item.text1]
+            v-for: (text, index) in [instance.text0, instance.text1]
             v-text: text
             ':style': '{ fontSize: fontSizes[index] }'
         div:
           class: spacer
-    on_click: $emit('click')
+    @click: $emit('click')
     e.post.create:
       v-if: showCreatePost
-      ':generator': $root.instanceToGenerator(item)
-      ':entityID': item._id
+      ':generator': $root.instanceToGenerator(instance)
+      ':entityID': instance._id
 name: e-instance
 props:
   item: null
-  showCreatePost: true
+  showCreatePost: false
+  instanceID: null
 data:
   width: null
+  instance: null
 methods:
-  getFontSize: |
+  getFontSize: | #js
     function (s) {
       if (!s) return 0;
       if (!this.width) return 0;
       const size = Math.min(3, Math.max(14, (36 - (s.length / 6))) / 50 *  this.width / 150);
       return `${size*2.5}vh`;
     }
-  updateImageSize: |
+  updateImageSize: | #js
     function () {
       this.width = this.$refs.image1.width;
     }
 computed:
-  showGenerator: |
+  showGenerator: | #js
     function () {
-      if (this.item.urlName == this.$root.params.urlName) return false;
+      if (!this.instance) return false;
+      if (this.instance.urlName == this.$root.params.urlName) return false;
       return true;
     }
-  fontSizes: |
+  fontSizes: | #js
     function () {
-      const sizes = [this.getFontSize(this.item.text0), this.getFontSize(this.item.text1)];
+      if (!this.instance) return [0, 0];
+      const sizes = [this.getFontSize(this.instance.text0), this.getFontSize(this.instance.text1)];
       return sizes;
     }
+watch:
+  item:
+    handler: | #js
+      function (item) {
+        this.instance = item;
+      }
+    immediate: true
+  instanceID:
+    handler: | #js
+      async function (instanceID) {
+        if (this.item) return;
+        this.instance = !instanceID ? null : await this.$root.dbp.instances.select.one(instanceID);
+      }
+    immediate: true
 style:
   .instance:
     display: block
@@ -91,11 +109,14 @@ style:
     top: auto
     bottom: 0
 template: >-
-  <div class="comp-e-instance" v-if="item" @click="$emit('click')"><ui-link
-  class="instance"><div><ui-image ref="image1" :imageID="item.imageID ||
-  item.generator?.imageID" @change="updateImageSize"></ui-image><div
-  class="texts"><div class="text" v-for="(text, index) in [item.text0,
-  item.text1]" v-text="text" :style="{ fontSize: fontSizes[index]
-  }"></div></div><div class="spacer"></div></div></ui-link><e-post-create
+  <div class="comp-e-instance" v-if="item" @click="$emit('click')"
+  path="643573758."><ui-link class="instance" path="643573758.0"><div
+  path="643573758.0.0"><ui-image ref="image1" :imageID="item.imageID ||
+  item.generator?.imageID" @change="updateImageSize"
+  path="643573758.0.0.0"></ui-image><div class="texts"
+  path="643573758.0.0.1"><div class="text" v-for="(text, index) in [item.text0,
+  item.text1]" v-text="text" :style="{ fontSize: fontSizes[index] }"
+  path="643573758.0.0.1.0"></div></div><div class="spacer"
+  path="643573758.0.0.2"></div></div></ui-link><e-post-create
   v-if="showCreatePost" :generator="$root.instanceToGenerator(item)"
-  :entityID="item._id"></e-post-create></div>
+  :entityID="item._id" path="643573758.1"></e-post-create></div>

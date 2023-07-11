@@ -5,20 +5,21 @@ dom:
     tooltip: Anonymous
     ':src': >-
       'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Anonymous_emblem.svg/1200px-Anonymous_emblem.svg.png'
-    on_click: $emit('click', null)
+    @click: $emit('click',)
   ui.image:
     v-else-if: generator
     ':tooltip': showTooltip && generator.displayName
     ':imageID': generator.imageID
     ':key': generator.generatorID
     ':square': 'true'
-    on_click: $emit('click', generator)
+    @click: $emit('click', generator)
 props:
   value: null
   showTooltip: true
   showAnonymous: false
 computed:
-  generator: |
+  generator: | #js
+
     function() {
       return this.value;
     }
@@ -30,7 +31,7 @@ template: >-
   <ui-image class="comp-e-generator-square anonymous" v-if="!generator"
   tooltip="Anonymous"
   :src="'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Anonymous_emblem.svg/1200px-Anonymous_emblem.svg.png'"
-  @click="$emit('click', null)"></ui-image><ui-image v-else-if="generator"
-  :tooltip="showTooltip &amp;&amp; generator.displayName"
+  @click="$emit('click',)" path="-916767999."></ui-image><ui-image
+  v-else-if="generator" :tooltip="showTooltip &amp;&amp; generator.displayName"
   :imageID="generator.imageID" :key="generator.generatorID" :square="true"
   @click="$emit('click', generator)"></ui-image>

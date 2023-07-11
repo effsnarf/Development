@@ -65,7 +65,7 @@
     .body-background
     .body-main
       #app
-        %div{":key": "key1"}
+        %div{":key" => "key1"}
           %div
             %transition{name: "ide-vt-fade"}
               %ide-system-hourglass.pt-l8{ref: "hourglass1", "v-show": "isIniting"}
@@ -78,7 +78,7 @@
                   %h1.fs-l5.mt-1{style: "margin-bottom: -0.3em; transform: scaleY(0.9);"} Compon
                   %div.fs-m3.text-center.opacity-50
                     %span development studio
-                    %span.opacity-50{"v-if": "fetchQueueLength"}
+                    %span.opacity-50{"v-if" => "fetchQueueLength"}
                       %span ({{fetchQueueLength}})
                       %img{src: "https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/images/loading.gif"}
               %div.flex.text-right
@@ -89,4 +89,4 @@
                   %meow-comp-267{ref: "ideUserAccount1"}
             / %button{"@click": "refresh"} refresh
             / ide-workspace
-            %meow-comp-171.ide-anim-on-load{"v-if": "showWorkspace"}
+            %meow-comp-171.ide-anim-on-load{"v-if" => "showWorkspace"}

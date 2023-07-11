@@ -2,15 +2,15 @@ dom:
   div:
     .center:
       ui.time:
-        ':value': item.created
+        ":value": item.created
     .post-menu:
       ui.button:
         text: ❌
-        ':click': onDelete
+        ":click": onDelete
 props:
   item: null
 methods:
-  onDelete: |
+  onDelete: | #js
     function () {
       this.$root.dbp.posts.delete.one(this.item._id);
       this.$emit("refresh-thread");
@@ -23,6 +23,8 @@ style:
     justify-content: center
 name: e-post-menu
 template: >-
-  <div class="comp-e-post-menu"><div class="center"><ui-time
-  :value="item.created"></ui-time></div><div class="post-menu"><ui-button
-  text="❌" :click="onDelete"></ui-button></div></div>
+  <div class="comp-e-post-menu" path="404353956."><div class="center"
+  path="404353956.0"><ui-time :value="item.created"
+  path="404353956.0.0"></ui-time></div><div class="post-menu"
+  path="404353956.1"><ui-button text="❌" :click="onDelete"
+  path="404353956.1.0"></ui-button></div></div>

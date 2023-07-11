@@ -1,0 +1,22 @@
+dom:
+  div: null
+data:
+  ctrl: false
+mounted: | #js
+  function() {
+    // Capture all keyboard events
+    window.addEventListener("keydown", this.onKeyDownOrUp);
+    window.addEventListener("keyup", this.onKeyDownOrUp);
+  }
+methods:
+  onKeyDownOrUp: | #js
+    function(e) {
+      this.ctrl = e.ctrlKey;
+    }
+watch:
+  ctrl: | #js
+    function(ctrl) {
+      this.$emit('ctrl', ctrl);
+    }
+name: ui-keyboard
+template: <div class="comp-ui-keyboard"></div>

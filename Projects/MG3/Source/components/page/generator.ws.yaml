@@ -6,41 +6,69 @@ dom:
     ':title-url': $root.url.generator(generator)
     ':title-key': generator?.generatorID
     ':recommendation-items': recommendationItems
-    template#1:
+    template:
       v-slot: article
-      content.article:
-        v-if: poem
-        template:
-          v-slot: content
-          .poem:
-            transition.group:
-              name: list
-              content.poem.stanza:
-                v-for: stanza in getRandomStanzas(poem)
-                ':item': stanza
-                ':key': stanza.map(l => l.substring(0, 5)).join('-')
-          div:
-            class: float-clear
-    template#2:
+      ui.image:
+        class: mb-l2
+        imageID: 680118409
+        :aspect-ratio: "3/1"
+      div:
+        div:
+          class: float-left mr-l1
+          :style: "{ width: '30%' }"
+          e.instance:
+            :item: instance
+        h1:
+          v-text: generator?.displayName
+        .poem:
+          :style: "{ marginLeft: '32%', width: '68%' }"
+          content.poem.stanza:
+            ':item': randomStanza
+        div:
+          class: float-clear
+        .description:
+          v-html: "'<h3>Socially Awkward Penguin</h3> is a popular internet meme that depicts a penguin character embodying the traits of social awkwardness. The meme typically features a simple illustration of a penguin with a slightly tilted head and a shy expression. It represents those relatable moments when individuals find themselves in uncomfortable or socially challenging situations. Socially Awkward Penguin serves as a lighthearted way to express and relate to the awkwardness many people experience in their daily lives, creating a sense of camaraderie and humor within online communities.'"
+        div:
+          class: float-clear
+    template:
       v-slot: middle
       content.stream:
         ref: contentStream1
         item-type: e.instance
         ':get-more-items': getMoreInstances
         grid-class: grid-1
-    template#3:
+    template:
       v-slot: left
       e.instance.create:
         v-if: showCreateInstance
         ':generator': generator
-        on_instance-created: onInstanceCreated
+        @instance-created: onInstanceCreated
+      e.teaser:
+        imageID: 32
+        title: Advice Animals
+        url: /c/advice-animals
+      e.teaser:
+        imageID: 679668918
+        title: Movies
+        url: /c/movies
+      e.teaser:
+        imageID: 679668921
+        title: Anonymous Times
+      e.teaser:
+        imageID: 679668909
+        title: YouTube
+
+    template:
+      v-slot: right
 data:
   urlName: null
   generator: null
+  instance: null
   poem: null
+  randomStanza: null
   recommendationItems: []
   showCreateInstance: false
-mounted: |
+mounted: | #js
   async function() {
     this.$watch(() => this.$root.params.urlName, {
       handler: async () => {
@@ -50,7 +78,7 @@ mounted: |
     });
   }
 methods:
-  init: |
+  init: | #js
     async function() {
       const dbp = this.$root.dbp;
       if (this.urlName == this.$root.params.urlName) return;
@@ -75,21 +103,21 @@ methods:
         this.$root.isLoading = false;
       }
     }
-  clear: |
+  clear: | #js
     function() {
       this.generator = null;
       this.poem = null;
       this.recommendationItems = [];
       this.$refs.contentStream1?.reset();
     }
-  getMoreInstances: |
+  getMoreInstances: | #js
     async function(pageIndex) {
       await this.init();
       if (!this.urlName) return [];
       const items = await this.$root.dbp.instances.select.popular("en", pageIndex, this.urlName)
       return items;
     }
-  getRandomStanzas: |
+  getRandomStanzas: | #js
     function(poem) {
       if (!poem) return [];
       // Return random stanzas
@@ -102,23 +130,39 @@ methods:
       }
       return result;
     }
-  onInstanceCreated: |
+  onInstanceCreated: | #js
     function(instance) {
       this.$refs.contentStream1?.add(instance);
     }
 watch:
-  generator: |
-    function(newGenerator) {
-      if (!newGenerator)
+  generator: | #js
+    async function(generator) {
+      if (!generator)
       {
+        this.instance = null;
+        this.randomStanza = null;
         this.showCreateInstance = false;
         return;
       }
+      this.instance = (await this.$root.dbp.instances.select.popular("en", 0, generator.urlName)).shuffle()[0];
+      this.randomStanza = this.getRandomStanzas(generator.desc.poem)[0];
       setTimeout(() => {
         this.showCreateInstance = true;
       }, 2000);
     }
 style:
+  .comp-e-teaser:
+    filter: grayscale(1)
+  .comp-e-teaser:hover:
+    filter: grayscale(0)
+  h1:
+    font-size: 3rem
+    line-height: 1.5em
+  .description:
+    margin: 2em 0
+  .description h3:
+    font-size: 2rem
+    display: inline-block
   .poem: null
   .poem .comp-content-poem-stanza:
     margin: 1rem auto
@@ -132,16 +176,19 @@ template: >-
   :title-image-id="generator?.imageID" :title-text="generator?.displayName"
   :title-url="$root.url.generator(generator)"
   :title-key="generator?.generatorID"
-  :recommendation-items="recommendationItems"><template
-  v-slot:article><content-article v-if="poem"><template v-slot:content><div
-  class="poem"><transition-group name="list"><content-poem-stanza v-for="stanza
-  in getRandomStanzas(poem)" :item="stanza" :key="stanza.map(l =&gt;
-  l.substring(0,
-  5)).join('-')"></content-poem-stanza></transition-group></div><div
-  class="float-clear"></div></template></content-article></template><template
-  v-slot:middle><content-stream ref="contentStream1" item-type="e.instance"
-  :get-more-items="getMoreInstances"
-  grid-class="grid-1"></content-stream></template><template
-  v-slot:left><e-instance-create v-if="showCreateInstance"
-  :generator="generator"
-  @instance-created="onInstanceCreated"></e-instance-create></template></site>
+  :recommendation-items="recommendationItems" path="-38884812."><template
+  v-slot:article path="-38884812.0"><content-article v-if="poem"
+  path="-38884812.0.0"><template v-slot:content path="-38884812.0.0.0"><div
+  class="poem" path="-38884812.0.0.0.0"><transition-group name="list"
+  path="-38884812.0.0.0.0.0"><content-poem-stanza v-for="stanza in
+  getRandomStanzas(poem)" :item="stanza" :key="stanza.map(l =&gt; l.substring(0,
+  5)).join('-')"
+  path="-38884812.0.0.0.0.0.0"></content-poem-stanza></transition-group></div><div
+  class="float-clear"
+  path="-38884812.0.0.0.1"></div></template></content-article></template><template
+  v-slot:middle path="-38884812.1"><content-stream ref="contentStream1"
+  item-type="e.instance" :get-more-items="getMoreInstances" grid-class="grid-1"
+  path="-38884812.1.0"></content-stream></template><template v-slot:left
+  path="-38884812.2"><e-instance-create v-if="showCreateInstance"
+  :generator="generator" @instance-created="onInstanceCreated"
+  path="-38884812.2.0"></e-instance-create></template></site>

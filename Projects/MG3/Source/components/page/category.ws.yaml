@@ -1,0 +1,22 @@
+dom:
+  site:
+    page-name: category
+    template#1:
+      v-slot: article
+      .grid-3:
+        e.teaser#1:
+          imageID: 679668918
+          title: Barbie
+        e.teaser#2:
+          imageID: 680118397
+          title: Indiana Jones 5
+        e.teaser#3:
+          imageID: 680118400
+          title: Oppenheimer
+        e.teaser#4:
+          imageID: 680118403
+          title: Nepoleon
+      h1:
+        v-text: "'Movies'"
+
+props:

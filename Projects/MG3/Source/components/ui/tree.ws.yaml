@@ -2,41 +2,51 @@ dom:
   ul:
     li:
       ui.tree.node:
-        ':item': root
+        ':node': root
+        ':initial-expanded': initialExpanded
+        ':expandable': '!initialExpanded'
         ':item-type': itemType
-        ':getChildren': getChildren
+        ':get-item': getItem || ((node) => node.item)
+        ':get-children': getChildren || ((node) => node.children||[])
         ':selected-node': selectedNode
-        on_node-click: onChildClick
-        on_node-hover: onChildHover
-        on_node-unhover: onChildUnhover
+        @node-click: onChildClick
+        @node-hover: onChildHover
+        @node-unhover: onChildUnhover
 props:
   root: null
+  initialExpanded: false
+  expandable: true
   itemType: null
+  getItem: null
   getChildren: null
 data:
   selectedNode: null
 methods:
-  onChildClick: |
+  onChildClick: | #js
     function(child) {
       this.$emit('node-click', child);
       this.selectedNode = (child == this.selectedNode) ? null : child;
     }
-  onChildHover: |
+  onChildHover: | #js
     function (child) {
       this.$emit('node-hover', child);
     }
-  onChildUnhover: |
+  onChildUnhover: | #js
     function (child) {
       this.$emit('node-unhover', child);
     }
 watch:
-  selectedNode: |
+  selectedNode: | #js
     function(newVal, oldVal) {
       this.$emit('node-select', newVal);
     }
 name: ui-tree
 template: >-
-  <ul class="comp-ui-tree"><li><ui-tree-node :item="root" :item-type="itemType"
-  :getChildren="getChildren" :selected-node="selectedNode"
-  @node-click="onChildClick" @node-hover="onChildHover"
-  @node-unhover="onChildUnhover"></ui-tree-node></li></ul>
+  <ul class="comp-ui-tree" path="-484140360."><li
+  path="-484140360.0"><ui-tree-node :node="root"
+  :initial-expanded="initialExpanded" :expandable="!initialExpanded"
+  :item-type="itemType" :get-item="getItem || ((node) =&gt; node.item)"
+  :get-children="getChildren || ((node) =&gt; node.children||[])"
+  :selected-node="selectedNode" @node-click="onChildClick"
+  @node-hover="onChildHover" @node-unhover="onChildUnhover"
+  path="-484140360.0.0"></ui-tree-node></li></ul>

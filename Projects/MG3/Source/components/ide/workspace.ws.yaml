@@ -1,56 +1,26 @@
 dom:
   div:
     class: workspace
-    ide.component.editor:
-      ':component': selectedComponent
-    ui.tree:
-      ':root': () => $root
-      ':getChildren': getVueChildren
-      item-type: ide-vue-node
-      on_node-select: onNodeSelect
-      on_node-click: onNodeClick
-      on_node-hover: onNodeHover
-      on_node-unhover: onNodeUnhover
-    ide.component.info:
-      ':item': selectedNode
+    h3:
+      ui.title:
+        icon: 🎄
+        ':value': $root.vm.vuesCount.toLocaleString()
+      div:
+        ui.button:
+          icon: ♻
+          text: refresh
+          @click: $root.reloadComponentsFromServer
+    ide.debug:
+    ide.component.picker: null
     div:
       ide.component.style:
         v-for: comp in comps
         ':component': comp
 props:
   comps: null
-data:
-  selectedNode: null
-methods:
-  getVueChildren: |
-    function(vue) {
-      return !vue ? [] : vue().$children?.map(c => (() => c));
-    }
-  onNodeSelect: |
-    function(node) {
-      this.selectedNode = node;
-    }
-  onNodeClick: |
-    function(node) {
-      //console.log(node());
-    }
-  onNodeHover: |
-    function (node) {
-      node()?.$el.classList?.add('highlighted');
-    }
-  onNodeUnhover: |
-    function (node) {
-      node()?.$el.classList?.remove('highlighted');
-    }
-computed:
-  selectedComponent: |
-    function() {
-      if (!this.selectedNode) return null;
-      const vue = this.selectedNode();
-      const compName = vue?.$options?._componentTag?.replace(/-/g, '.');
-      const comp = this.comps.find(c => c.name == compName);
-      return comp;
-    }
+data: null
+methods: null
+computed: null
 name: ide-workspace
 style:
   .comp-ide-workspace:
@@ -60,13 +30,21 @@ style:
     display: flex
     flex-direction: column
     gap: 3em
-    z-index: 100
+    background: '#303030'
+    padding: 1rem
+    box-shadow: 'inset -5px 5px 5px #000'
+    border: 1px solid gray
+    max-width: 20rem
+    overflow: hidden
+    z-index: 1000000
+    transition: 1s
+  .comp-ide-workspace:hover:
 template: >-
-  <div class="comp-ide-workspace workspace"><ide-component-editor
-  :component="selectedComponent"></ide-component-editor><ui-tree :root="() =&gt;
-  $root" :getChildren="getVueChildren" item-type="ide-vue-node"
-  @node-select="onNodeSelect" @node-click="onNodeClick"
-  @node-hover="onNodeHover"
-  @node-unhover="onNodeUnhover"></ui-tree><ide-component-info
-  :item="selectedNode"></ide-component-info><div><ide-component-style
-  v-for="comp in comps" :component="comp"></ide-component-style></div></div>
+  <div class="comp-ide-workspace workspace" path="-1163457967."><h2
+  v-text="'cunt'" path="-1163457967.0"></h2><h3 path="-1163457967.1"><ui-title
+  icon="🎄" :value="$root.vuesCount.toLocaleString()"
+  path="-1163457967.1.0"></ui-title><ui-button icon="♻" text="refresh"
+  @click="$root.reloadComponentsFromServer()"
+  path="-1163457967.1.1"></ui-button></h3><div
+  path="-1163457967.2"><ide-component-style v-for="comp in comps"
+  :component="comp" path="-1163457967.2.0"></ide-component-style></div></div>

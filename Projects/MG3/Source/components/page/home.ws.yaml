@@ -1,25 +1,44 @@
 dom:
   site:
     page-name: home
+    template#0:
+      v-slot: article
+      .grid-3:
+        e.teaser:
+          imageID: 32
+          title: Advice Animals
+          url: /c/advice-animals
+        e.teaser:
+          imageID: 679668918
+          title: Movies
+          url: /c/movies
+        e.teaser:
+          imageID: 679668921
+          title: Anonymous Times
+        e.teaser:
+          imageID: 679668909
+          title: YouTube
     template#1:
       v-slot: left
       e.thread.list: null
     template#2:
       v-slot: middle
-      e.template.editor: null
+      e.template.editor:
+        ref: TemplateEditor1
       content.stream:
         ref: stream1
         item-type: e.instance
-        ':get-more-items': getMoreInstances
+        ":get-more-items": getMoreInstances
         grid-class: grid-1
     template:
       v-slot: right
       div:
-        e.post.create: null
+        e.post.create:
+          ref: PostCreate1
 data:
   generators: []
   uniqueID: 1
-mounted: |
+mounted: | #js
   async function() {
     this.threads = await this.$root.dbp.threads.select.all();
     
@@ -31,15 +50,15 @@ mounted: |
     });
   }
 methods:
-  init: |
+  init: | #js
     async function() {
       if (this.$root.params.page == "home")
       {
         this.$root.setDocumentTitle(null);
-        this.$refs.stream1.reset();
+        this.$refs.stream1?.reset();
       }
     }
-  getMoreInstances: |
+  getMoreInstances: | #js
     async function(pageIndex) {
       const items = await this.$root.dbp.instances.sample.popular(null, 15);
       return items;
@@ -51,9 +70,12 @@ style:
     aspect-ratio: 2 / 1
 name: page-home
 template: >-
-  <site class="comp-page-home" page-name="home"><template
-  v-slot:left><e-thread-list></e-thread-list></template><template
-  v-slot:middle><e-template-editor></e-template-editor><content-stream
+  <site class="comp-page-home" page-name="home" path="838274270."><template
+  v-slot:left
+  path="838274270.0"><e-thread-list></e-thread-list></template><template
+  v-slot:middle
+  path="838274270.1"><e-template-editor></e-template-editor><content-stream
   ref="stream1" item-type="e.instance" :get-more-items="getMoreInstances"
-  grid-class="grid-1"></content-stream></template><template
-  v-slot:right><div><e-post-create></e-post-create></div></template></site>
+  grid-class="grid-1" path="838274270.1.1"></content-stream></template><template
+  v-slot:right path="838274270.2"><div
+  path="838274270.2.0"><e-post-create></e-post-create></div></template></site>

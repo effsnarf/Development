@@ -10,7 +10,7 @@ dom:
           ':show-create-button': 'false'
           v-model: tempInstance
           ':generator': generator
-          on_has-content: hasInstanceContent = $event
+          @has-content: hasInstanceContent = $event
     transition#2:
       name: slide
       div:
@@ -20,7 +20,7 @@ dom:
         e.generator.select:
           v-model: larpGenerator
           ':allow-anonymous': 'true'
-          on_input: showLarpGeneratorSelect = false;
+          @input: showLarpGeneratorSelect = false;
     transition#3:
       name: slide
       div:
@@ -44,11 +44,12 @@ data:
   hasInstanceContent: false
   showLarpGeneratorSelect: false
   isLoading: false
-mounted: |
+mounted: | #js
   async function() {
   }
 methods:
-  post: |
+  post: | #js
+
     async function() {
       const { generator, text0, text1 } = (this.tempInstance || {});
       const instance = !generator ? null : { generatorID: generator.generatorID, text0, text1 };
@@ -62,16 +63,18 @@ methods:
       }
       this.$emit('created', post);
     }
-  clear: |
+  clear: | #js
+
     function() {
       this.text = null;
       this.tempInstance = null;
     }
 watch:
-  tempInstance: |
+  tempInstance: | #js
     function() {
     }
-  threadID: |
+  threadID: | #js
+
     {
       handler: function() {
         //this.showInstanceCreate = !this.threadID;
@@ -79,25 +82,25 @@ watch:
       immediate: true
     }
 computed:
-  showInstanceCreate: |
+  showInstanceCreate: | #js
     function() {
       return !this.hasCommentContent;
     }
-  showCommentCreate: |
+  showCommentCreate: | #js
     function() {
       return !this.hasInstanceContent;
     }
-  hasCommentContent: |
+  hasCommentContent: | #js
     function() {
       return !!this.text;
     }
-  canPost: |
+  canPost: | #js
     function() {
       if (this.hasInstanceContent) return true;
       if (this.text) return true;
       return false;
     }
-  larpGeneratorTooltip: |
+  larpGeneratorTooltip: | #js
     function() {
       return `Larping as ${this.larpGenerator?.displayName || 'Anonymous'}`;
     }
@@ -111,18 +114,25 @@ style:
     gap: 1em
   h3:
     text-align: center
+config:
+  track:
+    state: true
 name: e-post-create
 template: >-
-  <div class="comp-e-post-create container"><div><transition
-  name="slide"><e-instance-create v-if="showInstanceCreate"
+  <div class="comp-e-post-create container" path="1762525697."><div
+  path="1762525697.0"><transition name="slide"
+  path="1762525697.0.0"><e-instance-create v-if="showInstanceCreate"
   ref="createInstance1" layout="horizontal" :show-create-button="false"
   v-model="tempInstance" :generator="generator" @has-content="hasInstanceContent
-  = $event"></e-instance-create></transition></div><transition name="slide"><div
-  v-show="showLarpGeneratorSelect"><h3 v-text="'Larping
-  as'"></h3><e-generator-select v-model="larpGenerator" :allow-anonymous="true"
-  @input="showLarpGeneratorSelect =
-  false;"></e-generator-select></div></transition><transition
-  name="slide"><div><e-comment-create v-if="showCommentCreate"
-  v-model="text"></e-comment-create></div></transition><transition
-  name="slide"><ui-button v-if="canPost" text="post"
-  :click="post"></ui-button></transition></div>
+  = $event"
+  path="1762525697.0.0.0"></e-instance-create></transition></div><transition
+  name="slide" path="1762525697.1"><div v-show="showLarpGeneratorSelect"
+  path="1762525697.1.0"><h3 v-text="'Larping as'"
+  path="1762525697.1.0.0"></h3><e-generator-select v-model="larpGenerator"
+  :allow-anonymous="true" @input="showLarpGeneratorSelect = false;"
+  path="1762525697.1.0.1"></e-generator-select></div></transition><transition
+  name="slide" path="1762525697.2"><div path="1762525697.2.0"><e-comment-create
+  v-if="showCommentCreate" v-model="text"
+  path="1762525697.2.0.0"></e-comment-create></div></transition><transition
+  name="slide" path="1762525697.3"><ui-button v-if="canPost" text="post"
+  :click="post" path="1762525697.3.0"></ui-button></transition></div>

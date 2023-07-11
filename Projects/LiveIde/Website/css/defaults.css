@@ -29,6 +29,16 @@ a:not([href])
   cursor: default;
 }
 
+.focused
+{
+  box-shadow: 0 0 0 max(100vh, 100vw) rgba(0, 0, 0, 0.9);
+}
+
+.grayscale
+{
+  filter: grayscale(1);
+}
+
 .grayish
 {
   filter: grayscale(1);
@@ -93,16 +103,22 @@ li
   background: #ffffff20;
   transition: 0s;
 }
+
 .highlighted
 {
-  background: #ffffff40;
-  border: 2px dashed white;
-  box-shadow: inset -4px 4px 2px #000;
+  border: 2px dashed yellow;
 }
-.highlighted:hover
+.highlighted2
 {
-  background: #ffffff70;
+  border: 2px dashed cyan;
 }
+
+.highlighted, .highlighted2
+{
+  box-shadow: inset -4px 4px 2px #000;
+  transition: 0s;
+}
+
 .tree .title.highlighted:hover
 {
   background: #ffffff70;
@@ -192,6 +208,7 @@ table.bordered td, table.bordered th
 {
   border: 1px solid #ffffff40;
 }
+
 div.padded, table.padded td, table.padded th
 {
   padding: 0.3em 0.6em;
@@ -255,7 +272,7 @@ tr:hover > td:last-child
 }
 .selected:hover
 {
-  background: #ffffff80 !important;
+  background: #ffffff60 !important;
 }
 
 .parent .visible-if-parent-hover
@@ -295,17 +312,22 @@ button /* .ide-button:hover */
   opacity: 1;
 }
 
-
-input, textarea, select, option, .ide-checkbox
+pre, input, textarea, select, option, .ide-checkbox
 {
-  width: 100%;
   padding: 0.5em 0.5em !important;
-  background: #202020ff;
-  font-size: 120%;
+  background: linear-gradient(to left, #303030, #101010);
+  box-shadow: inset -2px 2px 2px #000;
+  text-shadow: -3px 3px 2px #000;
   font-family: monospace !important;
+  font-size: 110%;
   border: 1px solid gray;
+  width: 100%;
   color: #ffffff;
-  text-shadow: none;
+}
+option
+{
+  background: #303030;
+  cursor: pointer;
 }
 input:focus, textarea:focus, select:focus
 {
@@ -334,6 +356,13 @@ input[type="color"]
   padding: 0 !important;
   min-height: 3em;
   cursor: pointer;
+}
+
+span.color
+{
+  display: inline-block;
+  width: 1em;
+  height: 1em;
 }
 
 .ide-checkbox
@@ -601,7 +630,6 @@ select, input[type=range]
 {
   filter: grayscale(1) contrast(0.8) brightness(0.8);
   pointer-events: none;
-  text-decoration: line-through;
 }
 .disabled2
 {
@@ -647,6 +675,11 @@ progress
 {
 }
 
+.flex.gap-1
+{
+  gap: 1em;
+}
+
 .progress-bar
 {
   margin: auto;
@@ -684,17 +717,17 @@ p
   padding: 0.5em 1em;
   z-index: 100;
   left: 50%;
+  bottom: 0;
   opacity: 0;
-  transform: translate(-50%, -180%);
-  transition: 0.3s;
+  transform: translate(-50%, 110%);
+  transition: 0.1s !important;
 }
 
 /* Show the tooltip text when hovering over the element */
 [tooltip]:hover::before {
   visibility: visible;
   opacity: 1;
-  transform: translate(-50%, -140%);
-  transition: 0.3s;
+  transition: 0.1s !important;
 }
 
 
@@ -729,6 +762,17 @@ img[src=""]
 }
 
 
+.message
+{
+  width: 100%;
+  background: #424242;
+  padding: 0.5rem 1rem;
+  border: 1px solid #ffffff80;
+  margin: 0.5rem auto;
+  text-align: center;
+}
+
+
 
 [tooltip]:hover::before {
   content: attr(tooltip);
@@ -740,25 +784,31 @@ img[src=""]
   border-radius: 0.5em;
   padding: 0.5em 1em;
   left: 50%;
-  transform: translate(-50%, -110%);
+  bottom: 0;
+  transform: translate(-50%, 110%);
   box-shadow: -8px 8px 6px #000;
 }
 
 
+.cyan
+{
+  color: #0e7abd;
+}
 
-/* textarea scrollbars */
-textarea::-webkit-scrollbar {
+
+/* scrollbars */
+::-webkit-scrollbar {
   width: 0.5em;
 }
 
-textarea::-webkit-scrollbar-track {
+::-webkit-scrollbar-track {
   background: #80808040;
 }
 
-textarea::-webkit-scrollbar-thumb {
+::-webkit-scrollbar-thumb {
   background: #80808080;
 }
 
-textarea::-webkit-scrollbar-thumb:hover {
+::-webkit-scrollbar-thumb:hover {
   background: #808080;
 }

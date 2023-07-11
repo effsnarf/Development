@@ -7,7 +7,8 @@ style:
   .comp-ui-time:
     text-shadow: '-2px 2px 1px #000000'
 methods:
-  timeAgo: |
+  timeAgo: | #js
+
     function (dt) {
       dt = new Date(dt);
       const now = new Date();
@@ -43,4 +44,6 @@ methods:
       return Math.round(days / 365) + " years ago";
     }
 name: ui-time
-template: <div class="comp-ui-time opacity-20" v-text="timeAgo(value)"></div>
+template: >-
+  <div class="comp-ui-time opacity-20" v-text="timeAgo(value)"
+  path="-484148761."></div>

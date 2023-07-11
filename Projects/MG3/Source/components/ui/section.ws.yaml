@@ -1,0 +1,16 @@
+dom:
+  div:
+    ui.expand:
+      :text: title
+      :value: "(opposite ^ value)"
+      @input: $emit('input', (opposite ^ $event))
+    transition:
+      name: slide2
+      div:
+        v-show: "(opposite ^ value)"
+        slot:
+
+props:
+  title: null
+  value: null
+  opposite: false

@@ -6,18 +6,19 @@ dom:
         ':value': generator
         ':key': generator?.generatorID
         ':show-anonymous': 'true'
-        on_click: () => onClick(generator)
+        @click: () => onClick(generator)
 props:
   allowAnonymous: false
 data:
   query: null
   generators: null
-mounted: |
+mounted: | #js
   async function() {
     await this.init();
   }
 methods:
-  init: |
+  init: | #js
+
     async function () {
       this.generators = (await this.$root.dbp.generators.select.popular());
       if (this.allowAnonymous) {
@@ -25,7 +26,8 @@ methods:
         this.generators.pop();
       }
     }
-  onClick: |
+  onClick: | #js
+
     function (generator) {
       this.$emit('input', generator)
     }
@@ -44,7 +46,8 @@ style:
     transition: 0s
 name: e-generator-select
 template: >-
-  <div class="comp-e-generator-select"><div class="grid"><e-generator-square
-  v-for="generator in generators" :value="generator"
-  :key="generator?.generatorID" :show-anonymous="true" @click="() =&gt;
-  onClick(generator)"></e-generator-square></div></div>
+  <div class="comp-e-generator-select" path="-928114976."><div class="grid"
+  path="-928114976.0"><e-generator-square v-for="generator in generators"
+  :value="generator" :key="generator?.generatorID" :show-anonymous="true"
+  @click="() =&gt; onClick(generator)"
+  path="-928114976.0.0"></e-generator-square></div></div>

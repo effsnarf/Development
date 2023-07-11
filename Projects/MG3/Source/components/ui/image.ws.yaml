@@ -6,18 +6,22 @@ dom:
     img:
       ref: image1
       ':class': getCssClass()
+      ':style': imgStyle
       ':src': src1
-      on_load: onLoad
-    on_click: $emit('click')
+      @load: onLoad
+    @click: $emit('click')
 props:
   imageID: null
   url: null
   src: null
   square: null
+  removeBackground: false
+  aspectRatio: null
+  objectPosition: null
 data:
   width: null
   height: null
-mounted: |
+mounted: | #js
   function () {
     window.addEventListener(`resize`, this.recalc.bind(this));
     // Detect if the image element changes its size
@@ -25,12 +29,13 @@ mounted: |
     resizeObserver.observe(this.$refs.image1);
   }
 methods:
-  onLoad: |
+  onLoad: | #js
     function () {
+      this.$emit("load", this.$refs.image1.src);
       this.recalc();
       [1,2,3].forEach(i => setTimeout(this.recalc.bind(this), i * 100))
     }
-  recalc: |
+  recalc: | #js
     function () {
       if (!this.$refs.image1) return;
       let rect = this.$refs.image1.getBoundingClientRect();
@@ -38,36 +43,49 @@ methods:
       this.height = Math.round(rect.height);
       this.$emit("change");
     }
-  getCssClass: |
+  getCssClass: | #js
     function () {
       return { empty: !this.src, square: this.square };
     }
-  getCompType: |
+  getCompType: | #js
     function () {
       if (!this.url) return `div`;
       return `ui-link`;
     }
 computed:
-  src1: |
+  diagonal: | #js
     function () {
-      if (this.imageID) return this.$root.url.image(this.imageID);
+      return Math.sqrt(this.width * this.width + this.height * this.height);
+    }
+  src1: | #js
+    function () {
+      if (this.imageID) return this.$root.url.image(this.imageID, true, this.removeBackground);
       if (this.src) return this.src;
       return this.emptySrc;
     }
-  emptySrc: |
+  emptySrc: | #js
     function () {
       return '/img/empty.png';
+    }
+  imgStyle: | #js
+    function () {
+      const style = {};
+      style.aspectRatio = this.aspectRatio;
+      style.objectPosition = this.objectPosition;
+      return style;
     }
 style:
   .comp-ui-image:
     overflow: hidden
+    transition: 0s
   .image, img:
     width: 100%
+    object-fit: cover
   .square:
     aspect-ratio: 1
-    object-fit: cover
 name: ui-image
 template: >-
   <component class="comp-ui-image image" :is="getCompType()" :url="url"
-  @click="$emit('click')"><img ref="image1" :class="getCssClass()" :src="src1"
-  @load="onLoad"/></component>
+  @click="$emit('click')" path="-2133760639."><img ref="image1"
+  :class="getCssClass()" :style="imgStyle" :src="src1" @load="onLoad"
+  path="-2133760639.0"/></component>

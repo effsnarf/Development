@@ -4,6 +4,7 @@
     "colors": "^1.4.0",
     "deep-object-diff": "^1.1.7",
     "fs": "^0.0.1-security",
+    "haml": "^0.4.3",
     "hamljs": "^0.6.2",
     "handlebars": "^4.7.7",
     "http": "^0.0.1-security",

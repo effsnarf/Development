@@ -8,11 +8,13 @@ dom:
 props:
   error: null
 computed:
-  errorText: |
+  errorText: | #js
+
     function() {
       return this.error?.message || this.error;
     }
 name: ui-error
 template: >-
-  <transition class="comp-ui-error" name="slide"><div class="error"
-  v-if="errorText" v-text="errorText" :key="errorText"></div></transition>
+  <transition class="comp-ui-error" name="slide" path="-2137289170."><div
+  class="error" v-if="errorText" v-text="errorText" :key="errorText"
+  path="-2137289170.0"></div></transition>

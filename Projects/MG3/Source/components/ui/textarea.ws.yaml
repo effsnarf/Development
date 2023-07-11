@@ -2,15 +2,15 @@ dom:
   textarea:
     ':value': value
     ':placeholder': hint
-    on_input: onInput
-    on_focus: $emit('focus')
-    on_blur: $emit('blur')
-    on_keydown: onKeyDown
+    @input: onInput
+    @focus: $emit('focus')
+    @blur: $emit('blur')
+    @keydown: onKeyDown
 props:
   value: null
   hint: null
 methods:
-  onInput: |
+  onInput: | #js
     function(e) {
       const heightLimit = 200;
       const textarea = e.target;
@@ -18,8 +18,8 @@ methods:
       textarea.style.height = "";
       textarea.style.height = Math.min(textarea.scrollHeight, heightLimit) + "px";
     }
-  onKeyDown: |
-    (e) => {
+  onKeyDown: | #js
+    function(e) {
       if (e.key == 'Tab') {
         e.preventDefault();
         let start = e.target.selectionStart;
@@ -31,7 +31,8 @@ methods:
       return false;
     }
 name: ui-textarea
+style: null
 template: >-
   <textarea class="comp-ui-textarea" :value="value" :placeholder="hint"
   @input="onInput" @focus="$emit('focus')" @blur="$emit('blur')"
-  @keydown="onKeyDown"></textarea>
+  @keydown="onKeyDown" path="-1490763436."></textarea>

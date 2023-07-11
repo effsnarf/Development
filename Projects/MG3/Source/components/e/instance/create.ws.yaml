@@ -5,7 +5,7 @@ dom:
       e.generator.select:
         v-show: '!generator && showGeneratorSelect'
         v-model: generator || tempInstance.generator
-        on_input: showGeneratorSelect = false
+        @input: showGeneratorSelect = false
     .container:
       ':class': layout
       div:
@@ -17,23 +17,23 @@ dom:
             ':item': tempInstance
             ':key': tempInstance.generator?.generatorID
             ':show-create-post': 'false'
-            on_click: showGeneratorSelect = !showGeneratorSelect
+            @click: showGeneratorSelect = !showGeneratorSelect
       .inputs:
         input#1:
           v-model: tempInstance.text0
           placeholder: top text
-          on_focus: onFocus
+          @focus: onFocus
         input#2:
           v-model: tempInstance.text1
           placeholder: bottom text
-          on_focus: onFocus
+          @focus: onFocus
         transition:
           name: slide
           ui.button:
             v-if: showCreateButton && hasText
             text: create
             ':is-loading': isCreating
-            on_click: create
+            @click: create
 props:
   value: null
   generator: null
@@ -44,7 +44,8 @@ data:
   showGeneratorSelect: false
   isCreating: false
 methods:
-  create: |
+  create: | #js
+
     async function() {
       this.isCreating = true;
       try
@@ -58,52 +59,62 @@ methods:
         this.isCreating = false;
       }
     }
-  clear: |
+  clear: | #js
+
     function() {
       this.tempInstance.text0 = null;
       this.tempInstance.text1 = null;
     }
-  onFocus: |
+  onFocus: | #js
+
     function(e) {
       if (!this.tempInstance.generator) this.showGeneratorSelect = true;
     }
-  getNewTempInstance: |
+  getNewTempInstance: | #js
+
     function() {
       return { generator: null, imageID: null, text0: null, text1: null };
     }
 computed:
-  hasContent: |
+  hasContent: | #js
+
     function() {
       return (this.hasGenerator && this.hasText) ? true : false;
     }
-  hasGenerator: |
+  hasGenerator: | #js
+
     function() {
       return !!this.tempInstance.generator;
     }
-  hasText: |
+  hasText: | #js
+
     function() {
       return !!this.tempInstance.text0 || !!this.tempInstance.text1;
     }
 watch:
   value:
-    handler: |
+    handler: | #js
+
       function(newValue) {
         this.tempInstance = newValue || this.getNewTempInstance();
       }
     immediate: true
   generator:
-    handler: |
+    handler: | #js
+
       function(newGenerator) {
         this.tempInstance.generator = newGenerator;
       }
     immediate: true
   tempInstance:
-    handler: |
+    handler: | #js
+
       function(newTempInstance) {
         this.$emit("input", newTempInstance);
       }
     deep: true
-  hasContent: |
+  hasContent: | #js
+
     function(newHasContent) {
       this.$emit("has-content", newHasContent);
     }
@@ -127,18 +138,21 @@ style:
     width: 70%
     margin: 0.5rem auto
 template: >-
-  <div class="comp-e-instance-create"><transition
-  name="slide"><e-generator-select v-show="!generator &amp;&amp;
-  showGeneratorSelect" v-model="generator || tempInstance.generator"
-  @input="showGeneratorSelect = false"></e-generator-select></transition><div
-  class="container" :class="layout"><div><transition name="slide"><e-instance
-  class="{ clickable: !generator }" v-if="((layout == 'horizontal') || hasText)"
+  <div class="comp-e-instance-create" path="-903297812."><transition
+  name="slide" path="-903297812.0"><e-generator-select v-show="!generator
+  &amp;&amp; showGeneratorSelect" v-model="generator || tempInstance.generator"
+  @input="showGeneratorSelect = false"
+  path="-903297812.0.0"></e-generator-select></transition><div class="container"
+  :class="layout" path="-903297812.1"><div path="-903297812.1.0"><transition
+  name="slide" path="-903297812.1.0.0"><e-instance class="{ clickable:
+  !generator }" v-if="((layout == 'horizontal') || hasText)"
   :item="tempInstance" :key="tempInstance.generator?.generatorID"
-  :show-create-post="false" @click="showGeneratorSelect =
-  !showGeneratorSelect"></e-instance></transition></div><div
-  class="inputs"><input v-model="tempInstance.text0" placeholder="top text"
-  @focus="onFocus"/><input v-model="tempInstance.text1" placeholder="bottom
-  text" @focus="onFocus"/><transition name="slide"><ui-button
-  v-if="showCreateButton &amp;&amp; hasText" text="create"
-  :is-loading="isCreating"
-  @click="create"></ui-button></transition></div></div></div>
+  :show-create-post="false" @click="showGeneratorSelect = !showGeneratorSelect"
+  path="-903297812.1.0.0.0"></e-instance></transition></div><div class="inputs"
+  path="-903297812.1.1"><input v-model="tempInstance.text0" placeholder="top
+  text" @focus="onFocus" path="-903297812.1.1.0"/><input
+  v-model="tempInstance.text1" placeholder="bottom text" @focus="onFocus"
+  path="-903297812.1.1.1"/><transition name="slide"
+  path="-903297812.1.1.2"><ui-button v-if="showCreateButton &amp;&amp; hasText"
+  text="create" :is-loading="isCreating" @click="create"
+  path="-903297812.1.1.2.0"></ui-button></transition></div></div></div>

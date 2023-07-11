@@ -1,0 +1,8 @@
+dom:
+  input:
+    type: color
+    :value: value
+    @input: $emit('input', $event.target.value)
+
+props:
+  value: null

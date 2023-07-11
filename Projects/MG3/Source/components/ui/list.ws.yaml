@@ -2,7 +2,7 @@ dom:
   transition.group:
     tag: ul
     name: list
-    class: menu3
+    :class: getMainCssClass()
     li:
       v-for: (item, index) in items
       ':key': $root.getKey(item)
@@ -10,26 +10,42 @@ dom:
       slot:
         ':index': index
         ':item': item
-      on_click: () => onItemClick({ item, index })
+      @click: () => onItemClick({ item, index })
 props:
   items: null
   selectedIndex: null
+  direction: vertical
 methods:
-  onItemClick: |
+  getMainCssClass: | #js
+    function() {
+      const cls = {
+        menu3: true,
+      };
+      cls[this.direction] = true;
+      return cls;
+    }
+  onItemClick: | #js
     function(e) {
       const newIndex = (e.index == this.selectedIndex) ? null : e.index;
       this.$emit('input', newIndex);
     }
-  getCssClass: |
+  getCssClass: | #js
     function(index) {
       return {
         selected: (index == this.selectedIndex),
       };
     }
 name: ui-list
-style: null
+style:
+  .horizontal:
+    display: flex
+    flex-direction: row
+  .horizontal > *:
+    flex-grow: 1
+    text-align: center
 template: >-
-  <transition-group class="comp-ui-list menu3" tag="ul" name="list"><li
-  v-for="(item, index) in items" :key="$root.getKey(item)"
-  :class="getCssClass(index)" @click="() =&gt; onItemClick({ item, index
-  })"><slot :index="index" :item="item"></slot></li></transition-group>
+  <transition-group class="comp-ui-list menu3" tag="ul" name="list"
+  path="-484386888."><li v-for="(item, index) in items"
+  :key="$root.getKey(item)" :class="getCssClass(index)" @click="() =&gt;
+  onItemClick({ item, index })" path="-484386888.0"><slot :index="index"
+  :item="item" path="-484386888.0.0"></slot></li></transition-group>

@@ -8,7 +8,7 @@ props:
   item: null
 data:
   drawTimer: null
-mounted: |
+mounted: | #js
   function () {
     window.addEventListener(`resize`, this.draw.bind(this));
     // Detect if the image element changes its size
@@ -16,7 +16,8 @@ mounted: |
     resizeObserver.observe(this.$refs.canvas1);
   }
 methods:
-  draw: |
+  draw: | #js
+
     function () {
       const canvas = this.$refs.canvas1;
       if (!canvas) return;
@@ -30,7 +31,8 @@ methods:
       if (!pattern) return;
       this[`draw${pattern}`](ctx, width, height, slices, colors, colorsCount);
     }
-  drawRadial: |
+  drawRadial: | #js
+
     function (ctx, width, height, slices, colors, colorsCount) {
       const grd = ctx.createRadialGradient(width / 2, height / 2, 0, width / 2, height / 2, width * 2);
       for (let i = 0; i < slices; i++) {
@@ -40,7 +42,8 @@ methods:
       ctx.fillStyle = grd;
       ctx.fillRect(0, 0, width, height);
     }
-  drawLines: |
+  drawLines: | #js
+
     function (ctx, width, height, slices, colors, colorsCount) {
       const grd = ctx.createLinearGradient(0, 0, width, height);
       for (let i = 0; i < slices; i++) {
@@ -50,7 +53,8 @@ methods:
       ctx.fillStyle = grd;
       ctx.fillRect(0, 0, width, height);
     }
-  drawCheckers: |
+  drawCheckers: | #js
+
     function (ctx, width, height, slices, colors, colorsCount) {
       // Slice the canvas into slices, like a pizza
       const sliceWidth = width / slices;
@@ -62,7 +66,8 @@ methods:
         }
       }
     }
-  drawPizza: |
+  drawPizza: | #js
+
     function (ctx, width, height, slices, colors, colorsCount) {
       const center = { x: width / 2, y: height / 2 };
       const angle = 2 * Math.PI / slices;
@@ -78,7 +83,8 @@ methods:
     }
 watch:
   item:
-    handler: |
+    handler: | #js
+
       function () {
         this.$nextTick(this.draw.bind(this));
       }
@@ -90,5 +96,5 @@ style:
     height: 100%
 name: e-template-rainbow-layer
 template: >-
-  <div class="comp-e-template-rainbow-layer"><canvas ref="canvas1" width="1000"
-  height="1000"></canvas></div>
+  <div class="comp-e-template-rainbow-layer" path="-388674482."><canvas
+  ref="canvas1" width="1000" height="1000" path="-388674482.0"></canvas></div>

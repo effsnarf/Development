@@ -8,6 +8,18 @@ helpers:
     (context: any, dom: any, compName: string) => {
       return context.toTemplate(context, dom, 0, compName).join("\n");
     };
+  addCode: | #ts
+    (context: any, methodBody: string, code: string) => {
+      if (!methodBody) methodBody = "function() {}";
+      methodBody = methodBody.replace(/\{/, `{\n${code}\n`);
+      return methodBody;
+    };
+  addMethodCode: | #ts
+    (context: any, methodName: string, methodBody: string) => {
+      if (!methodBody) methodBody = "function() {}";
+      methodBody = methodBody.replace(/\{/, `{\n this._log_method("${methodName}", [...arguments]); \n if (this.$root.state?.methods.pause.${methodName}) debugger; \n`);
+      return methodBody;
+    };
   prefixCssSelectors: | #ts
     (context: any, compName: string, selectors: string) => {
       const s = [];
@@ -18,4 +30,8 @@ helpers:
       s.push(...classSelectors.map(s => `.${scopeClass} ${s}`));
       s.push(...otherSelectors.map(s => `.${scopeClass} ${s}`));
       return s.join(", ");
+    };
+  unkebabize: | #ts
+    (context: any, str: string) => {
+      return str?.replace(/-/g, ".");
     };

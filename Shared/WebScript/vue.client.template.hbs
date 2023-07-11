@@ -11,15 +11,67 @@
         {{#each data}}
         {{@key}}: {{{or this null}}},
         {{/each}}
+        _: {
+          comp: {
+            name: `{{unkebabize name}}`,
+          },
+        }
     }
   },
-  {{#if mounted}}
-  mounted: {{{mounted}}},
-  {{/if}}
+  mounted: {{{addCode mounted "this.$root.vm.onVueMounted(this); this._log_method('mounted', arguments); this.$emit = this._getNewEmit(this.$emit);"}}},
+  unmounted: {{{addCode unmounted "this.$root.vm.onVueUnmounted(this); this._log_method('unmounted', arguments);"}}},
   methods: {
     {{#each methods}}
-    {{@key}}: {{{this}}},
+    {{@key}}: {{{addMethodCode @key this}}},
     {{/each}}
+    _getNewEmit: function (emit) {
+      return function (event, ...args) {
+        this._log_emit(event, args);
+        emit.call(this, event, ...args);
+      }
+    },
+
+    _log_emit: function(event, args) {
+      this.$root.state?.track(this, 'e', event, args);
+    },
+
+    _log_method: function (methodName, args) {
+      return;
+
+      if ([`processQueue`, `recalc`, `getFontSize`,
+        `onMouseMove`, `onMouseUp`,
+        `preventDefaults`,
+        `highlight`, `unhighlight`,
+        `getCssClass`, `getTabClass`, `getLayerClass`, `getLayerType`
+        ].includes(methodName)) return;
+      if ([`draw`].some(s => methodName.includes(s))) return;
+
+      this.$root.state?.track(this, 'm', methodName);
+
+      return;
+
+      console.log(
+        `🧊 %c{{name}} %c${methodName} %o`,
+        'color: green;',
+        'color: yellow;',
+        args);
+    },
+    _log_state: function (type, key, newValue, oldValue) {
+      if ([`queue`, `width`, `height`, `generators`, `items`].includes(key)) return;
+      if (!newValue && !oldValue) return;
+      this.$root.state?.track(this, type, key, newValue, oldValue);
+      if (!oldValue)
+      {
+        if (false)
+        {
+          console.log(
+            `🧊 %c${this._.comp.name} %c${key} %o`,
+            'color: green;',
+            'color: cyan;',
+            newValue);
+        }
+      }
+    },
   },
   computed: {
     {{#each computed}}
@@ -33,6 +85,26 @@
     {{/each}}
   },
   watch: {
+    {{#each data}}
+    {{@key}}: {
+      handler: function (newValue, oldValue) {
+        this._log_state('d', `{{@key}}`, newValue, oldValue);
+      },
+      immediate: true,
+      deep: true,
+    },
+    {{/each}}
+    
+    {{#each props}}
+    {{@key}}: {
+      handler: function (newValue, oldValue) {
+        this._log_state('p', `{{@key}}`, newValue, oldValue);
+      },
+      immediate: true,
+      deep: true,
+    },
+    {{/each}}
+
     {{#each watch}}
     {{#if handler}}
     {{@key}}: {

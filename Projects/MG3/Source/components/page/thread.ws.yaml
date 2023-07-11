@@ -14,16 +14,18 @@ data:
   thread: null
   threadNotFound: false
 computed:
-  threadID: |
+  threadID: | #js
+
     function() {
       return this.$root.params.threadID;
     }
-mounted: |
+mounted: | #js
   async function() {
   }
 watch:
   threadID:
-    handler: |
+    handler: | #js
+
       async function() {
         if (this.$root.params.page != "thread") return;
         try
@@ -40,7 +42,8 @@ watch:
       }
     immediate: true
   threadNotFound:
-    handler: |
+    handler: | #js
+
       function(newTNF) {
         this.$root.error = (!newTNF ? null : "Thread not found");
       }
@@ -49,7 +52,9 @@ methods: null
 name: page-thread
 style: null
 template: >-
-  <site class="comp-page-thread" page-name="thread"><template
-  v-slot:left><e-thread-list></e-thread-list></template><template
-  v-slot:middle><e-thread v-model="thread"></e-thread><e-post-create
-  v-if="threadNotFound"></e-post-create></template></site>
+  <site class="comp-page-thread" page-name="thread"
+  path="-1535040951."><template v-slot:left
+  path="-1535040951.0"><e-thread-list></e-thread-list></template><template
+  v-slot:middle path="-1535040951.1"><e-thread v-model="thread"
+  path="-1535040951.1.0"></e-thread><e-post-create v-if="threadNotFound"
+  path="-1535040951.1.1"></e-post-create></template></site>

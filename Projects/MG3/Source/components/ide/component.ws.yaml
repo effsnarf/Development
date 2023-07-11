@@ -8,5 +8,5 @@ props:
   source: null
 name: ide-component
 template: >-
-  <div class="comp-ide-component"><ui-title icon="📦"
-  :value="name"></ui-title></div>
+  <div class="comp-ide-component" path="622738105."><ui-title icon="📦"
+  :value="name" path="622738105.0"></ui-title></div>

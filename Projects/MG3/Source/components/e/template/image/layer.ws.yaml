@@ -1,10 +1,74 @@
 dom:
-  ui.image:
-    v-if: item
-    ':imageID': item.imageID
+  div:
+    ui.movable:
+      @drag-by: $emit('drag-by', $event)
+      @scale-by: $emit('scale-by', $event)
+      ui.image:
+        ref: image1
+        v-if: item
+        ':style': itemStyle
+        ':imageID': item.imageID
+        ':remove-background': item.removeBackground
+        @load: onImageLoad
+        @change: refresh
+    e.template.caption.layer:
+      v-if: item.caption
+      :item: item.caption
 props:
   item: null
+data:
+  itemStyle: null
+methods:
+  refresh: | #js
+    function() {
+      this.itemStyle = this.getStyle(this.item);
+    }.throttle(50)
+  onImageLoad: | #js
+    function(e) {
+      this.$emit('image-load', e);
+    }
+  getStyle: | #js
+    function(item) {
+      if (!item) return;
+      let style = {};
+      style.transform = `translate(${(-0.5 + item.trans.pos.x) * 100}%, ${(-0.5 + item.trans.pos.y) * 100}%) scale(${item.trans.scale})`;
+      const cssFilters = [];
+      const image1 = this.$refs.image1;
+      if (image1 && item.shadow)
+      {
+        // Apply the opacity to the shadow color
+        const color = item.shadow.color.replace(/#(..)(..)(..)/, (match, r, g, b) => {
+          const opacity = Math.round(item.shadow.opacity*255).toString(16);
+          return `#${r}${g}${b}${opacity}`;
+        });
+        const values = {
+          x: (item.shadow.x*image1.width).toFixed(2),
+          y: (item.shadow.y*image1.height).toFixed(2),
+          blur: item.shadow.blur/20*image1.diagonal.toFixed(2),
+          color: color
+        };
+        const dropShadow = `drop-shadow(${values.x}px ${values.y}px ${values.blur}px ${values.color})`;
+        cssFilters.push(dropShadow);
+      }
+      style.filter = cssFilters.join(' ');
+      return style;
+    }
+watch:
+  item:
+    handler: | #js
+      function(item) {
+        this.refresh();
+      }
+    deep: true
+style:
+  .comp-e-template-caption-layer:
+    position: absolute
+    top: 0
+    width: 100%
+    height: 100%
+    pointer-events: none
 name: e-template-image-layer
 template: >-
-  <ui-image class="comp-e-template-image-layer" v-if="item"
-  :imageID="item.imageID"></ui-image>
+  <ui-image class="comp-e-template-image-layer" :style="getStyle(item)"
+  v-if="item" :imageID="item.imageID" :remove-background="item.removeBackground"
+  :square="true" @load="onImageLoad" path="-1206774413."></ui-image>

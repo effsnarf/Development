@@ -1,0 +1,40 @@
+dom:
+  .icon:
+    @click: $emit('click')
+    div:
+      v-if: hasImage
+      ui.image:
+        ':imageID': layer.imageID
+        ':square': true
+    div#2:
+      v-if: (!hasImage)
+      v-text: getLayerTypeIcon(layer.type)
+props:
+  layer: null
+methods:
+  getLayerTypeIcon: | #js
+    function(type) {
+      return {
+        'image': '🖼️',
+        'caption': '✏️',
+        'rainbow': '🌈'
+      }[type];
+    }
+computed:
+  hasImage: | #js
+    function() {
+      if (!this.layer) return false;
+      return (this.layer.type == 'image') && this.layer.imageID;
+    }
+style:
+  .comp-ui-image:
+    width: 2.2rem !important
+  .icon:
+    font-size: 160%
+name: e-template-layer-icon
+template: >-
+  <div class="comp-e-template-layer-icon icon" @click="$emit('click')"
+  path="-1276424735."><div v-if="hasImage" path="-1276424735.0"><ui-image
+  :imageID="layer.imageID" :square="true"
+  path="-1276424735.0.0"></ui-image></div><div v-if="(!hasImage)"
+  v-text="getLayerTypeIcon(layer.type)" path="-1276424735.1"></div></div>

@@ -20,4 +20,4 @@ style:
     z-index: 30
     transition: 1s
 name: ui-large-title
-template: <div class="comp-ui-large-title title" v-text="text"></div>
+template: <div class="comp-ui-large-title title" v-text="text" path="-699352693."></div>

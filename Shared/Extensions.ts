@@ -242,6 +242,8 @@ interface String {
   is(type: any): boolean;
   isColorCode(): boolean;
 
+  isLowerCase(): boolean;
+
   pad(align: "left" | "right", fillString: string): string;
 
   nextChar(): string;
@@ -278,6 +280,7 @@ interface String {
   decodeHtml(): string;
   getMatches(regex: RegExp): string[];
   getWords(): string[];
+  getCaseWords(): string[];
   toCamelCase(): string;
   toTitleCase(): string;
   parseJSON(): any;
@@ -311,12 +314,13 @@ interface String {
 }
 
 interface Array<T> {
+  toMap(getKey: (item: T) => any): object;
   contains(item: T, getItemKey?: (item: T) => any): boolean;
   reversed(): T[];
   removeAt(index: number): void;
   insertAt(index: number, item: T, appendToEnd: boolean): void;
-  clear(stagger: number): void;
-  add(items: any[], stagger: number): void;
+  clear(stagger?: number): void;
+  add(items: any[], stagger?: number): void;
   take(count: number): T[];
   replace(
     getNewItems: () => Promise<any[]>,
@@ -349,6 +353,8 @@ interface Function {
   is(type: any): boolean;
   getArgumentNames(): string[];
   postpone(ms: number): (...args: any[]) => any;
+  debounce(ms: number): (...args: any[]) => any;
+  throttle(ms: number): (...args: any[]) => any;
 }
 // #endregion
 
@@ -638,6 +644,10 @@ if (typeof String !== "undefined") {
 
   String.prototype.isColorCode = function (): boolean {
     return this.startsWith("\x1b[");
+  };
+
+  String.prototype.isLowerCase = function (): boolean {
+    return this.toLowerCase() === this.toString();
   };
 
   String.prototype.pad = function (
@@ -936,6 +946,11 @@ if (typeof String !== "undefined") {
     return this.match(/\w+/g) || [];
   };
 
+  String.prototype.getCaseWords = function (): string[] {
+    // Split "titleCaseString" into "title case string"
+    return this.replace(/([A-Z])/g, " $1").split(" ");
+  };
+
   String.prototype.toCamelCase = function (): string {
     // Lowercase the first letter
     return this.charAt(0).toLowerCase() + this.slice(1);
@@ -1209,6 +1224,18 @@ if (typeof String !== "undefined") {
 
 // #region Array
 if (typeof Array !== "undefined") {
+  Array.prototype.toMap = function (
+    getKey: (item: any) => any,
+    getValue?: (item: any) => any
+  ) {
+    if (!getValue) getValue = (item) => item;
+    const map = {} as any;
+    this.forEach((item) => {
+      map[getKey(item)] = getValue!(item);
+    });
+    return map;
+  };
+
   Array.prototype.contains = function (
     item: any,
     getItemKey?: (item: any) => any
@@ -1237,7 +1264,11 @@ if (typeof Array !== "undefined") {
     this.splice(index, 0, item);
   };
 
-  Array.prototype.clear = function (stagger: number = 0) {
+  Array.prototype.clear = function (stagger?: number) {
+    if (!stagger) {
+      this.splice(0, this.length);
+      return;
+    }
     const removeOne = () => {
       if (this.length > 0) {
         this.pop();
@@ -1250,6 +1281,10 @@ if (typeof Array !== "undefined") {
   Array.prototype.add = async function (items: any[], stagger: number = 0) {
     if (!Array.isArray(items)) items = [items];
     items = [...items];
+    if (!stagger) {
+      this.push(...items);
+      return;
+    }
     const addOne = async () => {
       if (items.length > 0) {
         this.push(items.shift());
@@ -1381,13 +1416,9 @@ if (typeof Array !== "undefined") {
 
   Array.prototype.sortBy = function (...projects: ((item: any) => any)[]) {
     return this.sort((a, b) => {
-      for (const project of [...projects].reverse()) {
-        const aVal = project(a);
-        const bVal = project(b);
-        if (aVal > bVal) return 1;
-        if (aVal < bVal) return -1;
-      }
-      return 0;
+      const aVal = projects.map((project) => project(a)).join("/");
+      const bVal = projects.map((project) => project(b)).join("/");
+      return aVal.localeCompare(bVal);
     });
   };
 
@@ -1427,6 +1458,41 @@ if (typeof Function !== "undefined") {
     const fn = this;
     return () => {
       setTimeout(fn, delay);
+    };
+  };
+
+  /**
+   * If the original function is called multiple times within the specified delay,
+   * the function will only be executed once at the end.
+   */
+  Function.prototype.debounce = function (delay: number) {
+    const fn = this;
+    let timeout: any;
+    return function (this: any, ...args) {
+      const context = this;
+      clearTimeout(timeout);
+      timeout = setTimeout(async function () {
+        await fn.apply(context, args);
+      }, delay);
+    };
+  };
+
+  /**
+   * If the original function is called multiple times within the specified delay,
+   * it will execute once every delay time.
+   */
+  Function.prototype.throttle = function (delay: number) {
+    const fn = this;
+    let timeout: any;
+    return function (this: any, ...args) {
+      fn.prototype.nextArgs = args;
+      const context = this;
+      if (!timeout) {
+        timeout = setTimeout(async function () {
+          await fn.apply(context, fn.prototype.nextArgs);
+          timeout = null;
+        }, delay);
+      }
     };
   };
 }

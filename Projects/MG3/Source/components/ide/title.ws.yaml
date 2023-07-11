@@ -1,0 +1,9 @@
+dom:
+  h3:
+    v-if: item
+    ui.title:
+      :icon: $root.getIcon(item)
+      :text: item.key
+
+props:
+  item: null

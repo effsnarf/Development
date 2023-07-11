@@ -1,12 +1,156 @@
 dom:
-  div:
+  .items:
     v-if: item
-    ui.image.select:
-      v-model: item.imageID
+    transition#0:
+      name: slide2
+      div#1:
+        v-if: "!showShadowEditor"
+        .message:
+          div#1:
+            v-text: '''Drag the image to move it'''
+          div#2:
+            v-text: '''Ctrl-drag up/down to scale it'''
+        transition#1:
+          name: slide2
+          ui.checkbox:
+            v-if: (!removingBackground)
+            text: remove background
+            v-model: item.removeBackground
+        ui.image.select:
+          ref: imageSelect1
+          v-model: item.imageID
+          @uploading: onImageUploading
+        transition#2:
+          name: slide2
+          .message:
+            v-if: removingBackground
+            div:
+              v-text: '''Removing background'''
+            ui.loading: null
+    div:
+      ui.expand:
+        text: shadow
+        v-model: showShadowEditor
+      transition:
+        name: slide2
+        div:
+          v-if: showShadowEditor
+          .message:
+            div#1:
+              v-text: '''Drag the shadow to move it'''
+            div#2:
+              v-text: '''Ctrl-drag up/down to change the blur'''
+          ui.range#1:
+            text: x
+            v-model: item.shadow.x
+            min: -1
+            max: 1
+            step: 0.01
+          ui.range#2:
+            text: y
+            v-model: item.shadow.y
+            min: -1
+            max: 1
+            step: 0.01
+          ui.range#3:
+            text: blur
+            v-model: item.shadow.blur
+            min: 0
+            max: 1
+            step: 0.01
+          ui.range#4:
+            text: opacity
+            v-model: item.shadow.opacity
+            min: 0
+            max: 1
+            step: 0.01
+          
 props:
   item: null
-style: null
+data:
+  removingBackground: false
+  showMoveScale: false
+  showShadowEditor: false
+  processingNewImage: false
+style:
+  .comp-ui-image-select:
+    margin-top: 1em
+  .items:
+    display: flex
+    flex-direction: column
+    gap: 1rem
+mounted: | #js
+  async function() {
+    this.$watch('item.removeBackground', async (removeBackground) => {
+      this.removingBackground = removeBackground;
+    });
+  }
+methods:
+  onLayerDragBy: | #js
+    function(dpos) {
+      const pos = (this.showShadowEditor ? this.item.shadow : this.item.trans.pos);
+      pos.x += dpos.dx;
+      pos.y += dpos.dy;
+    }
+  onLayerScaleBy: | #js
+    function(ds) {
+      if (this.showShadowEditor) {
+        this.item.shadow.blur += ds;
+      }
+      else
+      {
+        this.item.trans.scale += ds;
+      }
+    }
+  onFileDrop: | #js
+    function(files) {
+      this.$refs.imageSelect1.onFileDrop(files);
+    }
+  onImageUploading: | #js
+    function(isUploading) {
+      if (isUploading) {
+        this.processingNewImage = true;
+        this.item.removeBackground = false;
+      }
+      this.$emit('toggle-disabled', isUploading);
+    }
+  onLayerImageLoad: | #js
+    function(src) {
+      if (src.includes(".nobg."))
+      {
+        this.removingBackground = false;
+        this.processingNewImage = false;
+      }
+      else
+      {
+        if (this.processingNewImage)
+        {
+          // After a user uploads a new image,
+          // we wait until the browser loads the image
+          // and then mark the checkbox to remove the background.
+          this.item.trans.pos.x = 0.5;
+          this.item.trans.pos.y = 0.5;
+          this.item.trans.scale = 1;
+          setTimeout(() => {
+            this.item.removeBackground = true;
+          }, 100);
+        }
+      }
+    }
+watch:
+  processingNewImage: | #js
+    function(newValue) {
+      this.$emit('toggle-disabled', newValue);
+    }
 name: e-template-image-editor
 template: >-
-  <div class="comp-e-template-image-editor" v-if="item"><ui-image-select
-  v-model="item.imageID"></ui-image-select></div>
+  <div class="comp-e-template-image-editor items" v-if="item"
+  path="1046603147."><transition name="slide2" path="1046603147.0"><ui-checkbox
+  v-if="(!removingBackground)" text="remove background"
+  v-model="item.removeBackground"
+  path="1046603147.0.0"></ui-checkbox></transition><ui-image-select
+  ref="imageSelect1" v-model="item.imageID" @uploading="onImageUploading"
+  path="1046603147.1"></ui-image-select><transition name="slide2"
+  path="1046603147.2"><div class="message" v-if="removingBackground"
+  path="1046603147.2.0"><div v-text="'Removing background'"
+  path="1046603147.2.0.0"></div><ui-loading></ui-loading></div></transition></div>

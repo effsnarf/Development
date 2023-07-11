@@ -4,6 +4,7 @@ import path from "path";
 import colors from "colors";
 import mime from "mime-types";
 import yaml from "yaml";
+const HAML = require("haml");
 const Handlebars = require("Handlebars");
 const http = require("http");
 const https = require("https");
@@ -38,20 +39,7 @@ import { ChatOpenAI, Roles } from "../../../Apis/OpenAI/classes/ChatOpenAI";
 
       const fileContent = fs.readFileSync(path, "utf-8");
       if (path.endsWith(".haml")) {
-        try {
-          const cached = await cache.get(
-            fileContent.hashCode().toString(),
-            async () => {
-              return {
-                html: "test",
-              };
-            }
-          );
-          return cached.html;
-        } catch (ex: any) {
-          console.log(`${ex.stack.bgRed}`);
-          return ex.toString();
-        }
+        return HAML.render(fileContent);
       }
       return fileContent;
     } catch (ex: any) {
@@ -90,7 +78,7 @@ import { ChatOpenAI, Roles } from "../../../Apis/OpenAI/classes/ChatOpenAI";
 
       var mimeType = getMimeType(path);
       //console.log(`${mimeType}\t${path.yellow}\t`);
-      if (path == "/") path = "./index.haml";
+      if (path == "/") path = "./index.html";
       else path = `.${path}`;
       res.writeHead(200, { "Content-Type": `${mimeType}; charset=utf-8` });
 
@@ -119,7 +107,7 @@ import { ChatOpenAI, Roles } from "../../../Apis/OpenAI/classes/ChatOpenAI";
       }
       return;
     } catch (ex: any) {
-      console.log(`${ex.toString().bgRed}`);
+      console.log(`${ex.stack}`);
       res.write(ex.toString());
       res.end();
     }
@@ -131,8 +119,8 @@ import { ChatOpenAI, Roles } from "../../../Apis/OpenAI/classes/ChatOpenAI";
     ? { ip: `127.0.0.1`, port: 80 }
     : { ip: `10.35.16.38`, port: 80 };
 
-  console.log(`Vue Studio`.cyan);
-  console.log(`${`http(s)://${ip}:${port}/`.yellow}`.green);
+  console.log(`Vue Studio`);
+  console.log(`${`http(s)://${ip}:${port}/`}`);
 
   const server = http.createServer(requestListener);
   server.listen(port, ip);
