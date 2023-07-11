@@ -16,6 +16,9 @@ computed:
       return !this.value ? '➕' : '➖';
     }
 style:
+  .comp-ui-expand:
+    width: 1.3em
+    height: 1.5em
   .flex:
     background-color: "#ffffff30"
   .flex:hover:

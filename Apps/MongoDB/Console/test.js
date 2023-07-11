@@ -1,4 +1,6 @@
 
+await dbs.MG3.delete("Generators", {});
+
 const adviceAnimals = [
     "Philosoraptor",
     "Grumpy Cat",

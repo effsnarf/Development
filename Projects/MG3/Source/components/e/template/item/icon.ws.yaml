@@ -1,36 +1,45 @@
 dom:
   .icon:
     @click: $emit('click')
+    ui.checkbox:
+      v-model: item.visible
+      size: normal
     div:
       v-if: hasImage
       ui.image:
-        ':imageID': layer.imageID
+        ':imageID': item.imageID
         ':square': true
     div#2:
       v-if: (!hasImage)
-      v-text: getLayerTypeIcon(layer.type)
+      v-text: getItemTypeIcon(item.type)
+    div#3:
+      v-if: item.caption?.text
+      v-text: item.caption.text.shorten(20)
 props:
-  layer: null
+  item: null
 methods:
-  getLayerTypeIcon: | #js
+  getItemTypeIcon: | #js
     function(type) {
       return {
+        'container': ' ',
         'image': '🖼️',
         'caption': '✏️',
         'rainbow': '🌈'
-      }[type];
+      }[type] || '❔';
     }
 computed:
   hasImage: | #js
     function() {
-      if (!this.layer) return false;
-      return (this.layer.type == 'image') && this.layer.imageID;
+      if (!this.item) return false;
+      return (this.item.type == 'image') && this.item.imageID;
     }
 style:
   .comp-ui-image:
     width: 2.2rem !important
   .icon:
-    font-size: 160%
+    display: flex
+    width: 5em
+    font-size: 110%
 name: e-template-layer-icon
 template: >-
   <div class="comp-e-template-layer-icon icon" @click="$emit('click')"

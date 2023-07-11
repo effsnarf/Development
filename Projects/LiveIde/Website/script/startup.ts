@@ -112,6 +112,7 @@ interface MgParams {
       isLoading: false,
       error: null,
       key1: 1,
+      _uniqueClientID: 1,
     },
     async mounted() {
       await this.init();
@@ -314,6 +315,10 @@ interface MgParams {
         } as any;
         if (item.type) return stateItemIcons[item.type] || "❔";
         return "❔";
+      },
+      getUniqueClientID() {
+        const self = this as any;
+        return self.$data._uniqueClientID++;
       },
     },
   });

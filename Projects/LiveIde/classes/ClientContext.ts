@@ -173,7 +173,7 @@ class ClientContext {
       //}
       // Try again
       // Wait a bit
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       return await ClientContext.fetch(...args);
     }
   }

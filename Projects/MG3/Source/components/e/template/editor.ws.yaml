@@ -3,72 +3,50 @@ dom:
     v-if: temp
     ':class': getCssClass()
     .div1:
-      ul:
-        class: tabs
-        li:
-          v-for: (layer, index) in temp.layers
-          ':class': getTabClass(index)
-          .flex:
-            ui.checkbox:
-              v-model: layer.visible
-            e.template.layer.icon:
-              ':layer': layer
-              @click: selectLayer(index)
+      div:
+        ui.tree:
+          ':root': temp
+          ':initial-expanded': 1
+          item-type: e.template.item.icon
+          ':get-item': (node) => node
+          ':get-children': (node) => node.items
+          @node-select: selectedItem = $event
       .div2:
-        ui.select#1:
-          :options: "['layers', 'vertical']"
-          input-type: value
-          type: dropdown
-          v-model: temp.layout
-        ui.select#2:
-          :options: "['2/3', '1/1', '3/2', '4/3', '5/4', '16/9', '16/10', '21/9']"
-          input-type: value
-          type: dropdown
-          v-model: temp.aspectRatio
-        ui.file.dropzone:
-          @file-drop: (files) => onFileDrop(files)
-          div:
-            :class: "'layout-' + temp.layout"
-            :style: getLayoutStyle(temp)
+        ui.image.select:
+          ref: imageSelect1
+          v-if: (selectedItem?.type=='image')
+          v-model: selectedItem.imageID
+        e.template.container.item:
+          :item: temp
+        div:
+          v-if: selectedItem
+          ui.section#1:
+            :title: "selectedItem.type"
+            v-model: showFilters
+            :opposite: true
             transition:
-              name: fade
-              v-for: layer in temp.layers
-              component#2:
-                v-show: layer.visible
-                ':class': getLayerClass(layer)
-                ':style': getLayerStyle(layer)
-                ':is': getLayerType(layer)
-                ':item': layer
-                @image-load: (src) => onLayerImageLoad(layer, src)
-                @drag-by: ({ dx, dy }) => onLayerDragBy(layer, dx, dy)
-                @scale-by: (ds) => onLayerScaleBy(layer, ds)
-        ui.section#1:
-          :title: "selectedLayer.type"
-          v-model: showFilters
-          :opposite: true
-          transition:
-            name: slide2
-            component#1:
-              ref: selectedLayerEditor1
-              ':is': selectedLayerEditorType
-              ':item': selectedLayer
-              @toggle-disabled: toggleDisabled($event)
-              :key: selectedLayerIndex
-        ui.section#2:
-          v-if: (selectedLayer?.type!='caption')
-          title: effects
-          v-model: showFilters
-          e.template.layer.filters:
-            ':imageID': selectedLayer.imageID
-            v-model: selectedLayer.filters
-            @input: () => onLayerChange(selectedLayer)
+              name: slide2
+              component#1:
+                ref: selectedItemEditor1
+                ':is': selectedItemEditorType
+                ':item': selectedItem
+                @toggle-disabled: toggleDisabled($event)
+                :key: selectedItemIndex
+          ui.section#2:
+            v-if: (selectedItem?.type!='caption')
+            title: effects
+            v-model: showFilters
+            e.template.item.filters:
+              ':imageID': selectedItem.imageID
+              v-model: selectedItem.filters
+              @input: () => onItemChange(selectedItem)
 props: null
 data:
   temp: null
-  selectedLayerIndex: 0
+  selectedItem: null
+  selectedItemIndex: 0
   disabled: 0
   showFilters: false
-  layersKey: 1
 mounted: | #js
   async function() {
     await this.init();
@@ -83,53 +61,27 @@ methods:
         };
 
       this.temp = {
-        aspectRatio: "2/3",
-        layout: "layers",
-        layers: []
+        id: this.$root.getUniqueClientID(),
+        type: "container",
+        visible: true,
+        aspectRatio: "1/1",
+        layout: "grid-2",
+        gap: 0.02,
+        items: []
       };
 
-      this.temp.layers.add({
-        "type": "rainbow",
-        "visible": true,
-        "pattern": "pizza",
-        "colors": [
-            "#000000",
-            "#800000",
-            "#e1d441",
-            "#6495ED",
-            "#87CEEB",
-            "#B0E0E6"
-        ],
-        "colorsCount": 3,
-        "slices": "6",
-        filters: {...filters}
-      });
-
-      for (let i = 0; i < 3; i++)
+      for (let i = 0; i < 4; i++)
       {
-        this.temp.layers.add({
-          "type": "image",
-          "visible": true,
-          "imageID": 679668909,
-          "removeBackground": false,
-          "trans": {
-              "pos": {
-                  "x": 0.5,
-                  "y": 0.5
-              },
-              "scale": 1
-          },
-          shadow: {
-            x: -0.1,
-            y: 0.1,
-            blur: 0.01,
-            color: '#000000',
-            opacity: 1
-          },
+        this.temp.items.add({
+          id: this.$root.getUniqueClientID(),
+          "type": "container",
+          visible: true,
+          layout: "grid-2",
+          aspectRatio: "1/1",
           caption: {
             visible: true,
-            text: 'Skip the dinner,\nwake up thinner.',
-            font: 'Special Elite',
+            text: ['Body', 'Hair', 'Style', 'Girlfriend'][i],
+            font: 'Arial',
             color: 'black',
             align: {
               h: "center",
@@ -137,9 +89,62 @@ methods:
             },
             uppercase: true,
           },
+          filters: {...filters},
+          items: []
+        });
+      }
+
+      if (false)
+      {
+        this.temp.items.add({
+          "type": "rainbow",
+          "visible": true,
+          "pattern": "pizza",
+          "colors": [
+              "#000000",
+              "#800000",
+              "#e1d441",
+              "#6495ED",
+              "#87CEEB",
+              "#B0E0E6"
+          ],
+          "colorsCount": 3,
+          "slices": "6",
           filters: {...filters}
         });
       }
+
+      for (let i = 0; i < 4; i++)
+      {
+        for (let j = 0; j < 4; j++)
+        {
+          this.temp.items[i].items.add({
+            id: this.$root.getUniqueClientID(),
+            type: "image",
+            visible: true,
+            "imageID": 679668909,
+            "removeBackground": false,
+            "trans": {
+                "pos": {
+                    "x": 0.5,
+                    "y": 0.5
+                },
+                "scale": 1
+            },
+            shadow: {
+              x: 0,
+              y: 0,
+              blur: 0,
+              color: '#000000',
+              opacity: 1
+            },
+          });
+        }
+      }
+    }
+  onFileDrop: | #js
+    async function(files) {
+      await this.$nextTick();
     }
   getCssClass: | #js
     function() {
@@ -147,77 +152,18 @@ methods:
         disabled: (this.disabled > 0)
       };
     }
-  getLayoutStyle: | #js
-    function(temp) {
-      if (temp.layout == 'layers') return { aspectRatio: eval(temp.aspectRatio) };
-      return {};
-    }
-  getLayerStyle: | #js
-    function(layer) {
-      if (!layer) return;
-      let style = {};
-      const { filters } = layer;
-      const cssFilters = [];
-      if (filters.blur) cssFilters.push(`blur(${filters.blur*10}px)`);
-      if (filters.transparent) cssFilters.push(`opacity(${1-filters.transparent})`);
-      if (filters.grayscale) cssFilters.push(`grayscale(${filters.grayscale})`);
-      style.filter = cssFilters.join(' ');
-      if (this.temp.layout != 'layers') style.aspectRatio = eval(this.temp.aspectRatio);
-      return style;
-    }
-  selectLayer: | #js
+  selectItem: | #js
     function(index) {
-      this.selectedLayerIndex = index;
+      this.selectedItemIndex = index;
     }
-  onFileDrop: | #js
-    async function(files) {
-      // If there is only one image layer
-      if (this.imageLayers.length == 1)
-      {
-        // Select the image layer
-        this.selectedLayerIndex = this.temp.layers.findIndex(layer => layer.type == 'image');
-      }
-      else if (this.selectedLayer.type != 'image')
-      {
-        alertify.error("There is more than one image layer.<br />Please select the image layer first.").delay(10);
-        return;
-      }
-      // Drop the files
-      await this.$nextTick();
-      this.$refs.selectedLayerEditor1.onFileDrop(files);
-    }
-  onLayerChange: | #js
-    function(layer) {
-    }
-  onLayerImageLoad: | #js
-    function(layer, src) {
-      const handler = this.$refs.selectedLayerEditor1?.onLayerImageLoad;
-      if (handler) handler(src);
-    }
-  onLayerDragBy: | #js
-    function(layer, dx, dy) {
-      this.$refs.selectedLayerEditor1.onLayerDragBy({ dx, dy });
-    }
-  onLayerScaleBy: | #js
-    function(layer, ds) {
-      this.$refs.selectedLayerEditor1.onLayerScaleBy(ds);
-    }
-  getLayerType: | #js
-    function(layer) {
-      return `e-template-${layer.type}-layer`;
+  onItemChange: | #js
+    function(item) {
     }
   getTabClass: | #js
     function(index) {
       return {
         clickable: true,
-        'selected': index === this.selectedLayerIndex
-      };
-    }
-  getLayerClass: | #js
-    function(layer) {
-      return {
-        'layer': true,
-        'selected': (layer === this.selectedLayer),
+        'selected': index === this.selectedItemIndex
       };
     }
   toggleDisabled: | #js
@@ -230,24 +176,25 @@ methods:
       return eval(s);
     }
 computed:
-  selectedLayer: | #js
+  selectedItem: | #js
     function() {
-      return this.temp.layers[this.selectedLayerIndex];
+      return this.temp;
+      //return this.temp.items[this.selectedItemIndex];
     }
-  selectedLayerEditorType: | #js
+  selectedItemEditorType: | #js
     function() {
-      if (!this.selectedLayer) return;
-      return `e-template-${this.selectedLayer.type}-editor`;
+      if (!this.selectedItem) return;
+      return `e-template-${this.selectedItem.type}-editor`;
     }
-  imageLayers: | #js
+  imageItems: | #js
     function() {
-      return this.temp.layers.filter(layer => layer.type === 'image');
+      return this.temp.items.filter(item => item.type === 'image');
     }
 name: e-template-editor
 style:
   .div1:
     display: grid
-    grid-template: 1fr / 3.7em 1fr
+    grid-template: 1fr / 10em 1fr
     margin-bottom: 5rem
     gap: 1em
   .div2:
@@ -266,29 +213,33 @@ style:
   .tabs li:
     transition: 0.3s;  
   .tabs li.selected:
-    transform: scale(1.5);
-    margin: 1em;
-  .layers:
+    transform: scale(1.2);
+  .layout-layers:
     aspect-ratio: 1 / 1
     overflow: hidden
-  .layers .layer:
+  .layout-layers .layer:
     position: absolute
     top: 0
     left: 0
     width: 100%
     height: 100%
     pointer-events: none
+  .layout-layers .layer .comp-ui-image:
   .layout-vertical:
     border: "2px solid #ffffff60"
     display: flex
     flex-direction: column-reverse
-  .layout-vertical .layer:
+  .layout-vertical .item:
     width: 100%
-  .layout-vertical, .layout-vertical .layer:
+  .layout-vertical, .layout-vertical .item:
     overflow: hidden
-  .layer:
+  .layout-grid-2:
+    display: grid
+    grid-template: 1fr / 1fr 1fr
+  .item:
+    overflow: hidden
     pointer-events: none
-  .layer.selected, .layer.selected:hover:
+  .item.selected, .item.selected:hover:
     background: none !important
     pointer-events: auto
 template: >-

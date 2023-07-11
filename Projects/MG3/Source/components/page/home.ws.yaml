@@ -18,13 +18,15 @@ dom:
         e.teaser:
           imageID: 679668909
           title: YouTube
+      div:
+        :style: "{ width: '40vw', margin: 'auto' }"
+        e.template.editor:
+          ref: TemplateEditor1
     template#1:
       v-slot: left
       e.thread.list: null
     template#2:
       v-slot: middle
-      e.template.editor:
-        ref: TemplateEditor1
       content.stream:
         ref: stream1
         item-type: e.instance

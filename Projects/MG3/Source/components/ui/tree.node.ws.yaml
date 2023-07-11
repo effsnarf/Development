@@ -3,7 +3,7 @@ dom:
     .tree-node:
       ':class': getCssClass()
       ui.expand:
-        v-if: expandable
+        v-if: showUiExpand
         v-model: isExpanded
       component:
         v-if: itemType
@@ -13,10 +13,13 @@ dom:
       @mouseenter: onMouseEnter
       @mouseleave: onMouseLeave
       slot: null
-    ul:
+    transition.group:
+      name: list
+      tag: ul
       class: ml-3
       li:
         v-for: child in getChildItems(node)
+        :key: child.id
         ui.tree.node:
           ':node': child
           ':initial-expanded': initialExpanded
@@ -96,21 +99,32 @@ computed:
     function() {
       return (this.node == this.selectedNode);
     }
+  showUiExpand: | #js
+    function() {
+      if (!this.node) return false;
+      return this.expandable;
+    }
+  depth: | #js
+    function() {
+      return this.$parent.depth + 1;
+    }
 watch:
   initialExpanded:
     handler: | #js
       function(newVal, oldVal) {
         if (this.isInited) return;
         this.isInited = true;
-        this.isExpanded = newVal;
+        this.isExpanded = (typeof newVal == 'boolean') ? newVal : (this.depth <= newVal);
       }
     immediate: true
 style:
   .tree-node:
-    display: block
+    display: flex
   .tree.node.expandable:
     display: grid
     grid-template: 1fr / 1.5em 1fr
+  .comp-ui-expand:
+    margin-right: 0.3em
   .comp-ui-expand .icon:
     font-size: 100% !important
     border: none !important

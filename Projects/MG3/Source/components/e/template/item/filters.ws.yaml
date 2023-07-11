@@ -1,5 +1,6 @@
 dom:
   div:
+    v-if: value
     ui.image.options#1:
       ":imageID": imageID
       filter: blur

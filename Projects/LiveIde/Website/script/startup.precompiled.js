@@ -163,9 +163,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "./script/1689011310654.ts":
+/***/ "./script/1689089065084.ts":
 /*!*********************************!*\
-  !*** ./script/1689011310654.ts ***!
+  !*** ./script/1689089065084.ts ***!
   \*********************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -276,6 +276,7 @@ const helpers = {
             isLoading: false,
             error: null,
             key1: 1,
+            _uniqueClientID: 1,
         },
         mounted() {
             return __awaiter(this, void 0, void 0, function* () {
@@ -507,6 +508,10 @@ const helpers = {
                 if (item.type)
                     return stateItemIcons[item.type] || "❔";
                 return "❔";
+            },
+            getUniqueClientID() {
+                const self = this;
+                return self.$data._uniqueClientID++;
             },
         },
     });
@@ -3337,7 +3342,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("./script/1689011310654.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("./script/1689089065084.ts");
 /******/ 	
 /******/ })()
 ;

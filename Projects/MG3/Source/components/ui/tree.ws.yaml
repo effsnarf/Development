@@ -4,7 +4,7 @@ dom:
       ui.tree.node:
         ':node': root
         ':initial-expanded': initialExpanded
-        ':expandable': '!initialExpanded'
+        ':expandable': 'initialExpandable'
         ':item-type': itemType
         ':get-item': getItem || ((node) => node.item)
         ':get-children': getChildren || ((node) => node.children||[])
@@ -34,6 +34,16 @@ methods:
   onChildUnhover: | #js
     function (child) {
       this.$emit('node-unhover', child);
+    }
+computed:
+  initialExpandable: | #js
+    function() {
+      if (typeof this.initialExpanded == 'boolean') return !this.initialExpanded;
+      return this.expandable;
+    }
+  depth: | #js
+    function() {
+      return 0;
     }
 watch:
   selectedNode: | #js

@@ -1,0 +1,95 @@
+dom:
+  div:
+    ui.track.size:
+      v-if: item
+      @input: onSizeChange
+      .items:
+        :class: "'layout-' + item.layout"
+        :style: getMainStyle(item)
+        transition:
+          name: fade
+          v-for: item in item.items
+          component#2:
+            v-show: item.visible
+            ':class': getItemClass(item)
+            ':style': getItemStyle(item)
+            ':is': getItemType(item)
+            ':item': item
+            @image-load: (src) => onItemImageLoad(item, src)
+            @drag-by: ({ dx, dy }) => onItemDragBy(item, dx, dy)
+            @scale-by: (ds) => onItemScaleBy(item, ds)
+      e.template.caption.item:
+        v-if: item.caption
+        :item: item.caption
+props:
+  item: null
+data:
+  size: null
+  mainStyle: null
+methods:
+  getMainStyle: | #js
+    function(item) {
+      if (!item) return {};
+      const style = {};
+      if (item.layout == 'layers') style.aspectRatio = eval(item.aspectRatio);
+      const gap = 0.02; // item.gap;
+      if ((this.size) && (gap)) style.gap = `${Math.round(gap * this.size.diagonal)}px`;
+      return style;
+    }
+  getItemClass: | #js
+    function(item) {
+      return {
+        'item': true,
+        'selected': (item === this.selectedItem),
+      };
+    }
+  getItemStyle: | #js
+    function(item) {
+      if (!item) return;
+      let style = {};
+      const { filters } = item;
+      const cssFilters = [];
+      if (filters)
+      {
+        if (filters.blur) cssFilters.push(`blur(${filters.blur*10}px)`);
+        if (filters.transparent) cssFilters.push(`opacity(${1-filters.transparent})`);
+        if (filters.grayscale) cssFilters.push(`grayscale(${filters.grayscale})`);
+      }
+      style.filter = cssFilters.join(' ');
+      if (this.item.layout != 'layers') style.aspectRatio = eval(this.item.aspectRatio);
+      return style;
+    }
+  getItemType: | #js
+    function(item) {
+      return `e-template-${item.type}-item`;
+    }
+  onItemImageLoad: | #js
+    function(item, src) {
+      const handler = this.$refs.selectedItemEditor1?.onItemImageLoad;
+      if (handler) handler(src);
+    }
+  onItemDragBy: | #js
+    function(item, dx, dy) {
+      this.$refs.selectedItemEditor1.onItemDragBy({ dx, dy });
+    }
+  onItemScaleBy: | #js
+    function(item, ds) {
+      this.$refs.selectedItemEditor1.onItemScaleBy(ds);
+    }
+  onSizeChange: | #js
+    function(size) {
+      this.size = size;
+      //this.refresh();
+      //this.mainStyle = this.getMainStyle(this.item);
+    }
+watch:
+style:
+  .items:
+    width: 100%
+    height: 100%
+  .items .item:
+    background: "#ffffff20"
+template: >-
+  <ui-image class="comp-e-template-image-layer" :style="getStyle(item)"
+  v-if="item" :imageID="item.imageID" :remove-background="item.removeBackground"
+  :square="true" @load="onImageLoad" path="-1206774413."></ui-image>

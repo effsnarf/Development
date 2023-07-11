@@ -17,7 +17,6 @@ mounted: | #js
   }
 methods:
   draw: | #js
-
     function () {
       const canvas = this.$refs.canvas1;
       if (!canvas) return;
@@ -32,7 +31,6 @@ methods:
       this[`draw${pattern}`](ctx, width, height, slices, colors, colorsCount);
     }
   drawRadial: | #js
-
     function (ctx, width, height, slices, colors, colorsCount) {
       const grd = ctx.createRadialGradient(width / 2, height / 2, 0, width / 2, height / 2, width * 2);
       for (let i = 0; i < slices; i++) {
@@ -43,7 +41,6 @@ methods:
       ctx.fillRect(0, 0, width, height);
     }
   drawLines: | #js
-
     function (ctx, width, height, slices, colors, colorsCount) {
       const grd = ctx.createLinearGradient(0, 0, width, height);
       for (let i = 0; i < slices; i++) {
@@ -54,7 +51,6 @@ methods:
       ctx.fillRect(0, 0, width, height);
     }
   drawCheckers: | #js
-
     function (ctx, width, height, slices, colors, colorsCount) {
       // Slice the canvas into slices, like a pizza
       const sliceWidth = width / slices;
@@ -67,7 +63,6 @@ methods:
       }
     }
   drawPizza: | #js
-
     function (ctx, width, height, slices, colors, colorsCount) {
       const center = { x: width / 2, y: height / 2 };
       const angle = 2 * Math.PI / slices;
@@ -84,7 +79,6 @@ methods:
 watch:
   item:
     handler: | #js
-
       function () {
         this.$nextTick(this.draw.bind(this));
       }
