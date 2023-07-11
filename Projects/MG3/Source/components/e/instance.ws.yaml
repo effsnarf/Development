@@ -23,7 +23,7 @@ dom:
 name: e-instance
 props:
   item: null
-  showCreatePost: true
+  showCreatePost: false
   instanceID: null
 data:
   width: null
@@ -43,7 +43,8 @@ methods:
 computed:
   showGenerator: | #js
     function () {
-      if (this.item.urlName == this.$root.params.urlName) return false;
+      if (!this.instance) return false;
+      if (this.instance.urlName == this.$root.params.urlName) return false;
       return true;
     }
   fontSizes: | #js
@@ -62,6 +63,7 @@ watch:
   instanceID:
     handler: | #js
       async function (instanceID) {
+        if (this.item) return;
         this.instance = !instanceID ? null : await this.$root.dbp.instances.select.one(instanceID);
       }
     immediate: true

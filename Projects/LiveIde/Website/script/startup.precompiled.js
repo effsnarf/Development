@@ -163,9 +163,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "./script/1688978553288.ts":
+/***/ "./script/1689011310654.ts":
 /*!*********************************!*\
-  !*** ./script/1688978553288.ts ***!
+  !*** ./script/1689011310654.ts ***!
   \*********************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -3251,7 +3251,7 @@ exports["default"] = (context, dom, indent, compName) => {
         const indentStr = "  ".repeat(indent);
         return `${indentStr}${tag}(${Object.entries(attrs)
             .map((a) => {
-            return { key: a[0], value: a[1] };
+            return { key: a[0].split("#")[0], value: a[1] };
         })
             .filter((a) => a.value)
             .map((a) => {
@@ -3337,7 +3337,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("./script/1688978553288.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("./script/1689011310654.ts");
 /******/ 	
 /******/ })()
 ;

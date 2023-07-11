@@ -12,6 +12,7 @@ import { TypeScript } from "@shared/TypeScript";
 import { DatabaseProxy } from "../../../Apps/DatabaseProxy/Client/DbpClient";
 import { MemoryCache } from "@shared/Cache";
 import { Analytics, ItemType } from "@shared/Analytics";
+import isAttributeName from "@shared/WebScript/is.attribute.name";
 
 const isDevEnv = Configuration.getEnvironment() == "dev";
 
@@ -180,6 +181,7 @@ const _fetchAsJson = async (url: string) => {
       .filter((a) => a.trim().length);
     for (const keyLine of keyLines) {
       const key = keyLine.replace(":", "");
+      if (isAttributeName([], key.trim())) continue;
       const keyRegex = new RegExp(keyLine, "gm");
       const matches = [...domSection.matchAll(keyRegex)];
       if (matches.length > 1) {

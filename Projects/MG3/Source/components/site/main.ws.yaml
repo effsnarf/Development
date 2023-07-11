@@ -1,4 +1,3 @@
-name: site-main
 dom:
   div:
     transition:
@@ -40,8 +39,6 @@ props:
   recommendationItems: null
 computed:
   leftStickyTop: | #js
-
-
     function() {
       if (this.titleText) return "250px";
       return "160px";

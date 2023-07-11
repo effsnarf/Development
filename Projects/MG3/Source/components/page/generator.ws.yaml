@@ -10,42 +10,26 @@ dom:
       v-slot: article
       ui.image:
         class: mb-l2
-        imageID: 680118406
-        :aspect-ratio: "5/1"
-        object-position: top
+        imageID: 680118409
+        :aspect-ratio: "3/1"
       div:
         div:
           class: float-left mr-l1
           :style: "{ width: '30%' }"
           e.instance:
-            :instanceID: 18334939
-        .description:
-          v-html: "'<h1>Socially Awkward Penguin</h1> is a popular internet meme that depicts a penguin character embodying the traits of social awkwardness. The meme typically features a simple illustration of a penguin with a slightly tilted head and a shy expression. It represents those relatable moments when individuals find themselves in uncomfortable or socially challenging situations. Socially Awkward Penguin serves as a lighthearted way to express and relate to the awkwardness many people experience in their daily lives, creating a sense of camaraderie and humor within online communities.'"
+            :item: instance
+        h1:
+          v-text: generator?.displayName
+        .poem:
+          :style: "{ marginLeft: '32%', width: '68%' }"
+          content.poem.stanza:
+            ':item': randomStanza
         div:
           class: float-clear
-        e.teaser:
-          imageID: 1058
-        e.teaser:
-          imageID: 4367294
-        e.teaser:
-          imageID: 2795748
-        e.teaser:
-          imageID: 1255
-        e.teaser:
-          imageID: 565919
-      content.article:
-        v-if: poem
-        template:
-          v-slot: content
-          .poem:
-            transition.group:
-              name: list
-              content.poem.stanza:
-                v-for: stanza in getRandomStanzas(poem)
-                ':item': stanza
-                ':key': stanza.map(l => l.substring(0, 5)).join('-')
-          div:
-            class: float-clear
+        .description:
+          v-html: "'<h3>Socially Awkward Penguin</h3> is a popular internet meme that depicts a penguin character embodying the traits of social awkwardness. The meme typically features a simple illustration of a penguin with a slightly tilted head and a shy expression. It represents those relatable moments when individuals find themselves in uncomfortable or socially challenging situations. Socially Awkward Penguin serves as a lighthearted way to express and relate to the awkwardness many people experience in their daily lives, creating a sense of camaraderie and humor within online communities.'"
+        div:
+          class: float-clear
     template:
       v-slot: middle
       content.stream:
@@ -59,10 +43,29 @@ dom:
         v-if: showCreateInstance
         ':generator': generator
         @instance-created: onInstanceCreated
+      e.teaser:
+        imageID: 32
+        title: Advice Animals
+        url: /c/advice-animals
+      e.teaser:
+        imageID: 679668918
+        title: Movies
+        url: /c/movies
+      e.teaser:
+        imageID: 679668921
+        title: Anonymous Times
+      e.teaser:
+        imageID: 679668909
+        title: YouTube
+
+    template:
+      v-slot: right
 data:
   urlName: null
   generator: null
+  instance: null
   poem: null
+  randomStanza: null
   recommendationItems: []
   showCreateInstance: false
 mounted: | #js
@@ -133,21 +136,33 @@ methods:
     }
 watch:
   generator: | #js
-    function(newGenerator) {
-      if (!newGenerator)
+    async function(generator) {
+      if (!generator)
       {
+        this.instance = null;
+        this.randomStanza = null;
         this.showCreateInstance = false;
         return;
       }
+      this.instance = (await this.$root.dbp.instances.select.popular("en", 0, generator.urlName)).shuffle()[0];
+      this.randomStanza = this.getRandomStanzas(generator.desc.poem)[0];
       setTimeout(() => {
         this.showCreateInstance = true;
       }, 2000);
     }
 style:
-  .description h1:
-    display: block
+  .comp-e-teaser:
+    filter: grayscale(1)
+  .comp-e-teaser:hover:
+    filter: grayscale(0)
+  h1:
     font-size: 3rem
     line-height: 1.5em
+  .description:
+    margin: 2em 0
+  .description h3:
+    font-size: 2rem
+    display: inline-block
   .poem: null
   .poem .comp-content-poem-stanza:
     margin: 1rem auto

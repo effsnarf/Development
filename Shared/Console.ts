@@ -582,25 +582,75 @@ class Console {
     return new Console();
   }
 
+  private static _on = {
+    _keyHandlers: new Map(),
+    _lineHandlers: new Map(),
+  };
+
   static on = {
     _initialized: false,
     _init: () => {
       readline.emitKeypressEvents(process.stdin);
+      readline
+        .createInterface({
+          input: process.stdin,
+          output: process.stdout,
+        })
+        .on("line", (line: string) => {
+          const handlers = [...Console._on._lineHandlers.values()].flatMap(
+            (h) => h
+          );
+          handlers.forEach((handler: any) => handler(line));
+        });
       process.stdin.setRawMode(true);
       process.stdin.on("keypress", (key) => {
-        const handlers = Console.on._keyHandlers.get(key);
+        const handlers = Console._on._keyHandlers.get(key);
         if (handlers) handlers.forEach((handler: any) => handler(key));
       });
       Console.on._initialized = true;
     },
-    _keyHandlers: new Map(),
     key: (key: string, callback: (key: string) => void) => {
       if (!Console.on._initialized) Console.on._init();
-      const handlers = Console.on._keyHandlers.get(key) || [];
+      const handlers = Console._on._keyHandlers.get(key) || [];
       handlers.push(callback);
-      Console.on._keyHandlers.set(key, handlers);
+      Console._on._keyHandlers.set(key, handlers);
+    },
+    line: (cbKey: any, callback: (line: string) => void) => {
+      if (!Console.on._initialized) Console.on._init();
+      const handlers = Console._on._lineHandlers.get(cbKey) || [];
+      handlers.push(callback);
+      Console._on._lineHandlers.set(cbKey, handlers);
     },
   };
+
+  static off = {
+    line: (cbKey: any) => {
+      Console._on._lineHandlers.delete(cbKey);
+    },
+  };
+
+  static readLines(question: string) {
+    return new Promise<string>((resolve) => {
+      const cbKey = Date.now();
+      const lines: string[] = [];
+      console.log(question.green);
+      console.log(
+        `${`(type`.gray} ${`double enter`} ${`to finish)`.gray}`.gray
+      );
+      console.log();
+      Console.on.line(cbKey, (line: string) => {
+        lines.push(line);
+        if (
+          lines.length > 2 &&
+          [...lines].reverse().take(2).join("").length === 0
+        ) {
+          console.log();
+          Console.off.line(cbKey);
+          return resolve(lines.join("\n").trim());
+        }
+      });
+    });
+  }
 
   static moveCursorTo(x: number, y: number) {
     x = Math.round(x);

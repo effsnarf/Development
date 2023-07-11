@@ -1,4 +1,3 @@
-name: content-recommendations
 dom:
   .list:
     transition.group:
@@ -7,8 +6,8 @@ dom:
       li:
         v-for: generator in items
         e.generator.wide:
-          ':item': generator
-        ':key': generator.generatorID
+          ":item": generator
+        ":key": generator.generatorID
 style:
   .list:
     display: flex

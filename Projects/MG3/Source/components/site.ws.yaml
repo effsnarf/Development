@@ -3,29 +3,29 @@ dom:
     transition:
       name: fade
       div:
-        ':class': getCssClass()
+        ":class": getCssClass()
         v-show: (this.pageName == $root.params.page)
         div:
           site.sidebar: null
           site.main:
-            ':title-image-id': titleImageId
-            ':title-text': titleText
-            ':title-url': titleUrl
-            ':title-key': titleKey
-            ':recommendation-items': recommendationItems
-            template#1:
+            ":title-image-id": titleImageId
+            ":title-text": titleText
+            ":title-url": titleUrl
+            ":title-key": titleKey
+            ":recommendation-items": recommendationItems
+            template:
               v-slot: article
               slot:
                 name: article
-            template#2:
+            template:
               v-slot: left
               slot:
                 name: left
-            template#3:
+            template:
               v-slot: middle
               slot:
                 name: middle
-            template#4:
+            template:
               v-slot: right
               slot:
                 name: right
@@ -40,7 +40,6 @@ props:
   pageName: null
 methods:
   getCssClass: | #js
-
     function() {
       const cls = {};
       cls['site-width'] = true;

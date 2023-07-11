@@ -4,18 +4,18 @@ dom:
     template#0:
       v-slot: article
       .grid-3:
-        e.teaser#1:
+        e.teaser:
           imageID: 32
-          title: Advice
+          title: Advice Animals
           url: /c/advice-animals
-        e.teaser#2:
+        e.teaser:
           imageID: 679668918
           title: Movies
           url: /c/movies
-        e.teaser#3:
+        e.teaser:
           imageID: 679668921
           title: Anonymous Times
-        e.teaser#4:
+        e.teaser:
           imageID: 679668909
           title: YouTube
     template#1:

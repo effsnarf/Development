@@ -1,4 +1,3 @@
-name: e-generator-wide
 dom:
   ui.link:
     ":url": url
@@ -11,7 +10,7 @@ dom:
           div:
             v-text: item.displayName
         content.poem.stanza:
-          v-if: item.desc?.poem
+          v-if: false && item.desc?.poem
           class: show-on-hover
           ":item": $root.getRandomStanza(item.desc?.poem)
 props:

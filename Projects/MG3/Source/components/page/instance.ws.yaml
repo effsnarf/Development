@@ -2,13 +2,13 @@ dom:
   site:
     v-if: $root.params.page=='instance'
     page-name: instance
-    ':recommendation-items': recommendationItems
-    template#1: null
-    template#2:
+    ":recommendation-items": recommendationItems
+    template: null
+    template:
       v-slot: middle
       content.stream:
         item-type: e.instance
-        ':get-more-items': getMoreInstances
+        ":get-more-items": getMoreInstances
         grid-class: grid-1
 data:
   instance: null
@@ -26,7 +26,6 @@ mounted: | #js
   }
 methods:
   init: | #js
-
     async function() {
       if (!this.$root.params.instanceID) return;
       const dbp = this.$root.dbp;
@@ -38,7 +37,6 @@ methods:
       }
     }
   getMoreInstances: | #js
-
     async function(pageIndex) {
       const items = await this.$root.dbp.instances.select.popular("en", pageIndex)
       if ((pageIndex == 0) && (this.instance)) items.unshift(this.instance);

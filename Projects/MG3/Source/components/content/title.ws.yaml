@@ -3,7 +3,7 @@ dom:
     ':class': getCssClass()
     div:
       class: content-title site-width
-      div#1:
+      div:
         class: background
       transition.group:
         name: list
@@ -16,7 +16,7 @@ dom:
             ':url': url
           ui.large.title:
             ':text': title
-    div#2:
+    div:
       class: spacer
 props:
   imageID: null
@@ -26,13 +26,11 @@ data:
   isStuck: false
 methods:
   onScroll: | #js
-
     function() {
       const scrollTop = window.scrollY;
       this.isStuck = scrollTop > 0;
     }
   getCssClass: | #js
-
     function() {
       return { stuck: this.isStuck };
     }
