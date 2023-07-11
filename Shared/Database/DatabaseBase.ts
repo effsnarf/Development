@@ -136,6 +136,10 @@ abstract class DatabaseBase {
     return await this.newIds.get(count);
   }
 
+  async setNewID(newID: number) {
+    await this._setNewID(newID);
+  }
+
   protected abstract _setNewID(newID: number): Promise<void>;
 
   protected abstract _getNewIDs(count: number): Promise<number[]>;

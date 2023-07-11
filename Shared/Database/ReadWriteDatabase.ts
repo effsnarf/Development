@@ -71,6 +71,9 @@ class ReadWriteDatabase extends DatabaseBase {
   count(collectionName: string, query?: any): Promise<number> {
     return this.readDb.count(collectionName, query);
   }
+  protected _setNewID(newID: number): Promise<void> {
+    return this.writeDb.setNewID(newID);
+  }
   protected _getNewIDs(count: number): Promise<number[]> {
     return this.writeDb.getNewIDs(count);
   }
