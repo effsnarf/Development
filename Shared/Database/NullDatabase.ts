@@ -55,6 +55,10 @@ class NullDatabase extends DatabaseBase {
     return 0;
   }
 
+  protected async _setNewID(newID: number): Promise<void> {
+    return;
+  }
+
   protected async _getNewIDs(count: number): Promise<number[]> {
     return [];
   }
