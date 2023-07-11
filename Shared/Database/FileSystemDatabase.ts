@@ -147,6 +147,11 @@ class FileSystemDatabase extends DatabaseBase {
     });
   }
 
+  protected async _setNewID(newID: number): Promise<void> {
+    const uniqueIdFilePath = path.join(this.basePath, "uniqueID.json");
+    fs.writeFileSync(uniqueIdFilePath, newID.toString());
+  }
+
   protected async _getNewIDs(count: number): Promise<number[]> {
     const uniqueIdFilePath = path.join(this.basePath, "uniqueID.json");
     if (!fs.existsSync(uniqueIdFilePath)) {
