@@ -39,7 +39,7 @@ import { Database } from "@shared/Database/Database";
       loading.stop();
       console.log(result);
     } catch (ex: any) {
-      console.log(ex.message.red);
+      console.log(ex.message.trim(200).red);
     } finally {
       loading.stop();
     }
