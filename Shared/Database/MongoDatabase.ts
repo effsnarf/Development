@@ -231,6 +231,16 @@ class MongoDatabase extends DatabaseBase {
     return result;
   }
 
+  protected async _setNewID(newID: number) {
+    const collection = await this.getCollection("_Settings");
+
+    await collection.updateOne(
+      { name: "global.unique.id" },
+      { $set: { value: newID } },
+      { upsert: true }
+    );
+  }
+
   protected async _getNewIDs(count: number) {
     const collection = await this.getCollection("_Settings");
 

@@ -100,7 +100,11 @@ abstract class DatabaseBase {
       ? await this.findOneByID(collectionName, doc._id)
       : null;
 
-    if (!doc._id) doc._id = await this.getNewID();
+    const newID = await this.getNewID();
+
+    if (doc._id > newID) await this._setNewID(doc._id + 1);
+
+    if (!doc._id) doc._id = newID;
     await this._upsert(collectionName, doc);
 
     if (returnNewDoc) return await this.findOneByID(collectionName, doc._id);
@@ -131,6 +135,8 @@ abstract class DatabaseBase {
   async getNewIDs(count: number) {
     return await this.newIds.get(count);
   }
+
+  protected abstract _setNewID(newID: number): Promise<void>;
 
   protected abstract _getNewIDs(count: number): Promise<number[]>;
 
