@@ -58,12 +58,19 @@ const debug = (...args: any[]) => {
         if (image) {
           fs.unlinkSync(tempFilePath);
         } else {
-          image = await db.upsert("MgImages", {
-            Created: Date.now(),
-            Md5: imageMd5,
-          });
+          image = await db.upsert(
+            "MgImages",
+            {
+              Created: Date.now(),
+              Md5: imageMd5,
+            },
+            true
+          );
           const newFilePath = getSplitDirImagePath(image._id, "jpg", false);
-          fs.renameSync(tempFilePath, newFilePath);
+          // Move the file to the new location
+          // Don't use rename because it doesn't work across drives
+          fs.copyFileSync(tempFilePath, newFilePath);
+          fs.unlinkSync(tempFilePath);
         }
         // debug(`${`Saved`.gray} ${newFilePath.yellow}`);
         writeStatus(200);
@@ -72,7 +79,7 @@ const debug = (...args: any[]) => {
         loading.stop();
 
         console.log(
-          `${loading.elapsed.unitifyTime()}\t${size.unitifySize()}Uploaded\t${
+          `${loading.elapsed.unitifyTime()}\t${size.unitifySize()}\tUploaded\t_id: ${
             image._id
           }`
         );
@@ -91,6 +98,11 @@ const debug = (...args: any[]) => {
     const f1 = Math.floor(imageID / 1024 / 1024);
     const f2 = Math.floor(imageID / 1024);
     const imagePath = `${config.folders.images}\\${f1}\\${f2}\\${imageID}${noBgStr}.${ext}`;
+    // Make sure the directory exists
+    const dir = path.dirname(imagePath);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
     return imagePath;
   };
 
