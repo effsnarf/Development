@@ -69,11 +69,28 @@ abstract class DatabaseBase {
 
   async upsert(
     collectionName: string,
-    doc: any,
+    doc: any | any[],
     returnNewDoc: boolean = false,
     returnDiff: boolean = false,
     uppercaseFields: boolean = false
   ): Promise<any> {
+    if (Array.isArray(doc)) {
+      const docs = doc;
+      const results = [];
+      for (const doc of docs) {
+        results.push(
+          await this.upsert(
+            collectionName,
+            doc,
+            returnNewDoc,
+            returnDiff,
+            uppercaseFields
+          )
+        );
+      }
+      return results;
+    }
+
     if (uppercaseFields) doc = Objects.toTitleCaseKeys(doc);
 
     if (returnNewDoc && returnDiff)
