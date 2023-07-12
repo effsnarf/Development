@@ -14,29 +14,14 @@ a
   cursor: pointer;
 }
 
-/* a:not([href]), a[href=""]
+a:not([href]), a[href=""]
 {
   cursor: default;
-} */
+}
 
 a:hover
 {
   text-decoration: none;
-}
-
-a:not([href])
-{
-  cursor: default;
-}
-
-.focused
-{
-  box-shadow: 0 0 0 max(100vh, 100vw) rgba(0, 0, 0, 0.9);
-}
-
-.grayscale
-{
-  filter: grayscale(1);
 }
 
 .grayish
@@ -92,33 +77,21 @@ li
   margin: 0;
 }
 
-.dimmed
-{
-  opacity: 0.5;
-  transition: 0.3s;
-}
-
 .hover-highlight:hover
 {
   background: #ffffff20;
   transition: 0s;
 }
-
 .highlighted
 {
-  border: 2px dashed yellow;
-}
-.highlighted2
-{
-  border: 2px dashed cyan;
-}
-
-.highlighted, .highlighted2
-{
+  background: #ffffff40;
+  border: 2px dashed white;
   box-shadow: inset -4px 4px 2px #000;
-  transition: 0s;
 }
-
+.highlighted:hover
+{
+  background: #ffffff70;
+}
 .tree .title.highlighted:hover
 {
   background: #ffffff70;
@@ -131,36 +104,6 @@ li
 {
   background: #ffffff60;
 }
-
-.clickable
-{
-  cursor: pointer;
-  opacity: 0.7;
-  transition: 0s;
-}
-.clickable:hover
-{
-  opacity: 1;
-  transition: 0s;
-}
-
-.clickable2
-{
-  display: block;
-  cursor: pointer;
-}
-.clickable2:hover
-{
-  background: #ffffff30;
-  transition: 0s;
-}
-
-li .clickable2:hover
-{
-  background: none;
-}
-
-
 
 .hoverable
 {
@@ -208,7 +151,6 @@ table.bordered td, table.bordered th
 {
   border: 1px solid #ffffff40;
 }
-
 div.padded, table.padded td, table.padded th
 {
   padding: 0.3em 0.6em;
@@ -272,7 +214,7 @@ tr:hover > td:last-child
 }
 .selected:hover
 {
-  background: #ffffff60 !important;
+  background: #ffffff80 !important;
 }
 
 .parent .visible-if-parent-hover
@@ -312,22 +254,16 @@ button /* .ide-button:hover */
   opacity: 1;
 }
 
-pre, input, textarea, select, option, .ide-checkbox
+
+input, textarea, select, option, .ide-checkbox
 {
-  padding: 0.5em 0.5em !important;
-  background: linear-gradient(to left, #303030, #101010);
-  box-shadow: inset -2px 2px 2px #000;
-  text-shadow: -3px 3px 2px #000;
-  font-family: monospace !important;
-  font-size: 110%;
-  border: 1px solid gray;
   width: 100%;
+  padding: 0.5em 0.5em !important;
+  background: #202020ff;
+  font-family: monospace !important;
+  border: 1px solid gray;
   color: #ffffff;
-}
-option
-{
-  background: #303030;
-  cursor: pointer;
+  text-shadow: none;
 }
 input:focus, textarea:focus, select:focus
 {
@@ -335,7 +271,6 @@ input:focus, textarea:focus, select:focus
   box-shadow: inset -5px 5px 3px #000;
   text-shadow: -3px 3px 2px #000000;
   outline: none;
-  transition: 0s;
 }
 input[type=checkbox], .ide-checkbox
 {
@@ -350,21 +285,6 @@ input, input[type=text], select
 {
   font-size: 120%;
 }
-
-input[type="color"]
-{
-  padding: 0 !important;
-  min-height: 3em;
-  cursor: pointer;
-}
-
-span.color
-{
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-}
-
 .ide-checkbox
 {
   background: #666666;
@@ -393,6 +313,28 @@ select
 select:hover
 {
   background: #00000020;
+}
+input:hover, textarea:hover
+{
+  background: #000000;
+  transition: 0s;
+}
+
+textarea
+{
+  min-width: 20rem;
+  font-size: 1.1rem;
+  aspect-ratio: 2 / 1.5;
+}
+
+textarea:focus
+{
+  min-width: 30rem;
+}
+
+textarea, textarea:focus
+{
+  transition: 0.6s;
 }
 
 select, input[type=range]
@@ -628,8 +570,9 @@ select, input[type=range]
 }
 .disabled
 {
-  filter: grayscale(1) contrast(0.8) brightness(0.8);
-  pointer-events: none;
+  opacity: 0.5 !important;
+  filter: grayscale(1);
+  text-decoration: line-through;
 }
 .disabled2
 {
@@ -646,7 +589,6 @@ select, input[type=range]
 }
 .error
 {
-  text-align: center;
   text-shadow: -3px 3px 1px #000;
   background: #b03030;
   padding: 0.5em;
@@ -673,11 +615,6 @@ progress
 
 .flex
 {
-}
-
-.flex.gap-1
-{
-  gap: 1em;
 }
 
 .progress-bar
@@ -715,19 +652,19 @@ p
   text-align: center;
   border-radius: 0.5em;
   padding: 0.5em 1em;
-  z-index: 100;
+  z-index: 1;
   left: 50%;
-  bottom: 0;
   opacity: 0;
-  transform: translate(-50%, 110%);
-  transition: 0.1s !important;
+  transform: translate(-50%, -180%);
+  transition: 0.3s;
 }
 
 /* Show the tooltip text when hovering over the element */
 [tooltip]:hover::before {
   visibility: visible;
   opacity: 1;
-  transition: 0.1s !important;
+  transform: translate(-50%, -140%);
+  transition: 0.3s;
 }
 
 
@@ -761,54 +698,3 @@ img[src=""]
   background: #80808040;
 }
 
-
-.message
-{
-  width: 100%;
-  background: #424242;
-  padding: 0.5rem 1rem;
-  border: 1px solid #ffffff80;
-  margin: 0.5rem auto;
-  text-align: center;
-}
-
-
-
-[tooltip]:hover::before {
-  content: attr(tooltip);
-  position: absolute;
-  width: max-content;
-  background-color: #222;
-  color: #fff;
-  text-align: center;
-  border-radius: 0.5em;
-  padding: 0.5em 1em;
-  left: 50%;
-  bottom: 0;
-  transform: translate(-50%, 110%);
-  box-shadow: -8px 8px 6px #000;
-}
-
-
-.cyan
-{
-  color: #0e7abd;
-}
-
-
-/* scrollbars */
-::-webkit-scrollbar {
-  width: 0.5em;
-}
-
-::-webkit-scrollbar-track {
-  background: #80808040;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #80808080;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #808080;
-}

@@ -2,10 +2,10 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "../../../Apps/DatabaseProxy/Client/DbpClient.ts":
-/*!*******************************************************!*\
-  !*** ../../../Apps/DatabaseProxy/Client/DbpClient.ts ***!
-  \*******************************************************/
+/***/ "../../../../Apps/DatabaseProxy/Client/DbpClient.ts":
+/*!**********************************************************!*\
+  !*** ../../../../Apps/DatabaseProxy/Client/DbpClient.ts ***!
+  \**********************************************************/
 /***/ (function(__unused_webpack_module, exports) {
 
 
@@ -30,19 +30,7 @@ class DatabaseProxy {
     constructor(urlBase, _fetchAsJson) {
         this.urlBase = urlBase;
         this.fetchAsJson =
-            _fetchAsJson ||
-                ((url) => __awaiter(this, void 0, void 0, function* () {
-                    const response = yield fetch(url);
-                    const text = yield response.text();
-                    if (!(text === null || text === void 0 ? void 0 : text.length))
-                        return null;
-                    try {
-                        return JSON.parse(text);
-                    }
-                    catch (e) {
-                        throw new Error(text);
-                    }
-                }));
+            _fetchAsJson || ((url) => __awaiter(this, void 0, void 0, function* () { return yield (yield fetch(url)).json(); }));
     }
     static new(urlBase, _fetchAsJson) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -163,10 +151,10 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "./script/1689011310654.ts":
-/*!*********************************!*\
-  !*** ./script/1689011310654.ts ***!
-  \*********************************/
+/***/ "../../../LiveIde/Website/script/1688106238544.ts":
+/*!********************************************************!*\
+  !*** ../../../LiveIde/Website/script/1688106238544.ts ***!
+  \********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -179,40 +167,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-__webpack_require__(/*! ../../../../Shared/Extensions */ "../../../Shared/Extensions.ts");
-const Extensions_Objects_Client_1 = __webpack_require__(/*! ../../../../Shared/Extensions.Objects.Client */ "../../../Shared/Extensions.Objects.Client.ts");
-const StateTracker_1 = __webpack_require__(/*! ../../classes/StateTracker */ "../classes/StateTracker.ts");
-const AnalyticsTracker_1 = __webpack_require__(/*! ../../classes/AnalyticsTracker */ "../classes/AnalyticsTracker.ts");
-const ClientContext_1 = __webpack_require__(/*! ../../classes/ClientContext */ "../classes/ClientContext.ts");
-const Params_1 = __webpack_require__(/*! ../../classes/Params */ "../classes/Params.ts");
-const DbpClient_1 = __webpack_require__(/*! ../../../../Apps/DatabaseProxy/Client/DbpClient */ "../../../Apps/DatabaseProxy/Client/DbpClient.ts");
-const VueManager_1 = __webpack_require__(/*! ../../classes/VueManager */ "../classes/VueManager.ts");
-const add_paths_1 = __importDefault(__webpack_require__(/*! ../../../../Shared/WebScript/add.paths */ "../../../Shared/WebScript/add.paths.ts"));
-// To make it accessible to client code
-const win = window;
-win.Objects = Extensions_Objects_Client_1.Objects;
-const htmlEncode = (s) => {
-    if (!s)
-        return null;
-    // HTML encode
-    s = s.replace(/&/g, "&amp;");
-    s = s.replace(/</g, "&lt;");
-    s = s.replace(/>/g, "&gt;");
-    s = s.replace(/"/g, "&quot;");
-    s = s.replace(/'/g, "&#39;");
-    return s;
-};
+__webpack_require__(/*! ../../../../Shared/Extensions */ "../../../../Shared/Extensions.ts");
+const AnalyticsTracker_1 = __webpack_require__(/*! ../../classes/AnalyticsTracker */ "../../../LiveIde/classes/AnalyticsTracker.ts");
+const ClientContext_1 = __webpack_require__(/*! ../../classes/ClientContext */ "../../../LiveIde/classes/ClientContext.ts");
+const Params_1 = __webpack_require__(/*! ../../classes/Params */ "../../../LiveIde/classes/Params.ts");
+const DbpClient_1 = __webpack_require__(/*! ../../../../Apps/DatabaseProxy/Client/DbpClient */ "../../../../Apps/DatabaseProxy/Client/DbpClient.ts");
 const helpers = {
     url: {
-        thread: (thread, full = false) => {
-            if (!thread)
-                return null;
-            return helpers.url.full(`/t/${thread._id}`, full);
-        },
         generator: (generator, full = false) => {
             if (!generator)
                 return null;
@@ -228,17 +190,14 @@ const helpers = {
                 return null;
             return `https://img.memegenerator.net/instances/${instance.instanceID}.jpg`;
         },
-        image: (imageID, full = false, removeBackground = false) => {
+        image: (imageID, full = false) => {
             if (!imageID)
                 return null;
-            const noBg = removeBackground ? ".nobg" : "";
-            return helpers.url.full(`https://img.memegenerator.net/images/${imageID}${noBg}.jpg`, full);
+            return helpers.url.full(`https://img.memegenerator.net/images/${imageID}.jpg`, full);
         },
         full: (path, full = false) => {
             if (!path)
                 return null;
-            if (path.startsWith("http"))
-                return path;
             if (full)
                 return `https://memegenerator.net${path}`;
             return path;
@@ -259,119 +218,26 @@ const helpers = {
         return (yield Params_1.Params.new(() => ideVueApp, client.config.params, window.location.pathname));
     });
     const params = yield getNewParams();
-    const vueManager = yield VueManager_1.VueManager.new(client);
     ideVueApp = new client.Vue({
+        el: "#app",
         data: {
-            state: null,
-            vm: vueManager,
-            client,
             dbp,
             analytics: yield AnalyticsTracker_1.AnalyticsTracker.new(),
             params: params,
             url: helpers.url,
             comps: client.Vue.ref(client.comps),
-            compsDic: {},
-            compNames: [],
             templates: client.templates,
-            isLoading: false,
-            error: null,
             key1: 1,
         },
         mounted() {
-            return __awaiter(this, void 0, void 0, function* () {
-                yield this.init();
-            });
+            return __awaiter(this, void 0, void 0, function* () { });
         },
         methods: {
-            init() {
+            navigateTo(url) {
                 return __awaiter(this, void 0, void 0, function* () {
-                    const self = this;
-                    self.compsDic = client.comps.toMap((c) => c.name.hashCode());
-                    self.compNames = client.comps.map((c) => c.name);
-                });
-            },
-            getComponent(uidOrName) {
-                const uid = typeof uidOrName == "number" ? uidOrName : null;
-                let name = typeof uidOrName == "string" ? uidOrName : null;
-                if (name)
-                    name = name.replace(/-/g, ".");
-                if (!uid && !name)
-                    return null;
-                if (uid) {
-                    const vue = vueManager.getVue(uid);
-                    if (!vue)
-                        return null;
-                    const compName = vue.$data._.comp.name;
-                    if (!compName)
-                        return null;
-                    const comp = this.compsDic[compName.hashCode()];
-                    return comp;
-                }
-                if (name) {
-                    const comp = this.compsDic[name.hashCode()];
-                    return comp;
-                }
-            },
-            isComponentName(name) {
-                if (!name)
-                    return false;
-                const self = this;
-                return !!self.compsDic[name.hashCode()];
-            },
-            getElementsFromViewNode(node) {
-                return document.querySelectorAll(`[path="${node[1].path}"]`);
-            },
-            getViewChildNodes(node) {
-                if (!node[1])
-                    return [];
-                if (typeof node[1] != "object")
-                    return [];
-                let children = Object.entries(node[1]);
-                children = children.filter((c) => !this.isAttributeName(c[0]));
-                return children;
-            },
-            addPaths(compName, dom) {
-                return (0, add_paths_1.default)(this, compName, dom);
-            },
-            ideWatch(uid, name) {
-                const ideWatches = this.ideWatches;
-                const key = `${uid}-${name}`;
-                if (ideWatches[key])
-                    return;
-                ideWatches[key] = { uid, name };
-            },
-            isAttributeName(name) {
-                const self = this;
-                return client.isAttributeName(self.compNames, name);
-            },
-            getDescendants(vue, filter) {
-                if (typeof filter == "string") {
-                    const compName = filter;
-                    filter = (vue) => { var _a; return ((_a = vue.$data._) === null || _a === void 0 ? void 0 : _a.comp.name) == compName; };
-                }
-                const vues = [];
-                for (const child of vue.$children) {
-                    if (filter(child))
-                        vues.push(child);
-                    vues.push(...this.getDescendants(child, filter));
-                }
-                return vues;
-            },
-            navigateTo(item) {
-                return __awaiter(this, void 0, void 0, function* () {
-                    const url = this.itemToUrl(item);
-                    const self = this;
-                    self.error = null;
                     window.history.pushState({}, "", url);
                     yield this.refresh();
                 });
-            },
-            itemToUrl(item) {
-                if (typeof item == "string")
-                    return item;
-                if (item.threadID)
-                    return helpers.url.thread({ _id: item.threadID });
-                throw new Error("Unknown item type");
             },
             compileApp() {
                 return __awaiter(this, void 0, void 0, function* () {
@@ -379,30 +245,11 @@ const helpers = {
                     this.refresh();
                 });
             },
-            reloadComponentsFromServer() {
-                return __awaiter(this, void 0, void 0, function* () {
-                    yield client.reloadComponentsFromServer();
-                    yield this.init();
-                    yield this.refreshComponents();
-                });
-            },
             getMoreInstances(pageIndex) {
                 return __awaiter(this, void 0, void 0, function* () {
                     const self = this;
                     return yield self.dbp.instances.select.popular("en", pageIndex, self.params.urlName);
                 });
-            },
-            textToHtml(text) {
-                if (!text)
-                    return null;
-                var s = text;
-                // HTML encode
-                s = htmlEncode(s) || "";
-                // >greentext
-                s = s.replace(/^&gt;(.*)$/gm, "<span class='greentext'>&gt;$1</span>");
-                // line breaks
-                s = s.replace(/\n/g, "<br />");
-                return s;
             },
             refresh() {
                 return __awaiter(this, void 0, void 0, function* () {
@@ -416,19 +263,6 @@ const helpers = {
                     window.scrollTo({ top: 0, behavior: "smooth" });
                 });
             },
-            refreshComponents() {
-                return __awaiter(this, void 0, void 0, function* () {
-                    const self = this;
-                    self.key1++;
-                    yield self.$nextTick();
-                    yield self.state.restoreState();
-                });
-            },
-            instanceToGenerator(instance) {
-                let gen = JSON.parse(JSON.stringify(instance));
-                gen._id = gen.generatorID;
-                return gen;
-            },
             getInstanceText(instance) {
                 if (!instance)
                     return null;
@@ -440,9 +274,11 @@ const helpers = {
             getKey(item) {
                 if (!item)
                     return null;
-                if (item._id)
-                    return item._id;
-                return item;
+                if (item.instanceID)
+                    return item.instanceID;
+                if (item.generatorID)
+                    return item.generatorID;
+                return null;
             },
             getRandomStanza(poem) {
                 if (!(poem === null || poem === void 0 ? void 0 : poem.length))
@@ -461,57 +297,8 @@ const helpers = {
             isDevEnv() {
                 return window.location.hostname == "localhost";
             },
-            visualizedYaml(obj) {
-                let yaml = window.jsyaml.dump(obj);
-                yaml = yaml.replace(/: true$/gm, ": ✔️");
-                yaml = yaml.replace(/: false$/gm, ": ❌");
-                // Replace colors with colored squares:
-                // '#ff0000\n' -> '🟥' (<span class="color"></span>)
-                // Works with 3, 6 and 8 digit hex colors
-                yaml = yaml.replace(/'#\w{3,8}\b'/g, (match) => {
-                    let color = match.slice(1); // Remove the '#' symbol
-                    color = color.substring(0, color.length - 1);
-                    return `<span class="color" style="background-color:${color}"></span>`;
-                });
-                // Replace "null" and "undefined" with <span class="opacity-50">null/undefined</span>
-                yaml = yaml.replace(/\b(null|undefined)\b/g, (match) => {
-                    return `<span class="opacity-30">${match}</span>`;
-                });
-                // Replace numbers (: [number]) with <span class="green">[number]</span>
-                yaml = yaml.replace(/: (\d+)/g, (match, p1) => {
-                    return `: <span class="green">${p1}</span>`;
-                });
-                // Replace strings (: [string]) with <span class="yellow">[string]</span>
-                yaml = yaml.replace(/: (\w.*)/g, (match, p1) => {
-                    return `: <span class="yellow">${p1}</span>`;
-                });
-                // Replace keys ([key]: ) with <span class="opacity-50">[key]: </span>
-                yaml = yaml.replace(/^(\s*)(\w+):/gm, (match, p1, p2) => {
-                    return `${p1}<span class="opacity-50">${p2}:</span>`;
-                });
-                return yaml;
-            },
-            getIcon(item) {
-                const stateItemIcons = {
-                    // method
-                    m: "🔴",
-                    // event
-                    e: "⚡",
-                    // prop
-                    p: "🔒",
-                    // data
-                    d: "🧊",
-                    // computed
-                    c: "✨",
-                };
-                if (item.type)
-                    return stateItemIcons[item.type] || "❔";
-                return "❔";
-            },
         },
     });
-    ideVueApp.state = yield StateTracker_1.StateTracker.new(() => ideVueApp, vueManager, client);
-    ideVueApp.$mount("#app");
     window.addEventListener("popstate", function (event) {
         return __awaiter(this, void 0, void 0, function* () {
             yield ideVueApp.refresh();
@@ -523,10 +310,10 @@ const helpers = {
 
 /***/ }),
 
-/***/ "../classes/AnalyticsTracker.ts":
-/*!**************************************!*\
-  !*** ../classes/AnalyticsTracker.ts ***!
-  \**************************************/
+/***/ "../../../LiveIde/classes/AnalyticsTracker.ts":
+/*!****************************************************!*\
+  !*** ../../../LiveIde/classes/AnalyticsTracker.ts ***!
+  \****************************************************/
 /***/ (function(__unused_webpack_module, exports) {
 
 
@@ -588,10 +375,10 @@ exports.AnalyticsTracker = AnalyticsTracker;
 
 /***/ }),
 
-/***/ "../classes/ClientContext.ts":
-/*!***********************************!*\
-  !*** ../classes/ClientContext.ts ***!
-  \***********************************/
+/***/ "../../../LiveIde/classes/ClientContext.ts":
+/*!*************************************************!*\
+  !*** ../../../LiveIde/classes/ClientContext.ts ***!
+  \*************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -609,11 +396,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ClientContext = void 0;
-const Lock_1 = __webpack_require__(/*! ../../../Shared/Lock */ "../../../Shared/Lock.ts");
-const to_template_1 = __importDefault(__webpack_require__(/*! ../../../Shared/WebScript/to.template */ "../../../Shared/WebScript/to.template.ts"));
-const is_attribute_name_1 = __importDefault(__webpack_require__(/*! ../../../Shared/WebScript/is.attribute.name */ "../../../Shared/WebScript/is.attribute.name.ts"));
-const ComponentManager_1 = __webpack_require__(/*! ./ComponentManager */ "../classes/ComponentManager.ts");
-const ClientDatabase_1 = __webpack_require__(/*! ./ClientDatabase */ "../classes/ClientDatabase.ts");
+const Lock_1 = __webpack_require__(/*! ../../../Shared/Lock */ "../../../../Shared/Lock.ts");
+const to_template_1 = __importDefault(__webpack_require__(/*! ../../../Shared/WebScript/to.template */ "../../../../Shared/WebScript/to.template.ts"));
+const ComponentManager_1 = __webpack_require__(/*! ./ComponentManager */ "../../../LiveIde/classes/ComponentManager.ts");
+const ClientDatabase_1 = __webpack_require__(/*! ./ClientDatabase */ "../../../LiveIde/classes/ClientDatabase.ts");
 const isDevEnv = window.location.hostname == "localhost";
 class ClientContext {
     // #region Globals
@@ -695,14 +481,47 @@ class ClientContext {
             yield this.compileAll((c) => !isIdeComponent(c));
         });
     }
-    reloadComponentsFromServer() {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield this.componentManager.reloadComponentsFromServer();
-            yield this.compileAll((c) => !["app"].includes(c.name));
-        });
-    }
     isAttributeName(componentNames, name) {
-        return (0, is_attribute_name_1.default)(componentNames, name);
+        if (name.includes("."))
+            return false;
+        if (name.startsWith(":"))
+            return true;
+        if (name.includes("#"))
+            return false;
+        if (name.startsWith("template"))
+            return false;
+        if (name == "slot")
+            return false;
+        if ([
+            "a",
+            "style",
+            ...[1, 2, 3, 4, 5, 6].map((i) => `h${i}`),
+            "pre",
+            "p",
+            "img",
+            "table",
+            "thead",
+            "tbody",
+            "tr",
+            "th",
+            "td",
+            "div",
+            "span",
+            "ul",
+            "li",
+            "input",
+            "button",
+            "canvas",
+            "textarea",
+            "component",
+            "transition",
+        ].includes(name))
+            return false;
+        if (name.startsWith("."))
+            return false;
+        if (componentNames.find((c) => c == name.replace(":", "")))
+            return false;
+        return true;
     }
     pugToHtml(pug) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -717,7 +536,6 @@ class ClientContext {
         return __awaiter(this, void 0, void 0, function* () {
             if (!isDevEnv)
                 return;
-            return;
             const url = `/component/update`;
             yield fetch(url, { method: "post", body: JSON.stringify(comp) });
         });
@@ -732,18 +550,15 @@ class ClientContext {
                 throw new Error(text);
             }
             catch (ex) {
+                // Try again
                 const url = args[0];
                 console.error(`Error fetching ${url}`);
                 console.error(ex);
-                if (ex.message.includes("You are not authorized")) {
-                    ClientContext.alertify.error(`<h3>${ex.message}</h3>`);
-                    return;
-                }
                 //if (window.location.hostname == "localhost") {
                 if (!ex.message.includes("Object reference not set to an instance of an object")) {
-                    // ClientContext.alertify
-                    //   .error(`<h3>${url}</h3><pre>${ex.message}</pre>`)
-                    //   .delay(0);
+                    ClientContext.alertify
+                        .error(`<h3>${url}</h3><pre>${ex.message}</pre>`)
+                        .delay(0);
                 }
                 //}
                 // Try again
@@ -777,10 +592,10 @@ exports.ClientContext = ClientContext;
 
 /***/ }),
 
-/***/ "../classes/ClientDatabase.ts":
-/*!************************************!*\
-  !*** ../classes/ClientDatabase.ts ***!
-  \************************************/
+/***/ "../../../LiveIde/classes/ClientDatabase.ts":
+/*!**************************************************!*\
+  !*** ../../../LiveIde/classes/ClientDatabase.ts ***!
+  \**************************************************/
 /***/ (function(__unused_webpack_module, exports) {
 
 
@@ -856,10 +671,10 @@ exports.ClientDatabase = ClientDatabase;
 
 /***/ }),
 
-/***/ "../classes/Component.ts":
-/*!*******************************!*\
-  !*** ../classes/Component.ts ***!
-  \*******************************/
+/***/ "../../../LiveIde/classes/Component.ts":
+/*!*********************************************!*\
+  !*** ../../../LiveIde/classes/Component.ts ***!
+  \*********************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -874,7 +689,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Component = void 0;
-const ClientContext_1 = __webpack_require__(/*! ./ClientContext */ "../classes/ClientContext.ts");
+const ClientContext_1 = __webpack_require__(/*! ./ClientContext */ "../../../LiveIde/classes/ClientContext.ts");
 String.prototype.kebabize = function () {
     return this.replace(/\./g, "-").toLowerCase();
 };
@@ -883,14 +698,11 @@ class Component {
         this.name = obj.name;
         this.path = obj.path;
         this.source = obj.source;
-        this.isCompiled = false;
         if (this.source)
             this.source.name = this.name.replace(/\./g, "-");
     }
     compile() {
         return __awaiter(this, void 0, void 0, function* () {
-            if (this.isCompiled)
-                return;
             const client = yield ClientContext_1.ClientContext.get();
             console.groupCollapsed(this.name);
             console.log(this);
@@ -916,7 +728,6 @@ class Component {
                     }
                 }
                 client.Vue.component(vueName, vueOptions);
-                this.isCompiled = true;
             }
             catch (ex) {
                 debugger;
@@ -934,10 +745,10 @@ exports.Component = Component;
 
 /***/ }),
 
-/***/ "../classes/ComponentManager.ts":
-/*!**************************************!*\
-  !*** ../classes/ComponentManager.ts ***!
-  \**************************************/
+/***/ "../../../LiveIde/classes/ComponentManager.ts":
+/*!****************************************************!*\
+  !*** ../../../LiveIde/classes/ComponentManager.ts ***!
+  \****************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -952,11 +763,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ComponentManager = void 0;
-__webpack_require__(/*! ../../../Shared/Extensions */ "../../../Shared/Extensions.ts");
-const Lock_1 = __webpack_require__(/*! ../../../Shared/Lock */ "../../../Shared/Lock.ts");
-const DataWatcher_1 = __webpack_require__(/*! ../../../Shared/DataWatcher */ "../../../Shared/DataWatcher.ts");
-const Component_1 = __webpack_require__(/*! ./Component */ "../classes/Component.ts");
-const ClientContext_1 = __webpack_require__(/*! ./ClientContext */ "../classes/ClientContext.ts");
+const Lock_1 = __webpack_require__(/*! ../../../Shared/Lock */ "../../../../Shared/Lock.ts");
+const DataWatcher_1 = __webpack_require__(/*! ../../../Shared/DataWatcher */ "../../../../Shared/DataWatcher.ts");
+const Component_1 = __webpack_require__(/*! ./Component */ "../../../LiveIde/classes/Component.ts");
+const ClientContext_1 = __webpack_require__(/*! ./ClientContext */ "../../../LiveIde/classes/ClientContext.ts");
 class ComponentManager {
     // #region Globals
     static get() {
@@ -986,18 +796,9 @@ class ComponentManager {
             return manager;
         });
     }
-    init(options = {}) {
+    init() {
         return __awaiter(this, void 0, void 0, function* () {
-            const url = options.onlyChanged ? "/changed/components" : "/components";
-            if (window.location.hostname == "localhost") {
-                const newComps = (yield (yield fetch(url)).json()).map((c) => new Component_1.Component(c));
-                for (const newComp of newComps) {
-                    const index = this.comps.findIndex((c) => c.name == newComp.name);
-                    if (index != -1)
-                        this.comps.removeAt(index);
-                }
-                this.comps.add(newComps);
-            }
+            if (false) {}
             else {
                 this.comps = window.components.map((c) => new Component_1.Component(c));
             }
@@ -1032,21 +833,16 @@ class ComponentManager {
             });
         });
     }
-    reloadComponentsFromServer() {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield this.init({ onlyChanged: true });
-        });
-    }
 }
 exports.ComponentManager = ComponentManager;
 
 
 /***/ }),
 
-/***/ "../classes/Params.ts":
-/*!****************************!*\
-  !*** ../classes/Params.ts ***!
-  \****************************/
+/***/ "../../../LiveIde/classes/Params.ts":
+/*!******************************************!*\
+  !*** ../../../LiveIde/classes/Params.ts ***!
+  \******************************************/
 /***/ (function(__unused_webpack_module, exports) {
 
 
@@ -1106,368 +902,10 @@ exports.Params = Params;
 
 /***/ }),
 
-/***/ "../classes/StateTracker.ts":
-/*!**********************************!*\
-  !*** ../classes/StateTracker.ts ***!
-  \**********************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.StateTracker = void 0;
-__webpack_require__(/*! ../../../Shared/Extensions */ "../../../Shared/Extensions.ts");
-const Extensions_Objects_Client_1 = __webpack_require__(/*! ../../../Shared/Extensions.Objects.Client */ "../../../Shared/Extensions.Objects.Client.ts");
-const VueHelper_1 = __webpack_require__(/*! ./VueHelper */ "../classes/VueHelper.ts");
-class StateTracker {
-    constructor(getApp, vm, client) {
-        this.getApp = getApp;
-        this.vm = vm;
-        this.client = client;
-        this.isPaused = 0;
-        this.refChanges = new Map();
-        this.methods = {
-            pause: {},
-        };
-    }
-    static new(app, vueManager, client) {
-        const st = new StateTracker(app, vueManager, client);
-        return st;
-    }
-    track(vue, type, key, newValue, oldValue) {
-        if (this.isPaused)
-            return;
-        const comp = this.getApp().getComponent(vue._uid);
-        if (!comp)
-            return;
-        //if (!comp.source.config?.track?.state) return;
-        const isEvent = type == "e";
-        newValue = isEvent ? newValue : Extensions_Objects_Client_1.Objects.clone(newValue);
-        oldValue = isEvent ? oldValue : Extensions_Objects_Client_1.Objects.clone(oldValue);
-        const item = {
-            id: StateTracker._nextID++,
-            dt: Date.now(),
-            uid: vue._uid,
-            type,
-            key,
-            newValue,
-            oldValue,
-        };
-        this.addItem(item);
-    }
-    apply(uid, change) {
-        return __awaiter(this, void 0, void 0, function* () {
-            this.pause();
-            const vue = this.vm.getVue(uid);
-            vue[change.key] = change.newValue;
-            yield vue.$nextTick();
-            this.resume();
-        });
-    }
-    // Sometimes when refreshing keys in the app, the vue components are recreated
-    // and lose their state.
-    // This method restores the state from the state tracker.
-    restoreState() {
-        return __awaiter(this, void 0, void 0, function* () {
-            this.pause();
-            const refKeys = this.vm.getRefKeys();
-            const vuesByRef = VueHelper_1.VueHelper.getVuesByRef(this.getApp());
-            for (const refKey of refKeys) {
-                const vues = vuesByRef.get(refKey) || [];
-                console.group(refKey);
-                const vueChanges = this.getRefChanges(refKey);
-                // For all vues that have this ref
-                for (const vue of vues) {
-                    // Find the last change for each key
-                    const lastChanges = vueChanges.reduce((acc, cur) => {
-                        acc[cur.key] = cur;
-                        return acc;
-                    }, {});
-                    // Apply the last change for each key
-                    for (const key in lastChanges) {
-                        const change = lastChanges[key];
-                        if (change.type != "d")
-                            continue;
-                        console.log(key, change.newValue);
-                        vue.$set(vue, key, change.newValue);
-                    }
-                }
-                console.groupEnd();
-            }
-            this.vm.updateDataVariableUIDs(this.getApp());
-            yield this.getApp().$nextTick();
-            this.resume();
-        });
-    }
-    addItem(item) {
-        const isState = item.type == "p" || item.type == "d";
-        const isMethod = item.type == "m";
-        const vueItems = this.getRefChanges(item.uid);
-        // Create an initial empty item
-        if (isState && item.newValue && !item.oldValue) {
-            const prevItemOfThisKey = [...vueItems]
-                .reverse()
-                .find((existingItem) => existingItem.key == item.key);
-            if (!prevItemOfThisKey) {
-                const emptyItem = JSON.parse(JSON.stringify(item));
-                emptyItem.id = StateTracker._nextID++;
-                emptyItem.dt = Date.now();
-                emptyItem.newValue = emptyItem.oldValue;
-                this.addItem(emptyItem);
-            }
-        }
-        // Group typing changes into one item
-        if (vueItems.length) {
-            const lastItem = vueItems.last();
-            if (this.isGroupable(item, lastItem)) {
-                item.oldValue = lastItem.oldValue;
-                vueItems.pop();
-            }
-        }
-        this.getRefChanges(item.uid).push(item);
-        if (vueItems.length > StateTracker._maxItems)
-            vueItems.shift();
-        this.getApp().$emit("state-changed", item);
-    }
-    isGroupable(newItem, prevItem) {
-        const timePassed = newItem.dt - prevItem.dt;
-        if (timePassed > 1000)
-            return false;
-        if (newItem.type != "p" && newItem.type != "d")
-            return false;
-        if (!prevItem.newValue && !prevItem.oldValue)
-            return false;
-        if (newItem.key != prevItem.key)
-            return false;
-        return true;
-    }
-    getRefChanges(refKeyOrUID) {
-        const refKey = typeof refKeyOrUID == "string"
-            ? refKeyOrUID
-            : this.vm.getRefKey(refKeyOrUID);
-        if (!refKey)
-            return [];
-        if (!this.refChanges.has(refKey)) {
-            this.refChanges.set(refKey, []);
-            console.log("new ref", refKey);
-        }
-        return this.refChanges.get(refKey) || [];
-    }
-    pause() {
-        this.isPaused++;
-    }
-    resume() {
-        this.isPaused--;
-    }
-    clear() {
-        this.refChanges.clear();
-    }
-}
-exports.StateTracker = StateTracker;
-StateTracker._nextID = 1;
-StateTracker._maxItems = 100;
-
-
-/***/ }),
-
-/***/ "../classes/VueHelper.ts":
-/*!*******************************!*\
-  !*** ../classes/VueHelper.ts ***!
-  \*******************************/
-/***/ ((__unused_webpack_module, exports) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.VueHelper = void 0;
-class VueHelper {
-    static getVuesByRef(rootVue) {
-        const map = new Map();
-        VueHelper.traverseVue(rootVue, (vue) => {
-            var _a;
-            for (const refKey in vue.$refs) {
-                if (!map.has(refKey)) {
-                    map.set(refKey, []);
-                }
-                (_a = map.get(refKey)) === null || _a === void 0 ? void 0 : _a.push(vue.$refs[refKey]);
-            }
-        });
-        return map;
-    }
-    static traverseVue(vue, callback) {
-        callback(vue);
-        if (vue.$children) {
-            vue.$children.forEach((c) => VueHelper.traverseVue(c, callback));
-        }
-    }
-    static getVuePath(vue) {
-        const path = [];
-        let currentVue = vue;
-        while (currentVue) {
-            const index = VueHelper.getVueChildIndex(currentVue);
-            path.push(index);
-            currentVue = currentVue.$parent;
-        }
-        return path.reverse();
-    }
-    static getVueChildIndex(vue) {
-        const parent = vue.$parent;
-        if (!parent)
-            return null;
-        const index = parent.$children.findIndex((c) => c._uid == vue._uid);
-        return index;
-    }
-}
-exports.VueHelper = VueHelper;
-
-
-/***/ }),
-
-/***/ "../classes/VueManager.ts":
-/*!********************************!*\
-  !*** ../classes/VueManager.ts ***!
-  \********************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.VueManager = void 0;
-__webpack_require__(/*! ../../../Shared/Extensions */ "../../../Shared/Extensions.ts");
-const TwoWayMap_1 = __webpack_require__(/*! ../../../Shared/TwoWayMap */ "../../../Shared/TwoWayMap.ts");
-const VueHelper_1 = __webpack_require__(/*! ./VueHelper */ "../classes/VueHelper.ts");
-class VueManager {
-    constructor(client) {
-        this.client = client;
-        this.vues = {};
-        this.vuesCount = 0;
-        // Tracking by uid or vue tree path are unreliable because vue recreates components
-        // We use $refs to track components
-        // Any ref that starts with a capital letter is a global reference
-        this.vueRefsToUIDs = new TwoWayMap_1.TwoWayMap();
-    }
-    static new(client) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const vm = new VueManager(client);
-            return vm;
-        });
-    }
-    /** Since vue UIDs might have changed, if anyone keeps a "..UID" reference
-     *  (hoveredVueUID, selectedVueUID, etc) we update them.
-     */
-    updateDataVariableUIDs(vue) {
-        VueHelper_1.VueHelper.traverseVue(vue, (vue) => {
-            const keys = Object.keys(vue.$data).filter((k) => k.endsWith("UID"));
-            for (const key of keys) {
-                let uid = vue.$data[key];
-                uid = this.toRecentVueUID(uid);
-                vue.$data[key] = uid;
-            }
-            const arrayKeys = Object.keys(vue.$data).filter((k) => k.endsWith("UIDs"));
-            for (const key of arrayKeys) {
-                let uids = vue.$data[key];
-                uids = uids.map((uid) => this.toRecentVueUID(uid));
-                vue.$data[key].clear();
-                vue.$data[key].push(...uids);
-            }
-        });
-    }
-    getVue(uid) {
-        if (uid == null || uid == undefined)
-            return null;
-        uid = this.toRecentVueUID(uid);
-        const vue = this.vues[uid];
-        if (!vue)
-            return null;
-        return vue();
-    }
-    // Vues are recreated occasionally
-    // Because we're tracking refs, in some cases we can map from the old vue to the new vue
-    toRecentVueUID(uid) {
-        const refKey = this.getRefKey(uid);
-        if (!refKey)
-            return uid;
-        const newUIDs = this.vueRefsToUIDs.get(refKey);
-        return newUIDs.last();
-    }
-    getComputedKeys(uid) {
-        const vue = this.getVue(uid);
-        if (!vue)
-            return [];
-        let keys = Object.keys(vue._computedWatchers || vue.$options._computedWatchers || {});
-        keys = keys.filter((k) => !k.startsWith("$"));
-        keys = keys.sortBy((k) => k);
-        return keys;
-    }
-    getFields(uid) {
-        const vue = this.getVue(uid);
-        if (!vue)
-            return [];
-        let fields = [];
-        fields.push(...Object.keys(vue.$data || {}).map((k) => {
-            return { type: "d", key: k, newValue: vue.$data[k] };
-        }));
-        fields.push(...Object.keys(vue.$props || {}).map((k) => {
-            return { type: "p", key: k, newValue: vue.$props[k] };
-        }));
-        fields.push(...this.getComputedKeys(uid).map((k) => {
-            return { type: "c", key: k, newValue: vue[k] };
-        }));
-        fields = fields.filter((f) => !f.key.startsWith("_"));
-        fields = fields.sortBy((f) => f.type, (f) => f.key);
-        return fields;
-    }
-    getRefKey(uid) {
-        return this.vueRefsToUIDs.getReverse(uid)[0];
-    }
-    getRefKeys() {
-        return this.vueRefsToUIDs.keys();
-    }
-    onVueMounted(vue) {
-        this.vues[vue._uid] = () => vue;
-        this.vuesCount++;
-        const compName = vue.$data._.comp.name;
-        //if (["e.", "ui."].some((prefix) => compName.startsWith(prefix))) return;
-        for (const refKey of Object.keys(vue.$refs)) {
-            if (refKey[0].isLowerCase())
-                continue;
-            this.vueRefsToUIDs.set(refKey, vue.$refs[refKey]._uid);
-        }
-    }
-    onVueUnmounted(vue) {
-        delete this.vues[vue._uid];
-        this.vuesCount--;
-        for (const refKey of Object.keys(vue.$refs)) {
-            if (refKey[0].isLowerCase())
-                continue;
-            this.vueRefsToUIDs.delete(refKey);
-        }
-    }
-}
-exports.VueManager = VueManager;
-
-
-/***/ }),
-
-/***/ "../../../Shared/DataWatcher.ts":
-/*!**************************************!*\
-  !*** ../../../Shared/DataWatcher.ts ***!
-  \**************************************/
+/***/ "../../../../Shared/DataWatcher.ts":
+/*!*****************************************!*\
+  !*** ../../../../Shared/DataWatcher.ts ***!
+  \*****************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -1482,7 +920,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.DataWatcher = void 0;
-const RepeatingTaskQueue_1 = __webpack_require__(/*! ./RepeatingTaskQueue */ "../../../Shared/RepeatingTaskQueue.ts");
+const RepeatingTaskQueue_1 = __webpack_require__(/*! ./RepeatingTaskQueue */ "../../../../Shared/RepeatingTaskQueue.ts");
 class DefaultDataComparer {
     clone(o1) {
         if (o1 == null)
@@ -1542,208 +980,10 @@ exports.DataWatcher = DataWatcher;
 
 /***/ }),
 
-/***/ "../../../Shared/Extensions.Objects.Client.ts":
-/*!****************************************************!*\
-  !*** ../../../Shared/Extensions.Objects.Client.ts ***!
-  \****************************************************/
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.Objects = void 0;
-__webpack_require__(/*! ./Extensions */ "../../../Shared/Extensions.ts");
-const _importMainFileToImplement = "This is not supported on the client side. Import Extensions.Objects to implement";
-class Objects {
-    static is(obj, type) {
-        return (0)._is(obj, type);
-    }
-    static clone(obj) {
-        if (obj == null || obj == undefined || typeof obj != "object")
-            return obj;
-        try {
-            return JSON.parse(JSON.stringify(obj));
-        }
-        catch (ex) {
-            console.error("Error cloning object", obj, ex);
-            debugger;
-            throw ex;
-        }
-    }
-    static on(obj, key, callback) {
-        if (typeof key === "function") {
-            const func = key;
-            const self = obj;
-            self[func.name] = (...args) => {
-                setTimeout(() => callback.apply(self, args), 0);
-                return func.apply(self, args);
-            };
-            return;
-        }
-        const self = obj;
-        const descriptor = Object.getOwnPropertyDescriptor(self, key);
-        if (descriptor && (descriptor.get || descriptor.set)) {
-            if (!descriptor.get)
-                throw new Error("Cannot watch a non-getter property");
-            if (!descriptor.set)
-                throw new Error("Cannot watch a non-setter property");
-            const getter = descriptor.get;
-            const setter = descriptor.set;
-            Object.defineProperty(self, key, {
-                get: function () {
-                    return getter();
-                },
-                set: function (newValue) {
-                    setter(newValue);
-                    callback(newValue);
-                },
-            });
-            return;
-        }
-        let value = self[key];
-        Object.defineProperty(self, key, {
-            get: function () {
-                return value;
-            },
-            set: function (newValue) {
-                value = newValue;
-                callback(newValue);
-            },
-        });
-    }
-    static traverse(obj, onValue, include) {
-        const traverse = function (node, key, value, path, include) {
-            if (!include)
-                include = () => true;
-            onValue(node, key, value, path);
-            if (value && (Array.isArray(value) || typeof value === "object")) {
-                if (Array.isArray(value)) {
-                    // Path index is filtered
-                    // (path filtered index)
-                    let pfi = 0;
-                    for (let i = 0; i < value.length; i++) {
-                        if (!include(node, i.toString(), value[i]))
-                            continue;
-                        traverse(value, i.toString(), value[i], [...path, pfi], include);
-                        pfi++;
-                    }
-                }
-                else {
-                    const keys = Object.keys(value);
-                    let pfj = 0;
-                    for (let j = 0; j < keys.length; j++) {
-                        const k = keys[j];
-                        if (!include(node, k, value[k]))
-                            continue;
-                        traverse(value, k, value[k], [...path, pfj], include);
-                        pfj++;
-                    }
-                }
-            }
-        };
-        traverse(obj, "", obj, [], include);
-    }
-    static toCamelCaseKeys(obj) {
-        const result = {};
-        for (const key of Object.keys(obj)) {
-            let value = obj[key];
-            if (value && !Array.isArray(value) && typeof value === "object")
-                value = Objects.toCamelCaseKeys(value);
-            result[key.toCamelCase()] = value;
-        }
-        return result;
-    }
-    static toTitleCaseKeys(obj) {
-        const result = {};
-        for (const key of Object.keys(obj)) {
-            let value = obj[key];
-            if (value && !Array.isArray(value) && typeof value === "object")
-                value = Objects.toTitleCaseKeys(value);
-            result[key.toTitleCase()] = value;
-        }
-        return result;
-    }
-    static stringify(obj) {
-        throw new Error(_importMainFileToImplement);
-    }
-    static yamlify(obj) {
-        throw new Error(_importMainFileToImplement);
-    }
-    static parseYaml(str) {
-        throw new Error(_importMainFileToImplement);
-    }
-    static pugToHtml(str, options) {
-        throw new Error(_importMainFileToImplement);
-    }
-    static jsonify(obj) {
-        throw new Error(_importMainFileToImplement);
-    }
-    static deepDiff(obj1, obj2) {
-        throw new Error(_importMainFileToImplement);
-    }
-    static deepMerge(target, ...objects) {
-        const deepMerge = (tgt, src) => {
-            if (typeof tgt !== "object" || typeof src !== "object") {
-                return tgt;
-            }
-            if (null == src) {
-                return tgt;
-            }
-            const merged = Objects.clone(tgt);
-            for (const key of Object.keys(src)) {
-                if (key in merged) {
-                    merged[key] = deepMerge(merged[key], src[key]);
-                }
-                else {
-                    merged[key] = src[key];
-                }
-            }
-            return merged;
-        };
-        let result = target;
-        for (const object of objects) {
-            result = deepMerge(result, object);
-        }
-        return result;
-    }
-    static map(obj, func) {
-        const result = {};
-        for (const key of Object.keys(obj)) {
-            const [newKey, newValue] = func(key, obj[key]);
-            result[newKey] = newValue;
-        }
-        return result;
-    }
-    static mapValues(obj, func) {
-        return Objects.map(obj, (key, value) => [key, func(value)]);
-    }
-    static try(func, onCatch) {
-        try {
-            return func();
-        }
-        catch (ex) {
-            onCatch(ex);
-        }
-    }
-}
-exports.Objects = Objects;
-Objects.json = {
-    parse: (str) => {
-        try {
-            return JSON.parse(str);
-        }
-        catch (ex) {
-            throw `Error parsing JSON\n${ex.message}\n${str}`;
-        }
-    },
-};
-
-
-/***/ }),
-
-/***/ "../../../Shared/Extensions.ts":
-/*!*************************************!*\
-  !*** ../../../Shared/Extensions.ts ***!
-  \*************************************/
+/***/ "../../../../Shared/Extensions.ts":
+/*!****************************************!*\
+  !*** ../../../../Shared/Extensions.ts ***!
+  \****************************************/
 /***/ (function() {
 
 
@@ -2174,9 +1414,6 @@ if (typeof String !== "undefined") {
     String.prototype.isColorCode = function () {
         return this.startsWith("\x1b[");
     };
-    String.prototype.isLowerCase = function () {
-        return this.toLowerCase() === this.toString();
-    };
     String.prototype.pad = function (align, fillString) {
         if (!align)
             align = "left";
@@ -2438,19 +1675,9 @@ if (typeof String !== "undefined") {
         // Get the words using a regex
         return this.match(/\w+/g) || [];
     };
-    String.prototype.getCaseWords = function () {
-        // Split "titleCaseString" into "title case string"
-        return this.replace(/([A-Z])/g, " $1").split(" ");
-    };
     String.prototype.toCamelCase = function () {
         // Lowercase the first letter
         return this.charAt(0).toLowerCase() + this.slice(1);
-    };
-    String.prototype.toTitleCase = function () {
-        // Uppercase the first letter of each word
-        return this.replace(/\w\S*/g, (txt) => {
-            return txt.charAt(0).toUpperCase() + txt.substring(1);
-        });
     };
     String.prototype.parseJSON = function () {
         return JSON.parse(this.toString());
@@ -2680,24 +1907,12 @@ if (typeof String !== "undefined") {
 // #endregion
 // #region Array
 if (typeof Array !== "undefined") {
-    Array.prototype.toMap = function (getKey, getValue) {
-        if (!getValue)
-            getValue = (item) => item;
-        const map = {};
-        this.forEach((item) => {
-            map[getKey(item)] = getValue(item);
-        });
-        return map;
-    };
     Array.prototype.contains = function (item, getItemKey) {
         if (getItemKey) {
             const key = getItemKey(item);
             return this.find((i) => getItemKey(i) == key) != null;
         }
         return this.indexOf(item) != -1;
-    };
-    Array.prototype.reversed = function () {
-        return this.slice().reverse();
     };
     Array.prototype.removeAt = function (index) {
         this.splice(index, 1);
@@ -2707,11 +1922,7 @@ if (typeof Array !== "undefined") {
             index = this.length;
         this.splice(index, 0, item);
     };
-    Array.prototype.clear = function (stagger) {
-        if (!stagger) {
-            this.splice(0, this.length);
-            return;
-        }
+    Array.prototype.clear = function (stagger = 0) {
         const removeOne = () => {
             if (this.length > 0) {
                 this.pop();
@@ -2722,13 +1933,7 @@ if (typeof Array !== "undefined") {
     };
     Array.prototype.add = function (items, stagger = 0) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!Array.isArray(items))
-                items = [items];
             items = [...items];
-            if (!stagger) {
-                this.push(...items);
-                return;
-            }
             const addOne = () => __awaiter(this, void 0, void 0, function* () {
                 if (items.length > 0) {
                     this.push(items.shift());
@@ -2832,9 +2037,15 @@ if (typeof Array !== "undefined") {
     };
     Array.prototype.sortBy = function (...projects) {
         return this.sort((a, b) => {
-            const aVal = projects.map((project) => project(a)).join("/");
-            const bVal = projects.map((project) => project(b)).join("/");
-            return aVal.localeCompare(bVal);
+            for (const project of [...projects].reverse()) {
+                const aVal = project(a);
+                const bVal = project(b);
+                if (aVal > bVal)
+                    return 1;
+                if (aVal < bVal)
+                    return -1;
+            }
+            return 0;
         });
     };
     Array.prototype.sortByDesc = function (...projects) {
@@ -2845,9 +2056,6 @@ if (typeof Array !== "undefined") {
     };
     Array.prototype.onlyTruthy = function () {
         return this.filter((item) => !!item);
-    };
-    Array.prototype.shuffle = function () {
-        return this.sortBy(() => Math.random() - 0.5);
     };
 }
 // #endregion
@@ -2869,53 +2077,16 @@ if (typeof Function !== "undefined") {
             setTimeout(fn, delay);
         };
     };
-    /**
-     * If the original function is called multiple times within the specified delay,
-     * the function will only be executed once at the end.
-     */
-    Function.prototype.debounce = function (delay) {
-        const fn = this;
-        let timeout;
-        return function (...args) {
-            const context = this;
-            clearTimeout(timeout);
-            timeout = setTimeout(function () {
-                return __awaiter(this, void 0, void 0, function* () {
-                    yield fn.apply(context, args);
-                });
-            }, delay);
-        };
-    };
-    /**
-     * If the original function is called multiple times within the specified delay,
-     * it will execute once every delay time.
-     */
-    Function.prototype.throttle = function (delay) {
-        const fn = this;
-        let timeout;
-        return function (...args) {
-            fn.prototype.nextArgs = args;
-            const context = this;
-            if (!timeout) {
-                timeout = setTimeout(function () {
-                    return __awaiter(this, void 0, void 0, function* () {
-                        yield fn.apply(context, fn.prototype.nextArgs);
-                        timeout = null;
-                    });
-                }, delay);
-            }
-        };
-    };
 }
 // #endregion
 
 
 /***/ }),
 
-/***/ "../../../Shared/Lock.ts":
-/*!*******************************!*\
-  !*** ../../../Shared/Lock.ts ***!
-  \*******************************/
+/***/ "../../../../Shared/Lock.ts":
+/*!**********************************!*\
+  !*** ../../../../Shared/Lock.ts ***!
+  \**********************************/
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -2956,10 +2127,10 @@ exports.Lock = Lock;
 
 /***/ }),
 
-/***/ "../../../Shared/RepeatingTaskQueue.ts":
-/*!*********************************************!*\
-  !*** ../../../Shared/RepeatingTaskQueue.ts ***!
-  \*********************************************/
+/***/ "../../../../Shared/RepeatingTaskQueue.ts":
+/*!************************************************!*\
+  !*** ../../../../Shared/RepeatingTaskQueue.ts ***!
+  \************************************************/
 /***/ (function(__unused_webpack_module, exports) {
 
 
@@ -3005,192 +2176,14 @@ exports.RepeatingTaskQueue = RepeatingTaskQueue;
 
 /***/ }),
 
-/***/ "../../../Shared/TwoWayMap.ts":
-/*!************************************!*\
-  !*** ../../../Shared/TwoWayMap.ts ***!
-  \************************************/
+/***/ "../../../../Shared/WebScript/to.template.ts":
+/*!***************************************************!*\
+  !*** ../../../../Shared/WebScript/to.template.ts ***!
+  \***************************************************/
 /***/ ((__unused_webpack_module, exports) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.TwoWayMap = void 0;
-class TwoWayMap {
-    constructor() {
-        this.forward = new Map();
-        this.reverse = new Map();
-    }
-    set(key, value) {
-        if (!this.forward.has(key)) {
-            this.forward.set(key, []);
-        }
-        this.forward.get(key).push(value);
-        if (!this.reverse.has(value)) {
-            this.reverse.set(value, []);
-        }
-        this.reverse.get(value).push(key);
-    }
-    setReverse(value, key) {
-        if (!this.reverse.has(value)) {
-            this.reverse.set(value, []);
-        }
-        this.reverse.get(value).push(key);
-        if (!this.forward.has(key)) {
-            this.forward.set(key, []);
-        }
-        this.forward.get(key).push(value);
-    }
-    delete(key) {
-        const values = this.forward.get(key);
-        if (!values)
-            return;
-        values.forEach((value) => {
-            const keys = this.reverse.get(value);
-            if (!keys)
-                return;
-            const index = keys.indexOf(key);
-            if (index == -1)
-                return;
-            keys.splice(index, 1);
-        });
-        this.forward.delete(key);
-    }
-    deleteReverse(value) {
-        const keys = this.reverse.get(value);
-        if (!keys)
-            return;
-        keys.forEach((key) => {
-            const values = this.forward.get(key);
-            if (!values)
-                return;
-            const index = values.indexOf(value);
-            if (index == -1)
-                return;
-            values.splice(index, 1);
-        });
-        this.reverse.delete(value);
-    }
-    get(key) {
-        return this.forward.get(key) || [];
-    }
-    getReverse(value) {
-        return this.reverse.get(value) || [];
-    }
-    keys() {
-        return Array.from(this.forward.keys());
-    }
-    values() {
-        return Array.from(this.reverse.keys());
-    }
-}
-exports.TwoWayMap = TwoWayMap;
-
-
-/***/ }),
-
-/***/ "../../../Shared/WebScript/add.paths.ts":
-/*!**********************************************!*\
-  !*** ../../../Shared/WebScript/add.paths.ts ***!
-  \**********************************************/
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const Extensions_Objects_Client_1 = __webpack_require__(/*! ../Extensions.Objects.Client */ "../../../Shared/Extensions.Objects.Client.ts");
-exports["default"] = (context, compName, dom) => {
-    compName = compName.replace(/-/g, ".");
-    dom = JSON.parse(JSON.stringify(dom));
-    const root = Object.values(dom)[0];
-    // Traverse the tree and for each object node (not attribute), add a path attribute
-    Extensions_Objects_Client_1.Objects.traverse(root, (node, key, value, path) => {
-        if (value && typeof value == "object") {
-            const paths = (value.paths || "").split("|").filter((p) => p);
-            if (paths.some((p) => p.startsWith(compName)))
-                return;
-            paths.push(`${compName.hashCode()}.${path.join(".")}`);
-            value.path = paths.join("|");
-        }
-    }, 
-    // In WebScript, attributes are on the same level as nodes
-    // for human readability, although formally this is not correct
-    // We only want to traverse the nodes, not the attributes
-    (n, key) => !context.isAttributeName(key));
-    return dom;
-};
-
-
-/***/ }),
-
-/***/ "../../../Shared/WebScript/is.attribute.name.ts":
-/*!******************************************************!*\
-  !*** ../../../Shared/WebScript/is.attribute.name.ts ***!
-  \******************************************************/
-/***/ ((__unused_webpack_module, exports) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports["default"] = (componentNames, name) => {
-    if (name.includes("."))
-        return false;
-    if (name.startsWith(":"))
-        return true;
-    if (name.includes("#"))
-        return false;
-    if (name.startsWith("template"))
-        return false;
-    if (name == "slot")
-        return false;
-    if ([
-        "a",
-        "style",
-        ...[1, 2, 3, 4, 5, 6].map((i) => `h${i}`),
-        "pre",
-        "code",
-        "p",
-        "img",
-        "table",
-        "thead",
-        "tbody",
-        "tr",
-        "th",
-        "td",
-        "div",
-        "span",
-        "ul",
-        "li",
-        "label",
-        "input",
-        "button",
-        "select",
-        "option",
-        "canvas",
-        "textarea",
-        "component",
-        "transition",
-        "keep.alive",
-    ].includes(name))
-        return false;
-    if (name.startsWith("."))
-        return false;
-    if (componentNames.find((c) => c == name.replace(":", "")))
-        return false;
-    return true;
-};
-
-
-/***/ }),
-
-/***/ "../../../Shared/WebScript/to.template.ts":
-/*!************************************************!*\
-  !*** ../../../Shared/WebScript/to.template.ts ***!
-  \************************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const add_paths_1 = __importDefault(__webpack_require__(/*! ./add.paths */ "../../../Shared/WebScript/add.paths.ts"));
 exports["default"] = (context, dom, indent, compName) => {
     if (!dom)
         return [];
@@ -3198,10 +2191,6 @@ exports["default"] = (context, dom, indent, compName) => {
     if (!indent)
         indent = 0;
     dom = JSON.parse(JSON.stringify(dom));
-    if (compName) {
-        // Traverse the tree and for each object node (not attribute), add a path attribute
-        dom = (0, add_paths_1.default)(context, compName, dom);
-    }
     // Add the component name as a class to the root element
     if (!indent && compName) {
         const compClassName = `comp-${compName}`;
@@ -3251,7 +2240,7 @@ exports["default"] = (context, dom, indent, compName) => {
         const indentStr = "  ".repeat(indent);
         return `${indentStr}${tag}(${Object.entries(attrs)
             .map((a) => {
-            return { key: a[0].split("#")[0], value: a[1] };
+            return { key: a[0], value: a[1] };
         })
             .filter((a) => a.value)
             .map((a) => {
@@ -3337,7 +2326,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("./script/1689011310654.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("../../../LiveIde/Website/script/1688106238544.ts");
 /******/ 	
 /******/ })()
 ;

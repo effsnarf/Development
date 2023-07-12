@@ -8,19 +8,15 @@ class Component {
   name: string;
   path: string;
   source: any;
-  isCompiled: boolean;
 
   constructor(obj: any) {
     this.name = obj.name;
     this.path = obj.path;
     this.source = obj.source;
-    this.isCompiled = false;
     if (this.source) this.source.name = this.name.replace(/\./g, "-");
   }
 
   async compile() {
-    if (this.isCompiled) return;
-
     const client = await ClientContext.get();
 
     console.groupCollapsed(this.name);
@@ -46,7 +42,6 @@ class Component {
         }
       }
       client.Vue.component(vueName, vueOptions);
-      this.isCompiled = true;
     } catch (ex) {
       debugger;
       throw ex;
