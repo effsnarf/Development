@@ -25,7 +25,6 @@ mounted: | #js
   }
 methods:
   init: | #js
-
     async function() {
       this.isLoading = true;
       try
@@ -38,12 +37,10 @@ methods:
       }
     }
   isCurrentThread: | #js
-
     function(thread) {
       return this.$root.params.url == this.$root.url.thread(thread);
     }
   getThreadTitle: | #js
-
     function(thread) {
       const post = thread.posts[0];
       if (!post) return null;
@@ -53,7 +50,6 @@ methods:
         post.instance?.displayName;
     }
   firstPost: | #js
-
     function(thread) {
       return thread.posts[0];
     }

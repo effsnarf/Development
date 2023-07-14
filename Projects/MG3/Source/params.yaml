@@ -12,6 +12,7 @@ params:
   urlName:
     get: | #ts
       function(url) {
+        if (url == "/") return null;
         if (url == "/admin") return null;
         if (["instance", "t"].some(a => url.startsWith(`/${a}/`))) return null;
         if (["c"].some(a => url.startsWith(`/${a}/`))) return url.split("/")[2];

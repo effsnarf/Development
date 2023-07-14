@@ -2,20 +2,31 @@ dom:
   div: 
     h2:
       v-text: '''Meet the Meme'''
-    .grid1:
-      e.generator.square:
-        ':generator': generator
-      .article1:
-        v-text: generator.desc.article
-    div: 
-      class: clear-both
+    transition:
+      name: slide
+      div: 
+        v-if: generator
+        ':key': generator?._id
+        .grid1:
+          e.generator.square:
+            ':generator': generator
+          .article1:
+            v-text: generator.desc.article
+        div: 
+          class: clear-both
 data:
   generator: null
+  isInited: false
 mounted: | #js
   async function() {
-    this.$watch(this.$root.params.page, {
-      handler: async () => {
+    this.$watch(() => this.$root.params.page, {
+      handler: async (page) => {
+        if (page != "home") {
+          this.generator = null;
+          return;
+        }
         await this.init();
+        this.isInited = true;
       },
       immediate: true
     });
@@ -38,8 +49,10 @@ style:
     gap: 1em
 template: >-
   <div class="comp-content-meet-the-meme" path="-1242656353."><h2 v-text="'Meet
-  the Meme'" path="-1242656353.0"></h2><div class="grid1"
-  path="-1242656353.1"><e-generator-square :generator="generator"
-  path="-1242656353.1.0"></e-generator-square><div class="article1"
-  v-text="generator.desc.article" path="-1242656353.1.1"></div></div><div
-  class="clear-both" path="-1242656353.2"></div></div>
+  the Meme'" path="-1242656353.0"></h2><transition name="slide"
+  path="-1242656353.1"><div v-if="generator" :key="generator?._id"
+  path="-1242656353.1.0"><div class="grid1"
+  path="-1242656353.1.0.0"><e-generator-square :generator="generator"
+  path="-1242656353.1.0.0.0"></e-generator-square><div class="article1"
+  v-text="generator.desc.article" path="-1242656353.1.0.0.1"></div></div><div
+  class="clear-both" path="-1242656353.1.0.1"></div></div></transition></div>
