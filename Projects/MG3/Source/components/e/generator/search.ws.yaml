@@ -17,9 +17,9 @@ data:
 watch:
   query:
     handler: | #js
-      async function(query) {
+      (async function(query) {
         this.generators = await this.$root.dbp.generators.select.search(query);
-      }.debounce(400)
+      }).debounce(400)
     immediate: true
 
 style:

@@ -6,7 +6,7 @@ dom:
       h3:
         ui.title:
           icon: 🎄
-          ':value': $root.vm.vuesCount.toLocaleString()
+          ':value': $root.vm.vuesCount?.toLocaleString()
         div:
           ui.button:
             icon: ♻
