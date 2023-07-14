@@ -25,6 +25,9 @@ dom:
           ':style': '{ marginLeft: ''32%'', width: ''68%'' }'
           content.poem.stanza:
             ':item': randomStanza
+        .description:
+          v-if: generator?.desc?.article
+          v-html: $root.textToHtml(generator.desc.article)
         div: 
           class: float-clear
     template: 
@@ -171,8 +174,11 @@ template: >-
   v-text="generator?.displayName" path="-38884812.0.1.1"></h1><div class="poem"
   :style="{ marginLeft: '32%', width: '68%' }"
   path="-38884812.0.1.2"><content-poem-stanza :item="randomStanza"
-  path="-38884812.0.1.2.0"></content-poem-stanza></div><div class="float-clear"
-  path="-38884812.0.1.3"></div></div></template><template v-slot:middle
+  path="-38884812.0.1.2.0"></content-poem-stanza></div><div class="description"
+  v-if="generator?.desc?.article"
+  v-html="$root.textToHtml(generator.desc.article)"
+  path="-38884812.0.1.3"></div><div class="float-clear"
+  path="-38884812.0.1.4"></div></div></template><template v-slot:middle
   path="-38884812.1"><content-stream ref="contentStream1" item-type="e.instance"
   :get-more-items="getMoreInstances" grid-class="grid-3"
   path="-38884812.1.0"></content-stream></template><template v-slot:left

@@ -95,6 +95,8 @@ methods:
 style:
   ul:
     display: grid
+  .grid-3 > li:
+    margin-bottom: 2em
 template: >-
   <ui-infinite-scroll class="comp-content-stream" @scroll="loadMore"
   path="-30902635."><transition-group tag="ul" name="list" :class="gridClass"
