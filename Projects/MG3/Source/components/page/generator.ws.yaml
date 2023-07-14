@@ -27,7 +27,7 @@ dom:
             ':item': randomStanza
         .description:
           v-if: generator?.desc?.article
-          v-html: $root.textToHtml(generator.desc.article)
+          v-html: "$root.textToHtml(generator.desc.article.replace('Title: ', ''))"
         div: 
           class: float-clear
     template: 

@@ -220,6 +220,8 @@ interface MgParams {
         s = htmlEncode(s) || "";
         // >greentext
         s = s.replace(/^&gt;(.*)$/gm, "<span class='greentext'>&gt;$1</span>");
+        // "text" to <strong>text</strong>
+        s = s.replace(/"(.*?)"(?!\w)/g, "<strong>$1</strong>");
         // line breaks
         s = s.replace(/\n/g, "<br />");
         return s;
