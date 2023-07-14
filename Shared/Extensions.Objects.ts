@@ -14,7 +14,11 @@ Objects.yamlify = (obj: any): string => {
 };
 
 Objects.parseYaml = (str: string): any => {
-  return jsyaml.load(str);
+  try {
+    return jsyaml.load(str);
+  } catch (ex: any) {
+    throw new Error(`Error parsing yaml\n${ex.message}\n${str}`);
+  }
 };
 
 Objects.pugToHtml = (str: string, options?: any): string => {
