@@ -39,6 +39,13 @@ const convertKeysToTitleCase = (obj: any) => {
   const batchSize = 10;
   const maxInstancesCount = 100;
 
+  const tasks = {
+    //Haiku: "Write a haiku about this meme",
+    Poem: "Write a poem about this meme, with 9 stanzas, 4 lines each.",
+    Article: "Write a 100 word article about this meme",
+    //aiInstances: "Write 10 examples of this meme in the topic of artificial intelligence",
+  };
+
   while (true) {
     console.log(`Getting generators..`.gray);
 
@@ -71,7 +78,8 @@ const convertKeysToTitleCase = (obj: any) => {
 
       while (
         (instancesCount > 0 && !Object.values(desc).length) ||
-        Object.values(desc).some((a) => !a)
+        Object.values(desc).some((a) => !a) ||
+        Object.keys(tasks).some((k) => !desc[k])
       ) {
         try {
           console.log(`${generator.DisplayName.green}`);
@@ -87,13 +95,6 @@ const convertKeysToTitleCase = (obj: any) => {
             true
           );
           console.log(`Found ${instances.length} instances`.gray);
-
-          const tasks = {
-            //Haiku: "Write a haiku about this meme",
-            Poem: "Write a poem about this meme, with 9 stanzas, 4 lines each.",
-            Article: "Write a 100 word article about this meme.",
-            //aiInstances: "Write 10 examples of this meme in the topic of artificial intelligence",
-          } as any;
 
           for (const task of Object.entries(tasks)) {
             if (desc[task[0]]) continue;
