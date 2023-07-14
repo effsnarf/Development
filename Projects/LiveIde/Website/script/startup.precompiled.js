@@ -163,9 +163,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "../../../LiveIde/Website/script/1689350952250.ts":
+/***/ "../../../LiveIde/Website/script/1689355511094.ts":
 /*!********************************************************!*\
-  !*** ../../../LiveIde/Website/script/1689350952250.ts ***!
+  !*** ../../../LiveIde/Website/script/1689355511094.ts ***!
   \********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -402,6 +402,8 @@ const helpers = {
                 s = htmlEncode(s) || "";
                 // >greentext
                 s = s.replace(/^&gt;(.*)$/gm, "<span class='greentext'>&gt;$1</span>");
+                // "text" to <strong>text</strong>
+                s = s.replace(/"(.*?)"(?!\w)/g, "<strong>$1</strong>");
                 // line breaks
                 s = s.replace(/\n/g, "<br />");
                 return s;
@@ -595,6 +597,25 @@ const helpers = {
             getUniqueClientID() {
                 const self = this;
                 return self.$data._uniqueClientID++;
+            },
+            wait(condition, timeout = 10000) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    const startedAt = Date.now();
+                    const tryInterval = 100;
+                    return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
+                        const tryAgain = () => __awaiter(this, void 0, void 0, function* () {
+                            if (Date.now() - startedAt > timeout)
+                                return reject();
+                            if (yield condition()) {
+                                resolve();
+                            }
+                            else {
+                                setTimeout(tryAgain, tryInterval);
+                            }
+                        });
+                        tryAgain();
+                    }));
+                });
             },
         },
     });
@@ -3425,7 +3446,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("../../../LiveIde/Website/script/1689350952250.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("../../../LiveIde/Website/script/1689355511094.ts");
 /******/ 	
 /******/ })()
 ;

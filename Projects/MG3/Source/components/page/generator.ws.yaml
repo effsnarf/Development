@@ -27,7 +27,7 @@ dom:
             ':item': randomStanza
         .description:
           v-if: generator?.desc?.article
-          v-html: "$root.textToHtml(generator.desc.article.replace('Title: ', ''))"
+          v-html: '$root.textToHtml(generator.desc.article.replace(''Title: '', ''''))'
         div: 
           class: float-clear
     template: 
@@ -149,6 +149,8 @@ style:
   .comp-e-teaser:hover:
     filter: grayscale(0)
   .description:
+    max-height: 15em
+    overflow: auto
     margin: 2em 0
   .description h3:
     font-size: 2rem
@@ -176,7 +178,7 @@ template: >-
   path="-38884812.0.1.2"><content-poem-stanza :item="randomStanza"
   path="-38884812.0.1.2.0"></content-poem-stanza></div><div class="description"
   v-if="generator?.desc?.article"
-  v-html="$root.textToHtml(generator.desc.article)"
+  v-html="$root.textToHtml(generator.desc.article.replace('Title: ', ''))"
   path="-38884812.0.1.3"></div><div class="float-clear"
   path="-38884812.0.1.4"></div></div></template><template v-slot:middle
   path="-38884812.1"><content-stream ref="contentStream1" item-type="e.instance"
