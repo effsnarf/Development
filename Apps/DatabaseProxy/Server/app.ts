@@ -213,7 +213,7 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
             // Remove the $ from $match, $sort, etc, because it can't be stored in MongoDB
             args = args.map((arg) =>
               Objects.json.parse(
-                JSON.stringify(arg).replace(/\$([a-z]+)/g, "$1")
+                JSON.stringify(arg)?.replace(/\$([a-z]+)/g, "$1")
               )
             );
             // dbs._analytics?.create(
