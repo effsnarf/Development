@@ -1,0 +1,35 @@
+dom:
+  div: 
+    h2:
+      v-text: '''Meet the Meme'''
+    .grid1:
+      e.generator.square:
+        ':generator': generator
+      .article1:
+        v-text: generator.desc.article
+    div: 
+      class: clear-both
+data:
+  generator: null
+mounted: | #js
+  async function() {
+    this.generator = (await this.$root.dbp.generators.sample.popular(1))[0];
+  }
+name: content-meet-the-meme
+style:
+  h2:
+    font-size: 3em
+  .article1:
+    max-height: 10em
+    overflow: auto
+  .grid1:
+    display: grid
+    grid-template: 1fr / 1fr 3fr
+    gap: 1em
+template: >-
+  <div class="comp-content-meet-the-meme" path="-1242656353."><h2 v-text="'Meet
+  the Meme'" path="-1242656353.0"></h2><div class="grid1"
+  path="-1242656353.1"><e-generator-square :generator="generator"
+  path="-1242656353.1.0"></e-generator-square><div class="article1"
+  v-text="generator.desc.article" path="-1242656353.1.1"></div></div><div
+  class="clear-both" path="-1242656353.2"></div></div>

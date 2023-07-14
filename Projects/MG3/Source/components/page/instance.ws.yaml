@@ -41,7 +41,9 @@ methods:
     }
   getMoreInstances: | #js
     async function(pageIndex) {
-      const items = await this.$root.dbp.instances.select.popular("en", pageIndex)
+      // Wait until instance is loaded
+      await this.$root.wait(() => this.instance);
+      const items = await this.$root.dbp.instances.select.popular("en", pageIndex, this.instance?.urlName);
       if ((pageIndex == 0) && (this.instance)) items.unshift(this.instance);
       return items;
     }

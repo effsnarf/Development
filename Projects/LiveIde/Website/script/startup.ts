@@ -410,6 +410,21 @@ interface MgParams {
         const self = this as any;
         return self.$data._uniqueClientID++;
       },
+      async wait(condition: () => boolean, timeout = 10000) {
+        const startedAt = Date.now();
+        const tryInterval = 100;
+        return new Promise(async (resolve: any, reject: any) => {
+          const tryAgain = async () => {
+            if (Date.now() - startedAt > timeout) return reject();
+            if (await condition()) {
+              resolve();
+            } else {
+              setTimeout(tryAgain, tryInterval);
+            }
+          };
+          tryAgain();
+        });
+      },
     },
   });
 
