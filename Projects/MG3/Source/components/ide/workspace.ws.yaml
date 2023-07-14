@@ -1,18 +1,19 @@
 dom:
   div:
-    v-if: showWorkspace
-    class: workspace
-    h3:
-      ui.title:
-        icon: 🎄
-        ':value': $root.vm.vuesCount.toLocaleString()
-      div:
-        ui.button:
-          icon: ♻
-          text: refresh
-          @click: $root.reloadComponentsFromServer
-    ide.debug:
-    ide.component.picker:
+    div:
+      v-if: showWorkspace
+      class: workspace
+      h3:
+        ui.title:
+          icon: 🎄
+          ':value': $root.vm.vuesCount.toLocaleString()
+        div:
+          ui.button:
+            icon: ♻
+            text: refresh
+            @click: $root.reloadComponentsFromServer
+      ide.debug:
+      ide.component.picker:
     div:
       ide.component.style:
         v-for: comp in comps
