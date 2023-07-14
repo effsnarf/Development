@@ -82,6 +82,23 @@ api:
         var gens = await db.find('Generators', { DisplayName: { $regex: regex, $ne: displayName } }, { InstancesCount: -1 }, 10, 0, true);
 
         return gens;
+    Generators.sample.popular:
+      args: [count]
+      code: | #js
+        let gens = (await db.aggregate("Generators",
+          [
+            { $match: { "Desc.Article": { $exists: true } } },
+            { $sample: { size: count * 2 } }
+          ]
+        ));
+
+        const genNames = gens.map(g => g.UrlName).distinct();
+
+        gens = genNames
+          .take(count)
+          .map(g => gens.first(gg => gg.UrlName == g));
+
+        return gens;
     Instances.delete.one:
       admin: true
       args: [instanceID]

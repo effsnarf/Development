@@ -629,6 +629,8 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
             // );
           }
 
+          if (result == undefined) result = null;
+
           return res.end(JSON.stringify(result));
         } catch (ex: any) {
           if (typeof ex == "string") {

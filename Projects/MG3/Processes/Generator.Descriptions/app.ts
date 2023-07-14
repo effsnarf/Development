@@ -42,7 +42,7 @@ const convertKeysToTitleCase = (obj: any) => {
   const tasks = {
     //Haiku: "Write a haiku about this meme",
     Poem: "Write a poem about this meme, with 9 stanzas, 4 lines each.",
-    Article: "Write a 100 word article about this meme",
+    Article: "Write a 100 word article about this meme, in a sarcastic tone.",
     //aiInstances: "Write 10 examples of this meme in the topic of artificial intelligence",
   };
 
@@ -52,13 +52,7 @@ const convertKeysToTitleCase = (obj: any) => {
     const generators = (
       await db.find(
         "Generators",
-        // {
-        //   UrlName: {
-        //     $in: ["Courage-Wolf", "Forever-Alone", "Socially-Awkward-Penguin"],
-        //   },
-        // },
-        {},
-        // { Desc: null },
+        {}, //{ IsQuality: true },
         { InstancesCount: -1 },
         batchSize,
         batchSize * pageIndex,
