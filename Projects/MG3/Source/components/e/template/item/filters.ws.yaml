@@ -1,34 +1,31 @@
 dom:
   div:
     v-if: value
-    ui.image.options#1:
-      ":imageID": imageID
+    ui.image.options: 
+      ':imageID': imageID
       filter: blur
       v-model: value.blur
-    ui.image.options#2:
-      ":imageID": imageID
+    ui.image.options: 
+      ':imageID': imageID
       filter: opacity
-      :reverse: true
+      ':reverse': true
       v-model: value.transparent
-    ui.image.options#3:
-      ":imageID": imageID
+    ui.image.options: 
+      ':imageID': imageID
       filter: grayscale
       v-model: value.grayscale
 props:
   imageID: null
   value: null
-data:
-methods:
-name: e-template-layer-filters
+data: null
+methods: null
+name: e-template-item-filters
 template: >-
-  <div class="comp-e-template-layer-filters" path="-822068845."><ui-expand
-  text="effects" v-model="showFilters"
-  path="-822068845.0"></ui-expand><transition name="slide2"
-  path="-822068845.1"><div v-if="showFilters"
-  path="-822068845.1.0"><ui-image-options :imageID="imageID" filter="blur"
-  v-model="value.blur"
-  path="-822068845.1.0.0"></ui-image-options><ui-image-options
-  :imageID="imageID" filter="opacity" v-model="value.opacity"
-  path="-822068845.1.0.1"></ui-image-options><ui-image-options
-  :imageID="imageID" filter="grayscale" v-model="value.grayscale"
-  path="-822068845.1.0.2"></ui-image-options></div></transition></div>
+  <div class="comp-e-template-item-filters" v-if="value"
+  path="-475504565."><ui-image-options :imageID="imageID" filter="blur"
+  v-model="value.blur" path="-475504565.0"></ui-image-options><ui-image-options
+  :imageID="imageID" filter="opacity" :reverse="true"
+  v-model="value.transparent"
+  path="-475504565.1"></ui-image-options><ui-image-options :imageID="imageID"
+  filter="grayscale" v-model="value.grayscale"
+  path="-475504565.2"></ui-image-options></div>

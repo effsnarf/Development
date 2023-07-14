@@ -169,11 +169,15 @@ const _fetchAsJson = async (url: string) => {
   };
 
   const preProcessYaml = (yaml: string) => {
+    // Replace @ with on_
     yaml = yaml.replace(/@/g, "on_");
     // Normalize line endings
     yaml = yaml.replace(/\r\n|\r/g, "\n");
     // Normalize indentation to spaces
     yaml = yaml.replace(/\t/g, "  ");
+    // Remove #1, #2, etc from the end of keys (div#1: -> div:)
+    // that may have been left from the previous step
+    yaml = yaml.replace(/(\w+)#\d+:/g, "$1: ");
     // Find duplicate lines
     // example:
     //   div:
@@ -213,7 +217,7 @@ const _fetchAsJson = async (url: string) => {
     // mounted: |
     yaml = yaml.replace(/mounted: \|/g, "mounted: | #js");
     // Remove #1, #2, etc from the end of keys (div#1: -> div:)
-    yaml = yaml.replace(/(\w+)#\d+: /g, "$1: ");
+    yaml = yaml.replace(/(\w+)#\d+:/g, "$1: ");
     return yaml;
   };
 

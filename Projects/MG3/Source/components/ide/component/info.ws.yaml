@@ -1,6 +1,6 @@
 dom:
-  div:
-    div#0:
+  div: 
+    div: 
       ui.button:
         ':text': '''refresh'''
         ':click': updateChanges
@@ -11,30 +11,30 @@ dom:
         @mouseenter: onItemHover(change)
         @mouseleave: onItemUnhover(change)
         @click: onItemClick(change)
-        td#1:
+        td: 
           class: opacity-50
           v-text: change.id
-        td#2:
+        td: 
           v-text: '''📦'''
-        td#3:
+        td: 
           class: opacity-50
           v-text: getItemCompName(change)
-        td#5:
+        td: 
           class: clickable
           v-text: '''📌'''
           @click: onClickHideField(change)
-        td#4:
+        td: 
           v-text: '''🧊'''
-        td#6:
+        td: 
           class: opacity-30
           v-text: change.key
-        td#7:
-          div:
+        td: 
+          div: 
             ':class': getValueType(change.newValue)
             v-text: previewValue(change.newValue)
-        td#8:
+        td: 
           class: opacity-30
-          div:
+          div: 
             ':class': getValueType(change.newValue)
             v-text: previewValue(change.oldValue)
 props:

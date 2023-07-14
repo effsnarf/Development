@@ -1,16 +1,16 @@
 dom:
-  .flex:
+  .flex: 
     ui.image:
       ':imageID': value
       ':square': true
     ui.file.dropzone:
       @file-drop: onFileDrop
       .dropzone:
-        .flex:
+        .flex: 
           class: justify-center
-          div:
+          div: 
             v-text: dropAreaText
-          div#2:
+          div: 
             ui.loading: null
             v-if: isUploading
 props:

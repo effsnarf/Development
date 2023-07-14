@@ -2,8 +2,7 @@ dom:
   .center:
     img:
       class: loading
-      :src: $root.loadingImageUrl
-
+      ':src': $root.loadingImageUrl
 style:
   .center:
     display: flex
@@ -12,6 +11,5 @@ style:
     max-width: min-content
 name: ui-loading
 template: >-
-  <div class="comp-ui-loading center" path="875113442."><img
-  src="/img/loading.gif"
-  path="875113442.0"/></div>
+  <div class="comp-ui-loading center" path="875113442."><img class="loading"
+  :src="$root.loadingImageUrl" path="875113442.0"/></div>

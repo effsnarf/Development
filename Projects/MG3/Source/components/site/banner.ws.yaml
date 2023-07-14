@@ -1,6 +1,6 @@
 dom:
-  div:
-    div:
+  div: 
+    div: 
       class: image
 style:
   .image:

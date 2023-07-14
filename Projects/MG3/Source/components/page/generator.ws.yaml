@@ -1,53 +1,50 @@
 dom:
   site:
     page-name: generator
-    :columns: 2
+    ':columns': 2
     ':title-image-id': generator?.imageID
     ':title-text': generator?.displayName
     ':title-url': $root.url.generator(generator)
     ':title-key': generator?.generatorID
-    template:
+    template: 
       v-slot: article
       ui.image:
         class: hidden mb-l2
         imageID: 680118409
-        :aspect-ratio: "3/1"
-      div:
-        div:
+        ':aspect-ratio': 3/1
+      div: 
+        div: 
           class: float-left mr-l1
-          :style: "{ width: '30%' }"
+          ':style': '{ width: ''30%'' }'
           e.instance:
-            :item: instance
-            :show-footer: "false"
+            ':item': instance
+            ':show-footer': 'false'
         h1:
           v-text: generator?.displayName
         .poem:
-          :style: "{ marginLeft: '32%', width: '68%' }"
+          ':style': '{ marginLeft: ''32%'', width: ''68%'' }'
           content.poem.stanza:
             ':item': randomStanza
-        #.description:
-          #v-html: "'<strong>Feminist Cunt</strong> is a popular internet meme that depicts a penguin character embodying the traits of social awkwardness. The meme typically features a simple illustration of a penguin with a slightly tilted head and a shy expression. It represents those relatable moments when individuals find themselves in uncomfortable or socially challenging situations. Socially Awkward Penguin serves as a lighthearted way to express and relate to the awkwardness many people experience in their daily lives, creating a sense of camaraderie and humor within online communities.'"
-        div:
+        div: 
           class: float-clear
-    template:
+    template: 
       v-slot: middle
       content.stream:
         ref: contentStream1
         item-type: e.instance
         ':get-more-items': getMoreInstances
         grid-class: grid-3
-    template:
+    template: 
       v-slot: left
       e.instance.create:
         v-if: showCreateInstance
         ':generator': generator
         @instance-created: onInstanceCreated
       h3:
-        v-text: "'See also'"
+        v-text: '''See also'''
       e.generator.list:
-        :generators: recommendationItems
-
-    template:
+        ':generators': recommendationItems
+    template: 
       v-slot: right
 data:
   urlName: null
@@ -162,23 +159,26 @@ style:
     clear: both
 name: page-generator
 template: >-
-  <site class="comp-page-generator" page-name="generator"
+  <site class="comp-page-generator" page-name="generator" :columns="2"
   :title-image-id="generator?.imageID" :title-text="generator?.displayName"
   :title-url="$root.url.generator(generator)"
-  :title-key="generator?.generatorID"
-  :recommendation-items="recommendationItems" path="-38884812."><template
-  v-slot:article path="-38884812.0"><content-article v-if="poem"
-  path="-38884812.0.0"><template v-slot:content path="-38884812.0.0.0"><div
-  class="poem" path="-38884812.0.0.0.0"><transition-group name="list"
-  path="-38884812.0.0.0.0.0"><content-poem-stanza v-for="stanza in
-  getRandomStanzas(poem)" :item="stanza" :key="stanza.map(l =&gt; l.substring(0,
-  5)).join('-')"
-  path="-38884812.0.0.0.0.0.0"></content-poem-stanza></transition-group></div><div
-  class="float-clear"
-  path="-38884812.0.0.0.1"></div></template></content-article></template><template
-  v-slot:middle path="-38884812.1"><content-stream ref="contentStream1"
-  item-type="e.instance" :get-more-items="getMoreInstances" grid-class="grid-1"
+  :title-key="generator?.generatorID" path="-38884812."><template v-slot:article
+  path="-38884812.0"><ui-image class="hidden mb-l2" imageID="680118409"
+  :aspect-ratio="3/1" path="-38884812.0.0"></ui-image><div
+  path="-38884812.0.1"><div class="float-left mr-l1" :style="{ width: '30%' }"
+  path="-38884812.0.1.0"><e-instance :item="instance" :show-footer="false"
+  path="-38884812.0.1.0.0"></e-instance></div><h1
+  v-text="generator?.displayName" path="-38884812.0.1.1"></h1><div class="poem"
+  :style="{ marginLeft: '32%', width: '68%' }"
+  path="-38884812.0.1.2"><content-poem-stanza :item="randomStanza"
+  path="-38884812.0.1.2.0"></content-poem-stanza></div><div class="float-clear"
+  path="-38884812.0.1.3"></div></div></template><template v-slot:middle
+  path="-38884812.1"><content-stream ref="contentStream1" item-type="e.instance"
+  :get-more-items="getMoreInstances" grid-class="grid-3"
   path="-38884812.1.0"></content-stream></template><template v-slot:left
   path="-38884812.2"><e-instance-create v-if="showCreateInstance"
   :generator="generator" @instance-created="onInstanceCreated"
-  path="-38884812.2.0"></e-instance-create></template></site>
+  path="-38884812.2.0"></e-instance-create><h3 v-text="'See also'"
+  path="-38884812.2.1"></h3><e-generator-list :generators="recommendationItems"
+  path="-38884812.2.2"></e-generator-list></template><template v-slot:right
+  path="-38884812.3"></template></site>

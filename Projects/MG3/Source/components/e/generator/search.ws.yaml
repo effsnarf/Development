@@ -2,18 +2,15 @@ dom:
   div:
     ui.text.box:
       type: search
-      icon: "🔎"
-      hint: "search memes…"
+      icon: 🔎
+      hint: search memes…
       v-model: query
     e.generator.list:
-      ":generators": generators
-
-props:
-
+      ':generators': generators
+props: null
 data:
   query: null
   generators: null
-
 watch:
   query:
     handler: | #js
@@ -21,7 +18,12 @@ watch:
         this.generators = await this.$root.dbp.generators.select.search(query);
       }).debounce(400)
     immediate: true
-
 style:
   li:
     margin-top: 0.5em
+name: e-generator-search
+template: >-
+  <div class="comp-e-generator-search" path="-928430196."><ui-text-box
+  type="search" icon="🔎" hint="search memes…" v-model="query"
+  path="-928430196.0"></ui-text-box><e-generator-list :generators="generators"
+  path="-928430196.1"></e-generator-list></div>

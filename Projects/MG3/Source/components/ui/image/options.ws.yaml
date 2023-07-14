@@ -1,8 +1,8 @@
 dom:
   .options:
-    :class: "filter+'-options'"
+    ':class': filter+'-options'
     ':tooltip': filter
-    div:
+    div: 
       class: option
       v-for: i in 10
       ':class': getClass(i)
@@ -12,8 +12,8 @@ dom:
         ':img-style': getStyle(i)
         ':imageID': imageID
         ':square': true
-      div:
-        v-if: "!imageID"
+      div: 
+        v-if: '!imageID'
         class: box
         ':style': getStyle(i)
 props:
@@ -48,7 +48,7 @@ methods:
 style:
   .box:
     aspect-ratio: 1/1
-    background: "#ffff0080"
+    background: '#ffff0080'
   .options:
     display: grid
     grid-template: 1fr / repeat(10, 1fr)
@@ -66,7 +66,9 @@ style:
     border: 2px solid
 name: ui-image-options
 template: >-
-  <div class="comp-ui-image-options options" :tooltip="filter" v-if="imageID"
-  path="907340593."><ui-image class="option" v-for="i in 10"
-  :class="getClass(i)" :img-style="getStyle(i)" :imageID="imageID"
-  :square="true" @click="onClick(i)" path="907340593.0"></ui-image></div>
+  <div class="comp-ui-image-options options" :class="filter+'-options'"
+  :tooltip="filter" path="907340593."><div class="option" v-for="i in 10"
+  :class="getClass(i)" @click="onClick(i)" path="907340593.0"><ui-image
+  v-if="imageID" :img-style="getStyle(i)" :imageID="imageID" :square="true"
+  path="907340593.0.0"></ui-image><div class="box" v-if="!imageID"
+  :style="getStyle(i)" path="907340593.0.1"></div></div></div>

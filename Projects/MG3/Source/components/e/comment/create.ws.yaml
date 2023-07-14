@@ -1,7 +1,7 @@
 dom:
   .flex:
     .poster:
-      transition#1:
+      transition:
         name: slide
         e.generator.square:
           ':show-tooltip': 'false'

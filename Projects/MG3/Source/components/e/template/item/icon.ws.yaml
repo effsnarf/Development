@@ -4,15 +4,15 @@ dom:
     ui.checkbox:
       v-model: item.visible
       size: normal
-    div:
+    div: 
       v-if: hasImage
       ui.image:
         ':imageID': item.imageID
         ':square': true
-    div:
+    div: 
       v-if: (!hasImage)
       v-text: getItemTypeIcon(item.type)
-    div:
+    div: 
       v-if: (item.type!='image')
       class: no-wrap
       v-text: item.caption?.text?.shorten(20)||('['+item.type+']')
@@ -43,10 +43,14 @@ style:
     font-size: 110%
   .no-wrap:
     white-space: nowrap
-name: e-template-layer-icon
+name: e-template-item-icon
 template: >-
-  <div class="comp-e-template-layer-icon icon" @click="$emit('click')"
-  path="-1276424735."><div v-if="hasImage" path="-1276424735.0"><ui-image
-  :imageID="layer.imageID" :square="true"
-  path="-1276424735.0.0"></ui-image></div><div v-if="(!hasImage)"
-  v-text="getLayerTypeIcon(layer.type)" path="-1276424735.1"></div></div>
+  <div class="comp-e-template-item-icon icon" @click="$emit('click')"
+  path="-562339287."><ui-checkbox v-model="item.visible" size="normal"
+  path="-562339287.0"></ui-checkbox><div v-if="hasImage"
+  path="-562339287.1"><ui-image :imageID="item.imageID" :square="true"
+  path="-562339287.1.0"></ui-image></div><div v-if="(!hasImage)"
+  v-text="getItemTypeIcon(item.type)" path="-562339287.2"></div><div
+  class="no-wrap" v-if="(item.type!='image')"
+  v-text="item.caption?.text?.shorten(20)||('['+item.type+']')"
+  path="-562339287.3"></div></div>

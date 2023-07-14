@@ -1,25 +1,25 @@
 dom:
   .app:
     v-if: $root.params.page == 'admin'
-    .column#1:
-      ui.select:
+    .column: 
+      ui.select: 
         ':options': Object.keys(options)
         v-model: catValue
         input-type: value
-    .column#2:
-      ui.select:
+    .column: 
+      ui.select: 
         ':options': options[catValue]
         v-model: eventValue
         input-type: value
-    .column#3:
-      ui.select:
+    .column: 
+      ui.select: 
         ':options': lastOptions
         v-model: lastValue
         input-type: value
     div:
       .bars:
         .bar:
-          ui.chart2#1:
+          ui.chart2:
             ':app': '''MG'''
             ':category': catValue
             ':event': eventValue

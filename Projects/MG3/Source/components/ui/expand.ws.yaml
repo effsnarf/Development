@@ -20,9 +20,9 @@ style:
     width: 1.3em
     height: 1.5em
   .flex:
-    background-color: "#ffffff30"
+    background-color: '#ffffff30'
   .flex:hover:
-    background-color: "#ffffff40"
+    background-color: '#ffffff40'
   .flex > *:
     font-size: 120%
     cursor: pointer

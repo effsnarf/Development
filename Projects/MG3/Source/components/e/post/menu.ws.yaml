@@ -2,11 +2,11 @@ dom:
   div:
     .center:
       ui.time:
-        ":value": item.created
+        ':value': item.created
     .post-menu:
       ui.button:
         text: ❌
-        ":click": onDelete
+        ':click': onDelete
 props:
   item: null
 methods:

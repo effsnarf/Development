@@ -50,7 +50,7 @@ methods:
 style:
   .file-dropzone: null
   .drop-possible:
-    border: "2px dashed #ccc"
+    border: '2px dashed #ccc'
     padding: 0.5rem
     transition: 0.3s
 name: ui-file-dropzone

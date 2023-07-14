@@ -140,7 +140,6 @@ class ClientContext {
 
   async updateComponent(comp: any) {
     if (!isDevEnv) return;
-    return;
     const url = `/component/update`;
     await fetch(url, { method: "post", body: JSON.stringify(comp) });
   }

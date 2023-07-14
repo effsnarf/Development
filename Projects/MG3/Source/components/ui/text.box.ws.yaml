@@ -26,5 +26,7 @@ style:
     position: absolute
     margin: 0.7em
 template: >-
-  <input class="comp-ui-text-box" :type="type" :placeholder="hint"
-  :value="value" @input="onInput" path="-1492297820."/>
+  <div class="comp-ui-text-box" path="-1492297820."><div class="icon"
+  v-if="icon" v-text="icon" path="-1492297820.0"></div><input :type="type"
+  :placeholder="hint" :value="value" @input="onInput"
+  path="-1492297820.1"/></div>

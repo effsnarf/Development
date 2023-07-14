@@ -2,9 +2,9 @@ dom:
   div:
     ui.loading:
       class: absolute-center
-      v-show: "item.isLoading"
+      v-show: item.isLoading
     ui.file.dropzone:
-      v-show: "!item.isLoading"
+      v-show: '!item.isLoading'
       @file-drop: $emit('file-drop', item, $event)
       ui.movable:
         @drag-by: ({ dx, dy }) => onItemDragBy(item, { dx, dy })
@@ -19,7 +19,7 @@ dom:
           @change: refresh
     e.template.caption.item:
       v-if: item.caption
-      :item: item.caption
+      ':item': item.caption
 props:
   item: null
 data:
@@ -85,6 +85,15 @@ style:
     pointer-events: none
 name: e-template-image-item
 template: >-
-  <ui-image class="comp-e-template-image-layer" :style="getStyle(item)"
-  v-if="item" :imageID="item.imageID" :remove-background="item.removeBackground"
-  :square="true" @load="onImageLoad" path="-1206774413."></ui-image>
+  <div class="comp-e-template-image-item" path="1623568049."><ui-loading
+  class="absolute-center" v-show="item.isLoading"
+  path="1623568049.0"></ui-loading><ui-file-dropzone v-show="!item.isLoading"
+  @file-drop="$emit('file-drop', item, $event)" path="1623568049.1"><ui-movable
+  @drag-by="({ dx, dy }) =&gt; onItemDragBy(item, { dx, dy })" @scale-by="(ds)
+  =&gt; onItemScaleBy(item, ds)" path="1623568049.1.0"><ui-image ref="image1"
+  v-if="item" :style="itemStyle" :imageID="item.imageID"
+  :remove-background="item.removeBackground" @load="onImageLoad"
+  @change="refresh"
+  path="1623568049.1.0.0"></ui-image></ui-movable></ui-file-dropzone><e-template-caption-item
+  v-if="item.caption" :item="item.caption"
+  path="1623568049.2"></e-template-caption-item></div>

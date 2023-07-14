@@ -1,6 +1,6 @@
 dom:
-  div:
-    ui.mouse:
+  div: 
+    ui.mouse: 
       ':global': true
       @move: onMouseMove
       @right-click: e => onRightClick(e, true)
@@ -10,22 +10,21 @@ dom:
       ':class': '{ pinned: isPinned, inited: isInited, visible: isVisible }'
       ':style': style
       h2:
-        ui.mouse:
+        ui.mouse: 
           @drag: onDrag
           @right-click: onRightClick
-        slot:
+        slot: 
           h3:
             ui.title:
-              :icon: icon
-              :text: title
-      div:
-        slot:
+              ':icon': icon
+              ':text': title
+      div: 
+        slot: 
           name: content
         component:
           v-if: itemType
-          :is: itemType
+          ':is': itemType
           v-bind: bindProps
-
 props:
   global: false
   visible: null
@@ -36,8 +35,12 @@ props:
 data:
   lastUpdate: 0
   space: 20
-  mousePos: { x: 0, y: 0 }
-  globalPos: { x: 0, y: 0 }
+  mousePos:
+    x: 0
+    'y': 0
+  globalPos:
+    x: 0
+    'y': 0
   isInited: false
   isPinned: false
   isInsideContextElement: false
@@ -158,14 +161,17 @@ style:
     border-bottom: '1px solid #000'
     margin-bottom: 0.5em
     user-select: none
-name: ui-context
+name: ui-context-window
 template: >-
-  <div class="comp-ui-context" path="1489993813."><ui-mouse :global="true"
-  @move="mousePos = $event" @right-click="e =&gt; onRightClick(e, true)"
-  path="1489993813.0"></ui-mouse><div class="context-menu" v-if="isVisible"
-  ref="menu1" :class="{ pinned: isPinned, inited: isInited, visible: isVisible
-  }" :style="style" path="1489993813.1"><h2 path="1489993813.1.0"><ui-mouse
-  @drag="onDrag" @right-click="onRightClick"
-  path="1489993813.1.0.0"></ui-mouse><slot name="title"
-  path="1489993813.1.0.1"></slot></h2><div path="1489993813.1.1"><slot
-  name="content" path="1489993813.1.1.0"></slot></div></div></div>
+  <div class="comp-ui-context-window" path="1458497449."><ui-mouse
+  :global="true" @move="onMouseMove" @right-click="e =&gt; onRightClick(e,
+  true)" path="1458497449.0"></ui-mouse><div class="context-menu"
+  v-if="isVisible" ref="menu1" :class="{ pinned: isPinned, inited: isInited,
+  visible: isVisible }" :style="style" path="1458497449.1"><h2
+  path="1458497449.1.0"><ui-mouse @drag="onDrag" @right-click="onRightClick"
+  path="1458497449.1.0.0"></ui-mouse><slot path="1458497449.1.0.1"><h3
+  path="1458497449.1.0.1.0"><ui-title :icon="icon" :text="title"
+  path="1458497449.1.0.1.0.0"></ui-title></h3></slot></h2><div
+  path="1458497449.1.1"><slot name="content"
+  path="1458497449.1.1.0"></slot><component v-if="itemType" :is="itemType"
+  v-bind="bindProps" path="1458497449.1.1.1"></component></div></div></div>

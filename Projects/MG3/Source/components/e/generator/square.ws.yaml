@@ -1,5 +1,5 @@
 dom:
-  ui.image:
+  ui.image: 
     v-if: '!generator'
     class: anonymous
     tooltip: Anonymous
@@ -8,8 +8,8 @@ dom:
     @click: $emit('click')
   ui.link:
     v-else-if: generator
-    :url: "$root.url.generator(generator)"
-    ui.image:
+    ':url': $root.url.generator(generator)
+    ui.image: 
       ':tooltip': showTooltip && generator.displayName
       ':imageID': generator.imageID
       ':key': generator.generatorID
@@ -19,7 +19,7 @@ props:
   generator: null
   showTooltip: true
   showAnonymous: false
-computed:
+computed: null
 style:
   .anonymous:
     opacity: 0.5
@@ -28,7 +28,8 @@ template: >-
   <ui-image class="comp-e-generator-square anonymous" v-if="!generator"
   tooltip="Anonymous"
   :src="'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Anonymous_emblem.svg/1200px-Anonymous_emblem.svg.png'"
-  @click="$emit('click',)" path="-916767999."></ui-image><ui-image
-  v-else-if="generator" :tooltip="showTooltip &amp;&amp; generator.displayName"
+  @click="$emit('click')" path="-916767999."></ui-image><ui-link
+  v-else-if="generator" :url="$root.url.generator(generator)"><ui-image
+  :tooltip="showTooltip &amp;&amp; generator.displayName"
   :imageID="generator.imageID" :key="generator.generatorID" :square="true"
-  @click="$emit('click', generator)"></ui-image>
+  @click="$emit('click', generator)"></ui-image></ui-link>

@@ -18,13 +18,13 @@ style:
   .comp-content-poem-stanza:
     width: 100%
     height: fit-content
-    background: "linear-gradient(45deg, black, #ffffff30)"
+    background: 'linear-gradient(45deg, black, #ffffff30)'
     border: 1px solid gray
-    box-shadow: "inset -4px 4px 2px #000"
+    box-shadow: 'inset -4px 4px 2px #000'
   .lines:
     padding: 1rem
   .line:
-    text-shadow: "-5px 5px 3px #000"
+    text-shadow: '-5px 5px 3px #000'
 name: content-poem-stanza
 template: >-
   <div class="comp-content-poem-stanza" v-if="item" path="-1353349913."><div

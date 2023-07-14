@@ -4,17 +4,19 @@ dom:
     tag: ul
     li:
       v-for: generator in generators
-      ":key": generator._id
+      ':key': generator._id
       e.generator.wide2:
-        ":generator": generator
-
+        ':generator': generator
 props:
   generators: null
-
-data:
-
-watch:
-
+data: null
+watch: null
 style:
   li:
     margin-top: 0.5em
+name: e-generator-list
+template: >-
+  <transition-group class="comp-e-generator-list" name="list" tag="ul"
+  path="-398935166."><li v-for="generator in generators" :key="generator._id"
+  path="-398935166.0"><e-generator-wide2 :generator="generator"
+  path="-398935166.0.0"></e-generator-wide2></li></transition-group>

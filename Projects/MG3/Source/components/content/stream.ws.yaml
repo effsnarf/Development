@@ -100,5 +100,5 @@ template: >-
   path="-30902635."><transition-group tag="ul" name="list" :class="gridClass"
   :style="{ gap: gap }" path="-30902635.0"><li v-for="(item, index) in items"
   :key="$root.getKey(item)" path="-30902635.0.0"><component
-  :is="itemType.kebabize()" :item="item"
+  :is="itemType.kebabize()" :item="item" v-bind="itemProps"
   path="-30902635.0.0.0"></component></li></transition-group></ui-infinite-scroll>

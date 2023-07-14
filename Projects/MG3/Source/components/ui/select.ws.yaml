@@ -1,23 +1,23 @@
 dom:
-  div:
+  div: 
     select:
       v-if: (type=='dropdown')
       option:
         v-for: (item, index) in options
         ':value': index
         v-text: item
-      :value: valueIndex
+      ':value': valueIndex
       @input: onInput($event.target.value)
     ui.list:
       v-if: (type=='list')
       v-slot: slotProps
       ':items': options
       ':selected-index': valueIndex
-      :direction: direction
+      ':direction': direction
       template:
         slot:
-          :item: slotProps.item
-        div:
+          ':item': slotProps.item
+        div: 
           v-if: showText
           v-text: getItemText(slotProps.item)
       @input: onInput($event)
@@ -62,8 +62,14 @@ style:
   li div:
     white-space: nowrap
 template: >-
-  <div class="comp-ui-select" path="-1442841194."><ui-list v-slot="slotProps"
-  :items="options" :selected-index="valueIndex" @input="onInput($event)"
-  path="-1442841194.0"><template path="-1442841194.0.0"><div
+  <div class="comp-ui-select" path="-1442841194."><select
+  v-if="(type=='dropdown')" :value="valueIndex"
+  @input="onInput($event.target.value)" path="-1442841194.0"><option
+  v-for="(item, index) in options" :value="index" v-text="item"
+  path="-1442841194.0.0"></option></select><ui-list v-if="(type=='list')"
+  v-slot="slotProps" :items="options" :selected-index="valueIndex"
+  :direction="direction" @input="onInput($event)" path="-1442841194.1"><template
+  path="-1442841194.1.0"><slot :item="slotProps.item"
+  path="-1442841194.1.0.0"></slot><div v-if="showText"
   v-text="getItemText(slotProps.item)"
-  path="-1442841194.0.0.0"></div></template></ui-list></div>
+  path="-1442841194.1.0.1"></div></template></ui-list></div>

@@ -1,6 +1,6 @@
 dom:
   div:
-    ":class": getCssClass(value)
+    ':class': getCssClass(value)
     v-text: valueToString(value)
 props:
   value: null
@@ -21,7 +21,7 @@ methods:
       if (typeof value == "object") return JSON.stringify(value).shorten(20);
       return value.toString();
     }
-name: ui-value-any
+name: ui-value-preview
 template: >-
-  <div class="comp-ui-value-any" :class="getCssClass(value)"
-  v-text="valueToString(value)" path="1299909909."></div>
+  <div class="comp-ui-value-preview" :class="getCssClass(value)"
+  v-text="valueToString(value)" path="-272450959."></div>

@@ -1,20 +1,17 @@
 dom:
-  div:
+  div: 
     ui.tabs:
-      ":options": contextMenuOptions
+      ':options': contextMenuOptions
       direction: vertical
-      div:
+      div: 
         v-for: (cm, index) in contextMenus
         template:
-          v-slot: "'tab'+index"
+          v-slot: '''tab''+index'
           ui.value.any:
-            :value: "{d: cm().$data, p:cm().$props}"
-
-props:
-
+            ':value': '{d: cm().$data, p:cm().$props}'
+props: null
 data:
   contextMenus: []
-
 mounted: | #js
   function() {
     this.$root.$on("context-menu-mounted", (contextMenu) => {
@@ -22,8 +19,15 @@ mounted: | #js
     this.$root.$on("context-menu-unmounted", () => {
     });
   }
-
 computed:
   contextMenuOptions: | #js
     function() {
     }
+name: ide-debug
+template: >-
+  <div class="comp-ide-debug" path="-1760824817."><ui-tabs
+  :options="contextMenuOptions" direction="vertical" path="-1760824817.0"><div
+  v-for="(cm, index) in contextMenus" path="-1760824817.0.0"><template
+  v-slot:'tab'+index path="-1760824817.0.0.0"><ui-value-any :value="{d:
+  cm().$data, p:cm().$props}"
+  path="-1760824817.0.0.0.0"></ui-value-any></template></div></ui-tabs></div>

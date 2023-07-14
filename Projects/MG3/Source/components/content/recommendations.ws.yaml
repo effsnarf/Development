@@ -6,8 +6,8 @@ dom:
       li:
         v-for: generator in items
         e.generator.wide:
-          ":item": generator
-        ":key": generator.generatorID
+          ':item': generator
+        ':key': generator.generatorID
 style:
   .list:
     display: flex
@@ -15,6 +15,7 @@ style:
     gap: 1rem
 props:
   items: null
+name: content-recommendations
 template: >-
   <div class="comp-content-recommendations list"
   path="-1482246043."><transition-group tag="ul" name="list"

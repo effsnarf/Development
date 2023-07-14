@@ -1,8 +1,11 @@
 dom:
   input:
     type: color
-    :value: value
+    ':value': value
     @input: $emit('input', $event.target.value)
-
 props:
   value: null
+name: ui-color
+template: >-
+  <input class="comp-ui-color" type="color" :value="value"
+  @input="$emit('input', $event.target.value)" path="-2139231351."/>

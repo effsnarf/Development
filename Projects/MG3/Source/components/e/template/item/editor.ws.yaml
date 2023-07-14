@@ -3,7 +3,7 @@ dom:
     v-text: item
 props:
   item: null
-name: e-template-layer-editor
+name: e-template-item-editor
 template: >-
-  <div class="comp-e-template-layer-editor" v-text="item"
-  path="1602713813."></div>
+  <div class="comp-e-template-item-editor" v-text="item"
+  path="644061981."></div>

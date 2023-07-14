@@ -1,13 +1,17 @@
 dom:
   ui.link:
-    :url: url
+    ':url': url
     ui.image:
-      :imageID: imageID
+      ':imageID': imageID
       aspect-ratio: 2 / 1
     h3:
       v-text: title
-
 props:
   imageID: null
   title: null
   url: null
+name: e-teaser
+template: >-
+  <ui-link class="comp-e-teaser" :url="url" path="1222941689."><ui-image
+  :imageID="imageID" aspect-ratio="2 / 1" path="1222941689.0"></ui-image><h3
+  v-text="title" path="1222941689.1"></h3></ui-link>

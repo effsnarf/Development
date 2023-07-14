@@ -1,18 +1,18 @@
 dom:
   ui.link:
-    ":url": url
+    ':url': url
     ui.card1:
       class: grayish
       .show-on-hover-container:
         .grid:
           ui.image:
-            ":imageID": item.imageID
+            ':imageID': item.imageID
           div:
             v-text: item.displayName
         content.poem.stanza:
           v-if: false && item.desc?.poem
           class: show-on-hover
-          ":item": $root.getRandomStanza(item.desc?.poem)
+          ':item': $root.getRandomStanza(item.desc?.poem)
 props:
   item: null
 style:
@@ -35,6 +35,7 @@ computed:
     function() {
       return `/${this.item.urlName}`;
     }
+name: e-generator-wide
 template: >-
   <ui-link class="comp-e-generator-wide" :url="url" path="-398607945."><ui-card1
   class="grayish" path="-398607945.0"><div class="show-on-hover-container"
@@ -42,6 +43,6 @@ template: >-
   :imageID="item.imageID" path="-398607945.0.0.0.0"></ui-image><div
   v-text="item.displayName"
   path="-398607945.0.0.0.1"></div></div><content-poem-stanza
-  class="show-on-hover" v-if="item.desc?.poem"
+  class="show-on-hover" v-if="false &amp;&amp; item.desc?.poem"
   :item="$root.getRandomStanza(item.desc?.poem)"
   path="-398607945.0.0.1"></content-poem-stanza></div></ui-card1></ui-link>

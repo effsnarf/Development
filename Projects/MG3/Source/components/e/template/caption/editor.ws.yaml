@@ -1,25 +1,25 @@
 dom:
   div:
     ui.textarea:
-      :hint: item.hint
+      ':hint': item.hint
       v-model: item.text
-    ui.select#1:
-      ":options": "['Oswald', 'Special Elite']"
+    ui.select: 
+      ':options': '[''Oswald'', ''Special Elite'']'
       type: dropdown
       input-type: value
       v-model: item.font
-    ui.select#2:
-      ":options": "['white', 'black']"
+    ui.select: 
+      ':options': '[''white'', ''black'']'
       type: dropdown
       input-type: value
       v-model: item.color
-    ui.select#3:
-      ":options": "['left', 'center', 'right']"
+    ui.select: 
+      ':options': '[''left'', ''center'', ''right'']'
       type: dropdown
       input-type: value
       v-model: item.align.h
-    ui.select#4:
-      ":options": "['top', 'center', 'bottom']"
+    ui.select: 
+      ':options': '[''top'', ''center'', ''bottom'']'
       type: dropdown
       input-type: value
       v-model: item.align.v
@@ -28,7 +28,14 @@ props:
   hint: null
 name: e-template-caption-editor
 template: >-
-  <div class="comp-e-template-caption-editor" path="-1978901725."><div
-  class="inputs" path="-1978901725.0"><input v-model="item.texts[0]"
-  placeholder="top text" path="-1978901725.0.0"/><input v-model="item.texts[1]"
-  placeholder="bottom text" path="-1978901725.0.1"/></div></div><path></path>
+  <div class="comp-e-template-caption-editor" path="-1537870880."><ui-textarea
+  :hint="item.hint" v-model="item.text"
+  path="-1537870880.0"></ui-textarea><ui-select :options="['Oswald', 'Special
+  Elite']" type="dropdown" input-type="value" v-model="item.font"
+  path="-1537870880.1"></ui-select><ui-select :options="['white', 'black']"
+  type="dropdown" input-type="value" v-model="item.color"
+  path="-1537870880.2"></ui-select><ui-select :options="['left', 'center',
+  'right']" type="dropdown" input-type="value" v-model="item.align.h"
+  path="-1537870880.3"></ui-select><ui-select :options="['top', 'center',
+  'bottom']" type="dropdown" input-type="value" v-model="item.align.v"
+  path="-1537870880.4"></ui-select></div>

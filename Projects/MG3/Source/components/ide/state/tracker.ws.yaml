@@ -1,35 +1,35 @@
 dom:
-  div:
+  div: 
     .flex.items-baseline:
-      div#2:
-        h3:
-          ui.title:
+      div: 
+        h3: 
+          ui.title: 
             text: Changes
-        ul#2:
+        ul: 
           class: changes
-          :key: key1
-          li:
+          ':key': key1
+          li: 
             v-for: change in $root.state.getRefChanges(uid).take(20)
             class: hoverable
             ':key': change.id
             @mouseenter: () => onMouseEnter(change)
             @mouseleave: () => onMouseLeave(change)
-            ide.state.tracker.item:
-              :uid: uid
-              :item: change
-              :key: change.id
-      div#1:
-        h3:
-          ui.title:
+            ide.state.tracker.item: 
+              ':uid': uid
+              ':item': change
+              ':key': change.id
+      div: 
+        h3: 
+          ui.title: 
             text: State
-        ul#1:
-          li:
+        ul: 
+          li: 
             v-for: field in $root.vm.getFields(uid)
-            ide.state.tracker.item:
-              :uid: uid
-              :item: field
-              :key: "uid+'.'+field.key"
-      div#3:
+            ide.state.tracker.item: 
+              ':uid': uid
+              ':item': field
+              ':key': uid+'.'+field.key
+      div:  null
 props:
   uid: null
 data:
@@ -59,7 +59,7 @@ methods:
 style:
   .comp-ui-title:
     border-radius: 0
-    border-bottom: "1px solid #000"
+    border-bottom: '1px solid #000'
   .flex:
     gap: 1em
   ul:
@@ -68,19 +68,23 @@ style:
   ul:not(.changes) .grid:
     opacity: 0.5
   li:hover:
-    background: "#ffffff30"
+    background: '#ffffff30'
     transition: 0s
 name: ide-state-tracker
 template: >-
-  <div class="comp-ide-state-tracker" path="-483235177."><div
-  path="-483235177.0"><ui-checkbox text="track methods"
-  v-model="stateTracker.isTrackingMethods"
-  path="-483235177.0.0"></ui-checkbox></div><ul name="list"
-  path="-483235177.1"><li class="hoverable" v-for="item in
-  stateTracker.items.take(20)" :key="item.id" @click="() =&gt;
-  onItemClick(item)" @mouseenter="() =&gt; onMouseEnter(item)" @mouseleave="()
-  =&gt; onMouseLeave(item)" path="-483235177.1.0"><ide-state-tracker-item
-  :state-tracker="stateTracker" :item="item"
-  path="-483235177.1.0.0"></ide-state-tracker-item></li></ul><div
-  path="-483235177.2"><button v-text="'❌'" @click="clear"
-  path="-483235177.2.0"></button></div></div>
+  <div class="comp-ide-state-tracker" path="-483235177."><div class="flex
+  items-baseline" path="-483235177.0"><div path="-483235177.0.0"><h3
+  path="-483235177.0.0.0"><ui-title text="Changes"
+  path="-483235177.0.0.0.0"></ui-title></h3><ul class="changes" :key="key1"
+  path="-483235177.0.0.1"><li class="hoverable" v-for="change in
+  $root.state.getRefChanges(uid).take(20)" :key="change.id" @mouseenter="()
+  =&gt; onMouseEnter(change)" @mouseleave="() =&gt; onMouseLeave(change)"
+  path="-483235177.0.0.1.0"><ide-state-tracker-item :uid="uid" :item="change"
+  :key="change.id"
+  path="-483235177.0.0.1.0.0"></ide-state-tracker-item></li></ul></div><div
+  path="-483235177.0.1"><h3 path="-483235177.0.1.0"><ui-title text="State"
+  path="-483235177.0.1.0.0"></ui-title></h3><ul path="-483235177.0.1.1"><li
+  v-for="field in $root.vm.getFields(uid)"
+  path="-483235177.0.1.1.0"><ide-state-tracker-item :uid="uid" :item="field"
+  :key="uid+'.'+field.key"
+  path="-483235177.0.1.1.0.0"></ide-state-tracker-item></li></ul></div><div></div></div></div>

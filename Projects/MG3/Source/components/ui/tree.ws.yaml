@@ -4,7 +4,7 @@ dom:
       ui.tree.node:
         ':node': root
         ':initial-expanded': initialExpanded
-        ':expandable': 'initialExpandable'
+        ':expandable': initialExpandable
         ':item-type': itemType
         ':get-item': getItem || ((node) => node.item)
         ':get-children': getChildren || ((node) => node.children||[])
@@ -54,7 +54,7 @@ name: ui-tree
 template: >-
   <ul class="comp-ui-tree" path="-484140360."><li
   path="-484140360.0"><ui-tree-node :node="root"
-  :initial-expanded="initialExpanded" :expandable="!initialExpanded"
+  :initial-expanded="initialExpanded" :expandable="initialExpandable"
   :item-type="itemType" :get-item="getItem || ((node) =&gt; node.item)"
   :get-children="getChildren || ((node) =&gt; node.children||[])"
   :selected-node="selectedNode" @node-click="onChildClick"

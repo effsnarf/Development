@@ -1,22 +1,32 @@
 dom:
   site:
     page-name: category
-    template#1:
+    template:
       v-slot: article
       .grid-3:
-        e.teaser#1:
+        e.teaser: 
           imageID: 679668918
           title: Barbie
-        e.teaser#2:
+        e.teaser: 
           imageID: 680118397
           title: Indiana Jones 5
-        e.teaser#3:
+        e.teaser: 
           imageID: 680118400
           title: Oppenheimer
-        e.teaser#4:
+        e.teaser: 
           imageID: 680118403
           title: Nepoleon
       h1:
-        v-text: "'Movies'"
-
-props:
+        v-text: '''Movies'''
+props: null
+name: page-category
+template: >-
+  <site class="comp-page-category" page-name="category"
+  path="871284093."><template v-slot:article path="871284093.0"><div
+  class="grid-3" path="871284093.0.0"><e-teaser imageID="679668918"
+  title="Barbie" path="871284093.0.0.0"></e-teaser><e-teaser imageID="680118397"
+  title="Indiana Jones 5" path="871284093.0.0.1"></e-teaser><e-teaser
+  imageID="680118400" title="Oppenheimer"
+  path="871284093.0.0.2"></e-teaser><e-teaser imageID="680118403"
+  title="Nepoleon" path="871284093.0.0.3"></e-teaser></div><h1 v-text="'Movies'"
+  path="871284093.0.1"></h1></template></site>

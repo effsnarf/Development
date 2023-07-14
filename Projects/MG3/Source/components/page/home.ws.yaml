@@ -1,37 +1,37 @@
 dom:
   site:
-    :columns: 2
+    ':columns': 2
     page-name: home
-    template#0:
+    template: 
       v-slot: article
       .grid-3:
         class: hidden
-        e.teaser:
+        e.teaser: 
           imageID: 32
           title: Advice Animals
           url: /c/advice-animals
-        e.teaser:
+        e.teaser: 
           imageID: 679668918
           title: Movies
           url: /c/movies
-        e.teaser:
+        e.teaser: 
           imageID: 679668921
           title: Anonymous Times
-        e.teaser:
+        e.teaser: 
           imageID: 679668909
           title: YouTube
-    template#1:
+    template: 
       v-slot: left
       e.generator.search: null
       e.thread.list: null
-    template#2:
+    template: 
       v-slot: middle
       content.stream:
         ref: stream1
         item-type: e.instance
-        ":get-more-items": getMoreInstances
+        ':get-more-items': getMoreInstances
         grid-class: grid-3
-    template:
+    template: 
       v-slot: right
 data:
   generators: []
@@ -68,12 +68,18 @@ style:
     aspect-ratio: 2 / 1
 name: page-home
 template: >-
-  <site class="comp-page-home" page-name="home" path="838274270."><template
+  <site class="comp-page-home" :columns="2" page-name="home"
+  path="838274270."><template v-slot:article path="838274270.0"><div
+  class="hidden grid-3" path="838274270.0.0"><e-teaser imageID="32"
+  title="Advice Animals" url="/c/advice-animals"
+  path="838274270.0.0.0"></e-teaser><e-teaser imageID="679668918" title="Movies"
+  url="/c/movies" path="838274270.0.0.1"></e-teaser><e-teaser
+  imageID="679668921" title="Anonymous Times"
+  path="838274270.0.0.2"></e-teaser><e-teaser imageID="679668909"
+  title="YouTube" path="838274270.0.0.3"></e-teaser></div></template><template
   v-slot:left
-  path="838274270.0"><e-thread-list></e-thread-list></template><template
-  v-slot:middle
-  path="838274270.1"><e-template-editor></e-template-editor><content-stream
-  ref="stream1" item-type="e.instance" :get-more-items="getMoreInstances"
-  grid-class="grid-1" path="838274270.1.1"></content-stream></template><template
-  v-slot:right path="838274270.2"><div
-  path="838274270.2.0"><e-post-create></e-post-create></div></template></site>
+  path="838274270.1"><e-generator-search></e-generator-search><e-thread-list></e-thread-list></template><template
+  v-slot:middle path="838274270.2"><content-stream ref="stream1"
+  item-type="e.instance" :get-more-items="getMoreInstances" grid-class="grid-3"
+  path="838274270.2.0"></content-stream></template><template v-slot:right
+  path="838274270.3"></template></site>

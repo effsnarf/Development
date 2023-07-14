@@ -1,16 +1,22 @@
 dom:
-  div:
+  div: 
     ui.expand:
-      :text: title
-      :value: "(opposite ^ value)"
+      ':text': title
+      ':value': (opposite ^ value)
       @input: $emit('input', (opposite ^ $event))
     transition:
       name: slide2
-      div:
-        v-show: "(opposite ^ value)"
-        slot:
-
+      div: 
+        v-show: (opposite ^ value)
+        slot: null
 props:
   title: null
   value: null
   opposite: false
+name: ui-section
+template: >-
+  <div class="comp-ui-section" path="-1786263157."><ui-expand :text="title"
+  :value="(opposite ^ value)" @input="$emit('input', (opposite ^ $event))"
+  path="-1786263157.0"></ui-expand><transition name="slide2"
+  path="-1786263157.1"><div v-show="(opposite ^ value)"
+  path="-1786263157.1.0"><slot></slot></div></transition></div>

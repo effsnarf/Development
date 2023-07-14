@@ -2,16 +2,16 @@ dom:
   site:
     v-if: $root.params.page=='instance'
     page-name: instance
-    ":recommendation-items": recommendationItems
-    template:
+    ':recommendation-items': recommendationItems
+    template: 
       v-slot: left
-      e.generator.search:
-    template:
+      e.generator.search: null
+    template: 
       v-slot: middle
       content.stream:
         item-type: e.instance
-        :item-props: "{ showFullFooter: true }"
-        ":get-more-items": getMoreInstances
+        ':item-props': '{ showFullFooter: true }'
+        ':get-more-items': getMoreInstances
         grid-class: grid-1
 data:
   instance: null
@@ -50,7 +50,8 @@ name: page-instance
 template: >-
   <site class="comp-page-instance" v-if="$root.params.page=='instance'"
   page-name="instance" :recommendation-items="recommendationItems"
-  path="1375900948."><template></template><template v-slot:middle
-  path="1375900948.1"><content-stream item-type="e.instance"
-  :get-more-items="getMoreInstances" grid-class="grid-1"
-  path="1375900948.1.0"></content-stream></template></site>
+  path="1375900948."><template v-slot:left
+  path="1375900948.0"><e-generator-search></e-generator-search></template><template
+  v-slot:middle path="1375900948.1"><content-stream item-type="e.instance"
+  :item-props="{ showFullFooter: true }" :get-more-items="getMoreInstances"
+  grid-class="grid-1" path="1375900948.1.0"></content-stream></template></site>

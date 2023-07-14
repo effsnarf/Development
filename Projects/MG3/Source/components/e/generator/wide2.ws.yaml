@@ -1,10 +1,10 @@
 dom:
   ui.link:
-    ":url": $root.url.generator(generator)
+    ':url': $root.url.generator(generator)
     .grid:
       class: grayish
       ui.image:
-        ":imageID": generator.imageID
+        ':imageID': generator.imageID
       div:
         v-text: generator.displayName
 props:
@@ -13,13 +13,9 @@ style:
   .grid:
     grid-template: 1fr / 1fr 4fr
     gap: 0.5em
+name: e-generator-wide2
 template: >-
-  <ui-link class="comp-e-generator-wide" :url="url" path="-398607945."><ui-card1
-  class="grayish" path="-398607945.0"><div class="show-on-hover-container"
-  path="-398607945.0.0"><div class="grid" path="-398607945.0.0.0"><ui-image
-  :imageID="item.imageID" path="-398607945.0.0.0.0"></ui-image><div
-  v-text="item.displayName"
-  path="-398607945.0.0.0.1"></div></div><content-poem-stanza
-  class="show-on-hover" v-if="item.desc?.poem"
-  :item="$root.getRandomStanza(item.desc?.poem)"
-  path="-398607945.0.0.1"></content-poem-stanza></div></ui-card1></ui-link>
+  <ui-link class="comp-e-generator-wide2" :url="$root.url.generator(generator)"
+  path="528055643."><div class="grayish grid" path="528055643.0"><ui-image
+  :imageID="generator.imageID" path="528055643.0.0"></ui-image><div
+  v-text="generator.displayName" path="528055643.0.1"></div></div></ui-link>

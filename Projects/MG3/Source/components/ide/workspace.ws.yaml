@@ -1,20 +1,20 @@
 dom:
-  div:
-    div:
+  div: 
+    div: 
       v-if: showWorkspace
       class: workspace
       h3:
         ui.title:
           icon: 🎄
           ':value': $root.vm.vuesCount?.toLocaleString()
-        div:
+        div: 
           ui.button:
             icon: ♻
             text: refresh
             @click: $root.reloadComponentsFromServer
-      ide.debug:
-      ide.component.picker:
-    div:
+      ide.debug: null
+      ide.component.picker: null
+    div: 
       ide.component.style:
         v-for: comp in comps
         ':component': comp
@@ -45,13 +45,13 @@ style:
     overflow: hidden
     z-index: 1000000
     transition: 1s
-  .comp-ide-workspace:hover:
+  .comp-ide-workspace:hover: null
 template: >-
-  <div class="comp-ide-workspace workspace" path="-1163457967."><h2
-  v-text="'cunt'" path="-1163457967.0"></h2><h3 path="-1163457967.1"><ui-title
-  icon="🎄" :value="$root.vuesCount.toLocaleString()"
-  path="-1163457967.1.0"></ui-title><ui-button icon="♻" text="refresh"
-  @click="$root.reloadComponentsFromServer()"
-  path="-1163457967.1.1"></ui-button></h3><div
-  path="-1163457967.2"><ide-component-style v-for="comp in comps"
-  :component="comp" path="-1163457967.2.0"></ide-component-style></div></div>
+  <div class="comp-ide-workspace" path="-1163457967."><div class="workspace"
+  v-if="showWorkspace" path="-1163457967.0"><h3 path="-1163457967.0.0"><ui-title
+  icon="🎄" :value="$root.vm.vuesCount?.toLocaleString()"
+  path="-1163457967.0.0.0"></ui-title><div path="-1163457967.0.0.1"><ui-button
+  icon="♻" text="refresh" @click="$root.reloadComponentsFromServer"
+  path="-1163457967.0.0.1.0"></ui-button></div></h3><ide-debug></ide-debug><ide-component-picker></ide-component-picker></div><div
+  path="-1163457967.1"><ide-component-style v-for="comp in comps"
+  :component="comp" path="-1163457967.1.0"></ide-component-style></div></div>

@@ -4,7 +4,7 @@ dom:
       v-text: item[0]
     div:
       ui.value.any:
-        :value: item[1]
+        ':value': item[1]
 props:
   item: null
 style:
@@ -16,5 +16,5 @@ name: ide-component-view-attribute
 template: >-
   <div class="comp-ide-component-view-attribute grid" path="-2070617496."><div
   class="opacity-50" v-text="item[0]" path="-2070617496.0"></div><div
-  path="-2070617496.1"><ui-textarea value="item[1]"
-  path="-2070617496.1.0"></ui-textarea></div></div>
+  path="-2070617496.1"><ui-value-any :value="item[1]"
+  path="-2070617496.1.0"></ui-value-any></div></div>

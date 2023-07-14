@@ -1,9 +1,9 @@
 dom:
-  div:
+  div: 
     ':class': getCssClass()
-    div:
+    div: 
       class: content-title site-width
-      div:
+      div: 
         class: background
       transition.group:
         name: list
@@ -16,7 +16,7 @@ dom:
             ':url': url
           ui.large.title:
             ':text': title
-    div:
+    div: 
       class: spacer
 props:
   imageID: null

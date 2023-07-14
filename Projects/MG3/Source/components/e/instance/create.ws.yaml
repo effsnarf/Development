@@ -1,6 +1,6 @@
 dom:
-  div:
-    transition:
+  div: 
+    transition: 
       name: slide
       e.generator.select:
         v-show: '!generator && showGeneratorSelect'
@@ -8,8 +8,8 @@ dom:
         @input: showGeneratorSelect = false
     .container:
       ':class': layout
-      div:
-        transition#1:
+      div: 
+        transition: 
           name: slide
           e.instance:
             class: '{ clickable: !generator  }'
@@ -17,18 +17,18 @@ dom:
             ':item': tempInstance
             ':key': tempInstance.generator?.generatorID
             ':show-create-post': 'false'
-            :show-footer: 'false'
+            ':show-footer': 'false'
             @click: showGeneratorSelect = !showGeneratorSelect
       .inputs:
-        input#1:
+        input: 
           v-model: tempInstance.text0
           placeholder: top text
           @focus: onFocus
-        input#2:
+        input: 
           v-model: tempInstance.text1
           placeholder: bottom text
           @focus: onFocus
-        transition:
+        transition: 
           name: slide
           ui.button:
             v-if: showCreateButton && hasText
@@ -137,7 +137,8 @@ template: >-
   name="slide" path="-903297812.1.0.0"><e-instance class="{ clickable:
   !generator }" v-if="((layout == 'horizontal') || hasText)"
   :item="tempInstance" :key="tempInstance.generator?.generatorID"
-  :show-create-post="false" @click="showGeneratorSelect = !showGeneratorSelect"
+  :show-create-post="false" :show-footer="false" @click="showGeneratorSelect =
+  !showGeneratorSelect"
   path="-903297812.1.0.0.0"></e-instance></transition></div><div class="inputs"
   path="-903297812.1.1"><input v-model="tempInstance.text0" placeholder="top
   text" @focus="onFocus" path="-903297812.1.1.0"/><input

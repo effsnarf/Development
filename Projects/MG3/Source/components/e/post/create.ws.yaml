@@ -1,7 +1,7 @@
 dom:
   .container:
-    div:
-      transition#1:
+    div: 
+      transition: 
         name: slide
         e.instance.create:
           v-if: showInstanceCreate
@@ -11,9 +11,9 @@ dom:
           v-model: tempInstance
           ':generator': generator
           @has-content: hasInstanceContent = $event
-    transition#2:
+    transition: 
       name: slide
-      div:
+      div: 
         v-show: showLarpGeneratorSelect
         h3:
           v-text: '''Larping as'''
@@ -21,13 +21,13 @@ dom:
           v-model: larpGenerator
           ':allow-anonymous': 'true'
           @input: showLarpGeneratorSelect = false;
-    transition#3:
+    transition: 
       name: slide
-      div:
+      div: 
         e.comment.create:
           v-if: showCommentCreate
           v-model: text
-    transition:
+    transition: 
       name: slide
       ui.button:
         v-if: canPost

@@ -1,10 +1,10 @@
 dom:
   site:
     page-name: thread
-    template#1:
+    template: 
       v-slot: left
       e.thread.list: null
-    template#2:
+    template: 
       v-slot: middle
       e.thread:
         v-model: thread

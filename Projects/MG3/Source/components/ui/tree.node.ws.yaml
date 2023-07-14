@@ -19,7 +19,7 @@ dom:
       class: ml-3
       li:
         v-for: child in getChildItems(node)
-        :key: child.id
+        ':key': child.id
         ui.tree.node:
           ':node': child
           ':initial-expanded': initialExpanded
@@ -135,14 +135,14 @@ name: ui-tree-node
 template: >-
   <div class="comp-ui-tree-node" path="2053324664."><div class="tree-node"
   :class="getCssClass()" @click="onNodeClick" @mouseenter="onMouseEnter"
-  @mouseleave="onMouseLeave" path="2053324664.0"><ui-expand v-if="expandable"
+  @mouseleave="onMouseLeave" path="2053324664.0"><ui-expand v-if="showUiExpand"
   v-model="isExpanded" path="2053324664.0.0"></ui-expand><component
   v-if="itemType" :is="getItemType()" :item="getItem(node)"
-  path="2053324664.0.1"></component><slot></slot></div><ul class="ml-3"
-  path="2053324664.1"><li v-for="child in getChildItems(node)"
-  path="2053324664.1.0"><ui-tree-node :node="child"
-  :initial-expanded="initialExpanded" :expandable="expandable"
+  path="2053324664.0.1"></component><slot></slot></div><transition-group
+  class="ml-3" name="list" tag="ul" path="2053324664.1"><li v-for="child in
+  getChildItems(node)" :key="child.id" path="2053324664.1.0"><ui-tree-node
+  :node="child" :initial-expanded="initialExpanded" :expandable="expandable"
   :item-type="getItemType()" :get-item="getItem" :get-children="getChildren"
   :selected-node="selectedNode" @node-click="onChildClick"
   @node-hover="onChildHover" @node-unhover="onChildUnhover"
-  path="2053324664.1.0.0"></ui-tree-node></li></ul></div>
+  path="2053324664.1.0.0"></ui-tree-node></li></transition-group></div>

@@ -2,7 +2,7 @@ dom:
   transition.group:
     tag: ul
     name: list
-    :class: getMainCssClass()
+    ':class': getMainCssClass()
     li:
       v-for: (item, index) in items
       ':key': $root.getKey(item)
@@ -44,8 +44,8 @@ style:
     flex-grow: 1
     text-align: center
 template: >-
-  <transition-group class="comp-ui-list menu3" tag="ul" name="list"
-  path="-484386888."><li v-for="(item, index) in items"
-  :key="$root.getKey(item)" :class="getCssClass(index)" @click="() =&gt;
+  <transition-group class="comp-ui-list" tag="ul" name="list"
+  :class="getMainCssClass()" path="-484386888."><li v-for="(item, index) in
+  items" :key="$root.getKey(item)" :class="getCssClass(index)" @click="() =&gt;
   onItemClick({ item, index })" path="-484386888.0"><slot :index="index"
   :item="item" path="-484386888.0.0"></slot></li></transition-group>

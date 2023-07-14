@@ -7,12 +7,12 @@ dom:
       v-text: header
     .chart.flex:
       .column1:
-        ui.num#1:
+        ui.num: 
           class: opacity-50
           ':value': scaled(minValue)
-        ui.num#2:
+        ui.num: 
           ':value': scaled(middleValue)
-        ui.num#3:
+        ui.num: 
           class: opacity-50
           ':value': scaled(maxValue)
       div:

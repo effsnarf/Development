@@ -1,11 +1,11 @@
 dom:
-  div:
+  div: 
     class: flex
     .icon:
-      :class: getIconClass()
+      ':class': getIconClass()
       v-if: icon
       v-text: icon
-    div:
+    div: 
       v-text: getText()
     .ml-1.opacity-50:
       v-if: number
@@ -37,6 +37,8 @@ style:
     text-wrap: nowrap
 name: ui-title
 template: >-
-  <div class="comp-ui-title flex" path="-2123702658."><div v-text="getText()"
-  path="-2123702658.0"></div><div class="ml-1 opacity-50" v-if="number"
-  v-text="getNumberText()" path="-2123702658.1"></div></div>
+  <div class="comp-ui-title flex" path="-2123702658."><div class="icon"
+  :class="getIconClass()" v-if="icon" v-text="icon"
+  path="-2123702658.0"></div><div v-text="getText()"
+  path="-2123702658.1"></div><div class="ml-1 opacity-50" v-if="number"
+  v-text="getNumberText()" path="-2123702658.2"></div></div>

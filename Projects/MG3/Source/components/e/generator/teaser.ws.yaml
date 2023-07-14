@@ -2,12 +2,12 @@ dom:
   ui.link:
     ':url': $root.url.generator(item)
     ui.card1:
-      div:
+      div: 
         class: grid-1-3
-        div:
+        div: 
           ui.image:
             ':imageID': item.imageID
-        div:
+        div: 
           content.poem.stanza:
             v-if: item.desc?.poem
             class: show-on-hover
@@ -21,6 +21,7 @@ style:
   .comp-content-poem-stanza:
     width: 100% !important
     font-size: 140%
+name: e-generator-teaser
 template: >-
   <ui-link class="comp-e-generator-teaser" :url="$root.url.generator(item)"
   path="-899800012."><ui-card1 path="-899800012.0"><div class="grid-1-3"

@@ -1,5 +1,5 @@
 dom:
-  div:
+  div: 
     ui.loading:
       v-if: isLoading && !threads.length
     ui.list:
@@ -9,12 +9,12 @@ dom:
         ':class': '{ selected: isCurrentThread(slotProps.item) }'
         ':url': $root.url.thread(slotProps.item)
         .grid:
-          div:
+          div: 
             e.instance:
               ':item': firstPost(slotProps.item)?.instance
           ui.title:
             ':number': slotProps.item.posts.length
-          div:
+          div: 
             v-text: getThreadTitle(slotProps.item)
 data:
   threads: []

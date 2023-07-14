@@ -1,7 +1,7 @@
 dom:
   component:
-    :is: getComponentType(value)
-    :value: value
+    ':is': getComponentType(value)
+    ':value': value
 props:
   value: null
 methods:
@@ -17,5 +17,5 @@ methods:
     }
 name: ui-value-any
 template: >-
-  <div class="comp-ui-value-any" :class="getCssClass(value)"
-  v-text="valueToString(value)" path="1299909909."></div>
+  <component class="comp-ui-value-any" :is="getComponentType(value)"
+  :value="value" path="1299909909."></component>

@@ -1,19 +1,19 @@
 dom:
-  div:
+  div: 
     ui.select:
-      ":options": (options||[]).map(option => getOptionText(option))
-      ":getUrl": getUrl
-      :direction: direction
+      ':options': (options||[]).map(option => getOptionText(option))
+      ':getUrl': getUrl
+      ':direction': direction
       v-model: selectedTabIndex
-    div:
-      div:
+    div: 
+      div: 
         v-for: (option, index) in options
         transition:
           name: slide2
-          div:
+          div: 
             v-show: (index == selectedTabIndex)
             slot:
-              ":name": "'tab' + index"
+              ':name': '''tab'' + index'
 props:
   options: null
   getText: null
@@ -38,14 +38,15 @@ methods:
     }
 style:
   .comp-ui-select:
-    border-bottom: "1px solid #000000"
+    border-bottom: '1px solid #000000'
     margin-bottom: 1em
 name: ui-tabs
 template: >-
   <div class="comp-ui-tabs" path="-484156776."><ui-select
-  :options="options.map(option =&gt; getOptionText(option))" :getUrl="getUrl"
-  v-model="selectedTabIndex" path="-484156776.0"></ui-select><div
-  path="-484156776.1"><div class="flex" :class="direction" v-for="(option,
-  index) in options" path="-484156776.1.0"><div v-show="(index ==
-  selectedTabIndex)" path="-484156776.1.0.0"><slot :name="'tab' + index"
-  path="-484156776.1.0.0.0"></slot></div></div></div></div>
+  :options="(options||[]).map(option =&gt; getOptionText(option))"
+  :getUrl="getUrl" :direction="direction" v-model="selectedTabIndex"
+  path="-484156776.0"></ui-select><div path="-484156776.1"><div v-for="(option,
+  index) in options" path="-484156776.1.0"><transition name="slide2"
+  path="-484156776.1.0.0"><div v-show="(index == selectedTabIndex)"
+  path="-484156776.1.0.0.0"><slot :name="'tab' + index"
+  path="-484156776.1.0.0.0.0"></slot></div></transition></div></div></div>

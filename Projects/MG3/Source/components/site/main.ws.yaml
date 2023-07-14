@@ -1,40 +1,40 @@
 dom:
-  div:
+  div: 
     transition:
       name: fade
       content.title:
         class: hidden
         v-if: titleText
-        ":imageID": titleImageId
-        ":title": titleText
-        ":url": titleUrl
-        ":key": titleKey
+        ':imageID': titleImageId
+        ':title': titleText
+        ':url': titleUrl
+        ':key': titleKey
     .article:
-      slot:
+      slot: 
         name: article
-    div:
-      :class: "'columns columns-' + columns"
+    div: 
+      ':class': '''columns columns-'' + columns'
       .left:
-        ui.sticky:
-          ":top": leftStickyTop
-          slot:
+        ui.sticky: 
+          ':top': leftStickyTop
+          slot: 
             name: left
       .middle:
         ui.error:
-          ":error": $root.error
-        slot:
+          ':error': $root.error
+        slot: 
           name: middle
       .right:
-        ui.sticky:
+        ui.sticky: 
           top: 140px
-          div:
-            slot:
+          div: 
+            slot: 
               name: right
             h3:
               v-if: recommendationItems?.length
-              v-text: "'See also'"
+              v-text: '''See also'''
             content.recommendations:
-              ":items": recommendationItems
+              ':items': recommendationItems
 props:
   titleImageId: null
   titleText: null
@@ -53,13 +53,14 @@ style:
   .comp-site-main: null
   .error:
     margin-bottom: 3rem
+name: site-main
 template: >-
   <div class="comp-site-main" path="-578759680."><transition name="fade"
-  path="-578759680.0"><content-title v-if="titleText" :imageID="titleImageId"
-  :title="titleText" :url="titleUrl" :key="titleKey"
-  path="-578759680.0.0"></content-title></transition><div
+  path="-578759680.0"><content-title class="hidden" v-if="titleText"
+  :imageID="titleImageId" :title="titleText" :url="titleUrl" :key="titleKey"
+  path="-578759680.0.0"></content-title></transition><div class="article"
   path="-578759680.1"><slot name="article"
-  path="-578759680.1.0"></slot></div><div class="columns"
+  path="-578759680.1.0"></slot></div><div :class="'columns columns-' + columns"
   path="-578759680.2"><div class="left" path="-578759680.2.0"><ui-sticky
   :top="leftStickyTop" path="-578759680.2.0.0"><slot name="left"
   path="-578759680.2.0.0.0"></slot></ui-sticky></div><div class="middle"
@@ -68,6 +69,7 @@ template: >-
   path="-578759680.2.1.1"></slot></div><div class="right"
   path="-578759680.2.2"><ui-sticky top="140px" path="-578759680.2.2.0"><div
   path="-578759680.2.2.0.0"><slot name="right"
-  path="-578759680.2.2.0.0.0"></slot><content-recommendations
+  path="-578759680.2.2.0.0.0"></slot><h3 v-if="recommendationItems?.length"
+  v-text="'See also'" path="-578759680.2.2.0.0.1"></h3><content-recommendations
   :items="recommendationItems"
-  path="-578759680.2.2.0.0.1"></content-recommendations></div></ui-sticky></div></div></div>
+  path="-578759680.2.2.0.0.2"></content-recommendations></div></ui-sticky></div></div></div>

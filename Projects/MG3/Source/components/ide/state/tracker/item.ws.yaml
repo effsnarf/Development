@@ -1,34 +1,34 @@
 dom:
-  div:
-    ui.context.window:
+  div: 
+    ui.context.window: 
       v-if: (item.type == 'm')
-      :icon: getIcon(item.type)
-      ":title": item.key
-      template#2:
+      ':icon': getIcon(item.type)
+      ':title': item.key
+      template:
         v-slot: content
         pre:
           code:
             v-html: getMethodBodyColored(item.compName, item.key)
         ui.textarea:
-          ":value": getMethodBody(item.compName, item.key)
-    ui.context.window#2:
+          ':value': getMethodBody(item.compName, item.key)
+    ui.context.window: 
       v-if: showFieldContext(item)
-      :visible: isHoveringOverValue
-      :icon: $root.getIcon(item)
-      :title: item.key
+      ':visible': isHoveringOverValue
+      ':icon': $root.getIcon(item)
+      ':title': item.key
       item-type: ui-value-any
-      :bind-props: "{ value: item.newValue }"
-      :key: "uid+'-'+item.key"
+      ':bind-props': '{ value: item.newValue }'
+      ':key': uid+'-'+item.key
     .grid:
-      ":class": item.type
+      ':class': item.type
       @click: onItemClick(item)
-      div#1:
+      div: 
         v-text: $root.getIcon(item)
-      div#3:
+      div: 
         v-text: item.key
       .newValue:
         ui.value.preview:
-          ":value": item.newValue
+          ':value': item.newValue
         @mouseenter: onHoverValue
         @mouseleave: onUnhoverValue
 props:
@@ -81,7 +81,7 @@ methods:
     function(item) {
       //if (item.key == this.item.key) this.refresh();
     }
-watch:
+watch: null
 style:
   .grid:
     grid-template: 1fr / 1.2em 5em 5em
@@ -103,22 +103,20 @@ style:
     font-size: 110%
 name: ide-state-tracker-item
 template: >-
-  <div class="comp-ide-state-tracker-item" path="841306122."><ui-context
-  v-if="(item.type == 'm')" path="841306122.0"><template v-slot:title
-  path="841306122.0.0"><div class="flex" path="841306122.0.0.0"><ui-title
-  icon="🔴" :text="item.key" path="841306122.0.0.0.0"></ui-title><ui-checkbox
-  text="pause" v-model="stateTracker.methods.pause[item.key]"
-  path="841306122.0.0.0.1"></ui-checkbox></div></template><template
-  v-slot:content path="841306122.0.1"><pre path="841306122.0.1.0"><code
-  v-html="getMethodBodyColored(item.compName, item.key)"
-  path="841306122.0.1.0.0"></code></pre><ui-textarea
+  <div class="comp-ide-state-tracker-item" path="841306122."><ui-context-window
+  v-if="(item.type == 'm')" :icon="getIcon(item.type)" :title="item.key"
+  path="841306122.0"><template v-slot:content path="841306122.0.0"><pre
+  path="841306122.0.0.0"><code v-html="getMethodBodyColored(item.compName,
+  item.key)" path="841306122.0.0.0.0"></code></pre><ui-textarea
   :value="getMethodBody(item.compName, item.key)"
-  path="841306122.0.1.1"></ui-textarea></template></ui-context><div class="grid"
-  :class="item.type" path="841306122.1"><ui-checkbox text="pause"
-  v-model="stateTracker.methods.pause[item.key]"
-  path="841306122.1.0"></ui-checkbox><div v-text="getIcon(item.type)"
-  path="841306122.1.1"></div><div class="comp-name" v-text="item.compName"
-  path="841306122.1.2"></div><div v-text="item.key"
-  path="841306122.1.3"></div><div class="newValue"
-  path="841306122.1.4"><ui-value-any :value="item.newValue"
-  path="841306122.1.4.0"></ui-value-any></div></div></div>
+  path="841306122.0.0.1"></ui-textarea></template></ui-context-window><ui-context-window
+  v-if="showFieldContext(item)" :visible="isHoveringOverValue"
+  :icon="$root.getIcon(item)" :title="item.key" item-type="ui-value-any"
+  :bind-props="{ value: item.newValue }" :key="uid+'-'+item.key"
+  path="841306122.1"></ui-context-window><div class="grid" :class="item.type"
+  @click="onItemClick(item)" path="841306122.2"><div
+  v-text="$root.getIcon(item)" path="841306122.2.0"></div><div v-text="item.key"
+  path="841306122.2.1"></div><div class="newValue" @mouseenter="onHoverValue"
+  @mouseleave="onUnhoverValue" path="841306122.2.2"><ui-value-preview
+  :value="item.newValue"
+  path="841306122.2.2.0"></ui-value-preview></div></div></div>

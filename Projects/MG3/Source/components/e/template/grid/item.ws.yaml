@@ -1,15 +1,17 @@
 dom:
   ui.track.size:
     v-if: item
-    div:
-      :class: "'flex caption-layout-' + item.caption?.align.v"
+    div: 
+      ':class': '''flex caption-layout-'' + item.caption?.align.v'
       @input: onSizeChange
-      div:
-        :class: "'items container grid' + ' items-' + getVisibleItemsCount(item.items) + ' rotation-' + item.rotation"
-        :style: getMainStyle(item)
-        component#2:
+      div: 
+        ':class': >-
+          'items container grid' + ' items-' + getVisibleItemsCount(item.items)
+          + ' rotation-' + item.rotation
+        ':style': getMainStyle(item)
+        component:
           v-for: item in item.items
-          :key: item.id
+          ':key': item.id
           v-if: item.visible
           ':class': getItemClass(item)
           ':style': getItemStyle(item)
@@ -20,7 +22,7 @@ dom:
       e.template.caption.item:
         class: clickable
         v-if: item.caption
-        :item: item.caption
+        ':item': item.caption
         @click: toggleRotation(item)
 props:
   item: null
@@ -85,7 +87,7 @@ methods:
       if (!items) return 0;
       return items.filter(item => item.visible).length;
     }
-watch:
+watch: null
 style:
   div:
     transition: 0s !important
@@ -98,7 +100,7 @@ style:
   .items:
     width: 100%
   .items .item:
-    background: "#ffffff20"
+    background: '#ffffff20'
   .items-2.rotation-1:
     grid-template: 1fr / 1fr 1fr
   .items-2.rotation-1 > div:
@@ -121,7 +123,19 @@ style:
     grid-template: 1fr / 1fr 1fr
   img.empty:
     height: 100%
+name: e-template-grid-item
 template: >-
-  <ui-image class="comp-e-template-image-layer" :style="getStyle(item)"
-  v-if="item" :imageID="item.imageID" :remove-background="item.removeBackground"
-  :square="true" @load="onImageLoad" path="-1206774413."></ui-image>
+  <ui-track-size class="comp-e-template-grid-item" v-if="item"
+  path="-1435649936."><div :class="'flex caption-layout-' +
+  item.caption?.align.v" @input="onSizeChange" path="-1435649936.0"><div
+  :class="'items container grid' + ' items-' + getVisibleItemsCount(item.items)
+  + ' rotation-' + item.rotation" :style="getMainStyle(item)"
+  path="-1435649936.0.0"><component v-for="item in item.items" :key="item.id"
+  v-if="item.visible" :class="getItemClass(item)" :style="getItemStyle(item)"
+  :is="getItemType(item)" :item="item" @image-load="(src) =&gt;
+  onItemImageLoad(item, src)" @file-drop="(item, files) =&gt; $emit('file-drop',
+  item, files)"
+  path="-1435649936.0.0.0"></component></div><e-template-caption-item
+  class="clickable" v-if="item.caption" :item="item.caption"
+  @click="toggleRotation(item)"
+  path="-1435649936.0.1"></e-template-caption-item></div></ui-track-size>

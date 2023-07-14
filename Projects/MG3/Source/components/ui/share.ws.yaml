@@ -1,7 +1,7 @@
 dom:
   .sharethis-inline-share-buttons:
-    ":data-url": url
-    ":data-image": imageUrl
+    ':data-url': url
+    ':data-image': imageUrl
 props:
   instance: null
 mounted: | #js

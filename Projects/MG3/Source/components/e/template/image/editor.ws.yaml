@@ -1,16 +1,16 @@
 dom:
   .items:
     v-if: item
-    transition#0:
+    transition: 
       name: slide2
-      div#1:
-        v-if: "!showShadowEditor"
-        .message:
-          div#1:
+      div: 
+        v-if: '!showShadowEditor'
+        .message: 
+          div: 
             v-text: '''Drag the image to move it'''
-          div#2:
+          div: 
             v-text: '''Ctrl-drag up/down to scale it'''
-        transition#1:
+        transition: 
           name: slide2
           ui.checkbox:
             v-if: (!removingBackground)
@@ -20,51 +20,50 @@ dom:
           ref: imageSelect1
           v-model: item.imageID
           @uploading: onImageUploading
-        transition#2:
+        transition: 
           name: slide2
-          .message:
+          .message: 
             v-if: removingBackground
-            div:
+            div: 
               v-text: '''Removing background'''
             ui.loading: null
     div:
       ui.expand:
         text: shadow
         v-model: showShadowEditor
-      transition:
+      transition: 
         name: slide2
-        div:
+        div: 
           v-if: showShadowEditor
-          .message:
-            div#1:
+          .message: 
+            div: 
               v-text: '''Drag the shadow to move it'''
-            div#2:
+            div: 
               v-text: '''Ctrl-drag up/down to change the blur'''
-          ui.range#1:
+          ui.range: 
             text: x
             v-model: item.shadow.x
             min: -1
             max: 1
             step: 0.01
-          ui.range#2:
-            text: y
+          ui.range: 
+            text: 'y'
             v-model: item.shadow.y
             min: -1
             max: 1
             step: 0.01
-          ui.range#3:
+          ui.range: 
             text: blur
             v-model: item.shadow.blur
             min: 0
             max: 1
             step: 0.01
-          ui.range#4:
+          ui.range: 
             text: opacity
             v-model: item.shadow.opacity
             min: 0
             max: 1
             step: 0.01
-          
 props:
   item: null
 data:
@@ -145,12 +144,31 @@ watch:
 name: e-template-image-editor
 template: >-
   <div class="comp-e-template-image-editor items" v-if="item"
-  path="1046603147."><transition name="slide2" path="1046603147.0"><ui-checkbox
-  v-if="(!removingBackground)" text="remove background"
-  v-model="item.removeBackground"
-  path="1046603147.0.0"></ui-checkbox></transition><ui-image-select
+  path="1046603147."><transition name="slide2" path="1046603147.0"><div
+  v-if="!showShadowEditor" path="1046603147.0.0"><div class="message"
+  path="1046603147.0.0.0"><div v-text="'Drag the image to move it'"
+  path="1046603147.0.0.0.0"></div><div v-text="'Ctrl-drag up/down to scale it'"
+  path="1046603147.0.0.0.1"></div></div><transition name="slide2"
+  path="1046603147.0.0.1"><ui-checkbox v-if="(!removingBackground)" text="remove
+  background" v-model="item.removeBackground"
+  path="1046603147.0.0.1.0"></ui-checkbox></transition><ui-image-select
   ref="imageSelect1" v-model="item.imageID" @uploading="onImageUploading"
-  path="1046603147.1"></ui-image-select><transition name="slide2"
-  path="1046603147.2"><div class="message" v-if="removingBackground"
-  path="1046603147.2.0"><div v-text="'Removing background'"
-  path="1046603147.2.0.0"></div><ui-loading></ui-loading></div></transition></div>
+  path="1046603147.0.0.2"></ui-image-select><transition name="slide2"
+  path="1046603147.0.0.3"><div class="message" v-if="removingBackground"
+  path="1046603147.0.0.3.0"><div v-text="'Removing background'"
+  path="1046603147.0.0.3.0.0"></div><ui-loading></ui-loading></div></transition></div></transition><div
+  path="1046603147.1"><ui-expand text="shadow" v-model="showShadowEditor"
+  path="1046603147.1.0"></ui-expand><transition name="slide2"
+  path="1046603147.1.1"><div v-if="showShadowEditor"
+  path="1046603147.1.1.0"><div class="message" path="1046603147.1.1.0.0"><div
+  v-text="'Drag the shadow to move it'" path="1046603147.1.1.0.0.0"></div><div
+  v-text="'Ctrl-drag up/down to change the blur'"
+  path="1046603147.1.1.0.0.1"></div></div><ui-range text="x"
+  v-model="item.shadow.x" min="-1" max="1" step="0.01"
+  path="1046603147.1.1.0.1"></ui-range><ui-range text="y"
+  v-model="item.shadow.y" min="-1" max="1" step="0.01"
+  path="1046603147.1.1.0.2"></ui-range><ui-range text="blur"
+  v-model="item.shadow.blur" max="1" step="0.01"
+  path="1046603147.1.1.0.3"></ui-range><ui-range text="opacity"
+  v-model="item.shadow.opacity" max="1" step="0.01"
+  path="1046603147.1.1.0.4"></ui-range></div></transition></div></div>

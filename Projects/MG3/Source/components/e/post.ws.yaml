@@ -1,5 +1,5 @@
 dom:
-  div:
+  div: 
     ':class': '{ post: true, enlarged }'
     .post-media:
       v-if: item.instance
@@ -10,9 +10,9 @@ dom:
       e.generator.square:
         class: larping-generator
         ':value': item.larpGenerator
-      div:
+      div: 
         v-html: $root.textToHtml(item.text)
-    div:
+    div: 
       class: clear-both
     e.post.menu:
       ':item': item

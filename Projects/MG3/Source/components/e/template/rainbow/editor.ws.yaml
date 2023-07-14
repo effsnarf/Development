@@ -1,47 +1,47 @@
 dom:
-  div:
-    div#2:
+  div: 
+    div: 
       table:
         tbody:
-          tr#2:
-            th:
-              v-text: "'pattern'"
-            td:
+          tr: 
+            th: 
+              v-text: '''pattern'''
+            td: 
               ui.select:
                 v-slot: slotProps
-                ":options": patternOptions
+                ':options': patternOptions
                 input-type: value
                 v-model: item.pattern
-                :show-text: "false"
+                ':show-text': 'false'
                 template:
                   img:
                     class: pattern-image
-                    :src: "'/img/rainbow/patterns/'+slotProps.item+'.png'"
-          tr#1:
-            th:
-              v-text: "'detail'"
-            td:
-              input:
+                    ':src': '''/img/rainbow/patterns/''+slotProps.item+''.png'''
+          tr: 
+            th: 
+              v-text: '''detail'''
+            td: 
+              input: 
                 type: range
                 min: 2
                 max: 36
                 v-model: item.slices
-          tr#4:
-            th:
-              v-text: "'colors'"
-            td:
+          tr: 
+            th: 
+              v-text: '''colors'''
+            td: 
               .flex:
-                ui.button#1:
-                  v-text: "'➖'"
-                  ":click": removeColor
-                input:
+                ui.button: 
+                  v-text: '''➖'''
+                  ':click': removeColor
+                input: 
                   class: clickable
                   type: color
                   v-for: index in item.colorsCount
                   v-model: item.colors[index-1]
-                ui.button#2:
-                  v-text: "'➕'"
-                  ":click": addColor
+                ui.button: 
+                  v-text: '''➕'''
+                  ':click': addColor
 props:
   item: null
 data:
@@ -86,8 +86,11 @@ template: >-
   path="637897232.0"><table path="637897232.0.0"><tbody
   path="637897232.0.0.0"><tr path="637897232.0.0.0.0"><th v-text="'pattern'"
   path="637897232.0.0.0.0.0"></th><td path="637897232.0.0.0.0.1"><ui-select
-  :options="styleOptions" input-type="value" v-model="item.pattern"
-  path="637897232.0.0.0.0.1.0"></ui-select></td></tr><tr
+  v-slot="slotProps" :options="patternOptions" input-type="value"
+  v-model="item.pattern" :show-text="false"
+  path="637897232.0.0.0.0.1.0"><template path="637897232.0.0.0.0.1.0.0"><img
+  class="pattern-image" :src="'/img/rainbow/patterns/'+slotProps.item+'.png'"
+  path="637897232.0.0.0.0.1.0.0.0"/></template></ui-select></td></tr><tr
   path="637897232.0.0.0.1"><th v-text="'detail'"
   path="637897232.0.0.0.1.0"></th><td path="637897232.0.0.0.1.1"><input
   type="range" min="2" max="36" v-model="item.slices"

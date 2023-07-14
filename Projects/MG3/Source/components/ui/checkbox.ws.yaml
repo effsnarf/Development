@@ -1,6 +1,6 @@
 dom:
   .flex:
-    :class: getCssClass()
+    ':class': getCssClass()
     input:
       type: checkbox
       ':checked': checkedValue
@@ -53,7 +53,8 @@ style:
     font-size: 120%
 name: ui-checkbox
 template: >-
-  <div class="comp-ui-checkbox hoverable flex" path="1049372125."><input
-  type="checkbox" :checked="value" @change="$emit('input', !value)"
-  path="1049372125.0"/><span class="clickable" v-text="text"
-  @click="$emit('input', !value)" path="1049372125.1"></span></div>
+  <div class="comp-ui-checkbox flex" :class="getCssClass()"
+  path="1049372125."><input type="checkbox" :checked="checkedValue"
+  @change="onInput(!checkedValue)" path="1049372125.0"/><span class="clickable"
+  v-text="text" @click="onInput(!checkedValue)"
+  path="1049372125.1"></span></div>

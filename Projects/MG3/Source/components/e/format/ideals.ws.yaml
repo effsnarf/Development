@@ -2,19 +2,15 @@ dom:
   div:
     e.template.editor:
       ref: TemplateEditor1
-      :temp: temp
-      :show-property-editor: "false"
-
-props:
-
+      ':temp': temp
+      ':show-property-editor': 'false'
+props: null
 data:
-  temp:
-
+  temp: null
 mounted: | #js
   function() {
     this.init();
   }
-
 methods:
   init: | #js
     async function() {
@@ -128,3 +124,8 @@ methods:
         });
       }
     }
+name: e-format-ideals
+template: >-
+  <div class="comp-e-format-ideals" path="854960844."><e-template-editor
+  ref="TemplateEditor1" :temp="temp" :show-property-editor="false"
+  path="854960844.0"></e-template-editor></div>

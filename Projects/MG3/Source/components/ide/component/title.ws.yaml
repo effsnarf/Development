@@ -1,10 +1,10 @@
 dom:
-  div:
+  div: 
     @click: $emit('click')
     v-if: vue
     ui.highlighter:
       ':get-elements': () => vue.$el
-      div:
+      div: 
         @click: onClick
         ui.title:
           icon: 📦
