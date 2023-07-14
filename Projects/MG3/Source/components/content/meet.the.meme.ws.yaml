@@ -13,8 +13,18 @@ data:
   generator: null
 mounted: | #js
   async function() {
-    this.generator = (await this.$root.dbp.generators.sample.popular(1))[0];
+    this.$watch(this.$root.params.page, {
+      handler: async () => {
+        await this.init();
+      },
+      immediate: true
+    });
   }
+methods:
+  init: | #js
+    async function() {
+      this.generator = (await this.$root.dbp.generators.sample.popular(1))[0];
+    }
 name: content-meet-the-meme
 style:
   h2:
