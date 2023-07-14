@@ -60,13 +60,6 @@ const _fetchAsJson = async (url: string) => {
       .map((s) => {
         let yaml = fs.readFileSync(s, "utf8");
 
-        if (s.endsWith("title.ws.yaml")) {
-          console.log(s);
-          console.log(yaml);
-          console.log("preProcessYaml");
-          console.log(preProcessYaml(yaml));
-        }
-
         yaml = preProcessYaml(yaml);
 
         const comp = {
