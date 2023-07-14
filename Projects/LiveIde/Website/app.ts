@@ -58,10 +58,21 @@ const _fetchAsJson = async (url: string) => {
     })
       .filter((s) => s.endsWith(".ws.yaml"))
       .map((s) => {
+        let yaml = fs.readFileSync(s, "utf8");
+
+        if (s.endsWith("title.ws.yaml")) {
+          console.log(s);
+          console.log(yaml);
+          console.log("preProcessYaml");
+          console.log(preProcessYaml(yaml));
+        }
+
+        yaml = preProcessYaml(yaml);
+
         const comp = {
           name: getCompName(s),
           path: s.replace(componentsFolder, ""),
-          source: Objects.parseYaml(preProcessYaml(fs.readFileSync(s, "utf8"))),
+          source: Objects.parseYaml(yaml),
         } as any;
 
         if (Configuration.getEnvironment() == "dev") {
@@ -166,6 +177,10 @@ const _fetchAsJson = async (url: string) => {
 
   const preProcessYaml = (yaml: string) => {
     yaml = yaml.replace(/@/g, "on_");
+    // Normalize line endings
+    yaml = yaml.replace(/\r\n|\r/g, "\n");
+    // Normalize indentation to spaces
+    yaml = yaml.replace(/\t/g, "  ");
     // Find duplicate lines
     // example:
     //   div:
