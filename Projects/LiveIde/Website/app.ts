@@ -135,11 +135,17 @@ const _fetchAsJson = async (url: string) => {
       const templates = await getTemplates();
       const helpers = await getHelpers();
       const config = await getClientConfig();
+      // Current date is used to invalidate the script url cache (day date only, without time)
+      let scriptUrlCacheInvalidator = parseInt(
+        new Date().toISOString().split("T")[0].replace(/-/g, "")
+      );
+
       return {
         components,
         templates,
         helpers,
         config,
+        scriptUrlCacheInvalidator: scriptUrlCacheInvalidator,
       };
     };
 
@@ -280,6 +286,7 @@ const _fetchAsJson = async (url: string) => {
         const existingComp = Objects.parseYaml(
           preProcessYaml(fs.readFileSync(compPath, "utf8"))
         );
+        if (!existingComp) throw new Error(`Component ${comp.name} not found`);
         if (!("editable" in existingComp) || existingComp.editable) {
           let yaml = Objects.yamlify(comp.source);
           yaml = postProcessYaml(yaml);
@@ -312,7 +319,10 @@ const _fetchAsJson = async (url: string) => {
       // Serve static files
       if (req.url.length > 1) {
         for (const folder of staticFileFolders) {
-          const filePath = path.join(folder, req.url.replace(".js", ".ts"));
+          const filePath = path.join(
+            folder,
+            req.url.split("?")[0].replace(".js", ".ts")
+          );
           if (fs.existsSync(filePath)) {
             // If TypeScript file, serve as compiled JavaScript
             if (path.extname(filePath) == ".ts") {
