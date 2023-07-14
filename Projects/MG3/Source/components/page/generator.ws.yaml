@@ -16,7 +16,6 @@ dom:
         div:
           class: float-left mr-l1
           :style: "{ width: '30%' }"
-          e.generator:
           e.instance:
             :item: instance
             :show-footer: "false"
