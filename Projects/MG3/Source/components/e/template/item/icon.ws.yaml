@@ -9,12 +9,13 @@ dom:
       ui.image:
         ':imageID': item.imageID
         ':square': true
-    div#2:
+    div:
       v-if: (!hasImage)
       v-text: getItemTypeIcon(item.type)
-    div#3:
-      v-if: item.caption?.text
-      v-text: item.caption.text.shorten(20)
+    div:
+      v-if: (item.type!='image')
+      class: no-wrap
+      v-text: item.caption?.text?.shorten(20)||('['+item.type+']')
 props:
   item: null
 methods:
@@ -25,7 +26,7 @@ methods:
         'image': '🖼️',
         'caption': '✏️',
         'rainbow': '🌈'
-      }[type] || '❔';
+      }[type] || '';
     }
 computed:
   hasImage: | #js
@@ -40,6 +41,8 @@ style:
     display: flex
     width: 5em
     font-size: 110%
+  .no-wrap:
+    white-space: nowrap
 name: e-template-layer-icon
 template: >-
   <div class="comp-e-template-layer-icon icon" @click="$emit('click')"

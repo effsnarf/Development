@@ -23,14 +23,6 @@ methods:
       let files = dt.files;
       this.$emit('file-drop', files);
     }
-  onDragOver: | #js
-    function (e) {
-      this.highlight(e);
-    }
-  onDragLeave: | #js
-    function (e) {
-      this.unhighlight(e);
-    }
   highlight: | #js
     function (e) {
       this.$refs.dropArea1.classList.add('drop-possible');

@@ -3,10 +3,14 @@ dom:
     url: /
     div:
       .meme:
-        v-text: '''meme'''
+        v-text: "'meme'"
       .generator:
-        v-text: '''generator'''
+        v-text: "'generator'"
 style:
+  .comp-site-logo:
+    background: black;
+    padding: 1em;
+    position: relative;
   .meme:
     font-size: 6vh
   .generator:
@@ -16,8 +20,8 @@ style:
     text-transform: uppercase
     line-height: 1em
     text-align: center
-    top: '-0.1rem'
-    text-shadow: '-6px 6px 3px #000'
+    top: "-0.1rem"
+    text-shadow: "-6px 6px 3px #000"
     opacity: 1
 name: site-logo
 template: >-

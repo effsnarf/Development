@@ -49,11 +49,10 @@ mounted: | #js
   }
 methods:
   post: | #js
-
     async function() {
       const { generator, text0, text1 } = (this.tempInstance || {});
       const instance = !generator ? null : { generatorID: generator.generatorID, text0, text1 };
-      const post = await this.$root.dbp.posts.create.one(this.threadID, this.larpGenerator?._id, this.text, instance);
+      const post = await this.$root.dbp.posts.create.one(this.threadID, this.text, { type: "instance", ...instance });
       this.clear();
       // New thread
       if (!this.threadID)
@@ -64,7 +63,6 @@ methods:
       this.$emit('created', post);
     }
   clear: | #js
-
     function() {
       this.text = null;
       this.tempInstance = null;
@@ -74,7 +72,6 @@ watch:
     function() {
     }
   threadID: | #js
-
     {
       handler: function() {
         //this.showInstanceCreate = !this.threadID;

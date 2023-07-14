@@ -1,33 +1,33 @@
 dom:
   site:
     page-name: generator
+    :columns: 2
     ':title-image-id': generator?.imageID
     ':title-text': generator?.displayName
     ':title-url': $root.url.generator(generator)
     ':title-key': generator?.generatorID
-    ':recommendation-items': recommendationItems
     template:
       v-slot: article
       ui.image:
-        class: mb-l2
+        class: hidden mb-l2
         imageID: 680118409
         :aspect-ratio: "3/1"
       div:
         div:
           class: float-left mr-l1
           :style: "{ width: '30%' }"
+          e.generator:
           e.instance:
             :item: instance
+            :show-footer: "false"
         h1:
           v-text: generator?.displayName
         .poem:
           :style: "{ marginLeft: '32%', width: '68%' }"
           content.poem.stanza:
             ':item': randomStanza
-        div:
-          class: float-clear
-        .description:
-          v-html: "'<h3>Socially Awkward Penguin</h3> is a popular internet meme that depicts a penguin character embodying the traits of social awkwardness. The meme typically features a simple illustration of a penguin with a slightly tilted head and a shy expression. It represents those relatable moments when individuals find themselves in uncomfortable or socially challenging situations. Socially Awkward Penguin serves as a lighthearted way to express and relate to the awkwardness many people experience in their daily lives, creating a sense of camaraderie and humor within online communities.'"
+        #.description:
+          #v-html: "'<strong>Feminist Cunt</strong> is a popular internet meme that depicts a penguin character embodying the traits of social awkwardness. The meme typically features a simple illustration of a penguin with a slightly tilted head and a shy expression. It represents those relatable moments when individuals find themselves in uncomfortable or socially challenging situations. Socially Awkward Penguin serves as a lighthearted way to express and relate to the awkwardness many people experience in their daily lives, creating a sense of camaraderie and humor within online communities.'"
         div:
           class: float-clear
     template:
@@ -36,27 +36,17 @@ dom:
         ref: contentStream1
         item-type: e.instance
         ':get-more-items': getMoreInstances
-        grid-class: grid-1
+        grid-class: grid-3
     template:
       v-slot: left
       e.instance.create:
         v-if: showCreateInstance
         ':generator': generator
         @instance-created: onInstanceCreated
-      e.teaser:
-        imageID: 32
-        title: Advice Animals
-        url: /c/advice-animals
-      e.teaser:
-        imageID: 679668918
-        title: Movies
-        url: /c/movies
-      e.teaser:
-        imageID: 679668921
-        title: Anonymous Times
-      e.teaser:
-        imageID: 679668909
-        title: YouTube
+      h3:
+        v-text: "'See also'"
+      e.generator.list:
+        :generators: recommendationItems
 
     template:
       v-slot: right
@@ -89,7 +79,7 @@ methods:
       {
         this.$root.isLoading = true;
         this.generator = !this.urlName ? null : await dbp.generators.select.one(null, this.urlName);
-        this.recommendationItems.replace(async() => await dbp.generators.select.related(this.urlName), 500, gen => gen.generatorID);
+        this.recommendationItems.replace(async() => await dbp.generators.select.related(this.urlName), 300, gen => gen.generatorID);
         this.$refs.contentStream1?.reset();
         setTimeout(() => {
           this.poem = this.generator?.desc?.poem;
@@ -145,19 +135,20 @@ watch:
         return;
       }
       this.instance = (await this.$root.dbp.instances.select.popular("en", 0, generator.urlName)).shuffle()[0];
-      this.randomStanza = this.getRandomStanzas(generator.desc.poem)[0];
+      this.instance.text0 = null;
+      this.instance.text1 = null;
+      this.randomStanza = this.getRandomStanzas(generator.desc?.poem)[0];
       setTimeout(() => {
         this.showCreateInstance = true;
-      }, 2000);
+      }, 200);
     }
 style:
+  .comp-e-instance .footer:
+    display: none
   .comp-e-teaser:
     filter: grayscale(1)
   .comp-e-teaser:hover:
     filter: grayscale(0)
-  h1:
-    font-size: 3rem
-    line-height: 1.5em
   .description:
     margin: 2em 0
   .description h3:

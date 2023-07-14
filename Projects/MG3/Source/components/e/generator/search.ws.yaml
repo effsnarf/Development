@@ -1,0 +1,27 @@
+dom:
+  div:
+    ui.text.box:
+      type: search
+      icon: "🔎"
+      hint: "search memes…"
+      v-model: query
+    e.generator.list:
+      ":generators": generators
+
+props:
+
+data:
+  query: null
+  generators: null
+
+watch:
+  query:
+    handler: | #js
+      async function(query) {
+        this.generators = await this.$root.dbp.generators.select.search(query);
+      }.debounce(400)
+    immediate: true
+
+style:
+  li:
+    margin-top: 0.5em

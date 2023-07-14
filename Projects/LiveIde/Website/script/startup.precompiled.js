@@ -163,9 +163,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "./script/1689089065084.ts":
+/***/ "./script/1689340390962.ts":
 /*!*********************************!*\
-  !*** ./script/1689089065084.ts ***!
+  !*** ./script/1689340390962.ts ***!
   \*********************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -275,6 +275,7 @@ const helpers = {
             templates: client.templates,
             isLoading: false,
             error: null,
+            loadingImageUrl: "https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/images/loading.gif",
             key1: 1,
             _uniqueClientID: 1,
         },
@@ -491,6 +492,88 @@ const helpers = {
                     return `${p1}<span class="opacity-50">${p2}:</span>`;
                 });
                 return yaml;
+            },
+            uploadFile(file) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    const self = this;
+                    const imageUrl = yield this.getImageUrlFromDataTransferFile(file);
+                    const s = [];
+                    s.push(`<img src='${imageUrl}' />`);
+                    s.push("<h3 class='text-center'>uploading..</h3>");
+                    s.push(`<div class='text-center'><img src='${self.$data.loadingImageUrl}'></img></div>`);
+                    const msg = client.alertify.message(s.join("")).delay(0);
+                    return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
+                        let url = "https://img.memegenerator.net/upload";
+                        var xhr = new XMLHttpRequest();
+                        var formData = new FormData();
+                        xhr.open("POST", url, true);
+                        xhr.addEventListener("readystatechange", function (e) {
+                            return __awaiter(this, void 0, void 0, function* () {
+                                if (xhr.readyState == 4 && xhr.status == 200) {
+                                    const image = JSON.parse(xhr.responseText);
+                                    // Download the image from the server
+                                    // this also takes some time, and we should hold the loading indicator
+                                    yield self.downloadImage(image._id);
+                                    msg.dismiss();
+                                    resolve(image);
+                                }
+                                else if (xhr.readyState == 4 && xhr.status != 200) {
+                                    msg.dismiss();
+                                    reject(xhr.responseText);
+                                }
+                            });
+                        });
+                        formData.append("image", file);
+                        xhr.send(formData);
+                    }));
+                });
+            },
+            getImageUrlFromDataTransferFile(file) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    // fileDropEvent.preventDefault();
+                    // const files = fileDropEvent.dataTransfer.files;
+                    // const imageUrls = [];
+                    function readFileAsDataURL(file) {
+                        return new Promise((resolve, reject) => {
+                            const reader = new FileReader();
+                            reader.onload = function (event) {
+                                resolve(event.target.result);
+                            };
+                            reader.onerror = function (event) {
+                                reject(event.error);
+                            };
+                            reader.readAsDataURL(file);
+                        });
+                    }
+                    const imageUrl = yield readFileAsDataURL(file);
+                    return imageUrl;
+                    // for (let i = 0; i < files.length; i++) {
+                    //   const file = files[i];
+                    //   if (file.type.startsWith("image/")) {
+                    //     const imageUrl = await readFileAsDataURL(file);
+                    //     imageUrls.push(imageUrl);
+                    //   }
+                    // }
+                    // return imageUrls;
+                });
+            },
+            downloadImage(imageIdOrUrl) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    const self = this;
+                    const imageUrl = typeof imageIdOrUrl === "string"
+                        ? imageIdOrUrl
+                        : self.url.image(imageIdOrUrl, true);
+                    return new Promise((resolve, reject) => {
+                        const imageObj = new Image();
+                        imageObj.onload = () => {
+                            resolve(imageObj);
+                        };
+                        imageObj.onerror = () => {
+                            reject(imageObj);
+                        };
+                        imageObj.src = imageUrl;
+                    });
+                });
             },
             getIcon(item) {
                 const stateItemIcons = {
@@ -753,7 +836,7 @@ class ClientContext {
                 //}
                 // Try again
                 // Wait a bit
-                yield new Promise((resolve) => setTimeout(resolve, 100));
+                yield new Promise((resolve) => setTimeout(resolve, 1000));
                 return yield ClientContext.fetch(...args);
             }
         });
@@ -3152,6 +3235,7 @@ exports["default"] = (componentNames, name) => {
         "code",
         "p",
         "img",
+        "video",
         "table",
         "thead",
         "tbody",
@@ -3342,7 +3426,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("./script/1689089065084.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("./script/1689340390962.ts");
 /******/ 	
 /******/ })()
 ;

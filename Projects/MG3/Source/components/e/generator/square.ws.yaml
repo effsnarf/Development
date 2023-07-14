@@ -1,28 +1,25 @@
 dom:
-  ui.image#1:
+  ui.image:
     v-if: '!generator'
     class: anonymous
     tooltip: Anonymous
     ':src': >-
       'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Anonymous_emblem.svg/1200px-Anonymous_emblem.svg.png'
-    @click: $emit('click',)
-  ui.image:
+    @click: $emit('click')
+  ui.link:
     v-else-if: generator
-    ':tooltip': showTooltip && generator.displayName
-    ':imageID': generator.imageID
-    ':key': generator.generatorID
-    ':square': 'true'
-    @click: $emit('click', generator)
+    :url: "$root.url.generator(generator)"
+    ui.image:
+      ':tooltip': showTooltip && generator.displayName
+      ':imageID': generator.imageID
+      ':key': generator.generatorID
+      ':square': 'true'
+      @click: $emit('click', generator)
 props:
-  value: null
+  generator: null
   showTooltip: true
   showAnonymous: false
 computed:
-  generator: | #js
-
-    function() {
-      return this.value;
-    }
 style:
   .anonymous:
     opacity: 0.5

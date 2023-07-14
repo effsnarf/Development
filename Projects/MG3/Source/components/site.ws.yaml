@@ -8,6 +8,7 @@ dom:
         div:
           site.sidebar: null
           site.main:
+            :columns: columns
             ":title-image-id": titleImageId
             ":title-text": titleText
             ":title-url": titleUrl
@@ -38,6 +39,7 @@ props:
   getMoreItems: null
   recommendationItems: null
   pageName: null
+  columns: 3
 methods:
   getCssClass: | #js
     function() {

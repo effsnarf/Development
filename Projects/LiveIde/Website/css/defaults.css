@@ -43,12 +43,14 @@ a:not([href])
 {
   filter: grayscale(1);
   opacity: 0.8;
+  transition: 0s;
 }
 
 .grayish:hover
 {
   filter: none;
   opacity: 1;
+  transition: 0s;
 }
 
 div
@@ -793,6 +795,11 @@ img[src=""]
 .cyan
 {
   color: #0e7abd;
+}
+
+.ajs-message
+{
+  background: #404040;
 }
 
 

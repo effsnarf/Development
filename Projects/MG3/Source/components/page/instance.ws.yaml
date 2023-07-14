@@ -3,11 +3,14 @@ dom:
     v-if: $root.params.page=='instance'
     page-name: instance
     ":recommendation-items": recommendationItems
-    template: null
+    template:
+      v-slot: left
+      e.generator.search:
     template:
       v-slot: middle
       content.stream:
         item-type: e.instance
+        :item-props: "{ showFullFooter: true }"
         ":get-more-items": getMoreInstances
         grid-class: grid-1
 data:

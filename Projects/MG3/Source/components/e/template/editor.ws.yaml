@@ -6,20 +6,29 @@ dom:
       div:
         ui.tree:
           ':root': temp
-          ':initial-expanded': 1
+          ':initial-expanded': 2
           item-type: e.template.item.icon
           ':get-item': (node) => node
           ':get-children': (node) => node.items
           @node-select: selectedItem = $event
       .div2:
         ui.image.select:
+          class: hidden
           ref: imageSelect1
           v-if: (selectedItem?.type=='image')
           v-model: selectedItem.imageID
-        e.template.container.item:
+        e.template.grid.item:
           :item: temp
+          @file-drop: (item, files) => onFileDrop(item, files)
+        .text-center.mt-l2:
+          ui.loading:
+            v-if: isCreatingMedia
+          ui.button:
+            v-if: "!isCreatingMedia"
+            ":text": "'✔️ Create'"
+            @click: "createMedia"
         div:
-          v-if: selectedItem
+          v-if: selectedItem && showPropertyEditor
           ui.section#1:
             :title: "selectedItem.type"
             v-model: showFilters
@@ -33,20 +42,64 @@ dom:
                 @toggle-disabled: toggleDisabled($event)
                 :key: selectedItemIndex
           ui.section#2:
-            v-if: (selectedItem?.type!='caption')
+            v-if: canApplyEffects(selectedItem)
             title: effects
             v-model: showFilters
             e.template.item.filters:
               ':imageID': selectedItem.imageID
               v-model: selectedItem.filters
               @input: () => onItemChange(selectedItem)
-props: null
-data:
+      .help:
+        .message:
+          video:
+            autoplay: true
+            muted: true
+            loop: true
+            src: "/video/interface/image/drop.webm"
+          div:
+            v-text: "'Drop images on boxes to upload.'"
+        .message:
+          video:
+            autoplay: true
+            muted: true
+            loop: true
+            src: "/video/interface/image/move.webm"
+          div:
+            v-text: "'Drag images inside boxes to move.'"
+        .message:
+          video:
+            autoplay: true
+            muted: true
+            loop: true
+            src: "/video/interface/image/scale.webm"
+          div:
+            v-text: "'Ctrl-drag images inside boxes to resize.'"
+        .message:
+          class: large-video
+          video:
+            autoplay: true
+            muted: true
+            loop: true
+            src: "/video/interface/image/visible.webm"
+          div:
+            v-text: "'Toggle image visibility using the tree on the left.'"
+        .message:
+          class: large-video
+          video:
+            autoplay: true
+            muted: true
+            loop: true
+            src: "/video/interface/image/rotate.webm"
+          div:
+            v-text: "'If less than 4 images are visible, click the title (Body, Hair..) to change the layout.'"
+props:
   temp: null
-  selectedItem: null
+  showPropertyEditor: true
+data:
   selectedItemIndex: 0
   disabled: 0
   showFilters: false
+  isCreatingMedia: false
 mounted: | #js
   async function() {
     await this.init();
@@ -54,97 +107,26 @@ mounted: | #js
 methods:
   init: | #js
     async function() {
-      const filters = {
-          blur: null,
-          transparent: null,
-          grayscale: null
-        };
-
-      this.temp = {
-        id: this.$root.getUniqueClientID(),
-        type: "container",
-        visible: true,
-        aspectRatio: "1/1",
-        layout: "grid-2",
-        gap: 0.02,
-        items: []
-      };
-
-      for (let i = 0; i < 4; i++)
-      {
-        this.temp.items.add({
-          id: this.$root.getUniqueClientID(),
-          "type": "container",
-          visible: true,
-          layout: "grid-2",
-          aspectRatio: "1/1",
-          caption: {
-            visible: true,
-            text: ['Body', 'Hair', 'Style', 'Girlfriend'][i],
-            font: 'Arial',
-            color: 'black',
-            align: {
-              h: "center",
-              v: "bottom"
-            },
-            uppercase: true,
-          },
-          filters: {...filters},
-          items: []
-        });
-      }
-
-      if (false)
-      {
-        this.temp.items.add({
-          "type": "rainbow",
-          "visible": true,
-          "pattern": "pizza",
-          "colors": [
-              "#000000",
-              "#800000",
-              "#e1d441",
-              "#6495ED",
-              "#87CEEB",
-              "#B0E0E6"
-          ],
-          "colorsCount": 3,
-          "slices": "6",
-          filters: {...filters}
-        });
-      }
-
-      for (let i = 0; i < 4; i++)
-      {
-        for (let j = 0; j < 4; j++)
-        {
-          this.temp.items[i].items.add({
-            id: this.$root.getUniqueClientID(),
-            type: "image",
-            visible: true,
-            "imageID": 679668909,
-            "removeBackground": false,
-            "trans": {
-                "pos": {
-                    "x": 0.5,
-                    "y": 0.5
-                },
-                "scale": 1
-            },
-            shadow: {
-              x: 0,
-              y: 0,
-              blur: 0,
-              color: '#000000',
-              opacity: 1
-            },
-          });
-        }
-      }
     }
   onFileDrop: | #js
-    async function(files) {
+    async function(item, files) {
       await this.$nextTick();
+      if (files.length > 1) return alertify.error('One file at a time, please');
+      item.isLoading = true;
+      try
+      {
+        const image = await this.$root.uploadFile(files[0]);
+        item.imageID = image._id;
+      }
+      finally
+      {
+        item.isLoading = false;
+      }
+    }
+  canApplyEffects: | #js
+    function(item) {
+      if (!item) return false;
+      return item.type === 'image';
     }
   getCssClass: | #js
     function() {
@@ -171,6 +153,20 @@ methods:
       if (disabled) this.disabled++;
       else this.disabled--;
     }
+  createMedia: | #js
+    async function() {
+      this.isCreatingMedia = true;
+      try
+      {
+        let media = { template: this.temp };
+        media = await this.$root.dbp.medias.create.one(media);
+        console.log(media);
+      }
+      finally
+      {
+        this.isCreatingMedia = false;
+      }
+    }
   eval: | #js
     function(s) {
       return eval(s);
@@ -194,9 +190,11 @@ name: e-template-editor
 style:
   .div1:
     display: grid
-    grid-template: 1fr / 10em 1fr
+    grid-template: 1fr / 1fr 4fr 2fr
     margin-bottom: 5rem
     gap: 1em
+  .div1 > div:
+    overflow: hidden
   .div2:
     display: flex
     flex-direction: column
@@ -233,15 +231,19 @@ style:
     width: 100%
   .layout-vertical, .layout-vertical .item:
     overflow: hidden
-  .layout-grid-2:
-    display: grid
-    grid-template: 1fr / 1fr 1fr
   .item:
     overflow: hidden
-    pointer-events: none
   .item.selected, .item.selected:hover:
     background: none !important
-    pointer-events: auto
+  .help .message:
+    display: grid
+    grid-template: 1fr / 1fr 2fr
+    gap: 1em
+    text-align: left
+  .help video:
+    filter: grayscale(1)
+  .message.large-video:
+    grid-template: 1fr / 1fr
 template: >-
   <div class="comp-e-template-editor" v-if="temp" :class="getCssClass()"
   path="-650358312."><div class="div1" path="-650358312.0"><ul class="tabs"

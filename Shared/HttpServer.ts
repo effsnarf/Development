@@ -144,6 +144,7 @@ class HttpServer {
           let templateData = await this.getIndexPageTemplateData(req);
           fileContent = Handlebars.compile(fileContent)(templateData);
           fileContent = HAML.render(fileContent);
+          fileContent = `<!DOCTYPE html>\n${fileContent}`;
           for (const key of Object.keys(templateData)) {
             fileContent = fileContent.replace(
               `(((${key})))`,

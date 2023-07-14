@@ -90,7 +90,9 @@ const convertKeysToTitleCase = (obj: any) => {
 
           const tasks = {
             //Haiku: "Write a haiku about this meme",
-            Poem: "Write a poem about this meme, with 9 stanzas, 4 lines each",
+            Poem: "Write a poem about this meme, with 9 stanzas, 4 lines each.",
+            Article:
+              "Write a 2 paragraph (about 100 words each) article about this meme. Reply with a JSON array of 2 strings.",
             //aiInstances: "Write 10 examples of this meme in the topic of artificial intelligence",
           } as any;
 

@@ -12,9 +12,11 @@ dom:
         component:
           ':is': itemType.kebabize()
           ':item': item
+          v-bind: itemProps
 name: content-stream
 props:
   itemType: null
+  itemProps: null
   getMoreItems: null
   gridClass: null
   gap: null
@@ -36,7 +38,6 @@ methods:
       this.items.insertAt(this.visibleItemIndex, item, true);
     }
   scrollTo: | #js
-
     function(index) {
       const items = this.$el.querySelectorAll('li');
       const item = items[index];
@@ -47,33 +48,28 @@ methods:
       window.scrollTo({ top, behavior: 'smooth' });
     }
   onScroll: | #js
-
     function() {
       this.updateVisibleItemIndex();
     }
   updateVisibleItemIndex: | #js
-
     function() {
       const items = this.$el.querySelectorAll('li');
       const visibleItemIndex = Array.from(items).findIndex(this.isOnScreen.bind(this));
       this.visibleItemIndex = visibleItemIndex;
     }
   isOnScreen: | #js
-
     function(item) {
       const rect = item.getBoundingClientRect();
       const viewHeight = Math.max(document.documentElement.clientHeight, window.innerHeight);
       return (rect.top > 0) && (rect.bottom < viewHeight);
     }
   reset: | #js
-
     async function() {
       this.pageIndex = 0;
       this.items = [];
       await this.loadMore();
     }
   loadMore: | #js
-
     function() {
       return new Promise((resolve, reject) => {
         if (!this.getMoreItems) return resolve();
@@ -84,14 +80,13 @@ methods:
           this.items.push(...newItems);
           this.updateVisibleItemIndex();
           this.$nextTick(() => {
-            window.__sharethis__.initialize();
+            window.__sharethis__?.initialize();
           });
           resolve();
         });
       });
     }
   processQueue: | #js
-
     async function() {
       const next = this.queue.shift();
       if (next) await next();

@@ -1,7 +1,7 @@
 dom:
   div:
     .header:
-      ':style': getStyle()
+      ":style": getStyle()
       site.logo: null
 name: site-header
 mounted: | #js
@@ -10,7 +10,6 @@ mounted: | #js
   }
 methods:
   init: | #js
-
     function() {
       return;
       const header = document.querySelector('.header');
@@ -27,13 +26,12 @@ methods:
       });
     }
   getStyle: | #js
-
     function() {
       // get a random number between 0 and 20 inclusive
       const index = Math.floor(Math.random() * 21);
-      return {
-        backgroundImage: `url('/img/banners/(${index}).jpg')`
-      };
+      const style = {};
+      //style.backgroundImage = `url('/img/banners/(${index}).jpg')`;
+      return style;
     }
 style:
   .comp-ui-large-title:
@@ -42,9 +40,9 @@ style:
   .header:
     width: 100%
     display: flex
-    padding: 1rem
     filter: grayscale(1) brightness(0.8)
     background-color: black
+    border-radius: 0
 template: >-
   <div class="comp-site-header" path="2017999636."><div class="header"
   :style="getStyle()" path="2017999636.0"><site-logo></site-logo></div></div>

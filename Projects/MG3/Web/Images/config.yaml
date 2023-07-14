@@ -3,7 +3,7 @@ server:
   port: 80
 old:
   images:
-    server: http://jsonvisualizer.net
+    server: http://10.35.16.2:8080
 folders:
   images:
     dev: C:\eff\Development\Temp

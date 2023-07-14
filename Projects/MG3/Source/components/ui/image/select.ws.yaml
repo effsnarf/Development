@@ -22,32 +22,13 @@ data:
 methods:
   onFileDrop: | #js
     function (files) {
-      ([...files]).forEach(this.uploadFile.bind(this));
+      if (files.length != 1) return alertify.error("One file at a time, please.");
+      this.uploadFile(files[0]);
     }
   uploadFile: | #js
     async function(file) {
-      let url = "https://img.memegenerator.net/upload";
-
-      this.isUploading = true;
-
-      var xhr = new XMLHttpRequest();
-      var formData = new FormData();
-      xhr.open('POST', url, true);
-
-      xhr.addEventListener('readystatechange', function(e) {
-        if (xhr.readyState == 4 && xhr.status == 200) {
-          this.isUploading = false;
-          const image = JSON.parse(xhr.responseText);
-          this.$emit('input', image._id);
-        }
-        else if (xhr.readyState == 4 && xhr.status != 200) {
-          this.isUploading = false;
-          alertify.error("An error occurred while uploading the file.");
-        }
-      }.bind(this));
-
-      formData.append('image', file);
-      xhr.send(formData);
+      const image = await this.$root.uploadFile(file);
+      this.$emit('input', image._id);
     }
 computed:
   dropAreaText: | #js

@@ -1,16 +1,22 @@
 dom:
   div:
-    ui.movable:
-      @drag-by: $emit('drag-by', $event)
-      @scale-by: $emit('scale-by', $event)
-      ui.image:
-        ref: image1
-        v-if: item
-        ':style': itemStyle
-        ':imageID': item.imageID
-        ':remove-background': item.removeBackground
-        @load: onImageLoad
-        @change: refresh
+    ui.loading:
+      class: absolute-center
+      v-show: "item.isLoading"
+    ui.file.dropzone:
+      v-show: "!item.isLoading"
+      @file-drop: $emit('file-drop', item, $event)
+      ui.movable:
+        @drag-by: ({ dx, dy }) => onItemDragBy(item, { dx, dy })
+        @scale-by: (ds) => onItemScaleBy(item, ds)
+        ui.image:
+          ref: image1
+          v-if: item
+          ':style': itemStyle
+          ':imageID': item.imageID
+          ':remove-background': item.removeBackground
+          @load: onImageLoad
+          @change: refresh
     e.template.caption.item:
       v-if: item.caption
       :item: item.caption
@@ -19,6 +25,16 @@ props:
 data:
   itemStyle: null
 methods:
+  onItemDragBy: | #js
+    function(item, dpos) {
+      const pos = item.trans.pos;
+      pos.x += dpos.dx;
+      pos.y += dpos.dy;
+    }
+  onItemScaleBy: | #js
+    function(item, ds) {
+      item.trans.scale += ds;
+    }
   refresh: | #js
     function() {
       this.itemStyle = this.getStyle(this.item);

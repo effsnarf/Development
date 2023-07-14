@@ -328,6 +328,10 @@ const _fetchAsJson = async (url: string) => {
               res.setHeader("Content-Type", "image/png");
               return res.end(fs.readFileSync(filePath));
             }
+            if (Http.isVideoFile(filePath)) {
+              res.setHeader("Content-Type", "video/mp4");
+              return res.end(fs.readFileSync(filePath));
+            }
             // Otherwise, serve as text
             return res.end(fs.readFileSync(filePath, "utf8"));
           }

@@ -11,7 +11,7 @@ server:
     prod: [memegenerator.net, localhost, localhost:5051]
   # on dev, we're relaying requests to the production dbp/db
   proxy:
-    dev: db.memegenerator.net
+    # dev: db.memegenerator.net
 database:
   connectionString: mongodb://localhost:27017
   query:
@@ -188,8 +188,22 @@ api:
         let threads = await db.find("Threads", {}, { LastPostCreated: -1 }, 1000, null, true);
         threads = await Promise.all(threads.map(async t => await dbp.threads.select.one(t._id)));
         return threads;
+    Medias.create.one:
+      args: [media]
+      code: | #js
+        const now = Date.now();
+
+        let media = {
+          Created: now,
+          Type: media.type,
+          Url: media.url,
+        };
+
+        media = await db.upsert("Medias", media, true, false, true);
+
+        return media;
     Posts.create.one:
-      args: [threadID, larpGeneratorID, text, instance]
+      args: [threadID, text, mediaOrMediaID]
       code: | #js
         const now = Date.now();
 
@@ -203,39 +217,16 @@ api:
         {
           thread = await dbp.threads.create.one();
         }
-        if (!instance) instance = null;
 
-        if (instance)
-        {
-          instance = await dbp.instances.create.one("en", instance.generatorID, null, instance.text0, instance.text1);
-          instance = {
-            _id: instance.instanceID,
-            GeneratorID: instance.generatorID,
-            DisplayName: instance.displayName,
-            UrlName: instance.urlName,
-            ImageID: instance.imageID,
-            Text0: instance.text0,
-            Text1: instance.text1,
-          };
-          instance._id = instance.instanceID;
-        }
-
-        let larpGenerator = (!larpGeneratorID) ? null : await db.findOne("Generators", { _id: larpGeneratorID });
-        if (larpGenerator)
-        {
-          larpGenerator = {
-            _id: larpGenerator._id,
-            DisplayName: larpGenerator.displayName,
-            UrlName: larpGenerator.urlName,
-            ImageID: larpGenerator.imageID,
-          };
-        }
+        let media = mediaOrMediaID;
+        if (!media) media = null;
+        else if (typeof media == "number") media = await db.findOne("Medias", { _id: media });
+        else media = await dbp.medias.create.one(media);
 
         let post = {
           ThreadID: thread._id,
-          LarpGenerator: larpGenerator,
           Text: text,
-          Instance: instance,
+          Media: media,
           Created: now,
         };
 

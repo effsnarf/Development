@@ -102,11 +102,12 @@ computed:
   showUiExpand: | #js
     function() {
       if (!this.node) return false;
+      if (!this.getChildren(this.node)?.length) return false;
       return this.expandable;
     }
   depth: | #js
     function() {
-      return this.$parent.depth + 1;
+      return ('depth' in this.$parent) ? this.$parent.depth : this.$parent.$parent.depth + 1;
     }
 watch:
   initialExpanded:
@@ -128,6 +129,8 @@ style:
   .comp-ui-expand .icon:
     font-size: 100% !important
     border: none !important
+  li:
+    transition: 0.3s !important
 name: ui-tree-node
 template: >-
   <div class="comp-ui-tree-node" path="2053324664."><div class="tree-node"

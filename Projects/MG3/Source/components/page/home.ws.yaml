@@ -1,9 +1,11 @@
 dom:
   site:
+    :columns: 2
     page-name: home
     template#0:
       v-slot: article
       .grid-3:
+        class: hidden
         e.teaser:
           imageID: 32
           title: Advice Animals
@@ -18,12 +20,9 @@ dom:
         e.teaser:
           imageID: 679668909
           title: YouTube
-      div:
-        :style: "{ width: '40vw', margin: 'auto' }"
-        e.template.editor:
-          ref: TemplateEditor1
     template#1:
       v-slot: left
+      e.generator.search: null
       e.thread.list: null
     template#2:
       v-slot: middle
@@ -31,12 +30,9 @@ dom:
         ref: stream1
         item-type: e.instance
         ":get-more-items": getMoreInstances
-        grid-class: grid-1
+        grid-class: grid-3
     template:
       v-slot: right
-      div:
-        e.post.create:
-          ref: PostCreate1
 data:
   generators: []
   uniqueID: 1

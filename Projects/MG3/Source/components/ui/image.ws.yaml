@@ -5,7 +5,7 @@ dom:
     ':url': url
     img:
       ref: image1
-      ':class': getCssClass()
+      ':class': cssClass
       ':style': imgStyle
       ':src': src1
       @load: onLoad
@@ -73,6 +73,10 @@ computed:
       style.aspectRatio = this.aspectRatio;
       style.objectPosition = this.objectPosition;
       return style;
+    }
+  cssClass: | #js
+    function () {
+      return this.getCssClass();
     }
 style:
   .comp-ui-image:

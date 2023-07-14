@@ -1,6 +1,6 @@
 dom:
   div:
-    ui.mouse#1:
+    ui.mouse:
       ':global': true
       @move: onMouseMove
       @right-click: e => onRightClick(e, true)

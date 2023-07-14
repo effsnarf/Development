@@ -17,6 +17,7 @@ dom:
             ':item': tempInstance
             ':key': tempInstance.generator?.generatorID
             ':show-create-post': 'false'
+            :show-footer: 'false'
             @click: showGeneratorSelect = !showGeneratorSelect
       .inputs:
         input#1:
@@ -45,7 +46,6 @@ data:
   isCreating: false
 methods:
   create: | #js
-
     async function() {
       this.isCreating = true;
       try
@@ -60,61 +60,51 @@ methods:
       }
     }
   clear: | #js
-
     function() {
       this.tempInstance.text0 = null;
       this.tempInstance.text1 = null;
     }
   onFocus: | #js
-
     function(e) {
       if (!this.tempInstance.generator) this.showGeneratorSelect = true;
     }
   getNewTempInstance: | #js
-
     function() {
       return { generator: null, imageID: null, text0: null, text1: null };
     }
 computed:
   hasContent: | #js
-
     function() {
       return (this.hasGenerator && this.hasText) ? true : false;
     }
   hasGenerator: | #js
-
     function() {
       return !!this.tempInstance.generator;
     }
   hasText: | #js
-
     function() {
       return !!this.tempInstance.text0 || !!this.tempInstance.text1;
     }
 watch:
   value:
     handler: | #js
-
       function(newValue) {
         this.tempInstance = newValue || this.getNewTempInstance();
       }
     immediate: true
   generator:
     handler: | #js
-
       function(newGenerator) {
         this.tempInstance.generator = newGenerator;
       }
     immediate: true
   tempInstance:
     handler: | #js
-
       function(newTempInstance) {
         this.$emit("input", newTempInstance);
       }
     deep: true
   hasContent: | #js
-
     function(newHasContent) {
       this.$emit("has-content", newHasContent);
     }

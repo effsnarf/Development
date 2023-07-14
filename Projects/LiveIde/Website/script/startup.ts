@@ -8,6 +8,7 @@ import { Params } from "../../classes/Params";
 import { DatabaseProxy } from "../../../../Apps/DatabaseProxy/Client/DbpClient";
 import { VueManager } from "../../classes/VueManager";
 import addPaths from "../../../../Shared/WebScript/add.paths";
+import { resolve } from "path";
 
 // To make it accessible to client code
 const win = window as any;
@@ -111,6 +112,8 @@ interface MgParams {
       templates: client.templates,
       isLoading: false,
       error: null,
+      loadingImageUrl:
+        "https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/images/loading.gif",
       key1: 1,
       _uniqueClientID: 1,
     },
@@ -299,6 +302,91 @@ interface MgParams {
           return `${p1}<span class="opacity-50">${p2}:</span>`;
         });
         return yaml;
+      },
+      async uploadFile(file: any) {
+        const self = this as any;
+        const imageUrl = await this.getImageUrlFromDataTransferFile(file);
+        const s = [] as string[];
+        s.push(`<img src='${imageUrl}' />`);
+        s.push("<h3 class='text-center'>uploading..</h3>");
+        s.push(
+          `<div class='text-center'><img src='${self.$data.loadingImageUrl}'></img></div>`
+        );
+        const msg = client.alertify.message(s.join("")).delay(0);
+
+        return new Promise(async (resolve, reject) => {
+          let url = "https://img.memegenerator.net/upload";
+
+          var xhr = new XMLHttpRequest();
+          var formData = new FormData();
+          xhr.open("POST", url, true);
+
+          xhr.addEventListener("readystatechange", async function (e: any) {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+              const image = JSON.parse(xhr.responseText);
+              // Download the image from the server
+              // this also takes some time, and we should hold the loading indicator
+              await self.downloadImage(image._id);
+              msg.dismiss();
+              resolve(image);
+            } else if (xhr.readyState == 4 && xhr.status != 200) {
+              msg.dismiss();
+              reject(xhr.responseText);
+            }
+          });
+
+          formData.append("image", file);
+          xhr.send(formData);
+        });
+      },
+      async getImageUrlFromDataTransferFile(file: any) {
+        // fileDropEvent.preventDefault();
+        // const files = fileDropEvent.dataTransfer.files;
+        // const imageUrls = [];
+
+        function readFileAsDataURL(file: any) {
+          return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = function (event: any) {
+              resolve(event.target.result);
+            };
+            reader.onerror = function (event: any) {
+              reject(event.error);
+            };
+            reader.readAsDataURL(file);
+          });
+        }
+
+        const imageUrl = await readFileAsDataURL(file);
+        return imageUrl;
+
+        // for (let i = 0; i < files.length; i++) {
+        //   const file = files[i];
+        //   if (file.type.startsWith("image/")) {
+        //     const imageUrl = await readFileAsDataURL(file);
+        //     imageUrls.push(imageUrl);
+        //   }
+        // }
+
+        // return imageUrls;
+      },
+      async downloadImage(imageIdOrUrl: any) {
+        const self = this as any;
+        const imageUrl =
+          typeof imageIdOrUrl === "string"
+            ? imageIdOrUrl
+            : self.url.image(imageIdOrUrl, true);
+
+        return new Promise((resolve, reject) => {
+          const imageObj = new Image();
+          imageObj.onload = () => {
+            resolve(imageObj);
+          };
+          imageObj.onerror = () => {
+            reject(imageObj);
+          };
+          imageObj.src = imageUrl;
+        });
       },
       getIcon(item: any) {
         const stateItemIcons = {

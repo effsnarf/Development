@@ -1,5 +1,6 @@
 dom:
   div:
+    @click: $emit('click')
     v-if: item
     div:
       class: size-ref
@@ -62,8 +63,10 @@ methods:
     function (s) {
       if (!s) return 0;
       if (!this.width) return 0;
-      const size = Math.min(3, Math.max(14, (36 - (s.length / 6))) / 50 *  this.width / 150);
-      return `${size*2.5}vh`;
+      let size = Math.min(3, Math.max(14, (36 - (s.length / 6))) / 50 *  this.width / 150);
+      size = size * 2.5;
+      if (this.item.scale) size *= this.item.scale;
+      return `${size}vh`;
     }
 computed:
   itemStyle: | #js
@@ -74,9 +77,9 @@ style:
   .size-ref, .text:
     width: 100%
     object-fit: cover
-    position: absolute
+    position: relative
   .size-ref:
-    height: 100%
+    height: fit-content
   .text.h-left:
     text-align: left
   .text.h-center:

@@ -13,6 +13,7 @@ export default (componentNames: string[], name: string) => {
       "code",
       "p",
       "img",
+      "video",
       "table",
       "thead",
       "tbody",

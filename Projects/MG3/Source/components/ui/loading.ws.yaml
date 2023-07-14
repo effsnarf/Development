@@ -1,14 +1,17 @@
 dom:
   .center:
     img:
-      src: >-
-        https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/images/loading.gif
+      class: loading
+      :src: $root.loadingImageUrl
+
 style:
   .center:
     display: flex
     justify-content: center
+  .loading:
+    max-width: min-content
 name: ui-loading
 template: >-
   <div class="comp-ui-loading center" path="875113442."><img
-  src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/images/loading.gif"
+  src="/img/loading.gif"
   path="875113442.0"/></div>

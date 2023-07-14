@@ -47,6 +47,10 @@ class Http {
       filePath.endsWith(".svg")
     );
   }
+
+  static isVideoFile(filePath: string): boolean {
+    return Http.getMimeType(filePath).startsWith("video/");
+  }
 }
 
 export { Http };

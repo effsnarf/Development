@@ -1,5 +1,6 @@
 dom:
   div:
+    v-if: showWorkspace
     class: workspace
     h3:
       ui.title:
@@ -11,14 +12,19 @@ dom:
           text: refresh
           @click: $root.reloadComponentsFromServer
     ide.debug:
-    ide.component.picker: null
+    ide.component.picker:
     div:
       ide.component.style:
         v-for: comp in comps
         ':component': comp
 props:
   comps: null
-data: null
+data:
+  showWorkspace: false
+mounted: | #js
+  function() {
+    this.showWorkspace = (window.location.hostname == "localhost");
+  }
 methods: null
 computed: null
 name: ide-workspace

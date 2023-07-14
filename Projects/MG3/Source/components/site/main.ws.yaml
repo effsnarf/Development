@@ -9,10 +9,11 @@ dom:
         ":title": titleText
         ":url": titleUrl
         ":key": titleKey
-    div:
+    .article:
       slot:
         name: article
-    .columns:
+    div:
+      :class: "'columns columns-' + columns"
       .left:
         ui.sticky:
           ":top": leftStickyTop
@@ -29,6 +30,9 @@ dom:
           div:
             slot:
               name: right
+            h3:
+              v-if: recommendationItems?.length
+              v-text: "'See also'"
             content.recommendations:
               ":items": recommendationItems
 props:
@@ -37,13 +41,15 @@ props:
   titleUrl: null
   titleKey: null
   recommendationItems: null
+  columns: 3
 computed:
   leftStickyTop: | #js
     function() {
-      if (this.titleText) return "250px";
-      return "160px";
+      return "120px";
     }
 style:
+  .article:
+    margin-top: 3rem
   .comp-site-main: null
   .error:
     margin-bottom: 3rem

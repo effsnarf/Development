@@ -1,19 +1,30 @@
 dom:
-  input:
-    ':type': type
-    ':placeholder': hint
-    ':value': value
-    @input: onInput
+  div:
+    .icon:
+      v-if: icon
+      v-text: icon
+    input:
+      ':type': type
+      ':placeholder': hint
+      ':value': value
+      @input: onInput
 props:
   type: text
   value: null
   hint: null
+  icon: null
 methods:
   onInput: | #js
     function(e) {
       this.$emit('input', e.target.value);
     }
 name: ui-text-box
+style:
+  input:
+    padding-left: 2em !important
+  .icon:
+    position: absolute
+    margin: 0.7em
 template: >-
   <input class="comp-ui-text-box" :type="type" :placeholder="hint"
   :value="value" @input="onInput" path="-1492297820."/>
