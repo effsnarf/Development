@@ -58,7 +58,8 @@ const isCachable = (
 
   const logLine = (...args: any[]) => {
     args = [
-      new Date().toLocaleTimeString().blue.bold,
+      config.title.gray,
+      new Date().toLocaleTimeString().gray,
       currentRequests.severify(10, 20, "<"),
       `queue`.gray,
       `${stats.successes.count}${
@@ -232,8 +233,8 @@ const isCachable = (
 
         if (targetIsDown) {
           // Try the cache
-          if (await cache.has(cacheKey)) {
-            if (isCachable(options, config)) {
+          if (isCachable(options, config)) {
+            if (await cache.has(cacheKey)) {
               const cachedResponse = await cache.get(cacheKey);
               if (cachedResponse) {
                 stats.cache.hits.track(1);
