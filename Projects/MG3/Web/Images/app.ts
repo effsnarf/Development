@@ -16,15 +16,16 @@ import { Database } from "@shared/Database/Database";
 import { MongoDatabase } from "@shared/Database/MongoDatabase";
 import { Timer } from "@shared/Timer";
 
-const debug = (...args: any[]) => {
-  args = args.map((a) => (typeof a == "string" ? a.gray : a));
-  console.log(...args);
-};
-
 (async () => {
   const config = (await Configuration.new()).data;
   const db = (await Database.new(config.database)) as MongoDatabase;
   db.options.lowercaseFields = true;
+
+  const log = (...args: any[]) => {
+    args = args.map((a) => (typeof a == "string" ? a.gray : a));
+    args.unshift(config.title);
+    console.log(...args);
+  };
 
   const getFileContent = async (filePath: string) => {
     // debug(`${`Reading`.gray} ${filePath})}`);
@@ -79,7 +80,7 @@ const debug = (...args: any[]) => {
 
         loading.stop();
 
-        console.log(
+        log(
           `${loading.elapsed.unitifyTime()}\t${size.unitifySize()}\tUploaded\t_id: ${
             image._id
           }`
@@ -165,13 +166,13 @@ const debug = (...args: any[]) => {
       rembg.on("close", (code: any) => {
         loading.stop();
         if (!fs.existsSync(noBgImagePath)) {
-          console.log(
+          log(
             `Error removing background from ${originalImagePath.yellow}.`.bgRed
           );
           return reject("Error removing background.");
         }
         // debug("No background image created successfully.");
-        console.log(
+        log(
           `${loading.elapsed.unitifyTime()}\t${`Removed background`.gray}\t${
             noBgImagePath.yellow
           }`
@@ -203,7 +204,7 @@ const debug = (...args: any[]) => {
 
     const fileSize = fs.statSync(imagePath).size;
 
-    console.log(
+    log(
       `${`${elapsed.unitifyTime()}`}\t${fileSize.unitifySize()}\t${mimeType}\t${
         req.url.yellow
       }\t`
@@ -226,14 +227,14 @@ const debug = (...args: any[]) => {
       writeStatus(200);
       res.write(response.data, "utf-8");
       res.end();
-      console.log(
+      log(
         `${timer.elapsed?.unitifyTime()}\t${size.unitifySize()}\t${mimeType}\t${
           `(from old server)`.gray
         }\t${req.url.yellow}`
       );
     } catch (ex: any) {
       if (ex.response.data.includes("Content not found")) {
-        console.log(
+        log(
           `${timer.elapsed?.unitifyTime()}\t\t${mimeType}\t${
             `(old server - 404)`.gray
           }\t${req.url.gray}`
@@ -242,8 +243,8 @@ const debug = (...args: any[]) => {
         res.end();
         return;
       }
-      console.log(url.bgRed);
-      console.log(ex.message.bgRed);
+      log(url.bgRed);
+      log(ex.message.bgRed);
       writeStatus(500);
       res.end();
     }
