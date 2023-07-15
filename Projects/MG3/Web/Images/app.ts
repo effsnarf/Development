@@ -243,7 +243,7 @@ import { Timer } from "@shared/Timer";
         }\t${req.url.yellow}`
       );
     } catch (ex: any) {
-      if (ex.response.data.includes("Content not found")) {
+      if (ex.response?.data.includes("Content not found")) {
         log(
           `${timer.elapsed
             ?.unitifyTime()
@@ -255,8 +255,8 @@ import { Timer } from "@shared/Timer";
         res.end();
         return;
       }
-      log(url.bgRed);
-      log(ex.message.bgRed);
+      log(url.bgRed.white);
+      log(ex.message.bgRed.white);
       writeStatus(500);
       res.end();
     }
@@ -291,9 +291,9 @@ import { Timer } from "@shared/Timer";
           res.end(JSON.stringify({ error: "Invalid request" }));
         }
       } catch (ex: any) {
-        log(`Error occurred: ${ex.message.bgRed}`);
-        log(ex.stack.bgRed);
-        //writeStatus(500);
+        log(`Error occurred: ${ex.message.bgRed.white}`);
+        log(ex.stack.bgRed.white);
+        writeStatus(500);
         res.write(JSON.stringify({ error: ex.message, stack: ex.stack }));
         res.end();
       } finally {
