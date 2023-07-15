@@ -291,8 +291,8 @@ import { Timer } from "@shared/Timer";
           res.end(JSON.stringify({ error: "Invalid request" }));
         }
       } catch (ex: any) {
-        // debug(`Error occurred: ${ex.message.bgRed}`);
-        writeStatus(500);
+        log(`Error occurred: ${ex.message.bgRed}`);
+        //writeStatus(500);
         res.write(JSON.stringify({ error: ex.message, stack: ex.stack }));
         res.end();
       } finally {
