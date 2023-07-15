@@ -204,6 +204,7 @@ class Objects {
   static json = {
     parse: (str: string) => {
       try {
+        if (str == "undefined") return undefined;
         return JSON.parse(str);
       } catch (ex: any) {
         throw `Error parsing JSON\n${ex.message}\n${str}`;
