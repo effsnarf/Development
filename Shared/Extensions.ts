@@ -964,7 +964,7 @@ if (typeof String !== "undefined") {
   };
 
   String.prototype.parseJSON = function (): string {
-    return JSON.parse(this.toString());
+    return Objects.json.parse(this.toString());
   };
 
   String.prototype.truncate = function (maxLength: number): string {

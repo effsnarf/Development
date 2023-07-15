@@ -3,7 +3,7 @@ import { Objects } from "../Extensions.Objects.Client";
 export default (context: any, compName: string, dom: any) => {
   compName = compName.replace(/-/g, ".");
 
-  dom = JSON.parse(JSON.stringify(dom));
+  dom = Objects.json.parse(JSON.stringify(dom));
 
   const root = Object.values(dom)[0];
 

@@ -240,7 +240,9 @@ class PersistedTree extends PersistedSomething {
   }
 
   private async copyTreePojoToTreeModel() {
-    this.root = this.tree.parse(JSON.parse(JSON.stringify(this.get() || {})));
+    this.root = this.tree.parse(
+      Objects.json.parse(JSON.stringify(this.get() || {}))
+    );
   }
 }
 

@@ -154,7 +154,7 @@ namespace Apify {
             if (!method) throw new Error(`Method ${methodName} not found`);
             const argsObj =
               typeof reqBody == "string"
-                ? JSON.parse(reqBody || "{}")
+                ? Objects.json.parse(reqBody || "{}")
                 : reqBody;
             const argValues = Reflection.getFunctionArgs(method).map(
               (argName) => argsObj[argName]
@@ -288,7 +288,7 @@ namespace Apify {
 
         let text = await response.text();
         if (text.length) {
-          let json = JSON.parse(text);
+          let json = Objects.json.parse(text);
           if (json.error) throw new Error(json.error);
           return json;
         }

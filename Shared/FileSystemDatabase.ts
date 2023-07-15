@@ -62,7 +62,7 @@ class FileSystemDatabase extends Database {
       const filePath = this.getFilePath(type, id);
       try {
         const data = fs.readFileSync(filePath, { encoding: "utf8" });
-        resolve(JSON.parse(data) as any);
+        resolve(Objects.json.parse(data) as any);
       } catch (error: any) {
         if (error.code === "ENOENT") {
           resolve(null);
@@ -120,7 +120,7 @@ class FileSystemDatabase extends Database {
           const filePath = `${this.dataDir}/${type}/${file}`;
           try {
             const data = fs.readFileSync(filePath, { encoding: "utf8" });
-            const doc = JSON.parse(data);
+            const doc = Objects.json.parse(data);
             if (!filter || filter(doc)) {
               docs.push(doc);
             }

@@ -13,7 +13,7 @@ class Objects {
   static clone(obj: any): any {
     if (obj == null || obj == undefined || typeof obj != "object") return obj;
     try {
-      return JSON.parse(JSON.stringify(obj));
+      return Objects.json.parse(JSON.stringify(obj));
     } catch (ex) {
       console.error("Error cloning object", obj, ex);
       debugger;

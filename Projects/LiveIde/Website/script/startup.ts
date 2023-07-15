@@ -243,7 +243,7 @@ interface MgParams {
         await self.state.restoreState();
       },
       instanceToGenerator(instance: any) {
-        let gen = JSON.parse(JSON.stringify(instance));
+        let gen = Objects.json.parse(JSON.stringify(instance));
         gen._id = gen.generatorID;
         return gen;
       },
@@ -325,7 +325,7 @@ interface MgParams {
 
           xhr.addEventListener("readystatechange", async function (e: any) {
             if (xhr.readyState == 4 && xhr.status == 200) {
-              const image = JSON.parse(xhr.responseText);
+              const image = Objects.json.parse(xhr.responseText);
               // Download the image from the server
               // this also takes some time, and we should hold the loading indicator
               await self.downloadImage(image._id);

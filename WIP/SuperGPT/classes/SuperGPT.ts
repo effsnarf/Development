@@ -37,7 +37,7 @@ class SuperGPT {
   async getResponse(msg: GptMessage) {
     let response = await this.chat.send(JSON.stringify(msg));
     try {
-      return JSON.parse(response) as GptMessage;
+      return Objects.json.parse(response) as GptMessage;
     } catch (ex: any) {
       console.log("Error parsing response: " + ex.toString());
       console.log(response);

@@ -240,7 +240,7 @@ class Summarizer {
 
   // Remove HTML tags
   private gptifyPost(post: Post) {
-    let p = JSON.parse(JSON.stringify(post)) as Post;
+    let p = Objects.json.parse(JSON.stringify(post)) as Post;
     p.title = this.gptifyText(p.title);
     p.comment = this.gptifyText(p.comment);
     let s = this.getPostText(p);

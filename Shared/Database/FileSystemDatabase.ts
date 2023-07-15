@@ -26,7 +26,7 @@ class FileSystemDatabase extends DatabaseBase {
       key
     );
     if (!fs.existsSync(filePath)) return null;
-    return JSON.parse(fs.readFileSync(filePath, "utf8"));
+    return Objects.json.parse(fs.readFileSync(filePath, "utf8"));
   }
 
   async set(key: any, value: any): Promise<void> {
@@ -64,7 +64,7 @@ class FileSystemDatabase extends DatabaseBase {
       recursive: true,
     })) {
       if (limit && docs.length >= limit) break;
-      docs.push(JSON.parse(fs.readFileSync(filePath, "utf8")));
+      docs.push(Objects.json.parse(fs.readFileSync(filePath, "utf8")));
     }
     if (lowercaseFields) docs = docs.map((d) => Objects.toCamelCaseKeys(d));
     return docs;
@@ -89,7 +89,7 @@ class FileSystemDatabase extends DatabaseBase {
     for (const file of Files.listFiles(collectionPath, { recursive: true })) {
       if (limit && docsYieldedCount >= limit) return;
       try {
-        let doc = JSON.parse(fs.readFileSync(file, "utf8"));
+        let doc = Objects.json.parse(fs.readFileSync(file, "utf8"));
         if (lowercaseFields) {
           doc = Objects.toCamelCaseKeys(doc);
         }
@@ -157,7 +157,7 @@ class FileSystemDatabase extends DatabaseBase {
     if (!fs.existsSync(uniqueIdFilePath)) {
       fs.writeFileSync(uniqueIdFilePath, "1");
     }
-    const uniqueID = JSON.parse(
+    const uniqueID = Objects.json.parse(
       await fs.promises.readFile(uniqueIdFilePath, "utf8")
     );
     const newId = uniqueID + count;

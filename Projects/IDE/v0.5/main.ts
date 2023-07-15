@@ -58,7 +58,7 @@ import { ChatOpenAI, Roles } from "../../../Apis/OpenAI/classes/ChatOpenAI";
           const values = await cache.get(
             `css-${propertyName}-values`,
             async () => {
-              const data = JSON.parse(
+              const data = Objects.json.parse(
                 await chat.send(
                   `give me a list of possible values for the css property [${propertyName}], in a json array. reply only with the json array of values and nothing else`
                 )

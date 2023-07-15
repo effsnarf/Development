@@ -19,11 +19,7 @@ class DatabaseProxy {
         const response = await fetch(url);
         const text = await response.text();
         if (!text?.length) return null;
-        try {
-          return JSON.parse(text);
-        } catch (e) {
-          throw new Error(text);
-        }
+        return JSON.parse(text);
       });
   }
 
@@ -63,7 +59,7 @@ class DatabaseProxy {
           //localStorage.setItem(url, JSON.stringify(item));
           return item;
         };
-        //const cachedItem = JSON.parse(localStorage.getItem(url) || "null");
+        //const cachedItem = Objects.json.parse(localStorage.getItem(url) || "null");
         const cachedItem = null;
         if (!cachedItem) return await fetchItem();
         // Fetch in the background
@@ -73,7 +69,7 @@ class DatabaseProxy {
       return await this.fetchAsJson(url);
     }
     // Check the local cache
-    //const cachedItem = JSON.parse(localStorage.getItem(url) || "null");
+    //const cachedItem = Objects.json.parse(localStorage.getItem(url) || "null");
     const cachedItem = null;
     if (cachedItem) DatabaseProxy.setValue(options.$set, cachedItem);
     // Fetch in the background

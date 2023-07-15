@@ -123,7 +123,9 @@ class StateTracker {
         .reverse()
         .find((existingItem) => existingItem.key == item.key);
       if (!prevItemOfThisKey) {
-        const emptyItem = JSON.parse(JSON.stringify(item)) as StateChange;
+        const emptyItem = Objects.json.parse(
+          JSON.stringify(item)
+        ) as StateChange;
         emptyItem.id = StateTracker._nextID++;
         emptyItem.dt = Date.now();
         emptyItem.newValue = emptyItem.oldValue;

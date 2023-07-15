@@ -3,7 +3,7 @@ import { RepeatingTaskQueue } from "./RepeatingTaskQueue";
 class DefaultDataComparer {
   clone(o1: any): any {
     if (o1 == null) return null;
-    return JSON.parse(JSON.stringify(o1));
+    return Objects.json.parse(JSON.stringify(o1));
   }
 
   areEqual(o1: any, o2: any): boolean {
