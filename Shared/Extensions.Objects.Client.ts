@@ -207,7 +207,7 @@ class Objects {
         if (str == "undefined") return undefined;
         return JSON.parse(str);
       } catch (ex: any) {
-        throw `Error parsing JSON\n${ex.message}\n${str}`;
+        throw `Error parsing JSON:\n\n${str}\n\n${ex.stack}`;
       }
     },
   };
