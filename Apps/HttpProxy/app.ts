@@ -133,7 +133,7 @@ const isCachable = (
         logNewLine(
           `${timer.elapsed?.unitifyTime().severify(100, 500, "<")} ${
             config.target.try.again.retries.toString().yellow
-          } ${`attempts failed`.red.bold} ${options.url.gray}`
+          } ${`attempts failed`.red.bold} ${options.url.red.bold}`
         );
         res.status(503);
         currentRequests--;
@@ -171,7 +171,9 @@ const isCachable = (
           logLine(
             `${timer.elapsed?.unitifyTime().severify(100, 500, "<")} ${
               nodeResponse.status.toString().yellow
-            } ${options.url.gray}`
+            } ${(options.url as string).severifyByHttpStatus(
+              nodeResponse.status
+            )}`
           );
           stats.response.times.track(timer.elapsed);
           stats.successes.track(1);
@@ -216,7 +218,7 @@ const isCachable = (
               !isError
                 ? ex.response.status.toString().yellow
                 : ex.message.yellow
-            } ${options.url.gray}`
+            } ${options.url.severifyByHttpStatus(ex.response.status)}`
           );
 
           // We don't track response time for (304 not modified, 404 not found, etc) because
@@ -244,9 +246,9 @@ const isCachable = (
                 logLine(
                   `${timer.elapsed?.unitifyTime().severify(100, 500, "<")} ${
                     `Fallback cache hit`.yellow.bold
-                  } ${cachedResponse.body.length.unitifySize()} ${
-                    options.url.gray
-                  }`
+                  } ${cachedResponse.body.length.unitifySize()} ${options.url.severifyByHttpStatus(
+                    cachedResponse.status.code
+                  )}`
                 );
                 res.set("x-debug-proxy-source", "cache");
                 res.status(cachedResponse.status.code);
@@ -259,7 +261,7 @@ const isCachable = (
           }
 
           if (attempt >= config.target.try.again.retries - 1) {
-            logNewLine(`${ex.message.red.bold} ${options.url.gray}`);
+            logNewLine(`${ex.message.red.bold} ${options.url.red.bold}`);
           }
 
           // Try again
