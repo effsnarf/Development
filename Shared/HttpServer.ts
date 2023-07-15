@@ -16,6 +16,7 @@ Handlebars.registerHelper("json", function (obj: any) {
 
 class HttpServer {
   private constructor(
+    private appName: string,
     private port: number,
     private ip: string,
     private handler: (req: any, res: any, data: any) => any,
@@ -24,18 +25,20 @@ class HttpServer {
   ) {
     const server = http.createServer(this.requestListener.bind(this));
     server.listen(port, ip, () => {
-      console.log(`${`Server is running on http://${ip}:${port}`.green}`);
+      this.log(`${`Server is running on http://${ip}:${port}`.green}`);
     });
   }
 
   static async new(
+    appName: string,
     port: number,
     ip: string,
     handler: (req: any, res: any, data: any) => any,
     getIndexPageTemplateData: (req: any) => Promise<any>,
-    indexPagePath?: string
+    indexPagePath: string | undefined = undefined
   ) {
     const server = new HttpServer(
+      appName,
       port,
       ip,
       handler,
@@ -95,13 +98,13 @@ class HttpServer {
       res.end(ex.stack);
       if (!ex.message?.includes("favicon.ico")) {
         this.logResponse(timer, req, res);
-        console.log(`${ex.stack?.bgRed}`);
+        this.log(`${ex.stack?.bgRed}`);
       }
     }
   }
 
   private logResponse(timer: Timer, req: any, res?: any) {
-    console.log(
+    this.log(
       `${`${this.ip}:${this.port}`.gray} ${timer.elapsed
         ?.unitifyTime()
         .severify(100, 500, "<")
@@ -120,8 +123,8 @@ class HttpServer {
     // let types = Object.keys(mime.types);
     // types.sortBy((a) => a);
     // types = types.filter((a) => a.startsWith("h"));
-    // console.log(types);
-    // console.log(extension);
+    // this.log(types);
+    // this.log(extension);
     return mime.types[extension];
   }
 
@@ -153,17 +156,22 @@ class HttpServer {
           }
           return fileContent;
         } catch (ex: any) {
-          console.log(`${ex.stack.bgRed}`);
-          console.log(fileContent.bgRed);
+          this.log(`${ex.stack.bgRed}`);
+          this.log(fileContent.bgRed);
           return ex.stack;
         }
       }
 
       return fileContent;
     } catch (ex: any) {
-      console.log(ex.stack?.bgRed);
+      this.log(ex.stack?.bgRed);
       throw { status: 500, message: ex.stack };
     }
+  }
+
+  private log(...args: any[]) {
+    args.unshift(`${this.appName?.gray}`);
+    console.log(...args);
   }
 }
 

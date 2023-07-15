@@ -242,6 +242,7 @@ const _fetchAsJson = async (url: string) => {
   console.log("staticFileFolders", staticFileFolders);
 
   const httpServer = await HttpServer.new(
+    config.title,
     config.server.port,
     config.server.host,
     async (req, res, data) => {
