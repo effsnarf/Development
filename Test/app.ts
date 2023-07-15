@@ -38,21 +38,7 @@ const malkovitch = new Malkovich();
 (async () => {
   console.log(Configuration.getEnvironment());
 
-  const obj = [
-    {
-      $match: {
-        cunt: true,
-      },
-    },
-  ];
-  Objects.traverse(obj, (node: any, key: string, value: any) => {
-    if (key.startsWith("$")) {
-      node[key.substring(1)] = value;
-      delete node[key];
-    }
-  });
-
-  console.log(obj);
+  console.log(Objects.json.parse("undefined"));
 
   process.exit();
 
