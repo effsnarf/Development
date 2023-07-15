@@ -14,6 +14,7 @@ import { Configuration } from "@shared/Configuration";
 import { Loading } from "@shared/Loading";
 import { Database } from "@shared/Database/Database";
 import { MongoDatabase } from "@shared/Database/MongoDatabase";
+import { Timer } from "@shared/Timer";
 
 const debug = (...args: any[]) => {
   args = args.map((a) => (typeof a == "string" ? a.gray : a));
@@ -217,21 +218,30 @@ const debug = (...args: any[]) => {
     mimeType: string
   ) => {
     const url = `${config.old.images.server}${req.url}`;
+    const timer = Timer.start();
     try {
       // debug("Processing serve from old server");
-      const started = Date.now();
       const response = await axios.get(url, { responseType: "arraybuffer" });
       const size = parseInt(response.headers["content-length"]);
       writeStatus(200);
       res.write(response.data, "utf-8");
       res.end();
-      const elapsed = Date.now() - started;
       console.log(
-        `${elapsed.unitifyTime()}\t${size.unitifySize()}\t${mimeType}\t${
+        `${timer.elapsed?.unitifyTime()}\t${size.unitifySize()}\t${mimeType}\t${
           `(from old server)`.gray
         }\t${req.url.yellow}`
       );
     } catch (ex: any) {
+      if (ex.response.data.includes("Content not found")) {
+        console.log(
+          `${timer.elapsed?.unitifyTime()}\t\t${mimeType}\t${
+            `(content not found on old server)`.gray
+          }\t${req.url.gray}`
+        );
+        writeStatus(404);
+        res.end();
+        return;
+      }
       console.log(url.bgRed);
       console.log(ex.message.bgRed);
       writeStatus(500);
