@@ -42,7 +42,8 @@ const convertKeysToTitleCase = (obj: any) => {
   const tasks = {
     //Haiku: "Write a haiku about this meme",
     Poem: "Write a poem about this meme, with 9 stanzas, 4 lines each.",
-    Article: "Write a 100 word article about this meme, in a sarcastic tone.",
+    Article:
+      "Write a 100 word article about this meme, as if you were an incredibly jaded and sarcastic article writer who's been in the business for 20 years and have already seen it all.",
     //aiInstances: "Write 10 examples of this meme in the topic of artificial intelligence",
   };
 
