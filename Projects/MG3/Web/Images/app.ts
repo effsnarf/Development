@@ -18,12 +18,15 @@ import { Timer } from "@shared/Timer";
 
 (async () => {
   const config = (await Configuration.new()).data;
+  const severity = {
+    time: config.severity.time as [number, number, "<" | ">"],
+  };
   const db = (await Database.new(config.database)) as MongoDatabase;
   db.options.lowercaseFields = true;
 
   const log = (...args: any[]) => {
     args = args.map((a) => (typeof a == "string" ? a.gray : a));
-    args.unshift(config.title);
+    args.unshift(config.title.gray);
     console.log(...args);
   };
 
@@ -81,9 +84,11 @@ import { Timer } from "@shared/Timer";
         loading.stop();
 
         log(
-          `${loading.elapsed.unitifyTime()}\t${size.unitifySize()}\tUploaded\t_id: ${
-            image._id
-          }`
+          `${loading.elapsed
+            .unitifyTime()
+            .severify(
+              ...severity.time
+            )}\t${size.unitifySize()}\tUploaded\t_id: ${image._id}`
         );
       });
     } finally {
@@ -205,9 +210,11 @@ import { Timer } from "@shared/Timer";
     const fileSize = fs.statSync(imagePath).size;
 
     log(
-      `${`${elapsed.unitifyTime()}`}\t${fileSize.unitifySize()}\t${mimeType}\t${
-        req.url.yellow
-      }\t`
+      `${`${elapsed
+        .unitifyTime()
+        .severify(
+          ...severity.time
+        )}`}\t${fileSize.unitifySize()}\t${mimeType}\t${req.url.yellow}\t`
     );
   };
 
@@ -228,14 +235,18 @@ import { Timer } from "@shared/Timer";
       res.write(response.data, "utf-8");
       res.end();
       log(
-        `${timer.elapsed?.unitifyTime()}\t${size.unitifySize()}\t${mimeType}\t${
+        `${timer.elapsed
+          ?.unitifyTime()
+          .severify(...severity.time)}\t${size.unitifySize()}\t${mimeType}\t${
           `(from old server)`.gray
         }\t${req.url.yellow}`
       );
     } catch (ex: any) {
       if (ex.response.data.includes("Content not found")) {
         log(
-          `${timer.elapsed?.unitifyTime()}\t\t${mimeType}\t${
+          `${timer.elapsed
+            ?.unitifyTime()
+            .severify(...severity.time)}\t\t${mimeType}\t${
             `(old server - 404)`.gray
           }\t${req.url.gray}`
         );
