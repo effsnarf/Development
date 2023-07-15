@@ -1,5 +1,6 @@
 import mime from "mime-types";
 import axios, { Axios, AxiosResponse, AxiosResponseHeaders } from "axios";
+import { Objects } from "./Extensions.Objects";
 
 class Http {
   static async getPostData(req: any): Promise<any> {
