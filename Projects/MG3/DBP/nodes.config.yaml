@@ -87,7 +87,7 @@ api:
       code: | #js
         let gens = (await db.aggregate("Generators",
           [
-            { $match: { "Desc.Article": { $exists: true } } },
+            { $match: { IsQuality: true, "Desc.Article": { $exists: true } } },
             { $sample: { size: count * 2 } }
           ]
         ));
