@@ -6,7 +6,7 @@ export default (context: any, dom: any, indent?: number, compName?: string) => {
   const s = [] as string[];
   if (!indent) indent = 0;
 
-  dom = Objects.json.parse(JSON.stringify(dom));
+  dom = JSON.parse(JSON.stringify(dom));
 
   if (compName) {
     // Traverse the tree and for each object node (not attribute), add a path attribute
@@ -44,7 +44,7 @@ export default (context: any, dom: any, indent?: number, compName?: string) => {
       const parts = tag.split(".");
       const newTag = parts[0] || "div";
       const classNames = parts.slice(1);
-      dom[newTag] = Objects.json.parse(JSON.stringify(dom[tag]));
+      dom[newTag] = JSON.parse(JSON.stringify(dom[tag]));
       dom[newTag].class = [];
       dom[newTag].class.push(...stringToArray(dom[tag].class));
       dom[newTag].class.push(...classNames);

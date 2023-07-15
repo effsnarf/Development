@@ -204,10 +204,9 @@ class Objects {
   static json = {
     parse: (str: string) => {
       try {
+        if (str === "undefined") return undefined;
         return JSON.parse(str);
       } catch (ex: any) {
-        if (ex.message.startsWith("Unexpected token u in JSON at position 0"))
-          return undefined;
         throw `Error parsing JSON:\n\n${str}\n\n${ex.stack}`;
       }
     },
