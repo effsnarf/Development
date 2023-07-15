@@ -963,8 +963,10 @@ if (typeof String !== "undefined") {
     });
   };
 
-  String.prototype.parseJSON = function (): string {
-    return Objects.json.parse(this.toString());
+  String.prototype.parseJSON = function () {
+    if (this == "undefined") return undefined;
+    if (!this) return null;
+    return JSON.parse(this.toString());
   };
 
   String.prototype.truncate = function (maxLength: number): string {
