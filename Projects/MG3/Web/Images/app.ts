@@ -235,7 +235,7 @@ const debug = (...args: any[]) => {
       if (ex.response.data.includes("Content not found")) {
         console.log(
           `${timer.elapsed?.unitifyTime()}\t\t${mimeType}\t${
-            `(content not found on old server)`.gray
+            `(old server - 404)`.gray
           }\t${req.url.gray}`
         );
         writeStatus(404);
