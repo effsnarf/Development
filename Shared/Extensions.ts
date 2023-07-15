@@ -546,9 +546,10 @@ if (typeof Number !== "undefined") {
     yellow: number,
     direction: "<" | ">"
   ): string {
-    return this.toString().colorize(
-      this.getSeverityColor(green, yellow, direction, true)
-    );
+    const color = this.getSeverityColor(green, yellow, direction, true);
+    let s = this.toString().colorize(color);
+    if (color == "bgRed") s = s.colorize("white");
+    return s;
   };
 
   Number.prototype.severifyByHttpStatus = function (): string {
@@ -730,7 +731,9 @@ if (typeof String !== "undefined") {
     const value = valueStr.deunitify();
     const unit = valueStr.getUnit();
     const color = value.getSeverityColor(green, yellow, direction, true);
-    return `${value.unitify(unitClass).withoutUnit().colorize(color)}${unit.c(
+    let coloredValue = value.unitify(unitClass).withoutUnit().colorize(color);
+    if (color == "bgRed") coloredValue = coloredValue.white;
+    return `${coloredValue}${unit.c(
       "gray"
     )}`;
   };

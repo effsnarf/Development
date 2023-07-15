@@ -255,7 +255,7 @@ import { Timer } from "@shared/Timer";
         return;
       }
       log(url.bgRed.white);
-      log(ex.message.bgRed.white);
+      log(ex.stack.bgRed.white);
       writeStatus(500);
       res.end();
     }
