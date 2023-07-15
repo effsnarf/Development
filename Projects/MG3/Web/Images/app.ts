@@ -78,8 +78,9 @@ import { Timer } from "@shared/Timer";
           fs.unlinkSync(tempFilePath);
         }
         // debug(`${`Saved`.gray} ${newFilePath.yellow}`);
+        res.send(JSON.stringify(image));
         writeStatus(200);
-        res.end(JSON.stringify(image));
+        res.end();
 
         loading.stop();
 
@@ -201,8 +202,8 @@ import { Timer } from "@shared/Timer";
     // debug(`Image path: ${imagePath}`);
     const fileContent = await getFileContent(imagePath);
 
-    writeStatus(200);
     res.write(fileContent, "utf-8");
+    writeStatus(200);
     res.end();
 
     let elapsed = Date.now() - started;
@@ -231,8 +232,8 @@ import { Timer } from "@shared/Timer";
       // debug("Processing serve from old server");
       const response = await axios.get(url, { responseType: "arraybuffer" });
       const size = parseInt(response.headers["content-length"]);
-      writeStatus(200);
       res.write(response.data, "utf-8");
+      writeStatus(200);
       res.end();
       log(
         `${timer.elapsed
