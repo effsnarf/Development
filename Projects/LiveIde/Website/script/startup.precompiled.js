@@ -36,12 +36,7 @@ class DatabaseProxy {
                     const text = yield response.text();
                     if (!(text === null || text === void 0 ? void 0 : text.length))
                         return null;
-                    try {
-                        return JSON.parse(text);
-                    }
-                    catch (e) {
-                        throw new Error(text);
-                    }
+                    return JSON.parse(text);
                 }));
     }
     static new(urlBase, _fetchAsJson) {
@@ -80,7 +75,7 @@ class DatabaseProxy {
                         //localStorage.setItem(url, JSON.stringify(item));
                         return item;
                     });
-                    //const cachedItem = JSON.parse(localStorage.getItem(url) || "null");
+                    //const cachedItem = Objects.json.parse(localStorage.getItem(url) || "null");
                     const cachedItem = null;
                     if (!cachedItem)
                         return yield fetchItem();
@@ -91,7 +86,7 @@ class DatabaseProxy {
                 return yield this.fetchAsJson(url);
             }
             // Check the local cache
-            //const cachedItem = JSON.parse(localStorage.getItem(url) || "null");
+            //const cachedItem = Objects.json.parse(localStorage.getItem(url) || "null");
             const cachedItem = null;
             if (cachedItem)
                 DatabaseProxy.setValue(options.$set, cachedItem);
@@ -163,9 +158,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "../../../LiveIde/Website/script/1689355511094.ts":
+/***/ "../../../LiveIde/Website/script/1689433651204.ts":
 /*!********************************************************!*\
-  !*** ../../../LiveIde/Website/script/1689355511094.ts ***!
+  !*** ../../../LiveIde/Website/script/1689433651204.ts ***!
   \********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -429,7 +424,7 @@ const helpers = {
                 });
             },
             instanceToGenerator(instance) {
-                let gen = JSON.parse(JSON.stringify(instance));
+                let gen = Extensions_Objects_Client_1.Objects.json.parse(JSON.stringify(instance));
                 gen._id = gen.generatorID;
                 return gen;
             },
@@ -512,7 +507,7 @@ const helpers = {
                         xhr.addEventListener("readystatechange", function (e) {
                             return __awaiter(this, void 0, void 0, function* () {
                                 if (xhr.readyState == 4 && xhr.status == 200) {
-                                    const image = JSON.parse(xhr.responseText);
+                                    const image = Extensions_Objects_Client_1.Objects.json.parse(xhr.responseText);
                                     // Download the image from the server
                                     // this also takes some time, and we should hold the loading indicator
                                     yield self.downloadImage(image._id);
@@ -1325,7 +1320,7 @@ class StateTracker {
                 .reverse()
                 .find((existingItem) => existingItem.key == item.key);
             if (!prevItemOfThisKey) {
-                const emptyItem = JSON.parse(JSON.stringify(item));
+                const emptyItem = Extensions_Objects_Client_1.Objects.json.parse(JSON.stringify(item));
                 emptyItem.id = StateTracker._nextID++;
                 emptyItem.dt = Date.now();
                 emptyItem.newValue = emptyItem.oldValue;
@@ -1669,7 +1664,7 @@ class Objects {
         if (obj == null || obj == undefined || typeof obj != "object")
             return obj;
         try {
-            return JSON.parse(JSON.stringify(obj));
+            return Objects.json.parse(JSON.stringify(obj));
         }
         catch (ex) {
             console.error("Error cloning object", obj, ex);
@@ -1837,10 +1832,12 @@ exports.Objects = Objects;
 Objects.json = {
     parse: (str) => {
         try {
+            if (str == "undefined")
+                return undefined;
             return JSON.parse(str);
         }
         catch (ex) {
-            throw `Error parsing JSON\n${ex.message}\n${str}`;
+            throw `Error parsing JSON:\n\n${str}\n\n${ex.stack}`;
         }
     },
 };
@@ -2186,7 +2183,11 @@ if (typeof Number !== "undefined") {
         return s;
     };
     Number.prototype.severify = function (green, yellow, direction) {
-        return this.toString().colorize(this.getSeverityColor(green, yellow, direction, true));
+        const color = this.getSeverityColor(green, yellow, direction, true);
+        let s = this.toString().colorize(color);
+        if (color == "bgRed")
+            s = s.colorize("white");
+        return s;
     };
     Number.prototype.severifyByHttpStatus = function () {
         const value = this.valueOf();
@@ -2361,7 +2362,10 @@ if (typeof String !== "undefined") {
         const value = valueStr.deunitify();
         const unit = valueStr.getUnit();
         const color = value.getSeverityColor(green, yellow, direction, true);
-        return `${value.unitify(unitClass).withoutUnit().colorize(color)}${unit.c("gray")}`;
+        let coloredValue = value.unitify(unitClass).withoutUnit().colorize(color);
+        if (color == "bgRed")
+            coloredValue = coloredValue.white;
+        return `${coloredValue}${unit.c("gray")}`;
     };
     String.prototype.severifyByHttpStatus = function (statusCode, bgRed) {
         if (!statusCode)
@@ -2561,6 +2565,10 @@ if (typeof String !== "undefined") {
         });
     };
     String.prototype.parseJSON = function () {
+        if (this == "undefined")
+            return undefined;
+        if (!this)
+            return null;
         return JSON.parse(this.toString());
     };
     String.prototype.truncate = function (maxLength) {
@@ -3206,7 +3214,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const Extensions_Objects_Client_1 = __webpack_require__(/*! ../Extensions.Objects.Client */ "../../../../Shared/Extensions.Objects.Client.ts");
 exports["default"] = (context, compName, dom) => {
     compName = compName.replace(/-/g, ".");
-    dom = JSON.parse(JSON.stringify(dom));
+    dom = Extensions_Objects_Client_1.Objects.json.parse(JSON.stringify(dom));
     const root = Object.values(dom)[0];
     // Traverse the tree and for each object node (not attribute), add a path attribute
     Extensions_Objects_Client_1.Objects.traverse(root, (node, key, value, path) => {
@@ -3446,7 +3454,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("../../../LiveIde/Website/script/1689355511094.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("../../../LiveIde/Website/script/1689433651204.ts");
 /******/ 	
 /******/ })()
 ;
