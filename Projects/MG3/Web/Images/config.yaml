@@ -13,4 +13,4 @@ database:
   connectionString: mongodb://localhost
   database: MemeGenerator
 severity:
-  time: 400, 800, ">"
+  time: [400, 800, "<"]
