@@ -292,6 +292,7 @@ import { Timer } from "@shared/Timer";
         }
       } catch (ex: any) {
         log(`Error occurred: ${ex.message.bgRed}`);
+        log(ex.stack.bgRed);
         //writeStatus(500);
         res.write(JSON.stringify({ error: ex.message, stack: ex.stack }));
         res.end();
