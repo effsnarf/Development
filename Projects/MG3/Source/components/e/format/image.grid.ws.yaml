@@ -1,0 +1,106 @@
+dom:
+  div:
+    e.template.editor:
+      ref: TemplateEditor1
+      ':temp': temp
+      ':show-property-editor': 'false'
+props:
+  item: null
+data:
+  temp: null
+watch:
+  item:
+    handler: | #js
+      function(item) {
+        if (!item) return;
+
+        const temp = {
+          id: this.$root.getUniqueClientID(),
+          type: "grid",
+          visible: true,
+          aspectRatio: null,
+          gap: 0.02,
+          caption: {
+            visible: true,
+            editable: item.title.editable,
+            text: item.title.text,
+            font: 'Arial',
+            color: 'white',
+            align: {
+              h: "center",
+              v: "top"
+            },
+            uppercase: false,
+            scale: 0.6
+          },
+          items: []
+        };
+
+        const hasSubgrid = true || (item.subgrid.items > 1);
+
+        for (let i = 0; i < item.captions.length; i++)
+        {
+          const caption = {
+            visible: true,
+            editable: true,
+            text: item.captions[i],
+            font: 'Arial',
+            color: 'white',
+            align: {
+              h: "center",
+              v: "bottom"
+            },
+            uppercase: false,
+          };
+
+          let subgrid = temp;
+
+          if (hasSubgrid)
+          {
+            subgrid = {
+              id: this.$root.getUniqueClientID(),
+              type: "grid",
+              visible: true,
+              aspectRatio: "1/1",
+              caption,
+              items: []
+            };
+
+            temp.items.push(subgrid);
+          }
+
+          for (let j = 0; j < item.subgrid.items; j++)
+          {
+            subgrid.items.add({
+              id: this.$root.getUniqueClientID(),
+              type: "image",
+              visible: true,
+              imageID: null,
+              removeBackground: false,
+              caption: (hasSubgrid ? null : caption),
+              trans: {
+                  pos: {
+                      x: 0.5,
+                      y: 0.5
+                  },
+                  scale: 1
+              },
+              shadow: {
+                x: 0,
+                y: 0,
+                blur: 0,
+                color: '#000000',
+                opacity: 1
+              },
+            });
+          }
+        }
+
+        this.temp = temp;
+      }
+    immediate: true
+name: e-format-image-grid
+template: >-
+  <div class="comp-e-format-image-grid" path="-603568889."><e-template-editor
+  ref="TemplateEditor1" :temp="temp" :show-property-editor="false"
+  path="-603568889.0"></e-template-editor></div>

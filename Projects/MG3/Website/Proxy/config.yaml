@@ -40,3 +40,10 @@ cache:
       #     database: MG-Web-Cache
 stats:
   every: 1m
+log:
+  debug:
+    enabled: true
+    path: (env) => env.getLogPath(env.config.title, 'debug')
+  errors:
+    enabled: true
+    path: (env) => env.getLogPath(env.config.title, 'errors')

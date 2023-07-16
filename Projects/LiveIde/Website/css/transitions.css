@@ -88,6 +88,29 @@
 
 
 
+
+.slide-large-enter-active,
+.slide-large-leave-active,
+.slide-large-move {
+  transition: 1.5s cubic-bezier(0.59, 0.12, 0.34, 0.95);
+}
+.slide-large-enter,
+.slide-large-leave-to {
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+}
+.slide-large-enter-to,
+.slide-large-leave {
+  opacity: 1;
+  max-height: 100vh;
+  overflow: hidden;
+}
+
+
+
+
+
 .fade
 {
   animation: fade 1s cubic-bezier(0.59, 0.12, 0.34, 0.95);

@@ -14,12 +14,13 @@ dom:
       ':items': options
       ':selected-index': valueIndex
       ':direction': direction
+      ':get-item-key': getItemKey
       template:
         slot:
           ':item': slotProps.item
         div: 
           v-if: showText
-          v-text: getItemText(slotProps.item)
+          v-text: _getItemText(slotProps.item)
       @input: onInput($event)
 props:
   options: null
@@ -28,14 +29,19 @@ props:
   direction: vertical
   showText: true
   type: list
+  getItemText: null
+  getItemKey: null
 methods:
   onInput: | #js
     function(index) {
       const value = this.inputType === "index" ? index : this.options[index];
       this.$emit("input", value);
     }
-  getItemText: | #js
-    function(text) {
+  _getItemText: | #js
+    function(item) {
+      if (this.getItemText) return this.getItemText(item);
+      
+      const text = item;
       const icons = {
         network: "🌐",
         site: "💻",
@@ -68,8 +74,8 @@ template: >-
   v-for="(item, index) in options" :value="index" v-text="item"
   path="-1442841194.0.0"></option></select><ui-list v-if="(type=='list')"
   v-slot="slotProps" :items="options" :selected-index="valueIndex"
-  :direction="direction" @input="onInput($event)" path="-1442841194.1"><template
-  path="-1442841194.1.0"><slot :item="slotProps.item"
-  path="-1442841194.1.0.0"></slot><div v-if="showText"
-  v-text="getItemText(slotProps.item)"
+  :direction="direction" :get-item-key="getItemKey" @input="onInput($event)"
+  path="-1442841194.1"><template path="-1442841194.1.0"><slot
+  :item="slotProps.item" path="-1442841194.1.0.0"></slot><div v-if="showText"
+  v-text="_getItemText(slotProps.item)"
   path="-1442841194.1.0.1"></div></template></ui-list></div>
