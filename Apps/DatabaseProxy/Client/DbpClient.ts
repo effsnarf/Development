@@ -94,8 +94,9 @@ class DatabaseProxy {
 
     const url = `${this.urlBase}/api/${entity}/${group}/${method}`;
 
-    // HTTP POST
-    if (group == "create") {
+    const isHttpPost = group == "create";
+
+    if (isHttpPost) {
       const data = {} as any;
       args.forEach((a) => (data[a.name] = a.value));
       const result = await fetch(url, {

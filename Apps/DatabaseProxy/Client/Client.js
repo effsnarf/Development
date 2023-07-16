@@ -459,13 +459,28 @@ if (typeof require != "undefined") {
       return await this.fetchUrlJson(this.urlBase, { ...this.fetchOptions, cache: true });
     };
     this.callApiMethod = async (entity, group, method, args) => {
+      const isHttpPost = (group == "create");
+
+      const url = `${this.urlBase}/api/${entity}/${group}/${method}`;
+
+      if (isHttpPost)
+      {
+        const data = new FormData();
+        for (const arg of args) data.append(arg.name, arg.value);
+
+        var result = await this.fetchUrlJson(url, {
+          method: "POST",
+          body: data,
+          ...this.fetchOptions,
+        });
+        return result;
+      }
+
       var argsStr = args
         .map((a) => `${a.name}=${JSON.stringify(a.value || null)}`)
         .join(`&`);
-      var url = `${
-        this.urlBase
-      }/api/${entity}/${group}/${method}?&_uid=${Date.now()}&${argsStr}`;
-      var result = await this.fetchUrlJson(url, this.fetchOptions);
+      const getUrl = `${url}?_uid=${Date.now()}&${argsStr}`;
+      var result = await this.fetchUrlJson(getUrl, this.fetchOptions);
       return result;
     };
     this.getApiMethods = async () => {
