@@ -9,27 +9,33 @@ import jsyaml from "js-yaml";
 
 abstract class Logger {
   static new(config: any): LoggerBase {
-    if (!config) {
-      return EmptyLogger.new();
-    }
+    const getNewLogger = () => {
+      if (!config) {
+        return EmptyLogger.new();
+      }
 
-    if ("enabled" in config && !config.enabled) {
-      return EmptyLogger.new();
-    }
+      if ("enabled" in config && !config.enabled) {
+        return EmptyLogger.new();
+      }
 
-    if (typeof config === "function") {
-      return FunctionLogger.new(config);
-    }
+      if (typeof config === "function") {
+        return FunctionLogger.new(config);
+      }
 
-    if (Array.isArray(config)) {
-      return MultiLogger.new(config.map((c: any) => Logger.new(c)));
-    }
+      if (Array.isArray(config)) {
+        return MultiLogger.new(config.map((c: any) => Logger.new(c)));
+      }
 
-    if (config.path) {
-      return FileSystemLogger.new(config.path);
-    }
+      if (config.path) {
+        return FileSystemLogger.new(config.path);
+      }
 
-    throw new Error(`Unknown logger type:\n${jsyaml.dump(config)}`);
+      throw new Error(`Unknown logger type:\n${jsyaml.dump(config)}`);
+    };
+
+    const logger = getNewLogger();
+    logger.log("Logger started");
+    return logger;
   }
 }
 

@@ -324,7 +324,7 @@ class Configuration {
     parts.push(process.argv[1].findParentDir("Development"));
     parts.push("Logs");
     // Add the title to the log path
-    if (type) parts.push(`${type}`);
+    if (type) parts.push(`${type.toTitleCase()}`);
     parts.push(`${title}`);
     const now = new Date();
     // Add yyyy\mm\dd to the log path
