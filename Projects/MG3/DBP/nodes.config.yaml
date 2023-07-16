@@ -51,7 +51,7 @@ api:
     Medias.create.one:
       args: [media]
       code: | #js
-        const media = await db.upsert("Medias", media);
+        media = await db.upsert("Medias", media);
         return media;
     Generators.select.search:
       args: [query]
