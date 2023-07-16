@@ -57,6 +57,8 @@ const isCachable = (
   const debugLogger = Logger.new(config.log.debug);
   const errorLogger = Logger.new(config.log.errors);
 
+  debugLogger.log(config);
+
   const logLine = (...args: any[]) => {
     args = [
       config.title.gray,
@@ -120,7 +122,9 @@ const isCachable = (
       const nodeIndex =
         (startingNodeIndex + attempt) % config.target.base.urls.length;
 
-      //startingNodeIndex = (startingNodeIndex + 1) % config.target.base.urls.length;
+      if (config.rotate?.nodes)
+        startingNodeIndex =
+          (startingNodeIndex + 1) % config.target.base.urls.length;
 
       const targetUrl = `${config.target.base.urls[nodeIndex]}${req.url}`;
 

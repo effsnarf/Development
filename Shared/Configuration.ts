@@ -93,7 +93,7 @@ class Configuration {
       const env = Configuration.getEnvironment(options);
       if (typeof value === "object" && value !== null) {
         // Replace [dev] or [prod] with the current environment
-        if (value[env]) {
+        if (env in value) {
           node[key] = value[env];
         }
         // Remove other environment keys

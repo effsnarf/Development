@@ -646,7 +646,10 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
 
           if (result == undefined) result = null;
 
-          return res.end(JSON.stringify(result));
+          debugLogger.log(req.method, req.url, data);
+          debugLogger.log(result);
+
+          return res.end(Objects.jsonify(result));
         } catch (ex: any) {
           if (typeof ex == "string") {
             if (ex.includes("not found")) {

@@ -47,3 +47,7 @@ log:
   errors:
     enabled: true
     path: (env) => env.getLogPath(env.config.title, 'errors')
+rotate:
+  nodes:
+    prod: true
+    dev: false

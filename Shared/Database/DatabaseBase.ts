@@ -93,6 +93,8 @@ abstract class DatabaseBase {
 
     if (!doc) throw new Error("Cannot upsert null doc");
 
+    doc = Objects.clone(doc);
+
     if (uppercaseFields) doc = Objects.toTitleCaseKeys(doc);
 
     if (returnNewDoc && returnDiff)
@@ -109,7 +111,7 @@ abstract class DatabaseBase {
     if (!doc._id) doc._id = newID;
     await this._upsert(collectionName, doc);
 
-    if (returnNewDoc) return await this.findOneByID(collectionName, doc._id);
+    if (returnNewDoc) return doc; // await this.findOneByID(collectionName, doc._id);
 
     if (returnDiff) return Objects.deepDiff(oldDoc, doc);
   }
