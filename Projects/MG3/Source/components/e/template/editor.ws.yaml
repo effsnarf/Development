@@ -100,6 +100,7 @@ dom:
               to change the layout.'
 props:
   temp: null
+  newGeneratorName: null
   showPropertyEditor: true
 data:
   selectedItemIndex: 0
@@ -177,14 +178,38 @@ methods:
       this.isCreatingMedia = true;
       try
       {
-        let media = { template: this.temp };
-        media = await this.$root.dbp.medias.create.one(media);
+        const media = this.getMedia(this.temp);
         console.log(media);
       }
       finally
       {
         this.isCreatingMedia = false;
       }
+    }
+  getMedia: | #js
+    function(temp) {
+      // Walk the tree and collect caption text and image IDs into an array
+      // [{text: 'test', {image: {_id: 1}}, ..]
+      const tcs = [];
+      const walk = (node) => {
+        if (node.caption) tcs.push({text: node.caption.text});
+        if (node.type === 'image')
+        {
+          tcs.push({
+            image: { _id: node.imageID }
+          });
+        }
+        if (node.items) node.items.forEach(walk);
+      };
+      walk(temp);
+
+      const media = {
+        newGenerator: { name: this.newGeneratorName },
+        content: {
+          items: tcs
+        }
+      }
+      return media;
     }
   eval: | #js
     function(s) {

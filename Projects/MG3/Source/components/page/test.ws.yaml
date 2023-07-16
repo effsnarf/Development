@@ -5,30 +5,30 @@ dom:
     template:
       v-slot: article
       ui.select:
-        ':options': formats
+        ':options': newGenerators
         input-type: value
         direction: horizontal
         ':get-item-key': (item) => item.name
         ':get-item-text': (item) => item.name
-        v-model: selectedFormat
+        v-model: selectedNewGenerator
       transition:
         name: slide-large
         keep.alive:
           component:
-            v-if: selectedFormat
-            ':is': selectedFormatTypeComponentName
-            ':item': selectedFormat.item
-            ':key': selectedFormat.name
+            v-if: selectedNewGenerator
+            ':is': selectedNewGeneratorTypeComponentName
+            ':source': selectedNewGenerator.source
+            ':key': selectedNewGenerator.name
 props: null
 data:
-  formats: []
-  selectedFormat: null
+  newGenerators: []
+  selectedNewGenerator: null
 mounted: | #js
   async function() {
     const whatIReallyDo = {
       name: "What I Really Do",
-      type: "image.grid",
-      item: {
+      format: "image.grid",
+      source: {
         title: {
           text: "[theme]",
           editable: true,
@@ -52,8 +52,8 @@ mounted: | #js
 
     const fitCBT = {
       name: "/fit/ CBT",
-      type: "image.grid",
-      item: {
+      format: "image.grid",
+      source: {
         title: {
           text: "/fit/ CBT",
           editable: false,
@@ -71,8 +71,8 @@ mounted: | #js
 
     const fitIdeals = {
       name: "/fit/ Ideals",
-      type: "image.grid",
-      item: {
+      format: "image.grid",
+      source: {
         title: {
           text: "/fit/ Ideals",
           editable: false,
@@ -88,8 +88,8 @@ mounted: | #js
 
     const fashionIdeals = {
       name: "/fa/ Ideals",
-      type: "image.grid",
-      item: {
+      format: "image.grid",
+      source: {
         title: {
           text: "/fa/ Ideals",
           editable: false,
@@ -106,8 +106,8 @@ mounted: | #js
 
     const galaxyBrain = {
       name: "Galaxy Brain",
-      type: "template",
-      item: null
+      format: "template",
+      source: null
     }
     
     galaxyBrain.item = {
@@ -173,20 +173,20 @@ mounted: | #js
     }
 
 
-    this.formats.push(whatIReallyDo);
-    //this.formats.push(fitCBT);
-    this.formats.push(fitIdeals);
-    this.formats.push(fashionIdeals);
-    //this.formats.push(galaxyBrain);
+    this.newGenerators.push(whatIReallyDo);
+    //this.newGenerators.push(fitCBT);
+    this.newGenerators.push(fitIdeals);
+    this.newGenerators.push(fashionIdeals);
+    //this.newGenerators.push(galaxyBrain);
   }
 computed:
-  selectedFormatTypeComponentName: | #js
+  selectedNewGeneratorTypeComponentName: | #js
     function() {
-      if (!this.selectedFormat) return null;
-      return `e-format-${this.selectedFormat.type.replace(/\./g, '-')}`;
+      if (!this.selectedNewGenerator) return null;
+      return `e-format-${this.selectedNewGenerator.format.replace(/\./g, '-')}`;
     }
 watch:
-  selectedFormat: | #js
+  selectedNewGenerator: | #js
     async function() {
       await this.$nextTick();
       // Press [play] on all videos inside this component
@@ -197,11 +197,11 @@ name: page-test
 template: >-
   <site class="comp-page-test" page-name="test" :columns="2"
   path="838622353."><template v-slot:article path="838622353.0"><ui-select
-  :options="formats" input-type="value" direction="horizontal"
+  :options="newGenerators" input-type="value" direction="horizontal"
   :get-item-key="(item) =&gt; item.name" :get-item-text="(item) =&gt; item.name"
-  v-model="selectedFormat" path="838622353.0.0"></ui-select><transition
+  v-model="selectedNewGenerator" path="838622353.0.0"></ui-select><transition
   name="slide-large" path="838622353.0.1"><keep-alive
-  path="838622353.0.1.0"><component v-if="selectedFormat"
-  :is="selectedFormatTypeComponentName" :item="selectedFormat.item"
-  :key="selectedFormat.name"
+  path="838622353.0.1.0"><component v-if="selectedNewGenerator"
+  :is="selectedNewGeneratorTypeComponentName"
+  :source="selectedNewGenerator.source" :key="selectedNewGenerator.name"
   path="838622353.0.1.0.0"></component></keep-alive></transition></template></site>
