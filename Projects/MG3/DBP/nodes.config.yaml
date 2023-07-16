@@ -51,7 +51,8 @@ api:
     Medias.create.one:
       args: [media]
       code: | #js
-        media = await db.upsert("Medias", media);
+        if (!media) throw new Error("Argument missing: media");
+        media = await db.upsert("Medias", media, true);
         return media;
     Generators.select.search:
       args: [query]

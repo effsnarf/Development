@@ -56,3 +56,7 @@ log:
     path: (env) => env.getLogPath(env.config.title, 'errors')
 stats:
   every: 1m
+rotate:
+  nodes:
+    prod: false
+    dev: false

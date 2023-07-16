@@ -13,7 +13,7 @@ class Http {
         });
         req.on("end", () => {
           try {
-            body = Objects.json.parse(body);
+            if (typeof body == "string") body = Objects.json.parse(body);
           } catch (ex) {}
           resolve(body);
         });
