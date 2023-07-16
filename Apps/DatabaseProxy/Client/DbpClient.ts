@@ -92,11 +92,25 @@ class DatabaseProxy {
     // in which case we'll need to resolve twice which is not possible with a promise
     const options = extraArgs.find((a) => a.$set) || {};
 
+    const url = `${this.urlBase}/api/${entity}/${group}/${method}`;
+
+    // HTTP POST
+    if (group == "create") {
+      const data = {} as any;
+      args.forEach((a) => (data[a.name] = a.value));
+      const result = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      return await result.json();
+    }
+
     const argsStr = args
       .map((a) => `${a.name}=${JSON.stringify(a.value || null)}`)
       .join("&");
-    const url = `${this.urlBase}/api/${entity}/${group}/${method}?${argsStr}`;
-    const result = await this.fetchJson(url, options);
+    const getUrl = `${url}?${argsStr}`;
+    const result = await this.fetchJson(getUrl, options);
     return result;
   }
 

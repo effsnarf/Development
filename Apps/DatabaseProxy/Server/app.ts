@@ -575,7 +575,7 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
     // For /[database]/api/[entity]/[group]/[method], execute the method
     httpServer.get(
       "/:database/api/:entity/:group/:method",
-      processRequest(async (req: any, res: any, user: User) => {
+      processRequest(async (req: any, res: any, user: User, data: any) => {
         // Response type
         res.setHeader("Content-Type", "application/json");
 
@@ -600,9 +600,10 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
         }, axios, ${apiMethod.args.join(", ")}) => { ${apiMethod.code} }`;
         const func = eval(funcStr);
         const collection = await db?.getCollection(req.params.entity);
-        const args = apiMethod.args.map((arg: any) =>
-          Objects.json.parse(req.query[arg] || "null")
-        );
+        const args = apiMethod.args.map((arg: any) => {
+          if (data && data[arg]) return data[arg];
+          return Objects.json.parse(req.query[arg] || "null");
+        });
 
         const start = Date.now();
 
