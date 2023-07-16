@@ -282,6 +282,11 @@ const isCachable = (
           }
 
           if (attempt >= config.target.try.again.retries - 1) {
+            errorLogger.log(
+              options.url,
+              `${config.try.again.retries} attempts failed`,
+              ex.stack
+            );
             logNewLine(`${ex.message.red.bold} ${options.url.red.bold}`);
             currentRequests--;
             res.status(503);
