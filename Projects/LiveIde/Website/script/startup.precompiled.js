@@ -31,8 +31,8 @@ class DatabaseProxy {
         this.urlBase = urlBase;
         this.fetchAsJson =
             _fetchAsJson ||
-                ((url) => __awaiter(this, void 0, void 0, function* () {
-                    const response = yield fetch(url);
+                ((url, ...args) => __awaiter(this, void 0, void 0, function* () {
+                    const response = yield fetch(url, ...args);
                     const text = yield response.text();
                     if (!(text === null || text === void 0 ? void 0 : text.length))
                         return null;
@@ -71,7 +71,7 @@ class DatabaseProxy {
                     // we still want to fetch in the background
                     // to update for the next time
                     const fetchItem = () => __awaiter(this, void 0, void 0, function* () {
-                        const item = yield this.fetchAsJson(url);
+                        const item = yield this.fetchAsJson(url, options);
                         //localStorage.setItem(url, JSON.stringify(item));
                         return item;
                     });
@@ -83,7 +83,7 @@ class DatabaseProxy {
                     fetchItem();
                     return cachedItem;
                 }
-                return yield this.fetchAsJson(url);
+                return yield this.fetchAsJson(url, options);
             }
             // Check the local cache
             //const cachedItem = Objects.json.parse(localStorage.getItem(url) || "null");
@@ -91,7 +91,7 @@ class DatabaseProxy {
             if (cachedItem)
                 DatabaseProxy.setValue(options.$set, cachedItem);
             // Fetch in the background
-            const item = yield this.fetchAsJson(url);
+            const item = yield this.fetchAsJson(url, options);
             // Update the local cache
             //localStorage.setItem(url, JSON.stringify(item));
             DatabaseProxy.setValue(options.$set, item);
@@ -109,11 +109,7 @@ class DatabaseProxy {
             if (isHttpPost) {
                 const data = {};
                 args.forEach((a) => (data[a.name] = a.value));
-                const result = yield fetch(url, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(data),
-                });
+                const result = yield this.fetchJson(url, Object.assign({ method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) }, options));
                 return yield result.json();
             }
             const argsStr = args
@@ -170,9 +166,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "../../../../LiveIde/Website/script/1689496523338.ts":
+/***/ "../../../../LiveIde/Website/script/1689497858064.ts":
 /*!***********************************************************!*\
-  !*** ../../../../LiveIde/Website/script/1689496523338.ts ***!
+  !*** ../../../../LiveIde/Website/script/1689497858064.ts ***!
   \***********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -3474,7 +3470,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1689496523338.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1689497858064.ts");
 /******/ 	
 /******/ })()
 ;

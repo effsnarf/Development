@@ -7,16 +7,16 @@
 };
 
 class DatabaseProxy {
-  private fetchAsJson: (url: string) => Promise<any>;
+  private fetchAsJson: (url: string, ...args: any[]) => Promise<any>;
 
   private constructor(
     private urlBase: string,
-    _fetchAsJson?: (url: string) => Promise<any>
+    _fetchAsJson?: (url: string, ...args: any[]) => Promise<any>
   ) {
     this.fetchAsJson =
       _fetchAsJson ||
-      (async (url: string) => {
-        const response = await fetch(url);
+      (async (url: string, ...args: any[]) => {
+        const response = await fetch(url, ...args);
         const text = await response.text();
         if (!text?.length) return null;
         return JSON.parse(text);
@@ -25,7 +25,7 @@ class DatabaseProxy {
 
   static async new(
     urlBase: string,
-    _fetchAsJson?: (url: string) => Promise<any>
+    _fetchAsJson?: (url: string, ...args: any[]) => Promise<any>
   ) {
     const dbp = new DatabaseProxy(urlBase, _fetchAsJson);
     await dbp.init();
@@ -55,7 +55,7 @@ class DatabaseProxy {
         // we still want to fetch in the background
         // to update for the next time
         const fetchItem = async () => {
-          const item = await this.fetchAsJson(url);
+          const item = await this.fetchAsJson(url, options);
           //localStorage.setItem(url, JSON.stringify(item));
           return item;
         };
@@ -66,14 +66,14 @@ class DatabaseProxy {
         fetchItem();
         return cachedItem;
       }
-      return await this.fetchAsJson(url);
+      return await this.fetchAsJson(url, options);
     }
     // Check the local cache
     //const cachedItem = Objects.json.parse(localStorage.getItem(url) || "null");
     const cachedItem = null;
     if (cachedItem) DatabaseProxy.setValue(options.$set, cachedItem);
     // Fetch in the background
-    const item = await this.fetchAsJson(url);
+    const item = await this.fetchAsJson(url, options);
     // Update the local cache
     //localStorage.setItem(url, JSON.stringify(item));
     DatabaseProxy.setValue(options.$set, item);
@@ -99,10 +99,11 @@ class DatabaseProxy {
     if (isHttpPost) {
       const data = {} as any;
       args.forEach((a) => (data[a.name] = a.value));
-      const result = await fetch(url, {
+      const result = await this.fetchJson(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
+        ...options,
       });
       return await result.json();
     }
