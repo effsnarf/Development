@@ -487,7 +487,7 @@ if (typeof Number !== "undefined") {
       ? [unit]
       : unit.sortByDesc((u) => unitClass.unitToValue[u]);
 
-    if (this == 0) return `0${units.last()}`.c("gray");
+    if (!value) return `0${units.last()}`.c("gray");
 
     for (const u of units) {
       const currentUnitValue = unitClass.unitToValue[u];
@@ -565,6 +565,8 @@ if (typeof Number !== "undefined") {
   ): string {
     const value = this.valueOf();
     if (direction == "<") {
+      if (value === null || value === undefined || Number.isNaN(value))
+        return "gray";
       if (value <= green) return "green";
       if (value <= yellow) return "yellow";
       return bgRed ? "bgRed" : "red";
@@ -733,9 +735,7 @@ if (typeof String !== "undefined") {
     const color = value.getSeverityColor(green, yellow, direction, true);
     let coloredValue = value.unitify(unitClass).withoutUnit().colorize(color);
     if (color == "bgRed") coloredValue = coloredValue.white;
-    return `${coloredValue}${unit.c(
-      "gray"
-    )}`;
+    return `${coloredValue}${unit.c("gray")}`;
   };
 
   String.prototype.severifyByHttpStatus = function (

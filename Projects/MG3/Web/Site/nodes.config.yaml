@@ -1,11 +1,11 @@
 server:
   host: localhost
 project:
-  folder: (env) => env.path.resolve(env.process.cwd(), '../../Source')
+  folder: (env) => env.path.resolve(env.process.cwd(), '../../../Source')
 webscript:
-  folder: (env) => env.path.join(env.process.cwd(), "../../../../Shared/WebScript")
+  folder: (env) => env.path.join(env.process.cwd(), "../../../../../Shared/WebScript")
 website:
-  folder: (env) => env.path.resolve(env.process.cwd(), '../../../LiveIde/Website')
+  folder: (env) => env.path.resolve(env.process.cwd(), '../../../../LiveIde/Website')
 analytics:
   prod:
     database:

@@ -97,6 +97,8 @@ const isCachable = (
 
   let currentRequests = 0;
 
+  let startingNodeIndex = 0;
+
   // Forward all incoming HTTP requests to config.target.base.urls/..
   // If a request fails (target is down), try the cache first
   // If the cache doesn't have the response, try backup urls up to target.try.again.retries times
@@ -113,7 +115,11 @@ const isCachable = (
     currentRequests++;
 
     const tryRequest = async (attempt: number = 0) => {
-      const nodeIndex = attempt % config.target.base.urls.length;
+      const nodeIndex =
+        (startingNodeIndex + attempt) % config.target.base.urls.length;
+
+      startingNodeIndex =
+        (startingNodeIndex + 1) % config.target.base.urls.length;
 
       const targetUrl = `${config.target.base.urls[nodeIndex]}${req.url}`;
 

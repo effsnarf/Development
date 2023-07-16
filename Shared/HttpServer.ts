@@ -105,7 +105,7 @@ class HttpServer {
 
   private logResponse(timer: Timer, req: any, res?: any) {
     this.log(
-      `${`${this.ip}:${this.port}`.gray} ${timer.elapsed
+      `${timer.elapsed
         ?.unitifyTime()
         .severify(100, 500, "<")
         .padStartChars(
@@ -170,6 +170,7 @@ class HttpServer {
   }
 
   private log(...args: any[]) {
+    args.unshift(`${new Date().toLocaleTimeString().gray}`);
     args.unshift(`${this.appName?.gray}`);
     console.log(...args);
   }
