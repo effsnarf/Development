@@ -78,6 +78,7 @@ const isCachable = (
   };
 
   const logNewLine = (...args: any[]) => {
+    console.log();
     logLine(...args);
     console.log();
   };
