@@ -2,17 +2,18 @@ dom:
   div:
     e.template.editor:
       ref: TemplateEditor1
+      ':new-generator-name': '''whatIReallyDo'''
       ':temp': temp
       ':show-property-editor': 'false'
 props:
-  item: null
+  source: null
 data:
   temp: null
 watch:
-  item:
+  source:
     handler: | #js
-      function(item) {
-        if (!item) return;
+      function(source) {
+        if (!source) return;
 
         const temp = {
           id: this.$root.getUniqueClientID(),
@@ -22,8 +23,8 @@ watch:
           gap: 0.02,
           caption: {
             visible: true,
-            editable: item.title.editable,
-            text: item.title.text,
+            editable: source.title.editable,
+            text: source.title.text,
             font: 'Arial',
             color: 'white',
             align: {
@@ -36,10 +37,10 @@ watch:
           items: []
         };
 
-        const hasSubgrid = true || (item.subgrid.items > 1);
+        const hasSubgrid = true || (source.subgrid.items > 1);
 
-        const captionItems = item.captions.items || item.captions;
-        const editable = item.captions.editable || false;
+        const captionItems = source.captions.items || source.captions;
+        const editable = source.captions.editable || false;
 
         for (let i = 0; i < captionItems.length; i++)
         {
@@ -72,7 +73,7 @@ watch:
             temp.items.push(subgrid);
           }
 
-          for (let j = 0; j < item.subgrid.items; j++)
+          for (let j = 0; j < source.subgrid.items; j++)
           {
             subgrid.items.add({
               id: this.$root.getUniqueClientID(),
@@ -105,5 +106,5 @@ watch:
 name: e-format-image-grid
 template: >-
   <div class="comp-e-format-image-grid" path="-603568889."><e-template-editor
-  ref="TemplateEditor1" :temp="temp" :show-property-editor="false"
-  path="-603568889.0"></e-template-editor></div>
+  ref="TemplateEditor1" :new-generator-name="'whatIReallyDo'" :temp="temp"
+  :show-property-editor="false" path="-603568889.0"></e-template-editor></div>

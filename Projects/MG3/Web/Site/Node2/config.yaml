@@ -1,3 +1,8 @@
 title: MG.Web.Node2
 server:
   port: 5052
+process:
+  restart:
+    periodically:
+      from: 00:05
+      every: 10m

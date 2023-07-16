@@ -1,3 +1,8 @@
 title: MG.Web.Node1
 server:
   port: 5051
+process:
+  restart:
+    periodically:
+      from: 00:00
+      every: 10m
