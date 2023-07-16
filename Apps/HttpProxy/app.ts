@@ -127,7 +127,7 @@ const isCachable = (
         url: targetUrl,
         method: req.method as any,
         headers: req.headers,
-        data: postData,
+        body: postData,
         // We want to proxy the data as-is,
         responseType: "stream",
         // We want to proxy the request as-is,
@@ -229,6 +229,7 @@ const isCachable = (
 
           res.status(ex.response.status);
           res.set(ex.response.headers);
+          res.set("access-control-allow-origin", origin);
           currentRequests--;
           ex.response.data.pipe(res);
           return;
