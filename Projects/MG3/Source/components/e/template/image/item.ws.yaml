@@ -2,10 +2,10 @@ dom:
   div:
     ui.loading:
       class: absolute-center
-      v-show: item.isLoading
+      v-show: isLoading
     ui.file.dropzone:
-      v-show: '!item.isLoading'
-      @file-drop: $emit('file-drop', item, $event)
+      v-show: '!isLoading'
+      @file-drop: onFileDrop(item, $event)
       ui.movable:
         @drag-by: ({ dx, dy }) => onItemDragBy(item, { dx, dy })
         @scale-by: (ds) => onItemScaleBy(item, ds)
@@ -24,7 +24,23 @@ props:
   item: null
 data:
   itemStyle: null
+  isLoading: 0
 methods:
+  onFileDrop: | #js
+    async function(item, files) {
+      await this.$nextTick();
+      if (files.length > 1) return alertify.error('One file at a time, please');
+      this.isLoading++;
+      try
+      {
+        const image = await this.$root.uploadFile(files[0]);
+        item.imageID = image._id;
+      }
+      finally
+      {
+        this.isLoading--;
+      }
+    }
   onItemDragBy: | #js
     function(item, dpos) {
       const pos = item.trans.pos;
@@ -86,9 +102,9 @@ style:
 name: e-template-image-item
 template: >-
   <div class="comp-e-template-image-item" path="1623568049."><ui-loading
-  class="absolute-center" v-show="item.isLoading"
-  path="1623568049.0"></ui-loading><ui-file-dropzone v-show="!item.isLoading"
-  @file-drop="$emit('file-drop', item, $event)" path="1623568049.1"><ui-movable
+  class="absolute-center" v-show="isLoading"
+  path="1623568049.0"></ui-loading><ui-file-dropzone v-show="!isLoading"
+  @file-drop="onFileDrop(item, $event)" path="1623568049.1"><ui-movable
   @drag-by="({ dx, dy }) =&gt; onItemDragBy(item, { dx, dy })" @scale-by="(ds)
   =&gt; onItemScaleBy(item, ds)" path="1623568049.1.0"><ui-image ref="image1"
   v-if="item" :style="itemStyle" :imageID="item.imageID"

@@ -62,6 +62,11 @@ methods:
       this.posQueue = [];
       setTimeout(this.update.bind(this), this.updateInterval);
     }
+  cancelEvent: | #js
+    function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
 watch:
   pos:
     handler: | #js

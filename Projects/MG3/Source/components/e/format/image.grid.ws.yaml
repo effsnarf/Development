@@ -38,12 +38,15 @@ watch:
 
         const hasSubgrid = true || (item.subgrid.items > 1);
 
-        for (let i = 0; i < item.captions.length; i++)
+        const captionItems = item.captions.items || item.captions;
+        const editable = item.captions.editable || false;
+
+        for (let i = 0; i < captionItems.length; i++)
         {
           const caption = {
             visible: true,
-            editable: true,
-            text: item.captions[i],
+            editable: editable,
+            text: captionItems[i],
             font: 'Arial',
             color: 'white',
             align: {

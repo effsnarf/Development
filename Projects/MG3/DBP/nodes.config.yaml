@@ -48,6 +48,11 @@ restart:
   url: /restart/Jz0xnwG1bDv57LFpKTS6UkV8h9XQtCeBOMl2NHfRIj3yPcZYimAsrqdV4oWEaFhu
 api:
   methods:
+    Medias.create.one:
+      args: [media]
+      code: | #js
+        const media = await db.upsert("Medias", media);
+        return media;
     Generators.select.search:
       args: [query]
       code: | #js

@@ -12,7 +12,7 @@ dom:
           item-type: e.template.item.icon
           ':get-item': (node) => node
           ':get-children': (node) => node.items
-          @node-select: selectedItem = $event
+          @node-select: onNodeSelect
       .div2:
         ui.image.select:
           class: hidden
@@ -118,7 +118,7 @@ methods:
     async function(item, files) {
       await this.$nextTick();
       if (files.length > 1) return alertify.error('One file at a time, please');
-      item.isLoading = true;
+      item.isLoading = (item.isLoading || 0) + 1;
       try
       {
         const image = await this.$root.uploadFile(files[0]);
@@ -126,7 +126,7 @@ methods:
       }
       finally
       {
-        item.isLoading = false;
+        item.isLoading--;
       }
     }
   canApplyEffects: | #js
@@ -150,6 +150,12 @@ methods:
   selectItem: | #js
     function(index) {
       this.selectedItemIndex = index;
+    }
+  onNodeSelect: | #js
+    function(node) {
+      // selectedItem is computed, only the root node
+      // When editing specific nodes with the property editor, this would be enabled
+      //this.selectedItem = node;
     }
   onItemChange: | #js
     function(item) {
@@ -283,10 +289,10 @@ template: >-
   path="-650358312.0"><div v-if="showTree" path="-650358312.0.0"><ui-tree
   :root="temp" :initial-expanded="2" item-type="e.template.item.icon"
   :get-item="(node) =&gt; node" :get-children="(node) =&gt; node.items"
-  @node-select="selectedItem = $event"
-  path="-650358312.0.0.0"></ui-tree></div><div class="div2"
-  path="-650358312.0.1"><ui-image-select class="hidden" ref="imageSelect1"
-  v-if="(selectedItem?.type=='image')" v-model="selectedItem.imageID"
+  @node-select="onNodeSelect" path="-650358312.0.0.0"></ui-tree></div><div
+  class="div2" path="-650358312.0.1"><ui-image-select class="hidden"
+  ref="imageSelect1" v-if="(selectedItem?.type=='image')"
+  v-model="selectedItem.imageID"
   path="-650358312.0.1.0"></ui-image-select><e-template-grid-item :item="temp"
   @file-drop="(item, files) =&gt; onFileDrop(item, files)"
   path="-650358312.0.1.1"></e-template-grid-item><div class="text-center mt-l2"

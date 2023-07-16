@@ -1,6 +1,15 @@
 dom:
   .file-dropzone:
     ref: dropArea1
+    .upload-button:
+      v-text: '''📤'''
+      title: Upload
+      @click: onClickUpload
+    input:
+      class: hidden
+      type: file
+      ref: fileInput
+      @change: onChangeFileInput
     slot: null
 mounted: | #js
   function() {
@@ -17,6 +26,15 @@ mounted: | #js
     dropArea.addEventListener('drop', this.onlyIfFiles(this.handleDrop.bind(this)), false);
   }
 methods:
+  onClickUpload: | #js
+    function (e) {
+      this.$refs.fileInput.click();
+    }
+  onChangeFileInput: | #js
+    function (e) {
+      let files = e.target.files;
+      this.$emit('file-drop', files);
+    }
   handleDrop: | #js
     function (e) {
       let dt = e.dataTransfer;
@@ -26,8 +44,6 @@ methods:
   highlight: | #js
     function (e) {
       this.$refs.dropArea1.classList.add('drop-possible');
-      // Add tooltip attribute
-      this.$refs.dropArea1.setAttribute('tooltip', 'Drop image here');      
     }
   unhighlight: | #js
     function (e) {
@@ -48,12 +64,43 @@ methods:
       }
     }
 style:
-  .file-dropzone: null
+  .file-dropzone:
+    width: 100%
+    height: 100%
+  .upload-button:
+    display: none
+    position: absolute
+    bottom: 0%
+    left: 50%
+    cursor: pointer
+    z-index: 10
+    font-size: 1.5rem
+    filter: grayscale(1)
+    transform: translate(-50%, 0%)
+    opacity: 0.3
+  .upload-button:hover:
+    opacity: 1
+  .file-dropzone:hover .upload-button:
+    display: block
   .drop-possible:
     border: '2px dashed #ccc'
     padding: 0.5rem
+    box-shadow: 'inset -1em 1em 2em #000'
     transition: 0.3s
+  .drop-possible::before:
+    position: absolute
+    top: 50%
+    left: 50%
+    transform: translate(-50%, -50%)
+    font-size: 120%
+    text-transform: uppercase
+    text-align: center
+    text-shadow: '-2px 2px 1px #000'
+    color: '#a0a0a0'
 name: ui-file-dropzone
 template: >-
   <div class="comp-ui-file-dropzone file-dropzone" ref="dropArea1"
-  path="1956569459."><slot></slot></div>
+  path="1956569459."><div class="upload-button" v-text="'📤'" title="Upload"
+  @click="onClickUpload" path="1956569459.0"></div><input class="hidden"
+  type="file" ref="fileInput" @change="onChangeFileInput"
+  path="1956569459.1"/><slot></slot></div>

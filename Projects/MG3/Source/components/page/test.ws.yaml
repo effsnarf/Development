@@ -33,14 +33,17 @@ mounted: | #js
           text: "[theme]",
           editable: true,
         },
-        captions: [
-          "What my friends think I do",
-          "What my family thinks I do",
-          "What my boss thinks I do",
-          "What society thinks I do",
-          "What I think I do",
-          "What I really do",
-        ],
+        captions: {
+          items: [
+            "What my friends think I do",
+            "What my family thinks I do",
+            "What my boss thinks I do",
+            "What society thinks I do",
+            "What I think I do",
+            "What I really do",
+          ],
+          editable: true
+        },
         subgrid: {
           items: 1
         }
@@ -75,12 +78,30 @@ mounted: | #js
           editable: false,
         },
         captions: [
-          "Body", "Hair", "Style", "Girlfriend",
-        ],
+            "Body", "Hair", "Style", "Girlfriend",
+          ],
         subgrid: {
           items: 4
         }
       }
+    }
+
+    const fashionIdeals = {
+      name: "/fa/ Ideals",
+      type: "image.grid",
+      item: {
+        title: {
+          text: "/fa/ Ideals",
+          editable: false,
+        },
+        captions: [
+            "Hair/Face", "Body", "Lifestyle", "Style", "Partner", "Car", "Music", "Home", "EDC"
+          ],
+        subgrid: {
+          items: 4
+        }
+      }
+
     }
 
     const galaxyBrain = {
@@ -153,9 +174,10 @@ mounted: | #js
 
 
     this.formats.push(whatIReallyDo);
-    this.formats.push(fitCBT);
+    //this.formats.push(fitCBT);
     this.formats.push(fitIdeals);
-    this.formats.push(galaxyBrain);
+    this.formats.push(fashionIdeals);
+    //this.formats.push(galaxyBrain);
   }
 computed:
   selectedFormatTypeComponentName: | #js
