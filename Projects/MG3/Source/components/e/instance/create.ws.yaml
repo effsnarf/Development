@@ -1,5 +1,5 @@
 dom:
-  div:
+  div: 
     class: hidden
     transition: 
       name: slide
@@ -129,7 +129,7 @@ style:
     width: 70%
     margin: 0.5rem auto
 template: >-
-  <div class="comp-e-instance-create" path="-903297812."><transition
+  <div class="comp-e-instance-create hidden" path="-903297812."><transition
   name="slide" path="-903297812.0"><e-generator-select v-show="!generator
   &amp;&amp; showGeneratorSelect" v-model="generator || tempInstance.generator"
   @input="showGeneratorSelect = false"
