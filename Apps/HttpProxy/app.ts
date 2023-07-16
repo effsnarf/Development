@@ -107,13 +107,6 @@ const isCachable = (
   app.all("*", async (req: any, res: any) => {
     const origin = req.headers.origin || "*";
 
-    // Check if it's a preflight request
-    if (req.method === "OPTIONS") {
-      res.set("access-control-allow-headers", "*");
-      res.set("access-control-allow-origin", origin);
-      return res.status(200).end();
-    }
-
     // Remove &_uid=1685119338348 from the URL (uniquifies the request)
     let cacheKey = req.url;
     cacheKey = cacheKey?.replace(/&_uid=\d+/g, "");

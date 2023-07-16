@@ -67,7 +67,13 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
     for (const dbName of Object.keys(config.dbs)) {
       dbps[dbName] = await DatabaseProxy.new(
         `http://${config.server.host}:${config.server.port}/${dbName}`,
-        async (url) => (await axios.get(url)).data
+        async (url) => {
+          try {
+            return (await axios.get(url)).data;
+          } catch (ex: any) {
+            throw new Error(`${ex.message}: ${url}`);
+          }
+        }
       );
     }
   }, 1000);
@@ -141,7 +147,7 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
 
   // #region 📝 Logging
   const debugLogger = Logger.new(config.log.debug);
-  const errorLogger = Logger.new(config.log.error);
+  const errorLogger = Logger.new(config.log.errors);
   debugLogger.log(Objects.yamlify(config));
   // #endregion
 
@@ -346,8 +352,15 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
       return async (req: any, res: any) => {
         currentRequests++;
         const timer = Timer.start();
+        const origin = req.headers.origin || "*";
         try {
           requests.per.minute.track(1);
+          // Check if it's a preflight request
+          if (req.method === "OPTIONS") {
+            res.set("access-control-allow-headers", "*");
+            res.set("access-control-allow-origin", origin);
+            return res.status(200).end();
+          }
           // Get the POST data
           const data = await Http.getPostData(req);
           const user = await User.get(req, res, data);
@@ -855,7 +868,6 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
   process.on("uncaughtException", async (ex: any) => {
     mainLog.log(`Uncaught exception:`, ex.stack.bgRed);
     errorLogger.log(ex.stack);
-    await debugLogger.flush();
   });
   // #endregion
 
