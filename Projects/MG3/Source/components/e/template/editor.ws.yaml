@@ -100,7 +100,7 @@ dom:
               to change the layout.'
 props:
   temp: null
-  newGeneratorName: null
+  newGeneratorKey: null
   showPropertyEditor: true
 data:
   selectedItemIndex: 0
@@ -178,7 +178,8 @@ methods:
       this.isCreatingMedia = true;
       try
       {
-        const media = this.getMedia(this.temp);
+        let media = this.getMedia(this.temp);
+        media = await this.$root.dbp.medias.create.one(media);
         console.log(media);
       }
       finally
@@ -204,7 +205,7 @@ methods:
       walk(temp);
 
       const media = {
-        newGenerator: { name: this.newGeneratorName },
+        newGenerator: { key: this.newGeneratorKey },
         content: {
           items: tcs
         }

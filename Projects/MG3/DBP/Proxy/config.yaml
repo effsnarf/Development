@@ -16,7 +16,7 @@ target:
   timeout: 5s
   try:
     again:
-      retries: 20
+      retries: 30
       delay: 1s
 analytics:
   prod:

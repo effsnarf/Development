@@ -2,7 +2,7 @@ dom:
   div:
     e.template.editor:
       ref: TemplateEditor1
-      ':new-generator-name': '''whatIReallyDo'''
+      ':new-generator-key': '''what.i.really.do'''
       ':temp': temp
       ':show-property-editor': 'false'
 props:
@@ -106,5 +106,5 @@ watch:
 name: e-format-image-grid
 template: >-
   <div class="comp-e-format-image-grid" path="-603568889."><e-template-editor
-  ref="TemplateEditor1" :new-generator-name="'whatIReallyDo'" :temp="temp"
+  ref="TemplateEditor1" :new-generator-key="'what.i.really.do'" :temp="temp"
   :show-property-editor="false" path="-603568889.0"></e-template-editor></div>

@@ -103,7 +103,7 @@ class DatabaseProxy {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
-        ...options,
+        mode: "no-cors",
       });
       return await result.json();
     }

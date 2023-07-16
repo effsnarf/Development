@@ -178,8 +178,20 @@ const isCachable = (
           );
           stats.response.times.track(timer.elapsed);
           stats.successes.track(1);
+          currentRequests--;
         });
 
+        nodeResponse.data.on("error", async (ex: any) => {
+          logNewLine(
+            `${timer.elapsed?.unitifyTime().severify(100, 500, "<")} ${
+              nodeResponse.status.toString().yellow
+            } ${ex.message?.red.bold} ${options.url.red.bold}`
+          );
+          stats.response.times.track(timer.elapsed);
+          currentRequests--;
+        });
+
+        // Save the response to the cache
         if (cache) {
           if (isCachable(options, config, req, nodeResponse)) {
             let data = await Http.getResponseStream(nodeResponse);
@@ -203,7 +215,6 @@ const isCachable = (
           }
         }
 
-        currentRequests--;
         return;
       } catch (ex: any) {
         // Some HTTP status codes are not errors (304 not modified, 404 not found, etc.)
@@ -230,8 +241,13 @@ const isCachable = (
           res.status(ex.response.status);
           res.set(ex.response.headers);
           res.set("access-control-allow-origin", origin);
-          currentRequests--;
           ex.response.data.pipe(res);
+          ex.response.data.on("end", async () => {
+            currentRequests--;
+          });
+          ex.response.data.on("error", async (ex: any) => {
+            currentRequests--;
+          });
           return;
         }
 
@@ -264,6 +280,9 @@ const isCachable = (
 
           if (attempt >= config.target.try.again.retries - 1) {
             logNewLine(`${ex.message.red.bold} ${options.url.red.bold}`);
+            currentRequests--;
+            res.status(503);
+            return res.end();
           }
 
           // Try again

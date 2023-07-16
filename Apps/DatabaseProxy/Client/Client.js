@@ -465,13 +465,15 @@ if (typeof require != "undefined") {
 
       if (isHttpPost)
       {
+        const options = {...this.fetchOptions, mode: "no-cors"};
+        
         const data = new FormData();
         for (const arg of args) data.append(arg.name, arg.value);
 
         var result = await this.fetchUrlJson(url, {
           method: "POST",
           body: data,
-          ...this.fetchOptions,
+          options,
         });
         return result;
       }
