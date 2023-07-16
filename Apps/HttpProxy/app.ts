@@ -120,8 +120,7 @@ const isCachable = (
       const nodeIndex =
         (startingNodeIndex + attempt) % config.target.base.urls.length;
 
-      startingNodeIndex =
-        (startingNodeIndex + 1) % config.target.base.urls.length;
+      //startingNodeIndex = (startingNodeIndex + 1) % config.target.base.urls.length;
 
       const targetUrl = `${config.target.base.urls[nodeIndex]}${req.url}`;
 

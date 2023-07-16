@@ -91,6 +91,8 @@ abstract class DatabaseBase {
       return results;
     }
 
+    if (!doc) throw new Error("Cannot upsert null doc");
+
     if (uppercaseFields) doc = Objects.toTitleCaseKeys(doc);
 
     if (returnNewDoc && returnDiff)
