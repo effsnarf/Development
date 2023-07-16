@@ -204,10 +204,12 @@ class Objects {
   static json = {
     parse: (str: string) => {
       try {
-        if (str?.trim()?.withoutColors() === "undefined") return undefined;
+        if (str === null) return null;
+        if (str === undefined) return undefined;
+        if (str === "undefined") return undefined;
         return JSON.parse(str);
       } catch (ex: any) {
-        throw `Error parsing JSON:\n\n${str}\n\n${ex.stack}`;
+        throw `Error parsing JSON:\n\n${JSON.stringify(str)}\n\n${ex.stack}`;
       }
     },
   };
