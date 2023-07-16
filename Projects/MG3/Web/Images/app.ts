@@ -126,10 +126,9 @@ import { Logger } from "@shared/Logger";
     // /images/73343154/text.jpg
     if (ps.length == 5) {
       imageID = parseInt(ps[2]);
-    }
-    if (ps.length == 4) {
+    } else if (ps.length == 4) {
       imageID = parseInt(ps[2]);
-    } else if (ps.length > 4) {
+    } else if (ps.length > 5) {
       const size = ps[2].split(`x`);
       const width = parseInt(size[0]);
       const height = parseInt(size[1]);
@@ -137,7 +136,7 @@ import { Logger } from "@shared/Logger";
     }
 
     if (Number.isNaN(imageID)) {
-      throw new Error(`Invalid image ID: ${imageID}, ${ps.join("/")}`);
+      throw new Error(`Invalid image ID: ${imageID}, ${JSON.stringify(ps)}`);
     }
 
     let imagePath = getSplitDirImagePath(imageID, ext, noBg);
