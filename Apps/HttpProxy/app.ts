@@ -109,6 +109,7 @@ const isCachable = (
 
     // Check if it's a preflight request
     if (req.method === "OPTIONS") {
+      res.set("access-control-allow-headers", "*");
       res.set("access-control-allow-origin", origin);
       return res.status(200).end();
     }
