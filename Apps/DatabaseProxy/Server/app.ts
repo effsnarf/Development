@@ -140,7 +140,8 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
   // #endregion
 
   // #region 📝 Logging
-  const debugLogger = Logger.new(config.log);
+  const debugLogger = Logger.new(config.log.debug);
+  const errorLogger = Logger.new(config.log.error);
   debugLogger.log(Objects.yamlify(config));
   // #endregion
 
@@ -368,7 +369,7 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
           );
         } catch (ex: any) {
           debugLogger.log(`${timer.elapsed?.unitifyTime()} ${req.url}`);
-          debugLogger.log(ex.stack || ex);
+          errorLogger.log(ex.stack || ex);
           itemsLog.log(
             req.method,
             res.statusCode.severifyByHttpStatus(),
@@ -638,7 +639,7 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
               return res.status(404).send(ex);
             }
           }
-          debugLogger.log(ex.stack);
+          errorLogger.log(ex.stack);
           if (req.query.debug) {
             return res
               .status(500)
@@ -852,7 +853,7 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
   // #region Log unhandled errors
   process.on("uncaughtException", async (ex: any) => {
     mainLog.log(`Uncaught exception:`, ex.stack.bgRed);
-    debugLogger.log(`Uncaught exception:`, ex.stack);
+    errorLogger.log(ex.stack);
     await debugLogger.flush();
   });
   // #endregion

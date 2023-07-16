@@ -14,3 +14,10 @@ database:
   database: MemeGenerator
 severity:
   time: [400, 800, "<"]
+log:
+  debug:
+    enabled: true
+    path: (env) => env.getLogPath(env.config.title, 'debug')
+  errors:
+    enabled: true
+    path: (env) => env.getLogPath(env.config.title, 'errors')

@@ -30,7 +30,10 @@ analytics:
 severity:
   time: [50, 500, "<"]
 log:
-  path: (env) => env.getLogPath(env.config.title)
+  debug:
+    path: (env) => env.getLogPath(env.config.title, "debug")
+  errors:
+    path: (env) => env.getLogPath(env.config.title, "errors")
 requests:
   severity:
     time: [100, 500, "<"]

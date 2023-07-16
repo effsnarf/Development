@@ -174,6 +174,8 @@ class Configuration {
   }
 
   private init() {
+    if (this.data.title) process.title = this.data.title;
+
     this.nextRestartTime = this.getNextRestartTime();
     if (this.nextRestartTime) {
       setTimeout(() => {

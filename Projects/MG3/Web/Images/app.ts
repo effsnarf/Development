@@ -15,6 +15,7 @@ import { Loading } from "@shared/Loading";
 import { Database } from "@shared/Database/Database";
 import { MongoDatabase } from "@shared/Database/MongoDatabase";
 import { Timer } from "@shared/Timer";
+import { Logger } from "@shared/Logger";
 
 (async () => {
   const config = (await Configuration.new()).data;
@@ -23,6 +24,8 @@ import { Timer } from "@shared/Timer";
   };
   const db = (await Database.new(config.database)) as MongoDatabase;
   db.options.lowercaseFields = true;
+
+  const errorLogger = Logger.new(config.log.errors);
 
   const log = (...args: any[]) => {
     args = args.map((a) => (typeof a == "string" ? a.gray : a));
@@ -119,6 +122,11 @@ import { Timer } from "@shared/Timer";
     ps = ps.except("nobg");
     const ext = ps[ps.length - 1];
     let imageID = 0;
+
+    // /images/73343154/text.jpg
+    if (ps.length == 5) {
+      imageID = parseInt(ps[2]);
+    }
     if (ps.length == 4) {
       imageID = parseInt(ps[2]);
     } else if (ps.length > 4) {
@@ -126,6 +134,10 @@ import { Timer } from "@shared/Timer";
       const width = parseInt(size[0]);
       const height = parseInt(size[1]);
       imageID = parseInt(ps[3]);
+    }
+
+    if (Number.isNaN(imageID)) {
+      throw new Error(`Invalid image ID: ${imageID}, ${ps.join("/")}`);
     }
 
     let imagePath = getSplitDirImagePath(imageID, ext, noBg);
@@ -256,6 +268,8 @@ import { Timer } from "@shared/Timer";
       }
       log(url.bgRed.white);
       log(ex.stack.bgRed.white);
+      errorLogger.log(url);
+      errorLogger.log(ex.stack);
       writeStatus(500);
       res.end();
     }
@@ -292,6 +306,8 @@ import { Timer } from "@shared/Timer";
       } catch (ex: any) {
         log(`Error occurred: ${ex.message.bgRed.white}`);
         log(ex.stack.bgRed.white);
+        errorLogger.log(req.url);
+        errorLogger.log(ex.stack);
         writeStatus(500);
         res.write(JSON.stringify({ error: ex.message, stack: ex.stack }));
         res.end();
