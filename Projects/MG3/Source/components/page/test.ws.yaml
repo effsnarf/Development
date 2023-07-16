@@ -1,0 +1,185 @@
+dom:
+  site:
+    page-name: test
+    ':columns': 2
+    template:
+      v-slot: article
+      ui.select:
+        ':options': formats
+        input-type: value
+        direction: horizontal
+        ':get-item-key': (item) => item.name
+        ':get-item-text': (item) => item.name
+        v-model: selectedFormat
+      transition:
+        name: slide-large
+        keep.alive:
+          component:
+            v-if: selectedFormat
+            ':is': selectedFormatTypeComponentName
+            ':item': selectedFormat.item
+            ':key': selectedFormat.name
+props: null
+data:
+  formats: []
+  selectedFormat: null
+mounted: | #js
+  async function() {
+    const whatIReallyDo = {
+      name: "What I Really Do",
+      type: "image.grid",
+      item: {
+        title: {
+          text: "[theme]",
+          editable: true,
+        },
+        captions: [
+          "What my friends think I do",
+          "What my family thinks I do",
+          "What my boss thinks I do",
+          "What society thinks I do",
+          "What I think I do",
+          "What I really do",
+        ],
+        subgrid: {
+          items: 1
+        }
+      }
+    };
+
+    const fitCBT = {
+      name: "/fit/ CBT",
+      type: "image.grid",
+      item: {
+        title: {
+          text: "/fit/ CBT",
+          editable: false,
+        },
+        captions: [
+          "What I want to look like",
+          "What I think I look like",
+          "What I actually look like",
+        ],
+        subgrid: {
+          items: 1
+        }
+      }
+    }
+
+    const fitIdeals = {
+      name: "/fit/ Ideals",
+      type: "image.grid",
+      item: {
+        title: {
+          text: "/fit/ Ideals",
+          editable: false,
+        },
+        captions: [
+          "Body", "Hair", "Style", "Girlfriend",
+        ],
+        subgrid: {
+          items: 4
+        }
+      }
+    }
+
+    const galaxyBrain = {
+      name: "Galaxy Brain",
+      type: "template",
+      item: null
+    }
+    
+    galaxyBrain.item = {
+      id: this.$root.getUniqueClientID(),
+      type: "grid",
+      visible: true,
+      aspectRatio: null,
+      gap: 0.02,
+      items: []
+    };
+
+    for (let i = 0; i < 4; i++)
+    {
+      const subgrid = {
+        id: this.$root.getUniqueClientID(),
+        type: "grid",
+        visible: true,
+        aspectRatio: null,
+        gap: 0.02,
+        items: []
+      };
+
+      const caption = {
+        type: "caption",
+        visible: true,
+        editable: true,
+        text: `text ${i}`,
+        font: 'Arial',
+        color: 'white',
+        align: {
+          h: "center",
+          v: "center"
+        },
+        uppercase: false,
+      };
+
+      const image = {
+        id: this.$root.getUniqueClientID(),
+        type: "image",
+        visible: true,
+        imageID: null,
+        removeBackground: false,
+        trans: {
+            pos: {
+                x: 0.5,
+                y: 0.5
+            },
+            scale: 1
+        },
+        shadow: {
+          x: 0,
+          y: 0,
+          blur: 0,
+          color: '#000000',
+          opacity: 1
+        },
+      };
+
+      subgrid.items.push(caption);
+      subgrid.items.push(image);
+
+      galaxyBrain.item.items.push(subgrid);
+    }
+
+
+    this.formats.push(whatIReallyDo);
+    this.formats.push(fitCBT);
+    this.formats.push(fitIdeals);
+    this.formats.push(galaxyBrain);
+  }
+computed:
+  selectedFormatTypeComponentName: | #js
+    function() {
+      if (!this.selectedFormat) return null;
+      return `e-format-${this.selectedFormat.type.replace(/\./g, '-')}`;
+    }
+watch:
+  selectedFormat: | #js
+    async function() {
+      await this.$nextTick();
+      // Press [play] on all videos inside this component
+      const videos = this.$el.querySelectorAll("video");
+      for (const video of videos) video.play();
+    }
+name: page-test
+template: >-
+  <site class="comp-page-test" page-name="test" :columns="2"
+  path="838622353."><template v-slot:article path="838622353.0"><ui-select
+  :options="formats" input-type="value" direction="horizontal"
+  :get-item-key="(item) =&gt; item.name" :get-item-text="(item) =&gt; item.name"
+  v-model="selectedFormat" path="838622353.0.0"></ui-select><transition
+  name="slide-large" path="838622353.0.1"><keep-alive
+  path="838622353.0.1.0"><component v-if="selectedFormat"
+  :is="selectedFormatTypeComponentName" :item="selectedFormat.item"
+  :key="selectedFormat.name"
+  path="838622353.0.1.0.0"></component></keep-alive></transition></template></site>

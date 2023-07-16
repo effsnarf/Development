@@ -48,7 +48,11 @@ cache:
       # - database:
       #     path: F:\Database\MG-DBP-Cache
 log:
-  enabled: true
-  path: (env) => env.getLogPath(env.config.title)
+  debug:
+    enabled: true
+    path: (env) => env.getLogPath(env.config.title, 'debug')
+  errors:
+    enabled: true
+    path: (env) => env.getLogPath(env.config.title, 'errors')
 stats:
   every: 1m

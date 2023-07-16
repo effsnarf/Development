@@ -314,17 +314,18 @@ class Configuration {
 
   static getConfigContext(configData: any) {
     const context = { os, process, path, config: configData } as any;
-    context.getLogPath = (title: string) =>
-      Configuration.getLogPath(configData, title);
+    context.getLogPath = Configuration.getLogPath;
     return context;
   }
 
-  static getLogPath(configData: any, title: string) {
+  //** @param (String) type - "debug", "error", etc */
+  static getLogPath(title: string, type?: string) {
     const parts = [];
     parts.push(process.argv[1].findParentDir("Development"));
     parts.push("Logs");
     // Add the title to the log path
-    parts.push(`${title}.log`);
+    if (type) parts.push(`${type}`);
+    parts.push(`${title}`);
     const now = new Date();
     // Add yyyy\mm\dd to the log path
     parts.push(...now.toISOString().split("T")[0].split("-").slice(0, 3));

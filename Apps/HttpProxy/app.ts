@@ -54,7 +54,8 @@ const isCachable = (
 (async () => {
   const config = (await Configuration.new()).data;
 
-  const debugLogger = Logger.new(config.log);
+  const debugLogger = Logger.new(config.log.debug);
+  const errorLogger = Logger.new(config.log.errors);
 
   const logLine = (...args: any[]) => {
     args = [
@@ -115,6 +116,7 @@ const isCachable = (
       const nodeIndex = attempt % config.target.base.urls.length;
 
       const targetUrl = `${config.target.base.urls[nodeIndex]}${req.url}`;
+
       const options = {
         url: targetUrl,
         method: req.method as any,
@@ -143,15 +145,8 @@ const isCachable = (
       const origin = req.headers.origin || "*";
 
       try {
-        const responseInterval = setInterval(() => {
-          // logLine(
-          //   "fetching",
-          //   responseTimer.elapsed?.unitifyTime(),
-          //   options.url
-          // );
-        }, 1000);
         const nodeResponse = await axios.request(options);
-        clearInterval(responseInterval);
+
         // Add debug headers
         // debug-proxy-source:
         // - forwarded
@@ -315,6 +310,14 @@ const isCachable = (
     );
   }, stats.interval);
 
+  // #region Log unhandled errors
+  process.on("uncaughtException", async (ex: any) => {
+    errorLogger.log(`Uncaught exception:`, ex.stack);
+    await errorLogger.flush();
+  });
+  // #endregion
+
+  // #region Start the server
   const server = config.incoming.server;
 
   app.listen(server.port, server.host, () => {
@@ -327,4 +330,5 @@ const isCachable = (
       logNewLine(`${`Target`.green} ${`URL`.gray} ${url.yellow}`);
     }
   });
+  // #endregion
 })();

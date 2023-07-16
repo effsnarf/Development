@@ -158,9 +158,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "../../../LiveIde/Website/script/1689433651204.ts":
+/***/ "../../../LiveIde/Website/script/1689439954399.ts":
 /*!********************************************************!*\
-  !*** ../../../LiveIde/Website/script/1689433651204.ts ***!
+  !*** ../../../LiveIde/Website/script/1689439954399.ts ***!
   \********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -1831,8 +1831,9 @@ class Objects {
 exports.Objects = Objects;
 Objects.json = {
     parse: (str) => {
+        var _a;
         try {
-            if (str == "undefined")
+            if (((_a = str === null || str === void 0 ? void 0 : str.trim()) === null || _a === void 0 ? void 0 : _a.withoutColors()) === "undefined")
                 return undefined;
             return JSON.parse(str);
         }
@@ -3454,7 +3455,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("../../../LiveIde/Website/script/1689433651204.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("../../../LiveIde/Website/script/1689439954399.ts");
 /******/ 	
 /******/ })()
 ;

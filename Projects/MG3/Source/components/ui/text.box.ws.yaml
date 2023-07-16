@@ -4,6 +4,7 @@ dom:
       v-if: icon
       v-text: icon
     input:
+      ':class': '{ hasIcon: icon }'
       ':type': type
       ':placeholder': hint
       ':value': value
@@ -20,13 +21,13 @@ methods:
     }
 name: ui-text-box
 style:
-  input:
+  input.has-icon:
     padding-left: 2em !important
   .icon:
     position: absolute
     margin: 0.7em
 template: >-
   <div class="comp-ui-text-box" path="-1492297820."><div class="icon"
-  v-if="icon" v-text="icon" path="-1492297820.0"></div><input :type="type"
-  :placeholder="hint" :value="value" @input="onInput"
+  v-if="icon" v-text="icon" path="-1492297820.0"></div><input :class="{ hasIcon:
+  icon }" :type="type" :placeholder="hint" :value="value" @input="onInput"
   path="-1492297820.1"/></div>

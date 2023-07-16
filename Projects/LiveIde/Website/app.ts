@@ -227,13 +227,13 @@ const _fetchAsJson = async (url: string) => {
     return yaml;
   };
 
-  const isLocalFolder = (url: string) => {
-    const localPath = path.join(process.cwd(), url);
+  const isLocalFile = (url: string) => {
+    const localPath = path.join(__dirname, url);
     return fs.existsSync(localPath);
   };
 
   const staticFileFolders = [
-    process.cwd(),
+    __dirname,
     config.project.folder,
     config.webscript.folder,
     config.website?.folder,
@@ -246,7 +246,7 @@ const _fetchAsJson = async (url: string) => {
     config.server.port,
     config.server.host,
     async (req, res, data) => {
-      if (req.url.startsWith("/img/") && !isLocalFolder(req.url)) {
+      if (req.url.startsWith("/img/") && !isLocalFile(req.url)) {
         // Redirect to img.memegenerator.net
         const url = `https://img.memegenerator.net/${req.url.replace(
           "/img/",
@@ -348,7 +348,7 @@ const _fetchAsJson = async (url: string) => {
               );
             // If image file, serve as binary
             if (Http.isImageFile(filePath)) {
-              res.setHeader("Content-Type", "image/png");
+              res.setHeader("Content-Type", `image/${path.extname(filePath)}`);
               return res.end(fs.readFileSync(filePath));
             }
             if (Http.isVideoFile(filePath)) {

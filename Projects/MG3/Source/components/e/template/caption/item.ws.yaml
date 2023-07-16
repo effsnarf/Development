@@ -1,20 +1,27 @@
 dom:
   div: 
-    @click: $emit('click')
     v-if: item
     div: 
       class: size-ref
       ref: sizeRef1
       .text:
-        v-html: $root.textToHtml(item.text)
         ':class': getCssClass(item)
         ':style': itemStyle
+        div: 
+          v-html: $root.textToHtml(item.text)
+          @click: onClickText
+        transition:
+          name: slide
+          ui.text.box:
+            v-if: showEditor
+            ':class': getCssClass(item)
+            v-model: item.text
 name: e-template-caption-item
 props:
   item: null
-  showCreatePost: true
 data:
   width: null
+  showEditor: false
 mounted: | #js
   function () {
     window.addEventListener(`resize`, this.recalc.bind(this));
@@ -23,6 +30,15 @@ mounted: | #js
     resizeObserver.observe(this.$refs.sizeRef1);
   }
 methods:
+  onClickText: | #js
+    function () {
+      if (this.item.editable)
+      {
+        this.showEditor = !this.showEditor;
+        return;
+      }
+      this.$emit("click");
+    }
   onLoad: | #js
     function () {
       this.recalc();
@@ -74,24 +90,28 @@ computed:
       return this.getStyle(this.item);
     }
 style:
+  input[type="text"]:
+    font-size: 100%
   .size-ref, .text:
     width: 100%
     object-fit: cover
     position: relative
   .size-ref:
     height: fit-content
-  .text.h-left:
+  .h-left:
     text-align: left
-  .text.h-center:
+  .h-center:
     text-align: center
-  .text.h-right:
+  .h-center input:
+    text-align: center
+  .h-right:
     text-align: right
-  .text.v-top:
+  .v-top:
     top: 0
-  .text.v-center:
+  .v-center:
     top: 50%
     transform: translateY(-50%)
-  .text.v-bottom:
+  .v-bottom:
     bottom: 0
   .text:
     display: block
@@ -105,7 +125,11 @@ style:
     filter: 'drop-shadow(-2px 4px 2px #00000080)'
     transition: 0s
 template: >-
-  <div class="comp-e-template-caption-item" @click="$emit('click')" v-if="item"
-  path="128142918."><div class="size-ref" ref="sizeRef1" path="128142918.0"><div
-  class="text" v-html="$root.textToHtml(item.text)" :class="getCssClass(item)"
-  :style="itemStyle" path="128142918.0.0"></div></div></div>
+  <div class="comp-e-template-caption-item" v-if="item" path="128142918."><div
+  class="size-ref" ref="sizeRef1" path="128142918.0"><div class="text"
+  :class="getCssClass(item)" :style="itemStyle" path="128142918.0.0"><div
+  v-html="$root.textToHtml(item.text)" @click="onClickText"
+  path="128142918.0.0.0"></div><transition name="slide"
+  path="128142918.0.0.1"><ui-text-box v-if="showEditor"
+  :class="getCssClass(item)" v-model="item.text"
+  path="128142918.0.0.1.0"></ui-text-box></transition></div></div></div>
