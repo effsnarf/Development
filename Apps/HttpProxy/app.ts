@@ -431,9 +431,11 @@ class TaskManager {
 
   // Every minute, track requests/minute and response times in analytics
   const analytics = await Analytics.new(config.analytics);
+  const appTitle = config.title.split(".").take(2).join(".");
+  console.log(appTitle);
   setInterval(async () => {
     await analytics.create(
-      config.title.split(".").first(),
+      appTitle,
       "network",
       "requests",
       ItemType.Count,
@@ -442,7 +444,7 @@ class TaskManager {
       null
     );
     await analytics.create(
-      config.title.split(".").first(),
+      appTitle,
       "network",
       "response.time",
       ItemType.Average,
@@ -452,6 +454,15 @@ class TaskManager {
         average: stats.response.times.average,
       },
       "ms"
+    );
+    await analytics.create(
+      appTitle,
+      "network",
+      "queue",
+      ItemType.Count,
+      stats.interval,
+      tasks.count,
+      null
     );
     tasks.logStatus();
   }, stats.interval);
