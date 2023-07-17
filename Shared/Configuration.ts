@@ -154,8 +154,15 @@ class Configuration {
       .forEach((file) => {
         config.log(`${`Watching`.gray} ${file.toShortPath()}`);
         fs.watchFile(file, () => {
-          config.log(`${file.toShortPath()} ${`changed, restarting...`.gray}`);
-          process.exit();
+          const delay = (config.data.restart?.delay || "0s").deunitify();
+          config.log(
+            `${file.toShortPath()} ${
+              `changed, restarting in ${delay.unitifyTime()}...`.gray
+            }`
+          );
+          setTimeout(() => {
+            process.exit();
+          }, delay);
         });
       });
 
