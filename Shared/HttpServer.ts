@@ -54,7 +54,7 @@ class HttpServer {
     const timer = Timer.start();
 
     try {
-      const data = await Http.getPostData(req);
+      const data = await Http.getPostDataFromStream(req);
 
       const customResult = await this.handler(req, res, data);
       if (customResult) {

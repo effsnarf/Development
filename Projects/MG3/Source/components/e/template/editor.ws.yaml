@@ -179,7 +179,12 @@ methods:
       try
       {
         let media = this.getMedia(this.temp);
+        const _uid = this.$root.getRandomUniqueID();
+        media._uid = _uid;
         media = await this.$root.dbp.medias.create.one(media);
+        // When POSTing from localhost to db.mg.net, we don't get the response,
+        // so we're making another request
+        if (!media) media = await this.$root.dbp.medias.select.one(_uid);
         console.log(media);
       }
       finally

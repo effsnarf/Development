@@ -171,9 +171,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "../../../../LiveIde/Website/script/1689601282461.ts":
+/***/ "../../../../LiveIde/Website/script/1689605016432.ts":
 /*!***********************************************************!*\
-  !*** ../../../../LiveIde/Website/script/1689601282461.ts ***!
+  !*** ../../../../LiveIde/Website/script/1689605016432.ts ***!
   \***********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -263,9 +263,7 @@ const helpers = {
     yield client.compileAll();
     let ideVueApp = null;
     const isLocalHost = window.location.hostname == "localhost";
-    const dbpHost = isLocalHost
-        ? `http://localhost:4040`
-        : `https://db.memegenerator.net`;
+    const dbpHost = `https://db.memegenerator.net`;
     const dbp = (yield DbpClient_1.DatabaseProxy.new(`${dbpHost}/MemeGenerator`));
     const getNewParams = () => __awaiter(void 0, void 0, void 0, function* () {
         return (yield Params_1.Params.new(() => ideVueApp, client.config.params, window.location.pathname));
@@ -609,6 +607,14 @@ const helpers = {
             getUniqueClientID() {
                 const self = this;
                 return self.$data._uniqueClientID++;
+            },
+            getRandomUniqueID() {
+                // Fallback for browsers without crypto.getRandomValues support
+                return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (char) => {
+                    const random = (Math.random() * 16) | 0;
+                    const value = char === "x" ? random : (random & 0x3) | 0x8;
+                    return value.toString(16);
+                });
             },
             wait(condition, timeout = 10000) {
                 return __awaiter(this, void 0, void 0, function* () {
@@ -2944,7 +2950,11 @@ if (typeof Array !== "undefined") {
     Array.prototype.joinColumns = function (columns, ellipsis) {
         if (!columns.length)
             return this.join(" ");
-        return this.map((item, i) => `${(item || "").toLength(columns[i], ellipsis, "right")}`).join(" ");
+        return this.map((item, i) => {
+            if (typeof item != "string")
+                item = JSON.stringify(item);
+            return `${(item || "").toLength(columns[i], ellipsis, "right")}`;
+        }).join(" ");
     };
     Array.prototype.distinct = function (project) {
         if (!project)
@@ -3479,7 +3489,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1689601282461.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1689605016432.ts");
 /******/ 	
 /******/ })()
 ;

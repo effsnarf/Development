@@ -82,9 +82,7 @@ interface MgParams {
   let ideVueApp: any = null;
 
   const isLocalHost = window.location.hostname == "localhost";
-  const dbpHost = isLocalHost
-    ? `http://localhost:4040`
-    : `https://db.memegenerator.net`;
+  const dbpHost = `https://db.memegenerator.net`;
 
   const dbp = (await DatabaseProxy.new(`${dbpHost}/MemeGenerator`)) as any;
 
@@ -412,6 +410,17 @@ interface MgParams {
       getUniqueClientID() {
         const self = this as any;
         return self.$data._uniqueClientID++;
+      },
+      getRandomUniqueID() {
+        // Fallback for browsers without crypto.getRandomValues support
+        return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
+          /[xy]/g,
+          (char) => {
+            const random = (Math.random() * 16) | 0;
+            const value = char === "x" ? random : (random & 0x3) | 0x8;
+            return value.toString(16);
+          }
+        );
       },
       async wait(condition: () => boolean, timeout = 10000) {
         const startedAt = Date.now();
