@@ -76,7 +76,9 @@ class TaskManager {
   add(task: Task) {
     task.id = this._taskID++;
     task.logTimer = setInterval(() => {
-      task.log.push(`${task.timer.elapsed?.unitifyTime()} passed`);
+      task.log.push(
+        `${task.timer.elapsed?.unitifyTime().withoutColors()} passed`
+      );
       this.taskLogger.log(task);
     }, 1000);
     this.items.set(task.id, task);
@@ -161,6 +163,7 @@ class TaskManager {
       // debug-proxy-source:
       // - forwarded
       // - cache
+      const origin = req.headers.origin || "*";
       res.set(
         "x-debug-proxy-source",
         `forwarded (${task.attempt.ordinalize()} attempt)`
