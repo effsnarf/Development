@@ -41,6 +41,13 @@ cache:
 stats:
   every: 1m
 log:
+  tasks:
+    enabled: true
+    path: (env) => env.getLogPath(env.config.title, 'tasks')
+  status:
+    enabled: true
+    overwrite: true
+    path: (env) => env.getLogPath(env.config.title, 'status')
   debug:
     enabled: true
     path: (env) => env.getLogPath(env.config.title, 'debug')
