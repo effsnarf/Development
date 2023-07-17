@@ -4,5 +4,5 @@ server:
 process:
   restart:
     periodically:
-      from: 00:05
-      every: 10m
+      from: 00:15
+      every: 30m
