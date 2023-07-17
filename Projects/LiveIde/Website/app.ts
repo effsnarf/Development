@@ -260,6 +260,10 @@ const _fetchAsJson = async (url: string) => {
         return res.end();
       }
 
+      if (req.url == "/analytics") {
+        return res.end(JSON.stringify(null));
+      }
+
       if (req.url == "/components") {
         const comps = await getComponents();
         return res.end(JSON.stringify(comps));

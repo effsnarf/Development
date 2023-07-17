@@ -5,6 +5,15 @@ import { Objects } from "./Extensions.Objects";
 class Http {
   static async getPostData(req: any): Promise<any> {
     if (req.method !== "POST") return Promise.resolve(null);
+
+    try {
+      return Promise.resolve(Objects.json.parse(req.body));
+    } catch (ex: any) {
+      return Promise.resolve(req.body);
+    }
+  }
+
+  static async getPostDataFromStream(req: any): Promise<any> {
     return new Promise((resolve, reject) => {
       try {
         let body = "";

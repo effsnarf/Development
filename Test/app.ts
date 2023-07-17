@@ -2,10 +2,9 @@ const util = require("util");
 import path from "path";
 import fs from "fs";
 import "colors";
-import express from "express";
-import * as moment from "moment";
 import axios from "axios";
 import "@shared/Extensions";
+import { Http } from "@shared/Http";
 import { Timer } from "@shared/Timer";
 import { Objects } from "@shared/Extensions.Objects";
 import { Configuration } from "@shared/Configuration";
@@ -36,9 +35,39 @@ class Malkovich {
 const malkovitch = new Malkovich();
 
 (async () => {
-  console.log(Configuration.getEnvironment());
+  const url = `http://localhost:4042/MemeGenerator/api/Medias/create/one`;
 
-  console.log(Objects.json.parse("undefined"));
+  const body = { media: { test: 1 } };
+
+  const options = {
+    url: url,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    // We want to proxy the data as-is,
+    responseType: "stream",
+    // We want to proxy the request as-is,
+    // let the client handle the redirects
+    maxRedirects: 0,
+    timeout: 5000,
+    mode: "no-cors",
+  } as any;
+
+  try {
+    console.log(url.green);
+
+    const response = await axios.post(url, body, options);
+
+    console.log(response.data);
+  } catch (ex: any) {
+    console.log(ex.message.bgRed.white);
+
+    if (ex.response) {
+      const data = await Http.getResponseStream(ex.response);
+      console.log(data);
+    }
+  }
 
   process.exit();
 

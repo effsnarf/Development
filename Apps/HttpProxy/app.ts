@@ -19,6 +19,11 @@ import {
   Unit,
 } from "@shared/Console";
 
+const objectToString = (obj: any) => {
+  if (typeof obj == "string") return obj;
+  return Objects.jsonify(obj);
+};
+
 interface CachedResponse {
   dt: number;
   status: {
@@ -62,6 +67,7 @@ interface Task {
   nodeIndex: number;
   log: string[];
   logTimer: NodeJS.Timer | null;
+  isPiping: boolean;
 }
 
 class TaskManager {
@@ -73,14 +79,17 @@ class TaskManager {
     private statusLogger: LoggerBase
   ) {}
 
-  add(task: Task) {
+  add(task: Task, req: any) {
     task.id = this._taskID++;
+    task.log.push(`[${task.id}] ${req.method} ${req.url}`);
+    task.log.push(JSON.stringify(task.postData).shorten(200));
     task.logTimer = setInterval(() => {
+      if (task.isPiping) return;
       task.log.push(
         `${task.timer.elapsed?.unitifyTime().withoutColors()} passed`
       );
-      this.taskLogger.log(task);
-    }, 1000);
+      if (this.items.has(task.id || 0)) this.taskLogger.log(task);
+    }, (1).seconds());
     this.items.set(task.id, task);
   }
 
@@ -112,6 +121,19 @@ class TaskManager {
   debugLogger.log(config);
 
   const tryRequest = async (task: Task, req: any, res: any) => {
+    if (config.custom) {
+      for (const item of config.custom) {
+        const regex = new RegExp(item.url);
+        if (regex.test(req.url)) {
+          res.status(item.status);
+          res.end();
+          task.log.push(`Custom response: ${item.status}`);
+          tasks.remove(task, true);
+          return;
+        }
+      }
+    }
+
     task.nodeIndex = task.attempt % config.target.base.urls.length;
 
     if (config.rotate?.nodes)
@@ -129,7 +151,7 @@ class TaskManager {
 
     const options = {
       url: targetUrl,
-      method: req.method as any,
+      method: req.method,
       headers: req.headers,
       body: task.postData,
       // We want to proxy the data as-is,
@@ -138,6 +160,7 @@ class TaskManager {
       // let the client handle the redirects
       maxRedirects: 0,
       timeout: task.timeout,
+      mode: "no-cors",
     } as any;
 
     if (task.attempt >= config.target.try.again.retries) {
@@ -155,7 +178,10 @@ class TaskManager {
     }
 
     try {
-      const nodeResponse = await axios.request(options);
+      const nodeResponse =
+        req.method == "POST"
+          ? await axios.post(options.url, task.postData, options)
+          : await axios.request(options);
 
       task.log.push(`Response status: ${nodeResponse.status}`);
 
@@ -163,15 +189,15 @@ class TaskManager {
       // debug-proxy-source:
       // - forwarded
       // - cache
-      const origin = req.headers.origin || "*";
       res.set(
         "x-debug-proxy-source",
         `forwarded (${task.attempt.ordinalize()} attempt)`
       );
       res.status(nodeResponse.status);
       res.set(nodeResponse.headers);
-      res.set("access-control-allow-origin", origin);
+      res.set("access-control-allow-origin", task.origin);
 
+      task.isPiping = true;
       task.log.push(`Piping response to client`);
 
       nodeResponse.data.pipe(res);
@@ -256,15 +282,16 @@ class TaskManager {
 
         res.status(ex.response.status);
         res.set(ex.response.headers);
-        res.set("access-control-allow-origin", origin);
+        res.set("access-control-allow-origin", task.origin);
 
+        task.isPiping = true;
         task.log.push(`Piping response to client`);
 
         ex.response.data.pipe(res);
         ex.response.data.on("end", async () => {
           task.log.push(`Response piped successfully to client`);
           task.log.push(`Removing task from queue`);
-          tasks.remove(task);
+          tasks.remove(task, true);
         });
         ex.response.data.on("error", async (ex: any) => {
           task.log.push(`Error piping response to client`);
@@ -295,10 +322,10 @@ class TaskManager {
               res.set("x-debug-proxy-source", "cache");
               res.status(cachedResponse.status.code);
               res.set(cachedResponse.headers);
-              res.set("access-control-allow-origin", origin);
+              res.set("access-control-allow-origin", task.origin);
               task.log.push(`Sending cached response to client`);
               task.log.push(`Removing task from queue`);
-              tasks.remove(task);
+              tasks.remove(task, true);
               return res.end(cachedResponse.body);
             }
           }
@@ -306,9 +333,7 @@ class TaskManager {
 
         task.attempt++;
 
-        task.log.push(
-          `Trying again in ${config.target.try.again.delay.unitifyTime()}`
-        );
+        task.log.push(`Trying again in ${config.target.try.again.delay}`);
 
         // Try again
         setTimeout(
@@ -326,7 +351,7 @@ class TaskManager {
       new Date().toLocaleTimeString().gray,
       tasks.count.severify(10, 20, "<"),
       `queue`.gray,
-      `${stats.successes.count}${
+      `${stats.successes.count.toLocaleString()} ${
         `/`.gray
       }${stats.successes.timeSpan.unitifyTime()}`,
       ...args,
@@ -371,16 +396,16 @@ class TaskManager {
       origin: req.headers.origin || "*",
       timeout: config.target.timeout.deunitify(),
       cacheKey: req.url.replace(/&_uid=\d+/g, ""),
-      postData: req.method == "POST" ? await Http.getPostData(req) : null,
+      postData:
+        req.method == "POST" ? await Http.getPostDataFromStream(req) : null,
       attempt: 0,
       nodeIndex: 0,
       log: [],
       logTimer: null,
+      isPiping: false,
     } as Task;
 
-    task.log.push(`[${task.id}] ${req.method} ${req.url}`);
-
-    tasks.add(task);
+    tasks.add(task, req);
 
     tryRequest(task, req, res);
   });

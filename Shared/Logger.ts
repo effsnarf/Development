@@ -57,7 +57,7 @@ abstract class LoggerBase implements Logger {
     if (!args?.length) return;
     const item = {
       dt: Date.now(),
-      args: args,
+      args: Objects.clone(args),
     };
     this.queue.add(item);
   }
@@ -160,6 +160,11 @@ class FileSystemLogger extends LoggerBase {
   }
 
   protected async _log(items: any[]): Promise<void> {
+    const folder = path.dirname(this.logPath);
+    if (!fs.existsSync(folder)) {
+      fs.mkdirSync(folder, { recursive: true });
+    }
+
     let text = items
       .map((item) => {
         if (!item.args.filter((a: any) => a).length) return null;

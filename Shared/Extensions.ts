@@ -1387,9 +1387,10 @@ if (typeof Array !== "undefined") {
     ellipsis?: boolean
   ) {
     if (!columns.length) return this.join(" ");
-    return this.map(
-      (item, i) => `${(item || "").toLength(columns[i], ellipsis, "right")}`
-    ).join(" ");
+    return this.map((item, i) => {
+      if (typeof item != "string") item = JSON.stringify(item);
+      return `${(item || "").toLength(columns[i], ellipsis, "right")}`;
+    }).join(" ");
   };
 
   Array.prototype.distinct = function (project?: ((item: any) => any) | null) {

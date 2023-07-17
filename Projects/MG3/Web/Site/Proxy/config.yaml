@@ -18,6 +18,9 @@ target:
     again:
       retries: 30
       delay: 0.1s
+custom:
+  - url: /analytics
+    status: 404
 analytics:
   prod:
     api:
