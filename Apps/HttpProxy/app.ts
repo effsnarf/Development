@@ -54,8 +54,6 @@ const isCachable = (
 interface Task {
   id: number | null;
   timer: Timer;
-  req: any;
-  res: any;
   origin: string;
   timeout: number;
   cacheKey: string;
@@ -111,15 +109,13 @@ class TaskManager {
 
   debugLogger.log(config);
 
-  const tryRequest = async (task: Task) => {
+  const tryRequest = async (task: Task, req: any, res: any) => {
     task.nodeIndex = task.attempt % config.target.base.urls.length;
 
     if (config.rotate?.nodes)
       task.nodeIndex = (task.nodeIndex + 1) % config.target.base.urls.length;
 
-    const targetUrl = `${config.target.base.urls[task.nodeIndex]}${
-      task.req.url
-    }`;
+    const targetUrl = `${config.target.base.urls[task.nodeIndex]}${req.url}`;
 
     task.log.push(
       `Attempt ${task.attempt + 1} of ${config.target.try.again.retries}`
@@ -131,8 +127,8 @@ class TaskManager {
 
     const options = {
       url: targetUrl,
-      method: task.req.method as any,
-      headers: task.req.headers,
+      method: req.method as any,
+      headers: req.headers,
       body: task.postData,
       // We want to proxy the data as-is,
       responseType: "stream",
@@ -149,11 +145,11 @@ class TaskManager {
           config.target.try.again.retries.toString().yellow
         } ${`attempts failed`.red.bold} ${options.url.red.bold}`
       );
-      task.res.status(503);
+      res.status(503);
       task.log.push(`Max attempts reached`);
       task.log.push(`Removing task from queue`);
       tasks.remove(task);
-      return task.res.end();
+      return res.end();
     }
 
     try {
@@ -165,17 +161,17 @@ class TaskManager {
       // debug-proxy-source:
       // - forwarded
       // - cache
-      task.res.set(
+      res.set(
         "x-debug-proxy-source",
         `forwarded (${task.attempt.ordinalize()} attempt)`
       );
-      task.res.status(nodeResponse.status);
-      task.res.set(nodeResponse.headers);
-      task.res.set("access-control-allow-origin", origin);
+      res.status(nodeResponse.status);
+      res.set(nodeResponse.headers);
+      res.set("access-control-allow-origin", origin);
 
       task.log.push(`Piping response to client`);
 
-      nodeResponse.data.pipe(task.res);
+      nodeResponse.data.pipe(res);
 
       // When the response ends
       nodeResponse.data.on("end", async () => {
@@ -208,7 +204,7 @@ class TaskManager {
 
       // Save the response to the cache
       if (cache) {
-        if (isCachable(options, config, task.req, nodeResponse)) {
+        if (isCachable(options, config, req, nodeResponse)) {
           let data = await Http.getResponseStream(nodeResponse);
           if (typeof data != "string") data = Objects.jsonify(data);
           if (data.trim().length) {
@@ -216,7 +212,7 @@ class TaskManager {
             // Get the response data
             const cachedResponse = {
               dt: Date.now(),
-              url: task.req.url,
+              url: req.url,
               status: {
                 code: nodeResponse.status,
                 text: nodeResponse.statusText,
@@ -225,7 +221,7 @@ class TaskManager {
               body: data,
             };
             delete cachedResponse.headers["access-control-allow-origin"];
-            await cache.set(task.req.url || "", cachedResponse);
+            await cache.set(req.url || "", cachedResponse);
             task.log.push(`Response cached`);
           }
         }
@@ -255,13 +251,13 @@ class TaskManager {
         //stats.response.times.track(elapsed);
         stats.successes.track(1);
 
-        task.res.status(ex.response.status);
-        task.res.set(ex.response.headers);
-        task.res.set("access-control-allow-origin", origin);
+        res.status(ex.response.status);
+        res.set(ex.response.headers);
+        res.set("access-control-allow-origin", origin);
 
         task.log.push(`Piping response to client`);
 
-        ex.response.data.pipe(task.res);
+        ex.response.data.pipe(res);
         ex.response.data.on("end", async () => {
           task.log.push(`Response piped successfully to client`);
           task.log.push(`Removing task from queue`);
@@ -293,14 +289,14 @@ class TaskManager {
                   cachedResponse.status.code
                 )}`
               );
-              task.res.set("x-debug-proxy-source", "cache");
-              task.res.status(cachedResponse.status.code);
-              task.res.set(cachedResponse.headers);
-              task.res.set("access-control-allow-origin", origin);
+              res.set("x-debug-proxy-source", "cache");
+              res.status(cachedResponse.status.code);
+              res.set(cachedResponse.headers);
+              res.set("access-control-allow-origin", origin);
               task.log.push(`Sending cached response to client`);
               task.log.push(`Removing task from queue`);
               tasks.remove(task);
-              return task.res.end(cachedResponse.body);
+              return res.end(cachedResponse.body);
             }
           }
         }
@@ -313,7 +309,7 @@ class TaskManager {
 
         // Try again
         setTimeout(
-          () => tryRequest(task),
+          () => tryRequest(task, req, res),
           config.target.try.again.delay.deunitify()
         );
         return;
@@ -369,8 +365,6 @@ class TaskManager {
     const task = {
       id: null,
       timer: Timer.start(),
-      req,
-      res,
       origin: req.headers.origin || "*",
       timeout: config.target.timeout.deunitify(),
       cacheKey: req.url.replace(/&_uid=\d+/g, ""),
@@ -381,11 +375,11 @@ class TaskManager {
       logTimer: null,
     } as Task;
 
-    task.log.push(`[${task.id}] ${task.req.method} ${task.req.url}`);
+    task.log.push(`[${task.id}] ${req.method} ${req.url}`);
 
     tasks.add(task);
 
-    tryRequest(task);
+    tryRequest(task, req, res);
   });
 
   // Every once in a while, display stats
