@@ -74,5 +74,39 @@
         "workspacePath": null,
         "id": "6vVCza2ejnuiAmkb",
         "label": "Node2"
+    },
+    {
+        "type": "File",
+        "name": "c:\\eff\\Development\\Apps\\DatabaseProxy\\Server\\app.ts",
+        "parent_id": "eFWLGx5lwUzbNcTv",
+        "fsPath": "c:\\eff\\Development\\Apps\\DatabaseProxy\\Server\\app.ts",
+        "workspaceRoot": null,
+        "workspacePath": null,
+        "id": "FiYfc98nabdJLxVl"
+    },
+    {
+        "type": "Group",
+        "name": "Http.Proxy",
+        "parent_id": "FiYfc98nabdJLxVl",
+        "workspaceRoot": null,
+        "workspacePath": null,
+        "id": "FJ4ucBXa2e3ZE0gb"
+    },
+    {
+        "type": "Group",
+        "name": "Http.Proxy",
+        "parent_id": null,
+        "workspaceRoot": null,
+        "workspacePath": null,
+        "id": "Qt10D9PRzmNEgrHJ"
+    },
+    {
+        "type": "File",
+        "name": "c:\\eff\\Development\\Apps\\HttpProxy\\app.ts",
+        "parent_id": "Qt10D9PRzmNEgrHJ",
+        "fsPath": "c:\\eff\\Development\\Apps\\HttpProxy\\app.ts",
+        "workspaceRoot": null,
+        "workspacePath": null,
+        "id": "CdX8lQJugLmk3PeB"
     }
 ]
