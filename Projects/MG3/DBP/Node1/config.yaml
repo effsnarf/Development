@@ -6,6 +6,7 @@ process:
     periodically:
       from: 00:00
       every: 30m
-  # In case of restarting because of config file change, we want the nodes to restart in different times,
+  # In case of restarting because of config file change,
+  # we want the nodes to restart in different times,
   # so that one is always available.
   delay: 1m

@@ -154,7 +154,9 @@ class Configuration {
       .forEach((file) => {
         config.log(`${`Watching`.gray} ${file.toShortPath()}`);
         fs.watchFile(file, () => {
-          const delay = (config.data.restart?.delay || "0s").deunitify();
+          const delay = (
+            config.data.process?.restart?.delay || "0s"
+          ).deunitify();
           config.log(
             `${file.toShortPath()} ${
               `changed, restarting in ${delay.unitifyTime()}...`.gray
