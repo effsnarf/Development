@@ -351,6 +351,7 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
     const processRequest = (handler: any) => {
       return async (req: any, res: any) => {
         currentRequests++;
+
         const timer = Timer.start();
         const origin = req.headers.origin || "*";
         try {
@@ -362,8 +363,9 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
             return res.status(200).end();
           }
           // Get the POST data
-          const data = await Http.getPostData(req);
+          const data = await Http.getPostDataFromStream(req);
           const user = await User.get(req, res, data);
+          debugLogger.log(req.method, req.url, data);
           await handler(req, res, user, data);
           itemsLog.log(
             req.method,
@@ -470,7 +472,7 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
     // #endregion
 
     // #region 📑 Analytics
-    httpServer.get(
+    httpServer.all(
       "/analytics/*",
       processRequest(async (req: any, res: any) => {
         return dbs._analytics?.api.handleRequest(req, res);
@@ -585,95 +587,104 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
       })
     );
 
+    const handleApiRequest = async (
+      req: any,
+      res: any,
+      user: User,
+      data: any
+    ) => {
+      // Response type
+      res.setHeader("Content-Type", "application/json");
+
+      const db = await dbs.get(req.params.database);
+      const apiMethods = (await cache.get.api.methods(db))?.filter(
+        (m: any) =>
+          m.entity == req.params.entity &&
+          m.group == req.params.group &&
+          m.name == req.params.method
+      );
+      if (!apiMethods?.length) return res.status(404).send("Method not found");
+      const apiMethod = apiMethods[0];
+      const userIP =
+        req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+      const isAdmin = config.admin.ips.includes(userIP);
+      if (apiMethod.admin && !isAdmin) {
+        return res.status(500).send("You are not authorized to do this.");
+      }
+      const funcStr = `async (dbp, fs, user, db, db${
+        req.params.entity
+      }, axios, ${apiMethod.args.join(", ")}) => { ${apiMethod.code} }`;
+      const func = eval(funcStr);
+      const collection = await db?.getCollection(req.params.entity);
+      const args = apiMethod.args.map((arg: any) => {
+        if (data && data[arg]) return data[arg];
+        return Objects.json.parse(req.query[arg] || "null");
+      });
+
+      const start = Date.now();
+
+      let result: any;
+
+      try {
+        const dbp = dbps[req.params.database];
+
+        result = await func(dbp, fs, user, db, collection, axios, ...args);
+
+        const elapsed = Date.now() - start;
+
+        let methodStr = `${req.params.entity}.${req.params.group}.${req.params.method}`;
+
+        if (elapsed < config.analytics.min.elapsed) {
+          methodStr = methodStr.gray;
+        } else {
+          // dbs._analytics?.create(
+          //   ItemType.Unknown,
+          //   config.title,
+          //   "api",
+          //   methodStr,
+          //   { args },
+          //   elapsed
+          // );
+        }
+
+        if (result == undefined) result = null;
+
+        debugLogger.log(req.method, req.url, data);
+        debugLogger.log(result);
+
+        return res.end(Objects.jsonify(result));
+      } catch (ex: any) {
+        if (typeof ex == "string") {
+          if (ex.includes("not found")) {
+            return res.status(404).send(ex);
+          }
+        }
+        errorLogger.log(ex.stack);
+        if (req.query.debug) {
+          return res
+            .status(500)
+            .send(
+              `${args}\n\n${funcStr}\n\n${JSON.stringify(
+                apiMethod
+              )}\n\n${result}\n\n${ex}\n\n${ex.stack}`
+            );
+        } else {
+          if (ex?.message?.includes("not found"))
+            return res.status(404).send(ex.message);
+          return res.status(500).send(`${ex.stack}\n\n${JSON.stringify(data)}`);
+        }
+      }
+    };
+
     // For /[database]/api/[entity]/[group]/[method], execute the method
-    httpServer.all(
+    httpServer.get(
       "/:database/api/:entity/:group/:method",
-      processRequest(async (req: any, res: any, user: User, data: any) => {
-        // Response type
-        res.setHeader("Content-Type", "application/json");
+      processRequest(handleApiRequest)
+    );
 
-        const db = await dbs.get(req.params.database);
-        const apiMethods = (await cache.get.api.methods(db))?.filter(
-          (m: any) =>
-            m.entity == req.params.entity &&
-            m.group == req.params.group &&
-            m.name == req.params.method
-        );
-        if (!apiMethods?.length)
-          return res.status(404).send("Method not found");
-        const apiMethod = apiMethods[0];
-        const userIP =
-          req.headers["x-forwarded-for"] || req.connection.remoteAddress;
-        const isAdmin = config.admin.ips.includes(userIP);
-        if (apiMethod.admin && !isAdmin) {
-          return res.status(500).send("You are not authorized to do this.");
-        }
-        const funcStr = `async (dbp, fs, user, db, db${
-          req.params.entity
-        }, axios, ${apiMethod.args.join(", ")}) => { ${apiMethod.code} }`;
-        const func = eval(funcStr);
-        const collection = await db?.getCollection(req.params.entity);
-        const args = apiMethod.args.map((arg: any) => {
-          if (data && data[arg]) return data[arg];
-          return Objects.json.parse(req.query[arg] || "null");
-        });
-
-        const start = Date.now();
-
-        let result: any;
-
-        try {
-          const dbp = dbps[req.params.database];
-
-          result = await func(dbp, fs, user, db, collection, axios, ...args);
-
-          const elapsed = Date.now() - start;
-
-          let methodStr = `${req.params.entity}.${req.params.group}.${req.params.method}`;
-
-          if (elapsed < config.analytics.min.elapsed) {
-            methodStr = methodStr.gray;
-          } else {
-            // dbs._analytics?.create(
-            //   ItemType.Unknown,
-            //   config.title,
-            //   "api",
-            //   methodStr,
-            //   { args },
-            //   elapsed
-            // );
-          }
-
-          if (result == undefined) result = null;
-
-          debugLogger.log(req.method, req.url, data);
-          debugLogger.log(result);
-
-          return res.end(Objects.jsonify(result));
-        } catch (ex: any) {
-          if (typeof ex == "string") {
-            if (ex.includes("not found")) {
-              return res.status(404).send(ex);
-            }
-          }
-          errorLogger.log(ex.stack);
-          if (req.query.debug) {
-            return res
-              .status(500)
-              .send(
-                `${args}\n\n${funcStr}\n\n${JSON.stringify(
-                  apiMethod
-                )}\n\n${result}\n\n${ex}\n\n${ex.stack}`
-              );
-          } else {
-            if (ex?.message?.includes("not found"))
-              return res.status(404).send(ex.message);
-            return res
-              .status(500)
-              .send(`${ex.stack}\n\n${JSON.stringify(data)}`);
-          }
-        }
-      })
+    httpServer.post(
+      "/:database/api/:entity/:group/:method",
+      processRequest(handleApiRequest)
     );
 
     // #region 🔍 Entity CRUD
