@@ -27,7 +27,7 @@ abstract class Logger {
       }
 
       if (config.path) {
-        return FileSystemLogger.new(config.path);
+        return FileSystemLogger.new(config.path, config.overwrite);
       }
 
       throw new Error(`Unknown logger type:\n${jsyaml.dump(config)}`);
@@ -142,7 +142,7 @@ class MultiLogger extends LoggerBase {
 class FileSystemLogger extends LoggerBase {
   private readonly logPath: string;
 
-  private constructor(logPath: string) {
+  private constructor(logPath: string, private overwrite?: boolean) {
     super();
     if (!logPath.isEqualPath(logPath.sanitizePath())) {
       logPath = logPath.sanitizePath();
@@ -155,8 +155,8 @@ class FileSystemLogger extends LoggerBase {
     this.logPath = logPath;
   }
 
-  static new(path: string) {
-    return new FileSystemLogger(path);
+  static new(path: string, overwrite?: boolean) {
+    return new FileSystemLogger(path, overwrite);
   }
 
   protected async _log(items: any[]): Promise<void> {
@@ -174,7 +174,11 @@ class FileSystemLogger extends LoggerBase {
     text = text.withoutColors();
 
     if (text.trim().length)
-      fs.writeFileSync(this.logPath, text + "\n", { flag: "a" });
+      if (this.overwrite) {
+        fs.writeFileSync(this.logPath, text);
+      } else {
+        fs.writeFileSync(this.logPath, text + "\n", { flag: "a" });
+      }
   }
 }
 

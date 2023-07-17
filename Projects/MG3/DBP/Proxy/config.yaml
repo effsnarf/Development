@@ -48,6 +48,13 @@ cache:
       # - database:
       #     path: F:\Database\MG-DBP-Cache
 log:
+  tasks:
+    enabled: true
+    path: (env) => env.getLogPath(env.config.title, 'tasks')
+  status:
+    enabled: true
+    overwrite: true
+    path: (env) => env.getLogPath(env.config.title, 'status')
   debug:
     enabled: true
     path: (env) => env.getLogPath(env.config.title, 'debug')

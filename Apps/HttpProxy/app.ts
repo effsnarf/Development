@@ -51,19 +51,263 @@ const isCachable = (
   return true;
 };
 
+let _taskID = 1;
+
+interface Task {
+  id: number;
+  timer: Timer;
+  req: any;
+  res: any;
+  origin: string;
+  timeout: number;
+  cacheKey: string;
+  postData: any;
+  attempt: number;
+  nodeIndex: number;
+  log: string[];
+}
+
+const currentTasks = {} as any;
+
 (async () => {
   const config = (await Configuration.new()).data;
 
   const debugLogger = Logger.new(config.log.debug);
   const errorLogger = Logger.new(config.log.errors);
+  const taskLogger = Logger.new(config.log.tasks);
+  const statusLogger = Logger.new(config.log.status);
+
+  (taskLogger as any)._log = taskLogger.log;
+  (taskLogger as any).log = (task: Task) => {
+    task = { ...task };
+    delete task.req;
+    delete task.res;
+    (taskLogger as any)._log(task);
+  };
 
   debugLogger.log(config);
+
+  const tryRequest = async (task: Task) => {
+    task.nodeIndex = task.attempt % config.target.base.urls.length;
+
+    if (config.rotate?.nodes)
+      task.nodeIndex = (task.nodeIndex + 1) % config.target.base.urls.length;
+
+    const targetUrl = `${config.target.base.urls[task.nodeIndex]}${
+      task.req.url
+    }`;
+
+    task.log.push(
+      `Attempt ${task.attempt + 1} of ${config.target.try.again.retries}`
+    );
+    task.log.push(
+      `Using node ${task.nodeIndex + 1} of ${config.target.base.urls.length}`
+    );
+    task.log.push(`Target URL: ${targetUrl}`);
+
+    const options = {
+      url: targetUrl,
+      method: task.req.method as any,
+      headers: task.req.headers,
+      body: task.postData,
+      // We want to proxy the data as-is,
+      responseType: "stream",
+      // We want to proxy the request as-is,
+      // let the client handle the redirects
+      maxRedirects: 0,
+      timeout: task.timeout,
+    } as any;
+
+    if (task.attempt >= config.target.try.again.retries) {
+      // Temporarily unavailable
+      logNewLine(
+        `${task.timer.elapsed?.unitifyTime().severify(100, 500, "<")} ${
+          config.target.try.again.retries.toString().yellow
+        } ${`attempts failed`.red.bold} ${options.url.red.bold}`
+      );
+      task.res.status(503);
+      task.log.push(`Max attempts reached`);
+      task.log.push(`Removing task from queue`);
+      taskLogger.log(task);
+      delete currentTasks[task.id];
+      return task.res.end();
+    }
+
+    try {
+      const nodeResponse = await axios.request(options);
+
+      task.log.push(`Response status: ${nodeResponse.status}`);
+
+      // Add debug headers
+      // debug-proxy-source:
+      // - forwarded
+      // - cache
+      task.res.set(
+        "x-debug-proxy-source",
+        `forwarded (${task.attempt.ordinalize()} attempt)`
+      );
+      task.res.status(nodeResponse.status);
+      task.res.set(nodeResponse.headers);
+      task.res.set("access-control-allow-origin", origin);
+
+      task.log.push(`Piping response to client`);
+
+      nodeResponse.data.pipe(task.res);
+
+      // When the response ends
+      nodeResponse.data.on("end", async () => {
+        logLine(
+          `${task.timer.elapsed?.unitifyTime().severify(100, 500, "<")} ${
+            nodeResponse.status.toString().yellow
+          } ${(options.url as string).severifyByHttpStatus(
+            nodeResponse.status
+          )}`
+        );
+        stats.response.times.track(task.timer.elapsed);
+        stats.successes.track(1);
+        task.log.push(`Response piped successfully to client`);
+        task.log.push(`Removing task from queue`);
+        taskLogger.log(task);
+        delete currentTasks[task.id];
+      });
+
+      nodeResponse.data.on("error", async (ex: any) => {
+        logNewLine(
+          `${task.timer.elapsed?.unitifyTime().severify(100, 500, "<")} ${
+            nodeResponse.status.toString().yellow
+          } ${ex.message?.red.bold} ${options.url.red.bold}`
+        );
+        stats.response.times.track(task.timer.elapsed);
+        task.log.push(`Error piping response to client`);
+        task.log.push(ex.stack);
+        task.log.push(`Removing task from queue`);
+        taskLogger.log(task);
+        delete currentTasks[task.id];
+      });
+
+      // Save the response to the cache
+      if (cache) {
+        if (isCachable(options, config, task.req, nodeResponse)) {
+          let data = await Http.getResponseStream(nodeResponse);
+          if (typeof data != "string") data = Objects.jsonify(data);
+          if (data.trim().length) {
+            //console.log("caching", options.url);
+            // Get the response data
+            const cachedResponse = {
+              dt: Date.now(),
+              url: task.req.url,
+              status: {
+                code: nodeResponse.status,
+                text: nodeResponse.statusText,
+              },
+              headers: nodeResponse.headers,
+              body: data,
+            };
+            delete cachedResponse.headers["access-control-allow-origin"];
+            await cache.set(task.req.url || "", cachedResponse);
+            task.log.push(`Response cached`);
+          }
+        }
+      }
+
+      return;
+    } catch (ex: any) {
+      task.log.push(`Error: ${ex.message}`);
+
+      // Some HTTP status codes are not errors (304 not modified, 404 not found, etc.)
+      const targetIsDown = !ex.response || ex.message.includes("ECONNREFUSED");
+
+      task.log.push(`Target is down: ${targetIsDown}`);
+
+      // If target is not down, target returned some http status and we should return it
+      if (!targetIsDown) {
+        const isError = !ex.response.status.isBetween(200, 500);
+        const elapsed = task.timer.elapsed;
+        logLine(
+          `${elapsed?.unitifyTime().severify(100, 500, "<")} ${
+            !isError ? ex.response.status.toString().yellow : ex.message.yellow
+          } ${options.url.severifyByHttpStatus(ex.response.status)}`
+        );
+
+        // We don't track response time for (304 not modified, 404 not found, etc) because
+        // there is no processing time to measure
+        //stats.response.times.track(elapsed);
+        stats.successes.track(1);
+
+        task.res.status(ex.response.status);
+        task.res.set(ex.response.headers);
+        task.res.set("access-control-allow-origin", origin);
+
+        task.log.push(`Piping response to client`);
+
+        ex.response.data.pipe(task.res);
+        ex.response.data.on("end", async () => {
+          task.log.push(`Response piped successfully to client`);
+          task.log.push(`Removing task from queue`);
+          taskLogger.log(task);
+          delete currentTasks[task.id];
+        });
+        ex.response.data.on("error", async (ex: any) => {
+          task.log.push(`Error piping response to client`);
+          task.log.push(ex.stack);
+          task.log.push(`Removing task from queue`);
+          taskLogger.log(task);
+          delete currentTasks[task.id];
+        });
+        return;
+      }
+
+      if (targetIsDown) {
+        // Try the cache
+        if (isCachable(options, config)) {
+          if (await cache.has(task.cacheKey)) {
+            const cachedResponse = await cache.get(task.cacheKey);
+            if (cachedResponse) {
+              stats.cache.hits.track(1);
+              // We don't track response time for cached results
+              // because we're interested in optimizing slow requests
+              //stats.response.times.track(timer.elapsed);
+              logLine(
+                `${task.timer.elapsed?.unitifyTime().severify(100, 500, "<")} ${
+                  `Fallback cache hit`.yellow.bold
+                } ${cachedResponse.body.length.unitifySize()} ${options.url.severifyByHttpStatus(
+                  cachedResponse.status.code
+                )}`
+              );
+              task.res.set("x-debug-proxy-source", "cache");
+              task.res.status(cachedResponse.status.code);
+              task.res.set(cachedResponse.headers);
+              task.res.set("access-control-allow-origin", origin);
+              task.log.push(`Sending cached response to client`);
+              task.log.push(`Removing task from queue`);
+              taskLogger.log(task);
+              delete currentTasks[task.id];
+              return task.res.end(cachedResponse.body);
+            }
+          }
+        }
+
+        task.attempt++;
+
+        task.log.push(
+          `Trying again in ${config.target.try.again.delay.unitifyTime()}`
+        );
+
+        // Try again
+        setTimeout(
+          () => tryRequest(task),
+          config.target.try.again.delay.deunitify()
+        );
+        return;
+      }
+    }
+  };
 
   const logLine = (...args: any[]) => {
     args = [
       config.title.gray,
       new Date().toLocaleTimeString().gray,
-      currentRequests.severify(10, 20, "<"),
+      Object.keys(currentTasks).length.severify(10, 20, "<"),
       `queue`.gray,
       `${stats.successes.count}${
         `/`.gray
@@ -98,208 +342,31 @@ const isCachable = (
 
   const cache = await Cache.new(config.cache.store);
 
-  let currentRequests = 0;
-
-  let startingNodeIndex = 0;
-
   // Forward all incoming HTTP requests to config.target.base.urls/..
   // If a request fails (target is down), try the cache first
   // If the cache doesn't have the response, try backup urls up to target.try.again.retries times
   const app = express();
   // Catch all requests
   app.all("*", async (req: any, res: any) => {
-    const origin = req.headers.origin || "*";
+    const task = {
+      id: _taskID++,
+      timer: Timer.start(),
+      req,
+      res,
+      origin: req.headers.origin || "*",
+      timeout: config.target.timeout.deunitify(),
+      cacheKey: req.url.replace(/&_uid=\d+/g, ""),
+      postData: req.method == "POST" ? await Http.getPostData(req) : null,
+      attempt: 0,
+      nodeIndex: 0,
+      log: [],
+    } as Task;
 
-    // Remove &_uid=1685119338348 from the URL (uniquifies the request)
-    let cacheKey = req.url;
-    cacheKey = cacheKey?.replace(/&_uid=\d+/g, "");
+    task.log.push(`[${task.id}] ${task.req.method} ${task.req.url}`);
 
-    const postData = req.method == "POST" ? await Http.getPostData(req) : null;
+    currentTasks[task.id] = task;
 
-    const timer = Timer.start();
-    currentRequests++;
-
-    const tryRequest = async (attempt: number = 0) => {
-      const nodeIndex =
-        (startingNodeIndex + attempt) % config.target.base.urls.length;
-
-      if (config.rotate?.nodes)
-        startingNodeIndex =
-          (startingNodeIndex + 1) % config.target.base.urls.length;
-
-      const targetUrl = `${config.target.base.urls[nodeIndex]}${req.url}`;
-
-      const options = {
-        url: targetUrl,
-        method: req.method as any,
-        headers: req.headers,
-        body: postData,
-        // We want to proxy the data as-is,
-        responseType: "stream",
-        // We want to proxy the request as-is,
-        // let the client handle the redirects
-        maxRedirects: 0,
-        timeout: config.target.timeout.deunitify(),
-      } as any;
-
-      if (attempt >= config.target.try.again.retries) {
-        // Temporarily unavailable
-        logNewLine(
-          `${timer.elapsed?.unitifyTime().severify(100, 500, "<")} ${
-            config.target.try.again.retries.toString().yellow
-          } ${`attempts failed`.red.bold} ${options.url.red.bold}`
-        );
-        res.status(503);
-        currentRequests--;
-        return res.end();
-      }
-
-      try {
-        const nodeResponse = await axios.request(options);
-
-        // Add debug headers
-        // debug-proxy-source:
-        // - forwarded
-        // - cache
-        res.set(
-          "x-debug-proxy-source",
-          `forwarded (${attempt.ordinalize()} attempt)`
-        );
-        res.status(nodeResponse.status);
-        res.set(nodeResponse.headers);
-        res.set("access-control-allow-origin", origin);
-
-        nodeResponse.data.pipe(res);
-
-        // When the response ends
-        nodeResponse.data.on("end", async () => {
-          logLine(
-            `${timer.elapsed?.unitifyTime().severify(100, 500, "<")} ${
-              nodeResponse.status.toString().yellow
-            } ${(options.url as string).severifyByHttpStatus(
-              nodeResponse.status
-            )}`
-          );
-          stats.response.times.track(timer.elapsed);
-          stats.successes.track(1);
-          currentRequests--;
-        });
-
-        nodeResponse.data.on("error", async (ex: any) => {
-          logNewLine(
-            `${timer.elapsed?.unitifyTime().severify(100, 500, "<")} ${
-              nodeResponse.status.toString().yellow
-            } ${ex.message?.red.bold} ${options.url.red.bold}`
-          );
-          stats.response.times.track(timer.elapsed);
-          currentRequests--;
-        });
-
-        // Save the response to the cache
-        if (cache) {
-          if (isCachable(options, config, req, nodeResponse)) {
-            let data = await Http.getResponseStream(nodeResponse);
-            if (typeof data != "string") data = Objects.jsonify(data);
-            if (data.trim().length) {
-              //console.log("caching", options.url);
-              // Get the response data
-              const cachedResponse = {
-                dt: Date.now(),
-                url: req.url,
-                status: {
-                  code: nodeResponse.status,
-                  text: nodeResponse.statusText,
-                },
-                headers: nodeResponse.headers,
-                body: data,
-              };
-              delete cachedResponse.headers["access-control-allow-origin"];
-              await cache.set(req.url || "", cachedResponse);
-            }
-          }
-        }
-
-        return;
-      } catch (ex: any) {
-        // Some HTTP status codes are not errors (304 not modified, 404 not found, etc.)
-        const targetIsDown =
-          !ex.response || ex.message.includes("ECONNREFUSED");
-
-        // If target is not down, target returned some http status and we should return it
-        if (!targetIsDown) {
-          const isError = !ex.response.status.isBetween(200, 500);
-          const elapsed = timer.elapsed;
-          logLine(
-            `${elapsed?.unitifyTime().severify(100, 500, "<")} ${
-              !isError
-                ? ex.response.status.toString().yellow
-                : ex.message.yellow
-            } ${options.url.severifyByHttpStatus(ex.response.status)}`
-          );
-
-          // We don't track response time for (304 not modified, 404 not found, etc) because
-          // there is no processing time to measure
-          //stats.response.times.track(elapsed);
-          stats.successes.track(1);
-
-          res.status(ex.response.status);
-          res.set(ex.response.headers);
-          res.set("access-control-allow-origin", origin);
-          ex.response.data.pipe(res);
-          ex.response.data.on("end", async () => {
-            currentRequests--;
-          });
-          ex.response.data.on("error", async (ex: any) => {
-            currentRequests--;
-          });
-          return;
-        }
-
-        if (targetIsDown) {
-          // Try the cache
-          if (isCachable(options, config)) {
-            if (await cache.has(cacheKey)) {
-              const cachedResponse = await cache.get(cacheKey);
-              if (cachedResponse) {
-                stats.cache.hits.track(1);
-                // We don't track response time for cached results
-                // because we're interested in optimizing slow requests
-                //stats.response.times.track(timer.elapsed);
-                logLine(
-                  `${timer.elapsed?.unitifyTime().severify(100, 500, "<")} ${
-                    `Fallback cache hit`.yellow.bold
-                  } ${cachedResponse.body.length.unitifySize()} ${options.url.severifyByHttpStatus(
-                    cachedResponse.status.code
-                  )}`
-                );
-                res.set("x-debug-proxy-source", "cache");
-                res.status(cachedResponse.status.code);
-                res.set(cachedResponse.headers);
-                res.set("access-control-allow-origin", origin);
-                currentRequests--;
-                return res.end(cachedResponse.body);
-              }
-            }
-          }
-
-          if (attempt >= config.target.try.again.retries - 1) {
-            logNewLine(`${ex.message.red.bold} ${options.url.red.bold}`);
-            currentRequests--;
-            res.status(503);
-            return res.end();
-          }
-
-          // Try again
-          setTimeout(
-            () => tryRequest(attempt + 1),
-            config.target.try.again.delay.deunitify()
-          );
-          return;
-        }
-      }
-    };
-
-    tryRequest();
+    tryRequest(task);
   });
 
   // Every once in a while, display stats
@@ -338,6 +405,7 @@ const isCachable = (
       },
       "ms"
     );
+    statusLogger.log(currentTasks);
   }, stats.interval);
 
   // #region Log unhandled errors
