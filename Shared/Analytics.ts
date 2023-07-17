@@ -161,6 +161,8 @@ class Analytics {
   constructor() {}
 
   static async new(config: any) {
+    if (!config) return new Analytics();
+
     let database =
       (!config.database
         ? Analytics.defaults.database
@@ -180,6 +182,8 @@ class Analytics {
     value: any,
     unit: string | null = null
   ) {
+    if (!this.db) return;
+
     const now = Date.now();
     const since = now - inTheLast;
 
@@ -199,11 +203,15 @@ class Analytics {
   }
 
   async update(eventID: number, value: any) {
+    if (!this.db) return;
+
     const newDoc = await this.db.upsert("Events", { _id: eventID, v: value });
     return newDoc;
   }
 
   async count(category: string, event: string) {
+    if (!this.db) return null;
+
     return await this.db.count("Events", { c: category, e: event });
   }
 
@@ -215,6 +223,8 @@ class Analytics {
     to: number,
     every: number
   ) {
+    if (!this.db) return [];
+
     // What's the overlap ratio where the value represents a count
     const getOverlapRatioForSum = (doc: AnalyticsEvent, interval: Interval) => {
       if (docIsInside(doc, interval)) {

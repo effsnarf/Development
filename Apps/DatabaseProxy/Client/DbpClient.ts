@@ -105,7 +105,7 @@ class DatabaseProxy {
         body: JSON.stringify(data),
         mode: "no-cors",
       });
-      return await result.json();
+      return await result?.json();
     }
 
     const argsStr = args

@@ -2,6 +2,7 @@ import fs, { stat } from "fs";
 import "colors";
 import express, { response } from "express";
 import axios, { Axios, AxiosResponse, AxiosResponseHeaders } from "axios";
+import https from "https";
 import { Configuration } from "@shared/Configuration";
 import { Objects } from "@shared/Extensions.Objects";
 import { Timer, IntervalCounter } from "@shared/Timer";
@@ -254,6 +255,7 @@ class TaskManager {
         //stats.response.times.track(elapsed);
         stats.successes.track(1);
 
+        const origin = req.headers.origin || "*";
         res.status(ex.response.status);
         res.set(ex.response.headers);
         res.set("access-control-allow-origin", origin);
@@ -276,6 +278,9 @@ class TaskManager {
       }
 
       if (targetIsDown) {
+        console.log(options.url.red.bold);
+        console.log(ex.message.bgRed.white);
+
         // Try the cache
         if (isCachable(options, config)) {
           if (await cache.has(task.cacheKey)) {
@@ -307,7 +312,7 @@ class TaskManager {
         task.attempt++;
 
         task.log.push(
-          `Trying again in ${config.target.try.again.delay.unitifyTime()}`
+          `Trying again in ${config.target.try.again.delay.deunitify()}`
         );
 
         // Try again
@@ -426,6 +431,7 @@ class TaskManager {
 
   // #region Log unhandled errors
   process.on("uncaughtException", async (ex: any) => {
+    console.log(`Uncaught exception:`, ex.stack.bgRed.white);
     errorLogger.log(`Uncaught exception:`, ex.stack);
     await errorLogger.flush();
   });

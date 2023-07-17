@@ -115,7 +115,7 @@ class DatabaseProxy {
                     body: JSON.stringify(data),
                     mode: "no-cors",
                 });
-                return yield result.json();
+                return yield (result === null || result === void 0 ? void 0 : result.json());
             }
             const argsStr = args
                 .map((a) => `${a.name}=${JSON.stringify(a.value || null)}`)
@@ -171,9 +171,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "../../../../LiveIde/Website/script/1689528588772.ts":
+/***/ "../../../../LiveIde/Website/script/1689601282461.ts":
 /*!***********************************************************!*\
-  !*** ../../../../LiveIde/Website/script/1689528588772.ts ***!
+  !*** ../../../../LiveIde/Website/script/1689601282461.ts ***!
   \***********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -262,7 +262,11 @@ const helpers = {
     });
     yield client.compileAll();
     let ideVueApp = null;
-    const dbp = (yield DbpClient_1.DatabaseProxy.new("https://db.memegenerator.net/MemeGenerator"));
+    const isLocalHost = window.location.hostname == "localhost";
+    const dbpHost = isLocalHost
+        ? `http://localhost:4040`
+        : `https://db.memegenerator.net`;
+    const dbp = (yield DbpClient_1.DatabaseProxy.new(`${dbpHost}/MemeGenerator`));
     const getNewParams = () => __awaiter(void 0, void 0, void 0, function* () {
         return (yield Params_1.Params.new(() => ideVueApp, client.config.params, window.location.pathname));
     });
@@ -3475,7 +3479,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1689528588772.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1689601282461.ts");
 /******/ 	
 /******/ })()
 ;

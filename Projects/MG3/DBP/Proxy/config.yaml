@@ -10,9 +10,11 @@ incoming:
 target:
   base:
     urls:
-      #- http://localhost:4050
-      - http://localhost:4041
-      - http://localhost:4042
+      prod:
+        - http://localhost:4041
+        - http://localhost:4042
+      dev:
+        - https://db.memegenerator.net
   timeout: 5s
   try:
     again:

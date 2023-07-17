@@ -81,9 +81,12 @@ interface MgParams {
 
   let ideVueApp: any = null;
 
-  const dbp = (await DatabaseProxy.new(
-    "https://db.memegenerator.net/MemeGenerator"
-  )) as any;
+  const isLocalHost = window.location.hostname == "localhost";
+  const dbpHost = isLocalHost
+    ? `http://localhost:4040`
+    : `https://db.memegenerator.net`;
+
+  const dbp = (await DatabaseProxy.new(`${dbpHost}/MemeGenerator`)) as any;
 
   const getNewParams = async () => {
     return (await Params.new(
