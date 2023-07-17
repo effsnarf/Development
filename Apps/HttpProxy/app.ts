@@ -85,6 +85,17 @@ const currentTasks = {} as any;
     (taskLogger as any)._log(task);
   };
 
+  (statusLogger as any)._log = statusLogger.log;
+  (statusLogger as any).log = (currentTasks: any) => {
+    currentTasks = { ...currentTasks };
+    Object.keys(currentTasks).forEach((key) => {
+      currentTasks[key] = { ...currentTasks[key] };
+      delete currentTasks[key].req;
+      delete currentTasks[key].res;
+      (statusLogger as any)._log(currentTasks);
+    });
+  };
+
   debugLogger.log(config);
 
   const tryRequest = async (task: Task) => {
