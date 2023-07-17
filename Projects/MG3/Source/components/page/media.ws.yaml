@@ -1,0 +1,46 @@
+dom:
+  site:
+    page-name: media
+    template:
+      v-slot: article
+      e.media:
+        :item: media
+data:
+  media: null
+  temp: null
+mounted: | #js
+  async function() {
+    this.$watch(() => this.$root.params.mediaID, {
+      handler: async () => {
+        await this.init();
+      },
+      immediate: true
+    });
+  }
+methods:
+  init: | #js
+    async function() {
+      if (!this.$root.params.mediaID) return;
+      const dbp = this.$root.dbp;
+      this.clear();
+      try
+      {
+        this.$root.isLoading++;
+        this.media = await dbp.medias.select.one(this.$root.params.mediaID);
+        if (this.$root.params.page == "media") {
+          this.$root.setDocumentTitle(this.$root.getMediaText(instance));
+        }
+      }
+      finally
+      {
+        this.$root.isLoading--;
+      }
+    }
+style: null
+name: page-media
+template: >-
+  <site class="comp-page-media" page-name="media" path="221009861."><template
+  v-slot:article path="221009861.0"><div v-text="media"
+  path="221009861.0.0"></div><e-template-editor ref="TemplateEditor1"
+  :temp="temp" :show-property-editor="false"
+  path="221009861.0.1"></e-template-editor></template></site>

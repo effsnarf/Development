@@ -111,7 +111,7 @@ interface MgParams {
       compsDic: {},
       compNames: [],
       templates: client.templates,
-      isLoading: false,
+      isLoading: 0,
       error: null,
       loadingImageUrl:
         "https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/images/loading.gif",
@@ -251,6 +251,9 @@ interface MgParams {
       getInstanceText(instance: any) {
         if (!instance) return null;
         return [instance.text0, instance.text1].filter((a) => a).join(", ");
+      },
+      getMediaText(media: any) {
+        return null;
       },
       setDocumentTitle(title: string) {
         document.title = [title, "Meme Generator"].filter((a) => a).join(" - ");

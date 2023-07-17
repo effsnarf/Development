@@ -80,7 +80,7 @@ methods:
       this.clear();
       try
       {
-        this.$root.isLoading = true;
+        this.$root.isLoading++;
         this.generator = !this.urlName ? null : await dbp.generators.select.one(null, this.urlName);
         this.recommendationItems.replace(async() => await dbp.generators.select.related(this.urlName), 300, gen => gen.generatorID);
         this.$refs.contentStream1?.reset();
@@ -93,7 +93,7 @@ methods:
       }
       finally
       {
-        this.$root.isLoading = false;
+        this.$root.isLoading--;
       }
     }
   clear: | #js

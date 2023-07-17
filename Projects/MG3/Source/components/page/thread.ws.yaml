@@ -15,7 +15,6 @@ data:
   threadNotFound: false
 computed:
   threadID: | #js
-
     function() {
       return this.$root.params.threadID;
     }
@@ -25,25 +24,23 @@ mounted: | #js
 watch:
   threadID:
     handler: | #js
-
       async function() {
         if (this.$root.params.page != "thread") return;
         try
         {
-          this.$root.isLoading = true;
+          this.$root.isLoading++;
           this.threadNotFound = false;
           this.thread = (!this.threadID) ? null : (await this.$root.dbp.threads.select.one(this.threadID));
           this.threadNotFound = (this.threadID && !this.thread);
         }
         finally
         {
-          this.$root.isLoading = false;
+          this.$root.isLoading--;
         }
       }
     immediate: true
   threadNotFound:
     handler: | #js
-
       function(newTNF) {
         this.$root.error = (!newTNF ? null : "Thread not found");
       }

@@ -5,6 +5,7 @@ params:
         if (url == "/") return "home";
         if (url == "/test") return "test";
         if (url == "/admin") return "admin";
+        if (url.startsWith("/m/")) return "media";
         if (url.startsWith("/instance/")) return "instance";
         if (url.startsWith("/c/")) return "category";
         if (url.startsWith("/t/")) return "thread";
@@ -18,6 +19,12 @@ params:
         if (["instance", "t"].some(a => url.startsWith(`/${a}/`))) return null;
         if (["c"].some(a => url.startsWith(`/${a}/`))) return url.split("/")[2];
         return url.split("/")[1];
+      }
+  mediaID:
+    get: | #ts
+      function(url) {
+        if (!url.startsWith("/m/")) return null;
+        return parseInt(url.split("/")[2]);
       }
   instanceID:
     get: | #ts
