@@ -1,0 +1,94 @@
+[
+    {
+        "type": "File",
+        "name": "d:\\Development\\Projects\\MG3\\Web\\Site\\Proxy\\config.yaml",
+        "parent_id": null,
+        "fsPath": "d:\\Development\\Projects\\MG3\\Web\\Site\\Proxy\\config.yaml",
+        "workspaceRoot": null,
+        "workspacePath": null,
+        "id": "1xp7U9KFYm2bMTRh",
+        "label": "MG3.Web.Site.Proxy"
+    },
+    {
+        "type": "File",
+        "name": "d:\\Development\\Projects\\MG3\\Web\\Site\\Node2\\config.yaml",
+        "parent_id": null,
+        "fsPath": "d:\\Development\\Projects\\MG3\\Web\\Site\\Node2\\config.yaml",
+        "workspaceRoot": null,
+        "workspacePath": null,
+        "id": "9hCLYySgUFpstqPn",
+        "label": "MG3.Web.Site.Node2"
+    },
+    {
+        "type": "File",
+        "name": "d:\\Development\\Projects\\MG3\\Web\\Site\\Node1\\config.yaml",
+        "parent_id": null,
+        "fsPath": "d:\\Development\\Projects\\MG3\\Web\\Site\\Node1\\config.yaml",
+        "workspaceRoot": null,
+        "workspacePath": null,
+        "id": "Fdwcr085LgPzj2vQ",
+        "label": "MG3.Web.Site.Node1"
+    },
+    {
+        "type": "File",
+        "name": "d:\\Development\\Projects\\MG3\\DBP\\Proxy\\config.yaml",
+        "parent_id": null,
+        "fsPath": "d:\\Development\\Projects\\MG3\\DBP\\Proxy\\config.yaml",
+        "workspaceRoot": null,
+        "workspacePath": null,
+        "id": "r5Wtqm68ZBJa9yji",
+        "label": "MG3.DBP.Proxy"
+    },
+    {
+        "type": "File",
+        "name": "d:\\Development\\Projects\\MG3\\DBP\\Node1\\config.yaml",
+        "parent_id": null,
+        "fsPath": "d:\\Development\\Projects\\MG3\\DBP\\Node1\\config.yaml",
+        "workspaceRoot": null,
+        "workspacePath": null,
+        "id": "yK0DntRH6UldMG9z",
+        "label": "MG3.DBP.Node1"
+    },
+    {
+        "type": "File",
+        "name": "d:\\Development\\Projects\\MG3\\DBP\\Node2\\config.yaml",
+        "parent_id": null,
+        "fsPath": "d:\\Development\\Projects\\MG3\\DBP\\Node2\\config.yaml",
+        "workspaceRoot": null,
+        "workspacePath": null,
+        "id": "x3IN8XSgovKWTnkz",
+        "label": "MG3.DBP.Node2"
+    },
+    {
+        "type": "Group",
+        "name": "MG3.Web.Site",
+        "parent_id": "x3IN8XSgovKWTnkz",
+        "workspaceRoot": null,
+        "workspacePath": null,
+        "id": "FESfQUoCswyjgnPd"
+    },
+    {
+        "type": "Group",
+        "name": "MG3.Web.Site",
+        "parent_id": "x3IN8XSgovKWTnkz",
+        "workspaceRoot": null,
+        "workspacePath": null,
+        "id": "edfNmKRqZ1rHn6Tp"
+    },
+    {
+        "type": "Group",
+        "name": "MG3.DBP",
+        "parent_id": "x3IN8XSgovKWTnkz",
+        "workspaceRoot": null,
+        "workspacePath": null,
+        "id": "h3HV8k52BiNjQKOx"
+    },
+    {
+        "type": "Group",
+        "name": "MG3-DBP",
+        "parent_id": "x3IN8XSgovKWTnkz",
+        "workspaceRoot": null,
+        "workspacePath": null,
+        "id": "xiXSE8jwzCydWUM7"
+    }
+]
