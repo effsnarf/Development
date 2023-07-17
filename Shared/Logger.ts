@@ -182,4 +182,4 @@ class FileSystemLogger extends LoggerBase {
   }
 }
 
-export { Logger };
+export { Logger, LoggerBase };
