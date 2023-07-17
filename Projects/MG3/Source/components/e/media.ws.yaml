@@ -1,0 +1,55 @@
+dom:
+  e.template.editor:
+    ref: TemplateEditor1
+    ":temp": temp
+    ":show-property-editor": "false"
+
+props:
+  item: null
+  mediaID: null
+
+data:
+  media: null
+  temp: null
+
+methods:
+  mediaToTemplate: | #js
+    function (media) {
+      if (!media) return null;
+
+      // Depending on media.newGenerator.key we set the format
+      // For example what.i.really.do generator has an image grid format
+
+      // Walk the tree and set caption text and image IDs
+      // [{text: 'test', {image: {_id: 1}}, ..]
+      const walk = (node, i) => {
+        if (node.caption) node.caption.text = media.content.items[i].text;
+        if (node.type === 'image')
+        {
+          node.imageID = media.content.items[i].image._id;
+        }
+        if (node.items) node.items.forEach(walk);
+      };
+      walk(this.temp, 0);
+    }
+
+watch:
+  media:
+    handler: | #js
+      function (media) {
+        this.temp = this.mediaToTemplate(media);
+      }
+    immediate: true
+  item:
+    handler: | #js
+      function (item) {
+        this.media = item;
+      }
+    immediate: true
+  instanceID:
+    handler: | #js
+      async function (mediaID) {
+        if (this.item) return;
+        this.media = !mediaID ? null : await this.$root.dbp.medias.select.one(mediaID);
+      }
+    immediate: true
