@@ -1,0 +1,16 @@
+{
+    "favorites.resources": [
+        {
+            "filePath": "Projects\\MG3\\DBP\\Proxy\\config.yaml",
+            "group": "Default"
+        },
+        {
+            "filePath": "Projects\\MG3\\DBP\\Node1\\config.yaml",
+            "group": "Default"
+        },
+        {
+            "filePath": "Projects\\MG3\\DBP\\Node2\\config.yaml",
+            "group": "Default"
+        }
+    ]
+}

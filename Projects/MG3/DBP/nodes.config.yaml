@@ -54,6 +54,14 @@ api:
         if (!media) throw new Error("Argument missing: media");
         media = await db.upsert("Medias", media, true);
         return media;
+    Medias.select.one:
+      args: [mediaID]
+      code: | #js
+        const uid = (typeof mediaID != "string") ? null : mediaID;
+        const media = uid ?
+          await db.findOne("Medias", { _uid: mediaID }) :
+          await db.findOne("Medias", { _id: mediaID });
+        return media;
     Generators.select.search:
       args: [query]
       code: | #js
