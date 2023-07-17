@@ -67,5 +67,5 @@ stats:
   every: 1m
 rotate:
   nodes:
-    prod: false
+    prod: true
     dev: false

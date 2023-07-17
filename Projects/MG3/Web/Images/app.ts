@@ -17,6 +17,8 @@ import { MongoDatabase } from "@shared/Database/MongoDatabase";
 import { Timer } from "@shared/Timer";
 import { Logger } from "@shared/Logger";
 
+let currentRequestsCount = 0;
+
 (async () => {
   const config = (await Configuration.new()).data;
   const severity = {
@@ -29,6 +31,9 @@ import { Logger } from "@shared/Logger";
 
   const log = (...args: any[]) => {
     args = args.map((a) => (typeof a == "string" ? a.gray : a));
+    args.unshift(
+      `${currentRequestsCount.severify(10, 20, "<")} ${`reqs`.gray}`
+    );
     args.unshift(config.title.gray);
     console.log(...args);
   };
@@ -288,6 +293,8 @@ import { Logger } from "@shared/Logger";
         });
       };
 
+      currentRequestsCount++;
+
       try {
         res.setHeader("Access-Control-Allow-Origin", "*");
         const ps = req.url.split(`/`).flatMap((a: string) => a.split(`.`));
@@ -311,6 +318,7 @@ import { Logger } from "@shared/Logger";
         res.write(JSON.stringify({ error: ex.message, stack: ex.stack }));
         res.end();
       } finally {
+        currentRequestsCount--;
         // debug("Request processing completed");
       }
     })
