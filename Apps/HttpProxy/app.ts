@@ -101,7 +101,7 @@ class TaskManager {
   }
 
   logStatus() {
-    this.statusLogger.log(`Tasks: ${this.count}`, this.items);
+    this.statusLogger.log(`Tasks: ${this.count}`, this.items.values());
   }
 
   get count() {
@@ -135,18 +135,16 @@ class TaskManager {
       }
     }
 
-    task.nodeIndex = task.attempt % config.target.base.urls.length;
+    const nodeIndex =
+      (task.nodeIndex + task.attempt) % config.target.base.urls.length;
 
-    if (config.rotate?.nodes)
-      task.nodeIndex = (task.nodeIndex + 1) % config.target.base.urls.length;
-
-    const targetUrl = `${config.target.base.urls[task.nodeIndex]}${req.url}`;
+    const targetUrl = `${config.target.base.urls[nodeIndex]}${req.url}`;
 
     task.log.push(
       `Attempt ${task.attempt + 1} of ${config.target.try.again.retries}`
     );
     task.log.push(
-      `Using node ${task.nodeIndex + 1} of ${config.target.base.urls.length}`
+      `Using node ${nodeIndex + 1} of ${config.target.base.urls.length}`
     );
     task.log.push(`Target URL: ${targetUrl}`);
 
@@ -389,6 +387,8 @@ class TaskManager {
 
   const cache = await Cache.new(config.cache.store);
 
+  let nextNodeIndex = 0;
+
   // Forward all incoming HTTP requests to config.target.base.urls/..
   // If a request fails (target is down), try the cache first
   // If the cache doesn't have the response, try backup urls up to target.try.again.retries times
@@ -404,7 +404,9 @@ class TaskManager {
       postData:
         req.method == "POST" ? await Http.getPostDataFromStream(req) : null,
       attempt: 0,
-      nodeIndex: 0,
+      nodeIndex: !config.rotate?.nodes
+        ? 0
+        : nextNodeIndex++ % config.target.base.urls.length,
       log: [],
       logTimer: null,
       isPiping: false,
@@ -429,9 +431,11 @@ class TaskManager {
 
   // Every minute, track requests/minute and response times in analytics
   const analytics = await Analytics.new(config.analytics);
+  const appTitle = config.title.split(".").take(2).join(".");
+  console.log(appTitle);
   setInterval(async () => {
     await analytics.create(
-      config.title.split(".").first(),
+      appTitle,
       "network",
       "requests",
       ItemType.Count,
@@ -440,7 +444,7 @@ class TaskManager {
       null
     );
     await analytics.create(
-      config.title.split(".").first(),
+      appTitle,
       "network",
       "response.time",
       ItemType.Average,
@@ -450,6 +454,15 @@ class TaskManager {
         average: stats.response.times.average,
       },
       "ms"
+    );
+    await analytics.create(
+      appTitle,
+      "network",
+      "queue",
+      ItemType.Count,
+      stats.interval,
+      tasks.count,
+      null
     );
     tasks.logStatus();
   }, stats.interval);

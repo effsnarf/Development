@@ -15,6 +15,8 @@ Handlebars.registerHelper("json", function (obj: any) {
 });
 
 class HttpServer {
+  private currentRequestsCount = 0;
+
   private constructor(
     private appName: string,
     private port: number,
@@ -54,9 +56,12 @@ class HttpServer {
     const timer = Timer.start();
 
     try {
+      this.currentRequestsCount++;
+
       const data = await Http.getPostDataFromStream(req);
 
       const customResult = await this.handler(req, res, data);
+
       if (customResult) {
         this.logResponse(timer, req, customResult);
         return;
@@ -100,6 +105,8 @@ class HttpServer {
         this.logResponse(timer, req, res);
         this.log(`${ex.stack?.bgRed}`);
       }
+    } finally {
+      this.currentRequestsCount--;
     }
   }
 
@@ -170,6 +177,9 @@ class HttpServer {
   }
 
   private log(...args: any[]) {
+    args.unshift(
+      `${this.currentRequestsCount.severify(10, 20, "<")} ${`reqs`.gray}`
+    );
     args.unshift(`${new Date().toLocaleTimeString().gray}`);
     args.unshift(`${this.appName?.gray}`);
     console.log(...args);
