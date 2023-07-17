@@ -17,7 +17,7 @@ target:
   try:
     again:
       retries: 30
-      delay: 1s
+      delay: 0.1s
 analytics:
   prod:
     api:

@@ -1,6 +1,6 @@
 title: MG.DBP.LB
 incoming:
-  address: localhost:4050
+  address: 10.35.16.36:80
   request:
     timeout: 1 # Timeout node requests
   cors:
