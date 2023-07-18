@@ -2,109 +2,154 @@ dom:
   div:
     e.template.editor:
       ref: TemplateEditor1
-      ':new-generator-key': '''what.i.really.do'''
+      ':builder': builder
       ':temp': temp
+      ':editable': editable
       ':show-property-editor': 'false'
+      @media-created: onMediaCreated
+      @cancel: $emit('cancel')
 props:
-  source: null
+  builder: null
+  media: null
+  editable: false
 data:
   temp: null
-watch:
-  source:
-    handler: | #js
-      function(source) {
-        if (!source) return;
+methods:
+  builderSourceToTemplate: | #js
+    function(source) {
+      if (!source) return null;
 
-        const temp = {
-          id: this.$root.getUniqueClientID(),
-          type: "grid",
+      const temp = {
+        id: this.$root.getUniqueClientID(),
+        type: "grid",
+        visible: true,
+        aspectRatio: null,
+        gap: 0.02,
+        caption: {
           visible: true,
-          aspectRatio: null,
-          gap: 0.02,
-          caption: {
-            visible: true,
-            editable: source.title.editable,
-            text: source.title.text,
-            font: 'Arial',
-            color: 'white',
-            align: {
-              h: "center",
-              v: "top"
-            },
-            uppercase: false,
-            scale: 0.6
+          editable: source.title.editable,
+          text: source.title.text,
+          font: 'Arial',
+          color: 'white',
+          align: {
+            h: "center",
+            v: "top"
           },
-          items: []
+          uppercase: false,
+          scale: 0.6
+        },
+        items: []
+      };
+
+      const hasSubgrid = true || (source.subgrid.items > 1);
+
+      const captionItems = source.captions.items || source.captions;
+      const editable = source.captions.editable || false;
+
+      for (let i = 0; i < captionItems.length; i++)
+      {
+        const caption = {
+          visible: true,
+          editable: editable,
+          text: captionItems[i],
+          font: 'Arial',
+          color: 'white',
+          align: {
+            h: "center",
+            v: "bottom"
+          },
+          uppercase: false,
         };
 
-        const hasSubgrid = true || (source.subgrid.items > 1);
+        let subgrid = temp;
 
-        const captionItems = source.captions.items || source.captions;
-        const editable = source.captions.editable || false;
-
-        for (let i = 0; i < captionItems.length; i++)
+        if (hasSubgrid)
         {
-          const caption = {
+          subgrid = {
+            id: this.$root.getUniqueClientID(),
+            type: "grid",
             visible: true,
-            editable: editable,
-            text: captionItems[i],
-            font: 'Arial',
-            color: 'white',
-            align: {
-              h: "center",
-              v: "bottom"
-            },
-            uppercase: false,
+            aspectRatio: "1/1",
+            caption,
+            rotation: 0,
+            items: []
           };
 
-          let subgrid = temp;
-
-          if (hasSubgrid)
-          {
-            subgrid = {
-              id: this.$root.getUniqueClientID(),
-              type: "grid",
-              visible: true,
-              aspectRatio: "1/1",
-              caption,
-              items: []
-            };
-
-            temp.items.push(subgrid);
-          }
-
-          for (let j = 0; j < source.subgrid.items; j++)
-          {
-            subgrid.items.add({
-              id: this.$root.getUniqueClientID(),
-              type: "image",
-              visible: true,
-              imageID: null,
-              removeBackground: false,
-              caption: (hasSubgrid ? null : caption),
-              trans: {
-                  pos: {
-                      x: 0.5,
-                      y: 0.5
-                  },
-                  scale: 1
-              },
-              shadow: {
-                x: 0,
-                y: 0,
-                blur: 0,
-                color: '#000000',
-                opacity: 1
-              },
-            });
-          }
+          temp.items.push(subgrid);
         }
 
+        for (let j = 0; j < source.subgrid.items; j++)
+        {
+          subgrid.items.add({
+            id: this.$root.getUniqueClientID(),
+            type: "image",
+            visible: true,
+            imageID: null,
+            removeBackground: false,
+            caption: (hasSubgrid ? null : caption),
+            trans: {
+                pos: {
+                    x: 0.5,
+                    y: 0.5
+                },
+                scale: 1
+            },
+            shadow: {
+              x: 0,
+              y: 0,
+              blur: 0,
+              color: '#000000',
+              opacity: 1
+            },
+          });
+        }
+      }
+
+      return temp;
+    }
+  applyMediaToTemplate: | #js
+    async function (media, temp) {
+      if (!media) return null;
+      let index = 0;
+      // Walk the tree and set caption text and image IDs
+      // [{text: 'test', {image: {_id: 1}}, ..]
+      const walk = (node) => {
+        const item = media.content.items[index];
+        Object.assign(node, item);
+        index++;
+        for (const child of (node.items||[])) walk(child);
+      };
+      walk(temp);
+    }
+  initFromBuilder: | #js
+    function (builder) {
+      this.temp = this.builderSourceToTemplate(builder?.source);
+    }
+  onMediaCreated: | #js
+    async function (media) {
+      this.initFromBuilder(this.builder);
+    }
+watch:
+  builder:
+    handler: | #js
+      function(builder) {
+        if (!builder) return;
+        this.initFromBuilder(builder);
+      }
+    immediate: true
+  media:
+    handler: | #js
+      async function(media) {
+        if (!media) return;
+        const builder = await this.$root.getBuilder(media.builderID);
+        const temp = this.builderSourceToTemplate(builder.source);
+        this.applyMediaToTemplate(media, temp);
         this.temp = temp;
       }
     immediate: true
 name: e-format-image-grid
 template: >-
   <div class="comp-e-format-image-grid" path="-603568889."><e-template-editor
-  ref="TemplateEditor1" :new-generator-key="'what.i.really.do'" :temp="temp"
-  :show-property-editor="false" path="-603568889.0"></e-template-editor></div>
+  ref="TemplateEditor1" :builder="builder" :temp="temp" :editable="editable"
+  :show-property-editor="false" @media-created="onMediaCreated"
+  @cancel="$emit('cancel')" path="-603568889.0"></e-template-editor></div>

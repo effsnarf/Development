@@ -1,0 +1,23 @@
+dom:
+  video:
+    ref: video1
+    autoplay: true
+    muted: true
+    loop: true
+    ':src': src
+props:
+  src: null
+mounted: | #js
+  function() {
+    this.ensureVideoIsPlaying();
+  }
+methods:
+  ensureVideoIsPlaying: | #js
+    function() {
+      if (this.$refs.video1?.paused) this.$refs.video1.play();
+      setTimeout(this.ensureVideoIsPlaying.bind(this), 400);
+    }
+name: ui-video
+template: >-
+  <video class="comp-ui-video" ref="video1" autoplay="true" muted="true"
+  loop="true" :src="src" path="-2121871199."></video>

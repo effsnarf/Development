@@ -21,7 +21,7 @@ methods:
     }
 name: ui-text-box
 style:
-  input.has-icon:
+  input.hasIcon:
     padding-left: 2em !important
   .icon:
     position: absolute

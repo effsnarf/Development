@@ -1,15 +1,16 @@
 dom:
-  component:
-    ':is': getCompType()
-    class: image
-    ':url': url
-    img:
-      ref: image1
-      ':class': cssClass
-      ':style': imgStyle
-      ':src': src1
-      @load: onLoad
-    @click: $emit('click')
+  div:
+    component:
+      ':is': getCompType()
+      class: image
+      ':url': url
+      img:
+        ref: image1
+        ':class': cssClass
+        ':style': imgStyle
+        ':src': src1
+        @load: onLoad
+      @click: $emit('click')
 props:
   imageID: null
   url: null
@@ -22,7 +23,7 @@ data:
   width: null
   height: null
 mounted: | #js
-  function () {
+  async function () {
     window.addEventListener(`resize`, this.recalc.bind(this));
     // Detect if the image element changes its size
     let resizeObserver = new ResizeObserver(this.recalc.bind(this));
@@ -89,7 +90,7 @@ style:
     aspect-ratio: 1
 name: ui-image
 template: >-
-  <component class="comp-ui-image image" :is="getCompType()" :url="url"
-  @click="$emit('click')" path="-2133760639."><img ref="image1"
-  :class="cssClass" :style="imgStyle" :src="src1" @load="onLoad"
-  path="-2133760639.0"/></component>
+  <div class="comp-ui-image" path="-2133760639."><component class="image"
+  :is="getCompType()" :url="url" @click="$emit('click')"
+  path="-2133760639.0"><img ref="image1" :class="cssClass" :style="imgStyle"
+  :src="src1" @load="onLoad" path="-2133760639.0.0"/></component></div>

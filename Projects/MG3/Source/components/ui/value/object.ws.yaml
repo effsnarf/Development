@@ -11,5 +11,7 @@ computed:
 style:
   pre:
     font-size: 100%
+    max-height: 60vh
+    overflow: auto
 name: ui-value-object
 template: <pre class="comp-ui-value-object" v-html="yaml" path="-1714629770."></pre>

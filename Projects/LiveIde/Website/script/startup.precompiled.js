@@ -171,9 +171,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "../../../../LiveIde/Website/script/1689605016432.ts":
+/***/ "../../../../LiveIde/Website/script/1689706832817.ts":
 /*!***********************************************************!*\
-  !*** ../../../../LiveIde/Website/script/1689605016432.ts ***!
+  !*** ../../../../LiveIde/Website/script/1689706832817.ts ***!
   \***********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -221,6 +221,16 @@ const helpers = {
                 return null;
             return helpers.url.full(`/t/${thread._id}`, full);
         },
+        builder: (builder, full = false) => {
+            if (!builder)
+                return null;
+            return helpers.url.full(`/b/${builder.urlName}`, full);
+        },
+        media: (media, full = false) => {
+            if (!media)
+                return null;
+            return helpers.url.full(`/m/${media._id}`, full);
+        },
         generator: (generator, full = false) => {
             if (!generator)
                 return null;
@@ -231,16 +241,34 @@ const helpers = {
                 return null;
             return helpers.url.full(`/instance/${instance.instanceID}`, full);
         },
-        instanceImage: (instance) => {
-            if (!instance)
+        itemImage: (item) => {
+            var _a;
+            if (!item)
                 return null;
-            return `https://img.memegenerator.net/instances/${instance.instanceID}.jpg`;
+            if (item.text0)
+                return `https://img.memegenerator.net/instances/${item._id}.jpg`;
+            if (item.builderID)
+                return helpers.url.image((_a = item.content.items.find((item) => item.imageID)) === null || _a === void 0 ? void 0 : _a.imageID);
+            throw new Error("Unknown item type");
         },
         image: (imageID, full = false, removeBackground = false) => {
             if (!imageID)
                 return null;
             const noBg = removeBackground ? ".nobg" : "";
             return helpers.url.full(`https://img.memegenerator.net/images/${imageID}${noBg}.jpg`, full);
+        },
+        item: (item, full = false) => {
+            if (!item)
+                return null;
+            if (item.builderID)
+                return helpers.url.media(item, full);
+            if (item.text0)
+                return helpers.url.instance(item, full);
+            if (item.format)
+                return helpers.url.builder(item, full);
+            if (item.displayName)
+                return helpers.url.generator(item, full);
+            throw new Error("Unknown item type");
         },
         full: (path, full = false) => {
             if (!path)
@@ -272,6 +300,9 @@ const helpers = {
     const vueManager = yield VueManager_1.VueManager.new(client);
     ideVueApp = new client.Vue({
         data: {
+            // MemeGenerator
+            builders: {},
+            // General
             state: null,
             vm: vueManager,
             client,
@@ -283,7 +314,7 @@ const helpers = {
             compsDic: {},
             compNames: [],
             templates: client.templates,
-            isLoading: false,
+            isLoading: 0,
             error: null,
             loadingImageUrl: "https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/images/loading.gif",
             key1: 1,
@@ -295,11 +326,34 @@ const helpers = {
             });
         },
         methods: {
+            getBuilder(builderID) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    const self = this;
+                    yield self.ensureBuilders();
+                    return self.builders[builderID];
+                });
+            },
+            ensureBuilders() {
+                var _a;
+                return __awaiter(this, void 0, void 0, function* () {
+                    const self = this;
+                    if (!((_a = self.builders) === null || _a === void 0 ? void 0 : _a.length)) {
+                        const allBuilders = yield self.dbp.builders.select.all();
+                        self.builders = allBuilders.toMap((b) => b._id);
+                    }
+                });
+            },
+            getBuilderComponentName(builder) {
+                if (!builder)
+                    return null;
+                return `e-format-${builder.format.replace(/\./g, "-")}`;
+            },
             init() {
                 return __awaiter(this, void 0, void 0, function* () {
                     const self = this;
                     self.compsDic = client.comps.toMap((c) => c.name.hashCode());
                     self.compNames = client.comps.map((c) => c.name);
+                    yield self.ensureBuilders();
                 });
             },
             getComponent(uidOrName) {
@@ -371,7 +425,7 @@ const helpers = {
             },
             navigateTo(item) {
                 return __awaiter(this, void 0, void 0, function* () {
-                    const url = this.itemToUrl(item);
+                    const url = typeof item == "string" ? item : this.itemToUrl(item);
                     const self = this;
                     self.error = null;
                     window.history.pushState({}, "", url);
@@ -383,6 +437,8 @@ const helpers = {
                     return item;
                 if (item.threadID)
                     return helpers.url.thread({ _id: item.threadID });
+                if (item.builderID && item.content)
+                    return helpers.url.media(item);
                 throw new Error("Unknown item type");
             },
             compileApp() {
@@ -447,6 +503,9 @@ const helpers = {
                 if (!instance)
                     return null;
                 return [instance.text0, instance.text1].filter((a) => a).join(", ");
+            },
+            getMediaText(media) {
+                return null;
             },
             setDocumentTitle(title) {
                 document.title = [title, "Meme Generator"].filter((a) => a).join(" - ");
@@ -3489,7 +3548,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1689605016432.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1689706832817.ts");
 /******/ 	
 /******/ })()
 ;

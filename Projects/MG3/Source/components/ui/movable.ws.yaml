@@ -1,16 +1,25 @@
 dom:
   .movable:
+    ':class': '{ enabled: enabled }'
     @mousedown: onMouseDown
     @mousemove: onMouseMove
     @mouseup: onMouseUp
     @mouseout: onMouseUp
     slot: null
+props:
+  value: null
+  enabled: true
+data:
+  isDragging: false
+  dragStart: null
+  dragStartPos: null
 mounted: | #js
   function() {
   }
 methods:
   onMouseDown: | #js
     function(e) {
+      if (!this.enabled) return;
       if (e.button !== 0) return;
 
       e.preventDefault();
@@ -21,6 +30,7 @@ methods:
     }
   onMouseMove: | #js
     function(e) {
+      if (!this.enabled) return;
       if (!this.isDragging) return;
 
       e.preventDefault();
@@ -65,34 +75,19 @@ methods:
     }
   onMouseUp: | #js
     function(e) {
+      if (!this.enabled) return;
       e.preventDefault();
       e.stopPropagation();
 
       this.isDragging = false;
     }
-  getStyle: | #js
-    function() {
-      const style = {};
-      if (this.posDelta)
-      {
-        style.position = 'relative';
-        style.left = this.posDelta.x + 'px';
-        style.top = this.posDelta.y + 'px';
-      }
-      return style;
-    }
-props:
-  value: null
-data:
-  isDragging: false
-  dragStart: null
-  dragStartPos: null
 style:
-  .movable:
+  .movable.enabled:
     cursor: move
+  .movable:
     user-select: none
 name: ui-movable
 template: >-
-  <div class="comp-ui-movable movable" @mousedown="onMouseDown"
-  @mousemove="onMouseMove" @mouseup="onMouseUp" @mouseout="onMouseUp"
-  path="1781914900."><slot></slot></div>
+  <div class="comp-ui-movable movable" :class="{ enabled: enabled }"
+  @mousedown="onMouseDown" @mousemove="onMouseMove" @mouseup="onMouseUp"
+  @mouseout="onMouseUp" path="1781914900."><slot></slot></div>

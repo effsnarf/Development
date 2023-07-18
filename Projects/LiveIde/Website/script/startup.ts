@@ -31,6 +31,14 @@ const helpers = {
       if (!thread) return null;
       return helpers.url.full(`/t/${thread._id}`, full);
     },
+    builder: (builder: any, full: boolean = false) => {
+      if (!builder) return null;
+      return helpers.url.full(`/b/${builder.urlName}`, full);
+    },
+    media: (media: any, full: boolean = false) => {
+      if (!media) return null;
+      return helpers.url.full(`/m/${media._id}`, full);
+    },
     generator: (generator: any, full: boolean = false) => {
       if (!generator) return null;
       return helpers.url.full(`/${generator.urlName}`, full);
@@ -39,9 +47,15 @@ const helpers = {
       if (!instance) return null;
       return helpers.url.full(`/instance/${instance.instanceID}`, full);
     },
-    instanceImage: (instance: any) => {
-      if (!instance) return null;
-      return `https://img.memegenerator.net/instances/${instance.instanceID}.jpg`;
+    itemImage: (item: any) => {
+      if (!item) return null;
+      if (item.text0)
+        return `https://img.memegenerator.net/instances/${item._id}.jpg`;
+      if (item.builderID)
+        return helpers.url.image(
+          item.content.items.find((item: any) => item.imageID)?.imageID
+        );
+      throw new Error("Unknown item type");
     },
     image: (
       imageID: number,
@@ -54,6 +68,14 @@ const helpers = {
         `https://img.memegenerator.net/images/${imageID}${noBg}.jpg`,
         full
       );
+    },
+    item: (item: any, full: boolean = false) => {
+      if (!item) return null;
+      if (item.builderID) return helpers.url.media(item, full);
+      if (item.text0) return helpers.url.instance(item, full);
+      if (item.format) return helpers.url.builder(item, full);
+      if (item.displayName) return helpers.url.generator(item, full);
+      throw new Error("Unknown item type");
     },
     full: (path: string, full: boolean = false) => {
       if (!path) return null;
@@ -100,6 +122,9 @@ interface MgParams {
 
   ideVueApp = new client.Vue({
     data: {
+      // MemeGenerator
+      builders: {} as any,
+      // General
       state: null as unknown as StateTracker,
       vm: vueManager,
       client,
@@ -111,7 +136,7 @@ interface MgParams {
       compsDic: {},
       compNames: [],
       templates: client.templates,
-      isLoading: false,
+      isLoading: 0,
       error: null,
       loadingImageUrl:
         "https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/images/loading.gif",
@@ -122,10 +147,27 @@ interface MgParams {
       await this.init();
     },
     methods: {
+      async getBuilder(builderID: number) {
+        const self = this as any;
+        await self.ensureBuilders();
+        return self.builders[builderID];
+      },
+      async ensureBuilders() {
+        const self = this as any;
+        if (!self.builders?.length) {
+          const allBuilders = await self.dbp.builders.select.all();
+          self.builders = allBuilders.toMap((b: any) => b._id);
+        }
+      },
+      getBuilderComponentName(builder: any) {
+        if (!builder) return null;
+        return `e-format-${builder.format.replace(/\./g, "-")}`;
+      },
       async init() {
         const self = this as any;
         self.compsDic = client.comps.toMap((c: Component) => c.name.hashCode());
         self.compNames = client.comps.map((c: Component) => c.name);
+        await self.ensureBuilders();
       },
       getComponent(uidOrName: number | string) {
         const uid = typeof uidOrName == "number" ? uidOrName : null;
@@ -186,7 +228,7 @@ interface MgParams {
         return vues;
       },
       async navigateTo(item: any) {
-        const url = this.itemToUrl(item);
+        const url = typeof item == "string" ? item : this.itemToUrl(item);
         const self = this as any;
         self.error = null;
         window.history.pushState({}, "", url);
@@ -195,6 +237,7 @@ interface MgParams {
       itemToUrl(item: any) {
         if (typeof item == "string") return item;
         if (item.threadID) return helpers.url.thread({ _id: item.threadID });
+        if (item.builderID && item.content) return helpers.url.media(item);
         throw new Error("Unknown item type");
       },
       async compileApp() {
@@ -251,6 +294,9 @@ interface MgParams {
       getInstanceText(instance: any) {
         if (!instance) return null;
         return [instance.text0, instance.text1].filter((a) => a).join(", ");
+      },
+      getMediaText(media: any) {
+        return null;
       },
       setDocumentTitle(title: string) {
         document.title = [title, "Meme Generator"].filter((a) => a).join(" - ");
