@@ -101,7 +101,7 @@ class TaskManager {
   }
 
   logStatus() {
-    this.statusLogger.log(`Tasks: ${this.count}`, this.items.values());
+    this.statusLogger.log(this.items);
   }
 
   get count() {

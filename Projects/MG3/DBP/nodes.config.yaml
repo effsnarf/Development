@@ -48,6 +48,16 @@ restart:
   url: /restart/Jz0xnwG1bDv57LFpKTS6UkV8h9XQtCeBOMl2NHfRIj3yPcZYimAsrqdV4oWEaFhu
 api:
   methods:
+    Builders.select.one:
+      args: [urlName]
+      code: | #js
+        const builder = await db.findOne("Builders", { UrlName: urlName });
+        return builder;
+    Builders.select.all:
+      args: []
+      code: | #js
+        const builders = await db.find("Builders", { }, { }, 100, undefined, true);
+        return builders;
     Medias.create.one:
       args: [media]
       code: | #js
@@ -62,6 +72,14 @@ api:
           await db.findOne("Medias", { _uid: mediaID }) :
           await db.findOne("Medias", { _id: mediaID });
         return media;
+    Medias.select.new:
+      args: [builderID, fromMediaID]
+      code: | #js
+        if (!builderID) throw new Error("Argument missing: builderID");
+        if (!fromMediaID) fromMediaID = Number.MAX_VALUE;
+        const pageSize = 15;
+        const medias = await db.find("Medias", { BuilderID: builderID, _id: { $lt: fromMediaID } }, { _id: -1 }, pageSize, 0, true);
+        return medias;
     Generators.select.search:
       args: [query]
       code: | #js

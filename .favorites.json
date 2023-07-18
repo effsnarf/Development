@@ -74,5 +74,23 @@
         "workspacePath": null,
         "id": "ZP6qsKUVmrD9xYyE",
         "label": "Node2"
+    },
+    {
+        "type": "Group",
+        "name": "Apps",
+        "parent_id": null,
+        "workspaceRoot": null,
+        "workspacePath": null,
+        "id": "LMYlq3EwoPhCrbj1"
+    },
+    {
+        "type": "File",
+        "name": "d:\\Development\\Apps\\HttpProxy\\app.ts",
+        "parent_id": "LMYlq3EwoPhCrbj1",
+        "fsPath": "d:\\Development\\Apps\\HttpProxy\\app.ts",
+        "workspaceRoot": null,
+        "workspacePath": null,
+        "id": "9IVf4YWy0RX52O7Q",
+        "label": "Http.Proxy"
     }
 ]
