@@ -135,10 +135,7 @@ const _fetchAsJson = async (url: string) => {
       const templates = await getTemplates();
       const helpers = await getHelpers();
       const config = await getClientConfig();
-      // Current date is used to invalidate the script url cache (day date only, without time)
-      let scriptUrlCacheInvalidator = parseInt(
-        new Date().toISOString().split("T")[0].replace(/-/g, "")
-      );
+      let scriptUrlCacheInvalidator = 1;
 
       return {
         components,
