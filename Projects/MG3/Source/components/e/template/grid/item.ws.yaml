@@ -15,6 +15,7 @@ dom:
           v-for: item in item.items
           ':key': item.id
           v-if: item.visible
+          ':editable': editable
           ':class': getItemClass(item)
           ':style': getItemStyle(item)
           ':is': getItemType(item)
@@ -22,12 +23,13 @@ dom:
           @image-load: (src) => onItemImageLoad(item, src)
           @file-drop: (item, files) => $emit('file-drop', item, files)
       e.template.caption.item:
-        class: clickable
         v-if: item.caption
+        ':editable': editable
         ':item': item.caption
         @click: toggleRotation(item)
 props:
   item: null
+  editable: false
 data:
   size: null
   mainStyle: null
@@ -125,7 +127,7 @@ style:
   .grid-items-4.items-3 > div:nth-child(1), .items-2 > div:
     aspect-ratio: 2.05 / 1 !important
     grid-column: 1 / span 2
-  .grid-items-4.items-3.rotation-1 div:nth-child(1):
+  .grid-items-4.items-3.rotation-1 > div:nth-child(1):
     aspect-ratio: 1 / 2.1 !important
     grid-column: 1
     grid-row: 1 / span 2
@@ -142,11 +144,11 @@ template: >-
   item.items.length + ' items-' + getVisibleItemsCount(item.items) + '
   rotation-' + item.rotation" :style="getMainStyle(item)"
   path="-1435649936.0.0"><component v-for="item in item.items" :key="item.id"
-  v-if="item.visible" :class="getItemClass(item)" :style="getItemStyle(item)"
-  :is="getItemType(item)" :item="item" @image-load="(src) =&gt;
-  onItemImageLoad(item, src)" @file-drop="(item, files) =&gt; $emit('file-drop',
-  item, files)"
+  v-if="item.visible" :editable="editable" :class="getItemClass(item)"
+  :style="getItemStyle(item)" :is="getItemType(item)" :item="item"
+  @image-load="(src) =&gt; onItemImageLoad(item, src)" @file-drop="(item, files)
+  =&gt; $emit('file-drop', item, files)"
   path="-1435649936.0.0.0"></component></div><e-template-caption-item
-  class="clickable" v-if="item.caption" :item="item.caption"
+  v-if="item.caption" :editable="editable" :item="item.caption"
   @click="toggleRotation(item)"
   path="-1435649936.0.1"></e-template-caption-item></div></ui-track-size>

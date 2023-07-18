@@ -26,7 +26,7 @@ dom:
       e.generator.wide2: 
         ':generator': $root.instanceToGenerator(instance)
       ui.share:
-        ':instance': instance
+        ':item': instance
     e.post.create:
       v-if: showCreatePost
       ':generator': $root.instanceToGenerator(instance)
@@ -98,6 +98,8 @@ style:
     margin-top: 1rem
   .comp-e-post-create:
     margin-top: 1rem !important
+  .comp-ui-image:
+    width: 100%
   .comp-ui-image, img:
     aspect-ratio: 1
     object-fit: cover
@@ -142,7 +144,7 @@ template: >-
   path="643573758.1.0"></e-generator-wide2></div><div class="footer2"
   v-if="showFullFooter" path="643573758.2"><e-generator-wide2
   :generator="$root.instanceToGenerator(instance)"
-  path="643573758.2.0"></e-generator-wide2><ui-share :instance="instance"
+  path="643573758.2.0"></e-generator-wide2><ui-share :item="instance"
   path="643573758.2.1"></ui-share></div><e-post-create v-if="showCreatePost"
   :generator="$root.instanceToGenerator(instance)" :entityID="instance._id"
   path="643573758.3"></e-post-create></div>

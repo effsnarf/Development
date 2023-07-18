@@ -5,14 +5,16 @@ dom:
       v-show: isLoading
     ui.file.dropzone:
       v-show: '!isLoading'
+      ':enabled': editable
       @file-drop: onFileDrop(item, $event)
       ui.movable:
+        ':enabled': editable
         @drag-by: ({ dx, dy }) => onItemDragBy(item, { dx, dy })
         @scale-by: (ds) => onItemScaleBy(item, ds)
         ui.image:
           ref: image1
           v-if: item
-          ':style': itemStyle
+          ':style': getStyle(item)
           ':imageID': item.imageID
           ':remove-background': item.removeBackground
           @load: onImageLoad
@@ -22,9 +24,12 @@ dom:
       ':item': item.caption
 props:
   item: null
+  editable: false
 data:
-  itemStyle: null
   isLoading: 0
+mounted: | #js
+  async function () {
+  }
 methods:
   onFileDrop: | #js
     async function(item, files) {
@@ -51,13 +56,12 @@ methods:
     function(item, ds) {
       item.trans.scale += ds;
     }
-  refresh: | #js
-    function() {
-      this.itemStyle = this.getStyle(this.item);
-    }.throttle(50)
   onImageLoad: | #js
     function(e) {
       this.$emit('image-load', e);
+    }
+  refresh: | #js
+    function() {
     }
   getStyle: | #js
     function(item) {
@@ -88,8 +92,7 @@ methods:
 watch:
   item:
     handler: | #js
-      function(item) {
-        this.refresh();
+      async function(item) {
       }
     deep: true
 style:
@@ -104,10 +107,11 @@ template: >-
   <div class="comp-e-template-image-item" path="1623568049."><ui-loading
   class="absolute-center" v-show="isLoading"
   path="1623568049.0"></ui-loading><ui-file-dropzone v-show="!isLoading"
-  @file-drop="onFileDrop(item, $event)" path="1623568049.1"><ui-movable
-  @drag-by="({ dx, dy }) =&gt; onItemDragBy(item, { dx, dy })" @scale-by="(ds)
-  =&gt; onItemScaleBy(item, ds)" path="1623568049.1.0"><ui-image ref="image1"
-  v-if="item" :style="itemStyle" :imageID="item.imageID"
+  :enabled="editable" @file-drop="onFileDrop(item, $event)"
+  path="1623568049.1"><ui-movable :enabled="editable" @drag-by="({ dx, dy })
+  =&gt; onItemDragBy(item, { dx, dy })" @scale-by="(ds) =&gt;
+  onItemScaleBy(item, ds)" path="1623568049.1.0"><ui-image ref="image1"
+  v-if="item" :style="getStyle(item)" :imageID="item.imageID"
   :remove-background="item.removeBackground" @load="onImageLoad"
   @change="refresh"
   path="1623568049.1.0.0"></ui-image></ui-movable></ui-file-dropzone><e-template-caption-item

@@ -1,6 +1,5 @@
 dom:
-  transition:
-    name: slide2
+  div:
     button:
       v-if: '!isLoading'
       v-text: text
@@ -10,33 +9,32 @@ dom:
 props:
   text: null
   click: null
+  showLoading: true
 data:
-  isLoading: null
+  isLoading: 0
 methods:
   onClick: | #js
     async function() {
       this.$emit('click');
       if (this.click)
       {
-        this.isLoading = true;
+        if (this.showLoading) this.isLoading++;
         try
         {
           await this.click();
         }
         finally
         {
-          this.isLoading = false;
+          if (this.showLoading) this.isLoading--;
         }
       }
     }
 style:
-  img:
-    display: block
-    width: 2rem
-    margin: auto
+  button:
+    margin: 0 0.5em
+    user-select: none
 name: ui-button
 template: >-
-  <transition class="comp-ui-button" name="slide2" path="-1914507316."><button
-  v-if="!isLoading" v-text="text" @click="onClick"
-  path="-1914507316.0"></button><ui-loading v-if="isLoading"
-  path="-1914507316.1"></ui-loading></transition>
+  <div class="comp-ui-button" path="-1914507316."><button v-if="!isLoading"
+  v-text="text" @click="onClick" path="-1914507316.0"></button><ui-loading
+  v-if="isLoading" path="-1914507316.1"></ui-loading></div>

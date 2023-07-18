@@ -95,8 +95,8 @@ watch:
     immediate: true
   generator:
     handler: | #js
-      function(newGenerator) {
-        this.tempInstance.generator = newGenerator;
+      function(generator) {
+        this.tempInstance.generator = generator;
       }
     immediate: true
   tempInstance:

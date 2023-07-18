@@ -1,8 +1,13 @@
 dom:
-  div:
-    .header:
+  .header:
+    .div1:
       ':style': getStyle()
       site.logo: null
+    .h-menu:
+      ui.link:
+        v-for: builder in $root.builders
+        ':text': builder.name
+        ':url': $root.url.builder(builder)
 name: site-header
 mounted: | #js
   function() {
@@ -38,11 +43,19 @@ style:
     position: absolute;
     bottom: 2rem
   .header:
+    background-color: black
+    border-radius: 0
+  .div1:
     width: 100%
     display: flex
     filter: grayscale(1) brightness(0.8)
-    background-color: black
-    border-radius: 0
+  .h-menu:
+    display: flex
+    justify-content: space-around
+    font-size: 160%
 template: >-
-  <div class="comp-site-header" path="2017999636."><div class="header"
-  :style="getStyle()" path="2017999636.0"><site-logo></site-logo></div></div>
+  <div class="comp-site-header header" path="2017999636."><div class="div1"
+  :style="getStyle()" path="2017999636.0"><site-logo></site-logo></div><div
+  class="h-menu" path="2017999636.1"><ui-link v-for="builder in $root.builders"
+  :text="builder.name" :url="$root.url.builder(builder)"
+  path="2017999636.1.0"></ui-link></div></div>

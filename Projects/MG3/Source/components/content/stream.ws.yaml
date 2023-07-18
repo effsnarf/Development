@@ -69,13 +69,18 @@ methods:
       this.items = [];
       await this.loadMore();
     }
+  clear: | #js
+    function() {
+      this.items = [];
+    }
   loadMore: | #js
     function() {
       return new Promise((resolve, reject) => {
         if (!this.getMoreItems) return resolve();
         const pageIndex = this.pageIndex++;
+        const lastItemID = this.items?.last()?._id;
         this.queue.push(async () => {
-          let newItems = await this.getMoreItems(pageIndex);
+          let newItems = await this.getMoreItems(pageIndex, lastItemID);
           newItems = newItems.exceptBy(this.items, this.$root.getKey);
           this.items.push(...newItems);
           this.updateVisibleItemIndex();

@@ -3,18 +3,18 @@ dom:
     ':data-url': url
     ':data-image': imageUrl
 props:
-  instance: null
+  item: null
 mounted: | #js
   function() {
   }
 computed:
   url: | #js
     function() {
-      return this.$root.url.instance(this.instance, true);
+      return this.$root.url.item(this.item, true);
     }
   imageUrl: | #js
     function() {
-      return this.$root.url.instanceImage(this.instance);
+      return this.$root.url.itemImage(this.item);
     }
 name: ui-share
 template: >-

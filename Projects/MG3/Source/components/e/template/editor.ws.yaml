@@ -21,14 +21,15 @@ dom:
           v-model: selectedItem.imageID
         e.template.grid.item:
           ':item': temp
-          @file-drop: (item, files) => onFileDrop(item, files)
-        .text-center.mt-l2:
-          ui.loading:
-            v-if: isCreatingMedia
-          ui.button:
-            v-if: '!isCreatingMedia'
+          ':editable': editable
+        .flex.justify-around.mt-l2:
+          v-if: editable
+          ui.button: 
+            ':text': '''✖️ cancel'''
+            ':click': () => $emit('cancel')
+          ui.button: 
             ':text': '''✔️ Create'''
-            @click: createMedia
+            ':click': createMedia
         div: 
           v-if: selectedItem && showPropertyEditor
           ui.section: 
@@ -52,47 +53,33 @@ dom:
               v-model: selectedItem.filters
               @input: () => onItemChange(selectedItem)
       .help:
+        v-if: editable
         .message: 
-          video: 
-            autoplay: true
-            muted: true
-            loop: true
+          ui.video: 
             src: /video/interface/image/drop.webm
           div: 
             v-text: '''Drop images on boxes to upload.'''
         .message: 
-          video: 
-            autoplay: true
-            muted: true
-            loop: true
+          ui.video: 
             src: /video/interface/image/move.webm
           div: 
             v-text: '''Drag images inside boxes to move.'''
         .message: 
-          video: 
-            autoplay: true
-            muted: true
-            loop: true
+          ui.video: 
             src: /video/interface/image/scale.webm
           div: 
             v-text: '''Ctrl-drag images inside boxes to resize.'''
         .message: 
           v-if: hasMoreThanOneImagePerGrid
           class: large-video
-          video: 
-            autoplay: true
-            muted: true
-            loop: true
+          ui.video: 
             src: /video/interface/image/visible.webm
           div: 
             v-text: '''Toggle image visibility using the tree on the left.'''
         .message: 
           v-if: hasMoreThanOneImagePerGrid
           class: large-video
-          video: 
-            autoplay: true
-            muted: true
-            loop: true
+          ui.video: 
             src: /video/interface/image/rotate.webm
           div: 
             v-text: >-
@@ -100,35 +87,60 @@ dom:
               to change the layout.'
 props:
   temp: null
-  newGeneratorKey: null
+  builder: null
+  editable: false
   showPropertyEditor: true
 data:
   selectedItemIndex: 0
   disabled: 0
   showFilters: false
-  isCreatingMedia: false
 mounted: | #js
   async function() {
     await this.init();
   }
 methods:
-  init: | #js
+  createMedia: | #js
     async function() {
-    }
-  onFileDrop: | #js
-    async function(item, files) {
-      await this.$nextTick();
-      if (files.length > 1) return alertify.error('One file at a time, please');
-      item.isLoading = (item.isLoading || 0) + 1;
       try
       {
-        const image = await this.$root.uploadFile(files[0]);
-        item.imageID = image._id;
+        let media = this.getMedia(this.temp);
+        const _uid = this.$root.getRandomUniqueID();
+        media._uid = _uid;
+        media = await this.$root.dbp.medias.create.one(media);
+        // When POSTing from localhost to db.mg.net, we don't get the response,
+        // so we're making another request
+        if (!media) media = await this.$root.dbp.medias.select.one(_uid);
+        this.$emit('media-created', media);
+        await this.$root.navigateTo(media);
       }
       finally
       {
-        item.isLoading--;
       }
+    }
+  getMedia: | #js
+    function(temp) {
+      // Walk the tree and collect caption text and image IDs into an array
+      // [{text: 'test', {image: {_id: 1}}, ..]
+      let items = [];
+      const walk = (node) => {
+        const item = {};
+        Object.assign(item, node);
+        items.push(item);
+        if (node.items) node.items.forEach(walk);
+      };
+      walk(temp);
+
+      items = JSON.parse(JSON.stringify(items));
+
+      const media = {
+        builderID: this.builder._id,
+        content: { items }
+      }
+
+      return media;
+    }
+  init: | #js
+    async function() {
     }
   canApplyEffects: | #js
     function(item) {
@@ -143,7 +155,7 @@ methods:
     }
   getStyle: | #js
     function() {
-      const columns = this.showTree ? [1, 4, 2] : [5, 2];
+      const columns = this.showTree ? [1, 4, 1.5] : this.editable ? [5, 1.5] : [1];
       return {
         gridTemplate: `1fr / ${columns.map(c => `${c}fr`).join(' ')}`
       };
@@ -173,50 +185,6 @@ methods:
       if (disabled) this.disabled++;
       else this.disabled--;
     }
-  createMedia: | #js
-    async function() {
-      this.isCreatingMedia = true;
-      try
-      {
-        let media = this.getMedia(this.temp);
-        const _uid = this.$root.getRandomUniqueID();
-        media._uid = _uid;
-        media = await this.$root.dbp.medias.create.one(media);
-        // When POSTing from localhost to db.mg.net, we don't get the response,
-        // so we're making another request
-        if (!media) media = await this.$root.dbp.medias.select.one(_uid);
-        console.log(media);
-      }
-      finally
-      {
-        this.isCreatingMedia = false;
-      }
-    }
-  getMedia: | #js
-    function(temp) {
-      // Walk the tree and collect caption text and image IDs into an array
-      // [{text: 'test', {image: {_id: 1}}, ..]
-      const tcs = [];
-      const walk = (node) => {
-        if (node.caption) tcs.push({text: node.caption.text});
-        if (node.type === 'image')
-        {
-          tcs.push({
-            image: { _id: node.imageID }
-          });
-        }
-        if (node.items) node.items.forEach(walk);
-      };
-      walk(temp);
-
-      const media = {
-        newGenerator: { key: this.newGeneratorKey },
-        content: {
-          items: tcs
-        }
-      }
-      return media;
-    }
   eval: | #js
     function(s) {
       return eval(s);
@@ -238,7 +206,7 @@ computed:
     }
   showTree: | #js
     function() {
-      return this.hasMoreThanOneImagePerGrid;
+      return this.editable && this.hasMoreThanOneImagePerGrid;
     }
   hasMoreThanOneImagePerGrid: | #js
     function() {
@@ -256,6 +224,11 @@ computed:
       }
 
       return checkNode(this.temp);
+    }
+watch:
+  builder: | #js
+    async function(builder) {
+      if (!builder) this.temp = null;
     }
 name: e-template-editor
 style:
@@ -305,6 +278,8 @@ style:
     overflow: hidden
   .item.selected, .item.selected:hover:
     background: none !important
+  .help:
+    margin-top: 4em
   .help .message:
     display: grid
     grid-template: 1fr / 1fr 2fr
@@ -325,16 +300,15 @@ template: >-
   ref="imageSelect1" v-if="(selectedItem?.type=='image')"
   v-model="selectedItem.imageID"
   path="-650358312.0.1.0"></ui-image-select><e-template-grid-item :item="temp"
-  @file-drop="(item, files) =&gt; onFileDrop(item, files)"
-  path="-650358312.0.1.1"></e-template-grid-item><div class="text-center mt-l2"
-  path="-650358312.0.1.2"><ui-loading v-if="isCreatingMedia"
-  path="-650358312.0.1.2.0"></ui-loading><ui-button v-if="!isCreatingMedia"
-  :text="'✔️ Create'" @click="createMedia"
-  path="-650358312.0.1.2.1"></ui-button></div><div v-if="selectedItem &amp;&amp;
-  showPropertyEditor" path="-650358312.0.1.3"><ui-section
-  :title="selectedItem.type" v-model="showFilters" :opposite="true"
-  path="-650358312.0.1.3.0"><transition name="slide2"
-  path="-650358312.0.1.3.0.0"><component ref="selectedItemEditor1"
+  :editable="editable" path="-650358312.0.1.1"></e-template-grid-item><div
+  class="flex justify-around mt-l2" v-if="editable"
+  path="-650358312.0.1.2"><ui-button :text="'✖️ cancel'" :click="() =&gt;
+  $emit('cancel')" path="-650358312.0.1.2.0"></ui-button><ui-button :text="'✔️
+  Create'" :click="createMedia" path="-650358312.0.1.2.1"></ui-button></div><div
+  v-if="selectedItem &amp;&amp; showPropertyEditor"
+  path="-650358312.0.1.3"><ui-section :title="selectedItem.type"
+  v-model="showFilters" :opposite="true" path="-650358312.0.1.3.0"><transition
+  name="slide2" path="-650358312.0.1.3.0.0"><component ref="selectedItemEditor1"
   :is="selectedItemEditorType" :item="selectedItem"
   @toggle-disabled="toggleDisabled($event)" :key="selectedItemIndex"
   path="-650358312.0.1.3.0.0.0"></component></transition></ui-section><ui-section
@@ -343,27 +317,22 @@ template: >-
   :imageID="selectedItem.imageID" v-model="selectedItem.filters" @input="()
   =&gt; onItemChange(selectedItem)"
   path="-650358312.0.1.3.1.0"></e-template-item-filters></ui-section></div></div><div
-  class="help" path="-650358312.0.2"><div class="message"
-  path="-650358312.0.2.0"><video autoplay="true" muted="true" loop="true"
-  src="/video/interface/image/drop.webm" path="-650358312.0.2.0.0"></video><div
-  v-text="'Drop images on boxes to upload.'"
-  path="-650358312.0.2.0.1"></div></div><div class="message"
-  path="-650358312.0.2.1"><video autoplay="true" muted="true" loop="true"
-  src="/video/interface/image/move.webm" path="-650358312.0.2.1.0"></video><div
-  v-text="'Drag images inside boxes to move.'"
-  path="-650358312.0.2.1.1"></div></div><div class="message"
-  path="-650358312.0.2.2"><video autoplay="true" muted="true" loop="true"
-  src="/video/interface/image/scale.webm" path="-650358312.0.2.2.0"></video><div
-  v-text="'Ctrl-drag images inside boxes to resize.'"
-  path="-650358312.0.2.2.1"></div></div><div class="large-video message"
-  v-if="hasMoreThanOneImagePerGrid" path="-650358312.0.2.3"><video
-  autoplay="true" muted="true" loop="true"
-  src="/video/interface/image/visible.webm"
-  path="-650358312.0.2.3.0"></video><div v-text="'Toggle image visibility using
-  the tree on the left.'" path="-650358312.0.2.3.1"></div></div><div
+  class="help" v-if="editable" path="-650358312.0.2"><div class="message"
+  path="-650358312.0.2.0"><ui-video src="/video/interface/image/drop.webm"
+  path="-650358312.0.2.0.0"></ui-video><div v-text="'Drop images on boxes to
+  upload.'" path="-650358312.0.2.0.1"></div></div><div class="message"
+  path="-650358312.0.2.1"><ui-video src="/video/interface/image/move.webm"
+  path="-650358312.0.2.1.0"></ui-video><div v-text="'Drag images inside boxes to
+  move.'" path="-650358312.0.2.1.1"></div></div><div class="message"
+  path="-650358312.0.2.2"><ui-video src="/video/interface/image/scale.webm"
+  path="-650358312.0.2.2.0"></ui-video><div v-text="'Ctrl-drag images inside
+  boxes to resize.'" path="-650358312.0.2.2.1"></div></div><div
   class="large-video message" v-if="hasMoreThanOneImagePerGrid"
-  path="-650358312.0.2.4"><video autoplay="true" muted="true" loop="true"
-  src="/video/interface/image/rotate.webm"
-  path="-650358312.0.2.4.0"></video><div v-text="'If less than 4 images are
+  path="-650358312.0.2.3"><ui-video src="/video/interface/image/visible.webm"
+  path="-650358312.0.2.3.0"></ui-video><div v-text="'Toggle image visibility
+  using the tree on the left.'" path="-650358312.0.2.3.1"></div></div><div
+  class="large-video message" v-if="hasMoreThanOneImagePerGrid"
+  path="-650358312.0.2.4"><ui-video src="/video/interface/image/rotate.webm"
+  path="-650358312.0.2.4.0"></ui-video><div v-text="'If less than 4 images are
   visible, click the title (Body, Hair..) to change the layout.'"
   path="-650358312.0.2.4.1"></div></div></div></div></div>

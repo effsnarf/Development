@@ -65,19 +65,20 @@ mounted: | #js
   async function() {
     this.$watch(() => this.$root.params.urlName, {
       handler: async () => {
-        await this.init();
+        await this.init(this.$root.params.page, this.$root.params.urlName);
       },
       immediate: true
     });
   }
 methods:
   init: | #js
-    async function() {
+    async function(page, urlName) {
       const dbp = this.$root.dbp;
-      if (this.urlName == this.$root.params.urlName) return;
-      this.urlName = this.$root.params.urlName;
-      if (!this.urlName) return;
+      if (page != "generator") return;
+      if (urlName == this.urlName) return;
       this.clear();
+      if (!urlName) return;
+      this.urlName = urlName;
       try
       {
         this.$root.isLoading++;
@@ -98,6 +99,7 @@ methods:
     }
   clear: | #js
     function() {
+      this.urlName = null;
       this.generator = null;
       this.poem = null;
       this.recommendationItems = [];

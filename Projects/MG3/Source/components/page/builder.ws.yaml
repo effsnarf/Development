@@ -1,0 +1,53 @@
+dom:
+  site:
+    page-name: builder
+    ':columns': 2
+    template:
+      v-slot: article
+      transition:
+        name: slide-large
+        keep.alive:
+          e.builder:
+            ':builder': builder
+            @cancel: onCancel
+props: null
+data:
+  builder: null
+  urlName: null
+mounted: | #js
+  async function() {
+    this.$watch(() => this.$root.params.urlName, {
+      handler: async () => {
+        await this.init(this.$root.params.page, this.$root.params.urlName);
+      },
+      immediate: true
+    });
+  }
+methods:
+  init: | #js
+    async function (page, urlName) {
+      if (page != "builder") return;
+      if (urlName == this.urlName) return;
+      this.clear();
+      if (!urlName) return;
+      this.urlName = urlName;
+      this.builder = await this.$root.dbp.builders.select.one(urlName);
+    }
+  clear: | #js
+    function () {
+      this.builder = null;
+      this.urlName = null;
+    }
+  onCancel: | #js
+    function () {
+      this.$root.navigateTo('/');
+    }
+computed: null
+watch: null
+name: page-builder
+template: >-
+  <site class="comp-page-builder" page-name="builder" :columns="2"
+  path="1227252540."><template v-slot:article path="1227252540.0"><transition
+  name="slide-large" path="1227252540.0.0"><keep-alive
+  path="1227252540.0.0.0"><e-builder :builder="builder" @cancel="onCancel"
+  path="1227252540.0.0.0.0"></e-builder></keep-alive></transition></template></site>

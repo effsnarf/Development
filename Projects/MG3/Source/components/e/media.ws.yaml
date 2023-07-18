@@ -1,43 +1,30 @@
 dom:
-  e.template.editor:
-    ref: TemplateEditor1
-    ":temp": temp
-    ":show-property-editor": "false"
-
+  div:
+    component:
+      ':is': formatComponentName
+      ':media': media
+    ui.share:
+      ':item': media
 props:
   item: null
   mediaID: null
-
 data:
   media: null
   temp: null
-
+  formatComponentName: null
 methods:
-  mediaToTemplate: | #js
-    function (media) {
-      if (!media) return null;
-
-      // Depending on media.newGenerator.key we set the format
-      // For example what.i.really.do generator has an image grid format
-
-      // Walk the tree and set caption text and image IDs
-      // [{text: 'test', {image: {_id: 1}}, ..]
-      const walk = (node, i) => {
-        if (node.caption) node.caption.text = media.content.items[i].text;
-        if (node.type === 'image')
-        {
-          node.imageID = media.content.items[i].image._id;
-        }
-        if (node.items) node.items.forEach(walk);
-      };
-      walk(this.temp, 0);
+  getFormatComponentName: | #js
+    async function (media) {
+      if (!media) return;
+      const builder = await this.$root.getBuilder(this.media.builderID);
+      return `e-format-${builder.format.replace(/\./g, '-')}`;
     }
-
+computed: null
 watch:
   media:
     handler: | #js
-      function (media) {
-        this.temp = this.mediaToTemplate(media);
+      async function (media) {
+        this.formatComponentName = await this.getFormatComponentName(media);
       }
     immediate: true
   item:
@@ -46,10 +33,16 @@ watch:
         this.media = item;
       }
     immediate: true
-  instanceID:
+  mediaID:
     handler: | #js
       async function (mediaID) {
         if (this.item) return;
         this.media = !mediaID ? null : await this.$root.dbp.medias.select.one(mediaID);
       }
     immediate: true
+name: e-media
+template: >-
+  <div class="comp-e-media" path="864271643."><component
+  :is="formatComponentName" :media="media"
+  path="864271643.0"></component><ui-share :item="media"
+  path="864271643.1"></ui-share></div>

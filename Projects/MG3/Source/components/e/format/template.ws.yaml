@@ -4,10 +4,11 @@ dom:
       ref: TemplateEditor1
       ':temp': item
       ':show-property-editor': 'false'
+      @cancel: $emit('cancel')
 props:
   item: null
 name: e-format-template
 template: >-
   <div class="comp-e-format-template" path="105070856."><e-template-editor
   ref="TemplateEditor1" :temp="item" :show-property-editor="false"
-  path="105070856.0"></e-template-editor></div>
+  @cancel="$emit('cancel')" path="105070856.0"></e-template-editor></div>
