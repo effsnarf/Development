@@ -101,7 +101,7 @@ class TaskManager {
   }
 
   logStatus() {
-    this.statusLogger.log(this.items);
+    this.statusLogger.log(this.items.values());
   }
 
   get count() {
@@ -257,12 +257,8 @@ class TaskManager {
 
       return;
     } catch (ex: any) {
-      task.log.push(`Error: ${ex.message}`);
-
       // Some HTTP status codes are not errors (304 not modified, 404 not found, etc.)
       const targetIsDown = !ex.response || ex.message.includes("ECONNREFUSED");
-
-      task.log.push(`Target is down: ${targetIsDown}`);
 
       // If target is not down, target returned some http status and we should return it
       if (!targetIsDown) {
@@ -273,6 +269,8 @@ class TaskManager {
             !isError ? ex.response.status.toString().yellow : ex.message.yellow
           } ${options.url.severifyByHttpStatus(ex.response.status)}`
         );
+
+        task.log.push(`Status: ${ex.response.status}`);
 
         // We don't track response time for (304 not modified, 404 not found, etc) because
         // there is no processing time to measure
@@ -303,9 +301,6 @@ class TaskManager {
       }
 
       if (targetIsDown) {
-        console.log(options.url.red.bold);
-        console.log(ex.message.bgRed.white);
-
         // Try the cache
         if (isCachable(options, config)) {
           if (await cache.has(task.cacheKey)) {
