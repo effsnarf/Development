@@ -120,8 +120,7 @@ style:
     grid-row: 1 / span 2
   .grid-items-4.items-2 > div:
     grid-column: auto !important
-  .grid-items-4.items-2.rotation-1 div:
-    height: 100%
+  .grid-items-4.items-2.rotation-1 div: null
   .grid-items-4.items-3:
     grid-template: 1fr / 1fr 1fr
   .grid-items-4.items-3 > div:nth-child(1), .items-2 > div:
