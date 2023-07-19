@@ -133,6 +133,7 @@ methods:
       items = JSON.parse(JSON.stringify(items));
 
       const media = {
+        created: new Date(),
         builderID: this.builder._id,
         content: { items }
       }
