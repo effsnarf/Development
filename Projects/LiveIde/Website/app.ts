@@ -40,6 +40,17 @@ const _fetchAsJson = async (url: string) => {
 
   const componentsFolder = path.join(config.project.folder, "Components");
 
+  const getScriptUrlCacheInvalidator = async () => {
+    return await memoryCache.get("scriptUrlCacheInvalidator", () => {
+      return fs
+        .readFileSync(
+          path.join(__dirname, "/script/startup.precompiled.js"),
+          "utf-8"
+        )
+        .hashCode();
+    });
+  };
+
   const compInfos = new Map<string, any>();
   const compIsModified = (comp: any) => {
     const info = compInfos.get(comp.name);
@@ -135,7 +146,7 @@ const _fetchAsJson = async (url: string) => {
       const templates = await getTemplates();
       const helpers = await getHelpers();
       const config = await getClientConfig();
-      let scriptUrlCacheInvalidator = 1;
+      let scriptUrlCacheInvalidator = await getScriptUrlCacheInvalidator();
 
       return {
         components,
