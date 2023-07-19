@@ -235,6 +235,8 @@ class TaskManager {
 
       task.isPiping = true;
       task.log.push(`Piping response to client`);
+      task.log.push(`Removing task from queue`);
+      tasks.remove(task, true);
 
       nodeResponse.data.pipe(res);
 
@@ -250,8 +252,6 @@ class TaskManager {
         stats.response.times.track(task.timer.elapsed);
         stats.successes.track(1);
         task.log.push(`Response piped successfully to client`);
-        task.log.push(`Removing task from queue`);
-        tasks.remove(task, true);
       });
 
       nodeResponse.data.on("error", async (ex: any) => {
