@@ -84,9 +84,6 @@ methods:
           newItems = newItems.exceptBy(this.items, this.$root.getKey);
           this.items.push(...newItems);
           this.updateVisibleItemIndex();
-          this.$nextTick(() => {
-            window.__sharethis__?.initialize();
-          });
           resolve();
         });
       });

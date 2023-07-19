@@ -37,7 +37,7 @@ class WebScript {
       },
       postProcessAttribute: (attr: any[]) => {
         attr = [...attr];
-        attr[0] = attr[0].replace("on_", "@");
+        attr[0] = attr[0].replace(/\bon_/g, "@");
         return attr;
       },
       toTemplate: WebScript.toTemplate,

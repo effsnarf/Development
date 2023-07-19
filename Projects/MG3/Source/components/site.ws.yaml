@@ -14,6 +14,7 @@ dom:
             ':title-url': titleUrl
             ':title-key': titleKey
             ':recommendation-items': recommendationItems
+            ':content-not-found': contentNotFound
             template: 
               v-slot: article
               slot: 
@@ -40,6 +41,7 @@ props:
   recommendationItems: null
   pageName: null
   columns: 3
+  contentNotFound: false
 methods:
   getCssClass: | #js
     function() {
@@ -59,7 +61,8 @@ template: >-
   path="3530567.0.0.0"><site-sidebar></site-sidebar><site-main
   :columns="columns" :title-image-id="titleImageId" :title-text="titleText"
   :title-url="titleUrl" :title-key="titleKey"
-  :recommendation-items="recommendationItems" path="3530567.0.0.0.1"><template
+  :recommendation-items="recommendationItems"
+  :content-not-found="contentNotFound" path="3530567.0.0.0.1"><template
   v-slot:article path="3530567.0.0.0.1.0"><slot name="article"
   path="3530567.0.0.0.1.0.0"></slot></template><template v-slot:left
   path="3530567.0.0.0.1.1"><slot name="left"

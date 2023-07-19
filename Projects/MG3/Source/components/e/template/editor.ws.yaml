@@ -104,10 +104,10 @@ methods:
       try
       {
         let media = this.getMedia(this.temp);
-        // Check that [theme] is not empty
-        if (media.content.items.some(item => item.caption?.text == '[theme]'))
+        // Check that [title] is not empty
+        if (media.content.items.some(item => item.caption?.text == '[title]'))
         {
-          alertify.error('Click "[theme]" to edit it.');
+          alertify.error('Click "[title]" to edit it.');
           return;
         }
         // Check if all images are empty

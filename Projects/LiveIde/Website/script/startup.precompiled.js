@@ -171,9 +171,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "../../../../LiveIde/Website/script/1689734037319.ts":
+/***/ "../../../../LiveIde/Website/script/1689786232860.ts":
 /*!***********************************************************!*\
-  !*** ../../../../LiveIde/Website/script/1689734037319.ts ***!
+  !*** ../../../../LiveIde/Website/script/1689786232860.ts ***!
   \***********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -854,7 +854,7 @@ class ClientContext {
                 },
                 postProcessAttribute: (attr) => {
                     attr = [...attr];
-                    attr[0] = attr[0].replace("on_", "@");
+                    attr[0] = attr[0].replace(/\bon_/g, "@");
                     return attr;
                 },
                 toTemplate: (...args) => {
@@ -1089,13 +1089,13 @@ class Component {
                 if (this.source) {
                     if (this.source.template) {
                         let html = this.source.template;
-                        html = html.replace(/on_/g, "@");
+                        html = html.replace(/\bon_/g, "@");
                         vueOptions.template = html;
                     }
                     else {
                         const pug = vueOptions.template;
                         let html = (yield client.pugToHtml(pug)) || "";
-                        html = html.replace(/on_/g, "@");
+                        html = html.replace(/\bon_/g, "@");
                         vueOptions.template = html;
                         this.source.template = html;
                         client.updateComponent(this);
@@ -3549,7 +3549,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1689734037319.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1689786232860.ts");
 /******/ 	
 /******/ })()
 ;

@@ -309,7 +309,7 @@ const _fetchAsJson = async (url: string) => {
       }
       if (req.url == "/pug") {
         let html = Objects.pugToHtml(data);
-        html = html.replace(/on_/g, "@");
+        html = html.replace(/\bon_/g, "@");
         // Vue:
         // Replace v-slot="value" with v-slot:[value], meaning we're selecting a slot
         // unless it's v-slot="slotProps", which means we're passing scope

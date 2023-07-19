@@ -22,6 +22,10 @@ dom:
       .middle:
         ui.error:
           ':error': $root.error
+        h3: 
+          v-if: contentNotFound
+          class: error
+          v-text: '''Content not found'''
         slot: 
           name: middle
       .right:
@@ -30,7 +34,7 @@ dom:
           div: 
             slot: 
               name: right
-            h3:
+            h3: 
               v-if: recommendationItems?.length
               v-text: '''See also'''
             content.recommendations:
@@ -41,6 +45,7 @@ props:
   titleUrl: null
   titleKey: null
   recommendationItems: null
+  contentNotFound: false
   columns: 3
 computed:
   leftStickyTop: | #js
@@ -65,8 +70,9 @@ template: >-
   :top="leftStickyTop" path="-578759680.2.0.0"><slot name="left"
   path="-578759680.2.0.0.0"></slot></ui-sticky></div><div class="middle"
   path="-578759680.2.1"><ui-error :error="$root.error"
-  path="-578759680.2.1.0"></ui-error><slot name="middle"
-  path="-578759680.2.1.1"></slot></div><div class="right"
+  path="-578759680.2.1.0"></ui-error><h3 class="error" v-if="contentNotFound"
+  v-text="'Content not found'" path="-578759680.2.1.1"></h3><slot name="middle"
+  path="-578759680.2.1.2"></slot></div><div class="right"
   path="-578759680.2.2"><ui-sticky top="140px" path="-578759680.2.2.0"><div
   path="-578759680.2.2.0.0"><slot name="right"
   path="-578759680.2.2.0.0.0"></slot><h3 v-if="recommendationItems?.length"

@@ -1,13 +1,19 @@
 dom:
   site:
+    ref: site1
     page-name: instance
+    ':content-not-found': contentNotFound
     ':recommendation-items': recommendationItems
     template: 
       v-slot: left
       e.generator.search: null
     template: 
       v-slot: middle
+      e.instance:
+        class: mb-l6
+        ':item': instance
       content.stream:
+        ref: stream1
         item-type: e.instance
         ':item-props': '{ showFullFooter: true }'
         ':get-more-items': getMoreInstances
@@ -16,43 +22,75 @@ data:
   instance: null
   generator: null
   recommendationItems: []
-  isInited: false
+  contentNotFound: false
 mounted: | #js
   async function() {
+    this.$watch(() => this.$root.params.page, {
+      handler: async () => {
+        await this.init(this.$root.params.page, this.$root.params.instanceID);
+      },
+      immediate: true
+    });
     this.$watch(() => this.$root.params.instanceID, {
       handler: async () => {
-        await this.init();
+        await this.init(this.$root.params.page, this.$root.params.instanceID);
       },
       immediate: true
     });
   }
 methods:
   init: | #js
-    async function() {
-      if (!this.$root.params.instanceID) return;
-      const dbp = this.$root.dbp;
-      this.instance = await dbp.instances.select.one(this.$root.params.instanceID);
-      this.generator = await dbp.generators.select.one(this.instance.generatorID);
-      this.recommendationItems = await dbp.generators.select.related(this.generator.urlName);
-      if (this.$root.params.page == "instance") {
-        this.$root.setDocumentTitle(this.$root.getInstanceText(instance));
+    async function(page, instanceID) {
+      this.clear();
+      if (page != "instance") return;
+      if (!instanceID) return;
+      if (instanceID == this.instance?._id) return;
+      try
+      {
+        this.$root.isLoading++;
+        const dbp = this.$root.dbp;
+        this.instance = await dbp.instances.select.one(instanceID);
+        if (!this.instance) {
+          this.contentNotFound = true;
+          return;
+        }
+        this.generator = await dbp.generators.select.one(this.instance.generatorID);
+        this.recommendationItems = await dbp.generators.select.related(this.generator.urlName);
+        if (page == "instance") {
+          this.$root.setDocumentTitle(this.$root.getInstanceText(this.instance));
+        }
+      }
+      finally
+      {
+        this.$root.isLoading--;
       }
     }
   getMoreInstances: | #js
     async function(pageIndex) {
       // Wait until instance is loaded
       await this.$root.wait(() => this.instance);
-      const items = await this.$root.dbp.instances.select.popular("en", pageIndex, this.instance?.urlName);
-      if ((pageIndex == 0) && (this.instance)) items.unshift(this.instance);
-      return items;
+      let instances = await this.$root.dbp.instances.select.popular("en", pageIndex, this.instance?.urlName);
+      instances = instances.filter(inst => inst._id != this.instance?._id);
+      return instances;
+    }
+  clear: | #js
+    function() {
+      this.$refs.stream1.clear();
+      this.instance = null;
+      this.generator = null;
+      this.recommendationItems = [];
+      this.contentNotFound = false;
     }
 style: null
 name: page-instance
 template: >-
-  <site class="comp-page-instance" page-name="instance"
+  <site class="comp-page-instance" ref="site1" page-name="instance"
+  :content-not-found="contentNotFound"
   :recommendation-items="recommendationItems" path="1375900948."><template
   v-slot:left
   path="1375900948.0"><e-generator-search></e-generator-search></template><template
-  v-slot:middle path="1375900948.1"><content-stream item-type="e.instance"
-  :item-props="{ showFullFooter: true }" :get-more-items="getMoreInstances"
-  grid-class="grid-1" path="1375900948.1.0"></content-stream></template></site>
+  v-slot:middle path="1375900948.1"><e-instance class="mb-l6" :item="instance"
+  path="1375900948.1.0"></e-instance><content-stream ref="stream1"
+  item-type="e.instance" :item-props="{ showFullFooter: true }"
+  :get-more-items="getMoreInstances" grid-class="grid-1"
+  path="1375900948.1.1"></content-stream></template></site>

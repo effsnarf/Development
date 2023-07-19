@@ -1,11 +1,23 @@
 dom:
-  .sharethis-inline-share-buttons:
-    ':data-url': url
-    ':data-image': imageUrl
+  .a2a_kit.a2a_kit_size_32.a2a_default_style:
+    ':data-a2a-url': url
+    ':data-a2a-title': imageUrl
+    a: 
+      class: a2a_dd
+      href: https://www.addtoany.com/share
+    a: 
+      class: a2a_button_facebook
+    a: 
+      class: a2a_button_twitter
+    a: 
+      class: a2a_button_email
 props:
   item: null
 mounted: | #js
   function() {
+    this.$nextTick(() => {
+      a2a.init('page');
+    });
   }
 computed:
   url: | #js
@@ -18,5 +30,10 @@ computed:
     }
 name: ui-share
 template: >-
-  <div class="comp-ui-share sharethis-inline-share-buttons" :data-url="url"
-  :data-image="imageUrl" path="-2124674043."></div>
+  <div class="comp-ui-share a2a_kit a2a_kit_size_32 a2a_default_style"
+  :data-a2a-url="url" :data-a2a-title="imageUrl" path="-2124674043."><a
+  class="a2a_dd" href="https://www.addtoany.com/share"
+  path="-2124674043.0"></a><a class="a2a_button_facebook"
+  path="-2124674043.1"></a><a class="a2a_button_twitter"
+  path="-2124674043.2"></a><a class="a2a_button_email"
+  path="-2124674043.3"></a></div>
