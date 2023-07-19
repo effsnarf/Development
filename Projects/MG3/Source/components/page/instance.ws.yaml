@@ -12,6 +12,7 @@ dom:
       e.instance:
         class: mb-l6
         ':item': instance
+        ':show-full-footer': true
       content.stream:
         ref: stream1
         item-type: e.instance
@@ -56,6 +57,7 @@ methods:
         }
         this.generator = await dbp.generators.select.one(this.instance.generatorID);
         this.recommendationItems = await dbp.generators.select.related(this.generator.urlName);
+        this.$refs.stream1?.reset();
         if (page == "instance") {
           this.$root.setDocumentTitle(this.$root.getInstanceText(this.instance));
         }
@@ -90,7 +92,7 @@ template: >-
   v-slot:left
   path="1375900948.0"><e-generator-search></e-generator-search></template><template
   v-slot:middle path="1375900948.1"><e-instance class="mb-l6" :item="instance"
-  path="1375900948.1.0"></e-instance><content-stream ref="stream1"
-  item-type="e.instance" :item-props="{ showFullFooter: true }"
+  :show-full-footer="true" path="1375900948.1.0"></e-instance><content-stream
+  ref="stream1" item-type="e.instance" :item-props="{ showFullFooter: true }"
   :get-more-items="getMoreInstances" grid-class="grid-1"
   path="1375900948.1.1"></content-stream></template></site>

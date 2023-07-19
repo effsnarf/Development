@@ -18,6 +18,9 @@ mounted: | #js
     this.$nextTick(() => {
       a2a.init('page');
     });
+    setTimeout(() => {
+      a2a.init('page');
+    }, 1000);
   }
 computed:
   url: | #js
