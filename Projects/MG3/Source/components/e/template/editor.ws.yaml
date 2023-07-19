@@ -302,7 +302,7 @@ template: >-
   v-model="selectedItem.imageID"
   path="-650358312.0.1.0"></ui-image-select><e-template-grid-item :item="temp"
   :editable="editable" path="-650358312.0.1.1"></e-template-grid-item><div
-  class="flex justify-around mt-l2" v-if="editable"
+  class="flex justify-between mt-l2" v-if="editable"
   path="-650358312.0.1.2"><ui-button :text="'✖️ cancel'" :click="() =&gt;
   $emit('cancel')" path="-650358312.0.1.2.0"></ui-button><ui-button :text="'✔️
   Create'" :click="createMedia" path="-650358312.0.1.2.1"></ui-button></div><div

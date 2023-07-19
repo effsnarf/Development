@@ -1,15 +1,15 @@
 dom:
   div:
     component:
-      ":is": formatComponentName
-      ":media": media
+      ':is': formatComponentName
+      ':media': media
     .flex.justify-around:
       ui.share:
-        ":item": media
+        ':item': media
       ui.button:
         v-if: $root.isAdmin
-        ":text": "'❌ delete'"
-        ":click": () => $root.dbp.medias.delete.one(media._id)
+        ':text': '''❌ delete'''
+        ':click': () => $root.dbp.medias.delete.one(media._id)
 props:
   item: null
   mediaID: null
@@ -49,7 +49,7 @@ name: e-media
 template: >-
   <div class="comp-e-media" path="864271643."><component
   :is="formatComponentName" :media="media" path="864271643.0"></component><div
-  class="flex justify-between" path="864271643.1"><ui-share :item="media"
+  class="flex justify-around" path="864271643.1"><ui-share :item="media"
   path="864271643.1.0"></ui-share><ui-button v-if="$root.isAdmin" :text="'❌
-  delete'" :click="() =&gt; deleteMedia(media)"
+  delete'" :click="() =&gt; $root.dbp.medias.delete.one(media._id)"
   path="864271643.1.1"></ui-button></div></div>
