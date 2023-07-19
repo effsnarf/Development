@@ -3,8 +3,13 @@ dom:
     component:
       ':is': formatComponentName
       ':media': media
-    ui.share:
-      ':item': media
+    .flex.justify-between:
+      ui.share:
+        ':item': media
+      ui.button:
+        v-if: $root.isAdmin
+        ':text': ❌ delete
+        ':click': () => deleteMedia(media)
 props:
   item: null
   mediaID: null
@@ -43,6 +48,8 @@ watch:
 name: e-media
 template: >-
   <div class="comp-e-media" path="864271643."><component
-  :is="formatComponentName" :media="media"
-  path="864271643.0"></component><ui-share :item="media"
-  path="864271643.1"></ui-share></div>
+  :is="formatComponentName" :media="media" path="864271643.0"></component><div
+  class="flex justify-between" path="864271643.1"><ui-share :item="media"
+  path="864271643.1.0"></ui-share><ui-button v-if="$root.isAdmin" :text="❌
+  delete" :click="() =&gt; deleteMedia(media)"
+  path="864271643.1.1"></ui-button></div></div>

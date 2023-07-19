@@ -171,9 +171,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "../../../../LiveIde/Website/script/1689706832817.ts":
+/***/ "../../../../LiveIde/Website/script/1689730280629.ts":
 /*!***********************************************************!*\
-  !*** ../../../../LiveIde/Website/script/1689706832817.ts ***!
+  !*** ../../../../LiveIde/Website/script/1689730280629.ts ***!
   \***********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -319,6 +319,7 @@ const helpers = {
             loadingImageUrl: "https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/images/loading.gif",
             key1: 1,
             _uniqueClientID: 1,
+            isAdmin: false,
         },
         mounted() {
             return __awaiter(this, void 0, void 0, function* () {
@@ -3548,7 +3549,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1689706832817.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1689730280629.ts");
 /******/ 	
 /******/ })()
 ;
