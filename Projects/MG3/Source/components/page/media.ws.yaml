@@ -77,7 +77,7 @@ methods:
   getMoreMedias: | #js
     async function(pageIndex, fromMediaID) {
       if (!this.media?.builderID) return [];
-      if (!fromMediaID) fromMediaID = this.media._id;
+      if (!fromMediaID) fromMediaID = this.media?._id;
       return await this.$root.dbp.medias.select.new(this.media?.builderID, fromMediaID);
     }
 watch:

@@ -8,7 +8,7 @@ dom:
         ':class': getCssClass(item)
         ':style': itemStyle
         div: 
-          v-html: $root.textToHtml(item.text)
+          v-html: getItemText(item)
           title: ✏️ edit
           @click: onClickText
         transition:
@@ -32,6 +32,12 @@ mounted: | #js
     resizeObserver.observe(this.$refs.sizeRef1);
   }
 methods:
+  getItemText: | #js
+    function (item) {
+      let text = this.$root.textToHtml(item.text);
+      if (this.editable && item.editable) text = `✏️ ${text}`;
+      return text;
+    }
   onClickText: | #js
     function () {
       if (this.editable && this.item.editable)
@@ -131,9 +137,8 @@ template: >-
   <div class="comp-e-template-caption-item" v-if="item" path="128142918."><div
   :class="{ sizeRef: true, clickable: editable }" ref="sizeRef1"
   path="128142918.0"><div class="text" :class="getCssClass(item)"
-  :style="itemStyle" path="128142918.0.0"><div
-  v-html="$root.textToHtml(item.text)" title="✏️ edit" @click="onClickText"
-  path="128142918.0.0.0"></div><transition name="slide"
-  path="128142918.0.0.1"><ui-text-box v-if="showEditor"
+  :style="itemStyle" path="128142918.0.0"><div v-html="getItemText(item)"
+  title="✏️ edit" @click="onClickText" path="128142918.0.0.0"></div><transition
+  name="slide" path="128142918.0.0.1"><ui-text-box v-if="showEditor"
   :class="getCssClass(item)" v-model="item.text"
   path="128142918.0.0.1.0"></ui-text-box></transition></div></div></div>

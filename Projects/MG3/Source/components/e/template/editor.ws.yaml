@@ -22,7 +22,7 @@ dom:
         e.template.grid.item:
           ':item': temp
           ':editable': editable
-        .flex.justify-between.mt-l2:
+        .flex.justify-around.mt-l2:
           v-if: editable
           ui.button: 
             ':text': '''✖️ cancel'''
@@ -104,6 +104,18 @@ methods:
       try
       {
         let media = this.getMedia(this.temp);
+        // Check that [theme] is not empty
+        if (media.content.items.some(item => item.caption?.text == '[theme]'))
+        {
+          alertify.error('Click "[theme]" to edit it.');
+          return;
+        }
+        // Check if all images are empty
+        if (media.content.items.every(item => !item.imageID))
+        {
+          alertify.error('Drop image files from your computer onto boxes to upload.');
+          return;
+        }
         const _uid = this.$root.getRandomUniqueID();
         media._uid = _uid;
         media = await this.$root.dbp.medias.create.one(media);
@@ -302,7 +314,7 @@ template: >-
   v-model="selectedItem.imageID"
   path="-650358312.0.1.0"></ui-image-select><e-template-grid-item :item="temp"
   :editable="editable" path="-650358312.0.1.1"></e-template-grid-item><div
-  class="flex justify-between mt-l2" v-if="editable"
+  class="flex justify-around mt-l2" v-if="editable"
   path="-650358312.0.1.2"><ui-button :text="'✖️ cancel'" :click="() =&gt;
   $emit('cancel')" path="-650358312.0.1.2.0"></ui-button><ui-button :text="'✔️
   Create'" :click="createMedia" path="-650358312.0.1.2.1"></ui-button></div><div
