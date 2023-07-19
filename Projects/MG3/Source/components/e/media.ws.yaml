@@ -1,15 +1,15 @@
 dom:
   div:
     component:
-      ':is': formatComponentName
-      ':media': media
-    .flex.justify-between:
+      ":is": formatComponentName
+      ":media": media
+    .flex.justify-around:
       ui.share:
-        ':item': media
+        ":item": media
       ui.button:
         v-if: $root.isAdmin
-        ':text': '''❌ delete'''
-        ':click': () => deleteMedia(media)
+        ":text": "'❌ delete'"
+        ":click": () => $root.dbp.medias.delete.one(media._id)
 props:
   item: null
   mediaID: null
