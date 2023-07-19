@@ -80,6 +80,11 @@ api:
         const pageSize = 15;
         const medias = await db.find("Medias", { BuilderID: builderID, _id: { $lt: fromMediaID } }, { _id: -1 }, pageSize, 0, true);
         return medias;
+    Medias.delete.one:
+      admin: true
+      args: [mediaID]
+      code: | #js
+        await db.delete("Medias", { _id: mediaID });
     Generators.select.search:
       args: [query]
       code: | #js
