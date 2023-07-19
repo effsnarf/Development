@@ -1,8 +1,10 @@
 title:
 admin:
   ips:
-    #- 127.0.0.1
-    - 2a02:ab88:c8b:fb00:ad3a:73d6:a5ba:7772
+    - 127.0.0.1
+    - ::1
+    - 89.134.7.63
+    - 2a02:ab88:c8b:fb00:a4d4:ea7:170e:ce50
 server:
   host: localhost
   port:
