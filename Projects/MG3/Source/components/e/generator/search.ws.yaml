@@ -10,12 +10,21 @@ dom:
 props: null
 data:
   query: null
-  generators: null
+  generators: []
+mounted: | #js
+  async function() {
+    this.search(this.query);
+  }
+methods:
+  search: | #js
+    async function(query) {
+      this.generators = await this.$root.dbp.generators.select.search(query);
+    }
 watch:
   query:
     handler: | #js
       (async function(query) {
-        this.generators = await this.$root.dbp.generators.select.search(query);
+        this.search(query);
       }).debounce(400)
     immediate: true
 style:
