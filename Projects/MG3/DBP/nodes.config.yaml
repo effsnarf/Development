@@ -85,6 +85,7 @@ api:
       args: [mediaID]
       code: | #js
         await db.delete("Medias", { _id: mediaID });
+        return true;
     Generators.select.search:
       args: [query]
       code: | #js
