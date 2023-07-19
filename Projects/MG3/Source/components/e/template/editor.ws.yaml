@@ -22,7 +22,7 @@ dom:
         e.template.grid.item:
           ':item': temp
           ':editable': editable
-        .flex.justify-around.mt-l2:
+        .flex.justify-between.mt-l2:
           v-if: editable
           ui.button: 
             ':text': '''✖️ cancel'''
