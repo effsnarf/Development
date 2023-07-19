@@ -302,7 +302,7 @@ class TaskManager {
 
       if (targetIsDown) {
         // Try the cache
-        if (isCachable(options, config)) {
+        if (false && isCachable(options, config)) {
           if (await cache.has(task.cacheKey)) {
             const cachedResponse = await cache.get(task.cacheKey);
             if (cachedResponse) {
