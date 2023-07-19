@@ -142,6 +142,7 @@ interface MgParams {
         "https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/images/loading.gif",
       key1: 1,
       _uniqueClientID: 1,
+      isAdmin: false,
     },
     async mounted() {
       await this.init();

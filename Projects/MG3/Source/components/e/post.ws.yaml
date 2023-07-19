@@ -23,7 +23,6 @@ data:
   enlarged: false
 methods:
   onInstanceClick: | #js
-
     function () {
       this.enlarged = !this.enlarged;
     }
