@@ -34,7 +34,7 @@ Objects.jsonify = (obj: any): string => {
   try {
     return JSON.stringify(obj, null, 2);
   } catch (ex: any) {
-    throw `Error stringifying object\n${ex.message}\n${Objects.yamlify(obj)}`;
+    throw `Error stringifying object\n${ex.message}}`;
   }
 };
 

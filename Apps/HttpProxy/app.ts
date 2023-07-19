@@ -101,7 +101,16 @@ class TaskManager {
   }
 
   logStatus() {
-    this.statusLogger.log(this.items.values());
+    this.statusLogger.log(
+      `${this.items.size} tasks`,
+      [...this.items.values()].map((item: any) => {
+        item = { ...item } as any;
+        item.elapsed = item.timer.elapsed?.unitifyTime().withoutColors();
+        delete item.timer;
+        delete item.logTimer;
+        return item;
+      })
+    );
   }
 
   get count() {
@@ -174,6 +183,34 @@ class TaskManager {
       task.log.push(`Removing task from queue`);
       tasks.remove(task);
       return res.end();
+    }
+
+    // Try the cache
+    if (isCachable(options, config)) {
+      if (await cache.has(task.cacheKey)) {
+        const cachedResponse = await cache.get(task.cacheKey);
+        if (cachedResponse) {
+          stats.cache.hits.track(1);
+          // We don't track response time for cached results
+          // because we're interested in optimizing slow requests
+          //stats.response.times.track(timer.elapsed);
+          logLine(
+            `${task.timer.elapsed?.unitifyTime().severify(100, 500, "<")} ${
+              `Cache hit`.yellow.bold
+            } ${cachedResponse.body.length.unitifySize()} ${options.url.severifyByHttpStatus(
+              cachedResponse.status.code
+            )}`
+          );
+          res.set("x-debug-proxy-source", "cache");
+          res.status(cachedResponse.status.code);
+          res.set(cachedResponse.headers);
+          res.set("access-control-allow-origin", task.origin);
+          task.log.push(`Sending cached response to client`);
+          task.log.push(`Removing task from queue`);
+          tasks.remove(task, true);
+          return res.end(cachedResponse.body);
+        }
+      }
     }
 
     try {
@@ -301,34 +338,6 @@ class TaskManager {
       }
 
       if (targetIsDown) {
-        // Try the cache
-        if (false && isCachable(options, config)) {
-          if (await cache.has(task.cacheKey)) {
-            const cachedResponse = await cache.get(task.cacheKey);
-            if (cachedResponse) {
-              stats.cache.hits.track(1);
-              // We don't track response time for cached results
-              // because we're interested in optimizing slow requests
-              //stats.response.times.track(timer.elapsed);
-              logLine(
-                `${task.timer.elapsed?.unitifyTime().severify(100, 500, "<")} ${
-                  `Fallback cache hit`.yellow.bold
-                } ${cachedResponse.body.length.unitifySize()} ${options.url.severifyByHttpStatus(
-                  cachedResponse.status.code
-                )}`
-              );
-              res.set("x-debug-proxy-source", "cache");
-              res.status(cachedResponse.status.code);
-              res.set(cachedResponse.headers);
-              res.set("access-control-allow-origin", task.origin);
-              task.log.push(`Sending cached response to client`);
-              task.log.push(`Removing task from queue`);
-              tasks.remove(task, true);
-              return res.end(cachedResponse.body);
-            }
-          }
-        }
-
         task.attempt++;
 
         task.log.push(`Trying again in ${config.target.try.again.delay}`);

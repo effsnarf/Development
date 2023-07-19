@@ -57,7 +57,7 @@ abstract class LoggerBase implements Logger {
     if (!args?.length) return;
     const item = {
       dt: Date.now(),
-      args: Objects.clone(args),
+      args: args,
     };
     this.queue.add(item);
   }
@@ -169,7 +169,7 @@ class FileSystemLogger extends LoggerBase {
       .map((item) => {
         if (!item.args.filter((a: any) => a).length) return null;
         const text = item.args.map((arg: any) =>
-          typeof arg == "string" ? arg : Objects.stringify(arg).withoutColors()
+          typeof arg == "string" ? arg : Objects.jsonify(arg).withoutColors()
         );
         return `${new Date(item.dt).toISOString()} ${text}`;
       })

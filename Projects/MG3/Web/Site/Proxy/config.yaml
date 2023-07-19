@@ -36,6 +36,8 @@ cache:
     - /new
     - /api/ip
     - /create
+    - /instance/
+    - /img/
   store:
     prod:
       # - database:
