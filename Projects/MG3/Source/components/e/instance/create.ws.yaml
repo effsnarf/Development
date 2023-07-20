@@ -1,6 +1,5 @@
 dom:
   div: 
-    class: hidden
     transition: 
       name: slide
       e.generator.select:
@@ -31,11 +30,11 @@ dom:
           @focus: onFocus
         transition: 
           name: slide
-          ui.button:
-            v-if: showCreateButton && hasText
-            text: create
-            ':is-loading': isCreating
-            @click: create
+          .text-center:
+            ui.button:
+              v-if: showCreateButton && hasText
+              text: create
+              ':click': create
 props:
   value: null
   generator: null
@@ -51,9 +50,10 @@ methods:
       this.isCreating = true;
       try
       {
-        const newInstance = await this.$root.dbp.instances.create.one(null, this.tempInstance.generator?._id, null, this.tempInstance.text0, this.tempInstance.text1);
+        const instance = await this.$root.dbp.instances.create.one(null, this.tempInstance.generator?._id, null, this.tempInstance.text0, this.tempInstance.text1);
         this.clear();
-        this.$emit("instance-created", newInstance);
+        //this.$root.navigateTo(instance);
+        //this.$emit("instance-created", newInstance);
       }
       finally
       {
@@ -129,7 +129,7 @@ style:
     width: 70%
     margin: 0.5rem auto
 template: >-
-  <div class="comp-e-instance-create hidden" path="-903297812."><transition
+  <div class="comp-e-instance-create" path="-903297812."><transition
   name="slide" path="-903297812.0"><e-generator-select v-show="!generator
   &amp;&amp; showGeneratorSelect" v-model="generator || tempInstance.generator"
   @input="showGeneratorSelect = false"
@@ -144,7 +144,7 @@ template: >-
   path="-903297812.1.1"><input v-model="tempInstance.text0" placeholder="top
   text" @focus="onFocus" path="-903297812.1.1.0"/><input
   v-model="tempInstance.text1" placeholder="bottom text" @focus="onFocus"
-  path="-903297812.1.1.1"/><transition name="slide"
-  path="-903297812.1.1.2"><ui-button v-if="showCreateButton &amp;&amp; hasText"
-  text="create" :is-loading="isCreating" @click="create"
-  path="-903297812.1.1.2.0"></ui-button></transition></div></div></div>
+  path="-903297812.1.1.1"/><transition name="slide" path="-903297812.1.1.2"><div
+  class="text-center" path="-903297812.1.1.2.0"><ui-button
+  v-if="showCreateButton &amp;&amp; hasText" text="create" :click="create"
+  path="-903297812.1.1.2.0.0"></ui-button></div></transition></div></div></div>

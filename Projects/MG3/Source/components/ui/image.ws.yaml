@@ -61,6 +61,7 @@ computed:
   src1: | #js
     function () {
       if (this.imageID) return this.$root.url.image(this.imageID, true, this.removeBackground);
+      if (this.url) return this.url;
       if (this.src) return this.src;
       return this.emptySrc;
     }

@@ -677,12 +677,7 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
     };
 
     // For /[database]/api/[entity]/[group]/[method], execute the method
-    httpServer.get(
-      "/:database/api/:entity/:group/:method",
-      processRequest(handleApiRequest)
-    );
-
-    httpServer.post(
+    httpServer.all(
       "/:database/api/:entity/:group/:method",
       processRequest(handleApiRequest)
     );

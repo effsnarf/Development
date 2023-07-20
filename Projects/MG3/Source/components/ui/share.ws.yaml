@@ -25,7 +25,7 @@ mounted: | #js
 computed:
   url: | #js
     function() {
-      return this.$root.url.item(this.item, true);
+      return (this.$root.url.itemImage(this.item, true) || this.$root.url.item(this.item));
     }
   imageUrl: | #js
     function() {

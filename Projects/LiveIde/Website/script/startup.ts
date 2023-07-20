@@ -49,12 +49,13 @@ const helpers = {
     },
     itemImage: (item: any) => {
       if (!item) return null;
-      if (item.text0)
+      if ("text0" in item)
         return `https://img.memegenerator.net/instances/${item._id}.jpg`;
       if (item.builderID)
         return helpers.url.image(
           item.content.items.find((item: any) => item.imageID)?.imageID
         );
+      console.log(item);
       throw new Error("Unknown item type");
     },
     image: (
@@ -72,7 +73,7 @@ const helpers = {
     item: (item: any, full: boolean = false) => {
       if (!item) return null;
       if (item.builderID) return helpers.url.media(item, full);
-      if (item.text0) return helpers.url.instance(item, full);
+      if ("text0" in item) return helpers.url.instance(item, full);
       if (item.format) return helpers.url.builder(item, full);
       if (item.displayName) return helpers.url.generator(item, full);
       throw new Error("Unknown item type");
