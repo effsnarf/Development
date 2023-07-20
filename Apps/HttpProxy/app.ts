@@ -222,11 +222,11 @@ class TaskManager {
     }
 
     try {
-      const nodeResponse = await axios.request(options);
-      // const nodeResponse =
-      //   req.method == "POST"
-      //     ? await axios.post(options.url, task.postData, options)
-      //     : await axios.request(options);
+      const isHttpPost = (req.method || "").toLowerCase() == "post";
+
+      const nodeResponse = isHttpPost
+        ? await axios.post(options.url, task.postData, options)
+        : await axios.request(options);
 
       task.log.push(`Response status: ${nodeResponse.status}`);
 
@@ -241,6 +241,10 @@ class TaskManager {
       res.status(nodeResponse.status);
       res.set(nodeResponse.headers);
       res.set("access-control-allow-origin", task.origin);
+
+      if (isHttpPost) {
+        return res.end(Objects.jsonify(nodeResponse.data));
+      }
 
       task.isPiping = true;
       task.log.push(`Piping response to client`);
