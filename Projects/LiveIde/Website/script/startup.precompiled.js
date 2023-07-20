@@ -171,9 +171,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "../../../../LiveIde/Website/script/1689791772664.ts":
+/***/ "../../../../LiveIde/Website/script/1689871203834.ts":
 /*!***********************************************************!*\
-  !*** ../../../../LiveIde/Website/script/1689791772664.ts ***!
+  !*** ../../../../LiveIde/Website/script/1689871203834.ts ***!
   \***********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -245,10 +245,11 @@ const helpers = {
             var _a;
             if (!item)
                 return null;
-            if (item.text0)
+            if ("text0" in item)
                 return `https://img.memegenerator.net/instances/${item._id}.jpg`;
             if (item.builderID)
                 return helpers.url.image((_a = item.content.items.find((item) => item.imageID)) === null || _a === void 0 ? void 0 : _a.imageID);
+            console.log(item);
             throw new Error("Unknown item type");
         },
         image: (imageID, full = false, removeBackground = false) => {
@@ -262,7 +263,7 @@ const helpers = {
                 return null;
             if (item.builderID)
                 return helpers.url.media(item, full);
-            if (item.text0)
+            if ("text0" in item)
                 return helpers.url.instance(item, full);
             if (item.format)
                 return helpers.url.builder(item, full);
@@ -3549,7 +3550,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1689791772664.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1689871203834.ts");
 /******/ 	
 /******/ })()
 ;

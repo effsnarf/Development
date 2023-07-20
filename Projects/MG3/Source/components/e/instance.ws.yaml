@@ -8,9 +8,13 @@ dom:
       div: 
         ui.image:
           ref: image1
-          ':imageID': instance.imageID || instance.generator?.imageID
+          ':imageID': >-
+            instanceImage ? null : (instance.imageID ||
+            instance.generator?.imageID)
+          ':url': $root.url.itemImage(instance)
           @change: updateImageSize
         .texts:
+          v-if: '!instanceImage'
           .text:
             v-for: (text, index) in [instance.text0, instance.text1]
             v-text: text
@@ -34,6 +38,7 @@ dom:
 name: e-instance
 props:
   item: null
+  instanceImage: false
   showFooter: true
   showFullFooter: false
   showCreatePost: false
@@ -131,9 +136,10 @@ template: >-
   <div class="comp-e-instance" @click="$emit('click')" v-if="instance"
   path="643573758."><ui-link class="instance"
   :url="$root.url.instance(instance)" path="643573758.0"><div
-  path="643573758.0.0"><ui-image ref="image1" :imageID="instance.imageID ||
-  instance.generator?.imageID" @change="updateImageSize"
-  path="643573758.0.0.0"></ui-image><div class="texts"
+  path="643573758.0.0"><ui-image ref="image1" :imageID="instanceImage ? null :
+  (instance.imageID || instance.generator?.imageID)"
+  :url="$root.url.itemImage(instance)" @change="updateImageSize"
+  path="643573758.0.0.0"></ui-image><div class="texts" v-if="!instanceImage"
   path="643573758.0.0.1"><div class="text" v-for="(text, index) in
   [instance.text0, instance.text1]" v-text="text" :style="{ fontSize:
   fontSizes[index] }" path="643573758.0.0.1.0"></div></div><div class="spacer"

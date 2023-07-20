@@ -81,7 +81,7 @@ class TaskManager {
   ) {}
 
   add(task: Task, req: any) {
-    task.id = this._taskID++;
+    if (!task.id) task.id = this._taskID++;
     task.log.push(`[${task.id}] ${req.method} ${req.url}`);
     task.log.push(JSON.stringify(task.postData).shorten(200));
     task.logTimer = setInterval(() => {
@@ -115,6 +115,14 @@ class TaskManager {
 
   get count() {
     return this.items.size;
+  }
+
+  get innerCount() {
+    return [...this.items.values()].filter((item) => !item.isPiping).length;
+  }
+
+  get outerCount() {
+    return [...this.items.values()].filter((item) => item.isPiping).length;
   }
 }
 
@@ -214,10 +222,11 @@ class TaskManager {
     }
 
     try {
-      const nodeResponse =
-        req.method == "POST"
-          ? await axios.post(options.url, task.postData, options)
-          : await axios.request(options);
+      const nodeResponse = await axios.request(options);
+      // const nodeResponse =
+      //   req.method == "POST"
+      //     ? await axios.post(options.url, task.postData, options)
+      //     : await axios.request(options);
 
       task.log.push(`Response status: ${nodeResponse.status}`);
 
@@ -235,8 +244,6 @@ class TaskManager {
 
       task.isPiping = true;
       task.log.push(`Piping response to client`);
-      task.log.push(`Removing task from queue`);
-      tasks.remove(task, true);
 
       nodeResponse.data.pipe(res);
 
@@ -252,6 +259,8 @@ class TaskManager {
         stats.response.times.track(task.timer.elapsed);
         stats.successes.track(1);
         task.log.push(`Response piped successfully to client`);
+        task.log.push(`Removing task from queue`);
+        tasks.remove(task, true);
       });
 
       nodeResponse.data.on("error", async (ex: any) => {
@@ -356,8 +365,10 @@ class TaskManager {
     args = [
       config.title.gray,
       new Date().toLocaleTimeString().gray,
-      tasks.count.severify(10, 20, "<"),
-      `queue`.gray,
+      tasks.innerCount.severify(10, 20, "<"),
+      `inner q`.gray,
+      tasks.outerCount.severify(10, 20, "<"),
+      `outer q`.gray,
       `${stats.successes.count.toLocaleString()} ${
         `/`.gray
       }${stats.successes.timeSpan.unitifyTime()}`,

@@ -1,5 +1,6 @@
 dom:
   div:
+    class: flex justify-center
     button:
       v-if: '!isLoading'
       v-text: text
@@ -35,6 +36,7 @@ style:
     user-select: none
 name: ui-button
 template: >-
-  <div class="comp-ui-button" path="-1914507316."><button v-if="!isLoading"
-  v-text="text" @click="onClick" path="-1914507316.0"></button><ui-loading
-  v-if="isLoading" path="-1914507316.1"></ui-loading></div>
+  <div class="comp-ui-button flex justify-center" path="-1914507316."><button
+  v-if="!isLoading" v-text="text" @click="onClick"
+  path="-1914507316.0"></button><ui-loading v-if="isLoading"
+  path="-1914507316.1"></ui-loading></div>
