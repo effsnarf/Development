@@ -243,6 +243,7 @@ class TaskManager {
       res.set("access-control-allow-origin", task.origin);
 
       if (isHttpPost) {
+        tasks.remove(task, true);
         return res.end(Objects.jsonify(nodeResponse.data));
       }
 

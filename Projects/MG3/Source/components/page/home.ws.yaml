@@ -5,6 +5,7 @@ dom:
     template: 
       v-slot: article
       .grid-3:
+        class: hidden
         e.teaser: 
           imageID: 32
           title: Advice Animals
