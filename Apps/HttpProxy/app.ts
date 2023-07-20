@@ -371,9 +371,9 @@ class TaskManager {
       config.title.gray,
       new Date().toLocaleTimeString().gray,
       tasks.innerCount.severify(10, 20, "<"),
-      `inner q`.gray,
+      `inner`.gray,
       tasks.outerCount.severify(10, 20, "<"),
-      `outer q`.gray,
+      `outer`.gray,
       `${stats.successes.count.toLocaleString()} ${
         `/`.gray
       }${stats.successes.timeSpan.unitifyTime()}`,
