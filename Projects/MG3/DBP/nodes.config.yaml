@@ -234,6 +234,35 @@ api:
         );
 
         return insts;
+    Instances.create.one:
+      args: [languageCode, generatorID, imageID, text0, text1]
+      code: | #js
+        const now = (new Date());
+        const nowDate = (new Date());
+        nowDate.setHours(0, 0, 0, 0);
+        const generator = await db.findOne("Generators", { _id: generatorID });
+        if (!generator) throw new Error("Generator not found");
+        let instance = {
+          LanguageCode: languageCode,
+          MgUserID: null,
+          GeneratorID: generatorID,
+          UrlName: generator.urlName,
+          UrlName_Lowercase: generator.urlName.toLowerCase(),
+          DisplayName: generator.displayName,
+          ImageID: generator.imageID,
+          Text0: text0,
+          Text1: text1,
+          Text: [text0, text1].filter(a => a).join(" "),
+          UpVotesScore: 0,
+          DownVotesScore: 0,
+          TotalVotesScore: 0,
+          Created: now,
+          CreatedDate: nowDate,
+        };
+        instance = await db.upsert("Instances", instance, true);
+        instance.InstanceID = instance._id;
+        await db.upsert("Instances", instance, true);
+        return instance;
     Threads.create.one:
       args: []
       code: | #js
