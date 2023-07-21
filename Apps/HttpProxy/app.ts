@@ -460,9 +460,9 @@ class TaskManager {
   let nextNodeIndex = 0;
 
   const processCacheQueue = async () => {
-    const cacheQueueItem = await cacheQueue.pop();
+    let cacheQueueItem = await cacheQueue.pop();
 
-    if (cacheQueueItem) {
+    while (cacheQueueItem) {
       const options = cacheQueueItem.options;
 
       const task = {
@@ -492,9 +492,11 @@ class TaskManager {
       tasks.add(task);
 
       tryRequest(task);
+
+      cacheQueueItem = await cacheQueue.pop();
     }
 
-    setTimeout(processCacheQueue, 10);
+    setTimeout(processCacheQueue, 1000);
   };
 
   // Forward all incoming HTTP requests to config.target.base.urls/..

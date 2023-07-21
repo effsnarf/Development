@@ -48,8 +48,6 @@ class MongoDatabase extends DatabaseBase {
 
   async init() {
     await this.client.connect();
-    // Convert _DbAnalytics collection to capped (20mb)
-    const dtb = await this.client.db(this.database);
   }
 
   async get(key: any): Promise<any> {

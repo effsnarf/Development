@@ -18,6 +18,7 @@ import { Timer } from "@shared/Timer";
 import { Logger } from "@shared/Logger";
 
 let currentRequestsCount = 0;
+const urlStrLen = 40;
 
 (async () => {
   const config = (await Configuration.new()).data;
@@ -228,9 +229,9 @@ let currentRequestsCount = 0;
     log(
       `${`${elapsed
         .unitifyTime()
-        .severify(
-          ...severity.time
-        )}`}\t${fileSize.unitifySize()}\t${mimeType}\t${req.url.yellow}\t`
+        .severify(...severity.time)}`}\t${fileSize.unitifySize()}\t${
+        mimeType.gray
+      }\t${req.url.shorten(urlStrLen).yellow}\t`
     );
   };
 
@@ -253,18 +254,16 @@ let currentRequestsCount = 0;
       log(
         `${timer.elapsed
           ?.unitifyTime()
-          .severify(...severity.time)}\t${size.unitifySize()}\t${mimeType}\t${
-          `(from old server)`.gray
-        }\t${req.url.yellow}`
+          .severify(...severity.time)}\t${size.unitifySize()}\t${
+          mimeType.gray
+        }\t${req.url.toLength(urlStrLen).yellow}\t${`(from old server)`.gray}`
       );
     } catch (ex: any) {
       if (ex.response?.data.includes("Content not found")) {
         log(
-          `${timer.elapsed
-            ?.unitifyTime()
-            .severify(...severity.time)}\t\t${mimeType}\t${
-            `(old server - 404)`.gray
-          }\t${req.url.gray}`
+          `${timer.elapsed?.unitifyTime().severify(...severity.time)}\t\t${
+            mimeType.gray
+          }\t${req.url.toLength(urlStrLen).gray}\t${`(old server - 404)`.gray}`
         );
         writeStatus(404);
         res.end();
