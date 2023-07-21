@@ -322,7 +322,9 @@ class TaskManager {
             await cache.set(task.cacheKey, cachedResponse);
             task.log.push(`Response cached`);
             if (isCacheQueueMode) {
+              const cacheItemsCount = await cacheQueue?.count();
               logNewLine(
+                `${cacheItemsCount?.humanize()} ${`cache queue`.gray}`,
                 task.timer.elapsed?.unitifyTime(),
                 data.length.unitifySize(),
                 `Cache updated for ${options.url}`.gray
