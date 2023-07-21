@@ -205,7 +205,15 @@ class TaskManager {
 
           // Queue the url as a background task
           // to update the cache
-          cacheQueue?.add(options);
+          const cacheQueueItem = {
+            _id: {
+              method: options.method,
+              url: options.url,
+              body: options.body,
+            },
+            options,
+          };
+          cacheQueue?.add(cacheQueueItem);
 
           return;
         }

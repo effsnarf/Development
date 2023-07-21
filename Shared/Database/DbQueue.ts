@@ -15,6 +15,7 @@ class DbQueue {
 
   async add(item: any) {
     if (!this.db) return;
+    if (await this.db.findOneByID(this.collectionName, item._id)) return;
     await this.db.upsert(this.collectionName, item, true);
   }
 
