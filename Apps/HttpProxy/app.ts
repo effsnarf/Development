@@ -203,16 +203,16 @@ class TaskManager {
           tasks.remove(task, true);
           res.end(cachedResponse.body);
 
+          const { method, url, body } = options;
+          const queueItemKey = { method, url, body };
+
           // Queue the url as a background task
           // to update the cache
           const cacheQueueItem = {
-            _id: {
-              method: options.method,
-              url: options.url,
-              body: options.body,
-            },
+            _id: queueItemKey,
             dt: Date.now(),
-            ...options,
+            ...queueItemKey,
+            options,
           };
           cacheQueue?.add(cacheQueueItem);
 
