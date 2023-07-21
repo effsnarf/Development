@@ -211,6 +211,7 @@ class TaskManager {
               url: options.url,
               body: options.body,
             },
+            dt: Date.now(),
             ...options,
           };
           cacheQueue?.add(cacheQueueItem);
