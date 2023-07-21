@@ -314,7 +314,7 @@ class TaskManager {
             // Get the response data
             const cachedResponse = {
               dt: Date.now(),
-              url: options.url,
+              url: options.url.split("/").slice(3).join("/"),
               status: {
                 code: nodeResponse.status,
                 text: nodeResponse.statusText,
@@ -511,10 +511,6 @@ class TaskManager {
       logTimer: null,
       isPiping: false,
     } as Task;
-
-    console.log();
-    console.log(task.cacheKey);
-    console.log();
 
     tasks.add(task, req);
 
