@@ -1,5 +1,6 @@
 dom:
   div: 
+    class: hidden
     transition: 
       name: slide
       e.generator.select:
