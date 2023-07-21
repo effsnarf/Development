@@ -39,6 +39,7 @@ cache:
     - /api/Posts/
     - /api/Instances/
     - /create/
+    - /sample/
     - /get/new/id
     - /googleLogin
   store:
