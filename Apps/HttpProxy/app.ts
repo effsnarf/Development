@@ -323,7 +323,7 @@ class TaskManager {
             task.log.push(`Response cached`);
             if (isCacheQueueMode) {
               const cacheItemsCount = await cacheQueue?.count();
-              logNewLine(
+              logLine(
                 `${cacheItemsCount?.humanize()} ${`cache queue`.gray}`,
                 task.timer.elapsed?.unitifyTime(),
                 data.length.unitifySize(),
