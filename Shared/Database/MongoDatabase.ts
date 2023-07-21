@@ -12,25 +12,13 @@ interface MongoDatabaseOptions {
 class MongoDatabase extends DatabaseBase {
   private client: MongoClient;
 
-  constructor(
+  private constructor(
     connectionString: string,
     public database: string,
     public options: MongoDatabaseOptions
   ) {
     super();
     this.client = new MongoClient(connectionString);
-    // Convert _DbAnalytics collection to capped (20mb)
-    // timeout: 30s
-    this.client
-      .db(database)
-      .command({
-        convertToCapped: "_DbAnalytics",
-        size: 20 * 1024 * 1024,
-        maxTimeMS: 30000,
-      })
-      .catch((ex: any) => {
-        throw ex;
-      });
   }
 
   public static async new(
@@ -54,8 +42,18 @@ class MongoDatabase extends DatabaseBase {
     }
 
     const db = new MongoDatabase(connectionString, database, options);
-    await db.client.connect();
+    await db.init();
     return db;
+  }
+
+  async init() {
+    await this.client.connect();
+    // Convert _DbAnalytics collection to capped (20mb)
+    const dtb = await this.client.db(this.database);
+    await dtb.command({
+      convertToCapped: "_DbAnalytics",
+      size: 20 * 1024 * 1024,
+    });
   }
 
   async get(key: any): Promise<any> {
