@@ -52,6 +52,7 @@ const isCachable = (
 interface Task {
   id: number | null;
   timer: Timer;
+  url: string;
   options: any;
   origin: string;
   timeout: number;
@@ -150,9 +151,7 @@ class TaskManager {
     const nodeIndex =
       (task.nodeIndex + task.attempt) % config.target.base.urls.length;
 
-    const url = task.options?.url || req.url;
-
-    const targetUrl = `${config.target.base.urls[nodeIndex]}${url}`;
+    const targetUrl = `${config.target.base.urls[nodeIndex]}${task.url}`;
 
     task.log.push(
       `Attempt ${task.attempt + 1} of ${config.target.try.again.retries}`
@@ -165,7 +164,6 @@ class TaskManager {
     const options =
       task.options ||
       ({
-        url: targetUrl,
         method: req.method,
         headers: req.headers,
         body: task.postData,
@@ -177,6 +175,8 @@ class TaskManager {
         timeout: task.timeout,
         mode: "no-cors",
       } as any);
+
+    options.url = targetUrl;
 
     if (task.attempt >= config.target.try.again.retries) {
       // Temporarily unavailable
@@ -218,9 +218,11 @@ class TaskManager {
             tasks.remove(task, true);
             res.end(cachedResponse.body);
 
-            let { method, url, body } = options;
-            // Remove http://[host] from the url
-            url = "/" + url.split("/").slice(3).join("/");
+            const cachedOptions = { ...options };
+            const url = task.url;
+            delete cachedOptions.url;
+
+            let { method, body } = options;
             const queueItemKey = { method, url, body };
 
             // Queue the url as a background task
@@ -229,7 +231,7 @@ class TaskManager {
               _id: queueItemKey,
               dt: Date.now(),
               ...queueItemKey,
-              options,
+              options: cachedOptions,
             };
             cacheQueue?.add(cacheQueueItem);
 
@@ -460,6 +462,7 @@ class TaskManager {
       const task = {
         id: null,
         timer: Timer.start(),
+        url: cacheQueueItem.url,
         options: options,
         origin: options.headers.origin,
         timeout: config.target.timeout.deunitify(),
@@ -497,6 +500,7 @@ class TaskManager {
     const task = {
       id: null,
       timer: Timer.start(),
+      url: req.url,
       options: null,
       origin: req.headers.origin || "*",
       timeout: config.target.timeout.deunitify(),
