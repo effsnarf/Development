@@ -32,8 +32,12 @@ Objects.pugToHtml = (str: string, options?: any): string => {
 
 Objects.jsonify = (obj: any, depth: number = 100): string => {
   try {
-    return util.inspect(obj, true, 10, false);
+    return JSON.stringify(obj, null, 2);
   } catch (ex: any) {
+    // Circular reference, util.inspect will handle it
+    if (ex.message.toLowerCase().includes("circular")) {
+      return util.inspect(obj, true, depth, false);
+    }
     throw `Error stringifying obj
     ect\n${ex.message}}`;
   }
