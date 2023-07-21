@@ -327,7 +327,7 @@ class TaskManager {
                 `${cacheItemsCount?.humanize()} ${`cache queue`.gray}`,
                 task.timer.elapsed?.unitifyTime(),
                 data.length.unitifySize(),
-                `Cache updated for ${options.url}`.gray
+                `Cache updated for ${task.cacheKey}`.gray
               );
             }
           }
