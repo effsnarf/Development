@@ -630,7 +630,11 @@ if (typeof Number !== "undefined") {
   Number.prototype.humanize = function (): string {
     const value = this.valueOf();
     if (value < 0) return `-${(-value).humanize()}`;
-    if (value < 10) return value.toFixed(2);
+    if (value < 10) {
+      // If no fraction, return as integer
+      if (value % 1 === 0) return value.toString();
+      return value.toFixed(2);
+    }
     if (value < 1000) return Math.round(value).toLocaleString();
     if (value < 1000000) return `${(value / 1000).toLocaleString()}k`;
     if (value < 1000000000) return `${(value / 1000000).toLocaleString()}m`;
