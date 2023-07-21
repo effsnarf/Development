@@ -473,7 +473,7 @@ class TaskManager {
         timeout: config.target.timeout.deunitify(),
         cacheKey:
           "/" +
-          options.url
+          cacheQueueItem.url
             .replace(/&_uid=\d+/g, "")
             .split("/")
             .slice(3)
