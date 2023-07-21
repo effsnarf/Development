@@ -508,6 +508,10 @@ class TaskManager {
       isPiping: false,
     } as Task;
 
+    console.log();
+    console.log(task.cacheKey);
+    console.log();
+
     tasks.add(task, req);
 
     tryRequest(task, req, res);
