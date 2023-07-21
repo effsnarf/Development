@@ -203,9 +203,14 @@ class TaskManager {
             // because we're interested in optimizing slow requests
             //stats.response.times.track(timer.elapsed);
             logLine(
-              `${task.timer.elapsed?.unitifyTime().severify(100, 500, "<")} ${
+              `${task.timer.elapsed
+                ?.unitifyTime()
+                .severify(100, 500, "<")
+                .padStartChars(8, " ")} ${
                 `Cache hit`.yellow.bold
-              } ${cachedResponse.body.length.unitifySize()} ${options.url.severifyByHttpStatus(
+              } ${cachedResponse.body.length
+                .unitifySize()
+                .padStartChars(8, " ")} ${options.url.severifyByHttpStatus(
                 cachedResponse.status.code
               )}`
             );
@@ -331,8 +336,8 @@ class TaskManager {
                 `${cacheItemsCount?.severify(100, 200, "<")} ${
                   `cache queue`.gray
                 }`,
-                task.timer.elapsed?.unitifyTime(),
-                data.length.unitifySize(),
+                task.timer.elapsed?.unitifyTime().padStartChars(8, " "),
+                data.length.unitifySize().padStartChars(8, " "),
                 `Cache updated for ${task.cacheKey}`.gray
               );
             }
