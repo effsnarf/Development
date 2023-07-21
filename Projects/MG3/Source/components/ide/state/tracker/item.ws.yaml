@@ -84,7 +84,7 @@ methods:
 watch: null
 style:
   .grid:
-    grid-template: 1fr / 1.2em 5em 5em
+    grid-template: 1fr / 1.2em 10em 10em
     gap: 1em
     width: min-content
     text-wrap: nowrap

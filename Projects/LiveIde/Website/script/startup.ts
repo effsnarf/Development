@@ -50,7 +50,7 @@ const helpers = {
     itemImage: (item: any) => {
       if (!item) return null;
       if ("text0" in item)
-        return `https://img.memegenerator.net/instances/${item._id}.jpg`;
+        return `https://img.memegenerator.net/instances/600x600/${item._id}.jpg`;
       if (item.builderID)
         return helpers.url.image(
           item.content.items.find((item: any) => item.imageID)?.imageID
@@ -305,6 +305,7 @@ interface MgParams {
       },
       getKey(item: any) {
         if (!item) return null;
+        if (item._uid) return item._uid;
         if (item._id) return item._id;
         return item;
       },

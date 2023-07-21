@@ -1,10 +1,23 @@
 dom:
-  div:
-    ':class': getCssClass(value)
-    v-text: valueToString(value)
+  div: 
+    ':class': '{ preview: preview }'
+    div: 
+      ':class': getCssClass(value)
+      v-text: valueToString(value)
+    ui.image:
+      v-if: isImageUrl(value)
+      ':url': value
 props:
   value: null
+  preview: true
 methods:
+  isImageUrl: | #js
+    function(value) {
+      if (typeof value != "string") return false;
+      if (!value.startsWith("http")) return false;
+      if ([".png", ".jpg", ".jpeg", ".gif"].some(ext => value.endsWith(ext))) return true;
+      return false;
+    }
   getCssClass: | #js
     function(value) {
       if ([undefined, null].includes(value)) return "opacity-30";
@@ -14,14 +27,25 @@ methods:
     function(value) {
       if (value == undefined) return "undefined";
       if (value == null) return "null";
-      if (typeof value == "string") return `"${value.shorten(20)}"`;
+      if (typeof value == "string") return `"${!this.preview ? value : value.shorten(20)}"`;
       if (typeof value == "number") return value.toString();
       if (typeof value == "boolean") return value ? "✔️" : "✖";
       if (typeof value == "function") return value.toString();
-      if (typeof value == "object") return JSON.stringify(value).shorten(20);
+      if (typeof value == "object") {
+        let json = JSON.stringify(value);
+        if (this.preview) json = json.shorten(20);
+        return json;
+      }
       return value.toString();
     }
+style:
+  .comp-ui-image:
+    width: 15em
+  .preview .comp-ui-image:
+    width: 4em
 name: ui-value-preview
 template: >-
-  <div class="comp-ui-value-preview" :class="getCssClass(value)"
-  v-text="valueToString(value)" path="-272450959."></div>
+  <div class="comp-ui-value-preview" :class="{ preview: preview }"
+  path="-272450959."><div :class="getCssClass(value)"
+  v-text="valueToString(value)" path="-272450959.0"></div><ui-image
+  v-if="isImageUrl(value)" :url="value" path="-272450959.1"></ui-image></div>

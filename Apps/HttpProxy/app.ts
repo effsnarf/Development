@@ -264,7 +264,8 @@ class TaskManager {
 
       if (isHttpPost) {
         tasks.remove(task, true);
-        return res?.end(Objects.jsonify(nodeResponse.data));
+        const dataText = await nodeResponse.data.text();
+        return res?.end(dataText);
       }
 
       if (res) {

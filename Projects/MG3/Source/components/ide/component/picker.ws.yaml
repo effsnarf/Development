@@ -1,5 +1,5 @@
 dom:
-  div:
+  div: 
     ui.keyboard:
       @ctrl: onCtrlKey
     ui.mouse:
@@ -13,21 +13,26 @@ dom:
       ':title': getTitle(hoveredVueUID)
       template:
         v-slot: content
-        .flex.flex-column.gap-1:
+        .flex.flex-row.gap-1:
+          div: 
+            .parent-chain:
+              ide.component.title: 
+                v-for: uid in parentChainUIDs
+                ':item': $root.vm.vues[uid]
+                ':class': '{ ''selected'': uid === selectedVueUID }'
+                @mouseenter: onMouseEnterVue(uid)
+                @mouseleave: onMouseLeaveVue(uid)
+                @click: selectVue(uid)
+            .child-chain:
+              ide.component.title: 
+                v-for: uid in childChainUIDs
+                ':item': $root.vm.vues[uid]
+                ':class': '{ ''selected'': uid === selectedVueUID }'
+                @mouseenter: onMouseEnterVue(uid)
+                @mouseleave: onMouseLeaveVue(uid)
+                @click: selectVue(uid)
           ide.component.editor:
-            ':vue-uid': selectedVueUID||hoveredVueUID
-          .parent-chain:
-            ide.component.title: 
-              v-for: uid in parentChainUIDs
-              ':item': $root.vm.vues[uid]
-              ':class': '{ ''selected'': uid === selectedVueUID }'
-              @click: selectVue(uid)
-          .child-chain:
-            ide.component.title: 
-              v-for: uid in childChainUIDs
-              ':item': $root.vm.vues[uid]
-              ':class': '{ ''selected'': uid === selectedVueUID }'
-              @click: selectVue(uid)
+            ':vue-uid': hoveredVueUID||selectedVueUID
 props: null
 data:
   hoveredElement: null
@@ -37,6 +42,14 @@ data:
   childChainUIDs: null
   showPicker: false
 methods:
+  onMouseEnterVue: | #js
+    function(uid) {
+      this.hoveredVueUID = uid;
+    }
+  onMouseLeaveVue: | #js
+    function(uid) {
+      this.hoveredVueUID = null;
+    }
   selectVue: | #js
     function(uid) {
       if (uid == this.selectedVueUID) uid = null;
@@ -149,15 +162,17 @@ template: >-
   path="-646340253.1"></ui-mouse><ui-context-window ref="context1"
   :global="true" :visible="showPicker" icon="📦"
   :title="getTitle(hoveredVueUID)" path="-646340253.2"><template v-slot:content
-  path="-646340253.2.0"><div class="flex flex-column gap-1"
-  path="-646340253.2.0.0"><ide-component-editor
-  :vue-uid="selectedVueUID||hoveredVueUID"
-  path="-646340253.2.0.0.0"></ide-component-editor><div class="parent-chain"
-  path="-646340253.2.0.0.1"><ide-component-title v-for="uid in parentChainUIDs"
-  :item="$root.vm.vues[uid]" :class="{ 'selected': uid === selectedVueUID }"
-  @click="selectVue(uid)"
-  path="-646340253.2.0.0.1.0"></ide-component-title></div><div
-  class="child-chain" path="-646340253.2.0.0.2"><ide-component-title v-for="uid
-  in childChainUIDs" :item="$root.vm.vues[uid]" :class="{ 'selected': uid ===
-  selectedVueUID }" @click="selectVue(uid)"
-  path="-646340253.2.0.0.2.0"></ide-component-title></div></div></template></ui-context-window></div>
+  path="-646340253.2.0"><div class="flex flex-row gap-1"
+  path="-646340253.2.0.0"><div path="-646340253.2.0.0.0"><div
+  class="parent-chain" path="-646340253.2.0.0.0.0"><ide-component-title
+  v-for="uid in parentChainUIDs" :item="$root.vm.vues[uid]" :class="{
+  'selected': uid === selectedVueUID }" @mouseenter="onMouseEnterVue(uid)"
+  @mouseleave="onMouseLeaveVue(uid)" @click="selectVue(uid)"
+  path="-646340253.2.0.0.0.0.0"></ide-component-title></div><div
+  class="child-chain" path="-646340253.2.0.0.0.1"><ide-component-title
+  v-for="uid in childChainUIDs" :item="$root.vm.vues[uid]" :class="{ 'selected':
+  uid === selectedVueUID }" @mouseenter="onMouseEnterVue(uid)"
+  @mouseleave="onMouseLeaveVue(uid)" @click="selectVue(uid)"
+  path="-646340253.2.0.0.0.1.0"></ide-component-title></div></div><ide-component-editor
+  :vue-uid="hoveredVueUID||selectedVueUID"
+  path="-646340253.2.0.0.1"></ide-component-editor></div></template></ui-context-window></div>

@@ -171,9 +171,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "../../../../LiveIde/Website/script/1689933464574.ts":
+/***/ "../../../../LiveIde/Website/script/1689948008421.ts":
 /*!***********************************************************!*\
-  !*** ../../../../LiveIde/Website/script/1689933464574.ts ***!
+  !*** ../../../../LiveIde/Website/script/1689948008421.ts ***!
   \***********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -246,7 +246,7 @@ const helpers = {
             if (!item)
                 return null;
             if ("text0" in item)
-                return `https://img.memegenerator.net/instances/${item._id}.jpg`;
+                return `https://img.memegenerator.net/instances/600x600/${item._id}.jpg`;
             if (item.builderID)
                 return helpers.url.image((_a = item.content.items.find((item) => item.imageID)) === null || _a === void 0 ? void 0 : _a.imageID);
             console.log(item);
@@ -515,6 +515,8 @@ const helpers = {
             getKey(item) {
                 if (!item)
                     return null;
+                if (item._uid)
+                    return item._uid;
                 if (item._id)
                     return item._id;
                 return item;
@@ -2353,8 +2355,12 @@ if (typeof Number !== "undefined") {
         const value = this.valueOf();
         if (value < 0)
             return `-${(-value).humanize()}`;
-        if (value < 10)
+        if (value < 10) {
+            // If no fraction, return as integer
+            if (value % 1 === 0)
+                return value.toString();
             return value.toFixed(2);
+        }
         if (value < 1000)
             return Math.round(value).toLocaleString();
         if (value < 1000000)
@@ -2447,8 +2453,11 @@ if (typeof String !== "undefined") {
     String.prototype.severify = function (green, yellow, direction) {
         const valueStr = this.toString();
         const unitClass = valueStr.getUnitClass();
-        if (!unitClass)
-            throw new Error("No unit class found");
+        if (!unitClass) {
+            const value = parseFloat(valueStr);
+            const color = value.getSeverityColor(green, yellow, direction);
+            return valueStr.colorize(color);
+        }
         const value = valueStr.deunitify();
         const unit = valueStr.getUnit();
         const color = value.getSeverityColor(green, yellow, direction, true);
@@ -3550,7 +3559,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1689933464574.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1689948008421.ts");
 /******/ 	
 /******/ })()
 ;
