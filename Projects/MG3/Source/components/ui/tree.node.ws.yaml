@@ -26,6 +26,7 @@ dom:
           ':expandable': expandable
           ':item-type': getItemType()
           ':get-item': getItem
+          ':get-item-key': getItemKey
           ':get-children': getChildren
           ':selected-node': selectedNode
           @node-click: onChildClick
@@ -37,6 +38,7 @@ props:
   expandable: true
   itemType: null
   getItem: null
+  getItemKey: null
   getChildren: null
   selectedNode: null
 data:
@@ -142,7 +144,8 @@ template: >-
   class="ml-3" name="list" tag="ul" path="2053324664.1"><li v-for="child in
   getChildItems(node)" :key="child.id" path="2053324664.1.0"><ui-tree-node
   :node="child" :initial-expanded="initialExpanded" :expandable="expandable"
-  :item-type="getItemType()" :get-item="getItem" :get-children="getChildren"
-  :selected-node="selectedNode" @node-click="onChildClick"
-  @node-hover="onChildHover" @node-unhover="onChildUnhover"
+  :item-type="getItemType()" :get-item="getItem" :get-item-key="getItemKey"
+  :get-children="getChildren" :selected-node="selectedNode"
+  @node-click="onChildClick" @node-hover="onChildHover"
+  @node-unhover="onChildUnhover"
   path="2053324664.1.0.0"></ui-tree-node></li></transition-group></div>

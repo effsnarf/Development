@@ -1,5 +1,7 @@
 dom:
   div: 
+    @mouseenter: $emit('mouseenter')
+    @mouseleave: $emit('mouseleave')
     @click: $emit('click')
     v-if: vue
     ui.highlighter:
@@ -24,7 +26,8 @@ computed:
     }
 name: ide-component-title
 template: >-
-  <div class="comp-ide-component-title" @click="$emit('click')" v-if="vue"
+  <div class="comp-ide-component-title" @mouseenter="$emit('mouseenter')"
+  @mouseleave="$emit('mouseleave')" @click="$emit('click')" v-if="vue"
   path="259955427."><ui-highlighter :get-elements="() =&gt; vue.$el"
   path="259955427.0"><div @click="onClick" path="259955427.0.0"><ui-title
   icon="📦" :value="vue.$options._componentTag"

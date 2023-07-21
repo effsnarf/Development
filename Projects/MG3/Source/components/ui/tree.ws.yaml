@@ -7,6 +7,7 @@ dom:
         ':expandable': initialExpandable
         ':item-type': itemType
         ':get-item': getItem || ((node) => node.item)
+        ':get-item-key': getItemKey || $root.getKey
         ':get-children': getChildren || ((node) => node.children||[])
         ':selected-node': selectedNode
         @node-click: onChildClick
@@ -18,6 +19,7 @@ props:
   expandable: true
   itemType: null
   getItem: null
+  getItemKey: null
   getChildren: null
 data:
   selectedNode: null
@@ -56,7 +58,7 @@ template: >-
   path="-484140360.0"><ui-tree-node :node="root"
   :initial-expanded="initialExpanded" :expandable="initialExpandable"
   :item-type="itemType" :get-item="getItem || ((node) =&gt; node.item)"
-  :get-children="getChildren || ((node) =&gt; node.children||[])"
-  :selected-node="selectedNode" @node-click="onChildClick"
-  @node-hover="onChildHover" @node-unhover="onChildUnhover"
-  path="-484140360.0.0"></ui-tree-node></li></ul>
+  :get-item-key="getItemKey || $root.getKey" :get-children="getChildren ||
+  ((node) =&gt; node.children||[])" :selected-node="selectedNode"
+  @node-click="onChildClick" @node-hover="onChildHover"
+  @node-unhover="onChildUnhover" path="-484140360.0.0"></ui-tree-node></li></ul>

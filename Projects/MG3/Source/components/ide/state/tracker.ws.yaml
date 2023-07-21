@@ -4,6 +4,17 @@ dom:
       div: 
         h3: 
           ui.title: 
+            text: State
+        ul: 
+          li: 
+            v-for: field in $root.vm.getFields(uid)
+            ide.state.tracker.item: 
+              ':uid': uid
+              ':item': field
+              ':key': uid+'.'+field.key
+      div: 
+        h3: 
+          ui.title: 
             text: Changes
         ul: 
           class: changes
@@ -18,17 +29,6 @@ dom:
               ':uid': uid
               ':item': change
               ':key': change.id
-      div: 
-        h3: 
-          ui.title: 
-            text: State
-        ul: 
-          li: 
-            v-for: field in $root.vm.getFields(uid)
-            ide.state.tracker.item: 
-              ':uid': uid
-              ':item': field
-              ':key': uid+'.'+field.key
       div:  null
 props:
   uid: null
@@ -74,17 +74,17 @@ name: ide-state-tracker
 template: >-
   <div class="comp-ide-state-tracker" path="-483235177."><div class="flex
   items-baseline" path="-483235177.0"><div path="-483235177.0.0"><h3
-  path="-483235177.0.0.0"><ui-title text="Changes"
-  path="-483235177.0.0.0.0"></ui-title></h3><ul class="changes" :key="key1"
-  path="-483235177.0.0.1"><li class="hoverable" v-for="change in
+  path="-483235177.0.0.0"><ui-title text="State"
+  path="-483235177.0.0.0.0"></ui-title></h3><ul path="-483235177.0.0.1"><li
+  v-for="field in $root.vm.getFields(uid)"
+  path="-483235177.0.0.1.0"><ide-state-tracker-item :uid="uid" :item="field"
+  :key="uid+'.'+field.key"
+  path="-483235177.0.0.1.0.0"></ide-state-tracker-item></li></ul></div><div
+  path="-483235177.0.1"><h3 path="-483235177.0.1.0"><ui-title text="Changes"
+  path="-483235177.0.1.0.0"></ui-title></h3><ul class="changes" :key="key1"
+  path="-483235177.0.1.1"><li class="hoverable" v-for="change in
   $root.state.getRefChanges(uid).take(20)" :key="change.id" @mouseenter="()
   =&gt; onMouseEnter(change)" @mouseleave="() =&gt; onMouseLeave(change)"
-  path="-483235177.0.0.1.0"><ide-state-tracker-item :uid="uid" :item="change"
+  path="-483235177.0.1.1.0"><ide-state-tracker-item :uid="uid" :item="change"
   :key="change.id"
-  path="-483235177.0.0.1.0.0"></ide-state-tracker-item></li></ul></div><div
-  path="-483235177.0.1"><h3 path="-483235177.0.1.0"><ui-title text="State"
-  path="-483235177.0.1.0.0"></ui-title></h3><ul path="-483235177.0.1.1"><li
-  v-for="field in $root.vm.getFields(uid)"
-  path="-483235177.0.1.1.0"><ide-state-tracker-item :uid="uid" :item="field"
-  :key="uid+'.'+field.key"
   path="-483235177.0.1.1.0.0"></ide-state-tracker-item></li></ul></div><div></div></div></div>

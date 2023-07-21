@@ -2,6 +2,7 @@ dom:
   component:
     ':is': getComponentType(value)
     ':value': value
+    ':preview': 'false'
 props:
   value: null
 methods:
@@ -9,7 +10,6 @@ methods:
     function(value) {
       const getType = (value) => {
         let typeofValue = typeof value;
-        if (typeofValue == "string") typeofValue = "object";
         if (["object", "boolean"].find(v => v == typeofValue)) return typeofValue;
         return "preview";
       };
@@ -18,4 +18,4 @@ methods:
 name: ui-value-any
 template: >-
   <component class="comp-ui-value-any" :is="getComponentType(value)"
-  :value="value" path="1299909909."></component>
+  :value="value" :preview="false" path="1299909909."></component>
