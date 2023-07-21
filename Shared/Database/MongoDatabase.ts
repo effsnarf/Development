@@ -20,11 +20,13 @@ class MongoDatabase extends DatabaseBase {
     super();
     this.client = new MongoClient(connectionString);
     // Convert _DbAnalytics collection to capped (20mb)
+    // timeout: 30s
     this.client
       .db(database)
       .command({
         convertToCapped: "_DbAnalytics",
         size: 20 * 1024 * 1024,
+        maxTimeMS: 30000,
       })
       .catch((ex: any) => {
         throw ex;
