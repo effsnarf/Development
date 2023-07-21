@@ -284,7 +284,10 @@ class TaskManager {
         // When the response ends
         nodeResponse.data.on("end", async () => {
           logLine(
-            `${task.timer.elapsed?.unitifyTime().severify(100, 500, "<")} ${
+            `${task.timer.elapsed
+              ?.unitifyTime()
+              .severify(100, 500, "<")
+              .padStartChars(8, " ")} ${
               nodeResponse.status.toString().yellow
             } ${(options.url as string).severifyByHttpStatus(
               nodeResponse.status
@@ -298,7 +301,10 @@ class TaskManager {
 
         nodeResponse.data.on("error", async (ex: any) => {
           logNewLine(
-            `${task.timer.elapsed?.unitifyTime().severify(100, 500, "<")} ${
+            `${task.timer.elapsed
+              ?.unitifyTime()
+              .severify(100, 500, "<")
+              .padStartChars(8, " ")} ${
               nodeResponse.status.toString().yellow
             } ${ex.message?.red.bold} ${options.url.red.bold}`
           );
