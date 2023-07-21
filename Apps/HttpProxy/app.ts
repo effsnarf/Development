@@ -52,6 +52,7 @@ const isCachable = (
 interface Task {
   id: number | null;
   timer: Timer;
+  options: any;
   origin: string;
   timeout: number;
   cacheKey: string;
@@ -72,9 +73,13 @@ class TaskManager {
     private statusLogger: LoggerBase
   ) {}
 
-  add(task: Task, req: any) {
+  add(task: Task, req?: any) {
     if (!task.id) task.id = this._taskID++;
-    task.log.push(`[${task.id}] ${req.method} ${req.url}`);
+    task.log.push(
+      `[${task.id}] ${task.options?.method || req.method} ${
+        task.options?.url || req?.url
+      }`
+    );
     task.log.push(JSON.stringify(task.postData).shorten(200));
     task.logTimer = setInterval(() => {
       if (task.isPiping) return;
@@ -111,6 +116,9 @@ class TaskManager {
 }
 
 (async () => {
+  // In cache queue mode, we're only processing the cache queue to update the cache, not serving clients
+  const isCacheQueueMode = process.argv.includes("--cache-queue");
+
   const config = (await Configuration.new()).data;
 
   const debugLogger = Logger.new(config.log.debug);
@@ -123,7 +131,7 @@ class TaskManager {
 
   debugLogger.log(config);
 
-  const tryRequest = async (task: Task, req: any, res: any) => {
+  const tryRequest = async (task: Task, req?: any, res?: any) => {
     if (config.custom) {
       for (const item of config.custom) {
         const regex = new RegExp(item.url);
@@ -140,7 +148,9 @@ class TaskManager {
     const nodeIndex =
       (task.nodeIndex + task.attempt) % config.target.base.urls.length;
 
-    const targetUrl = `${config.target.base.urls[nodeIndex]}${req.url}`;
+    const url = task.options?.url || req.url;
+
+    const targetUrl = `${config.target.base.urls[nodeIndex]}${url}`;
 
     task.log.push(
       `Attempt ${task.attempt + 1} of ${config.target.try.again.retries}`
@@ -150,19 +160,21 @@ class TaskManager {
     );
     task.log.push(`Target URL: ${targetUrl}`);
 
-    const options = {
-      url: targetUrl,
-      method: req.method,
-      headers: req.headers,
-      body: task.postData,
-      // We want to proxy the data as-is,
-      responseType: "stream",
-      // We want to proxy the request as-is,
-      // let the client handle the redirects
-      maxRedirects: 0,
-      timeout: task.timeout,
-      mode: "no-cors",
-    } as any;
+    const options =
+      task.options ||
+      ({
+        url: targetUrl,
+        method: req.method,
+        headers: req.headers,
+        body: task.postData,
+        // We want to proxy the data as-is,
+        responseType: "stream",
+        // We want to proxy the request as-is,
+        // let the client handle the redirects
+        maxRedirects: 0,
+        timeout: task.timeout,
+        mode: "no-cors",
+      } as any);
 
     if (task.attempt >= config.target.try.again.retries) {
       // Temporarily unavailable
@@ -171,58 +183,60 @@ class TaskManager {
           config.target.try.again.retries.toString().yellow
         } ${`attempts failed`.red.bold} ${options.url.red.bold}`
       );
-      res.status(503);
+      res?.status(503);
       task.log.push(`Max attempts reached`);
       task.log.push(`Removing task from queue`);
       tasks.remove(task);
-      return res.end();
+      return res?.end();
     }
 
     // Try the cache
-    if (isCachable(options, config)) {
-      if (await cache.has(task.cacheKey)) {
-        const cachedResponse = await cache.get(task.cacheKey);
-        if (cachedResponse) {
-          stats.cache.hits.track(1);
-          // We don't track response time for cached results
-          // because we're interested in optimizing slow requests
-          //stats.response.times.track(timer.elapsed);
-          logLine(
-            `${task.timer.elapsed?.unitifyTime().severify(100, 500, "<")} ${
-              `Cache hit`.yellow.bold
-            } ${cachedResponse.body.length.unitifySize()} ${options.url.severifyByHttpStatus(
-              cachedResponse.status.code
-            )}`
-          );
-          res.set("x-debug-proxy-source", "cache");
-          res.status(cachedResponse.status.code);
-          res.set(cachedResponse.headers);
-          res.set("access-control-allow-origin", task.origin);
-          task.log.push(`Sending cached response to client`);
-          task.log.push(`Removing task from queue`);
-          tasks.remove(task, true);
-          res.end(cachedResponse.body);
+    if (!isCacheQueueMode) {
+      if (isCachable(options, config)) {
+        if (await cache.has(task.cacheKey)) {
+          const cachedResponse = await cache.get(task.cacheKey);
+          if (cachedResponse) {
+            stats.cache.hits.track(1);
+            // We don't track response time for cached results
+            // because we're interested in optimizing slow requests
+            //stats.response.times.track(timer.elapsed);
+            logLine(
+              `${task.timer.elapsed?.unitifyTime().severify(100, 500, "<")} ${
+                `Cache hit`.yellow.bold
+              } ${cachedResponse.body.length.unitifySize()} ${options.url.severifyByHttpStatus(
+                cachedResponse.status.code
+              )}`
+            );
+            res.set("x-debug-proxy-source", "cache");
+            res.status(cachedResponse.status.code);
+            res.set(cachedResponse.headers);
+            res.set("access-control-allow-origin", task.origin);
+            task.log.push(`Sending cached response to client`);
+            task.log.push(`Removing task from queue`);
+            tasks.remove(task, true);
+            res.end(cachedResponse.body);
 
-          const { method, url, body } = options;
-          const queueItemKey = { method, url, body };
+            const { method, url, body } = options;
+            const queueItemKey = { method, url, body };
 
-          // Queue the url as a background task
-          // to update the cache
-          const cacheQueueItem = {
-            _id: queueItemKey,
-            dt: Date.now(),
-            ...queueItemKey,
-            options,
-          };
-          cacheQueue?.add(cacheQueueItem);
+            // Queue the url as a background task
+            // to update the cache
+            const cacheQueueItem = {
+              _id: queueItemKey,
+              dt: Date.now(),
+              ...queueItemKey,
+              options,
+            };
+            cacheQueue?.add(cacheQueueItem);
 
-          return;
+            return;
+          }
         }
       }
     }
 
     try {
-      const isHttpPost = (req.method || "").toLowerCase() == "post";
+      const isHttpPost = (options.method || "").toLowerCase() == "post";
 
       const nodeResponse = isHttpPost
         ? await axios.post(options.url, task.postData, options)
@@ -230,21 +244,23 @@ class TaskManager {
 
       task.log.push(`Response status: ${nodeResponse.status}`);
 
-      // Add debug headers
-      // debug-proxy-source:
-      // - forwarded
-      // - cache
-      res.set(
-        "x-debug-proxy-source",
-        `forwarded (${task.attempt.ordinalize()} attempt)`
-      );
-      res.status(nodeResponse.status);
-      res.set(nodeResponse.headers);
-      res.set("access-control-allow-origin", task.origin);
+      if (res) {
+        // Add debug headers
+        // debug-proxy-source:
+        // - forwarded
+        // - cache
+        res.set(
+          "x-debug-proxy-source",
+          `forwarded (${task.attempt.ordinalize()} attempt)`
+        );
+        res.status(nodeResponse.status);
+        res.set(nodeResponse.headers);
+        res.set("access-control-allow-origin", task.origin);
+      }
 
       if (isHttpPost) {
         tasks.remove(task, true);
-        return res.end(Objects.jsonify(nodeResponse.data));
+        return res?.end(Objects.jsonify(nodeResponse.data));
       }
 
       task.isPiping = true;
@@ -253,34 +269,36 @@ class TaskManager {
       tasks.remove(task, true);
       pipingTasks++;
 
-      nodeResponse.data.pipe(res);
+      if (res) {
+        nodeResponse.data.pipe(res);
 
-      // When the response ends
-      nodeResponse.data.on("end", async () => {
-        logLine(
-          `${task.timer.elapsed?.unitifyTime().severify(100, 500, "<")} ${
-            nodeResponse.status.toString().yellow
-          } ${(options.url as string).severifyByHttpStatus(
-            nodeResponse.status
-          )}`
-        );
-        stats.response.times.track(task.timer.elapsed);
-        stats.successes.track(1);
-        task.log.push(`Response piped successfully to client`);
-        pipingTasks--;
-      });
+        // When the response ends
+        nodeResponse.data.on("end", async () => {
+          logLine(
+            `${task.timer.elapsed?.unitifyTime().severify(100, 500, "<")} ${
+              nodeResponse.status.toString().yellow
+            } ${(options.url as string).severifyByHttpStatus(
+              nodeResponse.status
+            )}`
+          );
+          stats.response.times.track(task.timer.elapsed);
+          stats.successes.track(1);
+          task.log.push(`Response piped successfully to client`);
+          pipingTasks--;
+        });
 
-      nodeResponse.data.on("error", async (ex: any) => {
-        logNewLine(
-          `${task.timer.elapsed?.unitifyTime().severify(100, 500, "<")} ${
-            nodeResponse.status.toString().yellow
-          } ${ex.message?.red.bold} ${options.url.red.bold}`
-        );
-        stats.response.times.track(task.timer.elapsed);
-        task.log.push(`Error piping response to client`);
-        task.log.push(ex.stack);
-        pipingTasks--;
-      });
+        nodeResponse.data.on("error", async (ex: any) => {
+          logNewLine(
+            `${task.timer.elapsed?.unitifyTime().severify(100, 500, "<")} ${
+              nodeResponse.status.toString().yellow
+            } ${ex.message?.red.bold} ${options.url.red.bold}`
+          );
+          stats.response.times.track(task.timer.elapsed);
+          task.log.push(`Error piping response to client`);
+          task.log.push(ex.stack);
+          pipingTasks--;
+        });
+      }
 
       // Save the response to the cache
       if (cache) {
@@ -292,7 +310,7 @@ class TaskManager {
             // Get the response data
             const cachedResponse = {
               dt: Date.now(),
-              url: req.url,
+              url: options.url,
               status: {
                 code: nodeResponse.status,
                 text: nodeResponse.statusText,
@@ -301,8 +319,15 @@ class TaskManager {
               body: data,
             };
             delete cachedResponse.headers["access-control-allow-origin"];
-            await cache.set(req.url || "", cachedResponse);
+            await cache.set(task.cacheKey, cachedResponse);
             task.log.push(`Response cached`);
+            if (isCacheQueueMode) {
+              logNewLine(
+                task.timer.elapsed?.unitifyTime(),
+                data.length.unitifySize(),
+                `Cache updated for ${options.url}`.gray
+              );
+            }
           }
         }
       }
@@ -329,7 +354,7 @@ class TaskManager {
         //stats.response.times.track(elapsed);
         stats.successes.track(1);
 
-        const origin = req.headers.origin || "*";
+        const origin = options.headers.origin || "*";
         res.status(ex.response.status);
         res.set(ex.response.headers);
         res.set("access-control-allow-origin", task.origin);
@@ -412,6 +437,37 @@ class TaskManager {
 
   let nextNodeIndex = 0;
 
+  const processCacheQueue = async () => {
+    const cacheQueueItem = await cacheQueue.pop();
+
+    if (cacheQueueItem) {
+      const options = cacheQueueItem.options;
+
+      const task = {
+        id: null,
+        timer: Timer.start(),
+        options: options,
+        origin: options.headers.origin,
+        timeout: config.target.timeout.deunitify(),
+        cacheKey: options.url.replace(/&_uid=\d+/g, ""),
+        postData: options.body,
+        attempt: 0,
+        nodeIndex: !config.rotate?.nodes
+          ? 0
+          : nextNodeIndex++ % config.target.base.urls.length,
+        log: [],
+        logTimer: null,
+        isPiping: false,
+      } as Task;
+
+      tasks.add(task);
+
+      tryRequest(task);
+    }
+
+    setTimeout(processCacheQueue, 10);
+  };
+
   // Forward all incoming HTTP requests to config.target.base.urls/..
   // If a request fails (target is down), try the cache first
   // If the cache doesn't have the response, try backup urls up to target.try.again.retries times
@@ -421,6 +477,7 @@ class TaskManager {
     const task = {
       id: null,
       timer: Timer.start(),
+      options: null,
       origin: req.headers.origin || "*",
       timeout: config.target.timeout.deunitify(),
       cacheKey: req.url.replace(/&_uid=\d+/g, ""),
@@ -440,55 +497,59 @@ class TaskManager {
     tryRequest(task, req, res);
   });
 
-  // Every once in a while, display stats
-  setInterval(() => {
-    const successRate = 1 - stats.cache.hits.count / stats.successes.count;
-    logNewLine(
-      `${stats.successes.count.humanize()} ${
-        `successful proxied requests and`.gray
-      } ${stats.cache.hits.count.humanize()} ${
-        `fallback cache hits per`.gray
-      } ${stats.interval.unitifyTime()} (${successRate.unitifyPercent()})`
-    );
-  }, stats.interval);
+  if (!isCacheQueueMode) {
+    // Every once in a while, display stats
+    setInterval(() => {
+      const successRate = 1 - stats.cache.hits.count / stats.successes.count;
+      logNewLine(
+        `${stats.successes.count.humanize()} ${
+          `successful proxied requests and`.gray
+        } ${stats.cache.hits.count.humanize()} ${
+          `fallback cache hits per`.gray
+        } ${stats.interval.unitifyTime()} (${successRate.unitifyPercent()})`
+      );
+    }, stats.interval);
+  }
 
   // Every minute, track requests/minute and response times in analytics
   const analytics = await Analytics.new(config.analytics);
   const appTitle = config.title.split(".").take(2).join(".");
   console.log(appTitle);
-  setInterval(async () => {
-    await analytics.create(
-      appTitle,
-      "network",
-      "requests",
-      ItemType.Count,
-      stats.interval,
-      stats.successes.count,
-      null
-    );
-    await analytics.create(
-      appTitle,
-      "network",
-      "response.time",
-      ItemType.Average,
-      (1).minutes(),
-      {
-        count: stats.response.times.count,
-        average: stats.response.times.average,
-      },
-      "ms"
-    );
-    await analytics.create(
-      appTitle,
-      "network",
-      "queue",
-      ItemType.Count,
-      stats.interval,
-      tasks.count,
-      null
-    );
-    tasks.logStatus();
-  }, stats.interval);
+  if (!isCacheQueueMode) {
+    setInterval(async () => {
+      await analytics.create(
+        appTitle,
+        "network",
+        "requests",
+        ItemType.Count,
+        stats.interval,
+        stats.successes.count,
+        null
+      );
+      await analytics.create(
+        appTitle,
+        "network",
+        "response.time",
+        ItemType.Average,
+        (1).minutes(),
+        {
+          count: stats.response.times.count,
+          average: stats.response.times.average,
+        },
+        "ms"
+      );
+      await analytics.create(
+        appTitle,
+        "network",
+        "queue",
+        ItemType.Count,
+        stats.interval,
+        tasks.count,
+        null
+      );
+      tasks.logStatus();
+    }, stats.interval);
+  }
 
   // #region Log unhandled errors
   process.on("uncaughtException", async (ex: any) => {
@@ -498,18 +559,22 @@ class TaskManager {
   });
   // #endregion
 
-  // #region Start the server
-  const server = config.incoming.server;
+  if (isCacheQueueMode) {
+    processCacheQueue();
+  } else {
+    // #region Start the server
+    const server = config.incoming.server;
 
-  app.listen(server.port, server.host, () => {
-    logNewLine(
-      `${`HTTP Proxy`.green} ${`listening on `.gray} ${
-        server.host.toString().green
-      }:${server.port.toString().yellow}`
-    );
-    for (const url of config.target.base.urls) {
-      logNewLine(`${`Target`.green} ${`URL`.gray} ${url.yellow}`);
-    }
-  });
-  // #endregion
+    app.listen(server.port, server.host, () => {
+      logNewLine(
+        `${`HTTP Proxy`.green} ${`listening on `.gray} ${
+          server.host.toString().green
+        }:${server.port.toString().yellow}`
+      );
+      for (const url of config.target.base.urls) {
+        logNewLine(`${`Target`.green} ${`URL`.gray} ${url.yellow}`);
+      }
+    });
+    // #endregion
+  }
 })();
