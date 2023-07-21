@@ -729,7 +729,11 @@ if (typeof String !== "undefined") {
   ): string {
     const valueStr = this.toString();
     const unitClass = valueStr.getUnitClass();
-    if (!unitClass) throw new Error("No unit class found");
+    if (!unitClass) {
+      const value = parseFloat(valueStr);
+      const color = value.getSeverityColor(green, yellow, direction);
+      return valueStr.colorize(color);
+    }
     const value = valueStr.deunitify();
     const unit = valueStr.getUnit();
     const color = value.getSeverityColor(green, yellow, direction, true);

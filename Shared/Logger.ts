@@ -169,7 +169,7 @@ class FileSystemLogger extends LoggerBase {
       .map((item) => {
         if (!item.args.filter((a: any) => a).length) return null;
         const text = item.args.map((arg: any) =>
-          typeof arg == "string" ? arg : Objects.yamlify(arg).withoutColors()
+          typeof arg == "string" ? arg : Objects.jsonify(arg).withoutColors()
         );
         return `${new Date(item.dt).toISOString()} ${text}`;
       })
