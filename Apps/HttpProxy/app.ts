@@ -216,7 +216,9 @@ class TaskManager {
             tasks.remove(task, true);
             res.end(cachedResponse.body);
 
-            const { method, url, body } = options;
+            let { method, url, body } = options;
+            // Remove http://[host] from the url
+            url = "/" + url.split("/").slice(3).join("/");
             const queueItemKey = { method, url, body };
 
             // Queue the url as a background task
@@ -457,7 +459,13 @@ class TaskManager {
         options: options,
         origin: options.headers.origin,
         timeout: config.target.timeout.deunitify(),
-        cacheKey: options.url.replace(/&_uid=\d+/g, ""),
+        cacheKey:
+          "/" +
+          options.url
+            .replace(/&_uid=\d+/g, "")
+            .split("/")
+            .slice(3)
+            .join("/"),
         postData: options.body,
         attempt: 0,
         nodeIndex: !config.rotate?.nodes
