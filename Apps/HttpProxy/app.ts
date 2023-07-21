@@ -265,8 +265,7 @@ class TaskManager {
       if (isHttpPost) {
         tasks.remove(task, true);
         try {
-          const dataText = await nodeResponse.data.text();
-          return res?.end(dataText);
+          return res?.end(nodeResponse.data);
         } catch (ex: any) {
           return res?.end(ex.stack);
         }

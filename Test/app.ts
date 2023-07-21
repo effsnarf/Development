@@ -35,41 +35,59 @@ class Malkovich {
 const malkovitch = new Malkovich();
 
 (async () => {
-  const url = `http://localhost:4042/MemeGenerator/api/Medias/create/one`;
-
-  const body = { media: { test: 1 } };
+  const url = "http://localhost:4041/MemeGenerator/api/Instances/create/one";
 
   const options = {
-    url: url,
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
+    body: {
+      languageCode: null,
+      generatorID: 1104,
+      imageID: null,
+      text0: null,
+      text1: "test",
     },
-    // We want to proxy the data as-is,
-    responseType: "stream",
-    // We want to proxy the request as-is,
-    // let the client handle the redirects
-    maxRedirects: 0,
-    timeout: 5000,
-    mode: "no-cors",
   } as any;
 
-  try {
-    console.log(url.green);
+  const response = await axios.post(url, options.body, options);
 
-    const response = await axios.post(url, body, options);
-
-    console.log(response.data);
-  } catch (ex: any) {
-    console.log(ex.message.bgRed.white);
-
-    if (ex.response) {
-      const data = await Http.getResponseStream(ex.response);
-      console.log(data);
-    }
-  }
+  console.log(response.data);
 
   process.exit();
+
+  // const url = `http://localhost:4042/MemeGenerator/api/Medias/create/one`;
+
+  // const body = { media: { test: 1 } };
+
+  // const options = {
+  //   url: url,
+  //   method: "POST",
+  //   headers: {
+  //     "Content-Type": "application/json",
+  //   },
+  //   // We want to proxy the data as-is,
+  //   responseType: "stream",
+  //   // We want to proxy the request as-is,
+  //   // let the client handle the redirects
+  //   maxRedirects: 0,
+  //   timeout: 5000,
+  //   mode: "no-cors",
+  // } as any;
+
+  // try {
+  //   console.log(url.green);
+
+  //   const response = await axios.post(url, body, options);
+
+  //   console.log(response.data);
+  // } catch (ex: any) {
+  //   console.log(ex.message.bgRed.white);
+
+  //   if (ex.response) {
+  //     const data = await Http.getResponseStream(ex.response);
+  //     console.log(data);
+  //   }
+  // }
+
+  // process.exit();
 
   //const config = (await Configuration.new()).data;
 
