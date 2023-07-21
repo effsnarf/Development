@@ -314,7 +314,7 @@ class TaskManager {
             // Get the response data
             const cachedResponse = {
               dt: Date.now(),
-              url: options.url.split("/").slice(3).join("/"),
+              url: "/" + options.url.split("/").slice(3).join("/"),
               status: {
                 code: nodeResponse.status,
                 text: nodeResponse.statusText,
