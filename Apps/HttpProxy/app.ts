@@ -12,11 +12,6 @@ import { Analytics, ItemType } from "@shared/Analytics";
 import { Logger, LoggerBase } from "@shared/Logger";
 import { DbQueue } from "@shared/Database/DbQueue";
 
-const objectToString = (obj: any) => {
-  if (typeof obj == "string") return obj;
-  return Objects.jsonify(obj);
-};
-
 interface CachedResponse {
   dt: number;
   status: {
