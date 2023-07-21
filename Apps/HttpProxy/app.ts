@@ -263,14 +263,14 @@ class TaskManager {
         return res?.end(Objects.jsonify(nodeResponse.data));
       }
 
-      task.isPiping = true;
-      task.log.push(`Piping response to client`);
-      task.log.push(`Removing task from queue`);
-      tasks.remove(task, true);
-      pipingTasks++;
-
       if (res) {
         nodeResponse.data.pipe(res);
+
+        task.isPiping = true;
+        task.log.push(`Piping response to client`);
+        task.log.push(`Removing task from queue`);
+        tasks.remove(task, true);
+        pipingTasks++;
 
         // When the response ends
         nodeResponse.data.on("end", async () => {
@@ -339,45 +339,49 @@ class TaskManager {
       // Some HTTP status codes are not errors (304 not modified, 404 not found, etc.)
       const targetIsDown = !ex.response || ex.message.includes("ECONNREFUSED");
 
-      // If target is not down, target returned some http status and we should return it
-      if (!targetIsDown) {
-        const isError = !ex.response.status.isBetween(200, 500);
-        const elapsed = task.timer.elapsed;
-        logLine(
-          `${elapsed?.unitifyTime().severify(100, 500, "<")} ${
-            !isError ? ex.response.status.toString().yellow : ex.message.yellow
-          } ${options.url.severifyByHttpStatus(ex.response.status)}`
-        );
+      if (!isCacheQueueMode) {
+        // If target is not down, target returned some http status and we should return it
+        if (!targetIsDown) {
+          const isError = !ex.response.status.isBetween(200, 500);
+          const elapsed = task.timer.elapsed;
+          logLine(
+            `${elapsed?.unitifyTime().severify(100, 500, "<")} ${
+              !isError
+                ? ex.response.status.toString().yellow
+                : ex.message.yellow
+            } ${options.url.severifyByHttpStatus(ex.response.status)}`
+          );
 
-        task.log.push(`Status: ${ex.response.status}`);
+          task.log.push(`Status: ${ex.response.status}`);
 
-        // We don't track response time for (304 not modified, 404 not found, etc) because
-        // there is no processing time to measure
-        //stats.response.times.track(elapsed);
-        stats.successes.track(1);
+          // We don't track response time for (304 not modified, 404 not found, etc) because
+          // there is no processing time to measure
+          //stats.response.times.track(elapsed);
+          stats.successes.track(1);
 
-        const origin = options.headers.origin || "*";
-        res.status(ex.response.status);
-        res.set(ex.response.headers);
-        res.set("access-control-allow-origin", task.origin);
+          const origin = options.headers.origin || "*";
+          res.status(ex.response.status);
+          res.set(ex.response.headers);
+          res.set("access-control-allow-origin", task.origin);
 
-        task.isPiping = true;
-        task.log.push(`Piping response to client`);
-        task.log.push(`Removing task from queue`);
-        tasks.remove(task, true);
-        pipingTasks++;
+          task.isPiping = true;
+          task.log.push(`Piping response to client`);
+          task.log.push(`Removing task from queue`);
+          tasks.remove(task, true);
+          pipingTasks++;
 
-        ex.response.data.pipe(res);
-        ex.response.data.on("end", async () => {
-          task.log.push(`Response piped successfully to client`);
-          pipingTasks--;
-        });
-        ex.response.data.on("error", async (ex: any) => {
-          task.log.push(`Error piping response to client`);
-          task.log.push(ex.stack);
-          pipingTasks--;
-        });
-        return;
+          ex.response.data.pipe(res);
+          ex.response.data.on("end", async () => {
+            task.log.push(`Response piped successfully to client`);
+            pipingTasks--;
+          });
+          ex.response.data.on("error", async (ex: any) => {
+            task.log.push(`Error piping response to client`);
+            task.log.push(ex.stack);
+            pipingTasks--;
+          });
+          return;
+        }
       }
 
       if (targetIsDown) {
@@ -396,18 +400,20 @@ class TaskManager {
   };
 
   const logLine = (...args: any[]) => {
-    args = [
-      config.title.gray,
-      new Date().toLocaleTimeString().gray,
-      tasks.count.severify(10, 20, "<"),
-      `inner`.gray,
-      pipingTasks.severify(10, 20, "<"),
-      `outer`.gray,
-      `${stats.successes.count.toLocaleString()} ${
-        `/`.gray
-      }${stats.successes.timeSpan.unitifyTime()}`,
-      ...args,
-    ];
+    args = isCacheQueueMode
+      ? [config.title.gray, new Date().toLocaleTimeString().gray, ...args]
+      : [
+          config.title.gray,
+          new Date().toLocaleTimeString().gray,
+          tasks.count.severify(10, 20, "<"),
+          `inner`.gray,
+          pipingTasks.severify(10, 20, "<"),
+          `outer`.gray,
+          `${stats.successes.count.toLocaleString()} ${
+            `/`.gray
+          }${stats.successes.timeSpan.unitifyTime()}`,
+          ...args,
+        ];
     process.stdout.write("\r");
     process.stdout.clearLine(0);
     process.stdout.write(args.join(" "));
