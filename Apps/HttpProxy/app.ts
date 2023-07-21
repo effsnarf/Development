@@ -10,15 +10,6 @@ import { Cache } from "@shared/Cache";
 import { Http } from "@shared/Http";
 import { Analytics, ItemType } from "@shared/Analytics";
 import { Logger, LoggerBase } from "@shared/Logger";
-import {
-  Console,
-  Layout,
-  Log,
-  ObjectLog,
-  LargeText,
-  Bar,
-  Unit,
-} from "@shared/Console";
 
 const objectToString = (obj: any) => {
   if (typeof obj == "string") return obj;
@@ -116,14 +107,6 @@ class TaskManager {
   get count() {
     return this.items.size;
   }
-
-  get innerCount() {
-    return [...this.items.values()].filter((item) => !item.isPiping).length;
-  }
-
-  get outerCount() {
-    return [...this.items.values()].filter((item) => item.isPiping).length;
-  }
 }
 
 (async () => {
@@ -135,6 +118,7 @@ class TaskManager {
   const statusLogger = Logger.new(config.log.status);
 
   const tasks = new TaskManager(taskLogger, statusLogger);
+  let pipingTasks = 0;
 
   debugLogger.log(config);
 
@@ -249,6 +233,9 @@ class TaskManager {
 
       task.isPiping = true;
       task.log.push(`Piping response to client`);
+      task.log.push(`Removing task from queue`);
+      tasks.remove(task, true);
+      pipingTasks++;
 
       nodeResponse.data.pipe(res);
 
@@ -264,8 +251,7 @@ class TaskManager {
         stats.response.times.track(task.timer.elapsed);
         stats.successes.track(1);
         task.log.push(`Response piped successfully to client`);
-        task.log.push(`Removing task from queue`);
-        tasks.remove(task, true);
+        pipingTasks--;
       });
 
       nodeResponse.data.on("error", async (ex: any) => {
@@ -277,8 +263,7 @@ class TaskManager {
         stats.response.times.track(task.timer.elapsed);
         task.log.push(`Error piping response to client`);
         task.log.push(ex.stack);
-        task.log.push(`Removing task from queue`);
-        tasks.remove(task);
+        pipingTasks--;
       });
 
       // Save the response to the cache
@@ -335,18 +320,19 @@ class TaskManager {
 
         task.isPiping = true;
         task.log.push(`Piping response to client`);
+        task.log.push(`Removing task from queue`);
+        tasks.remove(task, true);
+        pipingTasks++;
 
         ex.response.data.pipe(res);
         ex.response.data.on("end", async () => {
           task.log.push(`Response piped successfully to client`);
-          task.log.push(`Removing task from queue`);
-          tasks.remove(task, true);
+          pipingTasks--;
         });
         ex.response.data.on("error", async (ex: any) => {
           task.log.push(`Error piping response to client`);
           task.log.push(ex.stack);
-          task.log.push(`Removing task from queue`);
-          tasks.remove(task);
+          pipingTasks--;
         });
         return;
       }
@@ -370,9 +356,9 @@ class TaskManager {
     args = [
       config.title.gray,
       new Date().toLocaleTimeString().gray,
-      tasks.innerCount.severify(10, 20, "<"),
+      tasks.count.severify(10, 20, "<"),
       `inner`.gray,
-      tasks.outerCount.severify(10, 20, "<"),
+      pipingTasks.severify(10, 20, "<"),
       `outer`.gray,
       `${stats.successes.count.toLocaleString()} ${
         `/`.gray
