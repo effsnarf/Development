@@ -211,7 +211,7 @@ class TaskManager {
               url: options.url,
               body: options.body,
             },
-            options,
+            ...options,
           };
           cacheQueue?.add(cacheQueueItem);
 
