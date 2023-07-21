@@ -19,6 +19,16 @@ class MongoDatabase extends DatabaseBase {
   ) {
     super();
     this.client = new MongoClient(connectionString);
+    // Convert _DbAnalytics collection to capped (20mb)
+    this.client
+      .db(database)
+      .command({
+        convertToCapped: "_DbAnalytics",
+        size: 20 * 1024 * 1024,
+      })
+      .catch((ex: any) => {
+        throw ex;
+      });
   }
 
   public static async new(
