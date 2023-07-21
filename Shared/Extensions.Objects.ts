@@ -30,11 +30,12 @@ Objects.pugToHtml = (str: string, options?: any): string => {
   }
 };
 
-Objects.jsonify = (obj: any): string => {
+Objects.jsonify = (obj: any, depth: number = 100): string => {
   try {
-    return JSON.stringify(obj, null, 2);
+    return util.inspect(obj, true, 10, false);
   } catch (ex: any) {
-    throw `Error stringifying object\n${ex.message}}`;
+    throw `Error stringifying obj
+    ect\n${ex.message}}`;
   }
 };
 
