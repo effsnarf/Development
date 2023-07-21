@@ -121,6 +121,8 @@ class TaskManager {
 
   const config = (await Configuration.new()).data;
 
+  if (isCacheQueueMode) process.title = `${config.title} (cache queue)`;
+
   const debugLogger = Logger.new(config.log.debug);
   const errorLogger = Logger.new(config.log.errors);
   const taskLogger = Logger.new(config.log.tasks);
@@ -326,7 +328,9 @@ class TaskManager {
             if (isCacheQueueMode) {
               const cacheItemsCount = await cacheQueue?.count();
               logLine(
-                `${cacheItemsCount?.humanize()} ${`cache queue`.gray}`,
+                `${cacheItemsCount?.severify(100, 200, ">")} ${
+                  `cache queue`.gray
+                }`,
                 task.timer.elapsed?.unitifyTime(),
                 data.length.unitifySize(),
                 `Cache updated for ${task.cacheKey}`.gray
