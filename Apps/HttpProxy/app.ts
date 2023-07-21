@@ -207,12 +207,10 @@ class TaskManager {
                 ?.unitifyTime()
                 .severify(100, 500, "<")
                 .padStartChars(8, " ")} ${
-                `Cache hit`.yellow.bold
+                `Cache hit`.gray
               } ${cachedResponse.body.length
                 .unitifySize()
-                .padStartChars(8, " ")} ${options.url.severifyByHttpStatus(
-                cachedResponse.status.code
-              )}`
+                .padStartChars(8, " ")} ${options.url.gray}`
             );
             res.set("x-debug-proxy-source", "cache");
             res.status(cachedResponse.status.code);
@@ -286,11 +284,14 @@ class TaskManager {
         // When the response ends
         nodeResponse.data.on("end", async () => {
           logLine(
-            `${task.timer.elapsed?.unitifyTime().severify(100, 500, "<")} ${
-              nodeResponse.status.toString().yellow
-            } ${(options.url as string).severifyByHttpStatus(
-              nodeResponse.status
-            )}`
+            `${task.timer.elapsed
+              ?.unitifyTime()
+              .severify(100, 500, "<")
+              .padStartChars(8, " ")} ${nodeResponse.status
+              .severifyByHttpStatus()
+              .padStartChars(9 + 8, " ")} ${(
+              options.url as string
+            ).severifyByHttpStatus(nodeResponse.status)}`
           );
           stats.response.times.track(task.timer.elapsed);
           stats.successes.track(1);
@@ -300,9 +301,14 @@ class TaskManager {
 
         nodeResponse.data.on("error", async (ex: any) => {
           logNewLine(
-            `${task.timer.elapsed?.unitifyTime().severify(100, 500, "<")} ${
-              nodeResponse.status.toString().yellow
-            } ${ex.message?.red.bold} ${options.url.red.bold}`
+            `${task.timer.elapsed
+              ?.unitifyTime()
+              .severify(100, 500, "<")
+              .padStartChars(8, " ")} ${nodeResponse.status
+              .severifyByHttpStatus()
+              .padStartChars(9 + 8, " ")} ${ex.message?.red.bold} ${
+              options.url.red.bold
+            }`
           );
           stats.response.times.track(task.timer.elapsed);
           task.log.push(`Error piping response to client`);
@@ -335,7 +341,7 @@ class TaskManager {
             if (isCacheQueueMode) {
               const cacheItemsCount = await cacheQueue?.count();
               logLine(
-                `${cacheItemsCount?.severify(100, 200, "<")} ${
+                `${cacheItemsCount?.humanize().severify(100, 200, "<")} ${
                   `cache queue`.gray
                 }`,
                 task.timer.elapsed?.unitifyTime().padStartChars(8, " "),
