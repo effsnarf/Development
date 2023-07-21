@@ -10,6 +10,7 @@ import { Cache } from "@shared/Cache";
 import { Http } from "@shared/Http";
 import { Analytics, ItemType } from "@shared/Analytics";
 import { Logger, LoggerBase } from "@shared/Logger";
+import { DbQueue } from "@shared/Database/DbQueue";
 
 const objectToString = (obj: any) => {
   if (typeof obj == "string") return obj;
@@ -200,7 +201,13 @@ class TaskManager {
           task.log.push(`Sending cached response to client`);
           task.log.push(`Removing task from queue`);
           tasks.remove(task, true);
-          return res.end(cachedResponse.body);
+          res.end(cachedResponse.body);
+
+          // Queue the url as a background task
+          // to update the cache
+          cacheQueue?.add(options);
+
+          return;
         }
       }
     }
@@ -392,6 +399,7 @@ class TaskManager {
   };
 
   const cache = await Cache.new(config.cache.store);
+  const cacheQueue = await DbQueue.new(config.cache.queue);
 
   let nextNodeIndex = 0;
 

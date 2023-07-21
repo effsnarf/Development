@@ -49,6 +49,12 @@ cache:
           database: MG-DBP-Cache
       # - database:
       #     path: F:\Database\MG-DBP-Cache
+  queue:
+    prod:
+      database:
+        connectionString: mongodb://localhost:37017
+        database: MG-DBP-Cache
+      collectionName: Queue
 log:
   tasks:
     enabled: true
