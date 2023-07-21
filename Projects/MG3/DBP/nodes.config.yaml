@@ -237,6 +237,11 @@ api:
     Instances.create.one:
       args: [languageCode, generatorID, imageID, text0, text1]
       code: | #js
+        if (null == generatorID) throw new Error("GeneratorID is required");
+
+        let existingInstance = await db.findOne("Instances", { GeneratorID: generatorID, Text0: text0, Text1: text1 });
+        if (existingInstance) return existingInstance;
+
         const now = (new Date());
         const nowDate = (new Date());
         nowDate.setHours(0, 0, 0, 0);

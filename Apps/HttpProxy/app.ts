@@ -1,6 +1,7 @@
 import fs, { stat } from "fs";
 import "colors";
 import express, { response } from "express";
+const bodyParser = require("body-parser");
 import axios, { Axios, AxiosResponse, AxiosResponseHeaders } from "axios";
 import https from "https";
 import { Configuration } from "@shared/Configuration";
@@ -76,7 +77,7 @@ class TaskManager {
         task.options?.url || req?.url
       }`
     );
-    task.log.push(JSON.stringify(task.postData).shorten(200));
+    task.log.push(JSON.stringify(task.postData)?.shorten(200));
     task.logTimer = setInterval(() => {
       if (task.isPiping) return;
       task.log.push(
@@ -130,6 +131,9 @@ class TaskManager {
   debugLogger.log(config);
 
   const tryRequest = async (task: Task, req?: any, res?: any) => {
+    const isHttpPost =
+      (req?.method || task.options?.method).toLowerCase() == "post";
+
     if (config.custom) {
       for (const item of config.custom) {
         const regex = new RegExp(item.url);
@@ -156,20 +160,18 @@ class TaskManager {
     );
     task.log.push(`Target URL: ${targetUrl}`);
 
-    const options =
-      task.options ||
-      ({
-        method: req.method,
-        headers: req.headers,
-        body: task.postData,
-        // We want to proxy the data as-is,
-        responseType: "stream",
-        // We want to proxy the request as-is,
-        // let the client handle the redirects
-        maxRedirects: 0,
-        timeout: task.timeout,
-        mode: "no-cors",
-      } as any);
+    const options = task.options
+      ? { ...task.options }
+      : ({
+          method: req.method,
+          headers: req.headers,
+          data: task.postData,
+          responseType: "stream",
+          // let the client handle the redirects
+          maxRedirects: 0,
+          timeout: task.timeout,
+          mode: "no-cors",
+        } as any);
 
     options.url = targetUrl;
 
@@ -242,9 +244,7 @@ class TaskManager {
     try {
       const isHttpPost = (options.method || "").toLowerCase() == "post";
 
-      const nodeResponse = isHttpPost
-        ? await axios.post(options.url, task.postData, options)
-        : await axios.request(options);
+      const nodeResponse = await axios.request(options);
 
       task.log.push(`Response status: ${nodeResponse.status}`);
 
@@ -264,11 +264,8 @@ class TaskManager {
 
       if (isHttpPost) {
         tasks.remove(task, true);
-        try {
-          return res?.end(nodeResponse.data);
-        } catch (ex: any) {
-          return res?.end(ex.stack);
-        }
+        const responseData = await Http.getResponseStream(nodeResponse.data);
+        return res.end(responseData);
       }
 
       if (res) {
@@ -357,10 +354,12 @@ class TaskManager {
       // Some HTTP status codes are not errors (304 not modified, 404 not found, etc.)
       const targetIsDown = !ex.response || ex.message.includes("ECONNREFUSED");
 
+      errorLogger.log(task, ex);
+
       if (!isCacheQueueMode) {
         // If target is not down, target returned some http status and we should return it
         if (!targetIsDown) {
-          const isError = !ex.response.status.isBetween(200, 500);
+          const isError = !ex.response.status.isBetweenOrEq(200, 500);
           const elapsed = task.timer.elapsed;
           logLine(
             `${elapsed?.unitifyTime().severify(100, 500, "<")} ${
@@ -507,8 +506,12 @@ class TaskManager {
   // If a request fails (target is down), try the cache first
   // If the cache doesn't have the response, try backup urls up to target.try.again.retries times
   const app = express();
+  app.use(express.json());
   // Catch all requests
   app.all("*", async (req: any, res: any) => {
+    const postData =
+      req.method == "POST" ? await Http.getPostDataFromStream(req) : null;
+
     const task = {
       id: null,
       timer: Timer.start(),
@@ -517,8 +520,7 @@ class TaskManager {
       origin: req.headers.origin || "*",
       timeout: config.target.timeout.deunitify(),
       cacheKey: req.url.replace(/&_uid=\d+/g, ""),
-      postData:
-        req.method == "POST" ? await Http.getPostDataFromStream(req) : null,
+      postData,
       attempt: 0,
       nodeIndex: !config.rotate?.nodes
         ? 0

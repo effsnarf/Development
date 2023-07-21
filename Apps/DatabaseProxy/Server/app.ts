@@ -5,6 +5,7 @@ import fs from "fs";
 import util, { debuglog } from "util";
 import axios from "axios";
 import express from "express";
+const bodyParser = require("body-parser");
 import cookieParser from "cookie-parser";
 import "@shared/Extensions";
 import { Objects } from "@shared/Extensions.Objects";
@@ -363,7 +364,10 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
             return res.status(200).end();
           }
           // Get the POST data
-          const data = await Http.getPostDataFromStream(req);
+          const data =
+            req.method.toLowerCase() == "post"
+              ? await Http.getPostDataFromStream(req)
+              : null;
           const user = await User.get(req, res, data);
           debugLogger.log(req.method, req.url, data);
           await handler(req, res, user, data);
@@ -595,6 +599,8 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
     ) => {
       // Response type
       res.setHeader("Content-Type", "application/json");
+
+      //if (req.url.includes("/create/")) return res.end("dbp:" + req.url);
 
       const db = await dbs.get(req.params.database);
       const apiMethods = (await cache.get.api.methods(db))?.filter(
