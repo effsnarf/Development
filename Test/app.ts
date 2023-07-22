@@ -35,21 +35,49 @@ class Malkovich {
 const malkovitch = new Malkovich();
 
 (async () => {
+  // const url1 = "http://localhost:4041/MemeGenerator/api/Builders/select/all";
+
+  // const res = await axios.request({
+  //   url: url1,
+  //   timeout: 5000,
+  // });
+
+  // console.log(res.data);
+
+  // process.exit();
+
   const url = "http://localhost:4041/MemeGenerator/api/Instances/create/one";
+  const body = {
+    languageCode: null,
+    generatorID: 1104,
+    imageID: null,
+    text0: null,
+    text1: "test",
+  };
+
+  console.log(url);
 
   const options = {
-    body: {
-      languageCode: null,
-      generatorID: 1104,
-      imageID: null,
-      text0: null,
-      text1: "test",
-    },
+    url,
+    method: "POST",
+    data: body,
+    responseType: "stream",
+    // We want to proxy the request as-is,
+    // let the client handle the redirects
+    maxRedirects: 0,
+    timeout: 5000,
+    mode: "no-cors",
   } as any;
 
-  const response = await axios.post(url, options.body, options);
+  try {
+    const response = await axios.request(options);
 
-  console.log(response.data);
+    const responseData = await Http.getResponseStream(response);
+
+    console.log(responseData);
+  } catch (ex: any) {
+    console.log(ex.message.bgRed.white);
+  }
 
   process.exit();
 

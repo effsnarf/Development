@@ -4,12 +4,14 @@ import { Objects } from "./Extensions.Objects";
 
 class Http {
   static async getPostData(req: any): Promise<any> {
-    if (req.method !== "POST") return Promise.resolve(null);
+    if (req.method.toLowerCase() != "post") return null;
+
+    if (typeof req.body != "string") return req.body;
 
     try {
-      return Promise.resolve(Objects.json.parse(req.body));
+      return Objects.json.parse(req.body);
     } catch (ex: any) {
-      return Promise.resolve(req.body);
+      return req.body;
     }
   }
 
