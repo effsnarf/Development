@@ -447,11 +447,11 @@ interface MgParams {
           // event
           e: "⚡",
           // prop
-          p: "🔒",
+          p: "🔗",
           // data
           d: "🧊",
           // computed
-          c: "✨",
+          c: "🧮",
         } as any;
         if (item.type) return stateItemIcons[item.type] || "❔";
         return "❔";

@@ -468,7 +468,6 @@ class TaskManager {
 
     while (cacheQueueItem) {
       const options = cacheQueueItem.options;
-
       const task = {
         id: null,
         timer: Timer.start(),
@@ -476,13 +475,7 @@ class TaskManager {
         options: options,
         origin: options.headers.origin,
         timeout: config.target.timeout.deunitify(),
-        cacheKey:
-          "/" +
-          cacheQueueItem.url
-            .replace(/&_uid=\d+/g, "")
-            .split("/")
-            .slice(3)
-            .join("/"),
+        cacheKey: "/" + cacheQueueItem.url.replace(/&_uid=\d+/g, ""),
         postData: options.body,
         attempt: 0,
         nodeIndex: !config.rotate?.nodes
