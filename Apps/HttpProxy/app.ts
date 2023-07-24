@@ -337,7 +337,7 @@ class TaskManager {
             if (isCacheQueueMode) {
               const cacheItemsCount = await cacheQueue?.count();
               logLine(
-                `${cacheItemsCount?.humanize().severify(100, 200, "<")} ${
+                `${cacheItemsCount?.humanize().severify(100, 200, ">")} ${
                   `cache queue`.gray
                 }`,
                 task.timer.elapsed?.unitifyTime().padStartChars(8, " "),
