@@ -44,7 +44,7 @@ style:
     transform: translateX(-50%)
     z-index: 1000000
   .header-spacer:
-    height: 8rem
+    height: 5rem
 template: >-
   <div class="comp-app" path="96801."><div path="96801.0"><div
   class="site-loading" path="96801.0.0"><ui-loading v-if="$root.isLoading"

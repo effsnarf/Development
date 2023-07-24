@@ -12,21 +12,25 @@ dom:
         class: hidden mb-l2
         imageID: 680118409
         ':aspect-ratio': 3/1
-      transition:
+      transition: 
         name: slide
         ':key': generator?._id
         div: 
           v-if: generator
           div: 
-            class: float-left mr-l1
-            ':style': '{ width: ''30%'' }'
-            e.instance:
-              ':item': instance
-              ':show-footer': 'false'
+            class: float-left w-25pc mr-l1
+            div: 
+              transition: 
+                name: fade
+                e.instance:
+                  v-if: instance
+                  ':item': instance
+                  ':show-footer': 'false'
+                  ':key': instance?._id
           h1:
             v-text: generator?.displayName
           .poem:
-            ':style': '{ marginLeft: ''32%'', width: ''68%'' }'
+            ':style': '{ marginLeft: ''27%'', width: ''fit-content'' }'
             content.poem.stanza:
               ':item': randomStanza
           .description:
@@ -177,11 +181,13 @@ template: >-
   path="-38884812.0"><ui-image class="hidden mb-l2" imageID="680118409"
   :aspect-ratio="3/1" path="-38884812.0.0"></ui-image><transition name="slide"
   :key="generator?._id" path="-38884812.0.1"><div v-if="generator"
-  path="-38884812.0.1.0"><div class="float-left mr-l1" :style="{ width: '30%' }"
-  path="-38884812.0.1.0.0"><e-instance :item="instance" :show-footer="false"
-  path="-38884812.0.1.0.0.0"></e-instance></div><h1
+  path="-38884812.0.1.0"><div class="float-left w-25pc mr-l1"
+  path="-38884812.0.1.0.0"><div path="-38884812.0.1.0.0.0"><transition
+  name="fade" path="-38884812.0.1.0.0.0.0"><e-instance v-if="instance"
+  :item="instance" :show-footer="false" :key="instance?._id"
+  path="-38884812.0.1.0.0.0.0.0"></e-instance></transition></div></div><h1
   v-text="generator?.displayName" path="-38884812.0.1.0.1"></h1><div
-  class="poem" :style="{ marginLeft: '32%', width: '68%' }"
+  class="poem" :style="{ marginLeft: '27%', width: 'fit-content' }"
   path="-38884812.0.1.0.2"><content-poem-stanza :item="randomStanza"
   path="-38884812.0.1.0.2.0"></content-poem-stanza></div><div
   class="description" v-if="generator?.desc?.article"

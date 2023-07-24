@@ -4,6 +4,7 @@ dom:
       ':style': getStyle()
       site.logo: null
     .h-menu:
+      v-if: 'false'
       ui.link:
         v-for: builder in $root.builders.mainMenu
         ':text': builder.name
@@ -56,6 +57,6 @@ style:
 template: >-
   <div class="comp-site-header header" path="2017999636."><div class="div1"
   :style="getStyle()" path="2017999636.0"><site-logo></site-logo></div><div
-  class="h-menu" path="2017999636.1"><ui-link v-for="builder in
+  class="h-menu" v-if="false" path="2017999636.1"><ui-link v-for="builder in
   $root.builders.mainMenu" :text="builder.name"
   :url="$root.url.builder(builder)" path="2017999636.1.0"></ui-link></div></div>

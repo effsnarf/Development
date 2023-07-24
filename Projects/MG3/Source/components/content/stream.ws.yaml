@@ -30,6 +30,7 @@ mounted: | #js
     this.processQueue();
     this.reset();
     document.addEventListener('scroll', this.onScroll.bind(this));
+    this.$watch(() => this.$root.params.url, this.clear.bind(this), { immediate: true });
   }
 methods:
   add: | #js
@@ -65,12 +66,12 @@ methods:
     }
   reset: | #js
     async function() {
-      this.pageIndex = 0;
-      this.items = [];
+      this.clear();
       await this.loadMore();
     }
   clear: | #js
     function() {
+      this.pageIndex = 0;
       this.items = [];
     }
   loadMore: | #js
