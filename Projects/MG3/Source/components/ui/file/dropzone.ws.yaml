@@ -3,8 +3,8 @@ dom:
     ref: dropArea1
     .upload-button:
       v-if: enabled
-      v-text: '''📤'''
-      title: 📤 upload
+      v-text: '''📤🖼️'''
+      title: 📤🖼️ upload image
       @click: onClickUpload
     input:
       class: hidden
@@ -76,15 +76,15 @@ style:
   .upload-button:
     position: absolute
     height: fit-content !important
-    bottom: 0%
-    left: 50%
+    bottom: 0
+    right: 0
     cursor: pointer
     z-index: 10
-    font-size: 1.5rem
+    font-size: 2rem
     filter: grayscale(1)
-    transform: translate(-50%, 0%)
     opacity: 0.6
   .upload-button:hover:
+    filter: none
     opacity: 1
   .file-dropzone:hover .upload-button:
     display: block
@@ -106,7 +106,7 @@ style:
 name: ui-file-dropzone
 template: >-
   <div class="comp-ui-file-dropzone file-dropzone" ref="dropArea1"
-  path="1956569459."><div class="upload-button" v-if="enabled" v-text="'📤'"
-  title="📤 upload" @click="onClickUpload" path="1956569459.0"></div><input
-  class="hidden" type="file" ref="fileInput" @change="onChangeFileInput"
-  path="1956569459.1"/><slot></slot></div>
+  path="1956569459."><div class="upload-button" v-if="enabled" v-text="'📤🖼️'"
+  title="📤🖼️ upload image" @click="onClickUpload"
+  path="1956569459.0"></div><input class="hidden" type="file" ref="fileInput"
+  @change="onChangeFileInput" path="1956569459.1"/><slot></slot></div>

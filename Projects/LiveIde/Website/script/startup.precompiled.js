@@ -171,9 +171,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "../../../../LiveIde/Website/script/1690030844121.ts":
+/***/ "../../../../LiveIde/Website/script/1690203559170.ts":
 /*!***********************************************************!*\
-  !*** ../../../../LiveIde/Website/script/1690030844121.ts ***!
+  !*** ../../../../LiveIde/Website/script/1690203559170.ts ***!
   \***********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -302,7 +302,10 @@ const helpers = {
     ideVueApp = new client.Vue({
         data: {
             // MemeGenerator
-            builders: {},
+            builders: {
+                all: {},
+                mainMenu: {},
+            },
             // General
             state: null,
             vm: vueManager,
@@ -332,7 +335,7 @@ const helpers = {
                 return __awaiter(this, void 0, void 0, function* () {
                     const self = this;
                     yield self.ensureBuilders();
-                    return self.builders[builderID];
+                    return self.builders.all[builderID];
                 });
             },
             ensureBuilders() {
@@ -341,7 +344,8 @@ const helpers = {
                     const self = this;
                     if (!((_a = self.builders) === null || _a === void 0 ? void 0 : _a.length)) {
                         const allBuilders = yield self.dbp.builders.select.all();
-                        self.builders = allBuilders.toMap((b) => b._id);
+                        self.builders.mainMenu = allBuilders.filter((b) => { var _a; return (_a = b.visible) === null || _a === void 0 ? void 0 : _a.mainMenu; });
+                        self.builders.all = allBuilders.toMap((b) => b._id);
                     }
                 });
             },
@@ -3559,7 +3563,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690030844121.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690203559170.ts");
 /******/ 	
 /******/ })()
 ;

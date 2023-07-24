@@ -5,7 +5,7 @@ dom:
       site.logo: null
     .h-menu:
       ui.link:
-        v-for: builder in $root.builders.filter(b => b.visible?.mainMenu)
+        v-for: builder in $root.builders.mainMenu
         ':text': builder.name
         ':url': $root.url.builder(builder)
 name: site-header
@@ -57,5 +57,5 @@ template: >-
   <div class="comp-site-header header" path="2017999636."><div class="div1"
   :style="getStyle()" path="2017999636.0"><site-logo></site-logo></div><div
   class="h-menu" path="2017999636.1"><ui-link v-for="builder in
-  $root.builders.filter(b =&gt; b.visible?.mainMenu)" :text="builder.name"
+  $root.builders.mainMenu" :text="builder.name"
   :url="$root.url.builder(builder)" path="2017999636.1.0"></ui-link></div></div>

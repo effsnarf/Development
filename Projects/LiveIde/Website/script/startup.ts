@@ -124,7 +124,10 @@ interface MgParams {
   ideVueApp = new client.Vue({
     data: {
       // MemeGenerator
-      builders: {} as any,
+      builders: {
+        all: {} as any,
+        mainMenu: {} as any,
+      },
       // General
       state: null as unknown as StateTracker,
       vm: vueManager,
@@ -152,13 +155,16 @@ interface MgParams {
       async getBuilder(builderID: number) {
         const self = this as any;
         await self.ensureBuilders();
-        return self.builders[builderID];
+        return self.builders.all[builderID];
       },
       async ensureBuilders() {
         const self = this as any;
         if (!self.builders?.length) {
           const allBuilders = await self.dbp.builders.select.all();
-          self.builders = allBuilders.toMap((b: any) => b._id);
+          self.builders.mainMenu = allBuilders.filter(
+            (b: any) => b.visible?.mainMenu
+          );
+          self.builders.all = allBuilders.toMap((b: any) => b._id);
         }
       },
       getBuilderComponentName(builder: any) {

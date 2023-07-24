@@ -1,22 +1,21 @@
 dom:
   div: 
     v-if: item
-    div: 
-      ':class': '{ sizeRef: true, clickable: editable }'
+    .text:
       ref: sizeRef1
-      .text:
-        ':class': getCssClass(item)
-        ':style': itemStyle
-        div: 
-          v-html: getItemText(item)
-          title: ✏️ edit
-          @click: onClickText
-        transition:
-          name: slide
-          ui.text.box:
-            v-if: showEditor
-            ':class': getCssClass(item)
-            v-model: item.text
+      ':class': getCssClass(item)
+      ':style': itemStyle
+      div: 
+        ':class': getTextContentClass(item)
+        v-html: getItemText(item)
+        title: ✏️ edit
+        @click: onClickText
+      transition:
+        name: slide
+        ui.text.box:
+          v-if: showEditor
+          ':class': getCssClass(item)
+          v-model: item.text
 name: e-template-caption-item
 props:
   item: null
@@ -35,7 +34,7 @@ methods:
   getItemText: | #js
     function (item) {
       let text = this.$root.textToHtml(item.text);
-      if (this.editable && item.editable) text = `✏️ ${text}`;
+      if (this.editable && item.editable) text = `${text||"[text]"}`;
       return text;
     }
   onClickText: | #js
@@ -63,8 +62,16 @@ methods:
   getCssClass: | #js
     function(item) {
       const cls = {};
+      cls.clickable = this.editable;
       cls[`h-${item.align.h}`] = true;
       cls[`v-${item.align.v}`] = true;
+      return cls;
+    }
+  getTextContentClass: | #js
+    function(item) {
+      const cls = {};
+      cls["text-content"] = true;
+      cls.empty = !item.text;
       return cls;
     }
   getStyle: | #js
@@ -84,12 +91,13 @@ methods:
       return style;
     }
   getFontSize: | #js
-    function (s) {
-      if (!s) return 0;
+    function (s, scale = 1) {
       if (!this.width) return 0;
-      let size = Math.min(3, Math.max(14, (36 - (s.length / 6))) / 50 *  this.width / 150);
-      size = size * 2.5;
+      const strLen = (s.length || 1);
+      let size = Math.min(3, Math.max(14, (36 - (strLen / 6))) / 50 *  this.width / 150);
+      size = size * 2;
       if (this.item.scale) size *= this.item.scale;
+      size = (size * scale);
       return `${size}vh`;
     }
 computed:
@@ -100,13 +108,7 @@ computed:
 style:
   input[type="text"]:
     font-size: 100%
-  .size-ref, .text:
-    width: 100%
-    object-fit: cover
-    position: relative
-    user-select: none
-  .size-ref:
-    height: fit-content
+    padding: 0 !important
   .h-left:
     text-align: left
   .h-center:
@@ -123,22 +125,37 @@ style:
   .v-bottom:
     bottom: 0
   .text:
+    width: 100%
+    object-fit: cover
+    line-height: 1em
+    user-select: none
+    position: absolute
     display: block
     overflow: hidden
     color: '#fff'
-    line-height: 1.2em
     font-family: Impact,Oswald
     '-webkit-font-smoothing': antialiased
     box-sizing: border-box
     padding: 0.3em
     filter: 'drop-shadow(-2px 4px 2px #00000080)'
     transition: 0s
+    pointer-events: all
+  .text-content.empty:
+    opacity: 0.4
+  .text-content:
+    filter: grayscale(1)
+  .text-content:hover:
+    filter: none
+  .text-content::after:
+    content: '''✏️'''
+    font-size: 60%
+    margin-left: 0.5em
 template: >-
   <div class="comp-e-template-caption-item" v-if="item" path="128142918."><div
-  :class="{ sizeRef: true, clickable: editable }" ref="sizeRef1"
-  path="128142918.0"><div class="text" :class="getCssClass(item)"
-  :style="itemStyle" path="128142918.0.0"><div v-html="getItemText(item)"
-  title="✏️ edit" @click="onClickText" path="128142918.0.0.0"></div><transition
-  name="slide" path="128142918.0.0.1"><ui-text-box v-if="showEditor"
-  :class="getCssClass(item)" v-model="item.text"
-  path="128142918.0.0.1.0"></ui-text-box></transition></div></div></div>
+  class="text" ref="sizeRef1" :class="getCssClass(item)" :style="itemStyle"
+  path="128142918.0"><div :class="getTextContentClass(item)"
+  v-html="getItemText(item)" title="✏️ edit" @click="onClickText"
+  path="128142918.0.0"></div><transition name="slide"
+  path="128142918.0.1"><ui-text-box v-if="showEditor" :class="getCssClass(item)"
+  v-model="item.text"
+  path="128142918.0.1.0"></ui-text-box></transition></div></div>

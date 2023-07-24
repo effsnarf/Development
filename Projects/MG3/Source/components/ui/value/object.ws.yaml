@@ -1,5 +1,6 @@
 dom:
   pre:
+    class: pre
     v-html: yaml
 props:
   value: null
@@ -9,9 +10,9 @@ computed:
       return this.$root.visualizedYaml(this.value);
     }
 style:
-  pre:
+  .pre:
     font-size: 100%
     max-height: 60vh
     overflow: auto
 name: ui-value-object
-template: <pre class="comp-ui-value-object" v-html="yaml" path="-1714629770."></pre>
+template: <pre class="comp-ui-value-object pre" v-html="yaml" path="-1714629770."></pre>

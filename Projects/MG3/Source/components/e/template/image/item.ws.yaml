@@ -22,6 +22,7 @@ dom:
     e.template.caption.item:
       v-if: item.caption
       ':item': item.caption
+      ':editable': editable
 props:
   item: null
   editable: false
@@ -115,5 +116,5 @@ template: >-
   :remove-background="item.removeBackground" @load="onImageLoad"
   @change="refresh"
   path="1623568049.1.0.0"></ui-image></ui-movable></ui-file-dropzone><e-template-caption-item
-  v-if="item.caption" :item="item.caption"
+  v-if="item.caption" :item="item.caption" :editable="editable"
   path="1623568049.2"></e-template-caption-item></div>

@@ -4,18 +4,20 @@ dom:
     ':columns': 2
     template:
       v-slot: article
-      ui.select:
-        ':options': builders
-        input-type: value
-        direction: horizontal
-        ':get-item-key': (item) => item._id
-        ':get-item-text': (item) => item.name
-        v-model: selectedBuilder
-      transition:
-        name: slide-large
-        keep.alive:
-          e.builder:
-            ':builder': selectedBuilder
+      .div1:
+        div:
+          ui.select:
+            ':options': builders
+            input-type: value
+            ':get-item-key': (item) => item._id
+            ':get-item-text': (item) => item.name
+            v-model: selectedBuilder
+        .width1:
+          transition:
+            name: slide-large
+            keep.alive:
+              e.builder:
+                ':builder': selectedBuilder
 props: null
 data:
   builders: []
@@ -26,13 +28,22 @@ mounted: | #js
   }
 computed: null
 watch: null
+style:
+  .article > .div1:
+    display: flex
+    gap: 1em
+  .width1:
+    width: 40em
+    margin: auto
 name: page-test
 template: >-
   <site class="comp-page-test" page-name="test" :columns="2"
-  path="838622353."><template v-slot:article path="838622353.0"><ui-select
-  :options="builders" input-type="value" direction="horizontal"
-  :get-item-key="(item) =&gt; item._id" :get-item-text="(item) =&gt; item.name"
-  v-model="selectedBuilder" path="838622353.0.0"></ui-select><transition
-  name="slide-large" path="838622353.0.1"><keep-alive
-  path="838622353.0.1.0"><e-builder :builder="selectedBuilder"
-  path="838622353.0.1.0.0"></e-builder></keep-alive></transition></template></site>
+  path="838622353."><template v-slot:article path="838622353.0"><div
+  class="div1" path="838622353.0.0"><div path="838622353.0.0.0"><ui-select
+  :options="builders" input-type="value" :get-item-key="(item) =&gt; item._id"
+  :get-item-text="(item) =&gt; item.name" v-model="selectedBuilder"
+  path="838622353.0.0.0.0"></ui-select></div><div class="width1"
+  path="838622353.0.0.1"><transition name="slide-large"
+  path="838622353.0.0.1.0"><keep-alive path="838622353.0.0.1.0.0"><e-builder
+  :builder="selectedBuilder"
+  path="838622353.0.0.1.0.0.0"></e-builder></keep-alive></transition></div></div></template></site>

@@ -103,6 +103,7 @@ methods:
     async function() {
       try
       {
+        debugger;
         let media = this.getMedia(this.temp);
         // Check that [title] is not empty
         if (media.content.items.some(item => item.caption?.text == '[title]'))
@@ -168,9 +169,9 @@ methods:
     }
   getStyle: | #js
     function() {
-      const columns = this.showTree ? [1, 4, 1.5] : this.editable ? [5, 1.5] : [1];
+      const columns = this.showTree ? ["1fr", "4fr", "1.5fr"] : this.editable ? ["1fr", "15em"] : ["1fr"];
       return {
-        gridTemplate: `1fr / ${columns.map(c => `${c}fr`).join(' ')}`
+        gridTemplate: `1fr / ${columns.map(c => `${c}`).join(' ')}`
       };
     }
   selectItem: | #js
@@ -224,6 +225,8 @@ computed:
   hasMoreThanOneImagePerGrid: | #js
     function() {
       if (!this.temp) return false;
+
+      if (this.temp.grid?.width == 1) return false;
 
       const checkNode = (node) => {
         if (node.type != 'grid') return false;
