@@ -317,16 +317,8 @@ api:
         const now = Date.now();
 
         let thread = null;
-
-        if (threadID)
-        {
-          thread = await db.findOne("Threads", { _id: threadID });
-        }
-        else
-        {
-          thread = await dbp.threads.create.one(threadMediaID);
-        }
-
+        thread = await dbp.threads.select.one(threadID, threadMediaID);
+        if (!thread) thread = await dbp.threads.create.one(threadMediaID);
         if (!thread) throw new Error("Provide either a threadID or a threadMediaID");
 
         if (!instance) instance = null;
