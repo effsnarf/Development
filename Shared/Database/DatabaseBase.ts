@@ -7,7 +7,7 @@ import { ProducerConsumer } from "../ProducerConsumer";
 abstract class DatabaseBase {
   protected static _mapCollectionName = "_Map";
 
-  private newIds = new ProducerConsumer(100, this._getNewIDs.bind(this));
+  private newIds = new ProducerConsumer(2, this._getNewIDs.bind(this));
 
   abstract get(key: any): Promise<any>;
 

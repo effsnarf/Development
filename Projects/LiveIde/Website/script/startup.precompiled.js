@@ -116,11 +116,16 @@ class DatabaseProxy {
                     mode: "no-cors",
                 };
                 const result = yield this.fetchJson(url, fetchOptions);
-                if (!result)
-                    throw new Error(`Api method returned null\n${url}\n${fetchOptions}`);
-                if (typeof result.json != "function")
-                    throw new Error(result);
-                return yield result.json();
+                // If we got an _id back, select the item
+                // This is because when POSTing from localhost I'm having trouble getting the actual object back
+                const _id = parseInt(result);
+                if (_id) {
+                    const idFieldName = `${entity
+                        .substring(0, entity.length - 1)
+                        .toLowerCase()}ID`;
+                    return yield this.callApiMethod(entity, "select", "one", [{ name: idFieldName, value: _id }], []);
+                }
+                return result;
             }
             const argsStr = args
                 .map((a) => `${a.name}=${JSON.stringify(a.value || null)}`)
@@ -176,9 +181,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "../../../../LiveIde/Website/script/1690254729687.ts":
+/***/ "../../../../LiveIde/Website/script/1690294302482.ts":
 /*!***********************************************************!*\
-  !*** ../../../../LiveIde/Website/script/1690254729687.ts ***!
+  !*** ../../../../LiveIde/Website/script/1690294302482.ts ***!
   \***********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -2313,8 +2318,8 @@ if (typeof Number !== "undefined") {
     Number.prototype.severify = function (green, yellow, direction, value) {
         if (value === undefined)
             value = this.valueOf();
-        const color = this.getSeverityColor(green, yellow, direction, true);
-        let s = this.toString().colorize(color);
+        const color = value.getSeverityColor(green, yellow, direction, true);
+        let s = value.toString().colorize(color);
         if (color == "bgRed")
             s = s.colorize("white");
         return s;
@@ -3599,7 +3604,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690254729687.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690294302482.ts");
 /******/ 	
 /******/ })()
 ;
