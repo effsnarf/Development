@@ -553,8 +553,8 @@ if (typeof Number !== "undefined") {
     value?: number
   ): string {
     if (value === undefined) value = this.valueOf();
-    const color = this.getSeverityColor(green, yellow, direction, true);
-    let s = this.toString().colorize(color);
+    const color = value.getSeverityColor(green, yellow, direction, true);
+    let s = value.toString().colorize(color);
     if (color == "bgRed") s = s.colorize("white");
     return s;
   };
