@@ -109,13 +109,18 @@ class DatabaseProxy {
             if (isHttpPost) {
                 const data = {};
                 args.forEach((a) => (data[a.name] = a.value));
-                const result = yield this.fetchJson(url, {
+                const fetchOptions = {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(data),
                     mode: "no-cors",
-                });
-                return yield (result === null || result === void 0 ? void 0 : result.json());
+                };
+                const result = yield this.fetchJson(url, fetchOptions);
+                if (!result)
+                    throw new Error(`Api method returned null\n${url}\n${fetchOptions}`);
+                if (typeof result.json != "function")
+                    throw new Error(result);
+                return yield result.json();
             }
             const argsStr = args
                 .map((a) => `${a.name}=${JSON.stringify(a.value || null)}`)
@@ -171,9 +176,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "../../../../LiveIde/Website/script/1690252339406.ts":
+/***/ "../../../../LiveIde/Website/script/1690254729687.ts":
 /*!***********************************************************!*\
-  !*** ../../../../LiveIde/Website/script/1690252339406.ts ***!
+  !*** ../../../../LiveIde/Website/script/1690254729687.ts ***!
   \***********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -3594,7 +3599,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690252339406.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690254729687.ts");
 /******/ 	
 /******/ })()
 ;

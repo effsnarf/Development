@@ -53,7 +53,7 @@ methods:
     async function() {
       const { generator, text0, text1 } = (this.tempInstance || {});
       const instance = !generator ? null : { generatorID: generator.generatorID, text0, text1 };
-      const post = await this.$root.dbp.posts.create.one(this.threadID, this.mediaID, this.text, { type: "instance", ...instance });
+      const post = await this.$root.dbp.posts.create.one(this.threadID, this.mediaID, this.text, instance);
       this.clear();
       this.$emit('created', post);
     }

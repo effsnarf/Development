@@ -106,6 +106,21 @@ class DatabaseProxy {
         mode: "no-cors",
       };
       const result = await this.fetchJson(url, fetchOptions);
+      // If we got an _id back, select the item
+      // This is because when POSTing from localhost I'm having trouble getting the actual object back
+      const _id = parseInt(result);
+      if (_id) {
+        const idFieldName = `${entity
+          .substring(0, entity.length - 1)
+          .toLowerCase()}ID`;
+        return await this.callApiMethod(
+          entity,
+          "select",
+          "one",
+          [{ name: idFieldName, value: _id }],
+          []
+        );
+      }
       return result;
     }
 
