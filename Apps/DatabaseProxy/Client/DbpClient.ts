@@ -106,10 +106,7 @@ class DatabaseProxy {
         mode: "no-cors",
       };
       const result = await this.fetchJson(url, fetchOptions);
-      if (!result)
-        throw new Error(`Api method returned null\n${url}\n${fetchOptions}`);
-      if (typeof result.json != "function") throw new Error(result);
-      return await result.json();
+      return result;
     }
 
     const argsStr = args
