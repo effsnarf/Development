@@ -8,7 +8,6 @@ dom:
     template: 
       v-slot: left
       div:
-        ':style': '{ marginTop: ''4em'' }'
         v-if: builder
         .text-center:
           h2:
@@ -89,9 +88,9 @@ template: >-
   <site class="comp-page-media" page-name="media"
   :content-not-found="contentNotFound" :columns="2" path="221009861."><template
   v-slot:article path="221009861.0"></template><template v-slot:left
-  path="221009861.1"><div :style="{ marginTop: '4em' }" v-if="builder"
-  path="221009861.1.0"><div class="text-center" path="221009861.1.0.0"><h2
-  v-text="builder.name" path="221009861.1.0.0.0"></h2><div class="mt-l1"
+  path="221009861.1"><div v-if="builder" path="221009861.1.0"><div
+  class="text-center" path="221009861.1.0.0"><h2 v-text="builder.name"
+  path="221009861.1.0.0.0"></h2><div class="mt-l1"
   path="221009861.1.0.0.1"><ui-link :text="'✏️ Create new'"
   :url="'/b/'+builder?.urlName"
   path="221009861.1.0.0.1.0"></ui-link></div></div></div></template><template

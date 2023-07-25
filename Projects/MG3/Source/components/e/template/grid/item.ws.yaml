@@ -115,6 +115,8 @@ style:
     width: 100%
   .items .item:
     background: '#ffffff20'
+  .grid-items-1 .text:
+    position: absolute
   .grid-items-3, .grid-items-6, .grid-items-9:
     grid-template: 1fr / 1fr 1fr 1fr
   .grid-items-4.items-2.rotation-1:

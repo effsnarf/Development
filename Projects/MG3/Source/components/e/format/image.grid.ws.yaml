@@ -1,12 +1,12 @@
 dom:
   div:
+    ':style': mediaStyle
     e.template.editor:
       ref: TemplateEditor1
-      ':builder': builder
+      ':builder': cBuilder
       ':temp': temp
       ':editable': editable
       ':show-property-editor': 'false'
-      ':style': tempStyle
       @media-created: onMediaCreated
       @cancel: $emit('cancel')
 props:
@@ -176,16 +176,21 @@ methods:
     async function (media) {
       this.initFromBuilder(this.builder);
     }
-  getTempStyle: | #js
-    function () {
+  getMediaStyle: | #js
+    function (builder) {
       const style = {};
-      if (this.builder?.source?.size?.max?.width) style['max-width'] = `${(parseInt(this.builder?.source?.size?.max?.width) + 15)}em`;
+      style.margin = "auto";
+      if (builder?.source?.size?.max?.width) style['max-width'] = `${(parseInt(builder?.source?.size?.max?.width) + (!this.editable ? 0 : 15))}em`;
       return style;
     }
 computed:
-  tempStyle: | #js
+  cBuilder: | #js
     function () {
-      return this.getTempStyle();
+      return this.builder || this.$root.builders.all[this.media?.builderID];
+    }
+  mediaStyle: | #js
+    function () {
+      return this.getMediaStyle(this.cBuilder);
     }
 watch:
   builder:
@@ -207,8 +212,8 @@ watch:
     immediate: true
 name: e-format-image-grid
 template: >-
-  <div class="comp-e-format-image-grid" path="-603568889."><e-template-editor
-  ref="TemplateEditor1" :builder="builder" :temp="temp" :editable="editable"
-  :show-property-editor="false" :style="tempStyle"
-  @media-created="onMediaCreated" @cancel="$emit('cancel')"
-  path="-603568889.0"></e-template-editor></div>
+  <div class="comp-e-format-image-grid" :style="mediaStyle"
+  path="-603568889."><e-template-editor ref="TemplateEditor1"
+  :builder="cBuilder" :temp="temp" :editable="editable"
+  :show-property-editor="false" @media-created="onMediaCreated"
+  @cancel="$emit('cancel')" path="-603568889.0"></e-template-editor></div>

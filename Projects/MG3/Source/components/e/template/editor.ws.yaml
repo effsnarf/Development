@@ -1,5 +1,5 @@
 dom:
-  div: 
+  .m-auto:
     v-if: temp
     ':class': getCssClass()
     .div1:
@@ -28,7 +28,7 @@ dom:
             ':text': '''✖️ cancel'''
             ':click': () => $emit('cancel')
           ui.button: 
-            ':text': '''✔️ Create'''
+            ':text': '''✔️ create'''
             ':click': createMedia
         div: 
           v-if: selectedItem && showPropertyEditor
@@ -103,7 +103,6 @@ methods:
     async function() {
       try
       {
-        debugger;
         let media = this.getMedia(this.temp);
         // Check that [title] is not empty
         if (media.content.items.some(item => item.caption?.text == '[title]'))
@@ -244,7 +243,6 @@ computed:
 watch:
   builder: | #js
     async function(builder) {
-      if (!builder) this.temp = null;
     }
 name: e-template-editor
 style:
@@ -306,7 +304,7 @@ style:
   .message.large-video:
     grid-template: 1fr / 1fr
 template: >-
-  <div class="comp-e-template-editor" v-if="temp" :class="getCssClass()"
+  <div class="comp-e-template-editor m-auto" v-if="temp" :class="getCssClass()"
   path="-650358312."><div class="div1" :style="getStyle()"
   path="-650358312.0"><div v-if="showTree" path="-650358312.0.0"><ui-tree
   :root="temp" :initial-expanded="2" item-type="e.template.item.icon"
@@ -320,7 +318,7 @@ template: >-
   class="flex justify-around mt-l2" v-if="editable"
   path="-650358312.0.1.2"><ui-button :text="'✖️ cancel'" :click="() =&gt;
   $emit('cancel')" path="-650358312.0.1.2.0"></ui-button><ui-button :text="'✔️
-  Create'" :click="createMedia" path="-650358312.0.1.2.1"></ui-button></div><div
+  create'" :click="createMedia" path="-650358312.0.1.2.1"></ui-button></div><div
   v-if="selectedItem &amp;&amp; showPropertyEditor"
   path="-650358312.0.1.3"><ui-section :title="selectedItem.type"
   v-model="showFilters" :opposite="true" path="-650358312.0.1.3.0"><transition

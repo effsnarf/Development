@@ -13,14 +13,12 @@ data:
   comments: []
 computed:
   topComments: | #js
-
     function() {
       return this.comments?.sortBy(c => -c.totalVotesScore).take(30);
     }
 watch:
   entityID:
     handler: | #js
-
       async function() {
         this.comments = await this.$root.dbp.comments.select.by(this.entityID);
       }

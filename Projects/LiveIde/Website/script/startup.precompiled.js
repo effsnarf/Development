@@ -171,9 +171,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "../../../../LiveIde/Website/script/1690207370704.ts":
+/***/ "../../../../LiveIde/Website/script/1690250427500.ts":
 /*!***********************************************************!*\
-  !*** ../../../../LiveIde/Website/script/1690207370704.ts ***!
+  !*** ../../../../LiveIde/Website/script/1690250427500.ts ***!
   \***********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -289,6 +289,23 @@ const helpers = {
             el.innerHTML = binding.value;
         },
     });
+    client.Vue.directive("dim", {
+        bind(el, binding) {
+            // Set the opacity to 0.4 if the value is true
+            if (binding.value) {
+                el.style.opacity = "0.4";
+            }
+        },
+        update(el, binding) {
+            // Update the opacity whenever the value changes
+            if (binding.value) {
+                el.style.opacity = "0.4";
+            }
+            else {
+                el.style.opacity = "";
+            }
+        },
+    });
     yield client.compileAll();
     let ideVueApp = null;
     const isLocalHost = window.location.hostname == "localhost";
@@ -331,6 +348,15 @@ const helpers = {
             });
         },
         methods: {
+            init() {
+                return __awaiter(this, void 0, void 0, function* () {
+                    const self = this;
+                    self.compsDic = client.comps.toMap((c) => c.name.hashCode());
+                    self.compNames = client.comps.map((c) => c.name);
+                    yield self.ensureBuilders();
+                    self.isAdmin = window.location.hostname == "localhost";
+                });
+            },
             getBuilder(builderID) {
                 return __awaiter(this, void 0, void 0, function* () {
                     const self = this;
@@ -353,14 +379,6 @@ const helpers = {
                 if (!builder)
                     return null;
                 return `e-format-${builder.format.replace(/\./g, "-")}`;
-            },
-            init() {
-                return __awaiter(this, void 0, void 0, function* () {
-                    const self = this;
-                    self.compsDic = client.comps.toMap((c) => c.name.hashCode());
-                    self.compNames = client.comps.map((c) => c.name);
-                    yield self.ensureBuilders();
-                });
             },
             getComponent(uidOrName) {
                 const uid = typeof uidOrName == "number" ? uidOrName : null;
@@ -391,6 +409,8 @@ const helpers = {
                 return !!self.compsDic[name.hashCode()];
             },
             getElementsFromViewNode(node) {
+                if (!node)
+                    return [];
                 return document.querySelectorAll(`[path="${node[1].path}"]`);
             },
             getViewChildNodes(node) {
@@ -700,6 +720,15 @@ const helpers = {
                         });
                         tryAgain();
                     }));
+                });
+            },
+            scrollIntoView(element) {
+                const elementRect = element.getBoundingClientRect();
+                const bodyRect = document.body.getBoundingClientRect();
+                const offset = elementRect.top - bodyRect.top;
+                window.scroll({
+                    top: offset - 200,
+                    behavior: "smooth",
                 });
             },
         },
@@ -3563,7 +3592,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690207370704.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690250427500.ts");
 /******/ 	
 /******/ })()
 ;

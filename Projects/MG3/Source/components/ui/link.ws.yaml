@@ -1,7 +1,7 @@
 dom:
   a:
     class: clickable2
-    ':target': 'targetBlank ? ''_blank'' : null'
+    ':target': target
     ':href': url
     @click: onClick
     div:
@@ -11,11 +11,12 @@ dom:
 props:
   text: null
   url: null
-  targetBlank: null
+  target: null
 methods:
   onClick: | #js
     function(e) {
       if (!this.url) return;
+      if (this.target) return;
       e.preventDefault();
       e.stopPropagation();
       this.$root.navigateTo(this.url);
@@ -23,6 +24,6 @@ methods:
 style: null
 name: ui-link
 template: >-
-  <a class="comp-ui-link clickable2" :target="targetBlank ? '_blank' : null"
-  :href="url" @click="onClick" path="-484387052."><div v-if="text" v-text="text"
+  <a class="comp-ui-link clickable2" :target="target" :href="url"
+  @click="onClick" path="-484387052."><div v-if="text" v-text="text"
   path="-484387052.0"></div><slot></slot></a>

@@ -1,0 +1,16 @@
+dom:
+  div:
+    e.post.create:
+      ':threadID': threadID
+      ':mediaID': mediaID
+      @created: $emit('created', $event)
+props:
+  mediaID: null
+  threadID: null
+data:
+  posts: null
+name: e-thread-teaser
+template: >-
+  <div class="comp-e-thread-teaser" path="-88604437."><e-post-create
+  :threadID="threadID" :mediaID="mediaID" @created="$emit('created', $event)"
+  path="-88604437.0"></e-post-create></div>

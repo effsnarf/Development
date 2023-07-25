@@ -1,0 +1,82 @@
+dom:
+  div:
+    ul:
+      li:
+        v-for: item in contentItems.filter(it => it.caption)
+        e.media.content.item.recaption:
+          ':item': item
+    .flex.justify-between.m-l2:
+      ui.button: 
+        v-if: $root.isAdmin
+        ':text': '''✖️ cancel'''
+        ':click': onCancel
+      ui.button: 
+        v-if: $root.isAdmin
+        ':text': '''✔️ create'''
+        ':click': create
+props:
+  media: null
+data:
+  originalMedia: null
+  contentItems: []
+  originalContentItems: []
+methods:
+  create: | #js
+    async function () {
+        let media = JSON.parse(JSON.stringify(this.media));
+        delete media._id;
+        const _uid = this.$root.getRandomUniqueID();
+        media._uid = _uid;
+        media = await this.$root.dbp.medias.create.one(media);
+        if (!media) media = await this.$root.dbp.medias.select.one(_uid);
+        this.$emit("created", media);
+        this.clear();
+    }
+  clear: | #js
+    function () {
+      for (const item of this.contentItems) {
+        if (item.caption) item.caption.text = this.findOriginalItem(item.id).caption.text;
+      }
+    }
+  onCancel: | #js
+    function () {
+      this.clear();
+      this.$emit('cancel');
+    }
+  getContentItems: | #js
+    function (item) {
+      if (!item?.items) return [];
+      const getChildren = (item) => {
+        return [...(item.items||[]), ...(item.items?.flatMap(getChildren)||[])];
+      }
+      return item.items.flatMap(getChildren);
+    }
+  findOriginalItem: | #js
+    function (id) {
+      return this.originalContentItems.find(it => it.id === id);
+    }
+computed: null
+watch:
+  media:
+    handler: | #js
+      function (media) {
+        this.originalMedia = JSON.parse(JSON.stringify(media));
+        this.contentItems = this.getContentItems(media?.content);
+        this.originalContentItems = this.getContentItems(this.originalMedia?.content);
+      }
+    immediate: true
+style:
+  .comp-e-media-recaption:
+    margin: auto
+    max-width: 20em
+name: e-media-recaption
+template: >-
+  <div class="comp-e-media-recaption" path="-2142476480."><ul
+  path="-2142476480.0"><li v-for="item in contentItems.filter(it =&gt;
+  it.caption)" path="-2142476480.0.0"><e-media-content-item-recaption
+  :item="item"
+  path="-2142476480.0.0.0"></e-media-content-item-recaption></li></ul><div
+  class="flex justify-between m-l2" path="-2142476480.1"><ui-button
+  v-if="$root.isAdmin" :text="'✖️ cancel'" :click="onCancel"
+  path="-2142476480.1.0"></ui-button><ui-button v-if="$root.isAdmin" :text="'✔️
+  create'" :click="create" path="-2142476480.1.1"></ui-button></div></div>

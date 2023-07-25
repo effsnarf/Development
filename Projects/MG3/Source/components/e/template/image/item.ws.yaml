@@ -4,7 +4,7 @@ dom:
       class: absolute-center
       v-show: isLoading
     ui.file.dropzone:
-      v-show: '!isLoading'
+      v-dim: isLoading
       ':enabled': editable
       @file-drop: onFileDrop(item, $event)
       ui.movable:
@@ -107,7 +107,7 @@ name: e-template-image-item
 template: >-
   <div class="comp-e-template-image-item" path="1623568049."><ui-loading
   class="absolute-center" v-show="isLoading"
-  path="1623568049.0"></ui-loading><ui-file-dropzone v-show="!isLoading"
+  path="1623568049.0"></ui-loading><ui-file-dropzone v-dim="isLoading"
   :enabled="editable" @file-drop="onFileDrop(item, $event)"
   path="1623568049.1"><ui-movable :enabled="editable" @drag-by="({ dx, dy })
   =&gt; onItemDragBy(item, { dx, dy })" @scale-by="(ds) =&gt;
