@@ -1,7 +1,9 @@
 dom:
   div:
     e.thread:
-      v-model: thread
+      ':threadID': threadID
+      ':mediaID': mediaID
+      ':teaser': 'true'
 props:
   mediaID: null
   threadID: null
@@ -32,6 +34,6 @@ methods:
     }
 name: e-thread-teaser
 template: >-
-  <div class="comp-e-thread-teaser" path="-88604437."><e-post-create
-  :threadID="threadID" :mediaID="mediaID" @created="$emit('created', $event)"
-  path="-88604437.0"></e-post-create></div>
+  <div class="comp-e-thread-teaser" path="-88604437."><e-thread
+  :threadID="threadID" :mediaID="mediaID" :teaser="true"
+  path="-88604437.0"></e-thread></div>

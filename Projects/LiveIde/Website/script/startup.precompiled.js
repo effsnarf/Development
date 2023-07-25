@@ -181,9 +181,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "../../../../LiveIde/Website/script/1690294302482.ts":
+/***/ "../../../../LiveIde/Website/script/1690301393312.ts":
 /*!***********************************************************!*\
-  !*** ../../../../LiveIde/Website/script/1690294302482.ts ***!
+  !*** ../../../../LiveIde/Website/script/1690301393312.ts ***!
   \***********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -252,13 +252,12 @@ const helpers = {
             return helpers.url.full(`/instance/${instance.instanceID}`, full);
         },
         itemImage: (item) => {
-            var _a;
             if (!item)
                 return null;
             if ("text0" in item)
                 return `https://img.memegenerator.net/instances/600x600/${item._id}.jpg`;
             if (item.builderID)
-                return helpers.url.image((_a = item.content.items.find((item) => item.imageID)) === null || _a === void 0 ? void 0 : _a.imageID);
+                return null;
             console.log(item);
             throw new Error("Unknown item type");
         },
@@ -313,6 +312,26 @@ const helpers = {
             }
             else {
                 el.style.opacity = "";
+            }
+        },
+    });
+    client.Vue.directive("disable", {
+        bind(el, binding) {
+            // Set the opacity to 0.4 if the value is true
+            if (binding.value) {
+                el.style.filter = "grayscale(1) contrast(0.8) brightness(0.8)";
+                el.style.pointerEvents = "none";
+            }
+        },
+        update(el, binding) {
+            // Update the opacity whenever the value changes
+            if (binding.value) {
+                el.style.filter = "grayscale(1) contrast(0.8) brightness(0.8)";
+                el.style.pointerEvents = "none";
+            }
+            else {
+                el.style.filter = "";
+                el.style.pointerEvents = "";
             }
         },
     });
@@ -715,6 +734,13 @@ const helpers = {
             },
             wait(condition, timeout = 10000) {
                 return __awaiter(this, void 0, void 0, function* () {
+                    // If no condition is provided, just wait the timeout
+                    if (typeof condition == "number") {
+                        return new Promise((resolve, reject) => {
+                            setTimeout(resolve, condition);
+                        });
+                    }
+                    // Wait for a condition to be true
                     const startedAt = Date.now();
                     const tryInterval = 100;
                     return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
@@ -3604,7 +3630,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690294302482.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690301393312.ts");
 /******/ 	
 /******/ })()
 ;

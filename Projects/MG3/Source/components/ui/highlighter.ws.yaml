@@ -16,11 +16,11 @@ methods:
     }
   onMouseEnter: | #js
     function() {
-      this.getElementsArray().forEach(el => el.classList.add("highlighted"));
+      this.getElementsArray().forEach(el => el.classList?.add("highlighted"));
     }
   onMouseLeave: | #js
     function() {
-      this.getElementsArray().forEach(el => el.classList.remove("highlighted"));
+      this.getElementsArray().forEach(el => el.classList?.remove("highlighted"));
     }
 name: ui-highlighter
 template: >-

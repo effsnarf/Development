@@ -7,29 +7,21 @@ dom:
       v-slot: article
     template: 
       v-slot: left
-      div:
-        v-if: builder
-        .text-center:
-          h2:
-            v-text: builder.name
-          .mt-l1:
-            ui.link:
-              ':text': '''✏️ Create new'''
-              ':url': '''/b/''+builder?.urlName'
+      div: 
+        e.media.menu:
+          ':media': media
     template: 
       v-slot: middle
-      transition:
-        name: slide-large
-        e.media:
-          v-if: media
-          ':key': media._id
-          ':item': media
-      .mt-l4:
-        content.stream:
-          ref: contentStream1
-          item-type: e.media
-          ':get-more-items': getMoreMedias
-          grid-class: grid-1
+      .flex.gap-2:
+        transition:
+          name: slide-large
+          e.media:
+            v-if: media
+            ':key': media._id
+            ':item': media
+        div: 
+          e.thread:
+            ':mediaID': media?._id
 data:
   media: null
   temp: null
@@ -88,15 +80,11 @@ template: >-
   <site class="comp-page-media" page-name="media"
   :content-not-found="contentNotFound" :columns="2" path="221009861."><template
   v-slot:article path="221009861.0"></template><template v-slot:left
-  path="221009861.1"><div v-if="builder" path="221009861.1.0"><div
-  class="text-center" path="221009861.1.0.0"><h2 v-text="builder.name"
-  path="221009861.1.0.0.0"></h2><div class="mt-l1"
-  path="221009861.1.0.0.1"><ui-link :text="'✏️ Create new'"
-  :url="'/b/'+builder?.urlName"
-  path="221009861.1.0.0.1.0"></ui-link></div></div></div></template><template
-  v-slot:middle path="221009861.2"><transition name="slide-large"
-  path="221009861.2.0"><e-media v-if="media" :key="media._id" :item="media"
-  path="221009861.2.0.0"></e-media></transition><div class="mt-l4"
-  path="221009861.2.1"><content-stream ref="contentStream1" item-type="e.media"
-  :get-more-items="getMoreMedias" grid-class="grid-1"
-  path="221009861.2.1.0"></content-stream></div></template></site>
+  path="221009861.1"><div path="221009861.1.0"><e-media-menu :media="media"
+  path="221009861.1.0.0"></e-media-menu></div></template><template v-slot:middle
+  path="221009861.2"><div class="flex gap-2" path="221009861.2.0"><transition
+  name="slide-large" path="221009861.2.0.0"><e-media v-if="media"
+  :key="media._id" :item="media"
+  path="221009861.2.0.0.0"></e-media></transition><div
+  path="221009861.2.0.1"><e-thread :mediaID="media?._id"
+  path="221009861.2.0.1.0"></e-thread></div></div></template></site>

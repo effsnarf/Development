@@ -51,10 +51,7 @@ const helpers = {
       if (!item) return null;
       if ("text0" in item)
         return `https://img.memegenerator.net/instances/600x600/${item._id}.jpg`;
-      if (item.builderID)
-        return helpers.url.image(
-          item.content.items.find((item: any) => item.imageID)?.imageID
-        );
+      if (item.builderID) return null;
       console.log(item);
       throw new Error("Unknown item type");
     },
@@ -113,6 +110,26 @@ interface MgParams {
         el.style.opacity = "0.4";
       } else {
         el.style.opacity = "";
+      }
+    },
+  });
+
+  client.Vue.directive("disable", {
+    bind(el: HTMLElement, binding: any) {
+      // Set the opacity to 0.4 if the value is true
+      if (binding.value) {
+        el.style.filter = "grayscale(1) contrast(0.8) brightness(0.8)";
+        el.style.pointerEvents = "none";
+      }
+    },
+    update(el: HTMLElement, binding: any) {
+      // Update the opacity whenever the value changes
+      if (binding.value) {
+        el.style.filter = "grayscale(1) contrast(0.8) brightness(0.8)";
+        el.style.pointerEvents = "none";
+      } else {
+        el.style.filter = "";
+        el.style.pointerEvents = "";
       }
     },
   });
@@ -497,6 +514,13 @@ interface MgParams {
         );
       },
       async wait(condition: () => boolean, timeout = 10000) {
+        // If no condition is provided, just wait the timeout
+        if (typeof condition == "number") {
+          return new Promise((resolve: any, reject: any) => {
+            setTimeout(resolve, condition as number);
+          });
+        }
+        // Wait for a condition to be true
         const startedAt = Date.now();
         const tryInterval = 100;
         return new Promise(async (resolve: any, reject: any) => {

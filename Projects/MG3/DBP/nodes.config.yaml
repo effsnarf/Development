@@ -307,7 +307,7 @@ api:
         threads = await Promise.all(threads.map(async t => await dbp.threads.select.one(t._id)));
         return threads;
     Posts.create.one:
-      args: [threadID, mediaID, text, instance]
+      args: [threadID, mediaID, text, instance, media]
       code: | #js
         const now = Date.now();
 
