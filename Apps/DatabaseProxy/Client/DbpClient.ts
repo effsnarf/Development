@@ -99,13 +99,16 @@ class DatabaseProxy {
     if (isHttpPost) {
       const data = {} as any;
       args.forEach((a) => (data[a.name] = a.value));
-      const result = await this.fetchJson(url, {
+      const fetchOptions = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
         mode: "no-cors",
-      });
-      return await result?.json();
+      };
+      const result = await this.fetchJson(url, fetchOptions);
+      if (!result)
+        throw new Error(`Api method returned null\n${url}\n${fetchOptions}`);
+      return await result.json();
     }
 
     const argsStr = args
