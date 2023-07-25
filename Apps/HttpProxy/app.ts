@@ -152,6 +152,8 @@ class TaskManager {
 
     const targetUrl = `${config.target.base.urls[nodeIndex]}${task.url}`;
 
+    debugLogger.log(targetUrl, task.options);
+
     task.log.push(
       `Attempt ${task.attempt + 1} of ${config.target.try.again.retries}`
     );
@@ -264,7 +266,7 @@ class TaskManager {
 
       if (isHttpPost) {
         tasks.remove(task, true);
-        const responseData = await Http.getResponseStream(nodeResponse.data);
+        const responseData = await Http.getResponseStream(nodeResponse);
         return res.end(responseData);
       }
 
@@ -353,6 +355,8 @@ class TaskManager {
 
       return;
     } catch (ex: any) {
+      debugLogger.log(task.url, ex.stack);
+
       // Some HTTP status codes are not errors (304 not modified, 404 not found, etc.)
       const targetIsDown = !ex.response || ex.message.includes("ECONNREFUSED");
 
