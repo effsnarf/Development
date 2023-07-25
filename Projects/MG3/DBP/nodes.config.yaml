@@ -324,12 +324,12 @@ api:
         {
           thread = await db.findOne("Threads", { _id: threadID });
         }
-        else if (mediaID)
+        else
         {
           thread = await dbp.threads.create.one(threadMediaID);
         }
 
-        if (!thread) throw new Error("Provide either a threadID or a mediaID");
+        if (!thread) throw new Error("Provide either a threadID or a threadMediaID");
 
         if (!instance) instance = null;
         if (instance)
