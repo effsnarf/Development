@@ -1,53 +1,110 @@
 dom:
-  div:
-    v-if: thread
-    h3:
-      v-text: thread.title
-    transition.group:
-      tag: ul
-      name: list
-      li:
-        v-for: post in [...thread.posts,null]
-        ':key': post?._id||0
-        e.post:
-          v-if: post
-          ':item': post
-          @refresh-thread: refresh
-        e.post.create:
-          v-else-if: '!post'
-          ':threadID': thread?._id
-          @created: refresh
+  div: 
+    div: 
+      v-if: thread
+      h3:
+        v-text: thread.title
+      transition.group:
+        tag: ul
+        name: list
+        li:
+          v-for: (post, index) in visiblePosts
+          ':key': post?._id||0
+          e.post:
+            ':item': post
+            @refresh-thread: refresh
+          .text-center.opacity-30:
+            v-if: getHiddenPostsCount(index)
+            v-text: '''('' + getHiddenPostsCount(index) + '' posts…)'''
+    transition:
+      name: slide
+      ui.loading:
+        v-if: isLoading
+    e.post.create:
+      ':threadID': threadID
+      ':mediaID': mediaID
+      @created: refresh
+    .mt-l2:
+      ui.button:
+        v-if: $root.isAdmin
+        ':text': '''♻ refresh'''
+        ':click': refresh
 props:
-  value: null
+  threadID: null
+  mediaID: null
+  teaser: false
 data:
   thread: null
+  isLoading: false
+mounted: | #js
+  async function() {
+    this.$root.$on("thread-updated", this.refresh.bind(this));
+    this.refresh();
+  }
 methods:
   refresh: | #js
-    async function() {
-      const updatedThread = await this.$root.dbp.threads.select.one(this.thread._id);
-      // Thread was deleted
-      if (!updatedThread) return this.$root.navigateTo('/');
-      this.$emit('input', updatedThread);
+    async function(threadID) {
+      if (threadID && (threadID != this.thread?._id)) return;
+      this.isLoading = true;
+      try
+      {
+        this.thread = await this.$root.dbp.threads.select.one(this.threadID, this.mediaID);
+      }
+      finally
+      {
+        this.isLoading = false;
+      }
+    }
+  getHiddenPostsCount: | #js
+    function(index) {
+      const post = this.visiblePosts[index];
+      const nextPost = this.visiblePosts[index + 1];
+      if (!post || !nextPost) return null;
+      return (nextPost.index - post.index - 1);
+    }
+computed:
+  visiblePosts: | #js
+    function() {
+      if (!this.thread) return [];
+      if (!this.teaser) return this.thread.posts;
+      // Thread teaser
+      let vPosts = [];
+      // Take the first two and the last two posts
+      vPosts.push(...this.thread.posts.slice(0, 2));
+      vPosts.push(...this.thread.posts.slice(-2));
+      // Make sure there are no duplicates
+      vPosts = vPosts.filter((post, index, self) => self.findIndex(p => p._id === post._id) === index);
+      // Return
+      return vPosts;
     }
 watch:
-  value: | #js
-    {
-      handler: function(newValue) {
-        this.thread = newValue;
-      },
-      immediate: true
+  threadID: | #js
+    async function(threadID) {
+      this.refresh();
+    }
+  mediaID: | #js
+    async function(mediaID) {
+      this.refresh();
     }
 style:
   ul:
     margin: auto
   li:
-    margin-bottom: 2vh
+    margin-bottom: 1vh
 name: e-thread
 template: >-
-  <div class="comp-e-thread" v-if="thread" path="1226205107."><h3
-  v-text="thread.title" path="1226205107.0"></h3><transition-group tag="ul"
-  name="list" path="1226205107.1"><li v-for="post in [...thread.posts,null]"
-  :key="post?._id||0" path="1226205107.1.0"><e-post v-if="post" :item="post"
-  @refresh-thread="refresh" path="1226205107.1.0.0"></e-post><e-post-create
-  v-else-if="!post" :threadID="thread?._id" @created="refresh"
-  path="1226205107.1.0.1"></e-post-create></li></transition-group></div>
+  <div class="comp-e-thread" path="1226205107."><div v-if="thread"
+  path="1226205107.0"><h3 v-text="thread.title"
+  path="1226205107.0.0"></h3><transition-group tag="ul" name="list"
+  path="1226205107.0.1"><li v-for="(post, index) in visiblePosts"
+  :key="post?._id||0" path="1226205107.0.1.0"><e-post :item="post"
+  @refresh-thread="refresh" path="1226205107.0.1.0.0"></e-post><div
+  class="text-center opacity-30" v-if="getHiddenPostsCount(index)" v-text="'(' +
+  getHiddenPostsCount(index) + ' posts…)'"
+  path="1226205107.0.1.0.1"></div></li></transition-group></div><transition
+  name="slide" path="1226205107.1"><ui-loading v-if="isLoading"
+  path="1226205107.1.0"></ui-loading></transition><e-post-create
+  :threadID="threadID" :mediaID="mediaID" @created="refresh"
+  path="1226205107.2"></e-post-create><div class="mt-l2"
+  path="1226205107.3"><ui-button v-if="$root.isAdmin" :text="'♻ refresh'"
+  :click="refresh" path="1226205107.3.0"></ui-button></div></div>

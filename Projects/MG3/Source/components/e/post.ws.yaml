@@ -1,6 +1,6 @@
 dom:
-  div: 
-    ':class': '{ post: true, enlarged }'
+  .post:
+    ':class': '{ enlarged }'
     .post-media:
       v-if: item.instance
       e.instance:
@@ -27,6 +27,11 @@ methods:
       this.enlarged = !this.enlarged;
     }
 style:
+  .comp-e-post-menu:
+    max-height: 0
+    overflow: hidden
+  .post:hover .comp-e-post-menu:
+    max-height: 5em
   .post:
     background: '#ffffff20'
     border: 2px solid gray
@@ -62,7 +67,7 @@ style:
   .comp-e-instance .footer:
     display: none
   .post-text:
-    padding: 1rem
+    padding: 0.5rem
     opacity: 0.9
   .enlarged .post-media:
     width: 100%
@@ -73,13 +78,12 @@ style:
     color: '#35c735'
 name: e-post
 template: >-
-  <div class="comp-e-post" :class="{ post: true, enlarged }"
-  path="-1357494135."><div class="post-media" v-if="item.instance"
-  @click="onInstanceClick" path="-1357494135.0"><e-instance
-  :item="item.instance" path="-1357494135.0.0"></e-instance></div><div
-  class="post-text" path="-1357494135.1"><e-generator-square
-  class="larping-generator" :value="item.larpGenerator"
-  path="-1357494135.1.0"></e-generator-square><div
+  <div class="comp-e-post post" :class="{ enlarged }" path="-1357494135."><div
+  class="post-media" v-if="item.instance" @click="onInstanceClick"
+  path="-1357494135.0"><e-instance :item="item.instance"
+  path="-1357494135.0.0"></e-instance></div><div class="post-text"
+  path="-1357494135.1"><e-generator-square class="larping-generator"
+  :value="item.larpGenerator" path="-1357494135.1.0"></e-generator-square><div
   v-html="$root.textToHtml(item.text)" path="-1357494135.1.1"></div></div><div
   class="clear-both" path="-1357494135.2"></div><e-post-menu :item="item"
   @refresh-thread="$emit('refresh-thread')"

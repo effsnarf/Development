@@ -1,5 +1,6 @@
 dom:
   .container:
+    v-disable: isLoading
     div: 
       transition: 
         name: slide
@@ -51,11 +52,19 @@ mounted: | #js
 methods:
   post: | #js
     async function() {
-      const { generator, text0, text1 } = (this.tempInstance || {});
-      const instance = !generator ? null : { generatorID: generator.generatorID, text0, text1 };
-      const post = await this.$root.dbp.posts.create.one(this.threadID, this.mediaID, this.text, instance);
-      this.clear();
-      this.$emit('created', post);
+      this.isLoading = true;
+      try
+      {
+        const { generator, text0, text1 } = (this.tempInstance || {});
+        const instance = !generator ? null : { generatorID: generator.generatorID, text0, text1 };
+        const post = await this.$root.dbp.posts.create.one(this.threadID, this.mediaID, this.text, instance);
+        this.$emit('created', post);
+        this.clear();
+      }
+      finally
+      {
+        this.isLoading = false;
+      }
     }
   clear: | #js
     function() {
@@ -106,8 +115,8 @@ config:
     state: true
 name: e-post-create
 template: >-
-  <div class="comp-e-post-create container" path="1762525697."><div
-  path="1762525697.0"><transition name="slide"
+  <div class="comp-e-post-create container" v-disable="isLoading"
+  path="1762525697."><div path="1762525697.0"><transition name="slide"
   path="1762525697.0.0"><e-instance-create v-if="showInstanceCreate"
   ref="createInstance1" layout="horizontal" :show-create-button="false"
   v-model="tempInstance" :generator="generator" @has-content="hasInstanceContent

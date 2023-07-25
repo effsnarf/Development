@@ -296,7 +296,7 @@ api:
         threads = await Promise.all(threads.map(async t => await dbp.threads.select.one(t._id)));
         return threads;
     Posts.create.one:
-      args: [threadID, mediaID, text, instance]
+      args: [threadID, mediaID, text, instance, media]
       code: | #js
         const now = Date.now();
 
@@ -327,21 +327,11 @@ api:
           instance._id = instance.instanceID;
         }
 
-        let larpGenerator = (!larpGeneratorID) ? null : await db.findOne("Generators", { _id: larpGeneratorID });
-        if (larpGenerator)
-        {
-          larpGenerator = {
-            _id: larpGenerator._id,
-            DisplayName: larpGenerator.displayName,
-            UrlName: larpGenerator.urlName,
-            ImageID: larpGenerator.imageID,
-          };
-        }
-
         let post = {
           ThreadID: thread._id,
           LarpGenerator: larpGenerator,
           Text: text,
+          Media: media,
           Instance: instance,
           Created: now,
         };

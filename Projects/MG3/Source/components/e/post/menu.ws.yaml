@@ -4,6 +4,7 @@ dom:
       ui.time:
         ':value': item.created
     .post-menu:
+      v-if: $root.isAdmin
       ui.button:
         text: ❌
         ':click': onDelete
@@ -26,5 +27,5 @@ template: >-
   <div class="comp-e-post-menu" path="404353956."><div class="center"
   path="404353956.0"><ui-time :value="item.created"
   path="404353956.0.0"></ui-time></div><div class="post-menu"
-  path="404353956.1"><ui-button text="❌" :click="onDelete"
+  v-if="$root.isAdmin" path="404353956.1"><ui-button text="❌" :click="onDelete"
   path="404353956.1.0"></ui-button></div></div>

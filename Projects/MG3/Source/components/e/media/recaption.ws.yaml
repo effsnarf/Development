@@ -5,6 +5,11 @@ dom:
         v-for: item in contentItems.filter(it => it.caption)
         e.media.content.item.recaption:
           ':item': item
+    ui.select:
+      ':options': '[''✨ start new thread'', ''➕ reply in thread'']'
+      type: dropdown
+      input-type: index
+      v-model: replyInThread
     .flex.justify-between.m-l2:
       ui.button: 
         v-if: $root.isAdmin
@@ -20,15 +25,23 @@ data:
   originalMedia: null
   contentItems: []
   originalContentItems: []
+  replyInThread: 1
 methods:
   create: | #js
     async function () {
+        const threadMediaID = (!this.replyInThread ? null : media._id);
         let media = JSON.parse(JSON.stringify(this.media));
         delete media._id;
         const _uid = this.$root.getRandomUniqueID();
         media._uid = _uid;
-        media = await this.$root.dbp.medias.create.one(media);
+        media = await this.$root.dbp.medias.create.one(media, threadMediaID);
         if (!media) media = await this.$root.dbp.medias.select.one(_uid);
+        // Also create a post
+        if (threadMediaID)
+        {
+          const post = await this.$root.dbp.posts.create.one(null, threadMediaID, null, null, media);
+        }
+        this.$root.$emit("thread-updated", threadMediaID);
         this.$emit("created", media);
         this.clear();
     }
@@ -75,8 +88,11 @@ template: >-
   path="-2142476480.0"><li v-for="item in contentItems.filter(it =&gt;
   it.caption)" path="-2142476480.0.0"><e-media-content-item-recaption
   :item="item"
-  path="-2142476480.0.0.0"></e-media-content-item-recaption></li></ul><div
-  class="flex justify-between m-l2" path="-2142476480.1"><ui-button
-  v-if="$root.isAdmin" :text="'✖️ cancel'" :click="onCancel"
-  path="-2142476480.1.0"></ui-button><ui-button v-if="$root.isAdmin" :text="'✔️
-  create'" :click="create" path="-2142476480.1.1"></ui-button></div></div>
+  path="-2142476480.0.0.0"></e-media-content-item-recaption></li></ul><ui-select
+  :options="['✨ start new thread', '➕ reply in thread']" type="dropdown"
+  input-type="index" v-model="replyInThread"
+  path="-2142476480.1"></ui-select><div class="flex justify-between m-l2"
+  path="-2142476480.2"><ui-button v-if="$root.isAdmin" :text="'✖️ cancel'"
+  :click="onCancel" path="-2142476480.2.0"></ui-button><ui-button
+  v-if="$root.isAdmin" :text="'✔️ create'" :click="create"
+  path="-2142476480.2.1"></ui-button></div></div>

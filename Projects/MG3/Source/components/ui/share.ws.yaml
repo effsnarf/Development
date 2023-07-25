@@ -1,16 +1,21 @@
 dom:
-  .a2a_kit.a2a_kit_size_32.a2a_default_style:
-    ':data-a2a-url': url
-    ':data-a2a-title': imageUrl
-    a: 
-      class: a2a_dd
-      href: https://www.addtoany.com/share
-    a: 
-      class: a2a_button_facebook
-    a: 
-      class: a2a_button_twitter
-    a: 
-      class: a2a_button_email
+  .flex.justify-around:
+    .a2a_kit.a2a_kit_size_32.a2a_default_style:
+      ':data-a2a-url': url
+      ':data-a2a-title': imageUrl
+      a: 
+        class: a2a_dd
+        href: https://www.addtoany.com/share
+      a: 
+        class: a2a_button_facebook
+      a: 
+        class: a2a_button_twitter
+      a: 
+        class: a2a_button_email
+      ui.link:
+        ':url': url
+        ':text': '''🔗'''
+        ':target': '''_blank'''
 props:
   item: null
 mounted: | #js
@@ -31,12 +36,18 @@ computed:
     function() {
       return this.$root.url.itemImage(this.item);
     }
+style:
+  .comp-ui-link:
+    position: relative
+    top: 0.25em
+    font-size: 160%
 name: ui-share
 template: >-
-  <div class="comp-ui-share a2a_kit a2a_kit_size_32 a2a_default_style"
-  :data-a2a-url="url" :data-a2a-title="imageUrl" path="-2124674043."><a
-  class="a2a_dd" href="https://www.addtoany.com/share"
-  path="-2124674043.0"></a><a class="a2a_button_facebook"
-  path="-2124674043.1"></a><a class="a2a_button_twitter"
-  path="-2124674043.2"></a><a class="a2a_button_email"
-  path="-2124674043.3"></a></div>
+  <div class="comp-ui-share flex justify-around" path="-2124674043."><div
+  class="a2a_kit a2a_kit_size_32 a2a_default_style" :data-a2a-url="url"
+  :data-a2a-title="imageUrl" path="-2124674043.0"><a class="a2a_dd"
+  href="https://www.addtoany.com/share" path="-2124674043.0.0"></a><a
+  class="a2a_button_facebook" path="-2124674043.0.1"></a><a
+  class="a2a_button_twitter" path="-2124674043.0.2"></a><a
+  class="a2a_button_email" path="-2124674043.0.3"></a><ui-link :url="url"
+  :text="'🔗'" :target="'_blank'" path="-2124674043.0.4"></ui-link></div></div>
