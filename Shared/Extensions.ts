@@ -255,7 +255,12 @@ interface String {
   pluralize(): string;
   antonym(): string;
 
-  severify(green: number, yellow: number, direction: "<" | ">"): string;
+  severify(
+    green: number,
+    yellow: number,
+    direction: "<" | ">",
+    value?: number
+  ): string;
   severifyByHttpStatus(statusCode?: number, bgRed?: boolean): string;
   deunitify(): number;
 
@@ -544,8 +549,10 @@ if (typeof Number !== "undefined") {
   Number.prototype.severify = function (
     green: number,
     yellow: number,
-    direction: "<" | ">"
+    direction: "<" | ">",
+    value?: number
   ): string {
+    if (value === undefined) value = this.valueOf();
     const color = this.getSeverityColor(green, yellow, direction, true);
     let s = this.toString().colorize(color);
     if (color == "bgRed") s = s.colorize("white");
