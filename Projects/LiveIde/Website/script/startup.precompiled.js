@@ -171,9 +171,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "../../../../LiveIde/Website/script/1690250427500.ts":
+/***/ "../../../../LiveIde/Website/script/1690252339406.ts":
 /*!***********************************************************!*\
-  !*** ../../../../LiveIde/Website/script/1690250427500.ts ***!
+  !*** ../../../../LiveIde/Website/script/1690252339406.ts ***!
   \***********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -2305,7 +2305,9 @@ if (typeof Number !== "undefined") {
             s = s.colorize(value.getSeverityColor(severifyArgs[0], severifyArgs[1], severifyArgs[2]));
         return s;
     };
-    Number.prototype.severify = function (green, yellow, direction) {
+    Number.prototype.severify = function (green, yellow, direction, value) {
+        if (value === undefined)
+            value = this.valueOf();
         const color = this.getSeverityColor(green, yellow, direction, true);
         let s = this.toString().colorize(color);
         if (color == "bgRed")
@@ -3592,7 +3594,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690250427500.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690252339406.ts");
 /******/ 	
 /******/ })()
 ;
