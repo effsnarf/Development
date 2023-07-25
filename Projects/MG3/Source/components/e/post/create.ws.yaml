@@ -27,6 +27,7 @@ dom:
         e.comment.create:
           v-if: showCommentCreate
           v-model: text
+          ':new-thread': 'false'
     transition: 
       name: slide
       ui.button:
@@ -36,7 +37,7 @@ dom:
 props:
   threadID: null
   generator: null
-  entityID: null
+  mediaID: null
 data:
   larpGenerator: null
   tempInstance: null
@@ -52,14 +53,8 @@ methods:
     async function() {
       const { generator, text0, text1 } = (this.tempInstance || {});
       const instance = !generator ? null : { generatorID: generator.generatorID, text0, text1 };
-      const post = await this.$root.dbp.posts.create.one(this.threadID, this.text, { type: "instance", ...instance });
+      const post = await this.$root.dbp.posts.create.one(this.threadID, this.mediaID, this.text, { type: "instance", ...instance });
       this.clear();
-      // New thread
-      if (!this.threadID)
-      {
-        this.$root.navigateTo(post);
-        return;
-      }
       this.$emit('created', post);
     }
   clear: | #js
@@ -71,13 +66,12 @@ watch:
   tempInstance: | #js
     function() {
     }
-  threadID: | #js
-    {
-      handler: function() {
+  threadID:
+    handler: | #js
+      function() {
         //this.showInstanceCreate = !this.threadID;
-      },
-      immediate: true
-    }
+      }
+    immediate: true
 computed:
   showInstanceCreate: | #js
     function() {
@@ -103,12 +97,8 @@ computed:
     }
 style:
   .container:
-    display: flex
-    flex-direction: column
-    align-items: center
     max-width: 25em
     margin: auto
-    gap: 1em
   h3:
     text-align: center
 config:
@@ -129,7 +119,7 @@ template: >-
   :allow-anonymous="true" @input="showLarpGeneratorSelect = false;"
   path="1762525697.1.0.1"></e-generator-select></div></transition><transition
   name="slide" path="1762525697.2"><div path="1762525697.2.0"><e-comment-create
-  v-if="showCommentCreate" v-model="text"
+  v-if="showCommentCreate" v-model="text" :new-thread="false"
   path="1762525697.2.0.0"></e-comment-create></div></transition><transition
   name="slide" path="1762525697.3"><ui-button v-if="canPost" text="post"
   :click="post" path="1762525697.3.0"></ui-button></transition></div>

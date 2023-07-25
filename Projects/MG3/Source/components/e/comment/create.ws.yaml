@@ -7,11 +7,17 @@ dom:
           ':show-tooltip': 'false'
           ':show-anonymous': 'true'
     ui.textarea:
-      hint: what's on your mind?
+      ':hint': hint
       ':value': value
       @input: $emit('input', $event)
 props:
   value: null
+  newThread: true
+computed:
+  hint: | #js
+    function () {
+      return this.newThread ? "what's on your mind?" : "comment…";
+    }
 style:
   .flex:
     gap: 1em
@@ -24,5 +30,5 @@ template: >-
   path="-322969580.0.0"><e-generator-square :show-tooltip="false"
   :show-anonymous="true"
   path="-322969580.0.0.0"></e-generator-square></transition></div><ui-textarea
-  hint="what's on your mind?" :value="value" @input="$emit('input', $event)"
+  :hint="hint" :value="value" @input="$emit('input', $event)"
   path="-322969580.1"></ui-textarea></div>

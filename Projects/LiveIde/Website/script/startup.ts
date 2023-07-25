@@ -100,6 +100,23 @@ interface MgParams {
     },
   });
 
+  client.Vue.directive("dim", {
+    bind(el: HTMLElement, binding: any) {
+      // Set the opacity to 0.4 if the value is true
+      if (binding.value) {
+        el.style.opacity = "0.4";
+      }
+    },
+    update(el: HTMLElement, binding: any) {
+      // Update the opacity whenever the value changes
+      if (binding.value) {
+        el.style.opacity = "0.4";
+      } else {
+        el.style.opacity = "";
+      }
+    },
+  });
+
   await client.compileAll();
 
   let ideVueApp: any = null;
@@ -152,6 +169,13 @@ interface MgParams {
       await this.init();
     },
     methods: {
+      async init() {
+        const self = this as any;
+        self.compsDic = client.comps.toMap((c: Component) => c.name.hashCode());
+        self.compNames = client.comps.map((c: Component) => c.name);
+        await self.ensureBuilders();
+        self.isAdmin = window.location.hostname == "localhost";
+      },
       async getBuilder(builderID: number) {
         const self = this as any;
         await self.ensureBuilders();
@@ -170,12 +194,6 @@ interface MgParams {
       getBuilderComponentName(builder: any) {
         if (!builder) return null;
         return `e-format-${builder.format.replace(/\./g, "-")}`;
-      },
-      async init() {
-        const self = this as any;
-        self.compsDic = client.comps.toMap((c: Component) => c.name.hashCode());
-        self.compNames = client.comps.map((c: Component) => c.name);
-        await self.ensureBuilders();
       },
       getComponent(uidOrName: number | string) {
         const uid = typeof uidOrName == "number" ? uidOrName : null;
@@ -201,6 +219,7 @@ interface MgParams {
         return !!self.compsDic[name.hashCode()];
       },
       getElementsFromViewNode(node: [string, any]) {
+        if (!node) return [];
         return document.querySelectorAll(`[path="${node[1].path}"]`);
       },
       getViewChildNodes(node: [string, any]) {
@@ -490,6 +509,15 @@ interface MgParams {
             }
           };
           tryAgain();
+        });
+      },
+      scrollIntoView(element: any) {
+        const elementRect = element.getBoundingClientRect();
+        const bodyRect = document.body.getBoundingClientRect();
+        const offset = elementRect.top - bodyRect.top;
+        window.scroll({
+          top: offset - 200,
+          behavior: "smooth",
         });
       },
     },

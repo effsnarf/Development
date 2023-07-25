@@ -1,55 +1,110 @@
 dom:
-  div:
+  div: 
+    div: 
+      v-text: mediaID
+    v-if: cMedia
+    ':style': mediaStyle
     component:
       ':is': formatComponentName
-      ':media': media
-    .flex.justify-around:
+      ':media': cMedia
+    .flex.justify-between:
       ui.share:
-        ':item': media
-      ui.button:
+        ':item': cMedia
+      ui.button: 
+        ':text': '''✏️ recaption'''
+        ':click': () => showRecaption = !showRecaption
+      ui.button: 
         v-if: $root.isAdmin
         ':text': '''❌ delete'''
-        ':click': () => $root.dbp.medias.delete.one(media._id)
+        ':click': () => $root.dbp.medias.delete.one(cMedia._id)
+      ui.link:
+        ':url': $root.url.item(cMedia)
+        ':text': '''🔗 link'''
+        ':target': '''_blank'''
+    transition:
+      name: slide
+      .m-l2:
+        v-if: showRecaption
+        e.media.recaption:
+          ':media': cMedia
+          @created: onMediaCreated
+          @cancel: () => showRecaption = false
+    .mt-l2:
+      e.thread.teaser:
+        ':mediaID': cMedia._id
 props:
   item: null
   mediaID: null
-data:
   media: null
+data:
+  cMedia: null
   temp: null
-  formatComponentName: null
+  showRecaption: false
 methods:
-  getFormatComponentName: | #js
-    async function (media) {
-      if (!media) return;
-      const builder = await this.$root.getBuilder(this.media.builderID);
-      return `e-format-${builder.format.replace(/\./g, '-')}`;
+  onMediaCreated: | #js
+    function (media) {
+      window.open(this.$root.url.item(media), '_blank');
+      this.showRecaption = false;
     }
-computed: null
+  getMediaStyle: | #js
+    function (builder) {
+      const style = {};
+      style.margin = "auto";
+      if (builder?.source?.size?.max?.width) style['max-width'] = `${(parseInt(builder?.source?.size?.max?.width) + (!this.editable ? 0 : 15))}em`;
+      return style;
+    }
+computed:
+  cBuilder: | #js
+    function () {
+      return this.$root.builders.all[this.cMedia?.builderID];
+    }
+  formatComponentName: | #js
+    function () {
+      if (!this.cBuilder) return;
+      return `e-format-${this.cBuilder.format.replace(/\./g, '-')}`;
+    }
+  mediaStyle: | #js
+    function () {
+      return this.getMediaStyle(this.cBuilder);
+    }
 watch:
-  media:
-    handler: | #js
-      async function (media) {
-        this.formatComponentName = await this.getFormatComponentName(media);
-      }
-    immediate: true
   item:
     handler: | #js
       function (item) {
-        this.media = item;
+        if (this.cMedia) return;
+        this.cMedia = item;
+      }
+    immediate: true
+  media:
+    handler: | #js
+      function (media) {
+        if (this.cMedia) return;
+        this.cMedia = media;
       }
     immediate: true
   mediaID:
     handler: | #js
       async function (mediaID) {
-        if (this.item) return;
-        this.media = !mediaID ? null : await this.$root.dbp.medias.select.one(mediaID);
+        if (this.cMedia) return;
+        this.cMedia = !mediaID ? null : await this.$root.dbp.medias.select.one(mediaID);
       }
     immediate: true
 name: e-media
 template: >-
-  <div class="comp-e-media" path="864271643."><component
-  :is="formatComponentName" :media="media" path="864271643.0"></component><div
-  class="flex justify-around" path="864271643.1"><ui-share :item="media"
-  path="864271643.1.0"></ui-share><ui-button v-if="$root.isAdmin" :text="'❌
-  delete'" :click="() =&gt; $root.dbp.medias.delete.one(media._id)"
-  path="864271643.1.1"></ui-button></div></div>
+  <div class="comp-e-media" v-if="cMedia" :style="mediaStyle"
+  path="864271643."><div v-text="mediaID" path="864271643.0"></div><component
+  :is="formatComponentName" :media="cMedia" path="864271643.1"></component><div
+  class="flex justify-between" path="864271643.2"><ui-share :item="cMedia"
+  path="864271643.2.0"></ui-share><ui-button :text="'✏️ recaption'" :click="()
+  =&gt; showRecaption = !showRecaption"
+  path="864271643.2.1"></ui-button><ui-button v-if="$root.isAdmin" :text="'❌
+  delete'" :click="() =&gt; $root.dbp.medias.delete.one(cMedia._id)"
+  path="864271643.2.2"></ui-button><ui-link :url="$root.url.item(cMedia)"
+  :text="'🔗 link'" :target="'_blank'"
+  path="864271643.2.3"></ui-link></div><transition name="slide"
+  path="864271643.3"><div class="m-l2" v-if="showRecaption"
+  path="864271643.3.0"><e-media-recaption :media="cMedia"
+  @created="onMediaCreated" @cancel="() =&gt; showRecaption = false"
+  path="864271643.3.0.0"></e-media-recaption></div></transition><div
+  class="mt-l2" path="864271643.4"><e-thread-teaser :mediaID="cMedia._id"
+  path="864271643.4.0"></e-thread-teaser></div></div>

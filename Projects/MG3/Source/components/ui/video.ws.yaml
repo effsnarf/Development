@@ -14,7 +14,11 @@ mounted: | #js
 methods:
   ensureVideoIsPlaying: | #js
     function() {
-      if (this.$refs.video1?.paused) this.$refs.video1.play();
+      try
+      {
+        if (this.$refs.video1?.paused) this.$refs.video1.play();
+      }
+      catch (ex) {}
       setTimeout(this.ensureVideoIsPlaying.bind(this), 400);
     }
 name: ui-video

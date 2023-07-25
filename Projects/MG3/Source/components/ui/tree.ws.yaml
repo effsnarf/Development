@@ -52,6 +52,11 @@ watch:
     function(newVal, oldVal) {
       this.$emit('node-select', newVal);
     }
+style:
+  ul.comp-ui-tree:
+    max-height: 50vh
+    scroll: auto
+    padding: 0 2em 0 0
 name: ui-tree
 template: >-
   <ul class="comp-ui-tree" path="-484140360."><li

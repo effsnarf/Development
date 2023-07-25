@@ -269,9 +269,11 @@ api:
         await db.upsert("Instances", instance, true);
         return instance;
     Threads.create.one:
-      args: []
+      args: [mediaID]
       code: | #js
+        const media = (!mediaID ? null : (await db.findOne("Medias", { _id: mediaID })) );
         let thread = {
+          Media: media,
           PostsCount: 0,
           Created: Date.now(),
         };
@@ -292,7 +294,7 @@ api:
         threads = await Promise.all(threads.map(async t => await dbp.threads.select.one(t._id)));
         return threads;
     Posts.create.one:
-      args: [threadID, larpGeneratorID, text, instance]
+      args: [threadID, mediaID, text, instance]
       code: | #js
         const now = Date.now();
 
@@ -304,7 +306,7 @@ api:
         }
         else
         {
-          thread = await dbp.threads.create.one();
+          thread = await dbp.threads.create.one(mediaID);
         }
         if (!instance) instance = null;
 
