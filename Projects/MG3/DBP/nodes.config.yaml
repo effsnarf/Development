@@ -316,8 +316,6 @@ api:
       code: | #js
         const now = Date.now();
 
-        const media = (!mediaID ? null : (await db.findOne("Medias", { _id: mediaID })) );
-
         let thread = null;
 
         if (threadID)
