@@ -3,7 +3,7 @@ admin:
   ips:
     - 127.0.0.1
     - ::1
-    - 89.134.7.63
+    - 89.134.7.165
     - 2a02:ab88:c8b:fb00:a4d4:ea7:170e:ce50
 server:
   host: localhost
@@ -236,6 +236,11 @@ api:
         );
 
         return insts;
+    Instances.select.one:
+      args: [instanceID]
+      code: | #js
+        const instance = await db.findOne("Instances", { _id: instanceID });
+        return instance;
     Instances.create.one:
       args: [languageCode, generatorID, imageID, text0, text1]
       code: | #js
@@ -271,22 +276,28 @@ api:
         await db.upsert("Instances", instance, true);
         return instance;
     Threads.create.one:
-      args: [mediaID]
+      args: []
       code: | #js
-        const media = (!mediaID ? null : (await db.findOne("Medias", { _id: mediaID })) );
         let thread = {
-          Media: media,
           PostsCount: 0,
           Created: Date.now(),
         };
         thread = await db.upsert("Threads", thread, true);
         return thread;
     Threads.select.one:
-      args: [threadID]
+      args: [threadID, mediaID]
       code: | #js
+        if (!threadID)
+        {
+          if (mediaID)
+          {
+            const firstPost = await db.findOne("Posts", { "Media._id": mediaID });
+            if (firstPost) threadID = firstPost.threadID;
+          }
+        }
         const thread = await db.findOne("Threads", { _id: threadID });
         if (!thread) return null;
-        thread.posts = await db.find("Posts", { ThreadID: thread._id }, { }, 1000, null, true);
+        thread.posts = await db.find("Posts", { ThreadID: thread._id }, { Index: 1 }, 1000, null, true);
         return thread;
     Threads.select.all:
       args: []
@@ -300,18 +311,25 @@ api:
       code: | #js
         const now = Date.now();
 
+        const media = (!mediaID ? null : (await db.findOne("Medias", { _id: mediaID })) );
+
         let thread = null;
 
         if (threadID)
         {
           thread = await db.findOne("Threads", { _id: threadID });
         }
-        else
+        else if (mediaID)
         {
-          thread = await dbp.threads.create.one(mediaID);
+          // When posting on a media, create a new thread
+          // unless there is already a thread for this media
+          thread = await dbp.threads.select.one(null, mediaID);
+          if (!thread) thread = await dbp.threads.create.one();
         }
-        if (!instance) instance = null;
 
+        if (!thread) throw new Error("Provide either a threadID or a mediaID");
+
+        if (!instance) instance = null;
         if (instance)
         {
           instance = await dbp.instances.create.one("en", instance.generatorID, null, instance.text0, instance.text1);
@@ -327,32 +345,24 @@ api:
           instance._id = instance.instanceID;
         }
 
-        let larpGenerator = (!larpGeneratorID) ? null : await db.findOne("Generators", { _id: larpGeneratorID });
-        if (larpGenerator)
-        {
-          larpGenerator = {
-            _id: larpGenerator._id,
-            DisplayName: larpGenerator.displayName,
-            UrlName: larpGenerator.urlName,
-            ImageID: larpGenerator.imageID,
-          };
-        }
+        const otherPosts = (await db.find("Posts", { ThreadID: thread._id }, { }, 1000, null, true));
 
         let post = {
           ThreadID: thread._id,
-          LarpGenerator: larpGenerator,
+          Index: otherPosts.length,
           Text: text,
+          Media: media,
           Instance: instance,
           Created: now,
         };
 
         post = await db.upsert("Posts", post, true);
 
-        thread.postsCount++;
+        thread.postsCount = ((thread.postsCount || 0) + 1);
         thread.lastPostCreated = now;
         await db.upsert("Threads", thread);
 
-        return post;
+        return post._id;
     Posts.delete.one:
       admin: true
       args: [postID]
