@@ -7,7 +7,7 @@ dom:
     template: 
       v-slot: middle
       e.thread:
-        v-model: thread
+        ':threadID': thread?._id
       e.post.create:
         v-if: threadNotFound
 data:
@@ -52,6 +52,6 @@ template: >-
   <site class="comp-page-thread" page-name="thread"
   path="-1535040951."><template v-slot:left
   path="-1535040951.0"><e-thread-list></e-thread-list></template><template
-  v-slot:middle path="-1535040951.1"><e-thread v-model="thread"
+  v-slot:middle path="-1535040951.1"><e-thread :threadID="thread?._id"
   path="-1535040951.1.0"></e-thread><e-post-create v-if="threadNotFound"
   path="-1535040951.1.1"></e-post-create></template></site>

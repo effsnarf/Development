@@ -29,16 +29,17 @@ dom:
           v-if: showCommentCreate
           v-model: text
           ':new-thread': 'false'
-    transition: 
-      name: slide
-      ui.button:
-        v-if: canPost
-        text: post
-        ':click': post
+    .mt-l1:
+      transition: 
+        name: slide
+        ui.button:
+          v-if: canPost
+          text: ✔️ post
+          ':click': post
 props:
   threadID: null
+  threadMediaID: null
   generator: null
-  mediaID: null
 data:
   larpGenerator: null
   tempInstance: null
@@ -57,7 +58,7 @@ methods:
       {
         const { generator, text0, text1 } = (this.tempInstance || {});
         const instance = !generator ? null : { generatorID: generator.generatorID, text0, text1 };
-        const post = await this.$root.dbp.posts.create.one(this.threadID, this.mediaID, this.text, instance);
+        const post = await this.$root.dbp.posts.create.one(this.threadID, this.threadMediaID, this.text, instance);
         this.$emit('created', post);
         this.clear();
       }
@@ -129,6 +130,7 @@ template: >-
   path="1762525697.1.0.1"></e-generator-select></div></transition><transition
   name="slide" path="1762525697.2"><div path="1762525697.2.0"><e-comment-create
   v-if="showCommentCreate" v-model="text" :new-thread="false"
-  path="1762525697.2.0.0"></e-comment-create></div></transition><transition
-  name="slide" path="1762525697.3"><ui-button v-if="canPost" text="post"
-  :click="post" path="1762525697.3.0"></ui-button></transition></div>
+  path="1762525697.2.0.0"></e-comment-create></div></transition><div
+  class="mt-l1" path="1762525697.3"><transition name="slide"
+  path="1762525697.3.0"><ui-button v-if="canPost" text="✔️ post" :click="post"
+  path="1762525697.3.0.0"></ui-button></transition></div></div>

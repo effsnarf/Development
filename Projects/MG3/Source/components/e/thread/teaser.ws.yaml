@@ -2,11 +2,11 @@ dom:
   div:
     e.thread:
       ':threadID': threadID
-      ':mediaID': mediaID
+      ':threadMediaID': threadMediaID
       ':teaser': 'true'
 props:
-  mediaID: null
   threadID: null
+  threadMediaID: null
 data:
   thread: null
 watch:
@@ -24,16 +24,16 @@ methods:
   refresh: | #js
     async function()
     {
-      this.thread = await this.getThread(this.threadID, this.mediaID);
+      this.thread = await this.getThread(this.threadID, this.threadMediaID);
     }
   getThread: | #js
-    async function(threadID, mediaID)
+    async function(threadID, threadMediaID)
     {
       if (!threadID) return [];
-      return await this.$root.dbp.threads.select.one(threadID, mediaID);
+      return await this.$root.dbp.threads.select.one(threadID, threadMediaID);
     }
 name: e-thread-teaser
 template: >-
   <div class="comp-e-thread-teaser" path="-88604437."><e-thread
-  :threadID="threadID" :mediaID="mediaID" :teaser="true"
+  :threadID="threadID" :threadMediaID="threadMediaID" :teaser="true"
   path="-88604437.0"></e-thread></div>

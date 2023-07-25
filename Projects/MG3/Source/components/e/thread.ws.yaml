@@ -21,8 +21,8 @@ dom:
       ui.loading:
         v-if: isLoading
     e.post.create:
-      ':threadID': threadID
-      ':mediaID': mediaID
+      ':threadID': thread?._id
+      ':threadMediaID': threadMediaID
       @created: refresh
     .mt-l2:
       ui.button:
@@ -31,7 +31,7 @@ dom:
         ':click': refresh
 props:
   threadID: null
-  mediaID: null
+  threadMediaID: null
   teaser: false
 data:
   thread: null
@@ -48,7 +48,7 @@ methods:
       this.isLoading = true;
       try
       {
-        this.thread = await this.$root.dbp.threads.select.one(this.threadID, this.mediaID);
+        this.thread = await this.$root.dbp.threads.select.one(this.threadID, this.threadMediaID);
       }
       finally
       {
@@ -82,8 +82,8 @@ watch:
     async function(threadID) {
       this.refresh();
     }
-  mediaID: | #js
-    async function(mediaID) {
+  threadMediaID: | #js
+    async function(threadMediaID) {
       this.refresh();
     }
 style:
@@ -104,7 +104,7 @@ template: >-
   path="1226205107.0.1.0.1"></div></li></transition-group></div><transition
   name="slide" path="1226205107.1"><ui-loading v-if="isLoading"
   path="1226205107.1.0"></ui-loading></transition><e-post-create
-  :threadID="threadID" :mediaID="mediaID" @created="refresh"
+  :threadID="thread?._id" :threadMediaID="threadMediaID" @created="refresh"
   path="1226205107.2"></e-post-create><div class="mt-l2"
   path="1226205107.3"><ui-button v-if="$root.isAdmin" :text="'♻ refresh'"
   :click="refresh" path="1226205107.3.0"></ui-button></div></div>

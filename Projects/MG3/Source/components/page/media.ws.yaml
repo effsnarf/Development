@@ -21,7 +21,7 @@ dom:
             ':item': media
         div: 
           e.thread:
-            ':mediaID': media?._id
+            ':threadMediaID': media?._id
 data:
   media: null
   temp: null
@@ -86,5 +86,5 @@ template: >-
   name="slide-large" path="221009861.2.0.0"><e-media v-if="media"
   :key="media._id" :item="media"
   path="221009861.2.0.0.0"></e-media></transition><div
-  path="221009861.2.0.1"><e-thread :mediaID="media?._id"
+  path="221009861.2.0.1"><e-thread :threadMediaID="media?._id"
   path="221009861.2.0.1.0"></e-thread></div></div></template></site>

@@ -290,13 +290,13 @@ api:
         }
         return thread;
     Threads.select.one:
-      args: [threadID, mediaID]
+      args: [threadID, threadMediaID]
       code: | #js
         if (!threadID)
         {
-          if (mediaID)
+          if (threadMediaID)
           {
-            const firstPost = await db.findOne("Posts", { "Media._id": mediaID });
+            const firstPost = await db.findOne("Posts", { "Media._id": threadMediaID });
             if (firstPost) threadID = firstPost.threadID;
           }
         }

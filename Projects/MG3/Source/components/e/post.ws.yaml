@@ -2,10 +2,13 @@ dom:
   .post:
     ':class': '{ enlarged }'
     .post-media:
-      v-if: item.instance
+      @click: onMediaClick
+      e.media:
+        v-if: item.media
+        ':item': item.media
       e.instance:
+        v-if: item.instance
         ':item': item.instance
-      @click: onInstanceClick
     .post-text:
       e.generator.square:
         class: larping-generator
@@ -22,7 +25,7 @@ props:
 data:
   enlarged: false
 methods:
-  onInstanceClick: | #js
+  onMediaClick: | #js
     function () {
       this.enlarged = !this.enlarged;
     }
@@ -79,11 +82,13 @@ style:
 name: e-post
 template: >-
   <div class="comp-e-post post" :class="{ enlarged }" path="-1357494135."><div
-  class="post-media" v-if="item.instance" @click="onInstanceClick"
-  path="-1357494135.0"><e-instance :item="item.instance"
-  path="-1357494135.0.0"></e-instance></div><div class="post-text"
-  path="-1357494135.1"><e-generator-square class="larping-generator"
-  :value="item.larpGenerator" path="-1357494135.1.0"></e-generator-square><div
+  class="post-media" @click="onMediaClick" path="-1357494135.0"><e-media
+  v-if="item.media" :item="item.media"
+  path="-1357494135.0.0"></e-media><e-instance v-if="item.instance"
+  :item="item.instance" path="-1357494135.0.1"></e-instance></div><div
+  class="post-text" path="-1357494135.1"><e-generator-square
+  class="larping-generator" :value="item.larpGenerator"
+  path="-1357494135.1.0"></e-generator-square><div
   v-html="$root.textToHtml(item.text)" path="-1357494135.1.1"></div></div><div
   class="clear-both" path="-1357494135.2"></div><e-post-menu :item="item"
   @refresh-thread="$emit('refresh-thread')"
