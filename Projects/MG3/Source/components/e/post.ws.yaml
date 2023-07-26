@@ -1,7 +1,7 @@
 dom:
   .post:
     v-if: item
-    ':class': '{ enlarged }'
+    ':class': '{ enlarged: isEnlarged }'
     .post-media:
       v-if: item.media
       ':class': getPostMediaClass(item.media)
@@ -20,6 +20,7 @@ dom:
       @thread-updated: $emit('thread-updated')
 props:
   item: null
+  teaser: false
 data:
   enlarged: false
 methods:
@@ -30,9 +31,22 @@ methods:
   getPostMediaClass: | #js
     function (media) {
       if (!media) return null;
-      return `media-${media.type}`;
+      const cls = [];
+      cls.push(`media-${media.type}`);
+      if (this.teaser) cls.push("teaser");
+      return cls;
+    }
+computed:
+  isEnlarged: | #js
+    function () {
+      return ((this.item.index == 0) || this.enlarged);
     }
 style:
+  .teaser:
+    max-height: 15rem
+    overflow: hidden
+  .teaser:hover:
+    max-height: 30rem
   .comp-e-post-menu:
     max-height: 0
     overflow: hidden
@@ -98,7 +112,7 @@ style:
     color: '#35c735'
 name: e-post
 template: >-
-  <div class="comp-e-post post" v-if="item" :class="{ enlarged }"
+  <div class="comp-e-post post" v-if="item" :class="{ enlarged: isEnlarged }"
   path="-1357494135."><div class="post-media" v-if="item.media"
   :class="getPostMediaClass(item.media)" path="-1357494135.0"><e-media
   :item="item.media" @click-media-content="onClickMediaContent"

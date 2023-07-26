@@ -14,9 +14,6 @@ dom:
           ui.button: 
             ':text': '''✖️ cancel'''
             ':click': onClickCancel
-        .mt-l3:
-          e.post:
-            ':item': postPreview
 props: null
 data:
   showCreateThread: false
@@ -44,6 +41,5 @@ template: >-
   path="-563191913.1.0"><e-post-create @input-preview="postPreview=$event"
   @created="onCreatedThread" path="-563191913.1.0.0"></e-post-create><div
   class="mt-l2" path="-563191913.1.0.1"><ui-button :text="'✖️ cancel'"
-  :click="onClickCancel" path="-563191913.1.0.1.0"></ui-button></div><div
-  class="mt-l3" path="-563191913.1.0.2"><e-post :item="postPreview"
-  path="-563191913.1.0.2.0"></e-post></div></div></transition></div>
+  :click="onClickCancel"
+  path="-563191913.1.0.1.0"></ui-button></div></div></transition></div>

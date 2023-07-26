@@ -13,6 +13,7 @@ dom:
       page.test: null
       page.admin.index: null
       page.home: null
+      page.catalog: null
       page.thread: null
       page.category: null
       page.builder: null
@@ -42,7 +43,7 @@ style:
     transition: 0s !important
     left: 50%
     transform: translateX(-50%)
-    z-index: 1000000
+    z-index: 1000
   .header-spacer:
     height: 5rem
 template: >-
@@ -52,4 +53,4 @@ template: >-
   path="96801.0.1"></site-header><div class="header-spacer"
   path="96801.0.2"></div></div><div class="pages" :class="{ 'site-width': true
   }"
-  path="96801.1"><page-test></page-test><page-admin-index></page-admin-index><page-home></page-home><page-thread></page-thread><page-category></page-category><page-builder></page-builder><page-generator></page-generator><page-instance></page-instance><page-media></page-media></div></div>
+  path="96801.1"><page-test></page-test><page-admin-index></page-admin-index><page-home></page-home><page-catalog></page-catalog><page-thread></page-thread><page-category></page-category><page-builder></page-builder><page-generator></page-generator><page-instance></page-instance><page-media></page-media></div></div>

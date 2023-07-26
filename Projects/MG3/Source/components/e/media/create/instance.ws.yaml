@@ -32,11 +32,24 @@ computed:
     function() {
       return { generator: this.generator, text0: this.text0, text1: this.text1 };
     }
+  shortInstance: | #js
+    function() {
+      return { generator: this.shortGenerator, text0: this.text0, text1: this.text1 };
+    }
+  shortGenerator: | #js
+    function() {
+      const g = this.generator;
+      const gen = { _id: this.generator._id };
+      ["urlName", "displayName", "imageID"].forEach((k) => {
+        gen[k] = g[k];
+      });
+      return gen;
+    }
 watch:
   instance:
     handler: | #js
       function() {
-        this.$emit('input', { type: "instance", instance: this.instance });
+        this.$emit('input', { type: "instance", instance: this.shortInstance });
       }
     deep: true
 style:

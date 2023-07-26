@@ -94,6 +94,10 @@ watch:
       }
     immediate: true
 computed:
+  isNewThread: | #js
+    function() {
+      return !this.threadID && !this.threadMediaID;
+    }
   postPreview: | #js
     function() {
       return {
@@ -103,6 +107,7 @@ computed:
     }
   canPost: | #js
     function() {
+      if (this.isNewThread) return this.media;
       if (this.media) return true;
       if (this.text) return true;
       return false;

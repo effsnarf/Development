@@ -1,39 +1,37 @@
 dom:
-  div:
-    e.thread:
-      ':threadID': threadID
-      ':threadMediaID': threadMediaID
-      ':teaser': 'true'
+  div: 
+    v-if: thread
+    ui.link:
+      ':url': $root.url.thread(thread)
+      e.post:
+        ':item': thread.posts[0]
+        ':teaser': 'true'
+      .text-center.opacity-50:
+        .opacity-50:
+          v-text: getUpdatedAgo(thread)
+        div: 
+          v-text: thread.postsCount + ' posts'
 props:
-  threadID: null
-  threadMediaID: null
-data:
   thread: null
-watch:
-  threadID: | #js
-    async function(threadID)
-    {
-      this.refresh();
-    }
+data: null
+watch: null
 methods:
-  onCreatedPost: | #js
-    async function(post)
+  getUpdatedAgo: | #js
+    function(thread)
     {
-      await this.refresh();
+      const ago = (Date.now() - thread.lastPostCreated).unitifyTime().withoutColors();
+      return `updated ${ago} ago`;
     }
-  refresh: | #js
-    async function()
-    {
-      this.thread = await this.getThread(this.threadID, this.threadMediaID);
-    }
-  getThread: | #js
-    async function(threadID, threadMediaID)
-    {
-      if (!threadID) return [];
-      return await this.$root.dbp.threads.select.one(threadID, threadMediaID);
-    }
+style:
+  .grid:
+    grid-template: 1fr / repeat(40rem, auto)
+    gap: 1em
 name: e-thread-teaser
 template: >-
-  <div class="comp-e-thread-teaser" path="-88604437."><e-thread
-  :threadID="threadID" :threadMediaID="threadMediaID" :teaser="true"
-  path="-88604437.0"></e-thread></div>
+  <div class="comp-e-thread-teaser" v-if="thread" path="-88604437."><ui-link
+  :url="$root.url.thread(thread)" path="-88604437.0"><e-post
+  :item="thread.posts[0]" :teaser="true" path="-88604437.0.0"></e-post><div
+  class="text-center opacity-50" path="-88604437.0.1"><div class="opacity-50"
+  v-text="getUpdatedAgo(thread)" path="-88604437.0.1.0"></div><div
+  v-text="thread.postsCount + ' posts'"
+  path="-88604437.0.1.1"></div></div></ui-link></div>

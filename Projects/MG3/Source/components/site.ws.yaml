@@ -4,7 +4,7 @@ dom:
       name: fade
       div: 
         ':class': getCssClass()
-        v-show: (this.pageName == $root.params.page)
+        v-if: (this.pageName == $root.params.page)
         div: 
           site.sidebar: null
           site.main:
@@ -58,7 +58,7 @@ style:
     padding: 0
 template: >-
   <div class="comp-site" path="3530567."><transition name="fade"
-  path="3530567.0"><div :class="getCssClass()" v-show="(this.pageName ==
+  path="3530567.0"><div :class="getCssClass()" v-if="(this.pageName ==
   $root.params.page)" path="3530567.0.0"><div
   path="3530567.0.0.0"><site-sidebar></site-sidebar><site-main
   :columns="columns" :title-image-id="titleImageId" :title-text="titleText"

@@ -1,57 +1,80 @@
 dom:
   site:
     page-name: thread
+    ':columns-focus-left': columnsFocusLeft
+    ':content-not-found': contentNotFound
+    ':columns': 2
     template: 
       v-slot: left
-      e.thread.list: null
+      .flex.ver.gap-2:
+        e.thread.create:
+          @input:columnsFocusLeft: columnsFocusLeft=$event
+        ui.link:
+          ':text': '''🔙 catalog'''
+          url: /catalog
     template: 
       v-slot: middle
-      e.thread:
-        ':threadID': thread?._id
-      e.post.create:
-        v-if: threadNotFound
+      .flex.gap-2:
+        transition:
+          name: slide-large
+          e.thread:
+            ':thread': thread
 data:
   thread: null
-  threadNotFound: false
-computed:
-  threadID: | #js
-    function() {
-      return this.$root.params.threadID;
-    }
+  contentNotFound: false
+  columnsFocusLeft: false
 mounted: | #js
   async function() {
+    this.$watch(() => [this.$root.params.threadID, this.$root.params.mediaID], {
+      handler: async () => {
+        await this.init(this.$root.params.threadID, this.$root.params.mediaID);
+      },
+      immediate: true
+    });
+
+    this.$root.$on("thread-updated", this.refresh.bind(this));
   }
-watch:
-  threadID:
-    handler: | #js
-      async function() {
-        if (this.$root.params.page != "thread") return;
-        try
-        {
-          this.$root.isLoading++;
-          this.threadNotFound = false;
-          this.thread = (!this.threadID) ? null : (await this.$root.dbp.threads.select.one(this.threadID));
-          this.threadNotFound = (this.threadID && !this.thread);
-        }
-        finally
-        {
-          this.$root.isLoading--;
-        }
+methods:
+  init: | #js
+    async function(threadID, threadMediaID) {
+      const dbp = this.$root.dbp;
+      this.clear();
+      if (!threadID && !threadMediaID) return;
+      try
+      {
+        this.$root.isLoading++;
+        this.thread = null;
+        this.thread = await dbp.threads.select.one(threadID, threadMediaID);
+        this.$root.setDocumentTitle(this.$root.getMediaText(this.media));
+        if (!this.thread) this.contentNotFound = true;
       }
-    immediate: true
-  threadNotFound:
-    handler: | #js
-      function(newTNF) {
-        this.$root.error = (!newTNF ? null : "Thread not found");
+      finally
+      {
+        this.$root.isLoading--;
       }
-    immediate: true
-methods: null
+    }
+  refresh: | #js
+    async function(thread) {
+      await this.init(this.thread?._id, this.thread?.posts[0].media._id);
+    }
+  clear: | #js
+    function() {
+      this.media = null;
+      this.contentNotFound = false;
+    }
+watch: null
 name: page-thread
 style: null
 template: >-
   <site class="comp-page-thread" page-name="thread"
-  path="-1535040951."><template v-slot:left
-  path="-1535040951.0"><e-thread-list></e-thread-list></template><template
-  v-slot:middle path="-1535040951.1"><e-thread :threadID="thread?._id"
-  path="-1535040951.1.0"></e-thread><e-post-create v-if="threadNotFound"
-  path="-1535040951.1.1"></e-post-create></template></site>
+  :columns-focus-left="columnsFocusLeft" :content-not-found="contentNotFound"
+  :columns="2" path="-1535040951."><template v-slot:left
+  path="-1535040951.0"><div class="flex ver gap-2"
+  path="-1535040951.0.0"><e-thread-create
+  @input:columnsFocusLeft="columnsFocusLeft=$event"
+  path="-1535040951.0.0.0"></e-thread-create><ui-link :text="'🔙 catalog'"
+  url="/catalog" path="-1535040951.0.0.1"></ui-link></div></template><template
+  v-slot:middle path="-1535040951.1"><div class="flex gap-2"
+  path="-1535040951.1.0"><transition name="slide-large"
+  path="-1535040951.1.0.0"><e-thread :thread="thread"
+  path="-1535040951.1.0.0.0"></e-thread></transition></div></template></site>
