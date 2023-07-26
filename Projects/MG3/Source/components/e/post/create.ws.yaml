@@ -54,7 +54,7 @@ methods:
       {
         const { generator, text0, text1 } = (this.tempInstance || {});
         const instance = !generator ? null : { generatorID: generator.generatorID, text0, text1 };
-        const post = await this.$root.dbp.posts.create.one(this.threadID, this.threadMediaID, this.text, { imageID: this.imageID });
+        const post = await this.$root.dbp.posts.create.one(this.threadID, this.threadMediaID, this.text, { type: "image", imageID: this.imageID });
         this.$emit('created', post);
         this.clear();
       }
@@ -107,6 +107,7 @@ computed:
     }
   canPost: | #js
     function() {
+      if (this.imageID) return true;
       if (this.hasInstanceContent) return true;
       if (this.text) return true;
       return false;

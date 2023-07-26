@@ -291,7 +291,7 @@ api:
         {
           if (threadMediaID)
           {
-            const firstPost = await db.findOne("Posts", { "Attachment.Media._id": threadMediaID });
+            const firstPost = await db.findOne("Posts", { "Media._id": threadMediaID });
             if (firstPost) threadID = firstPost.threadID;
           }
         }
@@ -307,7 +307,7 @@ api:
         threads = await Promise.all(threads.map(async t => await dbp.threads.select.one(t._id)));
         return threads;
     Posts.create.one:
-      args: [threadID, threadMediaID, text, attachment]
+      args: [threadID, threadMediaID, text, media]
       code: | #js
         const now = Date.now();
 
@@ -322,10 +322,7 @@ api:
               ThreadID: thread._id,
               Index: 0,
               Text: null,
-              Attachment: {
-                Media: threadMedia,
-                HasContent: true,
-              },
+              Media: threadMedia,
               Created: now,
             };
             await db.upsert("Posts", firstPost, true);
@@ -333,9 +330,9 @@ api:
         }
         if (!thread) throw new Error("Provide either a threadID or a threadMediaID");
 
-        if (attachment?.instance)
+        if (media?.instance)
         {
-          let instance = await dbp.instances.create.one("en", attachment.instance.generatorID, null, attachment.instance.text0, attachment.instance.text1);
+          let instance = await dbp.instances.create.one("en", media.instance.generatorID, null, media.instance.text0, media.instance.text1);
           instance = {
             _id: instance.instanceID,
             GeneratorID: instance.generatorID,
@@ -346,18 +343,17 @@ api:
             Text1: instance.text1,
           };
           instance._id = instance.instanceID;
-          attachment.instance = instance;
+          media.type = "instance";
+          media.instance = instance;
         }
 
         const otherPosts = (await db.find("Posts", { ThreadID: thread._id }, { }, 1000, null, true));
-
-        attachment.HasContent = (!!attachment?.media || !!attachment?.instance || !!attachment?.imageID);
 
         let post = {
           ThreadID: thread._id,
           Index: otherPosts.length,
           Text: text,
-          Attachment: attachment,
+          Media: media,
           Created: now,
         };
 

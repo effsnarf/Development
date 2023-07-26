@@ -146,6 +146,7 @@ methods:
 
       const media = {
         created: new Date(),
+        type: "builder",
         builderID: this.builder._id,
         content: { items }
       }
