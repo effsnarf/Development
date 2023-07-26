@@ -16,6 +16,7 @@ props:
   selectedIndex: null
   direction: vertical
   getItemKey: null
+  canSelectNone: true
 methods:
   _getItemKey: | #js
     function(item) {
@@ -33,6 +34,7 @@ methods:
   onItemClick: | #js
     function(e) {
       const newIndex = (e.index == this.selectedIndex) ? null : e.index;
+      if ((newIndex == null) && !this.canSelectNone) return;
       this.$emit('input', newIndex);
     }
   getCssClass: | #js

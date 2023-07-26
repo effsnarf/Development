@@ -81,7 +81,27 @@
 .slide2-enter-to,
 .slide2-leave {
   opacity: 1;
-  max-height: 10rem;
+  max-height: 15rem;
+  overflow: hidden;
+}
+
+
+
+.slide3-enter-active,
+.slide3-leave-active,
+.slide3-move {
+  transition: 1s;
+}
+.slide3-enter,
+.slide3-leave-to {
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+}
+.slide3-enter-to,
+.slide3-leave {
+  opacity: 1;
+  max-height: 30rem;
   overflow: hidden;
 }
 

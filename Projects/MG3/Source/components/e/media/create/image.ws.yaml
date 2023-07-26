@@ -1,0 +1,41 @@
+dom:
+  .box1:
+    ui.file.dropzone:
+      v-model: imageID
+      .flex.gap-1:
+        ui.image:
+          ':imageID': imageID
+        h3:
+          class: opacity-50
+          v-text: '''drop image to upload'''
+props:
+  value: null
+data:
+  imageID: null
+  emitChange: true
+methods:
+  onImageUpload: | #js
+    async function(imageID) {
+      this.emitChange = false;
+      this.imageID = imageID;
+      await this.$nextTick();
+      this.emitChange = true;
+    }
+watch:
+  imageID: | #js
+    function(imageID) {
+      if (!imageID) return this.$emit("input", null);
+      this.$emit("input", { type: "image", imageID });
+      if (this.emitChange) this.$emit("change");
+    }
+style:
+  .comp-ui-image:
+    width: 6em
+name: e-media-create-image
+template: >-
+  <div class="comp-e-media-create-image box1"
+  path="1626364892."><ui-file-dropzone v-model="imageID"
+  path="1626364892.0"><div class="flex gap-1" path="1626364892.0.0"><ui-image
+  :imageID="imageID" path="1626364892.0.0.0"></ui-image><h3 class="opacity-50"
+  v-text="'drop image to upload'"
+  path="1626364892.0.0.1"></h3></div></ui-file-dropzone></div>

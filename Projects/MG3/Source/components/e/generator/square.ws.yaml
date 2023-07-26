@@ -1,35 +1,39 @@
 dom:
-  ui.image: 
-    v-if: '!generator'
-    class: anonymous
-    tooltip: Anonymous
-    ':src': >-
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Anonymous_emblem.svg/1200px-Anonymous_emblem.svg.png'
-    @click: $emit('click')
-  ui.link:
-    v-else-if: generator
-    ':url': $root.url.generator(generator)
+  div:
     ui.image: 
-      ':tooltip': showTooltip && generator.displayName
-      ':imageID': generator.imageID
-      ':key': generator.generatorID
-      ':square': 'true'
-      @click: $emit('click', generator)
+      v-if: '!generator'
+      class: anonymous
+      tooltip: Anonymous
+      ':src': >-
+        'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Anonymous_emblem.svg/1200px-Anonymous_emblem.svg.png'
+      @click: $emit('click')
+    ui.link:
+      v-else-if: generator
+      ':enabled': link
+      ':url': $root.url.generator(generator)
+      ui.image: 
+        ':tooltip': showTooltip && generator.displayName
+        ':imageID': generator.imageID
+        ':key': generator.generatorID
+        ':square': 'true'
+        @click: $emit('click', generator)
 props:
   generator: null
   showTooltip: true
   showAnonymous: false
+  link: true
 computed: null
 style:
   .anonymous:
     opacity: 0.5
 name: e-generator-square
 template: >-
-  <ui-image class="comp-e-generator-square anonymous" v-if="!generator"
-  tooltip="Anonymous"
+  <div class="comp-e-generator-square" path="-916767999."><ui-image
+  class="anonymous" v-if="!generator" tooltip="Anonymous"
   :src="'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Anonymous_emblem.svg/1200px-Anonymous_emblem.svg.png'"
-  @click="$emit('click')" path="-916767999."></ui-image><ui-link
-  v-else-if="generator" :url="$root.url.generator(generator)"><ui-image
-  :tooltip="showTooltip &amp;&amp; generator.displayName"
-  :imageID="generator.imageID" :key="generator.generatorID" :square="true"
-  @click="$emit('click', generator)"></ui-image></ui-link>
+  @click="$emit('click')" path="-916767999.0"></ui-image><ui-link
+  v-else-if="generator" :enabled="link" :url="$root.url.generator(generator)"
+  path="-916767999.1"><ui-image :tooltip="showTooltip &amp;&amp;
+  generator.displayName" :imageID="generator.imageID"
+  :key="generator.generatorID" :square="true" @click="$emit('click', generator)"
+  path="-916767999.1.0"></ui-image></ui-link></div>

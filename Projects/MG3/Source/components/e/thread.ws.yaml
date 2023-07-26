@@ -1,9 +1,10 @@
 dom:
   .thread-columns:
-    div: 
+    .media-column:
       v-if: media
       e.media:
         ':media': media
+        @thread-updated: refresh
     div: 
       div: 
         v-if: thread
@@ -110,8 +111,8 @@ watch:
     }
 style:
   .thread-columns:
-    display: flex
-    flex-direction: row
+    display: grid
+    grid-template: 1fr / 1fr 1fr
     gap: 2vw
   ul:
     margin: auto
@@ -119,12 +120,12 @@ style:
     margin-bottom: 1vh
 name: e-thread
 template: >-
-  <div class="comp-e-thread thread-columns" path="1226205107."><div v-if="media"
-  path="1226205107.0"><e-media :media="media"
-  path="1226205107.0.0"></e-media></div><div path="1226205107.1"><div
-  v-if="thread" path="1226205107.1.0"><h3 v-text="thread.title"
-  path="1226205107.1.0.0"></h3><transition-group tag="ul" name="list"
-  path="1226205107.1.0.1"><li v-for="(post, index) in visiblePosts"
+  <div class="comp-e-thread thread-columns" path="1226205107."><div
+  class="media-column" v-if="media" path="1226205107.0"><e-media :media="media"
+  @thread-updated="refresh" path="1226205107.0.0"></e-media></div><div
+  path="1226205107.1"><div v-if="thread" path="1226205107.1.0"><h3
+  v-text="thread.title" path="1226205107.1.0.0"></h3><transition-group tag="ul"
+  name="list" path="1226205107.1.0.1"><li v-for="(post, index) in visiblePosts"
   :key="post?._id||0" path="1226205107.1.0.1.0"><e-post :item="post"
   @thread-updated="refresh" path="1226205107.1.0.1.0.0"></e-post><div
   class="text-center opacity-30" v-if="getHiddenPostsCount(index)" v-text="'(' +

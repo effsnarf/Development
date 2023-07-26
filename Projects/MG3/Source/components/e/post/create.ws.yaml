@@ -1,52 +1,68 @@
 dom:
-  .container:
+  .container.flex.ver.gap-1:
     v-disable: isLoading
-    div: 
-      transition: 
-        name: slide
-        e.instance.create:
-          v-if: showInstanceCreate
-          ref: createInstance1
-          layout: horizontal
-          ':show-create-button': 'false'
-          v-model: tempInstance
-          ':generator': generator
-          @has-content: hasInstanceContent = $event
     transition: 
       name: slide
+      div: 
+        v-show: showCreateMedia
+        e.media.create:
+          class: mt-l1
+          ref: createMedia1
+          v-model: media
+          @change: toggleShowCreateMedia
     transition: 
       name: slide
       div: 
         ui.file.dropzone:
-          v-model: imageID
+          @input: onImageUpload
           e.comment.create:
-            v-if: showCommentCreate
-            ':imageID': imageID
             v-model: text
+            ':media': media
             ':new-thread': 'false'
-    .mt-l1:
+            @click-media-preview: toggleShowCreateMedia
+    div:
       transition: 
         name: slide
-        ui.button:
-          v-if: canPost
-          text: ✔️ post
-          ':click': post
+        .flex.justify-around:
+          transition: 
+            name: slide
+            ui.button: 
+              class: ml-2
+              v-if: media
+              ':text': '''✖'''
+              ':click': onClearMedia
+          transition: 
+            name: slide
+            ui.button: 
+              v-if: canPost
+              text: ✔️ post
+              ':click': post
 props:
   threadID: null
   threadMediaID: null
   generator: null
 data:
-  larpGenerator: null
-  tempInstance: null
-  imageID: null
+  media: null
   text: null
-  hasInstanceContent: false
-  showLarpGeneratorSelect: false
+  showCreateMedia: false
   isLoading: false
 mounted: | #js
   async function() {
   }
 methods:
+  onImageUpload: | #js
+    function(imageID) {
+      this.$refs.createMedia1.onImageUpload(imageID);
+    }
+  onClearMedia: | #js
+    function() {
+      this.media = null;
+      this.showCreateMedia = false;
+    }
+  toggleShowCreateMedia: | #js
+    function() {
+      this.showCreateMedia = !this.showCreateMedia;
+    }
   post: | #js
     async function() {
       this.isLoading = true;
@@ -54,9 +70,9 @@ methods:
       {
         const { generator, text0, text1 } = (this.tempInstance || {});
         const instance = !generator ? null : { generatorID: generator.generatorID, text0, text1 };
-        const post = await this.$root.dbp.posts.create.one(this.threadID, this.threadMediaID, this.text, { type: "image", imageID: this.imageID });
+        const post = await this.$root.dbp.posts.create.one(this.threadID, this.threadMediaID, this.text, this.media);
         this.$emit('created', post);
-        this.clear();
+        setTimeout(this.clear.bind(this), 1000);
       }
       finally
       {
@@ -64,21 +80,13 @@ methods:
       }
     }
   clear: | #js
-    function() {
-      this.imageID = null;
+    async function() {
+      this.media = null;
       this.text = null;
-      this.tempInstance = null;
+      this.showCreateMedia = false;
+      this.$refs.createMedia1.clear();
     }
 watch:
-  tempInstance: | #js
-    function() {
-    }
-  threadID:
-    handler: | #js
-      function() {
-        //this.showInstanceCreate = !this.threadID;
-      }
-    immediate: true
   postPreview:
     handler: | #js
       function(postPreview) {
@@ -93,28 +101,11 @@ computed:
         text: this.text,
       };
     }
-  showInstanceCreate: | #js
-    function() {
-      return !this.hasCommentContent;
-    }
-  showCommentCreate: | #js
-    function() {
-      return !this.hasInstanceContent;
-    }
-  hasCommentContent: | #js
-    function() {
-      return !!this.text;
-    }
   canPost: | #js
     function() {
-      if (this.imageID) return true;
-      if (this.hasInstanceContent) return true;
+      if (this.media) return true;
       if (this.text) return true;
       return false;
-    }
-  larpGeneratorTooltip: | #js
-    function() {
-      return `Larping as ${this.larpGenerator?.displayName || 'Anonymous'}`;
     }
 style:
   .container:
@@ -127,18 +118,21 @@ config:
     state: true
 name: e-post-create
 template: >-
-  <div class="comp-e-post-create container" v-disable="isLoading"
-  path="1762525697."><div path="1762525697.0"><transition name="slide"
-  path="1762525697.0.0"><e-instance-create v-if="showInstanceCreate"
-  ref="createInstance1" layout="horizontal" :show-create-button="false"
-  v-model="tempInstance" :generator="generator" @has-content="hasInstanceContent
-  = $event"
-  path="1762525697.0.0.0"></e-instance-create></transition></div><transition
-  name="slide" path="1762525697.1"></transition><transition name="slide"
-  path="1762525697.2"><div path="1762525697.2.0"><ui-file-dropzone
-  v-model="imageID" path="1762525697.2.0.0"><e-comment-create
-  v-if="showCommentCreate" :imageID="imageID" v-model="text" :new-thread="false"
-  path="1762525697.2.0.0.0"></e-comment-create></ui-file-dropzone></div></transition><div
-  class="mt-l1" path="1762525697.3"><transition name="slide"
-  path="1762525697.3.0"><ui-button v-if="canPost" text="✔️ post" :click="post"
-  path="1762525697.3.0.0"></ui-button></transition></div></div>
+  <div class="comp-e-post-create container flex ver gap-1" v-disable="isLoading"
+  path="1762525697."><transition name="slide" path="1762525697.0"><div
+  v-show="showCreateMedia" path="1762525697.0.0"><e-media-create class="mt-l1"
+  ref="createMedia1" v-model="media" @change="toggleShowCreateMedia"
+  path="1762525697.0.0.0"></e-media-create></div></transition><transition
+  name="slide" path="1762525697.1"><div path="1762525697.1.0"><ui-file-dropzone
+  @input="onImageUpload" path="1762525697.1.0.0"><e-comment-create
+  v-model="text" :media="media" :new-thread="false"
+  @click-media-preview="toggleShowCreateMedia"
+  path="1762525697.1.0.0.0"></e-comment-create></ui-file-dropzone></div></transition><div
+  path="1762525697.2"><transition name="slide" path="1762525697.2.0"><div
+  class="flex justify-around" path="1762525697.2.0.0"><transition name="slide"
+  path="1762525697.2.0.0.0"><ui-button class="ml-2" v-if="media" :text="'✖'"
+  :click="onClearMedia"
+  path="1762525697.2.0.0.0.0"></ui-button></transition><transition name="slide"
+  path="1762525697.2.0.0.1"><ui-button v-if="canPost" text="✔️ post"
+  :click="post"
+  path="1762525697.2.0.0.1.0"></ui-button></transition></div></transition></div></div>

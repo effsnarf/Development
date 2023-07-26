@@ -2,15 +2,13 @@ dom:
   .post:
     v-if: item
     ':class': '{ enlarged }'
-    .post-attachment:
-      v-if: item.attachment?.hasContent
-      e.post.attachment:
-        ':item': item.attachment
-        @click-attachment-content: onClickAttachmentContent
+    .post-media:
+      v-if: item.media
+      ':class': getPostMediaClass(item.media)
+      e.media:
+        ':item': item.media
+        @click-media-content: onClickMediaContent
     .post-text:
-      e.generator.square:
-        class: larping-generator
-        ':value': item.larpGenerator
       div: 
         v-html: >-
           $root.textToHtml(item.text, { firstLine: ((item.index!=0) ? null :
@@ -25,9 +23,14 @@ props:
 data:
   enlarged: false
 methods:
-  onClickAttachmentContent: | #js
+  onClickMediaContent: | #js
     function () {
       this.enlarged = !this.enlarged;
+    }
+  getPostMediaClass: | #js
+    function (media) {
+      if (!media) return null;
+      return `media-${media.type}`;
     }
 style:
   .comp-e-post-menu:
@@ -65,16 +68,19 @@ style:
     float: left
     margin-right: 1em
     margin-bottom: 1em
-  .post-attachment:
+  .post-media:
     float: left
     width: 50%
     padding: 0.5em
     filter: grayscale(0.5)
     cursor: pointer
     z-index: 10
-  .post-attachment:hover, .enlarged .post-attachment:
+  .post-media.media-feel:
+    width: fit-content
+    margin: 0.5em
+  .post-media:hover, .enlarged .post-media:
     filter: none
-  .post-attachment a:
+  .post-media a:
     cursor: pointer !important
   .comp-e-instance .footer:
     display: none
@@ -83,7 +89,7 @@ style:
   .post-text:
     padding: 0.5rem
     opacity: 0.9
-  .enlarged .post-attachment:
+  .enlarged .post-media:
     width: 100%
   .enlarged .post-text: null
   .anonymous:
@@ -93,14 +99,13 @@ style:
 name: e-post
 template: >-
   <div class="comp-e-post post" v-if="item" :class="{ enlarged }"
-  path="-1357494135."><div class="post-attachment"
-  v-if="item.attachment?.hasContent" path="-1357494135.0"><e-post-attachment
-  :item="item.attachment" @click-attachment-content="onClickAttachmentContent"
-  path="-1357494135.0.0"></e-post-attachment></div><div class="post-text"
-  path="-1357494135.1"><e-generator-square class="larping-generator"
-  :value="item.larpGenerator" path="-1357494135.1.0"></e-generator-square><div
-  v-html="$root.textToHtml(item.text, { firstLine: ((item.index!=0) ? null :
-  'post-title') })" path="-1357494135.1.1"></div></div><div class="clear-both"
+  path="-1357494135."><div class="post-media" v-if="item.media"
+  :class="getPostMediaClass(item.media)" path="-1357494135.0"><e-media
+  :item="item.media" @click-media-content="onClickMediaContent"
+  path="-1357494135.0.0"></e-media></div><div class="post-text"
+  path="-1357494135.1"><div v-html="$root.textToHtml(item.text, { firstLine:
+  ((item.index!=0) ? null : 'post-title') })"
+  path="-1357494135.1.0"></div></div><div class="clear-both"
   path="-1357494135.2"></div><e-post-menu :item="item"
   @thread-updated="$emit('thread-updated')"
   path="-1357494135.3"></e-post-menu></div>

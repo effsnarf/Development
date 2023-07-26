@@ -1,0 +1,28 @@
+dom:
+  div:
+    .grid:
+      ui.image:
+        v-for: i in 8
+        ':class': '{ clickable: true }'
+        ':src': '''/img/feels/'' + i + ''.webp'''
+        ':square': true
+        @click: onClick(i)
+data:
+  selectedIndex: null
+methods:
+  onClick: | #js
+    function(index) {
+      this.$emit("input", { type: "feel", feelID: index });
+      this.$emit("change");
+    }
+watch: null
+style:
+  .grid:
+    grid-template: 1fr / 1fr 1fr 1fr 1fr
+    gap: 0.3em
+name: e-media-create-feel
+template: >-
+  <div class="comp-e-media-create-feel" path="745103109."><div class="grid"
+  path="745103109.0"><ui-image v-for="i in 8" :class="{ clickable: true }"
+  :src="'/img/feels/' + i + '.webp'" :square="true" @click="onClick(i)"
+  path="745103109.0.0"></ui-image></div></div>

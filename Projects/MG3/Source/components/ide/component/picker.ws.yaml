@@ -131,8 +131,8 @@ watch:
   hoveredVueUID:
     handler: | #js
       function(newVueUID, oldVueUID) {
-        if (oldVueUID) this.$root.vm.getVue(oldVueUID)?.$el.classList.remove(`highlighted2`);
-        if (newVueUID) this.$root.vm.getVue(newVueUID)?.$el.classList.add(`highlighted2`);
+        if (oldVueUID) this.$root.vm.getVue(oldVueUID)?.$el.classList?.remove(`highlighted2`);
+        if (newVueUID) this.$root.vm.getVue(newVueUID)?.$el.classList?.add(`highlighted2`);
       }
     immediate: true
   selectedVueUID:

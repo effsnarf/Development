@@ -1,39 +1,72 @@
 dom:
   div:
+    ui.text.box:
+      type: search
+      icon: 🔎
+      hint: search memes…
+      v-model: query
+    ui.loading:
+      class: absolute-center
+      v-if: isLoading
     .grid:
-      e.generator.square:
+      ui.image:
         v-for: generator in generators
-        ':value': generator
-        ':key': generator?.generatorID
-        ':show-anonymous': 'true'
+        ':class': '{ selected: (value?._id == generator._id) }'
+        ':tooltip': generator.displayName
+        ':imageID': generator.imageID
+        ':key': generator.generatorID
+        ':square': 'true'
         @click: () => onClick(generator)
 props:
-  allowAnonymous: false
+  value: null
 data:
   query: null
   generators: null
+  isLoading: false
 mounted: | #js
   async function() {
     await this.init();
   }
 methods:
-  init: | #js
-
-    async function () {
-      this.generators = (await this.$root.dbp.generators.select.popular());
-      if (this.allowAnonymous) {
-        this.generators.unshift(null);
-        this.generators.pop();
+  search: | #js
+    async function(query) {
+      try
+      {
+        this.generators = await this.$root.dbp.generators.select.search(query);
+      }
+      finally
+      {
+        this.isLoading = false;
       }
     }
+  init: | #js
+    async function () {
+      this.generators = (await this.$root.dbp.generators.select.popular());
+    }
   onClick: | #js
-
     function (generator) {
       this.$emit('input', generator)
     }
+watch:
+  query:
+    handler: | #js
+      (async function(query) {
+        this.search(query);
+      }).debounce(400)
+    immediate: true
+  query2:
+    handler: | #js
+      function(query) {
+        this.isLoading = true;
+      }
+computed:
+  query2: | #js
+    function() {
+      return this.query;
+    }
 style:
   .grid:
-    grid-template: 1fr / repeat(5, auto)
+    grid-template: 1fr / repeat(5, 1fr)
     gap: 0.5em
   .comp-ui-image:
     filter: grayscale(1)
@@ -46,8 +79,12 @@ style:
     transition: 0s
 name: e-generator-select
 template: >-
-  <div class="comp-e-generator-select" path="-928114976."><div class="grid"
-  path="-928114976.0"><e-generator-square v-for="generator in generators"
-  :value="generator" :key="generator?.generatorID" :show-anonymous="true"
+  <div class="comp-e-generator-select" path="-928114976."><ui-text-box
+  type="search" icon="🔎" hint="search memes…" v-model="query"
+  path="-928114976.0"></ui-text-box><ui-loading class="absolute-center"
+  v-if="isLoading" path="-928114976.1"></ui-loading><div class="grid"
+  path="-928114976.2"><ui-image v-for="generator in generators" :class="{
+  selected: (value?._id == generator._id) }" :tooltip="generator.displayName"
+  :imageID="generator.imageID" :key="generator.generatorID" :square="true"
   @click="() =&gt; onClick(generator)"
-  path="-928114976.0.0"></e-generator-square></div></div>
+  path="-928114976.2.0"></ui-image></div></div>

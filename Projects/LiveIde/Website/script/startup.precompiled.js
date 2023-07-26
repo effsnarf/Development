@@ -162,9 +162,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "../../../../LiveIde/Website/script/1690349537388.ts":
+/***/ "../../../../LiveIde/Website/script/1690376637657.ts":
 /*!***********************************************************!*\
-  !*** ../../../../LiveIde/Website/script/1690349537388.ts ***!
+  !*** ../../../../LiveIde/Website/script/1690376637657.ts ***!
   \***********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -219,15 +219,18 @@ const helpers = {
             return helpers.url.full(`/${generator.urlName}`, full);
         },
         instance: (instance, full = false) => {
-            if (!instance)
+            if (!instance?.instanceID)
                 return null;
             return helpers.url.full(`/instance/${instance.instanceID}`, full);
         },
         itemImage: (item) => {
             if (!item)
                 return null;
-            if ("text0" in item)
+            if ("text0" in item) {
+                if (!item._id)
+                    return `/img/empty.png`;
                 return `https://img.memegenerator.net/instances/600x600/${item._id}.jpg`;
+            }
             if (item.builderID)
                 return null;
             console.log(item);
@@ -3450,7 +3453,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690349537388.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690376637657.ts");
 /******/ 	
 /******/ })()
 ;

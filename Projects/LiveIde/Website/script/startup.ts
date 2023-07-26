@@ -44,13 +44,15 @@ const helpers = {
       return helpers.url.full(`/${generator.urlName}`, full);
     },
     instance: (instance: any, full: boolean = false) => {
-      if (!instance) return null;
+      if (!instance?.instanceID) return null;
       return helpers.url.full(`/instance/${instance.instanceID}`, full);
     },
     itemImage: (item: any) => {
       if (!item) return null;
-      if ("text0" in item)
+      if ("text0" in item) {
+        if (!item._id) return `/img/empty.png`;
         return `https://img.memegenerator.net/instances/600x600/${item._id}.jpg`;
+      }
       if (item.builderID) return null;
       console.log(item);
       throw new Error("Unknown item type");

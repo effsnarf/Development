@@ -1,0 +1,66 @@
+dom:
+  div: 
+    transition: 
+      name: slide
+      e.generator.select:
+        v-show: '!generator'
+        v-model: generator
+    transition: 
+      name: slide
+      .grid1:
+        v-show: generator
+        div: 
+          e.instance:
+            class: clickable
+            ':item': instance
+            ':show-footer': 'false'
+            @click: generator = null
+        .inputs:
+          input: 
+            v-model: text0
+            placeholder: top text
+          input: 
+            v-model: text1
+            placeholder: bottom text
+data:
+  generator: null
+  text0: null
+  text1: null
+methods: null
+computed:
+  instance: | #js
+    function() {
+      return { generator: this.generator, text0: this.text0, text1: this.text1 };
+    }
+watch:
+  instance:
+    handler: | #js
+      function() {
+        this.$emit('input', { type: "instance", instance: this.instance });
+      }
+    deep: true
+style:
+  .grid1:
+    display: grid
+    grid-template: 1fr / 1fr 3fr
+    gap: 0.5em
+  .inputs input:
+    text-align: center
+    text-transform: uppercase
+    padding: 0.3em 0.5em !important
+    margin-bottom: 0.5rem
+  .clickable *:
+    cursor: pointer
+name: e-media-create-instance
+template: >-
+  <div class="comp-e-media-create-instance" path="925255284."><transition
+  name="slide" path="925255284.0"><e-generator-select v-show="!generator"
+  v-model="generator"
+  path="925255284.0.0"></e-generator-select></transition><transition
+  name="slide" path="925255284.1"><div class="grid1" v-show="generator"
+  path="925255284.1.0"><div path="925255284.1.0.0"><e-instance class="clickable"
+  :item="instance" :show-footer="false" @click="generator = null"
+  path="925255284.1.0.0.0"></e-instance></div><div class="inputs"
+  path="925255284.1.0.1"><input v-model="text0" placeholder="top text"
+  path="925255284.1.0.1.0"/><input v-model="text1" placeholder="bottom text"
+  path="925255284.1.0.1.1"/></div></div></transition></div>

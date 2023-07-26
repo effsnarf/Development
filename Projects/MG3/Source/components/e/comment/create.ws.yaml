@@ -1,14 +1,18 @@
 dom:
-  .flex:
+  .grid1:
     .media-preview:
+      class: clickable
+      @click: onClickMediaPreview
       transition:
-        name: slide
-        ui.image:
-          v-if: imageID
-          ':imageID': imageID
+        name: list
+        e.media:
+          v-if: media
+          ':key': getMediaKey(media)
+          ':media': media
           ':square': true
+          ':show-footer': 'false'
         e.generator.square:
-          v-if: '!imageID'
+          v-if: '!media'
           ':show-tooltip': 'false'
           ':show-anonymous': 'true'
     ui.textarea:
@@ -17,10 +21,19 @@ dom:
       @input: onInputText
 props:
   value: null
+  media: null
   newThread: true
-  imageID: null
 data: null
 methods:
+  onClickMediaPreview: | #js
+    function() {
+      this.$emit('click-media-preview');
+    }
+  getMediaKey: | #js
+    function(media) {
+      if (!media) return null;
+      return JSON.stringify(media);
+    }
   onInputText: | #js
     function(text) {
       this.$emit('input', text);
@@ -32,17 +45,19 @@ computed:
     }
 watch: null
 style:
-  .flex:
+  .grid1:
+    display: flex
     gap: 1em
   .media-preview:
     width: 6em
 name: e-comment-create
 template: >-
-  <div class="comp-e-comment-create flex" path="-322969580."><div
-  class="media-preview" path="-322969580.0"><transition name="slide"
-  path="-322969580.0.0"><ui-image v-if="imageID" :imageID="imageID"
-  :square="true" path="-322969580.0.0.0"></ui-image><e-generator-square
-  v-if="!imageID" :show-tooltip="false" :show-anonymous="true"
+  <div class="comp-e-comment-create grid1" path="-322969580."><div
+  class="clickable media-preview" @click="onClickMediaPreview"
+  path="-322969580.0"><transition name="list" path="-322969580.0.0"><e-media
+  v-if="media" :key="getMediaKey(media)" :media="media" :square="true"
+  :show-footer="false" path="-322969580.0.0.0"></e-media><e-generator-square
+  v-if="!media" :show-tooltip="false" :show-anonymous="true"
   path="-322969580.0.0.1"></e-generator-square></transition></div><ui-textarea
   :hint="hint" :value="value" @input="onInputText"
   path="-322969580.1"></ui-textarea></div>

@@ -1,0 +1,103 @@
+dom:
+  div:
+    ':key': key1
+    ui.tabs:
+      ':options': options
+      direction: horizontal
+      ':value-type': '''index'''
+      v-model: selectedTabIndex
+      template: 
+        v-slot: tab0
+        component: 
+          ref: comp0
+          ':is': getComponentName(0)
+          v-model: medias[0]
+          @change: onChangeMedia
+      template: 
+        v-slot: tab1
+        component: 
+          ref: comp1
+          ':is': getComponentName(1)
+          v-model: medias[1]
+          @change: onChangeMedia
+      template: 
+        v-slot: tab2
+        component: 
+          ref: comp2
+          ':is': getComponentName(2)
+          v-model: medias[2]
+          @change: onChangeMedia
+props: null
+data:
+  options:
+    - 🖼️ image
+    - 📁 feel
+    - 📁 animals
+  componentNames:
+    - image
+    - feel
+    - instance
+  medias:
+    - null
+    - null
+    - null
+  selectedTabIndex: 0
+  key1: 1
+methods:
+  onImageUpload: | #js
+    function(imageID) {
+      for (let i = 0; i < this.medias.length; i++)
+      {
+        const comp = this.$refs[`comp${i}`];
+        if (comp.onImageUpload) comp.onImageUpload(imageID);
+      }
+    }
+  onChangeMedia: | #js
+    function() {
+      this.$emit("change");
+    }
+  getComponentName: | #js
+    function(index) {
+      return `e-media-create-${this.componentNames[index].getWords()[0]}`;
+    }
+  refresh: | #js
+    function() {
+      this.key1++;
+    }
+  clear: | #js
+    function() {
+      for (let i = 0; i < this.medias.length; i++) this.medias[i] = null;
+      this.refresh();
+    }
+computed:
+  media: | #js
+    function () {
+      return this.medias[this.selectedTabIndex];
+    }
+watch:
+  media:
+    handler: | #js
+      function(media) {
+        if (!media) return;
+        this.$emit("input", media);
+      }
+    deep: true
+  selectedTabIndex:
+    handler: | #js
+      function(index) {
+        if (!this.media) this.$emit("input", null);
+      }
+name: e-media-create
+template: >-
+  <div class="comp-e-media-create" :key="key1" path="-960387793."><ui-tabs
+  :options="options" direction="horizontal" :value-type="'index'"
+  v-model="selectedTabIndex" path="-960387793.0"><template v-slot:tab0
+  path="-960387793.0.0"><component ref="comp0" :is="getComponentName(0)"
+  v-model="medias[0]" @change="onChangeMedia"
+  path="-960387793.0.0.0"></component></template><template v-slot:tab1
+  path="-960387793.0.1"><component ref="comp1" :is="getComponentName(1)"
+  v-model="medias[1]" @change="onChangeMedia"
+  path="-960387793.0.1.0"></component></template><template v-slot:tab2
+  path="-960387793.0.2"><component ref="comp2" :is="getComponentName(2)"
+  v-model="medias[2]" @change="onChangeMedia"
+  path="-960387793.0.2.0"></component></template></ui-tabs></div>
