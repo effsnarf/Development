@@ -49,7 +49,7 @@ methods:
         // Also create a post
         if (threadMediaID)
         {
-          const post = await this.$root.dbp.posts.create.one(null, threadMediaID, null, null, media);
+          const post = await this.$root.dbp.posts.create.one(null, threadMediaID, null, {media});
           this.$emit("thread-updated");
         }
         this.$emit("created", media);

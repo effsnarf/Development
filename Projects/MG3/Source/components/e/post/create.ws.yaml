@@ -54,7 +54,7 @@ methods:
       {
         const { generator, text0, text1 } = (this.tempInstance || {});
         const instance = !generator ? null : { generatorID: generator.generatorID, text0, text1 };
-        const post = await this.$root.dbp.posts.create.one(this.threadID, this.threadMediaID, this.text, instance, this.imageID);
+        const post = await this.$root.dbp.posts.create.one(this.threadID, this.threadMediaID, this.text, { imageID: this.imageID });
         this.$emit('created', post);
         this.clear();
       }
@@ -65,6 +65,7 @@ methods:
     }
   clear: | #js
     function() {
+      this.imageID = null;
       this.text = null;
       this.tempInstance = null;
     }
