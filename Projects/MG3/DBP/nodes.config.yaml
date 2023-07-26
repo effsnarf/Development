@@ -286,7 +286,7 @@ api:
         const threadMedia = (!threadMediaID ? null : (await db.findOne("Medias", { _id: threadMediaID })) );
         if (threadMedia)
         {
-          const firstPost = await dbp.posts.create.one(thread._id, null, null, null, threadMedia);
+          const firstPost = await dbp.posts.create.one(thread._id, null, null, {media: threadMedia});
         }
         return thread;
     Threads.select.one:
@@ -312,7 +312,7 @@ api:
         threads = await Promise.all(threads.map(async t => await dbp.threads.select.one(t._id)));
         return threads;
     Posts.create.one:
-      args: [threadID, threadMediaID, text, instance, media, imageID]
+      args: [threadID, threadMediaID, text, attachment]
       code: | #js
         const now = Date.now();
 
@@ -321,10 +321,9 @@ api:
         if (!thread) thread = await dbp.threads.create.one(threadMediaID);
         if (!thread) throw new Error("Provide either a threadID or a threadMediaID");
 
-        if (!instance) instance = null;
-        if (instance)
+        if (attachment?.instance)
         {
-          instance = await dbp.instances.create.one("en", instance.generatorID, null, instance.text0, instance.text1);
+          let instance = await dbp.instances.create.one("en", attachment.instance.generatorID, null, attachment.instance.text0, attachment.instance.text1);
           instance = {
             _id: instance.instanceID,
             GeneratorID: instance.generatorID,
@@ -335,6 +334,7 @@ api:
             Text1: instance.text1,
           };
           instance._id = instance.instanceID;
+          attachment.instance = instance;
         }
 
         const otherPosts = (await db.find("Posts", { ThreadID: thread._id }, { }, 1000, null, true));
@@ -344,10 +344,7 @@ api:
           Index: otherPosts.length,
           Text: text,
           ImageID: imageID,
-          Attachment: {
-            Media: media,
-            Instance: instance,
-          },
+          Attachment: attachment,
           Created: now,
         };
 

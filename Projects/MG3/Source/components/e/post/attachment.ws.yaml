@@ -1,27 +1,37 @@
 dom:
-  div:
+  div: 
     v-if: item
+    div: 
+      v-text: item
+    ui.image:
+      v-if: item.imageID
+      ':imageID': item.imageID
+      @click: onClickAttachmentContent
     e.media:
       v-if: item.media
       ':item': item.media
-      @click-media-content: onClickMediaContent
+      @click-media-content: onClickAttachmentContent
       @thread-updated: $emit('thread-updated')
     e.instance:
       v-if: item.instance
       ':item': item.instance
+      @click: onClickAttachmentContent
 props:
   item: null
 data: null
 methods:
-  onClickMediaContent: | #js
+  onClickAttachmentContent: | #js
     function() {
       this.$emit('click-attachment-content');
     }
 name: e-post-attachment
 template: >-
-  <div class="comp-e-post-attachment" v-if="item" path="-2016563288."><e-media
-  v-if="item.media" :item="item.media"
-  @click-media-content="onClickMediaContent"
+  <div class="comp-e-post-attachment" v-if="item" path="-2016563288."><div
+  v-text="item" path="-2016563288.0"></div><ui-image v-if="item.imageID"
+  :imageID="item.imageID" @click="onClickAttachmentContent"
+  path="-2016563288.1"></ui-image><e-media v-if="item.media" :item="item.media"
+  @click-media-content="onClickAttachmentContent"
   @thread-updated="$emit('thread-updated')"
-  path="-2016563288.0"></e-media><e-instance v-if="item.instance"
-  :item="item.instance" path="-2016563288.1"></e-instance></div>
+  path="-2016563288.2"></e-media><e-instance v-if="item.instance"
+  :item="item.instance" @click="onClickAttachmentContent"
+  path="-2016563288.3"></e-instance></div>

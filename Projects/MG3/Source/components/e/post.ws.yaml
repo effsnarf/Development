@@ -3,6 +3,7 @@ dom:
     v-if: item
     ':class': '{ enlarged }'
     .post-attachment:
+      v-if: item.attachment?.hasContent
       e.post.attachment:
         ':item': item.attachment
         @click-attachment-content: onClickAttachmentContent
@@ -93,8 +94,8 @@ name: e-post
 template: >-
   <div class="comp-e-post post" v-if="item" :class="{ enlarged }"
   path="-1357494135."><div class="post-attachment"
-  path="-1357494135.0"><e-post-attachment :item="item.attachment"
-  @click-attachment-content="onClickAttachmentContent"
+  v-if="item.attachment?.hasContent" path="-1357494135.0"><e-post-attachment
+  :item="item.attachment" @click-attachment-content="onClickAttachmentContent"
   path="-1357494135.0.0"></e-post-attachment></div><div class="post-text"
   path="-1357494135.1"><e-generator-square class="larping-generator"
   :value="item.larpGenerator" path="-1357494135.1.0"></e-generator-square><div
