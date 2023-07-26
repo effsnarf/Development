@@ -1,32 +1,33 @@
 dom:
   site:
     page-name: media
+    ':columns-focus-left': columnsFocusLeft
     ':content-not-found': contentNotFound
     ':columns': 2
     template: 
       v-slot: article
     template: 
       v-slot: left
-      div: 
+      .flex.ver.gap-2:
         e.media.menu:
           ':media': media
+        e.thread.create:
+          @input:columnsFocusLeft: columnsFocusLeft=$event
     template: 
       v-slot: middle
       .flex.gap-2:
         transition:
           name: slide-large
-          e.media:
+          e.thread:
             v-if: media
             ':key': media._id
-            ':item': media
-        div: 
-          e.thread:
-            ':threadMediaID': media?._id
+            ':threadMediaID': media._id
 data:
   media: null
   temp: null
   builder: null
   contentNotFound: false
+  columnsFocusLeft: false
 mounted: | #js
   async function() {
     this.$watch(() => this.$root.params.mediaID, {
@@ -78,13 +79,15 @@ style: null
 name: page-media
 template: >-
   <site class="comp-page-media" page-name="media"
-  :content-not-found="contentNotFound" :columns="2" path="221009861."><template
-  v-slot:article path="221009861.0"></template><template v-slot:left
-  path="221009861.1"><div path="221009861.1.0"><e-media-menu :media="media"
-  path="221009861.1.0.0"></e-media-menu></div></template><template v-slot:middle
-  path="221009861.2"><div class="flex gap-2" path="221009861.2.0"><transition
-  name="slide-large" path="221009861.2.0.0"><e-media v-if="media"
-  :key="media._id" :item="media"
-  path="221009861.2.0.0.0"></e-media></transition><div
-  path="221009861.2.0.1"><e-thread :threadMediaID="media?._id"
-  path="221009861.2.0.1.0"></e-thread></div></div></template></site>
+  :columns-focus-left="columnsFocusLeft" :content-not-found="contentNotFound"
+  :columns="2" path="221009861."><template v-slot:article
+  path="221009861.0"></template><template v-slot:left path="221009861.1"><div
+  class="flex ver gap-2" path="221009861.1.0"><e-media-menu :media="media"
+  path="221009861.1.0.0"></e-media-menu><e-thread-create
+  @input:columnsFocusLeft="columnsFocusLeft=$event"
+  path="221009861.1.0.1"></e-thread-create></div></template><template
+  v-slot:middle path="221009861.2"><div class="flex gap-2"
+  path="221009861.2.0"><transition name="slide-large"
+  path="221009861.2.0.0"><e-thread v-if="media" :key="media._id"
+  :threadMediaID="media._id"
+  path="221009861.2.0.0.0"></e-thread></transition></div></template></site>

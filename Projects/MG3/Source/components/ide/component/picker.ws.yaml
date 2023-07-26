@@ -14,24 +14,29 @@ dom:
       template:
         v-slot: content
         .flex.flex-row.gap-1:
-          div: 
-            .parent-chain:
-              ide.component.title: 
-                v-for: uid in parentChainUIDs
-                ':item': $root.vm.vues[uid]
-                ':class': '{ ''selected'': uid === selectedVueUID }'
-                @mouseenter: onMouseEnterVue(uid)
-                @mouseleave: onMouseLeaveVue(uid)
-                @click: selectVue(uid)
-            .child-chain:
-              ide.component.title: 
-                v-for: uid in childChainUIDs
-                ':item': $root.vm.vues[uid]
-                ':class': '{ ''selected'': uid === selectedVueUID }'
-                @mouseenter: onMouseEnterVue(uid)
-                @mouseleave: onMouseLeaveVue(uid)
-                @click: selectVue(uid)
+          .flex.flex-column.gap-1:
+            div: 
+              .parent-chain:
+                ide.component.title: 
+                  v-for: uid in parentChainUIDs
+                  ':item': $root.vm.vues[uid]
+                  ':class': '{ ''selected'': uid === selectedVueUID }'
+                  @mouseenter: onMouseEnterVue(uid)
+                  @mouseleave: onMouseLeaveVue(uid)
+                  @click: selectVue(uid)
+              .child-chain:
+                ide.component.title: 
+                  v-for: uid in childChainUIDs
+                  ':item': $root.vm.vues[uid]
+                  ':class': '{ ''selected'': uid === selectedVueUID }'
+                  @mouseenter: onMouseEnterVue(uid)
+                  @mouseleave: onMouseLeaveVue(uid)
+                  @click: selectVue(uid)
+            ide.element.inspector:
+              class: hidden
+              ':element': hoveredElement
           ide.component.editor:
+            v-if: selectedVueUID
             ':vue-uid': hoveredVueUID||selectedVueUID
 props: null
 data:
@@ -163,16 +168,19 @@ template: >-
   :global="true" :visible="showPicker" icon="📦"
   :title="getTitle(hoveredVueUID)" path="-646340253.2"><template v-slot:content
   path="-646340253.2.0"><div class="flex flex-row gap-1"
-  path="-646340253.2.0.0"><div path="-646340253.2.0.0.0"><div
-  class="parent-chain" path="-646340253.2.0.0.0.0"><ide-component-title
+  path="-646340253.2.0.0"><div class="flex flex-column gap-1"
+  path="-646340253.2.0.0.0"><div path="-646340253.2.0.0.0.0"><div
+  class="parent-chain" path="-646340253.2.0.0.0.0.0"><ide-component-title
   v-for="uid in parentChainUIDs" :item="$root.vm.vues[uid]" :class="{
   'selected': uid === selectedVueUID }" @mouseenter="onMouseEnterVue(uid)"
   @mouseleave="onMouseLeaveVue(uid)" @click="selectVue(uid)"
-  path="-646340253.2.0.0.0.0.0"></ide-component-title></div><div
-  class="child-chain" path="-646340253.2.0.0.0.1"><ide-component-title
+  path="-646340253.2.0.0.0.0.0.0"></ide-component-title></div><div
+  class="child-chain" path="-646340253.2.0.0.0.0.1"><ide-component-title
   v-for="uid in childChainUIDs" :item="$root.vm.vues[uid]" :class="{ 'selected':
   uid === selectedVueUID }" @mouseenter="onMouseEnterVue(uid)"
   @mouseleave="onMouseLeaveVue(uid)" @click="selectVue(uid)"
-  path="-646340253.2.0.0.0.1.0"></ide-component-title></div></div><ide-component-editor
-  :vue-uid="hoveredVueUID||selectedVueUID"
+  path="-646340253.2.0.0.0.0.1.0"></ide-component-title></div></div><ide-element-inspector
+  class="hidden" :element="hoveredElement"
+  path="-646340253.2.0.0.0.1"></ide-element-inspector></div><ide-component-editor
+  v-if="selectedVueUID" :vue-uid="hoveredVueUID||selectedVueUID"
   path="-646340253.2.0.0.1"></ide-component-editor></div></template></ui-context-window></div>

@@ -6,20 +6,11 @@
 /*!*************************************************************!*\
   !*** ../../../../../Apps/DatabaseProxy/Client/DbpClient.ts ***!
   \*************************************************************/
-/***/ (function(__unused_webpack_module, exports) {
+/***/ ((__unused_webpack_module, exports) => {
 
 
 // This version is for public clients like Meme Generator
 // Doesn't have direct access to the database, but can still use the API
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.DatabaseProxy = void 0;
 // Lowercase the first letter of a string
@@ -27,32 +18,30 @@ String.prototype.untitleize = function () {
     return this.charAt(0).toLowerCase() + this.slice(1);
 };
 class DatabaseProxy {
+    urlBase;
+    fetchAsJson;
     constructor(urlBase, _fetchAsJson) {
         this.urlBase = urlBase;
         this.fetchAsJson =
             _fetchAsJson ||
-                ((url, ...args) => __awaiter(this, void 0, void 0, function* () {
-                    const response = yield fetch(url, ...args);
-                    const text = yield response.text();
-                    if (!(text === null || text === void 0 ? void 0 : text.length))
+                (async (url, ...args) => {
+                    const response = await fetch(url, ...args);
+                    const text = await response.text();
+                    if (!text?.length)
                         return null;
                     return JSON.parse(text);
-                }));
+                });
     }
-    static new(urlBase, _fetchAsJson) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const dbp = new DatabaseProxy(urlBase, _fetchAsJson);
-            yield dbp.init();
-            return dbp;
-        });
+    static async new(urlBase, _fetchAsJson) {
+        const dbp = new DatabaseProxy(urlBase, _fetchAsJson);
+        await dbp.init();
+        return dbp;
     }
-    init() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const api = yield this.createApiMethods();
-            for (const key of Object.keys(api)) {
-                this[key] = api[key];
-            }
-        });
+    async init() {
+        const api = await this.createApiMethods();
+        for (const key of Object.keys(api)) {
+            this[key] = api[key];
+        }
     }
     static setValue(obj, value) {
         if (Array.isArray(obj)) {
@@ -62,118 +51,110 @@ class DatabaseProxy {
             obj.value = value;
         }
     }
-    fetchJson(url, options = {}) {
-        return __awaiter(this, void 0, void 0, function* () {
-            // $set also implies cached
-            if (!options.$set) {
-                if (options.cached) {
-                    // Even though we're returning from the cache,
-                    // we still want to fetch in the background
-                    // to update for the next time
-                    const fetchItem = () => __awaiter(this, void 0, void 0, function* () {
-                        const item = yield this.fetchAsJson(url, options);
-                        //localStorage.setItem(url, JSON.stringify(item));
-                        return item;
-                    });
-                    //const cachedItem = Objects.json.parse(localStorage.getItem(url) || "null");
-                    const cachedItem = null;
-                    if (!cachedItem)
-                        return yield fetchItem();
-                    // Fetch in the background
-                    fetchItem();
-                    return cachedItem;
-                }
-                return yield this.fetchAsJson(url, options);
-            }
-            // Check the local cache
-            //const cachedItem = Objects.json.parse(localStorage.getItem(url) || "null");
-            const cachedItem = null;
-            if (cachedItem)
-                DatabaseProxy.setValue(options.$set, cachedItem);
-            // Fetch in the background
-            const item = yield this.fetchAsJson(url, options);
-            // Update the local cache
-            //localStorage.setItem(url, JSON.stringify(item));
-            DatabaseProxy.setValue(options.$set, item);
-            return item;
-        });
-    }
-    callApiMethod(entity, group, method, args, extraArgs) {
-        return __awaiter(this, void 0, void 0, function* () {
-            // We're using { $set: [obj, prop] } as a callback syntax
-            // This is because sometimes we use the local cache and also fetch in the background
-            // in which case we'll need to resolve twice which is not possible with a promise
-            const options = extraArgs.find((a) => a.$set) || {};
-            const url = `${this.urlBase}/api/${entity}/${group}/${method}`;
-            const isHttpPost = group == "create";
-            if (isHttpPost) {
-                const data = {};
-                args.forEach((a) => (data[a.name] = a.value));
-                const fetchOptions = {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(data),
-                    mode: "no-cors",
+    async fetchJson(url, options = {}) {
+        // $set also implies cached
+        if (!options.$set) {
+            if (options.cached) {
+                // Even though we're returning from the cache,
+                // we still want to fetch in the background
+                // to update for the next time
+                const fetchItem = async () => {
+                    const item = await this.fetchAsJson(url, options);
+                    //localStorage.setItem(url, JSON.stringify(item));
+                    return item;
                 };
-                const result = yield this.fetchJson(url, fetchOptions);
-                // If we got an _id back, select the item
-                // This is because when POSTing from localhost I'm having trouble getting the actual object back
-                const _id = parseInt(result);
-                if (_id) {
-                    const idFieldName = `${entity
-                        .substring(0, entity.length - 1)
-                        .toLowerCase()}ID`;
-                    return yield this.callApiMethod(entity, "select", "one", [{ name: idFieldName, value: _id }], []);
-                }
-                return result;
+                //const cachedItem = Objects.json.parse(localStorage.getItem(url) || "null");
+                const cachedItem = null;
+                if (!cachedItem)
+                    return await fetchItem();
+                // Fetch in the background
+                fetchItem();
+                return cachedItem;
             }
-            const argsStr = args
-                .map((a) => `${a.name}=${JSON.stringify(a.value || null)}`)
-                .join("&");
-            const getUrl = `${url}?${argsStr}`;
-            const result = yield this.fetchJson(getUrl, options);
-            return result;
-        });
+            return await this.fetchAsJson(url, options);
+        }
+        // Check the local cache
+        //const cachedItem = Objects.json.parse(localStorage.getItem(url) || "null");
+        const cachedItem = null;
+        if (cachedItem)
+            DatabaseProxy.setValue(options.$set, cachedItem);
+        // Fetch in the background
+        const item = await this.fetchAsJson(url, options);
+        // Update the local cache
+        //localStorage.setItem(url, JSON.stringify(item));
+        DatabaseProxy.setValue(options.$set, item);
+        return item;
     }
-    createApiMethods() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const api = {};
-            const apiMethods = yield this.getApiMethods();
-            apiMethods.forEach((e) => {
-                const entityName = e.entity.untitleize();
-                api[entityName] = {};
-                e.groups.forEach((g) => {
-                    api[entityName][g.name] = {};
-                    g.methods.forEach((m) => {
-                        api[entityName][g.name][m.name] = (...args) => __awaiter(this, void 0, void 0, function* () {
-                            let result = yield this.callApiMethod(e.entity, g.name, m.name, (m.args || []).map((a, i) => {
-                                return { name: a, value: args[i] };
-                            }), args.slice((m.args || []).length));
-                            if (m.then) {
-                                const thenArgs = [`api`, ...(m.then.args || [])];
-                                const then = eval(`async (${thenArgs.join(`,`)}) => { ${m.then.body} }`);
-                                if (m.then.chainResult) {
-                                    result = yield then(api, result);
-                                }
-                                else {
-                                    then(api, result);
-                                }
+    async callApiMethod(entity, group, method, args, extraArgs) {
+        // We're using { $set: [obj, prop] } as a callback syntax
+        // This is because sometimes we use the local cache and also fetch in the background
+        // in which case we'll need to resolve twice which is not possible with a promise
+        const options = extraArgs.find((a) => a.$set) || {};
+        const url = `${this.urlBase}/api/${entity}/${group}/${method}`;
+        const isHttpPost = group == "create";
+        if (isHttpPost) {
+            const data = {};
+            args.forEach((a) => (data[a.name] = a.value));
+            const fetchOptions = {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data),
+                mode: "no-cors",
+            };
+            const result = await this.fetchJson(url, fetchOptions);
+            // If we got an _id back, select the item
+            // This is because when POSTing from localhost I'm having trouble getting the actual object back
+            const _id = parseInt(result);
+            if (_id) {
+                const idFieldName = `${entity
+                    .substring(0, entity.length - 1)
+                    .toLowerCase()}ID`;
+                return await this.callApiMethod(entity, "select", "one", [{ name: idFieldName, value: _id }], []);
+            }
+            return result;
+        }
+        const argsStr = args
+            .map((a) => `${a.name}=${JSON.stringify(a.value || null)}`)
+            .join("&");
+        const getUrl = `${url}?${argsStr}`;
+        const result = await this.fetchJson(getUrl, options);
+        return result;
+    }
+    async createApiMethods() {
+        const api = {};
+        const apiMethods = await this.getApiMethods();
+        apiMethods.forEach((e) => {
+            const entityName = e.entity.untitleize();
+            api[entityName] = {};
+            e.groups.forEach((g) => {
+                api[entityName][g.name] = {};
+                g.methods.forEach((m) => {
+                    api[entityName][g.name][m.name] = async (...args) => {
+                        let result = await this.callApiMethod(e.entity, g.name, m.name, (m.args || []).map((a, i) => {
+                            return { name: a, value: args[i] };
+                        }), args.slice((m.args || []).length));
+                        if (m.then) {
+                            const thenArgs = [`api`, ...(m.then.args || [])];
+                            const then = eval(`async (${thenArgs.join(`,`)}) => { ${m.then.body} }`);
+                            if (m.then.chainResult) {
+                                result = await then(api, result);
                             }
-                            return result;
-                        });
-                    });
+                            else {
+                                then(api, result);
+                            }
+                        }
+                        return result;
+                    };
                 });
             });
-            return api;
         });
+        return api;
     }
-    getApiMethods() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const result = yield this.fetchJson(`${this.urlBase}/api`, {
-                cached: true,
-            });
-            return result;
+    async getApiMethods() {
+        const result = await this.fetchJson(`${this.urlBase}/api`, {
+            cached: true,
         });
+        return result;
     }
 }
 exports.DatabaseProxy = DatabaseProxy;
@@ -181,22 +162,13 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "../../../../LiveIde/Website/script/1690304407980.ts":
+/***/ "../../../../LiveIde/Website/script/1690347168015.ts":
 /*!***********************************************************!*\
-  !*** ../../../../LiveIde/Website/script/1690304407980.ts ***!
+  !*** ../../../../LiveIde/Website/script/1690347168015.ts ***!
   \***********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -290,9 +262,38 @@ const helpers = {
             return path;
         },
     },
+    html: {
+        getAppliedStyle: (element) => {
+            // Create a temporary element to get default styles
+            const tempElement = document.createElement(element.tagName);
+            // Add the temporary element off-screen
+            tempElement.style.position = "absolute";
+            tempElement.style.left = "-9999px";
+            document.body.appendChild(tempElement);
+            // Get computed styles of the temporary element
+            const defaultStyles = window.getComputedStyle(tempElement);
+            // Get computed styles of the target element
+            const computedStyles = window.getComputedStyle(element);
+            // Object to store non-default styles
+            const nonDefaultStyles = {};
+            // Compare styles to find non-default properties
+            for (const prop of defaultStyles) {
+                if (defaultStyles[prop] !== computedStyles[prop]) {
+                    nonDefaultStyles[prop] = computedStyles[prop];
+                }
+            }
+            // Clean up - remove the temporary element
+            document.body.removeChild(tempElement);
+            return Object.entries(nonDefaultStyles)
+                .filter((e) => !e[0].startsWith("border-"))
+                .map((e) => {
+                return { name: e[0], value: e[1] };
+            });
+        },
+    },
 };
-(() => __awaiter(void 0, void 0, void 0, function* () {
-    const client = yield ClientContext_1.ClientContext.get();
+(async () => {
+    const client = await ClientContext_1.ClientContext.get();
     client.Vue.directive("html-raw", {
         bind(el, binding) {
             el.innerHTML = binding.value;
@@ -335,16 +336,16 @@ const helpers = {
             }
         },
     });
-    yield client.compileAll();
+    await client.compileAll();
     let ideVueApp = null;
     const isLocalHost = window.location.hostname == "localhost";
     const dbpHost = `https://db.memegenerator.net`;
-    const dbp = (yield DbpClient_1.DatabaseProxy.new(`${dbpHost}/MemeGenerator`));
-    const getNewParams = () => __awaiter(void 0, void 0, void 0, function* () {
-        return (yield Params_1.Params.new(() => ideVueApp, client.config.params, window.location.pathname));
-    });
-    const params = yield getNewParams();
-    const vueManager = yield VueManager_1.VueManager.new(client);
+    const dbp = (await DbpClient_1.DatabaseProxy.new(`${dbpHost}/MemeGenerator`));
+    const getNewParams = async () => {
+        return (await Params_1.Params.new(() => ideVueApp, client.config.params, window.location.pathname));
+    };
+    const params = await getNewParams();
+    const vueManager = await VueManager_1.VueManager.new(client);
     ideVueApp = new client.Vue({
         data: {
             // MemeGenerator
@@ -357,9 +358,10 @@ const helpers = {
             vm: vueManager,
             client,
             dbp,
-            analytics: yield AnalyticsTracker_1.AnalyticsTracker.new(),
+            analytics: await AnalyticsTracker_1.AnalyticsTracker.new(),
             params: params,
             url: helpers.url,
+            html: helpers.html,
             comps: client.Vue.ref(client.comps),
             compsDic: {},
             compNames: [],
@@ -371,38 +373,29 @@ const helpers = {
             _uniqueClientID: 1,
             isAdmin: false,
         },
-        mounted() {
-            return __awaiter(this, void 0, void 0, function* () {
-                yield this.init();
-            });
+        async mounted() {
+            await this.init();
         },
         methods: {
-            init() {
-                return __awaiter(this, void 0, void 0, function* () {
-                    const self = this;
-                    self.compsDic = client.comps.toMap((c) => c.name.hashCode());
-                    self.compNames = client.comps.map((c) => c.name);
-                    yield self.ensureBuilders();
-                    self.isAdmin = window.location.hostname == "localhost";
-                });
+            async init() {
+                const self = this;
+                self.compsDic = client.comps.toMap((c) => c.name.hashCode());
+                self.compNames = client.comps.map((c) => c.name);
+                await self.ensureBuilders();
+                self.isAdmin = window.location.hostname == "localhost";
             },
-            getBuilder(builderID) {
-                return __awaiter(this, void 0, void 0, function* () {
-                    const self = this;
-                    yield self.ensureBuilders();
-                    return self.builders.all[builderID];
-                });
+            async getBuilder(builderID) {
+                const self = this;
+                await self.ensureBuilders();
+                return self.builders.all[builderID];
             },
-            ensureBuilders() {
-                var _a;
-                return __awaiter(this, void 0, void 0, function* () {
-                    const self = this;
-                    if (!((_a = self.builders) === null || _a === void 0 ? void 0 : _a.length)) {
-                        const allBuilders = yield self.dbp.builders.select.all();
-                        self.builders.mainMenu = allBuilders.filter((b) => { var _a; return (_a = b.visible) === null || _a === void 0 ? void 0 : _a.mainMenu; });
-                        self.builders.all = allBuilders.toMap((b) => b._id);
-                    }
-                });
+            async ensureBuilders() {
+                const self = this;
+                if (!self.builders?.length) {
+                    const allBuilders = await self.dbp.builders.select.all();
+                    self.builders.mainMenu = allBuilders.filter((b) => b.visible?.mainMenu);
+                    self.builders.all = allBuilders.toMap((b) => b._id);
+                }
             },
             getBuilderComponentName(builder) {
                 if (!builder)
@@ -468,7 +461,7 @@ const helpers = {
             getDescendants(vue, filter) {
                 if (typeof filter == "string") {
                     const compName = filter;
-                    filter = (vue) => { var _a; return ((_a = vue.$data._) === null || _a === void 0 ? void 0 : _a.comp.name) == compName; };
+                    filter = (vue) => vue.$data._?.comp.name == compName;
                 }
                 const vues = [];
                 for (const child of vue.$children) {
@@ -478,14 +471,12 @@ const helpers = {
                 }
                 return vues;
             },
-            navigateTo(item) {
-                return __awaiter(this, void 0, void 0, function* () {
-                    const url = typeof item == "string" ? item : this.itemToUrl(item);
-                    const self = this;
-                    self.error = null;
-                    window.history.pushState({}, "", url);
-                    yield this.refresh();
-                });
+            async navigateTo(item) {
+                const url = typeof item == "string" ? item : this.itemToUrl(item);
+                const self = this;
+                self.error = null;
+                window.history.pushState({}, "", url);
+                await this.refresh();
             },
             itemToUrl(item) {
                 if (typeof item == "string")
@@ -496,26 +487,20 @@ const helpers = {
                     return helpers.url.media(item);
                 throw new Error("Unknown item type");
             },
-            compileApp() {
-                return __awaiter(this, void 0, void 0, function* () {
-                    yield client.compileApp();
-                    this.refresh();
-                });
+            async compileApp() {
+                await client.compileApp();
+                this.refresh();
             },
-            reloadComponentsFromServer() {
-                return __awaiter(this, void 0, void 0, function* () {
-                    yield client.reloadComponentsFromServer();
-                    yield this.init();
-                    yield this.refreshComponents();
-                });
+            async reloadComponentsFromServer() {
+                await client.reloadComponentsFromServer();
+                await this.init();
+                await this.refreshComponents();
             },
-            getMoreInstances(pageIndex) {
-                return __awaiter(this, void 0, void 0, function* () {
-                    const self = this;
-                    return yield self.dbp.instances.select.popular("en", pageIndex, self.params.urlName);
-                });
+            async getMoreInstances(pageIndex) {
+                const self = this;
+                return await self.dbp.instances.select.popular("en", pageIndex, self.params.urlName);
             },
-            textToHtml(text) {
+            textToHtml(text, options = {}) {
                 if (!text)
                     return null;
                 var s = text;
@@ -527,27 +512,28 @@ const helpers = {
                 s = s.replace(/"(.*?)"(?!\w)/g, "<strong>$1</strong>");
                 // line breaks
                 s = s.replace(/\n/g, "<br />");
+                // First line title
+                if (options.firstLine) {
+                    // Convert the first line (ending with <br />) to <div class="title">..</div>
+                    s = s.replace(/^(.*?<br \/>)/g, `<div class='${options.firstLine}'>$1</div>`);
+                }
                 return s;
             },
-            refresh() {
-                return __awaiter(this, void 0, void 0, function* () {
-                    const self = this;
-                    const newParams = (yield getNewParams());
-                    for (const key in newParams) {
-                        if ("value" in newParams[key])
-                            self.params[key] = newParams[key].value;
-                    }
-                    //(this as any).key1++;
-                    window.scrollTo({ top: 0, behavior: "smooth" });
-                });
+            async refresh() {
+                const self = this;
+                const newParams = (await getNewParams());
+                for (const key in newParams) {
+                    if ("value" in newParams[key])
+                        self.params[key] = newParams[key].value;
+                }
+                //(this as any).key1++;
+                window.scrollTo({ top: 0, behavior: "smooth" });
             },
-            refreshComponents() {
-                return __awaiter(this, void 0, void 0, function* () {
-                    const self = this;
-                    self.key1++;
-                    yield self.$nextTick();
-                    yield self.state.restoreState();
-                });
+            async refreshComponents() {
+                const self = this;
+                self.key1++;
+                await self.$nextTick();
+                await self.state.restoreState();
             },
             instanceToGenerator(instance) {
                 let gen = Extensions_Objects_Client_1.Objects.json.parse(JSON.stringify(instance));
@@ -575,7 +561,7 @@ const helpers = {
                 return item;
             },
             getRandomStanza(poem) {
-                if (!(poem === null || poem === void 0 ? void 0 : poem.length))
+                if (!poem?.length)
                     return null;
                 const count = poem.length;
                 const index = Math.floor(Math.random() * count);
@@ -621,86 +607,78 @@ const helpers = {
                 });
                 return yaml;
             },
-            uploadFile(file) {
-                return __awaiter(this, void 0, void 0, function* () {
-                    const self = this;
-                    const imageUrl = yield this.getImageUrlFromDataTransferFile(file);
-                    const s = [];
-                    s.push(`<img src='${imageUrl}' />`);
-                    s.push("<h3 class='text-center'>uploading..</h3>");
-                    s.push(`<div class='text-center'><img src='${self.$data.loadingImageUrl}'></img></div>`);
-                    const msg = client.alertify.message(s.join("")).delay(0);
-                    return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
-                        let url = "https://img.memegenerator.net/upload";
-                        var xhr = new XMLHttpRequest();
-                        var formData = new FormData();
-                        xhr.open("POST", url, true);
-                        xhr.addEventListener("readystatechange", function (e) {
-                            return __awaiter(this, void 0, void 0, function* () {
-                                if (xhr.readyState == 4 && xhr.status == 200) {
-                                    const image = Extensions_Objects_Client_1.Objects.json.parse(xhr.responseText);
-                                    // Download the image from the server
-                                    // this also takes some time, and we should hold the loading indicator
-                                    yield self.downloadImage(image._id);
-                                    msg.dismiss();
-                                    resolve(image);
-                                }
-                                else if (xhr.readyState == 4 && xhr.status != 200) {
-                                    msg.dismiss();
-                                    reject(xhr.responseText);
-                                }
-                            });
-                        });
-                        formData.append("image", file);
-                        xhr.send(formData);
-                    }));
-                });
-            },
-            getImageUrlFromDataTransferFile(file) {
-                return __awaiter(this, void 0, void 0, function* () {
-                    // fileDropEvent.preventDefault();
-                    // const files = fileDropEvent.dataTransfer.files;
-                    // const imageUrls = [];
-                    function readFileAsDataURL(file) {
-                        return new Promise((resolve, reject) => {
-                            const reader = new FileReader();
-                            reader.onload = function (event) {
-                                resolve(event.target.result);
-                            };
-                            reader.onerror = function (event) {
-                                reject(event.error);
-                            };
-                            reader.readAsDataURL(file);
-                        });
-                    }
-                    const imageUrl = yield readFileAsDataURL(file);
-                    return imageUrl;
-                    // for (let i = 0; i < files.length; i++) {
-                    //   const file = files[i];
-                    //   if (file.type.startsWith("image/")) {
-                    //     const imageUrl = await readFileAsDataURL(file);
-                    //     imageUrls.push(imageUrl);
-                    //   }
-                    // }
-                    // return imageUrls;
-                });
-            },
-            downloadImage(imageIdOrUrl) {
-                return __awaiter(this, void 0, void 0, function* () {
-                    const self = this;
-                    const imageUrl = typeof imageIdOrUrl === "string"
-                        ? imageIdOrUrl
-                        : self.url.image(imageIdOrUrl, true);
-                    return new Promise((resolve, reject) => {
-                        const imageObj = new Image();
-                        imageObj.onload = () => {
-                            resolve(imageObj);
-                        };
-                        imageObj.onerror = () => {
-                            reject(imageObj);
-                        };
-                        imageObj.src = imageUrl;
+            async uploadFile(file) {
+                const self = this;
+                const imageUrl = await this.getImageUrlFromDataTransferFile(file);
+                const s = [];
+                s.push(`<img src='${imageUrl}' />`);
+                s.push("<h3 class='text-center'>uploading..</h3>");
+                s.push(`<div class='text-center'><img src='${self.$data.loadingImageUrl}'></img></div>`);
+                const msg = client.alertify.message(s.join("")).delay(0);
+                return new Promise(async (resolve, reject) => {
+                    let url = "https://img.memegenerator.net/upload";
+                    var xhr = new XMLHttpRequest();
+                    var formData = new FormData();
+                    xhr.open("POST", url, true);
+                    xhr.addEventListener("readystatechange", async function (e) {
+                        if (xhr.readyState == 4 && xhr.status == 200) {
+                            const image = Extensions_Objects_Client_1.Objects.json.parse(xhr.responseText);
+                            // Download the image from the server
+                            // this also takes some time, and we should hold the loading indicator
+                            await self.downloadImage(image._id);
+                            msg.dismiss();
+                            resolve(image);
+                        }
+                        else if (xhr.readyState == 4 && xhr.status != 200) {
+                            msg.dismiss();
+                            reject(xhr.responseText);
+                        }
                     });
+                    formData.append("image", file);
+                    xhr.send(formData);
+                });
+            },
+            async getImageUrlFromDataTransferFile(file) {
+                // fileDropEvent.preventDefault();
+                // const files = fileDropEvent.dataTransfer.files;
+                // const imageUrls = [];
+                function readFileAsDataURL(file) {
+                    return new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = function (event) {
+                            resolve(event.target.result);
+                        };
+                        reader.onerror = function (event) {
+                            reject(event.error);
+                        };
+                        reader.readAsDataURL(file);
+                    });
+                }
+                const imageUrl = await readFileAsDataURL(file);
+                return imageUrl;
+                // for (let i = 0; i < files.length; i++) {
+                //   const file = files[i];
+                //   if (file.type.startsWith("image/")) {
+                //     const imageUrl = await readFileAsDataURL(file);
+                //     imageUrls.push(imageUrl);
+                //   }
+                // }
+                // return imageUrls;
+            },
+            async downloadImage(imageIdOrUrl) {
+                const self = this;
+                const imageUrl = typeof imageIdOrUrl === "string"
+                    ? imageIdOrUrl
+                    : self.url.image(imageIdOrUrl, true);
+                return new Promise((resolve, reject) => {
+                    const imageObj = new Image();
+                    imageObj.onload = () => {
+                        resolve(imageObj);
+                    };
+                    imageObj.onerror = () => {
+                        reject(imageObj);
+                    };
+                    imageObj.src = imageUrl;
                 });
             },
             getIcon(item) {
@@ -732,30 +710,28 @@ const helpers = {
                     return value.toString(16);
                 });
             },
-            wait(condition, timeout = 10000) {
-                return __awaiter(this, void 0, void 0, function* () {
-                    // If no condition is provided, just wait the timeout
-                    if (typeof condition == "number") {
-                        return new Promise((resolve, reject) => {
-                            setTimeout(resolve, condition);
-                        });
-                    }
-                    // Wait for a condition to be true
-                    const startedAt = Date.now();
-                    const tryInterval = 100;
-                    return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
-                        const tryAgain = () => __awaiter(this, void 0, void 0, function* () {
-                            if (Date.now() - startedAt > timeout)
-                                return reject();
-                            if (yield condition()) {
-                                resolve();
-                            }
-                            else {
-                                setTimeout(tryAgain, tryInterval);
-                            }
-                        });
-                        tryAgain();
-                    }));
+            async wait(condition, timeout = 10000) {
+                // If no condition is provided, just wait the timeout
+                if (typeof condition == "number") {
+                    return new Promise((resolve, reject) => {
+                        setTimeout(resolve, condition);
+                    });
+                }
+                // Wait for a condition to be true
+                const startedAt = Date.now();
+                const tryInterval = 100;
+                return new Promise(async (resolve, reject) => {
+                    const tryAgain = async () => {
+                        if (Date.now() - startedAt > timeout)
+                            return reject();
+                        if (await condition()) {
+                            resolve();
+                        }
+                        else {
+                            setTimeout(tryAgain, tryInterval);
+                        }
+                    };
+                    tryAgain();
                 });
             },
             scrollIntoView(element) {
@@ -769,15 +745,13 @@ const helpers = {
             },
         },
     });
-    ideVueApp.state = yield StateTracker_1.StateTracker.new(() => ideVueApp, vueManager, client);
+    ideVueApp.state = await StateTracker_1.StateTracker.new(() => ideVueApp, vueManager, client);
     ideVueApp.$mount("#app");
-    window.addEventListener("popstate", function (event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield ideVueApp.refresh();
-        });
+    window.addEventListener("popstate", async function (event) {
+        await ideVueApp.refresh();
     });
     window.ideVueApp = ideVueApp;
-}))();
+})();
 
 
 /***/ }),
@@ -786,25 +760,16 @@ const helpers = {
 /*!*******************************************************!*\
   !*** ../../../../LiveIde/classes/AnalyticsTracker.ts ***!
   \*******************************************************/
-/***/ (function(__unused_webpack_module, exports) {
+/***/ ((__unused_webpack_module, exports) => {
 
 
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AnalyticsTracker = void 0;
 class AnalyticsTracker {
+    isPaused = false;
+    trackInterval = 100;
+    timeOnSite = 0;
     constructor() {
-        this.isPaused = false;
-        this.trackInterval = 100;
-        this.timeOnSite = 0;
         // If the user is not looking at the page, pause tracking
         document.addEventListener("visibilitychange", () => {
             if (document.visibilityState === "visible") {
@@ -824,22 +789,16 @@ class AnalyticsTracker {
         });
         this.trackTick();
     }
-    static new() {
-        return __awaiter(this, void 0, void 0, function* () {
-            return new AnalyticsTracker();
-        });
+    static async new() {
+        return new AnalyticsTracker();
     }
-    trackTick() {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (!this.isPaused)
-                yield this.track();
-            setTimeout(this.trackTick.bind(this), this.trackInterval);
-        });
+    async trackTick() {
+        if (!this.isPaused)
+            await this.track();
+        setTimeout(this.trackTick.bind(this), this.trackInterval);
     }
-    track() {
-        return __awaiter(this, void 0, void 0, function* () {
-            this.timeOnSite += this.trackInterval;
-        });
+    async track() {
+        this.timeOnSite += this.trackInterval;
     }
 }
 exports.AnalyticsTracker = AnalyticsTracker;
@@ -854,15 +813,6 @@ exports.AnalyticsTracker = AnalyticsTracker;
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -876,140 +826,132 @@ const ClientDatabase_1 = __webpack_require__(/*! ./ClientDatabase */ "../../../.
 const isDevEnv = window.location.hostname == "localhost";
 class ClientContext {
     // #region Globals
-    static get() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const lock = (window._clientContextLock ||
-                (window._clientContextLock = new Lock_1.Lock()));
-            yield lock.acquire();
-            try {
-                return (window._clientContext ||
-                    (window._clientContext =
-                        yield ClientContext.new()));
-            }
-            finally {
-                lock.release();
-            }
-        });
+    static async get() {
+        const lock = (window._clientContextLock ||
+            (window._clientContextLock = new Lock_1.Lock()));
+        await lock.acquire();
+        try {
+            return (window._clientContext ||
+                (window._clientContext =
+                    await ClientContext.new()));
+        }
+        finally {
+            lock.release();
+        }
     }
+    static _fetch;
+    // #endregion
+    db;
+    componentManager;
     get comps() {
         return this.componentManager.comps;
     }
+    Handlebars;
+    Vue;
+    templates;
+    config;
+    helpers;
+    compilation;
     constructor() { }
-    static new() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const context = new ClientContext();
-            yield context.init();
-            return context;
-        });
+    static async new() {
+        const context = new ClientContext();
+        await context.init();
+        return context;
     }
-    init() {
-        return __awaiter(this, void 0, void 0, function* () {
-            ClientContext._fetch = window.fetch.bind(null);
-            window.fetch = ClientContext.fetch;
-            this.db = yield ClientDatabase_1.ClientDatabase.new("IDE", {
-                ModifiedItems: ["key", "modifiedAt", "item"],
+    async init() {
+        ClientContext._fetch = window.fetch.bind(null);
+        window.fetch = ClientContext.fetch;
+        this.db = await ClientDatabase_1.ClientDatabase.new("IDE", {
+            ModifiedItems: ["key", "modifiedAt", "item"],
+        });
+        this.componentManager = await ComponentManager_1.ComponentManager.get();
+        this.templates = {};
+        this.config = {};
+        this.helpers = window.helpers;
+        this.templates = window.templates;
+        this.config = window.config;
+        this.Handlebars = window.Handlebars;
+        this.Vue = window.Vue;
+        this.compilation = {};
+        this.compilation.context = {
+            helpers: this.helpers,
+            isAttributeName: (name) => this.isAttributeName(this.comps.map((c) => c.name), name),
+            includeAttribute: (name) => {
+                return true;
+            },
+            postProcessAttribute: (attr) => {
+                attr = [...attr];
+                attr[0] = attr[0].replace(/\bon_/g, "@");
+                return attr;
+            },
+            toTemplate: (...args) => {
+                return to_template_1.default.apply(null, args);
+            },
+        };
+        for (const helper of Object.entries(this.helpers || {})) {
+            const func = eval(helper[1].replace(/: any/g, "").replace(/: string/g, ""));
+            this.Handlebars.registerHelper(helper[0], (...args) => {
+                return func(this.compilation.context, ...args);
             });
-            this.componentManager = yield ComponentManager_1.ComponentManager.get();
-            this.templates = {};
-            this.config = {};
-            this.helpers = window.helpers;
-            this.templates = window.templates;
-            this.config = window.config;
-            this.Handlebars = window.Handlebars;
-            this.Vue = window.Vue;
-            this.compilation = {};
-            this.compilation.context = {
-                helpers: this.helpers,
-                isAttributeName: (name) => this.isAttributeName(this.comps.map((c) => c.name), name),
-                includeAttribute: (name) => {
-                    return true;
-                },
-                postProcessAttribute: (attr) => {
-                    attr = [...attr];
-                    attr[0] = attr[0].replace(/\bon_/g, "@");
-                    return attr;
-                },
-                toTemplate: (...args) => {
-                    return to_template_1.default.apply(null, args);
-                },
-            };
-            for (const helper of Object.entries(this.helpers || {})) {
-                const func = eval(helper[1].replace(/: any/g, "").replace(/: string/g, ""));
-                this.Handlebars.registerHelper(helper[0], (...args) => {
-                    return func(this.compilation.context, ...args);
-                });
-            }
-        });
+        }
     }
-    compileAll(filter = (c) => true) {
-        return __awaiter(this, void 0, void 0, function* () {
-            for (const comp of this.comps.filter(filter)) {
-                yield comp.compile();
-            }
-        });
+    async compileAll(filter = (c) => true) {
+        for (const comp of this.comps.filter(filter)) {
+            await comp.compile();
+        }
     }
-    compileApp() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const isIdeComponent = (c) => ["ui", "ide"].some((p) => c.name.startsWith(`${p}.`));
-            yield this.compileAll((c) => !isIdeComponent(c));
-        });
+    async compileApp() {
+        const isIdeComponent = (c) => ["ui", "ide"].some((p) => c.name.startsWith(`${p}.`));
+        await this.compileAll((c) => !isIdeComponent(c));
     }
-    reloadComponentsFromServer() {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield this.componentManager.reloadComponentsFromServer();
-            yield this.compileAll((c) => !["app"].includes(c.name));
-        });
+    async reloadComponentsFromServer() {
+        await this.componentManager.reloadComponentsFromServer();
+        await this.compileAll((c) => !["app"].includes(c.name));
     }
     isAttributeName(componentNames, name) {
         return (0, is_attribute_name_1.default)(componentNames, name);
     }
-    pugToHtml(pug) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (!isDevEnv)
-                return null;
-            const url = `/pug`;
-            const item = yield (yield fetch(url, { method: "post", body: pug })).text();
-            return item;
-        });
+    async pugToHtml(pug) {
+        if (!isDevEnv)
+            return null;
+        const url = `/pug`;
+        const item = await (await fetch(url, { method: "post", body: pug })).text();
+        return item;
     }
-    updateComponent(comp) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (!isDevEnv)
+    async updateComponent(comp) {
+        if (!isDevEnv)
+            return;
+        const url = `/component/update`;
+        await fetch(url, { method: "post", body: JSON.stringify(comp) });
+    }
+    static async fetch(...args) {
+        try {
+            const result = await ClientContext._fetch(...args);
+            if (result.status < 500)
+                return result;
+            const text = await result.text();
+            throw new Error(text);
+        }
+        catch (ex) {
+            const url = args[0];
+            console.error(`Error fetching ${url}`);
+            console.error(ex);
+            if (ex.message.includes("You are not authorized")) {
+                ClientContext.alertify.error(`<h3>${ex.message}</h3>`);
                 return;
-            const url = `/component/update`;
-            yield fetch(url, { method: "post", body: JSON.stringify(comp) });
-        });
-    }
-    static fetch(...args) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const result = yield ClientContext._fetch(...args);
-                if (result.status < 500)
-                    return result;
-                const text = yield result.text();
-                throw new Error(text);
             }
-            catch (ex) {
-                const url = args[0];
-                console.error(`Error fetching ${url}`);
-                console.error(ex);
-                if (ex.message.includes("You are not authorized")) {
-                    ClientContext.alertify.error(`<h3>${ex.message}</h3>`);
-                    return;
-                }
-                //if (window.location.hostname == "localhost") {
-                if (!ex.message.includes("Object reference not set to an instance of an object")) {
-                    // ClientContext.alertify
-                    //   .error(`<h3>${url}</h3><pre>${ex.message}</pre>`)
-                    //   .delay(0);
-                }
-                //}
-                // Try again
-                // Wait a bit
-                yield new Promise((resolve) => setTimeout(resolve, 1000));
-                return yield ClientContext.fetch(...args);
+            //if (window.location.hostname == "localhost") {
+            if (!ex.message.includes("Object reference not set to an instance of an object")) {
+                // ClientContext.alertify
+                //   .error(`<h3>${url}</h3><pre>${ex.message}</pre>`)
+                //   .delay(0);
             }
-        });
+            //}
+            // Try again
+            // Wait a bit
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+            return await ClientContext.fetch(...args);
+        }
     }
     static getStringHashCode(str) {
         let hash = 0;
@@ -1039,22 +981,14 @@ exports.ClientContext = ClientContext;
 /*!*****************************************************!*\
   !*** ../../../../LiveIde/classes/ClientDatabase.ts ***!
   \*****************************************************/
-/***/ (function(__unused_webpack_module, exports) {
+/***/ ((__unused_webpack_module, exports) => {
 
 
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ClientDatabase = void 0;
 const Dexie = window.Dexie;
 class ClientDatabase {
+    db;
     // const collections = {
     //   ComponentClasses: ["_id", "name", "_item"],
     //   Cache: ["key", "value"],
@@ -1068,45 +1002,31 @@ class ClientDatabase {
             keys.join(","),
         ])));
     }
-    static new(dbName, collections) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const db = new ClientDatabase(dbName, collections);
-            return db;
-        });
+    static async new(dbName, collections) {
+        const db = new ClientDatabase(dbName, collections);
+        return db;
     }
-    pop(collection) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const item = yield this.db[collection].toCollection().first();
-            if (!item)
-                return null;
-            yield this.db[collection].delete(item.key);
-            return item;
-        });
+    async pop(collection) {
+        const item = await this.db[collection].toCollection().first();
+        if (!item)
+            return null;
+        await this.db[collection].delete(item.key);
+        return item;
     }
-    filter(collection, filter) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db[collection].filter(filter).toArray();
-        });
+    async filter(collection, filter) {
+        return await this.db[collection].filter(filter).toArray();
     }
-    find(collection, filter) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return (yield this.filter(collection, filter))[0];
-        });
+    async find(collection, filter) {
+        return (await this.filter(collection, filter))[0];
     }
-    upsert(collection, item) {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield this.db[collection].put(item);
-        });
+    async upsert(collection, item) {
+        await this.db[collection].put(item);
     }
-    upsertMany(collection, items) {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield this.db[collection].bulkPut(items);
-        });
+    async upsertMany(collection, items) {
+        await this.db[collection].bulkPut(items);
     }
-    delete(collection, key) {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield this.db[collection].delete(key);
-        });
+    async delete(collection, key) {
+        await this.db[collection].delete(key);
     }
 }
 exports.ClientDatabase = ClientDatabase;
@@ -1118,18 +1038,9 @@ exports.ClientDatabase = ClientDatabase;
 /*!************************************************!*\
   !*** ../../../../LiveIde/classes/Component.ts ***!
   \************************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Component = void 0;
 const ClientContext_1 = __webpack_require__(/*! ./ClientContext */ "../../../../LiveIde/classes/ClientContext.ts");
@@ -1137,6 +1048,10 @@ String.prototype.kebabize = function () {
     return this.replace(/\./g, "-").toLowerCase();
 };
 class Component {
+    name;
+    path;
+    source;
+    isCompiled;
     constructor(obj) {
         this.name = obj.name;
         this.path = obj.path;
@@ -1145,43 +1060,41 @@ class Component {
         if (this.source)
             this.source.name = this.name.replace(/\./g, "-");
     }
-    compile() {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (this.isCompiled)
-                return;
-            const client = yield ClientContext_1.ClientContext.get();
-            console.groupCollapsed(this.name);
-            console.log(this);
-            let json = client.Handlebars.compile(client.templates.vue)(this.source);
-            try {
-                //console.log(json);
-                const vueOptions = eval(`(${json})`);
-                console.log(vueOptions);
-                const vueName = Component.toVueName(this.name);
-                if (this.source) {
-                    if (this.source.template) {
-                        let html = this.source.template;
-                        html = html.replace(/\bon_/g, "@");
-                        vueOptions.template = html;
-                    }
-                    else {
-                        const pug = vueOptions.template;
-                        let html = (yield client.pugToHtml(pug)) || "";
-                        html = html.replace(/\bon_/g, "@");
-                        vueOptions.template = html;
-                        this.source.template = html;
-                        client.updateComponent(this);
-                    }
+    async compile() {
+        if (this.isCompiled)
+            return;
+        const client = await ClientContext_1.ClientContext.get();
+        console.groupCollapsed(this.name);
+        console.log(this);
+        let json = client.Handlebars.compile(client.templates.vue)(this.source);
+        try {
+            //console.log(json);
+            const vueOptions = eval(`(${json})`);
+            console.log(vueOptions);
+            const vueName = Component.toVueName(this.name);
+            if (this.source) {
+                if (this.source.template) {
+                    let html = this.source.template;
+                    html = html.replace(/\bon_/g, "@");
+                    vueOptions.template = html;
                 }
-                client.Vue.component(vueName, vueOptions);
-                this.isCompiled = true;
+                else {
+                    const pug = vueOptions.template;
+                    let html = (await client.pugToHtml(pug)) || "";
+                    html = html.replace(/\bon_/g, "@");
+                    vueOptions.template = html;
+                    this.source.template = html;
+                    client.updateComponent(this);
+                }
             }
-            catch (ex) {
-                debugger;
-                throw ex;
-            }
-            console.groupEnd();
-        });
+            client.Vue.component(vueName, vueOptions);
+            this.isCompiled = true;
+        }
+        catch (ex) {
+            debugger;
+            throw ex;
+        }
+        console.groupEnd();
     }
     static toVueName(name) {
         return name.kebabize().replace(/base-/g, "");
@@ -1196,18 +1109,9 @@ exports.Component = Component;
 /*!*******************************************************!*\
   !*** ../../../../LiveIde/classes/ComponentManager.ts ***!
   \*******************************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ComponentManager = void 0;
 __webpack_require__(/*! ../../../Shared/Extensions */ "../../../../../Shared/Extensions.ts");
@@ -1217,83 +1121,70 @@ const Component_1 = __webpack_require__(/*! ./Component */ "../../../../LiveIde/
 const ClientContext_1 = __webpack_require__(/*! ./ClientContext */ "../../../../LiveIde/classes/ClientContext.ts");
 class ComponentManager {
     // #region Globals
-    static get() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const lock = (window._componentManagerLock ||
-                (window._componentManagerLock = new Lock_1.Lock()));
-            yield lock.acquire();
-            try {
-                return (window._componentManager ||
-                    (window._componentManager =
-                        yield ComponentManager.new()));
+    static async get() {
+        const lock = (window._componentManagerLock ||
+            (window._componentManagerLock = new Lock_1.Lock()));
+        await lock.acquire();
+        try {
+            return (window._componentManager ||
+                (window._componentManager =
+                    await ComponentManager.new()));
+        }
+        finally {
+            lock.release();
+        }
+    }
+    // #endregion
+    comps = [];
+    watchers = [];
+    constructor() { }
+    static async new() {
+        const manager = new ComponentManager();
+        await manager.init();
+        return manager;
+    }
+    async init(options = {}) {
+        const url = options.onlyChanged ? "/changed/components" : "/components";
+        if (window.location.hostname == "localhost") {
+            const newComps = (await (await fetch(url)).json()).map((c) => new Component_1.Component(c));
+            for (const newComp of newComps) {
+                const index = this.comps.findIndex((c) => c.name == newComp.name);
+                if (index != -1)
+                    this.comps.removeAt(index);
             }
-            finally {
-                lock.release();
-            }
+            this.comps.add(newComps);
+        }
+        else {
+            this.comps = window.components.map((c) => new Component_1.Component(c));
+        }
+        const watchers = await Promise.all(this.comps.map((c) => DataWatcher_1.DataWatcher.new(() => c, this.onComponentChanged.bind(this))));
+        this.watchers.push(...watchers);
+        this.saveModifiedItems();
+    }
+    async saveModifiedItems() {
+        const client = await ClientContext_1.ClientContext.get();
+        // Item needs to be not modified for this time to be saved
+        // This is to throtte typing etc
+        // This can be a bit longer time because we're saving the changed in IndexedDB
+        // So if the user closes the browser, the changes will be saved next time
+        const delay = 1000 * 1;
+        let modifiedItem;
+        while ((modifiedItem = await client.db.find("ModifiedItems", (item) => item.modifiedAt > Date.now() - delay))) {
+            await client.db.delete("ModifiedItems", modifiedItem.key);
+            await client.updateComponent(modifiedItem.item);
+        }
+        setTimeout(this.saveModifiedItems.bind(this), 400);
+    }
+    async onComponentChanged(newComp) {
+        const client = await ClientContext_1.ClientContext.get();
+        client.db.upsert("ModifiedItems", {
+            key: newComp.name,
+            modifiedAt: Date.now(),
+            item: newComp,
         });
     }
-    constructor() {
-        // #endregion
-        this.comps = [];
-        this.watchers = [];
-    }
-    static new() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const manager = new ComponentManager();
-            yield manager.init();
-            return manager;
-        });
-    }
-    init(options = {}) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const url = options.onlyChanged ? "/changed/components" : "/components";
-            if (window.location.hostname == "localhost") {
-                const newComps = (yield (yield fetch(url)).json()).map((c) => new Component_1.Component(c));
-                for (const newComp of newComps) {
-                    const index = this.comps.findIndex((c) => c.name == newComp.name);
-                    if (index != -1)
-                        this.comps.removeAt(index);
-                }
-                this.comps.add(newComps);
-            }
-            else {
-                this.comps = window.components.map((c) => new Component_1.Component(c));
-            }
-            const watchers = yield Promise.all(this.comps.map((c) => DataWatcher_1.DataWatcher.new(() => c, this.onComponentChanged.bind(this))));
-            this.watchers.push(...watchers);
-            this.saveModifiedItems();
-        });
-    }
-    saveModifiedItems() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const client = yield ClientContext_1.ClientContext.get();
-            // Item needs to be not modified for this time to be saved
-            // This is to throtte typing etc
-            // This can be a bit longer time because we're saving the changed in IndexedDB
-            // So if the user closes the browser, the changes will be saved next time
-            const delay = 1000 * 1;
-            let modifiedItem;
-            while ((modifiedItem = yield client.db.find("ModifiedItems", (item) => item.modifiedAt > Date.now() - delay))) {
-                yield client.db.delete("ModifiedItems", modifiedItem.key);
-                yield client.updateComponent(modifiedItem.item);
-            }
-            setTimeout(this.saveModifiedItems.bind(this), 400);
-        });
-    }
-    onComponentChanged(newComp) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const client = yield ClientContext_1.ClientContext.get();
-            client.db.upsert("ModifiedItems", {
-                key: newComp.name,
-                modifiedAt: Date.now(),
-                item: newComp,
-            });
-        });
-    }
-    reloadComponentsFromServer() {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield this.init({ onlyChanged: true });
-        });
+    async reloadComponentsFromServer() {
+        await this.init({ onlyChanged: true });
     }
 }
 exports.ComponentManager = ComponentManager;
@@ -1305,58 +1196,45 @@ exports.ComponentManager = ComponentManager;
 /*!*********************************************!*\
   !*** ../../../../LiveIde/classes/Params.ts ***!
   \*********************************************/
-/***/ (function(__unused_webpack_module, exports) {
+/***/ ((__unused_webpack_module, exports) => {
 
 
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Params = void 0;
 const Vue = window.Vue;
 class Params {
+    getRootVue;
+    _config;
+    _items = [];
     constructor(getRootVue, _config) {
         this.getRootVue = getRootVue;
         this._config = _config;
-        this._items = [];
     }
-    static new(getRootVue, config, url) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const params = new Params(getRootVue, config);
-            yield params.init();
-            yield params.refresh(url);
-            return params;
-        });
+    static async new(getRootVue, config, url) {
+        const params = new Params(getRootVue, config);
+        await params.init();
+        await params.refresh(url);
+        return params;
     }
-    init() {
-        return __awaiter(this, void 0, void 0, function* () {
-            for (const param of Object.entries(this._config.params)) {
-                const paramConf = param[1];
-                const get = eval(`(${paramConf.get})`);
-                const ref = Vue.ref({ value: null });
-                const paramItem = {
-                    name: param[0],
-                    get,
-                    ref,
-                };
-                this._items.push(paramItem);
-                this[paramItem.name] = paramItem.ref;
-                const rootVue = this.getRootVue();
-            }
-        });
+    async init() {
+        for (const param of Object.entries(this._config.params)) {
+            const paramConf = param[1];
+            const get = eval(`(${paramConf.get})`);
+            const ref = Vue.ref({ value: null });
+            const paramItem = {
+                name: param[0],
+                get,
+                ref,
+            };
+            this._items.push(paramItem);
+            this[paramItem.name] = paramItem.ref;
+            const rootVue = this.getRootVue();
+        }
     }
-    refresh(url) {
-        return __awaiter(this, void 0, void 0, function* () {
-            for (const item of this._items) {
-                item.ref.value = yield item.get.apply(this, [url]);
-            }
-        });
+    async refresh(url) {
+        for (const item of this._items) {
+            item.ref.value = await item.get.apply(this, [url]);
+        }
     }
 }
 exports.Params = Params;
@@ -1368,33 +1246,29 @@ exports.Params = Params;
 /*!***************************************************!*\
   !*** ../../../../LiveIde/classes/StateTracker.ts ***!
   \***************************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StateTracker = void 0;
 __webpack_require__(/*! ../../../Shared/Extensions */ "../../../../../Shared/Extensions.ts");
 const Extensions_Objects_Client_1 = __webpack_require__(/*! ../../../Shared/Extensions.Objects.Client */ "../../../../../Shared/Extensions.Objects.Client.ts");
 const VueHelper_1 = __webpack_require__(/*! ./VueHelper */ "../../../../LiveIde/classes/VueHelper.ts");
 class StateTracker {
+    getApp;
+    vm;
+    client;
+    static _nextID = 1;
+    static _maxItems = 100;
+    isPaused = 0;
+    refChanges = new Map();
+    methods = {
+        pause: {},
+    };
     constructor(getApp, vm, client) {
         this.getApp = getApp;
         this.vm = vm;
         this.client = client;
-        this.isPaused = 0;
-        this.refChanges = new Map();
-        this.methods = {
-            pause: {},
-        };
     }
     static new(app, vueManager, client) {
         const st = new StateTracker(app, vueManager, client);
@@ -1421,49 +1295,45 @@ class StateTracker {
         };
         this.addItem(item);
     }
-    apply(uid, change) {
-        return __awaiter(this, void 0, void 0, function* () {
-            this.pause();
-            const vue = this.vm.getVue(uid);
-            vue[change.key] = change.newValue;
-            yield vue.$nextTick();
-            this.resume();
-        });
+    async apply(uid, change) {
+        this.pause();
+        const vue = this.vm.getVue(uid);
+        vue[change.key] = change.newValue;
+        await vue.$nextTick();
+        this.resume();
     }
     // Sometimes when refreshing keys in the app, the vue components are recreated
     // and lose their state.
     // This method restores the state from the state tracker.
-    restoreState() {
-        return __awaiter(this, void 0, void 0, function* () {
-            this.pause();
-            const refKeys = this.vm.getRefKeys();
-            const vuesByRef = VueHelper_1.VueHelper.getVuesByRef(this.getApp());
-            for (const refKey of refKeys) {
-                const vues = vuesByRef.get(refKey) || [];
-                console.group(refKey);
-                const vueChanges = this.getRefChanges(refKey);
-                // For all vues that have this ref
-                for (const vue of vues) {
-                    // Find the last change for each key
-                    const lastChanges = vueChanges.reduce((acc, cur) => {
-                        acc[cur.key] = cur;
-                        return acc;
-                    }, {});
-                    // Apply the last change for each key
-                    for (const key in lastChanges) {
-                        const change = lastChanges[key];
-                        if (change.type != "d")
-                            continue;
-                        console.log(key, change.newValue);
-                        vue.$set(vue, key, change.newValue);
-                    }
+    async restoreState() {
+        this.pause();
+        const refKeys = this.vm.getRefKeys();
+        const vuesByRef = VueHelper_1.VueHelper.getVuesByRef(this.getApp());
+        for (const refKey of refKeys) {
+            const vues = vuesByRef.get(refKey) || [];
+            console.group(refKey);
+            const vueChanges = this.getRefChanges(refKey);
+            // For all vues that have this ref
+            for (const vue of vues) {
+                // Find the last change for each key
+                const lastChanges = vueChanges.reduce((acc, cur) => {
+                    acc[cur.key] = cur;
+                    return acc;
+                }, {});
+                // Apply the last change for each key
+                for (const key in lastChanges) {
+                    const change = lastChanges[key];
+                    if (change.type != "d")
+                        continue;
+                    console.log(key, change.newValue);
+                    vue.$set(vue, key, change.newValue);
                 }
-                console.groupEnd();
             }
-            this.vm.updateDataVariableUIDs(this.getApp());
-            yield this.getApp().$nextTick();
-            this.resume();
-        });
+            console.groupEnd();
+        }
+        this.vm.updateDataVariableUIDs(this.getApp());
+        await this.getApp().$nextTick();
+        this.resume();
     }
     addItem(item) {
         const isState = item.type == "p" || item.type == "d";
@@ -1530,8 +1400,6 @@ class StateTracker {
     }
 }
 exports.StateTracker = StateTracker;
-StateTracker._nextID = 1;
-StateTracker._maxItems = 100;
 
 
 /***/ }),
@@ -1549,12 +1417,11 @@ class VueHelper {
     static getVuesByRef(rootVue) {
         const map = new Map();
         VueHelper.traverseVue(rootVue, (vue) => {
-            var _a;
             for (const refKey in vue.$refs) {
                 if (!map.has(refKey)) {
                     map.set(refKey, []);
                 }
-                (_a = map.get(refKey)) === null || _a === void 0 ? void 0 : _a.push(vue.$refs[refKey]);
+                map.get(refKey)?.push(vue.$refs[refKey]);
             }
         });
         return map;
@@ -1592,38 +1459,28 @@ exports.VueHelper = VueHelper;
 /*!*************************************************!*\
   !*** ../../../../LiveIde/classes/VueManager.ts ***!
   \*************************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.VueManager = void 0;
 __webpack_require__(/*! ../../../Shared/Extensions */ "../../../../../Shared/Extensions.ts");
 const TwoWayMap_1 = __webpack_require__(/*! ../../../Shared/TwoWayMap */ "../../../../../Shared/TwoWayMap.ts");
 const VueHelper_1 = __webpack_require__(/*! ./VueHelper */ "../../../../LiveIde/classes/VueHelper.ts");
 class VueManager {
+    client;
+    vues = {};
+    vuesCount = 0;
+    // Tracking by uid or vue tree path are unreliable because vue recreates components
+    // We use $refs to track components
+    // Any ref that starts with a capital letter is a global reference
+    vueRefsToUIDs = new TwoWayMap_1.TwoWayMap();
     constructor(client) {
         this.client = client;
-        this.vues = {};
-        this.vuesCount = 0;
-        // Tracking by uid or vue tree path are unreliable because vue recreates components
-        // We use $refs to track components
-        // Any ref that starts with a capital letter is a global reference
-        this.vueRefsToUIDs = new TwoWayMap_1.TwoWayMap();
     }
-    static new(client) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const vm = new VueManager(client);
-            return vm;
-        });
+    static async new(client) {
+        const vm = new VueManager(client);
+        return vm;
     }
     /** Since vue UIDs might have changed, if anyone keeps a "..UID" reference
      *  (hoveredVueUID, selectedVueUID, etc) we update them.
@@ -1726,18 +1583,9 @@ exports.VueManager = VueManager;
 /*!********************************************!*\
   !*** ../../../../../Shared/DataWatcher.ts ***!
   \********************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.DataWatcher = void 0;
 const RepeatingTaskQueue_1 = __webpack_require__(/*! ./RepeatingTaskQueue */ "../../../../../Shared/RepeatingTaskQueue.ts");
@@ -1753,6 +1601,8 @@ class DefaultDataComparer {
     }
 }
 class DataWatcher {
+    getData;
+    onChange;
     // #region Global
     static get _queue() {
         return window._dataWatcherQueue;
@@ -1766,33 +1616,30 @@ class DataWatcher {
         }
         return DataWatcher._queue;
     }
+    // #endregion
+    dataComparer = new DefaultDataComparer();
+    data;
     constructor(getData, onChange) {
         this.getData = getData;
         this.onChange = onChange;
-        // #endregion
-        this.dataComparer = new DefaultDataComparer();
         this.data = this.dataComparer.clone(getData());
         DataWatcher.queue.enqueue(this.check.bind(this));
     }
-    static new(getData, onChange) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const watcher = new DataWatcher(getData, onChange);
-            return watcher;
-        });
+    static async new(getData, onChange) {
+        const watcher = new DataWatcher(getData, onChange);
+        return watcher;
     }
-    check() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const newData = this.dataComparer.clone(this.getData());
-            if (!this.dataComparer.areEqual(this.data, newData)) {
-                try {
-                    yield this.onChange(newData, this.data);
-                }
-                catch (ex) {
-                    console.error(ex);
-                }
-                this.data = newData;
+    async check() {
+        const newData = this.dataComparer.clone(this.getData());
+        if (!this.dataComparer.areEqual(this.data, newData)) {
+            try {
+                await this.onChange(newData, this.data);
             }
-        });
+            catch (ex) {
+                console.error(ex);
+            }
+            this.data = newData;
+        }
     }
 }
 exports.DataWatcher = DataWatcher;
@@ -1982,24 +1829,24 @@ class Objects {
             onCatch(ex);
         }
     }
+    static json = {
+        parse: (str) => {
+            try {
+                if (str === null)
+                    return null;
+                if (str === undefined)
+                    return undefined;
+                if (str === "undefined")
+                    return undefined;
+                return JSON.parse(str);
+            }
+            catch (ex) {
+                throw `Error parsing JSON:\n\n${JSON.stringify(str)}\n\n${ex.stack}`;
+            }
+        },
+    };
 }
 exports.Objects = Objects;
-Objects.json = {
-    parse: (str) => {
-        try {
-            if (str === null)
-                return null;
-            if (str === undefined)
-                return undefined;
-            if (str === "undefined")
-                return undefined;
-            return JSON.parse(str);
-        }
-        catch (ex) {
-            throw `Error parsing JSON:\n\n${JSON.stringify(str)}\n\n${ex.stack}`;
-        }
-    },
-};
 
 
 /***/ }),
@@ -2008,19 +1855,46 @@ Objects.json = {
 /*!*******************************************!*\
   !*** ../../../../../Shared/Extensions.ts ***!
   \*******************************************/
-/***/ (function() {
+/***/ (() => {
 
 
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 class Time {
+    static units = [
+        "ms",
+        "s",
+        "m",
+        "h",
+        "d",
+        "w",
+        "M",
+        "y",
+        "de",
+        "ce",
+    ];
+    static longUnits = [
+        "milliseconds",
+        "seconds",
+        "minutes",
+        "hours",
+        "days",
+        "weeks",
+        "months",
+        "years",
+        "decades",
+        "centuries",
+    ];
+    static unitToValue = {
+        ms: 1,
+        s: 1000,
+        m: 1000 * 60,
+        h: 1000 * 60 * 60,
+        d: 1000 * 60 * 60 * 24,
+        w: 1000 * 60 * 60 * 24 * 7,
+        M: 1000 * 60 * 60 * 24 * 30,
+        y: 1000 * 60 * 60 * 24 * 30 * 365,
+        decade: 1000 * 60 * 60 * 24 * 30 * 365 * 10,
+        century: 1000 * 60 * 60 * 24 * 30 * 365 * 100,
+    };
     static prevUnit(unit) {
         return this.units[this.units.indexOf(unit) - 1];
     }
@@ -2028,43 +1902,40 @@ class Time {
         return this.units[this.units.indexOf(unit) + 1];
     }
 }
-Time.units = [
-    "ms",
-    "s",
-    "m",
-    "h",
-    "d",
-    "w",
-    "M",
-    "y",
-    "de",
-    "ce",
-];
-Time.longUnits = [
-    "milliseconds",
-    "seconds",
-    "minutes",
-    "hours",
-    "days",
-    "weeks",
-    "months",
-    "years",
-    "decades",
-    "centuries",
-];
-Time.unitToValue = {
-    ms: 1,
-    s: 1000,
-    m: 1000 * 60,
-    h: 1000 * 60 * 60,
-    d: 1000 * 60 * 60 * 24,
-    w: 1000 * 60 * 60 * 24 * 7,
-    M: 1000 * 60 * 60 * 24 * 30,
-    y: 1000 * 60 * 60 * 24 * 30 * 365,
-    decade: 1000 * 60 * 60 * 24 * 30 * 365 * 10,
-    century: 1000 * 60 * 60 * 24 * 30 * 365 * 100,
-};
 class Size {
+    static units = [
+        "b",
+        "kb",
+        "mb",
+        "gb",
+        "tb",
+        "pb",
+        "eb",
+        "zb",
+        "yb",
+    ];
+    static longUnits = [
+        "bytes",
+        "kilobytes",
+        "megabytes",
+        "gigabytes",
+        "terabytes",
+        "petabytes",
+        "exabytes",
+        "zettabytes",
+        "yottabytes",
+    ];
+    static unitToValue = {
+        b: 1,
+        kb: 1000,
+        mb: 1000 * 1000,
+        gb: 1000 * 1000 * 1000,
+        tb: 1000 * 1000 * 1000 * 1000,
+        pb: 1000 * 1000 * 1000 * 1000 * 1000,
+        eb: 1000 * 1000 * 1000 * 1000 * 1000 * 1000,
+        zb: 1000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000,
+        yb: 1000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000,
+    };
     static prevUnit(unit) {
         return this.units[this.units.indexOf(unit) - 1];
     }
@@ -2072,40 +1943,12 @@ class Size {
         return this.units[this.units.indexOf(unit) + 1];
     }
 }
-Size.units = [
-    "b",
-    "kb",
-    "mb",
-    "gb",
-    "tb",
-    "pb",
-    "eb",
-    "zb",
-    "yb",
-];
-Size.longUnits = [
-    "bytes",
-    "kilobytes",
-    "megabytes",
-    "gigabytes",
-    "terabytes",
-    "petabytes",
-    "exabytes",
-    "zettabytes",
-    "yottabytes",
-];
-Size.unitToValue = {
-    b: 1,
-    kb: 1000,
-    mb: 1000 * 1000,
-    gb: 1000 * 1000 * 1000,
-    tb: 1000 * 1000 * 1000 * 1000,
-    pb: 1000 * 1000 * 1000 * 1000 * 1000,
-    eb: 1000 * 1000 * 1000 * 1000 * 1000 * 1000,
-    zb: 1000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000,
-    yb: 1000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000,
-};
 class Percentage {
+    static units = ["%"];
+    static longUnits = ["percent"];
+    static unitToValue = {
+        "%": 100,
+    };
     static prevUnit(unit) {
         return this.units[this.units.indexOf(unit) - 1];
     }
@@ -2113,11 +1956,6 @@ class Percentage {
         return this.units[this.units.indexOf(unit) + 1];
     }
 }
-Percentage.units = ["%"];
-Percentage.longUnits = ["percent"];
-Percentage.unitToValue = {
-    "%": 100,
-};
 const UnitClasses = [Time, Size, Percentage];
 const color = {
     fromNumber: {
@@ -2291,7 +2129,7 @@ if (typeof Number !== "undefined") {
         // return "230ms" if value is < 1000
         // return "1.23s" if value is < 60000 and > 1000
         // return "1.23m" if value is > 60000
-        if (!(unit === null || unit === void 0 ? void 0 : unit.length))
+        if (!unit?.length)
             unit = unitClass.units;
         let value = this.valueOf();
         // Percent is a special case
@@ -3006,47 +2844,43 @@ if (typeof Array !== "undefined") {
         };
         removeOne();
     };
-    Array.prototype.add = function (items, stagger = 0) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (!Array.isArray(items))
-                items = [items];
-            items = [...items];
-            if (!stagger) {
-                this.push(...items);
-                return;
+    Array.prototype.add = async function (items, stagger = 0) {
+        if (!Array.isArray(items))
+            items = [items];
+        items = [...items];
+        if (!stagger) {
+            this.push(...items);
+            return;
+        }
+        const addOne = async () => {
+            if (items.length > 0) {
+                this.push(items.shift());
+                setTimeout(addOne, stagger);
             }
-            const addOne = () => __awaiter(this, void 0, void 0, function* () {
-                if (items.length > 0) {
-                    this.push(items.shift());
-                    setTimeout(addOne, stagger);
-                }
-            });
-            addOne();
-        });
+        };
+        addOne();
     };
     Array.prototype.take = function (count) {
         return this.slice(0, count);
     };
-    Array.prototype.replace = function (getNewItems, stagger = 0, getItemKey) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (getItemKey) {
-                let newItems = yield getNewItems();
-                const processNext = (i) => __awaiter(this, void 0, void 0, function* () {
-                    if (i > Math.max(this.length, newItems.length))
-                        return;
-                    if (this[i] && !newItems.contains(this[i], getItemKey))
-                        this.removeAt(i);
-                    if (newItems[i] && !this.contains(newItems[i], getItemKey))
-                        this.insertAt(i, newItems[i], true);
-                    setTimeout(() => processNext(i + 1), stagger);
-                });
-                processNext(0);
-            }
-            else {
-                this.clear(stagger);
-                this.add(yield getNewItems(), stagger);
-            }
-        });
+    Array.prototype.replace = async function (getNewItems, stagger = 0, getItemKey) {
+        if (getItemKey) {
+            let newItems = await getNewItems();
+            const processNext = async (i) => {
+                if (i > Math.max(this.length, newItems.length))
+                    return;
+                if (this[i] && !newItems.contains(this[i], getItemKey))
+                    this.removeAt(i);
+                if (newItems[i] && !this.contains(newItems[i], getItemKey))
+                    this.insertAt(i, newItems[i], true);
+                setTimeout(() => processNext(i + 1), stagger);
+            };
+            processNext(0);
+        }
+        else {
+            this.clear(stagger);
+            this.add(await getNewItems(), stagger);
+        }
     };
     Array.prototype.sum = function (getValue, getWeight) {
         if (!getValue)
@@ -3169,10 +3003,8 @@ if (typeof Function !== "undefined") {
         return function (...args) {
             const context = this;
             clearTimeout(timeout);
-            timeout = setTimeout(function () {
-                return __awaiter(this, void 0, void 0, function* () {
-                    yield fn.apply(context, args);
-                });
+            timeout = setTimeout(async function () {
+                await fn.apply(context, args);
             }, delay);
         };
     };
@@ -3187,11 +3019,9 @@ if (typeof Function !== "undefined") {
             fn.prototype.nextArgs = args;
             const context = this;
             if (!timeout) {
-                timeout = setTimeout(function () {
-                    return __awaiter(this, void 0, void 0, function* () {
-                        yield fn.apply(context, fn.prototype.nextArgs);
-                        timeout = null;
-                    });
+                timeout = setTimeout(async function () {
+                    await fn.apply(context, fn.prototype.nextArgs);
+                    timeout = null;
                 }, delay);
             }
         };
@@ -3212,10 +3042,9 @@ if (typeof Function !== "undefined") {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Lock = void 0;
 class Lock {
-    constructor() {
-        this.queue = [];
-        this.locked = false;
-    }
+    queue = [];
+    locked = false;
+    constructor() { }
     acquire() {
         return new Promise((resolve) => {
             if (!this.locked) {
@@ -3250,26 +3079,17 @@ exports.Lock = Lock;
 /*!***************************************************!*\
   !*** ../../../../../Shared/RepeatingTaskQueue.ts ***!
   \***************************************************/
-/***/ (function(__unused_webpack_module, exports) {
+/***/ ((__unused_webpack_module, exports) => {
 
 
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.RepeatingTaskQueue = void 0;
 class RepeatingTaskQueue {
+    // Meaning the queue will cycle through all tasks every [cycleInterval] milliseconds
+    cycleInterval = 1000;
+    tasks = [];
+    index = 0;
     constructor() {
-        // Meaning the queue will cycle through all tasks every [cycleInterval] milliseconds
-        this.cycleInterval = 1000;
-        this.tasks = [];
-        this.index = 0;
         this.index = 0;
         this.next();
     }
@@ -3277,14 +3097,12 @@ class RepeatingTaskQueue {
         const queue = new RepeatingTaskQueue();
         return queue;
     }
-    next() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const task = this.tasks[this.index];
-            if (task)
-                yield task();
-            this.index = (this.index + 1) % this.tasks.length || 0;
-            setTimeout(this.next.bind(this), this.cycleInterval / this.tasks.length);
-        });
+    async next() {
+        const task = this.tasks[this.index];
+        if (task)
+            await task();
+        this.index = (this.index + 1) % this.tasks.length || 0;
+        setTimeout(this.next.bind(this), this.cycleInterval / this.tasks.length);
     }
     enqueue(task) {
         this.tasks.push(task);
@@ -3305,6 +3123,8 @@ exports.RepeatingTaskQueue = RepeatingTaskQueue;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.TwoWayMap = void 0;
 class TwoWayMap {
+    forward;
+    reverse;
     constructor() {
         this.forward = new Map();
         this.reverse = new Map();
@@ -3630,7 +3450,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690304407980.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690347168015.ts");
 /******/ 	
 /******/ })()
 ;

@@ -82,6 +82,42 @@ const helpers = {
       return path;
     },
   },
+  html: {
+    getAppliedStyle: (element: HTMLElement) => {
+      // Create a temporary element to get default styles
+      const tempElement = document.createElement(element.tagName);
+
+      // Add the temporary element off-screen
+      tempElement.style.position = "absolute";
+      tempElement.style.left = "-9999px";
+      document.body.appendChild(tempElement);
+
+      // Get computed styles of the temporary element
+      const defaultStyles = window.getComputedStyle(tempElement) as any;
+
+      // Get computed styles of the target element
+      const computedStyles = window.getComputedStyle(element);
+
+      // Object to store non-default styles
+      const nonDefaultStyles = {} as any;
+
+      // Compare styles to find non-default properties
+      for (const prop of defaultStyles) {
+        if (defaultStyles[prop] !== computedStyles[prop]) {
+          nonDefaultStyles[prop] = computedStyles[prop];
+        }
+      }
+
+      // Clean up - remove the temporary element
+      document.body.removeChild(tempElement);
+
+      return Object.entries(nonDefaultStyles)
+        .filter((e) => !e[0].startsWith("border-"))
+        .map((e) => {
+          return { name: e[0], value: e[1] };
+        });
+    },
+  },
 };
 
 interface MgParams {
@@ -170,6 +206,7 @@ interface MgParams {
       analytics: await AnalyticsTracker.new(),
       params: params,
       url: helpers.url,
+      html: helpers.html,
       comps: client.Vue.ref(client.comps),
       compsDic: {},
       compNames: [],
@@ -301,7 +338,7 @@ interface MgParams {
           self.params.urlName
         );
       },
-      textToHtml(text: string) {
+      textToHtml(text: string, options: any = {}) {
         if (!text) return null;
         var s = text;
         // HTML encode
@@ -312,6 +349,14 @@ interface MgParams {
         s = s.replace(/"(.*?)"(?!\w)/g, "<strong>$1</strong>");
         // line breaks
         s = s.replace(/\n/g, "<br />");
+        // First line title
+        if (options.firstLine) {
+          // Convert the first line (ending with <br />) to <div class="title">..</div>
+          s = s.replace(
+            /^(.*?<br \/>)/g,
+            `<div class='${options.firstLine}'>$1</div>`
+          );
+        }
         return s;
       },
       async refresh() {

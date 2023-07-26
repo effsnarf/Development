@@ -1,0 +1,27 @@
+dom:
+  div:
+    v-if: item
+    e.media:
+      v-if: item.media
+      ':item': item.media
+      @click-media-content: onClickMediaContent
+      @thread-updated: $emit('thread-updated')
+    e.instance:
+      v-if: item.instance
+      ':item': item.instance
+props:
+  item: null
+data: null
+methods:
+  onClickMediaContent: | #js
+    function() {
+      this.$emit('click-attachment-content');
+    }
+name: e-post-attachment
+template: >-
+  <div class="comp-e-post-attachment" v-if="item" path="-2016563288."><e-media
+  v-if="item.media" :item="item.media"
+  @click-media-content="onClickMediaContent"
+  @thread-updated="$emit('thread-updated')"
+  path="-2016563288.0"></e-media><e-instance v-if="item.instance"
+  :item="item.instance" path="-2016563288.1"></e-instance></div>

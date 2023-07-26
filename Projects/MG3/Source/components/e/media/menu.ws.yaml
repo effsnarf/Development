@@ -3,33 +3,15 @@ dom:
     .flex.flex-column.gap-2:
       div: 
         v-if: false && $root.isAdmin
-        ui.button: 
+        ui.button:
           ':text': '''❌ delete'''
           ':click': () => $root.dbp.medias.delete.one(media._id)
       ui.share:
         ':item': media
-      .flex.justify-around:
-        ui.button: 
-          ':text': '''✏️ recaption'''
-          ':click': () => showRecaption = !showRecaption
-    transition:
-      name: slide
-      .mt-l2:
-        v-if: showRecaption
-        e.media.recaption:
-          ':media': media
-          @created: onMediaCreated
-          @cancel: () => showRecaption = false
 props:
   media: null
-data:
-  showRecaption: false
-methods:
-  onMediaCreated: | #js
-    function (media) {
-      //window.open(this.$root.url.item(media), '_blank');
-      this.showRecaption = false;
-    }
+data: null
+methods: null
 name: e-media-menu
 template: >-
   <div class="comp-e-media-menu" path="991464018."><div class="flex flex-column
@@ -37,11 +19,4 @@ template: >-
   path="991464018.0.0"><ui-button :text="'❌ delete'" :click="() =&gt;
   $root.dbp.medias.delete.one(media._id)"
   path="991464018.0.0.0"></ui-button></div><ui-share :item="media"
-  path="991464018.0.1"></ui-share><div class="flex justify-around"
-  path="991464018.0.2"><ui-button :text="'✏️ recaption'" :click="() =&gt;
-  showRecaption = !showRecaption"
-  path="991464018.0.2.0"></ui-button></div></div><transition name="slide"
-  path="991464018.1"><div class="mt-l2" v-if="showRecaption"
-  path="991464018.1.0"><e-media-recaption :media="media"
-  @created="onMediaCreated" @cancel="() =&gt; showRecaption = false"
-  path="991464018.1.0.0"></e-media-recaption></div></transition></div>
+  path="991464018.0.1"></ui-share></div></div>

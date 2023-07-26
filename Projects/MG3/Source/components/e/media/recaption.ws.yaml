@@ -1,24 +1,33 @@
 dom:
   div:
-    ul:
-      li:
-        v-for: item in contentItems.filter(it => it.caption)
-        e.media.content.item.recaption:
-          ':item': item
-    ui.select:
-      ':options': '[''✨ start new thread'', ''➕ reply in thread'']'
-      type: dropdown
-      input-type: index
-      v-model: replyInThread
-    .flex.justify-between.m-l2:
+    .flex.justify-around:
       ui.button: 
-        v-if: $root.isAdmin
-        ':text': '''✖️ cancel'''
-        ':click': onCancel
-      ui.button: 
-        v-if: $root.isAdmin
-        ':text': '''✔️ create'''
-        ':click': create
+        ':text': '''✏️ recaption'''
+        ':click': toggleRecaption
+    transition:
+      name: slide
+      .mt-l2:
+        v-if: showRecaption
+        ul:
+          class: content-items
+          li:
+            v-for: item in contentItems.filter(it => it.caption)
+            e.media.content.item.recaption:
+              ':item': item
+        ui.select:
+          ':options': '[''✨ start new thread'', ''➕ reply in thread'']'
+          type: dropdown
+          input-type: index
+          v-model: replyInThread
+        .flex.justify-between.m-l2:
+          ui.button: 
+            v-if: $root.isAdmin
+            ':text': '''✖️ cancel'''
+            ':click': onCancel
+          ui.button: 
+            v-if: $root.isAdmin
+            ':text': '''✔️ post'''
+            ':click': create
 props:
   media: null
 data:
@@ -26,6 +35,7 @@ data:
   contentItems: []
   originalContentItems: []
   replyInThread: 1
+  showRecaption: false
 methods:
   create: | #js
     async function () {
@@ -40,9 +50,10 @@ methods:
         if (threadMediaID)
         {
           const post = await this.$root.dbp.posts.create.one(null, threadMediaID, null, null, media);
-          this.$root.$emit("thread-updated", threadMediaID);
+          this.$emit("thread-updated");
         }
         this.$emit("created", media);
+        this.toggleRecaption();
         this.clear();
     }
   clear: | #js
@@ -53,8 +64,12 @@ methods:
     }
   onCancel: | #js
     function () {
+      this.toggleRecaption();
       this.clear();
-      this.$emit('cancel');
+    }
+  toggleRecaption: | #js
+    function () {
+      this.showRecaption = !this.showRecaption;
     }
   getContentItems: | #js
     function (item) {
@@ -82,17 +97,24 @@ style:
   .comp-e-media-recaption:
     margin: auto
     max-width: 20em
+  .content-items li:
+    margin-bottom: 0.3vh
+  input, select:
+    padding: 0.2em !important
 name: e-media-recaption
 template: >-
-  <div class="comp-e-media-recaption" path="-2142476480."><ul
-  path="-2142476480.0"><li v-for="item in contentItems.filter(it =&gt;
-  it.caption)" path="-2142476480.0.0"><e-media-content-item-recaption
-  :item="item"
-  path="-2142476480.0.0.0"></e-media-content-item-recaption></li></ul><ui-select
+  <div class="comp-e-media-recaption" path="-2142476480."><div class="flex
+  justify-around" path="-2142476480.0"><ui-button :text="'✏️ recaption'"
+  :click="toggleRecaption" path="-2142476480.0.0"></ui-button></div><transition
+  name="slide" path="-2142476480.1"><div class="mt-l2" v-if="showRecaption"
+  path="-2142476480.1.0"><ul class="content-items" path="-2142476480.1.0.0"><li
+  v-for="item in contentItems.filter(it =&gt; it.caption)"
+  path="-2142476480.1.0.0.0"><e-media-content-item-recaption :item="item"
+  path="-2142476480.1.0.0.0.0"></e-media-content-item-recaption></li></ul><ui-select
   :options="['✨ start new thread', '➕ reply in thread']" type="dropdown"
   input-type="index" v-model="replyInThread"
-  path="-2142476480.1"></ui-select><div class="flex justify-between m-l2"
-  path="-2142476480.2"><ui-button v-if="$root.isAdmin" :text="'✖️ cancel'"
-  :click="onCancel" path="-2142476480.2.0"></ui-button><ui-button
-  v-if="$root.isAdmin" :text="'✔️ create'" :click="create"
-  path="-2142476480.2.1"></ui-button></div></div>
+  path="-2142476480.1.0.1"></ui-select><div class="flex justify-between m-l2"
+  path="-2142476480.1.0.2"><ui-button v-if="$root.isAdmin" :text="'✖️ cancel'"
+  :click="onCancel" path="-2142476480.1.0.2.0"></ui-button><ui-button
+  v-if="$root.isAdmin" :text="'✔️ post'" :click="create"
+  path="-2142476480.1.0.2.1"></ui-button></div></div></transition></div>

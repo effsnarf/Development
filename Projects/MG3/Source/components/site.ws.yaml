@@ -14,6 +14,7 @@ dom:
             ':title-url': titleUrl
             ':title-key': titleKey
             ':recommendation-items': recommendationItems
+            ':columns-focus-left': columnsFocusLeft
             ':content-not-found': contentNotFound
             template: 
               v-slot: article
@@ -41,6 +42,7 @@ props:
   recommendationItems: null
   pageName: null
   columns: 3
+  columnsFocusLeft: false
   contentNotFound: false
 methods:
   getCssClass: | #js
@@ -62,10 +64,10 @@ template: >-
   :columns="columns" :title-image-id="titleImageId" :title-text="titleText"
   :title-url="titleUrl" :title-key="titleKey"
   :recommendation-items="recommendationItems"
-  :content-not-found="contentNotFound" path="3530567.0.0.0.1"><template
-  v-slot:article path="3530567.0.0.0.1.0"><slot name="article"
-  path="3530567.0.0.0.1.0.0"></slot></template><template v-slot:left
-  path="3530567.0.0.0.1.1"><slot name="left"
+  :columns-focus-left="columnsFocusLeft" :content-not-found="contentNotFound"
+  path="3530567.0.0.0.1"><template v-slot:article path="3530567.0.0.0.1.0"><slot
+  name="article" path="3530567.0.0.0.1.0.0"></slot></template><template
+  v-slot:left path="3530567.0.0.0.1.1"><slot name="left"
   path="3530567.0.0.0.1.1.0"></slot></template><template v-slot:middle
   path="3530567.0.0.0.1.2"><slot name="middle"
   path="3530567.0.0.0.1.2.0"></slot></template><template v-slot:right

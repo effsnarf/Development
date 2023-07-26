@@ -248,7 +248,6 @@ name: e-template-editor
 style:
   .div1:
     display: grid
-    margin-bottom: 5rem
     gap: 1em
   .div1 > div:
     overflow: hidden

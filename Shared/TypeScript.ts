@@ -142,7 +142,7 @@ class TypeScript {
       };
       const config = {
         mode: "development",
-        target: "node",
+        target: "web",
         entry: inputFilePath,
         output: {
           ...output,
@@ -154,10 +154,19 @@ class TypeScript {
           rules: [
             {
               test: /\.ts$/,
-              use: path.resolve(
-                __dirname,
-                path.resolve(basePath, "node_modules", "ts-loader")
-              ),
+              use: {
+                loader: path.resolve(
+                  __dirname,
+                  path.resolve(basePath, "node_modules", "ts-loader")
+                ),
+                options: {
+                  // Set the TypeScript options here
+                  transpileOnly: true,
+                  compilerOptions: {
+                    target: "esnext",
+                  },
+                },
+              },
               exclude: /node_modules/,
             },
             {
@@ -201,6 +210,8 @@ class TypeScript {
 
   static resolveSharedAliases(inputScript: string) {
     // From the current folder up, find the Shared folder
+    let source = inputScript;
+
     const findSharedPath = () => {
       let currentPath = path.dirname(process.argv[1]);
       while (currentPath !== "/") {
@@ -214,8 +225,6 @@ class TypeScript {
       }
       throw new Error("Shared folder not found");
     };
-
-    let source = inputScript;
 
     const sharedPath = findSharedPath();
 

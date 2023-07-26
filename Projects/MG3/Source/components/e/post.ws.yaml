@@ -1,31 +1,30 @@
 dom:
   .post:
+    v-if: item
     ':class': '{ enlarged }'
-    .post-media:
-      @click: onMediaClick
-      e.media:
-        v-if: item.media
-        ':item': item.media
-      e.instance:
-        v-if: item.instance
-        ':item': item.instance
+    .post-attachment:
+      e.post.attachment:
+        ':item': item.attachment
+        @click-attachment-content: onClickAttachmentContent
     .post-text:
       e.generator.square:
         class: larping-generator
         ':value': item.larpGenerator
       div: 
-        v-html: $root.textToHtml(item.text)
+        v-html: >-
+          $root.textToHtml(item.text, { firstLine: ((item.index!=0) ? null :
+          'post-title') })
     div: 
       class: clear-both
     e.post.menu:
       ':item': item
-      @refresh-thread: $emit('refresh-thread')
+      @thread-updated: $emit('thread-updated')
 props:
   item: null
 data:
   enlarged: false
 methods:
-  onMediaClick: | #js
+  onClickAttachmentContent: | #js
     function () {
       this.enlarged = !this.enlarged;
     }
@@ -53,26 +52,37 @@ style:
   .post .instance:hover:
     border: '1px solid #000000a0'
     transition: 0s !important
-  .instance: null
+  .post .comp-e-media-recaption:
+    max-height: 0
+    overflow: hidden
+    opacity: 0
+  .post.enlarged .comp-e-media-recaption:
+    max-height: 40em
+    opacity: 1
   .larping-generator:
     width: 4rem !important
     float: left
     margin-right: 1em
     margin-bottom: 1em
-  .post-media:
+  .post-attachment:
     float: left
-    width: 35%
-    left: '-1rem'
-    top: '-1rem'
+    width: 50%
+    padding: 0.5em
+    filter: grayscale(0.5)
+    cursor: pointer
     z-index: 10
-  .post-media a:
+  .post-attachment:hover, .enlarged .post-attachment:
+    filter: none
+  .post-attachment a:
     cursor: pointer !important
   .comp-e-instance .footer:
     display: none
+  .post-title:
+    font-size: 140%
   .post-text:
     padding: 0.5rem
     opacity: 0.9
-  .enlarged .post-media:
+  .enlarged .post-attachment:
     width: 100%
   .enlarged .post-text: null
   .anonymous:
@@ -81,15 +91,15 @@ style:
     color: '#35c735'
 name: e-post
 template: >-
-  <div class="comp-e-post post" :class="{ enlarged }" path="-1357494135."><div
-  class="post-media" @click="onMediaClick" path="-1357494135.0"><e-media
-  v-if="item.media" :item="item.media"
-  path="-1357494135.0.0"></e-media><e-instance v-if="item.instance"
-  :item="item.instance" path="-1357494135.0.1"></e-instance></div><div
-  class="post-text" path="-1357494135.1"><e-generator-square
-  class="larping-generator" :value="item.larpGenerator"
-  path="-1357494135.1.0"></e-generator-square><div
-  v-html="$root.textToHtml(item.text)" path="-1357494135.1.1"></div></div><div
-  class="clear-both" path="-1357494135.2"></div><e-post-menu :item="item"
-  @refresh-thread="$emit('refresh-thread')"
+  <div class="comp-e-post post" v-if="item" :class="{ enlarged }"
+  path="-1357494135."><div class="post-attachment"
+  path="-1357494135.0"><e-post-attachment :item="item.attachment"
+  @click-attachment-content="onClickAttachmentContent"
+  path="-1357494135.0.0"></e-post-attachment></div><div class="post-text"
+  path="-1357494135.1"><e-generator-square class="larping-generator"
+  :value="item.larpGenerator" path="-1357494135.1.0"></e-generator-square><div
+  v-html="$root.textToHtml(item.text, { firstLine: ((item.index!=0) ? null :
+  'post-title') })" path="-1357494135.1.1"></div></div><div class="clear-both"
+  path="-1357494135.2"></div><e-post-menu :item="item"
+  @thread-updated="$emit('thread-updated')"
   path="-1357494135.3"></e-post-menu></div>

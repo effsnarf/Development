@@ -4,9 +4,15 @@ dom:
       v-text: mediaID
     v-if: cMedia
     ':style': mediaStyle
-    component:
-      ':is': formatComponentName
-      ':media': cMedia
+    .flex.flex-column.gap-1:
+      div: 
+        @click: $emit('click-media-content')
+        component:
+          ':is': formatComponentName
+          ':media': cMedia
+      e.media.recaption:
+        ':media': cMedia
+        @thread-updated: $emit('thread-updated')
 props:
   item: null
   mediaID: null
@@ -58,9 +64,14 @@ watch:
         this.cMedia = !mediaID ? null : await this.$root.dbp.medias.select.one(mediaID);
       }
     immediate: true
+style: null
 name: e-media
 template: >-
   <div class="comp-e-media" v-if="cMedia" :style="mediaStyle"
-  path="864271643."><div v-text="mediaID" path="864271643.0"></div><component
+  path="864271643."><div v-text="mediaID" path="864271643.0"></div><div
+  class="flex flex-column gap-1" path="864271643.1"><div
+  @click="$emit('click-media-content')" path="864271643.1.0"><component
   :is="formatComponentName" :media="cMedia"
-  path="864271643.1"></component></div>
+  path="864271643.1.0.0"></component></div><e-media-recaption :media="cMedia"
+  @thread-updated="$emit('thread-updated')"
+  path="864271643.1.1"></e-media-recaption></div></div>

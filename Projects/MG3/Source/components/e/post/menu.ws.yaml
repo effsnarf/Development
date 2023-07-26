@@ -14,7 +14,7 @@ methods:
   onDelete: | #js
     function () {
       this.$root.dbp.posts.delete.one(this.item._id);
-      this.$emit("refresh-thread");
+      this.$emit("thread-updated");
     }
 style:
   .comp-e-post-menu:

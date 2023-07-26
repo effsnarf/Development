@@ -10,12 +10,18 @@ dom:
 props:
   text: null
   click: null
+  value: null
   showLoading: true
 data:
   isLoading: 0
 methods:
   onClick: | #js
     async function() {
+      if (this.value != null)
+      {
+        this.$emit("input", !this.value);
+        return;
+      }
       this.$emit('click');
       if (this.click)
       {

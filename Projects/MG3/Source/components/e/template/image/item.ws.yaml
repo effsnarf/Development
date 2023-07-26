@@ -1,12 +1,8 @@
 dom:
   div:
-    ui.loading:
-      class: absolute-center
-      v-show: isLoading
     ui.file.dropzone:
-      v-dim: isLoading
       ':enabled': editable
-      @file-drop: onFileDrop(item, $event)
+      v-model: item.imageID
       ui.movable:
         ':enabled': editable
         @drag-by: ({ dx, dy }) => onItemDragBy(item, { dx, dy })
@@ -26,27 +22,10 @@ dom:
 props:
   item: null
   editable: false
-data:
-  isLoading: 0
 mounted: | #js
   async function () {
   }
 methods:
-  onFileDrop: | #js
-    async function(item, files) {
-      await this.$nextTick();
-      if (files.length > 1) return alertify.error('One file at a time, please');
-      this.isLoading++;
-      try
-      {
-        const image = await this.$root.uploadFile(files[0]);
-        item.imageID = image._id;
-      }
-      finally
-      {
-        this.isLoading--;
-      }
-    }
   onItemDragBy: | #js
     function(item, dpos) {
       const pos = item.trans.pos;
@@ -105,16 +84,14 @@ style:
     pointer-events: none
 name: e-template-image-item
 template: >-
-  <div class="comp-e-template-image-item" path="1623568049."><ui-loading
-  class="absolute-center" v-show="isLoading"
-  path="1623568049.0"></ui-loading><ui-file-dropzone v-dim="isLoading"
-  :enabled="editable" @file-drop="onFileDrop(item, $event)"
-  path="1623568049.1"><ui-movable :enabled="editable" @drag-by="({ dx, dy })
-  =&gt; onItemDragBy(item, { dx, dy })" @scale-by="(ds) =&gt;
-  onItemScaleBy(item, ds)" path="1623568049.1.0"><ui-image ref="image1"
-  v-if="item" :style="getStyle(item)" :imageID="item.imageID"
+  <div class="comp-e-template-image-item" path="1623568049."><ui-file-dropzone
+  :enabled="editable" v-model="item.imageID" path="1623568049.0"><ui-movable
+  :enabled="editable" @drag-by="({ dx, dy }) =&gt; onItemDragBy(item, { dx, dy
+  })" @scale-by="(ds) =&gt; onItemScaleBy(item, ds)"
+  path="1623568049.0.0"><ui-image ref="image1" v-if="item"
+  :style="getStyle(item)" :imageID="item.imageID"
   :remove-background="item.removeBackground" @load="onImageLoad"
   @change="refresh"
-  path="1623568049.1.0.0"></ui-image></ui-movable></ui-file-dropzone><e-template-caption-item
+  path="1623568049.0.0.0"></ui-image></ui-movable></ui-file-dropzone><e-template-caption-item
   v-if="item.caption" :item="item.caption" :editable="editable"
-  path="1623568049.2"></e-template-caption-item></div>
+  path="1623568049.1"></e-template-caption-item></div>

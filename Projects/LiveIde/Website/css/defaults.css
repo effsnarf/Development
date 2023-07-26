@@ -678,6 +678,11 @@ progress
 {
 }
 
+.flex.ver
+{
+  flex-direction: column;
+}
+
 .gap-1
 {
   gap: 1em;

@@ -13,7 +13,7 @@ dom:
       slot: 
         name: article
     div: 
-      ':class': '''columns columns-'' + columns'
+      ':class': columnsClass
       .left:
         ui.sticky: 
           ':top': leftStickyTop
@@ -45,14 +45,27 @@ props:
   titleUrl: null
   titleKey: null
   recommendationItems: null
+  columnsFocusLeft: false
   contentNotFound: false
   columns: 3
 computed:
+  columnsClass: | #js
+    function() {
+      const cls = {};
+      cls['columns'] = true;
+      cls['columns-' + this.columns] = true;
+      cls['columns-focus-left'] = this.columnsFocusLeft;
+      return cls;
+    }
   leftStickyTop: | #js
     function() {
       return "120px";
     }
 style:
+  .columns-focus-left:
+    grid-template: 1fr / 1fr 1fr !important
+  .columns-focus-left .middle:
+    filter: blur(5px) grayscale(0.5)
   .article:
     margin-top: 3rem
   .comp-site-main: null
@@ -65,7 +78,7 @@ template: >-
   :imageID="titleImageId" :title="titleText" :url="titleUrl" :key="titleKey"
   path="-578759680.0.0"></content-title></transition><div class="article"
   path="-578759680.1"><slot name="article"
-  path="-578759680.1.0"></slot></div><div :class="'columns columns-' + columns"
+  path="-578759680.1.0"></slot></div><div :class="columnsClass"
   path="-578759680.2"><div class="left" path="-578759680.2.0"><ui-sticky
   :top="leftStickyTop" path="-578759680.2.0.0"><slot name="left"
   path="-578759680.2.0.0.0"></slot></ui-sticky></div><div class="middle"

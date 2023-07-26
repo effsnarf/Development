@@ -9,7 +9,7 @@ dom:
       div: 
         ':class': getTextContentClass(item)
         v-html: getItemText(item)
-        title: ✏️ edit
+        ':title': '!editable ? '''' : ''✏️ edit'''
         @click: onClickText
       transition:
         name: slide
@@ -157,8 +157,9 @@ template: >-
   <div class="comp-e-template-caption-item" v-if="item" :class="{ editable:
   editable }" path="128142918."><div class="text" ref="sizeRef1"
   :class="getCssClass(item)" :style="itemStyle" path="128142918.0"><div
-  :class="getTextContentClass(item)" v-html="getItemText(item)" title="✏️ edit"
-  @click="onClickText" path="128142918.0.0"></div><transition name="slide"
+  :class="getTextContentClass(item)" v-html="getItemText(item)"
+  :title="!editable ? '' : '✏️ edit'" @click="onClickText"
+  path="128142918.0.0"></div><transition name="slide"
   path="128142918.0.1"><ui-text-box v-if="showEditor" :class="getCssClass(item)"
   v-model="item.text"
   path="128142918.0.1.0"></ui-text-box></transition></div></div>

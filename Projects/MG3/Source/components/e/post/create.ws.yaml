@@ -14,21 +14,16 @@ dom:
           @has-content: hasInstanceContent = $event
     transition: 
       name: slide
-      div: 
-        v-show: showLarpGeneratorSelect
-        h3:
-          v-text: '''Larping as'''
-        e.generator.select:
-          v-model: larpGenerator
-          ':allow-anonymous': 'true'
-          @input: showLarpGeneratorSelect = false;
     transition: 
       name: slide
       div: 
-        e.comment.create:
-          v-if: showCommentCreate
-          v-model: text
-          ':new-thread': 'false'
+        ui.file.dropzone:
+          v-model: imageID
+          e.comment.create:
+            v-if: showCommentCreate
+            ':imageID': imageID
+            v-model: text
+            ':new-thread': 'false'
     .mt-l1:
       transition: 
         name: slide
@@ -43,6 +38,7 @@ props:
 data:
   larpGenerator: null
   tempInstance: null
+  imageID: null
   text: null
   hasInstanceContent: false
   showLarpGeneratorSelect: false
@@ -58,7 +54,7 @@ methods:
       {
         const { generator, text0, text1 } = (this.tempInstance || {});
         const instance = !generator ? null : { generatorID: generator.generatorID, text0, text1 };
-        const post = await this.$root.dbp.posts.create.one(this.threadID, this.threadMediaID, this.text, instance);
+        const post = await this.$root.dbp.posts.create.one(this.threadID, this.threadMediaID, this.text, instance, this.imageID);
         this.$emit('created', post);
         this.clear();
       }
@@ -82,7 +78,20 @@ watch:
         //this.showInstanceCreate = !this.threadID;
       }
     immediate: true
+  postPreview:
+    handler: | #js
+      function(postPreview) {
+        this.$emit('input-preview', postPreview);
+      }
+    immediate: true
 computed:
+  postPreview: | #js
+    function() {
+      return {
+        index: 0,
+        text: this.text,
+      };
+    }
   showInstanceCreate: | #js
     function() {
       return !this.hasCommentContent;
@@ -123,14 +132,11 @@ template: >-
   v-model="tempInstance" :generator="generator" @has-content="hasInstanceContent
   = $event"
   path="1762525697.0.0.0"></e-instance-create></transition></div><transition
-  name="slide" path="1762525697.1"><div v-show="showLarpGeneratorSelect"
-  path="1762525697.1.0"><h3 v-text="'Larping as'"
-  path="1762525697.1.0.0"></h3><e-generator-select v-model="larpGenerator"
-  :allow-anonymous="true" @input="showLarpGeneratorSelect = false;"
-  path="1762525697.1.0.1"></e-generator-select></div></transition><transition
-  name="slide" path="1762525697.2"><div path="1762525697.2.0"><e-comment-create
-  v-if="showCommentCreate" v-model="text" :new-thread="false"
-  path="1762525697.2.0.0"></e-comment-create></div></transition><div
+  name="slide" path="1762525697.1"></transition><transition name="slide"
+  path="1762525697.2"><div path="1762525697.2.0"><ui-file-dropzone
+  v-model="imageID" path="1762525697.2.0.0"><e-comment-create
+  v-if="showCommentCreate" :imageID="imageID" v-model="text" :new-thread="false"
+  path="1762525697.2.0.0.0"></e-comment-create></ui-file-dropzone></div></transition><div
   class="mt-l1" path="1762525697.3"><transition name="slide"
   path="1762525697.3.0"><ui-button v-if="canPost" text="✔️ post" :click="post"
   path="1762525697.3.0.0"></ui-button></transition></div></div>
