@@ -347,7 +347,7 @@ api:
           Attachment: {
             Media: media,
             Instance: instance,
-          }
+          },
           Created: now,
         };
 

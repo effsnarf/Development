@@ -1,9 +1,9 @@
 dom:
   .thread-columns:
     div: 
-      v-if: thread
+      v-if: media
       e.media:
-        ':media': thread.posts[0].media
+        ':media': media
     div: 
       div: 
         v-if: thread
@@ -40,6 +40,7 @@ props:
   teaser: false
 data:
   thread: null
+  media: null
   isLoading: false
 mounted: | #js
   async function() {
@@ -49,6 +50,12 @@ mounted: | #js
 methods:
   refresh: | #js
     async function(thread) {
+      if (!this.media) {
+        if (this.threadMediaID)
+        {
+          this.media = await this.$root.dbp.medias.select.one(this.threadMediaID);
+        }
+      }
       if ((thread) && (thread.threadID || thread.threadMediaID) && (!this.isRelevantThread(thread.threadID, thread.threadMediaID))) return;
       this.isLoading = true;
       try
@@ -112,8 +119,8 @@ style:
     margin-bottom: 1vh
 name: e-thread
 template: >-
-  <div class="comp-e-thread thread-columns" path="1226205107."><div
-  v-if="thread" path="1226205107.0"><e-media :media="thread.posts[0].media"
+  <div class="comp-e-thread thread-columns" path="1226205107."><div v-if="media"
+  path="1226205107.0"><e-media :media="media"
   path="1226205107.0.0"></e-media></div><div path="1226205107.1"><div
   v-if="thread" path="1226205107.1.0"><h3 v-text="thread.title"
   path="1226205107.1.0.0"></h3><transition-group tag="ul" name="list"
