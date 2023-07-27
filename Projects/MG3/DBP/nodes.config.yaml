@@ -279,7 +279,7 @@ api:
         instance = await db.upsert("Instances", instance, true);
         instance.InstanceID = instance._id;
         await db.upsert("Instances", instance, true);
-        return instance._id;
+        return { _id: instance._id };
     Threads.create.one:
       args: []
       code: | #js
