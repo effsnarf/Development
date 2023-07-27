@@ -233,6 +233,9 @@ interface MgParams {
         self.compNames = client.comps.map((c: Component) => c.name);
         await self.ensureBuilders();
         self.isAdmin = window.location.hostname == "localhost";
+        document.addEventListener("scroll", () => {
+          self.$emit("scroll");
+        });
       },
       async getBuilder(builderID: number) {
         const self = this as any;

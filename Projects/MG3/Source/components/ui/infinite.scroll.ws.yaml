@@ -9,7 +9,6 @@ mounted: | #js
   }
 methods:
   onScroll: | #js
-
     function(force) {
       if ((!force) && (this.lastEmit) && ((Date.now() - this.lastEmit) < 400)) return;
       const distanceToBottom = document.documentElement.scrollHeight - (window.scrollY + window.innerHeight);

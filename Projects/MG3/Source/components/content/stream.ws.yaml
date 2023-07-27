@@ -4,9 +4,11 @@ dom:
     transition.group:
       tag: ul
       name: slide
+      ':id': '''ul-''+_uid'
       ':class': gridClass
       ':style': '{ gap: gap }'
       li:
+        class: content-stream-item
         v-for: (item, index) in items
         ':key': $root.getKey(item)
         div: 
@@ -37,8 +39,8 @@ mounted: | #js
   function() {
     this.processQueue();
     this.reset();
-    document.addEventListener('scroll', this.onScroll.bind(this));
     this.$watch(() => this.$root.params.url, this.clear.bind(this), { immediate: true });
+    this.$root.$on("scroll", this.onScroll.bind(this));
   }
 methods:
   add: | #js
@@ -48,7 +50,7 @@ methods:
     }
   scrollTo: | #js
     function(index) {
-      const items = this.$el.querySelectorAll('li');
+      const items = this.getListItemElements();
       const item = items[index];
       if (!item) return;
       const rect = item.getBoundingClientRect();
@@ -63,9 +65,10 @@ methods:
       this.updateDistancesToVisibility();
       this.updateItemStyles();
       this.key1++;
-    }).throttle(100)
+    }).debounce(100)
   getItemStyle: | #js
     function(index) {
+      if (this.gridClass != "grid-1") return null;
       const distance = this.distancesToVisibility[index];
       const getValue = (min, scale) => Math.min(1, Math.max(min, 1 - (distance / window.innerHeight * scale)))
       const opacity = (getValue(0, 1));
@@ -86,7 +89,7 @@ methods:
     }
   getItemScrollTop: | #js
     function(index) {
-      const items = this.$el.querySelectorAll('li');
+      const items = this.getListItemElements();
       const item = items[index];
       if (!item) return;
       const rect = item.getBoundingClientRect();
@@ -109,9 +112,10 @@ methods:
     }
   updateVisibleItemIndex: | #js
     function() {
-      const items = this.$el.querySelectorAll('li');
+      const items = this.getListItemElements();
       const visibleItemIndex = Array.from(items).findIndex(this.isOnScreen.bind(this));
       this.visibleItemIndex = visibleItemIndex;
+      this.emitVisibleItem();
     }
   isOnScreen: | #js
     function(item) {
@@ -151,11 +155,25 @@ methods:
       if (next) await next();
       setTimeout(this.processQueue.bind(this), 300);
     }
+  getListItemElements: | #js
+    function() {
+      const items = (document.querySelectorAll('li.content-stream-item')||[]);
+      return items;     
+    }
+  emitVisibleItem: | #js
+    function() {
+      this.$emit("visible-item", this.visibleItem);
+    }
+computed:
+  visibleItem: | #js
+    function() {
+      return this.items[this.visibleItemIndex];
+    }
 watch:
   visibleItemIndex:
     handler: | #js
       (function() {
-        this.$emit("visible-item", this.items[this.visibleItemIndex]);
+        this.emitVisibleItem();
       }).debounce(100)
 style:
   ul:
@@ -164,8 +182,9 @@ style:
     margin-bottom: 2em
 template: >-
   <ui-infinite-scroll class="comp-content-stream" @scroll="loadMore"
-  path="-30902635."><transition-group tag="ul" name="slide" :class="gridClass"
-  :style="{ gap: gap }" path="-30902635.0"><li v-for="(item, index) in items"
+  path="-30902635."><transition-group tag="ul" name="slide" :id="'ul-'+_uid"
+  :class="gridClass" :style="{ gap: gap }" path="-30902635.0"><li
+  class="content-stream-item" v-for="(item, index) in items"
   :key="$root.getKey(item)" path="-30902635.0.0"><div
   path="-30902635.0.0.0"><div :key="key1"
   path="-30902635.0.0.0.0"></div><component :style="itemStyles[index]"

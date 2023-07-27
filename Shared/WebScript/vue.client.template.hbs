@@ -18,16 +18,17 @@
         }
     }
   },
-  mounted: {{{addCode mounted "this.$root.vm.onVueMounted(this); this._log_method('mounted', arguments); this.$emit = this._getNewEmit(this.$emit);"}}},
+  created: {{{addCode created ""}}},
+  mounted: {{{addCode mounted "this.$root.vm.onVueMounted(this); this._log_method('mounted', arguments);"}}},
   unmounted: {{{addCode unmounted "this.$root.vm.onVueUnmounted(this); this._log_method('unmounted', arguments);"}}},
   methods: {
     {{#each methods}}
     {{@key}}: {{{addMethodCode @key this}}},
     {{/each}}
-    _getNewEmit: function (emit) {
+    _getNewEmit: function (self, emit) {
       return function (event, ...args) {
         this._log_emit(event, args);
-        emit.call(this, event, ...args);
+        emit.call(self, event, ...args);
       }
     },
 

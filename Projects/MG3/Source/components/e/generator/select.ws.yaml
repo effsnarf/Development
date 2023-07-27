@@ -49,9 +49,10 @@ methods:
     async function(query) {
       if (query) return (await this.$root.dbp.generators.select.search(query));
       if (this.defaultGenerator) {
-        const gens = (await this.$root.dbp.generators.select.related(this.defaultGenerator?.urlName));
-        gens.removeByField("_id", this.defaultGenerator._id)
+        let gens = (await this.$root.dbp.generators.select.related(this.defaultGenerator?.urlName));
+        gens.removeByField("_id", this.defaultGenerator?._id)
         gens.unshift(this.defaultGenerator);
+        gens = gens.filter(g => g);
         return gens;
       }
       return (await this.$root.dbp.generators.select.popular());

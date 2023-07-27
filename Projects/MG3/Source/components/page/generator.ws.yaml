@@ -1,7 +1,6 @@
 dom:
   site:
     page-name: generator
-    ':columns': 2
     ':title-image-id': generator?.imageID
     ':title-text': generator?.displayName
     ':title-url': $root.url.generator(generator)
@@ -44,7 +43,8 @@ dom:
         ref: contentStream1
         item-type: e.instance
         ':get-more-items': getMoreInstances
-        grid-class: grid-3
+        grid-class: grid-1
+        @visible-item: onVisibleSteamInstanceChange
     template: 
       v-slot: left
       e.instance.create:
@@ -57,10 +57,17 @@ dom:
         ':generators': recommendationItems
     template: 
       v-slot: right
+      .sticky:
+        ':style': '{ top: ''0px'' }'
+        e.instance.wide:
+          ':instance': threadInstance
+      e.thread:
+        ':threadMedia': '{type: ''instance'', instance: threadInstance}'
 data:
   urlName: null
   generator: null
   instance: null
+  visibleStreamInstance: null
   poem: null
   randomStanza: null
   recommendationItems: []
@@ -133,6 +140,10 @@ methods:
     function(instance) {
       this.$refs.contentStream1?.add(instance);
     }
+  onVisibleSteamInstanceChange: | #js
+    function(instance) {
+      this.visibleStreamInstance = instance;
+    }
 watch:
   generator: | #js
     async function(generator) {
@@ -150,6 +161,11 @@ watch:
       setTimeout(() => {
         this.showCreateInstance = true;
       }, 200);
+    }
+computed:
+  threadInstance: | #js
+    function() {
+      return (this.visibleStreamInstance);
     }
 style:
   .comp-e-instance .footer:
@@ -172,9 +188,11 @@ style:
     font-size: 160%
   .float-clear:
     clear: both
+  .sticky:
+    padding: 0.5em
 name: page-generator
 template: >-
-  <site class="comp-page-generator" page-name="generator" :columns="2"
+  <site class="comp-page-generator" page-name="generator"
   :title-image-id="generator?.imageID" :title-text="generator?.displayName"
   :title-url="$root.url.generator(generator)"
   :title-key="generator?.generatorID" path="-38884812."><template v-slot:article
@@ -195,11 +213,16 @@ template: >-
   path="-38884812.0.1.0.3"></div><div class="float-clear"
   path="-38884812.0.1.0.4"></div></div></transition></template><template
   v-slot:middle path="-38884812.1"><content-stream ref="contentStream1"
-  item-type="e.instance" :get-more-items="getMoreInstances" grid-class="grid-3"
+  item-type="e.instance" :get-more-items="getMoreInstances" grid-class="grid-1"
+  @visible-item="onVisibleSteamInstanceChange"
   path="-38884812.1.0"></content-stream></template><template v-slot:left
   path="-38884812.2"><e-instance-create v-if="showCreateInstance"
   :generator="generator" @instance-created="onInstanceCreated"
   path="-38884812.2.0"></e-instance-create><h3 v-text="'See also'"
   path="-38884812.2.1"></h3><e-generator-list :generators="recommendationItems"
   path="-38884812.2.2"></e-generator-list></template><template v-slot:right
-  path="-38884812.3"></template></site>
+  path="-38884812.3"><div class="sticky" :style="{ top: '0px' }"
+  path="-38884812.3.0"><e-instance-wide :instance="threadInstance"
+  path="-38884812.3.0.0"></e-instance-wide></div><e-thread :threadMedia="{type:
+  'instance', instance: threadInstance}"
+  path="-38884812.3.1"></e-thread></template></site>

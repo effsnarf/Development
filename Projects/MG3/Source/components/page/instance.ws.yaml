@@ -16,7 +16,7 @@ dom:
       content.stream:
         ref: stream1
         item-type: e.instance
-        ':item-props': '{ showFullFooter: true }'
+        ':item-props': '{ showFullFooter: false }'
         ':get-more-items': getMoreInstances
         grid-class: grid-1
         @visible-item: onVisibleSteamInstanceChange
@@ -53,8 +53,6 @@ methods:
   onVisibleSteamInstanceChange: | #js
     function(instance) {
       this.visibleStreamInstance = instance;
-      if (instance) {
-      }
     }
   init: | #js
     async function(page, instanceID) {
@@ -111,7 +109,9 @@ watch:
         this.$root.setDocumentTitle(this.$root.getInstanceText(threadInstance));
       }
     immediate: true
-style: null
+style:
+  .sticky:
+    padding: 0.5em
 name: page-instance
 template: >-
   <site class="comp-page-instance" ref="site1" page-name="instance"
@@ -121,7 +121,7 @@ template: >-
   path="1375900948.1"><e-instance class="mb-l6" :item="instance"
   :instance-image="true" :show-full-footer="true"
   path="1375900948.1.0"></e-instance><content-stream ref="stream1"
-  item-type="e.instance" :item-props="{ showFullFooter: true }"
+  item-type="e.instance" :item-props="{ showFullFooter: false }"
   :get-more-items="getMoreInstances" grid-class="grid-1"
   @visible-item="onVisibleSteamInstanceChange"
   path="1375900948.1.1"></content-stream></template><template v-slot:right

@@ -162,9 +162,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "../../../../LiveIde/Website/script/1690477387706.ts":
+/***/ "../../../../LiveIde/Website/script/1690486212257.ts":
 /*!***********************************************************!*\
-  !*** ../../../../LiveIde/Website/script/1690477387706.ts ***!
+  !*** ../../../../LiveIde/Website/script/1690486212257.ts ***!
   \***********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -388,6 +388,9 @@ const helpers = {
                 self.compNames = client.comps.map((c) => c.name);
                 await self.ensureBuilders();
                 self.isAdmin = window.location.hostname == "localhost";
+                document.addEventListener("scroll", () => {
+                    self.$emit("scroll");
+                });
             },
             async getBuilder(builderID) {
                 const self = this;
@@ -3494,7 +3497,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690477387706.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690486212257.ts");
 /******/ 	
 /******/ })()
 ;
