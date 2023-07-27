@@ -9,10 +9,14 @@ dom:
       li:
         v-for: (item, index) in items
         ':key': $root.getKey(item)
-        component:
-          ':is': itemType.kebabize()
-          ':item': item
-          v-bind: itemProps
+        div: 
+          div: 
+            ':key': key1
+          component:
+            ':style': itemStyles[index]
+            ':is': itemType.kebabize()
+            ':item': item
+            v-bind: itemProps
 name: content-stream
 props:
   itemType: null
@@ -25,6 +29,10 @@ data:
   items: []
   queue: []
   visibleItemIndex: null
+  distancesToVisibility: []
+  itemStyles: []
+  scrollTop: 0
+  key1: 1
 mounted: | #js
   function() {
     this.processQueue();
@@ -49,8 +57,55 @@ methods:
       window.scrollTo({ top, behavior: 'smooth' });
     }
   onScroll: | #js
-    function() {
+    (function() {
+      this.scrollTop = window.scrollY;
       this.updateVisibleItemIndex();
+      this.updateDistancesToVisibility();
+      this.updateItemStyles();
+      this.key1++;
+    }).throttle(100)
+  getItemStyle: | #js
+    function(index) {
+      const distance = this.distancesToVisibility[index];
+      const getValue = (min, scale) => Math.min(1, Math.max(min, 1 - (distance / window.innerHeight * scale)))
+      const opacity = (getValue(0, 1));
+      const grayscale = (1 - getValue(0, 1));
+      const blur = `${Math.round((1 - getValue(0, 0.5)) * 5)}px`;
+      return {
+        opacity,
+        filter: `grayscale(${grayscale}) blur(${blur})`,
+        transition: 'opacity 0.2s, filter 0.2s',
+      }
+    }
+  getDistanceToVisibility: | #js
+    function(index) {
+      // How many pixels until the item is visible (visibleItemIndex = index)
+      const itemScrollTop = this.getItemScrollTop(index);
+      const distance = (itemScrollTop - this.scrollTop);
+      return distance;
+    }
+  getItemScrollTop: | #js
+    function(index) {
+      const items = this.$el.querySelectorAll('li');
+      const item = items[index];
+      if (!item) return;
+      const rect = item.getBoundingClientRect();
+      const topMargin = 250;
+      const top = rect.top + window.scrollY - topMargin;
+      return top;
+    }
+  updateItemStyles: | #js
+    function() {
+      for (let i = 0; i < this.items.length; i++) {
+        this.itemStyles[i] = this.getItemStyle(i);
+      }
+    }
+  updateDistancesToVisibility: | #js
+    function() {
+      const count = Math.max(this.items.length, this.distancesToVisibility.length);
+      for (let i = 0; i < count; i++) {
+        this.distancesToVisibility[i] = this.getDistanceToVisibility(i);
+      }
     }
   updateVisibleItemIndex: | #js
     function() {
@@ -86,6 +141,7 @@ methods:
           this.items.push(...newItems);
           this.updateVisibleItemIndex();
           resolve();
+          this.$nextTick(this.onScroll.bind(this));
         });
       });
     }
@@ -95,6 +151,12 @@ methods:
       if (next) await next();
       setTimeout(this.processQueue.bind(this), 300);
     }
+watch:
+  visibleItemIndex:
+    handler: | #js
+      (function() {
+        this.$emit("visible-item", this.items[this.visibleItemIndex]);
+      }).debounce(100)
 style:
   ul:
     display: grid
@@ -104,6 +166,8 @@ template: >-
   <ui-infinite-scroll class="comp-content-stream" @scroll="loadMore"
   path="-30902635."><transition-group tag="ul" name="slide" :class="gridClass"
   :style="{ gap: gap }" path="-30902635.0"><li v-for="(item, index) in items"
-  :key="$root.getKey(item)" path="-30902635.0.0"><component
+  :key="$root.getKey(item)" path="-30902635.0.0"><div
+  path="-30902635.0.0.0"><div :key="key1"
+  path="-30902635.0.0.0.0"></div><component :style="itemStyles[index]"
   :is="itemType.kebabize()" :item="item" v-bind="itemProps"
-  path="-30902635.0.0.0"></component></li></transition-group></ui-infinite-scroll>
+  path="-30902635.0.0.0.1"></component></div></li></transition-group></ui-infinite-scroll>

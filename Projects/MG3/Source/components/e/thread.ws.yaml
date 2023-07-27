@@ -33,7 +33,7 @@ data:
   thread: null
   dThreadMedia: null
   key1: 1
-  isLoading: false
+  isLoading: 0
 mounted: | #js
   async function() {
   }
@@ -58,7 +58,15 @@ methods:
   reload: | #js
     async function() {
       // Get the thread
-      this.thread = await this.$root.dbp.threads.select.one(this.thread?._id, this.dThreadMedia?._id);
+      this.isLoading++;
+      try
+      {
+        this.thread = await this.$root.dbp.threads.select.one(null, this.dThreadMedia?._id, this.dThreadMedia?.instance?._id);
+      }
+      finally
+      {
+        this.isLoading--;
+      }
     }
 computed:
   visiblePosts: | #js

@@ -1,0 +1,28 @@
+dom:
+  ui.link:
+    ':url': $root.url.instance(instance)
+    .grid:
+      ui.image:
+        ':imageID': instance.imageID
+      div: 
+        div: 
+          v-text: instance.text0
+        div: 
+          v-text: instance.text1
+props:
+  instance: null
+style:
+  .grid:
+    grid-template: 1fr / 4em 1fr
+    gap: 0.5em
+  div:
+    text-transform: uppercase
+    font-family: monospace
+name: e-instance-wide
+template: >-
+  <ui-link class="comp-e-instance-wide" :url="$root.url.instance(instance)"
+  path="-1269625149."><div class="grid" path="-1269625149.0"><ui-image
+  :imageID="instance.imageID" path="-1269625149.0.0"></ui-image><div
+  path="-1269625149.0.1"><div v-text="instance.text0"
+  path="-1269625149.0.1.0"></div><div v-text="instance.text1"
+  path="-1269625149.0.1.1"></div></div></div></ui-link>

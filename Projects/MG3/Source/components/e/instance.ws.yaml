@@ -93,10 +93,8 @@ style:
     margin-top: 1em
   .footer2:
     margin-top: 1em
-    display: grid
-    grid-template-columns: 4fr 2fr
   .footer2 .comp-e-generator-wide2:
-    font-size: 140%
+    font-size: 100%
   .admin-footer:
     display: flex
     justify-content: center

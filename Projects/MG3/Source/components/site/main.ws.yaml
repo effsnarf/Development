@@ -37,8 +37,9 @@ dom:
       .right:
         ui.sticky: 
           top: 140px
-          slot: 
-            name: right
+          .right-height:
+            slot: 
+              name: right
 props:
   titleImageId: null
   titleText: null
@@ -66,6 +67,9 @@ style:
   .article:
     margin-top: 3rem
   .comp-site-main: null
+  .right-height:
+    max-height: calc(100vh - 180px)
+    overflow: auto
   .error:
     margin-bottom: 3rem
 name: site-main
@@ -87,5 +91,6 @@ template: >-
   path="-578759680.2.1.0"></ui-error><h2 class="error" v-if="contentNotFound"
   v-text="'Content not found'" path="-578759680.2.1.1"></h2><slot name="middle"
   path="-578759680.2.1.2"></slot></div><div class="right"
-  path="-578759680.2.2"><ui-sticky top="140px" path="-578759680.2.2.0"><slot
-  name="right" path="-578759680.2.2.0.0"></slot></ui-sticky></div></div></div>
+  path="-578759680.2.2"><ui-sticky top="140px" path="-578759680.2.2.0"><div
+  class="right-height" path="-578759680.2.2.0.0"><slot name="right"
+  path="-578759680.2.2.0.0.0"></slot></div></ui-sticky></div></div></div>

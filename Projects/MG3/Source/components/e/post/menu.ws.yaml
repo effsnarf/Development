@@ -17,8 +17,6 @@ methods:
       this.$emit("thread-updated");
     }
 style:
-  .comp-e-post-menu:
-    margin-bottom: 0.5rem
   .center, .post-menu:
     display: flex
     justify-content: center

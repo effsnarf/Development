@@ -11,7 +11,7 @@ props:
   generator: null
 style:
   .grid:
-    grid-template: 1fr / 1fr 4fr
+    grid-template: 1fr / 2.5em 1fr
     gap: 0.5em
 name: e-generator-wide2
 template: >-
