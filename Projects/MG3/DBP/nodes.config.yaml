@@ -437,6 +437,11 @@ api:
         }
         thread.postsCount--;
         await db.upsert("Threads", thread);
+    Posts.select.recent:
+      args: []
+      code: | #js
+        const posts = await db.find("Posts", { Index: { $ne: 0 } }, { _id: -1 }, 15, null, true);
+        return posts;
     Comments.select.by:
       args: [entityID]
       code: | #js
