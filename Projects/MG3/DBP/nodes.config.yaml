@@ -302,9 +302,12 @@ api:
     Threads.select.all:
       args: []
       code: | #js
-        return [];
-        let threads = await db.find("Threads", {}, { LastPostCreated: -1 }, 1000, null, true);
-        threads = await Promise.all(threads.map(async t => await dbp.threads.select.one(t._id)));
+        const threads = await db.find("Threads", {}, { LastPostCreated: -1 }, 1000, null, true);
+        const allPosts = await db.find("Posts", {}, { }, 1000, null, true);
+        for (const thread of threads)
+        {
+          thread.posts = allPosts.filter(p => p.threadID == thread._id);
+        }
         return threads;
     Posts.create.one:
       args: [threadID, threadMedia, text, media]
@@ -357,21 +360,25 @@ api:
         }
         if (!thread) throw new Error("Provide either a threadID or a threadMedia");
 
-        if (media?.instance)
+        if (media?.instance && !media.instance._id)
         {
-          let instance = await dbp.instances.create.one("en", media.instance.generatorID, null, media.instance.text0, media.instance.text1);
-          instance = {
-            _id: instance.instanceID,
-            GeneratorID: instance.generatorID,
-            DisplayName: instance.displayName,
-            UrlName: instance.urlName,
-            ImageID: instance.imageID,
-            Text0: instance.text0,
-            Text1: instance.text1,
-          };
-          instance._id = instance.instanceID;
-          media.type = "instance";
-          media.instance = instance;
+          // Double check that an instance with this content doesn't already exist
+          let instance = await db.findOne("Instances", { GeneratorID: media.instance.generatorID, ImageID: media.instance.imageID, Text0: media.instance.text0, Text1: media.instance.text1 });
+          if (!instance) {
+            instance = await dbp.instances.create.one("en", media.instance.generatorID, null, media.instance.text0, media.instance.text1);
+            // Take only the important fields, in a media instance we don't need all the fields
+            instance = {
+              _id: instance.instanceID,
+              GeneratorID: instance.generatorID,
+              DisplayName: instance.displayName,
+              UrlName: instance.urlName,
+              ImageID: instance.imageID,
+              Text0: instance.text0,
+              Text1: instance.text1,
+            };
+            media.type = "instance";
+            media.instance = instance;
+          }
         }
 
         const otherPosts = (await db.find("Posts", { ThreadID: thread._id }, { }, 1000, null, true));
