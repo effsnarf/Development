@@ -314,6 +314,30 @@ api:
       code: | #js
         const now = Date.now();
 
+        const getSimpleInstance = async (instance) => {
+          // Make sure that the instance has an imageID
+          if (!instance.imageID)
+          {
+            // Find the generator
+            const generator = await db.findOne("Generators", { _id: instance.generatorID });
+            if (!generator) throw new Error(`Generator not found. Instance: ${instance}`);
+            instance.imageID = generator.imageID;
+          }
+
+          // Take only the important fields, in a media instance we don't need all the fields
+          instance = {
+            _id: instance.instanceID,
+            GeneratorID: instance.generatorID,
+            DisplayName: instance.displayName,
+            UrlName: instance.urlName,
+            ImageID: instance.imageID,
+            Text0: instance.text0,
+            Text1: instance.text1,
+          };
+
+          return instance;
+        }
+
         // This only happens on instances
         // Migrate instances to new media format, when posting in a new thread (commenting on the instance)
         if (threadMedia && !threadMedia._id)
@@ -328,14 +352,7 @@ api:
           }
           else
           {
-            // Make sure that the instance has an imageID
-            if (!instance.imageID)
-            {
-              // Find the generator
-              const generator = await db.findOne("Generators", { _id: instance.generatorID });
-              if (!generator) throw new Error("Generator not found");
-              instance.imageID = generator.imageID;
-            }
+            threadMedia.instance = await getSimpleInstance(threadMedia.instance);
             // Import the new thread media (with the instance) to the database
             threadMedia = await db.upsert("Medias", threadMedia, true);
           }
@@ -366,19 +383,10 @@ api:
           let instance = await db.findOne("Instances", { GeneratorID: media.instance.generatorID, ImageID: media.instance.imageID, Text0: media.instance.text0, Text1: media.instance.text1 });
           if (!instance) {
             instance = await dbp.instances.create.one("en", media.instance.generatorID, null, media.instance.text0, media.instance.text1);
-            // Take only the important fields, in a media instance we don't need all the fields
-            instance = {
-              _id: instance.instanceID,
-              GeneratorID: instance.generatorID,
-              DisplayName: instance.displayName,
-              UrlName: instance.urlName,
-              ImageID: instance.imageID,
-              Text0: instance.text0,
-              Text1: instance.text1,
-            };
-            media.type = "instance";
-            media.instance = instance;
           }
+          instance = await getSimpleInstance(instance);
+          media.type = "instance";
+          media.instance = instance;
         }
 
         const otherPosts = (await db.find("Posts", { ThreadID: thread._id }, { }, 1000, null, true));

@@ -23,7 +23,7 @@ dom:
       v-slot: right
       e.thread:
         ':thread': thread
-        ':threadMedia': "{type: 'instance', instance}"
+        ':threadMedia': '{type: ''instance'', instance}'
 data:
   instance: null
   generator: null
@@ -102,5 +102,5 @@ template: >-
   item-type="e.instance" :item-props="{ showFullFooter: true }"
   :get-more-items="getMoreInstances" grid-class="grid-1"
   path="1375900948.1.1"></content-stream></template><template v-slot:right
-  path="1375900948.2"><e-thread :thread="thread" :threadMedia="instance"
-  path="1375900948.2.0"></e-thread></template></site>
+  path="1375900948.2"><e-thread :thread="thread" :threadMedia="{type:
+  'instance', instance}" path="1375900948.2.0"></e-thread></template></site>
