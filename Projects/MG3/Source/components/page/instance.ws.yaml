@@ -23,11 +23,12 @@ dom:
       v-slot: right
       e.thread:
         ':thread': thread
-        ':threadMedia': '{type: ''instance'', instance}'
+        ':threadMedia': threadMedia
 data:
   instance: null
   generator: null
   thread: null
+  threadMedia: null
   recommendationItems: []
   contentNotFound: false
 mounted: | #js
@@ -62,6 +63,9 @@ methods:
           return;
         }
         this.generator = await dbp.generators.select.one(this.instance.generatorID);
+        // This instance may have a media
+        this.threadMedia = await dbp.medias.select.byInstance(this.instance._id);
+        if (!this.threadMedia) this.threadMedia = { type: "instance", instance };
         this.recommendationItems = await dbp.generators.select.related(this.generator.urlName);
         this.$refs.stream1?.reset();
         if (page == "instance") {

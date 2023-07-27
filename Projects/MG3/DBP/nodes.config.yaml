@@ -76,6 +76,11 @@ api:
           await db.findOne("Medias", { _uid: mediaID }) :
           await db.findOne("Medias", { _id: mediaID });
         return media;
+    Medias.select.byInstance:
+      args: [instanceID]
+      code: | #js
+        const media = await db.findOne("Medias", { "Instance._id": instanceID });
+        return media;
     Medias.select.new:
       args: [builderID, fromMediaID]
       code: | #js

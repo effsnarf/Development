@@ -1,8 +1,6 @@
 dom:
   site:
     page-name: catalog
-    ':columns-focus-left': columnsFocusLeft
-    ':content-not-found': contentNotFound
     ':columns': 2
     template:
       v-slot: article
@@ -11,7 +9,6 @@ props: null
 data: null
 name: page-catalog
 template: >-
-  <site class="comp-page-catalog" page-name="catalog"
-  :columns-focus-left="columnsFocusLeft" :content-not-found="contentNotFound"
-  :columns="2" path="1552012218."><template v-slot:article
+  <site class="comp-page-catalog" page-name="catalog" :columns="2"
+  path="1552012218."><template v-slot:article
   path="1552012218.0"><e-thread-catalog></e-thread-catalog></template></site>
