@@ -382,6 +382,8 @@ api:
 
         // When posting an instance (in a thread), this code is supposed to insert in the Instances collection
         // but calling dbp.instances.create.one() is not working, because of yo dawg I heard you like dbps shenaningans
+        // so in the meanwhile the instance will only exist in the post
+        // and later if needed we'll create Instances or Medias for it
         // if (media?.instance && !media.instance._id)
         // {
         //   Double check that an instance with this content doesn't already exist
