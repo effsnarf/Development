@@ -92,28 +92,32 @@ class DatabaseProxy {
     // in which case we'll need to resolve twice which is not possible with a promise
     const options = extraArgs.find((a) => a.$set) || {};
 
-    const url = `${this.urlBase}/api/${entity}/${group}/${method}`;
+    let url = `${this.urlBase}/api/${entity}/${group}/${method}`;
 
     const isHttpPost = group == "create";
 
     if (isHttpPost) {
       const data = {} as any;
       args.forEach((a) => (data[a.name] = a.value));
+      if (url.includes("/create/one")) {
+        data._uid = DatabaseProxy.getRandomUniqueID();
+      }
       const fetchOptions = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
         mode: "no-cors",
       };
-      const result = await this.fetchJson(url, fetchOptions);
+      let result = await this.fetchJson(url, fetchOptions);
       // If we got an _id back, select the item
       // This is because when POSTing from localhost I'm having trouble getting the actual object back
       const _id = parseInt(result);
+
       if (_id) {
         const idFieldName = `${entity
           .substring(0, entity.length - 1)
           .toLowerCase()}ID`;
-        return await this.callApiMethod(
+        result = await this.callApiMethod(
           entity,
           "select",
           "one",
@@ -121,6 +125,12 @@ class DatabaseProxy {
           []
         );
       }
+
+      if (!result) {
+        url = url.replace("/create/one", "/select/one");
+        result = await this.fetchJson(`${url}?_uid=${data._uid}`);
+      }
+
       return result;
     }
 
@@ -177,6 +187,14 @@ class DatabaseProxy {
       cached: true,
     });
     return result;
+  }
+
+  private static getRandomUniqueID() {
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (char) => {
+      const random = (Math.random() * 16) | 0;
+      const value = char === "x" ? random : (random & 0x3) | 0x8;
+      return value.toString(16);
+    });
   }
 }
 

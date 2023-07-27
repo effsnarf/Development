@@ -4,7 +4,6 @@ dom:
     transition.group:
       tag: ul
       name: slide
-      ':id': '''ul-''+_uid'
       ':class': gridClass
       ':style': '{ gap: gap }'
       li:

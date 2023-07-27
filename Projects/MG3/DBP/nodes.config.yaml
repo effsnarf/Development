@@ -242,12 +242,17 @@ api:
 
         return insts;
     Instances.select.one:
-      args: [instanceID]
+      args: [instanceID, _uid]
       code: | #js
-        const instance = await db.findOne("Instances", { _id: instanceID });
+        const instance = await db.findOne("Instances", {
+          $or: [
+            { "_id": instanceID },
+            { "_uid": _uid }
+          ]
+        });
         return instance;
     Instances.create.one:
-      args: [languageCode, generatorID, imageID, text0, text1]
+      args: [languageCode, generatorID, imageID, text0, text1, _uid]
       code: | #js
         if (null == generatorID) throw new Error("GeneratorID is required");
 
@@ -275,11 +280,12 @@ api:
           TotalVotesScore: 0,
           Created: now,
           CreatedDate: nowDate,
+          _uid: _uid,
         };
         instance = await db.upsert("Instances", instance, true);
         instance.InstanceID = instance._id;
         await db.upsert("Instances", instance, true);
-        return { _id: instance._id };
+        return instance._id;
     Threads.create.one:
       args: []
       code: | #js
