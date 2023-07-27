@@ -16,13 +16,19 @@ dom:
       ':class': columnsClass
       .left:
         ui.sticky: 
-          ':top': leftStickyTop
-          slot: 
-            name: left
+          top: 140px
+          div: 
+            slot: 
+              name: left
+            h2: 
+              v-if: recommendationItems?.length
+              v-text: '''See also'''
+            content.recommendations:
+              ':items': recommendationItems
       .middle:
         ui.error:
           ':error': $root.error
-        h3: 
+        h2: 
           v-if: contentNotFound
           class: error
           v-text: '''Content not found'''
@@ -31,14 +37,8 @@ dom:
       .right:
         ui.sticky: 
           top: 140px
-          div: 
-            slot: 
-              name: right
-            h3: 
-              v-if: recommendationItems?.length
-              v-text: '''See also'''
-            content.recommendations:
-              ':items': recommendationItems
+          slot: 
+            name: right
 props:
   titleImageId: null
   titleText: null
@@ -56,10 +56,6 @@ computed:
       cls['columns-' + this.columns] = true;
       cls['columns-focus-left'] = this.columnsFocusLeft;
       return cls;
-    }
-  leftStickyTop: | #js
-    function() {
-      return "120px";
     }
 style:
   .columns-focus-left:
@@ -81,15 +77,15 @@ template: >-
   path="-578759680.1"><slot name="article"
   path="-578759680.1.0"></slot></div><div :class="columnsClass"
   path="-578759680.2"><div class="left" path="-578759680.2.0"><ui-sticky
-  :top="leftStickyTop" path="-578759680.2.0.0"><slot name="left"
-  path="-578759680.2.0.0.0"></slot></ui-sticky></div><div class="middle"
-  path="-578759680.2.1"><ui-error :error="$root.error"
-  path="-578759680.2.1.0"></ui-error><h3 class="error" v-if="contentNotFound"
-  v-text="'Content not found'" path="-578759680.2.1.1"></h3><slot name="middle"
-  path="-578759680.2.1.2"></slot></div><div class="right"
-  path="-578759680.2.2"><ui-sticky top="140px" path="-578759680.2.2.0"><div
-  path="-578759680.2.2.0.0"><slot name="right"
-  path="-578759680.2.2.0.0.0"></slot><h3 v-if="recommendationItems?.length"
-  v-text="'See also'" path="-578759680.2.2.0.0.1"></h3><content-recommendations
+  top="140px" path="-578759680.2.0.0"><div path="-578759680.2.0.0.0"><slot
+  name="left" path="-578759680.2.0.0.0.0"></slot><h2
+  v-if="recommendationItems?.length" v-text="'See also'"
+  path="-578759680.2.0.0.0.1"></h2><content-recommendations
   :items="recommendationItems"
-  path="-578759680.2.2.0.0.2"></content-recommendations></div></ui-sticky></div></div></div>
+  path="-578759680.2.0.0.0.2"></content-recommendations></div></ui-sticky></div><div
+  class="middle" path="-578759680.2.1"><ui-error :error="$root.error"
+  path="-578759680.2.1.0"></ui-error><h2 class="error" v-if="contentNotFound"
+  v-text="'Content not found'" path="-578759680.2.1.1"></h2><slot name="middle"
+  path="-578759680.2.1.2"></slot></div><div class="right"
+  path="-578759680.2.2"><ui-sticky top="140px" path="-578759680.2.2.0"><slot
+  name="right" path="-578759680.2.2.0.0"></slot></ui-sticky></div></div></div>

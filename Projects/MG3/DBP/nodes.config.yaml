@@ -307,15 +307,42 @@ api:
         threads = await Promise.all(threads.map(async t => await dbp.threads.select.one(t._id)));
         return threads;
     Posts.create.one:
-      args: [threadID, threadMediaID, text, media]
+      args: [threadID, threadMedia, text, media]
       code: | #js
         const now = Date.now();
 
+        // This only happens on instances
+        // Migrate instances to new media format, when posting in a new thread (commenting on the instance)
+        if (threadMedia && !threadMedia._id)
+        {
+          // Double check if a media with this instance content already exists
+          const instance = threadMedia.instance;
+          if (!instance) throw new Error("threadMedia must have an _id or instance");
+          const existingInstanceMedia = await db.findOne("Medias", { "Instance.GeneratorID": instance.generatorID, "Instance.ImageID": instance.imageID, "Instance.Text0": instance.text0, "Instance.Text1": instance.text1 });
+          if (existingInstanceMedia)
+          {
+            threadMedia = existingInstanceMedia;
+          }
+          else
+          {
+            // Make sure that the instance has an imageID
+            if (!instance.imageID)
+            {
+              // Find the generator
+              const generator = await db.findOne("Generators", { _id: instance.generatorID });
+              if (!generator) throw new Error("Generator not found");
+              instance.imageID = generator.imageID;
+            }
+            // Import the new thread media (with the instance) to the database
+            threadMedia = await db.upsert("Medias", threadMedia, true);
+          }
+        }
+
         let thread = null;
-        thread = await dbp.threads.select.one(threadID, threadMediaID);
+        thread = await dbp.threads.select.one(threadID, threadMedia?._id);
+        // We create threads on the fly when posting to a new media (builder, instance, etc)
         if (!thread) {
           thread = await dbp.threads.create.one();
-          const threadMedia = (!threadMediaID ? null : (await db.findOne("Medias", { _id: threadMediaID })) );
           if (threadMedia)
           {
             const firstPost = {
@@ -328,7 +355,7 @@ api:
             await db.upsert("Posts", firstPost, true);
           }
         }
-        if (!thread) throw new Error("Provide either a threadID or a threadMediaID");
+        if (!thread) throw new Error("Provide either a threadID or a threadMedia");
 
         if (media?.instance)
         {

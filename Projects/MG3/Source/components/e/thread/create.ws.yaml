@@ -1,16 +1,19 @@
 dom:
   div:
-    ui.button: 
-      ':text': '''✨ start a new thread'''
-      v-model: showCreateThread
-    transition:
+    transition: 
+      name: slide
+      ui.button: 
+        v-if: '!showCreateThread'
+        ':text': '''✨ start a new thread'''
+        v-model: showCreateThread
+    transition: 
       name: slide
       .mt-l2:
         v-show: showCreateThread
         e.post.create:
           @input-preview: postPreview=$event
           @created: onCreatedThread
-        .mt-l2:
+        .mt-l1:
           ui.button: 
             ':text': '''✖️ cancel'''
             ':click': onClickCancel
@@ -34,12 +37,13 @@ watch:
     }
 name: e-thread-create
 template: >-
-  <div class="comp-e-thread-create" path="-563191913."><ui-button :text="'✨
-  start a new thread'" v-model="showCreateThread"
-  path="-563191913.0"></ui-button><transition name="slide"
+  <div class="comp-e-thread-create" path="-563191913."><transition name="slide"
+  path="-563191913.0"><ui-button v-if="!showCreateThread" :text="'✨ start a new
+  thread'" v-model="showCreateThread"
+  path="-563191913.0.0"></ui-button></transition><transition name="slide"
   path="-563191913.1"><div class="mt-l2" v-show="showCreateThread"
   path="-563191913.1.0"><e-post-create @input-preview="postPreview=$event"
   @created="onCreatedThread" path="-563191913.1.0.0"></e-post-create><div
-  class="mt-l2" path="-563191913.1.0.1"><ui-button :text="'✖️ cancel'"
+  class="mt-l1" path="-563191913.1.0.1"><ui-button :text="'✖️ cancel'"
   :click="onClickCancel"
   path="-563191913.1.0.1.0"></ui-button></div></div></transition></div>

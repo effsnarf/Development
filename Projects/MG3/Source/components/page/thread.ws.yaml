@@ -3,7 +3,6 @@ dom:
     page-name: thread
     ':columns-focus-left': columnsFocusLeft
     ':content-not-found': contentNotFound
-    ':columns': 2
     template: 
       v-slot: left
       .flex.ver.gap-2:
@@ -14,6 +13,10 @@ dom:
           url: /catalog
     template: 
       v-slot: middle
+      e.post:
+        ':item': thread?.posts[0]
+    template: 
+      v-slot: right
       .flex.gap-2:
         transition:
           name: slide-large
@@ -55,7 +58,10 @@ methods:
     }
   refresh: | #js
     async function(thread) {
-      await this.init(this.thread?._id, this.thread?.posts[0].media._id);
+      if (!this.thread) return;
+      if (this.thread._id != thread?._id) return;
+      thread = await this.$root.dbp.threads.select.one(this.thread._id);
+      this.thread.posts.splice(0, this.thread.posts.length, ...thread.posts);
     }
   clear: | #js
     function() {
@@ -68,13 +74,14 @@ style: null
 template: >-
   <site class="comp-page-thread" page-name="thread"
   :columns-focus-left="columnsFocusLeft" :content-not-found="contentNotFound"
-  :columns="2" path="-1535040951."><template v-slot:left
-  path="-1535040951.0"><div class="flex ver gap-2"
-  path="-1535040951.0.0"><e-thread-create
+  path="-1535040951."><template v-slot:left path="-1535040951.0"><div
+  class="flex ver gap-2" path="-1535040951.0.0"><e-thread-create
   @input:columnsFocusLeft="columnsFocusLeft=$event"
   path="-1535040951.0.0.0"></e-thread-create><ui-link :text="'🔙 catalog'"
   url="/catalog" path="-1535040951.0.0.1"></ui-link></div></template><template
-  v-slot:middle path="-1535040951.1"><div class="flex gap-2"
-  path="-1535040951.1.0"><transition name="slide-large"
-  path="-1535040951.1.0.0"><e-thread :thread="thread"
-  path="-1535040951.1.0.0.0"></e-thread></transition></div></template></site>
+  v-slot:middle path="-1535040951.1"><e-post :item="thread?.posts[0]"
+  path="-1535040951.1.0"></e-post></template><template v-slot:right
+  path="-1535040951.2"><div class="flex gap-2"
+  path="-1535040951.2.0"><transition name="slide-large"
+  path="-1535040951.2.0.0"><e-thread :thread="thread"
+  path="-1535040951.2.0.0.0"></e-thread></transition></div></template></site>

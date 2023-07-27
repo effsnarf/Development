@@ -39,17 +39,17 @@ data:
 methods:
   create: | #js
     async function () {
-        const threadMediaID = (!this.replyInThread ? null : this.media._id);
+        const threadMedia = (!this.replyInThread ? null : this.media);
         let media = JSON.parse(JSON.stringify(this.media));
         delete media._id;
         const _uid = this.$root.getRandomUniqueID();
         media._uid = _uid;
-        media = await this.$root.dbp.medias.create.one(media, threadMediaID);
+        media = await this.$root.dbp.medias.create.one(media);
         if (!media) media = await this.$root.dbp.medias.select.one(_uid);
         // Also create a post
-        if (threadMediaID)
+        if (threadMedia)
         {
-          const post = await this.$root.dbp.posts.create.one(null, threadMediaID, null, media);
+          const post = await this.$root.dbp.posts.create.one(null, threadMedia, null, media);
           this.$emit("thread-updated");
         }
         this.$emit("created", media);

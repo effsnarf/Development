@@ -1,9 +1,12 @@
 dom:
   div:
-    .grid1:
-      e.thread.teaser:
-        v-for: thread in threads
-        ':thread': thread
+    .catalog:
+      transition.group:
+        name: list
+        e.thread.teaser:
+          v-for: thread in threads
+          ':thread': thread
+          ':key': thread._id
 props: null
 data:
   threads: []
@@ -20,6 +23,10 @@ mounted: | #js
     }
   }
 style:
+  .comp-e-thread-teaser:
+    display: inline-block
+    width: 15rem
+    margin: 1rem
   .catalog:
     position: fixed;
     top: 50%;
@@ -28,6 +35,7 @@ style:
     width: 100vw;
     height: 90vh;
     overflow: auto;
+    text-align: center;
     z-index: 1000;
   .grid1:
     display: flex
@@ -38,6 +46,8 @@ style:
     margin-bottom: 3rem
 name: e-thread-catalog
 template: >-
-  <div class="comp-e-thread-catalog" path="-751930146."><div class="grid1"
-  path="-751930146.0"><e-thread-teaser v-for="thread in threads"
-  :thread="thread" path="-751930146.0.0"></e-thread-teaser></div></div>
+  <div class="comp-e-thread-catalog" path="-751930146."><div class="catalog"
+  path="-751930146.0"><transition-group name="list"
+  path="-751930146.0.0"><e-thread-teaser v-for="thread in threads"
+  :thread="thread" :key="thread._id"
+  path="-751930146.0.0.0"></e-thread-teaser></transition-group></div></div>

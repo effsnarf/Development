@@ -21,7 +21,7 @@ dom:
           e.thread:
             v-if: media
             ':key': media._id
-            ':threadMediaID': media._id
+            ':threadMedia': media
 data:
   media: null
   temp: null
@@ -89,5 +89,5 @@ template: >-
   v-slot:middle path="221009861.2"><div class="flex gap-2"
   path="221009861.2.0"><transition name="slide-large"
   path="221009861.2.0.0"><e-thread v-if="media" :key="media._id"
-  :threadMediaID="media._id"
+  :threadMedia="media"
   path="221009861.2.0.0.0"></e-thread></transition></div></template></site>

@@ -7,31 +7,30 @@ dom:
         ':item': thread.posts[0]
         ':teaser': 'true'
       .text-center.opacity-50:
-        .opacity-50:
-          v-text: getUpdatedAgo(thread)
+        ui.time:
+          ':value': thread.lastPostCreated
         div: 
           v-text: thread.postsCount + ' posts'
 props:
   thread: null
 data: null
 watch: null
-methods:
-  getUpdatedAgo: | #js
-    function(thread)
-    {
-      const ago = (Date.now() - thread.lastPostCreated).unitifyTime().withoutColors();
-      return `updated ${ago} ago`;
-    }
+methods: null
 style:
   .grid:
     grid-template: 1fr / repeat(40rem, auto)
     gap: 1em
+  .clickable2:
+    opacity: 0.8
+  .clickable2:hover:
+    background: none
+    opacity: 1
 name: e-thread-teaser
 template: >-
   <div class="comp-e-thread-teaser" v-if="thread" path="-88604437."><ui-link
   :url="$root.url.thread(thread)" path="-88604437.0"><e-post
   :item="thread.posts[0]" :teaser="true" path="-88604437.0.0"></e-post><div
-  class="text-center opacity-50" path="-88604437.0.1"><div class="opacity-50"
-  v-text="getUpdatedAgo(thread)" path="-88604437.0.1.0"></div><div
+  class="text-center opacity-50" path="-88604437.0.1"><ui-time
+  :value="thread.lastPostCreated" path="-88604437.0.1.0"></ui-time><div
   v-text="thread.postsCount + ' posts'"
   path="-88604437.0.1.1"></div></div></ui-link></div>

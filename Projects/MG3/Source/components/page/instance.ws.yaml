@@ -6,7 +6,6 @@ dom:
     ':recommendation-items': recommendationItems
     template: 
       v-slot: left
-      e.generator.search: null
     template: 
       v-slot: middle
       e.instance:
@@ -20,9 +19,15 @@ dom:
         ':item-props': '{ showFullFooter: true }'
         ':get-more-items': getMoreInstances
         grid-class: grid-1
+    template: 
+      v-slot: right
+      e.thread:
+        ':thread': thread
+        ':threadMedia': "{type: 'instance', instance}"
 data:
   instance: null
   generator: null
+  thread: null
   recommendationItems: []
   contentNotFound: false
 mounted: | #js
@@ -78,7 +83,7 @@ methods:
     }
   clear: | #js
     function() {
-      this.$refs.stream1.clear();
+      this.$refs.stream1?.clear();
       this.instance = null;
       this.generator = null;
       this.recommendationItems = [];
@@ -90,11 +95,12 @@ template: >-
   <site class="comp-page-instance" ref="site1" page-name="instance"
   :content-not-found="contentNotFound"
   :recommendation-items="recommendationItems" path="1375900948."><template
-  v-slot:left
-  path="1375900948.0"><e-generator-search></e-generator-search></template><template
-  v-slot:middle path="1375900948.1"><e-instance class="mb-l6" :item="instance"
+  v-slot:left path="1375900948.0"></template><template v-slot:middle
+  path="1375900948.1"><e-instance class="mb-l6" :item="instance"
   :instance-image="true" :show-full-footer="true"
   path="1375900948.1.0"></e-instance><content-stream ref="stream1"
   item-type="e.instance" :item-props="{ showFullFooter: true }"
   :get-more-items="getMoreInstances" grid-class="grid-1"
-  path="1375900948.1.1"></content-stream></template></site>
+  path="1375900948.1.1"></content-stream></template><template v-slot:right
+  path="1375900948.2"><e-thread :thread="thread" :threadMedia="instance"
+  path="1375900948.2.0"></e-thread></template></site>

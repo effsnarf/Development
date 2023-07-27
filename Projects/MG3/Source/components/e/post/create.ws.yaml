@@ -1,6 +1,9 @@
 dom:
   .container.flex.ver.gap-1:
     v-disable: isLoading
+    h3:
+      class: text-center
+      v-text: '!isNewThread ? null : ''Start a new thread'''
     transition: 
       name: slide
       div: 
@@ -39,7 +42,7 @@ dom:
               ':click': post
 props:
   threadID: null
-  threadMediaID: null
+  threadMedia: null
   generator: null
 data:
   media: null
@@ -70,7 +73,7 @@ methods:
       {
         const { generator, text0, text1 } = (this.tempInstance || {});
         const instance = !generator ? null : { generatorID: generator.generatorID, text0, text1 };
-        const post = await this.$root.dbp.posts.create.one(this.threadID, this.threadMediaID, this.text, this.media);
+        const post = await this.$root.dbp.posts.create.one(this.threadID, this.threadMedia, this.text, this.media);
         this.$emit('created', post);
         setTimeout(this.clear.bind(this), 1000);
       }
@@ -96,7 +99,7 @@ watch:
 computed:
   isNewThread: | #js
     function() {
-      return !this.threadID && !this.threadMediaID;
+      return !this.threadID && !this.threadMedia;
     }
   postPreview: | #js
     function() {
@@ -124,20 +127,22 @@ config:
 name: e-post-create
 template: >-
   <div class="comp-e-post-create container flex ver gap-1" v-disable="isLoading"
-  path="1762525697."><transition name="slide" path="1762525697.0"><div
-  v-show="showCreateMedia" path="1762525697.0.0"><e-media-create class="mt-l1"
-  ref="createMedia1" v-model="media" @change="toggleShowCreateMedia"
-  path="1762525697.0.0.0"></e-media-create></div></transition><transition
-  name="slide" path="1762525697.1"><div path="1762525697.1.0"><ui-file-dropzone
-  @input="onImageUpload" path="1762525697.1.0.0"><e-comment-create
+  path="1762525697."><h3 class="text-center" v-text="!isNewThread ? null :
+  'Start a new thread'" path="1762525697.0"></h3><transition name="slide"
+  path="1762525697.1"><div v-show="showCreateMedia"
+  path="1762525697.1.0"><e-media-create class="mt-l1" ref="createMedia1"
+  v-model="media" @change="toggleShowCreateMedia"
+  path="1762525697.1.0.0"></e-media-create></div></transition><transition
+  name="slide" path="1762525697.2"><div path="1762525697.2.0"><ui-file-dropzone
+  @input="onImageUpload" path="1762525697.2.0.0"><e-comment-create
   v-model="text" :media="media" :new-thread="false"
   @click-media-preview="toggleShowCreateMedia"
-  path="1762525697.1.0.0.0"></e-comment-create></ui-file-dropzone></div></transition><div
-  path="1762525697.2"><transition name="slide" path="1762525697.2.0"><div
-  class="flex justify-around" path="1762525697.2.0.0"><transition name="slide"
-  path="1762525697.2.0.0.0"><ui-button class="ml-2" v-if="media" :text="'✖'"
+  path="1762525697.2.0.0.0"></e-comment-create></ui-file-dropzone></div></transition><div
+  path="1762525697.3"><transition name="slide" path="1762525697.3.0"><div
+  class="flex justify-around" path="1762525697.3.0.0"><transition name="slide"
+  path="1762525697.3.0.0.0"><ui-button class="ml-2" v-if="media" :text="'✖'"
   :click="onClearMedia"
-  path="1762525697.2.0.0.0.0"></ui-button></transition><transition name="slide"
-  path="1762525697.2.0.0.1"><ui-button v-if="canPost" text="✔️ post"
+  path="1762525697.3.0.0.0.0"></ui-button></transition><transition name="slide"
+  path="1762525697.3.0.0.1"><ui-button v-if="canPost" text="✔️ post"
   :click="post"
-  path="1762525697.2.0.0.1.0"></ui-button></transition></div></transition></div></div>
+  path="1762525697.3.0.0.1.0"></ui-button></transition></div></transition></div></div>

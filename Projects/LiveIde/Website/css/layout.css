@@ -18,7 +18,7 @@ h1
 
 .comp-site-main .columns.columns-3
 {
-    grid-template: 1fr / 1fr 2fr 1fr;
+    grid-template: 1fr / 1fr 1fr 1fr;
 }
 
 .comp-site-main .columns.columns-2

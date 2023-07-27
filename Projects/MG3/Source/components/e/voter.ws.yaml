@@ -1,0 +1,28 @@
+dom:
+  div:
+    .flex:
+      .clickable: 
+        v-text: '''▼'''
+      .score:
+        v-text: '''0'''
+      .clickable: 
+        v-text: '''▲'''
+props: null
+data: null
+style:
+  .flex:
+    font-size: 140%
+    gap: 0.5em
+  .score:
+    opacity: 0.4
+  .clickable:
+    opacity: 0.2
+  .clickable:hover:
+    opacity: 0.6
+name: e-voter
+template: >-
+  <div class="comp-e-voter" path="872896511."><div class="flex"
+  path="872896511.0"><div class="clickable" v-text="'▼'"
+  path="872896511.0.0"></div><div class="score" v-text="'0'"
+  path="872896511.0.1"></div><div class="clickable" v-text="'▲'"
+  path="872896511.0.2"></div></div></div>
