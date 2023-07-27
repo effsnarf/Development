@@ -15,6 +15,7 @@ dom:
             e.instance:
               class: clickable
               ':item': instance
+              ':show-footer': 'false'
               @click: generator = null
           .inputs:
             input: 
@@ -91,9 +92,10 @@ template: >-
   name="slide" path="925255284.1"><div v-show="generator"
   path="925255284.1.0"><div class="grid1" path="925255284.1.0.0"><div
   path="925255284.1.0.0.0"><e-instance class="clickable" :item="instance"
-  @click="generator = null" path="925255284.1.0.0.0.0"></e-instance></div><div
-  class="inputs" path="925255284.1.0.0.1"><input v-model="text0"
-  placeholder="top text" path="925255284.1.0.0.1.0"/><input v-model="text1"
-  placeholder="bottom text" path="925255284.1.0.0.1.1"/></div></div><div
-  class="text-center opacity-30" v-text="generator?.displayName"
+  :show-footer="false" @click="generator = null"
+  path="925255284.1.0.0.0.0"></e-instance></div><div class="inputs"
+  path="925255284.1.0.0.1"><input v-model="text0" placeholder="top text"
+  path="925255284.1.0.0.1.0"/><input v-model="text1" placeholder="bottom text"
+  path="925255284.1.0.0.1.1"/></div></div><div class="text-center opacity-30"
+  v-text="generator?.displayName"
   path="925255284.1.0.1"></div></div></transition></div>
