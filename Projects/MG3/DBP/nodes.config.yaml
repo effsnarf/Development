@@ -294,11 +294,9 @@ api:
       code: | #js
         if (!threadID)
         {
-          if (threadMediaID)
-          {
-            const firstPost = await db.findOne("Posts", { "Media._id": threadMediaID });
-            if (firstPost) threadID = firstPost.threadID;
-          }
+          if (!threadMediaID) return null;
+          const firstPost = await db.findOne("Posts", { "Media._id": threadMediaID });
+          if (firstPost) threadID = firstPost.threadID;
         }
         const thread = await db.findOne("Threads", { _id: threadID });
         if (!thread) return null;
