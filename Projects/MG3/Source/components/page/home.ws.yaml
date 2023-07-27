@@ -25,13 +25,13 @@ dom:
       e.generator.search: null
     template: 
       v-slot: middle
-      content.meet.the.meme:
-        class: mb-l2
-      content.stream:
-        ref: stream1
-        item-type: e.instance
-        ':get-more-items': getMoreInstances
-        grid-class: grid-3
+      .flex.ver.gap-1:
+        content.meet.the.meme: null
+        content.stream:
+          ref: stream1
+          item-type: e.instance
+          ':get-more-items': getMoreInstances
+          grid-class: grid-3
     template: 
       v-slot: right
 data:
@@ -80,8 +80,9 @@ template: >-
   title="YouTube" path="838274270.0.0.3"></e-teaser></div></template><template
   v-slot:left
   path="838274270.1"><e-generator-search></e-generator-search></template><template
-  v-slot:middle path="838274270.2"><content-meet-the-meme class="mb-l2"
-  path="838274270.2.0"></content-meet-the-meme><content-stream ref="stream1"
-  item-type="e.instance" :get-more-items="getMoreInstances" grid-class="grid-3"
-  path="838274270.2.1"></content-stream></template><template v-slot:right
-  path="838274270.3"></template></site>
+  v-slot:middle path="838274270.2"><div class="flex ver gap-1"
+  path="838274270.2.0"><content-meet-the-meme></content-meet-the-meme><content-stream
+  ref="stream1" item-type="e.instance" :get-more-items="getMoreInstances"
+  grid-class="grid-3"
+  path="838274270.2.0.1"></content-stream></div></template><template
+  v-slot:right path="838274270.3"></template></site>

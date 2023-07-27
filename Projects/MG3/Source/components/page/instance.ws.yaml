@@ -20,12 +20,15 @@ dom:
         @visible-item: onVisibleSteamInstanceChange
     template: 
       v-slot: right
-      .sticky:
-        ':style': '{ top: ''0px'' }'
-        e.instance.wide:
-          ':instance': threadInstance
-      e.thread:
-        ':threadMedia': '{type: ''instance'', instance: threadInstance}'
+      div:
+        v-if: threadInstance
+        .sticky:
+          v-if: threadInstance
+          ':style': '{ top: ''0px'' }'
+          e.instance.wide:
+            ':instance': threadInstance
+        e.thread:
+          ':threadMedia': '{type: ''instance'', instance: threadInstance}'
 data:
   instance: null
   visibleStreamInstance: null
@@ -121,8 +124,9 @@ template: >-
   ref="stream1" item-type="e.instance" :get-more-items="getMoreInstances"
   grid-class="grid-1" @visible-item="onVisibleSteamInstanceChange"
   path="1375900948.1.1"></content-stream></template><template v-slot:right
-  path="1375900948.2"><div class="sticky" :style="{ top: '0px' }"
-  path="1375900948.2.0"><e-instance-wide :instance="threadInstance"
-  path="1375900948.2.0.0"></e-instance-wide></div><e-thread :threadMedia="{type:
-  'instance', instance: threadInstance}"
-  path="1375900948.2.1"></e-thread></template></site>
+  path="1375900948.2"><div v-if="threadInstance" path="1375900948.2.0"><div
+  class="sticky" v-if="threadInstance" :style="{ top: '0px' }"
+  path="1375900948.2.0.0"><e-instance-wide :instance="threadInstance"
+  path="1375900948.2.0.0.0"></e-instance-wide></div><e-thread
+  :threadMedia="{type: 'instance', instance: threadInstance}"
+  path="1375900948.2.0.1"></e-thread></div></template></site>

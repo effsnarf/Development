@@ -174,7 +174,7 @@ watch:
     handler: | #js
       (function() {
         this.emitVisibleItem();
-      }).debounce(100)
+      }).debounce(400)
 style:
   ul:
     display: grid

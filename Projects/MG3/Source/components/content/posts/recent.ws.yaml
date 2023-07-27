@@ -1,0 +1,16 @@
+dom:
+  div:
+    e.post:
+      v-for: post in posts
+      ':item': post
+props: null
+data:
+  posts: []
+mounted: | #js
+  async function() {
+    this.posts = await this.$root.dbp.posts.select.recent();
+  }
+name: content-posts-recent
+template: >-
+  <div class="comp-content-posts-recent" path="1605029931."><e-post v-for="post
+  in posts" :item="post" path="1605029931.0"></e-post></div>
