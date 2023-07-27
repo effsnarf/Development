@@ -49,7 +49,7 @@ dom:
       e.instance.create:
         v-if: showCreateInstance
         ':generator': generator
-        @instance-created: onInstanceCreated
+        @created: onInstanceCreated
       h3:
         v-text: '''See also'''
       e.generator.list:
@@ -216,7 +216,7 @@ template: >-
   @visible-item="onVisibleSteamInstanceChange"
   path="-38884812.1.0"></content-stream></template><template v-slot:left
   path="-38884812.2"><e-instance-create v-if="showCreateInstance"
-  :generator="generator" @instance-created="onInstanceCreated"
+  :generator="generator" @created="onInstanceCreated"
   path="-38884812.2.0"></e-instance-create><h3 v-text="'See also'"
   path="-38884812.2.1"></h3><e-generator-list :generators="recommendationItems"
   path="-38884812.2.2"></e-generator-list></template><template v-slot:right

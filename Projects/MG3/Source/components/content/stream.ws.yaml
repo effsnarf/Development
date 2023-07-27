@@ -45,6 +45,7 @@ mounted: | #js
 methods:
   add: | #js
     function(item) {
+      console.log(`item`, item);
       this.scrollTo(this.visibleItemIndex);
       this.items.insertAt(this.visibleItemIndex, item, true);
     }

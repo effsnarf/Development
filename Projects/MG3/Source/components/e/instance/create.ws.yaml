@@ -52,8 +52,7 @@ methods:
       {
         const instance = await this.$root.dbp.instances.create.one(null, this.tempInstance.generator?._id, null, this.tempInstance.text0, this.tempInstance.text1);
         this.clear();
-        //this.$root.navigateTo(instance);
-        //this.$emit("instance-created", newInstance);
+        this.$emit("created", instance);
       }
       finally
       {
