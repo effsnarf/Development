@@ -47,6 +47,7 @@ dom:
     template: 
       v-slot: left
       e.instance.create:
+        class: hidden
         v-if: showCreateInstance
         ':generator': generator
         @created: onInstanceCreated
