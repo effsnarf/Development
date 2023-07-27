@@ -13,20 +13,18 @@ dom:
           .text-center.opacity-30:
             v-if: getHiddenPostsCount(index)
             v-text: '''('' + getHiddenPostsCount(index) + '' posts…)'''
-      transition:
-        name: slide
-        ui.loading:
-          v-if: isLoading
       e.post.create:
         ':threadID': thread?._id
         ':threadMedia': dThreadMedia
         @created: reload
       .mt-l2:
+        class: hidden
         ui.button:
           v-if: $root.isAdmin
           ':text': '''♻ reload'''
           ':click': reload
 props:
+  threadID: null
   threadMedia: null
   teaser: false
 data:
@@ -61,7 +59,7 @@ methods:
       this.isLoading++;
       try
       {
-        this.thread = await this.$root.dbp.threads.select.one(null, this.dThreadMedia?._id, this.dThreadMedia?.instance?._id);
+        this.thread = await this.$root.dbp.threads.select.one(this.threadID, this.dThreadMedia?._id, this.dThreadMedia?.instance?._id);
       }
       finally
       {
@@ -92,6 +90,12 @@ watch:
       function() {
         this.refresh();
       }
+  threadID:
+    handler: | #js
+      async function(threadID) {
+        await this.reload();
+      }
+    immediate: true
   threadMedia:
     handler: | #js
       async function(threadMedia) {
@@ -127,10 +131,8 @@ template: >-
   @thread-updated="refresh" path="1226205107.0.0.0.0"></e-post><div
   class="text-center opacity-30" v-if="getHiddenPostsCount(index)" v-text="'(' +
   getHiddenPostsCount(index) + ' posts…)'"
-  path="1226205107.0.0.0.1"></div></li></transition-group><transition
-  name="slide" path="1226205107.0.1"><ui-loading v-if="isLoading"
-  path="1226205107.0.1.0"></ui-loading></transition><e-post-create
+  path="1226205107.0.0.0.1"></div></li></transition-group><e-post-create
   :threadID="thread?._id" :threadMedia="dThreadMedia" @created="reload"
-  path="1226205107.0.2"></e-post-create><div class="mt-l2"
-  path="1226205107.0.3"><ui-button v-if="$root.isAdmin" :text="'♻ reload'"
-  :click="reload" path="1226205107.0.3.0"></ui-button></div></div></div>
+  path="1226205107.0.1"></e-post-create><div class="hidden mt-l2"
+  path="1226205107.0.2"><ui-button v-if="$root.isAdmin" :text="'♻ reload'"
+  :click="reload" path="1226205107.0.2.0"></ui-button></div></div></div>

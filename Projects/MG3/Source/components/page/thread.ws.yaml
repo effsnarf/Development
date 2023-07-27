@@ -14,16 +14,19 @@ dom:
     template: 
       v-slot: middle
       e.post:
-        ':item': thread?.posts[0]
+        ':item': $refs.thread1?.thread?.posts[0]
     template: 
       v-slot: right
       .flex.gap-2:
         transition:
           name: slide-large
           e.thread:
-            ':thread': thread
+            ref: thread1
+            ':threadID': threadID
+            ':threadMedia': '{ _id: threadMediaID }'
 data:
-  thread: null
+  threadID: null
+  threadMediaID: null
   contentNotFound: false
   columnsFocusLeft: false
 mounted: | #js
@@ -34,39 +37,12 @@ mounted: | #js
       },
       immediate: true
     });
-
-    this.$root.$on("thread-updated", this.refresh.bind(this));
   }
 methods:
   init: | #js
     async function(threadID, threadMediaID) {
-      const dbp = this.$root.dbp;
-      this.clear();
-      if (!threadID && !threadMediaID) return;
-      try
-      {
-        this.$root.isLoading++;
-        this.thread = null;
-        this.thread = await dbp.threads.select.one(threadID, threadMediaID);
-        this.$root.setDocumentTitle(this.$root.getMediaText(this.media));
-        if (!this.thread) this.contentNotFound = true;
-      }
-      finally
-      {
-        this.$root.isLoading--;
-      }
-    }
-  refresh: | #js
-    async function(thread) {
-      if (!this.thread) return;
-      if (this.thread._id != thread?._id) return;
-      thread = await this.$root.dbp.threads.select.one(this.thread._id);
-      this.thread.posts.splice(0, this.thread.posts.length, ...thread.posts);
-    }
-  clear: | #js
-    function() {
-      this.media = null;
-      this.contentNotFound = false;
+      this.threadID = threadID;
+      this.threadMediaID = threadMediaID;
     }
 watch: null
 name: page-thread
@@ -79,9 +55,11 @@ template: >-
   @input:columnsFocusLeft="columnsFocusLeft=$event"
   path="-1535040951.0.0.0"></e-thread-create><ui-link :text="'🔙 catalog'"
   url="/catalog" path="-1535040951.0.0.1"></ui-link></div></template><template
-  v-slot:middle path="-1535040951.1"><e-post :item="thread?.posts[0]"
+  v-slot:middle path="-1535040951.1"><e-post
+  :item="$refs.thread1?.thread?.posts[0]"
   path="-1535040951.1.0"></e-post></template><template v-slot:right
   path="-1535040951.2"><div class="flex gap-2"
   path="-1535040951.2.0"><transition name="slide-large"
-  path="-1535040951.2.0.0"><e-thread :thread="thread"
+  path="-1535040951.2.0.0"><e-thread ref="thread1" :threadID="threadID"
+  :threadMedia="{ _id: threadMediaID }"
   path="-1535040951.2.0.0.0"></e-thread></transition></div></template></site>
