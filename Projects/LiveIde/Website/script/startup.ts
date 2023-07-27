@@ -1,6 +1,7 @@
 import "../../../../Shared/Extensions";
 import { Component } from "../../classes/Component";
 import { Objects } from "../../../../Shared/Extensions.Objects.Client";
+import { TaskQueue } from "../../../../Shared/TaskQueue";
 import { StateTracker } from "../../classes/StateTracker";
 import { AnalyticsTracker } from "../../classes/AnalyticsTracker";
 import { ClientContext } from "../../classes/ClientContext";
@@ -13,6 +14,7 @@ import { resolve } from "path";
 // To make it accessible to client code
 const win = window as any;
 win.Objects = Objects;
+win.TaskQueue = TaskQueue;
 
 const htmlEncode = (s: string) => {
   if (!s) return null;

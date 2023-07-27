@@ -12,6 +12,7 @@ dom:
           ref: comp0
           ':is': getComponentName(0)
           v-model: medias[0]
+          ':context-media': contextMedia
           @change: onChangeMedia
       template: 
         v-slot: tab1
@@ -19,6 +20,7 @@ dom:
           ref: comp1
           ':is': getComponentName(1)
           v-model: medias[1]
+          ':context-media': contextMedia
           @change: onChangeMedia
       template: 
         v-slot: tab2
@@ -26,17 +28,19 @@ dom:
           ref: comp2
           ':is': getComponentName(2)
           v-model: medias[2]
+          ':context-media': contextMedia
           @change: onChangeMedia
-props: null
+props:
+  contextMedia: null
 data:
   options:
-    - 🖼️ image
-    - 📁 feel
     - 📁 animals
+    - 📁 feels
+    - 🖼️ image
   componentNames:
-    - image
-    - feel
     - instance
+    - feel
+    - image
   medias:
     - null
     - null
@@ -78,10 +82,19 @@ watch:
   media:
     handler: | #js
       function(media) {
-        if (!media) return;
         this.$emit("input", media);
       }
     deep: true
+  contextMedia:
+    handler: | #js
+      function(contextMedia) {
+        if (!contextMedia) return;
+        if (contextMedia.instance) {
+          const index = this.componentNames.indexOf("instance");
+          this.selectedTabIndex = index;
+        }
+      }
+    immediate: true
   selectedTabIndex:
     handler: | #js
       function(index) {
@@ -93,11 +106,11 @@ template: >-
   :options="options" direction="horizontal" :value-type="'index'"
   v-model="selectedTabIndex" path="-960387793.0"><template v-slot:tab0
   path="-960387793.0.0"><component ref="comp0" :is="getComponentName(0)"
-  v-model="medias[0]" @change="onChangeMedia"
+  v-model="medias[0]" :context-media="contextMedia" @change="onChangeMedia"
   path="-960387793.0.0.0"></component></template><template v-slot:tab1
   path="-960387793.0.1"><component ref="comp1" :is="getComponentName(1)"
-  v-model="medias[1]" @change="onChangeMedia"
+  v-model="medias[1]" :context-media="contextMedia" @change="onChangeMedia"
   path="-960387793.0.1.0"></component></template><template v-slot:tab2
   path="-960387793.0.2"><component ref="comp2" :is="getComponentName(2)"
-  v-model="medias[2]" @change="onChangeMedia"
+  v-model="medias[2]" :context-media="contextMedia" @change="onChangeMedia"
   path="-960387793.0.2.0"></component></template></ui-tabs></div>

@@ -65,6 +65,8 @@ computed:
     }
 name: ui-select
 style:
+  .comp-ui-list:
+    user-select: none
   li:
     padding: 0.2em 0.5em
   li div:

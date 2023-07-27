@@ -603,14 +603,14 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
       //if (req.url.includes("/create/")) return res.end("dbp:" + req.url);
 
       const db = await dbs.get(req.params.database);
-      const apiMethods = (await cache.get.api.methods(db))?.filter(
+      const apiMethods = await cache.get.api.methods(db);
+      const apiMethod = (apiMethods?.filter(
         (m: any) =>
           m.entity == req.params.entity &&
           m.group == req.params.group &&
           m.name == req.params.method
-      );
-      if (!apiMethods?.length) return res.status(404).send("Method not found");
-      const apiMethod = apiMethods[0];
+      ))[0];
+      if (!apiMethod) return res.status(404).send("Method not found");
       const userIP =
         req.headers["x-forwarded-for"] || req.connection.remoteAddress;
       const isAdmin = config.admin.ips.includes(userIP);

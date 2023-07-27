@@ -162,9 +162,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "../../../../LiveIde/Website/script/1690463364302.ts":
+/***/ "../../../../LiveIde/Website/script/1690470046472.ts":
 /*!***********************************************************!*\
-  !*** ../../../../LiveIde/Website/script/1690463364302.ts ***!
+  !*** ../../../../LiveIde/Website/script/1690470046472.ts ***!
   \***********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -175,6 +175,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 __webpack_require__(/*! ../../../../Shared/Extensions */ "../../../../../Shared/Extensions.ts");
 const Extensions_Objects_Client_1 = __webpack_require__(/*! ../../../../Shared/Extensions.Objects.Client */ "../../../../../Shared/Extensions.Objects.Client.ts");
+const TaskQueue_1 = __webpack_require__(/*! ../../../../Shared/TaskQueue */ "../../../../../Shared/TaskQueue.ts");
 const StateTracker_1 = __webpack_require__(/*! ../../classes/StateTracker */ "../../../../LiveIde/classes/StateTracker.ts");
 const AnalyticsTracker_1 = __webpack_require__(/*! ../../classes/AnalyticsTracker */ "../../../../LiveIde/classes/AnalyticsTracker.ts");
 const ClientContext_1 = __webpack_require__(/*! ../../classes/ClientContext */ "../../../../LiveIde/classes/ClientContext.ts");
@@ -185,6 +186,7 @@ const add_paths_1 = __importDefault(__webpack_require__(/*! ../../../../Shared/W
 // To make it accessible to client code
 const win = window;
 win.Objects = Extensions_Objects_Client_1.Objects;
+win.TaskQueue = TaskQueue_1.TaskQueue;
 const htmlEncode = (s) => {
     if (!s)
         return null;
@@ -2834,6 +2836,14 @@ if (typeof Array !== "undefined") {
             index = this.length;
         this.splice(index, 0, item);
     };
+    Array.prototype.removeBy = function (predicate) {
+        const index = this.findIndex(predicate);
+        if (index != -1)
+            this.removeAt(index);
+    };
+    Array.prototype.removeByField = function (key, value) {
+        this.removeBy((item) => item[key] == value);
+    };
     Array.prototype.clear = function (stagger) {
         if (!stagger) {
             this.splice(0, this.length);
@@ -3112,6 +3122,37 @@ class RepeatingTaskQueue {
     }
 }
 exports.RepeatingTaskQueue = RepeatingTaskQueue;
+
+
+/***/ }),
+
+/***/ "../../../../../Shared/TaskQueue.ts":
+/*!******************************************!*\
+  !*** ../../../../../Shared/TaskQueue.ts ***!
+  \******************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.TaskQueue = void 0;
+// Enqueue async tasks and run them in order
+class TaskQueue {
+    tasks = [];
+    constructor() {
+        this.next();
+    }
+    enqueue(task) {
+        this.tasks.push(task);
+    }
+    async next() {
+        const task = this.tasks.shift();
+        if (task)
+            await task();
+        const delay = this.tasks.length ? 0 : 100;
+        setTimeout(this.next.bind(this), delay);
+    }
+}
+exports.TaskQueue = TaskQueue;
 
 
 /***/ }),
@@ -3453,7 +3494,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690463364302.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690470046472.ts");
 /******/ 	
 /******/ })()
 ;

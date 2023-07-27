@@ -380,17 +380,19 @@ api:
         }
         if (!thread) throw new Error("Provide either a threadID or a threadMedia");
 
-        if (media?.instance && !media.instance._id)
-        {
-          // Double check that an instance with this content doesn't already exist
-          let instance = await db.findOne("Instances", { GeneratorID: media.instance.generatorID, ImageID: media.instance.imageID, Text0: media.instance.text0, Text1: media.instance.text1 });
-          if (!instance) {
-            instance = await dbp.instances.create.one("en", media.instance.generatorID, null, media.instance.text0, media.instance.text1);
-          }
-          instance = await getSimpleInstance(instance);
-          media.type = "instance";
-          media.instance = instance;
-        }
+        // When posting an instance (in a thread), this code is supposed to insert in the Instances collection
+        // but calling dbp.instances.create.one() is not working, because of yo dawg I heard you like dbps shenaningans
+        // if (media?.instance && !media.instance._id)
+        // {
+        //   Double check that an instance with this content doesn't already exist
+        //   let instance = await db.findOne("Instances", { GeneratorID: media.instance.generatorID, ImageID: media.instance.imageID, Text0: media.instance.text0, Text1: media.instance.text1 });
+        //   if (!instance) {
+        //     instance = await dbp.instances.create.one("en", media.instance.generatorID, null, media.instance.text0, media.instance.text1);
+        //   }
+        //   instance = await getSimpleInstance(instance);
+        //   media.type = "instance";
+        //   media.instance = instance;
+        // }
 
         const otherPosts = (await db.find("Posts", { ThreadID: thread._id }, { }, 1000, null, true));
 

@@ -22,13 +22,10 @@ dom:
     template: 
       v-slot: right
       e.thread:
-        ':thread': thread
-        ':threadMedia': threadMedia
+        ':threadMedia': '{type: ''instance'', instance}'
 data:
   instance: null
   generator: null
-  thread: null
-  threadMedia: null
   recommendationItems: []
   contentNotFound: false
 mounted: | #js
@@ -63,11 +60,6 @@ methods:
           return;
         }
         this.generator = await dbp.generators.select.one(this.instance.generatorID);
-        // This instance may have a media
-        this.threadMedia = await dbp.medias.select.byInstance(this.instance._id);
-        if (!this.threadMedia) this.threadMedia = { type: "instance", instance };
-        // Get the thread
-        this.thread = await dbp.threads.select.one(null, this.threadMedia?._id);
         this.recommendationItems = await dbp.generators.select.related(this.generator.urlName);
         this.$refs.stream1?.reset();
         if (page == "instance") {
@@ -108,5 +100,5 @@ template: >-
   item-type="e.instance" :item-props="{ showFullFooter: true }"
   :get-more-items="getMoreInstances" grid-class="grid-1"
   path="1375900948.1.1"></content-stream></template><template v-slot:right
-  path="1375900948.2"><e-thread :thread="thread" :threadMedia="threadMedia"
+  path="1375900948.2"><e-thread :threadMedia="{type: 'instance', instance}"
   path="1375900948.2.0"></e-thread></template></site>

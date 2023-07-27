@@ -19,7 +19,7 @@ dom:
           v-if: isLoading
       e.post.create:
         ':threadID': thread?._id
-        ':threadMedia': threadMedia
+        ':threadMedia': dThreadMedia
         @created: reload
       .mt-l2:
         ui.button:
@@ -27,10 +27,11 @@ dom:
           ':text': '''♻ reload'''
           ':click': reload
 props:
-  thread: null
   threadMedia: null
   teaser: false
 data:
+  thread: null
+  dThreadMedia: null
   key1: 1
   isLoading: false
 mounted: | #js
@@ -56,7 +57,8 @@ methods:
     }
   reload: | #js
     async function() {
-      this.$root.$emit('thread-updated', this.thread);
+      // Get the thread
+      this.thread = await this.$root.dbp.threads.select.one(this.thread?._id, this.dThreadMedia?._id);
     }
 computed:
   visiblePosts: | #js
@@ -82,6 +84,23 @@ watch:
       function() {
         this.refresh();
       }
+  threadMedia:
+    handler: | #js
+      async function(threadMedia) {
+        this.dThreadMedia = threadMedia;
+        if (!threadMedia) return;
+        if (this.dThreadMedia.instance)
+        {
+          // This instance may already have a media
+          const existingInstanceMedia = await this.$root.dbp.medias.select.byInstance(this.dThreadMedia.instance._id);
+          if (existingInstanceMedia)
+          {
+            this.dThreadMedia = existingInstanceMedia;
+          }
+          await this.reload();
+        }
+      }
+    immediate: true
 style:
   .thread-columns:
     display: grid
@@ -103,7 +122,7 @@ template: >-
   path="1226205107.0.0.0.1"></div></li></transition-group><transition
   name="slide" path="1226205107.0.1"><ui-loading v-if="isLoading"
   path="1226205107.0.1.0"></ui-loading></transition><e-post-create
-  :threadID="thread?._id" :threadMedia="threadMedia" @created="reload"
+  :threadID="thread?._id" :threadMedia="dThreadMedia" @created="reload"
   path="1226205107.0.2"></e-post-create><div class="mt-l2"
   path="1226205107.0.3"><ui-button v-if="$root.isAdmin" :text="'♻ reload'"
   :click="reload" path="1226205107.0.3.0"></ui-button></div></div></div>

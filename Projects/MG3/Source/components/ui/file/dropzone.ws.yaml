@@ -7,7 +7,7 @@ dom:
       v-dim: isLoading
       ref: dropArea1
       .upload-button:
-        v-if: enabled
+        v-if: enabled && showUploadButton
         v-text: '''📤🖼️'''
         title: 📤🖼️ upload image
         @click: onClickUpload
@@ -19,6 +19,7 @@ dom:
       slot: null
 props:
   enabled: true
+  showUploadButton: true
 data:
   isLoading: 0
 mounted: | #js
@@ -131,7 +132,8 @@ template: >-
   <div class="comp-ui-file-dropzone" path="1956569459."><ui-loading
   class="absolute-center" v-show="isLoading"
   path="1956569459.0"></ui-loading><div class="file-dropzone" v-dim="isLoading"
-  ref="dropArea1" path="1956569459.1"><div class="upload-button" v-if="enabled"
-  v-text="'📤🖼️'" title="📤🖼️ upload image" @click="onClickUpload"
-  path="1956569459.1.0"></div><input class="hidden" type="file" ref="fileInput"
-  @change="onChangeFileInput" path="1956569459.1.1"/><slot></slot></div></div>
+  ref="dropArea1" path="1956569459.1"><div class="upload-button" v-if="enabled
+  &amp;&amp; showUploadButton" v-text="'📤🖼️'" title="📤🖼️ upload image"
+  @click="onClickUpload" path="1956569459.1.0"></div><input class="hidden"
+  type="file" ref="fileInput" @change="onChangeFileInput"
+  path="1956569459.1.1"/><slot></slot></div></div>

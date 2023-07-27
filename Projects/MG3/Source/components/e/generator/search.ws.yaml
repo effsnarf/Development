@@ -3,7 +3,7 @@ dom:
     ui.text.box:
       type: search
       icon: 🔎
-      hint: search memes…
+      hint: search…
       v-model: query
     e.generator.list:
       ':generators': generators
@@ -33,6 +33,6 @@ style:
 name: e-generator-search
 template: >-
   <div class="comp-e-generator-search" path="-928430196."><ui-text-box
-  type="search" icon="🔎" hint="search memes…" v-model="query"
+  type="search" icon="🔎" hint="search…" v-model="query"
   path="-928430196.0"></ui-text-box><e-generator-list :generators="generators"
   path="-928430196.1"></e-generator-list></div>

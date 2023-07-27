@@ -324,6 +324,8 @@ interface Array<T> {
   reversed(): T[];
   removeAt(index: number): void;
   insertAt(index: number, item: T, appendToEnd: boolean): void;
+  removeBy(predicate: (item: T) => boolean): void;
+  removeByField(key: string, value: any): void;
   clear(stagger?: number): void;
   add(items: any[], stagger?: number): void;
   take(count: number): T[];
@@ -1282,6 +1284,15 @@ if (typeof Array !== "undefined") {
   ) {
     if (appendToEnd && index > this.length) index = this.length;
     this.splice(index, 0, item);
+  };
+
+  Array.prototype.removeBy = function (predicate: (item: any) => boolean) {
+    const index = this.findIndex(predicate);
+    if (index != -1) this.removeAt(index);
+  };
+
+  Array.prototype.removeByField = function (key: string, value: any) {
+    this.removeBy((item) => item[key] == value);
   };
 
   Array.prototype.clear = function (stagger?: number) {

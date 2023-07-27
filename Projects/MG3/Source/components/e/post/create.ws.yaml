@@ -12,11 +12,13 @@ dom:
           class: mt-l1
           ref: createMedia1
           v-model: media
+          ':contextMedia': threadMedia
           @change: toggleShowCreateMedia
     transition: 
       name: slide
       div: 
         ui.file.dropzone:
+          ':show-upload-button': 'false'
           @input: onImageUpload
           e.comment.create:
             v-model: text
@@ -73,7 +75,7 @@ methods:
       {
         const { generator, text0, text1 } = (this.tempInstance || {});
         const instance = !generator ? null : { generatorID: generator.generatorID, text0, text1 };
-        const post = await this.$root.dbp.posts.create.one(this.threadID, this.threadMedia, this.text, this.media);
+        const post = await this.$root.dbp.posts.create.one(this.threadID, (this.threadID ? null : this.threadMedia), this.text, this.media);
         this.$emit('created', post);
         setTimeout(this.clear.bind(this), 1000);
       }
@@ -131,12 +133,12 @@ template: >-
   'Start a new thread'" path="1762525697.0"></h3><transition name="slide"
   path="1762525697.1"><div v-show="showCreateMedia"
   path="1762525697.1.0"><e-media-create class="mt-l1" ref="createMedia1"
-  v-model="media" @change="toggleShowCreateMedia"
+  v-model="media" :contextMedia="threadMedia" @change="toggleShowCreateMedia"
   path="1762525697.1.0.0"></e-media-create></div></transition><transition
   name="slide" path="1762525697.2"><div path="1762525697.2.0"><ui-file-dropzone
-  @input="onImageUpload" path="1762525697.2.0.0"><e-comment-create
-  v-model="text" :media="media" :new-thread="false"
-  @click-media-preview="toggleShowCreateMedia"
+  :show-upload-button="false" @input="onImageUpload"
+  path="1762525697.2.0.0"><e-comment-create v-model="text" :media="media"
+  :new-thread="false" @click-media-preview="toggleShowCreateMedia"
   path="1762525697.2.0.0.0"></e-comment-create></ui-file-dropzone></div></transition><div
   path="1762525697.3"><transition name="slide" path="1762525697.3.0"><div
   class="flex justify-around" path="1762525697.3.0.0"><transition name="slide"

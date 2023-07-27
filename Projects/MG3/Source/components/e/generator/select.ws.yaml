@@ -3,15 +3,15 @@ dom:
     ui.text.box:
       type: search
       icon: 🔎
-      hint: search memes…
+      hint: search…
       v-model: query
     ui.loading:
       class: absolute-center
       v-if: isLoading
-    .grid:
+    .grid1:
       ui.image:
-        v-for: generator in generators
-        ':class': '{ selected: (value?._id == generator._id) }'
+        v-for: generator in visibleGenerators
+        ':class': '{ selected: (dValue?._id == generator._id) }'
         ':tooltip': generator.displayName
         ':imageID': generator.imageID
         ':key': generator.generatorID
@@ -19,10 +19,14 @@ dom:
         @click: () => onClick(generator)
 props:
   value: null
+  defaultGeneratorID: null
 data:
   query: null
+  dValue: null
   generators: null
+  defaultGenerator: null
   isLoading: false
+  generatorsQueue: null
 mounted: | #js
   async function() {
     await this.init();
@@ -30,24 +34,44 @@ mounted: | #js
 methods:
   search: | #js
     async function(query) {
-      try
-      {
-        this.generators = await this.$root.dbp.generators.select.search(query);
+      this.generatorsQueue.enqueue(async () => {
+        try
+        {
+          this.generators = (await this.getGenerators(query));
+        }
+        finally
+        {
+          this.isLoading = false;
+        }
+      });
+    }
+  getGenerators: | #js
+    async function(query) {
+      if (query) return (await this.$root.dbp.generators.select.search(query));
+      if (this.defaultGenerator) {
+        const gens = (await this.$root.dbp.generators.select.related(this.defaultGenerator?.urlName));
+        gens.removeByField("_id", this.defaultGenerator._id)
+        gens.unshift(this.defaultGenerator);
+        return gens;
       }
-      finally
-      {
-        this.isLoading = false;
-      }
+      return (await this.$root.dbp.generators.select.popular());
     }
   init: | #js
     async function () {
-      this.generators = (await this.$root.dbp.generators.select.popular());
+      this.generatorsQueue = new TaskQueue();
+      await this.search(this.query);
     }
   onClick: | #js
     function (generator) {
       this.$emit('input', generator)
     }
 watch:
+  value:
+    handler: | #js
+      async function(value) {
+        this.dValue = value;
+      }
+    immediate: true
   query:
     handler: | #js
       (async function(query) {
@@ -59,15 +83,34 @@ watch:
       function(query) {
         this.isLoading = true;
       }
+  defaultGeneratorID:
+    handler: | #js
+      async function(defaultGeneratorID) {
+        this.defaultGenerator = (!defaultGeneratorID ? null : (await this.$root.dbp.generators.select.one(defaultGeneratorID)));
+        if (this.defaultGenerator) {
+          await this.init();
+          this.$emit('input', this.defaultGenerator);
+        }
+      }
+    immediate: true
 computed:
+  visibleGenerators: | #js
+    function() {
+      const gens = [...(this.generators||[])];
+      return gens;
+    }
   query2: | #js
     function() {
       return this.query;
     }
 style:
-  .grid:
-    grid-template: 1fr / repeat(5, 1fr)
-    gap: 0.5em
+  .grid1:
+    display: flex !important
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.3em !important
+  .grid1 > div:
+    width: calc(20% - 0.3em)
   .comp-ui-image:
     filter: grayscale(1)
     opacity: 0.5
@@ -80,11 +123,11 @@ style:
 name: e-generator-select
 template: >-
   <div class="comp-e-generator-select" path="-928114976."><ui-text-box
-  type="search" icon="🔎" hint="search memes…" v-model="query"
+  type="search" icon="🔎" hint="search…" v-model="query"
   path="-928114976.0"></ui-text-box><ui-loading class="absolute-center"
-  v-if="isLoading" path="-928114976.1"></ui-loading><div class="grid"
-  path="-928114976.2"><ui-image v-for="generator in generators" :class="{
-  selected: (value?._id == generator._id) }" :tooltip="generator.displayName"
+  v-if="isLoading" path="-928114976.1"></ui-loading><div class="grid1"
+  path="-928114976.2"><ui-image v-for="generator in visibleGenerators" :class="{
+  selected: (dValue?._id == generator._id) }" :tooltip="generator.displayName"
   :imageID="generator.imageID" :key="generator.generatorID" :square="true"
   @click="() =&gt; onClick(generator)"
   path="-928114976.2.0"></ui-image></div></div>
