@@ -128,7 +128,7 @@ class DatabaseProxy {
 
       if (!result) {
         url = url.replace("/create/one", "/select/one");
-        result = await this.fetchJson(`${url}?_uid=${data._uid}`);
+        result = await this.fetchJson(`${url}?uid=${data._uid}`);
       }
 
       return result;

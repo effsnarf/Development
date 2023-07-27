@@ -242,15 +242,10 @@ api:
 
         return insts;
     Instances.select.one:
-      args: [instanceID, _uid]
+      args: [instanceID, uid]
       code: | #js
-        const instance = await db.findOne("Instances", {
-          $or: [
-            { "_id": instanceID },
-            { "_uid": _uid }
-          ]
-        });
-        return instance;
+        if (uid) return await db.findOne("Instances", { _uid: uid });
+        return await db.findOne("Instances", { _id: instanceID });
     Instances.create.one:
       args: [languageCode, generatorID, imageID, text0, text1, _uid]
       code: | #js

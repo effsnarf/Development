@@ -90,18 +90,21 @@ class DatabaseProxy {
         // This is because sometimes we use the local cache and also fetch in the background
         // in which case we'll need to resolve twice which is not possible with a promise
         const options = extraArgs.find((a) => a.$set) || {};
-        const url = `${this.urlBase}/api/${entity}/${group}/${method}`;
+        let url = `${this.urlBase}/api/${entity}/${group}/${method}`;
         const isHttpPost = group == "create";
         if (isHttpPost) {
             const data = {};
             args.forEach((a) => (data[a.name] = a.value));
+            if (url.includes("/create/one")) {
+                data._uid = DatabaseProxy.getRandomUniqueID();
+            }
             const fetchOptions = {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(data),
                 mode: "no-cors",
             };
-            const result = await this.fetchJson(url, fetchOptions);
+            let result = await this.fetchJson(url, fetchOptions);
             // If we got an _id back, select the item
             // This is because when POSTing from localhost I'm having trouble getting the actual object back
             const _id = parseInt(result);
@@ -109,7 +112,11 @@ class DatabaseProxy {
                 const idFieldName = `${entity
                     .substring(0, entity.length - 1)
                     .toLowerCase()}ID`;
-                return await this.callApiMethod(entity, "select", "one", [{ name: idFieldName, value: _id }], []);
+                result = await this.callApiMethod(entity, "select", "one", [{ name: idFieldName, value: _id }], []);
+            }
+            if (!result) {
+                url = url.replace("/create/one", "/select/one");
+                result = await this.fetchJson(`${url}?_uid=${data._uid}`);
             }
             return result;
         }
@@ -156,15 +163,22 @@ class DatabaseProxy {
         });
         return result;
     }
+    static getRandomUniqueID() {
+        return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (char) => {
+            const random = (Math.random() * 16) | 0;
+            const value = char === "x" ? random : (random & 0x3) | 0x8;
+            return value.toString(16);
+        });
+    }
 }
 exports.DatabaseProxy = DatabaseProxy;
 
 
 /***/ }),
 
-/***/ "../../../../LiveIde/Website/script/1690490270459.ts":
+/***/ "../../../../LiveIde/Website/script/1690493320988.ts":
 /*!***********************************************************!*\
-  !*** ../../../../LiveIde/Website/script/1690490270459.ts ***!
+  !*** ../../../../LiveIde/Website/script/1690493320988.ts ***!
   \***********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -3497,7 +3511,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690490270459.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690493320988.ts");
 /******/ 	
 /******/ })()
 ;
