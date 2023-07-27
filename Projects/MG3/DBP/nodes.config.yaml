@@ -251,8 +251,8 @@ api:
       code: | #js
         if (null == generatorID) throw new Error("GeneratorID is required");
 
-        let existingInstance = await db.findOne("Instances", { GeneratorID: generatorID, Text0: text0, Text1: text1 });
-        if (existingInstance) return existingInstance;
+        //let existingInstance = await db.findOne("Instances", { GeneratorID: generatorID, Text0: text0, Text1: text1 });
+        //if (existingInstance) return existingInstance._id;
 
         const now = (new Date());
         const nowDate = (new Date());
