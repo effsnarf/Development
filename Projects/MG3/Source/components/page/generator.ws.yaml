@@ -24,7 +24,6 @@ dom:
                 e.instance:
                   v-if: instance
                   ':item': instance
-                  ':show-footer': 'false'
                   ':key': instance?._id
           h1:
             v-text: generator?.displayName
@@ -168,8 +167,6 @@ computed:
       return (this.visibleStreamInstance);
     }
 style:
-  .comp-e-instance .footer:
-    display: none
   .comp-e-teaser:
     filter: grayscale(1)
   .comp-e-teaser:hover:
@@ -202,7 +199,7 @@ template: >-
   path="-38884812.0.1.0"><div class="float-left w-25pc mr-l1"
   path="-38884812.0.1.0.0"><div path="-38884812.0.1.0.0.0"><transition
   name="fade" path="-38884812.0.1.0.0.0.0"><e-instance v-if="instance"
-  :item="instance" :show-footer="false" :key="instance?._id"
+  :item="instance" :key="instance?._id"
   path="-38884812.0.1.0.0.0.0.0"></e-instance></transition></div></div><h1
   v-text="generator?.displayName" path="-38884812.0.1.0.1"></h1><div
   class="poem" :style="{ marginLeft: '27%', width: 'fit-content' }"

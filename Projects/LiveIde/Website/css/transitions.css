@@ -59,7 +59,7 @@
 .slide-enter-to,
 .slide-leave {
   opacity: 1;
-  max-height: 20rem;
+  max-height: 25rem;
   overflow: hidden;
 }
 

@@ -12,11 +12,9 @@ dom:
         class: mb-l6
         ':item': instance
         ':instance-image': true
-        ':show-full-footer': true
       content.stream:
         ref: stream1
         item-type: e.instance
-        ':item-props': '{ showFullFooter: false }'
         ':get-more-items': getMoreInstances
         grid-class: grid-1
         @visible-item: onVisibleSteamInstanceChange
@@ -119,11 +117,9 @@ template: >-
   :recommendation-items="recommendationItems" path="1375900948."><template
   v-slot:left path="1375900948.0"></template><template v-slot:middle
   path="1375900948.1"><e-instance class="mb-l6" :item="instance"
-  :instance-image="true" :show-full-footer="true"
-  path="1375900948.1.0"></e-instance><content-stream ref="stream1"
-  item-type="e.instance" :item-props="{ showFullFooter: false }"
-  :get-more-items="getMoreInstances" grid-class="grid-1"
-  @visible-item="onVisibleSteamInstanceChange"
+  :instance-image="true" path="1375900948.1.0"></e-instance><content-stream
+  ref="stream1" item-type="e.instance" :get-more-items="getMoreInstances"
+  grid-class="grid-1" @visible-item="onVisibleSteamInstanceChange"
   path="1375900948.1.1"></content-stream></template><template v-slot:right
   path="1375900948.2"><div class="sticky" :style="{ top: '0px' }"
   path="1375900948.2.0"><e-instance-wide :instance="threadInstance"
