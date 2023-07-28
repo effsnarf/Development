@@ -327,7 +327,7 @@ api:
         const threads = await db.find("Threads", { }, { LastPostCreated: -1 }, 15, null, true);
         for (const thread of threads)
         {
-          const firstPost = await db.find("Posts", { ThreadID: thread._id }, { Index: 0 }, 1000, null, true);
+          const firstPost = await db.findOne("Posts", { ThreadID: thread._id, { Index: 1 } });
           let lastPosts = await db.find("Posts", { ThreadID: thread._id, Index: { $ne: 0 } }, { Index: -1 }, 3, null, true);
           lastPosts = [...lastPosts].reverse();
           const posts = [...firstPost, ...lastPosts];

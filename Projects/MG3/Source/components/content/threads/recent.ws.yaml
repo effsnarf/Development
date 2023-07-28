@@ -2,7 +2,7 @@ dom:
   div:
     e.thread.teaser:
       v-for: thread in threads
-      ":thread": thread
+      ':thread': thread
 props: null
 data:
   posts: []
@@ -10,7 +10,8 @@ mounted: | #js
   async function() {
     this.threads = await this.$root.dbp.threads.select.recent();
   }
-name: content-posts-recent
+name: content-threads-recent
 template: >-
-  <div class="comp-content-posts-recent" path="1605029931."><e-post v-for="post
-  in posts" :item="post" path="1605029931.0"></e-post></div>
+  <div class="comp-content-threads-recent" path="-1639663019."><e-thread-teaser
+  v-for="thread in threads" :thread="thread"
+  path="-1639663019.0"></e-thread-teaser></div>
