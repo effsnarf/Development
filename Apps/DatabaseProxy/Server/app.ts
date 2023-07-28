@@ -501,6 +501,8 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
           },
         });
 
+        return res.end(JSON.stringify({ intervals, docs }));
+
         for (const interval of intervals) {
           const count =
             docs?.filter((doc) => Intervals.docIsIn(doc, interval)).length || 0;
