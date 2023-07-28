@@ -1,8 +1,9 @@
 dom:
-  div:
+  .thread-teasers:
     e.thread.teaser:
       v-for: thread in threads
       ':thread': thread
+      ':show-posts': true
 props: null
 data:
   threads: []
@@ -10,8 +11,17 @@ mounted: | #js
   async function() {
     this.threads = await this.$root.dbp.threads.select.recent();
   }
+style:
+  .thread-teasers:
+    display: flex
+    flex-wrap: wrap
+  .thread-teasers > div:
+    width: 15em
+  .comp-e-thread-teaser:
+    margin-bottom: 2em
 name: content-threads-recent
 template: >-
-  <div class="comp-content-threads-recent" path="-1639663019."><e-thread-teaser
-  v-for="thread in threads" :thread="thread"
+  <div class="comp-content-threads-recent thread-teasers"
+  path="-1639663019."><e-thread-teaser v-for="thread in threads"
+  :thread="thread" :show-posts="true"
   path="-1639663019.0"></e-thread-teaser></div>

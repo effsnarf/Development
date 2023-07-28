@@ -27,6 +27,7 @@ dom:
         v-if: showGenerator
         ':generator': $root.instanceToGenerator(instance)
       ui.share:
+        v-if: showShare
         ':item': instance
     e.post.create:
       v-if: showCreatePost
@@ -38,6 +39,7 @@ props:
   instanceImage: false
   showFooter: true
   showCreatePost: false
+  showShare: true
   instanceID: null
 data:
   width: null
@@ -138,7 +140,7 @@ template: >-
   path="643573758.0.0.2"></div></div></ui-link><div class="footer"
   v-if="showFooter" path="643573758.1"><e-generator-wide2 v-if="showGenerator"
   :generator="$root.instanceToGenerator(instance)"
-  path="643573758.1.0"></e-generator-wide2><ui-share :item="instance"
-  path="643573758.1.1"></ui-share></div><e-post-create v-if="showCreatePost"
-  :generator="$root.instanceToGenerator(instance)" :entityID="instance._id"
-  path="643573758.2"></e-post-create></div>
+  path="643573758.1.0"></e-generator-wide2><ui-share v-if="showShare"
+  :item="instance" path="643573758.1.1"></ui-share></div><e-post-create
+  v-if="showCreatePost" :generator="$root.instanceToGenerator(instance)"
+  :entityID="instance._id" path="643573758.2"></e-post-create></div>

@@ -3,7 +3,7 @@ dom:
     v-if: thread
     ui.link:
       ':url': $root.url.thread(thread)
-      e.post:
+      e.post: 
         ':item': thread.posts[0]
         ':teaser': 'true'
       .text-center.opacity-50:
@@ -11,8 +11,13 @@ dom:
           ':value': thread.lastPostCreated
         div: 
           v-text: thread.postsCount + ' posts'
+    div: 
+      e.post: 
+        v-for: post in thread.posts
+        ':item': post
 props:
   thread: null
+  showPosts: false
 data: null
 watch: null
 methods: null
@@ -33,4 +38,6 @@ template: >-
   class="text-center opacity-50" path="-88604437.0.1"><ui-time
   :value="thread.lastPostCreated" path="-88604437.0.1.0"></ui-time><div
   v-text="thread.postsCount + ' posts'"
-  path="-88604437.0.1.1"></div></div></ui-link></div>
+  path="-88604437.0.1.1"></div></div></ui-link><div path="-88604437.1"><e-post
+  v-for="post in thread.posts" :item="post"
+  path="-88604437.1.0"></e-post></div></div>
