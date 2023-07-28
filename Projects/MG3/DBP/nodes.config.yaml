@@ -335,7 +335,7 @@ api:
           };
           
           const firstPost = {
-            Created: (new Date(instance.created)).valueOf(),
+            Created: instance.created,
             Index: 0,
             Media: {
               Type: "instance",
@@ -349,7 +349,7 @@ api:
 
           const replyPosts = comments.map((c, i) => {
             return {
-              Created: (new Date(c.created)).valueOf(),
+              Created: c.created,
               Index: (i + 1),
               Media: null,
               Text: c.text,
