@@ -322,18 +322,6 @@ api:
           };
           thread = await db.upsert("Threads", thread, true);
 
-          const posts = comments.map((c, i) => {
-            return {
-              Created: c.created.valueOf(),
-              Index: i,
-              Media: null,
-              Text: c.text,
-              TotalVotesScore: c.totalVotesScore,
-              ThreadID: thread._id,
-              Imported: true
-            };
-          });
-
           let instance = await db.findOne("Instances", { _id: threadMediaInstanceID });
 
           instance = {
@@ -346,10 +334,32 @@ api:
             Text1: instance.text1,
           };
           
-          posts[0].Media = {
-            Type: "instance",
-            Instance: instance
+          const firstPost = {
+            Created: (new Date(instance.created)).valueOf(),
+            Index: 0,
+            Media: {
+              Type: "instance",
+              Instance: instance
+            },
+            Text: c.text,
+            TotalVotesScore: c.totalVotesScore,
+            ThreadID: thread._id,
+            Imported: true
           };
+
+          const replyPosts = comments.map((c, i) => {
+            return {
+              Created: (new Date(c.created)).valueOf(),
+              Index: (i + 1),
+              Media: null,
+              Text: c.text,
+              TotalVotesScore: c.totalVotesScore,
+              ThreadID: thread._id,
+              Imported: true
+            };
+          });
+
+          const posts = [firstPost, ...replyPosts];
 
           await db.upsert("Posts", posts);
         }
