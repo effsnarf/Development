@@ -107,6 +107,7 @@ style:
   .post-text:
     padding: 0.5rem
     opacity: 0.9
+    word-break: break-word
   .enlarged .post-media:
     width: 100%
   .enlarged .post-text: null

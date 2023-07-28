@@ -3,6 +3,7 @@ import * as colors from "colors";
 import fs from "fs";
 import * as yaml from "js-yaml";
 import { OpenAI, Message } from "./OpenAI";
+import { Model } from "./OpenAI";
 
 class Role {
   static empty = new Role("", null, null, null);
@@ -81,10 +82,10 @@ class ChatOpenAI {
   private _messages: Message[] = [];
   role: Role;
 
-  constructor(role: Role, log: boolean = true) {
+  constructor(role: Role, log: boolean = true, model?: Model) {
     this._log = log;
     this.role = role;
-    this._openAI = OpenAI.new(log);
+    this._openAI = OpenAI.new(log, model);
     if (this._log) {
       console.log(role.toString().shorten(100).gray);
       console.log();
@@ -127,8 +128,8 @@ class ChatOpenAI {
     this._messages.pop();
   }
 
-  static async new(role: Role, log: boolean = true) {
-    let chat = new ChatOpenAI(role, log);
+  static async new(role: Role, log: boolean = true, model?: Model) {
+    let chat = new ChatOpenAI(role, log, model);
     chat._messages.push({ role: "system", content: role.toString() });
     return chat;
   }

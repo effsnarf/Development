@@ -18,8 +18,9 @@ interface Response {
 }
 
 enum Model {
-  Davinci = "text-davinci-003",
   Gpt35Turbo = "gpt-3.5-turbo",
+  Gpt35Turbo16k = "gpt-3.5-turbo-16k",
+  Ada = "text-ada-001",
 }
 
 enum RequestType {
@@ -37,12 +38,23 @@ class OpenAI {
   private messages: Message[];
   private readonly loading = new Loading();
   // This includes the request and the response
-  private readonly maxTotalTokens = 4097;
+  private get maxTotalTokens() {
+    switch (this.model) {
+      case Model.Gpt35Turbo:
+        return 4096;
+      case Model.Gpt35Turbo16k:
+        return 16384;
+      case Model.Ada:
+        return 2049;
+      default:
+        throw `Unknown model ${this.model}`;
+    }
+  }
 
-  static new(log: boolean = true): OpenAI {
+  static new(log: boolean = true, model: Model = Model.Gpt35Turbo16k): OpenAI {
     if (!this.apiKey)
       throw new Error("API key not set. Use OpenAI.apiKey = 'your key'");
-    return new OpenAI(this.apiKey, Model.Davinci, log);
+    return new OpenAI(this.apiKey, model, log);
   }
 
   private constructor(apiKey: string, model: Model, log: boolean = true) {
@@ -113,7 +125,7 @@ class OpenAI {
     return tokens;
   }
 
-  private async makeRequest<T>(model: string, type: string, dataProps: any) {
+  async makeRequest<T>(model: string, type: string, dataProps: any) {
     const tokens = this.getTokens(
       dataProps.prompt || dataProps.input || dataProps.messages || dataProps
     );
@@ -203,4 +215,4 @@ class OpenAI {
   }
 }
 
-export { OpenAI, Message };
+export { OpenAI, Message, Model };

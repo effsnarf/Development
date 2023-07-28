@@ -17,6 +17,7 @@ import { TreeScript } from "@shared/TreeScript/TreeScript";
 import { Apify } from "@shared/Apify";
 import { Console } from "@shared/Console";
 import { ChatOpenAI, Roles } from "../Apis/OpenAI/classes/ChatOpenAI";
+import { Model } from "../Apis/OpenAI/classes/OpenAI";
 import { Google } from "@shared/Google";
 import { Coder } from "@shared/Coder";
 import { Cache } from "@shared/Cache";
@@ -35,6 +36,26 @@ class Malkovich {
 const malkovitch = new Malkovich();
 
 (async () => {
+  const chat = await ChatOpenAI.new(Roles.ChatGPT, true, Model.Ada);
+
+  const result = await chat.send(
+    `Give me 0-1 scores for this text on the following dimensions:
+    shitpost (unintelligable text, nonsense)
+    offensive (racist, sexist, homophobic, etc)
+    spam (advertising)
+    quality (well written, interesting)
+
+    Reply in JSON format:
+    { shitpost: 0.5, spam: 0.5, quality: 0.5 }
+
+    The text is:
+
+    According to “Breaking Bad” and the Jesse Pinkmans of the world, we do, A LOT!
+    `
+  );
+
+  process.exit();
+
   // const url1 = "http://localhost:4041/MemeGenerator/api/Builders/select/all";
 
   // const res = await axios.request({

@@ -4,90 +4,76 @@ import { Configuration } from "@shared/Configuration";
 import { Loading } from "@shared/Loading";
 import { Progress } from "@shared/Progress";
 import { Database } from "@shared/Database/Database";
+import { ChatOpenAI, Roles } from "../../../../Apis/OpenAI/classes/ChatOpenAI";
+import { Model } from "../../../../Apis/OpenAI/classes/OpenAI";
 
 (async () => {
   const config = (await Configuration.new()).data;
   const db = await Database.new(config.database);
 
+  const chat = await ChatOpenAI.new(Roles.ChatGPT, true, Model.Ada);
+
+  const getModInfo = async (text: string) => {
+    if (!text) return {};
+
+    const result = await chat.send(
+      `Give me 0-1 scores for this text on the following dimensions:
+      - shitpost (unintelligable text, nonsense)
+      - offensive (racist, sexist, homophobic, etc)
+      - spam (advertising)
+      - quality (well written, interesting)
+  
+      Reply in JSON format:
+      { shitpost: 0.5, spam: 0.5, quality: 0.5 }
+  
+      The text is:
+  
+      ${text}
+      `
+    );
+
+    return JSON.parse(result);
+  };
+
   let fixed = 0;
 
   let progress = null;
 
-  const commentsCount = await db.count("Comments");
-  console.log(`Fixing ${`CommentEntities`.green}..`);
+  // AI moderation on posts
+  console.log(`Fixing ${`Posts`.green}..`);
 
-  const commentEntitiesCount = await db.count("CommentEntities");
+  const postsCount = await db.count("Posts", { Mod: { $exists: false } });
 
-  console.log(
-    `Deleting ${commentEntitiesCount.toLocaleString()} ${
-      `CommentEntities`.green
-    }..`
-  );
-  await db.delete("CommentEntities", {});
+  progress = Progress.newAutoDisplay(postsCount);
 
-  console.log(`Fixing Comments..`);
-  progress = Progress.newAutoDisplay(commentsCount);
+  for await (const post of db.findIterable("Posts", {
+    Mod: { $exists: false },
+  })) {
+    post.Mod = await getModInfo(post.text);
 
-  const shouldDeleteComment = async (comment: any) => {
-    // Delete comments whose instance doesn't exist
-    const instance = await db.findOneByID("Instances", comment.entityID);
-    if (!instance) return true;
-    // Delete empty comments
-    if (!comment.text?.length) return true;
-    // Delete junk comments ("hhhhhhhhhh", "wwwwwwwwww", etc.)
-    if (
-      comment.length > 1 &&
-      Array.from(comment.text.toLowerCase()).distinct().length > 2
-    )
-      return true;
-    // Delete duplicate comments
-    const duplicateComments = await db.find("Comments", {
-      _id: { $ne: comment._id },
-      EntityID: comment.entityID,
-      Text: comment.text,
-    });
-    if (duplicateComments.length) return true;
-    return false;
-  };
+    await db.upsert("Posts", post);
 
-  for await (const comment of db.findAll("Comments")) {
-    if (await shouldDeleteComment(comment)) {
-      await db.delete("Comments", { _id: comment._id });
-      continue;
-    }
-
-    let commentEntity = await db.findOneByID(
-      "CommentEntities",
-      `1/${comment.entityID}`
-    );
-    if (!commentEntity) {
-      commentEntity = {
-        _id: `1/${comment.entityID}`,
-        entityType: 1,
-        entityID: comment.entityID,
-        commentsCount: 0,
-      };
-    }
-    commentEntity.commentsCount += 1;
-    await db.upsert("CommentEntities", commentEntity, false, false, true);
     fixed++;
     progress.increment();
   }
 
-  const generatorsCount = await db.count("Generators");
-  console.log(`Fixing ${`Generators`.green}.${`InstancesCount`.yellow}..`);
-  progress = Progress.newAutoDisplay(generatorsCount);
+  // Fix Generators.InstancesCount
+  if (false) {
+    const generatorsCount = await db.count("Generators");
+    console.log(`Fixing ${`Generators`.green}.${`InstancesCount`.yellow}..`);
+    progress = Progress.newAutoDisplay(generatorsCount);
 
-  for await (const gen of db.findAll("Generators")) {
-    if (!gen.displayName) continue;
+    for await (const gen of db.findAll("Generators")) {
+      if (!gen.displayName) continue;
 
-    const instancesCount = await db.count("Instances", {
-      GeneratorID: gen._id,
-    });
-    if (gen.instancesCount !== instancesCount) {
-      fixed++;
+      const instancesCount = await db.count("Instances", {
+        GeneratorID: gen._id,
+      });
+      if (gen.instancesCount !== instancesCount) {
+        fixed++;
+      }
+      progress.increment();
     }
-    progress.increment();
   }
 
   progress.done();
