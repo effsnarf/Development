@@ -112,7 +112,9 @@ class ChatOpenAI {
       console.log(this._messages.length);
       // Delete the last message
       this._messages.pop();
-      throw ex.response?.data?.error?.message || ex;
+      const responseErrorMessage = ex.response?.data?.error?.message;
+      if (responseErrorMessage) ex = new Error(responseErrorMessage);
+      throw ex;
     }
   }
 
