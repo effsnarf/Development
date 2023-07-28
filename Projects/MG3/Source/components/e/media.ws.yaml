@@ -14,7 +14,7 @@ dom:
           ':imageID': cMedia.imageID
           ':square': square
         e.instance:
-          v-if: (cMedia.instance)
+          v-if: (cMedia.type=='instance')
           ':item': cMedia.instance
           ':show-footer': showFooter
         component:
@@ -94,7 +94,7 @@ template: >-
   v-if="(cMedia.type=='feel')" :src="'/img/feels/' + cMedia.feelID + '.webp'"
   :square="true" path="864271643.0.0.0"></ui-image><ui-image
   v-if="(cMedia.type=='image')" :imageID="cMedia.imageID" :square="square"
-  path="864271643.0.0.1"></ui-image><e-instance v-if="(cMedia.instance)"
+  path="864271643.0.0.1"></ui-image><e-instance v-if="(cMedia.type=='instance')"
   :item="cMedia.instance" :show-footer="showFooter"
   path="864271643.0.0.2"></e-instance><component v-if="(cMedia.type=='builder')"
   :is="formatComponentName" :media="cMedia"

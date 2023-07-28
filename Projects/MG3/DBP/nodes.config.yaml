@@ -347,6 +347,7 @@ api:
           };
           
           posts[0].Media = {
+            Type: "instance",
             Instance: instance
           };
 
