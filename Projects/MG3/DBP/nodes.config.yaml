@@ -390,7 +390,7 @@ api:
         }
         return threads;
     Posts.create.one:
-      args: [threadID, threadMedia, text, media]
+      args: [threadID, threadMedia, text, media, _uid]
       code: | #js
         const now = Date.now();
 
@@ -481,6 +481,7 @@ api:
           Text: text,
           Media: media,
           Created: now,
+          _uid
         };
 
         post = await db.upsert("Posts", post, true);
@@ -490,6 +491,11 @@ api:
         await db.upsert("Threads", thread);
 
         return post._id;
+    Posts.select.one:
+      args: [postID, uid]
+      code: | #js
+        const post = await db.findOne("Posts", { $or: [ { _id: postID }, { _uid: uid } ] });
+        return post;
     Posts.delete.one:
       admin: true
       args: [postID]
