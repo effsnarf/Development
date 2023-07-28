@@ -308,8 +308,34 @@ api:
           }
         }
         const thread = await db.findOne("Threads", { _id: threadID });
-        if (!thread) return null;
-        thread.posts = await db.find("Posts", { ThreadID: thread._id }, { Index: 1 }, 1000, null, true);
+
+        if (!thread)
+        {
+          // Import from the Comments collection
+          const comments = await db.find("Comments", { EntityID: threadMediaInstanceID }, { _id: 1 }, 1000);
+          if (!comments.length) return null;
+
+          let thread = {
+            PostsCount: comments.length,
+            Created: comments[0].created.valueOf(),
+            ImportedFromComments: true,
+          };
+          thread = await db.upsert("Threads", thread, true);
+
+          const posts = comments.map((c, i) => {
+            return {
+              Created: c.created.valueOf(),
+              Index: i,
+              Media: null,
+              Text: c.text,
+              ThreadID: thread._id,
+            };
+          });
+
+          await db.upsert("Posts", posts);
+        }
+
+        thread.posts = await db.find("Posts", { ThreadID: thread._id }, { Index: 1 }, 1000);
         return thread;
     Threads.select.all:
       args: []
@@ -454,7 +480,7 @@ api:
     Comments.select.by:
       args: [entityID]
       code: | #js
-        let comments = await db.find("Comments", { EntityType: 1, EntityID: entityID }, { }, 1000, null, true);
+        let comments = await db.find("Comments", { EntityType: 1, EntityID: entityID }, { }, 1000);
         comments = comments.sortBy(c => c._id);
         for (const comment of comments) comment.created = comment.created.valueOf();
         return comments;
