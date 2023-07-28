@@ -5,7 +5,7 @@ dom:
       ':thread': thread
 props: null
 data:
-  posts: []
+  threads: []
 mounted: | #js
   async function() {
     this.threads = await this.$root.dbp.threads.select.recent();
