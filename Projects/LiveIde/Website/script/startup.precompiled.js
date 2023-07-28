@@ -176,9 +176,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "../../../../LiveIde/Website/script/1690533030325.ts":
+/***/ "../../../../LiveIde/Website/script/1690534671414.ts":
 /*!***********************************************************!*\
-  !*** ../../../../LiveIde/Website/script/1690533030325.ts ***!
+  !*** ../../../../LiveIde/Website/script/1690534671414.ts ***!
   \***********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -339,18 +339,19 @@ const helpers = {
         bind(el, binding) {
             // Set the opacity to 0.4 if the value is true
             if (binding.value) {
-                el.style.filter = "grayscale(1) contrast(0.8) brightness(0.8)";
+                el.style.opacity = "0.4";
                 el.style.pointerEvents = "none";
             }
         },
         update(el, binding) {
             // Update the opacity whenever the value changes
             if (binding.value) {
-                el.style.filter = "grayscale(1) contrast(0.8) brightness(0.8)";
+                el.style.opacity = "0.4";
                 el.style.pointerEvents = "none";
             }
             else {
                 el.style.filter = "";
+                el.style.opacity = "";
                 el.style.pointerEvents = "";
             }
         },
@@ -3511,7 +3512,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690533030325.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690534671414.ts");
 /******/ 	
 /******/ })()
 ;

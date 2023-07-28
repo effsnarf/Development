@@ -14,7 +14,7 @@ dom:
             v-if: teaser && getHiddenPostsCount(index)
             v-text: '''('' + getHiddenPostsCount(index) + '' posts…)'''
       e.post.create:
-        v-dim: isLoading
+        v-disable: isLoading
         ':threadID': thread?._id
         ':threadMedia': dThreadMedia
         @created: reload
@@ -157,7 +157,7 @@ template: >-
   getHiddenPostsCount(index)" v-text="'(' + getHiddenPostsCount(index) + '
   posts…)'"
   path="1226205107.0.0.0.1"></div></li></transition-group><e-post-create
-  v-dim="isLoading" :threadID="thread?._id" :threadMedia="dThreadMedia"
+  v-disable="isLoading" :threadID="thread?._id" :threadMedia="dThreadMedia"
   @created="reload" path="1226205107.0.1"></e-post-create><div class="hidden
   mt-l2" path="1226205107.0.2"><ui-button v-if="$root.isAdmin" :text="'♻
   reload'" :click="reload"

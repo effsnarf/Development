@@ -158,17 +158,18 @@ interface MgParams {
     bind(el: HTMLElement, binding: any) {
       // Set the opacity to 0.4 if the value is true
       if (binding.value) {
-        el.style.filter = "grayscale(1) contrast(0.8) brightness(0.8)";
+        el.style.opacity = "0.4";
         el.style.pointerEvents = "none";
       }
     },
     update(el: HTMLElement, binding: any) {
       // Update the opacity whenever the value changes
       if (binding.value) {
-        el.style.filter = "grayscale(1) contrast(0.8) brightness(0.8)";
+        el.style.opacity = "0.4";
         el.style.pointerEvents = "none";
       } else {
         el.style.filter = "";
+        el.style.opacity = "";
         el.style.pointerEvents = "";
       }
     },
