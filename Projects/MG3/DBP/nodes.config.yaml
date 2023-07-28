@@ -341,8 +341,8 @@ api:
               Type: "instance",
               Instance: instance
             },
-            Text: c.text,
-            TotalVotesScore: c.totalVotesScore,
+            Text: null,
+            TotalVotesScore: instance,
             ThreadID: thread._id,
             Imported: true
           };
