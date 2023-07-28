@@ -84,10 +84,13 @@ computed:
   visiblePosts: | #js
     function() {
       if (!this.thread) return [];
-      const posts1 = [...this.thread.posts].sortBy(p => -p.totalVotesScore);
+      let posts1 = [...this.thread.posts];
       // OP is shown on the left
       posts1.shift();
+      // Sort by score
+      posts1.sortBy(p => -p.totalVotesScore);
       if (!this.teaser) return posts1;
+
       // Thread teaser
       let vPosts = [];
       // Take the first two and the last two posts
