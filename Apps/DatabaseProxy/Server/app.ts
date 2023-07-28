@@ -500,7 +500,7 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
           },
         });
 
-        return res.end(JSON.stringify(docs));
+        return res.end(JSON.stringify(intervals));
 
         for (const interval of intervals) {
           const count =
