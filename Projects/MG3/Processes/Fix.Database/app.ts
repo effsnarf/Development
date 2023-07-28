@@ -13,10 +13,10 @@ import { MongoDatabase } from "@shared/Database/MongoDatabase";
   const db = (await Database.new(config.database)) as MongoDatabase;
   db.options.lowercaseFields = true;
 
-  const chat = await ChatOpenAI.new(Roles.ChatGPT, false, Model.Ada);
-
   const getModInfo = async (text: string) => {
     if (!text) return {};
+
+    const chat = await ChatOpenAI.new(Roles.ChatGPT, false, Model.Ada);
 
     try {
       const result = await chat.send(
