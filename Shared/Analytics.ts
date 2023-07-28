@@ -17,6 +17,57 @@ interface Interval {
   average: number;
 }
 
+class Intervals {
+  /**
+   * Returns an array of intervals between the specified dates.
+   *
+   * @param {number} from - The starting date for generating intervals.
+   * @param {number} [to=Date.now()] - The end date for generating intervals.
+   * @param {number} every - The interval duration in milliseconds.
+   * @returns {Array<Interval>} An array of interval objects with 'from' and 'to' properties.
+   */
+  static get(from: number, to: number, every: number) {
+    if (!to) to = Date.now();
+    const intervals = [] as Interval[];
+    for (let i = from; i < to; i += every) {
+      intervals.push({ from: i, to: i + every - 1 } as Interval);
+    }
+    return intervals;
+  }
+
+  static getSince(since: number, count: number) {
+    const to = Date.now();
+    const from = to - since;
+    const every = since / count;
+    return Intervals.get(from, to, every);
+  }
+
+  static docIsIn(doc: any, interval: Interval, dtFieldName = "created") {
+    return doc[dtFieldName] >= interval.from && doc[dtFieldName] <= interval.to;
+  }
+
+  static isIn(value: number, interval: Interval) {
+    return value >= interval.from && value <= interval.to;
+  }
+
+  static docIsInside(doc: any, interval: Interval) {
+    return (
+      Intervals.isIn(doc.dt.f, interval) && Intervals.isIn(doc.dt.t, interval)
+    );
+  }
+
+  static docPartiallyCovers(doc: any, interval: Interval) {
+    return (
+      !Intervals.docIsInside(doc, interval) &&
+      (Intervals.isIn(doc.dt.f, interval) || Intervals.isIn(doc.dt.t, interval))
+    );
+  }
+
+  static docIsWrapping(doc: any, interval: Interval) {
+    return doc.dt.f < interval.from && doc.dt.t > interval.to;
+  }
+}
+
 interface AnalyticsEvent {
   _id: number;
   dt: { f: number; t: number };
@@ -79,19 +130,6 @@ class Api {
     throw new Error("Invalid request: " + url);
   }
 }
-
-const isIn = (value: number, interval: Interval) =>
-  value.isBetween(interval.from, interval.to);
-
-const docIsInside = (doc: any, interval: Interval) =>
-  isIn(doc.dt.f, interval) && isIn(doc.dt.t, interval);
-
-const docPartiallyCovers = (doc: any, interval: Interval) =>
-  !docIsInside(doc, interval) &&
-  (isIn(doc.dt.f, interval) || isIn(doc.dt.t, interval));
-
-const docIsWrapping = (doc: any, interval: Interval) =>
-  doc.dt.f < interval.from && doc.dt.t > interval.to;
 
 const filters = {
   somehowOverlap(
@@ -227,10 +265,10 @@ class Analytics {
 
     // What's the overlap ratio where the value represents a count
     const getOverlapRatioForSum = (doc: AnalyticsEvent, interval: Interval) => {
-      if (docIsInside(doc, interval)) {
+      if (Intervals.docIsInside(doc, interval)) {
         return 1;
       }
-      if (docPartiallyCovers(doc, interval)) {
+      if (Intervals.docPartiallyCovers(doc, interval)) {
         const { f, t } = doc.dt;
         const intervalLength = interval.to - interval.from;
         const overlap = f.isBetween(interval.from, interval.to)
@@ -238,7 +276,7 @@ class Analytics {
           : t - interval.from;
         return overlap / intervalLength;
       }
-      if (docIsWrapping(doc, interval)) {
+      if (Intervals.docIsWrapping(doc, interval)) {
         const { f, t } = doc.dt;
         const intervalLength = interval.to - interval.from;
         const docLength = t - f;
@@ -253,7 +291,7 @@ class Analytics {
       doc: AnalyticsEvent,
       interval: Interval
     ) => {
-      if (docIsInside(doc, interval)) {
+      if (Intervals.docIsInside(doc, interval)) {
         const { f, t } = doc.dt;
         const intervalLength = interval.to - interval.from;
         const docLength = t - f;
@@ -278,7 +316,7 @@ class Analytics {
 
     if (!exampleDoc) return [];
 
-    let intervals = Analytics.getIntervals(from, to, every);
+    let intervals = Intervals.get(from, to, every);
 
     // Aggregation is different according to the unit and type (count or average)
 
@@ -339,22 +377,13 @@ class Analytics {
           continue;
         }
       }
-      return intervals.map((intr) => intr.docs.average((d: any) => d.v));
+      return intervals.map((intr: Interval) =>
+        intr.docs.average((d: any) => d.v)
+      );
     }
 
     throw new Error("Unsupported aggregation");
   }
-
-  // Returns an array of intervals between the specified dates
-  // [{from: number, to: number}]
-  private static getIntervals(from: number, to: number, every: number) {
-    if (!to) to = Date.now();
-    const intervals = [] as any[];
-    for (let i = from; i < to; i += every) {
-      intervals.push({ from: i, to: i + every - 1 } as Interval);
-    }
-    return intervals;
-  }
 }
 
-export { Analytics, ItemType };
+export { Analytics, Intervals, ItemType };

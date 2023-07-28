@@ -28,7 +28,7 @@ import { Logger } from "@shared/Logger";
 import { TypeScript } from "@shared/TypeScript";
 import { Database } from "@shared/Database/Database";
 import { MongoDatabase } from "@shared/Database/MongoDatabase";
-import { Analytics, ItemType } from "@shared/Analytics";
+import { Analytics, Intervals, ItemType } from "@shared/Analytics";
 import { debug } from "console";
 import { DatabaseProxy } from "../Client/DbpClient";
 // #endregion
@@ -483,6 +483,32 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
       })
     );
     // #endregion
+
+    // #region 📑 Database Analytics
+    httpServer.all(
+      "/:database/analytics/:entity/since/:since",
+      processRequest(async (req: any, res: any) => {
+        const db = await dbs.get(req.params.database);
+        const entity = req.params.entity;
+        const since = req.params.since.deunitify();
+
+        const intervals = Intervals.getSince(since, 60);
+
+        const docs = await db?.find(entity, {
+          created: {
+            $gte: since,
+          },
+        });
+
+        for (const interval of intervals) {
+          const count =
+            docs?.filter((doc) => Intervals.docIsIn(doc, interval)).length || 0;
+          interval.count = count;
+        }
+
+        return res.end(JSON.stringify(intervals));
+      })
+    );
 
     // For /, return "Add a database name to the URL: /[database]"
     httpServer.get("/", (req: any, res: any) => {
