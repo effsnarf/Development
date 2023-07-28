@@ -6,10 +6,12 @@ import { Progress } from "@shared/Progress";
 import { Database } from "@shared/Database/Database";
 import { ChatOpenAI, Roles } from "../../../../Apis/OpenAI/classes/ChatOpenAI";
 import { Model } from "../../../../Apis/OpenAI/classes/OpenAI";
+import { MongoDatabase } from "@shared/Database/MongoDatabase";
 
 (async () => {
   const config = (await Configuration.new()).data;
-  const db = await Database.new(config.database);
+  const db = (await Database.new(config.database)) as MongoDatabase;
+  db.options.lowercaseFields = true;
 
   const chat = await ChatOpenAI.new(Roles.ChatGPT, true, Model.Ada);
 
@@ -46,9 +48,13 @@ import { Model } from "../../../../Apis/OpenAI/classes/OpenAI";
 
   progress = Progress.newAutoDisplay(postsCount);
 
-  for await (const post of db.findIterable("Posts", {
-    Mod: { $exists: false },
-  })) {
+  for await (const post of db.findIterable(
+    "Posts",
+    {
+      Mod: { $exists: false },
+    },
+    {}
+  )) {
     post.Mod = await getModInfo(post.text);
 
     await db.upsert("Posts", post);
