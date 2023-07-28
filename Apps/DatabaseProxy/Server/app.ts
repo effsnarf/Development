@@ -506,7 +506,9 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
           interval.count = count;
         }
 
-        return res.end(JSON.stringify(intervals));
+        const counts = intervals.map((i) => i.count);
+
+        return res.end(JSON.stringify(counts));
       })
     );
 
