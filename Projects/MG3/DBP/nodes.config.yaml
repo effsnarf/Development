@@ -342,7 +342,7 @@ api:
               Instance: instance
             },
             Text: null,
-            TotalVotesScore: instance,
+            TotalVotesScore: instance.totalVotesScore,
             ThreadID: thread._id,
             Imported: true
           };
