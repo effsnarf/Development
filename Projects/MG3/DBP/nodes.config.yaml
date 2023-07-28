@@ -318,7 +318,7 @@ api:
           let thread = {
             PostsCount: comments.length,
             Created: comments[0].created.valueOf(),
-            ImportedFromComments: true,
+            Imported: true,
           };
           thread = await db.upsert("Threads", thread, true);
 
@@ -329,6 +329,7 @@ api:
               Media: null,
               Text: c.text,
               ThreadID: thread._id,
+              Imported: true
             };
           });
 
