@@ -1,15 +1,15 @@
 dom:
-  div:
+  div: 
     .center:
-      div:
+      div: 
         v-text: item.totalVotesScore
       ui.time:
-        ":value": item.created
+        ':value': item.created
     .post-menu:
       v-if: $root.isAdmin
       ui.button:
         text: ❌
-        ":click": onDelete
+        ':click': onDelete
 props:
   item: null
 methods:
