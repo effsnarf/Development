@@ -491,12 +491,13 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
         const db = await dbs.get(req.params.database);
         const entity = req.params.entity;
         const since = req.params.since.deunitify();
+        const from = Date.now() - since;
 
         const intervals = Intervals.getSince(since, 60);
 
         const docs = await db?.find(entity, {
           Created: {
-            $gte: since,
+            $gte: from,
           },
         });
 
