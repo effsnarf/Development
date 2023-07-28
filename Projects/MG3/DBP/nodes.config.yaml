@@ -333,6 +333,22 @@ api:
             };
           });
 
+          let instance = await db.findOne("Instances", { _id: threadMediaInstanceID });
+
+          instance = {
+            _id: instance.instanceID,
+            GeneratorID: instance.generatorID,
+            DisplayName: instance.displayName,
+            UrlName: instance.urlName,
+            ImageID: instance.imageID,
+            Text0: instance.text0,
+            Text1: instance.text1,
+          };
+          
+          posts[0].Media = {
+            Instance: instance
+          };
+
           await db.upsert("Posts", posts);
         }
 
