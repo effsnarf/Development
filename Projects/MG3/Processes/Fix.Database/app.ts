@@ -89,4 +89,6 @@ import { MongoDatabase } from "@shared/Database/MongoDatabase";
   }
 
   progress.done();
+
+  process.exit();
 })();
