@@ -2,7 +2,7 @@ dom:
   div: 
     .post:
       v-if: item
-      ':class': '{ enlarged: isEnlarged }'
+      ':class': getPostClass(item)
       .post-media:
         v-if: item.media
         ':class': getPostMediaClass(item.media)
@@ -31,6 +31,13 @@ methods:
     function () {
       this.enlarged = !this.enlarged;
     }
+  getPostClass: | #js
+    function (post) {
+      const cls = {};
+      cls.enlarged = this.isEnlarged;
+      cls.useless = (post.mod?.shitpost >= 0.5) || (post.mod?.spam >= 0.5);
+      return cls;
+    }
   getPostMediaClass: | #js
     function (media) {
       if (!media) return null;
@@ -45,6 +52,15 @@ computed:
       return ((this.item.index == 0) || this.enlarged);
     }
 style:
+  .post.useless:
+    max-height: 2em
+    overflow: hidden
+    border: none
+    box-shadow: none
+    opacity: 0.3
+  .post.useless:hover:
+    max-height: 20em
+    opacity: 0.6
   .teaser:
     max-height: 15rem
     overflow: hidden
@@ -118,7 +134,7 @@ style:
 name: e-post
 template: >-
   <div class="comp-e-post" path="-1357494135."><div class="post" v-if="item"
-  :class="{ enlarged: isEnlarged }" path="-1357494135.0"><div class="post-media"
+  :class="getPostClass(item)" path="-1357494135.0"><div class="post-media"
   v-if="item.media" :class="getPostMediaClass(item.media)"
   path="-1357494135.0.0"><e-media :item="item.media"
   @click-media-content="onClickMediaContent"

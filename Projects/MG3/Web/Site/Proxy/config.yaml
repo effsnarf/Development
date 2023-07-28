@@ -38,6 +38,7 @@ cache:
     - /create
     - /instance/
     - /img/
+    - /script/
   store:
     prod:
       # - database:
