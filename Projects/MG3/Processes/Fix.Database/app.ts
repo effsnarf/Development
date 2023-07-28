@@ -37,7 +37,7 @@ import { MongoDatabase } from "@shared/Database/MongoDatabase";
 
       return JSON.parse(result);
     } catch (ex: any) {
-      console.log(ex.message.bgRed.white);
+      console.log(ex.message?.bgRed.white);
       return null;
     }
   };
