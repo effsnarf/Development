@@ -610,7 +610,10 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
           m.group == req.params.group &&
           m.name == req.params.method
       ))[0];
-      if (!apiMethod) return res.status(404).send("Method not found");
+      if (!apiMethod)
+        return res
+          .status(404)
+          .send(`Method not found: ${JSON.stringify(req.params)}`);
       const userIP =
         req.headers["x-forwarded-for"] || req.connection.remoteAddress;
       const isAdmin = config.admin.ips.includes(userIP);
