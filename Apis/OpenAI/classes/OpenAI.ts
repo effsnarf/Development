@@ -155,6 +155,7 @@ class OpenAI {
       this.loading.start();
       response = await axios.post<Response>(endpoint, data, {
         headers,
+        timeout: (30).seconds(),
       });
       this.log();
       if (dataProps.messages) {

@@ -18,8 +18,9 @@ import { MongoDatabase } from "@shared/Database/MongoDatabase";
   const getModInfo = async (text: string) => {
     if (!text) return {};
 
-    const result = await chat.send(
-      `Give me 0-1 scores for this text on the following dimensions:
+    try {
+      const result = await chat.send(
+        `Give me 0-1 scores for this text on the following dimensions:
       - shitpost (unintelligable text, nonsense)
       - offensive (racist, sexist, homophobic, etc)
       - spam (advertising)
@@ -32,9 +33,13 @@ import { MongoDatabase } from "@shared/Database/MongoDatabase";
   
       ${text}
       `
-    );
+      );
 
-    return JSON.parse(result);
+      return JSON.parse(result);
+    } catch (ex: any) {
+      console.log(ex.message.bgRed.white);
+      return null;
+    }
   };
 
   let fixed = 0;
