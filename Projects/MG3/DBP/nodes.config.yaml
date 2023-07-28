@@ -328,6 +328,7 @@ api:
               Index: i,
               Media: null,
               Text: c.text,
+              TotalVotesScore: c.totalVotesScore,
               ThreadID: thread._id,
               Imported: true
             };

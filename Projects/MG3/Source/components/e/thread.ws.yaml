@@ -3,7 +3,7 @@ dom:
     div: 
       transition.group:
         tag: ul
-        name: list
+        name: slide
         li:
           v-for: (post, index) in visiblePosts
           ':key': post?._id||0
@@ -14,6 +14,7 @@ dom:
             v-if: getHiddenPostsCount(index)
             v-text: '''('' + getHiddenPostsCount(index) + '' posts…)'''
       e.post.create:
+        v-dim: isLoading
         ':threadID': thread?._id
         ':threadMedia': dThreadMedia
         @created: reload
@@ -30,6 +31,8 @@ props:
 data:
   thread: null
   dThreadMedia: null
+  threadIsEmpty: false
+  tasks: null
   key1: 1
   isLoading: 0
 mounted: | #js
@@ -55,22 +58,33 @@ methods:
     }
   reload: | #js
     async function() {
+      if (!this.tasks) this.tasks = new TaskQueue();
+      this.tasks.enqueue(this._reload);
+    }
+  _reload: | #js
+    async function() {
       // Get the thread
       this.isLoading++;
       try
       {
         this.thread = await this.$root.dbp.threads.select.one(this.threadID, this.dThreadMedia?._id, this.dThreadMedia?.instance?._id);
+        this.threadIsEmpty = !this.thread;
       }
       finally
       {
         this.isLoading--;
       }
     }
+  clear: | #js
+    function() {
+      this.thread = null;
+      this.threadIsEmpty = false;
+    }
 computed:
   visiblePosts: | #js
     function() {
       if (!this.thread) return [];
-      const posts1 = [...this.thread.posts];
+      const posts1 = [...this.thread.posts].sortBy(p => p.totalVotesScore);
       // OP is shown on the left
       posts1.shift();
       if (!this.teaser) return posts1;
@@ -98,7 +112,12 @@ watch:
     immediate: true
   threadMedia:
     handler: | #js
-      async function(threadMedia) {
+      async function(threadMedia, oldThreadMedia) {
+        if (threadMedia?.instance?._id != oldThreadMedia?.instance?._id)
+        {
+          this.tasks.enqueue(this.clear);
+          this.clear();
+        }
         this.dThreadMedia = threadMedia;
         if (!threadMedia) return;
         if (this.dThreadMedia.instance)
@@ -125,14 +144,15 @@ style:
 name: e-thread
 template: >-
   <div class="comp-e-thread" path="1226205107."><div
-  path="1226205107.0"><transition-group tag="ul" name="list"
+  path="1226205107.0"><transition-group tag="ul" name="slide"
   path="1226205107.0.0"><li v-for="(post, index) in visiblePosts"
   :key="post?._id||0" path="1226205107.0.0.0"><e-post :item="post"
   @thread-updated="refresh" path="1226205107.0.0.0.0"></e-post><div
   class="text-center opacity-30" v-if="getHiddenPostsCount(index)" v-text="'(' +
   getHiddenPostsCount(index) + ' posts…)'"
   path="1226205107.0.0.0.1"></div></li></transition-group><e-post-create
-  :threadID="thread?._id" :threadMedia="dThreadMedia" @created="reload"
-  path="1226205107.0.1"></e-post-create><div class="hidden mt-l2"
-  path="1226205107.0.2"><ui-button v-if="$root.isAdmin" :text="'♻ reload'"
-  :click="reload" path="1226205107.0.2.0"></ui-button></div></div></div>
+  v-dim="isLoading" :threadID="thread?._id" :threadMedia="dThreadMedia"
+  @created="reload" path="1226205107.0.1"></e-post-create><div class="hidden
+  mt-l2" path="1226205107.0.2"><ui-button v-if="$root.isAdmin" :text="'♻
+  reload'" :click="reload"
+  path="1226205107.0.2.0"></ui-button></div></div></div>
