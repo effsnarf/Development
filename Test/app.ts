@@ -44,9 +44,10 @@ const malkovitch = new Malkovich();
     offensive (racist, sexist, homophobic, etc)
     spam (advertising)
     quality (well written, interesting)
+    language (two letter language code)
 
     Reply in JSON format:
-    { shitpost: 0.5, spam: 0.5, quality: 0.5 }
+    { shitpost: 0.5, spam: 0.5, quality: 0.5, language: "en" }
 
     The text is:
 

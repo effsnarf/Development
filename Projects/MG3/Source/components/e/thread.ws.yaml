@@ -59,12 +59,12 @@ methods:
   reload: | #js
     async function() {
       if (!this.tasks) this.tasks = new TaskQueue();
+      this.isLoading++;
       this.tasks.enqueue(this._reload);
     }
   _reload: | #js
     async function() {
       // Get the thread
-      this.isLoading++;
       try
       {
         this.thread = await this.$root.dbp.threads.select.one(this.threadID, this.dThreadMedia?._id, this.dThreadMedia?.instance?._id);
