@@ -321,6 +321,19 @@ api:
           thread.posts = allPosts.filter(p => p.threadID == thread._id);
         }
         return threads;
+    Threads.select.recent:
+      args: []
+      code: | #js
+        const threads = await db.find("Threads", { }, { LastPostCreated: -1 }, 15, null, true);
+        for (const thread of threads)
+        {
+          const firstPost = await db.find("Posts", { ThreadID: thread._id }, { Index: 0 }, 1000, null, true);
+          let lastPosts = await db.find("Posts", { ThreadID: thread._id, Index: { $ne: 0 } }, { Index: -1 }, 3, null, true);
+          lastPosts = [...lastPosts].reverse();
+          const posts = [...firstPost, ...lastPosts];
+          thread.posts = posts;
+        }
+        return threads;
     Posts.create.one:
       args: [threadID, threadMedia, text, media]
       code: | #js
@@ -438,11 +451,6 @@ api:
         }
         thread.postsCount--;
         await db.upsert("Threads", thread);
-    Posts.select.recent:
-      args: []
-      code: | #js
-        const posts = await db.find("Posts", { Index: { $ne: 0 } }, { _id: -1 }, 15, null, true);
-        return posts;
     Comments.select.by:
       args: [entityID]
       code: | #js

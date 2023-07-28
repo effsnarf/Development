@@ -27,6 +27,7 @@ dom:
       v-slot: middle
       .flex.ver.gap-1:
         content.meet.the.meme: null
+        content.posts.recent: null
         content.stream:
           ref: stream1
           item-type: e.instance
@@ -81,8 +82,8 @@ template: >-
   v-slot:left
   path="838274270.1"><e-generator-search></e-generator-search></template><template
   v-slot:middle path="838274270.2"><div class="flex ver gap-1"
-  path="838274270.2.0"><content-meet-the-meme></content-meet-the-meme><content-stream
+  path="838274270.2.0"><content-meet-the-meme></content-meet-the-meme><content-posts-recent></content-posts-recent><content-stream
   ref="stream1" item-type="e.instance" :get-more-items="getMoreInstances"
   grid-class="grid-3"
-  path="838274270.2.0.1"></content-stream></div></template><template
+  path="838274270.2.0.2"></content-stream></div></template><template
   v-slot:right path="838274270.3"></template></site>

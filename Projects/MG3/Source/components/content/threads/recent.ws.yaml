@@ -1,14 +1,14 @@
 dom:
   div:
-    e.post:
-      v-for: post in posts
-      ':item': post
+    e.thread.teaser:
+      v-for: thread in threads
+      ":thread": thread
 props: null
 data:
   posts: []
 mounted: | #js
   async function() {
-    this.posts = await this.$root.dbp.posts.select.recent();
+    this.threads = await this.$root.dbp.threads.select.recent();
   }
 name: content-posts-recent
 template: >-
