@@ -1,0 +1,82 @@
+dom:
+  e.format.base:
+    ':builder': builder
+    ':media': media
+    ':editable': editable
+    ':builder-source-to-template': builderSourceToTemplate
+    @cancel: $emit('cancel')
+props:
+  builder: null
+  media: null
+  editable: false
+data:
+  temp: null
+methods:
+  builderSourceToTemplate: | #js
+    function(source) {
+      if (!source) return null;
+
+      const temp = {
+        id: this.$root.getUniqueClientID(),
+        type: "grid",
+        visible: true,
+        aspectRatio: null,
+        gap: 0.02,
+        items: [],
+        grid: {
+          width: 1
+        }
+      };
+
+      for (const item of source.items)
+      {
+        temp.items.push(this.getNewItem(item));
+      }
+
+      return temp;
+    }
+  getNewItem: | #js
+    function(sourceItem) {
+      console.log(sourceItem);
+      
+      const item = {
+        id: this.$root.getUniqueClientID(),
+        type: sourceItem.type,
+        visible: true,
+        editable: (sourceItem.editable || true),
+      }
+
+      if (item.type == "caption")
+      {
+        item.text = sourceItem.text;
+        item.font = sourceItem.font;
+        item.color = sourceItem.color;
+        item.align = sourceItem.align || {h: null, v: null};
+        item.uppercase = sourceItem.uppercase;
+      }
+
+      if (item.type == "image")
+      {
+        item.trans = sourceItem.trans || {
+            pos: {
+                x: 0.5,
+                y: 0.5
+            },
+            scale: 1
+        };
+        item.shadow = sourceItem.shadow || {
+          x: 0,
+          y: 0,
+          blur: 0,
+          color: '#000000',
+          opacity: 1
+        }
+      }
+
+      return item;
+    }
+name: e-format-layers
+template: >-
+  <e-format-base class="comp-e-format-layers" :builder="builder" :media="media"
+  :editable="editable" :builder-source-to-template="builderSourceToTemplate"
+  @cancel="$emit('cancel')" path="938677584."></e-format-base>

@@ -1,0 +1,82 @@
+dom:
+  div:
+    ':style': mediaStyle
+    e.template.editor:
+      ref: TemplateEditor1
+      ':builder': cBuilder
+      ':temp': temp
+      ':editable': editable
+      ':show-property-editor': 'false'
+      @media-created: onMediaCreated
+      @cancel: $emit('cancel')
+props:
+  builder: null
+  media: null
+  editable: false
+  builderSourceToTemplate: null
+data:
+  temp: null
+methods:
+  applyMediaToTemplate: | #js
+    async function (media, temp) {
+      if (!media) return null;
+      let index = 0;
+      // Walk the tree and set caption text and image IDs
+      // [{text: 'test', {image: {_id: 1}}, ..]
+      const walk = (node) => {
+        const item = media.content.items[index];
+        Object.assign(node, item);
+        index++;
+        for (const child of (node.items||[])) walk(child);
+      };
+      walk(temp);
+    }
+  initFromBuilder: | #js
+    function (builder) {
+      this.temp = this.builderSourceToTemplate(builder?.source);
+    }
+  onMediaCreated: | #js
+    async function (media) {
+      this.initFromBuilder(this.builder);
+    }
+  getMediaStyle: | #js
+    function (builder) {
+      const style = {};
+      style.margin = "auto";
+      if (builder?.source?.size?.max?.width) style['max-width'] = `${(parseInt(builder?.source?.size?.max?.width) + (!this.editable ? 0 : 15))}em`;
+      return style;
+    }
+computed:
+  cBuilder: | #js
+    function () {
+      return this.builder || this.$root.builders.all[this.media?.builderID];
+    }
+  mediaStyle: | #js
+    function () {
+      return this.getMediaStyle(this.cBuilder);
+    }
+watch:
+  builder:
+    handler: | #js
+      function(builder) {
+        if (!builder) return;
+        this.initFromBuilder(builder);
+      }
+    immediate: true
+  media:
+    handler: | #js
+      async function(media) {
+        if (!media) return;
+        const builder = await this.$root.getBuilder(media.builderID);
+        const temp = this.builderSourceToTemplate(builder.source);
+        this.applyMediaToTemplate(media, temp);
+        this.temp = temp;
+      }
+    immediate: true
+name: e-format-base
+template: >-
+  <div class="comp-e-format-base" :style="mediaStyle"
+  path="-808258977."><e-template-editor ref="TemplateEditor1"
+  :builder="cBuilder" :temp="temp" :editable="editable"
+  :show-property-editor="false" @media-created="onMediaCreated"
+  @cancel="$emit('cancel')" path="-808258977.0"></e-template-editor></div>

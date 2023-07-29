@@ -238,10 +238,18 @@ interface MgParams {
           self.$emit("scroll");
         });
       },
-      async getBuilder(builderID: number) {
+      async getBuilder(urlNameOrID: string | number) {
         const self = this as any;
         await self.ensureBuilders();
-        return self.builders.all[builderID];
+        if (typeof urlNameOrID == "string") {
+          return Object.values(ideVueApp.builders.all).find(
+            (b: any) => b.urlName == urlNameOrID
+          );
+        }
+        if (typeof urlNameOrID == "number") {
+          return self.builders.all[urlNameOrID];
+        }
+        throw new Error("Invalid builder ID");
       },
       async ensureBuilders() {
         const self = this as any;

@@ -107,6 +107,12 @@ class Objects {
   }
 
   static toCamelCaseKeys(obj: any): any {
+    if (!obj) return obj;
+    if (typeof obj !== "object") return obj;
+    if (Array.isArray(obj)) return obj.map(Objects.toCamelCaseKeys);
+    if (obj instanceof Date) return obj;
+    if (obj instanceof RegExp) return obj;
+    // Traverse the object and convert all keys to camel case
     const result = {} as any;
     for (const key of Object.keys(obj)) {
       let value = obj[key];

@@ -791,7 +791,16 @@ if (typeof String !== "undefined") {
     // Search for the long unit name ("seconds", "bytes", "percentages")
     for (const unitClass of UnitClasses) {
       let index = unitClass.longUnits.indexOf(word);
-      if (index != -1) return unitClass.units[index];
+      if (index != -1) {
+        const lus = unitClass.longUnits
+          .map((lu) => lu[0])
+          .join("")
+          .toLowerCase();
+        const sus = unitClass.units.join("").toLowerCase();
+        if (lus == sus) return unitClass.units[index];
+        if (word.startsWith("month")) return "M";
+        return word[0];
+      }
     }
     // Search for the short unit name ("s", "B", "%")
     for (const unitClass of UnitClasses) {

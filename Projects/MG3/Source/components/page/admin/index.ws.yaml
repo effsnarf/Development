@@ -8,30 +8,41 @@ dom:
       v-slot: article
       .app:
         .column: 
-          ui.select: 
-            ':options': Object.keys(options)
-            v-model: catValue
-            input-type: value
+          div: 
+            v-if: '!entityValue'
+            ui.select: 
+              ':options': Object.keys(options)
+              v-model: catValue
+              input-type: value
+            ui.select: 
+              ':options': options[catValue]
+              v-model: eventValue
+              input-type: value
+          .mt-l2:
+            ui.select: 
+              ':options': entities
+              v-model: entityValue
+              input-type: value
         .column: 
-          ui.select: 
-            ':options': options[catValue]
-            v-model: eventValue
-            input-type: value
-        .column: 
-          ui.select: 
+          ui.select:
             ':options': lastOptions
             v-model: lastValue
             input-type: value
-        div:
+        div: 
           .bars:
             .bar:
               ui.chart2:
+                ':entity': entityValue
                 ':app': '''MG'''
                 ':category': catValue
                 ':event': eventValue
                 ':last': lastValue
                 ':every': every
 data:
+  entities:
+    - Posts
+    - Medias
+    - Instances
   options:
     network:
       - requests
@@ -40,12 +51,13 @@ data:
       - active.time
   catValue: network
   eventValue: requests
+  entityValue: null
   lastOptions:
-    - 1 month
-    - 1 week
-    - 1 day
-    - 1 hour
-  lastValue: 1 hour
+    - 1 months
+    - 1 weeks
+    - 1 days
+    - 1 hours
+  lastValue: 1 hours
   barsValue: 100
 methods:
   getCatOptions: | #js
@@ -86,15 +98,19 @@ template: >-
   path="-1156850540."><template v-slot:left
   path="-1156850540.0"></template><template v-slot:article
   path="-1156850540.1"><div class="app" path="-1156850540.1.0"><div
-  class="column" path="-1156850540.1.0.0"><ui-select
-  :options="Object.keys(options)" v-model="catValue" input-type="value"
-  path="-1156850540.1.0.0.0"></ui-select></div><div class="column"
-  path="-1156850540.1.0.1"><ui-select :options="options[catValue]"
-  v-model="eventValue" input-type="value"
-  path="-1156850540.1.0.1.0"></ui-select></div><div class="column"
-  path="-1156850540.1.0.2"><ui-select :options="lastOptions" v-model="lastValue"
-  input-type="value" path="-1156850540.1.0.2.0"></ui-select></div><div
-  path="-1156850540.1.0.3"><div class="bars" path="-1156850540.1.0.3.0"><div
-  class="bar" path="-1156850540.1.0.3.0.0"><ui-chart2 :app="'MG'"
-  :category="catValue" :event="eventValue" :last="lastValue" :every="every"
-  path="-1156850540.1.0.3.0.0.0"></ui-chart2></div></div></div></div></template></site>
+  class="column" path="-1156850540.1.0.0"><div v-if="!entityValue"
+  path="-1156850540.1.0.0.0"><ui-select :options="Object.keys(options)"
+  v-model="catValue" input-type="value"
+  path="-1156850540.1.0.0.0.0"></ui-select><ui-select
+  :options="options[catValue]" v-model="eventValue" input-type="value"
+  path="-1156850540.1.0.0.0.1"></ui-select></div><div class="mt-l2"
+  path="-1156850540.1.0.0.1"><ui-select :options="entities"
+  v-model="entityValue" input-type="value"
+  path="-1156850540.1.0.0.1.0"></ui-select></div></div><div class="column"
+  path="-1156850540.1.0.1"><ui-select :options="lastOptions" v-model="lastValue"
+  input-type="value" path="-1156850540.1.0.1.0"></ui-select></div><div
+  path="-1156850540.1.0.2"><div class="bars" path="-1156850540.1.0.2.0"><div
+  class="bar" path="-1156850540.1.0.2.0.0"><ui-chart2 :entity="entityValue"
+  :app="'MG'" :category="catValue" :event="eventValue" :last="lastValue"
+  :every="every"
+  path="-1156850540.1.0.2.0.0.0"></ui-chart2></div></div></div></div></template></site>

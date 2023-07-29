@@ -31,7 +31,7 @@ methods:
       this.clear();
       if (!urlName) return;
       this.urlName = urlName;
-      this.builder = await this.$root.dbp.builders.select.one(urlName);
+      this.builder = await this.$root.getBuilder(urlName);
     }
   clear: | #js
     function () {

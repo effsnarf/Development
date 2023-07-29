@@ -89,11 +89,7 @@ class MongoDatabase extends DatabaseBase {
 
     let docs = await this.aggregate(collectionName, pipeline);
 
-    if (lowercaseFields)
-      docs = docs.map((d) => {
-        if (typeof d == "object") return Objects.toCamelCaseKeys(d);
-        return d;
-      });
+    if (lowercaseFields) docs = Objects.toCamelCaseKeys(docs) as any[];
 
     return docs;
   }

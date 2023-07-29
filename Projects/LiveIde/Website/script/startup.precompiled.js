@@ -176,9 +176,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "../../../../LiveIde/Website/script/1690544076435.ts":
+/***/ "../../../../LiveIde/Website/script/1690614274528.ts":
 /*!***********************************************************!*\
-  !*** ../../../../LiveIde/Website/script/1690544076435.ts ***!
+  !*** ../../../../LiveIde/Website/script/1690614274528.ts ***!
   \***********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -407,10 +407,16 @@ const helpers = {
                     self.$emit("scroll");
                 });
             },
-            async getBuilder(builderID) {
+            async getBuilder(urlNameOrID) {
                 const self = this;
                 await self.ensureBuilders();
-                return self.builders.all[builderID];
+                if (typeof urlNameOrID == "string") {
+                    return Object.values(ideVueApp.builders.all).find((b) => b.urlName == urlNameOrID);
+                }
+                if (typeof urlNameOrID == "number") {
+                    return self.builders.all[urlNameOrID];
+                }
+                throw new Error("Invalid builder ID");
             },
             async ensureBuilders() {
                 const self = this;
@@ -2430,8 +2436,18 @@ if (typeof String !== "undefined") {
         // Search for the long unit name ("seconds", "bytes", "percentages")
         for (const unitClass of UnitClasses) {
             let index = unitClass.longUnits.indexOf(word);
-            if (index != -1)
-                return unitClass.units[index];
+            if (index != -1) {
+                const lus = unitClass.longUnits
+                    .map((lu) => lu[0])
+                    .join("")
+                    .toLowerCase();
+                const sus = unitClass.units.join("").toLowerCase();
+                if (lus == sus)
+                    return unitClass.units[index];
+                if (word.startsWith("month"))
+                    return "M";
+                return word[0];
+            }
         }
         // Search for the short unit name ("s", "B", "%")
         for (const unitClass of UnitClasses) {
@@ -3512,7 +3528,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690544076435.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690614274528.ts");
 /******/ 	
 /******/ })()
 ;
