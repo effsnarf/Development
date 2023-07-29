@@ -6,13 +6,14 @@ dom:
       ':builder': cBuilder
       ':temp': temp
       ':editable': editable
-      ':show-property-editor': 'false'
+      ':show-property-editor': showPropertyEditor
       @media-created: onMediaCreated
       @cancel: $emit('cancel')
 props:
   builder: null
   media: null
   editable: false
+  showPropertyEditor: false
   builderSourceToTemplate: null
 data:
   temp: null
@@ -78,5 +79,5 @@ template: >-
   <div class="comp-e-format-base" :style="mediaStyle"
   path="-808258977."><e-template-editor ref="TemplateEditor1"
   :builder="cBuilder" :temp="temp" :editable="editable"
-  :show-property-editor="false" @media-created="onMediaCreated"
+  :show-property-editor="showPropertyEditor" @media-created="onMediaCreated"
   @cancel="$emit('cancel')" path="-808258977.0"></e-template-editor></div>

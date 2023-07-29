@@ -178,7 +178,13 @@ const urlStrLen = 40;
         `${`Removing background from`.gray} ${originalImagePath.yellow}`
       );
       // rembg i [originalImagePath] [noBgImagePath]
-      const rembg = spawn("rembg", ["i", originalImagePath, noBgImagePath]);
+      const rembg = spawn("rembg", [
+        "i",
+        "-m",
+        "isnet-general-use",
+        originalImagePath,
+        noBgImagePath,
+      ]);
       rembg.stdout.on("data", (data: any) => {
         // debug(`rembg stdout: ${data.shorten(50)}`);
       });

@@ -1,7 +1,7 @@
 dom:
   div: 
     v-if: item
-    ':class': '{ editable: editable }'
+    ':class': '{ editable: isEditable }'
     .text:
       ref: sizeRef1
       ':class': getCssClass(item)
@@ -9,7 +9,7 @@ dom:
       div: 
         ':class': getTextContentClass(item)
         v-html: getItemText(item)
-        ':title': '!editable ? '''' : ''✏️ edit'''
+        ':title': '!isEditable ? '''' : ''✏️ edit'''
         @click: onClickText
       transition:
         name: slide
@@ -19,6 +19,7 @@ dom:
           v-model: item.text
 name: e-template-caption-item
 props:
+  temp: null
   item: null
   editable: false
 data:
@@ -35,12 +36,12 @@ methods:
   getItemText: | #js
     function (item) {
       let text = this.$root.textToHtml(item.text);
-      if (this.editable && item.editable) text = `${text||"[text]"}`;
+      if (this.editable && this.item.editable) text = `${text||"[text]"}`;
       return text;
     }
   onClickText: | #js
     function () {
-      if (this.editable && this.item.editable)
+      if (this.isEditable)
       {
         this.showEditor = !this.showEditor;
         return;
@@ -63,7 +64,7 @@ methods:
   getCssClass: | #js
     function(item) {
       const cls = {};
-      cls.clickable = this.editable;
+      cls.clickable = this.isEditable;
       cls[`h-${item.align.h}`] = true;
       cls[`v-${item.align.v}`] = true;
       return cls;
@@ -94,7 +95,7 @@ methods:
   getFontSize: | #js
     function (s, scale = 1) {
       if (!this.width) return 0;
-      const strLen = (s.length || 1);
+      const strLen = (s?.length || 1);
       let size = Math.min(3, Math.max(14, (36 - (strLen / 6))) / 50 *  this.width / 150);
       size = size * 2;
       if (this.item.scale) size *= this.item.scale;
@@ -102,6 +103,10 @@ methods:
       return `${size}vh`;
     }
 computed:
+  isEditable: | #js
+    function () {
+      return this.editable && this.item.editable && (!this.temp.layers);
+    }
   itemStyle: | #js
     function () {
       return this.getStyle(this.item);
@@ -155,10 +160,10 @@ style:
     display: inline-block
 template: >-
   <div class="comp-e-template-caption-item" v-if="item" :class="{ editable:
-  editable }" path="128142918."><div class="text" ref="sizeRef1"
+  isEditable }" path="128142918."><div class="text" ref="sizeRef1"
   :class="getCssClass(item)" :style="itemStyle" path="128142918.0"><div
   :class="getTextContentClass(item)" v-html="getItemText(item)"
-  :title="!editable ? '' : '✏️ edit'" @click="onClickText"
+  :title="!isEditable ? '' : '✏️ edit'" @click="onClickText"
   path="128142918.0.0"></div><transition name="slide"
   path="128142918.0.1"><ui-text-box v-if="showEditor" :class="getCssClass(item)"
   v-model="item.text"

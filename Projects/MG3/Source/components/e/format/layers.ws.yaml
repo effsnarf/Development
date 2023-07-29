@@ -19,6 +19,7 @@ methods:
       const temp = {
         id: this.$root.getUniqueClientID(),
         type: "grid",
+        layers: true,
         visible: true,
         aspectRatio: null,
         gap: 0.02,
@@ -37,8 +38,6 @@ methods:
     }
   getNewItem: | #js
     function(sourceItem) {
-      console.log(sourceItem);
-      
       const item = {
         id: this.$root.getUniqueClientID(),
         type: sourceItem.type,
@@ -49,6 +48,7 @@ methods:
       if (item.type == "caption")
       {
         item.text = sourceItem.text;
+        item.hint = sourceItem.hint;
         item.font = sourceItem.font;
         item.color = sourceItem.color;
         item.align = sourceItem.align || {h: null, v: null};
@@ -57,6 +57,8 @@ methods:
 
       if (item.type == "image")
       {
+        item.imageID = (sourceItem.imageID || null);
+        item.removeBackground = (sourceItem.removeBackground || true);
         item.trans = sourceItem.trans || {
             pos: {
                 x: 0.5,
@@ -71,6 +73,14 @@ methods:
           color: '#000000',
           opacity: 1
         }
+      }
+
+      if (item.type == "rainbow")
+      {
+        item.colors = (sourceItem.colors || ["#000000", "#ffffff", "#000000", "#ffffff", "#000000", "#ffffff"]);
+        item.colorsCount = (sourceItem.colorsCount || 2);
+        item.pattern = (sourceItem.pattern || "pizza");
+        item.slices = (sourceItem.slices || 6);
       }
 
       return item;

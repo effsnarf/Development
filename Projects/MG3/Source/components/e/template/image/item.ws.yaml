@@ -37,8 +37,8 @@ methods:
       item.trans.scale += ds;
     }
   onImageLoad: | #js
-    function(e) {
-      this.$emit('image-load', e);
+    function(src) {
+      this.$emit('image-load', this.item, src);
     }
   refresh: | #js
     function() {

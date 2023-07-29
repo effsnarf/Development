@@ -32,7 +32,7 @@ dom:
             td: 
               .flex:
                 ui.button: 
-                  v-text: '''➖'''
+                  ':text': '''➖'''
                   ':click': removeColor
                 input: 
                   class: clickable
@@ -40,7 +40,7 @@ dom:
                   v-for: index in item.colorsCount
                   v-model: item.colors[index-1]
                 ui.button: 
-                  v-text: '''➕'''
+                  ':text': '''➕'''
                   ':click': addColor
 props:
   item: null
@@ -72,6 +72,8 @@ watch:
       }
     deep: true
 style:
+  button:
+    padding: 0 0.3em !important
   ul:
     display: flex
   li:
@@ -97,8 +99,8 @@ template: >-
   path="637897232.0.0.0.1.1.0"/></td></tr><tr path="637897232.0.0.0.2"><th
   v-text="'colors'" path="637897232.0.0.0.2.0"></th><td
   path="637897232.0.0.0.2.1"><div class="flex"
-  path="637897232.0.0.0.2.1.0"><ui-button v-text="'➖'" :click="removeColor"
+  path="637897232.0.0.0.2.1.0"><ui-button :text="'➖'" :click="removeColor"
   path="637897232.0.0.0.2.1.0.0"></ui-button><input class="clickable"
   type="color" v-for="index in item.colorsCount" v-model="item.colors[index-1]"
-  path="637897232.0.0.0.2.1.0.1"/><ui-button v-text="'➕'" :click="addColor"
+  path="637897232.0.0.0.2.1.0.1"/><ui-button :text="'➕'" :click="addColor"
   path="637897232.0.0.0.2.1.0.2"></ui-button></div></td></tr></tbody></table></div></div>

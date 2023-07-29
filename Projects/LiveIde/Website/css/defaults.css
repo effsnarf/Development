@@ -296,7 +296,7 @@ code
 
 button
 {
-  padding: 0.3em 1em !important;
+  padding: 0.5em 1em !important;
   box-shadow: -3px 3px 2px #00000060;
   cursor: pointer;
   font-size: 1em;
@@ -317,7 +317,7 @@ button /* .ide-button:hover */
 
 pre, input, textarea, select, option, .ide-checkbox
 {
-  padding: 0.5em 0.5em !important;
+  padding: 0.3em 0.5em !important;
   background: linear-gradient(to left, #303030, #101010);
   box-shadow: inset -2px 2px 2px #000;
   text-shadow: -3px 3px 2px #000;
@@ -357,7 +357,6 @@ input, input[type=text], select
 input[type="color"]
 {
   padding: 0 !important;
-  min-height: 3em;
   cursor: pointer;
 }
 

@@ -14,22 +14,33 @@ dom:
           ':get-children': (node) => node.items
           @node-select: onNodeSelect
       .div2:
-        ui.image.select:
-          class: hidden
-          ref: imageSelect1
-          v-if: (selectedItem?.type=='image')
-          v-model: selectedItem.imageID
-        e.template.grid.item:
-          ':item': temp
-          ':editable': editable
-        .flex.justify-around.mt-l2:
+        ui.file.dropzone:
+          ':enabled': (editable && hasOnlyOneImage)
+          ':show-upload-button': 'false'
+          @input: onImageUpload
+          ui.movable:
+            ':enabled': editable
+            @drag-by: >-
+              ({ dx, dy }) => getOnlyImageComp()?.onItemDragBy(imageItems[0], {
+              dx, dy })
+            @scale-by: (ds) => getOnlyImageComp()?.onItemScaleBy(imageItems[0], ds)
+            e.template.grid.item:
+              class: main-content
+              ':temp': temp
+              ':item': temp
+              ':editable': editable
+              @image-load: (item, src) => onItemImageLoad(item, src)
+        div: 
           v-if: editable
-          ui.button: 
-            ':text': '''✖️ cancel'''
-            ':click': () => $emit('cancel')
-          ui.button: 
-            ':text': '''✔️ create'''
-            ':click': createMedia
+          e.template.editors:
+            ':temp': temp
+          .flex.justify-around.mt-l2:
+            ui.button: 
+              ':text': '''✖️ cancel'''
+              ':click': () => $emit('cancel')
+            ui.button: 
+              ':text': '''✔️ create'''
+              ':click': createMedia
         div: 
           v-if: selectedItem && showPropertyEditor
           ui.section: 
@@ -58,17 +69,17 @@ dom:
           ui.video: 
             src: /video/interface/image/drop.webm
           div: 
-            v-text: '''Drop images on boxes to upload.'''
+            v-text: '''Drop images to upload.'''
         .message: 
           ui.video: 
             src: /video/interface/image/move.webm
           div: 
-            v-text: '''Drag images inside boxes to move.'''
+            v-text: '''Drag images to move.'''
         .message: 
           ui.video: 
             src: /video/interface/image/scale.webm
           div: 
-            v-text: '''Ctrl-drag images inside boxes to resize.'''
+            v-text: '''Ctrl-drag images to resize.'''
         .message: 
           v-if: hasMoreThanOneImagePerGrid
           class: large-video
@@ -156,6 +167,27 @@ methods:
   init: | #js
     async function() {
     }
+  onItemImageLoad: | #js
+    function(item, src) {
+      const comps = this.findComponents(item)
+        .filter(c => c.onItemImageLoad);
+      comps.forEach(c => c.onItemImageLoad(src));
+    }
+  onImageUpload: | #js
+    function(imageID) {
+      if (!this.hasOnlyOneImage) return;
+      this.imageItems[0].imageID = imageID;
+    }
+  findComponents: | #js
+    function(item) {
+      if (!item) return null;
+      return ideVueApp.getDescendants(this, (c) => c.$props.item==item);
+    }
+  getOnlyImageComp: | #js
+    function() {
+      if (!this.hasOnlyOneImage) return;
+      return ideVueApp.getDescendants(this, (c) => c.$data._?.comp?.name=="e.template.image.item")[0];
+    }
   canApplyEffects: | #js
     function(item) {
       if (!item) return false;
@@ -218,6 +250,10 @@ computed:
     function() {
       return this.temp.items.filter(item => item.type === 'image');
     }
+  hasOnlyOneImage: | #js
+    function() {
+      return this.imageItems.length == 1;
+    }
   showTree: | #js
     function() {
       return this.editable && this.hasMoreThanOneImagePerGrid;
@@ -247,6 +283,8 @@ watch:
     }
 name: e-template-editor
 style:
+  .main-content:
+    border: 2px solid gray
   .div1:
     display: grid
     gap: 1em
@@ -310,39 +348,46 @@ template: >-
   :root="temp" :initial-expanded="2" item-type="e.template.item.icon"
   :get-item="(node) =&gt; node" :get-children="(node) =&gt; node.items"
   @node-select="onNodeSelect" path="-650358312.0.0.0"></ui-tree></div><div
-  class="div2" path="-650358312.0.1"><ui-image-select class="hidden"
-  ref="imageSelect1" v-if="(selectedItem?.type=='image')"
-  v-model="selectedItem.imageID"
-  path="-650358312.0.1.0"></ui-image-select><e-template-grid-item :item="temp"
-  :editable="editable" path="-650358312.0.1.1"></e-template-grid-item><div
-  class="flex justify-around mt-l2" v-if="editable"
-  path="-650358312.0.1.2"><ui-button :text="'✖️ cancel'" :click="() =&gt;
-  $emit('cancel')" path="-650358312.0.1.2.0"></ui-button><ui-button :text="'✔️
-  create'" :click="createMedia" path="-650358312.0.1.2.1"></ui-button></div><div
-  v-if="selectedItem &amp;&amp; showPropertyEditor"
-  path="-650358312.0.1.3"><ui-section :title="selectedItem.type"
-  v-model="showFilters" :opposite="true" path="-650358312.0.1.3.0"><transition
-  name="slide2" path="-650358312.0.1.3.0.0"><component ref="selectedItemEditor1"
+  class="div2" path="-650358312.0.1"><ui-file-dropzone :enabled="(editable
+  &amp;&amp; hasOnlyOneImage)" :show-upload-button="false"
+  @input="onImageUpload" path="-650358312.0.1.0"><ui-movable :enabled="editable"
+  @drag-by="({ dx, dy }) =&gt; getOnlyImageComp()?.onItemDragBy(imageItems[0], {
+  dx, dy })" @scale-by="(ds) =&gt;
+  getOnlyImageComp()?.onItemScaleBy(imageItems[0], ds)"
+  path="-650358312.0.1.0.0"><e-template-grid-item class="main-content"
+  :temp="temp" :item="temp" :editable="editable" @image-load="(item, src) =&gt;
+  onItemImageLoad(item, src)"
+  path="-650358312.0.1.0.0.0"></e-template-grid-item></ui-movable></ui-file-dropzone><div
+  v-if="editable" path="-650358312.0.1.1"><e-template-editors :temp="temp"
+  path="-650358312.0.1.1.0"></e-template-editors><div class="flex justify-around
+  mt-l2" path="-650358312.0.1.1.1"><ui-button :text="'✖️ cancel'" :click="()
+  =&gt; $emit('cancel')" path="-650358312.0.1.1.1.0"></ui-button><ui-button
+  :text="'✔️ create'" :click="createMedia"
+  path="-650358312.0.1.1.1.1"></ui-button></div></div><div v-if="selectedItem
+  &amp;&amp; showPropertyEditor" path="-650358312.0.1.2"><ui-section
+  :title="selectedItem.type" v-model="showFilters" :opposite="true"
+  path="-650358312.0.1.2.0"><transition name="slide2"
+  path="-650358312.0.1.2.0.0"><component ref="selectedItemEditor1"
   :is="selectedItemEditorType" :item="selectedItem"
   @toggle-disabled="toggleDisabled($event)" :key="selectedItemIndex"
-  path="-650358312.0.1.3.0.0.0"></component></transition></ui-section><ui-section
+  path="-650358312.0.1.2.0.0.0"></component></transition></ui-section><ui-section
   v-if="canApplyEffects(selectedItem)" title="effects" v-model="showFilters"
-  path="-650358312.0.1.3.1"><e-template-item-filters
+  path="-650358312.0.1.2.1"><e-template-item-filters
   :imageID="selectedItem.imageID" v-model="selectedItem.filters" @input="()
   =&gt; onItemChange(selectedItem)"
-  path="-650358312.0.1.3.1.0"></e-template-item-filters></ui-section></div></div><div
+  path="-650358312.0.1.2.1.0"></e-template-item-filters></ui-section></div></div><div
   class="help" v-if="editable" path="-650358312.0.2"><div class="message"
   path="-650358312.0.2.0"><ui-video src="/video/interface/image/drop.webm"
-  path="-650358312.0.2.0.0"></ui-video><div v-text="'Drop images on boxes to
-  upload.'" path="-650358312.0.2.0.1"></div></div><div class="message"
+  path="-650358312.0.2.0.0"></ui-video><div v-text="'Drop images to upload.'"
+  path="-650358312.0.2.0.1"></div></div><div class="message"
   path="-650358312.0.2.1"><ui-video src="/video/interface/image/move.webm"
-  path="-650358312.0.2.1.0"></ui-video><div v-text="'Drag images inside boxes to
-  move.'" path="-650358312.0.2.1.1"></div></div><div class="message"
+  path="-650358312.0.2.1.0"></ui-video><div v-text="'Drag images to move.'"
+  path="-650358312.0.2.1.1"></div></div><div class="message"
   path="-650358312.0.2.2"><ui-video src="/video/interface/image/scale.webm"
-  path="-650358312.0.2.2.0"></ui-video><div v-text="'Ctrl-drag images inside
-  boxes to resize.'" path="-650358312.0.2.2.1"></div></div><div
-  class="large-video message" v-if="hasMoreThanOneImagePerGrid"
-  path="-650358312.0.2.3"><ui-video src="/video/interface/image/visible.webm"
+  path="-650358312.0.2.2.0"></ui-video><div v-text="'Ctrl-drag images to
+  resize.'" path="-650358312.0.2.2.1"></div></div><div class="large-video
+  message" v-if="hasMoreThanOneImagePerGrid" path="-650358312.0.2.3"><ui-video
+  src="/video/interface/image/visible.webm"
   path="-650358312.0.2.3.0"></ui-video><div v-text="'Toggle image visibility
   using the tree on the left.'" path="-650358312.0.2.3.1"></div></div><div
   class="large-video message" v-if="hasMoreThanOneImagePerGrid"

@@ -176,9 +176,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "../../../../LiveIde/Website/script/1690614274528.ts":
+/***/ "../../../../LiveIde/Website/script/1690623050018.ts":
 /*!***********************************************************!*\
-  !*** ../../../../LiveIde/Website/script/1690614274528.ts ***!
+  !*** ../../../../LiveIde/Website/script/1690623050018.ts ***!
   \***********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -1777,11 +1777,21 @@ class Objects {
         traverse(obj, "", obj, [], include);
     }
     static toCamelCaseKeys(obj) {
+        if (!obj)
+            return obj;
+        if (typeof obj !== "object")
+            return obj;
+        if (Array.isArray(obj))
+            return obj.map(Objects.toCamelCaseKeys);
+        if (obj instanceof Date)
+            return obj;
+        if (obj instanceof RegExp)
+            return obj;
+        // Traverse the object and convert all keys to camel case
         const result = {};
         for (const key of Object.keys(obj)) {
             let value = obj[key];
-            if (value && !Array.isArray(value) && typeof value === "object")
-                value = Objects.toCamelCaseKeys(value);
+            value = Objects.toCamelCaseKeys(value);
             result[key.toCamelCase()] = value;
         }
         return result;
@@ -3528,7 +3538,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690614274528.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690623050018.ts");
 /******/ 	
 /******/ })()
 ;

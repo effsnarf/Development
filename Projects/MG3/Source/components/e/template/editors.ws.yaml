@@ -1,0 +1,28 @@
+dom:
+  ul:
+    li:
+      v-for: item in items
+      component:
+        ':is': '''e-template-'' + item.type + ''-editor'''
+        ':item': item
+        ':minimal': true
+props:
+  temp: null
+data: null
+computed:
+  items: | #js
+    function() {
+      if (!this.temp) return []
+      const items = [];
+      ["image", "caption", "rainbow"].forEach(type => {
+        items.push(...this.temp.items.filter(item => item.type == type));
+      });
+      return items;
+    }
+style: null
+name: e-template-editors
+template: >-
+  <ul class="comp-e-template-editors" path="1313728923."><li v-for="item in
+  items" path="1313728923.0"><component :is="'e-template-' + item.type +
+  '-editor'" :item="item" :minimal="true"
+  path="1313728923.0.0"></component></li></ul>

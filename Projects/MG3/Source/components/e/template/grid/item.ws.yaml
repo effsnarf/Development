@@ -8,7 +8,8 @@ dom:
         ':key': key1
         ':class': >-
           'items container grid' + ' grid-items-' + gridWidth + ' items-' +
-          getVisibleItemsCount(item.items) + ' rotation-' + item.rotation
+          getVisibleItemsCount(item.items) + ' rotation-' + item.rotation +
+          (!item.layers ? '' : ' layers')
         ':style': getMainStyle(item)
         component:
           v-for: item in item.items
@@ -18,15 +19,18 @@ dom:
           ':class': getItemClass(item)
           ':style': getItemStyle(item)
           ':is': getItemType(item)
+          ':temp': temp
           ':item': item
-          @image-load: (src) => onItemImageLoad(item, src)
+          @image-load: (item, src) => onItemImageLoad(item, src)
           @file-drop: (item, files) => $emit('file-drop', item, files)
       e.template.caption.item:
         v-if: item.caption
         ':editable': editable
+        ':temp': temp
         ':item': item.caption
         @click: toggleRotation(item)
 props:
+  temp: null
   item: null
   editable: false
 data:
@@ -73,8 +77,7 @@ methods:
     }
   onItemImageLoad: | #js
     function(item, src) {
-      const handler = this.$refs.selectedItemEditor1?.onItemImageLoad;
-      if (handler) handler(src);
+      this.$emit("image-load", item, src);
     }
   onSizeChange: | #js
     function(size) {
@@ -105,6 +108,14 @@ watch: null
 style:
   div:
     transition: 0s !important
+  .layers:
+    aspect-ratio: 1 / 1
+  .layers > .item:
+    position: absolute
+    top: 0
+    left: 0
+    width: 100%
+    height: 100%
   .caption-layout-top:
     flex-direction: column-reverse
   .caption-layout-bottom:
@@ -113,8 +124,9 @@ style:
     gap: 0.5em
   .items:
     width: 100%
-  .items .item:
-    background: '#ffffff20'
+  .items .item: null
+  .grid-items-1:
+    grid-template: 1fr / 1fr
   .grid-items-1 .text:
     position: absolute
   .grid-items-3, .grid-items-6, .grid-items-9:
@@ -146,14 +158,14 @@ template: >-
   path="-1435649936."><div :class="'flex caption-layout-' +
   item.caption?.align.v" @input="onSizeChange" path="-1435649936.0"><div
   :key="key1" :class="'items container grid' + ' grid-items-' + gridWidth + '
-  items-' + getVisibleItemsCount(item.items) + ' rotation-' + item.rotation"
-  :style="getMainStyle(item)" path="-1435649936.0.0"><component v-for="item in
-  item.items" :key="item.id" v-if="item.visible" :editable="editable"
-  :class="getItemClass(item)" :style="getItemStyle(item)"
-  :is="getItemType(item)" :item="item" @image-load="(src) =&gt;
-  onItemImageLoad(item, src)" @file-drop="(item, files) =&gt; $emit('file-drop',
-  item, files)"
+  items-' + getVisibleItemsCount(item.items) + ' rotation-' + item.rotation +
+  (!item.layers ? '' : ' layers')" :style="getMainStyle(item)"
+  path="-1435649936.0.0"><component v-for="item in item.items" :key="item.id"
+  v-if="item.visible" :editable="editable" :class="getItemClass(item)"
+  :style="getItemStyle(item)" :is="getItemType(item)" :temp="temp" :item="item"
+  @image-load="(item, src) =&gt; onItemImageLoad(item, src)" @file-drop="(item,
+  files) =&gt; $emit('file-drop', item, files)"
   path="-1435649936.0.0.0"></component></div><e-template-caption-item
-  v-if="item.caption" :editable="editable" :item="item.caption"
+  v-if="item.caption" :editable="editable" :temp="temp" :item="item.caption"
   @click="toggleRotation(item)"
   path="-1435649936.0.1"></e-template-caption-item></div></ui-track-size>

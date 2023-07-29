@@ -1,41 +1,46 @@
 dom:
-  div:
-    ui.textarea:
+  div: 
+    ui.text.box:
       ':hint': item.hint
       v-model: item.text
-    ui.select: 
-      ':options': '[''Oswald'', ''Special Elite'']'
-      type: dropdown
-      input-type: value
-      v-model: item.font
-    ui.select: 
-      ':options': '[''white'', ''black'']'
-      type: dropdown
-      input-type: value
-      v-model: item.color
-    ui.select: 
-      ':options': '[''left'', ''center'', ''right'']'
-      type: dropdown
-      input-type: value
-      v-model: item.align.h
-    ui.select: 
-      ':options': '[''top'', ''center'', ''bottom'']'
-      type: dropdown
-      input-type: value
-      v-model: item.align.v
+    div: 
+      v-if: '!minimal'
+      ui.select: 
+        ':options': '[''Oswald'', ''Special Elite'']'
+        type: dropdown
+        input-type: value
+        v-model: item.font
+      ui.select: 
+        ':options': '[''white'', ''black'']'
+        type: dropdown
+        input-type: value
+        v-model: item.color
+      ui.select: 
+        ':options': '[''left'', ''center'', ''right'']'
+        type: dropdown
+        input-type: value
+        v-model: item.align.h
+      ui.select: 
+        ':options': '[''top'', ''center'', ''bottom'']'
+        type: dropdown
+        input-type: value
+        v-model: item.align.v
 props:
   item: null
-  hint: null
+  minimal: false
+style:
+  input:
+    text-align: center
 name: e-template-caption-editor
 template: >-
-  <div class="comp-e-template-caption-editor" path="-1537870880."><ui-textarea
-  :hint="item.hint" v-model="item.text"
-  path="-1537870880.0"></ui-textarea><ui-select :options="['Oswald', 'Special
+  <div class="comp-e-template-caption-editor" path="-1537870880."><ui-text-box
+  :hint="item.hint" v-model="item.text" path="-1537870880.0"></ui-text-box><div
+  v-if="!minimal" path="-1537870880.1"><ui-select :options="['Oswald', 'Special
   Elite']" type="dropdown" input-type="value" v-model="item.font"
-  path="-1537870880.1"></ui-select><ui-select :options="['white', 'black']"
+  path="-1537870880.1.0"></ui-select><ui-select :options="['white', 'black']"
   type="dropdown" input-type="value" v-model="item.color"
-  path="-1537870880.2"></ui-select><ui-select :options="['left', 'center',
+  path="-1537870880.1.1"></ui-select><ui-select :options="['left', 'center',
   'right']" type="dropdown" input-type="value" v-model="item.align.h"
-  path="-1537870880.3"></ui-select><ui-select :options="['top', 'center',
+  path="-1537870880.1.2"></ui-select><ui-select :options="['top', 'center',
   'bottom']" type="dropdown" input-type="value" v-model="item.align.v"
-  path="-1537870880.4"></ui-select></div>
+  path="-1537870880.1.3"></ui-select></div></div>
