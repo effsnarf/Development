@@ -84,10 +84,11 @@ api:
         else
         {
           mediaGeneratorContent = await db.findOne("MediaGenerator", { _id: media.mediaGeneratorID });
-          media.mediaGenerator = {
-            content: mediaGeneratorContent.content,
-          };
         }
+
+        media.mediaGenerator = {
+          content: mediaGeneratorContent.content,
+        };
 
         media = await db.upsert("Medias", media, true);
         // Get the media generator
@@ -480,6 +481,14 @@ api:
           }
         }
         if (!thread) throw new Error("Provide either a threadID or a threadMedia");
+
+        if (media.mediaGeneratorID)
+        {
+          const mediaGeneratorContent = await db.findOne("MediaGenerator", { _id: media.mediaGeneratorID });
+          media.mediaGenerator = {
+            content: mediaGeneratorContent.content,
+          };
+        }
 
         // When posting an instance (in a thread), this code is supposed to insert in the Instances collection
         // but calling dbp.instances.create.one() is not working, because of yo dawg I heard you like dbps shenaningans
