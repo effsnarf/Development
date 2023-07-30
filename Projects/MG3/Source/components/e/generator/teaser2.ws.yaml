@@ -23,7 +23,7 @@ computed:
     }
   teaserArticle: | #js
     function () {
-      const paragraphs = this.generator.desc?.article?.split("\n")
+      const paragraphs = this.cGenerator.desc?.article?.split("\n")
         .map(p => p.trim())
         .filter(p => p.length > 100);
       const par = paragraphs[1] || paragraphs[0];

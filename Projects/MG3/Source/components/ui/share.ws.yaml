@@ -30,11 +30,11 @@ mounted: | #js
 computed:
   url: | #js
     function() {
-      return (this.$root.url.itemImage(this.item, true) || this.$root.url.item(this.item));
+      return (this.$root.url.item(this.item, true));
     }
   imageUrl: | #js
     function() {
-      return this.$root.url.itemImage(this.item);
+      return this.$root.url.itemImage(this.item, true);
     }
 style:
   .a2a_kit:

@@ -6,21 +6,21 @@ dom:
       ':url': $root.url.instance(instance)
       class: instance
       div: 
-        ui.image:
+        ui.image: 
           ref: image1
-          ':imageID': >-
-            instanceImage ? null : (instance.imageID ||
-            instance.generator?.imageID)
-          ':url': $root.url.itemImage(instance)
+          ':imageID': imageID
           @change: updateImageSize
+        div: 
+          class: spacer
+          ui.image: 
+            ref: image1
+            ':imageID': imageID
         .texts:
           v-if: '!instanceImage'
           .text:
             v-for: (text, index) in [instance.text0, instance.text1]
             v-text: text
             ':style': '{ fontSize: fontSizes[index] }'
-        div: 
-          class: spacer
     .footer:
       v-if: showFooter
       e.generator.wide2:
@@ -57,6 +57,10 @@ methods:
       this.width = this.$refs.image1.width;
     }
 computed:
+  imageID: | #js
+    function () {
+      return this.instanceImage ? null : (this.instance.imageID || this.instance.generator?.imageID);
+    }
   showGenerator: | #js
     function () {
       if (!this.instance) return false;
@@ -100,13 +104,20 @@ style:
   .comp-ui-image:
     width: 100%
   .comp-ui-image, img:
-    aspect-ratio: 1
+    aspect-ratio: auto
     object-fit: cover
   .instance .comp-ui-image, .texts, .text:
     position: absolute
+  .instance .spacer .comp-ui-image:
+    position: relative
+  .spacer:
+    visibility: hidden
   .spacer, .texts:
     width: 100%
-    aspect-ratio: 1
+    aspect-ratio: auto
+  .texts:
+    top: 0
+    height: 100%
   .text:
     text-align: center
     display: block
@@ -130,14 +141,14 @@ template: >-
   <div class="comp-e-instance" @click="$emit('click')" v-if="instance"
   path="643573758."><ui-link class="instance"
   :url="$root.url.instance(instance)" path="643573758.0"><div
-  path="643573758.0.0"><ui-image ref="image1" :imageID="instanceImage ? null :
-  (instance.imageID || instance.generator?.imageID)"
-  :url="$root.url.itemImage(instance)" @change="updateImageSize"
-  path="643573758.0.0.0"></ui-image><div class="texts" v-if="!instanceImage"
-  path="643573758.0.0.1"><div class="text" v-for="(text, index) in
-  [instance.text0, instance.text1]" v-text="text" :style="{ fontSize:
-  fontSizes[index] }" path="643573758.0.0.1.0"></div></div><div class="spacer"
-  path="643573758.0.0.2"></div></div></ui-link><div class="footer"
+  path="643573758.0.0"><ui-image ref="image1" :imageID="imageID"
+  @change="updateImageSize" path="643573758.0.0.0"></ui-image><div
+  class="spacer" path="643573758.0.0.1"><ui-image ref="image1"
+  :imageID="imageID" path="643573758.0.0.1.0"></ui-image></div><div
+  class="texts" v-if="!instanceImage" path="643573758.0.0.2"><div class="text"
+  v-for="(text, index) in [instance.text0, instance.text1]" v-text="text"
+  :style="{ fontSize: fontSizes[index] }"
+  path="643573758.0.0.2.0"></div></div></div></ui-link><div class="footer"
   v-if="showFooter" path="643573758.1"><e-generator-wide2 v-if="showGenerator"
   :generator="$root.instanceToGenerator(instance)"
   path="643573758.1.0"></e-generator-wide2><ui-share v-if="showShare"

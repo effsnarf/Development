@@ -3,11 +3,21 @@ dom:
     .builders:
       .flex1: 
         v-if: adviceAnimal
-        e.builder: 
+        div: 
           class: column1
-          ':builder': adviceAnimal
-          ':show-help': 'false'
-          ':media-created': onMediaCreated
+          e.builder: 
+            ':builder': adviceAnimal
+            ':show-help': 'false'
+            ':media-created': onMediaCreated
+          div: 
+            transition.group: 
+              name: list
+              tag: div
+              class: grid2
+              e.generator.square: 
+                v-for: generator in moreGenerators
+                ':generator': generator
+                ':key': generator._id
         div: 
           class: column2
           .list1: 
@@ -30,7 +40,7 @@ dom:
                   name: list
                   tag: div
                   class: grid2
-                  e.generator.square:
+                  e.generator.square: 
                     v-for: generator in moreGenerators
                     ':generator': generator
                     ':key': generator._id
@@ -94,7 +104,9 @@ data:
   popularGenerators: null
 mounted: | #js
   async function() {
-    this.popularGenerators = (await this.$root.dbp.generators.select.popular());
+    // Random page index between 0 and 100
+    const pageIndex = Math.round((Math.random() * 100) | 0);
+    this.popularGenerators = (await this.$root.dbp.generators.select.popular(pageIndex));
   }
 methods:
   onMediaCreated: | #js
@@ -104,7 +116,7 @@ methods:
 computed:
   teaserGenerators: | #js
     function () {
-      return this.popularGenerators?.shuffle().take(4);
+      return this.popularGenerators?.shuffle().take(10);
     }
   moreGenerators: | #js
     function () {
@@ -136,15 +148,18 @@ computed:
 style:
   .more-link:
     font-size: 160%
-    text-align: right
+    text-align: center
   .builders:
     display: flex
     flex-direction: column
     gap: 4em
   .grid2:
-    display: grid
-    grid-template: 1fr / repeat(5, 1fr)
+    display: flex
+    flex-wrap: wrap
+    justify-content: center
     gap: 1em
+  .grid2 > div:
+    width: 30%
   .flex1:
     display: flex
     gap: 2em
@@ -163,7 +178,7 @@ style:
   .list-alternating:
     display: flex
     flex-direction: column
-    gap: 1em
+    gap: 2em
   .list-alternating > *:nth-child(odd) .flex:
     flex-direction: row-reverse
   .list-alternating > *:nth-child(even) .flex:
@@ -174,17 +189,21 @@ name: e-builder-examples
 template: >-
   <div class="comp-e-builder-examples" path="1519228837."><div class="builders"
   path="1519228837.0"><div class="flex1" v-if="adviceAnimal"
-  path="1519228837.0.0"><e-builder class="column1" :builder="adviceAnimal"
-  :show-help="false" :media-created="onMediaCreated"
-  path="1519228837.0.0.0"></e-builder><div class="column2"
-  path="1519228837.0.0.1"><div class="list1" path="1519228837.0.0.1.0"><div
-  path="1519228837.0.0.1.0.0"><h2 v-text="adviceAnimal.name.pluralize()"
-  path="1519228837.0.0.1.0.0.0"></h2><div v-text="adviceAnimal.desc"
-  path="1519228837.0.0.1.0.0.1"></div></div><div class="list1"
-  path="1519228837.0.0.1.0.1"><transition-group class="list-alternating"
-  name="list" tag="div" path="1519228837.0.0.1.0.1.0"><e-generator-teaser2
-  v-for="generator in teaserGenerators" :generator="generator"
-  :key="generator._id"
+  path="1519228837.0.0"><div class="column1" path="1519228837.0.0.0"><e-builder
+  :builder="adviceAnimal" :show-help="false" :media-created="onMediaCreated"
+  path="1519228837.0.0.0.0"></e-builder><div
+  path="1519228837.0.0.0.1"><transition-group class="grid2" name="list"
+  tag="div" path="1519228837.0.0.0.1.0"><e-generator-square v-for="generator in
+  moreGenerators" :generator="generator" :key="generator._id"
+  path="1519228837.0.0.0.1.0.0"></e-generator-square></transition-group></div></div><div
+  class="column2" path="1519228837.0.0.1"><div class="list1"
+  path="1519228837.0.0.1.0"><div path="1519228837.0.0.1.0.0"><h2
+  v-text="adviceAnimal.name.pluralize()" path="1519228837.0.0.1.0.0.0"></h2><div
+  v-text="adviceAnimal.desc" path="1519228837.0.0.1.0.0.1"></div></div><div
+  class="list1" path="1519228837.0.0.1.0.1"><transition-group
+  class="list-alternating" name="list" tag="div"
+  path="1519228837.0.0.1.0.1.0"><e-generator-teaser2 v-for="generator in
+  teaserGenerators" :generator="generator" :key="generator._id"
   path="1519228837.0.0.1.0.1.0.0"></e-generator-teaser2></transition-group><div
   path="1519228837.0.0.1.0.1.1"><transition-group class="grid2" name="list"
   tag="div" path="1519228837.0.0.1.0.1.1.0"><e-generator-square v-for="generator

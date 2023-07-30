@@ -1,30 +1,32 @@
 dom:
   site:
     page-name: generators
+    ':columns': 2
     template:
       v-slot: middle
       content.stream:
         ref: contentStream1
         item-type: e.generator.teaser2
         ':get-more-items': getMoreGenerators
-        grid-class: grid-1
-        @visible-item: onVisibleSteamInstanceChange
+        grid-class: grid-1a
 props: null
 data: null
-metods:
+methods:
   getMoreGenerators: | #js
     async function(pageIndex) {
       const items = await this.$root.dbp.generators.select.popular(pageIndex)
       return items;
     }
+style:
+  .grid-1a:
+    gap: 1em
+  a:hover:
+    background: '#ffffff30'
 name: page-generators
 template: >-
-  <site class="comp-page-generators" page-name="generators"
+  <site class="comp-page-generators" page-name="generators" :columns="2"
   path="-1205429057."><template v-slot:middle
   path="-1205429057.0"><content-stream ref="contentStream1"
-  item-type="e.generator.teaser2" :get-more-items="getMoreInstances"
-  grid-class="grid-1" @visible-item="onVisibleSteamInstanceChange"
-  path="-1205429057.0.0"></content-stream></template></site><div><transition-group
-  class="list-alternating" name="list" tag="div"><e-generator-teaser2
-  v-for="generator in generators" :generator="generator"
-  :key="generator._id"></e-generator-teaser2></transition-group></div>
+  item-type="e.generator.teaser2" :get-more-items="getMoreGenerators"
+  grid-class="grid-1a"
+  path="-1205429057.0.0"></content-stream></template></site>

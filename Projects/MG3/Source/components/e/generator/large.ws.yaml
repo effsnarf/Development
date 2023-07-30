@@ -1,0 +1,14 @@
+dom:
+  div:
+    v-if: generator
+    ui.image:
+      ref: image1
+      ':imageID': generator.imageID
+props:
+  generator: null
+data: null
+name: e-generator-large
+template: >-
+  <div class="comp-e-generator-large" v-if="generator"
+  path="517672151."><ui-image ref="image1" :imageID="generator.imageID"
+  path="517672151.0"></ui-image></div>
