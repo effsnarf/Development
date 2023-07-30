@@ -160,6 +160,7 @@ api:
     Generators.select.popular:
       args: [pageIndex]
       code: | #js
+        pageIndex = (pageIndex || 0);
         const pageSize = 15;
         const skip = pageIndex * pageSize;
         const gens = await db.find('Generators', { }, { InstancesCount: -1 }, pageSize, skip, true);
