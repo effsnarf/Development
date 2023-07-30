@@ -21,25 +21,35 @@ dom:
           v-if: (cMedia.type=='builder')
           ':is': formatComponentName
           ':media': cMedia
+          ':editable': editable
+          ':show-help': 'false'
+          ':media-created': onMediaCreated
       e.media.recaption:
-        v-if: (cMedia.type=='builder')
+        v-if: (!editable) && (cMedia.type=='builder')
         ':media': cMedia
         ':threadMedia': threadMedia
         @thread-updated: $emit('thread-updated')
-        @media-created: $emit('media-created', $event)
+        @media-created: onMediaCreated
 props:
   item: null
   mediaID: null
   media: null
   threadMedia: null
+  editable: false
   square: false
   showFooter: true
+  mediaCreated: null
 data:
   cMedia: null
 methods:
   replyInThread: | #js
     function () {
       return this.$root.params.threadID;
+    }
+  onMediaCreated: | #js
+    function (media) {
+      if (this.mediaCreated) this.mediaCreated(media);
+      this.$emit('media-created', media);
     }
   onClickMediaContent: | #js
     function() {
@@ -103,9 +113,10 @@ template: >-
   path="864271643.0.0.1"></ui-image><e-instance v-if="(cMedia.type=='instance')"
   :item="cMedia.instance" :show-footer="showFooter"
   path="864271643.0.0.2"></e-instance><component v-if="(cMedia.type=='builder')"
-  :is="formatComponentName" :media="cMedia"
-  path="864271643.0.0.3"></component></div><e-media-recaption
-  v-if="(cMedia.type=='builder')" :media="cMedia" :threadMedia="threadMedia"
-  @thread-updated="$emit('thread-updated')"
-  @media-created="$emit('media-created', $event)"
+  :is="formatComponentName" :media="cMedia" :editable="editable"
+  :show-help="false" :media-created="onMediaCreated"
+  path="864271643.0.0.3"></component></div><e-media-recaption v-if="(!editable)
+  &amp;&amp; (cMedia.type=='builder')" :media="cMedia"
+  :threadMedia="threadMedia" @thread-updated="$emit('thread-updated')"
+  @media-created="onMediaCreated"
   path="864271643.0.1"></e-media-recaption></div></div>

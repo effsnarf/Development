@@ -6,6 +6,7 @@ params:
         if (url == "/test") return "test";
         if (url == "/admin") return "admin";
         if (url.startsWith("/catalog")) return "catalog";
+        if (url.startsWith("/advice-animals")) return "generators";
         if (url.startsWith("/b/")) return "builder";
         if (url.startsWith("/t/")) return "thread";
         if (url.startsWith("/m/")) return "media";

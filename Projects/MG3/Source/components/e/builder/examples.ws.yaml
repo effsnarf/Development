@@ -17,19 +17,25 @@ dom:
               div: 
                 v-text: adviceAnimal.desc
             .list1: 
-              div: 
+              transition.group: 
+                name: list
+                tag: div
                 class: list-alternating
                 e.generator.teaser2:
                   v-for: generator in teaserGenerators
                   ':generator': generator
+                  ':key': generator._id
               div: 
-                .grid2:
+                transition.group: 
+                  name: list
+                  tag: div
+                  class: grid2
                   e.generator.square:
                     v-for: generator in moreGenerators
                     ':generator': generator
+                    ':key': generator._id
               div: 
                 ui.link:
-                  v-if: 'false'
                   class: more-link
                   ':url': '''/advice-animals'''
                   ':text': '''see all Advice Animals…'''
@@ -43,15 +49,31 @@ dom:
                 v-text: videoVertical.name.pluralize()
               div: 
                 v-text: videoVertical.desc
-            div: 
-              class: list-alternating
+            .flex.gap-1:
+              div: 
+                e.media: 
+                  ':mediaID': 733550349
+                  ':editable': true
+                  ':media-created': onMediaCreated
+              div: 
+                e.media: 
+                  ':mediaID': 733588104
+                  ':editable': true
+                  ':media-created': onMediaCreated
+        div: 
+          class: column1
+          e.media:
+            ':mediaID': 733469675
+            ':editable': true
+            ':media-created': onMediaCreated
         e.builder: 
+          v-if: 'false'
           class: column1
           ':builder': videoVertical
           ':show-help': 'false'
           ':media-created': onMediaCreated
       .flex1: 
-        v-if: famousQuote
+        v-if: (false && famousQuote)
         e.builder: 
           class: column1
           ':builder': famousQuote
@@ -159,27 +181,37 @@ template: >-
   path="1519228837.0.0.1.0.0"><h2 v-text="adviceAnimal.name.pluralize()"
   path="1519228837.0.0.1.0.0.0"></h2><div v-text="adviceAnimal.desc"
   path="1519228837.0.0.1.0.0.1"></div></div><div class="list1"
-  path="1519228837.0.0.1.0.1"><div class="list-alternating"
-  path="1519228837.0.0.1.0.1.0"><e-generator-teaser2 v-for="generator in
-  teaserGenerators" :generator="generator"
-  path="1519228837.0.0.1.0.1.0.0"></e-generator-teaser2></div><div
-  path="1519228837.0.0.1.0.1.1"><div class="grid2"
-  path="1519228837.0.0.1.0.1.1.0"><e-generator-square v-for="generator in
-  moreGenerators" :generator="generator"
-  path="1519228837.0.0.1.0.1.1.0.0"></e-generator-square></div></div><div
-  path="1519228837.0.0.1.0.1.2"><ui-link class="more-link" v-if="false"
+  path="1519228837.0.0.1.0.1"><transition-group class="list-alternating"
+  name="list" tag="div" path="1519228837.0.0.1.0.1.0"><e-generator-teaser2
+  v-for="generator in teaserGenerators" :generator="generator"
+  :key="generator._id"
+  path="1519228837.0.0.1.0.1.0.0"></e-generator-teaser2></transition-group><div
+  path="1519228837.0.0.1.0.1.1"><transition-group class="grid2" name="list"
+  tag="div" path="1519228837.0.0.1.0.1.1.0"><e-generator-square v-for="generator
+  in moreGenerators" :generator="generator" :key="generator._id"
+  path="1519228837.0.0.1.0.1.1.0.0"></e-generator-square></transition-group></div><div
+  path="1519228837.0.0.1.0.1.2"><ui-link class="more-link"
   :url="'/advice-animals'" :text="'see all Advice Animals…'"
   path="1519228837.0.0.1.0.1.2.0"></ui-link></div></div></div></div></div><div
   class="flex1" v-if="videoVertical" path="1519228837.0.1"><div class="column2"
   path="1519228837.0.1.0"><div class="list1" path="1519228837.0.1.0.0"><div
   path="1519228837.0.1.0.0.0"><h2 v-text="videoVertical.name.pluralize()"
   path="1519228837.0.1.0.0.0.0"></h2><div v-text="videoVertical.desc"
-  path="1519228837.0.1.0.0.0.1"></div></div><div class="list-alternating"
-  path="1519228837.0.1.0.0.1"></div></div></div><e-builder class="column1"
-  :builder="videoVertical" :show-help="false" :media-created="onMediaCreated"
-  path="1519228837.0.1.1"></e-builder></div><div class="flex1"
-  v-if="famousQuote" path="1519228837.0.2"><e-builder class="column1"
-  :builder="famousQuote" :show-help="false" :media-created="onMediaCreated"
+  path="1519228837.0.1.0.0.0.1"></div></div><div class="flex gap-1"
+  path="1519228837.0.1.0.0.1"><div path="1519228837.0.1.0.0.1.0"><e-media
+  :mediaID="733550349" :editable="true" :media-created="onMediaCreated"
+  path="1519228837.0.1.0.0.1.0.0"></e-media></div><div
+  path="1519228837.0.1.0.0.1.1"><e-media :mediaID="733588104" :editable="true"
+  :media-created="onMediaCreated"
+  path="1519228837.0.1.0.0.1.1.0"></e-media></div></div></div></div><div
+  class="column1" path="1519228837.0.1.1"><e-media :mediaID="733469675"
+  :editable="true" :media-created="onMediaCreated"
+  path="1519228837.0.1.1.0"></e-media></div><e-builder class="column1"
+  v-if="false" :builder="videoVertical" :show-help="false"
+  :media-created="onMediaCreated" path="1519228837.0.1.2"></e-builder></div><div
+  class="flex1" v-if="(false &amp;&amp; famousQuote)"
+  path="1519228837.0.2"><e-builder class="column1" :builder="famousQuote"
+  :show-help="false" :media-created="onMediaCreated"
   path="1519228837.0.2.0"></e-builder><div class="column2"
   path="1519228837.0.2.1"><div class="list1" path="1519228837.0.2.1.0"><div
   path="1519228837.0.2.1.0.0"><h2 v-text="famousQuote.name.pluralize()"

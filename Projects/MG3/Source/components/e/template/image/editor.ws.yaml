@@ -22,11 +22,37 @@ dom:
           ':minimal': 'true'
         transition: 
           name: slide2
+          .error.my-l1:
+            v-if: error
+            .flex.gap-1:
+              ui.image: 
+                ':style': '{ width: ''5em'' }'
+                ':imageID': item.imageID
+                ':square': 'true'
+              div: 
+                div: 
+                  v-text: '''An error occurred.'''
+                div: 
+                  span:
+                    v-text: '''Try another image or '''
+                  a:
+                    class: yellow
+                    target: _blank
+                    href: https://www.remove.bg/
+                    v-text: '''remove.bg'''
+        transition: 
+          name: slide2
           .message:
             v-if: removingBackground
-            div: 
-              v-text: '''Removing background'''
-            ui.loading: null
+            .flex:
+              ui.image: 
+                ':style': '{ width: ''5em'' }'
+                ':imageID': item.imageID
+                ':square': 'true'
+              div: 
+                .fs-m2:
+                  v-text: '''Removing background'''
+                ui.loading: null
     div:
       transition: 
         name: slide2
@@ -64,13 +90,22 @@ data:
   showMoveScale: false
   showShadowEditor: false
   processingNewImage: false
+  error: false
 style:
+  a:hover:
+    text-decoration: underline
+  .error:
+    text-align: left
   .comp-ui-image-select:
     margin-top: 1em
 mounted: | #js
   async function() {
     this.$watch(() => this.item?.removeBackground, (removeBackground) => {
-      this.removingBackground = removeBackground
+      this.removingBackground = removeBackground;
+    });
+    this.$watch(() => this.item?.imageID, (imageID) => {
+      this.error = false
+      this.removingBackground = true;
     });
   }
 methods:
@@ -121,6 +156,12 @@ methods:
         }
       }
     }
+  onItemImageError: | #js
+    function(src) {
+      this.removingBackground = false;
+      this.processingNewImage = false;
+      this.error = true;
+    }
 watch:
   processingNewImage: | #js
     function(newValue) {
@@ -140,9 +181,25 @@ template: >-
   path="1046603147.0.0.0.0.1"></ui-checkbox></div></transition><e-template-caption-editor
   v-if="item.caption" :item="item.caption" :minimal="true"
   path="1046603147.0.0.1"></e-template-caption-editor><transition name="slide2"
-  path="1046603147.0.0.2"><div class="message" v-if="removingBackground"
-  path="1046603147.0.0.2.0"><div v-text="'Removing background'"
-  path="1046603147.0.0.2.0.0"></div><ui-loading></ui-loading></div></transition></div></transition><div
+  path="1046603147.0.0.2"><div class="error my-l1" v-if="error"
+  path="1046603147.0.0.2.0"><div class="flex gap-1"
+  path="1046603147.0.0.2.0.0"><ui-image :style="{ width: '5em' }"
+  :imageID="item.imageID" :square="true"
+  path="1046603147.0.0.2.0.0.0"></ui-image><div
+  path="1046603147.0.0.2.0.0.1"><div v-text="'An error occurred.'"
+  path="1046603147.0.0.2.0.0.1.0"></div><div
+  path="1046603147.0.0.2.0.0.1.1"><span v-text="'Try another image or '"
+  path="1046603147.0.0.2.0.0.1.1.0"></span><a class="yellow" target="_blank"
+  href="https://www.remove.bg/" v-text="'remove.bg'"
+  path="1046603147.0.0.2.0.0.1.1.1"></a></div></div></div></div></transition><transition
+  name="slide2" path="1046603147.0.0.3"><div class="message"
+  v-if="removingBackground" path="1046603147.0.0.3.0"><div class="flex"
+  path="1046603147.0.0.3.0.0"><ui-image :style="{ width: '5em' }"
+  :imageID="item.imageID" :square="true"
+  path="1046603147.0.0.3.0.0.0"></ui-image><div
+  path="1046603147.0.0.3.0.0.1"><div class="fs-m2" v-text="'Removing
+  background'"
+  path="1046603147.0.0.3.0.0.1.0"></div><ui-loading></ui-loading></div></div></div></transition></div></transition><div
   path="1046603147.1"><transition name="slide2" path="1046603147.1.0"><div
   v-if="showShadowEditor" path="1046603147.1.0.0"><ui-range text="x"
   v-model="item.shadow.x" min="-1" max="1" step="0.01"

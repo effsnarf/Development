@@ -18,6 +18,7 @@ dom:
       page.category: null
       page.builder: null
       page.media: null
+      page.generators: null
       page.generator: null
       page.instance: null
 name: app
@@ -31,6 +32,7 @@ style:
   .site-width:
     width: min(1000px, 90vw)
     margin: auto
+    z-index: 10
   .pages > div:
     position: absolute
     top: 0
@@ -55,4 +57,4 @@ template: >-
   path="96801.0.1"></site-header><div class="header-spacer"
   path="96801.0.2"></div></div><div class="pages" :class="{ 'site-width': true
   }"
-  path="96801.1"><page-test></page-test><page-admin-index></page-admin-index><page-home></page-home><page-catalog></page-catalog><page-thread></page-thread><page-category></page-category><page-builder></page-builder><page-media></page-media><page-generator></page-generator><page-instance></page-instance></div></div>
+  path="96801.1"><page-test></page-test><page-admin-index></page-admin-index><page-home></page-home><page-catalog></page-catalog><page-thread></page-thread><page-category></page-category><page-builder></page-builder><page-media></page-media><page-generators></page-generators><page-generator></page-generator><page-instance></page-instance></div></div>

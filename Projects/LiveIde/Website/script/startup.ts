@@ -282,7 +282,6 @@ interface MgParams {
         return `e-format-${builder.format.replace(/\./g, "-")}`;
       },
       async mediaToTemp(media: any) {
-        console.log(media);
         const self = this as any;
         const builder = await self.getBuilder(media.builderID);
         let temp = self.builderSourceToTemplate(builder.format, builder.source);
@@ -324,6 +323,8 @@ interface MgParams {
           } as any;
 
           const hasSubgrid = true || source.subgrid.items > 1;
+
+          const textColor = hasSubgrid ? "white" : "yellow";
 
           const captionItems = source.captions.items || source.captions;
           const editable = source.captions.editable || false;
@@ -398,7 +399,7 @@ interface MgParams {
                   editable: editable,
                   text: "",
                   font: "Arial",
-                  color: "white",
+                  color: textColor,
                   align: {
                     h: "center",
                     v: "bottom",
@@ -591,7 +592,7 @@ interface MgParams {
           const imageUrl = helpers.url.itemImage(temp);
           (window as any).alertify
             .message(
-              `<a href="${url}" onclick="ideVueApp.navigateTo(this.href); return false;" class="clickable"><img src="${imageUrl}" /></a><div class="opacity-50 text-center"><div>click image to view</div><div>(close)</div></div>`
+              `<a href="${url}" onclick="ideVueApp.navigateTo(this.href); return false;" class="clickable"><img src="${imageUrl}" /></a><div class="opacity-50 text-center"><div>click image to navigate</div></div>`
             )
             .delay(0);
         }

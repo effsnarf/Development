@@ -178,9 +178,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "../../../../LiveIde/Website/script/1690722405270.ts":
+/***/ "../../../../LiveIde/Website/script/1690731037200.ts":
 /*!***********************************************************!*\
-  !*** ../../../../LiveIde/Website/script/1690722405270.ts ***!
+  !*** ../../../../LiveIde/Website/script/1690731037200.ts ***!
   \***********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -447,7 +447,6 @@ const helpers = {
                 return `e-format-${builder.format.replace(/\./g, "-")}`;
             },
             async mediaToTemp(media) {
-                console.log(media);
                 const self = this;
                 const builder = await self.getBuilder(media.builderID);
                 let temp = self.builderSourceToTemplate(builder.format, builder.source);
@@ -487,6 +486,7 @@ const helpers = {
                         join: JSON.parse(JSON.stringify(source.join)),
                     };
                     const hasSubgrid =  true || 0;
+                    const textColor = hasSubgrid ? "white" : "yellow";
                     const captionItems = source.captions.items || source.captions;
                     const editable = source.captions.editable || false;
                     if (Array.isArray(captionItems)) {
@@ -556,7 +556,7 @@ const helpers = {
                                     editable: editable,
                                     text: "",
                                     font: "Arial",
-                                    color: "white",
+                                    color: textColor,
                                     align: {
                                         h: "center",
                                         v: "bottom",
@@ -746,7 +746,7 @@ const helpers = {
                     const temp = await self.mediaToTemp(item);
                     const imageUrl = helpers.url.itemImage(temp);
                     window.alertify
-                        .message(`<a href="${url}" onclick="ideVueApp.navigateTo(this.href); return false;" class="clickable"><img src="${imageUrl}" /></a><div class="opacity-50 text-center"><div>click image to view</div><div>(close)</div></div>`)
+                        .message(`<a href="${url}" onclick="ideVueApp.navigateTo(this.href); return false;" class="clickable"><img src="${imageUrl}" /></a><div class="opacity-50 text-center"><div>click image to navigate</div></div>`)
                         .delay(0);
                 }
             },
@@ -3846,7 +3846,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690722405270.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690731037200.ts");
 /******/ 	
 /******/ })()
 ;

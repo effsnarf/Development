@@ -1,0 +1,30 @@
+dom:
+  site:
+    page-name: generators
+    template:
+      v-slot: middle
+      content.stream:
+        ref: contentStream1
+        item-type: e.generator.teaser2
+        ':get-more-items': getMoreGenerators
+        grid-class: grid-1
+        @visible-item: onVisibleSteamInstanceChange
+props: null
+data: null
+metods:
+  getMoreGenerators: | #js
+    async function(pageIndex) {
+      const items = await this.$root.dbp.generators.select.popular(pageIndex)
+      return items;
+    }
+name: page-generators
+template: >-
+  <site class="comp-page-generators" page-name="generators"
+  path="-1205429057."><template v-slot:middle
+  path="-1205429057.0"><content-stream ref="contentStream1"
+  item-type="e.generator.teaser2" :get-more-items="getMoreInstances"
+  grid-class="grid-1" @visible-item="onVisibleSteamInstanceChange"
+  path="-1205429057.0.0"></content-stream></template></site><div><transition-group
+  class="list-alternating" name="list" tag="div"><e-generator-teaser2
+  v-for="generator in generators" :generator="generator"
+  :key="generator._id"></e-generator-teaser2></transition-group></div>

@@ -157,6 +157,13 @@ api:
         var gens = await db.find('Generators', { DisplayName: { $regex: regex, $ne: displayName } }, { InstancesCount: -1 }, 10, 0, true);
 
         return gens;
+    Generators.select.popular:
+      args: [pageIndex]
+      code: | #js
+        const pageSize = 15;
+        const skip = pageIndex * pageSize;
+        const gens = await db.find('Generators', { }, { InstancesCount: -1 }, pageSize, skip, true);
+        return gens;
     Generators.sample.popular:
       args: [count]
       code: | #js

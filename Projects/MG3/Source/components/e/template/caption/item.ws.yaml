@@ -39,7 +39,7 @@ methods:
   getItemText: | #js
     function (item) {
       let text = this.$root.textToHtml(item.text);
-      if (!text?.length && this.showPlaceholderText) text = (item.hint || "(text)");
+      if (!text?.length && this.showPlaceholderText) text = (item.hint || ("(text)"));
       if (item.hint == "quote") text = `"${text}"`;
       return text;
     }
@@ -130,7 +130,6 @@ computed:
     }
   showPlaceholderText: | #js
     function () {
-      if (this.temp?.layers) return true;
       return this.isEditable;
     }
   itemStyle: | #js
@@ -148,8 +147,8 @@ computed:
       return style;
     }
 style:
-  .rect:not(.editable):
-    pointer-events: none
+  .rect:not(.editable), .rect:not(.editable) *:
+    pointer-events: none !important
   input[type="text"]:
     font-size: 100%
     padding: 0 !important
@@ -185,10 +184,8 @@ style:
     pointer-events: all
   .text-content.empty:
     opacity: 0.3
-  .text-content:
-    filter: grayscale(1)
-  .text-content:hover:
-    filter: none
+  .text-content: null
+  .text-content:hover: null
   .text-content::after:
     display: none
     content: '''✏️'''

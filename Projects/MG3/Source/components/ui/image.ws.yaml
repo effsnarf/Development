@@ -10,6 +10,7 @@ dom:
         ':style': imgStyle
         ':src': src1
         @load: onLoad
+        @error: onError
       @click: $emit('click')
 props:
   imageID: null
@@ -35,6 +36,10 @@ methods:
       this.$emit("load", this.$refs.image1.src);
       this.recalc();
       [1,2,3].forEach(i => setTimeout(this.recalc.bind(this), i * 100))
+    }
+  onError: | #js
+    function () {
+      this.$emit("error", this.$refs.image1.src);
     }
   recalc: | #js
     function () {
@@ -94,4 +99,5 @@ template: >-
   <div class="comp-ui-image" path="-2133760639."><component class="image"
   :is="getCompType()" :url="url" @click="$emit('click')"
   path="-2133760639.0"><img ref="image1" :class="cssClass" :style="imgStyle"
-  :src="src1" @load="onLoad" path="-2133760639.0.0"/></component></div>
+  :src="src1" @load="onLoad" @error="onError"
+  path="-2133760639.0.0"/></component></div>

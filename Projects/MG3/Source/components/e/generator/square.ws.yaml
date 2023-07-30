@@ -17,6 +17,8 @@ dom:
         ':key': generator.generatorID
         ':square': 'true'
         @click: $emit('click', generator)
+      .name:
+        v-text: generator.displayName
 props:
   generator: null
   showTooltip: true
@@ -26,6 +28,14 @@ computed: null
 style:
   .anonymous:
     opacity: 0.5
+  .name:
+    background: black;
+    border-radius: 0;
+    position: absolute;
+    bottom: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-align: center;
 name: e-generator-square
 template: >-
   <div class="comp-e-generator-square" path="-916767999."><ui-image
@@ -36,4 +46,5 @@ template: >-
   path="-916767999.1"><ui-image :tooltip="showTooltip &amp;&amp;
   generator.displayName" :imageID="generator.imageID"
   :key="generator.generatorID" :square="true" @click="$emit('click', generator)"
-  path="-916767999.1.0"></ui-image></ui-link></div>
+  path="-916767999.1.0"></ui-image><div class="name"
+  v-text="generator.displayName" path="-916767999.1.1"></div></ui-link></div>

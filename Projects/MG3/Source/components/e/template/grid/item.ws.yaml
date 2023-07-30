@@ -22,6 +22,7 @@ dom:
           ':temp': temp
           ':item': item
           @image-load: (item, src) => onItemImageLoad(item, src)
+          @image-error: (item, src) => onItemImageError(item, src)
           @file-drop: (item, files) => $emit('file-drop', item, files)
       e.template.caption.item:
         v-if: item.caption
@@ -78,6 +79,10 @@ methods:
   onItemImageLoad: | #js
     function(item, src) {
       this.$emit("image-load", item, src);
+    }
+  onItemImageError: | #js
+    function(item, src) {
+      this.$emit("image-error", item, src);
     }
   onSizeChange: | #js
     function(size) {
@@ -165,8 +170,9 @@ template: >-
   path="-1435649936.0.0"><component v-for="item in item.items" :key="item.id"
   v-if="item.visible" :editable="editable" :class="getItemClass(item)"
   :style="getItemStyle(item)" :is="getItemType(item)" :temp="temp" :item="item"
-  @image-load="(item, src) =&gt; onItemImageLoad(item, src)" @file-drop="(item,
-  files) =&gt; $emit('file-drop', item, files)"
+  @image-load="(item, src) =&gt; onItemImageLoad(item, src)"
+  @image-error="(item, src) =&gt; onItemImageError(item, src)"
+  @file-drop="(item, files) =&gt; $emit('file-drop', item, files)"
   path="-1435649936.0.0.0"></component></div><e-template-caption-item
   v-if="item.caption" :editable="editable" :temp="temp" :item="item.caption"
   @click="toggleRotation(item)"

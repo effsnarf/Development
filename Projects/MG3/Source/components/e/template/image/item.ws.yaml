@@ -15,6 +15,7 @@ dom:
           ':imageID': item.imageID
           ':remove-background': item.removeBackground
           @load: onImageLoad
+          @error: onImageError
           @change: refresh
     e.template.caption.item:
       v-if: item.caption
@@ -42,6 +43,10 @@ methods:
   onImageLoad: | #js
     function(src) {
       this.$emit('image-load', this.item, src);
+    }
+  onImageError: | #js
+    function(src) {
+      this.$emit('image-error', this.item, src);
     }
   refresh: | #js
     function() {
@@ -96,7 +101,7 @@ template: >-
   =&gt; onItemScaleBy(item, ds)" path="1623568049.0.0"><ui-image ref="image1"
   v-if="item" :style="getStyle(item)" :imageID="item.imageID"
   :remove-background="item.removeBackground" @load="onImageLoad"
-  @change="refresh"
+  @error="onImageError" @change="refresh"
   path="1623568049.0.0.0"></ui-image></ui-movable></ui-file-dropzone><e-template-caption-item
   v-if="item.caption" :temp="temp" :item="item.caption" :editable="editable"
   path="1623568049.1"></e-template-caption-item></div>

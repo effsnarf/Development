@@ -30,6 +30,7 @@ dom:
               ':item': temp
               ':editable': editable
               @image-load: (item, src) => onItemImageLoad(item, src)
+              @image-error: (item, src) => onItemImageError(item, src)
         div: 
           v-if: editable
           e.template.editors:
@@ -204,6 +205,12 @@ methods:
       const comps = this.findComponents(item)
         .filter(c => c.onItemImageLoad);
       comps.forEach(c => c.onItemImageLoad(src));
+    }
+  onItemImageError: | #js
+    function(item, src) {
+      const comps = this.findComponents(item)
+        .filter(c => c.onItemImageError);
+      comps.forEach(c => c.onItemImageError(src));
     }
   onImageUpload: | #js
     function(imageID) {
@@ -390,7 +397,8 @@ template: >-
   getOnlyImageComp()?.onItemScaleBy(imageItems[0], ds)"
   path="-650358312.0.1.0.0"><e-template-grid-item class="main-content"
   :temp="temp" :item="temp" :editable="editable" @image-load="(item, src) =&gt;
-  onItemImageLoad(item, src)"
+  onItemImageLoad(item, src)" @image-error="(item, src) =&gt;
+  onItemImageError(item, src)"
   path="-650358312.0.1.0.0.0"></e-template-grid-item></ui-movable></ui-file-dropzone><div
   v-if="editable" path="-650358312.0.1.1"><e-template-editors :temp="temp"
   path="-650358312.0.1.1.0"></e-template-editors><div class="flex justify-around
