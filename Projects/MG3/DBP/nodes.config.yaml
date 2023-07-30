@@ -3,8 +3,7 @@ admin:
   ips:
     - 127.0.0.1
     - ::1
-    - 89.134.7.165
-    - 2a02:ab88:c8b:fb00:a4d4:ea7:170e:ce50
+    - 89.134.7.130
 server:
   host: localhost
   port:
@@ -88,19 +87,6 @@ api:
         media = await db.upsert("Medias", media, true);
         // Get the media generator
         const builder = await db.findOne("Builders", { _id: media.builderID });
-        if (builder.source.get?.media?.generator)
-        {
-          const getContentItem = eval(builder.source.get.media.generator);
-          // Walk the tree and collect the content items that constitute the media generator
-          let items = [];
-          const walk = (node) => {
-            const item = {};
-            Object.assign(item, node);
-            items.push(item);
-            if (node.items) node.items.forEach(walk);
-          };
-          walk(media.content);
-        }
 
         return media;
     Medias.select.one:

@@ -24,6 +24,7 @@ dom:
     template: 
       v-slot: right
       e.thread:
+        ref: thread1
         v-if: media
         ':threadMedia': media
 data:
@@ -95,5 +96,5 @@ template: >-
   path="221009861.2.0.0.0"><e-media v-if="media" :media="media"
   path="221009861.2.0.0.0.0"></e-media><e-media-menu :media="media"
   path="221009861.2.0.0.0.1"></e-media-menu></div></transition></div></template><template
-  v-slot:right path="221009861.3"><e-thread v-if="media" :threadMedia="media"
-  path="221009861.3.0"></e-thread></template></site>
+  v-slot:right path="221009861.3"><e-thread ref="thread1" v-if="media"
+  :threadMedia="media" path="221009861.3.0"></e-thread></template></site>

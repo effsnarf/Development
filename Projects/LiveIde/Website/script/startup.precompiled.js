@@ -176,9 +176,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "../../../../LiveIde/Website/script/1690695187457.ts":
+/***/ "../../../../LiveIde/Website/script/1690700578649.ts":
 /*!***********************************************************!*\
-  !*** ../../../../LiveIde/Website/script/1690695187457.ts ***!
+  !*** ../../../../LiveIde/Website/script/1690700578649.ts ***!
   \***********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -1884,11 +1884,11 @@ class Objects {
     }
     static deepMerge(target, ...objects) {
         const deepMerge = (tgt, src) => {
-            if (typeof tgt !== "object" || typeof src !== "object") {
-                return tgt;
+            if (Objects.is(tgt, Array) || Objects.is(src, Array)) {
+                return src.map((s, i) => deepMerge(tgt[i], s));
             }
-            if (null == src) {
-                return tgt;
+            if (!Objects.is(tgt, Object) || !Objects.is(src, Object)) {
+                return src;
             }
             const merged = Objects.clone(tgt);
             for (const key of Object.keys(src)) {
@@ -3596,7 +3596,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690695187457.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690700578649.ts");
 /******/ 	
 /******/ })()
 ;

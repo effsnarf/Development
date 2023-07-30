@@ -11,7 +11,7 @@ dom:
         ul:
           class: content-items
           li:
-            v-for: item in contentItems.filter(it => it.caption)
+            v-for: item in contentItems
             e.media.content.item.recaption:
               ':item': item
         ui.select:
@@ -31,6 +31,7 @@ dom:
 props:
   media: null
 data:
+  dMedia: null
   originalMedia: null
   contentItems: []
   originalContentItems: []
@@ -39,28 +40,26 @@ data:
 methods:
   create: | #js
     async function () {
-        const threadMedia = (!this.replyInThread ? null : this.media);
-        let media = JSON.parse(JSON.stringify(this.media));
-        delete media._id;
-        const _uid = this.$root.getRandomUniqueID();
-        media._uid = _uid;
+      const threadMedia = (!this.replyInThread ? null : this.dMedia);
+      let media = JSON.parse(JSON.stringify(this.dMedia));
+      delete media._id;
+      delete media._uid;
+      if (this.replyInThread)
+      {
+        const post = await this.$root.dbp.posts.create.one(null, {_id: threadMedia?._id}, null, media);
+        this.$root.$emit("thread-updated", null, threadMedia?._id);
+        this.$emit("thread-updated");
+      }
+      else
+      {
         media = await this.$root.dbp.medias.create.one(media);
-        if (!media) media = await this.$root.dbp.medias.select.one(_uid);
-        // Also create a post
-        if (threadMedia)
-        {
-          const post = await this.$root.dbp.posts.create.one(null, threadMedia, null, media);
-          this.$emit("thread-updated");
-        }
         this.$emit("created", media);
-        this.toggleRecaption();
-        this.clear();
+      }
+      this.toggleRecaption();
+      this.clear();
     }
   clear: | #js
     function () {
-      for (const item of this.contentItems) {
-        if (item.caption) item.caption.text = this.findOriginalItem(item.id).caption.text;
-      }
     }
   onCancel: | #js
     function () {
@@ -77,7 +76,7 @@ methods:
       const getChildren = (item) => {
         return [...(item.items||[]), ...(item.items?.flatMap(getChildren)||[])];
       }
-      return item.items.flatMap(getChildren);
+      return getChildren(item);
     }
   findOriginalItem: | #js
     function (id) {
@@ -88,9 +87,10 @@ watch:
   media:
     handler: | #js
       function (media) {
+        this.dMedia = JSON.parse(JSON.stringify(media));
         this.originalMedia = JSON.parse(JSON.stringify(media));
-        this.contentItems = this.getContentItems(media?.content);
-        this.originalContentItems = this.getContentItems(this.originalMedia?.content);
+        this.contentItems = this.getContentItems(this.dMedia?.content?.item);
+        this.originalContentItems = this.getContentItems(this.originalMedia?.content?.item);
       }
     immediate: true
 style:
@@ -108,7 +108,7 @@ template: >-
   :click="toggleRecaption" path="-2142476480.0.0"></ui-button></div><transition
   name="slide" path="-2142476480.1"><div class="mt-l2" v-if="showRecaption"
   path="-2142476480.1.0"><ul class="content-items" path="-2142476480.1.0.0"><li
-  v-for="item in contentItems.filter(it =&gt; it.caption)"
+  v-for="item in contentItems"
   path="-2142476480.1.0.0.0"><e-media-content-item-recaption :item="item"
   path="-2142476480.1.0.0.0.0"></e-media-content-item-recaption></li></ul><ui-select
   :options="['✨ start new thread', '➕ reply in thread']" type="dropdown"

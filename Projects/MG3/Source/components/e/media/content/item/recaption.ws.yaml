@@ -1,12 +1,13 @@
 dom:
   div:
     v-if: item.caption
-    ui.text.box:
-      v-model: item.caption.text
+    e.template.caption.editor:
+      ':item': item.caption
+      ':minimal': true
 props:
   item: null
 name: e-media-content-item-recaption
 template: >-
   <div class="comp-e-media-content-item-recaption" v-if="item.caption"
-  path="-1916563584."><ui-text-box v-model="item.caption.text"
-  path="-1916563584.0"></ui-text-box></div>
+  path="-1916563584."><e-template-caption-editor :item="item.caption"
+  :minimal="true" path="-1916563584.0"></e-template-caption-editor></div>

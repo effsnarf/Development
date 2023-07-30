@@ -102,7 +102,7 @@ methods:
 computed:
   gridWidth: | #js
     function() {
-      return (this.item?.gridItems?.width || this.item?.items.length);
+      return (this.item?.gridItems?.width || this.item?.items?.length);
     }
 watch: null
 style:

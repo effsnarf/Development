@@ -33,7 +33,6 @@ props:
   showFooter: true
 data:
   cMedia: null
-  temp: null
 methods:
   onClickMediaContent: | #js
     function() {

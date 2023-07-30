@@ -23,18 +23,9 @@ data:
   temp: null
 methods:
   applyMediaToTemplate: | #js
-    async function (media, temp) {
-      if (!media) return null;
-      let index = 0;
-      // Walk the tree and set caption text and image IDs
-      // [{text: 'test', {image: {_id: 1}}, ..]
-      const walk = (node) => {
-        const item = media.content.items[index];
-        Object.assign(node, item);
-        index++;
-        for (const child of (node.items||[])) walk(child);
-      };
-      walk(temp);
+    function (media, temp) {
+      if (!temp || !media) return null;
+      return Objects.deepMerge(temp, media.content.item);
     }
   initFromBuilder: | #js
     function (builder) {
@@ -75,8 +66,7 @@ watch:
         if (!media) return;
         const builder = await this.$root.getBuilder(media.builderID);
         const temp = this.builderSourceToTemplate(builder.source);
-        this.applyMediaToTemplate(media, temp);
-        this.temp = temp;
+        this.temp = this.applyMediaToTemplate(media, temp);
       }
     immediate: true
 name: e-format-base

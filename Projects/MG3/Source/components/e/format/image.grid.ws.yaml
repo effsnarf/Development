@@ -5,14 +5,15 @@ dom:
     ':editable': editable
     ':builder-source-to-template': builderSourceToTemplate
     ':show-help': showHelp
+    ':media-created': mediaCreated
     @cancel: $emit('cancel')
 props:
   builder: null
   media: null
   editable: false
   showHelp: true
-data:
-  temp: null
+  mediaCreated: null
+data: null
 methods:
   builderSourceToTemplate: | #js
     function(source) {
@@ -163,4 +164,5 @@ template: >-
   <e-format-base class="comp-e-format-image-grid" :builder="builder"
   :media="media" :editable="editable"
   :builder-source-to-template="builderSourceToTemplate" :show-help="showHelp"
-  @cancel="$emit('cancel')" path="-603568889."></e-format-base>
+  :media-created="mediaCreated" @cancel="$emit('cancel')"
+  path="-603568889."></e-format-base>

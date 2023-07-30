@@ -76,7 +76,7 @@ mounted: | #js
   }
 methods:
   onMediaCreated: | #js
-    async function (media) {
+    function (media) {
       this.$root.navigateTo(media);
     }
 computed:

@@ -37,8 +37,14 @@ data:
   isLoading: 0
 mounted: | #js
   async function() {
+    this.$root.$on("thread-updated", this.onThreadUpdated.bind(this));
   }
 methods:
+  onThreadUpdated: | #js
+    async function(threadID, threadMediaID) {
+      if (threadMediaID != this.dThreadMedia?._id) return;
+      await this.reload();
+    }
   getHiddenPostsCount: | #js
     function(index) {
       const post = this.visiblePosts[index];
