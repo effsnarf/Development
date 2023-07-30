@@ -139,7 +139,7 @@ methods:
     }
   onInstanceCreated: | #js
     function(instance) {
-      this.$refs.contentStream1?.add(instance);
+      console.log(instance);
     }
   onVisibleSteamInstanceChange: | #js
     function(instance) {

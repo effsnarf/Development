@@ -36,8 +36,9 @@ dom:
                   v-for: generator in teaserGenerators
                   ':generator': generator
                   ':key': generator._id
-              div: 
+              .mt-l1:
                 ui.link:
+                  v-if: teaserGenerators?.length
                   class: more-link
                   ':url': '''/advice-animals'''
                   ':text': '''see all Advice Animals…'''
@@ -197,8 +198,9 @@ template: >-
   path="1519228837.0.0.1.0.1.0"><e-generator-teaser2 v-for="generator in
   teaserGenerators" :generator="generator" :key="generator._id"
   path="1519228837.0.0.1.0.1.0.0"></e-generator-teaser2></transition-group><div
-  path="1519228837.0.0.1.0.1.1"><ui-link class="more-link"
-  :url="'/advice-animals'" :text="'see all Advice Animals…'"
+  class="mt-l1" path="1519228837.0.0.1.0.1.1"><ui-link class="more-link"
+  v-if="teaserGenerators?.length" :url="'/advice-animals'" :text="'see all
+  Advice Animals…'"
   path="1519228837.0.0.1.0.1.1.0"></ui-link></div></div></div></div></div><div
   class="flex1" v-if="videoVertical" path="1519228837.0.1"><div class="column2"
   path="1519228837.0.1.0"><div class="list1" path="1519228837.0.1.0.0"><div
