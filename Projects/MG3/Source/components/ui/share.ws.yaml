@@ -37,6 +37,8 @@ computed:
       return this.$root.url.itemImage(this.item);
     }
 style:
+  .a2a_kit:
+    width: fit-content
   .comp-ui-link:
     position: relative
     top: 0.25em

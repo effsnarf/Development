@@ -176,9 +176,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "../../../../LiveIde/Website/script/1690623050018.ts":
+/***/ "../../../../LiveIde/Website/script/1690693207703.ts":
 /*!***********************************************************!*\
-  !*** ../../../../LiveIde/Website/script/1690623050018.ts ***!
+  !*** ../../../../LiveIde/Website/script/1690693207703.ts ***!
   \***********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -1691,6 +1691,21 @@ class Objects {
     static is(obj, type) {
         return (0)._is(obj, type);
     }
+    static areEqual(obj1, obj2) {
+        if (typeof obj1 != "object" || typeof obj2 != "object")
+            return obj1 == obj2;
+        if ((obj1 == null) != (obj2 == null))
+            return false;
+        const keys1 = Object.keys(obj1).sortBy((s) => s);
+        const keys2 = Object.keys(obj2).sortBy((s) => s);
+        if (keys1.join(",") != keys2.join(","))
+            return false;
+        for (const key of keys1) {
+            if (!Objects.areEqual(obj1[key], obj2[key]))
+                return false;
+        }
+        return true;
+    }
     static clone(obj) {
         if (obj == null || obj == undefined || typeof obj != "object")
             return obj;
@@ -1702,6 +1717,42 @@ class Objects {
             debugger;
             throw ex;
         }
+    }
+    static subtract(target, source) {
+        const targetJson = JSON.stringify(target);
+        const sourceJson = JSON.stringify(source);
+        if (targetJson === sourceJson) {
+            return {}; // Return an empty object if the JSON representations are identical
+        }
+        else {
+            const result = {};
+            for (const key in target) {
+                if (target.hasOwnProperty(key)) {
+                    if (typeof target[key] === "object" &&
+                        typeof source[key] === "object") {
+                        const nestedResult = Objects.subtract(target[key], source[key]); // Recursively subtract nested objects
+                        if (Object.keys(nestedResult).length > 0) {
+                            result[key] = nestedResult;
+                        }
+                    }
+                    else if (target[key] !== source[key]) {
+                        result[key] = target[key]; // Add the property to the result if the values are different
+                    }
+                }
+            }
+            return result;
+        }
+    }
+    static withoutFalsyValues(obj) {
+        const result = {};
+        for (const key in obj) {
+            if (obj.hasOwnProperty(key)) {
+                if (obj[key]) {
+                    result[key] = obj[key];
+                }
+            }
+        }
+        return result;
     }
     static on(obj, key, callback) {
         if (typeof key === "function") {
@@ -3538,7 +3589,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690623050018.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690693207703.ts");
 /******/ 	
 /******/ })()
 ;

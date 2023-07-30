@@ -4,13 +4,17 @@ dom:
     ':media': media
     ':editable': editable
     ':builder-source-to-template': builderSourceToTemplate
-    @cancel: $emit('cancel')
+    ':show-help': showHelp
+    ':media-created': mediaCreated
+    ':cancel': cancel
 props:
   builder: null
   media: null
   editable: false
-data:
-  temp: null
+  showHelp: true
+  mediaCreated: null
+  cancel: null
+data: null
 methods:
   builderSourceToTemplate: | #js
     function(source) {
@@ -21,11 +25,16 @@ methods:
         type: "grid",
         layers: true,
         visible: true,
-        aspectRatio: null,
+        aspectRatio: source.aspectRatio,
         gap: 0.02,
         items: [],
-        grid: {
+        gridItems: {
           width: 1
+        },
+        can: {
+          remove: {
+            background: true
+          }
         }
       };
 
@@ -38,7 +47,7 @@ methods:
     }
   getNewItem: | #js
     function(sourceItem) {
-      const item = {
+      let item = {
         id: this.$root.getUniqueClientID(),
         type: sourceItem.type,
         visible: true,
@@ -47,12 +56,7 @@ methods:
 
       if (item.type == "caption")
       {
-        item.text = sourceItem.text;
-        item.hint = sourceItem.hint;
-        item.font = sourceItem.font;
-        item.color = sourceItem.color;
-        item.align = sourceItem.align || {h: null, v: null};
-        item.uppercase = sourceItem.uppercase;
+        Object.assign(item, sourceItem);
       }
 
       if (item.type == "image")
@@ -83,10 +87,15 @@ methods:
         item.slices = (sourceItem.slices || 6);
       }
 
+      item.rect = sourceItem.rect;
+
+      item = JSON.parse(JSON.stringify(item));
+
       return item;
     }
 name: e-format-layers
 template: >-
   <e-format-base class="comp-e-format-layers" :builder="builder" :media="media"
   :editable="editable" :builder-source-to-template="builderSourceToTemplate"
-  @cancel="$emit('cancel')" path="938677584."></e-format-base>
+  :show-help="showHelp" :media-created="mediaCreated" :cancel="cancel"
+  path="938677584."></e-format-base>

@@ -3,14 +3,11 @@ dom:
     page-name: media
     ':columns-focus-left': columnsFocusLeft
     ':content-not-found': contentNotFound
-    ':columns': 2
     template: 
       v-slot: article
     template: 
       v-slot: left
       .flex.ver.gap-2:
-        e.media.menu:
-          ':media': media
         e.thread.create:
           @input:columnsFocusLeft: columnsFocusLeft=$event
     template: 
@@ -18,10 +15,17 @@ dom:
       .flex.gap-2:
         transition:
           name: slide-large
-          e.thread:
-            v-if: media
-            ':key': media._id
-            ':threadMedia': media
+          .flex.ver.gap-2:
+            e.media:
+              v-if: media
+              ':media': media
+            e.media.menu:
+              ':media': media
+    template: 
+      v-slot: right
+      e.thread:
+        v-if: media
+        ':threadMedia': media
 data:
   media: null
   temp: null
@@ -80,14 +84,16 @@ name: page-media
 template: >-
   <site class="comp-page-media" page-name="media"
   :columns-focus-left="columnsFocusLeft" :content-not-found="contentNotFound"
-  :columns="2" path="221009861."><template v-slot:article
+  path="221009861."><template v-slot:article
   path="221009861.0"></template><template v-slot:left path="221009861.1"><div
-  class="flex ver gap-2" path="221009861.1.0"><e-media-menu :media="media"
-  path="221009861.1.0.0"></e-media-menu><e-thread-create
+  class="flex ver gap-2" path="221009861.1.0"><e-thread-create
   @input:columnsFocusLeft="columnsFocusLeft=$event"
-  path="221009861.1.0.1"></e-thread-create></div></template><template
+  path="221009861.1.0.0"></e-thread-create></div></template><template
   v-slot:middle path="221009861.2"><div class="flex gap-2"
   path="221009861.2.0"><transition name="slide-large"
-  path="221009861.2.0.0"><e-thread v-if="media" :key="media._id"
-  :threadMedia="media"
-  path="221009861.2.0.0.0"></e-thread></transition></div></template></site>
+  path="221009861.2.0.0"><div class="flex ver gap-2"
+  path="221009861.2.0.0.0"><e-media v-if="media" :media="media"
+  path="221009861.2.0.0.0.0"></e-media><e-media-menu :media="media"
+  path="221009861.2.0.0.0.1"></e-media-menu></div></transition></div></template><template
+  v-slot:right path="221009861.3"><e-thread v-if="media" :threadMedia="media"
+  path="221009861.3.0"></e-thread></template></site>

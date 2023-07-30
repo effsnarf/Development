@@ -9,19 +9,20 @@ dom:
           .flex.justify-between:
             v-if: (item.imageID && !removingBackground)
             ui.expand:
+              v-if: 'false'
               text: shadow
               v-model: showShadowEditor
             ui.checkbox:
+              v-if: temp?.can?.remove?.background
               text: remove background
               v-model: item.removeBackground
-        ui.image.select:
-          v-if: 'false'
-          ref: imageSelect1
-          v-model: item.imageID
-          @uploading: onImageUploading
+        e.template.caption.editor:
+          v-if: item.caption
+          ':item': item.caption
+          ':minimal': 'true'
         transition: 
           name: slide2
-          .message: 
+          .message:
             v-if: removingBackground
             div: 
               v-text: '''Removing background'''
@@ -31,11 +32,6 @@ dom:
         name: slide2
         div: 
           v-if: showShadowEditor
-          .message: 
-            div: 
-              v-text: '''Drag the shadow to move it'''
-            div: 
-              v-text: '''Ctrl-drag up/down to change the blur'''
           ui.range: 
             text: x
             v-model: item.shadow.x
@@ -61,6 +57,7 @@ dom:
             max: 1
             step: 0.01
 props:
+  temp: null
   item: null
 data:
   removingBackground: false
@@ -92,10 +89,6 @@ methods:
       {
         this.item.trans.scale += ds;
       }
-    }
-  onFileDrop: | #js
-    function(files) {
-      this.$refs.imageSelect1.onFileDrop(files);
     }
   onImageUploading: | #js
     function(isUploading) {
@@ -139,27 +132,24 @@ template: >-
   path="1046603147."><transition name="slide2" path="1046603147.0"><div
   path="1046603147.0.0"><transition name="slide2" path="1046603147.0.0.0"><div
   class="flex justify-between" v-if="(item.imageID &amp;&amp;
-  !removingBackground)" path="1046603147.0.0.0.0"><ui-expand text="shadow"
-  v-model="showShadowEditor"
-  path="1046603147.0.0.0.0.0"></ui-expand><ui-checkbox text="remove background"
+  !removingBackground)" path="1046603147.0.0.0.0"><ui-expand v-if="false"
+  text="shadow" v-model="showShadowEditor"
+  path="1046603147.0.0.0.0.0"></ui-expand><ui-checkbox
+  v-if="temp?.can?.remove?.background" text="remove background"
   v-model="item.removeBackground"
-  path="1046603147.0.0.0.0.1"></ui-checkbox></div></transition><ui-image-select
-  v-if="false" ref="imageSelect1" v-model="item.imageID"
-  @uploading="onImageUploading"
-  path="1046603147.0.0.1"></ui-image-select><transition name="slide2"
+  path="1046603147.0.0.0.0.1"></ui-checkbox></div></transition><e-template-caption-editor
+  v-if="item.caption" :item="item.caption" :minimal="true"
+  path="1046603147.0.0.1"></e-template-caption-editor><transition name="slide2"
   path="1046603147.0.0.2"><div class="message" v-if="removingBackground"
   path="1046603147.0.0.2.0"><div v-text="'Removing background'"
   path="1046603147.0.0.2.0.0"></div><ui-loading></ui-loading></div></transition></div></transition><div
   path="1046603147.1"><transition name="slide2" path="1046603147.1.0"><div
-  v-if="showShadowEditor" path="1046603147.1.0.0"><div class="message"
-  path="1046603147.1.0.0.0"><div v-text="'Drag the shadow to move it'"
-  path="1046603147.1.0.0.0.0"></div><div v-text="'Ctrl-drag up/down to change
-  the blur'" path="1046603147.1.0.0.0.1"></div></div><ui-range text="x"
+  v-if="showShadowEditor" path="1046603147.1.0.0"><ui-range text="x"
   v-model="item.shadow.x" min="-1" max="1" step="0.01"
-  path="1046603147.1.0.0.1"></ui-range><ui-range text="y"
+  path="1046603147.1.0.0.0"></ui-range><ui-range text="y"
   v-model="item.shadow.y" min="-1" max="1" step="0.01"
-  path="1046603147.1.0.0.2"></ui-range><ui-range text="blur"
+  path="1046603147.1.0.0.1"></ui-range><ui-range text="blur"
   v-model="item.shadow.blur" max="1" step="0.01"
-  path="1046603147.1.0.0.3"></ui-range><ui-range text="opacity"
+  path="1046603147.1.0.0.2"></ui-range><ui-range text="opacity"
   v-model="item.shadow.opacity" max="1" step="0.01"
-  path="1046603147.1.0.0.4"></ui-range></div></transition></div></div>
+  path="1046603147.1.0.0.3"></ui-range></div></transition></div></div>

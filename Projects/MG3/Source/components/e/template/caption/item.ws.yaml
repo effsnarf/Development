@@ -1,7 +1,8 @@
 dom:
   div: 
     v-if: item
-    ':class': '{ editable: isEditable }'
+    ':class': '{ rect: true, editable: isEditable }'
+    ':style': rectStyle
     .text:
       ref: sizeRef1
       ':class': getCssClass(item)
@@ -36,7 +37,8 @@ methods:
   getItemText: | #js
     function (item) {
       let text = this.$root.textToHtml(item.text);
-      if (this.editable && this.item.editable) text = `${text||"[text]"}`;
+      if (!text?.length && this.showPlaceholderText) text = (item.hint || "(text)");
+      if (item.hint == "quote") text = `"${text}"`;
       return text;
     }
   onClickText: | #js
@@ -79,7 +81,7 @@ methods:
   getStyle: | #js
     function(item) {
       const style = {};
-      style.fontSize = this.getFontSize(item.text);
+      style.fontSize = this.getFontSize(item.text, item.trans?.scale);
       style.fontFamily = item.font;
       if (item.uppercase) style.textTransform = "uppercase";
       style.color = item.color;
@@ -95,6 +97,7 @@ methods:
   getFontSize: | #js
     function (s, scale = 1) {
       if (!this.width) return 0;
+      if (!scale) scale = 1;
       const strLen = (s?.length || 1);
       let size = Math.min(3, Math.max(14, (36 - (strLen / 6))) / 50 *  this.width / 150);
       size = size * 2;
@@ -105,13 +108,34 @@ methods:
 computed:
   isEditable: | #js
     function () {
-      return this.editable && this.item.editable && (!this.temp.layers);
+      if (!this.editable) return false;
+      if (!this.item.editable) return false;
+      if (this.temp?.layers) return false;
+      if (this.temp?.join?.caption?.editors) return false;
+      return true;
+    }
+  showPlaceholderText: | #js
+    function () {
+      if (this.temp?.layers) return true;
+      return this.isEditable;
     }
   itemStyle: | #js
     function () {
       return this.getStyle(this.item);
     }
+  rectStyle: | #js
+    function () {
+      const style = {};
+      const rect = (this.item?.rect||{});
+      style.left = rect.left;
+      style.top = rect.top;
+      style.width = rect.width;
+      style.height = rect.height;
+      return style;
+    }
 style:
+  .rect:not(.editable):
+    pointer-events: none
   input[type="text"]:
     font-size: 100%
     padding: 0 !important
@@ -146,7 +170,7 @@ style:
     transition: 0s
     pointer-events: all
   .text-content.empty:
-    opacity: 0.4
+    opacity: 0.3
   .text-content:
     filter: grayscale(1)
   .text-content:hover:
@@ -159,12 +183,12 @@ style:
   .editable > .text > .text-content::after:
     display: inline-block
 template: >-
-  <div class="comp-e-template-caption-item" v-if="item" :class="{ editable:
-  isEditable }" path="128142918."><div class="text" ref="sizeRef1"
-  :class="getCssClass(item)" :style="itemStyle" path="128142918.0"><div
-  :class="getTextContentClass(item)" v-html="getItemText(item)"
-  :title="!isEditable ? '' : '✏️ edit'" @click="onClickText"
-  path="128142918.0.0"></div><transition name="slide"
+  <div class="comp-e-template-caption-item" v-if="item" :class="{ rect: true,
+  editable: isEditable }" :style="rectStyle" path="128142918."><div class="text"
+  ref="sizeRef1" :class="getCssClass(item)" :style="itemStyle"
+  path="128142918.0"><div :class="getTextContentClass(item)"
+  v-html="getItemText(item)" :title="!isEditable ? '' : '✏️ edit'"
+  @click="onClickText" path="128142918.0.0"></div><transition name="slide"
   path="128142918.0.1"><ui-text-box v-if="showEditor" :class="getCssClass(item)"
   v-model="item.text"
   path="128142918.0.1.0"></ui-text-box></transition></div></div>

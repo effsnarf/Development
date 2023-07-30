@@ -61,12 +61,44 @@ api:
         const builders = await db.find("Builders", { }, { }, 100, undefined, true);
         return builders;
     Medias.create.one:
-      args: [media]
+      args: [media, mediaGeneratorContent]
       code: | #js
         if (!media) throw new Error("Argument missing: media");
+
         const existingMedia = await db.findOne("Medias", { _uid: media._uid });
         if (existingMedia) return existingMedia;
+
+        if (mediaGeneratorContent)
+        {
+          // Find the MediaGenerator
+          let mediaGenerator = await db.findOne("MediaGenerators", { Content: mediaGeneratorContent });
+          if (!mediaGenerator) {
+            mediaGenerator = {
+              Content: mediaGeneratorContent,
+              Created: Date.now(),
+            };
+            mediaGenerator = await db.upsert("MediaGenerator", mediaGenerator, true);
+            media.mediaGeneratorID = mediaGenerator._id;
+          }
+        }
+
         media = await db.upsert("Medias", media, true);
+        // Get the media generator
+        const builder = await db.findOne("Builders", { _id: media.builderID });
+        if (builder.source.get?.media?.generator)
+        {
+          const getContentItem = eval(builder.source.get.media.generator);
+          // Walk the tree and collect the content items that constitute the media generator
+          let items = [];
+          const walk = (node) => {
+            const item = {};
+            Object.assign(item, node);
+            items.push(item);
+            if (node.items) node.items.forEach(walk);
+          };
+          walk(media.content);
+        }
+
         return media;
     Medias.select.one:
       args: [mediaID]

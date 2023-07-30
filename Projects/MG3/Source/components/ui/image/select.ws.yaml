@@ -34,7 +34,7 @@ computed:
   dropAreaText: | #js
     function () {
       if (this.isUploading) return "uploading…";
-      return "drop image here";
+      return "📤 drop image";
     }
 watch:
   isUploading: | #js

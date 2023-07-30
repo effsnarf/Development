@@ -36,8 +36,9 @@ dom:
             ':temp': temp
           .flex.justify-around.mt-l2:
             ui.button: 
+              v-if: cancel
               ':text': '''✖️ cancel'''
-              ':click': () => $emit('cancel')
+              ':click': cancel
             ui.button: 
               ':text': '''✔️ create'''
               ':click': createMedia
@@ -63,45 +64,19 @@ dom:
               ':imageID': selectedItem.imageID
               v-model: selectedItem.filters
               @input: () => onItemChange(selectedItem)
-      .help:
-        v-if: editable
-        .message: 
-          ui.video: 
-            src: /video/interface/image/drop.webm
-          div: 
-            v-text: '''Drop images to upload.'''
-        .message: 
-          ui.video: 
-            src: /video/interface/image/move.webm
-          div: 
-            v-text: '''Drag images to move.'''
-        .message: 
-          ui.video: 
-            src: /video/interface/image/scale.webm
-          div: 
-            v-text: '''Ctrl-drag images to resize.'''
-        .message: 
-          v-if: hasMoreThanOneImagePerGrid
-          class: large-video
-          ui.video: 
-            src: /video/interface/image/visible.webm
-          div: 
-            v-text: '''Toggle image visibility using the tree on the left.'''
-        .message: 
-          v-if: hasMoreThanOneImagePerGrid
-          class: large-video
-          ui.video: 
-            src: /video/interface/image/rotate.webm
-          div: 
-            v-text: >-
-              'If less than 4 images are visible, click the title (Body, Hair..)
-              to change the layout.'
+      e.template.help:
+        v-if: editable && showHelp
+        ':show-visibility-help': hasMoreThanOneImagePerGrid
 props:
   temp: null
   builder: null
   editable: false
   showPropertyEditor: true
+  showHelp: true
+  mediaCreated: null
+  cancel: null
 data:
+  emptyTemp: null
   selectedItemIndex: 0
   disabled: 0
   showFilters: false
@@ -115,6 +90,8 @@ methods:
       try
       {
         let media = this.getMedia(this.temp);
+        const mediaGeneratorContent = { item: this.withoutDefaultValues(this.emptyTemp) };
+
         // Check that [title] is not empty
         if (media.content.items.some(item => item.caption?.text == '[title]'))
         {
@@ -129,12 +106,11 @@ methods:
         }
         const _uid = this.$root.getRandomUniqueID();
         media._uid = _uid;
-        media = await this.$root.dbp.medias.create.one(media);
+        media = await this.$root.dbp.medias.create.one(media, mediaGeneratorContent);
         // When POSTing from localhost to db.mg.net, we don't get the response,
         // so we're making another request
         if (!media) media = await this.$root.dbp.medias.select.one(_uid);
-        this.$emit('media-created', media);
-        await this.$root.navigateTo(media);
+        if (this.mediaCreated) await this.mediaCreated(media);
       }
       finally
       {
@@ -142,27 +118,83 @@ methods:
     }
   getMedia: | #js
     function(temp) {
-      // Walk the tree and collect caption text and image IDs into an array
-      // [{text: 'test', {image: {_id: 1}}, ..]
-      let items = [];
-      const walk = (node) => {
-        const item = {};
-        Object.assign(item, node);
-        items.push(item);
-        if (node.items) node.items.forEach(walk);
-      };
-      walk(temp);
-
-      items = JSON.parse(JSON.stringify(items));
+      const item = Objects.subtract(temp, this.emptyTemp);
 
       const media = {
         created: new Date(),
         type: "builder",
         builderID: this.builder._id,
-        content: { items }
+        content: { item }
       }
 
       return media;
+    }
+  withoutDefaultValues: | #js
+    function(item, key) {
+      if (!item) return null;
+
+      item = JSON.parse(JSON.stringify(item));
+
+      const allDefaults = {
+        grid: {
+          type: null,
+          visible: true,
+          grid: null,
+          gap: 0.02,
+          aspectRatio: null,
+          caption: null,
+        },
+        image: {
+          type: null,
+          visible: true,
+          imageID: null,
+          removeBackground: false,
+          shadow: {
+            blur: 0,
+            color: "#000000",
+            opacity: 1,
+            x: 0,
+            y: 0
+          },
+          trans: {
+            pos: {
+              x: 0.5,
+              y: 0.5
+            },
+            scale: 1,
+          },
+          caption: null,
+        },
+        caption: {
+          type: "caption",
+          visible: true,
+          text: "",
+          uppercase: false,
+          font: "Arial",
+          editable: true,
+          color: "white",
+          align: null
+        }
+      };
+
+      const defaults = allDefaults[key||item.type];
+
+      for (const key of Object.keys(item))
+      {
+        if (key == "items") continue;
+        if (!(key in defaults)) delete item[key];
+        if (item[key] == null) delete item[key];
+        if (item[key] == {}) delete item[key];
+        if (Objects.areEqual(item[key], defaults[key])) delete item[key];
+        if (Object.keys(allDefaults).includes(key)) {
+          item[key] = this.withoutDefaultValues(item[key], key);
+          if (item[key] == null) delete item[key];
+        }
+      }
+
+      if (item.items) item.items = item.items.map(child => this.withoutDefaultValues(child));
+
+      return item;
     }
   init: | #js
     async function() {
@@ -201,7 +233,7 @@ methods:
     }
   getStyle: | #js
     function() {
-      const columns = this.showTree ? ["1fr", "4fr", "1.5fr"] : this.editable ? ["1fr", "15em"] : ["1fr"];
+      const columns = this.showTree ? ["1fr", "4fr", "1.5fr"] : (this.editable && this.showHelp) ? ["1fr", "15em"] : ["1fr"];
       return {
         gridTemplate: `1fr / ${columns.map(c => `${c}`).join(' ')}`
       };
@@ -262,7 +294,7 @@ computed:
     function() {
       if (!this.temp) return false;
 
-      if (this.temp.grid?.width == 1) return false;
+      if (this.temp.gridItems?.width == 1) return false;
 
       const checkNode = (node) => {
         if (node.type != 'grid') return false;
@@ -281,10 +313,14 @@ watch:
   builder: | #js
     async function(builder) {
     }
+  temp:
+    handler: | #js
+      function(temp) {
+        this.emptyTemp = JSON.parse(JSON.stringify(temp));
+      }
+    immediate: true
 name: e-template-editor
 style:
-  .main-content:
-    border: 2px solid gray
   .div1:
     display: grid
     gap: 1em
@@ -330,15 +366,6 @@ style:
     overflow: hidden
   .item.selected, .item.selected:hover:
     background: none !important
-  .help:
-    margin-top: 4em
-  .help .message:
-    display: grid
-    grid-template: 1fr / 1fr 2fr
-    gap: 1em
-    text-align: left
-  .help video:
-    filter: grayscale(1)
   .message.large-video:
     grid-template: 1fr / 1fr
 template: >-
@@ -360,9 +387,9 @@ template: >-
   path="-650358312.0.1.0.0.0"></e-template-grid-item></ui-movable></ui-file-dropzone><div
   v-if="editable" path="-650358312.0.1.1"><e-template-editors :temp="temp"
   path="-650358312.0.1.1.0"></e-template-editors><div class="flex justify-around
-  mt-l2" path="-650358312.0.1.1.1"><ui-button :text="'✖️ cancel'" :click="()
-  =&gt; $emit('cancel')" path="-650358312.0.1.1.1.0"></ui-button><ui-button
-  :text="'✔️ create'" :click="createMedia"
+  mt-l2" path="-650358312.0.1.1.1"><ui-button v-if="cancel" :text="'✖️ cancel'"
+  :click="cancel" path="-650358312.0.1.1.1.0"></ui-button><ui-button :text="'✔️
+  create'" :click="createMedia"
   path="-650358312.0.1.1.1.1"></ui-button></div></div><div v-if="selectedItem
   &amp;&amp; showPropertyEditor" path="-650358312.0.1.2"><ui-section
   :title="selectedItem.type" v-model="showFilters" :opposite="true"
@@ -375,23 +402,7 @@ template: >-
   path="-650358312.0.1.2.1"><e-template-item-filters
   :imageID="selectedItem.imageID" v-model="selectedItem.filters" @input="()
   =&gt; onItemChange(selectedItem)"
-  path="-650358312.0.1.2.1.0"></e-template-item-filters></ui-section></div></div><div
-  class="help" v-if="editable" path="-650358312.0.2"><div class="message"
-  path="-650358312.0.2.0"><ui-video src="/video/interface/image/drop.webm"
-  path="-650358312.0.2.0.0"></ui-video><div v-text="'Drop images to upload.'"
-  path="-650358312.0.2.0.1"></div></div><div class="message"
-  path="-650358312.0.2.1"><ui-video src="/video/interface/image/move.webm"
-  path="-650358312.0.2.1.0"></ui-video><div v-text="'Drag images to move.'"
-  path="-650358312.0.2.1.1"></div></div><div class="message"
-  path="-650358312.0.2.2"><ui-video src="/video/interface/image/scale.webm"
-  path="-650358312.0.2.2.0"></ui-video><div v-text="'Ctrl-drag images to
-  resize.'" path="-650358312.0.2.2.1"></div></div><div class="large-video
-  message" v-if="hasMoreThanOneImagePerGrid" path="-650358312.0.2.3"><ui-video
-  src="/video/interface/image/visible.webm"
-  path="-650358312.0.2.3.0"></ui-video><div v-text="'Toggle image visibility
-  using the tree on the left.'" path="-650358312.0.2.3.1"></div></div><div
-  class="large-video message" v-if="hasMoreThanOneImagePerGrid"
-  path="-650358312.0.2.4"><ui-video src="/video/interface/image/rotate.webm"
-  path="-650358312.0.2.4.0"></ui-video><div v-text="'If less than 4 images are
-  visible, click the title (Body, Hair..) to change the layout.'"
-  path="-650358312.0.2.4.1"></div></div></div></div></div>
+  path="-650358312.0.1.2.1.0"></e-template-item-filters></ui-section></div></div><e-template-help
+  v-if="editable &amp;&amp; showHelp"
+  :show-visibility-help="hasMoreThanOneImagePerGrid"
+  path="-650358312.0.2"></e-template-help></div></div>

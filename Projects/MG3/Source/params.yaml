@@ -8,7 +8,7 @@ params:
         if (url.startsWith("/catalog")) return "catalog";
         if (url.startsWith("/b/")) return "builder";
         if (url.startsWith("/t/")) return "thread";
-        if (url.startsWith("/m/")) return "thread";
+        if (url.startsWith("/m/")) return "media";
         if (url.startsWith("/instance/")) return "instance";
         if (url.startsWith("/c/")) return "category";
         return "generator";

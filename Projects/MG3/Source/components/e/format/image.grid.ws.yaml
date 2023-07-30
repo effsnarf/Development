@@ -4,11 +4,13 @@ dom:
     ':media': media
     ':editable': editable
     ':builder-source-to-template': builderSourceToTemplate
+    ':show-help': showHelp
     @cancel: $emit('cancel')
 props:
   builder: null
   media: null
   editable: false
+  showHelp: true
 data:
   temp: null
 methods:
@@ -36,9 +38,10 @@ methods:
           scale: 0.6
         },
         items: [],
-        grid: {
-          width: (source.grid?.width || 3)
-        }
+        gridItems: {
+          width: (source.gridItems?.width || 3)
+        },
+        join: JSON.parse(JSON.stringify(source.join))
       };
 
       const hasSubgrid = true || (source.subgrid.items > 1);
@@ -146,6 +149,11 @@ methods:
               },
             });
         }
+
+        for (let i = 0; i < (source.defaults||[]).length; i++)
+        {
+          Object.assign(temp.items[i], source.defaults[i]);
+        }
       }
 
       return temp;
@@ -154,5 +162,5 @@ name: e-format-image-grid
 template: >-
   <e-format-base class="comp-e-format-image-grid" :builder="builder"
   :media="media" :editable="editable"
-  :builder-source-to-template="builderSourceToTemplate"
+  :builder-source-to-template="builderSourceToTemplate" :show-help="showHelp"
   @cancel="$emit('cancel')" path="-603568889."></e-format-base>

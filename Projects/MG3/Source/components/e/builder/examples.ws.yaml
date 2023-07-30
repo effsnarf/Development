@@ -1,0 +1,188 @@
+dom:
+  div: 
+    .builders:
+      .flex1: 
+        v-if: adviceAnimal
+        e.builder: 
+          class: column1
+          ':builder': adviceAnimal
+          ':show-help': 'false'
+          ':media-created': onMediaCreated
+        div: 
+          class: column2
+          .list1: 
+            div: 
+              h2: 
+                v-text: adviceAnimal.name.pluralize()
+              div: 
+                v-text: adviceAnimal.desc
+            .list1: 
+              div: 
+                class: list-alternating
+                e.generator.teaser2:
+                  v-for: generator in teaserGenerators
+                  ':generator': generator
+              div: 
+                .grid2:
+                  e.generator.square:
+                    v-for: generator in moreGenerators
+                    ':generator': generator
+              div: 
+                ui.link:
+                  v-if: 'false'
+                  class: more-link
+                  ':url': '''/advice-animals'''
+                  ':text': '''see all Advice Animals…'''
+      .flex1: 
+        v-if: videoVertical
+        div: 
+          class: column2
+          .list1: 
+            div: 
+              h2: 
+                v-text: videoVertical.name.pluralize()
+              div: 
+                v-text: videoVertical.desc
+            div: 
+              class: list-alternating
+        e.builder: 
+          class: column1
+          ':builder': videoVertical
+          ':show-help': 'false'
+          ':media-created': onMediaCreated
+      .flex1: 
+        v-if: famousQuote
+        e.builder: 
+          class: column1
+          ':builder': famousQuote
+          ':show-help': 'false'
+          ':media-created': onMediaCreated
+        div: 
+          class: column2
+          .list1: 
+            div: 
+              h2: 
+                v-text: famousQuote.name.pluralize()
+              div: 
+                v-text: famousQuote.desc
+            div: 
+              class: list-alternating
+props: null
+data:
+  popularGenerators: null
+mounted: | #js
+  async function() {
+    this.popularGenerators = (await this.$root.dbp.generators.select.popular());
+  }
+methods:
+  onMediaCreated: | #js
+    async function (media) {
+      this.$root.navigateTo(media);
+    }
+computed:
+  teaserGenerators: | #js
+    function () {
+      return this.popularGenerators?.shuffle().take(4);
+    }
+  moreGenerators: | #js
+    function () {
+      return this.popularGenerators
+        ?.filter(g => (!this.teaserGenerators?.find(g2 => (g2._id == g._id))))
+        .take(10)
+    }
+  adviceAnimal: | #js
+    function () {
+      return this.builders["Advice-Animal"];
+    }
+  videoVertical: | #js
+    function () {
+      return this.builders["Video-Vertical"];
+    }
+  famousQuote: | #js
+    function () {
+      return this.builders["Famous-Quote"];
+    }
+  builders: | #js
+    function () {
+      const builders = {};
+      for (const builder of Object.values(this.$root.builders.all))
+      {
+        builders[builder.urlName] = builder;
+      }
+      return builders;
+    }
+style:
+  .more-link:
+    font-size: 160%
+    text-align: right
+  .builders:
+    display: flex
+    flex-direction: column
+    gap: 4em
+  .grid2:
+    display: grid
+    grid-template: 1fr / repeat(5, 1fr)
+    gap: 1em
+  .flex1:
+    display: flex
+    gap: 2em
+  .list1:
+    display: flex
+    flex-direction: column
+    gap: 1em
+  .column1:
+    width: 33%
+  .column2:
+    width: 67%
+  h2:
+    font-size: 3rem
+  h3:
+    font-size: 1.5rem
+  .list-alternating:
+    display: flex
+    flex-direction: column
+    gap: 1em
+  .list-alternating > *:nth-child(odd) .flex:
+    flex-direction: row-reverse
+  .list-alternating > *:nth-child(even) .flex:
+    flex-direction: row
+  .comp-e-template-help:
+    width: 20em
+name: e-builder-examples
+template: >-
+  <div class="comp-e-builder-examples" path="1519228837."><div class="builders"
+  path="1519228837.0"><div class="flex1" v-if="adviceAnimal"
+  path="1519228837.0.0"><e-builder class="column1" :builder="adviceAnimal"
+  :show-help="false" :media-created="onMediaCreated"
+  path="1519228837.0.0.0"></e-builder><div class="column2"
+  path="1519228837.0.0.1"><div class="list1" path="1519228837.0.0.1.0"><div
+  path="1519228837.0.0.1.0.0"><h2 v-text="adviceAnimal.name.pluralize()"
+  path="1519228837.0.0.1.0.0.0"></h2><div v-text="adviceAnimal.desc"
+  path="1519228837.0.0.1.0.0.1"></div></div><div class="list1"
+  path="1519228837.0.0.1.0.1"><div class="list-alternating"
+  path="1519228837.0.0.1.0.1.0"><e-generator-teaser2 v-for="generator in
+  teaserGenerators" :generator="generator"
+  path="1519228837.0.0.1.0.1.0.0"></e-generator-teaser2></div><div
+  path="1519228837.0.0.1.0.1.1"><div class="grid2"
+  path="1519228837.0.0.1.0.1.1.0"><e-generator-square v-for="generator in
+  moreGenerators" :generator="generator"
+  path="1519228837.0.0.1.0.1.1.0.0"></e-generator-square></div></div><div
+  path="1519228837.0.0.1.0.1.2"><ui-link class="more-link" v-if="false"
+  :url="'/advice-animals'" :text="'see all Advice Animals…'"
+  path="1519228837.0.0.1.0.1.2.0"></ui-link></div></div></div></div></div><div
+  class="flex1" v-if="videoVertical" path="1519228837.0.1"><div class="column2"
+  path="1519228837.0.1.0"><div class="list1" path="1519228837.0.1.0.0"><div
+  path="1519228837.0.1.0.0.0"><h2 v-text="videoVertical.name.pluralize()"
+  path="1519228837.0.1.0.0.0.0"></h2><div v-text="videoVertical.desc"
+  path="1519228837.0.1.0.0.0.1"></div></div><div class="list-alternating"
+  path="1519228837.0.1.0.0.1"></div></div></div><e-builder class="column1"
+  :builder="videoVertical" :show-help="false" :media-created="onMediaCreated"
+  path="1519228837.0.1.1"></e-builder></div><div class="flex1"
+  v-if="famousQuote" path="1519228837.0.2"><e-builder class="column1"
+  :builder="famousQuote" :show-help="false" :media-created="onMediaCreated"
+  path="1519228837.0.2.0"></e-builder><div class="column2"
+  path="1519228837.0.2.1"><div class="list1" path="1519228837.0.2.1.0"><div
+  path="1519228837.0.2.1.0.0"><h2 v-text="famousQuote.name.pluralize()"
+  path="1519228837.0.2.1.0.0.0"></h2><div v-text="famousQuote.desc"
+  path="1519228837.0.2.1.0.0.1"></div></div><div class="list-alternating"
+  path="1519228837.0.2.1.0.1"></div></div></div></div></div></div>

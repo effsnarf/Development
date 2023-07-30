@@ -1,5 +1,6 @@
 dom:
   div:
+    v-if: item
     ui.file.dropzone:
       ':enabled': editable
       v-model: item.imageID
@@ -17,9 +18,11 @@ dom:
           @change: refresh
     e.template.caption.item:
       v-if: item.caption
+      ':temp': temp
       ':item': item.caption
       ':editable': editable
 props:
+  temp: null
   item: null
   editable: false
 mounted: | #js
@@ -76,6 +79,8 @@ watch:
       }
     deep: true
 style:
+  .comp-e-template-image-item:
+    border: 1px solid gray
   .comp-e-template-caption-item:
     position: absolute
     top: 0
@@ -84,14 +89,14 @@ style:
     pointer-events: none
 name: e-template-image-item
 template: >-
-  <div class="comp-e-template-image-item" path="1623568049."><ui-file-dropzone
-  :enabled="editable" v-model="item.imageID" path="1623568049.0"><ui-movable
-  :enabled="editable" @drag-by="({ dx, dy }) =&gt; onItemDragBy(item, { dx, dy
-  })" @scale-by="(ds) =&gt; onItemScaleBy(item, ds)"
-  path="1623568049.0.0"><ui-image ref="image1" v-if="item"
-  :style="getStyle(item)" :imageID="item.imageID"
+  <div class="comp-e-template-image-item" v-if="item"
+  path="1623568049."><ui-file-dropzone :enabled="editable"
+  v-model="item.imageID" path="1623568049.0"><ui-movable :enabled="editable"
+  @drag-by="({ dx, dy }) =&gt; onItemDragBy(item, { dx, dy })" @scale-by="(ds)
+  =&gt; onItemScaleBy(item, ds)" path="1623568049.0.0"><ui-image ref="image1"
+  v-if="item" :style="getStyle(item)" :imageID="item.imageID"
   :remove-background="item.removeBackground" @load="onImageLoad"
   @change="refresh"
   path="1623568049.0.0.0"></ui-image></ui-movable></ui-file-dropzone><e-template-caption-item
-  v-if="item.caption" :item="item.caption" :editable="editable"
+  v-if="item.caption" :temp="temp" :item="item.caption" :editable="editable"
   path="1623568049.1"></e-template-caption-item></div>

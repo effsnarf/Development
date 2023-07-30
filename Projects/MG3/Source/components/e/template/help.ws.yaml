@@ -1,0 +1,63 @@
+dom:
+  .help:
+    .message: 
+      ui.video: 
+        src: /video/interface/image/drop.webm
+      div: 
+        v-text: '''Drop images to upload.'''
+    .message: 
+      ui.video: 
+        src: /video/interface/image/move.webm
+      div: 
+        v-text: '''Drag images to position.'''
+    .message: 
+      ui.video: 
+        src: /video/interface/image/scale.webm
+      div: 
+        v-text: '''Ctrl-drag images to resize.'''
+    .message: 
+      v-if: showVisibilityHelp
+      class: large-video
+      ui.video: 
+        src: /video/interface/image/visible.webm
+      div: 
+        v-text: '''Toggle image visibility using the tree on the left.'''
+    .message: 
+      v-if: showVisibilityHelp
+      class: large-video
+      ui.video: 
+        src: /video/interface/image/rotate.webm
+      div: 
+        v-text: >-
+          'If less than 4 images are visible, click the title (Body, Hair..) to
+          change the layout.'
+props:
+  showVisibilityHelp: false
+style:
+  .help .message:
+    display: grid
+    grid-template: 1fr / 1fr 2fr
+    gap: 1em
+    text-align: left
+  .help video:
+    filter: grayscale(1)
+name: e-template-help
+template: >-
+  <div class="comp-e-template-help help" path="-67625364."><div class="message"
+  path="-67625364.0"><ui-video src="/video/interface/image/drop.webm"
+  path="-67625364.0.0"></ui-video><div v-text="'Drop images to upload.'"
+  path="-67625364.0.1"></div></div><div class="message"
+  path="-67625364.1"><ui-video src="/video/interface/image/move.webm"
+  path="-67625364.1.0"></ui-video><div v-text="'Drag images to position.'"
+  path="-67625364.1.1"></div></div><div class="message"
+  path="-67625364.2"><ui-video src="/video/interface/image/scale.webm"
+  path="-67625364.2.0"></ui-video><div v-text="'Ctrl-drag images to resize.'"
+  path="-67625364.2.1"></div></div><div class="large-video message"
+  v-if="showVisibilityHelp" path="-67625364.3"><ui-video
+  src="/video/interface/image/visible.webm" path="-67625364.3.0"></ui-video><div
+  v-text="'Toggle image visibility using the tree on the left.'"
+  path="-67625364.3.1"></div></div><div class="large-video message"
+  v-if="showVisibilityHelp" path="-67625364.4"><ui-video
+  src="/video/interface/image/rotate.webm" path="-67625364.4.0"></ui-video><div
+  v-text="'If less than 4 images are visible, click the title (Body, Hair..) to
+  change the layout.'" path="-67625364.4.1"></div></div></div>

@@ -1,0 +1,36 @@
+dom:
+  ui.link:
+    ':url': $root.url.generator(generator)
+    .flex.gap-1:
+      div: 
+        ':style': '{ width: ''15%'' }'
+        ui.image:
+          ':imageID': generator.imageID
+      div: 
+        ':style': '{ width: ''85%'' }'
+        h3:
+          v-text: generator.displayName
+        div: 
+          v-text: teaserArticle
+props:
+  generator: null
+data: null
+computed:
+  teaserArticle: | #js
+    function () {
+      const paragraphs = this.generator.desc?.article?.split("\n")
+        .map(p => p.trim())
+        .filter(p => p.length > 100);
+      const par = paragraphs[1] || paragraphs[0];
+      return par?.split(".").filter(s => (s?.length > 100))[0] + ".";
+    }
+name: e-generator-teaser2
+template: >-
+  <ui-link class="comp-e-generator-teaser2"
+  :url="$root.url.generator(generator)" path="-2123996546."><div class="flex
+  gap-1" path="-2123996546.0"><div :style="{ width: '15%' }"
+  path="-2123996546.0.0"><ui-image :imageID="generator.imageID"
+  path="-2123996546.0.0.0"></ui-image></div><div :style="{ width: '85%' }"
+  path="-2123996546.0.1"><h3 v-text="generator.displayName"
+  path="-2123996546.0.1.0"></h3><div v-text="teaserArticle"
+  path="-2123996546.0.1.1"></div></div></div></ui-link>

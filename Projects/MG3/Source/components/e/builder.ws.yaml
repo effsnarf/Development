@@ -5,12 +5,17 @@ dom:
     ':editable': true
     ':builder': builder
     ':key': builder._id
-    @cancel: $emit('cancel')
+    ':show-help': showHelp
+    ':media-created': mediaCreated
+    ':cancel': cancel
 props:
   builder: null
+  showHelp: true
+  mediaCreated: null
+  cancel: null
 name: e-builder
 template: >-
   <component class="comp-e-builder" v-if="builder"
   :is="$root.getBuilderComponentName(builder)" :editable="true"
-  :builder="builder" :key="builder._id" @cancel="$emit('cancel')"
-  path="926534418."></component>
+  :builder="builder" :key="builder._id" :show-help="showHelp"
+  :media-created="mediaCreated" :cancel="cancel" path="926534418."></component>

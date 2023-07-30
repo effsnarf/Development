@@ -1,6 +1,5 @@
 dom:
   div:
-    ':tooltip': text
     input:
       type: range
       ':value': value
@@ -17,7 +16,6 @@ props:
 style: null
 name: ui-range
 template: >-
-  <div class="comp-ui-range" :tooltip="text" path="-2125793949."><input
-  type="range" :value="value" :min="min" :max="max" :step="step"
-  @input="$emit('input', parseFloat($event.target.value))"
-  path="-2125793949.0"/></div>
+  <div class="comp-ui-range" path="-2125793949."><input type="range"
+  :value="value" :min="min" :max="max" :step="step" @input="$emit('input',
+  parseFloat($event.target.value))" path="-2125793949.0"/></div>

@@ -4,6 +4,7 @@ dom:
       v-for: item in items
       component:
         ':is': '''e-template-'' + item.type + ''-editor'''
+        ':temp': temp
         ':item': item
         ':minimal': true
 props:
@@ -19,10 +20,12 @@ computed:
       });
       return items;
     }
-style: null
+style:
+  li:
+    margin-bottom: 0.5em
 name: e-template-editors
 template: >-
   <ul class="comp-e-template-editors" path="1313728923."><li v-for="item in
   items" path="1313728923.0"><component :is="'e-template-' + item.type +
-  '-editor'" :item="item" :minimal="true"
+  '-editor'" :temp="temp" :item="item" :minimal="true"
   path="1313728923.0.0"></component></li></ul>

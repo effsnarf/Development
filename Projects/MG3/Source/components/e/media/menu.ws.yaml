@@ -1,6 +1,6 @@
 dom:
   div: 
-    .flex.flex-column.gap-2:
+    .flex.ver.gap-2:
       div: 
         v-if: false && $root.isAdmin
         ui.button:
@@ -14,8 +14,8 @@ data: null
 methods: null
 name: e-media-menu
 template: >-
-  <div class="comp-e-media-menu" path="991464018."><div class="flex flex-column
-  gap-2" path="991464018.0"><div v-if="false &amp;&amp; $root.isAdmin"
+  <div class="comp-e-media-menu" path="991464018."><div class="flex ver gap-2"
+  path="991464018.0"><div v-if="false &amp;&amp; $root.isAdmin"
   path="991464018.0.0"><ui-button :text="'❌ delete'" :click="() =&gt;
   $root.dbp.medias.delete.one(media._id)"
   path="991464018.0.0.0"></ui-button></div><ui-share :item="media"

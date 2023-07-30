@@ -10,6 +10,18 @@ class Objects {
     return (0)._is(obj, type);
   }
 
+  static areEqual(obj1: any, obj2: any): boolean {
+    if (typeof obj1 != "object" || typeof obj2 != "object") return obj1 == obj2;
+    if ((obj1 == null) != (obj2 == null)) return false;
+    const keys1 = Object.keys(obj1).sortBy((s) => s);
+    const keys2 = Object.keys(obj2).sortBy((s) => s);
+    if (keys1.join(",") != keys2.join(",")) return false;
+    for (const key of keys1) {
+      if (!Objects.areEqual(obj1[key], obj2[key])) return false;
+    }
+    return true;
+  }
+
   static clone(obj: any): any {
     if (obj == null || obj == undefined || typeof obj != "object") return obj;
     try {
@@ -19,6 +31,47 @@ class Objects {
       debugger;
       throw ex;
     }
+  }
+
+  static subtract(target: any, source: any): any {
+    const targetJson = JSON.stringify(target);
+    const sourceJson = JSON.stringify(source);
+
+    if (targetJson === sourceJson) {
+      return {}; // Return an empty object if the JSON representations are identical
+    } else {
+      const result: any = {};
+
+      for (const key in target) {
+        if (target.hasOwnProperty(key)) {
+          if (
+            typeof target[key] === "object" &&
+            typeof source[key] === "object"
+          ) {
+            const nestedResult = Objects.subtract(target[key], source[key]); // Recursively subtract nested objects
+            if (Object.keys(nestedResult).length > 0) {
+              result[key] = nestedResult;
+            }
+          } else if (target[key] !== source[key]) {
+            result[key] = target[key]; // Add the property to the result if the values are different
+          }
+        }
+      }
+
+      return result;
+    }
+  }
+
+  static withoutFalsyValues(obj: any): any {
+    const result: any = {};
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        if (obj[key]) {
+          result[key] = obj[key];
+        }
+      }
+    }
+    return result;
   }
 
   static on(obj: any, key: string | Function, callback: Function): void {

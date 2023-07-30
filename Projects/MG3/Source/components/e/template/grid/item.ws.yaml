@@ -42,7 +42,7 @@ methods:
     function(item) {
       if (!item) return {};
       const style = {};
-      //if (item.layout == 'layers') style.aspectRatio = eval(item.aspectRatio);
+      style.aspectRatio = item.aspectRatio;
       const gap = 0.02; // item.gap;
       if ((this.size) && (gap)) style.gap = `${Math.round(gap * this.size.diagonal)}px`;
       return style;
@@ -102,7 +102,7 @@ methods:
 computed:
   gridWidth: | #js
     function() {
-      return (this.item?.grid?.width || this.item?.items.length);
+      return (this.item?.gridItems?.width || this.item?.items.length);
     }
 watch: null
 style:
@@ -122,6 +122,8 @@ style:
     flex-direction: column
   .container:
     gap: 0.5em
+  .container.grid-items-1:
+    gap: 0 !important
   .items:
     width: 100%
   .items .item: null
