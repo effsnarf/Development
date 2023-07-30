@@ -66,6 +66,12 @@ const helpers = {
         const imageID = getImageID(item.content.item);
         return helpers.url.image(imageID);
       }
+
+      const imageNode = Objects.traverseMap(item).find(
+        (a) => a.key == "imageID"
+      );
+      if (imageNode) return helpers.url.image(imageNode.value);
+
       console.log(item);
       throw new Error("Unknown item type");
     },
@@ -275,6 +281,243 @@ interface MgParams {
         if (!builder) return null;
         return `e-format-${builder.format.replace(/\./g, "-")}`;
       },
+      async mediaToTemp(media: any) {
+        console.log(media);
+        const self = this as any;
+        const builder = await self.getBuilder(media.builderID);
+        let temp = self.builderSourceToTemplate(builder.format, builder.source);
+        temp = self.applyMediaToTemplate(media, temp);
+        return temp;
+      },
+      builderSourceToTemplate(format: string, source: any) {
+        const self = this as any;
+
+        if (!source) return null;
+
+        if (format == "image.grid") {
+          const temp = {
+            id: self.getUniqueClientID(),
+            type: "grid",
+            visible: true,
+            aspectRatio: null,
+            gap: 0.02,
+            caption: !source.title
+              ? null
+              : {
+                  visible: true,
+                  editable: source.title.editable,
+                  text: source.title.text,
+                  font: "Arial",
+                  color: "white",
+                  align: {
+                    h: "center",
+                    v: "top",
+                  },
+                  uppercase: false,
+                  scale: 0.6,
+                },
+            items: [],
+            gridItems: {
+              width: source.gridItems?.width || 3,
+            },
+            join: JSON.parse(JSON.stringify(source.join)),
+          } as any;
+
+          const hasSubgrid = true || source.subgrid.items > 1;
+
+          const captionItems = source.captions.items || source.captions;
+          const editable = source.captions.editable || false;
+
+          if (Array.isArray(captionItems)) {
+            for (let i = 0; i < captionItems.length; i++) {
+              const caption = {
+                visible: true,
+                editable: editable,
+                text: captionItems[i],
+                font: "Arial",
+                color: "white",
+                align: {
+                  h: "center",
+                  v: "bottom",
+                },
+                uppercase: false,
+              };
+
+              let subgrid = temp;
+
+              if (hasSubgrid) {
+                subgrid = {
+                  id: self.getUniqueClientID(),
+                  type: "grid",
+                  visible: true,
+                  aspectRatio: "1/1",
+                  caption,
+                  rotation: 0,
+                  items: [],
+                } as any;
+
+                temp.items.push(subgrid);
+              }
+
+              for (let j = 0; j < source.subgrid.items; j++) {
+                subgrid.items.add({
+                  id: self.getUniqueClientID(),
+                  type: "image",
+                  visible: true,
+                  imageID: null,
+                  removeBackground: false,
+                  caption: hasSubgrid ? null : caption,
+                  trans: {
+                    pos: {
+                      x: 0.5,
+                      y: 0.5,
+                    },
+                    scale: 1,
+                  },
+                  shadow: {
+                    x: 0,
+                    y: 0,
+                    blur: 0,
+                    color: "#000000",
+                    opacity: 1,
+                  },
+                });
+              }
+            }
+          } else {
+            // { default: ?, min: ?, max: ? }
+            for (let i = 0; i < captionItems.default; i++) {
+              temp.items.push({
+                id: self.getUniqueClientID(),
+                type: "image",
+                visible: true,
+                imageID: null,
+                removeBackground: false,
+                caption: {
+                  visible: true,
+                  editable: editable,
+                  text: "",
+                  font: "Arial",
+                  color: "white",
+                  align: {
+                    h: "center",
+                    v: "bottom",
+                  },
+                  uppercase: false,
+                },
+                trans: {
+                  pos: {
+                    x: 0.5,
+                    y: 0.5,
+                  },
+                  scale: 1,
+                },
+                shadow: {
+                  x: 0,
+                  y: 0,
+                  blur: 0,
+                  color: "#000000",
+                  opacity: 1,
+                },
+              });
+            }
+
+            for (let i = 0; i < (source.defaults || []).length; i++) {
+              Object.assign(temp.items[i], source.defaults[i]);
+            }
+          }
+
+          return temp;
+        }
+
+        if (format == "layers") {
+          const getNewItem = (sourceItem: any) => {
+            let item = {
+              id: self.getUniqueClientID(),
+              type: sourceItem.type,
+              visible: true,
+              editable: sourceItem.editable || true,
+            } as any;
+
+            if (item.type == "caption") {
+              Object.assign(item, sourceItem);
+            }
+
+            if (item.type == "image") {
+              item.imageID = sourceItem.imageID || null;
+              item.removeBackground = sourceItem.removeBackground || true;
+              item.trans = sourceItem.trans || {
+                pos: {
+                  x: 0.5,
+                  y: 0.5,
+                },
+                scale: 1,
+              };
+              item.shadow = sourceItem.shadow || {
+                x: 0,
+                y: 0,
+                blur: 0,
+                color: "#000000",
+                opacity: 1,
+              };
+            }
+
+            if (item.type == "rainbow") {
+              item.colors = sourceItem.colors || [
+                "#000000",
+                "#ffffff",
+                "#000000",
+                "#ffffff",
+                "#000000",
+                "#ffffff",
+              ];
+              item.colorsCount = sourceItem.colorsCount || 2;
+              item.pattern = sourceItem.pattern || "pizza";
+              item.slices = sourceItem.slices || 6;
+            }
+
+            item.rect = sourceItem.rect;
+
+            item = JSON.parse(JSON.stringify(item));
+
+            return item;
+          };
+
+          const temp = {
+            id: self.getUniqueClientID(),
+            type: "grid",
+            layers: true,
+            visible: true,
+            aspectRatio: source.aspectRatio,
+            gap: 0.02,
+            items: [],
+            gridItems: {
+              width: 1,
+            },
+            can: {
+              remove: {
+                background: true,
+              },
+            },
+          } as any;
+
+          for (const item of source.items) {
+            temp.items.push(getNewItem(item));
+          }
+
+          return temp;
+        }
+
+        throw new Error("Unknown builder source type");
+      },
+      applyMediaToTemplate(media: any, temp: any) {
+        debugger;
+        if (!media || !temp) return null;
+        if (media.mediaGenerator)
+          temp = Objects.deepMerge(temp, media.mediaGenerator.content.item);
+        temp = Objects.deepMerge(temp, media.content.item);
+        return temp;
+      },
       getComponent(uidOrName: number | string) {
         const uid = typeof uidOrName == "number" ? uidOrName : null;
         let name = typeof uidOrName == "string" ? uidOrName : null;
@@ -341,11 +584,18 @@ interface MgParams {
         window.history.pushState({}, "", url);
         await this.refresh();
       },
-      notifyNavigateTo(item: any) {
-        debugger;
+      async notifyNavigateTo(item: any) {
         const self = this as any;
         const url = this.itemToUrl(item);
-        const imageUrl = helpers.url.itemImage(item);
+        if (url?.startsWith("/m/")) {
+          const temp = await self.mediaToTemp(item);
+          const imageUrl = helpers.url.itemImage(temp);
+          (window as any).alertify
+            .message(
+              `<a onclick="ideVueApp.navigateTo('${url}')" class="clickable"><img src=${url} /></a><div class="opacity-50 text-center"><div>click the image to view</div></div>`
+            )
+            .delay(0);
+        }
       },
       itemToUrl(item: any) {
         if (typeof item == "string") return item;

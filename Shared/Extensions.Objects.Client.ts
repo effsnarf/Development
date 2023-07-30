@@ -167,6 +167,14 @@ class Objects {
     traverse(obj, "", obj, [], include);
   }
 
+  static traverseMap(obj: any) {
+    const items = [] as any[];
+    Objects.traverse(obj, (node, key, value, path) => {
+      items.push({ node, key, value, path });
+    });
+    return items;
+  }
+
   static toCamelCaseKeys(obj: any): any {
     if (!obj) return obj;
     if (typeof obj !== "object") return obj;

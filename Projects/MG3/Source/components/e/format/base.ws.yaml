@@ -16,20 +16,15 @@ props:
   editable: false
   showHelp: true
   showPropertyEditor: false
-  builderSourceToTemplate: null
   mediaCreated: null
   cancel: null
 data:
   temp: null
 methods:
-  applyMediaToTemplate: | #js
-    function (media, temp) {
-      if (!temp || !media) return null;
-      return Objects.deepMerge(temp, media.content.item);
-    }
   initFromBuilder: | #js
     function (builder) {
-      this.temp = this.builderSourceToTemplate(builder?.source);
+      if (!builder) return;
+      this.temp = this.$root.builderSourceToTemplate(builder.format, builder.source);
     }
   onMediaCreated: | #js
     async function (media) {
@@ -64,9 +59,7 @@ watch:
     handler: | #js
       async function(media) {
         if (!media) return;
-        const builder = await this.$root.getBuilder(media.builderID);
-        const temp = this.builderSourceToTemplate(builder.source);
-        this.temp = this.applyMediaToTemplate(media, temp);
+        this.temp = await this.$root.mediaToTemp(media);
       }
     immediate: true
 name: e-format-base

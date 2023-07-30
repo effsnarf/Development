@@ -51,7 +51,6 @@ methods:
       }
       else
       {
-        debugger;
         media = await this.$root.dbp.medias.create.one(media);
         this.$emit("media-created", media);
       }

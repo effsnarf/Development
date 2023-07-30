@@ -3,7 +3,6 @@ dom:
     ':builder': builder
     ':media': media
     ':editable': editable
-    ':builder-source-to-template': builderSourceToTemplate
     ':show-help': showHelp
     ':media-created': mediaCreated
     ':cancel': cancel
@@ -15,87 +14,9 @@ props:
   mediaCreated: null
   cancel: null
 data: null
-methods:
-  builderSourceToTemplate: | #js
-    function(source) {
-      if (!source) return null;
-
-      const temp = {
-        id: this.$root.getUniqueClientID(),
-        type: "grid",
-        layers: true,
-        visible: true,
-        aspectRatio: source.aspectRatio,
-        gap: 0.02,
-        items: [],
-        gridItems: {
-          width: 1
-        },
-        can: {
-          remove: {
-            background: true
-          }
-        }
-      };
-
-      for (const item of source.items)
-      {
-        temp.items.push(this.getNewItem(item));
-      }
-
-      return temp;
-    }
-  getNewItem: | #js
-    function(sourceItem) {
-      let item = {
-        id: this.$root.getUniqueClientID(),
-        type: sourceItem.type,
-        visible: true,
-        editable: (sourceItem.editable || true),
-      }
-
-      if (item.type == "caption")
-      {
-        Object.assign(item, sourceItem);
-      }
-
-      if (item.type == "image")
-      {
-        item.imageID = (sourceItem.imageID || null);
-        item.removeBackground = (sourceItem.removeBackground || true);
-        item.trans = sourceItem.trans || {
-            pos: {
-                x: 0.5,
-                y: 0.5
-            },
-            scale: 1
-        };
-        item.shadow = sourceItem.shadow || {
-          x: 0,
-          y: 0,
-          blur: 0,
-          color: '#000000',
-          opacity: 1
-        }
-      }
-
-      if (item.type == "rainbow")
-      {
-        item.colors = (sourceItem.colors || ["#000000", "#ffffff", "#000000", "#ffffff", "#000000", "#ffffff"]);
-        item.colorsCount = (sourceItem.colorsCount || 2);
-        item.pattern = (sourceItem.pattern || "pizza");
-        item.slices = (sourceItem.slices || 6);
-      }
-
-      item.rect = sourceItem.rect;
-
-      item = JSON.parse(JSON.stringify(item));
-
-      return item;
-    }
+methods: null
 name: e-format-layers
 template: >-
   <e-format-base class="comp-e-format-layers" :builder="builder" :media="media"
-  :editable="editable" :builder-source-to-template="builderSourceToTemplate"
-  :show-help="showHelp" :media-created="mediaCreated" :cancel="cancel"
-  path="938677584."></e-format-base>
+  :editable="editable" :show-help="showHelp" :media-created="mediaCreated"
+  :cancel="cancel" path="938677584."></e-format-base>
