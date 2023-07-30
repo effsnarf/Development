@@ -70,8 +70,10 @@ api:
 
         if (mediaGeneratorContent)
         {
+          mediaGeneratorContent.hashCode = JSON.stringify(mediaGeneratorContent.item).hashCode();
+
           // Find the MediaGenerator
-          let mediaGenerator = await db.findOne("MediaGenerators", { Content: mediaGeneratorContent });
+          let mediaGenerator = await db.findOne("MediaGenerators", { "Content.HashCode": mediaGeneratorContent.hashCode });
           if (!mediaGenerator) {
             mediaGenerator = {
               BuilderID: media.builderID,
@@ -79,8 +81,8 @@ api:
               Created: Date.now(),
             };
             mediaGenerator = await db.upsert("MediaGenerator", mediaGenerator, true);
-            media.mediaGeneratorID = mediaGenerator._id;
           }
+          media.mediaGeneratorID = mediaGenerator._id;
         }
 
         media = await db.upsert("Medias", media, true);

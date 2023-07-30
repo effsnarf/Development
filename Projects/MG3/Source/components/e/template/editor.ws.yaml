@@ -136,6 +136,7 @@ methods:
   withoutDefaultValues: | #js
     function(item, key) {
       if (!item) return null;
+      if (Array.isArray(item)) return item.map(child => this.withoutDefaultValues(child));
 
       item = JSON.parse(JSON.stringify(item));
 

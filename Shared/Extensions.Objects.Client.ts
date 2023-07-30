@@ -34,6 +34,14 @@ class Objects {
   }
 
   static subtract(target: any, source: any): any {
+    if (Array.isArray(target) && Array.isArray(source)) {
+      const result = [] as any[];
+      for (let i = 0; i < target.length; i++) {
+        result.push(Objects.subtract(target[i], source[i]));
+      }
+      return result;
+    }
+
     const targetJson = JSON.stringify(target);
     const sourceJson = JSON.stringify(source);
 

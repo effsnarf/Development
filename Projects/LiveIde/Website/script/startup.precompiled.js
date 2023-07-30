@@ -176,9 +176,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "../../../../LiveIde/Website/script/1690693207703.ts":
+/***/ "../../../../LiveIde/Website/script/1690695187457.ts":
 /*!***********************************************************!*\
-  !*** ../../../../LiveIde/Website/script/1690693207703.ts ***!
+  !*** ../../../../LiveIde/Website/script/1690695187457.ts ***!
   \***********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -1719,6 +1719,13 @@ class Objects {
         }
     }
     static subtract(target, source) {
+        if (Array.isArray(target) && Array.isArray(source)) {
+            const result = [];
+            for (let i = 0; i < target.length; i++) {
+                result.push(Objects.subtract(target[i], source[i]));
+            }
+            return result;
+        }
         const targetJson = JSON.stringify(target);
         const sourceJson = JSON.stringify(source);
         if (targetJson === sourceJson) {
@@ -3589,7 +3596,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690693207703.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690695187457.ts");
 /******/ 	
 /******/ })()
 ;
