@@ -43,7 +43,6 @@ methods:
       const threadMedia = (!this.replyInThread ? null : this.dMedia);
       let media = JSON.parse(JSON.stringify(this.dMedia));
       delete media._id;
-      media._uid = this.$root.getRandomUniqueID();
       if (this.replyInThread)
       {
         const post = await this.$root.dbp.posts.create.one(null, {_id: threadMedia?._id}, null, media);
