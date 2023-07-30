@@ -7,8 +7,10 @@ dom:
       v-slot: article
     template: 
       v-slot: left
+      e.generator.search: null
       .flex.ver.gap-2:
         e.thread.create:
+          v-if: 'false'
           @input:columnsFocusLeft: columnsFocusLeft=$event
     template: 
       v-slot: middle
@@ -93,10 +95,11 @@ template: >-
   <site class="comp-page-media" page-name="media"
   :columns-focus-left="columnsFocusLeft" :content-not-found="contentNotFound"
   path="221009861."><template v-slot:article
-  path="221009861.0"></template><template v-slot:left path="221009861.1"><div
-  class="flex ver gap-2" path="221009861.1.0"><e-thread-create
+  path="221009861.0"></template><template v-slot:left
+  path="221009861.1"><e-generator-search></e-generator-search><div class="flex
+  ver gap-2" path="221009861.1.1"><e-thread-create v-if="false"
   @input:columnsFocusLeft="columnsFocusLeft=$event"
-  path="221009861.1.0.0"></e-thread-create></div></template><template
+  path="221009861.1.1.0"></e-thread-create></div></template><template
   v-slot:middle path="221009861.2"><div class="flex gap-2"
   path="221009861.2.0"><transition name="slide-large"
   path="221009861.2.0.0"><div class="flex ver gap-2"

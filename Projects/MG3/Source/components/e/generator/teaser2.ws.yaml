@@ -23,11 +23,13 @@ computed:
     }
   teaserArticle: | #js
     function () {
-      const paragraphs = this.cGenerator.desc?.article?.split("\n")
+      const paragraphs = (this.cGenerator.desc?.article?.split("\n")
         .map(p => p.trim())
-        .filter(p => p.length > 100);
-      const par = paragraphs[1] || paragraphs[0];
-      return par?.split(".").filter(s => (s?.length > 100))[0] + ".";
+        .filter(p => p.length > 100)) || [];
+      const par = (paragraphs[1] || paragraphs[0]);
+      const text = par?.split(".").filter(s => (s?.length > 100))[0];
+      if (!text) return null;
+      return `${text}.`;
     }
 name: e-generator-teaser2
 template: >-

@@ -4,6 +4,8 @@ dom:
     ':columns': 2
     template:
       v-slot: middle
+      h2:
+        v-text: '''Advice Animals'''
       content.stream:
         ref: contentStream1
         item-type: e.generator.teaser2
@@ -18,6 +20,8 @@ methods:
       return items;
     }
 style:
+  h2:
+    font-size: 3rem
   .grid-1a:
     gap: 1em
   a:hover:
@@ -25,8 +29,8 @@ style:
 name: page-generators
 template: >-
   <site class="comp-page-generators" page-name="generators" :columns="2"
-  path="-1205429057."><template v-slot:middle
-  path="-1205429057.0"><content-stream ref="contentStream1"
-  item-type="e.generator.teaser2" :get-more-items="getMoreGenerators"
-  grid-class="grid-1a"
-  path="-1205429057.0.0"></content-stream></template></site>
+  path="-1205429057."><template v-slot:middle path="-1205429057.0"><h2
+  v-text="'Advice Animals'" path="-1205429057.0.0"></h2><content-stream
+  ref="contentStream1" item-type="e.generator.teaser2"
+  :get-more-items="getMoreGenerators" grid-class="grid-1a"
+  path="-1205429057.0.1"></content-stream></template></site>

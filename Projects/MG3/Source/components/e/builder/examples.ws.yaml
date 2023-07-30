@@ -10,11 +10,12 @@ dom:
             ':show-help': 'false'
             ':media-created': onMediaCreated
           div: 
+            v-if: 'false'
             transition.group: 
               name: list
               tag: div
               class: grid2
-              e.generator.square: 
+              e.generator.square:
                 v-for: generator in moreGenerators
                 ':generator': generator
                 ':key': generator._id
@@ -35,15 +36,6 @@ dom:
                   v-for: generator in teaserGenerators
                   ':generator': generator
                   ':key': generator._id
-              div: 
-                transition.group: 
-                  name: list
-                  tag: div
-                  class: grid2
-                  e.generator.square: 
-                    v-for: generator in moreGenerators
-                    ':generator': generator
-                    ':key': generator._id
               div: 
                 ui.link:
                   class: more-link
@@ -105,7 +97,7 @@ data:
 mounted: | #js
   async function() {
     // Random page index between 0 and 100
-    const pageIndex = Math.round((Math.random() * 100) | 0);
+    const pageIndex = Math.round((Math.random() * 5) | 0);
     this.popularGenerators = (await this.$root.dbp.generators.select.popular(pageIndex));
   }
 methods:
@@ -116,7 +108,7 @@ methods:
 computed:
   teaserGenerators: | #js
     function () {
-      return this.popularGenerators?.shuffle().take(10);
+      return this.popularGenerators?.shuffle().take(5);
     }
   moreGenerators: | #js
     function () {
@@ -178,7 +170,7 @@ style:
   .list-alternating:
     display: flex
     flex-direction: column
-    gap: 2em
+    gap: 1em
   .list-alternating > *:nth-child(odd) .flex:
     flex-direction: row-reverse
   .list-alternating > *:nth-child(even) .flex:
@@ -191,7 +183,7 @@ template: >-
   path="1519228837.0"><div class="flex1" v-if="adviceAnimal"
   path="1519228837.0.0"><div class="column1" path="1519228837.0.0.0"><e-builder
   :builder="adviceAnimal" :show-help="false" :media-created="onMediaCreated"
-  path="1519228837.0.0.0.0"></e-builder><div
+  path="1519228837.0.0.0.0"></e-builder><div v-if="false"
   path="1519228837.0.0.0.1"><transition-group class="grid2" name="list"
   tag="div" path="1519228837.0.0.0.1.0"><e-generator-square v-for="generator in
   moreGenerators" :generator="generator" :key="generator._id"
@@ -205,13 +197,9 @@ template: >-
   path="1519228837.0.0.1.0.1.0"><e-generator-teaser2 v-for="generator in
   teaserGenerators" :generator="generator" :key="generator._id"
   path="1519228837.0.0.1.0.1.0.0"></e-generator-teaser2></transition-group><div
-  path="1519228837.0.0.1.0.1.1"><transition-group class="grid2" name="list"
-  tag="div" path="1519228837.0.0.1.0.1.1.0"><e-generator-square v-for="generator
-  in moreGenerators" :generator="generator" :key="generator._id"
-  path="1519228837.0.0.1.0.1.1.0.0"></e-generator-square></transition-group></div><div
-  path="1519228837.0.0.1.0.1.2"><ui-link class="more-link"
+  path="1519228837.0.0.1.0.1.1"><ui-link class="more-link"
   :url="'/advice-animals'" :text="'see all Advice Animals…'"
-  path="1519228837.0.0.1.0.1.2.0"></ui-link></div></div></div></div></div><div
+  path="1519228837.0.0.1.0.1.1.0"></ui-link></div></div></div></div></div><div
   class="flex1" v-if="videoVertical" path="1519228837.0.1"><div class="column2"
   path="1519228837.0.1.0"><div class="list1" path="1519228837.0.1.0.0"><div
   path="1519228837.0.1.0.0.0"><h2 v-text="videoVertical.name.pluralize()"
