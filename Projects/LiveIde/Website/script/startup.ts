@@ -511,7 +511,6 @@ interface MgParams {
         throw new Error("Unknown builder source type");
       },
       applyMediaToTemplate(media: any, temp: any) {
-        debugger;
         if (!media || !temp) return null;
         if (media.mediaGenerator)
           temp = Objects.deepMerge(temp, media.mediaGenerator.content.item);
@@ -592,7 +591,7 @@ interface MgParams {
           const imageUrl = helpers.url.itemImage(temp);
           (window as any).alertify
             .message(
-              `<a onclick="ideVueApp.navigateTo('${url}')" class="clickable"><img src=${url} /></a><div class="opacity-50 text-center"><div>click the image to view</div></div>`
+              `<a href="${url}" onclick="ideVueApp.navigateTo(this.href); return false;" class="clickable"><img src="${imageUrl}" /></a><div class="opacity-50 text-center"><div>click image to view</div></div>`
             )
             .delay(0);
         }
