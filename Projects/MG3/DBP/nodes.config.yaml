@@ -81,6 +81,13 @@ api:
           }
           media.mediaGeneratorID = mediaGenerator._id;
         }
+        else
+        {
+          mediaGeneratorContent = await db.findOne("MediaGenerator", { _id: media.mediaGeneratorID });
+          media.mediaGenerator = {
+            content: mediaGeneratorContent.content,
+          };
+        }
 
         media = await db.upsert("Medias", media, true);
         // Get the media generator
