@@ -55,7 +55,17 @@ const helpers = {
         if (!item._id) return `/img/empty.png`;
         return `https://img.memegenerator.net/instances/600x600/${item._id}.jpg`;
       }
-      if (item.builderID) return null;
+      if (item.type == "builder" && item.content?.item) {
+        const getImageID = (item: any) => {
+          const imageIDs = [] as number[];
+          Objects.traverse(item, (node: any, key: string, value: any) => {
+            if (key == "imageID") imageIDs.push(value);
+          });
+          return imageIDs[0];
+        };
+        const imageID = getImageID(item.content.item);
+        return helpers.url.image(imageID);
+      }
       console.log(item);
       throw new Error("Unknown item type");
     },
@@ -330,6 +340,12 @@ interface MgParams {
         self.error = null;
         window.history.pushState({}, "", url);
         await this.refresh();
+      },
+      notifyNavigateTo(item: any) {
+        debugger;
+        const self = this as any;
+        const url = this.itemToUrl(item);
+        const imageUrl = helpers.url.itemImage(item);
       },
       itemToUrl(item: any) {
         if (typeof item == "string") return item;

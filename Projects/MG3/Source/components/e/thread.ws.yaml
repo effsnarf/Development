@@ -9,7 +9,7 @@ dom:
           ':key': post?._id||0
           e.post:
             ':item': post
-            @thread-updated: refresh
+            @thread-updated: reload
           .text-center.opacity-30:
             v-if: teaser && getHiddenPostsCount(index)
             v-text: '''('' + getHiddenPostsCount(index) + '' posts…)'''
@@ -75,6 +75,7 @@ methods:
       {
         this.thread = await this.$root.dbp.threads.select.one(this.threadID, this.dThreadMedia?._id, this.dThreadMedia?.instance?._id);
         this.threadIsEmpty = !this.thread;
+        this.refresh();
       }
       finally
       {
@@ -158,7 +159,7 @@ template: >-
   path="1226205107.0"><transition-group tag="ul" name="slide"
   path="1226205107.0.0"><li v-for="(post, index) in visiblePosts"
   :key="post?._id||0" path="1226205107.0.0.0"><e-post :item="post"
-  @thread-updated="refresh" path="1226205107.0.0.0.0"></e-post><div
+  @thread-updated="reload" path="1226205107.0.0.0.0"></e-post><div
   class="text-center opacity-30" v-if="teaser &amp;&amp;
   getHiddenPostsCount(index)" v-text="'(' + getHiddenPostsCount(index) + '
   posts…)'"

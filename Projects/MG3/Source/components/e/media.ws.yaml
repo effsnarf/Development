@@ -25,6 +25,7 @@ dom:
         v-if: (cMedia.type=='builder')
         ':media': cMedia
         @thread-updated: $emit('thread-updated')
+        @media-created: $emit('media-created', $event)
 props:
   item: null
   mediaID: null
@@ -34,6 +35,10 @@ props:
 data:
   cMedia: null
 methods:
+  replyInThread: | #js
+    function () {
+      return this.$root.params.threadID;
+    }
   onClickMediaContent: | #js
     function() {
       this.$emit('click-media-content');
@@ -100,4 +105,5 @@ template: >-
   path="864271643.0.0.3"></component></div><e-media-recaption
   v-if="(cMedia.type=='builder')" :media="cMedia"
   @thread-updated="$emit('thread-updated')"
+  @media-created="$emit('media-created', $event)"
   path="864271643.0.1"></e-media-recaption></div></div>

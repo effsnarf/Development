@@ -176,9 +176,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "../../../../LiveIde/Website/script/1690702968810.ts":
+/***/ "../../../../LiveIde/Website/script/1690705024863.ts":
 /*!***********************************************************!*\
-  !*** ../../../../LiveIde/Website/script/1690702968810.ts ***!
+  !*** ../../../../LiveIde/Website/script/1690705024863.ts ***!
   \***********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -247,8 +247,18 @@ const helpers = {
                     return `/img/empty.png`;
                 return `https://img.memegenerator.net/instances/600x600/${item._id}.jpg`;
             }
-            if (item.builderID)
-                return null;
+            if (item.type == "builder" && item.content?.item) {
+                const getImageID = (item) => {
+                    const imageIDs = [];
+                    Extensions_Objects_Client_1.Objects.traverse(item, (node, key, value) => {
+                        if (key == "imageID")
+                            imageIDs.push(value);
+                    });
+                    return imageIDs[0];
+                };
+                const imageID = getImageID(item.content.item);
+                return helpers.url.image(imageID);
+            }
             console.log(item);
             throw new Error("Unknown item type");
         },
@@ -506,6 +516,12 @@ const helpers = {
                 self.error = null;
                 window.history.pushState({}, "", url);
                 await this.refresh();
+            },
+            notifyNavigateTo(item) {
+                debugger;
+                const self = this;
+                const url = this.itemToUrl(item);
+                const imageUrl = helpers.url.itemImage(item);
             },
             itemToUrl(item) {
                 if (typeof item == "string")
@@ -3596,7 +3612,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690702968810.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690705024863.ts");
 /******/ 	
 /******/ })()
 ;

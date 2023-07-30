@@ -99,7 +99,8 @@ class DatabaseProxy {
     if (isHttpPost) {
       const data = {} as any;
       args.forEach((a) => (data[a.name] = a.value));
-      if (url.includes("/create/one")) {
+      const isCreateCall = url.includes("/create/one");
+      if (isCreateCall) {
         data._uid = DatabaseProxy.getRandomUniqueID();
       }
       const fetchOptions = {
@@ -113,17 +114,27 @@ class DatabaseProxy {
       // This is because when POSTing from localhost I'm having trouble getting the actual object back
       const _id = parseInt(result);
 
-      if (_id) {
-        const idFieldName = `${entity
-          .substring(0, entity.length - 1)
-          .toLowerCase()}ID`;
-        result = await this.callApiMethod(
-          entity,
-          "select",
-          "one",
-          [{ name: idFieldName, value: _id }],
-          []
-        );
+      if (isCreateCall && (!result || typeof result != "object")) {
+        if (_id) {
+          const idFieldName = `${entity
+            .substring(0, entity.length - 1)
+            .toLowerCase()}ID`;
+          result = await this.callApiMethod(
+            entity,
+            "select",
+            "one",
+            [{ name: idFieldName, value: _id }],
+            []
+          );
+        } else {
+          result = await this.callApiMethod(
+            entity,
+            "select",
+            "one",
+            [{ name: "_uid", value: data._uid }],
+            []
+          );
+        }
       }
 
       if (!result) {

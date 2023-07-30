@@ -7,7 +7,7 @@ dom:
         ':value': index
         v-text: item
       ':value': valueIndex
-      @input: onInput($event.target.value)
+      @input: onInput(parseInt($event.target.value))
     ui.list:
       v-if: (type=='list')
       v-slot: slotProps
@@ -25,7 +25,7 @@ dom:
       @input: onInput($event)
 props:
   options: null
-  value: null
+  value: 0
   inputType: index
   direction: vertical
   showText: true
@@ -74,7 +74,7 @@ style:
 template: >-
   <div class="comp-ui-select" path="-1442841194."><select
   v-if="(type=='dropdown')" :value="valueIndex"
-  @input="onInput($event.target.value)" path="-1442841194.0"><option
+  @input="onInput(parseInt($event.target.value))" path="-1442841194.0"><option
   v-for="(item, index) in options" :value="index" v-text="item"
   path="-1442841194.0.0"></option></select><ui-list v-if="(type=='list')"
   v-slot="slotProps" :items="options" :selected-index="valueIndex"
