@@ -74,6 +74,7 @@ api:
           let mediaGenerator = await db.findOne("MediaGenerators", { Content: mediaGeneratorContent });
           if (!mediaGenerator) {
             mediaGenerator = {
+              BuilderID: media.builderID,
               Content: mediaGeneratorContent,
               Created: Date.now(),
             };
