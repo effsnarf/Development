@@ -87,7 +87,7 @@ api:
         }
 
         media.mediaGenerator = {
-          content: mediaGeneratorContent.content,
+          content: mediaGeneratorContent,
         };
 
         media = await db.upsert("Medias", media, true);
