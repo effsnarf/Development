@@ -509,7 +509,7 @@ api:
     Posts.select.one:
       args: [postID, _uid]
       code: | #js
-        const post = await db.findOne("Posts", { $or: [ { _id: postID }, { _uid: uid } ] });
+        const post = await db.findOne("Posts", { $or: [ { _id: postID }, { _uid: _uid } ] });
         return post;
     Posts.delete.one:
       admin: true

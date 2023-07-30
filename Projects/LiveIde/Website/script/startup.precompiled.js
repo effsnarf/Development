@@ -95,7 +95,8 @@ class DatabaseProxy {
         if (isHttpPost) {
             const data = {};
             args.forEach((a) => (data[a.name] = a.value));
-            if (url.includes("/create/one")) {
+            const isCreateCall = url.includes("/create/one");
+            if (isCreateCall) {
                 data._uid = DatabaseProxy.getRandomUniqueID();
             }
             const fetchOptions = {
@@ -108,15 +109,16 @@ class DatabaseProxy {
             // If we got an _id back, select the item
             // This is because when POSTing from localhost I'm having trouble getting the actual object back
             const _id = parseInt(result);
-            if (_id) {
-                const idFieldName = `${entity
-                    .substring(0, entity.length - 1)
-                    .toLowerCase()}ID`;
-                result = await this.callApiMethod(entity, "select", "one", [{ name: idFieldName, value: _id }], []);
-            }
-            if (!result) {
-                url = url.replace("/create/one", "/select/one");
-                result = await this.fetchJson(`${url}?uid="${data._uid}"`);
+            if (isCreateCall && (!result || typeof result != "object")) {
+                if (_id) {
+                    const idFieldName = `${entity
+                        .substring(0, entity.length - 1)
+                        .toLowerCase()}ID`;
+                    result = await this.callApiMethod(entity, "select", "one", [{ name: idFieldName, value: _id }], []);
+                }
+                else {
+                    result = await this.callApiMethod(entity, "select", "one", [{ name: "_uid", value: data._uid }], []);
+                }
             }
             return result;
         }
@@ -176,9 +178,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "../../../../LiveIde/Website/script/1690705024863.ts":
+/***/ "../../../../LiveIde/Website/script/1690705961655.ts":
 /*!***********************************************************!*\
-  !*** ../../../../LiveIde/Website/script/1690705024863.ts ***!
+  !*** ../../../../LiveIde/Website/script/1690705961655.ts ***!
   \***********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -3612,7 +3614,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690705024863.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690705961655.ts");
 /******/ 	
 /******/ })()
 ;
