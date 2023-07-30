@@ -21,7 +21,7 @@ dom:
           imageID: 679668909
           title: YouTube
       e.builder.examples:
-        v-if: $root.isDevEnv()
+        v-if: 'true'
     template: 
       v-slot: left
       e.generator.search: null
@@ -81,8 +81,8 @@ template: >-
   imageID="679668921" title="Anonymous Times"
   path="838274270.0.0.2"></e-teaser><e-teaser imageID="679668909"
   title="YouTube" path="838274270.0.0.3"></e-teaser></div><e-builder-examples
-  v-if="$root.isDevEnv()"
-  path="838274270.0.1"></e-builder-examples></template><template v-slot:left
+  v-if="true" path="838274270.0.1"></e-builder-examples></template><template
+  v-slot:left
   path="838274270.1"><e-generator-search></e-generator-search></template><template
   v-slot:middle path="838274270.2"><div class="flex ver gap-1"
   path="838274270.2.0"><content-meet-the-meme></content-meet-the-meme><content-stream
