@@ -1,8 +1,6 @@
 admin:
   ips:
-    - 127.0.0.1
-    - ::1
-    - 89.134.7.130
+    - 2a02:ab88:c8b:fb00:5325:7a17:b7ba:8e15
 server:
   host: localhost
   cors:
@@ -88,13 +86,11 @@ api:
 
         return media;
     Medias.select.one:
-      args: [mediaID]
+      args: [mediaID, _uid]
       code: | #js
-        const uid = (typeof mediaID != "string") ? null : mediaID;
-        const media = uid ?
-          await db.findOne("Medias", { _uid: mediaID }) :
-          await db.findOne("Medias", { _id: mediaID });
-        return media;
+        if (mediaID) return await db.findOne("Medias", { _id: mediaID });
+        if (_uid) return await db.findOne("Medias", { _uid: _uid });
+        throw new Error("Argument missing: mediaID or _uid");
     Medias.select.byInstance:
       args: [instanceID]
       code: | #js
@@ -261,9 +257,9 @@ api:
 
         return insts;
     Instances.select.one:
-      args: [instanceID, uid]
+      args: [instanceID, _uid]
       code: | #js
-        if (uid) return await db.findOne("Instances", { _uid: uid });
+        if (_uid) return await db.findOne("Instances", { _uid: _uid });
         return await db.findOne("Instances", { _id: instanceID });
     Instances.create.one:
       args: [languageCode, generatorID, imageID, text0, text1, _uid]
@@ -511,7 +507,7 @@ api:
 
         return post._id;
     Posts.select.one:
-      args: [postID, uid]
+      args: [postID, _uid]
       code: | #js
         const post = await db.findOne("Posts", { $or: [ { _id: postID }, { _uid: uid } ] });
         return post;
