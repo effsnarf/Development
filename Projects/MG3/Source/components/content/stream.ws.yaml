@@ -18,6 +18,8 @@ dom:
             ':is': itemType.kebabize()
             ':item': item
             v-bind: itemProps
+    ui.loading:
+      v-if: isLoading
 name: content-stream
 props:
   itemType: null
@@ -31,6 +33,7 @@ data:
   queue: []
   visibleItemIndex: null
   distancesToVisibility: []
+  isLoading: 1
   itemStyles: []
   scrollTop: 0
   key1: 1
@@ -140,12 +143,20 @@ methods:
         const pageIndex = this.pageIndex++;
         const lastItemID = this.items?.last()?._id;
         this.queue.push(async () => {
-          let newItems = await this.getMoreItems(pageIndex, lastItemID);
-          newItems = newItems.exceptBy(this.items, this.$root.getKey);
-          this.items.push(...newItems);
-          this.updateVisibleItemIndex();
-          resolve();
-          this.$nextTick(this.onScroll.bind(this));
+          this.isLoading++;
+          try
+          {
+            let newItems = await this.getMoreItems(pageIndex, lastItemID);
+            newItems = newItems.exceptBy(this.items, this.$root.getKey);
+            this.items.push(...newItems);
+            this.updateVisibleItemIndex();
+            resolve();
+            this.$nextTick(this.onScroll.bind(this));
+          }
+          finally
+          {
+            this.isLoading--;
+          }
         });
       });
     }
@@ -188,4 +199,5 @@ template: >-
   path="-30902635.0.0"><div path="-30902635.0.0.0"><div :key="key1"
   path="-30902635.0.0.0.0"></div><component :style="itemStyles[index]"
   :is="itemType.kebabize()" :item="item" v-bind="itemProps"
-  path="-30902635.0.0.0.1"></component></div></li></transition-group></ui-infinite-scroll>
+  path="-30902635.0.0.0.1"></component></div></li></transition-group><ui-loading
+  v-if="isLoading" path="-30902635.1"></ui-loading></ui-infinite-scroll>

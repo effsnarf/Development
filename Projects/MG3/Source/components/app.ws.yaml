@@ -29,6 +29,8 @@ style:
     position: fixed
     top: 50%
     left: 50%
+  .site-loading > div:
+    width: fit-content
   .site-width:
     width: min(1000px, 90vw)
     margin: auto
