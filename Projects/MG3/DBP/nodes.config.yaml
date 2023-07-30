@@ -73,7 +73,7 @@ api:
           mediaGeneratorContent.hashCode = JSON.stringify(mediaGeneratorContent.item).hashCode();
 
           // Find the MediaGenerator
-          let mediaGenerator = await db.findOne("MediaGenerators", { "Content.HashCode": mediaGeneratorContent.hashCode });
+          let mediaGenerator = await db.findOne("MediaGenerator", { "Content.HashCode": mediaGeneratorContent.hashCode });
           if (!mediaGenerator) {
             mediaGenerator = {
               BuilderID: media.builderID,
