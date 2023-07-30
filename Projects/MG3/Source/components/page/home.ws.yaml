@@ -21,7 +21,7 @@ dom:
           imageID: 679668909
           title: YouTube
       e.builder.examples:
-        v-if: '$root.isDevEnv'
+        v-if: '$root.isDevEnv()'
     template: 
       v-slot: left
       e.generator.search: null

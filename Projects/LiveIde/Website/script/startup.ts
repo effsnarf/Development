@@ -223,7 +223,6 @@ interface MgParams {
       key1: 1,
       _uniqueClientID: 1,
       isAdmin: false,
-      isDevEnv: false,
     },
     async mounted() {
       await this.init();
@@ -235,7 +234,6 @@ interface MgParams {
         self.compNames = client.comps.map((c: Component) => c.name);
         await self.ensureBuilders();
         self.isAdmin = window.location.hostname == "localhost";
-        self.isDevEnv = window.location.hostname == "localhost";
         document.addEventListener("scroll", () => {
           self.$emit("scroll");
         });
