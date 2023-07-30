@@ -187,10 +187,10 @@ methods:
       for (const key of Object.keys(item))
       {
         if (key == "items") continue;
-        if (!(key in defaults)) delete item[key];
+        if (defaults && (!(key in defaults))) delete item[key];
         if (item[key] == null) delete item[key];
         if (item[key] == {}) delete item[key];
-        if (Objects.areEqual(item[key], defaults[key])) delete item[key];
+        if (defaults && Objects.areEqual(item[key], defaults[key])) delete item[key];
         if (Object.keys(allDefaults).includes(key)) {
           item[key] = this.withoutDefaultValues(item[key], key);
           if (item[key] == null) delete item[key];

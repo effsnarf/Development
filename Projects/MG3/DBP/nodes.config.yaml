@@ -83,11 +83,11 @@ api:
         }
         else
         {
-          mediaGeneratorContent = await db.findOne("MediaGenerator", { _id: media.mediaGeneratorID });
+          mediaGeneratorContent = (await db.findOne("MediaGenerator", { _id: media.mediaGeneratorID })).content;
         }
 
         media.mediaGenerator = {
-          content: mediaGeneratorContent.content,
+          content: mediaGeneratorContent,
         };
 
         media = await db.upsert("Medias", media, true);
