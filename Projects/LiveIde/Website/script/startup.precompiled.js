@@ -176,9 +176,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "../../../../LiveIde/Website/script/1690700578649.ts":
+/***/ "../../../../LiveIde/Website/script/1690702336660.ts":
 /*!***********************************************************!*\
-  !*** ../../../../LiveIde/Website/script/1690700578649.ts ***!
+  !*** ../../../../LiveIde/Website/script/1690702336660.ts ***!
   \***********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -392,6 +392,11 @@ const helpers = {
             key1: 1,
             _uniqueClientID: 1,
             isAdmin: false,
+        },
+        computed: {
+            isDevEnv() {
+                return window.location.hostname == "localhost";
+            },
         },
         async mounted() {
             await this.init();
@@ -3596,7 +3601,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690700578649.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690702336660.ts");
 /******/ 	
 /******/ })()
 ;

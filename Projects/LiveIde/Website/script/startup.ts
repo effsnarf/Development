@@ -224,6 +224,11 @@ interface MgParams {
       _uniqueClientID: 1,
       isAdmin: false,
     },
+    computed: {
+      isDevEnv() {
+        return window.location.hostname == "localhost";
+      },
+    },
     async mounted() {
       await this.init();
     },
