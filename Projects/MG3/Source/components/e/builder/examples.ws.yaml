@@ -108,7 +108,7 @@ methods:
 computed:
   teaserGenerators: | #js
     function () {
-      return this.popularGenerators?.shuffle().take(5);
+      return this.popularGenerators?.shuffle().take(8);
     }
   moreGenerators: | #js
     function () {
