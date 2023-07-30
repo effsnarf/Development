@@ -77,7 +77,7 @@ mounted: | #js
 methods:
   onMediaCreated: | #js
     function (media) {
-      this.$root.navigateTo(media);
+      this.$root.notifyNavigateTo(media);
     }
 computed:
   teaserGenerators: | #js

@@ -22,6 +22,8 @@ dom:
       page.instance: null
 name: app
 style:
+  div:
+    width: 100%
   .site-loading:
     position: fixed
     top: 50%

@@ -482,7 +482,7 @@ api:
         }
         if (!thread) throw new Error("Provide either a threadID or a threadMedia");
 
-        if (media.mediaGeneratorID)
+        if (media?.mediaGeneratorID)
         {
           const mediaGeneratorContent = await db.findOne("MediaGenerator", { _id: media.mediaGeneratorID });
           media.mediaGenerator = {
