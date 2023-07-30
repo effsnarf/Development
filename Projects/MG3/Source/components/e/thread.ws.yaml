@@ -9,6 +9,7 @@ dom:
           ':key': post?._id||0
           e.post:
             ':item': post
+            ':threadMedia': dThreadMedia
             @thread-updated: reload
           .text-center.opacity-30:
             v-if: teaser && getHiddenPostsCount(index)
@@ -159,10 +160,10 @@ template: >-
   path="1226205107.0"><transition-group tag="ul" name="slide"
   path="1226205107.0.0"><li v-for="(post, index) in visiblePosts"
   :key="post?._id||0" path="1226205107.0.0.0"><e-post :item="post"
-  @thread-updated="reload" path="1226205107.0.0.0.0"></e-post><div
-  class="text-center opacity-30" v-if="teaser &amp;&amp;
-  getHiddenPostsCount(index)" v-text="'(' + getHiddenPostsCount(index) + '
-  posts…)'"
+  :threadMedia="dThreadMedia" @thread-updated="reload"
+  path="1226205107.0.0.0.0"></e-post><div class="text-center opacity-30"
+  v-if="teaser &amp;&amp; getHiddenPostsCount(index)" v-text="'(' +
+  getHiddenPostsCount(index) + ' posts…)'"
   path="1226205107.0.0.0.1"></div></li></transition-group><e-post-create
   v-disable="isLoading" :threadID="thread?._id" :threadMedia="dThreadMedia"
   @created="reload" path="1226205107.0.1"></e-post-create><div class="hidden

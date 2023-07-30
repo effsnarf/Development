@@ -19,6 +19,8 @@ dom:
             e.media:
               v-if: media
               ':media': media
+              ':threadMedia': media
+              @thread-updated: onThreadUpdated
               @media-created: $root.notifyNavigateTo
             e.media.menu:
               ':media': media
@@ -69,6 +71,10 @@ methods:
       this.contentNotFound = false;
       this.$refs.contentStream1?.clear();
     }
+  onThreadUpdated: | #js
+    function(...args) {
+      this.$refs.thread1?.reload();
+    }
   getMoreMedias: | #js
     async function(pageIndex, fromMediaID) {
       if (!this.media?.builderID) return [];
@@ -95,6 +101,7 @@ template: >-
   path="221009861.2.0"><transition name="slide-large"
   path="221009861.2.0.0"><div class="flex ver gap-2"
   path="221009861.2.0.0.0"><e-media v-if="media" :media="media"
+  :threadMedia="media" @thread-updated="onThreadUpdated"
   @media-created="$root.notifyNavigateTo"
   path="221009861.2.0.0.0.0"></e-media><e-media-menu :media="media"
   path="221009861.2.0.0.0.1"></e-media-menu></div></transition></div></template><template

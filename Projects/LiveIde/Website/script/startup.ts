@@ -591,7 +591,7 @@ interface MgParams {
           const imageUrl = helpers.url.itemImage(temp);
           (window as any).alertify
             .message(
-              `<a href="${url}" onclick="ideVueApp.navigateTo(this.href); return false;" class="clickable"><img src="${imageUrl}" /></a><div class="opacity-50 text-center"><div>click image to view</div></div>`
+              `<a href="${url}" onclick="ideVueApp.navigateTo(this.href); return false;" class="clickable"><img src="${imageUrl}" /></a><div class="opacity-50 text-center"><div>click image to view</div><div>(close)</div></div>`
             )
             .delay(0);
         }

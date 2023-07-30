@@ -8,6 +8,8 @@ dom:
         ':class': getPostMediaClass(item.media)
         e.media:
           ':item': item.media
+          ':thread-media': threadMedia
+          @media-created: onClickMediaContent
           @click-media-content: onClickMediaContent
       .post-text:
         div: 
@@ -23,6 +25,7 @@ dom:
       e.voter: null
 props:
   item: null
+  threadMedia: null
   teaser: false
 data:
   enlarged: false
@@ -136,7 +139,8 @@ template: >-
   <div class="comp-e-post" path="-1357494135."><div class="post" v-if="item"
   :class="getPostClass(item)" path="-1357494135.0"><div class="post-media"
   v-if="item.media" :class="getPostMediaClass(item.media)"
-  path="-1357494135.0.0"><e-media :item="item.media"
+  path="-1357494135.0.0"><e-media :item="item.media" :thread-media="threadMedia"
+  @media-created="onClickMediaContent"
   @click-media-content="onClickMediaContent"
   path="-1357494135.0.0.0"></e-media></div><div class="post-text"
   path="-1357494135.0.1"><div v-html="$root.textToHtml(item.text, { firstLine:

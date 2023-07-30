@@ -12,6 +12,7 @@ dom:
         v-html: getItemText(item)
         ':title': '!isEditable ? '''' : ''✏️ edit'''
         @click: onClickText
+        ':key': key1
       transition:
         name: slide
         ui.text.box:
@@ -26,6 +27,7 @@ props:
 data:
   width: null
   showEditor: false
+  key1: 1
 mounted: | #js
   function () {
     window.addEventListener(`resize`, this.recalc.bind(this));
@@ -105,6 +107,18 @@ methods:
       size = (size * scale);
       return `${size}vh`;
     }
+  refresh: | #js
+    function() {
+      this.key1++;
+    }
+watch:
+  item:
+    handler: | #js
+      function (item) {
+        this.refresh();
+      }
+    immediate: true
+    deep: true
 computed:
   isEditable: | #js
     function () {
@@ -188,7 +202,7 @@ template: >-
   ref="sizeRef1" :class="getCssClass(item)" :style="itemStyle"
   path="128142918.0"><div :class="getTextContentClass(item)"
   v-html="getItemText(item)" :title="!isEditable ? '' : '✏️ edit'"
-  @click="onClickText" path="128142918.0.0"></div><transition name="slide"
-  path="128142918.0.1"><ui-text-box v-if="showEditor" :class="getCssClass(item)"
-  v-model="item.text"
+  @click="onClickText" :key="key1" path="128142918.0.0"></div><transition
+  name="slide" path="128142918.0.1"><ui-text-box v-if="showEditor"
+  :class="getCssClass(item)" v-model="item.text"
   path="128142918.0.1.0"></ui-text-box></transition></div></div>

@@ -1,13 +1,23 @@
 dom:
-  div:
-    v-if: item.caption
-    e.template.caption.editor:
-      ':item': item.caption
-      ':minimal': true
+  div: 
+    div: 
+      v-if: item.caption
+      e.template.caption.editor: 
+        ':item': item.caption
+        ':minimal': true
+    div: 
+      v-if: '!item.caption'
+      e.template.caption.editor: 
+        ':item': item
+        ':minimal': true
 props:
   item: null
 name: e-media-content-item-recaption
 template: >-
-  <div class="comp-e-media-content-item-recaption" v-if="item.caption"
-  path="-1916563584."><e-template-caption-editor :item="item.caption"
-  :minimal="true" path="-1916563584.0"></e-template-caption-editor></div>
+  <div class="comp-e-media-content-item-recaption" path="-1916563584."><div
+  v-if="item.caption" path="-1916563584.0"><e-template-caption-editor
+  :item="item.caption" :minimal="true"
+  path="-1916563584.0.0"></e-template-caption-editor></div><div
+  v-if="!item.caption" path="-1916563584.1"><e-template-caption-editor
+  :item="item" :minimal="true"
+  path="-1916563584.1.0"></e-template-caption-editor></div></div>

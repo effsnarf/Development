@@ -178,9 +178,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "../../../../LiveIde/Website/script/1690711546903.ts":
+/***/ "../../../../LiveIde/Website/script/1690722405270.ts":
 /*!***********************************************************!*\
-  !*** ../../../../LiveIde/Website/script/1690711546903.ts ***!
+  !*** ../../../../LiveIde/Website/script/1690722405270.ts ***!
   \***********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -746,7 +746,7 @@ const helpers = {
                     const temp = await self.mediaToTemp(item);
                     const imageUrl = helpers.url.itemImage(temp);
                     window.alertify
-                        .message(`<a href="${url}" onclick="ideVueApp.navigateTo(this.href); return false;" class="clickable"><img src="${imageUrl}" /></a><div class="opacity-50 text-center"><div>click image to view</div></div>`)
+                        .message(`<a href="${url}" onclick="ideVueApp.navigateTo(this.href); return false;" class="clickable"><img src="${imageUrl}" /></a><div class="opacity-50 text-center"><div>click image to view</div><div>(close)</div></div>`)
                         .delay(0);
                 }
             },
@@ -3846,7 +3846,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690711546903.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690722405270.ts");
 /******/ 	
 /******/ })()
 ;
