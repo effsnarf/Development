@@ -504,6 +504,8 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
           }
           const filter = {} as any;
           filter.Created = { $gte: from, $lte: to };
+          if (["Threads", "Posts"].includes(entity))
+            filter.Imported = { $exists: false };
           return filter;
         };
 

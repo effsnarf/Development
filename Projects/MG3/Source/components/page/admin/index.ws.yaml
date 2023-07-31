@@ -57,6 +57,10 @@ data:
   eventValue: requests
   entityValue: null
   lastOptions:
+    - 1 years
+    - 6 months
+    - 3 months
+    - 2 months
     - 1 months
     - 1 weeks
     - 1 days
