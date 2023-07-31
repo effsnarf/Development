@@ -597,7 +597,7 @@ class TaskManager {
   // #endregion
 
   if (isCacheQueueMode) {
-    Array.from({ length: 10 }).forEach((a) => setTimeout(processCacheQueue, 0));
+    processCacheQueue();
   } else {
     // #region Start the server
     const server = config.incoming.server;
