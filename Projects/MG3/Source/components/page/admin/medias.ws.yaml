@@ -2,7 +2,7 @@ dom:
   div: 
     h2:
       v-text: '''New Medias'''
-    .columns1:
+    div: 
       div: 
         content.stream:
           item-type: e.media
@@ -21,8 +21,7 @@ style:
 name: page-admin-medias
 template: >-
   <div class="comp-page-admin-medias" path="-1396420211."><h2 v-text="'New
-  Medias'" path="-1396420211.0"></h2><div class="columns1"
-  path="-1396420211.1"><div path="-1396420211.1.0"><content-stream
-  item-type="e.media" :item-props="{ showMediaMenu: true }"
-  :get-more-items="getMoreMedias" grid-class="grid-1"
+  Medias'" path="-1396420211.0"></h2><div path="-1396420211.1"><div
+  path="-1396420211.1.0"><content-stream item-type="e.media" :item-props="{
+  showMediaMenu: true }" :get-more-items="getMoreMedias" grid-class="grid-1"
   path="-1396420211.1.0.0"></content-stream></div></div></div>

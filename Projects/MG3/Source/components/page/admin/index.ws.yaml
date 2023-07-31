@@ -38,9 +38,10 @@ dom:
                 ':event': eventValue
                 ':last': lastValue
                 ':every': every
-      .flex:
+      .flex.gap-1:
         page.admin.medias: null
-        page.admin.posts:
+        page.admin.posts: null
+        div:  null
 data:
   entities:
     - Posts
@@ -121,4 +122,5 @@ template: >-
   :app="'MG'" :category="catValue" :event="eventValue" :last="lastValue"
   :every="every"
   path="-1156850540.1.0.2.0.0.0"></ui-chart2></div></div></div></div><div
-  path="-1156850540.1.1"><page-admin-medias></page-admin-medias></div></template></site>
+  class="flex gap-1"
+  path="-1156850540.1.1"><page-admin-medias></page-admin-medias><page-admin-posts></page-admin-posts><div></div></div></template></site>
