@@ -495,11 +495,13 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
 
         const intervals = Intervals.getSince(since, 60);
 
-        const docs = await db?.find(entity, {
-          Created: {
-            $gte: from,
-          },
-        });
+        const docs = (
+          await db?.find(entity, {
+            Created: {
+              $gte: from,
+            },
+          })
+        )?.take(10);
 
         return { intervals, docs };
 
