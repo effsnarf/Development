@@ -523,7 +523,9 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
     httpServer.get(
       "/analytics/*",
       processRequest(async (req: any, res: any) => {
-        return dbs._analytics?.api.handleRequest(req, res);
+        res.status(404).send("Not found");
+        // Too slow, everything hangs
+        //return dbs._analytics?.api.handleRequest(req, res);
       })
     );
 
