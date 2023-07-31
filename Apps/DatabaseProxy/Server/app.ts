@@ -495,17 +495,12 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
 
         const intervals = Intervals.getSince(since, 60);
 
+        const filter = {} as any;
+        const dateField = entity == "Instances" ? "CreatedUnix" : "Created";
+        filter[dateField] = { $gte: from };
+
         const docs =
-          (await db?.find(
-            entity,
-            {
-              Created: {
-                $gte: from,
-              },
-            },
-            null,
-            Number.MAX_SAFE_INTEGER
-          )) || [];
+          (await db?.find(entity, filter, null, Number.MAX_SAFE_INTEGER)) || [];
 
         for (const interval of intervals) {
           let count =
