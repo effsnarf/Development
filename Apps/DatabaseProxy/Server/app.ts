@@ -28,7 +28,7 @@ import { Logger } from "@shared/Logger";
 import { TypeScript } from "@shared/TypeScript";
 import { Database } from "@shared/Database/Database";
 import { MongoDatabase } from "@shared/Database/MongoDatabase";
-import { Analytics, Intervals, ItemType } from "@shared/Analytics";
+import { Analytics, Intervals, Interval, ItemType } from "@shared/Analytics";
 import { debug } from "console";
 import { DatabaseProxy } from "../Client/DbpClient";
 // #endregion
@@ -495,20 +495,18 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
 
         const intervals = Intervals.getSince(since, 60);
 
-        const filter = {} as any;
-        const isUnixDate = entity == "Instances";
-        if (isUnixDate) {
-          filter.CreatedUnix = { $gte: from * 1000 };
-        } else {
-          filter.Created = { $gte: from };
-        }
-
-        const docs =
-          (await db?.find(entity, filter, null, Number.MAX_SAFE_INTEGER)) || [];
+        const getFilter = (interval: Interval) => {
+          const isUnixDate = entity == "Instances";
+          const dateField = isUnixDate ? "CreatedUnix" : "Created";
+          const { from, to } = interval;
+          const scale = isUnixDate ? 1000 : 1;
+          const filter = {} as any;
+          filter[dateField] = { $gte: from * scale, $lte: to * scale };
+          return filter;
+        };
 
         for (const interval of intervals) {
-          let count =
-            docs.filter((doc) => Intervals.docIsIn(doc, interval)).length || 0;
+          let count = (await db?.count(entity, getFilter(interval))) || 0;
           interval.count = count;
         }
 

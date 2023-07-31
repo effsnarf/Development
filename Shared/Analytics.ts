@@ -386,4 +386,4 @@ class Analytics {
   }
 }
 
-export { Analytics, Intervals, ItemType };
+export { Analytics, Intervals, Interval, ItemType };
