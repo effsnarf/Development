@@ -705,7 +705,7 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
             return res.status(404).send(ex);
           }
         }
-        errorLogger.log(ex.stack, funcStr);
+        errorLogger.log(methodStr, ex.stack);
         if (req.query.debug) {
           return res
             .status(500)
