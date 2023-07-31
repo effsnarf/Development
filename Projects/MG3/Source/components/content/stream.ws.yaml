@@ -71,6 +71,7 @@ methods:
     }).debounce(100)
   getItemStyle: | #js
     function(index) {
+      return null;
       if (this.gridClass != "grid-1") return null;
       const distance = this.distancesToVisibility[index];
       const getValue = (min, scale) => Math.min(1, Math.max(min, 1 - (distance / window.innerHeight * scale)))

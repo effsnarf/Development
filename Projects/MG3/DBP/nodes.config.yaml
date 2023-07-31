@@ -90,6 +90,8 @@ api:
           content: mediaGeneratorContent,
         };
 
+        media.created = Date.now();
+
         media = await db.upsert("Medias", media, true);
         // Get the media generator
         const builder = await db.findOne("Builders", { _id: media.builderID });

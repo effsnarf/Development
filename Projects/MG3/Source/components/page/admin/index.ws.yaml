@@ -39,7 +39,7 @@ dom:
                 ':last': lastValue
                 ':every': every
       div:
-        e.page.admin.medias:
+        page.admin.medias: null
 data:
   entities:
     - Posts
@@ -115,4 +115,5 @@ template: >-
   class="bar" path="-1156850540.1.0.2.0.0"><ui-chart2 :entity="entityValue"
   :app="'MG'" :category="catValue" :event="eventValue" :last="lastValue"
   :every="every"
-  path="-1156850540.1.0.2.0.0.0"></ui-chart2></div></div></div></div></template></site>
+  path="-1156850540.1.0.2.0.0.0"></ui-chart2></div></div></div></div><div
+  path="-1156850540.1.1"><page-admin-medias></page-admin-medias></div></template></site>

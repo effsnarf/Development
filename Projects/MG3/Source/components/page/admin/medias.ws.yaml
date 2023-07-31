@@ -1,16 +1,26 @@
 dom:
-  div:
-    content.stream:
-      item-type: e.media
-      ":get-more-items": getMoreMedias
-      grid-class: grid-1
-
-data:
-
+  div: 
+    h2:
+      v-text: '''New Medias'''
+    .columns1:
+      div: 
+        content.stream:
+          item-type: e.media
+          ':get-more-items': getMoreMedias
+          grid-class: grid-1
+data: null
 methods:
   getMoreMedias: | #js
     async function(pageIndex, fromMediaID) {
-      if (!this.media?.builderID) return [];
-      if (!fromMediaID) fromMediaID = this.media?._id;
       return await this.$root.dbp.medias.select.new(null, fromMediaID);
     }
+style:
+  .columns1 > div:nth-child(1):
+    width: 30%
+name: page-admin-medias
+template: >-
+  <div class="comp-page-admin-medias" path="-1396420211."><h2 v-text="'New
+  Medias'" path="-1396420211.0"></h2><div class="columns1"
+  path="-1396420211.1"><div path="-1396420211.1.0"><content-stream
+  item-type="e.media" :get-more-items="getMoreMedias" grid-class="grid-1"
+  path="-1396420211.1.0.0"></content-stream></div></div></div>
