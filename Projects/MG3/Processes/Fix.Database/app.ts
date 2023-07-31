@@ -80,9 +80,13 @@ import { MongoDatabase } from "@shared/Database/MongoDatabase";
 
   const instancesCount = await db.count("Instances", filter);
 
-  progress = Progress.newAutoDisplay(postsCount);
+  console.log(`${instancesCount} instances to fix..`);
 
-  for await (const instance of db.findIterable("Instances", filter, {})) {
+  progress = Progress.newAutoDisplay(instancesCount);
+
+  for await (const instance of db.findIterable("Instances", filter, {
+    Created: -1,
+  })) {
     instance.Created = new Date(instance.Created);
 
     await db.upsert("Instances", instance);
