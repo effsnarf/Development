@@ -29,11 +29,14 @@ dom:
         ':media': cMedia
         ':admin': 'true'
       e.media.recaption:
-        v-if: (!editable) && (cMedia.type=='builder')
+        v-if: (!note) && (!editable) && (cMedia.type=='builder')
         ':media': cMedia
         ':threadMedia': threadMedia
         @thread-updated: $emit('thread-updated')
         @media-created: onMediaCreated
+      ui.share:
+        v-if: note
+        ':item': cMedia
 props:
   item: null
   mediaID: null
@@ -44,6 +47,7 @@ props:
   showFooter: true
   mediaCreated: null
   showMediaMenu: false
+  note: false
 data:
   cMedia: null
 methods:
@@ -122,8 +126,9 @@ template: >-
   :show-help="false" :media-created="onMediaCreated"
   path="864271643.0.0.3"></component></div><e-media-menu v-if="showMediaMenu"
   :media="cMedia" :admin="true"
-  path="864271643.0.1"></e-media-menu><e-media-recaption v-if="(!editable)
-  &amp;&amp; (cMedia.type=='builder')" :media="cMedia"
+  path="864271643.0.1"></e-media-menu><e-media-recaption v-if="(!note)
+  &amp;&amp; (!editable) &amp;&amp; (cMedia.type=='builder')" :media="cMedia"
   :threadMedia="threadMedia" @thread-updated="$emit('thread-updated')"
   @media-created="onMediaCreated"
-  path="864271643.0.2"></e-media-recaption></div></div>
+  path="864271643.0.2"></e-media-recaption><ui-share v-if="note" :item="cMedia"
+  path="864271643.0.3"></ui-share></div></div>

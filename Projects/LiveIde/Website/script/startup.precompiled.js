@@ -178,9 +178,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "../../../../LiveIde/Website/script/1690786944708.ts":
+/***/ "../../../../LiveIde/Website/script/1690788608056.ts":
 /*!***********************************************************!*\
-  !*** ../../../../LiveIde/Website/script/1690786944708.ts ***!
+  !*** ../../../../LiveIde/Website/script/1690788608056.ts ***!
   \***********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -760,6 +760,10 @@ const helpers = {
                 if (item.builderID && item.content)
                     return helpers.url.media(item);
                 throw new Error("Unknown item type");
+            },
+            notify(componentName, item) {
+                const self = this;
+                self.$emit("notify", { componentName, item });
             },
             async compileApp() {
                 await client.compileApp();
@@ -3848,7 +3852,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690786944708.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690788608056.ts");
 /******/ 	
 /******/ })()
 ;

@@ -21,6 +21,7 @@ methods:
       e.preventDefault();
       e.stopPropagation();
       this.$root.navigateTo(this.url);
+      this.$emit("navigate", this.url);
     }
 style: null
 name: ui-link

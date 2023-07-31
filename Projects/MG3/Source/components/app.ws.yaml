@@ -21,10 +21,16 @@ dom:
       page.generators: null
       page.generator: null
       page.instance: null
+    .notifications:
+      ui.notifications: null
 name: app
 style:
-  div:
-    width: 100%
+  .notifications:
+    position: fixed
+    bottom: 2em
+    right: 2em
+    width: 20em
+    z-index: 1000
   .site-loading:
     position: fixed
     top: 50%
@@ -52,6 +58,8 @@ style:
     z-index: 1000
   .header-spacer:
     height: 5rem
+  div:
+    width: 100%
 template: >-
   <div class="comp-app" path="96801."><div path="96801.0"><div
   class="site-loading" path="96801.0.0"><ui-loading v-if="$root.isLoading"
@@ -59,4 +67,6 @@ template: >-
   path="96801.0.1"></site-header><div class="header-spacer"
   path="96801.0.2"></div></div><div class="pages" :class="{ 'site-width': true
   }"
-  path="96801.1"><page-test></page-test><page-admin-index></page-admin-index><page-home></page-home><page-catalog></page-catalog><page-thread></page-thread><page-category></page-category><page-builder></page-builder><page-media></page-media><page-generators></page-generators><page-generator></page-generator><page-instance></page-instance></div></div>
+  path="96801.1"><page-test></page-test><page-admin-index></page-admin-index><page-home></page-home><page-catalog></page-catalog><page-thread></page-thread><page-category></page-category><page-builder></page-builder><page-media></page-media><page-generators></page-generators><page-generator></page-generator><page-instance></page-instance></div><div
+  class="notifications"
+  path="96801.2"><ui-notifications></ui-notifications></div></div>

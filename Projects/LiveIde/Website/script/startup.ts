@@ -604,6 +604,10 @@ interface MgParams {
         if (item.builderID && item.content) return helpers.url.media(item);
         throw new Error("Unknown item type");
       },
+      notify(componentName: string, item: any) {
+        const self = this as any;
+        self.$emit("notify", { componentName, item });
+      },
       async compileApp() {
         await client.compileApp();
         this.refresh();

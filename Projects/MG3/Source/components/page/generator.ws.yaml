@@ -139,7 +139,7 @@ methods:
     }
   onInstanceCreated: | #js
     function(instance) {
-      this.$root.notifyNavigateTo(instance);
+      this.$root.notify("e.instance", instance);
     }
   onVisibleSteamInstanceChange: | #js
     function(instance) {
