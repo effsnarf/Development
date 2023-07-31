@@ -475,17 +475,17 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
     );
     // #endregion
 
-    // #region 📑 Analytics
-    httpServer.all(
-      "/analytics/*",
-      processRequest(async (req: any, res: any) => {
-        return dbs._analytics?.api.handleRequest(req, res);
-      })
-    );
-    // #endregion
+    // // #region 📑 Analytics
+    // httpServer.all(
+    //   "/analytics/*",
+    //   processRequest(async (req: any, res: any) => {
+    //     return dbs._analytics?.api.handleRequest(req, res);
+    //   })
+    // );
+    // // #endregion
 
     // #region 📑 Database Analytics
-    httpServer.all(
+    httpServer.get(
       "/:database/analytics/:entity/since/:since",
       processRequest(async (req: any, res: any) => {
         const db = await dbs.get(req.params.database);
@@ -495,23 +495,25 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
 
         const intervals = Intervals.getSince(since, 60);
 
-        const docs = (
-          await db?.find(entity, {
-            Created: {
-              $gte: from,
+        const docs =
+          (await db?.find(
+            entity,
+            {
+              Created: {
+                $gte: from,
+              },
             },
-          })
-        )?.take(10);
-
-        return { intervals, docs };
+            null,
+            Number.MAX_SAFE_INTEGER
+          )) || [];
 
         for (const interval of intervals) {
-          const count =
-            docs?.filter((doc) => Intervals.docIsIn(doc, interval)).length || 0;
+          let count =
+            docs.filter((doc) => Intervals.docIsIn(doc, interval)).length || 0;
           interval.count = count;
         }
 
-        const counts = intervals.map((i) => i.count);
+        const counts = intervals.map((intr) => intr.count);
 
         return res.end(JSON.stringify(counts));
       })
@@ -667,14 +669,14 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
 
       let result: any;
 
+      let methodStr = `${req.params.entity}.${req.params.group}.${req.params.method}`;
+
       try {
         const dbp = dbps[req.params.database];
 
         result = await func(dbp, fs, user, db, collection, axios, ...args);
 
         const elapsed = Date.now() - start;
-
-        let methodStr = `${req.params.entity}.${req.params.group}.${req.params.method}`;
 
         if (elapsed < config.analytics.min.elapsed) {
           methodStr = methodStr.gray;
@@ -701,7 +703,7 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
             return res.status(404).send(ex);
           }
         }
-        errorLogger.log(ex.stack);
+        errorLogger.log(methodStr, ex.stack);
         if (req.query.debug) {
           return res
             .status(500)
