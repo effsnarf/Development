@@ -48,10 +48,15 @@ import { MongoDatabase } from "@shared/Database/MongoDatabase";
 
   let progress = null;
 
-  // #region AI moderation on posts
-  console.log(`Fixing ${`Posts`.green}..`);
+  let filter = {} as any;
+  let sort = {} as any;
 
-  const postsCount = await db.count("Posts", { Mod: { $exists: false } });
+  // #region Posts
+
+  // AI moderation on posts
+  console.log(`Fixing ${`Posts`.green} moderation..`);
+
+  let postsCount = await db.count("Posts", { Mod: { $exists: false } });
 
   progress = Progress.newAutoDisplay(postsCount);
 
@@ -70,19 +75,47 @@ import { MongoDatabase } from "@shared/Database/MongoDatabase";
     progress.increment();
   }
 
+  // Fix Posts.Created
+  console.log(`Fixing ${`Posts`.green} date..`);
+
+  filter = {
+    Created: { $type: "string" },
+  };
+
+  sort = {
+    Created: -1,
+  };
+
+  postsCount = await db.count("Posts", filter);
+
+  progress = Progress.newAutoDisplay(postsCount);
+
+  for await (const post of db.findIterable("Posts", filter, sort)) {
+    post.created = new Date(post.created).valueOf();
+
+    await db.upsert("Posts", post);
+
+    fixed++;
+    progress.increment();
+  }
+
   // #endregion
 
   // #region Instances
 
   console.log(`Fixing ${`Instances`.green}..`);
 
-  let filter = { Created: { $type: "string" } };
+  filter = { Created: { $type: "string" } };
 
   const instancesCount = await db.count("Instances", filter);
 
-  progress = Progress.newAutoDisplay(postsCount);
+  console.log(`${instancesCount} instances to fix..`);
 
-  for await (const instance of db.findIterable("Instances", filter, {})) {
+  progress = Progress.newAutoDisplay(instancesCount);
+
+  for await (const instance of db.findIterable("Instances", filter, {
+    Created: -1,
+  })) {
     instance.Created = new Date(instance.Created);
 
     await db.upsert("Instances", instance);

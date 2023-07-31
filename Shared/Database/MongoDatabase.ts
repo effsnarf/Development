@@ -102,6 +102,8 @@ class MongoDatabase extends DatabaseBase {
     skip?: number | undefined,
     lowercaseFields?: boolean | undefined
   ): AsyncGenerator<any, any, unknown> {
+    if (!limit) limit = Number.MAX_SAFE_INTEGER;
+
     if (skip) {
       const docs = await this.find(
         collectionName,
@@ -115,7 +117,7 @@ class MongoDatabase extends DatabaseBase {
         yield doc;
       }
     } else {
-      if (!sort) throw new Error("Sort is required.");
+      if (!sort || !Object.keys(sort)) throw new Error("Sort is required.");
       const batchSize = 100;
       let skip = 0;
       let docs = await this.find(
@@ -179,7 +181,7 @@ class MongoDatabase extends DatabaseBase {
 
     timer.stop();
 
-    this.removeDollarSigns(pipeline);
+    pipeline = this.removeDollarSigns(pipeline);
 
     this.upsert(
       "_DbAnalytics",
@@ -283,12 +285,14 @@ class MongoDatabase extends DatabaseBase {
   }
 
   private removeDollarSigns(obj: any) {
+    obj = Objects.clone(obj);
     Objects.traverse(obj, (node: any, key: string, value: any) => {
       if (key.startsWith("$")) {
         node[key.substring(1)] = value;
         delete node[key];
       }
     });
+    return obj;
   }
 }
 
