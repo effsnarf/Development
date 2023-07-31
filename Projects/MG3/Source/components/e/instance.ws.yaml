@@ -9,12 +9,14 @@ dom:
         ui.image: 
           ref: image1
           ':imageID': imageID
+          ':url': imageUrl
           @change: updateImageSize
         div: 
           class: spacer
           ui.image: 
             ref: image1
             ':imageID': imageID
+            ':url': imageUrl
         .texts:
           v-if: '!instanceImage'
           .text:
@@ -60,6 +62,11 @@ computed:
   imageID: | #js
     function () {
       return this.instanceImage ? null : (this.instance.imageID || this.instance.generator?.imageID);
+    }
+  imageUrl: | #js
+    function () {
+      if (!this.instanceImage) return null;
+      return this.$root.url.itemImage(this.instance);
     }
   showGenerator: | #js
     function () {
@@ -141,16 +148,16 @@ template: >-
   <div class="comp-e-instance" @click="$emit('click')" v-if="instance"
   path="643573758."><ui-link class="instance"
   :url="$root.url.instance(instance)" path="643573758.0"><div
-  path="643573758.0.0"><ui-image ref="image1" :imageID="imageID"
+  path="643573758.0.0"><ui-image ref="image1" :imageID="imageID" :url="imageUrl"
   @change="updateImageSize" path="643573758.0.0.0"></ui-image><div
   class="spacer" path="643573758.0.0.1"><ui-image ref="image1"
-  :imageID="imageID" path="643573758.0.0.1.0"></ui-image></div><div
-  class="texts" v-if="!instanceImage" path="643573758.0.0.2"><div class="text"
-  v-for="(text, index) in [instance.text0, instance.text1]" v-text="text"
-  :style="{ fontSize: fontSizes[index] }"
-  path="643573758.0.0.2.0"></div></div></div></ui-link><div class="footer"
-  v-if="showFooter" path="643573758.1"><e-generator-wide2 v-if="showGenerator"
-  :generator="$root.instanceToGenerator(instance)"
+  :imageID="imageID" :url="imageUrl"
+  path="643573758.0.0.1.0"></ui-image></div><div class="texts"
+  v-if="!instanceImage" path="643573758.0.0.2"><div class="text" v-for="(text,
+  index) in [instance.text0, instance.text1]" v-text="text" :style="{ fontSize:
+  fontSizes[index] }" path="643573758.0.0.2.0"></div></div></div></ui-link><div
+  class="footer" v-if="showFooter" path="643573758.1"><e-generator-wide2
+  v-if="showGenerator" :generator="$root.instanceToGenerator(instance)"
   path="643573758.1.0"></e-generator-wide2><ui-share v-if="showShare"
   :item="instance" path="643573758.1.1"></ui-share></div><e-post-create
   v-if="showCreatePost" :generator="$root.instanceToGenerator(instance)"

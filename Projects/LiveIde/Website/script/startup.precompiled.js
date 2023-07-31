@@ -178,9 +178,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "../../../../LiveIde/Website/script/1690785015503.ts":
+/***/ "../../../../LiveIde/Website/script/1690786944708.ts":
 /*!***********************************************************!*\
-  !*** ../../../../LiveIde/Website/script/1690785015503.ts ***!
+  !*** ../../../../LiveIde/Website/script/1690786944708.ts ***!
   \***********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -742,17 +742,19 @@ const helpers = {
             async notifyNavigateTo(item) {
                 const self = this;
                 const url = this.itemToUrl(item);
-                if (url?.startsWith("/m/")) {
-                    const temp = await self.mediaToTemp(item);
-                    const imageUrl = helpers.url.itemImage(temp);
-                    window.alertify
-                        .message(`<a href="${url}" onclick="ideVueApp.navigateTo(this.href); return false;" class="clickable"><img src="${imageUrl}" /></a><div class="opacity-50 text-center"><div>click image to navigate</div></div>`)
-                        .delay(0);
-                }
+                const item2 = url?.startsWith("/m/")
+                    ? await self.mediaToTemp(item)
+                    : item;
+                const imageUrl = helpers.url.itemImage(item2);
+                window.alertify
+                    .message(`<a href="${url}" onclick="ideVueApp.navigateTo(this.href); return false;" class="clickable"><img src="${imageUrl}" /></a><div class="opacity-50 text-center"></div>`)
+                    .delay(0);
             },
             itemToUrl(item) {
                 if (typeof item == "string")
                     return item;
+                if (item.instanceID)
+                    return helpers.url.instance(item);
                 if (item.threadID)
                     return helpers.url.thread({ _id: item.threadID });
                 if (item.builderID && item.content)
@@ -3846,7 +3848,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690785015503.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690786944708.ts");
 /******/ 	
 /******/ })()
 ;

@@ -587,18 +587,19 @@ interface MgParams {
       async notifyNavigateTo(item: any) {
         const self = this as any;
         const url = this.itemToUrl(item);
-        if (url?.startsWith("/m/")) {
-          const temp = await self.mediaToTemp(item);
-          const imageUrl = helpers.url.itemImage(temp);
-          (window as any).alertify
-            .message(
-              `<a href="${url}" onclick="ideVueApp.navigateTo(this.href); return false;" class="clickable"><img src="${imageUrl}" /></a><div class="opacity-50 text-center"><div>click image to navigate</div></div>`
-            )
-            .delay(0);
-        }
+        const item2 = url?.startsWith("/m/")
+          ? await self.mediaToTemp(item)
+          : item;
+        const imageUrl = helpers.url.itemImage(item2);
+        (window as any).alertify
+          .message(
+            `<a href="${url}" onclick="ideVueApp.navigateTo(this.href); return false;" class="clickable"><img src="${imageUrl}" /></a><div class="opacity-50 text-center"></div>`
+          )
+          .delay(0);
       },
       itemToUrl(item: any) {
         if (typeof item == "string") return item;
+        if (item.instanceID) return helpers.url.instance(item);
         if (item.threadID) return helpers.url.thread({ _id: item.threadID });
         if (item.builderID && item.content) return helpers.url.media(item);
         throw new Error("Unknown item type");
