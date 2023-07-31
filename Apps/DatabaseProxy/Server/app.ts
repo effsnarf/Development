@@ -671,14 +671,14 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
 
       let result: any;
 
+      let methodStr = `${req.params.entity}.${req.params.group}.${req.params.method}`;
+
       try {
         const dbp = dbps[req.params.database];
 
         result = await func(dbp, fs, user, db, collection, axios, ...args);
 
         const elapsed = Date.now() - start;
-
-        let methodStr = `${req.params.entity}.${req.params.group}.${req.params.method}`;
 
         if (elapsed < config.analytics.min.elapsed) {
           methodStr = methodStr.gray;
