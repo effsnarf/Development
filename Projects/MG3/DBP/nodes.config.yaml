@@ -284,6 +284,7 @@ api:
     Instances.select.one:
       args: [instanceID, _uid]
       code: | #js
+        return { instanceID, _uid };
         if (_uid) {
           const instance = await db.findOne("Instances", { _uid: _uid });
           if (instance) return instance;
