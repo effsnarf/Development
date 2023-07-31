@@ -480,7 +480,7 @@ class TaskManager {
         options: options,
         origin: options.headers.origin,
         timeout: config.target.timeout.deunitify(),
-        cacheKey: cacheQueueItem.url.replace(/&_uid=\d+/g, ""),
+        cacheKey: cacheQueueItem.url,
         postData: options.body,
         attempt: 0,
         nodeIndex: !config.rotate?.nodes
@@ -518,7 +518,7 @@ class TaskManager {
       options: null,
       origin: req.headers.origin || "*",
       timeout: config.target.timeout.deunitify(),
-      cacheKey: req.url.replace(/&_uid=\d+/g, ""),
+      cacheKey: req.url,
       postData,
       attempt: 0,
       nodeIndex: !config.rotate?.nodes
