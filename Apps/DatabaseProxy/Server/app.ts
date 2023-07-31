@@ -493,7 +493,11 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
         const since = req.params.since.deunitify();
         const from = Date.now() - since;
 
+        return "123";
+
         const intervals = Intervals.getSince(since, 60);
+
+        return intervals;
 
         const docs = (
           await db?.find(entity, {
@@ -701,7 +705,7 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
             return res.status(404).send(ex);
           }
         }
-        errorLogger.log(ex.stack);
+        errorLogger.log(ex.stack, funcStr);
         if (req.query.debug) {
           return res
             .status(500)
