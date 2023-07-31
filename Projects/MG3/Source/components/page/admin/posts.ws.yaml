@@ -14,9 +14,7 @@ methods:
     async function(pageIndex, fromPostID) {
       return await this.$root.dbp.posts.select.new(null, fromPostID);
     }
-style:
-  .columns1 > div:nth-child(1):
-    width: 30%
+style: null
 name: page-admin-posts
 template: >-
   <div class="comp-page-admin-posts" path="-1150341227."><h2 v-text="'New

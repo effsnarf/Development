@@ -321,6 +321,13 @@ api:
         instance.InstanceID = instance._id;
         await db.upsert("Instances", instance, true);
         return instance._id;
+    Instances.select.new:
+      args: [languageCode, fromInstanceID]
+      code: | #js
+        if (!fromInstanceID) fromInstanceID = Number.MAX_VALUE;
+        const pageSize = 15;
+        const instances = await db.find("Instances", { LanguageCode: languageCode, _id: { $lt: fromInstanceID } }, { _id: -1 }, pageSize, 0, true);
+        return instances;
     Threads.create.one:
       args: []
       code: | #js

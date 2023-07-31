@@ -1,0 +1,24 @@
+dom:
+  div: 
+    h2:
+      v-text: '''New Instances'''
+    div: 
+      div: 
+        content.stream:
+          item-type: e.instance
+          ':get-more-items': getMoreInstances
+          grid-class: grid-1
+data: null
+methods:
+  getMoreInstances: | #js
+    async function(pageIndex, fromInstanceID) {
+      return await this.$root.dbp.instances.select.new(null, fromInstanceID);
+    }
+style: null
+name: page-admin-instances
+template: >-
+  <div class="comp-page-admin-instances" path="-1813446336."><h2 v-text="'New
+  Instances'" path="-1813446336.0"></h2><div path="-1813446336.1"><div
+  path="-1813446336.1.0"><content-stream item-type="e.instance"
+  :get-more-items="getMoreInstances" grid-class="grid-1"
+  path="-1813446336.1.0.0"></content-stream></div></div></div>

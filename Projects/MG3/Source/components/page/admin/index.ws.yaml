@@ -41,6 +41,7 @@ dom:
       .flex.gap-1:
         page.admin.medias: null
         page.admin.posts: null
+        page.admin.instances: null
         div:  null
 data:
   entities:
@@ -127,4 +128,4 @@ template: >-
   :every="every"
   path="-1156850540.1.0.2.0.0.0"></ui-chart2></div></div></div></div><div
   class="flex gap-1"
-  path="-1156850540.1.1"><page-admin-medias></page-admin-medias><page-admin-posts></page-admin-posts><div></div></div></template></site>
+  path="-1156850540.1.1"><page-admin-medias></page-admin-medias><page-admin-posts></page-admin-posts><page-admin-instances></page-admin-instances><div></div></div></template></site>
