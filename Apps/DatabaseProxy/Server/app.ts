@@ -523,7 +523,6 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
     httpServer.get(
       "/analytics/*",
       processRequest(async (req: any, res: any) => {
-        return "test";
         return dbs._analytics?.api.handleRequest(req, res);
       })
     );
