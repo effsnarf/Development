@@ -109,11 +109,16 @@ api:
     Medias.select.new:
       args: [builderID, fromMediaID]
       code: | #js
-        if (!builderID) throw new Error("Argument missing: builderID");
         if (!fromMediaID) fromMediaID = Number.MAX_VALUE;
         const pageSize = 15;
-        const medias = await db.find("Medias", { BuilderID: builderID, _id: { $lt: fromMediaID } }, { _id: -1 }, pageSize, 0, true);
-        return medias;
+        if (builderID) {
+          const medias = await db.find("Medias", { BuilderID: builderID, _id: { $lt: fromMediaID } }, { _id: -1 }, pageSize, 0, true);
+          return medias;
+        }
+        else {
+          const medias = await db.find("Medias", { _id: { $lt: fromMediaID } }, { _id: -1 }, pageSize, 0, true);
+          return medias;
+        }
     Medias.delete.one:
       admin: true
       args: [mediaID]

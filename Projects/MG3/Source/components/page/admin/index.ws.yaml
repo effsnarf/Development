@@ -38,6 +38,8 @@ dom:
                 ':event': eventValue
                 ':last': lastValue
                 ':every': every
+      div:
+        e.page.admin.medias:
 data:
   entities:
     - Posts

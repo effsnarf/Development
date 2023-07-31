@@ -1,0 +1,16 @@
+dom:
+  div:
+    content.stream:
+      item-type: e.media
+      ":get-more-items": getMoreMedias
+      grid-class: grid-1
+
+data:
+
+methods:
+  getMoreMedias: | #js
+    async function(pageIndex, fromMediaID) {
+      if (!this.media?.builderID) return [];
+      if (!fromMediaID) fromMediaID = this.media?._id;
+      return await this.$root.dbp.medias.select.new(null, fromMediaID);
+    }
