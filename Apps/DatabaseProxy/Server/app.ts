@@ -496,12 +496,14 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
         const intervals = Intervals.getSince(since, 60);
 
         const getFilter = (interval: Interval) => {
-          const isUnixDate = entity == "Instances";
-          const dateField = isUnixDate ? "CreatedUnix" : "Created";
-          const { from, to } = interval;
-          const scale = isUnixDate ? 1000 : 1;
+          const isDateField = entity == "Instances";
+          let { from, to } = interval as any;
+          if (isDateField) {
+            from = new Date(from);
+            to = new Date(to);
+          }
           const filter = {} as any;
-          filter[dateField] = { $gte: from * scale, $lte: to * scale };
+          filter.Created = { $gte: from, $lte: to };
           return filter;
         };
 
