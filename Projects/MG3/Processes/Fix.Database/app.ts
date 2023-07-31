@@ -125,10 +125,10 @@ import { MongoDatabase } from "@shared/Database/MongoDatabase";
   for await (const instance of db.findIterable("Instances", filter, {
     _id: -1,
   })) {
-    let created = instance.CreatedDate;
+    let created = instance.createdDate;
     if (typeof created === "string") created = new Date(created);
-    instance.Created = created;
-    instance.CreatedDate = created;
+    instance.created = created;
+    instance.createdDate = created;
     await db.upsert("Instances", instance);
     fixed++;
     progress.increment();
