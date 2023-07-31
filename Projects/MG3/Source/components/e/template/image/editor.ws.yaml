@@ -105,6 +105,9 @@ mounted: | #js
     });
     this.$watch(() => this.item?.imageID, (imageID) => {
       this.error = false;
+      if (this.item.removeBackground) {
+        this.removingBackground = true;
+      }
     });
   }
 methods:
