@@ -539,6 +539,13 @@ api:
         await db.upsert("Threads", thread);
 
         return post._id;
+    Posts.select.new:
+      args: [fromPostID]
+      code: | #js
+        if (!fromPostID) fromPostID = Number.MAX_VALUE;
+        const pageSize = 15;
+        const posts = await db.find("Posts", { _id: { $lt: fromPostID } }, { _id: -1 }, pageSize, 0, true);
+        return posts;
     Posts.select.one:
       args: [postID, _uid]
       code: | #js

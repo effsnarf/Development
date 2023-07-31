@@ -24,6 +24,10 @@ dom:
           ':editable': editable
           ':show-help': 'false'
           ':media-created': onMediaCreated
+      e.media.menu:
+        v-if: showMediaMenu
+        ':media': cMedia
+        ':admin': 'true'
       e.media.recaption:
         v-if: (!editable) && (cMedia.type=='builder')
         ':media': cMedia
@@ -39,6 +43,7 @@ props:
   square: false
   showFooter: true
   mediaCreated: null
+  showMediaMenu: false
 data:
   cMedia: null
 methods:
@@ -115,8 +120,10 @@ template: >-
   path="864271643.0.0.2"></e-instance><component v-if="(cMedia.type=='builder')"
   :is="formatComponentName" :media="cMedia" :editable="editable"
   :show-help="false" :media-created="onMediaCreated"
-  path="864271643.0.0.3"></component></div><e-media-recaption v-if="(!editable)
+  path="864271643.0.0.3"></component></div><e-media-menu v-if="showMediaMenu"
+  :media="cMedia" :admin="true"
+  path="864271643.0.1"></e-media-menu><e-media-recaption v-if="(!editable)
   &amp;&amp; (cMedia.type=='builder')" :media="cMedia"
   :threadMedia="threadMedia" @thread-updated="$emit('thread-updated')"
   @media-created="onMediaCreated"
-  path="864271643.0.1"></e-media-recaption></div></div>
+  path="864271643.0.2"></e-media-recaption></div></div>

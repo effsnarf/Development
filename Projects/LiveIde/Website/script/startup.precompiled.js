@@ -178,9 +178,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "../../../../LiveIde/Website/script/1690777852013.ts":
+/***/ "../../../../LiveIde/Website/script/1690783839925.ts":
 /*!***********************************************************!*\
-  !*** ../../../../LiveIde/Website/script/1690777852013.ts ***!
+  !*** ../../../../LiveIde/Website/script/1690783839925.ts ***!
   \***********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -826,10 +826,10 @@ const helpers = {
             getKey(item) {
                 if (!item)
                     return null;
-                if (item._uid)
-                    return item._uid;
                 if (item._id)
                     return item._id;
+                if (item._uid)
+                    return item._uid;
                 return item;
             },
             getRandomStanza(poem) {
@@ -3846,7 +3846,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690777852013.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690783839925.ts");
 /******/ 	
 /******/ })()
 ;

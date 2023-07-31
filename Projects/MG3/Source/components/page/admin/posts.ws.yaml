@@ -1,19 +1,18 @@
 dom:
-  div: 
+  div:
     h2:
-      v-text: '''New Medias'''
+      v-text: "'New Posts'"
     .columns1:
-      div: 
+      div:
         content.stream:
-          item-type: e.media
-          ':item-props': '{ showMediaMenu: true }'
-          ':get-more-items': getMoreMedias
+          item-type: e.post
+          ":get-more-items": getMorePosts
           grid-class: grid-1
 data: null
 methods:
-  getMoreMedias: | #js
-    async function(pageIndex, fromMediaID) {
-      return await this.$root.dbp.medias.select.new(null, fromMediaID);
+  getMorePosts: | #js
+    async function(pageIndex, fromPostID) {
+      return await this.$root.dbp.posts.select.new(null, fromPostID);
     }
 style:
   .columns1 > div:nth-child(1):

@@ -38,8 +38,9 @@ dom:
                 ':event': eventValue
                 ':last': lastValue
                 ':every': every
-      div:
+      .flex:
         page.admin.medias: null
+        page.admin.posts:
 data:
   entities:
     - Posts
@@ -61,6 +62,10 @@ data:
     - 1 hours
   lastValue: 1 hours
   barsValue: 100
+mounted: | #js
+  async function() {
+    this.$root.isAdmin = true;
+  }
 methods:
   getCatOptions: | #js
     function() {

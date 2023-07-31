@@ -45,7 +45,6 @@ data:
   hoveredIndex: null
 methods:
   getCssClass: | #js
-
     function() {
       const cls = {};
       if (!this.data?.length) cls.empty = true;
@@ -53,7 +52,6 @@ methods:
       return cls;
     }
   drawChart: | #js
-
     function(data) {
       if (!this.data?.length) return;
 
@@ -72,14 +70,12 @@ methods:
       this.ctx.stroke();
     }
   drawBar: | #js
-
     function(x, value, color) {
       const y = this.paddingY + this.chartHeight - (value - this.min) * this.stepY;
       this.ctx.fillStyle = color;
       this.ctx.fillRect(x, y, this.step, this.chartHeight - y + this.paddingY);
     }
   onMouseMove: | #js
-
     function(e) {
       const rect = this.canvas.getBoundingClientRect();
       const scaleX = this.canvas.width / rect.width;
@@ -88,19 +84,16 @@ methods:
       this.hoveredIndex = i;
     }
   onMouseOut: | #js
-
     function(e) {
       this.hoveredIndex = null;
     }
   getValueFunc: | #js
-
     function(value) {
       let func = this.getValue;
       if (typeof func === 'string') func = eval(func);
       return func(value);
     }
   scaled: | #js
-
     function(value) {
       return value;
       return Math.round(value * this.scale);
@@ -108,7 +101,6 @@ methods:
 watch:
   data:
     handler: | #js
-
       async function(data) {
         await this.$nextTick();
         this.drawChart(data);
@@ -142,61 +134,49 @@ computed:
   step: function() { return this.chartWidth / this.data.length; }
   stepY: function() { return this.chartHeight / this.range; }
   min: | #js
-
     function() {
       if (!this.data?.length) return 0;
       return Math.round(Math.min(...this.data.map(x => this.getValueFunc(x))));
     }
   max: | #js
-
     function() {
       if (!this.data?.length) return 0;
       return Math.round(Math.max(...this.data.map(x => this.getValueFunc(x))) * 1.1);
     }
   minValue: | #js
-
     function() {
       return (this.data||[]).filter(v => v).min();
     }
   averageValue: | #js
-
     function() {
       return (this.data||[]).filter(v => v).average();
     }
   middleValue: | #js
-
     function() {
       return (this.minValue + this.maxValue) / 2;
     }
   maxValue: | #js
-
     function() {
       return (this.data||[]).filter(v => v).max();
     }
   range: | #js
-
     function() {
       return this.max - this.min;
     }
   hoveredData: | #js
-
     function() {
       if (this.hoveredIndex === null) return null;
       const value = this.data[this.hoveredIndex];
       return value;
     }
   hoveredX: | #js
-
     function() {
       if (this.hoveredIndex === null) return null;
       return this.paddingX + this.hoveredIndex * this.step;
     }
-name: ui-chart
 style:
-  column1:
-    width: 10%
-  .chart > div:
-    flex-grow: 1
+  .column1:
+    width: 2em !important
   canvas:
     width: 100%
   .card:
@@ -219,6 +199,7 @@ style:
   .column1 .comp-ui-num:nth-child(1):
     position: absolute
     bottom: 0
+name: ui-chart
 template: >-
   <div class="comp-ui-chart card" :class="getCssClass()" path="-2139450364."><h2
   class="header" v-if="header" v-text="header" path="-2139450364.0"></h2><div

@@ -674,8 +674,8 @@ interface MgParams {
       },
       getKey(item: any) {
         if (!item) return null;
-        if (item._uid) return item._uid;
         if (item._id) return item._id;
+        if (item._uid) return item._uid;
         return item;
       },
       getRandomStanza(poem: any) {
