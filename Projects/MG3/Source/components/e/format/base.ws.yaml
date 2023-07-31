@@ -20,6 +20,7 @@ props:
   cancel: null
 data:
   temp: null
+  cBuilder: null
 methods:
   initFromBuilder: | #js
     function (builder) {
@@ -28,7 +29,7 @@ methods:
     }
   onMediaCreated: | #js
     async function (media) {
-      this.initFromBuilder(this.builder);
+      //this.initFromBuilder(this.builder);
       if (this.mediaCreated) await this.mediaCreated(media);
     }
   getMediaStyle: | #js
@@ -48,11 +49,17 @@ computed:
       return this.getMediaStyle(this.cBuilder);
     }
 watch:
+  cBuilder:
+    handler: | #js
+      function(builder) {
+        this.initFromBuilder(builder);
+      }
+    immediate: true
   builder:
     handler: | #js
       function(builder) {
-        if (!builder) return;
-        this.initFromBuilder(builder);
+        if (this.cBuilder) return;
+        this.cBuilder = builder;
       }
     immediate: true
   media:

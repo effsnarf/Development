@@ -37,7 +37,11 @@
     },
 
     _log_method: function (methodName, args) {
-      return;
+      const compName = this.$data._.comp.name;
+
+      if ([`ide.`, `ui.`].some(s => compName.startsWith(s))) return;
+
+      if (methodName == 'mounted') return;
 
       if ([`processQueue`, `recalc`, `getFontSize`,
         `onMouseMove`, `onMouseUp`,
@@ -45,7 +49,14 @@
         `highlight`, `unhighlight`,
         `getCssClass`, `getTabClass`, `getLayerClass`, `getLayerType`
         ].includes(methodName)) return;
-      if ([`draw`].some(s => methodName.includes(s))) return;
+
+      if ([`draw`, `refresh`, `isOnScreen`, `updateImageSize`].some(s => methodName.includes(s))) return;
+
+      if (methodName.startsWith('get')) return;
+
+      console.log(compName, methodName, args);
+
+      return;
 
       this.$root.state?.track(this, 'm', methodName);
 
