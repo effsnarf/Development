@@ -496,8 +496,12 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
         const intervals = Intervals.getSince(since, 60);
 
         const filter = {} as any;
-        const dateField = entity == "Instances" ? "CreatedUnix" : "Created";
-        filter[dateField] = { $gte: from };
+        const isUnixDate = entity == "Instances";
+        if (isUnixDate) {
+          filter.CreatedUnix = { $gte: from * 1000 };
+        } else {
+          filter.Created = { $gte: from };
+        }
 
         const docs =
           (await db?.find(entity, filter, null, Number.MAX_SAFE_INTEGER)) || [];
