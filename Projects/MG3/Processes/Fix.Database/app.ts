@@ -44,8 +44,8 @@ import { MongoDatabase } from "@shared/Database/MongoDatabase";
     }
   };
 
+  let docsCount = 0;
   let fixed = 0;
-
   let progress = null;
 
   let filter = {} as any;
@@ -103,23 +103,33 @@ import { MongoDatabase } from "@shared/Database/MongoDatabase";
 
   // #region Instances
 
-  console.log(`Fixing ${`Instances`.green}..`);
-
+  console.log(`Fixing ${`Instances.Created`.green}..`);
   filter = { Created: { $type: "string" } };
-
-  const instancesCount = await db.count("Instances", filter);
-
-  console.log(`${instancesCount} instances to fix..`);
-
-  progress = Progress.newAutoDisplay(instancesCount);
-
+  docsCount = await db.count("Instances", filter);
+  console.log(`${docsCount} instances to fix..`);
+  progress = Progress.newAutoDisplay(docsCount);
   for await (const instance of db.findIterable("Instances", filter, {
     Created: -1,
   })) {
     instance.Created = new Date(instance.Created);
-
     await db.upsert("Instances", instance);
+    fixed++;
+    progress.increment();
+  }
 
+  console.log(`Fixing ${`Instances.Created (null)`.green}..`);
+  filter = { Created: null };
+  docsCount = await db.count("Instances", filter);
+  console.log(`${docsCount} instances to fix..`);
+  progress = Progress.newAutoDisplay(docsCount);
+  for await (const instance of db.findIterable("Instances", filter, {
+    _id: -1,
+  })) {
+    let created = instance.CreatedDate;
+    if (typeof created === "string") created = new Date(created);
+    instance.Created = created;
+    instance.CreatedDate = created;
+    await db.upsert("Instances", instance);
     fixed++;
     progress.increment();
   }
