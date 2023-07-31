@@ -4,7 +4,10 @@ dom:
     h2:
       class: header
       v-if: header
-      v-text: header
+      span:
+        v-text: header
+      .sum:
+        v-text: sum
     .chart.flex:
       .column1:
         ui.num: 
@@ -133,6 +136,10 @@ computed:
   chartHeight: function () { return this.height - this.paddingY * 2; }
   step: function() { return this.chartWidth / this.data.length; }
   stepY: function() { return this.chartHeight / this.range; }
+  sum: | #js
+    function() {
+      return (this.data||[]).filter(v => v).sum();
+    }
   min: | #js
     function() {
       if (!this.data?.length) return 0;
@@ -175,6 +182,10 @@ computed:
       return this.paddingX + this.hoveredIndex * this.step;
     }
 style:
+  .sum:
+    display: inline
+    opacity: 0.5
+    margin-left: 1em
   .column1:
     width: 2em !important
   canvas:
@@ -202,9 +213,11 @@ style:
 name: ui-chart
 template: >-
   <div class="comp-ui-chart card" :class="getCssClass()" path="-2139450364."><h2
-  class="header" v-if="header" v-text="header" path="-2139450364.0"></h2><div
-  class="chart flex" path="-2139450364.1"><div class="column1"
-  path="-2139450364.1.0"><ui-num class="opacity-50" :value="scaled(minValue)"
+  class="header" v-if="header" path="-2139450364.0"><span v-text="header"
+  path="-2139450364.0.0"></span><div class="sum" v-text="sum"
+  path="-2139450364.0.1"></div></h2><div class="chart flex"
+  path="-2139450364.1"><div class="column1" path="-2139450364.1.0"><ui-num
+  class="opacity-50" :value="scaled(minValue)"
   path="-2139450364.1.0.0"></ui-num><ui-num :value="scaled(middleValue)"
   path="-2139450364.1.0.1"></ui-num><ui-num class="opacity-50"
   :value="scaled(maxValue)" path="-2139450364.1.0.2"></ui-num></div><div

@@ -48,7 +48,7 @@ import { MongoDatabase } from "@shared/Database/MongoDatabase";
 
   let progress = null;
 
-  // AI moderation on posts
+  // #region AI moderation on posts
   console.log(`Fixing ${`Posts`.green}..`);
 
   const postsCount = await db.count("Posts", { Mod: { $exists: false } });
@@ -69,6 +69,28 @@ import { MongoDatabase } from "@shared/Database/MongoDatabase";
     fixed++;
     progress.increment();
   }
+
+  // #endregion
+
+  // #region Instances
+
+  console.log(`Fixing ${`Instances`.green}..`);
+
+  let filter = { Created: { $type: "string" } };
+
+  const instancesCount = await db.count("Instances", filter);
+
+  progress = Progress.newAutoDisplay(postsCount);
+
+  for await (const instance of db.findIterable("Instances", filter, {})) {
+    instance.Created = new Date(instance.Created);
+
+    await db.upsert("Instances", instance);
+
+    fixed++;
+    progress.increment();
+  }
+  // #endregion
 
   // Fix Generators.InstancesCount
   if (false) {
