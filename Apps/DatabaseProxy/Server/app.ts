@@ -520,6 +520,14 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
       })
     );
 
+    httpServer.get(
+      "/analytics/*",
+      processRequest(async (req: any, res: any) => {
+        return "test";
+        return dbs._analytics?.api.handleRequest(req, res);
+      })
+    );
+
     // For /, return "Add a database name to the URL: /[database]"
     httpServer.get("/", (req: any, res: any) => {
       return res.end("Add a database name to the URL: /[database]");
