@@ -475,17 +475,17 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
     );
     // #endregion
 
-    // #region 📑 Analytics
-    httpServer.all(
-      "/analytics/*",
-      processRequest(async (req: any, res: any) => {
-        return dbs._analytics?.api.handleRequest(req, res);
-      })
-    );
-    // #endregion
+    // // #region 📑 Analytics
+    // httpServer.all(
+    //   "/analytics/*",
+    //   processRequest(async (req: any, res: any) => {
+    //     return dbs._analytics?.api.handleRequest(req, res);
+    //   })
+    // );
+    // // #endregion
 
     // #region 📑 Database Analytics
-    httpServer.all(
+    httpServer.get(
       "/:database/analytics/:entity/since/:since",
       processRequest(async (req: any, res: any) => {
         const db = await dbs.get(req.params.database);
@@ -493,29 +493,27 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
         const since = req.params.since.deunitify();
         const from = Date.now() - since;
 
-        return "123";
-
         const intervals = Intervals.getSince(since, 60);
 
-        return intervals;
-
-        const docs = (
-          await db?.find(entity, {
-            Created: {
-              $gte: from,
+        const docs =
+          (await db?.find(
+            entity,
+            {
+              Created: {
+                $gte: from,
+              },
             },
-          })
-        )?.take(10);
-
-        return { intervals, docs };
+            null,
+            Number.MAX_SAFE_INTEGER
+          )) || [];
 
         for (const interval of intervals) {
-          const count =
-            docs?.filter((doc) => Intervals.docIsIn(doc, interval)).length || 0;
+          let count =
+            docs.filter((doc) => Intervals.docIsIn(doc, interval)).length || 0;
           interval.count = count;
         }
 
-        const counts = intervals.map((i) => i.count);
+        const counts = intervals.map((intr) => intr.count);
 
         return res.end(JSON.stringify(counts));
       })
