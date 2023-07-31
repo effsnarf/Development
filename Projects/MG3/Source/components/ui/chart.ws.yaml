@@ -8,6 +8,10 @@ dom:
         v-text: header
       .sum:
         v-text: sum
+    div: 
+      ui.checkbox:
+        text: cumulative
+        v-model: isCumulative
     .chart.flex:
       .column1:
         ui.num: 
@@ -18,7 +22,7 @@ dom:
         ui.num: 
           class: opacity-50
           ':value': scaled(maxValue)
-      div:
+      div: 
         canvas:
           ref: canvas1
           class: ml-l1
@@ -46,25 +50,26 @@ props:
 data:
   canvasWidth: 400
   hoveredIndex: null
+  isCumulative: false
 methods:
   getCssClass: | #js
     function() {
       const cls = {};
-      if (!this.data?.length) cls.empty = true;
+      if (!this.cData?.length) cls.empty = true;
       if (this.color) cls[`${this.color}`] = true;
       return cls;
     }
   drawChart: | #js
     function(data) {
-      if (!this.data?.length) return;
+      if (!data?.length) return;
 
       this.ctx.clearRect(0, 0, this.width, this.height);
       this.ctx.beginPath();
       this.ctx.moveTo(this.paddingX, this.paddingY + this.chartHeight);
-      for (let i = 0; i < this.data.length; i++) {
+      for (let i = 0; i < data.length; i++) {
         const x = this.paddingX + i * this.step;
-        const y = this.paddingY + this.chartHeight - (this.getValueFunc(this.data[i]) - this.min) * this.stepY;
-        this.drawBar(x, this.getValueFunc(this.data[i]), '#ffffff80');
+        const y = this.paddingY + this.chartHeight - (this.getValueFunc(data[i]) - this.min) * this.stepY;
+        this.drawBar(x, this.getValueFunc(data[i]), '#ffffff80');
       }
       this.ctx.lineTo(this.paddingX + this.chartWidth, this.paddingY + this.chartHeight);
       this.ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
@@ -73,8 +78,8 @@ methods:
       this.ctx.stroke();
     }
   drawBar: | #js
-    function(x, value, color) {
-      const y = this.paddingY + this.chartHeight - (value - this.min) * this.stepY;
+    function(x, value, color, maxDisplayValue) {
+      let y = this.paddingY + this.chartHeight - ((value - this.min) * this.stepY);
       this.ctx.fillStyle = color;
       this.ctx.fillRect(x, y, this.step, this.chartHeight - y + this.paddingY);
     }
@@ -101,30 +106,49 @@ methods:
       return value;
       return Math.round(value * this.scale);
     }
+  toCumulative: | #js
+    function(data) {
+      const result = [];
+      let sum = 0;
+      for (let i = 0; i < data.length; i++) {
+        sum += this.getValueFunc(data[i]);
+        result.push(sum);
+      }
+      return result;
+    }
 watch:
-  data:
+  cData:
     handler: | #js
-      async function(data) {
+      async function(cData) {
         await this.$nextTick();
-        this.drawChart(data);
+        this.drawChart(cData);
       }
     immediate: true
     deep: true
   hoveredIndex:
     handler: | #js
-
       async function(newIndex, oldIndex) {
         if (newIndex === oldIndex) return;
         await this.$nextTick();
-        this.drawChart(this.data);
+        this.drawChart(this.cData);
         if (newIndex !== null) {
-          const value = this.getValueFunc(this.data[newIndex]);
+          const value = this.getValueFunc(this.cData[newIndex]);
           this.drawBar(this.hoveredX, value, '#ffffff80');
         }
       }
     immediate: true
     deep: true
+  isCumulative:
+    handler: | #js
+      async function() {
+        this.drawChart(this.cData);
+      }
 computed:
+  cData: | #js
+    function() {
+      if (this.isCumulative) return this.toCumulative(this.data);
+      return this.data;
+    }
   canvas: function() { return this.$refs.canvas1; }
   ctx: function() { return this.canvas.getContext('2d'); }
   width: function() { return this.canvas.width; }
@@ -134,7 +158,7 @@ computed:
   paddingY: function() { return this.height * this.padding; }
   chartWidth: function() { return this.width - this.paddingX * 2; }
   chartHeight: function () { return this.height - this.paddingY * 2; }
-  step: function() { return this.chartWidth / this.data.length; }
+  step: function() { return this.chartWidth / this.cData.length; }
   stepY: function() { return this.chartHeight / this.range; }
   sum: | #js
     function() {
@@ -142,21 +166,21 @@ computed:
     }
   min: | #js
     function() {
-      if (!this.data?.length) return 0;
-      return Math.round(Math.min(...this.data.map(x => this.getValueFunc(x))));
+      if (!this.cData?.length) return 0;
+      return Math.round(Math.min(...this.cData.map(x => this.getValueFunc(x))));
     }
   max: | #js
     function() {
-      if (!this.data?.length) return 0;
-      return Math.round(Math.max(...this.data.map(x => this.getValueFunc(x))) * 1.1);
+      if (!this.cData?.length) return 0;
+      return Math.round(Math.max(...this.cData.map(x => this.getValueFunc(x))) * 1.1);
     }
   minValue: | #js
     function() {
-      return (this.data||[]).filter(v => v).min();
+      return (this.cData||[]).filter(v => v).min();
     }
   averageValue: | #js
     function() {
-      return (this.data||[]).filter(v => v).average();
+      return (this.cData||[]).filter(v => v).average();
     }
   middleValue: | #js
     function() {
@@ -164,7 +188,7 @@ computed:
     }
   maxValue: | #js
     function() {
-      return (this.data||[]).filter(v => v).max();
+      return (this.cData||[]).filter(v => v).max();
     }
   range: | #js
     function() {
@@ -173,7 +197,7 @@ computed:
   hoveredData: | #js
     function() {
       if (this.hoveredIndex === null) return null;
-      const value = this.data[this.hoveredIndex];
+      const value = this.cData[this.hoveredIndex];
       return value;
     }
   hoveredX: | #js
@@ -215,17 +239,19 @@ template: >-
   <div class="comp-ui-chart card" :class="getCssClass()" path="-2139450364."><h2
   class="header" v-if="header" path="-2139450364.0"><span v-text="header"
   path="-2139450364.0.0"></span><div class="sum" v-text="sum"
-  path="-2139450364.0.1"></div></h2><div class="chart flex"
-  path="-2139450364.1"><div class="column1" path="-2139450364.1.0"><ui-num
+  path="-2139450364.0.1"></div></h2><div path="-2139450364.1"><ui-checkbox
+  text="cumulative" v-model="isCumulative"
+  path="-2139450364.1.0"></ui-checkbox></div><div class="chart flex"
+  path="-2139450364.2"><div class="column1" path="-2139450364.2.0"><ui-num
   class="opacity-50" :value="scaled(minValue)"
-  path="-2139450364.1.0.0"></ui-num><ui-num :value="scaled(middleValue)"
-  path="-2139450364.1.0.1"></ui-num><ui-num class="opacity-50"
-  :value="scaled(maxValue)" path="-2139450364.1.0.2"></ui-num></div><div
-  path="-2139450364.1.1"><canvas class="ml-l1" ref="canvas1"
+  path="-2139450364.2.0.0"></ui-num><ui-num :value="scaled(middleValue)"
+  path="-2139450364.2.0.1"></ui-num><ui-num class="opacity-50"
+  :value="scaled(maxValue)" path="-2139450364.2.0.2"></ui-num></div><div
+  path="-2139450364.2.1"><canvas class="ml-l1" ref="canvas1"
   :width="canvasWidth" :height="(canvasWidth / 2)" @mousemove="onMouseMove"
-  @mouseout="onMouseOut" path="-2139450364.1.1.0"></canvas></div></div><div
-  class="flex flex-column justify-center items-center" path="-2139450364.2"><div
-  class="title" path="-2139450364.2.0"><div class="icon" v-text="icon"
-  path="-2139450364.2.0.0"></div><div class="text" v-text="title"
-  path="-2139450364.2.0.1"></div></div><ui-num :value="scaled(hoveredData ||
-  total)" path="-2139450364.2.1"></ui-num></div></div>
+  @mouseout="onMouseOut" path="-2139450364.2.1.0"></canvas></div></div><div
+  class="flex flex-column justify-center items-center" path="-2139450364.3"><div
+  class="title" path="-2139450364.3.0"><div class="icon" v-text="icon"
+  path="-2139450364.3.0.0"></div><div class="text" v-text="title"
+  path="-2139450364.3.0.1"></div></div><ui-num :value="scaled(hoveredData ||
+  total)" path="-2139450364.3.1"></ui-num></div></div>
