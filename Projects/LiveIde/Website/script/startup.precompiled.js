@@ -89,7 +89,7 @@ class DatabaseProxy {
         // We're using { $set: [obj, prop] } as a callback syntax
         // This is because sometimes we use the local cache and also fetch in the background
         // in which case we'll need to resolve twice which is not possible with a promise
-        const options = extraArgs.find((a) => a.$set) || {};
+        const options = extraArgs.find((a) => a?.$set) || {};
         let url = `${this.urlBase}/api/${entity}/${group}/${method}`;
         const isHttpPost = group == "create";
         if (isHttpPost) {
@@ -178,9 +178,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "../../../../LiveIde/Website/script/1690783839925.ts":
+/***/ "../../../../LiveIde/Website/script/1690785015503.ts":
 /*!***********************************************************!*\
-  !*** ../../../../LiveIde/Website/script/1690783839925.ts ***!
+  !*** ../../../../LiveIde/Website/script/1690785015503.ts ***!
   \***********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -3846,7 +3846,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690783839925.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690785015503.ts");
 /******/ 	
 /******/ })()
 ;
