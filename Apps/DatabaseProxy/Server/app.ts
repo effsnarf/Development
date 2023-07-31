@@ -507,10 +507,6 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
           return filter;
         };
 
-        return res.end(
-          JSON.stringify(intervals.map((intr) => getFilter(intr)))
-        );
-
         for (const interval of intervals) {
           let count = (await db?.count(entity, getFilter(interval))) || 0;
           interval.count = count;
