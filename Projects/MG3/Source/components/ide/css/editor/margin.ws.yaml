@@ -1,0 +1,52 @@
+dom:
+  div: 
+    h3:
+      v-text: '''Margin'''
+    div: 
+      ui.select:
+        ':options': options
+        ':getItemKey': a => a
+        v-model: selectedOption
+        @item-hover: onOptionHover($event)
+props:
+  el: null
+data:
+  options: []
+  selectedOption: null
+  hoveredOption: null
+  appliedStyles: null
+mounted: | #js
+  function() {
+    for (let i = 0; i < 10; i++) {
+      this.options.push(i * 3);
+    }
+  }
+methods:
+  onOptionHover: | #js
+    function(option) {
+      this.hoveredOption = option.item;
+    }
+computed:
+  hoveredOrSelectedOption: | #js
+    function() {
+      return this.hoveredOption || this.selectedOption;
+    }
+watch:
+  hoveredOrSelectedOption: | #js
+    function(hoso) {
+      const el = this.el;
+      if (!hoso) 
+      {
+        el.style.margin = "";
+        return;
+      }
+      el.style.margin = hoso + "px";
+    }
+style: null
+name: ide-css-editor-margin
+template: >-
+  <div class="comp-ide-css-editor-margin" path="1091445344."><h3
+  v-text="'Margin'" path="1091445344.0"></h3><div path="1091445344.1"><ui-select
+  :options="options" :getItemKey="a =&gt; a" v-model="selectedOption"
+  @item-hover="onOptionHover($event)"
+  path="1091445344.1.0"></ui-select></div></div>

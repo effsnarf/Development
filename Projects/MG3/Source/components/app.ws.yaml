@@ -23,6 +23,8 @@ dom:
       page.instance: null
     .notifications:
       ui.notifications: null
+    ide.css.stylesheet:
+      ':rules': $root.newCssRules
 name: app
 style:
   .notifications:
@@ -69,4 +71,5 @@ template: >-
   }"
   path="96801.1"><page-test></page-test><page-admin-index></page-admin-index><page-home></page-home><page-catalog></page-catalog><page-thread></page-thread><page-category></page-category><page-builder></page-builder><page-media></page-media><page-generators></page-generators><page-generator></page-generator><page-instance></page-instance></div><div
   class="notifications"
-  path="96801.2"><ui-notifications></ui-notifications></div></div>
+  path="96801.2"><ui-notifications></ui-notifications></div><ide-css-stylesheet
+  :rules="$root.newCssRules" path="96801.3"></ide-css-stylesheet></div>

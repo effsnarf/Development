@@ -1,0 +1,36 @@
+dom:
+  .flex:
+    ':tooltip': tooltip
+    div: 
+      ':style': '{ width: ''12em'' }'
+      v-text: '''⛏️ '' + name'
+    div: 
+      class: flex-grow-1
+      ui.select:
+        ':options': cOptions
+        ':value': value
+        ':input-type': value
+        ':type': '''toggle'''
+        @input: onInput($event)
+props:
+  name: null
+  tooltip: null
+  value: null
+methods:
+  onInput: | #js
+    function(value) {
+      this.$emit("input", value);
+    }
+computed:
+  cOptions: | #js
+    function() {
+      return this.$root.html.getPossibleCssValues(this.name);
+    }
+name: ide-css-editor-field
+template: >-
+  <div class="comp-ide-css-editor-field flex" :tooltip="tooltip"
+  path="-802314744."><div :style="{ width: '12em' }" v-text="'⛏️ ' + name"
+  path="-802314744.0"></div><div class="flex-grow-1"
+  path="-802314744.1"><ui-select :options="cOptions" :value="value"
+  :input-type="value" :type="'toggle'" @input="onInput($event)"
+  path="-802314744.1.0"></ui-select></div></div>

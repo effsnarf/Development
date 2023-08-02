@@ -107,14 +107,17 @@ li
   transition: 0s;
 }
 
-.highlighted
+.highlighted, tr.highlighted > th, tr.highlighted > td
 {
-  border: 2px dashed yellow;
-  padding: 0.5em;
+  border: 2px dashed #ffff0080;
+}
+:not(tr).highlighted
+{
+  padding: 0.3em;
 }
 .highlighted2
 {
-  border: 2px dashed cyan;
+  border: 4px dashed yellow;
 }
 
 .highlighted, .highlighted2
@@ -133,7 +136,8 @@ li
 }
 .selected
 {
-  background: #ffffff60;
+  background: #ffffff40;
+  transition: 0s;
 }
 
 .clickable

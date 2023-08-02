@@ -319,6 +319,7 @@ interface String {
 }
 
 interface Array<T> {
+  all(predicate: (item: T) => boolean): boolean;
   toMap(getKey: (item: T) => any): object;
   contains(item: T, getItemKey?: (item: T) => any): boolean;
   reversed(): T[];
@@ -354,6 +355,7 @@ interface Array<T> {
   stringify(): string;
   onlyTruthy<T>(): T[];
   shuffle(): T[];
+  rotate(count: number): T[];
 }
 
 interface Function {
@@ -1267,6 +1269,10 @@ if (typeof Array !== "undefined") {
     return map;
   };
 
+  Array.prototype.all = function (predicate: (item: any) => boolean) {
+    return this.findIndex((item) => !predicate(item)) == -1;
+  };
+
   Array.prototype.contains = function (
     item: any,
     getItemKey?: (item: any) => any
@@ -1477,6 +1483,23 @@ if (typeof Array !== "undefined") {
 
   Array.prototype.shuffle = function (): any {
     return this.sortBy(() => Math.random() - 0.5);
+  };
+
+  Array.prototype.rotate = function (count: number = 1): any {
+    const arr = this;
+
+    if (arr.length == 0 || count == 0) return [...arr]; // Return an empty array if the array is empty
+
+    const rotations = count % arr.length; // Calculate the effective number of rotations
+
+    if (rotations === 0) {
+      return arr.slice(); // Return a copy of the original array if no rotations are needed
+    }
+
+    const rotatedPart = arr.slice(0, rotations); // Extract the elements to be rotated
+    const remainingPart = arr.slice(rotations); // Extract the remaining elements
+
+    return remainingPart.concat(rotatedPart); // Concatenate the two parts to get the rotated array
   };
 }
 // #endregion

@@ -1,0 +1,36 @@
+dom:
+  div:
+    ide.css.editor.example.flex:
+      ':example-style': flexStyle
+    ide.css.editor.field:
+      v-for: (name, index) in fieldNames
+      ':name': name
+      ':tooltip': fieldTooltips[index]
+      v-model: flexStyle[name]
+props: null
+data:
+  flexStyle: {}
+  fieldNames:
+    - flex-direction
+    - flex-wrap
+    - justify-content
+    - align-items
+    - align-content
+computed:
+  fieldTooltips: | #js
+    function() {
+      const tips = [null, null, null, null, null];
+      if (!["wrap", "wrap-reverse"].includes(this.flexStyle["flex-wrap"])) {
+        tips[4] = "align-content only works with wrap or wrap-reverse";
+      }
+      return tips;
+    }
+style: null
+name: ide-css-editor-flex
+template: >-
+  <div class="comp-ide-css-editor-flex"
+  path="-25878229."><ide-css-editor-example-flex :example-style="flexStyle"
+  path="-25878229.0"></ide-css-editor-example-flex><ide-css-editor-field
+  v-for="(name, index) in fieldNames" :name="name"
+  :tooltip="fieldTooltips[index]" v-model="flexStyle[name]"
+  path="-25878229.1"></ide-css-editor-field></div>

@@ -20,7 +20,6 @@ props:
   cancel: null
 data:
   temp: null
-  cBuilder: null
 methods:
   initFromBuilder: | #js
     function (builder) {

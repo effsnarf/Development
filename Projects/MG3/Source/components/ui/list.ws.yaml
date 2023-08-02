@@ -4,24 +4,33 @@ dom:
     name: list
     ':class': getMainCssClass()
     li:
-      v-for: (item, index) in items
-      ':key': _getItemKey(item)
-      ':class': getCssClass(index)
+      v-for: indexedItem in visibleItems
+      ':key': _getItemKey(indexedItem.item)
+      ':class': getCssClass(indexedItem.index)
       slot:
-        ':index': index
-        ':item': item
-      @click: () => onItemClick({ item, index })
+        ':index': indexedItem.index
+        ':item': indexedItem.item
+      @mouseenter: () => onItemHover(indexedItem)
+      @mouseleave: '() => onItemHover({ item: null, index: null })'
+      @click: () => onItemClick(indexedItem)
 props:
   items: null
   selectedIndex: null
   direction: vertical
+  isItemVisible: null
   getItemKey: null
   canSelectNone: true
 methods:
+  _isItemVisible: | #js
+    function(item) {
+      if (this.isItemVisible) return this.isItemVisible(item);
+      return true;
+    }
   _getItemKey: | #js
     function(item) {
-      if (this.getItemKey) return this.getItemKey(item);
-      return this.$root.getKey(item);
+      const stringKey = (typeof item === 'string') ? item : JSON.stringify(item);
+      if (this.getItemKey) return this.getItemKey(item) || stringKey;
+      return this.$root.getKey(item) || stringKey;
     }
   getMainCssClass: | #js
     function() {
@@ -30,6 +39,10 @@ methods:
       };
       cls[this.direction] = true;
       return cls;
+    }
+  onItemHover: | #js
+    function(e) {
+      this.$emit('item-hover', e);
     }
   onItemClick: | #js
     function(e) {
@@ -43,6 +56,28 @@ methods:
         selected: (index == this.selectedIndex),
       };
     }
+computed:
+  visibleItems: | #js
+    function() {
+      return (this.items||[])
+        .map((item, index) => ({
+          item,
+          index,
+        }))
+        .filter((item) => this._isItemVisible(item.item));
+    }
+  index: | #js
+    function() {
+      return this.selectedIndex;
+    }
+  item: | #js
+    function() {
+      return this.items[this.selectedIndex];
+    }
+  value: | #js
+    function() {
+      return this.selectedIndex;
+    }
 name: ui-list
 style:
   .horizontal:
@@ -53,7 +88,10 @@ style:
     text-align: center
 template: >-
   <transition-group class="comp-ui-list" tag="ul" name="list"
-  :class="getMainCssClass()" path="-484386888."><li v-for="(item, index) in
-  items" :key="_getItemKey(item)" :class="getCssClass(index)" @click="() =&gt;
-  onItemClick({ item, index })" path="-484386888.0"><slot :index="index"
-  :item="item" path="-484386888.0.0"></slot></li></transition-group>
+  :class="getMainCssClass()" path="-484386888."><li v-for="indexedItem in
+  visibleItems" :key="_getItemKey(indexedItem.item)"
+  :class="getCssClass(indexedItem.index)" @mouseenter="() =&gt;
+  onItemHover(indexedItem)" @mouseleave="() =&gt; onItemHover({ item: null,
+  index: null })" @click="() =&gt; onItemClick(indexedItem)"
+  path="-484386888.0"><slot :index="indexedItem.index" :item="indexedItem.item"
+  path="-484386888.0.0"></slot></li></transition-group>

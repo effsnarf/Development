@@ -1,28 +1,45 @@
 dom:
   div: 
-    select:
-      v-if: (type=='dropdown')
-      option:
-        v-for: (item, index) in options
-        ':value': index
-        v-text: item
-      ':value': valueIndex
-      @input: onInput(parseInt($event.target.value))
-    ui.list:
-      v-if: (type=='list')
-      v-slot: slotProps
-      ':items': options
-      ':selected-index': valueIndex
-      ':direction': direction
-      ':get-item-key': getItemKey
-      ':can-select-none': canSelectNone
-      template:
-        slot:
-          ':item': slotProps.item
+    div: 
+      ':style': '{ ''max-width'': ((direction == ''horizontal'') ? null : ''15em'') }'
+      ui.text.box:
+        v-if: showSearchBox
+        icon: 🔎
+        type: search
+        v-model: query
+      .list-container:
         div: 
-          v-if: showText
-          v-text: _getItemText(slotProps.item)
-      @input: onInput($event)
+          v-if: (type=='toggle')
+          .clickable:
+            v-text: (options[valueIndex]||'[-]')
+            @click: toggleValue($event, +1)
+            @contextmenu: toggleValue($event, -1)
+        select:
+          v-if: (type=='dropdown')
+          option:
+            v-for: (item, index) in options
+            ':value': index
+            v-text: item
+          ':value': valueIndex
+          @input: onInput(parseInt($event.target.value))
+        ui.list:
+          v-if: (type=='list')
+          v-slot: slotProps
+          ':items': options
+          ':selected-index': valueIndex
+          ':direction': direction
+          ':is-item-visible': _isOptionVisible
+          ':get-item-key': _getItemKey
+          ':can-select-none': canSelectNone
+          template:
+            slot:
+              ':item': slotProps.item
+            ui.title:
+              v-if: showText
+              ':icon': _getItemIcon(slotProps.item)
+              ':text': __getItemText(slotProps.item)
+          @item-hover: onItemHover($event)
+          @input: onInput($event)
 props:
   options: null
   value: 0
@@ -30,32 +47,62 @@ props:
   direction: vertical
   showText: true
   type: list
+  itemIcon: null
+  isOptionVisible: null
   getItemText: null
+  getItemIcon: null
   getItemKey: null
+  searchBox: false
   canSelectNone: true
+data:
+  query: null
 methods:
+  _isOptionVisible: | #js
+    function(item) {
+      const isQueryFilter = (this.query && this.query.length) ? this.__getItemText(item).toLowerCase().includes(this.query.toLowerCase()) : true;
+      const isOptionVisibleFilter = this.isOptionVisible ? this.isOptionVisible(item) : true;
+      return isQueryFilter && isOptionVisibleFilter;
+    }
+  onItemHover: | #js
+    function(e) {
+      this.$emit("item-hover", e);
+    }
   onInput: | #js
     function(index) {
       const value = this.inputType === "index" ? index : this.options[index];
       this.$emit("input", value);
     }
+  _getItemKey: | #js
+    function(item) {
+      if (this.getItemKey) return this.getItemKey(item);
+      if (this.getItemText) return this.getItemText(item);
+      return this.item;
+    }
+  _getItemIcon: | #js
+    function(item) {
+      if (this.getItemIcon) return this.getItemIcon(item);
+      return null;
+    }
+  __getItemText: | #js
+    function(item) {
+      let s = this._getItemText(item);
+      if (this.itemIcon) s = `${this.itemIcon} ${s}`;
+      return s;
+    }
   _getItemText: | #js
     function(item) {
       if (this.getItemText) return this.getItemText(item);
-      
       const text = item;
-      const icons = {
-        network: "🌐",
-        site: "💻",
-        requests: "📡",
-        "response.time": "⏱️",
-        "1 month": "📅",
-        "1 week": "📅",
-        "1 day": "📅",
-        "1 hour": "📅",
-      };
-      const icon = icons[text] || "";
-      return [icon, text].filter(a => a).join(" ");
+      return text;
+    }
+  toggleValue: | #js
+    function(e, delta) {
+      e.preventDefault();
+      e.stopPropagation();
+      const index = this.valueIndex;
+      let newIndex = (index + delta) % this.options.length;
+      if (newIndex < 0) newIndex = this.options.length - 1;
+      this.onInput(newIndex);
     }
 computed:
   valueIndex: | #js
@@ -63,24 +110,47 @@ computed:
       if (this.inputType === "index") return this.value;
       return this.options.indexOf(this.value);
     }
+  showSearchBox: | #js
+    function() {
+      return (this.searchBox) && (this.type === "list" && this.options?.length > 10);
+    }
 name: ui-select
 style:
+  .list-container:
+    max-height: 30em;
+    overflow-x: hidden;
+    overflow-y: auto;
   .comp-ui-list:
     user-select: none
   li:
     padding: 0.2em 0.5em
   li div:
     white-space: nowrap
+  .clickable:
+    text-align: center
+    user-select: none
+  .clickable:hover:
+    background: '#ffffff20'
 template: >-
-  <div class="comp-ui-select" path="-1442841194."><select
-  v-if="(type=='dropdown')" :value="valueIndex"
-  @input="onInput(parseInt($event.target.value))" path="-1442841194.0"><option
-  v-for="(item, index) in options" :value="index" v-text="item"
-  path="-1442841194.0.0"></option></select><ui-list v-if="(type=='list')"
+  <div class="comp-ui-select" path="-1442841194."><div :style="{ 'max-width':
+  ((direction == 'horizontal') ? null : '15em') }"
+  path="-1442841194.0"><ui-text-box v-if="showSearchBox" icon="🔎" type="search"
+  v-model="query" path="-1442841194.0.0"></ui-text-box><div
+  class="list-container" path="-1442841194.0.1"><div v-if="(type=='toggle')"
+  path="-1442841194.0.1.0"><div class="clickable"
+  v-text="(options[valueIndex]||'[-]')" @click="toggleValue($event, +1)"
+  @contextmenu="toggleValue($event, -1)"
+  path="-1442841194.0.1.0.0"></div></div><select v-if="(type=='dropdown')"
+  :value="valueIndex" @input="onInput(parseInt($event.target.value))"
+  path="-1442841194.0.1.1"><option v-for="(item, index) in options"
+  :value="index" v-text="item"
+  path="-1442841194.0.1.1.0"></option></select><ui-list v-if="(type=='list')"
   v-slot="slotProps" :items="options" :selected-index="valueIndex"
-  :direction="direction" :get-item-key="getItemKey"
-  :can-select-none="canSelectNone" @input="onInput($event)"
-  path="-1442841194.1"><template path="-1442841194.1.0"><slot
-  :item="slotProps.item" path="-1442841194.1.0.0"></slot><div v-if="showText"
-  v-text="_getItemText(slotProps.item)"
-  path="-1442841194.1.0.1"></div></template></ui-list></div>
+  :direction="direction" :is-item-visible="_isOptionVisible"
+  :get-item-key="_getItemKey" :can-select-none="canSelectNone"
+  @item-hover="onItemHover($event)" @input="onInput($event)"
+  path="-1442841194.0.1.2"><template path="-1442841194.0.1.2.0"><slot
+  :item="slotProps.item" path="-1442841194.0.1.2.0.0"></slot><ui-title
+  v-if="showText" :icon="_getItemIcon(slotProps.item)"
+  :text="__getItemText(slotProps.item)"
+  path="-1442841194.0.1.2.0.1"></ui-title></template></ui-list></div></div></div>

@@ -13,7 +13,7 @@ data:
 mounted: | #js
   function() {
     this.isMounted = true;
-    const element = this.global ? window : this.$el.parentElement;
+    const element = this.getElement();
     element.addEventListener("mousedown", this.onMouseDown);
     element.addEventListener("mouseup", this.onMouseUp);
     window.addEventListener("mousemove", this.onMouseMove);
@@ -28,6 +28,7 @@ unmounted: | #js
 methods:
   onMouseDown: | #js
     function(e) {
+      if (!this.global && e.target.tagName != "DIV") return;
       if (e.button != 0) return;
       if (this.dragStart) return;
       this.dragStart = { x: e.clientX, y: e.clientY };
@@ -61,6 +62,10 @@ methods:
       if (pos) this.pos = pos;
       this.posQueue = [];
       setTimeout(this.update.bind(this), this.updateInterval);
+    }
+  getElement: | #js
+    function() {
+      return (this.global ? window : this.$el.parentElement);
     }
   cancelEvent: | #js
     function(e) {

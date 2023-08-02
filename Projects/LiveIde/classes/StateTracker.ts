@@ -39,29 +39,47 @@ class StateTracker {
 
   track(vue: any, type: string, key: string, newValue: any, oldValue: any) {
     if (this.isPaused) return;
+    if (!this.isTrackable(newValue)) return;
+    if (!this.isTrackable(oldValue)) return;
 
-    const comp = this.getApp().getComponent(vue._uid);
+    try {
+      const comp = this.getApp().getComponent(vue._uid);
 
-    if (!comp) return;
+      if (!comp) return;
 
-    //if (!comp.source.config?.track?.state) return;
+      //if (!comp.source.config?.track?.state) return;
 
-    const isEvent = type == "e";
+      const isEvent = type == "e";
 
-    newValue = isEvent ? newValue : Objects.clone(newValue);
-    oldValue = isEvent ? oldValue : Objects.clone(oldValue);
+      newValue = isEvent ? newValue : Objects.clone(newValue);
+      oldValue = isEvent ? oldValue : Objects.clone(oldValue);
 
-    const item = {
-      id: StateTracker._nextID++,
-      dt: Date.now(),
-      uid: vue._uid,
-      type,
-      key,
-      newValue,
-      oldValue,
-    } as StateChange;
+      const item = {
+        id: StateTracker._nextID++,
+        dt: Date.now(),
+        uid: vue._uid,
+        type,
+        key,
+        newValue,
+        oldValue,
+      } as StateChange;
 
-    this.addItem(item);
+      this.addItem(item);
+    } catch (ex) {
+      console.warn(
+        `Error tracking state change for ${vue.$data._?.comp?.name}.${key}`
+      );
+    }
+  }
+
+  isTrackable(value: any) {
+    if (!value) return true;
+    if (Array.isArray(value)) return value.all(this.isTrackable);
+    // HTML elements are not trackable
+    if (value instanceof HTMLElement) return false;
+    // Functions are not trackable
+    if (typeof value == "function") return false;
+    return true;
   }
 
   async apply(uid: number, change: StateChange) {

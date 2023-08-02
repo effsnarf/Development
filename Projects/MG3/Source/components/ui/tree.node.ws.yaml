@@ -120,6 +120,8 @@ watch:
 style:
   .tree-node:
     display: flex
+    padding-right: 1em
+    user-select: none
   .tree.node.expandable:
     display: grid
     grid-template: 1fr / 1.5em 1fr

@@ -19,7 +19,6 @@ props:
   options: null
   getText: null
   getUrl: null
-  valueType: value
   direction: vertical
   value: null
   transitionName: null
@@ -36,18 +35,16 @@ watch:
     handler: | #js
       function(newIndex) {
         if (!this.options) return;
-        this.$emit('input', (this.valueType == "index") ? newIndex : this.options[newIndex]);
+        this.$emit('input', newIndex);
       }
     immediate: true
-  value:
-    handler: | #js
-      function(value) {
-        if (!this.options) return;
-        const newIndex = (this.valueType == "index") ? value : this.options.indexOf(value);
-        if (newIndex == this.selectedTabIndex) return;
-        this.selectedTabIndex = newIndex;
-      }
-    immediate: true
+  value: | #js
+    function(value) {
+      if (!this.options) return;
+      const newIndex = value;
+      if (newIndex == this.selectedTabIndex) return;
+      this.selectedTabIndex = newIndex;
+    }
 style:
   .comp-ui-select:
     border-bottom: '1px solid #000000'

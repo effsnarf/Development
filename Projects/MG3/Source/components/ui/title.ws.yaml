@@ -30,6 +30,8 @@ methods:
       return null;
     }
 style:
+  .icon:
+    text-align: center
   .flex:
     gap: 0.5em
   div:

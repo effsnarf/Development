@@ -1,0 +1,30 @@
+dom:
+  div: 
+    div: 
+      v-text: name
+    ide.css.editor.example.flex:
+      v-for: option in options
+      ':example-style': getExampleStyle(option)
+props:
+  name: null
+data: null
+methods:
+  getExampleStyle: | #js
+    function(option) {
+      const style = {};
+      style[this.name] = option;
+      return style;
+    }
+computed:
+  options: | #js
+    function() {
+      if (!this.name) return [];
+      let values = this.$root.html.cssProperties[this.name].values;
+      return values;
+    }
+name: ide-css-editor-field-options
+template: >-
+  <div class="comp-ide-css-editor-field-options" path="-1253591880."><div
+  v-text="name" path="-1253591880.0"></div><ide-css-editor-example-flex
+  v-for="option in options" :example-style="getExampleStyle(option)"
+  path="-1253591880.1"></ide-css-editor-example-flex></div>

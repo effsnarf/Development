@@ -272,6 +272,36 @@ const _fetchAsJson = async (url: string) => {
         return res.end(JSON.stringify(null));
       }
 
+      if (req.url == "/css-tool") {
+        const folder = path.join(__dirname, "css-tool");
+        const backupFolder = path.join(folder, "backup");
+        if (!fs.existsSync(backupFolder))
+          fs.mkdirSync(backupFolder, { recursive: true });
+        const backupFilePath = path.join(backupFolder, `${Date.now()}.css`);
+        const backupFiles = fs.readdirSync(backupFolder);
+        const latestBackupFile = [...backupFiles]
+          .sortBy((a) => parseInt(a))
+          .last();
+        const latestBackupFilePath = path.join(backupFolder, latestBackupFile);
+        const cssToolFilePath = path.join(folder, "style.css");
+        if (!fs.existsSync(cssToolFilePath))
+          fs.writeFileSync(cssToolFilePath, "{}");
+        switch (req.method) {
+          case "GET":
+            const css = JSON.parse(fs.readFileSync(cssToolFilePath, "utf8"));
+            return res.end(JSON.stringify(css));
+          case "POST":
+            const css1 = fs.readFileSync(cssToolFilePath, "utf8");
+            const latestBackupJson = !latestBackupFile
+              ? null
+              : fs.readFileSync(latestBackupFilePath, "utf8");
+            if (css1 != latestBackupJson)
+              fs.writeFileSync(backupFilePath, css1);
+            fs.writeFileSync(cssToolFilePath, JSON.stringify(data.css));
+            return res.end("ok");
+        }
+      }
+
       if (req.url == "/components") {
         const comps = await getComponents();
         return res.end(JSON.stringify(comps));

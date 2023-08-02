@@ -4,7 +4,6 @@ dom:
     ui.tabs:
       ':options': options
       direction: horizontal
-      ':value-type': '''index'''
       v-model: selectedTabIndex
       template: 
         v-slot: tab0
@@ -103,10 +102,10 @@ watch:
 name: e-media-create
 template: >-
   <div class="comp-e-media-create" :key="key1" path="-960387793."><ui-tabs
-  :options="options" direction="horizontal" :value-type="'index'"
-  v-model="selectedTabIndex" path="-960387793.0"><template v-slot:tab0
-  path="-960387793.0.0"><component ref="comp0" :is="getComponentName(0)"
-  v-model="medias[0]" :context-media="contextMedia" @change="onChangeMedia"
+  :options="options" direction="horizontal" v-model="selectedTabIndex"
+  path="-960387793.0"><template v-slot:tab0 path="-960387793.0.0"><component
+  ref="comp0" :is="getComponentName(0)" v-model="medias[0]"
+  :context-media="contextMedia" @change="onChangeMedia"
   path="-960387793.0.0.0"></component></template><template v-slot:tab1
   path="-960387793.0.1"><component ref="comp1" :is="getComponentName(1)"
   v-model="medias[1]" :context-media="contextMedia" @change="onChangeMedia"

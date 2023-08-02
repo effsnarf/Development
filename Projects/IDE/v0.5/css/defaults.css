@@ -68,7 +68,7 @@ li
 }
 .selected
 {
-  background: #ffffff60;
+  background: #ffffff40;
 }
 
 .highlighted-group > :not(.ide-highlighted)
