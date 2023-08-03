@@ -96,7 +96,7 @@ methods:
 computed:
   isSelected: | #js
     function() {
-      return (this.node == this.selectedNode);
+      return Objects.areEqual(this.node, this.selectedNode);
     }
   showUiExpand: | #js
     function() {

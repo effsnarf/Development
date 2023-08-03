@@ -16,7 +16,7 @@ watch:
     immediate: true
     handler: | #js
       function() {
-        this.appliedStyles = this.$root.html.getAppliedStyle(this.element);
+        this.appliedStyles = this.$root.html.getAppliedStyles(this.element);
       }
 style:
   .comp-ide-element-inspector:

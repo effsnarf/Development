@@ -25,7 +25,7 @@ style:
     padding-left: 2em !important
   .icon:
     position: absolute
-    margin: 0.7em
+    margin: 0.25em
 template: >-
   <div class="comp-ui-text-box" path="-1492297820."><div class="icon"
   v-if="icon" v-text="icon" path="-1492297820.0"></div><input :class="{ hasIcon:

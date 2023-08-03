@@ -12,8 +12,16 @@ dom:
             icon: ♻
             text: refresh
             @click: $root.reloadComponentsFromServer
+        select:
+          v-model: selectedEditor
+          option:
+            v-for: editor in ['component', 'css']
+            ':selected': (selectedEditor == editor)
+            ':key': editor
+            v-text: editor
       ide.debug: null
-      ide.css.editor: null
+      ide.component.picker:
+        v-if: (selectedEditor == 'component')
     div: 
       ide.component.style:
         v-for: comp in comps
@@ -22,6 +30,7 @@ props:
   comps: null
 data:
   showWorkspace: false
+  selectedEditor: component
 mounted: | #js
   function() {
     this.showWorkspace = (window.location.hostname == "localhost");
@@ -52,6 +61,11 @@ template: >-
   icon="🎄" :value="$root.vm.vuesCount?.toLocaleString()"
   path="-1163457967.0.0.0"></ui-title><div path="-1163457967.0.0.1"><ui-button
   icon="♻" text="refresh" @click="$root.reloadComponentsFromServer"
-  path="-1163457967.0.0.1.0"></ui-button></div></h3><ide-debug></ide-debug><ide-css-editor></ide-css-editor></div><div
+  path="-1163457967.0.0.1.0"></ui-button></div><select v-model="selectedEditor"
+  path="-1163457967.0.0.2"><option v-for="editor in ['component', 'css']"
+  :selected="(selectedEditor == editor)" :key="editor" v-text="editor"
+  path="-1163457967.0.0.2.0"></option></select></h3><ide-debug></ide-debug><ide-component-picker
+  v-if="(selectedEditor == 'component')"
+  path="-1163457967.0.2"></ide-component-picker></div><div
   path="-1163457967.1"><ide-component-style v-for="comp in comps"
   :component="comp" path="-1163457967.1.0"></ide-component-style></div></div>

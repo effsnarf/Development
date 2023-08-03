@@ -178,9 +178,9 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "../../../../LiveIde/Website/script/1690987609494.ts":
+/***/ "../../../../LiveIde/Website/script/1691031359760.ts":
 /*!***********************************************************!*\
-  !*** ../../../../LiveIde/Website/script/1690987609494.ts ***!
+  !*** ../../../../LiveIde/Website/script/1691031359760.ts ***!
   \***********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -4166,6 +4166,8 @@ class Objects {
             return obj1 == obj2;
         if ((obj1 == null) != (obj2 == null))
             return false;
+        if (obj1 == null && obj2 == null)
+            return true;
         const keys1 = Object.keys(obj1).sortBy((s) => s);
         const keys2 = Object.keys(obj2).sortBy((s) => s);
         if (keys1.join(",") != keys2.join(","))
@@ -6088,7 +6090,7 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1690987609494.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("../../../../LiveIde/Website/script/1691031359760.ts");
 /******/ 	
 /******/ })()
 ;

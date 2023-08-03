@@ -282,7 +282,9 @@ const _fetchAsJson = async (url: string) => {
         const latestBackupFile = [...backupFiles]
           .sortBy((a) => parseInt(a))
           .last();
-        const latestBackupFilePath = path.join(backupFolder, latestBackupFile);
+        const latestBackupFilePath = !latestBackupFile
+          ? ""
+          : path.join(backupFolder, latestBackupFile);
         const cssToolFilePath = path.join(folder, "style.css");
         if (!fs.existsSync(cssToolFilePath))
           fs.writeFileSync(cssToolFilePath, "{}");

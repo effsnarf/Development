@@ -1,7 +1,7 @@
 dom:
   div: 
     ui.keyboard:
-      @ctrl: onCtrlKey
+      @ctrl: toggleVisibility
     ui.mouse:
       @hovered-element: onHoveredElement
       ':global': true
@@ -60,9 +60,9 @@ methods:
       if (uid == this.selectedVueUID) uid = null;
       this.selectedVueUID = uid;
     }
-  onCtrlKey: | #js
-    function(ctrl) {
-      this.showPicker = ctrl;
+  toggleVisibility: | #js
+    function(visible) {
+      this.showPicker = visible;
     }
   getTitle: | #js
     function(vue) {
@@ -162,7 +162,7 @@ style:
 name: ide-component-picker
 template: >-
   <div class="comp-ide-component-picker" path="-646340253."><ui-keyboard
-  @ctrl="onCtrlKey" path="-646340253.0"></ui-keyboard><ui-mouse
+  @ctrl="toggleVisibility" path="-646340253.0"></ui-keyboard><ui-mouse
   @hovered-element="onHoveredElement" :global="true"
   path="-646340253.1"></ui-mouse><ui-context-window ref="context1"
   :global="true" :visible="showPicker" icon="📦"

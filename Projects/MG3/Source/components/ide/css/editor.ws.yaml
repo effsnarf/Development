@@ -1,100 +1,106 @@
 dom:
   div: 
-    ide.element.picker:
-      @context-element: contextElement=$event
-      template: 
-        v-slot: default
-        .flex.gap-2:
+    .flex.gap-2:
+      div: 
+        .opacity-50:
+          ui.select: 
+            ':options': classList
+            item-icon: 🟢
+            input-type: value
+            v-model: selectedClass
+          ui.select: 
+            ':options': cssFieldNames
+            ':get-item-icon': () => '⛏️'
+            input-type: value
+            search-hint: properties
+            v-model: selectedFieldName
+      .css-rule-select:
+        ui.select:
+          ':options': cssRules
+          item-icon: 📐
+          ':get-item-text': (rule) => rule.selectorText
+          ':get-item-key': (rule) => rule.selectorText
+          ':is-option-visible': isRuleVisible
+          search-hint: rules
+          v-model: selectedRuleIndex
+          @input:query: ruleQuery=$event
+        div: 
+          v-if: ruleQuery?.length
+          .message:
+            v-text: ruleQuery
+          ui.button: 
+            text: ➕ add new rule
+            ':click': addNewRule
+      .flex.ver.gap-1:
+        div: 
+          v-if: false && selectedClass
           div: 
-            .opacity-50:
-              ui.select: 
-                ':options': classList
-                item-icon: 🟢
-                input-type: value
-                v-model: selectedClass
-              ui.select: 
-                ':options': cssFieldNames
-                ':get-item-icon': () => '⛏️'
-                ':search-box': '!contextElement'
-                input-type: value
-                v-model: selectedFieldName
-          .css-rule-select:
-            ui.select:
-              ':options': cssRules
-              item-icon: 📐
-              ':get-item-text': (rule) => rule.selectorText
-              ':get-item-key': (rule) => rule.selectorText
-              ':is-option-visible': isRuleVisible
-              v-model: selectedRuleIndex
-          .flex.ver.gap-1:
-            div: 
-              v-if: false && selectedClass
-              div: 
-                ui.title: 
-                  icon: 🟢
-                  ':text': selectedClass
-            div: 
-              v-if: selectedRule
-              .opacity-30:
-                v-text: getShortPath(selectedRule.parentStyleSheet?.href)
-              .opacity-50.fs-m2:
-                .flex: 
-                  span:
-                    v-text: '''📐'''
-                  ul:
-                    li:
-                      v-for: selector in getSelectors(selectedRule)
-                      div: 
-                        v-text: selector
-            div: 
-              v-if: selectedRule
-              ui.tabs:
-                ':options': '[''📝 Properties'', ''🔳 Flex'']'
-                direction: horizontal
-                template: 
-                  v-slot: tab0
-                  table: 
-                    tr: 
-                      ':class': '{ highlighted: (selectedFieldName == field.name) }'
-                      v-for: field in selectedRuleFields
-                      ':key': field.id
-                      th: 
-                        .flex: 
-                          .w-l2:
-                            v-text: '''⛏️'''
-                          div: 
-                            div: 
-                              v-if: field.value
-                              v-text: field.name
-                            ui.text.box:
-                              ':style': '{ width: ''5em'' }'
-                              v-if: '!field.value'
-                              v-model: field.name
-                      td: 
-                        ide.css.field.editor:
-                          ':field': field
-                          @input: (value) => setNewCssRule(field.name, value)
-                  .mt-l1:
-                    ui.button:
-                      text: ➕
-                      ':click': addNewField
-                template: 
-                  v-slot: tab1
-                  ide.css.editor.flex: null
-            div: 
+            ui.title: 
+              icon: 🟢
+              ':text': selectedClass
+        div: 
+          v-if: selectedRule
+          .opacity-30:
+            v-text: getShortPath(selectedRule.parentStyleSheet?.href)
+          .opacity-50.fs-m2:
+            .flex: 
+              span:
+                v-text: '''📐'''
+              ul:
+                li:
+                  v-for: selector in getSelectors(selectedRule)
+                  div: 
+                    v-text: selector
+        div: 
+          v-if: selectedRule
+          ui.tabs:
+            ':options': '[''📝 Properties'', ''🔳 Flex'']'
+            direction: horizontal
+            template: 
+              v-slot: tab0
               table: 
-                v-if: 'false'
                 tr: 
-                  v-for: field in appliedStyles
+                  ':class': '{ highlighted: (selectedFieldName == field.name) }'
+                  v-for: field in selectedRuleFields
+                  ':key': field.id
                   th: 
-                    ui.title: 
-                      icon: ⛏️
-                      ':text': field.name
+                    .flex: 
+                      .w-l2:
+                        v-text: '''⛏️'''
+                      div: 
+                        div: 
+                          v-if: field.value
+                          v-text: field.name
+                        ui.text.box:
+                          ':style': '{ width: ''5em'' }'
+                          v-if: '!field.value'
+                          v-model: field.name
                   td: 
-                    .css-field-value:
-                      v-text: field.value
-data:
+                    ide.css.field.editor:
+                      ':field': field
+                      @input: (value) => setNewCssRule(field.name, value)
+              .mt-l1:
+                ui.button: 
+                  text: ➕
+                  ':click': addNewField
+            template: 
+              v-slot: tab1
+              ide.css.editor.flex: null
+        div: 
+          table: 
+            v-if: 'false'
+            tr: 
+              v-for: field in appliedStyles
+              th: 
+                ui.title: 
+                  icon: ⛏️
+                  ':text': field.name
+              td: 
+                .css-field-value:
+                  v-text: field.value
+props:
   contextElement: null
+data:
   classList: []
   cssRules: []
   cssFields: []
@@ -109,6 +115,7 @@ data:
   appliedStyles: {}
   allCssRules: []
   newCssRules: {}
+  ruleQuery: null
 mounted: | #js
   function() {
     this.init();
@@ -131,17 +138,22 @@ methods:
       this.selectedItemFields = this.selectedClass ? this.selectedClassFields :
         this.selectedRule ? this.selectedRuleFields : [];
     }
+  addNewRule: | #js
+    function() {
+      const selector = this.ruleQuery;
+      this.setNewCssRule("display", "flex", selector);
+      this.allCssRules = this.getAllCssRules();
+    }
   addNewField: | #js
     function() {
       this.selectedRuleFields.push({ id: this.$root.getUniqueClientID(), name: "", value: "" });
     }
   setNewCssRule: | #js
-    function(name, value) {
-      const selector = (this.selectedRule ? this.selectedRule.selectorText : this.selectedClass ? `.${this.selectedClass}` : null);
+    function(name, value, selector) {
+      selector = selector || (this.selectedRule ? this.selectedRule.selectorText : this.selectedClass ? `.${this.selectedClass}` : null);
       if (!selector) throw new Error("Selector is needed to set a new css rule");
-      const newCssRule = this.newCssRules[selector] || {};
+      const newCssRule = (this.newCssRules[selector] = (this.newCssRules[selector] || {}));
       newCssRule[name] = value;
-      this.newCssRules[selector] = newCssRule;
       this.$root.newCssRules = JSON.parse(JSON.stringify(this.newCssRules));
     }
   getCssFields: | #js
@@ -230,7 +242,7 @@ methods:
     }
   getCssRulesForElement: | #js
     function(el) {
-      if (!el) return [];
+      if (!el) return this.getAllCssRules();
 
       const elCssRules = this.allCssRules.filter(rule => {
         return el.matches(rule.selectorText);
@@ -312,62 +324,62 @@ style:
     font-size: 100%
 name: ide-css-editor
 template: >-
-  <div class="comp-ide-css-editor" path="-1978980996."><ide-element-picker
-  @context-element="contextElement=$event" path="-1978980996.0"><template
-  v-slot:default path="-1978980996.0.0"><div class="flex gap-2"
-  path="-1978980996.0.0.0"><div path="-1978980996.0.0.0.0"><div
-  class="opacity-50" path="-1978980996.0.0.0.0.0"><ui-select
-  :options="classList" item-icon="🟢" input-type="value" v-model="selectedClass"
-  path="-1978980996.0.0.0.0.0.0"></ui-select><ui-select :options="cssFieldNames"
-  :get-item-icon="() =&gt; '⛏️'" :search-box="!contextElement"
-  input-type="value" v-model="selectedFieldName"
-  path="-1978980996.0.0.0.0.0.1"></ui-select></div></div><div
-  class="css-rule-select" path="-1978980996.0.0.0.1"><ui-select
-  :options="cssRules" item-icon="📐" :get-item-text="(rule) =&gt;
-  rule.selectorText" :get-item-key="(rule) =&gt; rule.selectorText"
-  :is-option-visible="isRuleVisible" v-model="selectedRuleIndex"
-  path="-1978980996.0.0.0.1.0"></ui-select></div><div class="flex ver gap-1"
-  path="-1978980996.0.0.0.2"><div v-if="false &amp;&amp; selectedClass"
-  path="-1978980996.0.0.0.2.0"><div path="-1978980996.0.0.0.2.0.0"><ui-title
-  icon="🟢" :text="selectedClass"
-  path="-1978980996.0.0.0.2.0.0.0"></ui-title></div></div><div
-  v-if="selectedRule" path="-1978980996.0.0.0.2.1"><div class="opacity-30"
+  <div class="comp-ide-css-editor" path="-1978980996."><div class="flex gap-2"
+  path="-1978980996.0"><div path="-1978980996.0.0"><div class="opacity-50"
+  path="-1978980996.0.0.0"><ui-select :options="classList" item-icon="🟢"
+  input-type="value" v-model="selectedClass"
+  path="-1978980996.0.0.0.0"></ui-select><ui-select :options="cssFieldNames"
+  :get-item-icon="() =&gt; '⛏️'" input-type="value" search-hint="properties"
+  v-model="selectedFieldName"
+  path="-1978980996.0.0.0.1"></ui-select></div></div><div
+  class="css-rule-select" path="-1978980996.0.1"><ui-select :options="cssRules"
+  item-icon="📐" :get-item-text="(rule) =&gt; rule.selectorText"
+  :get-item-key="(rule) =&gt; rule.selectorText"
+  :is-option-visible="isRuleVisible" search-hint="rules"
+  v-model="selectedRuleIndex" @input:query="ruleQuery=$event"
+  path="-1978980996.0.1.0"></ui-select><div v-if="ruleQuery?.length"
+  path="-1978980996.0.1.1"><div class="message" v-text="ruleQuery"
+  path="-1978980996.0.1.1.0"></div><ui-button text="➕ add new rule"
+  :click="addNewRule" path="-1978980996.0.1.1.1"></ui-button></div></div><div
+  class="flex ver gap-1" path="-1978980996.0.2"><div v-if="false &amp;&amp;
+  selectedClass" path="-1978980996.0.2.0"><div
+  path="-1978980996.0.2.0.0"><ui-title icon="🟢" :text="selectedClass"
+  path="-1978980996.0.2.0.0.0"></ui-title></div></div><div v-if="selectedRule"
+  path="-1978980996.0.2.1"><div class="opacity-30"
   v-text="getShortPath(selectedRule.parentStyleSheet?.href)"
-  path="-1978980996.0.0.0.2.1.0"></div><div class="opacity-50 fs-m2"
-  path="-1978980996.0.0.0.2.1.1"><div class="flex"
-  path="-1978980996.0.0.0.2.1.1.0"><span v-text="'📐'"
-  path="-1978980996.0.0.0.2.1.1.0.0"></span><ul
-  path="-1978980996.0.0.0.2.1.1.0.1"><li v-for="selector in
-  getSelectors(selectedRule)" path="-1978980996.0.0.0.2.1.1.0.1.0"><div
-  v-text="selector"
-  path="-1978980996.0.0.0.2.1.1.0.1.0.0"></div></li></ul></div></div></div><div
-  v-if="selectedRule" path="-1978980996.0.0.0.2.2"><ui-tabs :options="['📝
+  path="-1978980996.0.2.1.0"></div><div class="opacity-50 fs-m2"
+  path="-1978980996.0.2.1.1"><div class="flex"
+  path="-1978980996.0.2.1.1.0"><span v-text="'📐'"
+  path="-1978980996.0.2.1.1.0.0"></span><ul path="-1978980996.0.2.1.1.0.1"><li
+  v-for="selector in getSelectors(selectedRule)"
+  path="-1978980996.0.2.1.1.0.1.0"><div v-text="selector"
+  path="-1978980996.0.2.1.1.0.1.0.0"></div></li></ul></div></div></div><div
+  v-if="selectedRule" path="-1978980996.0.2.2"><ui-tabs :options="['📝
   Properties', '🔳 Flex']" direction="horizontal"
-  path="-1978980996.0.0.0.2.2.0"><template v-slot:tab0
-  path="-1978980996.0.0.0.2.2.0.0"><table path="-1978980996.0.0.0.2.2.0.0.0"><tr
+  path="-1978980996.0.2.2.0"><template v-slot:tab0
+  path="-1978980996.0.2.2.0.0"><table path="-1978980996.0.2.2.0.0.0"><tr
   :class="{ highlighted: (selectedFieldName == field.name) }" v-for="field in
-  selectedRuleFields" :key="field.id" path="-1978980996.0.0.0.2.2.0.0.0.0"><th
-  path="-1978980996.0.0.0.2.2.0.0.0.0.0"><div class="flex"
-  path="-1978980996.0.0.0.2.2.0.0.0.0.0.0"><div class="w-l2" v-text="'⛏️'"
-  path="-1978980996.0.0.0.2.2.0.0.0.0.0.0.0"></div><div
-  path="-1978980996.0.0.0.2.2.0.0.0.0.0.0.1"><div v-if="field.value"
+  selectedRuleFields" :key="field.id" path="-1978980996.0.2.2.0.0.0.0"><th
+  path="-1978980996.0.2.2.0.0.0.0.0"><div class="flex"
+  path="-1978980996.0.2.2.0.0.0.0.0.0"><div class="w-l2" v-text="'⛏️'"
+  path="-1978980996.0.2.2.0.0.0.0.0.0.0"></div><div
+  path="-1978980996.0.2.2.0.0.0.0.0.0.1"><div v-if="field.value"
   v-text="field.name"
-  path="-1978980996.0.0.0.2.2.0.0.0.0.0.0.1.0"></div><ui-text-box :style="{
-  width: '5em' }" v-if="!field.value" v-model="field.name"
-  path="-1978980996.0.0.0.2.2.0.0.0.0.0.0.1.1"></ui-text-box></div></div></th><td
-  path="-1978980996.0.0.0.2.2.0.0.0.0.1"><ide-css-field-editor :field="field"
+  path="-1978980996.0.2.2.0.0.0.0.0.0.1.0"></div><ui-text-box :style="{ width:
+  '5em' }" v-if="!field.value" v-model="field.name"
+  path="-1978980996.0.2.2.0.0.0.0.0.0.1.1"></ui-text-box></div></div></th><td
+  path="-1978980996.0.2.2.0.0.0.0.1"><ide-css-field-editor :field="field"
   @input="(value) =&gt; setNewCssRule(field.name, value)"
-  path="-1978980996.0.0.0.2.2.0.0.0.0.1.0"></ide-css-field-editor></td></tr></table><div
-  class="mt-l1" path="-1978980996.0.0.0.2.2.0.0.1"><ui-button text="➕"
+  path="-1978980996.0.2.2.0.0.0.0.1.0"></ide-css-field-editor></td></tr></table><div
+  class="mt-l1" path="-1978980996.0.2.2.0.0.1"><ui-button text="➕"
   :click="addNewField"
-  path="-1978980996.0.0.0.2.2.0.0.1.0"></ui-button></div></template><template
+  path="-1978980996.0.2.2.0.0.1.0"></ui-button></div></template><template
   v-slot:tab1
-  path="-1978980996.0.0.0.2.2.0.1"><ide-css-editor-flex></ide-css-editor-flex></template></ui-tabs></div><div
-  path="-1978980996.0.0.0.2.3"><table v-if="false"
-  path="-1978980996.0.0.0.2.3.0"><tr v-for="field in appliedStyles"
-  path="-1978980996.0.0.0.2.3.0.0"><th
-  path="-1978980996.0.0.0.2.3.0.0.0"><ui-title icon="⛏️" :text="field.name"
-  path="-1978980996.0.0.0.2.3.0.0.0.0"></ui-title></th><td
-  path="-1978980996.0.0.0.2.3.0.0.1"><div class="css-field-value"
+  path="-1978980996.0.2.2.0.1"><ide-css-editor-flex></ide-css-editor-flex></template></ui-tabs></div><div
+  path="-1978980996.0.2.3"><table v-if="false" path="-1978980996.0.2.3.0"><tr
+  v-for="field in appliedStyles" path="-1978980996.0.2.3.0.0"><th
+  path="-1978980996.0.2.3.0.0.0"><ui-title icon="⛏️" :text="field.name"
+  path="-1978980996.0.2.3.0.0.0.0"></ui-title></th><td
+  path="-1978980996.0.2.3.0.0.1"><div class="css-field-value"
   v-text="field.value"
-  path="-1978980996.0.0.0.2.3.0.0.1.0"></div></td></tr></table></div></div></div></template></ide-element-picker></div>
+  path="-1978980996.0.2.3.0.0.1.0"></div></td></tr></table></div></div></div></div>
