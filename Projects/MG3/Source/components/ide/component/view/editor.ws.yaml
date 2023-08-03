@@ -4,19 +4,33 @@ dom:
     v-if: component
     .flex.gap-2:
       div: 
-        ui.tree:
-          ':root': '[null, dom]'
-          ':expandable': 'false'
-          ':initial-expanded': true
-          item-type: ide.component.view.node
-          ':get-item': (node) => node
-          ':get-children': (node) => $root.getViewChildNodes(node)
-          @node-select: onNodeSelect
-      div: 
+        transition: 
+          name: slide-hor
+          div: 
+            v-show: (!selectedTabIndex)
+            ui.tree:
+              ':root': '[null, dom]'
+              ':expandable': 'false'
+              ':initial-expanded': true
+              item-type: ide.component.view.node
+              ':get-item': (node) => node
+              ':get-children': (node) => $root.getViewChildNodes(node)
+              @node-select: onNodeSelect
+      .w-100pc:
         v-show: selectedNode
         ui.tabs:
           ':options': '[''✏️ edit'', ''🟢 style'']'
+          v-model: selectedTabIndex
           direction: horizontal
+          template: 
+            v-slot: header
+            transition: 
+              name: slide
+              h2:
+                v-if: (selectedNode && selectedTabIndex)
+                ui.title:
+                  icon: 📁
+                  ':text': selectedNode[0]
           template: 
             v-slot: tab0
             ide.component.view.node.editor:
@@ -33,6 +47,7 @@ data:
   domYaml: null
   selectedNode: null
   contextElement: null
+  selectedTabIndex: 0
 computed:
   selectedNodeSelector: | #js
     function() {
@@ -74,16 +89,24 @@ name: ide-component-view-editor
 template: >-
   <div class="comp-ide-component-view-editor" :style="{ 'min-width': '30em' }"
   v-if="component" path="-1512907487."><div class="flex gap-2"
-  path="-1512907487.0"><div path="-1512907487.0.0"><ui-tree :root="[null, dom]"
-  :expandable="false" :initial-expanded="true"
-  item-type="ide.component.view.node" :get-item="(node) =&gt; node"
-  :get-children="(node) =&gt; $root.getViewChildNodes(node)"
-  @node-select="onNodeSelect" path="-1512907487.0.0.0"></ui-tree></div><div
-  v-show="selectedNode" path="-1512907487.0.1"><ui-tabs :options="['✏️ edit',
-  '🟢 style']" direction="horizontal" path="-1512907487.0.1.0"><template
-  v-slot:tab0 path="-1512907487.0.1.0.0"><ide-component-view-node-editor
+  path="-1512907487.0"><div path="-1512907487.0.0"><transition name="slide-hor"
+  path="-1512907487.0.0.0"><div v-show="(!selectedTabIndex)"
+  path="-1512907487.0.0.0.0"><ui-tree :root="[null, dom]" :expandable="false"
+  :initial-expanded="true" item-type="ide.component.view.node" :get-item="(node)
+  =&gt; node" :get-children="(node) =&gt; $root.getViewChildNodes(node)"
+  @node-select="onNodeSelect"
+  path="-1512907487.0.0.0.0.0"></ui-tree></div></transition></div><div
+  class="w-100pc" v-show="selectedNode" path="-1512907487.0.1"><ui-tabs
+  :options="['✏️ edit', '🟢 style']" v-model="selectedTabIndex"
+  direction="horizontal" path="-1512907487.0.1.0"><template v-slot:header
+  path="-1512907487.0.1.0.0"><transition name="slide"
+  path="-1512907487.0.1.0.0.0"><h2 v-if="(selectedNode &amp;&amp;
+  selectedTabIndex)" path="-1512907487.0.1.0.0.0.0"><ui-title icon="📁"
+  :text="selectedNode[0]"
+  path="-1512907487.0.1.0.0.0.0.0"></ui-title></h2></transition></template><template
+  v-slot:tab0 path="-1512907487.0.1.0.1"><ide-component-view-node-editor
   :node="selectedNode"
-  path="-1512907487.0.1.0.0.0"></ide-component-view-node-editor></template><template
-  v-slot:tab1 path="-1512907487.0.1.0.1"><div
-  path="-1512907487.0.1.0.1.0"><ide-css-editor :context-element="contextElement"
-  path="-1512907487.0.1.0.1.0.0"></ide-css-editor></div></template></ui-tabs></div></div></div>
+  path="-1512907487.0.1.0.1.0"></ide-component-view-node-editor></template><template
+  v-slot:tab1 path="-1512907487.0.1.0.2"><div
+  path="-1512907487.0.1.0.2.0"><ide-css-editor :context-element="contextElement"
+  path="-1512907487.0.1.0.2.0.0"></ide-css-editor></div></template></ui-tabs></div></div></div>

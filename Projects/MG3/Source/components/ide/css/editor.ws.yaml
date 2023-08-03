@@ -15,7 +15,7 @@ dom:
               ':options': cssFieldNames
               ':get-item-icon': () => '⛏️'
               input-type: value
-              search-hint: properties
+              search-hint: properties…
               v-model: selectedFieldName
       .css-rule-select:
         ui.select:
@@ -24,13 +24,16 @@ dom:
           ':get-item-text': (rule) => rule.selectorText
           ':get-item-key': (rule) => rule.selectorText
           ':is-option-visible': isRuleVisible
-          search-hint: rules
+          search-hint: rules…
+          ':show-search': 'true'
           v-model: selectedRuleIndex
           @input:query: ruleQuery=$event
         div: 
           v-if: ruleQuery?.length
-          .message:
-            v-text: ruleQuery
+          h3:
+            ui.title: 
+              icon: 📐
+              ':text': ruleQuery
           ui.button: 
             text: ➕ add new rule
             ':click': addNewRule
@@ -91,7 +94,7 @@ dom:
             tr: 
               v-for: field in appliedStyles
               th: 
-                ui.title:
+                ui.title: 
                   icon: ⛏️
                   ':text': field.name
               td: 
@@ -334,19 +337,20 @@ template: >-
   path="-1978980996.0.0.0.0"><ui-select :options="classList" item-icon="🟢"
   input-type="value" v-model="selectedClass"
   path="-1978980996.0.0.0.0.0"></ui-select><ui-select :options="cssFieldNames"
-  :get-item-icon="() =&gt; '⛏️'" input-type="value" search-hint="properties"
+  :get-item-icon="() =&gt; '⛏️'" input-type="value" search-hint="properties…"
   v-model="selectedFieldName"
   path="-1978980996.0.0.0.0.1"></ui-select></div></transition></div><div
   class="css-rule-select" path="-1978980996.0.1"><ui-select :options="cssRules"
   item-icon="📐" :get-item-text="(rule) =&gt; rule.selectorText"
   :get-item-key="(rule) =&gt; rule.selectorText"
-  :is-option-visible="isRuleVisible" search-hint="rules"
+  :is-option-visible="isRuleVisible" search-hint="rules…" :show-search="true"
   v-model="selectedRuleIndex" @input:query="ruleQuery=$event"
   path="-1978980996.0.1.0"></ui-select><div v-if="ruleQuery?.length"
-  path="-1978980996.0.1.1"><div class="message" v-text="ruleQuery"
-  path="-1978980996.0.1.1.0"></div><ui-button text="➕ add new rule"
-  :click="addNewRule" path="-1978980996.0.1.1.1"></ui-button></div></div><div
-  class="flex ver gap-1" path="-1978980996.0.2"><transition name="slide-hor"
+  path="-1978980996.0.1.1"><h3 path="-1978980996.0.1.1.0"><ui-title icon="📐"
+  :text="ruleQuery" path="-1978980996.0.1.1.0.0"></ui-title></h3><ui-button
+  text="➕ add new rule" :click="addNewRule"
+  path="-1978980996.0.1.1.1"></ui-button></div></div><div class="flex ver gap-1"
+  path="-1978980996.0.2"><transition name="slide-hor"
   path="-1978980996.0.2.0"><div v-if="selectedRule"
   path="-1978980996.0.2.0.0"><div path="-1978980996.0.2.0.0.0"><div
   class="opacity-30" v-text="getShortPath(selectedRule.parentStyleSheet?.href)"

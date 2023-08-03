@@ -48,6 +48,7 @@ props:
   direction: vertical
   showText: true
   searchHint: null
+  showSearch: null
   type: list
   itemIcon: null
   isOptionVisible: null
@@ -113,6 +114,7 @@ computed:
     }
   showSearchBox: | #js
     function() {
+      if (typeof this.showSearch === "boolean") return this.showSearch;
       return (this.type === "list" && this.options?.length > 10);
     }
 watch:
