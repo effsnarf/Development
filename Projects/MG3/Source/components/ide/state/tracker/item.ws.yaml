@@ -1,24 +1,5 @@
 dom:
   div: 
-    ui.context.window: 
-      v-if: (item.type == 'm')
-      ':icon': getIcon(item.type)
-      ':title': item.key
-      template:
-        v-slot: content
-        pre:
-          code:
-            v-html: getMethodBodyColored(item.compName, item.key)
-        ui.textarea:
-          ':value': getMethodBody(item.compName, item.key)
-    ui.context.window: 
-      v-if: showFieldContext(item)
-      ':visible': isHoveringOverValue
-      ':icon': $root.getIcon(item)
-      ':title': item.key
-      item-type: ui-value-any
-      ':bind-props': '{ value: item.newValue }'
-      ':key': uid+'-'+item.key
     .grid:
       ':class': item.type
       @click: onItemClick(item)
@@ -36,6 +17,7 @@ props:
   item: null
 data:
   isHoveringOverValue: false
+  selectedItem: null
 mounted: | #js
   function() {
     this.$root.$on("state-changed", this.onStateChanged.bind(this));
@@ -53,7 +35,8 @@ methods:
     }
   onItemClick: | #js
     function(item) {
-      this.$root.$emit("watch-state-item", { uid: this.uid, key: item.key });
+      this.selectedItem = (this.selectedItem == item) ? null : item;
+      //this.$root.$emit("watch-state-item", { uid: this.uid, key: item.key });
       console.log(item);
     }
   showFieldContext: | #js
@@ -81,7 +64,13 @@ methods:
     function(item) {
       //if (item.key == this.item.key) this.refresh();
     }
-watch: null
+watch:
+  selectedItem:
+    handler: | #js
+      function(selectedItem) {
+        this.$emit("select-item", selectedItem);
+      }
+    immediate: true
 style:
   .grid:
     grid-template: 1fr / 1.2em 10em 10em
@@ -103,20 +92,10 @@ style:
     font-size: 110%
 name: ide-state-tracker-item
 template: >-
-  <div class="comp-ide-state-tracker-item" path="841306122."><ui-context-window
-  v-if="(item.type == 'm')" :icon="getIcon(item.type)" :title="item.key"
-  path="841306122.0"><template v-slot:content path="841306122.0.0"><pre
-  path="841306122.0.0.0"><code v-html="getMethodBodyColored(item.compName,
-  item.key)" path="841306122.0.0.0.0"></code></pre><ui-textarea
-  :value="getMethodBody(item.compName, item.key)"
-  path="841306122.0.0.1"></ui-textarea></template></ui-context-window><ui-context-window
-  v-if="showFieldContext(item)" :visible="isHoveringOverValue"
-  :icon="$root.getIcon(item)" :title="item.key" item-type="ui-value-any"
-  :bind-props="{ value: item.newValue }" :key="uid+'-'+item.key"
-  path="841306122.1"></ui-context-window><div class="grid" :class="item.type"
-  @click="onItemClick(item)" path="841306122.2"><div
-  v-text="$root.getIcon(item)" path="841306122.2.0"></div><div v-text="item.key"
-  path="841306122.2.1"></div><div class="newValue" @mouseenter="onHoverValue"
-  @mouseleave="onUnhoverValue" path="841306122.2.2"><ui-value-preview
+  <div class="comp-ide-state-tracker-item" path="841306122."><div class="grid"
+  :class="item.type" @click="onItemClick(item)" path="841306122.0"><div
+  v-text="$root.getIcon(item)" path="841306122.0.0"></div><div v-text="item.key"
+  path="841306122.0.1"></div><div class="newValue" @mouseenter="onHoverValue"
+  @mouseleave="onUnhoverValue" path="841306122.0.2"><ui-value-preview
   :value="item.newValue"
-  path="841306122.2.2.0"></ui-value-preview></div></div></div>
+  path="841306122.0.2.0"></ui-value-preview></div></div></div>

@@ -2,35 +2,43 @@ dom:
   div: 
     ':style': '{ ''min-width'': ''30em'' }'
     v-if: component
-    ui.tabs:
-      ':options': '[''📁🌲 tree'', ''✏️ edit'', ''🟢 css'']'
-      direction: horizontal
-      template: 
-        v-slot: tab0
-        .flex:
-          div: 
-            ':style': '{''width'': ''15em''}'
-            ui.tree:
-              ':root': '[null, dom]'
-              ':initial-expanded': true
-              item-type: ide.component.view.node
-              ':get-item': (node) => node
-              ':get-children': (node) => $root.getViewChildNodes(node)
-              @node-select: onNodeSelect
-      template: 
-        v-slot: tab1
-        ui.textarea:
-          v-model: domYaml
-      template: 
-        v-slot: tab2
-        div: 
-          ide.css.editor: null
+    .flex.gap-2:
+      div: 
+        ui.tree:
+          ':root': '[null, dom]'
+          ':expandable': 'false'
+          ':initial-expanded': true
+          item-type: ide.component.view.node
+          ':get-item': (node) => node
+          ':get-children': (node) => $root.getViewChildNodes(node)
+          @node-select: onNodeSelect
+      div: 
+        v-show: selectedNode
+        ui.tabs:
+          ':options': '[''✏️ edit'', ''🟢 style'']'
+          direction: horizontal
+          template: 
+            v-slot: tab0
+            ide.component.view.node.editor:
+              ':node': selectedNode
+          template: 
+            v-slot: tab1
+            div: 
+              ide.css.editor:
+                ':context-element': contextElement
 props:
   component: null
 data:
   dom: null
   domYaml: null
   selectedNode: null
+  contextElement: null
+computed:
+  selectedNodeSelector: | #js
+    function() {
+      if (!this.selectedNode) return null;
+      return `.comp-${this.component.name.replace(/\./g, '-')} [path="${this.selectedNode[1].path}"]`;
+    }
 watch:
   component:
     handler: | #js
@@ -38,6 +46,19 @@ watch:
         const dom = component.source.dom;
         this.dom = this.$root.addPaths(component.name, dom);
         this.domYaml = !dom ? null : jsyaml.dump(dom);
+      }
+    immediate: true
+  selectedNodeSelector:
+    handler: | #js
+      function(selector, oldSelector) {
+        let els = [...document.querySelectorAll(oldSelector)];
+        els.forEach(el => el.classList.remove("highlighted2"));
+        this.contextElement = null;
+        if (!selector) return;
+        els = [...document.querySelectorAll(selector)];
+        this.contextElement = els[0];
+        if (!this.contextElement) return;
+        els.forEach(el => el.classList.add("highlighted2"));
       }
     immediate: true
 methods:
@@ -52,16 +73,17 @@ style:
 name: ide-component-view-editor
 template: >-
   <div class="comp-ide-component-view-editor" :style="{ 'min-width': '30em' }"
-  v-if="component" path="-1512907487."><ui-tabs :options="['📁🌲 tree', '✏️
-  edit', '🟢 css']" direction="horizontal" path="-1512907487.0"><template
-  v-slot:tab0 path="-1512907487.0.0"><div class="flex"
-  path="-1512907487.0.0.0"><div :style="{'width': '15em'}"
-  path="-1512907487.0.0.0.0"><ui-tree :root="[null, dom]"
-  :initial-expanded="true" item-type="ide.component.view.node" :get-item="(node)
-  =&gt; node" :get-children="(node) =&gt; $root.getViewChildNodes(node)"
-  @node-select="onNodeSelect"
-  path="-1512907487.0.0.0.0.0"></ui-tree></div></div></template><template
-  v-slot:tab1 path="-1512907487.0.1"><ui-textarea v-model="domYaml"
-  path="-1512907487.0.1.0"></ui-textarea></template><template v-slot:tab2
-  path="-1512907487.0.2"><div
-  path="-1512907487.0.2.0"><ide-css-editor></ide-css-editor></div></template></ui-tabs></div>
+  v-if="component" path="-1512907487."><div class="flex gap-2"
+  path="-1512907487.0"><div path="-1512907487.0.0"><ui-tree :root="[null, dom]"
+  :expandable="false" :initial-expanded="true"
+  item-type="ide.component.view.node" :get-item="(node) =&gt; node"
+  :get-children="(node) =&gt; $root.getViewChildNodes(node)"
+  @node-select="onNodeSelect" path="-1512907487.0.0.0"></ui-tree></div><div
+  v-show="selectedNode" path="-1512907487.0.1"><ui-tabs :options="['✏️ edit',
+  '🟢 style']" direction="horizontal" path="-1512907487.0.1.0"><template
+  v-slot:tab0 path="-1512907487.0.1.0.0"><ide-component-view-node-editor
+  :node="selectedNode"
+  path="-1512907487.0.1.0.0.0"></ide-component-view-node-editor></template><template
+  v-slot:tab1 path="-1512907487.0.1.0.1"><div
+  path="-1512907487.0.1.0.1.0"><ide-css-editor :context-element="contextElement"
+  path="-1512907487.0.1.0.1.0.0"></ide-css-editor></div></template></ui-tabs></div></div></div>

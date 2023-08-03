@@ -54,15 +54,16 @@ methods:
     function() {
       if (this.isSelected)
       {
-          this.isExpanded = false;
-          this.children = null;
+          if (this.expandable) this.isExpanded = false;
+          //this.children = null;
       }
       else
       {
         this.isExpanded = true;        
         this.children = this.getChildren(this.node);
       }
-      this.$emit('node-click', this.node);
+      const node = Objects.areEqual(this.node, this.selectedNode) ? null : this.node;
+      this.$emit('node-click', node);
     }
   onMouseEnter: | #js
     function() {

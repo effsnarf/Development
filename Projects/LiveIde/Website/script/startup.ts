@@ -2796,6 +2796,7 @@ interface MgParams {
       },
       getElementsFromViewNode(node: [string, any]) {
         if (!node) return [];
+        if (!node[1]) return [];
         return document.querySelectorAll(`[path="${node[1].path}"]`);
       },
       getViewChildNodes(node: [string, any]) {
@@ -3078,7 +3079,7 @@ interface MgParams {
           // data
           d: "🧊",
           // computed
-          c: "🧮",
+          c: "💡",
         } as any;
         if (item.type) return stateItemIcons[item.type] || "❔";
         return "❔";

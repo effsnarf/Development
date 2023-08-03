@@ -2,7 +2,6 @@ dom:
   div:
     ':style': mediaStyle
     e.template.editor:
-      ref: TemplateEditor1
       ':builder': cBuilder
       ':temp': temp
       ':editable': editable
@@ -24,6 +23,7 @@ methods:
   initFromBuilder: | #js
     function (builder) {
       if (!builder) return;
+      if (this.temp) return;
       this.temp = this.$root.builderSourceToTemplate(builder.format, builder.source);
     }
   onMediaCreated: | #js
@@ -71,7 +71,7 @@ watch:
 name: e-format-base
 template: >-
   <div class="comp-e-format-base" :style="mediaStyle"
-  path="-808258977."><e-template-editor ref="TemplateEditor1"
-  :builder="cBuilder" :temp="temp" :editable="editable" :show-help="showHelp"
+  path="-808258977."><e-template-editor :builder="cBuilder" :temp="temp"
+  :editable="editable" :show-help="showHelp"
   :show-property-editor="showPropertyEditor" :cancel="cancel"
   :media-created="onMediaCreated" path="-808258977.0"></e-template-editor></div>

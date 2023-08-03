@@ -66,6 +66,26 @@
 
 
 
+.slide-hor-enter-active,
+.slide-hor-leave-active,
+.slide-hor-move {
+  transition: 0.6s;
+}
+.slide-hor-enter,
+.slide-hor-leave-to {
+  opacity: 0;
+  max-width: 0;
+  overflow: hidden;
+}
+.slide-hor-enter-to,
+.slide-hor-leave {
+  opacity: 1;
+  max-width: 20rem;
+  overflow: hidden;
+}
+
+
+
 
 .slide2-enter-active,
 .slide2-leave-active,

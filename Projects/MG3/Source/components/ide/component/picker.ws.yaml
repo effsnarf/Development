@@ -37,7 +37,7 @@ dom:
               ':element': hoveredElement
           ide.component.editor:
             v-if: selectedVueUID
-            ':vue-uid': hoveredVueUID||selectedVueUID
+            ':vue-uid': selectedVueUID
 props: null
 data:
   hoveredElement: null
@@ -182,5 +182,5 @@ template: >-
   path="-646340253.2.0.0.0.0.1.0"></ide-component-title></div></div><ide-element-inspector
   class="hidden" :element="hoveredElement"
   path="-646340253.2.0.0.0.1"></ide-element-inspector></div><ide-component-editor
-  v-if="selectedVueUID" :vue-uid="hoveredVueUID||selectedVueUID"
+  v-if="selectedVueUID" :vue-uid="selectedVueUID"
   path="-646340253.2.0.0.1"></ide-component-editor></div></template></ui-context-window></div>
