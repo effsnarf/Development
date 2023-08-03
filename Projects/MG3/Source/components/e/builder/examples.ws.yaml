@@ -139,6 +139,8 @@ computed:
       return builders;
     }
 style:
+  .builders > div:nth-child(1) .comp-ui-button:
+    display: none !important
   .more-link:
     font-size: 160%
     text-align: center

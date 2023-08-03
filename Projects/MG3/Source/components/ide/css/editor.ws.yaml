@@ -303,7 +303,6 @@ style:
     display: block
     max-height: 30em
     overflow: auto
-    width: fit-content
   .title1:
     font-size: 120%
     border-bottom: '1px solid #ffffff30'
