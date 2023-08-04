@@ -52,6 +52,19 @@ class VueManager {
     return vue();
   }
 
+  getDescendants(vue: any, filter: any): any[] {
+    if (typeof filter == "string") {
+      const compName = filter;
+      filter = (vue: any) => vue.$data._?.comp.name == compName;
+    }
+    const vues = [];
+    for (const child of vue.$children) {
+      if (filter(child)) vues.push(child);
+      vues.push(...this.getDescendants(child, filter));
+    }
+    return vues;
+  }
+
   // Vues are recreated occasionally
   // Because we're tracking refs, in some cases we can map from the old vue to the new vue
   private toRecentVueUID(uid: number) {
@@ -107,19 +120,24 @@ class VueManager {
     return this.vueRefsToUIDs.keys();
   }
 
-  onVueMounted(vue: any) {
+  registerVue(vue: any) {
+    if (!vue) return;
+
     this.vues[vue._uid] = () => vue;
     this.vuesCount++;
 
-    const compName = vue.$data._.comp.name;
+    //const compName = vue.$data._.comp.name;
     //if (["e.", "ui."].some((prefix) => compName.startsWith(prefix))) return;
+
     for (const refKey of Object.keys(vue.$refs)) {
       if (refKey[0].isLowerCase()) continue;
       this.vueRefsToUIDs.set(refKey, vue.$refs[refKey]._uid);
     }
   }
 
-  onVueUnmounted(vue: any) {
+  unregisterVue(vue: any) {
+    if (!vue) return;
+
     delete this.vues[vue._uid];
     this.vuesCount--;
 
@@ -127,6 +145,14 @@ class VueManager {
       if (refKey[0].isLowerCase()) continue;
       this.vueRefsToUIDs.delete(refKey);
     }
+  }
+
+  onVueMounted(vue: any) {
+    this.registerVue(vue);
+  }
+
+  onVueUnmounted(vue: any) {
+    this.unregisterVue(vue);
   }
 }
 

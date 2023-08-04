@@ -224,12 +224,12 @@ methods:
   findComponents: | #js
     function(item) {
       if (!item) return null;
-      return ideVueApp.getDescendants(this, (c) => c.$props.item==item);
+      return vueApp.vm.getDescendants(this, (c) => c.$props.item==item);
     }
   getOnlyImageComp: | #js
     function() {
       if (!this.hasOnlyOneImage) return;
-      return ideVueApp.getDescendants(this, (c) => c.$data._?.comp?.name=="e.template.image.item")[0];
+      return vueApp.vm.getDescendants(this, (c) => c.$data._?.comp?.name=="e.template.image.item")[0];
     }
   canApplyEffects: | #js
     function(item) {

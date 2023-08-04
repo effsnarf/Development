@@ -2,232 +2,6 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "../../../../../Apps/DatabaseProxy/Client/DbpClient.ts":
-/*!*************************************************************!*\
-  !*** ../../../../../Apps/DatabaseProxy/Client/DbpClient.ts ***!
-  \*************************************************************/
-/***/ ((__unused_webpack_module, exports) => {
-
-
-// This version is for public clients like Meme Generator
-// Doesn't have direct access to the database, but can still use the API
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.DatabaseProxy = void 0;
-// Lowercase the first letter of a string
-String.prototype.untitleize = function () {
-    return this.charAt(0).toLowerCase() + this.slice(1);
-};
-class DatabaseProxy {
-    urlBase;
-    fetchAsJson;
-    constructor(urlBase, _fetchAsJson) {
-        this.urlBase = urlBase;
-        this.fetchAsJson =
-            _fetchAsJson ||
-                (async (url, ...args) => {
-                    const response = await fetch(url, ...args);
-                    const text = await response.text();
-                    if (!text?.length)
-                        return null;
-                    return JSON.parse(text);
-                });
-    }
-    static async new(urlBase, _fetchAsJson) {
-        const dbp = new DatabaseProxy(urlBase, _fetchAsJson);
-        await dbp.init();
-        return dbp;
-    }
-    async init() {
-        const api = await this.createApiMethods();
-        for (const key of Object.keys(api)) {
-            this[key] = api[key];
-        }
-    }
-    static setValue(obj, value) {
-        if (Array.isArray(obj)) {
-            obj[0][obj[1]] = value;
-        }
-        else {
-            obj.value = value;
-        }
-    }
-    async fetchJson(url, options = {}) {
-        // $set also implies cached
-        if (!options.$set) {
-            if (options.cached) {
-                // Even though we're returning from the cache,
-                // we still want to fetch in the background
-                // to update for the next time
-                const fetchItem = async () => {
-                    const item = await this.fetchAsJson(url, options);
-                    //localStorage.setItem(url, JSON.stringify(item));
-                    return item;
-                };
-                //const cachedItem = Objects.json.parse(localStorage.getItem(url) || "null");
-                const cachedItem = null;
-                if (!cachedItem)
-                    return await fetchItem();
-                // Fetch in the background
-                fetchItem();
-                return cachedItem;
-            }
-            return await this.fetchAsJson(url, options);
-        }
-        // Check the local cache
-        //const cachedItem = Objects.json.parse(localStorage.getItem(url) || "null");
-        const cachedItem = null;
-        if (cachedItem)
-            DatabaseProxy.setValue(options.$set, cachedItem);
-        // Fetch in the background
-        const item = await this.fetchAsJson(url, options);
-        // Update the local cache
-        //localStorage.setItem(url, JSON.stringify(item));
-        DatabaseProxy.setValue(options.$set, item);
-        return item;
-    }
-    async callApiMethod(entity, group, method, args, extraArgs) {
-        // We're using { $set: [obj, prop] } as a callback syntax
-        // This is because sometimes we use the local cache and also fetch in the background
-        // in which case we'll need to resolve twice which is not possible with a promise
-        const options = extraArgs.find((a) => a?.$set) || {};
-        let url = `${this.urlBase}/api/${entity}/${group}/${method}`;
-        const isHttpPost = group == "create";
-        if (isHttpPost) {
-            const data = {};
-            args.forEach((a) => (data[a.name] = a.value));
-            const isCreateCall = url.includes("/create/one");
-            if (isCreateCall) {
-                data._uid = DatabaseProxy.getRandomUniqueID();
-            }
-            const fetchOptions = {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(data),
-                mode: "no-cors",
-            };
-            let result = await this.fetchJson(url, fetchOptions);
-            // If we got an _id back, select the item
-            // This is because when POSTing from localhost I'm having trouble getting the actual object back
-            const _id = parseInt(result);
-            if (isCreateCall && (!result || typeof result != "object")) {
-                if (_id) {
-                    const idFieldName = `${entity
-                        .substring(0, entity.length - 1)
-                        .toLowerCase()}ID`;
-                    result = await this.callApiMethod(entity, "select", "one", [{ name: idFieldName, value: _id }], []);
-                }
-                else {
-                    result = await this.callApiMethod(entity, "select", "one", [{ name: "_uid", value: data._uid }], []);
-                }
-            }
-            return result;
-        }
-        const argsStr = args
-            .map((a) => `${a.name}=${JSON.stringify(a.value || null)}`)
-            .join("&");
-        const getUrl = `${url}?${argsStr}`;
-        const result = await this.fetchJson(getUrl, options);
-        return result;
-    }
-    async createApiMethods() {
-        const api = {};
-        const apiMethods = await this.getApiMethods();
-        apiMethods.forEach((e) => {
-            const entityName = e.entity.untitleize();
-            api[entityName] = {};
-            e.groups.forEach((g) => {
-                api[entityName][g.name] = {};
-                g.methods.forEach((m) => {
-                    api[entityName][g.name][m.name] = async (...args) => {
-                        let result = await this.callApiMethod(e.entity, g.name, m.name, (m.args || []).map((a, i) => {
-                            return { name: a, value: args[i] };
-                        }), args.slice((m.args || []).length));
-                        if (m.then) {
-                            const thenArgs = [`api`, ...(m.then.args || [])];
-                            const then = eval(`async (${thenArgs.join(`,`)}) => { ${m.then.body} }`);
-                            if (m.then.chainResult) {
-                                result = await then(api, result);
-                            }
-                            else {
-                                then(api, result);
-                            }
-                        }
-                        return result;
-                    };
-                });
-            });
-        });
-        return api;
-    }
-    async getApiMethods() {
-        const result = await this.fetchJson(`${this.urlBase}/api`, {
-            cached: true,
-        });
-        return result;
-    }
-    static getRandomUniqueID() {
-        return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (char) => {
-            const random = (Math.random() * 16) | 0;
-            const value = char === "x" ? random : (random & 0x3) | 0x8;
-            return value.toString(16);
-        });
-    }
-}
-exports.DatabaseProxy = DatabaseProxy;
-
-
-/***/ }),
-
-/***/ "../../../../LiveIde/classes/AnalyticsTracker.ts":
-/*!*******************************************************!*\
-  !*** ../../../../LiveIde/classes/AnalyticsTracker.ts ***!
-  \*******************************************************/
-/***/ ((__unused_webpack_module, exports) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.AnalyticsTracker = void 0;
-class AnalyticsTracker {
-    isPaused = false;
-    trackInterval = 100;
-    timeOnSite = 0;
-    constructor() {
-        // If the user is not looking at the page, pause tracking
-        document.addEventListener("visibilitychange", () => {
-            if (document.visibilityState === "visible") {
-                this.isPaused = false;
-            }
-            else {
-                this.isPaused = true;
-            }
-        });
-        // Send a beacon when the user closes the website
-        window.addEventListener("beforeunload", (event) => {
-            const data = {
-                timeOnSite: this.timeOnSite,
-            };
-            // Create and send a beacon
-            navigator.sendBeacon("/analytics", JSON.stringify(data));
-        });
-        this.trackTick();
-    }
-    static async new() {
-        return new AnalyticsTracker();
-    }
-    async trackTick() {
-        if (!this.isPaused)
-            await this.track();
-        setTimeout(this.trackTick.bind(this), this.trackInterval);
-    }
-    async track() {
-        this.timeOnSite += this.trackInterval;
-    }
-}
-exports.AnalyticsTracker = AnalyticsTracker;
-
-
-/***/ }),
-
 /***/ "../../../../LiveIde/classes/ClientContext.ts":
 /*!****************************************************!*\
   !*** ../../../../LiveIde/classes/ClientContext.ts ***!
@@ -2984,52 +2758,186 @@ exports.HtmlHelper = HtmlHelper;
 
 /***/ }),
 
-/***/ "../../../../LiveIde/classes/Params.ts":
-/*!*********************************************!*\
-  !*** ../../../../LiveIde/classes/Params.ts ***!
-  \*********************************************/
-/***/ ((__unused_webpack_module, exports) => {
+/***/ "../../../../LiveIde/classes/StateTracker.ts":
+/*!***************************************************!*\
+  !*** ../../../../LiveIde/classes/StateTracker.ts ***!
+  \***************************************************/
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.Params = void 0;
-const Vue = window.Vue;
-class Params {
-    getRootVue;
-    _config;
-    _items = [];
-    constructor(getRootVue, _config) {
-        this.getRootVue = getRootVue;
-        this._config = _config;
+exports.StateTracker = void 0;
+__webpack_require__(/*! ../../../Shared/Extensions */ "../../../../../Shared/Extensions.ts");
+const Extensions_Objects_Client_1 = __webpack_require__(/*! ../../../Shared/Extensions.Objects.Client */ "../../../../../Shared/Extensions.Objects.Client.ts");
+const VueHelper_1 = __webpack_require__(/*! ./VueHelper */ "../../../../LiveIde/classes/VueHelper.ts");
+class StateTracker {
+    getApp;
+    vm;
+    client;
+    static _nextID = 1;
+    static _maxItems = 100;
+    isPaused = 0;
+    refChanges = new Map();
+    methods = {
+        pause: {},
+    };
+    constructor(getApp, vm, client) {
+        this.getApp = getApp;
+        this.vm = vm;
+        this.client = client;
     }
-    static async new(getRootVue, config, url) {
-        const params = new Params(getRootVue, config);
-        await params.init();
-        await params.refresh(url);
-        return params;
+    static new(app, vueManager, client) {
+        const st = new StateTracker(app, vueManager, client);
+        return st;
     }
-    async init() {
-        for (const param of Object.entries(this._config.params)) {
-            const paramConf = param[1];
-            const get = eval(`(${paramConf.get})`);
-            const ref = Vue.ref({ value: null });
-            const paramItem = {
-                name: param[0],
-                get,
-                ref,
+    track(vue, type, key, newValue, oldValue) {
+        if (this.isPaused)
+            return;
+        if (!this.isTrackable(newValue))
+            return;
+        if (!this.isTrackable(oldValue))
+            return;
+        try {
+            const comp = this.getApp().getComponent(vue._uid);
+            if (!comp)
+                return;
+            //if (!comp.source.config?.track?.state) return;
+            const isEvent = type == "e";
+            newValue = isEvent ? newValue : Extensions_Objects_Client_1.Objects.clone(newValue);
+            oldValue = isEvent ? oldValue : Extensions_Objects_Client_1.Objects.clone(oldValue);
+            const item = {
+                id: StateTracker._nextID++,
+                dt: Date.now(),
+                uid: vue._uid,
+                type,
+                key,
+                newValue,
+                oldValue,
             };
-            this._items.push(paramItem);
-            this[paramItem.name] = paramItem.ref;
-            const rootVue = this.getRootVue();
+            this.addItem(item);
+        }
+        catch (ex) {
+            console.warn(`Error tracking state change for ${vue.$data._?.comp?.name}.${key}`);
         }
     }
-    async refresh(url) {
-        for (const item of this._items) {
-            item.ref.value = await item.get.apply(this, [url]);
+    isTrackable(value) {
+        if (!value)
+            return true;
+        if (Array.isArray(value))
+            return value.all(this.isTrackable);
+        // HTML elements are not trackable
+        if (value instanceof HTMLElement)
+            return false;
+        // Functions are not trackable
+        if (typeof value == "function")
+            return false;
+        return true;
+    }
+    async apply(uid, change) {
+        this.pause();
+        const vue = this.vm.getVue(uid);
+        vue[change.key] = change.newValue;
+        await vue.$nextTick();
+        this.resume();
+    }
+    // Sometimes when refreshing keys in the app, the vue components are recreated
+    // and lose their state.
+    // This method restores the state from the state tracker.
+    async restoreState() {
+        this.pause();
+        const refKeys = this.vm.getRefKeys();
+        const vuesByRef = VueHelper_1.VueHelper.getVuesByRef(this.getApp());
+        for (const refKey of refKeys) {
+            const vues = vuesByRef.get(refKey) || [];
+            console.group(refKey);
+            const vueChanges = this.getRefChanges(refKey);
+            // For all vues that have this ref
+            for (const vue of vues) {
+                // Find the last change for each key
+                const lastChanges = vueChanges.reduce((acc, cur) => {
+                    acc[cur.key] = cur;
+                    return acc;
+                }, {});
+                // Apply the last change for each key
+                for (const key in lastChanges) {
+                    const change = lastChanges[key];
+                    if (change.type != "d")
+                        continue;
+                    console.log(key, change.newValue);
+                    vue.$set(vue, key, change.newValue);
+                }
+            }
+            console.groupEnd();
         }
+        this.vm.updateDataVariableUIDs(this.getApp());
+        await this.getApp().$nextTick();
+        this.resume();
+    }
+    addItem(item) {
+        const isState = item.type == "p" || item.type == "d";
+        const isMethod = item.type == "m";
+        const vueItems = this.getRefChanges(item.uid);
+        // Create an initial empty item
+        if (isState && item.newValue && !item.oldValue) {
+            const prevItemOfThisKey = [...vueItems]
+                .reverse()
+                .find((existingItem) => existingItem.key == item.key);
+            if (!prevItemOfThisKey) {
+                const emptyItem = Extensions_Objects_Client_1.Objects.json.parse(JSON.stringify(item));
+                emptyItem.id = StateTracker._nextID++;
+                emptyItem.dt = Date.now();
+                emptyItem.newValue = emptyItem.oldValue;
+                this.addItem(emptyItem);
+            }
+        }
+        // Group typing changes into one item
+        if (vueItems.length) {
+            const lastItem = vueItems.last();
+            if (this.isGroupable(item, lastItem)) {
+                item.oldValue = lastItem.oldValue;
+                vueItems.pop();
+            }
+        }
+        this.getRefChanges(item.uid).push(item);
+        if (vueItems.length > StateTracker._maxItems)
+            vueItems.shift();
+        this.getApp().$emit("state-changed", item);
+    }
+    isGroupable(newItem, prevItem) {
+        const timePassed = newItem.dt - prevItem.dt;
+        if (timePassed > 1000)
+            return false;
+        if (newItem.type != "p" && newItem.type != "d")
+            return false;
+        if (!prevItem.newValue && !prevItem.oldValue)
+            return false;
+        if (newItem.key != prevItem.key)
+            return false;
+        return true;
+    }
+    getRefChanges(refKeyOrUID) {
+        const refKey = typeof refKeyOrUID == "string"
+            ? refKeyOrUID
+            : this.vm.getRefKey(refKeyOrUID);
+        if (!refKey)
+            return [];
+        if (!this.refChanges.has(refKey)) {
+            this.refChanges.set(refKey, []);
+            console.log("new ref", refKey);
+        }
+        return this.refChanges.get(refKey) || [];
+    }
+    pause() {
+        this.isPaused++;
+    }
+    resume() {
+        this.isPaused--;
+    }
+    clear() {
+        this.refChanges.clear();
     }
 }
-exports.Params = Params;
+exports.StateTracker = StateTracker;
 
 
 /***/ }),
@@ -5268,185 +5176,24 @@ var __webpack_exports__ = {};
 (() => {
 var exports = __webpack_exports__;
 /*!***********************************************************!*\
-  !*** ../../../../LiveIde/Website/script/1691171309751.ts ***!
+  !*** ../../../../LiveIde/Website/script/1691171309115.ts ***!
   \***********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 __webpack_require__(/*! ../../../../Shared/Extensions */ "../../../../../Shared/Extensions.ts");
 const HtmlHelper_1 = __webpack_require__(/*! ../../classes/HtmlHelper */ "../../../../LiveIde/classes/HtmlHelper.ts");
-const Extensions_Objects_Client_1 = __webpack_require__(/*! ../../../../Shared/Extensions.Objects.Client */ "../../../../../Shared/Extensions.Objects.Client.ts");
-const AnalyticsTracker_1 = __webpack_require__(/*! ../../classes/AnalyticsTracker */ "../../../../LiveIde/classes/AnalyticsTracker.ts");
+const StateTracker_1 = __webpack_require__(/*! ../../classes/StateTracker */ "../../../../LiveIde/classes/StateTracker.ts");
 const ClientContext_1 = __webpack_require__(/*! ../../classes/ClientContext */ "../../../../LiveIde/classes/ClientContext.ts");
-const Params_1 = __webpack_require__(/*! ../../classes/Params */ "../../../../LiveIde/classes/Params.ts");
-const DbpClient_1 = __webpack_require__(/*! ../../../../Apps/DatabaseProxy/Client/DbpClient */ "../../../../../Apps/DatabaseProxy/Client/DbpClient.ts");
+const VueHelper_1 = __webpack_require__(/*! ../../classes/VueHelper */ "../../../../LiveIde/classes/VueHelper.ts");
 const VueManager_1 = __webpack_require__(/*! ../../classes/VueManager */ "../../../../LiveIde/classes/VueManager.ts");
-// To make it accessible to client code
-const win = window;
-win.Objects = Extensions_Objects_Client_1.Objects;
-const mgHelpers = {
-    url: {
-        thread: (thread, full = false) => {
-            if (!thread)
-                return null;
-            return mgHelpers.url.full(`/t/${thread._id}`, full);
-        },
-        builder: (builder, full = false) => {
-            if (!builder)
-                return null;
-            return mgHelpers.url.full(`/b/${builder.urlName}`, full);
-        },
-        media: (media, full = false) => {
-            if (!media)
-                return null;
-            return mgHelpers.url.full(`/m/${media._id}`, full);
-        },
-        generator: (generator, full = false) => {
-            if (!generator)
-                return null;
-            return mgHelpers.url.full(`/${generator.urlName}`, full);
-        },
-        instance: (instance, full = false) => {
-            if (!instance?.instanceID)
-                return null;
-            return mgHelpers.url.full(`/instance/${instance.instanceID}`, full);
-        },
-        itemImage: (item) => {
-            if (!item)
-                return null;
-            if ("text0" in item) {
-                if (!item._id)
-                    return `/img/empty.png`;
-                return `https://img.memegenerator.net/instances/600x600/${item._id}.jpg`;
-            }
-            if (item.type == "builder" && item.content?.item) {
-                const getImageID = (item) => {
-                    const imageIDs = [];
-                    Extensions_Objects_Client_1.Objects.traverse(item, (node, key, value) => {
-                        if (key == "imageID")
-                            imageIDs.push(value);
-                    });
-                    return imageIDs[0];
-                };
-                const imageID = getImageID(item.content.item);
-                return mgHelpers.url.image(imageID);
-            }
-            const imageNode = Extensions_Objects_Client_1.Objects.traverseMap(item).find((a) => a.key == "imageID");
-            if (imageNode)
-                return mgHelpers.url.image(imageNode.value);
-            console.log(item);
-            throw new Error("Unknown item type");
-        },
-        image: (imageID, full = false, removeBackground = false) => {
-            if (!imageID)
-                return null;
-            const noBg = removeBackground ? ".nobg" : "";
-            return mgHelpers.url.full(`https://img.memegenerator.net/images/${imageID}${noBg}.jpg`, full);
-        },
-        item: (item, full = false) => {
-            if (!item)
-                return null;
-            if (item.builderID)
-                return mgHelpers.url.media(item, full);
-            if ("text0" in item)
-                return mgHelpers.url.instance(item, full);
-            if (item.format)
-                return mgHelpers.url.builder(item, full);
-            if (item.displayName)
-                return mgHelpers.url.generator(item, full);
-            throw new Error("Unknown item type");
-        },
-        full: (path, full = false) => {
-            if (!path)
-                return null;
-            if (path.startsWith("http"))
-                return path;
-            if (full)
-                return `https://memegenerator.net${path}`;
-            return path;
-        },
-    },
-};
 (async () => {
     const client = await ClientContext_1.ClientContext.get();
-    client.Vue.directive("html-raw", {
-        bind(el, binding) {
-            el.innerHTML = binding.value;
-        },
-    });
-    client.Vue.directive("dim", {
-        bind(el, binding) {
-            // Set the opacity to 0.4 if the value is true
-            if (binding.value) {
-                el.style.opacity = "0.4";
-            }
-        },
-        update(el, binding) {
-            // Update the opacity whenever the value changes
-            if (binding.value) {
-                el.style.opacity = "0.4";
-            }
-            else {
-                el.style.opacity = "";
-            }
-        },
-    });
-    client.Vue.directive("disable", {
-        bind(el, binding) {
-            // Set the opacity to 0.4 if the value is true
-            if (binding.value) {
-                el.style.opacity = "0.4";
-                el.style.pointerEvents = "none";
-            }
-        },
-        update(el, binding) {
-            // Update the opacity whenever the value changes
-            if (binding.value) {
-                el.style.opacity = "0.4";
-                el.style.pointerEvents = "none";
-            }
-            else {
-                el.style.filter = "";
-                el.style.opacity = "";
-                el.style.pointerEvents = "";
-            }
-        },
-    });
     await client.compileAll();
-    let vueApp = null;
-    const isLocalHost = window.location.hostname == "localhost";
-    const dbpHost = `https://db.memegenerator.net`;
-    const dbp = (await DbpClient_1.DatabaseProxy.new(`${dbpHost}/MemeGenerator`));
-    const getNewParams = async () => {
-        return (await Params_1.Params.new(() => vueApp, client.config.params, window.location.pathname));
-    };
-    const params = await getNewParams();
     const vueManager = await VueManager_1.VueManager.new(client);
-    vueApp = new client.Vue({
+    const ideApp = new client.Vue({
         data: {
-            // MemeGenerator
-            builders: {
-                all: {},
-                mainMenu: {},
-            },
-            // General
             vm: vueManager,
-            client,
-            dbp,
-            analytics: await AnalyticsTracker_1.AnalyticsTracker.new(),
-            params: params,
-            url: mgHelpers.url,
             html: new HtmlHelper_1.HtmlHelper(),
-            comps: client.Vue.ref(client.comps),
-            compsDic: {},
-            compNames: [],
-            templates: client.templates,
-            isLoading: 0,
-            error: null,
-            loadingImageUrl: "https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/images/loading.gif",
-            key1: 1,
-            _uniqueClientID: 1,
-            isAdmin: false,
-            newCssRules: {},
         },
         async mounted() {
             await this.init();
@@ -5455,378 +5202,17 @@ const mgHelpers = {
             async init() {
                 const self = this;
                 self.newCssRules = await (await fetch(`/css-tool`)).json();
-                self.compsDic = client.comps.toMap((c) => c.name.hashCode());
-                self.compNames = client.comps.map((c) => c.name);
-                await self.ensureBuilders();
-                self.isAdmin = window.location.hostname == "localhost";
-                document.addEventListener("scroll", () => {
-                    self.$emit("scroll");
-                });
             },
-            async getBuilder(urlNameOrID) {
-                const self = this;
-                await self.ensureBuilders();
-                if (typeof urlNameOrID == "string") {
-                    return Object.values(vueApp.builders.all).find((b) => b.urlName == urlNameOrID);
-                }
-                if (typeof urlNameOrID == "number") {
-                    return self.builders.all[urlNameOrID];
-                }
-                throw new Error("Invalid builder ID");
-            },
-            async ensureBuilders() {
-                const self = this;
-                if (!self.builders?.length) {
-                    const allBuilders = await self.dbp.builders.select.all();
-                    self.builders.mainMenu = allBuilders.filter((b) => b.visible?.mainMenu);
-                    self.builders.all = allBuilders.toMap((b) => b._id);
-                }
-            },
-            getBuilderComponentName(builder) {
-                if (!builder)
-                    return null;
-                return `e-format-${builder.format.replace(/\./g, "-")}`;
-            },
-            async mediaToTemp(media) {
-                const self = this;
-                const builder = await self.getBuilder(media.builderID);
-                let temp = self.builderSourceToTemplate(builder.format, builder.source);
-                temp = self.applyMediaToTemplate(media, temp);
-                return temp;
-            },
-            builderSourceToTemplate(format, source) {
-                const self = this;
-                if (!source)
-                    return null;
-                if (format == "image.grid") {
-                    const temp = {
-                        id: self.getUniqueClientID(),
-                        type: "grid",
-                        visible: true,
-                        aspectRatio: null,
-                        gap: 0.02,
-                        caption: !source.title
-                            ? null
-                            : {
-                                visible: true,
-                                editable: source.title.editable,
-                                text: source.title.text,
-                                font: "Arial",
-                                color: "white",
-                                align: {
-                                    h: "center",
-                                    v: "top",
-                                },
-                                uppercase: false,
-                                scale: 0.6,
-                            },
-                        items: [],
-                        gridItems: {
-                            width: source.gridItems?.width || 3,
-                        },
-                        join: JSON.parse(JSON.stringify(source.join)),
-                    };
-                    const hasSubgrid =  true || 0;
-                    const textColor = hasSubgrid ? "white" : "yellow";
-                    const captionItems = source.captions.items || source.captions;
-                    const editable = source.captions.editable || false;
-                    if (Array.isArray(captionItems)) {
-                        for (let i = 0; i < captionItems.length; i++) {
-                            const caption = {
-                                visible: true,
-                                editable: editable,
-                                text: captionItems[i],
-                                font: "Arial",
-                                color: "white",
-                                align: {
-                                    h: "center",
-                                    v: "bottom",
-                                },
-                                uppercase: false,
-                            };
-                            let subgrid = temp;
-                            if (hasSubgrid) {
-                                subgrid = {
-                                    id: self.getUniqueClientID(),
-                                    type: "grid",
-                                    visible: true,
-                                    aspectRatio: "1/1",
-                                    caption,
-                                    rotation: 0,
-                                    items: [],
-                                };
-                                temp.items.push(subgrid);
-                            }
-                            for (let j = 0; j < source.subgrid.items; j++) {
-                                subgrid.items.add({
-                                    id: self.getUniqueClientID(),
-                                    type: "image",
-                                    visible: true,
-                                    imageID: null,
-                                    removeBackground: false,
-                                    caption: hasSubgrid ? null : caption,
-                                    trans: {
-                                        pos: {
-                                            x: 0.5,
-                                            y: 0.5,
-                                        },
-                                        scale: 1,
-                                    },
-                                    shadow: {
-                                        x: 0,
-                                        y: 0,
-                                        blur: 0,
-                                        color: "#000000",
-                                        opacity: 1,
-                                    },
-                                });
-                            }
-                        }
-                    }
-                    else {
-                        // { default: ?, min: ?, max: ? }
-                        for (let i = 0; i < captionItems.default; i++) {
-                            temp.items.push({
-                                id: self.getUniqueClientID(),
-                                type: "image",
-                                visible: true,
-                                imageID: null,
-                                removeBackground: false,
-                                caption: {
-                                    visible: true,
-                                    editable: editable,
-                                    text: "",
-                                    font: "Arial",
-                                    color: textColor,
-                                    align: {
-                                        h: "center",
-                                        v: "bottom",
-                                    },
-                                    uppercase: false,
-                                },
-                                trans: {
-                                    pos: {
-                                        x: 0.5,
-                                        y: 0.5,
-                                    },
-                                    scale: 1,
-                                },
-                                shadow: {
-                                    x: 0,
-                                    y: 0,
-                                    blur: 0,
-                                    color: "#000000",
-                                    opacity: 1,
-                                },
-                            });
-                        }
-                        for (let i = 0; i < (source.defaults || []).length; i++) {
-                            Object.assign(temp.items[i], source.defaults[i]);
-                        }
-                    }
-                    return temp;
-                }
-                if (format == "layers") {
-                    const getNewItem = (sourceItem) => {
-                        let item = {
-                            id: self.getUniqueClientID(),
-                            type: sourceItem.type,
-                            visible: true,
-                            editable: sourceItem.editable || true,
-                        };
-                        if (item.type == "caption") {
-                            Object.assign(item, sourceItem);
-                        }
-                        if (item.type == "image") {
-                            item.imageID = sourceItem.imageID || null;
-                            item.removeBackground = sourceItem.removeBackground || true;
-                            item.trans = sourceItem.trans || {
-                                pos: {
-                                    x: 0.5,
-                                    y: 0.5,
-                                },
-                                scale: 1,
-                            };
-                            item.shadow = sourceItem.shadow || {
-                                x: 0,
-                                y: 0,
-                                blur: 0,
-                                color: "#000000",
-                                opacity: 1,
-                            };
-                        }
-                        if (item.type == "rainbow") {
-                            item.colors = sourceItem.colors || [
-                                "#000000",
-                                "#ffffff",
-                                "#000000",
-                                "#ffffff",
-                                "#000000",
-                                "#ffffff",
-                            ];
-                            item.colorsCount = sourceItem.colorsCount || 2;
-                            item.pattern = sourceItem.pattern || "pizza";
-                            item.slices = sourceItem.slices || 6;
-                        }
-                        item.rect = sourceItem.rect;
-                        item = JSON.parse(JSON.stringify(item));
-                        return item;
-                    };
-                    const temp = {
-                        id: self.getUniqueClientID(),
-                        type: "grid",
-                        layers: true,
-                        visible: true,
-                        aspectRatio: source.aspectRatio,
-                        gap: 0.02,
-                        items: [],
-                        gridItems: {
-                            width: 1,
-                        },
-                        can: {
-                            remove: {
-                                background: true,
-                            },
-                        },
-                    };
-                    for (const item of source.items) {
-                        temp.items.push(getNewItem(item));
-                    }
-                    return temp;
-                }
-                throw new Error("Unknown builder source type");
-            },
-            applyMediaToTemplate(media, temp) {
-                if (!media || !temp)
-                    return null;
-                if (media.mediaGenerator)
-                    temp = Extensions_Objects_Client_1.Objects.deepMerge(temp, media.mediaGenerator.content.item);
-                temp = Extensions_Objects_Client_1.Objects.deepMerge(temp, media.content.item);
-                return temp;
-            },
-            isComponentName(name) {
-                if (!name)
-                    return false;
-                const self = this;
-                return !!self.compsDic[name.hashCode()];
-            },
-            ideWatch(uid, name) {
-                const ideWatches = this.ideWatches;
-                const key = `${uid}-${name}`;
-                if (ideWatches[key])
-                    return;
-                ideWatches[key] = { uid, name };
-            },
-            async navigateTo(item) {
-                const url = typeof item == "string" ? item : this.itemToUrl(item);
-                const self = this;
-                self.error = null;
-                window.history.pushState({}, "", url);
-                await this.refresh();
-            },
-            async notifyNavigateTo(item) {
-                const self = this;
-                const url = this.itemToUrl(item);
-                const item2 = url?.startsWith("/m/")
-                    ? await self.mediaToTemp(item)
-                    : item;
-                const imageUrl = mgHelpers.url.itemImage(item2);
-                window.alertify
-                    .message(`<a href="${url}" onclick="vueApp.navigateTo(this.href); return false;" class="clickable"><img src="${imageUrl}" /></a><div class="opacity-50 text-center"></div>`)
-                    .delay(0);
-            },
-            itemToUrl(item) {
-                if (typeof item == "string")
-                    return item;
-                if (item.instanceID)
-                    return mgHelpers.url.instance(item);
-                if (item.threadID)
-                    return mgHelpers.url.thread({ _id: item.threadID });
-                if (item.builderID && item.content)
-                    return mgHelpers.url.media(item);
-                throw new Error("Unknown item type");
-            },
-            notify(componentName, item) {
-                const self = this;
-                self.$emit("notify", { componentName, item });
-            },
-            async compileApp() {
-                await client.compileApp();
-                this.refresh();
-            },
-            async getMoreInstances(pageIndex) {
-                const self = this;
-                return await self.dbp.instances.select.popular("en", pageIndex, self.params.urlName);
-            },
-            textToHtml(text, options = {}) {
-                if (!text)
-                    return null;
-                var s = text;
-                // HTML encode
-                s = vueApp.html.encode(s) || "";
-                // >greentext
-                s = s.replace(/^&gt;(.*)$/gm, "<span class='greentext'>&gt;$1</span>");
-                // "text" to <strong>text</strong>
-                s = s.replace(/"(.*?)"(?!\w)/g, "<strong>$1</strong>");
-                // line breaks
-                s = s.replace(/\n/g, "<br />");
-                // First line title
-                if (options.firstLine) {
-                    // Convert the first line (ending with <br />) to <div class="title">..</div>
-                    s = s.replace(/^(.*?<br \/>)/g, `<div class='${options.firstLine}'>$1</div>`);
-                }
-                return s;
-            },
-            async refresh() {
-                const self = this;
-                const newParams = (await getNewParams());
-                for (const key in newParams) {
-                    if ("value" in newParams[key])
-                        self.params[key] = newParams[key].value;
-                }
-                //(this as any).key1++;
-                window.scrollTo({ top: 0, behavior: "smooth" });
+            async reloadComponentsFromServer() {
+                await client.reloadComponentsFromServer();
+                await this.init();
+                await this.refreshComponents();
             },
             async refreshComponents() {
                 const self = this;
                 self.key1++;
                 await self.$nextTick();
                 await self.state.restoreState();
-            },
-            instanceToGenerator(instance) {
-                let gen = Extensions_Objects_Client_1.Objects.json.parse(JSON.stringify(instance));
-                gen._id = gen.generatorID;
-                return gen;
-            },
-            getInstanceText(instance) {
-                if (!instance)
-                    return null;
-                return [instance.text0, instance.text1].filter((a) => a).join(", ");
-            },
-            getMediaText(media) {
-                return null;
-            },
-            setDocumentTitle(title) {
-                document.title = [title, "Meme Generator"].filter((a) => a).join(" - ");
-            },
-            getKey(item) {
-                if (!item)
-                    return null;
-                if (item._id)
-                    return item._id;
-                if (item._uid)
-                    return item._uid;
-                return item;
-            },
-            getRandomStanza(poem) {
-                if (!poem?.length)
-                    return null;
-                const count = poem.length;
-                const index = Math.floor(Math.random() * count);
-                return poem[index];
-            },
-            isDevEnv() {
-                return window.location.hostname == "localhost";
             },
             visualizedYaml(obj) {
                 let yaml = window.jsyaml.dump(obj);
@@ -5858,79 +5244,21 @@ const mgHelpers = {
                 });
                 return yaml;
             },
-            async uploadFile(file) {
-                const self = this;
-                const imageUrl = await this.getImageUrlFromDataTransferFile(file);
-                const s = [];
-                s.push(`<img src='${imageUrl}' />`);
-                s.push("<h3 class='text-center'>uploading..</h3>");
-                s.push(`<div class='text-center'><img src='${self.$data.loadingImageUrl}'></img></div>`);
-                const msg = client.alertify.message(s.join("")).delay(0);
-                return new Promise(async (resolve, reject) => {
-                    let url = "https://img.memegenerator.net/upload";
-                    var xhr = new XMLHttpRequest();
-                    var formData = new FormData();
-                    xhr.open("POST", url, true);
-                    xhr.addEventListener("readystatechange", async function (e) {
-                        if (xhr.readyState == 4 && xhr.status == 200) {
-                            const image = Extensions_Objects_Client_1.Objects.json.parse(xhr.responseText);
-                            // Download the image from the server
-                            // this also takes some time, and we should hold the loading indicator
-                            await self.downloadImage(image._id);
-                            msg.dismiss();
-                            resolve(image);
-                        }
-                        else if (xhr.readyState == 4 && xhr.status != 200) {
-                            msg.dismiss();
-                            reject(xhr.responseText);
-                        }
-                    });
-                    formData.append("image", file);
-                    xhr.send(formData);
-                });
-            },
-            async getImageUrlFromDataTransferFile(file) {
-                // fileDropEvent.preventDefault();
-                // const files = fileDropEvent.dataTransfer.files;
-                // const imageUrls = [];
-                function readFileAsDataURL(file) {
-                    return new Promise((resolve, reject) => {
-                        const reader = new FileReader();
-                        reader.onload = function (event) {
-                            resolve(event.target.result);
-                        };
-                        reader.onerror = function (event) {
-                            reject(event.error);
-                        };
-                        reader.readAsDataURL(file);
-                    });
+            getComponent(uidOrName) {
+                const uid = typeof uidOrName == "number" ? uidOrName : null;
+                let name = typeof uidOrName == "string" ? uidOrName : null;
+                if (name)
+                    name = name.replace(/-/g, ".");
+                if (!uid && !name)
+                    return null;
+                if (uid) {
+                    const vue = vueManager.getVue(uid);
+                    return VueHelper_1.VueHelper.toIdeComponent(vue);
                 }
-                const imageUrl = await readFileAsDataURL(file);
-                return imageUrl;
-                // for (let i = 0; i < files.length; i++) {
-                //   const file = files[i];
-                //   if (file.type.startsWith("image/")) {
-                //     const imageUrl = await readFileAsDataURL(file);
-                //     imageUrls.push(imageUrl);
-                //   }
-                // }
-                // return imageUrls;
-            },
-            async downloadImage(imageIdOrUrl) {
-                const self = this;
-                const imageUrl = typeof imageIdOrUrl === "string"
-                    ? imageIdOrUrl
-                    : self.url.image(imageIdOrUrl, true);
-                return new Promise((resolve, reject) => {
-                    const imageObj = new Image();
-                    imageObj.onload = () => {
-                        resolve(imageObj);
-                    };
-                    imageObj.onerror = () => {
-                        reject(imageObj);
-                    };
-                    imageObj.src = imageUrl;
-                });
+                if (name) {
+                    const comp = this.compsDic[name.hashCode()];
+                    return comp;
+                }
             },
             getIcon(item) {
                 const stateItemIcons = {
@@ -5952,14 +5280,6 @@ const mgHelpers = {
             getUniqueClientID() {
                 const self = this;
                 return self.$data._uniqueClientID++;
-            },
-            getRandomUniqueID() {
-                // Fallback for browsers without crypto.getRandomValues support
-                return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (char) => {
-                    const random = (Math.random() * 16) | 0;
-                    const value = char === "x" ? random : (random & 0x3) | 0x8;
-                    return value.toString(16);
-                });
             },
             async wait(condition, timeout = 10000) {
                 // If no condition is provided, just wait the timeout
@@ -5985,15 +5305,6 @@ const mgHelpers = {
                     tryAgain();
                 });
             },
-            scrollIntoView(element) {
-                const elementRect = element.getBoundingClientRect();
-                const bodyRect = document.body.getBoundingClientRect();
-                const offset = elementRect.top - bodyRect.top;
-                window.scroll({
-                    top: offset - 200,
-                    behavior: "smooth",
-                });
-            },
         },
         watch: {
             newCssRules: {
@@ -6007,12 +5318,14 @@ const mgHelpers = {
                 },
             },
         },
+        template: `<ide-workspace></ide-workspace>`,
     });
-    vueApp.$mount("#app");
-    window.addEventListener("popstate", async function (event) {
-        await vueApp.refresh();
-    });
-    window.vueApp = vueApp;
+    ideApp.state = await StateTracker_1.StateTracker.new(() => ideApp, vueManager, client);
+    // Create an element to host the Vue IDE app
+    const el = document.createElement("div");
+    el.id = `vue-ide-app-${Date.now()}`;
+    document.body.appendChild(el);
+    ideApp.$mount(`#${el.id}`);
 })();
 
 })();

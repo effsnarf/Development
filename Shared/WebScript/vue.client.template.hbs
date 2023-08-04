@@ -19,8 +19,8 @@
     }
   },
   created: {{{addCode created ""}}},
-  mounted: {{{addCode mounted "this.$root.vm.onVueMounted(this); this._log_method('mounted', arguments);"}}},
-  unmounted: {{{addCode unmounted "this.$root.vm.onVueUnmounted(this); this._log_method('unmounted', arguments);"}}},
+  mounted: {{{addCode mounted "//this.$root.vm.onVueMounted(this); \n this._log_method('mounted', arguments);"}}},
+  unmounted: {{{addCode unmounted "//this.$root.vm.onVueUnmounted(this); \n this._log_method('unmounted', arguments);"}}},
   methods: {
     {{#each methods}}
     {{@key}}: {{{addMethodCode @key this}}},
@@ -33,7 +33,7 @@
     },
 
     _log_emit: function(event, args) {
-      this.$root.state?.track(this, 'e', event, args);
+      //this.$root.state?.track(this, 'e', event, args);
     },
 
     _log_method: function (methodName, args) {
@@ -58,7 +58,7 @@
 
       return;
 
-      this.$root.state?.track(this, 'm', methodName);
+      //this.$root.state?.track(this, 'm', methodName);
 
       return;
 
@@ -71,7 +71,7 @@
     _log_state: function (type, key, newValue, oldValue) {
       if ([`queue`, `width`, `height`, `generators`, `items`].includes(key)) return;
       if (!newValue && !oldValue) return;
-      this.$root.state?.track(this, type, key, newValue, oldValue);
+      //this.$root.state?.track(this, type, key, newValue, oldValue);
       if (!oldValue)
       {
         if (false)

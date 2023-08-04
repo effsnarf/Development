@@ -10,34 +10,47 @@ dom:
       ':global': true
       ':visible': showPicker
       icon: 📦
-      ':title': getTitle(hoveredVueUID)
+      ':title': getTitle(activeVueUID)
+      @pinned: onPinned
       template:
         v-slot: content
         .flex.flex-row.gap-1:
           .flex.flex-column.gap-1:
             div: 
-              .parent-chain:
-                ide.component.title: 
+              transition.group: 
+                tag: div
+                name: list2
+                class: parent-chain
+                div: 
                   v-for: uid in parentChainUIDs
-                  ':item': $root.vm.vues[uid]
-                  ':class': '{ ''selected'': uid === selectedVueUID }'
-                  @mouseenter: onMouseEnterVue(uid)
-                  @mouseleave: onMouseLeaveVue(uid)
-                  @click: selectVue(uid)
-              .child-chain:
-                ide.component.title: 
+                  ':key': uid
+                  ide.component.title: 
+                    ':item': $root.vm.vues[uid]
+                    ':class': '{ ''selected'': uid === selectedVueUID }'
+                    @mouseenter: onMouseEnterVue(uid)
+                    @mouseleave: onMouseLeaveVue(uid)
+                    @click: selectVue(uid)
+              transition.group: 
+                tag: div
+                name: list2
+                class: child-chain
+                div: 
                   v-for: uid in childChainUIDs
-                  ':item': $root.vm.vues[uid]
-                  ':class': '{ ''selected'': uid === selectedVueUID }'
-                  @mouseenter: onMouseEnterVue(uid)
-                  @mouseleave: onMouseLeaveVue(uid)
-                  @click: selectVue(uid)
+                  ':key': uid
+                  ide.component.title: 
+                    ':item': $root.vm.vues[uid]
+                    ':class': '{ ''selected'': uid === selectedVueUID }'
+                    @mouseenter: onMouseEnterVue(uid)
+                    @mouseleave: onMouseLeaveVue(uid)
+                    @click: selectVue(uid)
             ide.element.inspector:
               class: hidden
               ':element': hoveredElement
-          ide.component.editor:
-            v-if: selectedVueUID
-            ':vue-uid': selectedVueUID
+          transition:
+            name: slide-hor
+            ':key': selectedVueUID
+            ide.component.editor:
+              ':vue-uid': selectedVueUID
 props: null
 data:
   hoveredElement: null
@@ -47,6 +60,15 @@ data:
   childChainUIDs: null
   showPicker: false
 methods:
+  onPinned: | #js
+    function(pinned) {
+      if (pinned)
+      {
+        this.selectedVueUID = this.hoveredVueUID;
+        return;
+      }
+      this.selectedVueUID = null;
+    }
   onMouseEnterVue: | #js
     function(uid) {
       this.hoveredVueUID = uid;
@@ -79,6 +101,7 @@ methods:
       let chain = [];
       let parent = vue;
       while (parent && (chain.length < maxChainLength)) {
+        this.$root.vm.registerVue(parent);
         chain.push(parent._uid);
         parent = this.getParentVue(parent);
       }
@@ -87,7 +110,20 @@ methods:
     }
   getChildChainUIDs: | #js
     function(vue) {
-      return vue?.$children?.map(c => c._uid);
+      const children = [];
+      const addChildren = (vue) => {
+        if (!vue) return;
+        this.$root.vm.registerVue(vue);
+        for (const child of vue.$children) {
+          if (["transition", "transition-group"].includes(child.$options._componentTag)) {
+            addChildren(child);
+            continue;
+          }
+          children.push(child._uid);
+        }
+      };
+      addChildren(vue);
+      return children;
     }
   getParentVue: | #js
     function(vue) {
@@ -117,10 +153,15 @@ methods:
     }
   updateChains: | #js
     function(vue) {
+      this.$root.vm.registerVue(vue);
       this.parentChainUIDs = this.getParentChainUIDs(vue);
       this.childChainUIDs = this.getChildChainUIDs(vue);
     }
-computed: null
+computed:
+  activeVueUID: | #js
+    function() {
+      return this.hoveredVueUID || this.selectedVueUID;
+    }
 watch:
   hoveredElement: | #js
     function(newEl, oldEl) {
@@ -132,7 +173,23 @@ watch:
     handler: | #js
       function(newVueUID, oldVueUID) {
         if (oldVueUID) this.$root.vm.getVue(oldVueUID)?.$el.classList?.remove(`highlighted2`);
-        if (newVueUID) this.$root.vm.getVue(newVueUID)?.$el.classList?.add(`highlighted2`);
+        if (this.showPicker)
+        {
+          if (newVueUID) this.$root.vm.getVue(newVueUID)?.$el.classList?.add(`highlighted2`);
+        }
+      }
+    immediate: true
+  showPicker:
+    handler: | #js
+      function(visible) {
+        if (visible)
+        {
+          if (this.hoveredVueUID) this.$root.vm.getVue(this.hoveredVueUID)?.$el.classList?.add(`highlighted2`);
+        }
+        else
+        {
+          if (this.hoveredVueUID) this.$root.vm.getVue(this.hoveredVueUID)?.$el.classList?.remove(`highlighted2`);
+        }
       }
     immediate: true
   selectedVueUID:
@@ -145,8 +202,7 @@ watch:
 style:
   div:
     font-family: monospace
-  .parent-chain:
-    margin-top: 2em
+  .parent-chain: null
   .parent-chain > :nth-child(1):
     margin-left: 0.5em
   .parent-chain > :nth-child(2):
@@ -165,22 +221,27 @@ template: >-
   @ctrl="toggleVisibility" path="-646340253.0"></ui-keyboard><ui-mouse
   @hovered-element="onHoveredElement" :global="true"
   path="-646340253.1"></ui-mouse><ui-context-window ref="context1"
-  :global="true" :visible="showPicker" icon="📦"
-  :title="getTitle(hoveredVueUID)" path="-646340253.2"><template v-slot:content
+  :global="true" :visible="showPicker" icon="📦" :title="getTitle(activeVueUID)"
+  @pinned="onPinned" path="-646340253.2"><template v-slot:content
   path="-646340253.2.0"><div class="flex flex-row gap-1"
   path="-646340253.2.0.0"><div class="flex flex-column gap-1"
-  path="-646340253.2.0.0.0"><div path="-646340253.2.0.0.0.0"><div
-  class="parent-chain" path="-646340253.2.0.0.0.0.0"><ide-component-title
-  v-for="uid in parentChainUIDs" :item="$root.vm.vues[uid]" :class="{
-  'selected': uid === selectedVueUID }" @mouseenter="onMouseEnterVue(uid)"
-  @mouseleave="onMouseLeaveVue(uid)" @click="selectVue(uid)"
-  path="-646340253.2.0.0.0.0.0.0"></ide-component-title></div><div
-  class="child-chain" path="-646340253.2.0.0.0.0.1"><ide-component-title
-  v-for="uid in childChainUIDs" :item="$root.vm.vues[uid]" :class="{ 'selected':
-  uid === selectedVueUID }" @mouseenter="onMouseEnterVue(uid)"
-  @mouseleave="onMouseLeaveVue(uid)" @click="selectVue(uid)"
-  path="-646340253.2.0.0.0.0.1.0"></ide-component-title></div></div><ide-element-inspector
+  path="-646340253.2.0.0.0"><div path="-646340253.2.0.0.0.0"><transition-group
+  class="parent-chain" tag="div" name="list2" path="-646340253.2.0.0.0.0.0"><div
+  v-for="uid in parentChainUIDs" :key="uid"
+  path="-646340253.2.0.0.0.0.0.0"><ide-component-title
+  :item="$root.vm.vues[uid]" :class="{ 'selected': uid === selectedVueUID }"
+  @mouseenter="onMouseEnterVue(uid)" @mouseleave="onMouseLeaveVue(uid)"
+  @click="selectVue(uid)"
+  path="-646340253.2.0.0.0.0.0.0.0"></ide-component-title></div></transition-group><transition-group
+  class="child-chain" tag="div" name="list2" path="-646340253.2.0.0.0.0.1"><div
+  v-for="uid in childChainUIDs" :key="uid"
+  path="-646340253.2.0.0.0.0.1.0"><ide-component-title
+  :item="$root.vm.vues[uid]" :class="{ 'selected': uid === selectedVueUID }"
+  @mouseenter="onMouseEnterVue(uid)" @mouseleave="onMouseLeaveVue(uid)"
+  @click="selectVue(uid)"
+  path="-646340253.2.0.0.0.0.1.0.0"></ide-component-title></div></transition-group></div><ide-element-inspector
   class="hidden" :element="hoveredElement"
-  path="-646340253.2.0.0.0.1"></ide-element-inspector></div><ide-component-editor
-  v-if="selectedVueUID" :vue-uid="selectedVueUID"
-  path="-646340253.2.0.0.1"></ide-component-editor></div></template></ui-context-window></div>
+  path="-646340253.2.0.0.0.1"></ide-element-inspector></div><transition
+  name="slide-hor" :key="selectedVueUID"
+  path="-646340253.2.0.0.1"><ide-component-editor :vue-uid="selectedVueUID"
+  path="-646340253.2.0.0.1.0"></ide-component-editor></transition></div></template></ui-context-window></div>

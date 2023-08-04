@@ -37,9 +37,10 @@
     %script
       window.config = (((config)));
     %script{src: "/script/startup.js?_uid=(((scriptUrlCacheInvalidator)))"}
+    %script{src: "/script/ide.js?_uid=(((scriptUrlCacheInvalidator)))"}
   %body
     %div
       %div{id: "app"}
-        %app{ref: "app", ":key": "key1"}
-        %ide-workspace{":comps": "comps", ":style": "getWorkspaceStyle()"}
+        %app{ref: "app", ":key": "key1", ":comps": "comps"}
+        / %ide-workspace{"v-show": "isDevEnv()"}
         

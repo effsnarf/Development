@@ -67,7 +67,7 @@ methods:
       this.globalPos.y += dpos.dy;
       // Since child context menus are positioned relative to the parent
       // we need to update their position in the other direction when dragging the parent
-      const childContexts = this.$root.getDescendants(this, this.$data._.comp.name);
+      const childContexts = this.$root.vm.getDescendants(this, this.$data._.comp.name);
       for (const child of childContexts) {
         // I have no idea what's going on here
         child.globalPos.x -= 0.0001;

@@ -63,7 +63,7 @@ methods:
     }
   onPinned: | #js
     function(isPinned) {
-      const treeNodeComps = this.$root.getDescendants(this, (c) => c.$data._?.comp.name === "ui.tree.node");
+      const treeNodeComps = this.$root.vm.getDescendants(this, (c) => c.$data._?.comp.name === "ui.tree.node");
       const treeNodeComp = treeNodeComps.find(c => ((!c.node.el ? null : c.node.el()) == this.hoveredElement));
       treeNodeComp?.onNodeClick();
     }
