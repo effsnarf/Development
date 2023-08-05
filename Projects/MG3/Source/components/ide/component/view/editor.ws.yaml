@@ -7,7 +7,7 @@ dom:
         transition: 
           name: slide-hor
           div: 
-            v-show: (!selectedTabIndex)
+            v-show: (selectedTabIndex == 0)
             ui.tree:
               ':root': dom
               ':expandable': 'false'
@@ -96,7 +96,7 @@ template: >-
   <div class="comp-ide-component-view-editor" :style="{ 'min-width': '30em' }"
   v-if="component" path="-1512907487."><div class="flex gap-2"
   path="-1512907487.0"><div path="-1512907487.0.0"><transition name="slide-hor"
-  path="-1512907487.0.0.0"><div v-show="(!selectedTabIndex)"
+  path="-1512907487.0.0.0"><div v-show="(selectedTabIndex == 0)"
   path="-1512907487.0.0.0.0"><ui-tree :root="dom" :expandable="false"
   :initial-expanded="true" item-type="ide.component.view.node" :get-item="(node)
   =&gt; node" :get-children="(node) =&gt; node.children"

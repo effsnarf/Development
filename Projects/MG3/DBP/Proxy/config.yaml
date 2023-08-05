@@ -57,17 +57,29 @@ cache:
       collectionName: Queue
 log:
   tasks:
-    enabled: true
+    dev:
+      enabled: true
+    prod:
+      enabled: false
     path: (env) => env.getLogPath(env.config.title, 'tasks')
   status:
-    enabled: true
+    dev:
+      enabled: true
+    prod:
+      enabled: false
     overwrite: true
     path: (env) => env.getLogPath(env.config.title, 'status')
   debug:
-    enabled: true
+    dev:
+      enabled: true
+    prod:
+      enabled: false
     path: (env) => env.getLogPath(env.config.title, 'debug')
   errors:
-    enabled: true
+    dev:
+      enabled: true
+    prod:
+      enabled: false
     path: (env) => env.getLogPath(env.config.title, 'errors')
 stats:
   every: 1m

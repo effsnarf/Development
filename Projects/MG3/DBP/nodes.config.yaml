@@ -28,8 +28,16 @@ severity:
   time: [50, 500, "<"]
 log:
   debug:
+    dev:
+      enabled: true
+    prod:
+      enabled: false
     path: (env) => env.getLogPath(env.config.title, "debug")
   errors:
+    dev:
+      enabled: true
+    prod:
+      enabled: false
     path: (env) => env.getLogPath(env.config.title, "errors")
 requests:
   severity:
