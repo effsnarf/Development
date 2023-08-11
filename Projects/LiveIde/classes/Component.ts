@@ -21,15 +21,23 @@ class Component {
   async compile() {
     if (this.isCompiled) return;
 
+    const logGroup = false;
+
     const client = await ClientContext.get();
 
-    console.groupCollapsed(this.name);
-    console.log(this);
+    if (logGroup) {
+      console.groupCollapsed(this.name);
+      console.log(this);
+    } else {
+      console.log(this.name);
+    }
+
     let json = client.Handlebars.compile(client.templates.vue)(this.source);
+
     try {
       //console.log(json);
       const vueOptions = eval(`(${json})`);
-      console.log(vueOptions);
+      if (logGroup) console.log(vueOptions);
       const vueName = Component.toVueName(this.name);
       if (this.source) {
         if (this.source.template) {
@@ -50,8 +58,9 @@ class Component {
     } catch (ex) {
       debugger;
       throw ex;
+    } finally {
+      if (logGroup) console.groupEnd();
     }
-    console.groupEnd();
   }
 
   private static toVueName(name: string) {

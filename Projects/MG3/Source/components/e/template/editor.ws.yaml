@@ -291,7 +291,7 @@ computed:
     }
   imageItems: | #js
     function() {
-      return this.temp.items.filter(item => item.type === 'image');
+      return this.temp?.items?.filter(item => item.type === 'image') || [];
     }
   hasOnlyOneImage: | #js
     function() {

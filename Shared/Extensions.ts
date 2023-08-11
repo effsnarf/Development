@@ -201,6 +201,7 @@ const color = {
 // #region Interfaces
 interface Number {
   _is(obj: any, type: any): boolean;
+  _getObjectType(obj: any): any;
   is(type: any): boolean;
   seconds(): number;
   minutes(): number;
@@ -378,20 +379,20 @@ if (typeof Number !== "undefined") {
   //   (0)._is("5", String) // true
   //   (0)._is("5", Number) // false
   Number.prototype._is = function (obj: any, type: any): boolean {
-    switch (type) {
-      case String:
-        return typeof obj === "string" || obj instanceof String;
-      case Number:
-        return typeof obj === "number" && isFinite(obj);
-      case Boolean:
-        return typeof obj === "boolean";
-      case Array:
-        return Array.isArray(obj);
-      case Object:
-        return obj !== null && typeof obj === "object" && !Array.isArray(obj);
-      default:
-        return obj instanceof type;
-    }
+    const objType = Number.prototype._getObjectType(obj);
+    if (objType === null) return obj instanceof type;
+    if (objType !== type) return false;
+    return true;
+  };
+
+  Number.prototype._getObjectType = function (obj: any) {
+    if (typeof obj === "string" || obj instanceof String) return String;
+    if (typeof obj === "number" && isFinite(obj)) return Number;
+    if (typeof obj === "boolean") return Boolean;
+    if (Array.isArray(obj)) return Array;
+    if (obj !== null && typeof obj === "object" && !Array.isArray(obj))
+      return Object;
+    return null;
   };
 
   Number.prototype.is = function (type: any): boolean {
@@ -1465,7 +1466,7 @@ if (typeof Array !== "undefined") {
     return this.sort((a, b) => {
       const aVal = projects.map((project) => project(a)).join("/");
       const bVal = projects.map((project) => project(b)).join("/");
-      return aVal.localeCompare(bVal);
+      return -aVal.localeCompare(bVal);
     });
   };
 

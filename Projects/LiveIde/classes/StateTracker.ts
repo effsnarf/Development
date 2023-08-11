@@ -4,6 +4,13 @@ import { ClientContext } from "./ClientContext";
 import { VueHelper } from "./VueHelper";
 import { VueManager } from "./VueManager";
 
+enum StateValueType {
+  Cloned,
+  // Some values cannot be cloned (Vue components, etc.)
+  // We save them as () => value
+  Pointer = "p",
+}
+
 interface StateChange {
   id: number;
   dt: number;
@@ -11,65 +18,109 @@ interface StateChange {
   vuePath: [];
   type: string;
   key: string;
-  newValue: any;
-  oldValue: any;
+  newValue: StateValue;
+  oldValue: StateValue;
+  delta: StateValue;
+}
+
+class StateValue {
+  private type: StateValueType;
+  private _value: any;
+
+  private constructor(value: any) {
+    try {
+      if (value == window) throw new Error("Cannot clone window");
+      this._value = Objects.clone(value);
+      this.type = StateValueType.Cloned;
+    } catch (ex) {
+      this._value = () => value;
+      this.type = StateValueType.Pointer;
+    }
+  }
+
+  static from(value: any) {
+    if (value instanceof StateValue) return value;
+    return new StateValue(value);
+  }
+
+  getDelta(oldValue: StateValue) {
+    if (
+      this.type == StateValueType.Pointer ||
+      oldValue.type == StateValueType.Pointer
+    ) {
+      return StateValue.from(this.value);
+    }
+
+    try {
+      const delta = Objects.subtract(this.value, oldValue.value);
+      return StateValue.from(delta);
+    } catch (ex) {
+      return StateValue.from(this.value);
+    }
+  }
+
+  get value() {
+    if (this.type == StateValueType.Cloned) return this._value;
+    return this._value();
+  }
 }
 
 class StateTracker {
   private static _nextID: number = 1;
-  private static _maxItems: number = 100;
+  private static _maxChangesPerVue: number = 100;
   private isPaused: number = 0;
 
   refChanges = new Map<string, StateChange[]>();
+  changes = new Map<number, StateChange[]>();
 
   methods: any = {
     pause: {},
   };
 
-  private constructor(
-    private getApp: () => any,
-    private vm: VueManager,
-    private client: ClientContext
-  ) {}
+  private constructor(private vm: VueManager, private client: ClientContext) {}
 
-  static new(app: any, vueManager: VueManager, client: ClientContext) {
-    const st = new StateTracker(app, vueManager, client);
+  static new(vueManager: VueManager, client: ClientContext) {
+    const st = new StateTracker(vueManager, client);
     return st;
   }
 
   track(vue: any, type: string, key: string, newValue: any, oldValue: any) {
     if (this.isPaused) return;
+    if (!this.isKeyTrackable(key)) return;
     if (!this.isTrackable(newValue)) return;
     if (!this.isTrackable(oldValue)) return;
 
     try {
-      const comp = this.getApp().getComponent(vue._uid);
-
-      if (!comp) return;
-
-      //if (!comp.source.config?.track?.state) return;
-
       const isEvent = type == "e";
 
-      newValue = isEvent ? newValue : Objects.clone(newValue);
-      oldValue = isEvent ? oldValue : Objects.clone(oldValue);
+      const newStateValue = StateValue.from(newValue);
+      const oldStateValue = StateValue.from(oldValue);
 
-      const item = {
+      const change = {
         id: StateTracker._nextID++,
         dt: Date.now(),
         uid: vue._uid,
         type,
         key,
-        newValue,
-        oldValue,
+        newValue: newStateValue,
+        oldValue: oldStateValue,
+        delta: newStateValue.getDelta(oldStateValue),
       } as StateChange;
 
-      this.addItem(item);
+      this.addChange(change);
+
+      return change;
     } catch (ex) {
       console.warn(
-        `Error tracking state change for ${vue.$data._?.comp?.name}.${key}`
+        `Error tracking state change for ${vue.$options_componentTag}.${key}`
       );
+      console.warn(ex);
     }
+  }
+
+  isKeyTrackable(key: string) {
+    if (["$asyncComputed", "_asyncComputed"].includes(key)) return false;
+    return true;
   }
 
   isTrackable(value: any) {
@@ -83,9 +134,10 @@ class StateTracker {
   }
 
   async apply(uid: number, change: StateChange) {
+    if (change.type != "d") return;
     this.pause();
     const vue = this.vm.getVue(uid);
-    vue[change.key] = change.newValue;
+    vue[change.key] = change.newValue.value;
     await vue.$nextTick();
     this.resume();
   }
@@ -94,11 +146,15 @@ class StateTracker {
   // and lose their state.
   // This method restores the state from the state tracker.
   async restoreState() {
+    throw new Error("Not implemented");
+
+    const app = null as any;
+
     this.pause();
 
     const refKeys = this.vm.getRefKeys();
 
-    const vuesByRef = VueHelper.getVuesByRef(this.getApp());
+    const vuesByRef = VueHelper.getVuesByRef(app);
 
     for (const refKey of refKeys) {
       const vues = vuesByRef.get(refKey) || [];
@@ -122,18 +178,18 @@ class StateTracker {
       console.groupEnd();
     }
 
-    this.vm.updateDataVariableUIDs(this.getApp());
+    this.vm.updateDataVariableUIDs(app);
 
-    await this.getApp().$nextTick();
+    await app.$nextTick();
 
     this.resume();
   }
 
-  private addItem(item: StateChange) {
+  private addChange(item: StateChange) {
     const isState = item.type == "p" || item.type == "d";
     const isMethod = item.type == "m";
 
-    const vueItems = this.getRefChanges(item.uid);
+    const vueItems = this.getVueChanges(item.uid);
 
     // Create an initial empty item
     if (isState && item.newValue && !item.oldValue) {
@@ -147,7 +203,7 @@ class StateTracker {
         emptyItem.id = StateTracker._nextID++;
         emptyItem.dt = Date.now();
         emptyItem.newValue = emptyItem.oldValue;
-        this.addItem(emptyItem);
+        this.addChange(emptyItem);
       }
     }
 
@@ -160,11 +216,9 @@ class StateTracker {
       }
     }
 
-    this.getRefChanges(item.uid).push(item);
+    vueItems.push(item);
 
-    if (vueItems.length > StateTracker._maxItems) vueItems.shift();
-
-    this.getApp().$emit("state-changed", item);
+    if (vueItems.length > StateTracker._maxChangesPerVue) vueItems.shift();
   }
 
   private isGroupable(newItem: StateChange, prevItem: StateChange) {
@@ -176,6 +230,13 @@ class StateTracker {
     return true;
   }
 
+  private getVueChanges(uid: number) {
+    if (!this.changes.has(uid)) {
+      this.changes.set(uid, []);
+    }
+    return this.changes.get(uid) || [];
+  }
+
   private getRefChanges(refKeyOrUID: string | number) {
     const refKey =
       typeof refKeyOrUID == "string"
@@ -185,7 +246,6 @@ class StateTracker {
     if (!refKey) return [];
     if (!this.refChanges.has(refKey)) {
       this.refChanges.set(refKey, []);
-      console.log("new ref", refKey);
     }
     return this.refChanges.get(refKey) || [];
   }
@@ -203,4 +263,4 @@ class StateTracker {
   }
 }
 
-export { StateTracker };
+export { StateTracker, StateValue };

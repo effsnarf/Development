@@ -28,8 +28,6 @@ class Objects {
     try {
       return Objects.json.parse(JSON.stringify(obj));
     } catch (ex) {
-      console.error("Error cloning object", obj, ex);
-      debugger;
       throw ex;
     }
   }
@@ -42,6 +40,8 @@ class Objects {
       }
       return result;
     }
+
+    if (!Objects.is(target, Object)) return target;
 
     const targetJson = JSON.stringify(target);
     const sourceJson = JSON.stringify(source);

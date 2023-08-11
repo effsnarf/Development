@@ -9,6 +9,9 @@ const HAML = require("./haml");
 const Handlebars = require("Handlebars");
 const http = require("http");
 import "../Shared/Extensions";
+import { Configuration } from "./Configuration";
+import { Objects } from "./Extensions.Objects";
+import { TypeScript } from "./TypeScript";
 
 Handlebars.registerHelper("json", function (obj: any) {
   return JSON.stringify(obj);
@@ -23,10 +26,12 @@ class HttpServer {
     private ip: string,
     private handler: (req: any, res: any, data: any) => any,
     private getIndexPageTemplateData: (req: any) => Promise<any>,
-    private indexPagePath?: string
+    private indexPagePath: string | null,
+    private staticFileFolders: string[]
   ) {
     const server = http.createServer(this.requestListener.bind(this));
     server.listen(port, ip, () => {
+      console.log(this.appName.green);
       this.log(`${`Server is running on http://${ip}:${port}`.green}`);
     });
   }
@@ -37,7 +42,8 @@ class HttpServer {
     ip: string,
     handler: (req: any, res: any, data: any) => any,
     getIndexPageTemplateData: (req: any) => Promise<any>,
-    indexPagePath: string | undefined = undefined
+    indexPagePath: string | null,
+    staticFileFolders: string[]
   ) {
     const server = new HttpServer(
       appName,
@@ -45,14 +51,13 @@ class HttpServer {
       ip,
       handler,
       getIndexPageTemplateData,
-      indexPagePath
+      indexPagePath,
+      staticFileFolders
     );
     return server;
   }
 
   private async requestListener(req: any, res: any) {
-    const rootPath = this.indexPagePath;
-
     const timer = Timer.start();
 
     try {
@@ -67,15 +72,60 @@ class HttpServer {
         return;
       }
 
-      var path = req.url;
+      // #region Serve static files
+      if (req.url.length > 1) {
+        for (const folder of this.staticFileFolders) {
+          const filePath = path.join(
+            folder,
+            req.url.split("?")[0].replace(".js", ".ts")
+          );
+          if (fs.existsSync(filePath)) {
+            // If TypeScript file, serve as compiled JavaScript
+            if (path.extname(filePath) == ".ts") {
+              const precompiledPath = filePath.replace(
+                ".ts",
+                ".precompiled.js"
+              );
+              if (Configuration.getEnvironment() != "dev") {
+                if (fs.existsSync(precompiledPath)) {
+                  return res.end(fs.readFileSync(precompiledPath, "utf8"));
+                }
+              }
+              const compiledJsCode = await TypeScript.webpackify(filePath);
+              fs.writeFileSync(precompiledPath, compiledJsCode);
+              return res.end(compiledJsCode);
+            }
+            if (filePath.endsWith(".yaml"))
+              return res.end(
+                JSON.stringify(
+                  Objects.parseYaml(fs.readFileSync(filePath, "utf8"))
+                )
+              );
+            // If image file, serve as binary
+            if (Http.isImageFile(filePath)) {
+              res.setHeader("Content-Type", `image/${path.extname(filePath)}`);
+              return res.end(fs.readFileSync(filePath));
+            }
+            if (Http.isVideoFile(filePath)) {
+              res.setHeader("Content-Type", "video/mp4");
+              return res.end(fs.readFileSync(filePath));
+            }
+            // Otherwise, serve as text
+            return res.end(fs.readFileSync(filePath, "utf8"));
+          }
+        }
+      }
+      // #endregion
 
-      var mimeType = HttpServer.getMimeType(path);
+      var reqPath = req.url;
 
-      if (path == "/") path = rootPath;
-      else path = `.${path}`;
+      var mimeType = HttpServer.getMimeType(reqPath);
 
-      if (!fs.existsSync(path)) {
-        path = rootPath;
+      if (reqPath == "/") reqPath = this.indexPagePath;
+      else reqPath = `.${path}`;
+
+      if (!fs.existsSync(reqPath)) {
+        reqPath = this.indexPagePath;
       }
 
       const status = 200;
@@ -83,10 +133,10 @@ class HttpServer {
       res.writeHead(status, { "Content-Type": `${mimeType}; charset=utf-8` });
 
       if (typeof mimeType == `string` && mimeType.startsWith(`video`)) {
-        let readStream = fs.createReadStream(path);
+        let readStream = fs.createReadStream(reqPath);
         readStream.pipe(res);
       } else {
-        const content = await this.getContent(req, res, path);
+        const content = await this.getContent(req, res, reqPath);
         if (typeof content == `string`) {
           res.write(content, "utf-8");
         } else {

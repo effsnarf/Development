@@ -1,0 +1,11 @@
+nodes:
+  - id: 1
+    type: panel
+    props:
+      width: 30rem
+  - id: 2
+    type: panel
+links:
+  - from: 2
+    to: 1
+    type: inside

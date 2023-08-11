@@ -3,22 +3,30 @@ import { Component } from "./Component";
 const Vue = (window as any).Vue;
 
 type HtmlJson = {
+  cid: number;
   tag: string;
   attributes?: { [key: string]: string };
   children?: HtmlJson[];
+  path: number[];
 };
 
 class VueHelper {
+  private static cid = 1;
+
   static toIdeComponent(vue: any) {
     if (!vue) return null;
     const compName = vue.$options._componentTag;
     if (!compName) return null;
     const vueComp = Vue.component(vue.$options._componentTag);
-    const comp = {} as Component;
+
+    const comp = {} as any;
+
+    comp.uid = vue._uid;
     comp.name = compName;
     comp.source = {
       dom: VueHelper.htmlToJson(vueComp.options.template),
     };
+
     return comp;
   }
 
@@ -26,9 +34,11 @@ class VueHelper {
     const parser = new DOMParser();
     const doc = parser.parseFromString(htmlString, "text/html");
 
-    function walk(node: ChildNode): HtmlJson {
+    function walk(node: ChildNode, path: number[]): HtmlJson {
+      const cid = VueHelper.cid++;
+
       if (node.nodeName === "#text") {
-        return { tag: node.textContent || "" };
+        return { cid, tag: node.textContent || "", path };
       }
 
       let element = node as Element;
@@ -38,8 +48,9 @@ class VueHelper {
       let siblings = Array.from(node.parentNode!.childNodes).filter(
         (n) => n.nodeName === node.nodeName
       );
+      let siblingIndex = siblings.indexOf(node as ChildNode);
       if (siblings.length > 1) {
-        tag += `#${siblings.indexOf(node as ChildNode) + 1}`;
+        tag += `#${siblingIndex + 1}`;
       }
 
       // Adding attributes to the JSON object
@@ -51,14 +62,15 @@ class VueHelper {
 
       // Walking through child nodes
       let children: HtmlJson[] = [];
-      for (let child of Array.from(node.childNodes)) {
-        let childObj = walk(child as ChildNode);
+      for (let i = 0; i < Array.from(node.childNodes).length; i++) {
+        let child = node.childNodes[i] as ChildNode;
+        let childObj = walk(child, [...path, i]);
         if (childObj.tag !== "") {
           children.push(childObj);
         }
       }
 
-      let result: HtmlJson = { tag };
+      let result: HtmlJson = { cid, tag, path };
       if (Object.keys(attributes).length > 0) {
         result.attributes = attributes;
       }
@@ -68,7 +80,7 @@ class VueHelper {
       return result;
     }
 
-    return walk(doc.body.firstChild! as ChildNode);
+    return walk(doc.body.firstChild! as ChildNode, []);
   }
 
   static getVuesByRef(rootVue: any) {

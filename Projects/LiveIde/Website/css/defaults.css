@@ -347,9 +347,9 @@ input:focus, textarea:focus, select:focus
 }
 input[type=checkbox], .ide-checkbox
 {
-  width: 1.6em;
-  height: 1.6em;
-  margin: 0 0.5em;
+  width: 1em;
+  height: 1em;
+  margin: 0.15em 0.5em;
   cursor: pointer;
   background: #979797;
   transform: scale(1.1);
@@ -414,6 +414,21 @@ select, input[type=range]
   padding: 0.5em;
   box-shadow: inset -3px 3px 3px #000;
   border: 2px solid #ffffff30;
+}
+
+
+.slider-closed
+{
+  max-width: 5em;
+  filter: grayscale(1) blur(3px);
+  opacity: 0.5;
+  overflow: hidden;
+}
+.slider-closed:hover, .slider-opened
+{
+  max-width: 20em;
+  filter: none;
+  opacity: 1;
 }
 
 

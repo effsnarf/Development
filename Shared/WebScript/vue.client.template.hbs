@@ -1,4 +1,5 @@
 {
+  mixins: [vueIdeCompMixin],
   props: {
     {{#each props}}
     {{@key}}: {
@@ -19,71 +20,12 @@
     }
   },
   created: {{{addCode created ""}}},
-  mounted: {{{addCode mounted "//this.$root.vm.onVueMounted(this); \n this._log_method('mounted', arguments);"}}},
-  unmounted: {{{addCode unmounted "//this.$root.vm.onVueUnmounted(this); \n this._log_method('unmounted', arguments);"}}},
+  mounted: {{{addCode mounted ""}}},
+  unmounted: {{{addCode unmounted ""}}},
   methods: {
     {{#each methods}}
-    {{@key}}: {{{addMethodCode @key this}}},
+    {{@key}}: {{{this}}},
     {{/each}}
-    _getNewEmit: function (self, emit) {
-      return function (event, ...args) {
-        this._log_emit(event, args);
-        emit.call(self, event, ...args);
-      }
-    },
-
-    _log_emit: function(event, args) {
-      //this.$root.state?.track(this, 'e', event, args);
-    },
-
-    _log_method: function (methodName, args) {
-      const compName = this.$data._.comp.name;
-
-      if ([`ide.`, `ui.`].some(s => compName.startsWith(s))) return;
-
-      if (methodName == 'mounted') return;
-
-      if ([`processQueue`, `recalc`, `getFontSize`,
-        `onMouseMove`, `onMouseUp`,
-        `preventDefaults`,
-        `highlight`, `unhighlight`,
-        `getCssClass`, `getTabClass`, `getLayerClass`, `getLayerType`
-        ].includes(methodName)) return;
-
-      if ([`draw`, `refresh`, `isOnScreen`, `updateImageSize`].some(s => methodName.includes(s))) return;
-
-      if (methodName.startsWith('get')) return;
-
-      console.log(compName, methodName, args);
-
-      return;
-
-      //this.$root.state?.track(this, 'm', methodName);
-
-      return;
-
-      console.log(
-        `🧊 %c{{name}} %c${methodName} %o`,
-        'color: green;',
-        'color: yellow;',
-        args);
-    },
-    _log_state: function (type, key, newValue, oldValue) {
-      if ([`queue`, `width`, `height`, `generators`, `items`].includes(key)) return;
-      if (!newValue && !oldValue) return;
-      //this.$root.state?.track(this, type, key, newValue, oldValue);
-      if (!oldValue)
-      {
-        if (false)
-        {
-          console.log(
-            `🧊 %c${this._.comp.name} %c${key} %o`,
-            'color: green;',
-            'color: cyan;',
-            newValue);
-        }
-      }
-    },
   },
   computed: {
     {{#each computed}}
@@ -96,27 +38,7 @@
     {{/if}}
     {{/each}}
   },
-  watch: {
-    {{#each data}}
-    {{@key}}: {
-      handler: function (newValue, oldValue) {
-        this._log_state('d', `{{@key}}`, newValue, oldValue);
-      },
-      immediate: true,
-      deep: true,
-    },
-    {{/each}}
-    
-    {{#each props}}
-    {{@key}}: {
-      handler: function (newValue, oldValue) {
-        this._log_state('p', `{{@key}}`, newValue, oldValue);
-      },
-      immediate: true,
-      deep: true,
-    },
-    {{/each}}
-
+  watch: {    
     {{#each watch}}
     {{#if handler}}
     {{@key}}: {

@@ -2,6 +2,7 @@ import "../../../Shared/Extensions";
 import { TwoWayMap } from "../../../Shared/TwoWayMap";
 import { ClientContext } from "./ClientContext";
 import { VueHelper } from "./VueHelper";
+import { StateValue } from "./StateTracker";
 
 class VueManager {
   vues = {} as any;
@@ -15,7 +16,7 @@ class VueManager {
 
   private constructor(private client: ClientContext) {}
 
-  static async new(client: ClientContext) {
+  static new(client: ClientContext) {
     const vm = new VueManager(client);
     return vm;
   }
@@ -52,12 +53,25 @@ class VueManager {
     return vue();
   }
 
+  getAncestors(vue: any, filter: any, maxCount: number = 10000): any[] {
+    if (typeof filter == "string") {
+      const compName = filter;
+      filter = (vue: any) => vue.$data._?.comp.name == compName;
+    }
+    const vues = [] as any[];
+    while (vue.$parent && vues.length < maxCount) {
+      vue = vue.$parent;
+      if (filter(vue)) vues.push(vue);
+    }
+    return vues;
+  }
+
   getDescendants(vue: any, filter: any): any[] {
     if (typeof filter == "string") {
       const compName = filter;
       filter = (vue: any) => vue.$data._?.comp.name == compName;
     }
-    const vues = [];
+    const vues = [] as any[];
     for (const child of vue.$children) {
       if (filter(child)) vues.push(child);
       vues.push(...this.getDescendants(child, filter));
@@ -91,17 +105,17 @@ class VueManager {
     let fields = [] as any[];
     fields.push(
       ...Object.keys(vue.$data || {}).map((k) => {
-        return { type: "d", key: k, newValue: vue.$data[k] };
+        return { type: "d", key: k, newValue: StateValue.from(vue.$data[k]) };
       })
     );
     fields.push(
       ...Object.keys(vue.$props || {}).map((k) => {
-        return { type: "p", key: k, newValue: vue.$props[k] };
+        return { type: "p", key: k, newValue: StateValue.from(vue.$props[k]) };
       })
     );
     fields.push(
       ...this.getComputedKeys(uid).map((k) => {
-        return { type: "c", key: k, newValue: vue[k] };
+        return { type: "c", key: k, newValue: StateValue.from(vue[k]) };
       })
     );
     fields = fields.filter((f) => !f.key.startsWith("_"));
@@ -122,6 +136,8 @@ class VueManager {
 
   registerVue(vue: any) {
     if (!vue) return;
+
+    if (this.vues[vue._uid]) return;
 
     this.vues[vue._uid] = () => vue;
     this.vuesCount++;
@@ -145,14 +161,6 @@ class VueManager {
       if (refKey[0].isLowerCase()) continue;
       this.vueRefsToUIDs.delete(refKey);
     }
-  }
-
-  onVueMounted(vue: any) {
-    this.registerVue(vue);
-  }
-
-  onVueUnmounted(vue: any) {
-    this.unregisterVue(vue);
   }
 }
 

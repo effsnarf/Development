@@ -161,7 +161,6 @@ class MemoryCache extends CacheBase {
 
   constructor() {
     super();
-    console.log(`${`MemoryCache`.gray}`);
   }
 
   static new() {

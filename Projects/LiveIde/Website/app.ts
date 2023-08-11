@@ -14,6 +14,10 @@ import { MemoryCache } from "@shared/Cache";
 import { Analytics, ItemType } from "@shared/Analytics";
 import isAttributeName from "@shared/WebScript/is.attribute.name";
 
+Configuration.log = false;
+
+console.clear();
+
 const isDevEnv = Configuration.getEnvironment() == "dev";
 
 const memoryCache = new MemoryCache();
@@ -33,12 +37,7 @@ const _fetchAsJson = async (url: string) => {
     )
   ).data;
 
-  console.log(config);
-  console.log(projectConfig);
-
   const analytics = await Analytics.new(config.analytics);
-
-  const componentsFolder = path.join(config.project.folder, "Components");
 
   const getScriptUrlCacheInvalidator = async () => {
     return await memoryCache.get("scriptUrlCacheInvalidator", () => {
@@ -51,17 +50,38 @@ const _fetchAsJson = async (url: string) => {
     });
   };
 
+  const componentFolders = [
+    path.join(config.liveIde.folder, "Components"),
+    path.join(config.project.folder, "Components"),
+  ];
+
+  const getCompFilePath = (compPath: string) => {
+    for (const folder of componentFolders) {
+      const filePath = path.join(folder, compPath);
+      if (fs.existsSync(filePath)) return filePath;
+    }
+    throw new Error(
+      `Component file not found: ${compPath} (${componentFolders})`
+    );
+  };
+
   const compInfos = new Map<string, any>();
   const compIsModified = (comp: any) => {
     const info = compInfos.get(comp.name);
     if (!info) return true;
-    const lastModified = fs.statSync(
-      path.join(componentsFolder, comp.path)
-    ).mtimeMs;
+    const lastModified = fs.statSync(getCompFilePath(comp.path)).mtimeMs;
     return lastModified > info.last.served;
   };
 
-  const getComponents = async () => {
+  const getComponents = async (componentsFolder?: string): Promise<any[]> => {
+    if (!componentsFolder) {
+      const comps = [];
+      for (const folder of componentFolders) {
+        comps.push(...((await getComponents(folder)) as any[]));
+      }
+      return comps;
+    }
+
     const now = Date.now();
 
     const comps = Files.getFiles(componentsFolder, {
@@ -74,7 +94,7 @@ const _fetchAsJson = async (url: string) => {
         yaml = preProcessYaml(yaml);
 
         const comp = {
-          name: getCompName(s),
+          name: getCompName(componentsFolder, s),
           path: s.replace(componentsFolder, ""),
           source: Objects.parseYaml(yaml),
         } as any;
@@ -95,7 +115,8 @@ const _fetchAsJson = async (url: string) => {
 
         return comp;
       });
-    return comps;
+
+    return comps as any[];
   };
 
   const getChangedComponents = async () => {
@@ -169,12 +190,22 @@ const _fetchAsJson = async (url: string) => {
     return obj;
   };
 
-  const dbp = await DatabaseProxy.new(
-    projectConfig.databaseProxy.url,
-    _fetchAsJson
-  );
+  if (!projectConfig.databaseProxy) {
+    const projectConfigPath = path.join(config.project.folder, "config.yaml");
+    console.warn(
+      `${
+        `DatabaseProxy is not configured`.yellow
+      } (${projectConfigPath.toShortPath()}: ${
+        `databaseProxy.url is missing`.gray
+      })`
+    );
+  }
 
-  const getCompName = (path: string) => {
+  const dbp = !projectConfig.databaseProxy
+    ? null
+    : await DatabaseProxy.new(projectConfig.databaseProxy.url, _fetchAsJson);
+
+  const getCompName = (componentsFolder: string, path: string) => {
     return path
       .replace(componentsFolder, "")
       .replace(".ws.yaml", "")
@@ -245,15 +276,23 @@ const _fetchAsJson = async (url: string) => {
     config.project.folder,
     config.webscript.folder,
     config.website?.folder,
+    config.static.folder,
   ].filter((s) => s);
 
-  console.log("staticFileFolders", staticFileFolders);
+  //console.log("staticFileFolders", staticFileFolders);
+
+  const handler = !config.handler ? null : eval(`(${config.handler})`);
 
   const httpServer = await HttpServer.new(
     config.title,
     config.server.port,
     config.server.host,
     async (req, res, data) => {
+      if (handler) {
+        const result = await handler(req, res, data);
+        if (result) return result;
+      }
+
       if (req.url.startsWith("/img/") && !isLocalFile(req.url)) {
         // Redirect to img.memegenerator.net
         const url = `https://img.memegenerator.net/${req.url.replace(
@@ -327,7 +366,7 @@ const _fetchAsJson = async (url: string) => {
         fs.writeFileSync(updateLogFilePath, JSON.stringify(data, null, 2));
 
         const comp = data;
-        const compPath = path.join(componentsFolder, comp.path);
+        const compPath = getCompFilePath(comp.path);
         const existingComp = Objects.parseYaml(
           preProcessYaml(fs.readFileSync(compPath, "utf8"))
         );
@@ -361,51 +400,9 @@ const _fetchAsJson = async (url: string) => {
           "ms"
         );
       }
-      // Serve static files
-      if (req.url.length > 1) {
-        for (const folder of staticFileFolders) {
-          const filePath = path.join(
-            folder,
-            req.url.split("?")[0].replace(".js", ".ts")
-          );
-          if (fs.existsSync(filePath)) {
-            // If TypeScript file, serve as compiled JavaScript
-            if (path.extname(filePath) == ".ts") {
-              const precompiledPath = filePath.replace(
-                ".ts",
-                ".precompiled.js"
-              );
-              if (Configuration.getEnvironment() != "dev") {
-                if (fs.existsSync(precompiledPath)) {
-                  return res.end(fs.readFileSync(precompiledPath, "utf8"));
-                }
-              }
-              const compiledJsCode = await TypeScript.webpackify(filePath);
-              fs.writeFileSync(precompiledPath, compiledJsCode);
-              return res.end(compiledJsCode);
-            }
-            if (filePath.endsWith(".yaml"))
-              return res.end(
-                JSON.stringify(
-                  Objects.parseYaml(fs.readFileSync(filePath, "utf8"))
-                )
-              );
-            // If image file, serve as binary
-            if (Http.isImageFile(filePath)) {
-              res.setHeader("Content-Type", `image/${path.extname(filePath)}`);
-              return res.end(fs.readFileSync(filePath));
-            }
-            if (Http.isVideoFile(filePath)) {
-              res.setHeader("Content-Type", "video/mp4");
-              return res.end(fs.readFileSync(filePath));
-            }
-            // Otherwise, serve as text
-            return res.end(fs.readFileSync(filePath, "utf8"));
-          }
-        }
-      }
     },
     async (req: any) => await getProjectPageTemplateObject(req),
-    path.join(config.project.folder, "../../LiveIde/Website", "index.haml")
+    path.join(config.liveIde.folder, "Website", "index.haml"),
+    staticFileFolders
   );
 })();

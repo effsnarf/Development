@@ -1,0 +1,106 @@
+dom:
+  div: 
+    .flex.gap-3:
+      h3:
+        ui.title:
+          text: ✨ Activity
+          ':number': changes.length
+      div: 
+        .checkboxes:
+          ui.checkbox:
+            v-for: type in changes.map(c => c.type).distinct()
+            ':text': $root.getIcon(type)
+            ':value-array': showTypes
+            ':value-key': type
+    transition.group:
+      tag: ul
+      name: list2
+      class: list1
+      ':key': key1
+      li:
+        v-for: change in visibleChanges
+        class: hoverable
+        ':key': change.id
+        @mouseenter: () => onMouseEnter(change)
+        @mouseleave: () => onMouseLeave(change)
+        ide.state.tracker.item:
+          ':uid': uid
+          ':icon': '''-'''
+          ':item': change
+          ':key': change.id
+props:
+  uid: null
+data:
+  changes: []
+  showTypes:
+    - p
+    - d
+    - m
+    - c
+  key1: 1
+mounted: | #js
+  async function() {
+    this.$root.$on("state-changed", this.onStateChanged.bind(this));
+  }
+methods:
+  onStateChanged: | #js
+    function(change) {
+      if (!change) return;
+      if (this.uid == change.uid) this.reload();
+    }
+  onMouseEnter: | #js
+    function(item) {
+      this.$root.state.apply(this.uid, item);
+    }
+  onMouseLeave: | #js
+    function(item) {
+    }
+  getChanges: | #js
+    function(uid) {
+      let changes = this.$root.state.changes.get(uid);
+      changes = (changes || []);
+      changes = changes.reverse();
+      changes = changes.take(50);
+      return changes;
+    }
+  reload: | #js
+    function() {
+      this.changes = this.getChanges(this.uid);
+    }
+  refresh: | #js
+    function() {
+      this.key1++;
+    }
+computed:
+  visibleChanges: | #js
+    function() {
+      return this.changes.filter(c => this.showTypes.includes(c.type));
+    }
+watch:
+  uid:
+    handler: | #js
+      function() {
+        this.reload();
+      }
+    immediate: true
+style:
+  .checkboxes:
+    display: flex
+    filter: grayscale(0.6)
+    opacity: 0.5
+name: ide-component-activity
+template: >-
+  <div class="comp-ide-component-activity" path="720218788."><div class="flex
+  gap-3" path="720218788.0"><h3 path="720218788.0.0"><ui-title text="✨ Activity"
+  :number="changes.length" path="720218788.0.0.0"></ui-title></h3><div
+  path="720218788.0.1"><div class="checkboxes"
+  path="720218788.0.1.0"><ui-checkbox v-for="type in changes.map(c =&gt;
+  c.type).distinct()" :text="$root.getIcon(type)" :value-array="showTypes"
+  :value-key="type"
+  path="720218788.0.1.0.0"></ui-checkbox></div></div></div><transition-group
+  class="list1" tag="ul" name="list2" :key="key1" path="720218788.1"><li
+  class="hoverable" v-for="change in visibleChanges" :key="change.id"
+  @mouseenter="() =&gt; onMouseEnter(change)" @mouseleave="() =&gt;
+  onMouseLeave(change)" path="720218788.1.0"><ide-state-tracker-item :uid="uid"
+  :icon="'-'" :item="change" :key="change.id"
+  path="720218788.1.0.0"></ide-state-tracker-item></li></transition-group></div>

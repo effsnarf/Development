@@ -1,12 +1,12 @@
 import "../../../../Shared/Extensions";
-import { HtmlHelper } from "../../classes/HtmlHelper";
-import { Component } from "../../classes/Component";
+import { HtmlHelper } from "../../Classes/HtmlHelper";
+import { Component } from "../../Classes/Component";
 import { Objects } from "../../../../Shared/Extensions.Objects.Client";
-import { AnalyticsTracker } from "../../classes/AnalyticsTracker";
-import { ClientContext } from "../../classes/ClientContext";
-import { Params } from "../../classes/Params";
+import { AnalyticsTracker } from "../../Classes/AnalyticsTracker";
+import { ClientContext } from "../../Classes/ClientContext";
+import { Params } from "../../Classes/Params";
 import { DatabaseProxy } from "../../../../Apps/DatabaseProxy/Client/DbpClient";
-import { VueManager } from "../../classes/VueManager";
+import { VueManager } from "../../Classes/VueManager";
 
 // To make it accessible to client code
 const win = window as any;

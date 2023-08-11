@@ -118,6 +118,29 @@
 
 
 
+.slide-hor-key-enter-active,
+.slide-hor-key-leave-active,
+.slide-hor-key-move {
+  transition: 0.6s;
+}
+.slide-hor-key-enter,
+.slide-hor-key-leave-to {
+  position: absolute;
+  opacity: 0;
+  max-width: 0;
+  overflow: hidden;
+}
+.slide-hor-key-enter-to,
+.slide-hor-key-leave {
+  opacity: 1;
+  max-width: 20rem;
+  overflow: hidden;
+}
+
+
+
+
+
 .slide2-enter-active,
 .slide2-leave-active,
 .slide2-move {
@@ -132,7 +155,7 @@
 .slide2-enter-to,
 .slide2-leave {
   opacity: 1;
-  max-height: 15rem;
+  max-height: 25rem;
   overflow: hidden;
 }
 

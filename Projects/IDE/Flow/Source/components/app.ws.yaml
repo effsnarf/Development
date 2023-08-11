@@ -1,0 +1,10 @@
+dom:
+  div:
+    ui.title:
+      text: Flow
+      icon: 📁
+props: null
+name: app
+template: >-
+  <div class="comp-app" path="96801."><ui-title text="Flow" icon="📁"
+  path="96801.0"></ui-title></div>

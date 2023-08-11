@@ -2,10 +2,10 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "../../../../../Apps/DatabaseProxy/Client/DbpClient.ts":
-/*!*************************************************************!*\
-  !*** ../../../../../Apps/DatabaseProxy/Client/DbpClient.ts ***!
-  \*************************************************************/
+/***/ "../../../../Apps/DatabaseProxy/Client/DbpClient.ts":
+/*!**********************************************************!*\
+  !*** ../../../../Apps/DatabaseProxy/Client/DbpClient.ts ***!
+  \**********************************************************/
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -178,10 +178,10 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "../../../../LiveIde/classes/AnalyticsTracker.ts":
-/*!*******************************************************!*\
-  !*** ../../../../LiveIde/classes/AnalyticsTracker.ts ***!
-  \*******************************************************/
+/***/ "../../../LiveIde/Classes/AnalyticsTracker.ts":
+/*!****************************************************!*\
+  !*** ../../../LiveIde/Classes/AnalyticsTracker.ts ***!
+  \****************************************************/
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -228,10 +228,10 @@ exports.AnalyticsTracker = AnalyticsTracker;
 
 /***/ }),
 
-/***/ "../../../../LiveIde/classes/ClientContext.ts":
-/*!****************************************************!*\
-  !*** ../../../../LiveIde/classes/ClientContext.ts ***!
-  \****************************************************/
+/***/ "../../../LiveIde/Classes/ClientContext.ts":
+/*!*************************************************!*\
+  !*** ../../../LiveIde/Classes/ClientContext.ts ***!
+  \*************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -240,11 +240,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ClientContext = void 0;
-const Lock_1 = __webpack_require__(/*! ../../../Shared/Lock */ "../../../../../Shared/Lock.ts");
-const to_template_1 = __importDefault(__webpack_require__(/*! ../../../Shared/WebScript/to.template */ "../../../../../Shared/WebScript/to.template.ts"));
-const is_attribute_name_1 = __importDefault(__webpack_require__(/*! ../../../Shared/WebScript/is.attribute.name */ "../../../../../Shared/WebScript/is.attribute.name.ts"));
-const ComponentManager_1 = __webpack_require__(/*! ./ComponentManager */ "../../../../LiveIde/classes/ComponentManager.ts");
-const ClientDatabase_1 = __webpack_require__(/*! ./ClientDatabase */ "../../../../LiveIde/classes/ClientDatabase.ts");
+const Lock_1 = __webpack_require__(/*! ../../../Shared/Lock */ "../../../../Shared/Lock.ts");
+const to_template_1 = __importDefault(__webpack_require__(/*! ../../../Shared/WebScript/to.template */ "../../../../Shared/WebScript/to.template.ts"));
+const is_attribute_name_1 = __importDefault(__webpack_require__(/*! ../../../Shared/WebScript/is.attribute.name */ "../../../../Shared/WebScript/is.attribute.name.ts"));
+const ComponentManager_1 = __webpack_require__(/*! ./ComponentManager */ "../../../LiveIde/Classes/ComponentManager.ts");
+const ClientDatabase_1 = __webpack_require__(/*! ./ClientDatabase */ "../../../LiveIde/Classes/ClientDatabase.ts");
 const isDevEnv = window.location.hostname == "localhost";
 class ClientContext {
     // #region Globals
@@ -399,10 +399,10 @@ exports.ClientContext = ClientContext;
 
 /***/ }),
 
-/***/ "../../../../LiveIde/classes/ClientDatabase.ts":
-/*!*****************************************************!*\
-  !*** ../../../../LiveIde/classes/ClientDatabase.ts ***!
-  \*****************************************************/
+/***/ "../../../LiveIde/Classes/ClientDatabase.ts":
+/*!**************************************************!*\
+  !*** ../../../LiveIde/Classes/ClientDatabase.ts ***!
+  \**************************************************/
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -456,16 +456,16 @@ exports.ClientDatabase = ClientDatabase;
 
 /***/ }),
 
-/***/ "../../../../LiveIde/classes/Component.ts":
-/*!************************************************!*\
-  !*** ../../../../LiveIde/classes/Component.ts ***!
-  \************************************************/
+/***/ "../../../LiveIde/Classes/Component.ts":
+/*!*********************************************!*\
+  !*** ../../../LiveIde/Classes/Component.ts ***!
+  \*********************************************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Component = void 0;
-const ClientContext_1 = __webpack_require__(/*! ./ClientContext */ "../../../../LiveIde/classes/ClientContext.ts");
+const ClientContext_1 = __webpack_require__(/*! ./ClientContext */ "../../../LiveIde/Classes/ClientContext.ts");
 String.prototype.kebabize = function () {
     return this.replace(/\./g, "-").toLowerCase();
 };
@@ -485,14 +485,21 @@ class Component {
     async compile() {
         if (this.isCompiled)
             return;
+        const logGroup = false;
         const client = await ClientContext_1.ClientContext.get();
-        console.groupCollapsed(this.name);
-        console.log(this);
+        if (logGroup) {
+            console.groupCollapsed(this.name);
+            console.log(this);
+        }
+        else {
+            console.log(this.name);
+        }
         let json = client.Handlebars.compile(client.templates.vue)(this.source);
         try {
             //console.log(json);
             const vueOptions = eval(`(${json})`);
-            console.log(vueOptions);
+            if (logGroup)
+                console.log(vueOptions);
             const vueName = Component.toVueName(this.name);
             if (this.source) {
                 if (this.source.template) {
@@ -516,7 +523,10 @@ class Component {
             debugger;
             throw ex;
         }
-        console.groupEnd();
+        finally {
+            if (logGroup)
+                console.groupEnd();
+        }
     }
     static toVueName(name) {
         return name.kebabize().replace(/base-/g, "");
@@ -527,20 +537,20 @@ exports.Component = Component;
 
 /***/ }),
 
-/***/ "../../../../LiveIde/classes/ComponentManager.ts":
-/*!*******************************************************!*\
-  !*** ../../../../LiveIde/classes/ComponentManager.ts ***!
-  \*******************************************************/
+/***/ "../../../LiveIde/Classes/ComponentManager.ts":
+/*!****************************************************!*\
+  !*** ../../../LiveIde/Classes/ComponentManager.ts ***!
+  \****************************************************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ComponentManager = void 0;
-__webpack_require__(/*! ../../../Shared/Extensions */ "../../../../../Shared/Extensions.ts");
-const Lock_1 = __webpack_require__(/*! ../../../Shared/Lock */ "../../../../../Shared/Lock.ts");
-const DataWatcher_1 = __webpack_require__(/*! ../../../Shared/DataWatcher */ "../../../../../Shared/DataWatcher.ts");
-const Component_1 = __webpack_require__(/*! ./Component */ "../../../../LiveIde/classes/Component.ts");
-const ClientContext_1 = __webpack_require__(/*! ./ClientContext */ "../../../../LiveIde/classes/ClientContext.ts");
+__webpack_require__(/*! ../../../Shared/Extensions */ "../../../../Shared/Extensions.ts");
+const Lock_1 = __webpack_require__(/*! ../../../Shared/Lock */ "../../../../Shared/Lock.ts");
+const DataWatcher_1 = __webpack_require__(/*! ../../../Shared/DataWatcher */ "../../../../Shared/DataWatcher.ts");
+const Component_1 = __webpack_require__(/*! ./Component */ "../../../LiveIde/Classes/Component.ts");
+const ClientContext_1 = __webpack_require__(/*! ./ClientContext */ "../../../LiveIde/Classes/ClientContext.ts");
 class ComponentManager {
     // #region Globals
     static async get() {
@@ -614,10 +624,10 @@ exports.ComponentManager = ComponentManager;
 
 /***/ }),
 
-/***/ "../../../../LiveIde/classes/HtmlHelper.ts":
-/*!*************************************************!*\
-  !*** ../../../../LiveIde/classes/HtmlHelper.ts ***!
-  \*************************************************/
+/***/ "../../../LiveIde/Classes/HtmlHelper.ts":
+/*!**********************************************!*\
+  !*** ../../../LiveIde/Classes/HtmlHelper.ts ***!
+  \**********************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -626,7 +636,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.HtmlHelper = void 0;
-const add_paths_1 = __importDefault(__webpack_require__(/*! ../../../Shared/WebScript/add.paths */ "../../../../../Shared/WebScript/add.paths.ts"));
+const add_paths_1 = __importDefault(__webpack_require__(/*! ../../../Shared/WebScript/add.paths */ "../../../../Shared/WebScript/add.paths.ts"));
 class HtmlHelper {
     cssProperties = {
         "align-content": {
@@ -2984,10 +2994,10 @@ exports.HtmlHelper = HtmlHelper;
 
 /***/ }),
 
-/***/ "../../../../LiveIde/classes/Params.ts":
-/*!*********************************************!*\
-  !*** ../../../../LiveIde/classes/Params.ts ***!
-  \*********************************************/
+/***/ "../../../LiveIde/Classes/Params.ts":
+/*!******************************************!*\
+  !*** ../../../LiveIde/Classes/Params.ts ***!
+  \******************************************/
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -3034,10 +3044,254 @@ exports.Params = Params;
 
 /***/ }),
 
-/***/ "../../../../LiveIde/classes/VueHelper.ts":
+/***/ "../../../LiveIde/Classes/StateTracker.ts":
 /*!************************************************!*\
-  !*** ../../../../LiveIde/classes/VueHelper.ts ***!
+  !*** ../../../LiveIde/Classes/StateTracker.ts ***!
   \************************************************/
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.StateValue = exports.StateTracker = void 0;
+__webpack_require__(/*! ../../../Shared/Extensions */ "../../../../Shared/Extensions.ts");
+const Extensions_Objects_Client_1 = __webpack_require__(/*! ../../../Shared/Extensions.Objects.Client */ "../../../../Shared/Extensions.Objects.Client.ts");
+const VueHelper_1 = __webpack_require__(/*! ./VueHelper */ "../../../LiveIde/Classes/VueHelper.ts");
+var StateValueType;
+(function (StateValueType) {
+    StateValueType[StateValueType["Cloned"] = 0] = "Cloned";
+    // Some values cannot be cloned (Vue components, etc.)
+    // We save them as () => value
+    StateValueType["Pointer"] = "p";
+})(StateValueType || (StateValueType = {}));
+class StateValue {
+    type;
+    _value;
+    constructor(value) {
+        try {
+            if (value == window)
+                throw new Error("Cannot clone window");
+            this._value = Extensions_Objects_Client_1.Objects.clone(value);
+            this.type = StateValueType.Cloned;
+        }
+        catch (ex) {
+            this._value = () => value;
+            this.type = StateValueType.Pointer;
+        }
+    }
+    static from(value) {
+        if (value instanceof StateValue)
+            return value;
+        return new StateValue(value);
+    }
+    getDelta(oldValue) {
+        if (this.type == StateValueType.Pointer ||
+            oldValue.type == StateValueType.Pointer) {
+            return StateValue.from(this.value);
+        }
+        try {
+            const delta = Extensions_Objects_Client_1.Objects.subtract(this.value, oldValue.value);
+            return StateValue.from(delta);
+        }
+        catch (ex) {
+            return StateValue.from(this.value);
+        }
+    }
+    get value() {
+        if (this.type == StateValueType.Cloned)
+            return this._value;
+        return this._value();
+    }
+}
+exports.StateValue = StateValue;
+class StateTracker {
+    vm;
+    client;
+    static _nextID = 1;
+    static _maxChangesPerVue = 100;
+    isPaused = 0;
+    refChanges = new Map();
+    changes = new Map();
+    methods = {
+        pause: {},
+    };
+    constructor(vm, client) {
+        this.vm = vm;
+        this.client = client;
+    }
+    static new(vueManager, client) {
+        const st = new StateTracker(vueManager, client);
+        return st;
+    }
+    track(vue, type, key, newValue, oldValue) {
+        if (this.isPaused)
+            return;
+        if (!this.isKeyTrackable(key))
+            return;
+        if (!this.isTrackable(newValue))
+            return;
+        if (!this.isTrackable(oldValue))
+            return;
+        try {
+            const isEvent = type == "e";
+            const newStateValue = StateValue.from(newValue);
+            const oldStateValue = StateValue.from(oldValue);
+            const change = {
+                id: StateTracker._nextID++,
+                dt: Date.now(),
+                uid: vue._uid,
+                type,
+                key,
+                newValue: newStateValue,
+                oldValue: oldStateValue,
+                delta: newStateValue.getDelta(oldStateValue),
+            };
+            this.addChange(change);
+            return change;
+        }
+        catch (ex) {
+            console.warn(`Error tracking state change for ${vue.$options_componentTag}.${key}`);
+            console.warn(ex);
+        }
+    }
+    isKeyTrackable(key) {
+        if (["$asyncComputed", "_asyncComputed"].includes(key))
+            return false;
+        return true;
+    }
+    isTrackable(value) {
+        if (!value)
+            return true;
+        if (Array.isArray(value))
+            return value.all(this.isTrackable);
+        // HTML elements are not trackable
+        if (value instanceof HTMLElement)
+            return false;
+        // Functions are not trackable
+        if (typeof value == "function")
+            return false;
+        return true;
+    }
+    async apply(uid, change) {
+        if (change.type != "d")
+            return;
+        this.pause();
+        const vue = this.vm.getVue(uid);
+        vue[change.key] = change.newValue.value;
+        await vue.$nextTick();
+        this.resume();
+    }
+    // Sometimes when refreshing keys in the app, the vue components are recreated
+    // and lose their state.
+    // This method restores the state from the state tracker.
+    async restoreState() {
+        throw new Error("Not implemented");
+        const app = null;
+        this.pause();
+        const refKeys = this.vm.getRefKeys();
+        const vuesByRef = VueHelper_1.VueHelper.getVuesByRef(app);
+        for (const refKey of refKeys) {
+            const vues = vuesByRef.get(refKey) || [];
+            console.group(refKey);
+            const vueChanges = this.getRefChanges(refKey);
+            // For all vues that have this ref
+            for (const vue of vues) {
+                // Find the last change for each key
+                const lastChanges = vueChanges.reduce((acc, cur) => {
+                    acc[cur.key] = cur;
+                    return acc;
+                }, {});
+                // Apply the last change for each key
+                for (const key in lastChanges) {
+                    const change = lastChanges[key];
+                    if (change.type != "d")
+                        continue;
+                    console.log(key, change.newValue);
+                    vue.$set(vue, key, change.newValue);
+                }
+            }
+            console.groupEnd();
+        }
+        this.vm.updateDataVariableUIDs(app);
+        await app.$nextTick();
+        this.resume();
+    }
+    addChange(item) {
+        const isState = item.type == "p" || item.type == "d";
+        const isMethod = item.type == "m";
+        const vueItems = this.getVueChanges(item.uid);
+        // Create an initial empty item
+        if (isState && item.newValue && !item.oldValue) {
+            const prevItemOfThisKey = [...vueItems]
+                .reverse()
+                .find((existingItem) => existingItem.key == item.key);
+            if (!prevItemOfThisKey) {
+                const emptyItem = Extensions_Objects_Client_1.Objects.json.parse(JSON.stringify(item));
+                emptyItem.id = StateTracker._nextID++;
+                emptyItem.dt = Date.now();
+                emptyItem.newValue = emptyItem.oldValue;
+                this.addChange(emptyItem);
+            }
+        }
+        // Group typing changes into one item
+        if (vueItems.length) {
+            const lastItem = vueItems.last();
+            if (this.isGroupable(item, lastItem)) {
+                item.oldValue = lastItem.oldValue;
+                vueItems.pop();
+            }
+        }
+        vueItems.push(item);
+        if (vueItems.length > StateTracker._maxChangesPerVue)
+            vueItems.shift();
+    }
+    isGroupable(newItem, prevItem) {
+        const timePassed = newItem.dt - prevItem.dt;
+        if (timePassed > 1000)
+            return false;
+        if (newItem.type != "p" && newItem.type != "d")
+            return false;
+        if (!prevItem.newValue && !prevItem.oldValue)
+            return false;
+        if (newItem.key != prevItem.key)
+            return false;
+        return true;
+    }
+    getVueChanges(uid) {
+        if (!this.changes.has(uid)) {
+            this.changes.set(uid, []);
+        }
+        return this.changes.get(uid) || [];
+    }
+    getRefChanges(refKeyOrUID) {
+        const refKey = typeof refKeyOrUID == "string"
+            ? refKeyOrUID
+            : this.vm.getRefKey(refKeyOrUID);
+        if (!refKey)
+            return [];
+        if (!this.refChanges.has(refKey)) {
+            this.refChanges.set(refKey, []);
+        }
+        return this.refChanges.get(refKey) || [];
+    }
+    pause() {
+        this.isPaused++;
+    }
+    resume() {
+        this.isPaused--;
+    }
+    clear() {
+        this.refChanges.clear();
+    }
+}
+exports.StateTracker = StateTracker;
+
+
+/***/ }),
+
+/***/ "../../../LiveIde/Classes/VueHelper.ts":
+/*!*********************************************!*\
+  !*** ../../../LiveIde/Classes/VueHelper.ts ***!
+  \*********************************************/
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -3045,6 +3299,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.VueHelper = void 0;
 const Vue = window.Vue;
 class VueHelper {
+    static cid = 1;
     static toIdeComponent(vue) {
         if (!vue)
             return null;
@@ -3053,6 +3308,7 @@ class VueHelper {
             return null;
         const vueComp = Vue.component(vue.$options._componentTag);
         const comp = {};
+        comp.uid = vue._uid;
         comp.name = compName;
         comp.source = {
             dom: VueHelper.htmlToJson(vueComp.options.template),
@@ -3062,16 +3318,18 @@ class VueHelper {
     static htmlToJson(htmlString) {
         const parser = new DOMParser();
         const doc = parser.parseFromString(htmlString, "text/html");
-        function walk(node) {
+        function walk(node, path) {
+            const cid = VueHelper.cid++;
             if (node.nodeName === "#text") {
-                return { tag: node.textContent || "" };
+                return { cid, tag: node.textContent || "", path };
             }
             let element = node;
             let tag = element.tagName.toLowerCase();
             // Handling multiple divs
             let siblings = Array.from(node.parentNode.childNodes).filter((n) => n.nodeName === node.nodeName);
+            let siblingIndex = siblings.indexOf(node);
             if (siblings.length > 1) {
-                tag += `#${siblings.indexOf(node) + 1}`;
+                tag += `#${siblingIndex + 1}`;
             }
             // Adding attributes to the JSON object
             let attributes = {};
@@ -3081,13 +3339,14 @@ class VueHelper {
             }
             // Walking through child nodes
             let children = [];
-            for (let child of Array.from(node.childNodes)) {
-                let childObj = walk(child);
+            for (let i = 0; i < Array.from(node.childNodes).length; i++) {
+                let child = node.childNodes[i];
+                let childObj = walk(child, [...path, i]);
                 if (childObj.tag !== "") {
                     children.push(childObj);
                 }
             }
-            let result = { tag };
+            let result = { cid, tag, path };
             if (Object.keys(attributes).length > 0) {
                 result.attributes = attributes;
             }
@@ -3096,7 +3355,7 @@ class VueHelper {
             }
             return result;
         }
-        return walk(doc.body.firstChild);
+        return walk(doc.body.firstChild, []);
     }
     static getVuesByRef(rootVue) {
         const map = new Map();
@@ -3139,18 +3398,19 @@ exports.VueHelper = VueHelper;
 
 /***/ }),
 
-/***/ "../../../../LiveIde/classes/VueManager.ts":
-/*!*************************************************!*\
-  !*** ../../../../LiveIde/classes/VueManager.ts ***!
-  \*************************************************/
+/***/ "../../../LiveIde/Classes/VueManager.ts":
+/*!**********************************************!*\
+  !*** ../../../LiveIde/Classes/VueManager.ts ***!
+  \**********************************************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.VueManager = void 0;
-__webpack_require__(/*! ../../../Shared/Extensions */ "../../../../../Shared/Extensions.ts");
-const TwoWayMap_1 = __webpack_require__(/*! ../../../Shared/TwoWayMap */ "../../../../../Shared/TwoWayMap.ts");
-const VueHelper_1 = __webpack_require__(/*! ./VueHelper */ "../../../../LiveIde/classes/VueHelper.ts");
+__webpack_require__(/*! ../../../Shared/Extensions */ "../../../../Shared/Extensions.ts");
+const TwoWayMap_1 = __webpack_require__(/*! ../../../Shared/TwoWayMap */ "../../../../Shared/TwoWayMap.ts");
+const VueHelper_1 = __webpack_require__(/*! ./VueHelper */ "../../../LiveIde/Classes/VueHelper.ts");
+const StateTracker_1 = __webpack_require__(/*! ./StateTracker */ "../../../LiveIde/Classes/StateTracker.ts");
 class VueManager {
     client;
     vues = {};
@@ -3162,7 +3422,7 @@ class VueManager {
     constructor(client) {
         this.client = client;
     }
-    static async new(client) {
+    static new(client) {
         const vm = new VueManager(client);
         return vm;
     }
@@ -3194,6 +3454,19 @@ class VueManager {
         if (!vue)
             return null;
         return vue();
+    }
+    getAncestors(vue, filter, maxCount = 10000) {
+        if (typeof filter == "string") {
+            const compName = filter;
+            filter = (vue) => vue.$data._?.comp.name == compName;
+        }
+        const vues = [];
+        while (vue.$parent && vues.length < maxCount) {
+            vue = vue.$parent;
+            if (filter(vue))
+                vues.push(vue);
+        }
+        return vues;
     }
     getDescendants(vue, filter) {
         if (typeof filter == "string") {
@@ -3232,13 +3505,13 @@ class VueManager {
             return [];
         let fields = [];
         fields.push(...Object.keys(vue.$data || {}).map((k) => {
-            return { type: "d", key: k, newValue: vue.$data[k] };
+            return { type: "d", key: k, newValue: StateTracker_1.StateValue.from(vue.$data[k]) };
         }));
         fields.push(...Object.keys(vue.$props || {}).map((k) => {
-            return { type: "p", key: k, newValue: vue.$props[k] };
+            return { type: "p", key: k, newValue: StateTracker_1.StateValue.from(vue.$props[k]) };
         }));
         fields.push(...this.getComputedKeys(uid).map((k) => {
-            return { type: "c", key: k, newValue: vue[k] };
+            return { type: "c", key: k, newValue: StateTracker_1.StateValue.from(vue[k]) };
         }));
         fields = fields.filter((f) => !f.key.startsWith("_"));
         fields = fields.sortBy((f) => f.type, (f) => f.key);
@@ -3252,6 +3525,8 @@ class VueManager {
     }
     registerVue(vue) {
         if (!vue)
+            return;
+        if (this.vues[vue._uid])
             return;
         this.vues[vue._uid] = () => vue;
         this.vuesCount++;
@@ -3274,28 +3549,22 @@ class VueManager {
             this.vueRefsToUIDs.delete(refKey);
         }
     }
-    onVueMounted(vue) {
-        this.registerVue(vue);
-    }
-    onVueUnmounted(vue) {
-        this.unregisterVue(vue);
-    }
 }
 exports.VueManager = VueManager;
 
 
 /***/ }),
 
-/***/ "../../../../../Shared/DataWatcher.ts":
-/*!********************************************!*\
-  !*** ../../../../../Shared/DataWatcher.ts ***!
-  \********************************************/
+/***/ "../../../../Shared/DataWatcher.ts":
+/*!*****************************************!*\
+  !*** ../../../../Shared/DataWatcher.ts ***!
+  \*****************************************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.DataWatcher = void 0;
-const RepeatingTaskQueue_1 = __webpack_require__(/*! ./RepeatingTaskQueue */ "../../../../../Shared/RepeatingTaskQueue.ts");
+const RepeatingTaskQueue_1 = __webpack_require__(/*! ./RepeatingTaskQueue */ "../../../../Shared/RepeatingTaskQueue.ts");
 class DefaultDataComparer {
     clone(o1) {
         if (o1 == null)
@@ -3354,16 +3623,16 @@ exports.DataWatcher = DataWatcher;
 
 /***/ }),
 
-/***/ "../../../../../Shared/Extensions.Objects.Client.ts":
-/*!**********************************************************!*\
-  !*** ../../../../../Shared/Extensions.Objects.Client.ts ***!
-  \**********************************************************/
+/***/ "../../../../Shared/Extensions.Objects.Client.ts":
+/*!*******************************************************!*\
+  !*** ../../../../Shared/Extensions.Objects.Client.ts ***!
+  \*******************************************************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Objects = void 0;
-__webpack_require__(/*! ./Extensions */ "../../../../../Shared/Extensions.ts");
+__webpack_require__(/*! ./Extensions */ "../../../../Shared/Extensions.ts");
 const _importMainFileToImplement = "This is not supported on the client side. Import Extensions.Objects to implement";
 class Objects {
     static is(obj, type) {
@@ -3393,8 +3662,6 @@ class Objects {
             return Objects.json.parse(JSON.stringify(obj));
         }
         catch (ex) {
-            console.error("Error cloning object", obj, ex);
-            debugger;
             throw ex;
         }
     }
@@ -3406,6 +3673,8 @@ class Objects {
             }
             return result;
         }
+        if (!Objects.is(target, Object))
+            return target;
         const targetJson = JSON.stringify(target);
         const sourceJson = JSON.stringify(source);
         if (targetJson === sourceJson) {
@@ -3635,10 +3904,10 @@ exports.Objects = Objects;
 
 /***/ }),
 
-/***/ "../../../../../Shared/Extensions.ts":
-/*!*******************************************!*\
-  !*** ../../../../../Shared/Extensions.ts ***!
-  \*******************************************/
+/***/ "../../../../Shared/Extensions.ts":
+/*!****************************************!*\
+  !*** ../../../../Shared/Extensions.ts ***!
+  \****************************************/
 /***/ (() => {
 
 
@@ -3830,20 +4099,25 @@ if (typeof Number !== "undefined") {
     //   (0)._is("5", String) // true
     //   (0)._is("5", Number) // false
     Number.prototype._is = function (obj, type) {
-        switch (type) {
-            case String:
-                return typeof obj === "string" || obj instanceof String;
-            case Number:
-                return typeof obj === "number" && isFinite(obj);
-            case Boolean:
-                return typeof obj === "boolean";
-            case Array:
-                return Array.isArray(obj);
-            case Object:
-                return obj !== null && typeof obj === "object" && !Array.isArray(obj);
-            default:
-                return obj instanceof type;
-        }
+        const objType = Number.prototype._getObjectType(obj);
+        if (objType === null)
+            return obj instanceof type;
+        if (objType !== type)
+            return false;
+        return true;
+    };
+    Number.prototype._getObjectType = function (obj) {
+        if (typeof obj === "string" || obj instanceof String)
+            return String;
+        if (typeof obj === "number" && isFinite(obj))
+            return Number;
+        if (typeof obj === "boolean")
+            return Boolean;
+        if (Array.isArray(obj))
+            return Array;
+        if (obj !== null && typeof obj === "object" && !Array.isArray(obj))
+            return Object;
+        return null;
     };
     Number.prototype.is = function (type) {
         return (0)._is(this, type);
@@ -4763,7 +5037,7 @@ if (typeof Array !== "undefined") {
         return this.sort((a, b) => {
             const aVal = projects.map((project) => project(a)).join("/");
             const bVal = projects.map((project) => project(b)).join("/");
-            return aVal.localeCompare(bVal);
+            return -aVal.localeCompare(bVal);
         });
     };
     Array.prototype.sortByDesc = function (...projects) {
@@ -4849,10 +5123,10 @@ if (typeof Function !== "undefined") {
 
 /***/ }),
 
-/***/ "../../../../../Shared/Lock.ts":
-/*!*************************************!*\
-  !*** ../../../../../Shared/Lock.ts ***!
-  \*************************************/
+/***/ "../../../../Shared/Lock.ts":
+/*!**********************************!*\
+  !*** ../../../../Shared/Lock.ts ***!
+  \**********************************/
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -4892,10 +5166,10 @@ exports.Lock = Lock;
 
 /***/ }),
 
-/***/ "../../../../../Shared/RepeatingTaskQueue.ts":
-/*!***************************************************!*\
-  !*** ../../../../../Shared/RepeatingTaskQueue.ts ***!
-  \***************************************************/
+/***/ "../../../../Shared/RepeatingTaskQueue.ts":
+/*!************************************************!*\
+  !*** ../../../../Shared/RepeatingTaskQueue.ts ***!
+  \************************************************/
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -4930,10 +5204,10 @@ exports.RepeatingTaskQueue = RepeatingTaskQueue;
 
 /***/ }),
 
-/***/ "../../../../../Shared/TwoWayMap.ts":
-/*!******************************************!*\
-  !*** ../../../../../Shared/TwoWayMap.ts ***!
-  \******************************************/
+/***/ "../../../../Shared/TwoWayMap.ts":
+/*!***************************************!*\
+  !*** ../../../../Shared/TwoWayMap.ts ***!
+  \***************************************/
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -5014,15 +5288,15 @@ exports.TwoWayMap = TwoWayMap;
 
 /***/ }),
 
-/***/ "../../../../../Shared/WebScript/add.paths.ts":
-/*!****************************************************!*\
-  !*** ../../../../../Shared/WebScript/add.paths.ts ***!
-  \****************************************************/
+/***/ "../../../../Shared/WebScript/add.paths.ts":
+/*!*************************************************!*\
+  !*** ../../../../Shared/WebScript/add.paths.ts ***!
+  \*************************************************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const Extensions_Objects_Client_1 = __webpack_require__(/*! ../Extensions.Objects.Client */ "../../../../../Shared/Extensions.Objects.Client.ts");
+const Extensions_Objects_Client_1 = __webpack_require__(/*! ../Extensions.Objects.Client */ "../../../../Shared/Extensions.Objects.Client.ts");
 exports["default"] = (context, compName, dom) => {
     compName = compName.replace(/-/g, ".");
     dom = Extensions_Objects_Client_1.Objects.json.parse(JSON.stringify(dom));
@@ -5047,10 +5321,10 @@ exports["default"] = (context, compName, dom) => {
 
 /***/ }),
 
-/***/ "../../../../../Shared/WebScript/is.attribute.name.ts":
-/*!************************************************************!*\
-  !*** ../../../../../Shared/WebScript/is.attribute.name.ts ***!
-  \************************************************************/
+/***/ "../../../../Shared/WebScript/is.attribute.name.ts":
+/*!*********************************************************!*\
+  !*** ../../../../Shared/WebScript/is.attribute.name.ts ***!
+  \*********************************************************/
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -5109,10 +5383,10 @@ exports["default"] = (componentNames, name) => {
 
 /***/ }),
 
-/***/ "../../../../../Shared/WebScript/to.template.ts":
-/*!******************************************************!*\
-  !*** ../../../../../Shared/WebScript/to.template.ts ***!
-  \******************************************************/
+/***/ "../../../../Shared/WebScript/to.template.ts":
+/*!***************************************************!*\
+  !*** ../../../../Shared/WebScript/to.template.ts ***!
+  \***************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -5120,7 +5394,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const add_paths_1 = __importDefault(__webpack_require__(/*! ./add.paths */ "../../../../../Shared/WebScript/add.paths.ts"));
+const add_paths_1 = __importDefault(__webpack_require__(/*! ./add.paths */ "../../../../Shared/WebScript/add.paths.ts"));
 exports["default"] = (context, dom, indent, compName) => {
     if (!dom)
         return [];
@@ -5267,19 +5541,19 @@ var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
 var exports = __webpack_exports__;
-/*!***********************************************************!*\
-  !*** ../../../../LiveIde/Website/script/1691175253305.ts ***!
-  \***********************************************************/
+/*!********************************************************!*\
+  !*** ../../../LiveIde/Website/script/1691734828256.ts ***!
+  \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-__webpack_require__(/*! ../../../../Shared/Extensions */ "../../../../../Shared/Extensions.ts");
-const HtmlHelper_1 = __webpack_require__(/*! ../../classes/HtmlHelper */ "../../../../LiveIde/classes/HtmlHelper.ts");
-const Extensions_Objects_Client_1 = __webpack_require__(/*! ../../../../Shared/Extensions.Objects.Client */ "../../../../../Shared/Extensions.Objects.Client.ts");
-const AnalyticsTracker_1 = __webpack_require__(/*! ../../classes/AnalyticsTracker */ "../../../../LiveIde/classes/AnalyticsTracker.ts");
-const ClientContext_1 = __webpack_require__(/*! ../../classes/ClientContext */ "../../../../LiveIde/classes/ClientContext.ts");
-const Params_1 = __webpack_require__(/*! ../../classes/Params */ "../../../../LiveIde/classes/Params.ts");
-const DbpClient_1 = __webpack_require__(/*! ../../../../Apps/DatabaseProxy/Client/DbpClient */ "../../../../../Apps/DatabaseProxy/Client/DbpClient.ts");
-const VueManager_1 = __webpack_require__(/*! ../../classes/VueManager */ "../../../../LiveIde/classes/VueManager.ts");
+__webpack_require__(/*! ../../../../Shared/Extensions */ "../../../../Shared/Extensions.ts");
+const HtmlHelper_1 = __webpack_require__(/*! ../../Classes/HtmlHelper */ "../../../LiveIde/Classes/HtmlHelper.ts");
+const Extensions_Objects_Client_1 = __webpack_require__(/*! ../../../../Shared/Extensions.Objects.Client */ "../../../../Shared/Extensions.Objects.Client.ts");
+const AnalyticsTracker_1 = __webpack_require__(/*! ../../Classes/AnalyticsTracker */ "../../../LiveIde/Classes/AnalyticsTracker.ts");
+const ClientContext_1 = __webpack_require__(/*! ../../Classes/ClientContext */ "../../../LiveIde/Classes/ClientContext.ts");
+const Params_1 = __webpack_require__(/*! ../../Classes/Params */ "../../../LiveIde/Classes/Params.ts");
+const DbpClient_1 = __webpack_require__(/*! ../../../../Apps/DatabaseProxy/Client/DbpClient */ "../../../../Apps/DatabaseProxy/Client/DbpClient.ts");
+const VueManager_1 = __webpack_require__(/*! ../../Classes/VueManager */ "../../../LiveIde/Classes/VueManager.ts");
 // To make it accessible to client code
 const win = window;
 win.Objects = Extensions_Objects_Client_1.Objects;

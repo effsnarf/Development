@@ -1,15 +1,15 @@
 dom:
-  div: 
-    div: 
+  div:
+    div:
       .site-loading:
         ui.loading:
           v-if: $root.isLoading
       site.header:
         class: site-width
-      div: 
+      div:
         class: header-spacer
     .pages:
-      ':class': '{ ''site-width'': true }'
+      ":class": "{ 'site-width': true }"
       page.test: null
       page.admin.index: null
       page.home: null
@@ -23,12 +23,6 @@ dom:
       page.instance: null
     .notifications:
       ui.notifications: null
-    ide.css.stylesheet:
-      ':rules': $root.newCssRules
-    div: 
-      ide.component.style:
-        v-for: comp in comps
-        ':component': comp
 props:
   comps: null
 name: app

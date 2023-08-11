@@ -36,6 +36,7 @@ interface ConfigurationOptions {
 }
 
 class Configuration {
+  static log: boolean = true;
   static _environment: string | undefined;
   static environments = ["dev", "prod"];
   options: ConfigurationOptions;
@@ -374,6 +375,7 @@ class Configuration {
   }
 
   private log(...args: any[]) {
+    if (!Configuration.log) return;
     if (!this.options.log) return;
     console.log(...args);
   }
