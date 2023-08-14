@@ -959,7 +959,7 @@ if (typeof String !== "undefined") {
   String.prototype.splitOnWidth = function (width: number): string[] {
     const lines: string[] = [];
     let currentLine = "";
-    let colorStack = [];
+    let colorStack = [] as string[];
     for (const char of this.getChars()) {
       if (char.isColorCode()) colorStack.push(char);
       if (currentLine.getCharsCount() >= width) {
@@ -1479,7 +1479,7 @@ if (typeof Array !== "undefined") {
 
   Array.prototype.distinct = function (project?: ((item: any) => any) | null) {
     if (!project) project = (item) => item;
-    const result = [];
+    const result = [] as any[];
     const map = new Map();
     for (const item of this) {
       const key = project ? project(item) : item;

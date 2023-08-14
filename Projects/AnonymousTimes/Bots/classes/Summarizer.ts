@@ -1,12 +1,13 @@
 import * as colors from "colors";
 import * as fs from "fs";
-import "@shared/Extensions";
+import "../../../../Shared/Extensions";
+import { Objects } from "../../../../Shared/Extensions.Objects";
 import { Config } from "../../Shared/Config";
-import { Config as OpenAiConfig } from "../../../OpenAI/classes/Config";
-import { MongoDatabase } from "@shared/MongoDatabase";
+import { Config as OpenAiConfig } from "../../../../Apis/OpenAI/classes/Config";
+import { MongoDatabase } from "../../../../Shared/Database/MongoDatabase";
 import { Thread, Post } from "../../Shared/DataTypes";
-import { OpenAI } from "../../../OpenAI/classes/OpenAI";
-import { ChatOpenAI, Role } from "../../../OpenAI/classes/ChatOpenAI";
+import { OpenAI } from "../../../../Apis/OpenAI/classes/OpenAI";
+import { ChatOpenAI, Role } from "../../../../Apis/OpenAI/classes/ChatOpenAI";
 
 class Summarizer {
   private db!: MongoDatabase;
