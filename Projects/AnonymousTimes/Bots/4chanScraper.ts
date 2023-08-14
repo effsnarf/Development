@@ -1,7 +1,7 @@
 const colors = require("colors");
 import * as fs from "fs";
 import * as jsyaml from "js-yaml";
-import { Config } from "@shared/Config";
+import { Config } from "../Shared/Config";
 import { Scraper } from "./classes/Scraper";
 
 const config: Config = jsyaml.load(

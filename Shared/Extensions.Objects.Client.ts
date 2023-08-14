@@ -10,6 +10,10 @@ class Objects {
     return (0)._is(obj, type);
   }
 
+  static compare(obj1: any, obj2: any): number {
+    return (0)._compare(obj1, obj2);
+  }
+
   static areEqual(obj1: any, obj2: any): boolean {
     if (typeof obj1 != "object" || typeof obj2 != "object") return obj1 == obj2;
     if ((obj1 == null) != (obj2 == null)) return false;

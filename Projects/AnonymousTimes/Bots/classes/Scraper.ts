@@ -1,34 +1,36 @@
 import * as colors from "colors";
 import axios from "axios";
-import "@shared/Extensions";
+import "../../../../Shared/Extensions";
 import { Config } from "../../Shared/Config";
-import { RateLimiter } from "@shared/RateLimiter";
+import { RateLimiter } from "../../../../Shared/RateLimiter";
 import { Forum, Thread, Image, Timestamp } from "../../Shared/DataTypes";
 import { ImageScraper } from "./ImageScraper";
-import { FileSystemDatabase } from "@shared/FileSystemDatabase";
+import { FileSystemDatabase } from "../../../../Shared/FileSystemDatabase";
 import { MongoForumDatabase } from "./MongoForumDatabase";
 
 class Scraper {
   private config: Config;
-  private fileSystemDb: FileSystemDatabase;
+  private fileSystemDb!: FileSystemDatabase;
   private db!: MongoForumDatabase;
-  private imageScraper: ImageScraper;
+  private imageScraper!: ImageScraper;
   private rateLimiter: RateLimiter = new RateLimiter();
 
   private constructor(config: Config) {
     this.config = config;
-    this.fileSystemDb = new FileSystemDatabase(config.db.fileSystem.dataDir);
-    this.imageScraper = new ImageScraper(
-      this.fileSystemDb,
-      config.images.download
-    );
   }
 
   static async new(config: Config) {
     const scraper = new Scraper(config);
+    scraper.fileSystemDb = await FileSystemDatabase.new(
+      config.db.fileSystem.dataDir
+    );
     scraper.db = await MongoForumDatabase.new(
       config.db.mongo.connection,
       config.db.mongo.database
+    );
+    scraper.imageScraper = new ImageScraper(
+      scraper.fileSystemDb,
+      config.images.download
     );
     return scraper;
   }

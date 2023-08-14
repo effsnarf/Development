@@ -201,6 +201,7 @@ const color = {
 // #region Interfaces
 interface Number {
   _is(obj: any, type: any): boolean;
+  _compare(obj1: any, obj2: any): number;
   _getObjectType(obj: any): any;
   is(type: any): boolean;
   seconds(): number;
@@ -384,6 +385,46 @@ if (typeof Number !== "undefined") {
     if (objType === null) return obj instanceof type;
     if (objType !== type) return false;
     return true;
+  };
+
+  // #warning This is a hack to save the _is function somewhere we can access it
+  // This is needed because we can't export or import anything from Extensions.ts
+  Number.prototype._compare = function (obj1: any, obj2: any): number {
+    const compare = (obj1: any, obj2: any): number => {
+      if (obj1 === obj2) return 0;
+
+      // Handle numbers
+      if (typeof obj1 === "number" || typeof obj2 === "number") {
+        if (obj1 == undefined) obj1 = 0;
+        if (obj2 == undefined) obj2 = 0;
+        if (typeof obj1 === "number" && typeof obj2 === "number") {
+          return obj1 - obj2;
+        }
+      }
+
+      // Handle strings
+      if (typeof obj1 === "string" && typeof obj2 === "string") {
+        return obj1.localeCompare(obj2);
+      }
+
+      // Handle dates
+      if (obj1 instanceof Date && obj2 instanceof Date) {
+        return obj1.getTime() - obj2.getTime();
+      }
+
+      // Handle arrays
+      if (Array.isArray(obj1) && Array.isArray(obj2)) {
+        if (obj1.length == 1 && obj2.length == 1)
+          return compare(obj1[0], obj2[0]);
+        throw new Error("Arrays are not supported");
+      }
+
+      throw new Error(
+        `Cannot compare ${obj1} (${typeof obj1}) with ${obj2} (${typeof obj2})`
+      );
+    };
+
+    return compare(obj1, obj2);
   };
 
   Number.prototype._getObjectType = function (obj: any) {
@@ -1469,9 +1510,9 @@ if (typeof Array !== "undefined") {
 
   Array.prototype.sortBy = function (...projects: ((item: any) => any)[]) {
     return this.sort((a, b) => {
-      const aVal = projects.map((project) => project(a)).join("/");
-      const bVal = projects.map((project) => project(b)).join("/");
-      return -aVal.localeCompare(bVal);
+      const aVals = projects.map((project) => project(a));
+      const bVals = projects.map((project) => project(b));
+      return (0)._compare(aVals, bVals);
     });
   };
 

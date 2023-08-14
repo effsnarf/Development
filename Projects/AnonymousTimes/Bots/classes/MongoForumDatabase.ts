@@ -1,6 +1,6 @@
-import "@shared/Extensions";
+import "../../../../Shared/Extensions";
 import { Forum, Thread, ThreadTeaser } from "../../Shared/DataTypes";
-import { MongoDatabase } from "@shared/MongoDatabase";
+import { MongoDatabase } from "../../../../Shared/Database/MongoDatabase";
 import { ForumDatabase } from "./ForumDatabase";
 
 class MongoForumDatabase extends ForumDatabase {

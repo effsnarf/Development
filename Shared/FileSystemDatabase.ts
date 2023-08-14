@@ -1,5 +1,6 @@
 import glob from "glob";
 import { Database } from "./Database";
+import { Objects } from "./Extensions.Objects";
 
 const fs = require("fs");
 const path = require("path");

@@ -166,7 +166,7 @@ class OpenAI {
     } catch (ex: any) {
       let msg = ex.response?.data?.error?.message;
       this.log();
-      this.log(msg.red);
+      this.log(msg);
       throw msg || ex;
     } finally {
       this.loading.stop();
