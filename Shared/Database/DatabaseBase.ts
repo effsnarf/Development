@@ -76,7 +76,7 @@ abstract class DatabaseBase {
   ): Promise<any> {
     if (Array.isArray(doc)) {
       const docs = doc;
-      const results = [];
+      const results = [] as any[];
       for (const doc of docs) {
         results.push(
           await this.upsert(
