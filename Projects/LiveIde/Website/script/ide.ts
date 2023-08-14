@@ -292,9 +292,11 @@ const vueIdeCompMixin = {
   // Create an element to host the Vue IDE app
   const el = document.createElement("div");
   el.id = `vue-ide-app-${Date.now()}`;
-  document.body.appendChild(el);
-
-  vueIdeApp.$mount(`#${el.id}`);
+  // When the document is ready, append the element to the body
+  document.addEventListener("DOMContentLoaded", () => {
+    document.body.appendChild(el);
+    vueIdeApp.$mount(`#${el.id}`);
+  });
 
   (window as any).vueIdeApp = vueIdeApp;
 })();
