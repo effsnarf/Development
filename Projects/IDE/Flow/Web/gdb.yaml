@@ -1,11 +1,58 @@
 nodes:
   - id: 1
-    type: panel
-    props:
-      width: 30rem
+    type: flow.layout.view
   - id: 2
-    type: panel
+    type: flow.layout.panel
+    orientation: vertical
+    children:
+      - size:
+          type: size
+          option: percent
+          value: 30
+          is:
+            changing: false
+        nodeID: 3
+      - size:
+          type: size
+          option: percent
+          value: 70
+          is:
+            changing: false
+        nodeID: 7
+  - id: 3
+    type: flow.layout.panel
+    orientation: horizontal
+    children:
+      - size:
+          type: size
+          option: percent
+          value: 50
+          is:
+            changing: false
+        nodeID: 6
+      - size:
+          type: size
+          option: percent
+          value: 50
+          is:
+            changing: false
+        nodeID: null
+  - id: 6
+    type: flow.input.text
+    hint: search…
+    value: null
+  - id: 7
+    type: flow.layout.list
+  - id: 8
+    type: flow.data.variable
+    name: query
+    value: null
 links:
-  - from: 2
+  - id: 4
+    from: 2
     to: 1
     type: inside
+  - id: 9
+    from: 6
+    to: 8
+    type: data.bind

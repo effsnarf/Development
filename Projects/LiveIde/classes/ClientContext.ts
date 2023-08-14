@@ -87,9 +87,6 @@ class ClientContext {
           this.comps.map((c) => c.name),
           name
         ),
-      includeAttribute: (name: string) => {
-        return true;
-      },
       postProcessAttribute: (attr: any[]) => {
         attr = [...attr];
         attr[0] = attr[0].replace(/\bon_/g, "@");

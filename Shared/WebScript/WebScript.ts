@@ -10,7 +10,7 @@ class WebScript {
 
   private static _helpers: any;
 
-  static async getHelpers() {
+  static getHelpers() {
     return Objects.parseYaml(
       fs.readFileSync(path.join(__dirname, "handlebars.helpers.yaml"), "utf8")
     ).helpers;
@@ -22,8 +22,8 @@ class WebScript {
 
   // #endregion
 
-  static async transpile(inputs: any[]) {
-    const helpers = await WebScript.getHelpers();
+  static transpile(inputs: any[]) {
+    const helpers = WebScript.getHelpers();
 
     const context = {
       helpers,
@@ -32,9 +32,6 @@ class WebScript {
           inputs.map((c) => c.name),
           name
         ),
-      includeAttribute: (name: string) => {
-        return true;
-      },
       postProcessAttribute: (attr: any[]) => {
         attr = [...attr];
         attr[0] = attr[0].replace(/\bon_/g, "@");
@@ -44,9 +41,25 @@ class WebScript {
     };
 
     for (const helper of Object.entries(helpers)) {
-      Handlebars.registerHelper(helper[0], (...args) =>
-        eval(helper[1] as string)(context, ...args)
-      );
+      try {
+        const code = helper[1] as string; // Type assertion
+        const func = eval(`(${code})`);
+        Handlebars.registerHelper(helper[0], (...args) => {
+          try {
+            return func(context, ...args);
+          } catch (ex: any) {
+            throw new Error(
+              `Error executing helper ${helper[0]}: ${ex.message}\n\n${args
+                .map((a) => JSON.stringify(a))
+                .join("\n\n")}\n\n${helper[1]}}`
+            );
+          }
+        });
+      } catch (ex: any) {
+        throw new Error(
+          `Error registering helper ${helper[0]}: ${ex.message}\n\n${helper[1]}`
+        );
+      }
     }
 
     WebScript.transpileAllComponents(inputs);

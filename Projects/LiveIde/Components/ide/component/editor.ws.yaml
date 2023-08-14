@@ -36,7 +36,6 @@ methods: null
 watch:
   vueUid: | #js
     function(vueUid) {
-      console.log(this.$root);
       this.component = !vueUid ? null : this.$root.getComponent(vueUid);
     }
   selectedTabIndex: | #js

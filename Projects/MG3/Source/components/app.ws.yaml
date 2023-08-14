@@ -1,15 +1,15 @@
 dom:
-  div:
-    div:
+  div: 
+    div: 
       .site-loading:
         ui.loading:
           v-if: $root.isLoading
       site.header:
         class: site-width
-      div:
+      div: 
         class: header-spacer
     .pages:
-      ":class": "{ 'site-width': true }"
+      ':class': '{ ''site-width'': true }'
       page.test: null
       page.admin.index: null
       page.home: null
@@ -71,7 +71,4 @@ template: >-
   }"
   path="96801.1"><page-test></page-test><page-admin-index></page-admin-index><page-home></page-home><page-catalog></page-catalog><page-thread></page-thread><page-category></page-category><page-builder></page-builder><page-media></page-media><page-generators></page-generators><page-generator></page-generator><page-instance></page-instance></div><div
   class="notifications"
-  path="96801.2"><ui-notifications></ui-notifications></div><ide-css-stylesheet
-  :rules="$root.newCssRules" path="96801.3"></ide-css-stylesheet><div
-  path="96801.4"><ide-component-style v-for="comp in comps" :component="comp"
-  path="96801.4.0"></ide-component-style></div></div>
+  path="96801.2"><ui-notifications></ui-notifications></div></div>

@@ -1,0 +1,16 @@
+dom:
+  div:
+    v-if: node
+    h3:
+      flow.node.title:
+        ':node': node
+    ui.value.any:
+      ':value': node
+props:
+  node: null
+name: flow-node-info
+template: >-
+  <div class="comp-flow-node-info" v-if="node" path="674862170."><h3
+  path="674862170.0"><flow-node-title :node="node"
+  path="674862170.0.0"></flow-node-title></h3><ui-value-any :value="node"
+  path="674862170.1"></ui-value-any></div>

@@ -109,7 +109,6 @@ export default (context: any, dom: any, indent?: number, compName?: string) => {
     const attrs = Object.fromEntries(
       Object.entries(child[1] as any)
         .filter((a) => context.isAttributeName(a[0]))
-        .filter((a) => context.includeAttribute(a[0]))
         .map((a) => context.postProcessAttribute(a))
     );
     const children = Object.fromEntries(

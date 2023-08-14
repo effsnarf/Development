@@ -1,21 +1,21 @@
 helpers:
   or: | #ts
-    (context: any, a: any, b: any) => {
+    (context, a, b) => {
       if (a != undefined) return JSON.stringify(a);
       return JSON.stringify(b);
-    };
+    }
   dom: | #ts
-    (context: any, dom: any, compName: string) => {
+    (context, dom, compName) => {
       return context.toTemplate(context, dom, 0, compName).join("\n");
-    };
+    }
   addCode: | #ts
-    (context: any, methodBody: string, code: string) => {
+    (context, methodBody, code) => {
       if (!methodBody) methodBody = "function() {}";
       methodBody = methodBody.replace(/\{/, `{\n${code}\n`);
       return methodBody;
-    };
+    }
   prefixCssSelectors: | #ts
-    (context: any, compName: string, selectors: string) => {
+    (context, compName, selectors) => {
       const s = [];
       const scopeClass = `comp-${compName.replace(/\./g, "-")}`;
       const classSelectors = selectors.split(',').map(s => s.trim()).filter(s => s.startsWith("."));
@@ -24,8 +24,8 @@ helpers:
       s.push(...classSelectors.map(s => `.${scopeClass} ${s}`));
       s.push(...otherSelectors.map(s => `.${scopeClass} ${s}`));
       return s.join(", ");
-    };
+    }
   unkebabize: | #ts
-    (context: any, str: string) => {
+    (context, str) => {
       return str?.replace(/-/g, ".");
-    };
+    }

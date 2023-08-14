@@ -24,17 +24,24 @@ interface StateChange {
 }
 
 class StateValue {
-  private type: StateValueType;
+  private type!: StateValueType;
   private _value: any;
 
   private constructor(value: any) {
+    if (value == window) throw new Error("Cannot clone window");
+    const storeAsPointer = () => {
+      this._value = () => value;
+      this.type = StateValueType.Pointer;
+    };
+    if (!Objects.isClonable(value)) {
+      storeAsPointer();
+      return;
+    }
     try {
-      if (value == window) throw new Error("Cannot clone window");
       this._value = Objects.clone(value);
       this.type = StateValueType.Cloned;
     } catch (ex) {
-      this._value = () => value;
-      this.type = StateValueType.Pointer;
+      storeAsPointer();
     }
   }
 

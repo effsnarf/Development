@@ -5,6 +5,7 @@
 
 import { msg } from "../util/msg";
 import { Utility } from "../util/utility";
+import { Objects } from "../../../../../Shared/Extensions.Objects.Client";
 import { IdentityProvider } from "../identity-provider/identity-provider";
 import { MemoryDatabase } from "./memory-database";
 

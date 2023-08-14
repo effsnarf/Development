@@ -1,0 +1,47 @@
+dom:
+  div:
+    ui.list:
+      ':items': nodes
+      v-model: selectedNodeIndex
+      @item-hover: hoveredNode=$event.item
+      ':can-select-none': 'true'
+      ':get-item-key': (item) => item.id
+      v-slot: slotProps
+      flow.node.title:
+        ':node': slotProps.item
+props:
+  value: null
+data:
+  selectedNodeIndex: null
+  hoveredNode: null
+computed:
+  nodes: | #js
+    function () {
+      return this.$root.gdb.getAllNodes();
+    }
+  activeNode: | #js
+    function () {
+      return (this.selectedNode || this.hoveredNode);
+    }
+  selectedNode: | #js
+    function () {
+      return this.nodes[this.selectedNodeIndex];
+    }
+watch:
+  activeNode: | #js
+    function (node, oldNode) {
+      this.$emit("input", node);
+      const exceptVues = (v) => (v.$options.name !== "flow-node-title");
+      const oldVues = this.$root.getNodeVues(oldNode).filter(exceptVues);
+      oldVues.forEach(v => v.$el.classList.remove("highlighted"));
+      const vues = this.$root.getNodeVues(node).filter(exceptVues);
+      vues.forEach(v => v.$el.classList.add("highlighted"));
+    }
+style: null
+name: flow-node-list
+template: >-
+  <div class="comp-flow-node-list" path="674947146."><ui-list :items="nodes"
+  v-model="selectedNodeIndex" @item-hover="hoveredNode=$event.item"
+  :can-select-none="true" :get-item-key="(item) =&gt; item.id"
+  v-slot="slotProps" path="674947146.0"><flow-node-title :node="slotProps.item"
+  path="674947146.0.0"></flow-node-title></ui-list></div>

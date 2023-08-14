@@ -109,7 +109,7 @@ li
 
 .highlighted, tr.highlighted > th, tr.highlighted > td
 {
-  border: 2px dashed #ffff0080;
+  border: 2px dashed #ffff0080 !important;
 }
 :not(tr).highlighted
 {

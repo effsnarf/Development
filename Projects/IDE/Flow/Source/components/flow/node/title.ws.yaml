@@ -1,0 +1,30 @@
+dom:
+  ui.title:
+    ':text': title
+    ':icon': getIcon(node)
+props:
+  node: null
+methods:
+  getIcon: | #js
+    function (node) {
+      const type = node.type.split('.').skip(1).join('.');
+      const icons = {
+        "layout.view": "📁",
+        "layout.panel": "📁",
+        "layout.list": "📁",
+        "input.text": "🆎",
+        "data.variable": "🧊"
+      };
+      return icons[type] || "❔";
+    }
+computed:
+  title: | #js
+    function() {
+      if (!this.node) return null;
+      const node = this.node;
+      return (node.name || node.type);
+    }
+name: flow-node-title
+template: >-
+  <ui-title class="comp-flow-node-title" :text="title" :icon="getIcon(node)"
+  path="-544085972."></ui-title>

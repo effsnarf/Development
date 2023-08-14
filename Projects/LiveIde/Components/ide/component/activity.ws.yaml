@@ -25,7 +25,7 @@ dom:
         @mouseleave: () => onMouseLeave(change)
         ide.state.tracker.item:
           ':uid': uid
-          ':icon': '''-'''
+          ':icon': '''✨'''
           ':item': change
           ':key': change.id
 props:
@@ -86,8 +86,6 @@ watch:
 style:
   .checkboxes:
     display: flex
-    filter: grayscale(0.6)
-    opacity: 0.5
 name: ide-component-activity
 template: >-
   <div class="comp-ide-component-activity" path="720218788."><div class="flex
@@ -102,5 +100,5 @@ template: >-
   class="hoverable" v-for="change in visibleChanges" :key="change.id"
   @mouseenter="() =&gt; onMouseEnter(change)" @mouseleave="() =&gt;
   onMouseLeave(change)" path="720218788.1.0"><ide-state-tracker-item :uid="uid"
-  :icon="'-'" :item="change" :key="change.id"
+  :icon="'✨'" :item="change" :key="change.id"
   path="720218788.1.0.0"></ide-state-tracker-item></li></transition-group></div>

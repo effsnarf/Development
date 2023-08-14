@@ -12,7 +12,7 @@ dom:
         div: 
           v-if: (type=='toggle')
           .clickable:
-            v-text: (options[valueIndex]||'[-]')
+            v-text: getOptionText(valueIndex)
             @click: toggleValue($event, +1)
             @contextmenu: toggleValue($event, -1)
         select:
@@ -64,6 +64,14 @@ methods:
       const isQueryFilter = (this.query && this.query.length) ? this.__getItemText(item).toLowerCase().includes(this.query.toLowerCase()) : true;
       const isOptionVisibleFilter = this.isOptionVisible ? this.isOptionVisible(item) : true;
       return isQueryFilter && isOptionVisibleFilter;
+    }
+  getOptionText: | #js
+    function(index) {
+      let s = this.options[index];
+      if (this.getItemText) s = this.getItemText(s);
+      if (this.itemIcon) s = `${this.itemIcon} ${s}`;
+      if (this.type === "toggle") s = `[ ${s} ]`;
+      return s;
     }
   onItemHover: | #js
     function(e) {
@@ -124,6 +132,8 @@ watch:
     }
 name: ui-select
 style:
+  div:
+    white-space: nowrap
   .list-container:
     max-height: 30em;
     overflow-x: hidden;
@@ -137,6 +147,7 @@ style:
   .clickable:
     text-align: center
     user-select: none
+    padding: 0 0.5em
   .clickable:hover:
     background: '#ffffff20'
 template: >-
@@ -146,7 +157,7 @@ template: >-
   :hint="searchHint" v-model="query" path="-1442841194.0.0"></ui-text-box><div
   class="list-container" path="-1442841194.0.1"><div v-if="(type=='toggle')"
   path="-1442841194.0.1.0"><div class="clickable"
-  v-text="(options[valueIndex]||'[-]')" @click="toggleValue($event, +1)"
+  v-text="getOptionText(valueIndex)" @click="toggleValue($event, +1)"
   @contextmenu="toggleValue($event, -1)"
   path="-1442841194.0.1.0.0"></div></div><select v-if="(type=='dropdown')"
   :value="valueIndex" @input="onInput(parseInt($event.target.value))"

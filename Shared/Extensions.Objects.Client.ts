@@ -23,13 +23,44 @@ class Objects {
     return true;
   }
 
+  static eval(str: string): any {
+    try {
+      return eval(str);
+    } catch (ex: any) {
+      throw new Error(`Error evaluating expression:\n\n${str}\n\n${ex.stack}`);
+    }
+  }
+
   static clone(obj: any): any {
     if (obj == null || obj == undefined || typeof obj != "object") return obj;
+    if (obj instanceof Date) return new Date(obj.getTime());
+    if (obj instanceof RegExp) return new RegExp(obj.source, obj.flags);
     try {
       return Objects.json.parse(JSON.stringify(obj));
     } catch (ex) {
       throw ex;
     }
+  }
+
+  // JSDoc documentation
+  /**
+   * Return whether the object is clonable.
+   * @param obj The object to check.
+   * @returns true, false, or undefined if the object is clonable, not clonable, or unknown.
+   **/
+  static isClonable(obj: any): boolean | undefined {
+    if (obj == null || obj == undefined) return true;
+    if (Objects.is(obj, String)) return true;
+    if (Objects.is(obj, Number)) return true;
+    if (Objects.is(obj, Boolean)) return true;
+    if (Objects.is(obj, Date)) return true;
+    if (Objects.is(obj, RegExp)) return true;
+    if (Objects.is(obj, Function)) return false;
+    if (Objects.is(obj, Array)) return (obj as any[]).every(Objects.isClonable);
+
+    if (obj instanceof Element) return false;
+
+    return undefined;
   }
 
   static subtract(target: any, source: any): any {

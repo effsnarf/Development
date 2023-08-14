@@ -1,0 +1,19 @@
+dom:
+  ul:
+    li:
+      v-for: i in 5
+props:
+  node: null
+style:
+  ul:
+    display: flex
+    flex-direction: column
+    gap: 0.2em
+  li:
+    min-height: 2em
+    border: 2px dashed gray
+    background: '#ffffff20'
+name: flow-layout-list
+template: >-
+  <ul class="comp-flow-layout-list" path="1843248162."><li v-for="i in 5"
+  path="1843248162.0"></li></ul>

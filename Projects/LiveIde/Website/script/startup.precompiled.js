@@ -298,9 +298,6 @@ class ClientContext {
         this.compilation.context = {
             helpers: this.helpers,
             isAttributeName: (name) => this.isAttributeName(this.comps.map((c) => c.name), name),
-            includeAttribute: (name) => {
-                return true;
-            },
             postProcessAttribute: (attr) => {
                 attr = [...attr];
                 attr[0] = attr[0].replace(/\bon_/g, "@");
@@ -3067,15 +3064,22 @@ class StateValue {
     type;
     _value;
     constructor(value) {
+        if (value == window)
+            throw new Error("Cannot clone window");
+        const storeAsPointer = () => {
+            this._value = () => value;
+            this.type = StateValueType.Pointer;
+        };
+        if (!Extensions_Objects_Client_1.Objects.isClonable(value)) {
+            storeAsPointer();
+            return;
+        }
         try {
-            if (value == window)
-                throw new Error("Cannot clone window");
             this._value = Extensions_Objects_Client_1.Objects.clone(value);
             this.type = StateValueType.Cloned;
         }
         catch (ex) {
-            this._value = () => value;
-            this.type = StateValueType.Pointer;
+            storeAsPointer();
         }
     }
     static from(value) {
@@ -3623,6 +3627,121 @@ exports.DataWatcher = DataWatcher;
 
 /***/ }),
 
+/***/ "../../../../Shared/Database/GraphDatabase.ts":
+/*!****************************************************!*\
+  !*** ../../../../Shared/Database/GraphDatabase.ts ***!
+  \****************************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.GraphDatabase = void 0;
+const findArg = (condition, ...args) => {
+    if (typeof condition == "string") {
+        const type = condition;
+        condition = (arg) => typeof arg == type;
+    }
+    const predicate = condition;
+    const arg = args.find((a) => predicate(a));
+    return arg;
+};
+var Graph;
+(function (Graph) {
+    class Database {
+        data;
+        nodes;
+        links;
+        // #region nextID
+        // Property that maps to this.data.nextID
+        get nextID() {
+            return this.data.nextID;
+        }
+        set nextID(value) {
+            this.data.nextID = value;
+        }
+        // #endregion
+        // #region Constructor
+        constructor(data) {
+            this.data = data;
+            this.nodes = data.nodes;
+            this.links = data.links;
+            const Vue = window?.Vue;
+            if (Vue) {
+                for (const node of this.nodes) {
+                    if ("value" in node) {
+                        Vue.watch(() => node.value, (value) => this.onNodeChange(node, "value", value));
+                    }
+                }
+            }
+        }
+        static async new(data) {
+            return new Database(data);
+        }
+        // #endregion
+        onNodeChange(node, key, value) {
+            const targetNodes = this.getNodes(node, "data.bind");
+            for (const targetNode of targetNodes) {
+                targetNode[key] = value;
+            }
+        }
+        getAllNodes() {
+            return [...this.nodes];
+        }
+        getNodes(a, b) {
+            const fromOrTo = this.fromOrTo(a, b);
+            const oppFromOrTo = this.getOppositeFromOrTo(fromOrTo);
+            const links = this.getLinks(a, b);
+            const nodes = links.map((l) => this.getNode(l[oppFromOrTo]));
+            return nodes;
+        }
+        getLinks(a, b) {
+            const fromOrTo = this.fromOrTo(a, b);
+            const type = findArg("string", a, b);
+            const node = findArg("object", a, b);
+            if (!node)
+                return [];
+            const links = this.links.filter((l) => l.type == type && l[fromOrTo] == node.id);
+            return links;
+        }
+        getNode(id) {
+            if (!id)
+                return null;
+            const node = this.nodes.find((n) => n.id == id);
+            return node;
+        }
+        fromOrTo(a, b) {
+            if (typeof a !== "string") {
+                return "from";
+            }
+            else {
+                return "to";
+            }
+        }
+        getOppositeFromOrTo(fromOrTo) {
+            if (fromOrTo == "from") {
+                return "to";
+            }
+            else {
+                return "from";
+            }
+        }
+        getTypeArg(a, b) {
+            if (typeof a !== "string") {
+                return a.type;
+            }
+            else {
+                return b;
+            }
+        }
+    }
+    Graph.Database = Database;
+})(Graph || (Graph = {}));
+const GraphDatabase = Graph.Database;
+exports.GraphDatabase = GraphDatabase;
+
+
+/***/ }),
+
 /***/ "../../../../Shared/Extensions.Objects.Client.ts":
 /*!*******************************************************!*\
   !*** ../../../../Shared/Extensions.Objects.Client.ts ***!
@@ -3655,15 +3774,54 @@ class Objects {
         }
         return true;
     }
+    static eval(str) {
+        try {
+            return eval(str);
+        }
+        catch (ex) {
+            throw new Error(`Error evaluating expression:\n\n${str}\n\n${ex.stack}`);
+        }
+    }
     static clone(obj) {
         if (obj == null || obj == undefined || typeof obj != "object")
             return obj;
+        if (obj instanceof Date)
+            return new Date(obj.getTime());
+        if (obj instanceof RegExp)
+            return new RegExp(obj.source, obj.flags);
         try {
             return Objects.json.parse(JSON.stringify(obj));
         }
         catch (ex) {
             throw ex;
         }
+    }
+    // JSDoc documentation
+    /**
+     * Return whether the object is clonable.
+     * @param obj The object to check.
+     * @returns true, false, or undefined if the object is clonable, not clonable, or unknown.
+     **/
+    static isClonable(obj) {
+        if (obj == null || obj == undefined)
+            return true;
+        if (Objects.is(obj, String))
+            return true;
+        if (Objects.is(obj, Number))
+            return true;
+        if (Objects.is(obj, Boolean))
+            return true;
+        if (Objects.is(obj, Date))
+            return true;
+        if (Objects.is(obj, RegExp))
+            return true;
+        if (Objects.is(obj, Function))
+            return false;
+        if (Objects.is(obj, Array))
+            return obj.every(Objects.isClonable);
+        if (obj instanceof Element)
+            return false;
+        return undefined;
     }
     static subtract(target, source) {
         if (Array.isArray(target) && Array.isArray(source)) {
@@ -5033,6 +5191,9 @@ if (typeof Array !== "undefined") {
         const itemKeys = items.map(getItemKey);
         return this.filter((item) => !itemKeys.includes(getItemKey(item)));
     };
+    Array.prototype.exceptLast = function (count) {
+        return this.slice(0, this.length - count);
+    };
     Array.prototype.sortBy = function (...projects) {
         return this.sort((a, b) => {
             const aVal = projects.map((project) => project(a)).join("/");
@@ -5330,6 +5491,8 @@ exports["default"] = (context, compName, dom) => {
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports["default"] = (componentNames, name) => {
+    if (name.startsWith("v-"))
+        return true;
     if (name.includes("@"))
         return true;
     if (name.includes("."))
@@ -5494,7 +5657,6 @@ exports["default"] = (context, dom, indent, compName) => {
         }
         const attrs = Object.fromEntries(Object.entries(child[1])
             .filter((a) => context.isAttributeName(a[0]))
-            .filter((a) => context.includeAttribute(a[0]))
             .map((a) => context.postProcessAttribute(a)));
         const children = Object.fromEntries(Object.entries(child[1]).filter((a) => !context.isAttributeName(a[0])));
         s.push(domNode(tag, attrs, indent));
@@ -5542,7 +5704,7 @@ var __webpack_exports__ = {};
 (() => {
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/Website/script/1691734828256.ts ***!
+  !*** ../../../LiveIde/Website/script/1691998971020.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -5554,6 +5716,7 @@ const ClientContext_1 = __webpack_require__(/*! ../../Classes/ClientContext */ "
 const Params_1 = __webpack_require__(/*! ../../Classes/Params */ "../../../LiveIde/Classes/Params.ts");
 const DbpClient_1 = __webpack_require__(/*! ../../../../Apps/DatabaseProxy/Client/DbpClient */ "../../../../Apps/DatabaseProxy/Client/DbpClient.ts");
 const VueManager_1 = __webpack_require__(/*! ../../Classes/VueManager */ "../../../LiveIde/Classes/VueManager.ts");
+const GraphDatabase_1 = __webpack_require__(/*! ../../../../Shared/Database/GraphDatabase */ "../../../../Shared/Database/GraphDatabase.ts");
 // To make it accessible to client code
 const win = window;
 win.Objects = Extensions_Objects_Client_1.Objects;
@@ -5685,11 +5848,150 @@ const mgHelpers = {
             }
         },
     });
+    client.Vue.directive("show-parent-hover", {
+        inserted(el) {
+            // Initially hide the element
+            el.style.opacity = "0";
+            el.style.transition = "opacity 0.1s ease";
+            // Define the mouseover and mouseout handlers
+            const mouseoverHandler = () => {
+                el.style.opacity = "1";
+            };
+            const mouseoutHandler = () => {
+                el.style.opacity = "0";
+            };
+            // Get a reference to the parent element
+            const parent = el.parentElement;
+            // Attach the handlers to the parent element
+            parent?.addEventListener("mouseover", mouseoverHandler);
+            parent?.addEventListener("mouseout", mouseoutHandler);
+            // Store the handlers and parent on the element so they can be removed later
+            el._mouseoverHandler = mouseoverHandler;
+            el._mouseoutHandler = mouseoutHandler;
+            el._parentElement = parent;
+        },
+        unbind(el) {
+            // Retrieve the handlers and parent from the element
+            const mouseoverHandler = el._mouseoverHandler;
+            const mouseoutHandler = el._mouseoutHandler;
+            const parent = el._parentElement;
+            // Remove the handlers
+            parent?.removeEventListener("mouseover", mouseoverHandler);
+            parent?.removeEventListener("mouseout", mouseoutHandler);
+        },
+    });
+    client.Vue.directive("drag", {
+        bind(el, binding) {
+            let isDragging = false;
+            let startX = 0;
+            let startY = 0;
+            const handleMouseDown = (event) => {
+                isDragging = true;
+                startX = event.clientX;
+                startY = event.clientY;
+            };
+            const handleMouseMove = (event) => {
+                if (!isDragging)
+                    return;
+                const deltaX = event.clientX - startX;
+                const deltaY = event.clientY - startY;
+                // Call the provided handler with the deltas
+                if (typeof binding.value === "function") {
+                    binding.value({ deltaX: deltaX, deltaY: deltaY });
+                }
+                startX = event.clientX;
+                startY = event.clientY;
+            };
+            const handleMouseUp = () => {
+                isDragging = false;
+            };
+            el.addEventListener("mousedown", handleMouseDown);
+            document.addEventListener("mousemove", handleMouseMove);
+            document.addEventListener("mouseup", handleMouseUp);
+            // Store the handlers on the element so they can be removed later
+            el._handleMouseDown = handleMouseDown;
+            el._handleMouseMove = handleMouseMove;
+            el._handleMouseUp = handleMouseUp;
+        },
+        unbind(el) {
+            // Remove the handlers when the directive is unbound
+            el.removeEventListener("mousedown", el._handleMouseDown);
+            document.removeEventListener("mousemove", el._handleMouseMove);
+            document.removeEventListener("mouseup", el._handleMouseUp);
+        },
+    });
+    client.Vue.directive("hover", {
+        bind(el, binding) {
+            // Handler for mouseover event
+            const handleMouseOver = () => {
+                if (typeof binding.value === "function") {
+                    binding.value(true); // Call the provided function with true
+                }
+            };
+            // Handler for mouseout event
+            const handleMouseOut = () => {
+                if (typeof binding.value === "function") {
+                    binding.value(false); // Call the provided function with false
+                }
+            };
+            // Add the event listeners
+            el.addEventListener("mouseover", handleMouseOver);
+            el.addEventListener("mouseout", handleMouseOut);
+            // Store the handlers on the element so they can be removed later
+            el._handleMouseOver = handleMouseOver;
+            el._handleMouseOut = handleMouseOut;
+        },
+        unbind(el) {
+            // Remove the event listeners when the directive is unbound
+            el.removeEventListener("mouseover", el._handleMouseOver);
+            el.removeEventListener("mouseout", el._handleMouseOut);
+        },
+    });
+    client.Vue.directive("follow-mouse", {
+        bind(el, binding) {
+            const isEnabled = binding.value === true || binding.value === "true";
+            if (!isEnabled)
+                return;
+            el.style.transition = "none";
+            // Function to update the position of the element
+            const updatePosition = (event) => {
+                const rect = el.offsetParent?.getBoundingClientRect();
+                if (rect) {
+                    const x = event.clientX - rect.left;
+                    const y = event.clientY - rect.top;
+                    el.style.position = "absolute";
+                    el.style.left = x + "px";
+                    el.style.top = y + "px";
+                    el.style.transform = "translate(1rem, -50%)";
+                    el.style.pointerEvents = "none";
+                }
+            };
+            // Add the mousemove listener
+            document.addEventListener("mousemove", updatePosition);
+            // Store the handler on the element so it can be removed later
+            el._updatePosition = updatePosition;
+        },
+        update(el, binding) {
+            const isEnabled = binding.value === true || binding.value === "true";
+            if (isEnabled) {
+                document.addEventListener("mousemove", el._updatePosition);
+            }
+            else {
+                document.removeEventListener("mousemove", el._updatePosition);
+                el.style.pointerEvents = "auto";
+            }
+        },
+        unbind(el) {
+            document.removeEventListener("mousemove", el._updatePosition);
+        },
+    });
     await client.compileAll();
     let vueApp = null;
     const isLocalHost = window.location.hostname == "localhost";
     const dbpHost = `https://db.memegenerator.net`;
     const dbp = (await DbpClient_1.DatabaseProxy.new(`${dbpHost}/MemeGenerator`));
+    const gdbData = await (await fetch(`/gdb.yaml`)).json();
+    const gdb = await GraphDatabase_1.GraphDatabase.new(gdbData);
     const getNewParams = async () => {
         return (await Params_1.Params.new(() => vueApp, client.config.params, window.location.pathname));
     };
@@ -5706,6 +6008,7 @@ const mgHelpers = {
             vm: vueManager,
             client,
             dbp,
+            gdb,
             analytics: await AnalyticsTracker_1.AnalyticsTracker.new(),
             params: params,
             url: mgHelpers.url,
@@ -6267,6 +6570,18 @@ const mgHelpers = {
                     top: offset - 200,
                     behavior: "smooth",
                 });
+            },
+            getGdbCompName(node, defaultName) {
+                if (!node)
+                    return defaultName?.kebabize();
+                return `${node.type.kebabize()}`;
+            },
+            getNodeVues(node) {
+                if (!node)
+                    return [];
+                const self = this;
+                const vues = self.vm.getDescendants(this, (v) => v.$props?.node?.id == node.id);
+                return vues;
             },
         },
         watch: {

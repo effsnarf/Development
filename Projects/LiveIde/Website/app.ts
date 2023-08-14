@@ -13,6 +13,7 @@ import { DatabaseProxy } from "../../../Apps/DatabaseProxy/Client/DbpClient";
 import { MemoryCache } from "@shared/Cache";
 import { Analytics, ItemType } from "@shared/Analytics";
 import isAttributeName from "@shared/WebScript/is.attribute.name";
+import { FlowScript } from "@shared/FlowScript";
 
 Configuration.log = false;
 
@@ -281,7 +282,9 @@ const _fetchAsJson = async (url: string) => {
 
   //console.log("staticFileFolders", staticFileFolders);
 
-  const handler = !config.handler ? null : eval(`(${config.handler})`);
+  const handler = !config.handler
+    ? null
+    : eval(`(${config.handler})`)({ Objects, process, path, fs, FlowScript });
 
   const httpServer = await HttpServer.new(
     config.title,

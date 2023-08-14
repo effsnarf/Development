@@ -4,8 +4,10 @@ project:
   folder: (env) => env.path.resolve(env.process.cwd(), '../../../Source')
 webscript:
   folder: (env) => env.path.join(env.process.cwd(), "../../../../../Shared/WebScript")
-website:
-  folder: (env) => env.path.resolve(env.process.cwd(), '../../../../LiveIde/Website')
+liveIde:
+  folder: (env) => env.path.resolve(env.process.cwd(), '../../../../LiveIde')
+static:
+  folder: (env) => env.process.cwd()
 analytics:
   prod:
     database:

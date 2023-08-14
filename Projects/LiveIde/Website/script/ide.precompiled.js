@@ -72,9 +72,6 @@ class ClientContext {
         this.compilation.context = {
             helpers: this.helpers,
             isAttributeName: (name) => this.isAttributeName(this.comps.map((c) => c.name), name),
-            includeAttribute: (name) => {
-                return true;
-            },
             postProcessAttribute: (attr) => {
                 attr = [...attr];
                 attr[0] = attr[0].replace(/\bon_/g, "@");
@@ -2791,15 +2788,22 @@ class StateValue {
     type;
     _value;
     constructor(value) {
+        if (value == window)
+            throw new Error("Cannot clone window");
+        const storeAsPointer = () => {
+            this._value = () => value;
+            this.type = StateValueType.Pointer;
+        };
+        if (!Extensions_Objects_Client_1.Objects.isClonable(value)) {
+            storeAsPointer();
+            return;
+        }
         try {
-            if (value == window)
-                throw new Error("Cannot clone window");
             this._value = Extensions_Objects_Client_1.Objects.clone(value);
             this.type = StateValueType.Cloned;
         }
         catch (ex) {
-            this._value = () => value;
-            this.type = StateValueType.Pointer;
+            storeAsPointer();
         }
     }
     static from(value) {
@@ -3379,15 +3383,54 @@ class Objects {
         }
         return true;
     }
+    static eval(str) {
+        try {
+            return eval(str);
+        }
+        catch (ex) {
+            throw new Error(`Error evaluating expression:\n\n${str}\n\n${ex.stack}`);
+        }
+    }
     static clone(obj) {
         if (obj == null || obj == undefined || typeof obj != "object")
             return obj;
+        if (obj instanceof Date)
+            return new Date(obj.getTime());
+        if (obj instanceof RegExp)
+            return new RegExp(obj.source, obj.flags);
         try {
             return Objects.json.parse(JSON.stringify(obj));
         }
         catch (ex) {
             throw ex;
         }
+    }
+    // JSDoc documentation
+    /**
+     * Return whether the object is clonable.
+     * @param obj The object to check.
+     * @returns true, false, or undefined if the object is clonable, not clonable, or unknown.
+     **/
+    static isClonable(obj) {
+        if (obj == null || obj == undefined)
+            return true;
+        if (Objects.is(obj, String))
+            return true;
+        if (Objects.is(obj, Number))
+            return true;
+        if (Objects.is(obj, Boolean))
+            return true;
+        if (Objects.is(obj, Date))
+            return true;
+        if (Objects.is(obj, RegExp))
+            return true;
+        if (Objects.is(obj, Function))
+            return false;
+        if (Objects.is(obj, Array))
+            return obj.every(Objects.isClonable);
+        if (obj instanceof Element)
+            return false;
+        return undefined;
     }
     static subtract(target, source) {
         if (Array.isArray(target) && Array.isArray(source)) {
@@ -4757,6 +4800,9 @@ if (typeof Array !== "undefined") {
         const itemKeys = items.map(getItemKey);
         return this.filter((item) => !itemKeys.includes(getItemKey(item)));
     };
+    Array.prototype.exceptLast = function (count) {
+        return this.slice(0, this.length - count);
+    };
     Array.prototype.sortBy = function (...projects) {
         return this.sort((a, b) => {
             const aVal = projects.map((project) => project(a)).join("/");
@@ -5085,6 +5131,8 @@ exports["default"] = (context, compName, dom) => {
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports["default"] = (componentNames, name) => {
+    if (name.startsWith("v-"))
+        return true;
     if (name.includes("@"))
         return true;
     if (name.includes("."))
@@ -5249,7 +5297,6 @@ exports["default"] = (context, dom, indent, compName) => {
         }
         const attrs = Object.fromEntries(Object.entries(child[1])
             .filter((a) => context.isAttributeName(a[0]))
-            .filter((a) => context.includeAttribute(a[0]))
             .map((a) => context.postProcessAttribute(a)));
         const children = Object.fromEntries(Object.entries(child[1]).filter((a) => !context.isAttributeName(a[0])));
         s.push(domNode(tag, attrs, indent));
@@ -5297,7 +5344,7 @@ var __webpack_exports__ = {};
 (() => {
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/Website/script/1691735381867.ts ***!
+  !*** ../../../LiveIde/Website/script/1691998971012.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -5321,85 +5368,88 @@ const vueIdeCompMixin = {
         self._vueIde = {
             methodDatas: {},
         };
-        // Watch all data properties
-        Object.keys(self.$data).forEach((key) => {
-            self.$watch(key, {
-                handler: async (newVal, oldVal) => {
-                    await waitUntilInit();
-                    const change = vueIdeApp.state.track(self, "d", key, newVal, oldVal);
-                    vueIdeApp.$emit("state-changed", change);
-                },
-                immediate: true,
-                deep: true,
+        const watchInIde = false;
+        if (watchInIde) {
+            // Watch all data properties
+            Object.keys(self.$data).forEach((key) => {
+                self.$watch(key, {
+                    handler: async (newVal, oldVal) => {
+                        await waitUntilInit();
+                        const change = vueIdeApp.state.track(self, "d", key, newVal, oldVal);
+                        vueIdeApp.$emit("state-changed", change);
+                    },
+                    immediate: true,
+                    deep: true,
+                });
             });
-        });
-        // Watch all props
-        Object.keys(self.$props).forEach((key) => {
-            self.$watch(key, {
-                handler: async (newVal, oldVal) => {
-                    await waitUntilInit();
-                    const change = vueIdeApp.state.track(self, "p", key, newVal, oldVal);
-                    vueIdeApp.$emit("state-changed", change);
-                },
-                immediate: true,
-                deep: true,
+            // Watch all props
+            Object.keys(self.$props).forEach((key) => {
+                self.$watch(key, {
+                    handler: async (newVal, oldVal) => {
+                        await waitUntilInit();
+                        const change = vueIdeApp.state.track(self, "p", key, newVal, oldVal);
+                        vueIdeApp.$emit("state-changed", change);
+                    },
+                    immediate: true,
+                    deep: true,
+                });
             });
-        });
-        // Watch all computed properties
-        Object.keys(self.$options.computed).forEach((key) => {
-            self.$watch(key, {
-                handler: async (newVal, oldVal) => {
-                    await waitUntilInit();
-                    const change = vueIdeApp.state.track(self, "c", key, newVal, oldVal);
-                    vueIdeApp.$emit("state-changed", change);
-                },
-                immediate: true,
-                deep: true,
+            // Watch all computed properties
+            Object.keys(self.$options.computed).forEach((key) => {
+                self.$watch(key, {
+                    handler: async (newVal, oldVal) => {
+                        await waitUntilInit();
+                        const change = vueIdeApp.state.track(self, "c", key, newVal, oldVal);
+                        vueIdeApp.$emit("state-changed", change);
+                    },
+                    immediate: true,
+                    deep: true,
+                });
             });
-        });
-        // Watch all methods
-        Object.keys(self.$options.methods).forEach((methodName) => {
-            const originalMethod = self[methodName];
-            const isAsync = originalMethod.constructor.name == "AsyncFunction";
-            const methodKey = `${self._uid}.${methodName}`;
-            const methodDatas = self._vueIde.methodDatas;
-            const methodData = (methodDatas[methodKey] = methodDatas[methodKey] || {
-                invokes: 0,
-                track: true,
-            });
-            const trackInvokes = () => {
-                methodData.invokes++;
-                if (methodData.invokes > 100) {
-                    methodData.track = false;
-                    console.warn(`Method ${compName}.${methodName} invoked more than 100 times. Tracking disabled.`);
-                }
-            };
-            if (isAsync) {
-                self[methodName] = async function (...args) {
-                    if (!methodData.track)
-                        return originalMethod.apply(self, args);
-                    trackInvokes();
-                    await waitUntilInit();
-                    const result = await originalMethod.apply(self, args);
-                    const change = vueIdeApp.state.track(self, "m", methodName, null);
-                    //vueIdeApp.$emit("state-changed", change);
-                    return result;
+            // Watch all methods
+            Object.keys(self.$options.methods).forEach((methodName) => {
+                const originalMethod = self[methodName];
+                const isAsync = originalMethod.constructor.name == "AsyncFunction";
+                const methodKey = `${self._uid}.${methodName}`;
+                const methodDatas = self._vueIde.methodDatas;
+                const methodData = (methodDatas[methodKey] = methodDatas[methodKey] || {
+                    invokes: 0,
+                    track: true,
+                });
+                const trackInvokes = () => {
+                    methodData.invokes++;
+                    if (methodData.invokes > 100) {
+                        methodData.track = false;
+                        console.warn(`Method ${compName}.${methodName} invoked more than 100 times. Tracking disabled.`);
+                    }
                 };
-            }
-            else {
-                self[methodName] = function (...args) {
-                    if (!methodData.track)
-                        return originalMethod.apply(self, args);
-                    trackInvokes();
-                    const result = originalMethod.apply(self, args);
-                    if (vueIdeApp) {
+                if (isAsync) {
+                    self[methodName] = async function (...args) {
+                        if (!methodData.track)
+                            return originalMethod.apply(self, args);
+                        trackInvokes();
+                        await waitUntilInit();
+                        const result = await originalMethod.apply(self, args);
                         const change = vueIdeApp.state.track(self, "m", methodName, null);
                         //vueIdeApp.$emit("state-changed", change);
-                    }
-                    return result;
-                };
-            }
-        });
+                        return result;
+                    };
+                }
+                else {
+                    self[methodName] = function (...args) {
+                        if (!methodData.track)
+                            return originalMethod.apply(self, args);
+                        trackInvokes();
+                        const result = originalMethod.apply(self, args);
+                        if (vueIdeApp) {
+                            const change = vueIdeApp.state.track(self, "m", methodName, null);
+                            //vueIdeApp.$emit("state-changed", change);
+                        }
+                        return result;
+                    };
+                }
+            });
+        }
     },
     mounted() {
         taskQueue.enqueue(async () => {

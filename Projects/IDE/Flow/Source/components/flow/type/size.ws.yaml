@@ -1,0 +1,81 @@
+dom:
+  .dimension-line:
+    ':class':
+      - orientation
+    ui.context.window:
+      ':visible': $refs.slider1?.contextIsVisible
+      h3:
+        v-if: 'false'
+        class: opacity-50
+        v-text: widthOrHeight
+      transition:
+        name: slide
+        .value:
+          v-if: (value.option == 'percent')
+          span:
+            v-text: Math.round(value.value)
+          .unit:
+            class: unit
+            v-text: '''%'''
+      ui.select:
+        ':options': '[''percent'', ''auto'', ''min-content'', ''max-content'', ''fit-content'']'
+        v-model: value.option
+        input-type: value
+    ui.input.slider:
+      ref: slider1
+      v-model: value.value
+      @input: $emit('change')
+      @changing: value.is.changing = $event
+      ':orientation': orientation
+props:
+  value: null
+  orientation: null
+computed:
+  widthOrHeight: | #js
+    function () {
+      return (this.orientation === 'horizontal') ? 'Width' : 'Height';
+    }
+style:
+  .dimension-line:
+    position: absolute
+    background-color: '#ffffff30'
+    border-radius: 0
+    z-index: 10
+  .dimension-line.horizontal:
+    width: 100%
+    height: 1em
+    top: 50%
+    transform: translate(0, -50%)
+  .dimension-line.vertical:
+    width: 1em
+    height: 100%
+    left: 50%
+    transform: translate(-50%)
+  .value:
+    display: flex
+    width: fit-content
+    margin: auto
+    color: white
+    font-size: 2.5em
+    font-weight: bold
+    user-select: none
+  .unit:
+    opacity: 0.3
+    font-size: 80%
+name: flow-type-size
+template: >-
+  <div class="comp-flow-type-size dimension-line" :class="orientation"
+  path="728707445."><ui-context-window
+  :visible="$refs.slider1?.contextIsVisible" path="728707445.0"><h3
+  class="opacity-50" v-if="false" v-text="widthOrHeight"
+  path="728707445.0.0"></h3><transition name="slide" path="728707445.0.1"><div
+  class="value" v-if="(value.option == 'percent')" path="728707445.0.1.0"><span
+  v-text="Math.round(value.value)" path="728707445.0.1.0.0"></span><div
+  class="unit unit" v-text="'%'"
+  path="728707445.0.1.0.1"></div></div></transition><ui-select
+  :options="['percent', 'auto', 'min-content', 'max-content', 'fit-content']"
+  v-model="value.option" input-type="value"
+  path="728707445.0.2"></ui-select></ui-context-window><ui-input-slider
+  ref="slider1" v-model="value.value" @input="$emit('change')"
+  @changing="value.is.changing = $event" :orientation="orientation"
+  path="728707445.1"></ui-input-slider></div>

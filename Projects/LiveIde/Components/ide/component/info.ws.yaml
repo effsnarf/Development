@@ -136,7 +136,6 @@ watch:
     function(newItem, oldItem) {
       const newVue = (!newItem) ? null : this.$root.vues[newItem.uid]();
       const oldVue = (!oldItem) ? null : this.$root.vues[oldItem.uid]();
-      console.log(newVue);
       newVue?.$el.classList.add("highlighted2");
       oldVue?.$el.classList.remove("highlighted2");
     }

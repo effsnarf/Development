@@ -24,90 +24,112 @@ const vueIdeCompMixin = {
       methodDatas: {},
     };
 
-    // Watch all data properties
-    Object.keys(self.$data).forEach((key) => {
-      self.$watch(key, {
-        handler: async (newVal: any, oldVal: any) => {
-          await waitUntilInit();
-          const change = vueIdeApp.state.track(self, "d", key, newVal, oldVal);
-          vueIdeApp.$emit("state-changed", change);
-        },
-        immediate: true,
-        deep: true,
-      });
-    });
+    const watchInIde = false;
 
-    // Watch all props
-    Object.keys(self.$props).forEach((key) => {
-      self.$watch(key, {
-        handler: async (newVal: any, oldVal: any) => {
-          await waitUntilInit();
-          const change = vueIdeApp.state.track(self, "p", key, newVal, oldVal);
-          vueIdeApp.$emit("state-changed", change);
-        },
-        immediate: true,
-        deep: true,
-      });
-    });
-
-    // Watch all computed properties
-    Object.keys(self.$options.computed).forEach((key) => {
-      self.$watch(key, {
-        handler: async (newVal: any, oldVal: any) => {
-          await waitUntilInit();
-          const change = vueIdeApp.state.track(self, "c", key, newVal, oldVal);
-          vueIdeApp.$emit("state-changed", change);
-        },
-        immediate: true,
-        deep: true,
-      });
-    });
-
-    // Watch all methods
-    Object.keys(self.$options.methods).forEach((methodName) => {
-      const originalMethod = self[methodName];
-      const isAsync = originalMethod.constructor.name == "AsyncFunction";
-
-      const methodKey = `${self._uid}.${methodName}`;
-      const methodDatas = self._vueIde.methodDatas;
-      const methodData = (methodDatas[methodKey] = methodDatas[methodKey] || {
-        invokes: 0,
-        track: true,
+    if (watchInIde) {
+      // Watch all data properties
+      Object.keys(self.$data).forEach((key) => {
+        self.$watch(key, {
+          handler: async (newVal: any, oldVal: any) => {
+            await waitUntilInit();
+            const change = vueIdeApp.state.track(
+              self,
+              "d",
+              key,
+              newVal,
+              oldVal
+            );
+            vueIdeApp.$emit("state-changed", change);
+          },
+          immediate: true,
+          deep: true,
+        });
       });
 
-      const trackInvokes = () => {
-        methodData.invokes++;
-        if (methodData.invokes > 100) {
-          methodData.track = false;
-          console.warn(
-            `Method ${compName}.${methodName} invoked more than 100 times. Tracking disabled.`
-          );
-        }
-      };
+      // Watch all props
+      Object.keys(self.$props).forEach((key) => {
+        self.$watch(key, {
+          handler: async (newVal: any, oldVal: any) => {
+            await waitUntilInit();
+            const change = vueIdeApp.state.track(
+              self,
+              "p",
+              key,
+              newVal,
+              oldVal
+            );
+            vueIdeApp.$emit("state-changed", change);
+          },
+          immediate: true,
+          deep: true,
+        });
+      });
 
-      if (isAsync) {
-        self[methodName] = async function (...args: any[]) {
-          if (!methodData.track) return originalMethod.apply(self, args);
-          trackInvokes();
-          await waitUntilInit();
-          const result = await originalMethod.apply(self, args);
-          const change = vueIdeApp.state.track(self, "m", methodName, null);
-          //vueIdeApp.$emit("state-changed", change);
-          return result;
+      // Watch all computed properties
+      Object.keys(self.$options.computed).forEach((key) => {
+        self.$watch(key, {
+          handler: async (newVal: any, oldVal: any) => {
+            await waitUntilInit();
+            const change = vueIdeApp.state.track(
+              self,
+              "c",
+              key,
+              newVal,
+              oldVal
+            );
+            vueIdeApp.$emit("state-changed", change);
+          },
+          immediate: true,
+          deep: true,
+        });
+      });
+
+      // Watch all methods
+      Object.keys(self.$options.methods).forEach((methodName) => {
+        const originalMethod = self[methodName];
+        const isAsync = originalMethod.constructor.name == "AsyncFunction";
+
+        const methodKey = `${self._uid}.${methodName}`;
+        const methodDatas = self._vueIde.methodDatas;
+        const methodData = (methodDatas[methodKey] = methodDatas[methodKey] || {
+          invokes: 0,
+          track: true,
+        });
+
+        const trackInvokes = () => {
+          methodData.invokes++;
+          if (methodData.invokes > 100) {
+            methodData.track = false;
+            console.warn(
+              `Method ${compName}.${methodName} invoked more than 100 times. Tracking disabled.`
+            );
+          }
         };
-      } else {
-        self[methodName] = function (...args: any[]) {
-          if (!methodData.track) return originalMethod.apply(self, args);
-          trackInvokes();
-          const result = originalMethod.apply(self, args);
-          if (vueIdeApp) {
+
+        if (isAsync) {
+          self[methodName] = async function (...args: any[]) {
+            if (!methodData.track) return originalMethod.apply(self, args);
+            trackInvokes();
+            await waitUntilInit();
+            const result = await originalMethod.apply(self, args);
             const change = vueIdeApp.state.track(self, "m", methodName, null);
             //vueIdeApp.$emit("state-changed", change);
-          }
-          return result;
-        };
-      }
-    });
+            return result;
+          };
+        } else {
+          self[methodName] = function (...args: any[]) {
+            if (!methodData.track) return originalMethod.apply(self, args);
+            trackInvokes();
+            const result = originalMethod.apply(self, args);
+            if (vueIdeApp) {
+              const change = vueIdeApp.state.track(self, "m", methodName, null);
+              //vueIdeApp.$emit("state-changed", change);
+            }
+            return result;
+          };
+        }
+      });
+    }
   },
   mounted() {
     taskQueue.enqueue(async () => {

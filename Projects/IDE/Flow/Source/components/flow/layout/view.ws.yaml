@@ -1,0 +1,22 @@
+dom:
+  .view:
+    component:
+      v-for: node in childNodes
+      ':is': $root.getGdbCompName(node)
+      ':node': node
+props:
+  node: null
+computed:
+  childNodes: | #js
+    function () {
+      return this.$root.gdb.getNodes("inside", this.node);
+    }
+style:
+  .view:
+    aspect-ratio: 4 / 5
+    height: 50vh
+name: flow-layout-view
+template: >-
+  <div class="comp-flow-layout-view view" path="1843545641."><component
+  v-for="node in childNodes" :is="$root.getGdbCompName(node)" :node="node"
+  path="1843545641.0"></component></div>

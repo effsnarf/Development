@@ -1,18 +1,19 @@
 dom:
-  transition.group:
-    tag: ul
-    name: list
-    ':class': getMainCssClass()
-    li:
-      v-for: indexedItem in visibleItems
-      ':key': _getItemKey(indexedItem.item)
-      ':class': getCssClass(indexedItem.index)
-      slot:
-        ':index': indexedItem.index
-        ':item': indexedItem.item
-      @mouseenter: () => onItemHover(indexedItem)
-      @mouseleave: '() => onItemHover({ item: null, index: null })'
-      @click: () => onItemClick(indexedItem)
+  div:
+    transition.group:
+      tag: ul
+      name: list
+      ':class': getMainCssClass()
+      li:
+        v-for: indexedItem in visibleItems
+        ':key': _getItemKey(indexedItem.item)
+        ':class': getCssClass(indexedItem.index)
+        slot:
+          ':index': indexedItem.index
+          ':item': indexedItem.item
+        @mouseenter: () => onItemHover(indexedItem)
+        @mouseleave: '() => onItemHover({ item: null, index: null })'
+        @click: () => onItemClick(indexedItem)
 props:
   items: null
   selectedIndex: null
@@ -20,6 +21,8 @@ props:
   isItemVisible: null
   getItemKey: null
   canSelectNone: true
+data:
+  mySelectedIndex: null
 methods:
   _isItemVisible: | #js
     function(item) {
@@ -46,14 +49,15 @@ methods:
     }
   onItemClick: | #js
     function(e) {
-      const newIndex = (e.index == this.selectedIndex) ? null : e.index;
+      const newIndex = (e.index == this.mySelectedIndex) ? null : e.index;
       if ((newIndex == null) && !this.canSelectNone) return;
+      this.mySelectedIndex = newIndex;
       this.$emit('input', newIndex);
     }
   getCssClass: | #js
     function(index) {
       return {
-        selected: (index == this.selectedIndex),
+        selected: (index == this.mySelectedIndex),
       };
     }
 computed:
@@ -68,17 +72,24 @@ computed:
     }
   index: | #js
     function() {
-      return this.selectedIndex;
+      return this.mySelectedIndex;
     }
   item: | #js
     function() {
       if (!this.items) return null;
-      return this.items[this.selectedIndex];
+      return this.items[this.mySelectedIndex];
     }
   value: | #js
     function() {
-      return this.selectedIndex;
+      return this.mySelectedIndex;
     }
+watch:
+  selectedIndex:
+    handler: | #js
+      function() {
+        this.mySelectedIndex = this.selectedIndex;
+      }
+    immediate: true
 name: ui-list
 style:
   .horizontal:
@@ -88,11 +99,12 @@ style:
     flex-grow: 1
     text-align: center
 template: >-
-  <transition-group class="comp-ui-list" tag="ul" name="list"
-  :class="getMainCssClass()" path="-484386888."><li v-for="indexedItem in
-  visibleItems" :key="_getItemKey(indexedItem.item)"
+  <div class="comp-ui-list" path="-484386888."><transition-group tag="ul"
+  name="list" :class="getMainCssClass()" path="-484386888.0"><li
+  v-for="indexedItem in visibleItems" :key="_getItemKey(indexedItem.item)"
   :class="getCssClass(indexedItem.index)" @mouseenter="() =&gt;
   onItemHover(indexedItem)" @mouseleave="() =&gt; onItemHover({ item: null,
   index: null })" @click="() =&gt; onItemClick(indexedItem)"
-  path="-484386888.0"><slot :index="indexedItem.index" :item="indexedItem.item"
-  path="-484386888.0.0"></slot></li></transition-group>
+  path="-484386888.0.0"><slot :index="indexedItem.index"
+  :item="indexedItem.item"
+  path="-484386888.0.0.0"></slot></li></transition-group></div>

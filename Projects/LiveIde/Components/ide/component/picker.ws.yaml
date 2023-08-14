@@ -10,54 +10,52 @@ dom:
       ':global': true
       ':visible': showPicker
       @pinned: onPinned
-      template:
-        v-slot: content
-        .flex.flex-row.gap-1:
-          .flex.flex-column.gap-1:
-            div: 
-              ':class': componentTreeClass
-              transition.group: 
-                tag: div
-                name: list2
-                class: parent-chain
-                div: 
-                  v-for: uid in parentChainUIDs
-                  ':key': uid
-                  ide.component.title: 
-                    ':item': $root.vm.vues[uid]
-                    ':class': '{ ''selected'': uid === selectedVueUID }'
-                    @mouseenter: onMouseEnterVue(uid)
-                    @mouseleave: onMouseLeaveVue(uid)
-                    @click: selectVue(uid)
-              transition.group: 
-                tag: div
-                name: list2
-                class: child-chain
-                div: 
-                  v-for: uid in childChainUIDs
-                  ':key': uid
-                  ide.component.title: 
-                    ':item': $root.vm.vues[uid]
-                    ':class': '{ ''selected'': uid === selectedVueUID }'
-                    @mouseenter: onMouseEnterVue(uid)
-                    @mouseleave: onMouseLeaveVue(uid)
-                    @click: selectVue(uid)
-            ide.element.inspector:
-              class: hidden
-              ':element': hoveredElement
-          h2:
-            v-if: 'false'
-            ui.title:
-              icon: 📦
-              ':text': getTitle(hoveredVueUID)
-          transition:
-            name: slide-hor
-            div: 
-              v-show: selectedVueUID
-              ide.component.editor:
-                ':vue-uid': (selectedVueUID||hoveredVueUID)
-                @selected-view-node: selectedViewNode=$event
-                @selected-tab-index: selectedEditorTabIndex=$event
+      .flex.flex-row.gap-1:
+        .flex.flex-column.gap-1:
+          div: 
+            ':class': componentTreeClass
+            transition.group: 
+              tag: div
+              name: list2
+              class: parent-chain
+              div: 
+                v-for: uid in parentChainUIDs
+                ':key': uid
+                ide.component.title: 
+                  ':item': $root.vm.vues[uid]
+                  ':class': '{ ''selected'': uid === selectedVueUID }'
+                  @mouseenter: onMouseEnterVue(uid)
+                  @mouseleave: onMouseLeaveVue(uid)
+                  @click: selectVue(uid)
+            transition.group: 
+              tag: div
+              name: list2
+              class: child-chain
+              div: 
+                v-for: uid in childChainUIDs
+                ':key': uid
+                ide.component.title: 
+                  ':item': $root.vm.vues[uid]
+                  ':class': '{ ''selected'': uid === selectedVueUID }'
+                  @mouseenter: onMouseEnterVue(uid)
+                  @mouseleave: onMouseLeaveVue(uid)
+                  @click: selectVue(uid)
+          ide.element.inspector:
+            class: hidden
+            ':element': hoveredElement
+        h2:
+          v-if: 'false'
+          ui.title:
+            icon: 📦
+            ':text': getTitle(hoveredVueUID)
+        transition:
+          name: slide-hor
+          div: 
+            v-show: selectedVueUID
+            ide.component.editor:
+              ':vue-uid': (selectedVueUID||hoveredVueUID)
+              @selected-view-node: selectedViewNode=$event
+              @selected-tab-index: selectedEditorTabIndex=$event
 props: null
 data:
   hoveredElement: null
@@ -250,30 +248,30 @@ template: >-
   @hovered-element="onHoveredElement" :global="true"
   path="-646340253.1"></ui-mouse><ui-context-window ref="context1"
   :global="true" :visible="showPicker" @pinned="onPinned"
-  path="-646340253.2"><template v-slot:content path="-646340253.2.0"><div
-  class="flex flex-row gap-1" path="-646340253.2.0.0"><div class="flex
-  flex-column gap-1" path="-646340253.2.0.0.0"><div :class="componentTreeClass"
-  path="-646340253.2.0.0.0.0"><transition-group class="parent-chain" tag="div"
-  name="list2" path="-646340253.2.0.0.0.0.0"><div v-for="uid in parentChainUIDs"
-  :key="uid" path="-646340253.2.0.0.0.0.0.0"><ide-component-title
+  path="-646340253.2"><div class="flex flex-row gap-1"
+  path="-646340253.2.0"><div class="flex flex-column gap-1"
+  path="-646340253.2.0.0"><div :class="componentTreeClass"
+  path="-646340253.2.0.0.0"><transition-group class="parent-chain" tag="div"
+  name="list2" path="-646340253.2.0.0.0.0"><div v-for="uid in parentChainUIDs"
+  :key="uid" path="-646340253.2.0.0.0.0.0"><ide-component-title
   :item="$root.vm.vues[uid]" :class="{ 'selected': uid === selectedVueUID }"
   @mouseenter="onMouseEnterVue(uid)" @mouseleave="onMouseLeaveVue(uid)"
   @click="selectVue(uid)"
-  path="-646340253.2.0.0.0.0.0.0.0"></ide-component-title></div></transition-group><transition-group
-  class="child-chain" tag="div" name="list2" path="-646340253.2.0.0.0.0.1"><div
+  path="-646340253.2.0.0.0.0.0.0"></ide-component-title></div></transition-group><transition-group
+  class="child-chain" tag="div" name="list2" path="-646340253.2.0.0.0.1"><div
   v-for="uid in childChainUIDs" :key="uid"
-  path="-646340253.2.0.0.0.0.1.0"><ide-component-title
-  :item="$root.vm.vues[uid]" :class="{ 'selected': uid === selectedVueUID }"
+  path="-646340253.2.0.0.0.1.0"><ide-component-title :item="$root.vm.vues[uid]"
+  :class="{ 'selected': uid === selectedVueUID }"
   @mouseenter="onMouseEnterVue(uid)" @mouseleave="onMouseLeaveVue(uid)"
   @click="selectVue(uid)"
-  path="-646340253.2.0.0.0.0.1.0.0"></ide-component-title></div></transition-group></div><ide-element-inspector
+  path="-646340253.2.0.0.0.1.0.0"></ide-component-title></div></transition-group></div><ide-element-inspector
   class="hidden" :element="hoveredElement"
-  path="-646340253.2.0.0.0.1"></ide-element-inspector></div><h2 v-if="false"
-  path="-646340253.2.0.0.1"><ui-title icon="📦" :text="getTitle(hoveredVueUID)"
-  path="-646340253.2.0.0.1.0"></ui-title></h2><transition name="slide-hor"
-  path="-646340253.2.0.0.2"><div v-show="selectedVueUID"
-  path="-646340253.2.0.0.2.0"><ide-component-editor
+  path="-646340253.2.0.0.1"></ide-element-inspector></div><h2 v-if="false"
+  path="-646340253.2.0.1"><ui-title icon="📦" :text="getTitle(hoveredVueUID)"
+  path="-646340253.2.0.1.0"></ui-title></h2><transition name="slide-hor"
+  path="-646340253.2.0.2"><div v-show="selectedVueUID"
+  path="-646340253.2.0.2.0"><ide-component-editor
   :vue-uid="(selectedVueUID||hoveredVueUID)"
   @selected-view-node="selectedViewNode=$event"
   @selected-tab-index="selectedEditorTabIndex=$event"
-  path="-646340253.2.0.0.2.0.0"></ide-component-editor></div></transition></div></template></ui-context-window></div>
+  path="-646340253.2.0.2.0.0"></ide-component-editor></div></transition></div></ui-context-window></div>

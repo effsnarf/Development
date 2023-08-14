@@ -1,0 +1,65 @@
+dom:
+  .panel:
+    ':style': getPanelStyle(node)
+    v-if: node
+    div:
+      v-for: (child, index) in node.children
+      ':style': getChildStyle(child.size)
+      flow.type.size:
+        v-model: child.size
+        v-show-parent-hover: true
+        @change: onChildSizeChange(child, index)
+        ':orientation': node.orientation
+      component:
+        ':is': >-
+          $root.getGdbCompName($root.gdb.getNode(child.nodeID),
+          'flow.layout.panel.empty')
+        ':node': $root.gdb.getNode(child.nodeID)
+props:
+  node: null
+computed:
+  childNodes: | #js
+    function () {
+      return this.$root.gdb.getNodes("inside", this.node);
+    }
+methods:
+  onChildSizeChange: | #js
+    function (child, index) {
+      const otherChild = this.node.children[1 - index];
+      otherChild.size.value = (100 - child.size.value);
+    }
+  getPanelStyle: | #js
+    function (node) {
+      const style = {};
+      style["flex-direction"] = (node.orientation === "horizontal") ? "row" : "column";
+      return style;
+    }
+  getChildStyle: | #js
+    function (size) {
+      const style = {};
+      const widthOrHeight = (this.node.orientation === "horizontal") ? "width" : "height";
+      style[widthOrHeight] = (size.option === "percent") ? `${size.value}%` : size.option;
+      return style;
+    }
+style:
+  .panel:
+    display: flex
+    height: 100%
+  .panel:hover > div:
+    transition: width 0s, height 0s
+  .panel, .panel > div:
+    border: 2px dashed gray
+  .panel > div:
+    margin: 0.5em
+    background-color: '#ffffff30'
+name: flow-layout-panel
+template: >-
+  <div class="comp-flow-layout-panel panel" :style="getPanelStyle(node)"
+  v-if="node" path="1309568768."><div v-for="(child, index) in node.children"
+  :style="getChildStyle(child.size)" path="1309568768.0"><flow-type-size
+  v-model="child.size" v-show-parent-hover="true"
+  @change="onChildSizeChange(child, index)" :orientation="node.orientation"
+  path="1309568768.0.0"></flow-type-size><component
+  :is="$root.getGdbCompName($root.gdb.getNode(child.nodeID),
+  'flow.layout.panel.empty')" :node="$root.gdb.getNode(child.nodeID)"
+  path="1309568768.0.1"></component></div></div>

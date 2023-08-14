@@ -351,6 +351,7 @@ interface Array<T> {
   distinct(project?: ((item: T) => any) | null): T[];
   except(...items: T[]): T[];
   exceptBy(items: T[], getItemKey?: (item: T) => any): T[];
+  exceptLast(count: number): T[];
   sortBy(...projects: ((item: T) => any)[]): T[];
   sortByDesc(...projects: ((item: T) => any)[]): T[];
   stringify(): string;
@@ -1460,6 +1461,10 @@ if (typeof Array !== "undefined") {
     if (!getItemKey) getItemKey = (item) => item;
     const itemKeys = items.map(getItemKey);
     return this.filter((item) => !itemKeys.includes((getItemKey as any)(item)));
+  };
+
+  Array.prototype.exceptLast = function (count: number) {
+    return this.slice(0, this.length - count);
   };
 
   Array.prototype.sortBy = function (...projects: ((item: any) => any)[]) {

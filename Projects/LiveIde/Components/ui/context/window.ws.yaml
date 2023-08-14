@@ -25,14 +25,12 @@ dom:
                 v-if: (showTitle) && (icon || title)
                 ui.mouse: 
                   @right-click: onRightClick
-                slot: 
-                  h3:
-                    ui.title:
-                      ':icon': icon
-                      ':text': title
+                h3:
+                  ui.title:
+                    ':icon': icon
+                    ':text': title
             div: 
-              slot: 
-                name: content
+              slot: null
               component:
                 v-if: itemType
                 ':is': itemType
@@ -101,7 +99,6 @@ methods:
     }
   onRightClick: | #js
     function(e, global) {
-      if (!e.ctrlKey) return;
       if (!this.isVisible) return;
       // We unpin it by right clicking the title
       // Global right click is ignored if the menu is pinned
@@ -158,6 +155,7 @@ watch:
 style:
   .close-button:
     float: right
+    margin: '-0.5em -1.5rem'
     opacity: 0.3
     cursor: pointer
     z-index: 100
@@ -169,8 +167,7 @@ style:
     display: block
   .context-menu:
     display: none
-    min-width: 20rem
-    padding: 1rem
+    padding: 1rem 2rem 1rem 1rem
     background: 'linear-gradient(to right, #303030, #101010)'
     box-shadow: '-12px 12px 6px #000000'
     opacity: 0.7
@@ -203,11 +200,9 @@ template: >-
   path="1458497449.1.0.0.1"><transition name="slide"
   path="1458497449.1.0.0.1.0"><h2 v-if="(showTitle) &amp;&amp; (icon || title)"
   path="1458497449.1.0.0.1.0.0"><ui-mouse @right-click="onRightClick"
-  path="1458497449.1.0.0.1.0.0.0"></ui-mouse><slot
-  path="1458497449.1.0.0.1.0.0.1"><h3
-  path="1458497449.1.0.0.1.0.0.1.0"><ui-title :icon="icon" :text="title"
-  path="1458497449.1.0.0.1.0.0.1.0.0"></ui-title></h3></slot></h2></transition><div
-  path="1458497449.1.0.0.1.1"><slot name="content"
-  path="1458497449.1.0.0.1.1.0"></slot><component v-if="itemType" :is="itemType"
-  v-bind="bindProps"
+  path="1458497449.1.0.0.1.0.0.0"></ui-mouse><h3
+  path="1458497449.1.0.0.1.0.0.1"><ui-title :icon="icon" :text="title"
+  path="1458497449.1.0.0.1.0.0.1.0"></ui-title></h3></h2></transition><div
+  path="1458497449.1.0.0.1.1"><slot></slot><component v-if="itemType"
+  :is="itemType" v-bind="bindProps"
   path="1458497449.1.0.0.1.1.1"></component></div></ui-mouse></div></div></transition></div>

@@ -12,23 +12,21 @@ dom:
       ':icon': icon
       ':title': contextElement?.tagName.toLowerCase()
       @pinned: onPinned
-      template:
-        v-slot: content
-        .flex.gap-2:
-          div: 
-            ui.tree:
-              ':root': contextTree
-              ':initial-expanded': 10
-              ':expandable': 'false'
-              item-type: ide.element.tree.node
-              ':get-item': '(node) => (!node?.el ? null : node.el())'
-              ':get-children': (node) => node.children
-              @node-hover: onNodeHover
-              @node-unhover: onNodeUnhover
-              @node-select: onNodeSelect
-          div: 
-            ide.css.editor:
-              ':context-element': contextElement
+      .flex.gap-2:
+        div: 
+          ui.tree:
+            ':root': contextTree
+            ':initial-expanded': 10
+            ':expandable': 'false'
+            item-type: ide.element.tree.node
+            ':get-item': '(node) => (!node?.el ? null : node.el())'
+            ':get-children': (node) => node.children
+            @node-hover: onNodeHover
+            @node-unhover: onNodeUnhover
+            @node-select: onNodeSelect
+        div: 
+          ide.css.editor:
+            ':context-element': contextElement
 props:
   icon: ❔
   title: null
@@ -132,12 +130,11 @@ template: >-
   path="-549121148.1"></ui-mouse><ui-context-window ref="context1"
   :global="true" :visible="isTriggerPressed" :icon="icon"
   :title="contextElement?.tagName.toLowerCase()" @pinned="onPinned"
-  path="-549121148.2"><template v-slot:content path="-549121148.2.0"><div
-  class="flex gap-2" path="-549121148.2.0.0"><div
-  path="-549121148.2.0.0.0"><ui-tree :root="contextTree" :initial-expanded="10"
+  path="-549121148.2"><div class="flex gap-2" path="-549121148.2.0"><div
+  path="-549121148.2.0.0"><ui-tree :root="contextTree" :initial-expanded="10"
   :expandable="false" item-type="ide.element.tree.node" :get-item="(node) =&gt;
   (!node?.el ? null : node.el())" :get-children="(node) =&gt; node.children"
   @node-hover="onNodeHover" @node-unhover="onNodeUnhover"
-  @node-select="onNodeSelect" path="-549121148.2.0.0.0.0"></ui-tree></div><div
-  path="-549121148.2.0.0.1"><ide-css-editor :context-element="contextElement"
-  path="-549121148.2.0.0.1.0"></ide-css-editor></div></div></template></ui-context-window></div>
+  @node-select="onNodeSelect" path="-549121148.2.0.0.0"></ui-tree></div><div
+  path="-549121148.2.0.1"><ide-css-editor :context-element="contextElement"
+  path="-549121148.2.0.1.0"></ide-css-editor></div></div></ui-context-window></div>
