@@ -207,7 +207,7 @@ class HttpServer {
           fileContent = `<!DOCTYPE html>\n${fileContent}`;
           for (const key of Object.keys(templateData)) {
             fileContent = fileContent.replace(
-              new RegExp(`(((${key})))`, "g"),
+              new RegExp(`(((${key})))`.escapeRegExp(), "g"),
               JSON.stringify(templateData[key])
             );
           }

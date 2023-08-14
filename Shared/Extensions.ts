@@ -317,6 +317,8 @@ interface String {
   decodeBase64(): string;
   hashCode(): number;
 
+  escapeRegExp(): string;
+
   parseEnum<T>(enumType: T): T[keyof T] | null;
 }
 
@@ -1283,6 +1285,10 @@ if (typeof String !== "undefined") {
       hash = hash & hash; // Convert to 32-bit integer
     }
     return hash;
+  };
+
+  String.prototype.escapeRegExp = function (): string {
+    return this.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
   };
 
   // Case insensitive

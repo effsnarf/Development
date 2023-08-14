@@ -4662,6 +4662,9 @@ if (typeof String !== "undefined") {
         }
         return hash;
     };
+    String.prototype.escapeRegExp = function () {
+        return this.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
+    };
     // Case insensitive
     String.prototype.parseEnum = function (enumType) {
         const str = this.toString();
@@ -5383,7 +5386,7 @@ var __webpack_exports__ = {};
 (() => {
 var exports = __webpack_exports__;
 /*!***********************************************************!*\
-  !*** ../../../../LiveIde/Website/script/1692039642652.ts ***!
+  !*** ../../../../LiveIde/Website/script/1692040838972.ts ***!
   \***********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
