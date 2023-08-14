@@ -13,6 +13,11 @@ interface Config {
   };
   images: {
     download: boolean;
+    take: {
+      per: {
+        thread: number;
+      };
+    };
   };
 }
 

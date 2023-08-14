@@ -8,3 +8,6 @@ db:
     database: AnonymousTimes
 images:
   download: true
+  take:
+    per:
+      thread: 5
