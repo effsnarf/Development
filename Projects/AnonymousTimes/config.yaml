@@ -2,7 +2,7 @@ fourChan:
   boards: [fit]
 db:
   fileSystem:
-    dataDir: ../../Data
+    dataDir: ../Data
   mongo:
     connection: mongodb://localhost:27017
     database: AnonymousTimes
