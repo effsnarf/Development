@@ -154,8 +154,10 @@ class Scraper {
       count: posts.length,
       items: posts,
     };
-    // Download any images
-    for (const post of posts.filter((p) => p.image))
+    // Download several first images
+    for (const post of posts
+      .filter((p) => p.image)
+      .take(this.config.images.take.per.thread))
       this.imageScraper.enqueue(thread.forum, post.image);
   }
 
