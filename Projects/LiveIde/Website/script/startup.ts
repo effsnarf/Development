@@ -308,7 +308,10 @@ interface MgParams {
 
   const dbp = (await DatabaseProxy.new(`${dbpHost}/MemeGenerator`)) as any;
 
-  const gdbData = await (await fetch(`/gdb.yaml`)).json();
+  const gdbData = await Objects.try(
+    async () => await (await fetch(`/gdb.yaml`)).json(),
+    { nodes: [], links: [] }
+  );
   const gdb = await GraphDatabase.new(gdbData);
 
   const getNewParams = async () => {

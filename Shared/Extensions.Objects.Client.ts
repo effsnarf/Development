@@ -303,11 +303,12 @@ class Objects {
     return Objects.map(obj, (key, value) => [key, func(value)]);
   }
 
-  static try(func: Function, onCatch: (ex: any) => void) {
+  static async try(func: Function, onCatch: any | ((ex: any) => void)) {
     try {
-      return func();
+      return await func();
     } catch (ex) {
-      onCatch(ex);
+      if (typeof onCatch === "function") return await onCatch(ex);
+      return onCatch;
     }
   }
 

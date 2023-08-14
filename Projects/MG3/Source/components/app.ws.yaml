@@ -23,6 +23,13 @@ dom:
       page.instance: null
     .notifications:
       ui.notifications: null
+    div: 
+      ide.css.stylesheet:
+        ':rules': $root.newCssRules
+      div: 
+        ide.component.style:
+          v-for: comp in $root.comps
+          ':component': comp
 props:
   comps: null
 name: app
@@ -71,4 +78,8 @@ template: >-
   }"
   path="96801.1"><page-test></page-test><page-admin-index></page-admin-index><page-home></page-home><page-catalog></page-catalog><page-thread></page-thread><page-category></page-category><page-builder></page-builder><page-media></page-media><page-generators></page-generators><page-generator></page-generator><page-instance></page-instance></div><div
   class="notifications"
-  path="96801.2"><ui-notifications></ui-notifications></div></div>
+  path="96801.2"><ui-notifications></ui-notifications></div><div
+  path="96801.3"><ide-css-stylesheet :rules="$root.newCssRules"
+  path="96801.3.0"></ide-css-stylesheet><div
+  path="96801.3.1"><ide-component-style v-for="comp in $root.comps"
+  :component="comp" path="96801.3.1.0"></ide-component-style></div></div></div>

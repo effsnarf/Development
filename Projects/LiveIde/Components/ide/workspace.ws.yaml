@@ -24,12 +24,6 @@ dom:
         v-if: (selectedEditor == 'component')
       ide.element.picker:
         v-if: (selectedEditor == 'css')
-      ide.css.stylesheet:
-        ':rules': $root.newCssRules
-      div: 
-        ide.component.style:
-          v-for: comp in $root.comps
-          ':component': comp
 props: null
 data:
   showWorkspace: false
@@ -71,8 +65,4 @@ template: >-
   v-if="(selectedEditor == 'component')"
   path="-1163457967.0.2"></ide-component-picker><ide-element-picker
   v-if="(selectedEditor == 'css')"
-  path="-1163457967.0.3"></ide-element-picker><ide-css-stylesheet
-  :rules="$root.newCssRules" path="-1163457967.0.4"></ide-css-stylesheet><div
-  path="-1163457967.0.5"><ide-component-style v-for="comp in $root.comps"
-  :component="comp"
-  path="-1163457967.0.5.0"></ide-component-style></div></div></div>
+  path="-1163457967.0.3"></ide-element-picker></div></div>
