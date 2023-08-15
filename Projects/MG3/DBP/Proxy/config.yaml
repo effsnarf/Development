@@ -87,3 +87,8 @@ rotate:
   nodes:
     prod: true
     dev: false
+process:
+  restart:
+    periodically:
+      from: 00:00
+      every: 30m
