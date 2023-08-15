@@ -20,6 +20,8 @@ style:
   .center, .post-menu:
     display: flex
     justify-content: center
+  .center > div, .post-menu > div:
+    width: fit-content
 name: e-post-menu
 template: >-
   <div class="comp-e-post-menu" path="404353956."><div class="center"
