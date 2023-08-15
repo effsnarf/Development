@@ -41,6 +41,10 @@ mounted: | #js
     this.$root.$on("thread-updated", this.onThreadUpdated.bind(this));
   }
 methods:
+  ensureInited: | #js
+    function() {
+      if (!this.tasks) this.tasks = new TaskQueue();
+    }
   onThreadUpdated: | #js
     async function(threadID, threadMediaID) {
       if (threadMediaID != this.dThreadMedia?._id) return;
@@ -65,7 +69,7 @@ methods:
     }
   reload: | #js
     async function() {
-      if (!this.tasks) this.tasks = new TaskQueue();
+      await this.ensureInited();
       this.isLoading++;
       this.tasks.enqueue(this._reload);
     }

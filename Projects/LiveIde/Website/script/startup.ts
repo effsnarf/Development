@@ -2,6 +2,7 @@ import "../../../../Shared/Extensions";
 import { HtmlHelper } from "../../Classes/HtmlHelper";
 import { Component } from "../../Classes/Component";
 import { Objects } from "../../../../Shared/Extensions.Objects.Client";
+import { TaskQueue } from "../../../../Shared/TaskQueue";
 import { AnalyticsTracker } from "../../Classes/AnalyticsTracker";
 import { ClientContext } from "../../Classes/ClientContext";
 import { Params } from "../../Classes/Params";
@@ -12,6 +13,7 @@ import { GraphDatabase } from "../../../../Shared/Database/GraphDatabase";
 // To make it accessible to client code
 const win = window as any;
 win.Objects = Objects;
+win.TaskQueue = TaskQueue;
 
 const mgHelpers = {
   url: {

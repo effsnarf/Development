@@ -27,6 +27,10 @@ data:
   defaultGenerator: null
   isLoading: false
   generatorsQueue: null
+created: |
+  async function() {
+    this.generatorsQueue = new TaskQueue();
+  }
 mounted: | #js
   async function() {
     await this.init();
@@ -34,6 +38,7 @@ mounted: | #js
 methods:
   search: | #js
     async function(query) {
+      if (!this.generatorsQueue) this.generatorsQueue = new TaskQueue();
       this.generatorsQueue.enqueue(async () => {
         try
         {
@@ -59,7 +64,6 @@ methods:
     }
   init: | #js
     async function () {
-      this.generatorsQueue = new TaskQueue();
       await this.search(this.query);
     }
   onClick: | #js

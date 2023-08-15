@@ -5407,6 +5407,37 @@ exports.RepeatingTaskQueue = RepeatingTaskQueue;
 
 /***/ }),
 
+/***/ "../../../../../Shared/TaskQueue.ts":
+/*!******************************************!*\
+  !*** ../../../../../Shared/TaskQueue.ts ***!
+  \******************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.TaskQueue = void 0;
+// Enqueue async tasks and run them in order
+class TaskQueue {
+    tasks = [];
+    constructor() {
+        this.next();
+    }
+    enqueue(task) {
+        this.tasks.push(task);
+    }
+    async next() {
+        const task = this.tasks.shift();
+        if (task)
+            await task();
+        const delay = this.tasks.length ? 0 : 100;
+        setTimeout(this.next.bind(this), delay);
+    }
+}
+exports.TaskQueue = TaskQueue;
+
+
+/***/ }),
+
 /***/ "../../../../../Shared/TwoWayMap.ts":
 /*!******************************************!*\
   !*** ../../../../../Shared/TwoWayMap.ts ***!
@@ -5746,13 +5777,14 @@ var __webpack_exports__ = {};
 (() => {
 var exports = __webpack_exports__;
 /*!***********************************************************!*\
-  !*** ../../../../LiveIde/Website/script/1692040839554.ts ***!
+  !*** ../../../../LiveIde/Website/script/1692070950594.ts ***!
   \***********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 __webpack_require__(/*! ../../../../Shared/Extensions */ "../../../../../Shared/Extensions.ts");
 const HtmlHelper_1 = __webpack_require__(/*! ../../Classes/HtmlHelper */ "../../../../LiveIde/Classes/HtmlHelper.ts");
 const Extensions_Objects_Client_1 = __webpack_require__(/*! ../../../../Shared/Extensions.Objects.Client */ "../../../../../Shared/Extensions.Objects.Client.ts");
+const TaskQueue_1 = __webpack_require__(/*! ../../../../Shared/TaskQueue */ "../../../../../Shared/TaskQueue.ts");
 const AnalyticsTracker_1 = __webpack_require__(/*! ../../Classes/AnalyticsTracker */ "../../../../LiveIde/Classes/AnalyticsTracker.ts");
 const ClientContext_1 = __webpack_require__(/*! ../../Classes/ClientContext */ "../../../../LiveIde/Classes/ClientContext.ts");
 const Params_1 = __webpack_require__(/*! ../../Classes/Params */ "../../../../LiveIde/Classes/Params.ts");
@@ -5762,6 +5794,7 @@ const GraphDatabase_1 = __webpack_require__(/*! ../../../../Shared/Database/Grap
 // To make it accessible to client code
 const win = window;
 win.Objects = Extensions_Objects_Client_1.Objects;
+win.TaskQueue = TaskQueue_1.TaskQueue;
 const mgHelpers = {
     url: {
         thread: (thread, full = false) => {
