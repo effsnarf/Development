@@ -35,6 +35,7 @@ analytics:
         database: MG-Analytics
 cache:
   ignore:
+    - /api/Medias/
     - /api/Threads/
     - /api/Posts/
     - /api/Instances/
@@ -87,3 +88,8 @@ rotate:
   nodes:
     prod: true
     dev: false
+process:
+  restart:
+    periodically:
+      from: 00:00
+      every: 30m
