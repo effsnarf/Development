@@ -1,5 +1,6 @@
 dom:
   .slider:
+    ':style': '{ cursor: ''n-resize'' }'
     @mouseenter: contextIsVisible++
     @mouseleave: contextIsVisible--
     @mousedown: onMouseDown
@@ -24,8 +25,13 @@ methods:
     }
   onDrag: | #js
     function (e) {
-      const delta = e.deltaY;
+      const delta = false ? -e.deltaX : e.deltaY;
       this.$emit("input", (this.value - delta * 0.3), this.value);
+    }
+computed:
+  isHorizontal: | #js
+    function () {
+      return (this.orientation === "horizontal");
     }
 style:
   .slider:
@@ -35,6 +41,6 @@ style:
     cursor: n-resize
 name: ui-input-slider
 template: >-
-  <div class="comp-ui-input-slider slider" @mouseenter="contextIsVisible++"
-  @mouseleave="contextIsVisible--" @mousedown="onMouseDown" v-drag="onDrag"
-  path="-1273250657."></div>
+  <div class="comp-ui-input-slider slider" :style="{ cursor: 'n-resize' }"
+  @mouseenter="contextIsVisible++" @mouseleave="contextIsVisible--"
+  @mousedown="onMouseDown" v-drag="onDrag" path="-1273250657."></div>

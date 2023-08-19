@@ -10,6 +10,21 @@ dom:
 props:
   value: null
   preview: true
+computed:
+  type: | #js
+    function() {
+      return Objects.getType(this.value)?.name.toLowerCase();
+    }
+  typeColor: | #js
+    function() {
+      if (this.type == "boolean") return this.value ? "green" : "red";
+      return ({
+        "string": "yellow",
+        "number": "green",
+        "object": "cyan",
+        "array": "white"
+      }[this.type]) || null;
+    }
 methods:
   isImageUrl: | #js
     function(value) {
@@ -20,22 +35,21 @@ methods:
     }
   getCssClass: | #js
     function(value) {
-      if ([undefined, null].includes(value)) return "opacity-30";
-      return null;
+      const cls = [];
+      if ([undefined, null].includes(value)) cls.push("opacity-30");
+      cls.push(this.typeColor);
+      return cls;
     }
   valueToString: | #js
     function(value) {
       if (value == undefined) return "undefined";
       if (value == null) return "null";
-      if (typeof value == "string") return `"${!this.preview ? value : value.shorten(20)}"`;
+      if (typeof value == "string") return `${!this.preview ? value : value.shorten(20)}`;
       if (typeof value == "number") return value.toString();
       if (typeof value == "boolean") return value ? "✔️" : "✖";
       if (typeof value == "function") return value.toString();
-      if (typeof value == "object") {
-        let json = JSON.stringify(value);
-        if (this.preview) json = json.shorten(20);
-        return json;
-      }
+      if (Array.isArray(value)) return `[${value.length}…]`;
+      if (typeof value == "object") return `{${Object.keys(value).join(', ')}…}`;
       return value.toString();
     }
 style:

@@ -35,8 +35,8 @@
       window.helpers = (((helpers)));
     %script
       window.config = (((config)));
-    %script{src: "/script/ide.js?_uid=(((scriptUrlCacheInvalidator)))"}
-    %script{src: "/script/startup.js?_uid=(((scriptUrlCacheInvalidator)))"}
+    %script{src: "/script/ide.js?_uid=(((scriptUrlCacheInvalidator)))", defer: "true"}
+    %script{src: "/script/startup.js?_uid=(((scriptUrlCacheInvalidator)))", defer: "true"}
   %body
     %div
       %div{id: "app"}

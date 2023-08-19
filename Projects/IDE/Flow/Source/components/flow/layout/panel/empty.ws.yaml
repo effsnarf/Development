@@ -1,12 +1,11 @@
 dom:
-  .empty: null
+  div:
+    class: layout panel empty
 props:
   node: null
 style:
   .empty:
     height: 100%
-    border: 2px dashed gray
-    background-color: '#ffffff20'
   .empty::after:
     content: '[empty]'
     color: gray
@@ -17,4 +16,6 @@ style:
     transform: translate(-50%, -50%)
     pointer-events: none
 name: flow-layout-panel-empty
-template: <div class="comp-flow-layout-panel-empty empty"></div>
+template: >-
+  <div class="comp-flow-layout-panel-empty layout panel empty"
+  path="864067807."></div>

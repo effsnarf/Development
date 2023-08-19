@@ -1,0 +1,140 @@
+dom:
+  div:
+    .opacity-50:
+      v-if: isEmpty
+      v-text: emptyText
+    table:
+      ':class': type
+      v-if: '!isEmpty'
+      tr:
+        v-for: row in rows
+        th:
+          class: opacity-40 fw-100
+          v-if: isPrimitive(row.value)
+          v-text: row.key
+        td: 
+          v-if: isPrimitive(row.value)
+          ui.value.any:
+            ':value': row.value
+            ':depth': (depth + 1)
+        td: 
+          v-if: '!isPrimitive(row.value)'
+          colspan: 2
+          .clickable:
+            class: flex
+            @click: toggleExpanded(row.key)
+            ui.expand:
+              class: opacity-40
+              ':value': isExpanded[row.key]
+              ':text': row.key
+          transition:
+            name: slide
+            .ml-l1:
+              v-if: isExpanded[row.key]
+              ui.value.table:
+                ':value': row.value
+                ':depth': (depth + 1)
+props:
+  value: null
+  title: null
+  depth: 0
+data:
+  isExpanded: {}
+  rows: null
+methods:
+  getRows: | #js
+    function() {
+      const value = this.value;
+      if (!value) return [];
+      if (this.type === 'array') {
+        return value.map((value, index) => ({key: index, value}))
+      }
+      if (this.type === 'object') {
+        let entries = Object.entries(value).map(([key, value]) => ({key, value}));
+        entries = entries.exceptBy(this.filteredKeys, e => e[0]);
+        return entries;
+      }
+    }
+  toggleExpanded: | #js
+    function(key) {
+      this.$set(this.isExpanded, key, !this.isExpanded[key]);
+    }
+  isPrimitive: | #js
+    function(value) {
+      if (value == null) return true;
+      return ['string', 'number', 'boolean'].includes(typeof value);
+    }
+computed:
+  type: | #js
+    function() {
+      if (Array.isArray(this.value)) {
+        return 'array'
+      }
+      if (typeof this.value === 'object') {
+        return 'object'
+      }
+      return null;
+    }
+  isEmpty: | #js
+    function() {
+      return (Object.keys(this.value).length === 0);
+    }
+  filteredKeys: | #js
+    function() {
+      return ["__proto__"];
+    }
+  emptyText: | #js
+    function() {
+      switch (this.type)
+      {
+        case 'array': return '[0…]';
+        case 'object': return '{…}';
+        default: return '';
+      }
+    }
+watch:
+  value:
+    handler: | #js
+      function(value) {
+        this.rows = this.getRows();
+        // Expand the first row
+        if (this.rows.length && !this.isExpanded[this.rows[0].key]) {
+          this.toggleExpanded(this.rows[0].key);
+        }
+      }
+    immediate: true
+style:
+  .comp-ui-expand:
+    width: 100%
+  tr:hover:
+    background-color: '#ffffff10'
+    transition: 0s
+  th:first-child:
+    padding-left: 0.5em
+    border-radius: 0.3em 0 0 0.3em
+  td:last-child:
+    padding-right: 0.5em
+    border-radius: 0 0.3em 0.3em 0
+  table.array th:
+    width: 3em
+  th:
+    padding-right: 1em
+name: ui-value-table
+template: >-
+  <div class="comp-ui-value-table" path="-604919625."><div class="opacity-50"
+  v-if="isEmpty" v-text="emptyText" path="-604919625.0"></div><table
+  :class="type" v-if="!isEmpty" path="-604919625.1"><tr v-for="row in rows"
+  path="-604919625.1.0"><th class="opacity-40 fw-100"
+  v-if="isPrimitive(row.value)" v-text="row.key"
+  path="-604919625.1.0.0"></th><td v-if="isPrimitive(row.value)"
+  path="-604919625.1.0.1"><ui-value-any :value="row.value" :depth="(depth + 1)"
+  path="-604919625.1.0.1.0"></ui-value-any></td><td
+  v-if="!isPrimitive(row.value)" colspan="2" path="-604919625.1.0.2"><div
+  class="flex clickable" @click="toggleExpanded(row.key)"
+  path="-604919625.1.0.2.0"><ui-expand class="opacity-40"
+  :value="isExpanded[row.key]" :text="row.key"
+  path="-604919625.1.0.2.0.0"></ui-expand></div><transition name="slide"
+  path="-604919625.1.0.2.1"><div class="ml-l1" v-if="isExpanded[row.key]"
+  path="-604919625.1.0.2.1.0"><ui-value-table :value="row.value" :depth="(depth
+  + 1)"
+  path="-604919625.1.0.2.1.0.0"></ui-value-table></div></transition></td></tr></table></div>

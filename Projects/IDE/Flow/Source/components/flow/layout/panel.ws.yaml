@@ -1,9 +1,11 @@
 dom:
-  .panel:
+  div: 
+    class: layout panel
     ':style': getPanelStyle(node)
     v-if: node
-    div:
+    div: 
       v-for: (child, index) in node.children
+      class: layout panel child
       ':style': getChildStyle(child.size)
       flow.type.size:
         v-model: child.size
@@ -22,6 +24,18 @@ computed:
     function () {
       return this.$root.gdb.getNodes("inside", this.node);
     }
+  isHorizontal: | #js
+    function () {
+      return (this.node.orientation === "horizontal");
+    }
+  widthOrHeight: | #js
+    function () {
+      return (this.node.orientation === "horizontal") ? "width" : "height";
+    }
+  widthOrHeightOpp: | #js
+    function () {
+      return (this.node.orientation === "horizontal") ? "height" : "width";
+    }
 methods:
   onChildSizeChange: | #js
     function (child, index) {
@@ -31,34 +45,41 @@ methods:
   getPanelStyle: | #js
     function (node) {
       const style = {};
-      style["flex-direction"] = (node.orientation === "horizontal") ? "row" : "column";
+      style["flex-direction"] = this.isHorizontal ? "row" : "column";
+      style.width = style.height = "100%";
       return style;
     }
   getChildStyle: | #js
     function (size) {
       const style = {};
-      const widthOrHeight = (this.node.orientation === "horizontal") ? "width" : "height";
-      style[widthOrHeight] = (size.option === "percent") ? `${size.value}%` : size.option;
+      if (["grow", "shrink"].includes(size.option))
+      {
+        style[`flex-${size.option}`] = 1;
+      }
+      else
+      {
+        style[this.widthOrHeight] = (size.option === "percent") ? `${size.value}%` : size.option;
+      }
       return style;
     }
 style:
-  .panel:
-    display: flex
-    height: 100%
+  .layout:
+    width: 100%
+    padding: 0.5em
+    background-color: '#ffffff10'
+  .panel: null
   .panel:hover > div:
     transition: width 0s, height 0s
-  .panel, .panel > div:
-    border: 2px dashed gray
   .panel > div:
-    margin: 0.5em
-    background-color: '#ffffff30'
+    width: 100%
 name: flow-layout-panel
 template: >-
-  <div class="comp-flow-layout-panel panel" :style="getPanelStyle(node)"
-  v-if="node" path="1309568768."><div v-for="(child, index) in node.children"
-  :style="getChildStyle(child.size)" path="1309568768.0"><flow-type-size
-  v-model="child.size" v-show-parent-hover="true"
-  @change="onChildSizeChange(child, index)" :orientation="node.orientation"
+  <div class="comp-flow-layout-panel layout panel" :style="getPanelStyle(node)"
+  v-if="node" path="1309568768."><div class="layout panel child" v-for="(child,
+  index) in node.children" :style="getChildStyle(child.size)"
+  path="1309568768.0"><flow-type-size v-model="child.size"
+  v-show-parent-hover="true" @change="onChildSizeChange(child, index)"
+  :orientation="node.orientation"
   path="1309568768.0.0"></flow-type-size><component
   :is="$root.getGdbCompName($root.gdb.getNode(child.nodeID),
   'flow.layout.panel.empty')" :node="$root.gdb.getNode(child.nodeID)"

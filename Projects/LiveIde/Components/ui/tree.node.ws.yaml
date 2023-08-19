@@ -3,6 +3,7 @@ dom:
     .tree-node:
       ':class': getCssClass()
       ui.expand:
+        class: opacity-50
         v-if: showUiExpand
         v-model: isExpanded
       component:
@@ -13,24 +14,29 @@ dom:
       @mouseenter: onMouseEnter
       @mouseleave: onMouseLeave
       slot: null
-    ul:
-      class: ml-3
-      li:
-        v-for: child in getChildItems(node)
-        ui.tree.node:
-          ':node': child
-          ':initial-expanded': initialExpanded
-          ':expandable': expandable
-          ':item-type': getItemType()
-          ':get-item': getItem
-          ':get-item-key': getItemKey
-          ':get-children': getChildren
-          ':selected-node': selectedNode
-          @node-click: onChildClick
-          @node-hover: onChildHover
-          @node-unhover: onChildUnhover
+    transition:
+      name: slide-fast
+      ul:
+        v-if: isExpanded
+        class: ml-3
+        li:
+          v-for: child in getChildItems(node)
+          ui.tree.node:
+            ':node': child
+            ':depth': (depth + 1)
+            ':initial-expanded': initialExpanded
+            ':expandable': expandable
+            ':item-type': getItemType()
+            ':get-item': getItem
+            ':get-item-key': getItemKey
+            ':get-children': getChildren
+            ':selected-node': selectedNode
+            @node-click: onChildClick
+            @node-hover: onChildHover
+            @node-unhover: onChildUnhover
 props:
   node: null
+  depth: null
   initialExpanded: false
   expandable: true
   itemType: null
@@ -105,17 +111,13 @@ computed:
       if (!this.getChildren(this.node)?.length) return false;
       return this.expandable;
     }
-  depth: | #js
-    function() {
-      return ('depth' in this.$parent) ? this.$parent.depth : this.$parent.$parent.depth + 1;
-    }
 watch:
   initialExpanded:
     handler: | #js
       function(newVal, oldVal) {
         if (this.isInited) return;
         this.isInited = true;
-        this.isExpanded = (typeof newVal == 'boolean') ? newVal : (this.depth <= newVal);
+        this.isExpanded = (typeof newVal == 'boolean') ? !!newVal : (this.depth <= newVal);
       }
     immediate: true
 style:
@@ -137,15 +139,17 @@ name: ui-tree-node
 template: >-
   <div class="comp-ui-tree-node" path="2053324664."><div class="tree-node"
   :class="getCssClass()" @click="onNodeClick" @mouseenter="onMouseEnter"
-  @mouseleave="onMouseLeave" path="2053324664.0"><ui-expand v-if="showUiExpand"
-  v-model="isExpanded" path="2053324664.0.0"></ui-expand><component
-  v-if="itemType" :is="getItemType()" :item="getItem(node)"
-  path="2053324664.0.1"></component><slot></slot></div><ul class="ml-3"
-  path="2053324664.1"><li v-for="child in getChildItems(node)"
-  path="2053324664.1.0"><ui-tree-node :node="child"
+  @mouseleave="onMouseLeave" path="2053324664.0"><ui-expand class="opacity-50"
+  v-if="showUiExpand" v-model="isExpanded"
+  path="2053324664.0.0"></ui-expand><component v-if="itemType"
+  :is="getItemType()" :item="getItem(node)"
+  path="2053324664.0.1"></component><slot></slot></div><transition
+  name="slide-fast" path="2053324664.1"><ul class="ml-3" v-if="isExpanded"
+  path="2053324664.1.0"><li v-for="child in getChildItems(node)"
+  path="2053324664.1.0.0"><ui-tree-node :node="child" :depth="(depth + 1)"
   :initial-expanded="initialExpanded" :expandable="expandable"
   :item-type="getItemType()" :get-item="getItem" :get-item-key="getItemKey"
   :get-children="getChildren" :selected-node="selectedNode"
   @node-click="onChildClick" @node-hover="onChildHover"
   @node-unhover="onChildUnhover"
-  path="2053324664.1.0.0"></ui-tree-node></li></ul></div>
+  path="2053324664.1.0.0.0"></ui-tree-node></li></ul></transition></div>

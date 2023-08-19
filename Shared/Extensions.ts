@@ -223,6 +223,7 @@ interface Number {
   unitifyTime(unit?: string[] | string): string;
   unitifySize(unit?: string[] | string): string;
   unitifyPercent(): string;
+  toPrecent(): string;
   toProgressBar(barLength?: number, ...severifyArgs: any[]): string;
   severify(green: number, yellow: number, direction: "<" | ">"): string;
   severifyByHttpStatus(): string;
@@ -274,6 +275,7 @@ interface String {
   padEndChars(maxLength: number, fillString?: string): string;
   sliceChars(start: number | undefined, end?: number | undefined): string;
   alignRight(): string;
+  toSingleLine(): string;
   shorten(maxLength: number, ellipsis?: boolean): string;
   toLength(
     length: number,
@@ -284,6 +286,7 @@ interface String {
   trimAll(): string;
   trimDoubleQuotes(): string;
   stripHtmlTags(): string;
+  htmlToText(): string;
   decodeHtml(): string;
   getMatches(regex: RegExp): string[];
   getWords(): string[];
@@ -418,7 +421,7 @@ if (typeof Number !== "undefined") {
       if (Array.isArray(obj1) && Array.isArray(obj2)) {
         if (obj1.length == 1 && obj2.length == 1)
           return compare(obj1[0], obj2[0]);
-        throw new Error("Arrays are not supported");
+        return 0;
       }
 
       throw new Error(
@@ -570,6 +573,10 @@ if (typeof Number !== "undefined") {
   Number.prototype.unitifyPercent = function (): string {
     return this.unitify(Percentage);
     //return `${Math.round(this.valueOf() * 100)}${`%`.c("gray")}`;
+  };
+
+  Number.prototype.toPrecent = function (): string {
+    return `${Math.round(this.valueOf() * 100)}${`%`.c("gray")}`;
   };
 
   Number.prototype.toProgressBar = function (
@@ -929,6 +936,15 @@ if (typeof String !== "undefined") {
     return `${padding}${this}`;
   };
 
+  String.prototype.toSingleLine = function (): string {
+    let s = this.toString();
+    s = s.replace(/\r/g, " ");
+    s = s.replace(/\n/g, " ");
+    s = s.replace(/\t/g, " ");
+    s = s.replace(/\s+/g, " ");
+    return s.trim();
+  };
+
   String.prototype.shorten = function (
     maxLength: number,
     ellipsis: boolean = true
@@ -998,6 +1014,84 @@ if (typeof String !== "undefined") {
         // Remove HTML tags
         .replace(/(<([^>]+)>)/gi, " ")
     );
+  };
+
+  (String.prototype as any).htmlToText = function (): string {
+    const nonContentTags = [
+      "script",
+      "style",
+      "head",
+      "title",
+      "meta",
+      "link",
+      "object",
+      "iframe",
+      "noscript",
+      "embed",
+      "applet",
+      "noframes",
+      "param",
+      "base",
+      "basefont",
+      "canvas",
+      "svg",
+      "math",
+      "input",
+      "textarea",
+      "select",
+      "option",
+      "button",
+      "img",
+      "map",
+      "area",
+      "form",
+      "fieldset",
+      "legend",
+      "label",
+      "frameset",
+      "frame",
+      "bgsound",
+      "marquee",
+      "blink",
+      "embed",
+      "ilayer",
+      "object",
+      "audio",
+      "video",
+      "source",
+      "track",
+      "xml",
+      "command",
+      "keygen",
+      "menu",
+      "nav",
+      "datalist",
+      "output",
+      "progress",
+    ];
+
+    let text = this.toString();
+
+    for (const tag of nonContentTags) {
+      const regex = new RegExp(`<${tag}[^>]*>.*?<\\/${tag}>`, "gs"); // Added 's' flag for the dot to match newline characters
+      text = text.replace(regex, "\n");
+      // Remove the tags that don't have a closing tag
+      text = text.replace(new RegExp(`<${tag}[^>]*>`, "g"), "\n");
+    }
+
+    // Remove all remaining HTML tags
+    text = text.replace(/<[^>]+>/g, "\n");
+
+    // Remove repeating whitespaces
+    text = text.replace(/[ \t]+/g, " ");
+
+    // Remove repeating new lines
+    text = text.replace(/(\n )+/g, "\n");
+    text = text.replace(/\n+/g, "\n");
+
+    text = text.trim(); // Trim leading and trailing whitespace
+
+    return text;
   };
 
   (String.prototype as any).decodeHtml = function (): string {

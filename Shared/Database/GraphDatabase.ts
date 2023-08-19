@@ -72,6 +72,10 @@ namespace Graph {
       return [...this.nodes];
     }
 
+    getAllLinks() {
+      return [...this.links];
+    }
+
     getNodes(a: string | Node, b: string | Node) {
       const fromOrTo = this.fromOrTo(a, b);
       const oppFromOrTo = this.getOppositeFromOrTo(fromOrTo);

@@ -1,31 +1,36 @@
 dom:
   div: 
     .grid:
-      ':class': item.type
+      ':class': getGridClass()
       ':style': getGridStyle()
       @click: onItemClick(item)
       div: 
         v-if: icon
         v-text: icon
+      .opacity-30:
+        v-text: vueCompName
       .text-center:
         v-text: $root.getIcon(item)
       div: 
         v-text: item.key
       .newValue:
-        v-if: item.newValue
-        .opacity-50:
-          v-if: (item.newValue.type == 'p')
-          v-text: '''[console.log()]'''
-          @click: consoleLog(item.newValue.value)
+        v-if: (valueInGrid && item.newValue)
         ui.value.preview:
           v-if: showValue(item)
-          ':value': (item.delta||item.newValue).value
+          ':value': item.newValue.value
         @mouseenter: onHoverValue
         @mouseleave: onUnhoverValue
+    ui.value.any:
+      v-if: (!valueInGrid && showValue(item))
+      ':value': item.newValue.value
+    ide.component.method:
+      v-if: (showMethod(item))
+      ':method': getMethod(item)
+      ':args': item.args
 props:
-  uid: null
   item: null
   icon: null
+  preview: false
 data:
   isHoveringOverValue: false
   selectedItem: null
@@ -34,10 +39,22 @@ mounted: | #js
     //this.$root.$on("state-changed", this.onStateChanged.bind(this));
   }
 methods:
+  getMethod: | #js
+    function(item) {
+      const vue = this.$root.vm.getVue(item.uid);
+      const methodDatas = vue._vueIde.methodDatas;
+      return methodDatas[item.key].originalMethod;
+    }
   showValue: | #js
-    function(value) {
-      if (["m"].includes(value.type)) return false;
+    function(item) {
+      if (["m"].includes(item.type)) return false;
       return true;
+    }
+  showMethod: | #js
+    function(item) {
+      if (!this.preview) return false;
+      if (["m"].includes(item.type)) return true;
+      return false;
     }
   onHoverValue: | #js
     function() {
@@ -79,14 +96,24 @@ methods:
     function(item) {
       //if (item.key == this.item.key) this.refresh();
     }
+  getGridClass: | #js
+    function() {
+      const cls = [];
+      cls.push(this.item.type);
+      if (this.preview) cls.push("preview");
+      return cls;
+    }
   getGridStyle: | #js
     function() {
       const style = {};
+      const compColumn = "8em";
+      const valueColumn = (this.valueInGrid) ? "8em" : "0px";
+      const nameColumn = (this.valueInGrid) ? "8em" : "8em";
       if (this.icon) {
-        style["grid-template"] = "1fr / 1em 2em 10em 10em";
+        style["grid-template"] = `1fr / 1em ${compColumn} 2em ${nameColumn} ${valueColumn}`;
       }
       else {
-        style["grid-template"] = "1fr / 2em 10em 10em";
+        style["grid-template"] = `1fr / ${compColumn} 2em ${nameColumn} ${valueColumn}`;
       }
       return style;
     }
@@ -94,7 +121,17 @@ methods:
     function(value) {
       console.log(value);
     }
-computed: null
+computed:
+  vueCompName: | #js
+    function() {
+      const vue = this.$root.vm.getVue(this.item.uid);
+      if (!vue) return null;
+      return vue.$options._componentTag;
+    }
+  valueInGrid: | #js
+    function() {
+      return (!this.preview);
+    }
 watch:
   selectedItem:
     handler: | #js
@@ -109,6 +146,8 @@ style:
     overflow: hidden
   .grid > *:
     overflow: hidden
+  .grid.preview:
+    font-size: 140%
   .comp-name:
     opacity: 0.5
   .newValue:
@@ -122,14 +161,17 @@ style:
 name: ide-state-tracker-item
 template: >-
   <div class="comp-ide-state-tracker-item" path="841306122."><div class="grid"
-  :class="item.type" :style="getGridStyle()" @click="onItemClick(item)"
+  :class="getGridClass()" :style="getGridStyle()" @click="onItemClick(item)"
   path="841306122.0"><div v-if="icon" v-text="icon"
-  path="841306122.0.0"></div><div class="text-center"
-  v-text="$root.getIcon(item)" path="841306122.0.1"></div><div v-text="item.key"
-  path="841306122.0.2"></div><div class="newValue" v-if="item.newValue"
-  @mouseenter="onHoverValue" @mouseleave="onUnhoverValue"
-  path="841306122.0.3"><div class="opacity-50" v-if="(item.newValue.type ==
-  'p')" v-text="'[console.log()]'" @click="consoleLog(item.newValue.value)"
-  path="841306122.0.3.0"></div><ui-value-preview v-if="showValue(item)"
-  :value="(item.delta||item.newValue).value"
-  path="841306122.0.3.1"></ui-value-preview></div></div></div>
+  path="841306122.0.0"></div><div class="opacity-30" v-text="vueCompName"
+  path="841306122.0.1"></div><div class="text-center"
+  v-text="$root.getIcon(item)" path="841306122.0.2"></div><div v-text="item.key"
+  path="841306122.0.3"></div><div class="newValue" v-if="(valueInGrid &amp;&amp;
+  item.newValue)" @mouseenter="onHoverValue" @mouseleave="onUnhoverValue"
+  path="841306122.0.4"><ui-value-preview v-if="showValue(item)"
+  :value="item.newValue.value"
+  path="841306122.0.4.0"></ui-value-preview></div></div><ui-value-any
+  v-if="(!valueInGrid &amp;&amp; showValue(item))" :value="item.newValue.value"
+  path="841306122.1"></ui-value-any><ide-component-method
+  v-if="(showMethod(item))" :method="getMethod(item)" :args="item.args"
+  path="841306122.2"></ide-component-method></div>

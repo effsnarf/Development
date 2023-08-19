@@ -24,9 +24,18 @@ const vueIdeCompMixin = {
       methodDatas: {},
     };
 
-    const watchInIde = false;
+    const watchInIde = true;
 
     if (watchInIde) {
+      // Watch all events
+      Object.keys(self.$listeners).forEach((eventName) => {
+        self.$on(eventName, async (...args: any[]) => {
+          await waitUntilInit();
+          const change = vueIdeApp.state.track(self, "e", eventName, args);
+          vueIdeApp.$emit("state-changed", change);
+        });
+      });
+
       // Watch all data properties
       Object.keys(self.$data).forEach((key) => {
         self.$watch(key, {
@@ -86,14 +95,18 @@ const vueIdeCompMixin = {
 
       // Watch all methods
       Object.keys(self.$options.methods).forEach((methodName) => {
-        const originalMethod = self[methodName];
+        const originalMethod = self.$options.methods[methodName];
         const isAsync = originalMethod.constructor.name == "AsyncFunction";
 
-        const methodKey = `${self._uid}.${methodName}`;
+        const methodKey = `${methodName}`;
         const methodDatas = self._vueIde.methodDatas;
         const methodData = (methodDatas[methodKey] = methodDatas[methodKey] || {
           invokes: 0,
           track: true,
+          originalMethod: {
+            args: originalMethod.getArgumentNames(),
+            code: originalMethod.toString(),
+          },
         });
 
         const trackInvokes = () => {
@@ -112,7 +125,14 @@ const vueIdeCompMixin = {
             trackInvokes();
             await waitUntilInit();
             const result = await originalMethod.apply(self, args);
-            const change = vueIdeApp.state.track(self, "m", methodName, null);
+            const change = vueIdeApp.state.track(
+              self,
+              "m",
+              methodName,
+              null,
+              null,
+              args
+            );
             //vueIdeApp.$emit("state-changed", change);
             return result;
           };
@@ -122,7 +142,14 @@ const vueIdeCompMixin = {
             trackInvokes();
             const result = originalMethod.apply(self, args);
             if (vueIdeApp) {
-              const change = vueIdeApp.state.track(self, "m", methodName, null);
+              const change = vueIdeApp.state.track(
+                self,
+                "m",
+                methodName,
+                null,
+                null,
+                args
+              );
               //vueIdeApp.$emit("state-changed", change);
             }
             return result;
@@ -292,11 +319,8 @@ const vueIdeCompMixin = {
   // Create an element to host the Vue IDE app
   const el = document.createElement("div");
   el.id = `vue-ide-app-${Date.now()}`;
-  // When the document is ready, append the element to the body
-  document.addEventListener("DOMContentLoaded", () => {
-    document.body.appendChild(el);
-    vueIdeApp.$mount(`#${el.id}`);
-  });
+  document.body.appendChild(el);
+  vueIdeApp.$mount(`#${el.id}`);
 
   (window as any).vueIdeApp = vueIdeApp;
 })();

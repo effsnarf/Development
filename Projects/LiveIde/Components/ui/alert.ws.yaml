@@ -1,0 +1,31 @@
+dom:
+  div:
+    transition:
+      name: slide
+      .alert:
+        v-if: text
+        v-text: text
+        @click: onClick
+data:
+  text: null
+methods:
+  show: | #js
+    function(text) {
+      this.text = text;
+    }
+  onClick: | #js
+    function() {
+      this.text = null;
+    }
+style:
+  .alert:
+    background: '#ffffff20'
+    padding: 0.5em 1em
+    cursor: pointer
+  .alert:hover:
+    background: '#ffffff30'
+name: ui-alert
+template: >-
+  <div class="comp-ui-alert" path="-2141174398."><transition name="slide"
+  path="-2141174398.0"><div class="alert" v-if="text" v-text="text"
+  @click="onClick" path="-2141174398.0.0"></div></transition></div>

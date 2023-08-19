@@ -4,21 +4,21 @@ dom:
       ':global': true
       @move: onMouseMove
       @right-click: e => onRightClick(e, true)
-    transition: 
-      name: fade
-      .context-menu:
-        v-show: isVisible
-        ref: menu1
-        ':class': '{ pinned: isPinned, inited: isInited, visible: isVisible }'
-        ':style': style
-        div: 
+    ui.mouse: 
+      @drag: onDrag
+      transition: 
+        name: fade
+        .context-menu:
+          v-show: isVisible
+          ref: menu1
+          ':class': '{ pinned: isPinned, inited: isInited, visible: isVisible }'
+          ':style': style
           div: 
-            v-if: isPinned
-            class: close-button
-            v-text: '''✖️'''
-            @click: isPinned=false
-          ui.mouse: 
-            @drag: onDrag
+            div: 
+              v-if: isPinned
+              class: close-button
+              v-text: '''✖️'''
+              @click: isPinned=false
             transition: 
               name: slide
               h2:
@@ -191,18 +191,18 @@ name: ui-context-window
 template: >-
   <div class="comp-ui-context-window" path="1458497449."><ui-mouse
   :global="true" @move="onMouseMove" @right-click="e =&gt; onRightClick(e,
-  true)" path="1458497449.0"></ui-mouse><transition name="fade"
-  path="1458497449.1"><div class="context-menu" v-show="isVisible" ref="menu1"
-  :class="{ pinned: isPinned, inited: isInited, visible: isVisible }"
-  :style="style" path="1458497449.1.0"><div path="1458497449.1.0.0"><div
+  true)" path="1458497449.0"></ui-mouse><ui-mouse @drag="onDrag"
+  path="1458497449.1"><transition name="fade" path="1458497449.1.0"><div
+  class="context-menu" v-show="isVisible" ref="menu1" :class="{ pinned:
+  isPinned, inited: isInited, visible: isVisible }" :style="style"
+  path="1458497449.1.0.0"><div path="1458497449.1.0.0.0"><div
   class="close-button" v-if="isPinned" v-text="'✖️'" @click="isPinned=false"
-  path="1458497449.1.0.0.0"></div><ui-mouse @drag="onDrag"
-  path="1458497449.1.0.0.1"><transition name="slide"
-  path="1458497449.1.0.0.1.0"><h2 v-if="(showTitle) &amp;&amp; (icon || title)"
-  path="1458497449.1.0.0.1.0.0"><ui-mouse @right-click="onRightClick"
-  path="1458497449.1.0.0.1.0.0.0"></ui-mouse><h3
-  path="1458497449.1.0.0.1.0.0.1"><ui-title :icon="icon" :text="title"
-  path="1458497449.1.0.0.1.0.0.1.0"></ui-title></h3></h2></transition><div
-  path="1458497449.1.0.0.1.1"><slot></slot><component v-if="itemType"
+  path="1458497449.1.0.0.0.0"></div><transition name="slide"
+  path="1458497449.1.0.0.0.1"><h2 v-if="(showTitle) &amp;&amp; (icon || title)"
+  path="1458497449.1.0.0.0.1.0"><ui-mouse @right-click="onRightClick"
+  path="1458497449.1.0.0.0.1.0.0"></ui-mouse><h3
+  path="1458497449.1.0.0.0.1.0.1"><ui-title :icon="icon" :text="title"
+  path="1458497449.1.0.0.0.1.0.1.0"></ui-title></h3></h2></transition><div
+  path="1458497449.1.0.0.0.2"><slot></slot><component v-if="itemType"
   :is="itemType" v-bind="bindProps"
-  path="1458497449.1.0.0.1.1.1"></component></div></ui-mouse></div></div></transition></div>
+  path="1458497449.1.0.0.0.2.1"></component></div></div></div></transition></ui-mouse></div>

@@ -96,6 +96,26 @@
 
 
 
+.slide-fast-enter-active,
+.slide-fast-leave-active,
+.slide-fast-move {
+  transition: 0.5s;
+}
+.slide-fast-enter,
+.slide-fast-leave-to {
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+}
+.slide-fast-enter-to,
+.slide-fast-leave {
+  opacity: 1;
+  max-height: 25rem;
+  overflow: hidden;
+}
+
+
+
 
 .slide-hor-enter-active,
 .slide-hor-leave-active,

@@ -136,8 +136,12 @@ li
 }
 .selected
 {
-  background: #ffffff40;
+  background: #ffffff20;
   transition: 0s;
+}
+.selected:hover
+{
+  background: #ffffff30 !important;
 }
 
 .clickable
@@ -207,6 +211,7 @@ table
 td, th
 {
   text-align: left;
+  border-radius: 0;
 }
 th
 {
@@ -278,10 +283,6 @@ tr:hover > td:last-child
 {
   border-radius: 0 0.5em 0.5em 0;
 }
-.selected:hover
-{
-  background: #ffffff60 !important;
-}
 
 .parent .visible-if-parent-hover
 {
@@ -331,6 +332,11 @@ pre, input, textarea, select, option, .ide-checkbox
   border: 1px solid gray;
   width: 100%;
   color: #ffffff;
+}
+pre
+{
+  font-size: 100%;
+  overflow: hidden;
 }
 option
 {

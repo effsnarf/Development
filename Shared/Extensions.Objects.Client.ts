@@ -10,6 +10,37 @@ class Objects {
     return (0)._is(obj, type);
   }
 
+  static isPrimitive(obj: any): boolean {
+    return Objects.isPrimitiveType(Objects.getType(obj));
+  }
+
+  static getType(obj: any): string {
+    return (0)._getObjectType(obj);
+  }
+
+  static isPrimitiveType(type: any): boolean {
+    return [String, Number, Boolean, Date, RegExp].some((t) => t === type);
+  }
+
+  static getAllKeys(obj: any): string[] {
+    let keys: string[] = [];
+    let currentObj = obj;
+    const visitedObjects = new Set();
+
+    while (currentObj && !visitedObjects.has(currentObj)) {
+      keys = keys.concat(Object.getOwnPropertyNames(currentObj));
+      visitedObjects.add(currentObj);
+      currentObj = Object.getPrototypeOf(currentObj);
+    }
+
+    return keys;
+  }
+
+  static getAllEntries(obj: any): any[] {
+    const keys = Objects.getAllKeys(obj);
+    return keys.map((key) => [key, obj[key]]);
+  }
+
   static compare(obj1: any, obj2: any): number {
     return (0)._compare(obj1, obj2);
   }

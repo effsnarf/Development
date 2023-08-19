@@ -2,14 +2,19 @@ dom:
   component:
     ':is': getComponentType(value)
     ':value': value
+    ':title': title
     ':preview': 'false'
+    ':depth': (depth + 1)
 props:
   value: null
+  title: null
+  depth: 0
 methods:
   getComponentType: | #js
     function(value) {
       const getType = (value) => {
         let typeofValue = typeof value;
+        if (value == null) return "preview";
         if (["object", "boolean"].find(v => v == typeofValue)) return typeofValue;
         return "preview";
       };
@@ -18,4 +23,5 @@ methods:
 name: ui-value-any
 template: >-
   <component class="comp-ui-value-any" :is="getComponentType(value)"
-  :value="value" :preview="false" path="1299909909."></component>
+  :value="value" :title="title" :preview="false" :depth="(depth + 1)"
+  path="1299909909."></component>

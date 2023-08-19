@@ -92,28 +92,39 @@ class ChatOpenAI {
     }
   }
 
-  public async send(message: string, maxReplyTokens?: number) {
+  public async send(
+    message: string,
+    maxReplyTokens?: number,
+    log?: boolean,
+    desc?: string
+  ) {
+    if (log === undefined) log = this._log;
     try {
-      if (this._log) console.log(message.cyan);
+      if (log)
+        console.log(
+          `${message.shorten(100).cyan} ${`(${message.length})`.gray}`
+        );
       this._messages.push({
         role: "user",
         content: JSON.stringify(message),
       });
       let responseMessage = await this._openAI.chat(
         this._messages,
-        maxReplyTokens
+        maxReplyTokens,
+        desc
       );
       this._messages.push(responseMessage);
       return responseMessage.content;
     } catch (ex: any) {
-      console.log(`An error occurred while sending a message:`.bgRed);
-      console.log(message.shorten(100));
-      console.log(ex.toString().bgRed);
-      console.log(this._messages.length);
+      // console.log(`An error occurred while sending a message:`.bgRed);
+      // console.log(message.shorten(100));
+      // console.log(ex.toString().bgRed);
+      // console.log(this._messages.length);
+
       // Delete the last message
       this._messages.pop();
-      const responseErrorMessage = ex.response?.data?.error?.message;
-      if (responseErrorMessage) ex = new Error(responseErrorMessage);
+      //const responseErrorMessage = ex.response?.data?.error?.message;
+      //if (responseErrorMessage) ex = new Error(responseErrorMessage);
       throw ex;
     }
   }

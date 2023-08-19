@@ -1,5 +1,6 @@
 dom:
-  .view:
+  div:
+    class: layout view
     component:
       v-for: node in childNodes
       ':is': $root.getGdbCompName(node)
@@ -17,6 +18,6 @@ style:
     height: 60vh
 name: flow-layout-view
 template: >-
-  <div class="comp-flow-layout-view view" path="1843545641."><component
+  <div class="comp-flow-layout-view layout view" path="1843545641."><component
   v-for="node in childNodes" :is="$root.getGdbCompName(node)" :node="node"
   path="1843545641.0"></component></div>

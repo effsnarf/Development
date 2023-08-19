@@ -58,6 +58,7 @@ class Configuration {
       quitIfChanged: [],
       toAbsolutePaths: [],
       types: Types,
+      log: false,
     },
     configPaths?: ConfigPaths,
     findConfigPaths: boolean = true

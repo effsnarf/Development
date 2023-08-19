@@ -744,6 +744,7 @@ interface MgParams {
       },
       getKey(item: any) {
         if (!item) return null;
+        if (item.id) return item.id;
         if (item._id) return item._id;
         if (item._uid) return item._uid;
         return item;

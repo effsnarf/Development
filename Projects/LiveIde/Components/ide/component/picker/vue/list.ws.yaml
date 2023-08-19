@@ -1,0 +1,27 @@
+dom:
+  transition.group:
+    tag: div
+    name: list2
+    ':class': className
+    div:
+      v-for: uid in uids
+      ':key': uid
+      ide.component.title:
+        ':item': $root.vm.vues[uid]
+        ':class': '{ ''selected'': uid === selectedVueUID }'
+        @mouseenter: $emit('hover', uid)
+        @mouseleave: $emit('hover', null)
+        @click: $emit('select', uid)
+props:
+  uids: null
+  selectedVueUID: null
+  className: null
+data: null
+name: ide-component-picker-vue-list
+template: >-
+  <transition-group class="comp-ide-component-picker-vue-list" tag="div"
+  name="list2" :class="className" path="-912894927."><div v-for="uid in uids"
+  :key="uid" path="-912894927.0"><ide-component-title :item="$root.vm.vues[uid]"
+  :class="{ 'selected': uid === selectedVueUID }" @mouseenter="$emit('hover',
+  uid)" @mouseleave="$emit('hover', null)" @click="$emit('select', uid)"
+  path="-912894927.0.0"></ide-component-title></div></transition-group>

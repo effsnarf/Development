@@ -1,12 +1,16 @@
 dom:
   div: 
+    ':class': class1
     ui.select:
+      ':class': '{ corner: (type==''toggle'') }'
       ':options': (options||[]).map(option => getOptionText(option))
       ':getUrl': getUrl
       ':direction': direction
+      ':type': type
       ':can-select-none': 'false'
       v-model: selectedTabIndex
     div: 
+      class: flex-grow-1
       slot: 
         name: header
       div: 
@@ -26,6 +30,17 @@ props:
   transitionName: null
 data:
   selectedTabIndex: 0
+computed:
+  type: | #js
+    function() {
+      if (this.direction === 'toggle') return 'toggle';
+      return 'list';
+    }
+  class1: | #js
+    function() {
+      if (this.direction === 'toggle') return 'flex-reverse';
+      return null;
+    }
 methods:
   getOptionText: | #js
     function(option) {
@@ -48,17 +63,26 @@ watch:
       this.selectedTabIndex = newIndex;
     }
 style:
+  .flex-reverse:
+    display: flex
+    flex-direction: row-reverse
   .comp-ui-select:
-    border-bottom: '1px solid #000000'
     margin-bottom: 0.1em
+  .corner:
+    position: absolute
+    z-index: 10
+    transform: scale(1.5)
+    top: '-0.6em'
+    right: '-1em'
   li:
     margin-bottom: 0
 name: ui-tabs
 template: >-
-  <div class="comp-ui-tabs" path="-484156776."><ui-select
-  :options="(options||[]).map(option =&gt; getOptionText(option))"
-  :getUrl="getUrl" :direction="direction" :can-select-none="false"
-  v-model="selectedTabIndex" path="-484156776.0"></ui-select><div
+  <div class="comp-ui-tabs" :class="class1" path="-484156776."><ui-select
+  :class="{ corner: (type=='toggle') }" :options="(options||[]).map(option =&gt;
+  getOptionText(option))" :getUrl="getUrl" :direction="direction" :type="type"
+  :can-select-none="false" v-model="selectedTabIndex"
+  path="-484156776.0"></ui-select><div class="flex-grow-1"
   path="-484156776.1"><slot name="header" path="-484156776.1.0"></slot><div
   v-for="(option, index) in options" path="-484156776.1.1"><transition
   :name="(transitionName||'slide2')" path="-484156776.1.1.0"><div v-show="(index

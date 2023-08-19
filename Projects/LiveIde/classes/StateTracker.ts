@@ -18,6 +18,7 @@ interface StateChange {
   vuePath: [];
   type: string;
   key: string;
+  args: any[];
   newValue: StateValue;
   oldValue: StateValue;
   delta: StateValue;
@@ -91,7 +92,14 @@ class StateTracker {
     return st;
   }
 
-  track(vue: any, type: string, key: string, newValue: any, oldValue: any) {
+  track(
+    vue: any,
+    type: string,
+    key: string,
+    newValue: any,
+    oldValue: any,
+    args: any[]
+  ) {
     if (this.isPaused) return;
     if (!this.isKeyTrackable(key)) return;
     if (!this.isTrackable(newValue)) return;
@@ -109,6 +117,7 @@ class StateTracker {
         uid: vue._uid,
         type,
         key,
+        args,
         newValue: newStateValue,
         oldValue: oldStateValue,
         delta: newStateValue.getDelta(oldStateValue),

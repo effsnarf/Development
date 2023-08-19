@@ -92,6 +92,10 @@ style:
   .watches:
     width: 20em
     overflow: auto
+  .watches ul:
+    gap: 1em
+  .watches h3:
+    font-size: 1.2rem
   .comp-ui-title:
     border-radius: 0
     border-bottom: '1px solid #000'

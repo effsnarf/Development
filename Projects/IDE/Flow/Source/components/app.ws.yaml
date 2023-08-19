@@ -1,22 +1,32 @@
 dom:
   div: 
-    .flex:
+    div: 
+      .flex:
+        div: 
+          class: logo
+        h2:
+          ui.title:
+            class: title1
+            text: Flow
+      .flex1:
+        flow.node.list:
+          v-model: activeNode
+        transition:
+          name: slide-hor
+          flow.node.info:
+            v-if: activeNode
+            ':node': activeNode
+        component:
+          v-if: gdb
+          ':is': $root.getGdbCompName(gdb.nodes[0])
+          ':node': gdb.nodes[0]
+    div: 
+      ide.css.stylesheet:
+        ':rules': $root.newCssRules
       div: 
-        class: logo
-      h2:
-        ui.title:
-          class: title1
-          text: Flow
-    .flex1:
-      flow.node.list:
-        v-model: activeNode
-      div: 
-        flow.node.info:
-          ':node': activeNode
-      component:
-        v-if: gdb
-        ':is': $root.getGdbCompName(gdb.nodes[0])
-        ':node': gdb.nodes[0]
+        ide.component.style:
+          v-for: comp in $root.comps
+          ':component': comp
 props:
   comps: null
 data:
@@ -37,18 +47,24 @@ style:
     flex-direction: row
     gap: 1em
   .flex1 > div:nth-child(1):
-    width: 10em
+    width: auto
   .flex1 > div:nth-child(2):
-    width: 15em
+    width: auto
   .comp-ui-title.title1:
     font-size: 200%
 name: app
 template: >-
-  <div class="comp-app" path="96801."><div class="flex" path="96801.0"><div
-  class="logo" path="96801.0.0"></div><h2 path="96801.0.1"><ui-title
-  class="title1" text="Flow" path="96801.0.1.0"></ui-title></h2></div><div
-  class="flex1" path="96801.1"><flow-node-list v-model="activeNode"
-  path="96801.1.0"></flow-node-list><div path="96801.1.1"><flow-node-info
-  :node="activeNode" path="96801.1.1.0"></flow-node-info></div><component
-  v-if="gdb" :is="$root.getGdbCompName(gdb.nodes[0])" :node="gdb.nodes[0]"
-  path="96801.1.2"></component></div></div>
+  <div class="comp-app" path="96801."><div path="96801.0"><div class="flex"
+  path="96801.0.0"><div class="logo" path="96801.0.0.0"></div><h2
+  path="96801.0.0.1"><ui-title class="title1" text="Flow"
+  path="96801.0.0.1.0"></ui-title></h2></div><div class="flex1"
+  path="96801.0.1"><flow-node-list v-model="activeNode"
+  path="96801.0.1.0"></flow-node-list><transition name="slide-hor"
+  path="96801.0.1.1"><flow-node-info v-if="activeNode" :node="activeNode"
+  path="96801.0.1.1.0"></flow-node-info></transition><component v-if="gdb"
+  :is="$root.getGdbCompName(gdb.nodes[0])" :node="gdb.nodes[0]"
+  path="96801.0.1.2"></component></div></div><div
+  path="96801.1"><ide-css-stylesheet :rules="$root.newCssRules"
+  path="96801.1.0"></ide-css-stylesheet><div
+  path="96801.1.1"><ide-component-style v-for="comp in $root.comps"
+  :component="comp" path="96801.1.1.0"></ide-component-style></div></div></div>

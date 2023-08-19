@@ -125,10 +125,16 @@ class OpenAI {
     return tokens;
   }
 
-  async makeRequest<T>(model: string, type: string, dataProps: any) {
-    const tokens = this.getTokens(
-      dataProps.prompt || dataProps.input || dataProps.messages || dataProps
-    );
+  async makeRequest<T>(
+    model: string,
+    type: string,
+    dataProps: any,
+    desc?: string
+  ): Promise<T> {
+    const promptText =
+      dataProps.prompt || dataProps.input || dataProps.messages || dataProps;
+
+    const tokens = this.getTokens(promptText);
     const maxReplyTokens = this.maxTotalTokens - tokens;
     if (false)
       console.log(
@@ -152,7 +158,7 @@ class OpenAI {
 
     let response: AxiosResponse<Response>;
     try {
-      this.loading.start();
+      this.loading.start(desc);
       response = await axios.post<Response>(endpoint, data, {
         headers,
         timeout: (30).seconds(),
@@ -164,10 +170,16 @@ class OpenAI {
         this.log(JSON.stringify(dataProps).shorten(100));
       }
     } catch (ex: any) {
-      let msg = ex.response?.data?.error?.message;
-      this.log();
-      this.log(msg);
-      throw msg || ex;
+      let msg = ex.response?.data?.error?.message || ex.message;
+      //this.log();
+      //this.log(msg);
+      if (msg.includes("Rate limit reached")) {
+        await this.wait("Rate limit reached", (5).seconds());
+        return await this.makeRequest<T>(model, type, dataProps, desc);
+      }
+      if (["ECONNRESET", "socket hang up"].some((err) => msg.includes(err)))
+        return await this.makeRequest<T>(model, type, dataProps, desc);
+      throw msg ? new Error(msg) : ex;
     } finally {
       this.loading.stop();
     }
@@ -181,6 +193,18 @@ class OpenAI {
     this.log();
     this.log(((reply as any)?.content || reply).green);
     return reply;
+  }
+
+  private async wait(message: string, ms: number) {
+    return new Promise((resolve: Function) => {
+      const loading = Loading.startNew(
+        `${`${`waiting`.gray} ${ms.unitifyTime()}`} ${message}`
+      );
+      setTimeout(() => {
+        loading.stop();
+        resolve();
+      }, ms);
+    });
   }
 
   public async complete(prompt: string) {
@@ -198,14 +222,20 @@ class OpenAI {
 
   public async chat(
     messages: Message[],
-    maxReplyTokens?: number
+    maxReplyTokens?: number,
+    desc?: string
   ): Promise<Message> {
     if (maxReplyTokens) {
       messages = this.shortenMessages(messages, maxReplyTokens);
     }
-    return await this.makeRequest<Message>(Model.Gpt35Turbo, RequestType.Chat, {
-      messages,
-    });
+    return await this.makeRequest<Message>(
+      this.model,
+      RequestType.Chat,
+      {
+        messages,
+      },
+      desc
+    );
   }
 
   private log(message?: string) {

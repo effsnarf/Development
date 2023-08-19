@@ -1,19 +1,112 @@
 dom:
-  pre:
-    class: pre
-    v-html: yaml
+  div:
+    .flex:
+      ':style': '{ gap: ''1em'' }'
+      v-if: (title || specialTypeName)
+      h3: 
+        v-if: title
+        v-text: title
+      h3: 
+        class: opacity-50
+        v-if: specialTypeName
+        v-text: specialTypeName
+    ui.tabs:
+      ':options': '[''🎄'', ''🆎'']'
+      direction: toggle
+      template: 
+        v-slot: tab0
+        pre: 
+          class: pre
+          ui.value.table:
+            ':value': value
+            ':depth': (depth + 1)
+      template: 
+        v-slot: tab1
+        .box1:
+          .error:
+            v-if: yamlError
+            v-text: yamlError
+          pre: 
+            v-if: '!yamlError'
+            class: pre
+            v-html: yaml
+    .console-log-button:
+      class: clickable
+      title: console.log()
+      v-text: '''💻'''
+      @click: () => consoleLog(value)
+    ui.alert:
+      ref: alert1
 props:
   value: null
+  title: null
+  depth: 0
+data:
+  yamlError: null
+methods:
+  consoleLog: | #js
+    function(value) {
+      console.log(value);
+      this.$refs.alert1.show('Object logged to browser console.');
+    }
 computed:
+  type: | #js
+    function() {
+      const type = Objects.getType(this.value);
+      return (type?.name || type);
+    }
+  specialTypeName: | #js
+    function() {
+      if (!this.value) return null;
+      const type = Objects.getType(this.value).toString();
+      const specialTypeName = this.value.constructor?.name;
+      return (type === specialTypeName) ? null : specialTypeName;
+    }
   yaml: | #js
     function() {
-      return this.$root.visualizedYaml(this.value);
+      try
+      {
+        this.yamlError = null;
+        return this.$root.visualizedYaml(this.value);
+      }
+      catch (ex)
+      {
+        this.yamlError = ex.message;
+        return null;
+      }
     }
 style:
-  .pre:
+  .console-log-button:
+    position: absolute
+    right: '-1em'
+    bottom: '-0.6em'
+    font-size: 160%
+    padding: 0 0.4em
+    cursor: pointer
+    z-index: 10
+  .console-log-button:hover:
+    background: '#ffffff20'
+  .box1:
     font-size: 100%
     max-width: 20em
     max-height: 50vh
     overflow: auto
 name: ui-value-object
-template: <pre class="comp-ui-value-object pre" v-html="yaml" path="-1714629770."></pre>
+template: >-
+  <div class="comp-ui-value-object" path="-1714629770."><div class="flex"
+  :style="{ gap: '1em' }" v-if="(title || specialTypeName)"
+  path="-1714629770.0"><h3 v-if="title" v-text="title"
+  path="-1714629770.0.0"></h3><h3 class="opacity-50" v-if="specialTypeName"
+  v-text="specialTypeName" path="-1714629770.0.1"></h3></div><ui-tabs
+  :options="['🎄', '🆎']" direction="toggle" path="-1714629770.1"><template
+  v-slot:tab0 path="-1714629770.1.0"><pre class="pre"
+  path="-1714629770.1.0.0"><ui-value-table :value="value" :depth="(depth + 1)"
+  path="-1714629770.1.0.0.0"></ui-value-table></pre></template><template
+  v-slot:tab1 path="-1714629770.1.1"><div class="box1"
+  path="-1714629770.1.1.0"><div class="error" v-if="yamlError"
+  v-text="yamlError" path="-1714629770.1.1.0.0"></div><pre class="pre"
+  v-if="!yamlError" v-html="yaml"
+  path="-1714629770.1.1.0.1"></pre></div></template></ui-tabs><div
+  class="clickable console-log-button" title="console.log()" v-text="'💻'"
+  @click="() =&gt; consoleLog(value)" path="-1714629770.2"></div><ui-alert
+  ref="alert1" path="-1714629770.3"></ui-alert></div>

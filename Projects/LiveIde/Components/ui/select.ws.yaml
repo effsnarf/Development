@@ -70,7 +70,9 @@ methods:
       let s = this.options[index];
       if (this.getItemText) s = this.getItemText(s);
       if (this.itemIcon) s = `${this.itemIcon} ${s}`;
-      if (this.type === "toggle") s = `[ ${s} ]`;
+      if (this.type === "toggle") {
+        if (s.length > 2) s = `[ ${s} ]`;
+      }
       return s;
     }
   onItemHover: | #js

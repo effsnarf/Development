@@ -1,27 +1,42 @@
 dom:
   div:
-    ui.list:
+    ui.list: 
       ':items': nodes
       v-model: selectedNodeIndex
       @item-hover: hoveredNode=$event.item
       ':can-select-none': 'true'
       ':get-item-key': (item) => item.id
       v-slot: slotProps
-      flow.node.title:
+      flow.node.title: 
+        ':node': slotProps.item
+    ui.list: 
+      ':items': links
+      v-model: selectedLinkIndex
+      @item-hover: hoveredLink=$event.item
+      ':can-select-none': 'true'
+      ':get-item-key': (item) => item.id
+      v-slot: slotProps
+      flow.node.title: 
         ':node': slotProps.item
 props:
   value: null
 data:
   selectedNodeIndex: null
+  selectedLinkIndex: null
   hoveredNode: null
+  hoveredLink: null
 computed:
   nodes: | #js
     function () {
       return this.$root.gdb.getAllNodes();
     }
+  links: | #js
+    function () {
+      return this.$root.gdb.getAllLinks();
+    }
   activeNode: | #js
     function () {
-      return (this.selectedNode || this.hoveredNode);
+      return (this.selectedNode);
     }
   selectedNode: | #js
     function () {
@@ -44,4 +59,8 @@ template: >-
   v-model="selectedNodeIndex" @item-hover="hoveredNode=$event.item"
   :can-select-none="true" :get-item-key="(item) =&gt; item.id"
   v-slot="slotProps" path="674947146.0"><flow-node-title :node="slotProps.item"
-  path="674947146.0.0"></flow-node-title></ui-list></div>
+  path="674947146.0.0"></flow-node-title></ui-list><ui-list :items="links"
+  v-model="selectedLinkIndex" @item-hover="hoveredLink=$event.item"
+  :can-select-none="true" :get-item-key="(item) =&gt; item.id"
+  v-slot="slotProps" path="674947146.1"><flow-node-title :node="slotProps.item"
+  path="674947146.1.0"></flow-node-title></ui-list></div>

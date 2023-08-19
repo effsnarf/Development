@@ -3,6 +3,7 @@ dom:
     li:
       ui.tree.node:
         ':node': root
+        ':depth': '0'
         ':initial-expanded': initialExpanded
         ':expandable': initialExpandable
         ':item-type': itemType
@@ -60,7 +61,7 @@ style:
 name: ui-tree
 template: >-
   <ul class="comp-ui-tree" path="-484140360."><li
-  path="-484140360.0"><ui-tree-node :node="root"
+  path="-484140360.0"><ui-tree-node :node="root" :depth="0"
   :initial-expanded="initialExpanded" :expandable="initialExpandable"
   :item-type="itemType" :get-item="getItem || ((node) =&gt; node.item)"
   :get-item-key="getItemKey || $root.getKey" :get-children="getChildren ||

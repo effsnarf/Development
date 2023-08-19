@@ -18,7 +18,9 @@ dom:
             class: unit
             v-text: '''%'''
       ui.select:
-        ':options': '[''percent'', ''auto'', ''min-content'', ''max-content'', ''fit-content'']'
+        ':options': >-
+          ['percent', 'auto', 'min-content', 'max-content', 'fit-content',
+          'grow', 'shrink']
         v-model: value.option
         input-type: value
     ui.input.slider:
@@ -73,8 +75,8 @@ template: >-
   v-text="Math.round(value.value)" path="728707445.0.1.0.0"></span><div
   class="unit unit" v-text="'%'"
   path="728707445.0.1.0.1"></div></div></transition><ui-select
-  :options="['percent', 'auto', 'min-content', 'max-content', 'fit-content']"
-  v-model="value.option" input-type="value"
+  :options="['percent', 'auto', 'min-content', 'max-content', 'fit-content',
+  'grow', 'shrink']" v-model="value.option" input-type="value"
   path="728707445.0.2"></ui-select></ui-context-window><ui-input-slider
   ref="slider1" v-model="value.value" @input="$emit('change')"
   @changing="value.is.changing = $event" :orientation="orientation"
