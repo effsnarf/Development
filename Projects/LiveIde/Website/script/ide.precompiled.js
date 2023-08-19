@@ -2867,6 +2867,7 @@ class StateTracker {
                 id: StateTracker._nextID++,
                 dt: Date.now(),
                 uid: vue._uid,
+                vueCompName: vue.$options._componentTag,
                 type,
                 key,
                 args,
@@ -3197,17 +3198,30 @@ class VueManager {
         }
         return vues;
     }
-    getDescendants(vue, filter) {
+    getDescendant(vue, filter) {
+        return this.getDescendants(vue, filter, 1)[0];
+    }
+    getDescendants(vue, filter, maxCount) {
         if (typeof filter == "string") {
             const compName = filter;
             filter = (vue) => vue.$data._?.comp.name == compName;
+        }
+        if (typeof filter == "number") {
+            const uid = filter;
+            filter = (vue) => vue._uid == uid;
         }
         const vues = [];
         for (const child of vue.$children) {
             if (filter(child))
                 vues.push(child);
-            vues.push(...this.getDescendants(child, filter));
+            if (vues.length >= maxCount)
+                break;
+            vues.push(...this.getDescendants(child, filter, maxCount));
+            if (vues.length >= maxCount)
+                break;
         }
+        if (vues.length >= maxCount)
+            vues.length = maxCount;
         return vues;
     }
     // Vues are recreated occasionally
@@ -5492,7 +5506,7 @@ var __webpack_exports__ = {};
 (() => {
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/Website/script/1692464402450.ts ***!
+  !*** ../../../LiveIde/Website/script/1692480679233.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

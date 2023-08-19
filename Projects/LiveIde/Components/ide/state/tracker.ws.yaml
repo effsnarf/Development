@@ -7,16 +7,15 @@ dom:
           text: 🧊 State
       transition: 
         name: slide
-        ul:
+        table:
           class: list1
-          li: 
+          ide.state.tracker.item:
             v-for: field in $root.vm.getFields(uid)
             ':class': getCssClass(field)
             @click: toggleWatch(field)
-            ide.state.tracker.item:
-              ':uid': uid
-              ':item': field
-              ':key': uid+'.'+field.key
+            ':uid': uid
+            ':item': field
+            ':key': uid+'.'+field.key
     transition: 
       name: slide-hor
       .watches:
@@ -24,7 +23,7 @@ dom:
         transition.group:
           tag: ul
           name: slide
-          li: 
+          li:
             v-for: field in watchedFields
             ':key': field.key
             h3: 
@@ -90,7 +89,7 @@ computed:
     }
 style:
   .watches:
-    width: 20em
+    max-height: 50vh
     overflow: auto
   .watches ul:
     gap: 1em
@@ -106,7 +105,7 @@ style:
     flex-direction: column-reverse
   ul:not(.changes) .grid:
     opacity: 0.5
-  li:hover:
+  tr:hover:
     background: '#ffffff10'
     transition: 0s
 name: ide-state-tracker
@@ -115,11 +114,11 @@ template: >-
   :class="getSliderClass()" path="-483235177.0"><h3
   path="-483235177.0.0"><ui-title text="🧊 State"
   path="-483235177.0.0.0"></ui-title></h3><transition name="slide"
-  path="-483235177.0.1"><ul class="list1" path="-483235177.0.1.0"><li
-  v-for="field in $root.vm.getFields(uid)" :class="getCssClass(field)"
-  @click="toggleWatch(field)" path="-483235177.0.1.0.0"><ide-state-tracker-item
-  :uid="uid" :item="field" :key="uid+'.'+field.key"
-  path="-483235177.0.1.0.0.0"></ide-state-tracker-item></li></ul></transition></div><transition
+  path="-483235177.0.1"><table class="list1"
+  path="-483235177.0.1.0"><ide-state-tracker-item v-for="field in
+  $root.vm.getFields(uid)" :class="getCssClass(field)"
+  @click="toggleWatch(field)" :uid="uid" :item="field" :key="uid+'.'+field.key"
+  path="-483235177.0.1.0.0"></ide-state-tracker-item></table></transition></div><transition
   name="slide-hor" path="-483235177.1"><div class="watches"
   v-if="watchedFieldKeys.length" path="-483235177.1.0"><transition-group
   tag="ul" name="slide" path="-483235177.1.0.0"><li v-for="field in

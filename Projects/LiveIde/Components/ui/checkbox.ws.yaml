@@ -1,17 +1,25 @@
 dom:
   .flex:
     ':class': getCssClass()
+    @mouseenter: $emit('mouseenter')
+    @mouseleave: $emit('mouseleave')
     @click: onInput(!checkedValue)
     input:
       type: checkbox
       ':checked': checkedValue
-    span:
+    span: 
       class: clickable
-      v-text: text
+      .icon:
+        v-if: icon
+        v-text: icon
+      span: 
+        v-text: text
 props:
   value: null
   valueArray: null
+  valueArrayExclude: false
   valueKey: null
+  icon: null
   text: null
   size: large
 methods:
@@ -40,19 +48,30 @@ computed:
   checkedValue: | #js
     function() {
       if (this.valueArray && this.valueKey)
+      {
+        if (this.valueArrayExclude) return !this.valueArray.includes(this.valueKey);
         return this.valueArray.includes(this.valueKey);
+      }
       return this.value;
     }
 style:
+  .icon:
+    display: inline-block
+    margin-right: 0.3rem
   .normal input[type=checkbox]:
     width: 1em
     height: 1em
   span:
     flex-grow: 1
-    font-size: 120%
+    font-size: 100%
+    white-space: nowrap
+    user-select: none
 name: ui-checkbox
 template: >-
   <div class="comp-ui-checkbox flex" :class="getCssClass()"
+  @mouseenter="$emit('mouseenter')" @mouseleave="$emit('mouseleave')"
   @click="onInput(!checkedValue)" path="1049372125."><input type="checkbox"
   :checked="checkedValue" path="1049372125.0"/><span class="clickable"
-  v-text="text" path="1049372125.1"></span></div>
+  path="1049372125.1"><div class="icon" v-if="icon" v-text="icon"
+  path="1049372125.1.0"></div><span v-text="text"
+  path="1049372125.1.1"></span></span></div>

@@ -15,6 +15,7 @@ interface StateChange {
   id: number;
   dt: number;
   uid: number;
+  vueCompName: string;
   vuePath: [];
   type: string;
   key: string;
@@ -115,6 +116,7 @@ class StateTracker {
         id: StateTracker._nextID++,
         dt: Date.now(),
         uid: vue._uid,
+        vueCompName: vue.$options._componentTag,
         type,
         key,
         args,

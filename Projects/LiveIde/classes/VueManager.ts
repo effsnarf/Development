@@ -66,16 +66,27 @@ class VueManager {
     return vues;
   }
 
-  getDescendants(vue: any, filter: any): any[] {
+  getDescendant(vue: any, filter: any): any {
+    return this.getDescendants(vue, filter, 1)[0];
+  }
+
+  getDescendants(vue: any, filter: any, maxCount: number): any[] {
     if (typeof filter == "string") {
       const compName = filter;
       filter = (vue: any) => vue.$data._?.comp.name == compName;
     }
+    if (typeof filter == "number") {
+      const uid = filter;
+      filter = (vue: any) => vue._uid == uid;
+    }
     const vues = [] as any[];
     for (const child of vue.$children) {
       if (filter(child)) vues.push(child);
-      vues.push(...this.getDescendants(child, filter));
+      if (vues.length >= maxCount) break;
+      vues.push(...this.getDescendants(child, filter, maxCount));
+      if (vues.length >= maxCount) break;
     }
+    if (vues.length >= maxCount) vues.length = maxCount;
     return vues;
   }
 

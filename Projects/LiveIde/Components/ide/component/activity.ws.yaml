@@ -1,46 +1,90 @@
 dom:
   div: 
-    .flex.gap-3:
+    .flex.gap-3.justify-between:
       h3:
         ui.title:
           text: ✨ Activity
           ':number': changes.length
-      div: 
-        .checkboxes:
-          ui.checkbox:
-            v-for: type in changes.map(c => c.type).distinct()
-            ':text': $root.getIcon(type)
-            ':value-array': showTypes
-            ':value-key': type
     .flex1:
-      transition.group:
-        tag: ul
-        name: list2
-        ':class': activityListClass
-        ':key': key1
-        li:
-          v-for: change in visibleChanges
-          ':class': '{ hoverable: true, ''selected'': (selectedChange == change) }'
-          ':key': change.id
-          @mouseenter: () => onMouseEnter(change)
-          @mouseleave: () => onMouseLeave(change)
-          @click: () => onClick(change)
+      .slider-closed:
+        div: 
+          class: show-on-hover-container
+          div: 
+            ui.checkbox: 
+              v-for: type in changes.map(c => c.type).distinct()
+              ':text': $root.getIcon(type) + ' ' + getTypeName(type)
+              ':value-array': showTypes
+              ':value-key': type
+          div: 
+            class: mt-l1
+            ui.checkbox: 
+              text: 🎄 Child components
+              v-model: includeChildComps
+            transition: 
+              name: slide
+              div: 
+                v-if: includeChildComps
+                class: show-on-hover mt-1 ml-l1
+                div: 
+                  ui.select:
+                    type: toggle
+                    ':options': childCompsDepthOptions
+                    ':can-select-none': false
+                    v-model: childCompsDepthIndex
+                    ':get-item-text': (i) => (childCompsDepthOptions[i] + ' levels deep')
+                ui.checkbox: 
+                  v-for: vueCompName in vueCompNames
+                  icon: 📦
+                  ':text': vueCompName
+                  ':value-array': excludedVueCompNames
+                  ':value-array-exclude': 'true'
+                  ':value-key': vueCompName
+                  @mouseenter: hoveredVueCompName = vueCompName
+                  @mouseleave: hoveredVueCompName = null
+      div: 
+        transition.group:
+          tag: table
+          name: list2
+          ':class': activityListClass
+          ':key': key1
           ide.state.tracker.item: 
+            v-for: change in visibleChanges
             ':icon': '''✨'''
             ':item': change
+            ':class': >-
+              { hoverable: true, highlight: (change.vueCompName ==
+              hoveredVueCompName), selected: (selectedChange == change) }
+            ':show-comp-name': includeChildComps
             ':key': change.id
-      transition:
-        name: slide-hor
-        ide.state.tracker.item: 
-          v-if: selectedChange
-          ':preview': 'true'
-          ':icon': '''✨'''
-          ':item': selectedChange
-          ':key': selectedChange.id
+            @mouseenter: () => onMouseEnter(change)
+            @mouseleave: () => onMouseLeave(change)
+            @click: () => onClick(change)
+      div: 
+        table:
+          transition: 
+            name: slide-hor
+            ide.state.tracker.item: 
+              v-if: selectedChange
+              ':preview': 'true'
+              ':icon': '''✨'''
+              ':item': selectedChange
+              ':key': selectedChange.id
 props:
   uid: null
 data:
   changes: []
+  vueCompNames: []
+  hoveredVueCompName: null
+  excludedVueCompNames: []
+  includeChildComps: false
+  childCompsDepthOptions:
+    - all
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+  childCompsDepthIndex: 0
   showTypes:
     - p
     - d
@@ -54,6 +98,35 @@ mounted: | #js
     this.$root.$on("state-changed", this.onStateChanged.bind(this));
   }
 methods:
+  getTypeName: | #js
+    function(type) {
+      return {
+        p: 'prop',
+        d: 'data',
+        e: 'event',
+        m: 'method',
+        c: 'computed',
+      }[type];
+    }
+  getChangeDepth: | #js
+    function(change) {
+      const mainVue = this.$root.vm.getVue(this.uid);
+      const changeVue = this.$root.vm.getDescendant(mainVue, change.uid);
+      return this.getVueDistance(mainVue, changeVue);
+    }
+  getVueDistance: | #js
+    function(parentVue, childVue) {
+      if (!childVue) return null;
+      if (parentVue == childVue) return 0;
+      let distance = 1;
+      let vue = childVue;
+      while (vue.$parent) {
+        vue = vue.$parent;
+        if (vue == parentVue) return distance;
+        distance++;
+      }
+      return null;
+    }
   onStateChanged: | #js
     function(change) {
       if (!change) return;
@@ -74,36 +147,53 @@ methods:
     function(uid, depth = 0) {
       let changes = [...(this.$root.state.changes.get(uid) || [])];
       const vue = this.$root.vm.getVue(uid);
-      if ((vue) && (depth < 5)) {
+      if (vue && this.includeChildComps && this.includeChildCompsDepth(depth)) {
         for (const childVue of vue.$children) {
           changes.push(...this.getChanges(childVue._uid, (depth + 1)));
         }
       }
-      changes = changes.sortBy(c => c.id);
-      changes = [...changes].reverse();
-      changes = changes.take(50);
+      if (!depth) {
+        changes = changes.sortBy(c => c.id);
+        changes = [...changes].reverse();
+      }
       return changes;
+    }
+  includeChildCompsDepth: | #js
+    function(depth) {
+      if (this.childCompsDepth == 'all') return true;
+      return (depth < parseInt(this.childCompsDepth));
     }
   reload: | #js
     function() {
       this.changes = this.getChanges(this.uid);
+      this.vueCompNames = this.changes
+        .map(c => c.vueCompName)
+        .distinct()
+        .sort();
     }
   refresh: | #js
     function() {
       this.key1++;
     }
 computed:
+  childCompsDepth: | #js
+    function() {
+      return this.childCompsDepthOptions[this.childCompsDepthIndex];
+    }
   activityListClass: | #js
     function() {
       return {
-        list2: true,
         // 'slider-opened': !this.selectedChange,
         // 'slider-closed': !!this.selectedChange,
       };
     }
   visibleChanges: | #js
     function() {
-      return this.changes.filter(c => this.showTypes.includes(c.type));
+      let changes = [...this.changes];
+      changes = changes.filter(c => this.showTypes.includes(c.type));
+      changes = changes.filter(c => !this.excludedVueCompNames.includes(c.vueCompName));
+      changes = changes.take(50);
+      return changes;
     }
 watch:
   uid:
@@ -112,37 +202,71 @@ watch:
         this.reload();
       }
     immediate: true
+  includeChildComps:
+    handler: | #js
+      function() {
+        this.reload();
+      }
+    immediate: true
+  excludedVueCompNames:
+    handler: | #js
+      function() {
+        this.reload();
+      }
+    immediate: true
+    deep: true
 style:
-  .list2:
-    max-height: 50vh
-    overflow-x: hidden
-    overflow-y: auto
+  .highlight:
+    background-color: '#ffffff20'
   .flex1:
     display: flex
     flex-direction: row
     gap: 1em
     margin-top: 1em
+    max-height: 50vh
+    overflow-x: hidden
+    overflow-y: auto
   .checkboxes:
     display: flex
+  .disabled:
+    opacity: 0.5
 name: ide-component-activity
 template: >-
   <div class="comp-ide-component-activity" path="720218788."><div class="flex
-  gap-3" path="720218788.0"><h3 path="720218788.0.0"><ui-title text="✨ Activity"
-  :number="changes.length" path="720218788.0.0.0"></ui-title></h3><div
-  path="720218788.0.1"><div class="checkboxes"
-  path="720218788.0.1.0"><ui-checkbox v-for="type in changes.map(c =&gt;
-  c.type).distinct()" :text="$root.getIcon(type)" :value-array="showTypes"
-  :value-key="type"
-  path="720218788.0.1.0.0"></ui-checkbox></div></div></div><div class="flex1"
-  path="720218788.1"><transition-group tag="ul" name="list2"
-  :class="activityListClass" :key="key1" path="720218788.1.0"><li v-for="change
-  in visibleChanges" :class="{ hoverable: true, 'selected': (selectedChange ==
-  change) }" :key="change.id" @mouseenter="() =&gt; onMouseEnter(change)"
-  @mouseleave="() =&gt; onMouseLeave(change)" @click="() =&gt; onClick(change)"
-  path="720218788.1.0.0"><ide-state-tracker-item :icon="'✨'" :item="change"
-  :key="change.id"
-  path="720218788.1.0.0.0"></ide-state-tracker-item></li></transition-group><transition
-  name="slide-hor" path="720218788.1.1"><ide-state-tracker-item
+  gap-3 justify-between" path="720218788.0"><h3 path="720218788.0.0"><ui-title
+  text="✨ Activity" :number="changes.length"
+  path="720218788.0.0.0"></ui-title></h3></div><div class="flex1"
+  path="720218788.1"><div class="slider-closed" path="720218788.1.0"><div
+  class="show-on-hover-container" path="720218788.1.0.0"><div
+  path="720218788.1.0.0.0"><ui-checkbox v-for="type in changes.map(c =&gt;
+  c.type).distinct()" :text="$root.getIcon(type) + ' ' + getTypeName(type)"
+  :value-array="showTypes" :value-key="type"
+  path="720218788.1.0.0.0.0"></ui-checkbox></div><div class="mt-l1"
+  path="720218788.1.0.0.1"><ui-checkbox text="🎄 Child components"
+  v-model="includeChildComps"
+  path="720218788.1.0.0.1.0"></ui-checkbox><transition name="slide"
+  path="720218788.1.0.0.1.1"><div class="show-on-hover mt-1 ml-l1"
+  v-if="includeChildComps" path="720218788.1.0.0.1.1.0"><div
+  path="720218788.1.0.0.1.1.0.0"><ui-select type="toggle"
+  :options="childCompsDepthOptions" v-model="childCompsDepthIndex"
+  :get-item-text="(i) =&gt; (childCompsDepthOptions[i] + ' levels deep')"
+  path="720218788.1.0.0.1.1.0.0.0"></ui-select></div><ui-checkbox
+  v-for="vueCompName in vueCompNames" icon="📦" :text="vueCompName"
+  :value-array="excludedVueCompNames" :value-array-exclude="true"
+  :value-key="vueCompName" @mouseenter="hoveredVueCompName = vueCompName"
+  @mouseleave="hoveredVueCompName = null"
+  path="720218788.1.0.0.1.1.0.1"></ui-checkbox></div></transition></div></div></div><div
+  path="720218788.1.1"><transition-group tag="table" name="list2"
+  :class="activityListClass" :key="key1"
+  path="720218788.1.1.0"><ide-state-tracker-item v-for="change in
+  visibleChanges" :icon="'✨'" :item="change" :class="{ hoverable: true,
+  highlight: (change.vueCompName == hoveredVueCompName), selected:
+  (selectedChange == change) }" :show-comp-name="includeChildComps"
+  :key="change.id" @mouseenter="() =&gt; onMouseEnter(change)" @mouseleave="()
+  =&gt; onMouseLeave(change)" @click="() =&gt; onClick(change)"
+  path="720218788.1.1.0.0"></ide-state-tracker-item></transition-group></div><div
+  path="720218788.1.2"><table path="720218788.1.2.0"><transition
+  name="slide-hor" path="720218788.1.2.0.0"><ide-state-tracker-item
   v-if="selectedChange" :preview="true" :icon="'✨'" :item="selectedChange"
   :key="selectedChange.id"
-  path="720218788.1.1.0"></ide-state-tracker-item></transition></div></div>
+  path="720218788.1.2.0.0.0"></ide-state-tracker-item></transition></table></div></div></div>

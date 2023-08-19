@@ -71,7 +71,7 @@ methods:
       if (this.getItemText) s = this.getItemText(s);
       if (this.itemIcon) s = `${this.itemIcon} ${s}`;
       if (this.type === "toggle") {
-        if (s.length > 2) s = `[ ${s} ]`;
+        if (s?.length > 2) s = `[ ${s} ]`;
       }
       return s;
     }

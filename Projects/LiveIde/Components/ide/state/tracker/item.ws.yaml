@@ -1,36 +1,33 @@
 dom:
-  div: 
-    .grid:
-      ':class': getGridClass()
-      ':style': getGridStyle()
-      @click: onItemClick(item)
-      div: 
-        v-if: icon
-        v-text: icon
-      .opacity-30:
-        v-text: vueCompName
-      .text-center:
-        v-text: $root.getIcon(item)
-      div: 
-        v-text: item.key
-      .newValue:
-        v-if: (valueInGrid && item.newValue)
-        ui.value.preview:
-          v-if: showValue(item)
-          ':value': item.newValue.value
-        @mouseenter: onHoverValue
-        @mouseleave: onUnhoverValue
-    ui.value.any:
-      v-if: (!valueInGrid && showValue(item))
-      ':value': item.newValue.value
-    ide.component.method:
-      v-if: (showMethod(item))
-      ':method': getMethod(item)
-      ':args': item.args
+  tr:
+    ':class': getGridClass()
+    @click: $emit('click')
+    td: 
+      v-if: icon
+      v-text: icon
+    td: 
+      v-if: showCompName
+      class: opacity-30
+      v-text: item.vueCompName
+    td: 
+      class: text-center
+      v-text: $root.getIcon(item)
+    td: 
+      v-text: item.key
+    td: 
+      class: newValue
+      v-if: (valueInGrid && item.newValue)
+      ui.value.preview:
+        v-if: showValue(item)
+        ':value': item.newValue.value
+      @mouseenter: onHoverValue
+      @mouseleave: onUnhoverValue
 props:
   item: null
   icon: null
   preview: false
+  showCompName: false
+  depth: 0
 data:
   isHoveringOverValue: false
   selectedItem: null
@@ -100,34 +97,15 @@ methods:
     function() {
       const cls = [];
       cls.push(this.item.type);
+      cls.push("tr");
       if (this.preview) cls.push("preview");
       return cls;
-    }
-  getGridStyle: | #js
-    function() {
-      const style = {};
-      const compColumn = "8em";
-      const valueColumn = (this.valueInGrid) ? "8em" : "0px";
-      const nameColumn = (this.valueInGrid) ? "8em" : "8em";
-      if (this.icon) {
-        style["grid-template"] = `1fr / 1em ${compColumn} 2em ${nameColumn} ${valueColumn}`;
-      }
-      else {
-        style["grid-template"] = `1fr / ${compColumn} 2em ${nameColumn} ${valueColumn}`;
-      }
-      return style;
     }
   consoleLog: | #js
     function(value) {
       console.log(value);
     }
 computed:
-  vueCompName: | #js
-    function() {
-      const vue = this.$root.vm.getVue(this.item.uid);
-      if (!vue) return null;
-      return vue.$options._componentTag;
-    }
   valueInGrid: | #js
     function() {
       return (!this.preview);
@@ -140,6 +118,14 @@ watch:
       }
     immediate: true
 style:
+  .tr:
+    white-space: nowrap
+  td:
+    padding: 0 0.5em
+  td:first-child:
+    border-radius: 0.5em 0 0 0.5em
+  td:last-child:
+    border-radius: 0 0.5em 0.5em 0
   .grid:
     width: min-content
     text-wrap: nowrap
@@ -160,18 +146,13 @@ style:
     font-size: 110%
 name: ide-state-tracker-item
 template: >-
-  <div class="comp-ide-state-tracker-item" path="841306122."><div class="grid"
-  :class="getGridClass()" :style="getGridStyle()" @click="onItemClick(item)"
-  path="841306122.0"><div v-if="icon" v-text="icon"
-  path="841306122.0.0"></div><div class="opacity-30" v-text="vueCompName"
-  path="841306122.0.1"></div><div class="text-center"
-  v-text="$root.getIcon(item)" path="841306122.0.2"></div><div v-text="item.key"
-  path="841306122.0.3"></div><div class="newValue" v-if="(valueInGrid &amp;&amp;
+  <tr class="comp-ide-state-tracker-item" :class="getGridClass()"
+  @click="$emit('click')" path="841306122."><td v-if="icon" v-text="icon"
+  path="841306122.0"></td><td class="opacity-30" v-if="showCompName"
+  v-text="item.vueCompName" path="841306122.1"></td><td class="text-center"
+  v-text="$root.getIcon(item)" path="841306122.2"></td><td v-text="item.key"
+  path="841306122.3"></td><td class="newValue" v-if="(valueInGrid &amp;&amp;
   item.newValue)" @mouseenter="onHoverValue" @mouseleave="onUnhoverValue"
-  path="841306122.0.4"><ui-value-preview v-if="showValue(item)"
+  path="841306122.4"><ui-value-preview v-if="showValue(item)"
   :value="item.newValue.value"
-  path="841306122.0.4.0"></ui-value-preview></div></div><ui-value-any
-  v-if="(!valueInGrid &amp;&amp; showValue(item))" :value="item.newValue.value"
-  path="841306122.1"></ui-value-any><ide-component-method
-  v-if="(showMethod(item))" :method="getMethod(item)" :args="item.args"
-  path="841306122.2"></ide-component-method></div>
+  path="841306122.4.0"></ui-value-preview></td></tr>
