@@ -1,31 +1,60 @@
 dom:
   div:
     transition:
-      name: slide
+      name: slide2
       .alert:
-        v-if: text
-        v-text: text
+        v-if: isVisible
+        ':key': text1
+        v-text: text1
         @click: onClick
-data:
+props:
   text: null
+data:
+  text1: null
+  isVisible: true
 methods:
   show: | #js
     function(text) {
-      this.text = text;
+      if (text) this.text1 = text;
+      this.isVisible = true;
     }
   onClick: | #js
     function() {
-      this.text = null;
+      this.isVisible = false;
+      this.$emit('click');
     }
+watch:
+  text:
+    handler: | #js
+      function(text) {
+        this.show(text);
+      }
+    immediate: true
+example:
+  dom:
+    ui.alert:
+      ref: alert1
+      text: ⚠️ This is an alert.
+      @click: onClick
+  methods:
+    onClick: | #js
+      function() {
+        setTimeout(() => {
+          this.$refs.alert1.show('⚠️ This is another alert.');
+        }, 1000);
+      }
 style:
   .alert:
     background: '#ffffff20'
     padding: 0.5em 1em
+    text-align: center
     cursor: pointer
-  .alert:hover:
-    background: '#ffffff30'
 name: ui-alert
+_:
+  examples:
+    count: 1
 template: >-
-  <div class="comp-ui-alert" path="-2141174398."><transition name="slide"
-  path="-2141174398.0"><div class="alert" v-if="text" v-text="text"
-  @click="onClick" path="-2141174398.0.0"></div></transition></div>
+  <div class="comp-ui-alert" path="-2141174398."><transition name="slide2"
+  path="-2141174398.0"><div class="alert" v-if="isVisible" :key="text1"
+  v-text="text1" @click="onClick"
+  path="-2141174398.0.0"></div></transition></div>

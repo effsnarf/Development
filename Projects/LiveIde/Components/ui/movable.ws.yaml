@@ -87,6 +87,9 @@ style:
   .movable:
     user-select: none
 name: ui-movable
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-ui-movable movable" :class="{ enabled: enabled }"
   @mousedown="onMouseDown" @mousemove="onMouseMove" @mouseup="onMouseUp"

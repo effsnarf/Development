@@ -3,10 +3,10 @@ dom:
     .flex:
       ':style': '{ gap: ''1em'' }'
       v-if: (title || specialTypeName)
-      h3: 
+      .title: 
         v-if: title
         v-text: title
-      h3: 
+      .title: 
         class: opacity-50
         v-if: specialTypeName
         v-text: specialTypeName
@@ -76,6 +76,8 @@ computed:
       }
     }
 style:
+  .title1:
+    opacity: 0.5
   .console-log-button:
     position: absolute
     right: '-1em'
@@ -92,14 +94,18 @@ style:
     max-height: 50vh
     overflow: auto
 name: ui-value-object
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-ui-value-object" path="-1714629770."><div class="flex"
   :style="{ gap: '1em' }" v-if="(title || specialTypeName)"
-  path="-1714629770.0"><h3 v-if="title" v-text="title"
-  path="-1714629770.0.0"></h3><h3 class="opacity-50" v-if="specialTypeName"
-  v-text="specialTypeName" path="-1714629770.0.1"></h3></div><ui-tabs
-  :options="['🎄', '🆎']" direction="toggle" path="-1714629770.1"><template
-  v-slot:tab0 path="-1714629770.1.0"><pre class="pre"
+  path="-1714629770.0"><div class="title" v-if="title" v-text="title"
+  path="-1714629770.0.0"></div><div class="opacity-50 title"
+  v-if="specialTypeName" v-text="specialTypeName"
+  path="-1714629770.0.1"></div></div><ui-tabs :options="['🎄', '🆎']"
+  direction="toggle" path="-1714629770.1"><template v-slot:tab0
+  path="-1714629770.1.0"><pre class="pre"
   path="-1714629770.1.0.0"><ui-value-table :value="value" :depth="(depth + 1)"
   path="-1714629770.1.0.0.0"></ui-value-table></pre></template><template
   v-slot:tab1 path="-1714629770.1.1"><div class="box1"

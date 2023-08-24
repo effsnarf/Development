@@ -310,6 +310,8 @@ class ClientContext {
         for (const helper of Object.entries(this.helpers || {})) {
             const func = eval(helper[1].replace(/: any/g, "").replace(/: string/g, ""));
             this.Handlebars.registerHelper(helper[0], (...args) => {
+                if (args[0]?.constructor?.name == "ClientContext")
+                    args.shift();
                 return func(this.compilation.context, ...args);
             });
         }
@@ -464,7 +466,12 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Component = void 0;
 const ClientContext_1 = __webpack_require__(/*! ./ClientContext */ "../../../LiveIde/Classes/ClientContext.ts");
 String.prototype.kebabize = function () {
-    return this.replace(/\./g, "-").toLowerCase();
+    return this.toString()
+        .replace(/\./g, " ")
+        .replace(/\-/g, " ")
+        .getCaseWords()
+        .map((w) => w.toLowerCase())
+        .join("-");
 };
 class Component {
     name;
@@ -3487,7 +3494,7 @@ class VueManager {
             filter = (vue) => vue._uid == uid;
         }
         const vues = [];
-        for (const child of vue.$children) {
+        for (const child of vue.$children || []) {
             if (filter(child))
                 vues.push(child);
             if (vues.length >= maxCount)
@@ -4029,7 +4036,7 @@ class Objects {
     static yamlify(obj) {
         throw new Error(_importMainFileToImplement);
     }
-    static parseYaml(str) {
+    static parseYaml(str, options) {
         throw new Error(_importMainFileToImplement);
     }
     static pugToHtml(str, options) {
@@ -4861,6 +4868,23 @@ if (typeof String !== "undefined") {
             .replace(/<br\s*[\/]?>/gi, "\n")
             // Remove HTML tags
             .replace(/(<([^>]+)>)/gi, " "));
+    };
+    String.prototype.htmlEncode = function () {
+        return (this.toString()
+            // Replace & with &amp;
+            .replace(/&/g, "&amp;")
+            // Replace < with &lt;
+            .replace(/</g, "&lt;")
+            // Replace > with &gt;
+            .replace(/>/g, "&gt;")
+            // Replace " with &quot;
+            .replace(/"/g, "&quot;"));
+    };
+    String.prototype.textToHtml = function () {
+        return (this.toString()
+            .htmlEncode()
+            // Replace new lines with <br />
+            .replace(/\n/g, "<br />"));
     };
     String.prototype.htmlToText = function () {
         const nonContentTags = [
@@ -5900,7 +5924,7 @@ var __webpack_exports__ = {};
 (() => {
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/Website/script/1692480679862.ts ***!
+  !*** ../../../LiveIde/Website/script/1692882680265.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -6181,6 +6205,78 @@ const mgHelpers = {
         },
         unbind(el) {
             document.removeEventListener("mousemove", el._updatePosition);
+        },
+    });
+    client.Vue.directive("tooltip", {
+        inserted(el, binding) {
+            // Check if the styles are already added
+            if (!document.getElementById("vue-tooltip-styles")) {
+                const style = document.createElement("style");
+                style.id = "vue-tooltip-styles";
+                style.innerHTML = `
+          .vue-tooltip {
+            position: absolute;
+            background-color: #333;
+            color: #fff;
+            border-radius: 0.5em;
+            padding: 0.5em 1em;
+            box-shadow: -8px 8px 8px #000000a0;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 100ms ease-in-out;
+            pointer-events: none; // Prevents the tooltip from interfering with mouse events
+          }
+          .vue-tooltip.show {
+            opacity: 1;
+          }
+        `;
+                document.head.appendChild(style);
+            }
+        },
+        bind(el, binding) {
+            let tooltipElem = null;
+            let showTimer = null;
+            el.addEventListener("mousemove", function (e) {
+                if (!tooltipElem) {
+                    tooltipElem = document.createElement("div");
+                    tooltipElem.className = "vue-tooltip";
+                    tooltipElem.innerHTML = binding.value?.textToHtml();
+                    document.body.appendChild(tooltipElem);
+                }
+                tooltipElem?.classList.remove("show");
+                // Position the tooltip based on mouse position
+                //const left: number = e.clientX + 30; // 10px offset from the mouse pointer
+                //const top: number = e.clientY - 10;
+                // Position the tooltip to the right of the element
+                const rect = el.getBoundingClientRect();
+                const left = rect.right + 10;
+                const top = rect.top + rect.height / 2 - 20;
+                tooltipElem.style.left = `${left}px`;
+                tooltipElem.style.top = `${top}px`;
+                // Fade in effect
+                requestAnimationFrame(() => {
+                    clearTimeout(showTimer);
+                    showTimer = setTimeout(() => {
+                        tooltipElem?.classList.add("show");
+                    }, 0);
+                });
+            });
+            el.addEventListener("mouseout", function () {
+                if (tooltipElem) {
+                    clearTimeout(showTimer);
+                    // Fade out effect
+                    requestAnimationFrame(() => {
+                        tooltipElem?.classList.remove("show");
+                    });
+                }
+            });
+        },
+        unbind(el) {
+            // Clean up if the element is removed
+            const tooltipElem = document.querySelector(".vue-tooltip");
+            if (tooltipElem) {
+                tooltipElem.remove();
+            }
         },
     });
     await client.compileAll();
@@ -6511,6 +6607,8 @@ const mgHelpers = {
                     .delay(0);
             },
             itemToUrl(item) {
+                if (!item)
+                    return null;
                 if (typeof item == "string")
                     return item;
                 if (item.instanceID)

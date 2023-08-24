@@ -95,6 +95,9 @@ style:
   .square:
     aspect-ratio: 1
 name: ui-image
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-ui-image" path="-2133760639."><component class="image"
   :is="getCompType()" :url="url" @click="$emit('click')"

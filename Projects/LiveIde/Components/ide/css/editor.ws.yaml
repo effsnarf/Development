@@ -329,6 +329,9 @@ style:
   input:
     font-size: 100%
 name: ide-css-editor
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-ide-css-editor" path="-1978980996."><div class="flex gap-2"
   path="-1978980996.0"><div path="-1978980996.0.0"><transition name="slide-hor"

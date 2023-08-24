@@ -1,0 +1,30 @@
+dom:
+  div:
+    .flex:
+      .icon:
+        v-text: '''ƒ'''
+      .text:
+        v-text: value
+props:
+  value: null
+methods: null
+style:
+  .icon:
+    color: brown
+    transform: scale(1.5);
+    margin-right: 0.5em;
+  .text:
+    width: 10em
+    height: 1.5em
+    overflow: hidden
+    color: chocolate
+    white-space: pre
+name: ui-value-preview-function
+_:
+  examples:
+    count: 0
+template: >-
+  <div class="comp-ui-value-preview-function" path="-776676683."><div
+  class="flex" path="-776676683.0"><div class="icon" v-text="'ƒ'"
+  path="-776676683.0.0"></div><div class="text" v-text="value"
+  path="-776676683.0.1"></div></div></div>

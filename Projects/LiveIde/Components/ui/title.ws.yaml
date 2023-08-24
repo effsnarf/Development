@@ -6,7 +6,9 @@ dom:
       v-if: icon
       v-text: icon
     div: 
-      v-text: getText()
+      slot: null
+      div: 
+        v-text: getText()
     .ml-1.opacity-50:
       v-if: number
       v-text: getNumberText()
@@ -38,9 +40,13 @@ style:
     white-space: nowrap
     text-wrap: nowrap
 name: ui-title
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-ui-title flex" path="-2123702658."><div class="icon"
   :class="getIconClass()" v-if="icon" v-text="icon"
-  path="-2123702658.0"></div><div v-text="getText()"
-  path="-2123702658.1"></div><div class="ml-1 opacity-50" v-if="number"
-  v-text="getNumberText()" path="-2123702658.2"></div></div>
+  path="-2123702658.0"></div><div path="-2123702658.1"><slot></slot><div
+  v-text="getText()" path="-2123702658.1.1"></div></div><div class="ml-1
+  opacity-50" v-if="number" v-text="getNumberText()"
+  path="-2123702658.2"></div></div>

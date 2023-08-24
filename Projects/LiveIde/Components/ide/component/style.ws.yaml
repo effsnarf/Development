@@ -28,6 +28,9 @@ watch:
       }
     immediate: true
 name: ide-component-style
+_:
+  examples:
+    count: 0
 template: >-
   <style class="comp-ide-component-style" :class="component.name" v-html="css"
   path="259364412."></style>

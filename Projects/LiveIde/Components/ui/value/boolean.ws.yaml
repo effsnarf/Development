@@ -1,7 +1,8 @@
 dom:
   ui.title:
     ':icon': getIcon(value)
-    ':text': (value)
+    div:
+      v-text: (value.toString())
 props:
   value: null
 methods:
@@ -10,6 +11,10 @@ methods:
       return value ? "✔️" : "❌";
     }
 name: ui-value-boolean
+_:
+  examples:
+    count: 0
 template: >-
-  <ui-title class="comp-ui-value-boolean" :icon="getIcon(value)" :text="(value)"
-  path="110445265."></ui-title>
+  <ui-title class="comp-ui-value-boolean" :icon="getIcon(value)"
+  path="110445265."><div v-text="(value.toString())"
+  path="110445265.0"></div></ui-title>

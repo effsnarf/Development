@@ -23,6 +23,9 @@ methods:
       this.$emit("input", size);
     }
 name: ui-track-size
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-ui-track-size" ref="div1"
   path="759638622."><slot></slot></div>

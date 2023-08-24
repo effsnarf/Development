@@ -49,6 +49,9 @@ style:
     overflow-x: hidden
     overflow-y: auto
 name: ide-component-editor
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-ide-component-editor" v-if="component" path="-965690814."><h2
   path="-965690814.0"><ui-title icon="📦" :text="component.name"

@@ -96,6 +96,9 @@ watch:
       }
     immediate: true
 name: ui-chart2
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-ui-chart2 w-100pc" v-if="every" path="-1898451794."><ui-chart
   v-dim="isBusy" :class="cssClass" :header="getHeader()" :data="values"

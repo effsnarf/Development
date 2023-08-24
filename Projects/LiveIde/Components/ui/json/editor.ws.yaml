@@ -59,6 +59,9 @@ watch:
       }
     }
 name: ui-json-editor
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-ui-json-editor" path="-208761639."><ui-textarea
   v-model="yaml" @focus="isFocused = true" @blur="isFocused = false"

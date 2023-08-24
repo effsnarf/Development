@@ -8,6 +8,13 @@ helpers:
     (context, dom, compName) => {
       return context.toTemplate(context, dom, 0, compName).join("\n");
     }
+  hasKey: | #ts
+    (context, object, key, options) => {
+      if (!object) return false;
+      if (typeof object !== "object") return false;
+      const hasKey = (key in object);
+      return hasKey;
+    }
   addCode: | #ts
     (context, methodBody, code) => {
       if (!methodBody) methodBody = "function() {}";

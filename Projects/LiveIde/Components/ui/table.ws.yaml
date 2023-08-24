@@ -43,6 +43,9 @@ style:
   td:
     padding-right: 1em
 name: ui-table
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-ui-table card" path="-2123958284."><table
   path="-2123958284.0"><thead path="-2123958284.0.0"><th v-for="key in

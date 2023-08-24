@@ -355,7 +355,7 @@ input[type=checkbox], .ide-checkbox
 {
   width: 1em;
   height: 1em;
-  margin: 0.15em 0.5em;
+  margin: 0.1em 0.5em;
   cursor: pointer;
   background: #979797;
   transform: scale(1.1);
@@ -582,6 +582,7 @@ select, input[type=range]
 {
   height: 3em;
 }
+
 
 .show-on-hover-container > .show-on-hover
 {

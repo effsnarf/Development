@@ -7,6 +7,9 @@ props:
   name: null
   source: null
 name: ide-component
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-ide-component" path="622738105."><ui-title icon="📦"
   :value="name" path="622738105.0"></ui-title></div>

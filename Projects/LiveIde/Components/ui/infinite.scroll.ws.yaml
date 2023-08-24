@@ -19,4 +19,7 @@ methods:
     }
 name: ui-infinite-scroll
 style: null
+_:
+  examples:
+    count: 0
 template: <div class="comp-ui-infinite-scroll" path="795650189."><slot></slot></div>

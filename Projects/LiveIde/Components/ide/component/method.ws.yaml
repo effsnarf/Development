@@ -17,6 +17,9 @@ computed:
       return (this.method?.args || []);
     }
 name: ide-component-method
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-ide-component-method" path="-735417930."><div
   path="-735417930.0"><ui-value-code :value="method.code.toString()"

@@ -4,6 +4,9 @@ dom:
 props:
   item: null
 name: ide-component-flow-tree-node
+_:
+  examples:
+    count: 0
 template: >-
   <ui-title class="comp-ide-component-flow-tree-node" v-bind="item?.name"
   path="2107452775."></ui-title>

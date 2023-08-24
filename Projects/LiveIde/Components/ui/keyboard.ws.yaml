@@ -25,4 +25,7 @@ watch:
       this.$emit('alt', alt);
     }
 name: ui-keyboard
+_:
+  examples:
+    count: 0
 template: <div class="comp-ui-keyboard"></div>

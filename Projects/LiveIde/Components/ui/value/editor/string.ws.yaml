@@ -1,0 +1,13 @@
+dom:
+  ui.text.box:
+    ':value': value
+    @input: (value) => $emit('input', value)
+props:
+  value: null
+name: ui-value-editor-string
+_:
+  examples:
+    count: 0
+template: >-
+  <ui-text-box class="comp-ui-value-editor-string" :value="value"
+  @input="(value) =&gt; $emit('input', value)" path="1808749467."></ui-text-box>

@@ -13,7 +13,9 @@ dom:
         v-if: icon
         v-text: icon
       span: 
-        v-text: text
+        slot: null
+        span: 
+          v-text: text
 props:
   value: null
   valueArray: null
@@ -22,6 +24,8 @@ props:
   icon: null
   text: null
   size: large
+data:
+  value1: null
 methods:
   getCssClass: | #js
     function() {
@@ -32,6 +36,7 @@ methods:
       if (this.valueArray && this.valueKey) {
         this.toggleArrayValue(this.valueArray, this.valueKey);
       } else {
+        this.value1 = value;
         this.$emit("input", value);
       }
     }
@@ -43,7 +48,13 @@ methods:
         array.push(value);
       }
     }
-watch: null
+watch:
+  value:
+    handler: | #js
+      function(value) {
+        this.value1 = value;
+      }
+    immediate: true
 computed:
   checkedValue: | #js
     function() {
@@ -52,8 +63,34 @@ computed:
         if (this.valueArrayExclude) return !this.valueArray.includes(this.valueKey);
         return this.valueArray.includes(this.valueKey);
       }
-      return this.value;
+      return this.value1;
     }
+example1:
+  - dom:
+      .flex:
+        div:
+          ui.checkbox:
+            v-for: option in options
+            ':text': option
+            ':value-key': option
+            ':value-array': checkedOptions
+        pre:
+          v-text: toYaml(checkedOptions)
+    data:
+      options:
+        - one
+        - two
+        - three
+        - four
+      checkedOptions: []
+    methods:
+      toYaml: | #js
+        function(value) {
+          return jsyaml.dump(value);
+        }
+  - dom:
+      ui.checkbox:
+        text: Check me
 style:
   .icon:
     display: inline-block
@@ -66,12 +103,17 @@ style:
     font-size: 100%
     white-space: nowrap
     user-select: none
+  .clickable:
+    padding-right: 1em
 name: ui-checkbox
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-ui-checkbox flex" :class="getCssClass()"
   @mouseenter="$emit('mouseenter')" @mouseleave="$emit('mouseleave')"
   @click="onInput(!checkedValue)" path="1049372125."><input type="checkbox"
   :checked="checkedValue" path="1049372125.0"/><span class="clickable"
   path="1049372125.1"><div class="icon" v-if="icon" v-text="icon"
-  path="1049372125.1.0"></div><span v-text="text"
-  path="1049372125.1.1"></span></span></div>
+  path="1049372125.1.0"></div><span path="1049372125.1.1"><slot></slot><span
+  v-text="text" path="1049372125.1.1.1"></span></span></span></div>

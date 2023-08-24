@@ -124,6 +124,9 @@ style:
     width: 30em
     height: 20em
 name: ide-component-view-editor
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-ide-component-view-editor" :style="{ 'min-width': '30em' }"
   v-if="component" path="-1512907487."><div class="flex gap-2"

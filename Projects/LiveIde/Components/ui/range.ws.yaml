@@ -15,6 +15,9 @@ props:
   step: null
 style: null
 name: ui-range
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-ui-range" path="-2125793949."><input type="range"
   :value="value" :min="min" :max="max" :step="step" @input="$emit('input',

@@ -1,12 +1,13 @@
 dom:
-  .card:
+  .container:
     @mouseenter: onMouseEnter
     @mouseleave: onMouseLeave
     @mousemove: onMouseMove
-    ref: card
-    slot: null
-    div:
-      class: glow
+    .card:
+      ref: card
+      slot: null
+      div:
+        class: glow
 data:
   bounds: null
 mounted: | #js
@@ -57,6 +58,8 @@ methods:
       `;
     }
 style:
+  .container:
+    perspective: 600px
   .card:
     font-weight: bold
     box-shadow: '0 1px 5px #00000099'
@@ -79,9 +82,27 @@ style:
     top: 0
     background-image: 'radial-gradient(circle at 50% -20%, #ffffff22, #0000000f)'
     pointer-events: none
-name: ui-card1
+example:
+  dom:
+    ui.card:
+      .content:
+        div:
+          v-text: >-
+            'This is a card. Hover over it to see the effect. The card component
+            can contan any other component.'
+  style:
+    .content:
+      width: 15em
+      padding: 1em
+      aspect-ratio: 3 / 2
+      font-weight: normal
+      text-shadow: '-2px 2px 2px #000'
+name: ui-card
+_:
+  examples:
+    count: 1
 template: >-
-  <div class="comp-ui-card1 card" @mouseenter="onMouseEnter"
-  @mouseleave="onMouseLeave" @mousemove="onMouseMove" ref="card"
-  path="-2139643065."><slot></slot><div class="glow"
-  path="-2139643065.1"></div></div>
+  <div class="comp-ui-card container" @mouseenter="onMouseEnter"
+  @mouseleave="onMouseLeave" @mousemove="onMouseMove" path="-484662742."><div
+  class="card" ref="card" path="-484662742.0"><slot></slot><div class="glow"
+  path="-484662742.0.1"></div></div></div>

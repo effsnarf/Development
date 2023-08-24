@@ -1,11 +1,15 @@
 dom:
   div:
+    class: w-100pc h-100pc
     ui.loading:
       class: absolute-center
       v-show: isLoading
     .file-dropzone:
       v-dim: isLoading
       ref: dropArea1
+      .hint:
+        v-if: enabled
+        v-text: hint
       .upload-button:
         v-if: enabled && showUploadButton
         v-text: '''📤🖼️'''
@@ -20,6 +24,7 @@ dom:
 props:
   enabled: true
   showUploadButton: true
+  hint: drop file here
 data:
   isLoading: 0
 mounted: | #js
@@ -39,18 +44,7 @@ mounted: | #js
 methods:
   onFileDrop: | #js
     async function(files) {
-      await this.$nextTick();
-      if (files.length > 1) return alertify.error('One file at a time, please');
-      this.isLoading++;
-      try
-      {
-        const image = await this.$root.uploadFile(files[0]);
-        this.$emit("input", image._id);
-      }
-      finally
-      {
-        this.isLoading--;
-      }
+      this.$emit('file-drop', files);
     }
   onClickUpload: | #js
     function (e) {
@@ -92,10 +86,44 @@ methods:
         handler(e);
       }
     }
+examples:
+  - dom:
+      div:
+        class: w-100pc h-100pc
+        ui.file.dropzone:
+          @file-drop: onFileDrop
+    methods:
+      onFileDrop: | #js
+        function (files) {
+          console.log(files);
+          alertify.message(`Dropped files logged to console.`);
+        }
 style:
   .file-dropzone:
     width: 100%
     height: 100%
+  .hint:
+    position: absolute
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%
+    height: 100%
+    left: 50%
+    top: 50%
+    transform: translate(-50%, -50%)
+    border: '5px dashed #ccc'
+    font-family: monospace
+    font-size: 2em
+    text-shadow: '-0.1em 0.1em 0.1em #000'
+    text-align: center
+    opacity: 0.5
+    pointer-events: none
+    transition: 0s
+  .drop-possible .hint:
+    background: '#ffffff20'
+    opacity: 1
+    transition: 0s
   .upload-button:
     position: absolute
     width: fit-content !important
@@ -113,30 +141,17 @@ style:
     opacity: 1
   .file-dropzone:hover .upload-button:
     display: block
-  .drop-possible:
-    border: '2px dashed #ccc'
-    padding: 0.5rem
-    box-shadow: 'inset -1em 1em 2em #000'
-    transition: 0.3s
-  .drop-possible::after:
-    content: '''📤 drop image'''
-    position: absolute
-    top: 50%
-    left: 50%
-    transform: translate(-50%, -50%)
-    font-family: monospace
-    font-size: 180%
-    text-align: center
-    width: 100%
-    text-shadow: '-2px 2px 2px #000, 2px -2px 2px #000'
-    pointer-events: none
 name: ui-file-dropzone
+_:
+  examples:
+    count: 1
 template: >-
-  <div class="comp-ui-file-dropzone" path="1956569459."><ui-loading
-  class="absolute-center" v-show="isLoading"
+  <div class="comp-ui-file-dropzone w-100pc h-100pc"
+  path="1956569459."><ui-loading class="absolute-center" v-show="isLoading"
   path="1956569459.0"></ui-loading><div class="file-dropzone" v-dim="isLoading"
-  ref="dropArea1" path="1956569459.1"><div class="upload-button" v-if="enabled
-  &amp;&amp; showUploadButton" v-text="'📤🖼️'" title="📤🖼️ upload image"
-  @click="onClickUpload" path="1956569459.1.0"></div><input class="hidden"
-  type="file" ref="fileInput" @change="onChangeFileInput"
-  path="1956569459.1.1"/><slot></slot></div></div>
+  ref="dropArea1" path="1956569459.1"><div class="hint" v-if="enabled"
+  v-text="hint" path="1956569459.1.0"></div><div class="upload-button"
+  v-if="enabled &amp;&amp; showUploadButton" v-text="'📤🖼️'" title="📤🖼️
+  upload image" @click="onClickUpload" path="1956569459.1.1"></div><input
+  class="hidden" type="file" ref="fileInput" @change="onChangeFileInput"
+  path="1956569459.1.2"/><slot></slot></div></div>

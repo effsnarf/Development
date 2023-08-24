@@ -1,27 +1,25 @@
 dom:
-  div:
-    class: flex justify-center
-    button:
-      v-if: '!isLoading'
-      v-text: text
-      @click: onClick
+  .text-center:
+    transition:
+      name: slide2
+      button:
+        v-if: '!isLoading'
+        @click: onClick
+        ui.title:
+          ':icon': icon
+          ':text': text
     ui.loading:
-      v-if: isLoading
+      ':show': isLoading
 props:
+  icon: null
   text: null
   click: null
-  value: null
   showLoading: true
 data:
   isLoading: 0
 methods:
   onClick: | #js
     async function() {
-      if (this.value != null)
-      {
-        this.$emit("input", !this.value);
-        return;
-      }
       this.$emit('click');
       if (this.click)
       {
@@ -36,12 +34,27 @@ methods:
         }
       }
     }
+example:
+  dom:
+    ui.button:
+      icon: ✔️
+      text: Click me
+      ':click': onClick
+  methods:
+    onClick: | #js
+      async function() {
+        await this.$root.wait(1000);
+      }
 style:
   button:
     user-select: none
 name: ui-button
+_:
+  examples:
+    count: 1
 template: >-
-  <div class="comp-ui-button flex justify-center" path="-1914507316."><button
-  v-if="!isLoading" v-text="text" @click="onClick"
-  path="-1914507316.0"></button><ui-loading v-if="isLoading"
-  path="-1914507316.1"></ui-loading></div>
+  <div class="comp-ui-button text-center" path="-1914507316."><transition
+  name="slide2" path="-1914507316.0"><button v-if="!isLoading" @click="onClick"
+  path="-1914507316.0.0"><ui-title :icon="icon" :text="text"
+  path="-1914507316.0.0.0"></ui-title></button></transition><ui-loading
+  :show="isLoading" path="-1914507316.1"></ui-loading></div>

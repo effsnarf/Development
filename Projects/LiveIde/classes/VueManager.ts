@@ -80,7 +80,7 @@ class VueManager {
       filter = (vue: any) => vue._uid == uid;
     }
     const vues = [] as any[];
-    for (const child of vue.$children) {
+    for (const child of vue.$children || []) {
       if (filter(child)) vues.push(child);
       if (vues.length >= maxCount) break;
       vues.push(...this.getDescendants(child, filter, maxCount));

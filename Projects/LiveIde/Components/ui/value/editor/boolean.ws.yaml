@@ -1,0 +1,18 @@
+dom:
+  .flex:
+    ui.checkbox:
+      ':value': value
+      @input: (value) => $emit('input', value)
+      ui.value.boolean:
+        ':value': value
+props:
+  value: null
+name: ui-value-editor-boolean
+_:
+  examples:
+    count: 0
+template: >-
+  <div class="comp-ui-value-editor-boolean flex"
+  path="-2111837730."><ui-checkbox :value="value" @input="(value) =&gt;
+  $emit('input', value)" path="-2111837730.0"><ui-value-boolean :value="value"
+  path="-2111837730.0.0"></ui-value-boolean></ui-checkbox></div>

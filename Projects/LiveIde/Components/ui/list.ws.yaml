@@ -1,5 +1,5 @@
 dom:
-  div:
+  div: 
     transition.group:
       tag: ul
       name: list
@@ -8,6 +8,8 @@ dom:
         v-for: indexedItem in visibleItems
         ':key': _getItemKey(indexedItem.item)
         ':class': getCssClass(indexedItem.index)
+        div: 
+          v-text: getItemText(indexedItem.item)
         slot:
           ':index': indexedItem.index
           ':item': indexedItem.item
@@ -16,6 +18,8 @@ dom:
         @click: () => onItemClick(indexedItem)
 props:
   items: null
+  value: null
+  valueType: index
   selectedIndex: null
   direction: vertical
   isItemVisible: null
@@ -35,6 +39,13 @@ methods:
       if (this.getItemKey) return this.getItemKey(item) || stringKey;
       return this.$root.getKey(item) || stringKey;
     }
+  getItemText: | #js
+    function(item) {
+      if (this.$slots.default) return null;
+      if (this.$scopedSlots.default) return null;
+      if (typeof item === 'string') return item;
+      return item;
+    }
   getMainCssClass: | #js
     function() {
       const cls = {
@@ -52,7 +63,8 @@ methods:
       const newIndex = (e.index == this.mySelectedIndex) ? null : e.index;
       if ((newIndex == null) && !this.canSelectNone) return;
       this.mySelectedIndex = newIndex;
-      this.$emit('input', newIndex);
+      const value = (this.valueType == 'index') ? newIndex : this.items[newIndex];
+      this.$emit('input', value);
     }
   getCssClass: | #js
     function(index) {
@@ -79,11 +91,12 @@ computed:
       if (!this.items) return null;
       return this.items[this.mySelectedIndex];
     }
-  value: | #js
-    function() {
-      return this.mySelectedIndex;
-    }
 watch:
+  value:
+    handler: | #js
+      function(value) {
+      }
+    immediate: true
   selectedIndex:
     handler: | #js
       function() {
@@ -98,6 +111,34 @@ style:
   .horizontal > *:
     flex-grow: 1
     text-align: center
+examples:
+  - dom:
+      .flex.flex-column.gap-1:
+        ui.list:
+          ':items': listItems
+          value-type: value
+          @item-hover: (e) => hoveredItem = e.item
+          v-model: selectedItem
+        div:
+          div:
+            v-text: '''🧊 hovered: '' + hoveredItem'
+          span:
+            v-text: '''🧊 selected: '' + selectedItem'
+    data:
+      listItems: []
+      hoveredItem: null
+      selectedItem: null
+    mounted: | #js #js
+      function() {
+        this.listItems = [
+          '🧊 item 1',
+          '✨ item 2',
+          '📁 item 3',
+        ];
+      }
+_:
+  examples:
+    count: 1
 template: >-
   <div class="comp-ui-list" path="-484386888."><transition-group tag="ul"
   name="list" :class="getMainCssClass()" path="-484386888.0"><li
@@ -105,6 +146,7 @@ template: >-
   :class="getCssClass(indexedItem.index)" @mouseenter="() =&gt;
   onItemHover(indexedItem)" @mouseleave="() =&gt; onItemHover({ item: null,
   index: null })" @click="() =&gt; onItemClick(indexedItem)"
-  path="-484386888.0.0"><slot :index="indexedItem.index"
+  path="-484386888.0.0"><div v-text="getItemText(indexedItem.item)"
+  path="-484386888.0.0.0"></div><slot :index="indexedItem.index"
   :item="indexedItem.item"
-  path="-484386888.0.0.0"></slot></li></transition-group></div>
+  path="-484386888.0.0.1"></slot></li></transition-group></div>

@@ -25,6 +25,9 @@ methods:
     }
 style: null
 name: ui-link
+_:
+  examples:
+    count: 0
 template: >-
   <a class="comp-ui-link clickable2" :target="target" :href="(!enabled ? null :
   url)" @click="onClick" path="-484387052."><div v-if="text" v-text="text"

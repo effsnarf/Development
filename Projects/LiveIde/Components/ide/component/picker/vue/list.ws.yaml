@@ -18,6 +18,9 @@ props:
   className: null
 data: null
 name: ide-component-picker-vue-list
+_:
+  examples:
+    count: 0
 template: >-
   <transition-group class="comp-ide-component-picker-vue-list" tag="div"
   name="list2" :class="className" path="-912894927."><div v-for="uid in uids"

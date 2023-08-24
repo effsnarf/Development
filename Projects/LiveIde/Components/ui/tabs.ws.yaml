@@ -62,6 +62,21 @@ watch:
       if (newIndex == this.selectedTabIndex) return;
       this.selectedTabIndex = newIndex;
     }
+examples:
+  - dom:
+      ui.tabs:
+        ':options': tabNames
+        direction: horizontal
+        template:
+          v-for: (tabName, index) in tabNames
+          v-slot: '''tab'' + index'
+          h3:
+            v-text: tabName
+    data:
+      tabNames:
+        - 🧊 tab1
+        - ✨ tab2
+        - 📁 tab3
 style:
   .flex-reverse:
     display: flex
@@ -77,6 +92,9 @@ style:
   li:
     margin-bottom: 0
 name: ui-tabs
+_:
+  examples:
+    count: 1
 template: >-
   <div class="comp-ui-tabs" :class="class1" path="-484156776."><ui-select
   :class="{ corner: (type=='toggle') }" :options="(options||[]).map(option =&gt;

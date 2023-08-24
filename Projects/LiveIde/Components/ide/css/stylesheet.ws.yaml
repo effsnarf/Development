@@ -26,4 +26,7 @@ computed:
       return this.getRulesCss(this.rules);
     }
 name: ide-css-stylesheet
+_:
+  examples:
+    count: 0
 template: <style class="comp-ide-css-stylesheet" v-html="css" path="52333277."></style>

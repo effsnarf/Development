@@ -120,6 +120,9 @@ style:
   th:
     padding-right: 1em
 name: ui-value-table
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-ui-value-table" path="-604919625."><div class="opacity-50"
   v-if="isEmpty" v-text="emptyText" path="-604919625.0"></div><table

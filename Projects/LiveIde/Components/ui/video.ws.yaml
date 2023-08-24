@@ -22,6 +22,9 @@ methods:
       setTimeout(this.ensureVideoIsPlaying.bind(this), 400);
     }
 name: ui-video
+_:
+  examples:
+    count: 0
 template: >-
   <video class="comp-ui-video" ref="video1" autoplay="true" muted="true"
   loop="true" :src="src" path="-2121871199."></video>

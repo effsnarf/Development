@@ -31,6 +31,9 @@ watch:
       }
     immediate: true
 name: ide-component-view-node
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-ide-component-view-node w-100pc" v-if="item"
   path="-971127114."><ui-highlighter :get-elements="() =&gt;

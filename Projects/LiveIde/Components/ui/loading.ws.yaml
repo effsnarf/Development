@@ -1,8 +1,13 @@
 dom:
-  .center:
-    img:
-      class: loading
-      ':src': $root.loadingImageUrl
+  transition:
+    name: slide2
+    .center:
+      v-if: show
+      img:
+        class: loading
+        ':src': $root.loadingImageUrl
+props:
+  show: true
 style:
   .center:
     display: flex
@@ -10,6 +15,10 @@ style:
   .loading:
     max-width: min-content
 name: ui-loading
+_:
+  examples:
+    count: 0
 template: >-
-  <div class="comp-ui-loading center" path="875113442."><img class="loading"
-  :src="$root.loadingImageUrl" path="875113442.0"/></div>
+  <transition class="comp-ui-loading" name="slide2" path="875113442."><div
+  class="center" v-if="show" path="875113442.0"><img class="loading"
+  :src="$root.loadingImageUrl" path="875113442.0.0"/></div></transition>

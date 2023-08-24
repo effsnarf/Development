@@ -33,6 +33,9 @@ style:
   th:
     padding-right: 1em
 name: ide-component-view-node-editor
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-ide-component-view-node-editor" v-if="node"
   path="-981981275."><div path="-981981275.0"><ui-text-box class="fs-m3"

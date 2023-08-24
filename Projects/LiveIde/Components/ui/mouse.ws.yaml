@@ -3,6 +3,7 @@ dom:
     slot: null
 props:
   global: false
+  ctrlRightClick: true
 data:
   pos: {}
   hoveredElement: null
@@ -90,4 +91,7 @@ watch:
       this.$emit("hovered-element", newHoveredElement);
     }
 name: ui-mouse
+_:
+  examples:
+    count: 0
 template: <div class="comp-ui-mouse" path="-2129987381."><slot></slot></div>

@@ -32,6 +32,9 @@ mounted: | #js
     });
   }
 name: ide-component-state-watches
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-ide-component-state-watches" path="1039616747."><h3
   v-text="'State Watches'" path="1039616747.0"></h3><div v-text="stateItems"

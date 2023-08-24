@@ -27,6 +27,9 @@ computed:
     }
 style: null
 name: ide-css-editor-flex
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-ide-css-editor-flex"
   path="-25878229."><ide-css-editor-example-flex :example-style="flexStyle"

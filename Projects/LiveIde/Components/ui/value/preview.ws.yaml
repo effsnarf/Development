@@ -2,11 +2,15 @@ dom:
   div: 
     ':class': '{ preview: preview }'
     div: 
+      v-if: isSimpleType(value)
       ':class': getCssClass(value)
       v-text: valueToString(value)
     ui.image:
       v-if: isImageUrl(value)
       ':url': value
+    ui.value.preview.function:
+      v-if: isFunction(value)
+      ':value': value
 props:
   value: null
   preview: true
@@ -26,12 +30,20 @@ computed:
       }[this.type]) || null;
     }
 methods:
+  isSimpleType: | #js
+    function(value) {
+      return (!this.isImageUrl(value) && !this.isFunction(value));
+    }
   isImageUrl: | #js
     function(value) {
       if (typeof value != "string") return false;
       if (!value.startsWith("http")) return false;
       if ([".png", ".jpg", ".jpeg", ".gif"].some(ext => value.endsWith(ext))) return true;
       return false;
+    }
+  isFunction: | #js
+    function(value) {
+      return typeof value == "function";
     }
   getCssClass: | #js
     function(value) {
@@ -58,8 +70,14 @@ style:
   .preview .comp-ui-image:
     width: 4em
 name: ui-value-preview
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-ui-value-preview" :class="{ preview: preview }"
-  path="-272450959."><div :class="getCssClass(value)"
+  path="-272450959."><div v-if="isSimpleType(value)" :class="getCssClass(value)"
   v-text="valueToString(value)" path="-272450959.0"></div><ui-image
-  v-if="isImageUrl(value)" :url="value" path="-272450959.1"></ui-image></div>
+  v-if="isImageUrl(value)" :url="value"
+  path="-272450959.1"></ui-image><ui-value-preview-function
+  v-if="isFunction(value)" :value="value"
+  path="-272450959.2"></ui-value-preview-function></div>

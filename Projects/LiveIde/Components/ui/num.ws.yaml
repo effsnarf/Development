@@ -29,6 +29,9 @@ style:
     font-size: 70%;
     opacity: 0.4;
 name: ui-num
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-ui-num flex" path="-846907092."><div v-text="number"
   path="-846907092.0"></div><div class="letter" v-text="unit"

@@ -1,7 +1,12 @@
 import { ClientContext } from "./ClientContext";
 
 (String.prototype as any).kebabize = function () {
-  return this.replace(/\./g, "-").toLowerCase();
+  return this.toString()
+    .replace(/\./g, " ")
+    .replace(/\-/g, " ")
+    .getCaseWords()
+    .map((w: string) => w.toLowerCase())
+    .join("-");
 };
 
 class Component {

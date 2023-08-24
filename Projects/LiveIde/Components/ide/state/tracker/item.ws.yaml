@@ -145,6 +145,9 @@ style:
     height: 20em
     font-size: 110%
 name: ide-state-tracker-item
+_:
+  examples:
+    count: 0
 template: >-
   <tr class="comp-ide-state-tracker-item" :class="getGridClass()"
   @click="$emit('click')" path="841306122."><td v-if="icon" v-text="icon"

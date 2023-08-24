@@ -44,6 +44,9 @@ style:
     top: 0.25em
     font-size: 160%
 name: ui-share
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-ui-share flex justify-around" path="-2124674043."><div
   class="a2a_kit a2a_kit_size_32 a2a_default_style" :data-a2a-url="url"

@@ -21,6 +21,9 @@ methods:
       return `ui.value.${getType(value)}`.replace(/\./g, "-");
     }
 name: ui-value-any
+_:
+  examples:
+    count: 0
 template: >-
   <component class="comp-ui-value-any" :is="getComponentType(value)"
   :value="value" :title="title" :preview="false" :depth="(depth + 1)"

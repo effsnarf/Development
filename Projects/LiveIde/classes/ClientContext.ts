@@ -102,6 +102,7 @@ class ClientContext {
         (helper[1] as string).replace(/: any/g, "").replace(/: string/g, "")
       );
       this.Handlebars.registerHelper(helper[0], (...args: any[]) => {
+        if (args[0]?.constructor?.name == "ClientContext") args.shift();
         return func(this.compilation.context, ...args);
       });
     }

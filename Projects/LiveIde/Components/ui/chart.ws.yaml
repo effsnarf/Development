@@ -62,6 +62,7 @@ methods:
   drawChart: | #js
     function(data) {
       if (!data?.length) return;
+      if (!this.ctx) return;
 
       this.ctx.clearRect(0, 0, this.width, this.height);
       this.ctx.beginPath();
@@ -85,6 +86,7 @@ methods:
     }
   onMouseMove: | #js
     function(e) {
+      if (!this.canvas) return;
       const rect = this.canvas.getBoundingClientRect();
       const scaleX = this.canvas.width / rect.width;
       const x = e.offsetX;
@@ -150,9 +152,9 @@ computed:
       return this.data;
     }
   canvas: function() { return this.$refs.canvas1; }
-  ctx: function() { return this.canvas.getContext('2d'); }
-  width: function() { return this.canvas.width; }
-  height: function() { return this.canvas.height; }
+  ctx: function() { return this.canvas?.getContext('2d'); }
+  width: function() { return this.canvas?.width; }
+  height: function() { return this.canvas?.height; }
   padding: function() { return 0; }
   paddingX: function() { return this.width * this.padding; }
   paddingY: function() { return this.height * this.padding; }
@@ -205,6 +207,19 @@ computed:
       if (this.hoveredIndex === null) return null;
       return this.paddingX + this.hoveredIndex * this.step;
     }
+example_not:
+  dom:
+    div:
+      ui.chart:
+        icon: 📈
+        title: Chart
+        ':data': '[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]'
+        ':getValue': x => x
+        ':color': green
+        ':header': Header
+        ':total': 100
+        ':scale': 10
+        ':isCumulative': true
 style:
   .top-right:
     position: absolute
@@ -241,6 +256,9 @@ style:
     position: absolute
     bottom: 0
 name: ui-chart
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-ui-chart card" :class="getCssClass()" path="-2139450364."><h2
   class="header" v-if="header" path="-2139450364.0"><span v-text="header"

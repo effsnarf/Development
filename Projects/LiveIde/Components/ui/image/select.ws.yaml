@@ -55,6 +55,9 @@ style:
     border: 6px dashed white
     opacity: 0.3
 name: ui-image-select
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-ui-image-select flex" path="-1667730935."><ui-image
   :imageID="value" :square="true"

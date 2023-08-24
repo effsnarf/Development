@@ -65,6 +65,9 @@ style:
     background: none
     border: 2px solid
 name: ui-image-options
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-ui-image-options options" :class="filter+'-options'"
   :tooltip="filter" path="907340593."><div class="option" v-for="i in 10"

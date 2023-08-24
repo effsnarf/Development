@@ -286,6 +286,8 @@ interface String {
   trimAll(): string;
   trimDoubleQuotes(): string;
   stripHtmlTags(): string;
+  htmlEncode(): string;
+  textToHtml(): string;
   htmlToText(): string;
   decodeHtml(): string;
   getMatches(regex: RegExp): string[];
@@ -1013,6 +1015,29 @@ if (typeof String !== "undefined") {
         .replace(/<br\s*[\/]?>/gi, "\n")
         // Remove HTML tags
         .replace(/(<([^>]+)>)/gi, " ")
+    );
+  };
+
+  (String.prototype as any).htmlEncode = function (): string {
+    return (
+      this.toString()
+        // Replace & with &amp;
+        .replace(/&/g, "&amp;")
+        // Replace < with &lt;
+        .replace(/</g, "&lt;")
+        // Replace > with &gt;
+        .replace(/>/g, "&gt;")
+        // Replace " with &quot;
+        .replace(/"/g, "&quot;")
+    );
+  };
+
+  (String.prototype as any).textToHtml = function (): string {
+    return (
+      this.toString()
+        .htmlEncode()
+        // Replace new lines with <br />
+        .replace(/\n/g, "<br />")
     );
   };
 

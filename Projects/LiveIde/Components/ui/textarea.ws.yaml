@@ -32,6 +32,9 @@ methods:
     }
 name: ui-textarea
 style: null
+_:
+  examples:
+    count: 0
 template: >-
   <textarea class="comp-ui-textarea" :value="value" :placeholder="hint"
   @input="onInput" @focus="$emit('focus')" @blur="$emit('blur')"

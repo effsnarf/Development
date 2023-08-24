@@ -1,0 +1,28 @@
+dom:
+  component:
+    ':is': getComponentType(value)
+    ':value': value
+    @input: (value) => $emit('input', value)
+props:
+  value: null
+methods:
+  getComponentType: | #js
+    function(value) {
+      const getType = (value) => {
+        if (value == null) null;
+        let type = typeof value;
+        if (["string", "boolean"].find(v => v == type)) return type;
+        return null;
+      };
+      const type = getType(value);
+      if (!type) return null;
+      return `ui.value.editor.${type}`.replace(/\./g, "-");
+    }
+name: ui-value-editor
+_:
+  examples:
+    count: 0
+template: >-
+  <component class="comp-ui-value-editor" :is="getComponentType(value)"
+  :value="value" @input="(value) =&gt; $emit('input', value)"
+  path="-1999089244."></component>

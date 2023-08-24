@@ -88,9 +88,12 @@ computed:
       return fields.filter(f => this.watchedFieldKeys.includes(f.key));
     }
 style:
+  .comp-ide-state-tracker:
+    overflow: hidden
   .watches:
     max-height: 50vh
     overflow: auto
+    padding: 1em 2em
   .watches ul:
     gap: 1em
   .watches h3:
@@ -109,6 +112,9 @@ style:
     background: '#ffffff10'
     transition: 0s
 name: ide-state-tracker
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-ide-state-tracker flex" path="-483235177."><div
   :class="getSliderClass()" path="-483235177.0"><h3

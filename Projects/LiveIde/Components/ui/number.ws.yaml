@@ -1,13 +1,13 @@
 dom:
-  div.card:
-    div.top:
-      div.icon:
+  .card:
+    .top:
+      .icon:
         v-text: icon
-      div.number:
+      .number:
         v-text: formatNumber(value)
-      div.unit:
+      .unit:
         v-text: unit
-    div.text:
+    .text:
       v-text: text
 props:
   value: null
@@ -16,7 +16,6 @@ props:
   unit: null
 methods:
   formatNumber: | #js
-
     function(number) {
       if (number == null) return null;
       if (typeof number === 'string') number = parseFloat(number);
@@ -25,6 +24,7 @@ methods:
 style:
   .card:
     line-height: 1
+    display: inline-block
   .card > div:
     text-align: center
   .top:
@@ -34,22 +34,31 @@ style:
     width: min-content
     white-space: nowrap
   .number:
-    font-size: 500%
+    font-size: 100%
   .unit:
-    font-size: 400%
+    font-size: 90%
     opacity: 0.4
   .icon:
-    font-size: 200%
+    font-size: 100%
     margin: auto
   .text:
-    font-size: 120%
+    font-size: 110%
     opacity: 0.6
     line-height: 1.2em
+examples:
+  - dom:
+      ui.number:
+        icon: 📁
+        value: 1042
+        unit: mb
 name: ui-number
+_:
+  examples:
+    count: 1
 template: >-
-  <div-card class="comp-ui-number" path="-1571183645."><div-top
-  path="-1571183645.0"><div-icon v-text="icon"
-  path="-1571183645.0.0"></div-icon><div-number v-text="formatNumber(value)"
-  path="-1571183645.0.1"></div-number><div-unit v-text="unit"
-  path="-1571183645.0.2"></div-unit></div-top><div-text v-text="text"
-  path="-1571183645.1"></div-text></div-card>
+  <div class="comp-ui-number card" path="-1571183645."><div class="top"
+  path="-1571183645.0"><div class="icon" v-text="icon"
+  path="-1571183645.0.0"></div><div class="number" v-text="formatNumber(value)"
+  path="-1571183645.0.1"></div><div class="unit" v-text="unit"
+  path="-1571183645.0.2"></div></div><div class="text" v-text="text"
+  path="-1571183645.1"></div></div>

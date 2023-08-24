@@ -277,7 +277,7 @@ class Objects {
     throw new Error(_importMainFileToImplement);
   }
 
-  static parseYaml(str: string): any {
+  static parseYaml(str: string, options?: any): any {
     throw new Error(_importMainFileToImplement);
   }
 

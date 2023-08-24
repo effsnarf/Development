@@ -136,6 +136,9 @@ style:
   li:
     transition: 0.3s !important
 name: ui-tree-node
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-ui-tree-node" path="2053324664."><div class="tree-node"
   :class="getCssClass()" @click="onNodeClick" @mouseenter="onMouseEnter"

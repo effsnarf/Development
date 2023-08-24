@@ -40,6 +40,9 @@ style:
     overflow: visible
     cursor: n-resize
 name: ui-input-slider
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-ui-input-slider slider" :style="{ cursor: 'n-resize' }"
   @mouseenter="contextIsVisible++" @mouseleave="contextIsVisible--"

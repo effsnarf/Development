@@ -84,6 +84,8 @@ class ClientContext {
         for (const helper of Object.entries(this.helpers || {})) {
             const func = eval(helper[1].replace(/: any/g, "").replace(/: string/g, ""));
             this.Handlebars.registerHelper(helper[0], (...args) => {
+                if (args[0]?.constructor?.name == "ClientContext")
+                    args.shift();
                 return func(this.compilation.context, ...args);
             });
         }
@@ -238,7 +240,12 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Component = void 0;
 const ClientContext_1 = __webpack_require__(/*! ./ClientContext */ "../../../LiveIde/Classes/ClientContext.ts");
 String.prototype.kebabize = function () {
-    return this.replace(/\./g, "-").toLowerCase();
+    return this.toString()
+        .replace(/\./g, " ")
+        .replace(/\-/g, " ")
+        .getCaseWords()
+        .map((w) => w.toLowerCase())
+        .join("-");
 };
 class Component {
     name;
@@ -3211,7 +3218,7 @@ class VueManager {
             filter = (vue) => vue._uid == uid;
         }
         const vues = [];
-        for (const child of vue.$children) {
+        for (const child of vue.$children || []) {
             if (filter(child))
                 vues.push(child);
             if (vues.length >= maxCount)
@@ -3635,7 +3642,7 @@ class Objects {
     static yamlify(obj) {
         throw new Error(_importMainFileToImplement);
     }
-    static parseYaml(str) {
+    static parseYaml(str, options) {
         throw new Error(_importMainFileToImplement);
     }
     static pugToHtml(str, options) {
@@ -4467,6 +4474,23 @@ if (typeof String !== "undefined") {
             .replace(/<br\s*[\/]?>/gi, "\n")
             // Remove HTML tags
             .replace(/(<([^>]+)>)/gi, " "));
+    };
+    String.prototype.htmlEncode = function () {
+        return (this.toString()
+            // Replace & with &amp;
+            .replace(/&/g, "&amp;")
+            // Replace < with &lt;
+            .replace(/</g, "&lt;")
+            // Replace > with &gt;
+            .replace(/>/g, "&gt;")
+            // Replace " with &quot;
+            .replace(/"/g, "&quot;"));
+    };
+    String.prototype.textToHtml = function () {
+        return (this.toString()
+            .htmlEncode()
+            // Replace new lines with <br />
+            .replace(/\n/g, "<br />"));
     };
     String.prototype.htmlToText = function () {
         const nonContentTags = [
@@ -5506,7 +5530,7 @@ var __webpack_exports__ = {};
 (() => {
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/Website/script/1692480679233.ts ***!
+  !*** ../../../LiveIde/Website/script/1692882679359.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

@@ -29,6 +29,9 @@ methods:
       this.getElementsArray().forEach(el => el.classList?.remove("highlighted"));
     }
 name: ui-highlighter
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-ui-highlighter" :class="getCssClass()"
   @mouseenter="onMouseEnter" @mouseleave="onMouseLeave"

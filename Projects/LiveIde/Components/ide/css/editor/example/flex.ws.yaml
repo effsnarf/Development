@@ -46,6 +46,8 @@ style:
     font-size: 3rem
     transition: 0s
 name: ide-css-editor-example-flex
+examples:
+  count: 0
 template: >-
   <div class="comp-ide-css-editor-example-flex" path="-1461106385."><div
   class="example-flex" :style="exampleStyle" path="-1461106385.0"><div

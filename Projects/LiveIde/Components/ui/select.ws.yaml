@@ -152,6 +152,9 @@ style:
     padding: 0 0.5em
   .clickable:hover:
     background: '#ffffff20'
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-ui-select" path="-1442841194."><div :style="{ 'max-width':
   ((direction == 'horizontal') ? null : '15em') }"

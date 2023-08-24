@@ -27,6 +27,9 @@ computed:
       return this.$root.html.getPossibleCssValues(this.name);
     }
 name: ide-css-editor-field
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-ide-css-editor-field flex" :tooltip="tooltip"
   path="-802314744."><div :style="{ width: '12em' }" v-text="'⛏️ ' + name"

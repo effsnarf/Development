@@ -8,6 +8,9 @@ style:
   pre:
     min-width: 10em
 name: ui-value-code
+_:
+  examples:
+    count: 0
 template: >-
   <pre class="comp-ui-value-code" path="1642561508."><code v-text="value"
   path="1642561508.0"></code></pre>

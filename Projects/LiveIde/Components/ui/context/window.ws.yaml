@@ -2,6 +2,7 @@ dom:
   div: 
     ui.mouse: 
       ':global': true
+      ':ctrl-right-click': ctrlRightClick
       @move: onMouseMove
       @right-click: e => onRightClick(e, true)
     ui.mouse: 
@@ -23,26 +24,60 @@ dom:
               name: slide
               h2:
                 v-if: (showTitle) && (icon || title)
-                ui.mouse: 
-                  @right-click: onRightClick
-                h3:
-                  ui.title:
-                    ':icon': icon
-                    ':text': title
+                ui.title:
+                  ':icon': icon
+                  ':title': title
             div: 
               slot: null
               component:
-                v-if: itemType
-                ':is': itemType
+                v-if: compName
+                ':is': compName
                 v-bind: bindProps
 props:
   global: false
+  ctrlRightClick: false
   visible: null
   icon: null
   title: null
-  itemType: null
-  bindProps: null
   showTitle: true
+  compName: null
+  bindProps: null
+  semiTransparent: true
+  getContextElement: null
+desc:
+  global:
+    'true': |
+      The context window is not tied to a particular element.
+      It can be used to create a global context menu.
+      [visible] can control the visibility of the context window from outside.
+    'false': The context window is tied to the parent element.
+  ctrlRightClick:
+    'true': |
+      The context window can be pinned by right clicking it with Ctrl pressed.
+    'false': The context window can be pinned by right clicking it.
+  visible:
+    undefined: The visibility will be controlled by the context window itself.
+    true, false: >-
+      The visibility will be controlled from outside. Usually used together with
+      [global]=true.
+  compName:
+    'null': The slot will be used to render the content of the context window.
+    string: >-
+      The context window will contain the component with this name. Use
+      [bindProps] to pass props to the component.
+  bindProps:
+    'null': >-
+      No props will be passed to the [compName] component inside the context
+      window.
+    object: >-
+      The object will be passed as props to the [compName] component inside the
+      context window.
+  semiTransparent:
+    'true': When unpinned, the context window will be semi-transparent.
+    'false': The context window will be opaque.
+  getContextElement:
+    'null': The context window will be tied to the parent element.
+    function: The context window will be tied to the element returned by this function.
 data:
   lastUpdate: 0
   space: 20
@@ -56,20 +91,28 @@ data:
   isPinned: false
   isInsideContextElement: false
 mounted: | #js
-  function() {
-    const element = (this.global ? window : this.$el.parentElement);
-    element.addEventListener("mouseenter", this.onMouseEnterContext);
-    element.addEventListener("mouseleave", this.onMouseLeaveContext);
-    this.$root.$emit("context-menu-mounted", this);
+  async function() {
+    this.bindToParent();
   }
 unmounted: | #js
   function() {
-    const element = (this.global ? window : this.$el.parentElement);
-    element.removeEventListener("mouseenter", this.onMouseEnterContext);
-    element.removeEventListener("mouseleave", this.onMouseLeaveContext);
-    this.$root.$emit("context-menu-unmounted", this);
+    this.unbindFromParent();
   }
 methods:
+  bindToParent: | #js
+    function() {
+      const element = (this.global ? window : this._getContextElement());
+      element.addEventListener("mouseenter", this.onMouseEnterContext);
+      element.addEventListener("mouseleave", this.onMouseLeaveContext);
+      this.$root.$emit("context-menu-mounted", this);
+    }
+  unbindFromParent: | #js
+    function() {
+      const element = (this.global ? window : this._getContextElement());
+      element.removeEventListener("mouseenter", this.onMouseEnterContext);
+      element.removeEventListener("mouseleave", this.onMouseLeaveContext);
+      this.$root.$emit("context-menu-unmounted", this);
+    }
   onDrag: | #js
     function(dpos) {
       this.globalPos.x += dpos.dx;
@@ -107,6 +150,11 @@ methods:
       e.stopPropagation();
       this.isPinned = !this.isPinned;
     }
+  _getContextElement: | #js
+    function() {
+      if (this.getContextElement) return this.getContextElement();
+      return this.$el.parentElement;
+    }
 computed:
   isVisible: | #js
     function() {
@@ -122,7 +170,7 @@ computed:
       const pos = { ...this.globalPos };
       if (this.global) return pos;
       if (!this.$el) return pos;
-      const rect = this.$el.parentElement.getBoundingClientRect();
+      const rect = this._getContextElement().getBoundingClientRect();
       pos.x -= rect.left;
       pos.y -= rect.top;
       return pos;
@@ -135,6 +183,7 @@ computed:
       const pos = (this.global ? this.globalPos : this.localPos);
       style.left = ((pos.x + this.space) + "px");
       style.top = ((pos.y + this.space) + "px");
+      if (!this.semiTransparent) style.opacity = 1;
       return style;
     }
 watch:
@@ -142,6 +191,7 @@ watch:
     handler: | #js
       function(isPinned) {
         this.$emit("pinned", isPinned);
+        if (!isPinned) this.onMouseLeaveContext();
       }
     deep: true
   mousePos:
@@ -187,11 +237,35 @@ style:
     margin-bottom: 0.5em
     user-select: none
     font-size: 2rem
+examples:
+  - dom:
+      div:
+        ui.alert:
+          ':text': '''hover for context'''
+        ui.context.window:
+          ':ctrl-right-click': 'false'
+          .flex.flex-column:
+            ':style': '{ gap: ''1em'' }'
+            div:
+              ':style': '{ width: ''20em'' }'
+              v-text: >-
+                'Context window will appear when the parent is hovered. Right
+                click to pin it.'
+            span:
+              div:
+                v-text: '''Context window can contain other components.'''
+              ui.button:
+                icon: ✔️
+                text: Button
 name: ui-context-window
+_:
+  examples:
+    count: 1
 template: >-
   <div class="comp-ui-context-window" path="1458497449."><ui-mouse
-  :global="true" @move="onMouseMove" @right-click="e =&gt; onRightClick(e,
-  true)" path="1458497449.0"></ui-mouse><ui-mouse @drag="onDrag"
+  :global="true" :ctrl-right-click="ctrlRightClick" @move="onMouseMove"
+  @right-click="e =&gt; onRightClick(e, true)"
+  path="1458497449.0"></ui-mouse><ui-mouse @drag="onDrag"
   path="1458497449.1"><transition name="fade" path="1458497449.1.0"><div
   class="context-menu" v-show="isVisible" ref="menu1" :class="{ pinned:
   isPinned, inited: isInited, visible: isVisible }" :style="style"
@@ -199,10 +273,8 @@ template: >-
   class="close-button" v-if="isPinned" v-text="'✖️'" @click="isPinned=false"
   path="1458497449.1.0.0.0.0"></div><transition name="slide"
   path="1458497449.1.0.0.0.1"><h2 v-if="(showTitle) &amp;&amp; (icon || title)"
-  path="1458497449.1.0.0.0.1.0"><ui-mouse @right-click="onRightClick"
-  path="1458497449.1.0.0.0.1.0.0"></ui-mouse><h3
-  path="1458497449.1.0.0.0.1.0.1"><ui-title :icon="icon" :text="title"
-  path="1458497449.1.0.0.0.1.0.1.0"></ui-title></h3></h2></transition><div
-  path="1458497449.1.0.0.0.2"><slot></slot><component v-if="itemType"
-  :is="itemType" v-bind="bindProps"
+  path="1458497449.1.0.0.0.1.0"><ui-title :icon="icon" :title="title"
+  path="1458497449.1.0.0.0.1.0.0"></ui-title></h2></transition><div
+  path="1458497449.1.0.0.0.2"><slot></slot><component v-if="compName"
+  :is="compName" v-bind="bindProps"
   path="1458497449.1.0.0.0.2.1"></component></div></div></div></transition></ui-mouse></div>

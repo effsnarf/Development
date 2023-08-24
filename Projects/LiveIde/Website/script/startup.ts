@@ -301,6 +301,88 @@ interface MgParams {
     },
   });
 
+  client.Vue.directive("tooltip", {
+    inserted(el: HTMLElement, binding: any) {
+      // Check if the styles are already added
+      if (!document.getElementById("vue-tooltip-styles")) {
+        const style: HTMLStyleElement = document.createElement("style");
+        style.id = "vue-tooltip-styles";
+        style.innerHTML = `
+          .vue-tooltip {
+            position: absolute;
+            background-color: #333;
+            color: #fff;
+            border-radius: 0.5em;
+            padding: 0.5em 1em;
+            box-shadow: -8px 8px 8px #000000a0;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 100ms ease-in-out;
+            pointer-events: none; // Prevents the tooltip from interfering with mouse events
+          }
+          .vue-tooltip.show {
+            opacity: 1;
+          }
+        `;
+        document.head.appendChild(style);
+      }
+    },
+    bind(el: HTMLElement, binding: any) {
+      let tooltipElem: HTMLDivElement | null = null;
+
+      let showTimer = null as any;
+
+      el.addEventListener("mousemove", function (e: MouseEvent) {
+        if (!tooltipElem) {
+          tooltipElem = document.createElement("div");
+          tooltipElem.className = "vue-tooltip";
+          tooltipElem.innerHTML = binding.value?.textToHtml();
+          document.body.appendChild(tooltipElem);
+        }
+
+        tooltipElem?.classList.remove("show");
+
+        // Position the tooltip based on mouse position
+        //const left: number = e.clientX + 30; // 10px offset from the mouse pointer
+        //const top: number = e.clientY - 10;
+
+        // Position the tooltip to the right of the element
+        const rect = el.getBoundingClientRect();
+        const left = rect.right + 10;
+        const top = rect.top + rect.height / 2 - 20;
+
+        tooltipElem.style.left = `${left}px`;
+        tooltipElem.style.top = `${top}px`;
+
+        // Fade in effect
+        requestAnimationFrame(() => {
+          clearTimeout(showTimer);
+          showTimer = setTimeout(() => {
+            tooltipElem?.classList.add("show");
+          }, 0);
+        });
+      });
+
+      el.addEventListener("mouseout", function () {
+        if (tooltipElem) {
+          clearTimeout(showTimer);
+          // Fade out effect
+          requestAnimationFrame(() => {
+            tooltipElem?.classList.remove("show");
+          });
+        }
+      });
+    },
+    unbind(el: HTMLElement) {
+      // Clean up if the element is removed
+      const tooltipElem: HTMLElement | null =
+        document.querySelector(".vue-tooltip");
+      if (tooltipElem) {
+        tooltipElem.remove();
+      }
+    },
+  });
+
   await client.compileAll();
 
   let vueApp: any = null;
@@ -668,6 +750,7 @@ interface MgParams {
           .delay(0);
       },
       itemToUrl(item: any) {
+        if (!item) return null;
         if (typeof item == "string") return item;
         if (item.instanceID) return mgHelpers.url.instance(item);
         if (item.threadID) return mgHelpers.url.thread({ _id: item.threadID });

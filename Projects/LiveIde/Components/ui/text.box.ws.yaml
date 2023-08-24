@@ -1,5 +1,6 @@
 dom:
   div:
+    ':class': '{ disabled: !enabled }'
     .icon:
       v-if: icon
       v-text: icon
@@ -28,8 +29,17 @@ style:
   .icon:
     position: absolute
     margin: 0.25em
+examples:
+  - dom:
+      ui.text.box:
+        icon: 🔎
+        hint: search…
+_:
+  examples:
+    count: 1
 template: >-
-  <div class="comp-ui-text-box" path="-1492297820."><div class="icon"
-  v-if="icon" v-text="icon" path="-1492297820.0"></div><input :class="{ hasIcon:
-  icon }" :type="type" :placeholder="hint" :value="value" :disabled="!enabled"
-  @input="onInput" path="-1492297820.1"/></div>
+  <div class="comp-ui-text-box" :class="{ disabled: !enabled }"
+  path="-1492297820."><div class="icon" v-if="icon" v-text="icon"
+  path="-1492297820.0"></div><input :class="{ hasIcon: icon }" :type="type"
+  :placeholder="hint" :value="value" :disabled="!enabled" @input="onInput"
+  path="-1492297820.1"/></div>

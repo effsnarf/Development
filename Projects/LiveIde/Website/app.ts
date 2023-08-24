@@ -66,8 +66,23 @@ const _fetchAsJson = async (url: string) => {
     );
   };
 
+  const toExampleCompFilePath = (compFilePath: string, index = 0) => {
+    const compFolder = path.dirname(compFilePath);
+    const compFileNameWoExt = path
+      .basename(compFilePath)
+      .replace(".ws.yaml", "");
+
+    const exampleCompFilePath = path.join(
+      compFolder,
+      `${compFileNameWoExt}.example${index}.ws.yaml`
+    );
+
+    return exampleCompFilePath;
+  };
+
   const compInfos = new Map<string, any>();
   const compIsModified = (comp: any) => {
+    if (comp.name.endsWith(".example")) return false;
     const info = compInfos.get(comp.name);
     if (!info) return true;
     const lastModified = fs.statSync(getCompFilePath(comp.path)).mtimeMs;
@@ -85,37 +100,67 @@ const _fetchAsJson = async (url: string) => {
 
     const now = Date.now();
 
+    const webScriptToComp = (
+      compFilePath: string,
+      compWebScriptOrYaml: any
+    ) => {
+      let compWebScript = compWebScriptOrYaml;
+      const options = { addSuffixToDuplicateKeysUnder: ["dom"] };
+      if (typeof compWebScript == "string")
+        compWebScript = Objects.parseYaml(preProcessYaml(compWebScript));
+      compWebScript = Objects.parseYaml(
+        preProcessYaml(Objects.yamlify(compWebScript))
+      );
+      const comp = {
+        name: getCompName(componentsFolder, compFilePath),
+        path: compFilePath.replace(componentsFolder, ""),
+        source: compWebScript,
+      } as any;
+
+      if (Configuration.getEnvironment() == "dev") {
+        if (comp.source) {
+          delete comp.source.template;
+        }
+      }
+
+      if (!compInfos.has(comp.name)) {
+        compInfos.set(comp.name, {
+          last: {
+            served: now,
+          },
+        });
+      }
+
+      return comp;
+    };
+
     const comps = Files.getFiles(componentsFolder, {
       recursive: true,
     })
-      .filter((s) => s.endsWith(".ws.yaml"))
-      .map((s) => {
-        let yaml = fs.readFileSync(s, "utf8");
-
-        yaml = preProcessYaml(yaml);
-
-        const comp = {
-          name: getCompName(componentsFolder, s),
-          path: s.replace(componentsFolder, ""),
-          source: Objects.parseYaml(yaml),
-        } as any;
-
-        if (Configuration.getEnvironment() == "dev") {
-          if (comp.source) {
-            delete comp.source.template;
-          }
-        }
-
-        if (!compInfos.has(comp.name)) {
-          compInfos.set(comp.name, {
-            last: {
-              served: now,
-            },
-          });
-        }
-
-        return comp;
-      });
+      .filter((compFilePath) => compFilePath.endsWith(".ws.yaml"))
+      .map((compFilePath) => {
+        const comps = [] as any[];
+        let yaml = fs.readFileSync(compFilePath, "utf8");
+        const comp = webScriptToComp(compFilePath, yaml);
+        if (comp.source.examples && "count" in comp.source.examples)
+          delete comp.source.examples;
+        const compExamples = [
+          ...[comp.source.example],
+          ...(comp.source.examples || []),
+        ]
+          .filter((ce) => ce)
+          .map((ce, i) =>
+            webScriptToComp(toExampleCompFilePath(compFilePath, i), ce)
+          );
+        comps.push(...compExamples);
+        comp.source._ = comp.source._ || {};
+        comp.source._.examples = {
+          count: compExamples.length,
+        };
+        comps.push(comp);
+        return comps;
+      })
+      .flatMap((comps) => comps);
 
     return comps as any[];
   };
@@ -355,7 +400,14 @@ const _fetchAsJson = async (url: string) => {
         return res.end(JSON.stringify(comps));
       }
       if (req.url == "/component/update") {
-        if (Configuration.getEnvironment() != "dev") return res.end("ok");
+        const comp = data;
+
+        if (
+          comp.name.includes(".example") ||
+          Configuration.getEnvironment() != "dev"
+        )
+          return res.end("ok");
+
         // Save a log of updates, just in case
         const updateLogFolder = path.join(
           config.project.folder,
@@ -368,7 +420,6 @@ const _fetchAsJson = async (url: string) => {
         const updateLogFilePath = path.join(updateLogFolder, fileName);
         fs.writeFileSync(updateLogFilePath, JSON.stringify(data, null, 2));
 
-        const comp = data;
         const compPath = getCompFilePath(comp.path);
         const existingComp = Objects.parseYaml(
           preProcessYaml(fs.readFileSync(compPath, "utf8"))

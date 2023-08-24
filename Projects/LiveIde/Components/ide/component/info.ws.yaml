@@ -160,6 +160,9 @@ style:
   .clickable:hover:
     filter: none
 name: ide-component-info
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-ide-component-info" path="-1793052989."><div
   path="-1793052989.0"><ui-button :text="'refresh'" :click="updateChanges"

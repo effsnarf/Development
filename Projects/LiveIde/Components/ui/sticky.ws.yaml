@@ -22,6 +22,9 @@ style:
     position: sticky
     z-index: 10
 name: ui-sticky
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-ui-sticky" :style="getStyle()"
   path="-1429079421."><slot></slot></div>
