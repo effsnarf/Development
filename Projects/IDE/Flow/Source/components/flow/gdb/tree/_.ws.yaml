@@ -38,7 +38,7 @@ methods:
     }
   onNodeClick: | #js
     function(treeNode) {
-      let node = treeNode.item;
+      let node = treeNode?.item;
       if (node?.id == this.selectedNode?.id) node = null;
       this.selectedNode = node;
     }

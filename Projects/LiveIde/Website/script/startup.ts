@@ -9,6 +9,7 @@ import { Params } from "../../Classes/Params";
 import { DatabaseProxy } from "../../../../Apps/DatabaseProxy/Client/DbpClient";
 import { VueManager } from "../../Classes/VueManager";
 import { GraphDatabase } from "../../../../Shared/Database/GraphDatabase";
+import { Flow } from "../../../../Shared/Flow/Flow";
 
 // To make it accessible to client code
 const win = window as any;
@@ -400,6 +401,8 @@ interface MgParams {
     vueApp.onGraphNodesChange(nodes);
   });
 
+  const userApp = await Flow.UserApp.new();
+
   const getNewParams = async () => {
     return (await Params.new(
       () => vueApp,
@@ -424,6 +427,7 @@ interface MgParams {
       client,
       dbp,
       gdb,
+      userApp,
       analytics: await AnalyticsTracker.new(),
       params: params,
       url: mgHelpers.url,

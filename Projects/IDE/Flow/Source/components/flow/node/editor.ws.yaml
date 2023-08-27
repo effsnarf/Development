@@ -1,5 +1,6 @@
 dom:
   div:
+    class: box
     v-if: node
     table:
       tr:
@@ -19,12 +20,17 @@ methods:
       if (!node.data) return [];
       return Object.keys(node.data);
     }
+style:
+  .box:
+    padding: 1em
+    background: '#ffffff10'
+    border: 1px solid gray
 _:
   examples:
     count: 0
 name: flow-node-editor
 template: >-
-  <div class="comp-flow-node-editor" v-if="node" path="-121170407."><table
+  <div class="comp-flow-node-editor box" v-if="node" path="-121170407."><table
   path="-121170407.0"><tr v-for="fieldName in getEditableFieldNames(node)"
   path="-121170407.0.0"><th v-text="fieldName" path="-121170407.0.0.0"></th><td
   path="-121170407.0.0.1"><flow-field-editor :node="node"
