@@ -121,7 +121,7 @@ _:
     count: 0
 name: flow-node-base
 template: >-
-  <div class="comp-flow-node-base" path="674641533."><div v-if="true"
+  <div class="comp-flow-node-base" path="674641533."><div v-if="false"
   path="674641533.0"><ui-leader-line v-for="twinVue in twinVues" :from="getThis"
   :to="() =&gt; twinVue()" :visible="isHighlighted"
   path="674641533.0.0"></ui-leader-line><ui-leader-line v-for="linkedVue in
