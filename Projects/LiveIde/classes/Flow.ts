@@ -31,13 +31,27 @@ namespace Flow {
   export class UI {
     nodeIdsToVueUids = new Map<number, number[]>();
 
-    constructor(private vm: VueManager) {}
+    constructor(private vm: VueManager, private gdb: Graph.Database) {}
 
-    getNodeVues(node: any) {
+    getNodeVues(node: any, options: any = {}) {
+      if (!node) return [];
       const vueUids = this.nodeIdsToVueUids.get(node.id) || [];
-      const vues = vueUids
-        .map((uid) => this.vm.getVue(uid))
-        .filter((vue) => vue);
+      return this.uidsToVues(vueUids, options);
+    }
+
+    getLinkedVues(node: any, options: any = {}) {
+      const linkedNodes = this.gdb.getLinkedNodes(node);
+
+      const vues = linkedNodes
+        .flatMap(this.getNodeVues.bind(this))
+        .distinct((vue) => vue._uid);
+
+      return vues;
+    }
+
+    uidsToVues(vueUids: number[], options: any = {}) {
+      let vues = vueUids.map((uid) => this.vm.getVue(uid)).filter((vue) => vue);
+      vues = vues.except(options.except);
       return vues;
     }
 
@@ -65,7 +79,7 @@ namespace Flow {
     };
 
     constructor(private vm: VueManager, private gdb: Graph.Database) {
-      this.ui = new UI(vm);
+      this.ui = new UI(vm, gdb);
       this.user.app = new UserApp(gdb);
     }
   }

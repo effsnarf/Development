@@ -174,6 +174,20 @@ namespace Graph {
       return nodes;
     }
 
+    getLinkedNodes(node: Node) {
+      if (!node) return [];
+
+      const links = this.links.filter(
+        (l) => l.from == node.id || l.to == node.id
+      );
+
+      const nodeIds = links.flatMap((l) => [l.from, l.to]).except(node.id);
+
+      const nodes = nodeIds.map((id) => this.getNode(id));
+
+      return nodes;
+    }
+
     private getLinks(a: string | Node, b: string | Node) {
       const fromOrTo = this.fromOrTo(a, b);
       const type = findArg("string", a, b);

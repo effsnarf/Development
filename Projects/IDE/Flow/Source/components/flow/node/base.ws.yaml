@@ -2,10 +2,15 @@ dom:
   div: 
     div: 
       v-if: 'false'
-      ui.leader.line:
+      ui.leader.line: 
         v-for: twinVue in twinVues
         ':from': getThis
         ':to': () => twinVue()
+        ':visible': isHighlighted
+      ui.leader.line: 
+        v-for: linkedVue in linkedVues
+        ':from': getThis
+        ':to': () => linkedVue()
         ':visible': isHighlighted
     div: 
       flow.dnd.dropzone:
@@ -23,6 +28,7 @@ data:
     onGraphNodesChange: onGraphNodesChange
     onHighlightedNode: onHighlightedNode
   twinVues: []
+  linkedVues: []
   isMounted: false
 mounted: | #js
   this.isMounted = true;
@@ -31,7 +37,7 @@ mounted: | #js
   this.handlers.onHighlightedNode = this.onHighlightedNode.bind(this);
   this.$root.$on("graph-nodes-change", this.handlers.onGraphNodesChange);
   this.$root.$on("highlighted-node", this.handlers.onHighlightedNode);
-  this.updateTwinVues();
+  this.updateRelatedVues();
 unmounted: | #js
   this.$root.flow.ui.unregisterVue(this);
   this.$root.$off("graph-nodes-change", this.handlers.onGraphNodesChange);
@@ -42,20 +48,25 @@ methods:
     function() {
       return this;
     }
-  updateTwinVues: | #js
+  updateRelatedVues: | #js
     function() {
       if (!this.isMounted) return;
-      this.twinVues = this.getTwinVues()
-        .map(vue => () => vue);
-      setTimeout(this.updateTwinVues.bind(this), 100);
+      this.twinVues = this.getTwinVues().map(vue => () => vue);
+      this.linkedVues = this.getLinkedVues().map(vue => () => vue);
+      setTimeout(this.updateRelatedVues.bind(this), 100);
     }
   getTwinVues: | #js
     function() {
       // Twin vue means other vues that are connected to the same node.
-      if (!this.node) return [];
-      const vues = this.$root.flow.ui.getNodeVues(this.node);
-      const twinVues = vues.filter(vue => vue != this);
-      return twinVues;
+      let vues = this.$root.flow.ui.getNodeVues(this.node, { except: this });
+      vues = vues.filter(v => (v.$parent.$options._componentTag != this.$parent.$options._componentTag));
+      return vues;
+    }
+  getLinkedVues: | #js
+    function() {
+      let vues = this.$root.flow.ui.getLinkedVues(this.node, { except: this });
+      vues = vues.filter(v => (v.$parent.$options._componentTag != this.$parent.$options._componentTag));
+      return vues;
     }
   onGraphNodesChange: | #js
     function(nodesMap) {
@@ -110,10 +121,12 @@ _:
     count: 0
 name: flow-node-base
 template: >-
-  <div class="comp-flow-node-base" path="674641533."><div v-if="false"
+  <div class="comp-flow-node-base" path="674641533."><div v-if="true"
   path="674641533.0"><ui-leader-line v-for="twinVue in twinVues" :from="getThis"
   :to="() =&gt; twinVue()" :visible="isHighlighted"
-  path="674641533.0.0"></ui-leader-line></div><div
+  path="674641533.0.0"></ui-leader-line><ui-leader-line v-for="linkedVue in
+  linkedVues" :from="getThis" :to="() =&gt; linkedVue()"
+  :visible="isHighlighted" path="674641533.0.1"></ui-leader-line></div><div
   path="674641533.1"><flow-dnd-dropzone :class="cssClass" :node="node"
   @drag-over="onDragOver"
   path="674641533.1.0"><slot></slot></flow-dnd-dropzone></div></div>

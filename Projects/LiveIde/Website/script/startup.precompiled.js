@@ -676,15 +676,28 @@ var Flow;
     Flow.UserApp = UserApp;
     class UI {
         vm;
+        gdb;
         nodeIdsToVueUids = new Map();
-        constructor(vm) {
+        constructor(vm, gdb) {
             this.vm = vm;
+            this.gdb = gdb;
         }
-        getNodeVues(node) {
+        getNodeVues(node, options = {}) {
+            if (!node)
+                return [];
             const vueUids = this.nodeIdsToVueUids.get(node.id) || [];
-            const vues = vueUids
-                .map((uid) => this.vm.getVue(uid))
-                .filter((vue) => vue);
+            return this.uidsToVues(vueUids, options);
+        }
+        getLinkedVues(node, options = {}) {
+            const linkedNodes = this.gdb.getLinkedNodes(node);
+            const vues = linkedNodes
+                .flatMap(this.getNodeVues.bind(this))
+                .distinct((vue) => vue._uid);
+            return vues;
+        }
+        uidsToVues(vueUids, options = {}) {
+            let vues = vueUids.map((uid) => this.vm.getVue(uid)).filter((vue) => vue);
+            vues = vues.except(options.except);
             return vues;
         }
         registerVue(vue) {
@@ -715,7 +728,7 @@ var Flow;
         constructor(vm, gdb) {
             this.vm = vm;
             this.gdb = gdb;
-            this.ui = new UI(vm);
+            this.ui = new UI(vm, gdb);
             this.user.app = new UserApp(gdb);
         }
     }
@@ -3888,6 +3901,14 @@ var Graph;
             const nodes = links.map((l) => this.getNode(l[oppFromOrTo]));
             return nodes;
         }
+        getLinkedNodes(node) {
+            if (!node)
+                return [];
+            const links = this.links.filter((l) => l.from == node.id || l.to == node.id);
+            const nodeIds = links.flatMap((l) => [l.from, l.to]).except(node.id);
+            const nodes = nodeIds.map((id) => this.getNode(id));
+            return nodes;
+        }
         getLinks(a, b) {
             const fromOrTo = this.fromOrTo(a, b);
             const type = findArg("string", a, b);
@@ -6155,7 +6176,7 @@ var __webpack_exports__ = {};
 (() => {
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/Website/script/1693120077143.ts ***!
+  !*** ../../../LiveIde/Website/script/1693126434327.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
