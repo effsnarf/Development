@@ -1,0 +1,12 @@
+dom:
+  div:
+    v-text: '''percent'''
+props:
+  value: null
+_:
+  examples:
+    count: 0
+name: flow-unit-percent
+template: >-
+  <div class="comp-flow-unit-percent" v-text="'percent'"
+  path="2123665051."></div>

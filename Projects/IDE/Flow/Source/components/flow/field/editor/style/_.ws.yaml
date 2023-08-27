@@ -1,0 +1,29 @@
+dom:
+  div:
+    h3:
+      v-text: '''style'''
+    table:
+      tr:
+        v-for: (field, fieldName) in field.values
+        th:
+          v-text: fieldName
+        td:
+          flow.field.editor:
+            ':node': node
+            ':field-name': '''style.values.'' + fieldName'
+            ':field': field
+props:
+  node: null
+  field: null
+_:
+  examples:
+    count: 0
+name: flow-field-editor-style
+template: >-
+  <div class="comp-flow-field-editor-style" path="1311804196."><h3
+  v-text="'style'" path="1311804196.0"></h3><table path="1311804196.1"><tr
+  v-for="(field, fieldName) in field.values" path="1311804196.1.0"><th
+  v-text="fieldName" path="1311804196.1.0.0"></th><td
+  path="1311804196.1.0.1"><flow-field-editor :node="node"
+  :field-name="'style.values.' + fieldName" :field="field"
+  path="1311804196.1.0.1.0"></flow-field-editor></td></tr></table></div>

@@ -4,7 +4,15 @@ dom:
     div: 
       v-if: isSimpleType(value)
       ':class': getCssClass(value)
-      v-text: valueToString(value)
+      div: 
+        ':class': '{ clickable: isLargeType(value) }'
+        v-text: valueToString(value)
+        @click: isMoreVisible = !isMoreVisible
+      transition:
+        name: slide
+        ui.value.any:
+          v-if: isLargeType(value) && isMoreVisible
+          ':value': value
     ui.image:
       v-if: isImageUrl(value)
       ':url': value
@@ -14,6 +22,8 @@ dom:
 props:
   value: null
   preview: true
+data:
+  isMoreVisible: false
 computed:
   type: | #js
     function() {
@@ -33,6 +43,11 @@ methods:
   isSimpleType: | #js
     function(value) {
       return (!this.isImageUrl(value) && !this.isFunction(value));
+    }
+  isLargeType: | #js
+    function(value) {
+      // object or array
+      return (this.type == "object" || this.type == "array");
     }
   isImageUrl: | #js
     function(value) {
@@ -76,7 +91,12 @@ _:
 template: >-
   <div class="comp-ui-value-preview" :class="{ preview: preview }"
   path="-272450959."><div v-if="isSimpleType(value)" :class="getCssClass(value)"
-  v-text="valueToString(value)" path="-272450959.0"></div><ui-image
+  path="-272450959.0"><div :class="{ clickable: isLargeType(value) }"
+  v-text="valueToString(value)" @click="isMoreVisible = !isMoreVisible"
+  path="-272450959.0.0"></div><transition name="slide"
+  path="-272450959.0.1"><ui-value-any v-if="isLargeType(value) &amp;&amp;
+  isMoreVisible" :value="value"
+  path="-272450959.0.1.0"></ui-value-any></transition></div><ui-image
   v-if="isImageUrl(value)" :url="value"
   path="-272450959.1"></ui-image><ui-value-preview-function
   v-if="isFunction(value)" :value="value"

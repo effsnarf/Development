@@ -13,7 +13,6 @@ import { DatabaseProxy } from "../../../Apps/DatabaseProxy/Client/DbpClient";
 import { MemoryCache } from "@shared/Cache";
 import { Analytics, ItemType } from "@shared/Analytics";
 import isAttributeName from "@shared/WebScript/is.attribute.name";
-import { FlowScript } from "@shared/FlowScript";
 
 Configuration.log = false;
 
@@ -142,23 +141,28 @@ const _fetchAsJson = async (url: string) => {
         const comps = [] as any[];
         let yaml = fs.readFileSync(compFilePath, "utf8");
         const comp = webScriptToComp(compFilePath, yaml);
-        if (comp.source.examples && "count" in comp.source.examples)
-          delete comp.source.examples;
-        const compExamples = [
-          ...[comp.source.example],
-          ...(comp.source.examples || []),
-        ]
-          .filter((ce) => ce)
-          .map((ce, i) =>
-            webScriptToComp(toExampleCompFilePath(compFilePath, i), ce)
-          );
-        comps.push(...compExamples);
-        comp.source._ = comp.source._ || {};
-        comp.source._.examples = {
-          count: compExamples.length,
-        };
-        comps.push(comp);
-        return comps;
+        try {
+          if (comp.source.examples && "count" in comp.source.examples)
+            delete comp.source.examples;
+          const compExamples = [
+            ...[comp.source.example],
+            ...(comp.source.examples || []),
+          ]
+            .filter((ce) => ce)
+            .map((ce, i) =>
+              webScriptToComp(toExampleCompFilePath(compFilePath, i), ce)
+            );
+          comps.push(...compExamples);
+          comp.source._ = comp.source._ || {};
+          comp.source._.examples = {
+            count: compExamples.length,
+          };
+          comps.push(comp);
+          return comps;
+        } catch (ex: any) {
+          console.log(comp);
+          throw new Error(`Error in ${compFilePath}: ${ex.message}`); // ${ex.stack}
+        }
       })
       .flatMap((comps) => comps);
 
@@ -252,11 +256,15 @@ const _fetchAsJson = async (url: string) => {
     : await DatabaseProxy.new(projectConfig.databaseProxy.url, _fetchAsJson);
 
   const getCompName = (componentsFolder: string, path: string) => {
-    return path
+    let name = path
       .replace(componentsFolder, "")
       .replace(".ws.yaml", "")
       .replace(/\\/g, ".")
       .substring(1);
+
+    if (name.endsWith("_")) name = name.substring(0, name.length - 2);
+
+    return name;
   };
 
   const preProcessYaml = (yaml: string) => {
@@ -329,7 +337,7 @@ const _fetchAsJson = async (url: string) => {
 
   const handler = !config.handler
     ? null
-    : eval(`(${config.handler})`)({ Objects, process, path, fs, FlowScript });
+    : eval(`(${config.handler})`)({ Objects, process, path, fs });
 
   const httpServer = await HttpServer.new(
     config.title,

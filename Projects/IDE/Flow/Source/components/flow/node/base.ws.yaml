@@ -1,0 +1,36 @@
+dom:
+  flow.dnd.dropzone:
+    ':node': node
+    @drag-over: onDragOver
+    slot: null
+props:
+  node: null
+mounted: | #js
+  this.$root.$on("graph-nodes-change", (nodesMap) => {
+    const node = nodesMap[this.node.id];
+    if (!node) return;
+    if (this.$parent?.onNodeChange) this.$parent.onNodeChange(node);
+  });
+
+  this.$root.$on("node-highlight", (node, isHighlighted) => {
+    if (node.id === this.node.id) {
+      this.$el.classList.toggle("highlighted", isHighlighted);
+    }
+  });
+methods:
+  onDragOver: | #js
+    function(isDragOver) {
+      this.$root.$emit("node-highlight", this.node, isDragOver);
+    }
+style:
+  .highlighted:
+    border: 3px dashed yellow !important
+    background: '#ffffff20'
+    transition: 0s
+_:
+  examples:
+    count: 0
+name: flow-node-base
+template: >-
+  <flow-dnd-dropzone class="comp-flow-node-base" :node="node"
+  @drag-over="onDragOver" path="674641533."><slot></slot></flow-dnd-dropzone>

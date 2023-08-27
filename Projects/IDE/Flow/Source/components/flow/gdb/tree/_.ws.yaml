@@ -1,0 +1,71 @@
+dom:
+  div:
+    ui.tree:
+      ':root': root
+      item-type: flow.gdb.tree.node
+      @node-click: onNodeClick
+      @node-hovered: onNodeHovered
+data:
+  root: null
+  selectedNode: null
+  hoveredNode: null
+mounted: | #js
+  this.$root.$on("graph-nodes-change", this.refresh.bind(this));
+  this.refresh();
+methods:
+  buildTree: | #js
+    function() {
+      const rootItem = this.$root.gdb.nodes.find(node => node.type === "flow.layout.view");
+      const root = {
+        id: rootItem.id,
+        item: rootItem,
+        children: []
+      };
+      root.children = this.getChildNodes(root);
+      this.root = root;
+    }
+  getChildNodes: | #js
+    function(node) {
+      let childNodes = this.$root.gdb.getNodes("child.of", node);
+      childNodes = childNodes.map(childNode => {
+        return {
+          id: childNode.id,
+          item: childNode,
+          children: this.getChildNodes(childNode)
+        };
+      });
+      return childNodes;
+    }
+  onNodeClick: | #js
+    function(treeNode) {
+      let node = treeNode.item;
+      if (node?.id == this.selectedNode?.id) node = null;
+      this.selectedNode = node;
+    }
+  onNodeHovered: | #js
+    function(treeNode, isHovered) {
+      const node = treeNode.item;
+      this.hoveredNode = isHovered ? node : null;
+    }
+  refresh: | #js
+    function() {
+      this.buildTree();
+    }
+computed:
+  activeNode: | #js
+    function() {
+      return (this.hoveredNode || this.selectedNode);
+    }
+watch:
+  activeNode: | #js
+    function(activeNode) {
+      this.$emit("update:active-node", activeNode);
+    }
+_:
+  examples:
+    count: 0
+name: flow-gdb-tree
+template: >-
+  <div class="comp-flow-gdb-tree" path="675361159."><ui-tree :root="root"
+  item-type="flow.gdb.tree.node" @node-click="onNodeClick"
+  @node-hovered="onNodeHovered" path="675361159.0"></ui-tree></div>

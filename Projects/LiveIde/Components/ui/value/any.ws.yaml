@@ -15,6 +15,7 @@ methods:
       const getType = (value) => {
         let typeofValue = typeof value;
         if (value == null) return "preview";
+        if (Array.isArray(value)) return "array";
         if (["object", "boolean"].find(v => v == typeofValue)) return typeofValue;
         return "preview";
       };

@@ -7,13 +7,14 @@ dom:
         ':initial-expanded': initialExpanded
         ':expandable': initialExpandable
         ':item-type': itemType
-        ':get-item': getItem || ((node) => node.item)
+        ':get-item': getItem || ((node) => node?.item)
         ':get-item-key': getItemKey || $root.getKey
         ':get-children': getChildren || ((node) => node.children||[])
         ':selected-node': selectedNode
         @node-click: onChildClick
         @node-hover: onChildHover
         @node-unhover: onChildUnhover
+        @node-hovered: onChildHovered
 props:
   root: null
   initialExpanded: false
@@ -37,6 +38,10 @@ methods:
   onChildUnhover: | #js
     function (child) {
       this.$emit('node-unhover', child);
+    }
+  onChildHovered: | #js
+    function (child, isHovered) {
+      this.$emit('node-hovered', child, isHovered);
     }
 computed:
   initialExpandable: | #js
@@ -92,8 +97,9 @@ template: >-
   <ul class="comp-ui-tree" path="-484140360."><li
   path="-484140360.0"><ui-tree-node :node="root" :depth="0"
   :initial-expanded="initialExpanded" :expandable="initialExpandable"
-  :item-type="itemType" :get-item="getItem || ((node) =&gt; node.item)"
+  :item-type="itemType" :get-item="getItem || ((node) =&gt; node?.item)"
   :get-item-key="getItemKey || $root.getKey" :get-children="getChildren ||
   ((node) =&gt; node.children||[])" :selected-node="selectedNode"
   @node-click="onChildClick" @node-hover="onChildHover"
-  @node-unhover="onChildUnhover" path="-484140360.0.0"></ui-tree-node></li></ul>
+  @node-unhover="onChildUnhover" @node-hovered="onChildHovered"
+  path="-484140360.0.0"></ui-tree-node></li></ul>

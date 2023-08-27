@@ -1,0 +1,53 @@
+dom:
+  div: 
+    div: 
+      v-text: '''toolbar'''
+    div: 
+      v-for: comp in getNewTools()
+      ui.dnd.draggable:
+        ':drag-item': comp.name.replace('.new', '')
+        .tool:
+          .comp:
+            v-text: ''
+          ui.title:
+            ':icon': getIcon(comp.name)
+            ':text': comp.name.split('.').last()
+props: null
+methods:
+  getNewTools: | #js
+    function() {
+      const newCompNames = ["layout.pages", "layout.panel", "layout.view", "layout.list"]
+        .map(c => `flow.${c}`);
+
+      const newComps = this.$root.comps.filter(c =>
+
+      newCompNames.includes(c.name));
+
+      console.log(newComps);
+
+      return newComps;
+    }
+  getIcon: | #js
+    function(name) {
+      name = name.split('.')[1];
+      return ({
+        layout: '⬜'
+      })[name] || '🔧';
+    }
+computed: null
+style:
+  .tool .comp:
+    aspect-ratio: 1 / 1
+    border: 3px dashed white
+_:
+  examples:
+    count: 0
+name: flow-toolbar
+template: >-
+  <div class="comp-flow-toolbar" path="527208123."><div v-text="'toolbar'"
+  path="527208123.0"></div><div v-for="comp in getNewTools()"
+  path="527208123.1"><ui-dnd-draggable :drag-item="comp.name.replace('.new',
+  '')" path="527208123.1.0"><div class="tool" path="527208123.1.0.0"><div
+  class="comp" path="527208123.1.0.0.0"></div><ui-title
+  :icon="getIcon(comp.name)" :text="comp.name.split('.').last()"
+  path="527208123.1.0.0.1"></ui-title></div></ui-dnd-draggable></div></div>

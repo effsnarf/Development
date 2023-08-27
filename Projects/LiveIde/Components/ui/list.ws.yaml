@@ -9,7 +9,7 @@ dom:
         ':key': _getItemKey(indexedItem.item)
         ':class': getCssClass(indexedItem.index)
         div: 
-          v-text: getItemText(indexedItem.item)
+          v-html: getItemText(indexedItem.item)
         slot:
           ':index': indexedItem.index
           ':item': indexedItem.item
@@ -146,7 +146,7 @@ template: >-
   :class="getCssClass(indexedItem.index)" @mouseenter="() =&gt;
   onItemHover(indexedItem)" @mouseleave="() =&gt; onItemHover({ item: null,
   index: null })" @click="() =&gt; onItemClick(indexedItem)"
-  path="-484386888.0.0"><div v-text="getItemText(indexedItem.item)"
+  path="-484386888.0.0"><div v-html="getItemText(indexedItem.item)"
   path="-484386888.0.0.0"></div><slot :index="indexedItem.index"
   :item="indexedItem.item"
   path="-484386888.0.0.1"></slot></li></transition-group></div>

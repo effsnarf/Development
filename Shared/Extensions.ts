@@ -257,6 +257,7 @@ interface String {
   singularize(): string;
   pluralize(): string;
   antonym(): string;
+  capitalize(): string;
 
   severify(
     green: number,
@@ -789,6 +790,10 @@ if (typeof String !== "undefined") {
       if (this === b) return a;
     }
     return this.toString();
+  };
+
+  String.prototype.capitalize = function (): string {
+    return this[0].toUpperCase() + this.slice(1);
   };
 
   String.prototype.severify = function (

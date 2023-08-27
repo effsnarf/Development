@@ -498,10 +498,8 @@ class Component {
         else {
             console.log(this.name);
         }
-        let json = client.Handlebars.compile(client.templates.vue)(this.source);
         try {
-            //console.log(json);
-            const vueOptions = eval(`(${json})`);
+            const vueOptions = await this.getVueOptions();
             if (logGroup)
                 console.log(vueOptions);
             const vueName = Component.toVueName(this.name);
@@ -530,6 +528,18 @@ class Component {
         finally {
             if (logGroup)
                 console.groupEnd();
+        }
+    }
+    async getVueOptions() {
+        const client = await ClientContext_1.ClientContext.get();
+        let json = client.Handlebars.compile(client.templates.vue)(this.source);
+        try {
+            const vueOptions = eval(`(${json})`);
+            return vueOptions;
+        }
+        catch (ex) {
+            debugger;
+            throw ex;
         }
     }
     static toVueName(name) {
@@ -3653,11 +3663,12 @@ exports.DataWatcher = DataWatcher;
 /*!****************************************************!*\
   !*** ../../../../Shared/Database/GraphDatabase.ts ***!
   \****************************************************/
-/***/ ((__unused_webpack_module, exports) => {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GraphDatabase = void 0;
+const Extensions_Objects_Client_1 = __webpack_require__(/*! ../Extensions.Objects.Client */ "../../../../Shared/Extensions.Objects.Client.ts");
 const findArg = (condition, ...args) => {
     if (typeof condition == "string") {
         const type = condition;
@@ -3671,8 +3682,7 @@ var Graph;
 (function (Graph) {
     class Database {
         data;
-        nodes;
-        links;
+        onNodesChange;
         // #region nextID
         // Property that maps to this.data.nextID
         get nextID() {
@@ -3682,35 +3692,94 @@ var Graph;
             this.data.nextID = value;
         }
         // #endregion
+        get nodes() {
+            return this.data.nodes;
+        }
+        get links() {
+            return this.data.links;
+        }
         // #region Constructor
-        constructor(data) {
+        constructor(data, onNodesChange) {
             this.data = data;
-            this.nodes = data.nodes;
-            this.links = data.links;
-            const Vue = window?.Vue;
-            if (Vue) {
-                for (const node of this.nodes) {
-                    if ("value" in node) {
-                        Vue.watch(() => node.value, (value) => this.onNodeChange(node, "value", value));
+            this.onNodesChange = onNodesChange;
+        }
+        static async new(data, onNodesChange) {
+            return new Database(data, onNodesChange);
+        }
+        // #endregion
+        addNode(type, data, links = []) {
+            let node = {
+                id: this.getNextID(),
+                type,
+                data,
+            };
+            const affectedNodes = [];
+            for (const link of links) {
+                if (link.from) {
+                    affectedNodes.push(this.getNode(link.from));
+                    link.to = node.id;
+                }
+                else {
+                    if (link.to) {
+                        affectedNodes.push(this.getNode(link.to));
+                        link.from = node.id;
                     }
                 }
             }
+            this.nodes.push(node);
+            this.links.push(...links);
+            this.onNodesChange(affectedNodes);
+            return node;
         }
-        static async new(data) {
-            return new Database(data);
+        updateNodeField(node, field, value) {
+            node = this.getNode(node.id) || node;
+            Extensions_Objects_Client_1.Objects.deepSet(node.data, field, value);
+            this.onNodesChange([node]);
         }
-        // #endregion
-        onNodeChange(node, key, value) {
-            const targetNodes = this.getNodes(node, "data.bind");
-            for (const targetNode of targetNodes) {
-                targetNode[key] = value;
+        replaceNode(oldNode, newNode) {
+            const node = this.getNode(oldNode.id);
+            if (!node)
+                throw new Error(`Node not found: ${oldNode.id}`);
+            this.replaceNodeLinks(oldNode, newNode);
+            Object.assign(node, newNode);
+            this.onNodesChange([node]);
+            return node;
+        }
+        replaceNodeLinks(oldNode, newNode) {
+            const oldLinks = this.getNodeLinks(oldNode);
+            for (const link of oldLinks) {
+                this.replaceLinkNode(link, oldNode, newNode);
             }
         }
-        getAllNodes() {
-            return [...this.nodes];
+        replaceLinkNode(link, oldNode, newNode) {
+            if (link.from == oldNode.id)
+                link.from = newNode.id;
+            if (link.to == oldNode.id)
+                link.to = newNode.id;
         }
-        getAllLinks() {
-            return [...this.links];
+        addLink(from, type, to) {
+            const link = {
+                id: this.getNextID(),
+                from: from.id,
+                to: to.id,
+                type,
+            };
+            this.links.push(link);
+            const affectedNodes = [from, to].map((n) => this.getNode(n.id));
+            this.onNodesChange(affectedNodes);
+            return link;
+        }
+        addChildNode(parent, typeOrNode, data) {
+            const child = typeof typeOrNode == "object"
+                ? typeOrNode
+                : this.addNode(typeOrNode, data);
+            this.addLink(child, "child.of", parent);
+            return child;
+        }
+        addChildNodes(parent, typeOrNode, data, count) {
+            for (let i = 0; i < count; i++) {
+                this.addChildNode(parent, typeOrNode, data);
+            }
         }
         getNodes(a, b) {
             const fromOrTo = this.fromOrTo(a, b);
@@ -3729,10 +3798,12 @@ var Graph;
             return links;
         }
         getNode(id) {
-            if (!id)
-                return null;
             const node = this.nodes.find((n) => n.id == id);
             return node;
+        }
+        getNodeLinks(node) {
+            const links = this.links.filter((l) => l.from == node.id || l.to == node.id);
+            return links;
         }
         fromOrTo(a, b) {
             if (typeof a !== "string") {
@@ -3757,6 +3828,9 @@ var Graph;
             else {
                 return b;
             }
+        }
+        getNextID() {
+            return this.nextID++;
         }
     }
     Graph.Database = Database;
@@ -4047,6 +4121,17 @@ class Objects {
     }
     static deepDiff(obj1, obj2) {
         throw new Error(_importMainFileToImplement);
+    }
+    static deepSet(obj, path, value) {
+        const keys = path.split(".");
+        let current = obj;
+        for (let i = 0; i < keys.length - 1; i++) {
+            if (!current[keys[i]]) {
+                current[keys[i]] = {};
+            }
+            current = current[keys[i]];
+        }
+        current[keys[keys.length - 1]] = value;
     }
     static deepMerge(target, ...objects) {
         const deepMerge = (tgt, src) => {
@@ -4665,6 +4750,9 @@ if (typeof String !== "undefined") {
                 return a;
         }
         return this.toString();
+    };
+    String.prototype.capitalize = function () {
+        return this[0].toUpperCase() + this.slice(1);
     };
     String.prototype.severify = function (green, yellow, direction) {
         const valueStr = this.toString();
@@ -5924,7 +6012,7 @@ var __webpack_exports__ = {};
 (() => {
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/Website/script/1692882680265.ts ***!
+  !*** ../../../LiveIde/Website/script/1693095848855.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -6285,7 +6373,9 @@ const mgHelpers = {
     const dbpHost = `https://db.memegenerator.net`;
     const dbp = (await DbpClient_1.DatabaseProxy.new(`${dbpHost}/MemeGenerator`));
     const gdbData = await Extensions_Objects_Client_1.Objects.try(async () => await (await fetch(`/gdb.yaml`)).json(), { nodes: [], links: [] });
-    const gdb = await GraphDatabase_1.GraphDatabase.new(gdbData);
+    const gdb = await GraphDatabase_1.GraphDatabase.new(gdbData, (nodes) => {
+        vueApp.onGraphNodesChange(nodes);
+    });
     const getNewParams = async () => {
         return (await Params_1.Params.new(() => vueApp, client.config.params, window.location.pathname));
     };
@@ -6869,17 +6959,18 @@ const mgHelpers = {
                     behavior: "smooth",
                 });
             },
-            getGdbCompName(node, defaultName) {
-                if (!node)
-                    return defaultName?.kebabize();
-                return `${node.type.kebabize()}`;
-            },
             getNodeVues(node) {
                 if (!node)
                     return [];
                 const self = this;
                 const vues = self.vm.getDescendants(this, (v) => v.$props?.node?.id == node.id);
                 return vues;
+            },
+            async onGraphNodesChange(nodes) {
+                const self = this;
+                await self.$nextTick();
+                const nodesMap = nodes.toMap((n) => n.id);
+                self.$emit("graph-nodes-change", nodesMap);
             },
         },
         watch: {

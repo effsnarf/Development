@@ -1,0 +1,32 @@
+dom:
+  div:
+    v-if: node
+    table:
+      tr:
+        v-for: fieldName in getEditableFieldNames(node)
+        th:
+          v-text: fieldName
+        td:
+          flow.field.editor:
+            ':node': node
+            ':field-name': fieldName
+            ':field': node.data[fieldName]
+props:
+  node: null
+methods:
+  getEditableFieldNames: | #js
+    function(node) {
+      if (!node.data) return [];
+      return Object.keys(node.data);
+    }
+_:
+  examples:
+    count: 0
+name: flow-node-editor
+template: >-
+  <div class="comp-flow-node-editor" v-if="node" path="-121170407."><table
+  path="-121170407.0"><tr v-for="fieldName in getEditableFieldNames(node)"
+  path="-121170407.0.0"><th v-text="fieldName" path="-121170407.0.0.0"></th><td
+  path="-121170407.0.0.1"><flow-field-editor :node="node"
+  :field-name="fieldName" :field="node.data[fieldName]"
+  path="-121170407.0.0.1.0"></flow-field-editor></td></tr></table></div>

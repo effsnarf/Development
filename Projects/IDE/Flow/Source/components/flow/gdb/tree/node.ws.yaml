@@ -1,0 +1,34 @@
+dom:
+  flow.node.base:
+    ':node': node
+    ui.title:
+      v-if: item
+      ':icon': getIcon(node)
+      ':text': getName(node)
+props:
+  item: null
+methods:
+  getName: | #js
+    function(node) {
+      return node.type.split('.').reverse().take(1).reverse().join('.');
+    }
+  getIcon: | #js
+    function(node) {
+      const type = node.type.split('.').skip(1)[0];
+      return ({
+        'layout': '📄',
+      })[type] || '❔';
+    }
+computed:
+  node: | #js
+    function() {
+      return this.item;
+    }
+_:
+  examples:
+    count: 0
+name: flow-gdb-tree-node
+template: >-
+  <flow-node-base class="comp-flow-gdb-tree-node" :node="node"
+  path="1592758793."><ui-title v-if="item" :icon="getIcon(node)"
+  :text="getName(node)" path="1592758793.0"></ui-title></flow-node-base>

@@ -102,6 +102,7 @@ methods:
   bindToParent: | #js
     function() {
       const element = (this.global ? window : this._getContextElement());
+      if (!element) return setTimeout(this.bindToParent.bind(this), 100);
       element.addEventListener("mouseenter", this.onMouseEnterContext);
       element.addEventListener("mouseleave", this.onMouseLeaveContext);
       this.$root.$emit("context-menu-mounted", this);
@@ -109,6 +110,7 @@ methods:
   unbindFromParent: | #js
     function() {
       const element = (this.global ? window : this._getContextElement());
+      if (!element) return setTimeout(this.unbindFromParent.bind(this), 100);
       element.removeEventListener("mouseenter", this.onMouseEnterContext);
       element.removeEventListener("mouseleave", this.onMouseLeaveContext);
       this.$root.$emit("context-menu-unmounted", this);

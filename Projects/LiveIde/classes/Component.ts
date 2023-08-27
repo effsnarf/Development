@@ -37,11 +37,9 @@ class Component {
       console.log(this.name);
     }
 
-    let json = client.Handlebars.compile(client.templates.vue)(this.source);
-
     try {
-      //console.log(json);
-      const vueOptions = eval(`(${json})`);
+      const vueOptions = await this.getVueOptions();
+
       if (logGroup) console.log(vueOptions);
       const vueName = Component.toVueName(this.name);
       if (this.source) {
@@ -65,6 +63,18 @@ class Component {
       throw ex;
     } finally {
       if (logGroup) console.groupEnd();
+    }
+  }
+
+  async getVueOptions() {
+    const client = await ClientContext.get();
+    let json = client.Handlebars.compile(client.templates.vue)(this.source);
+    try {
+      const vueOptions = eval(`(${json})`);
+      return vueOptions;
+    } catch (ex) {
+      debugger;
+      throw ex;
     }
   }
 

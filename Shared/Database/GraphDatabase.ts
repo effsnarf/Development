@@ -1,3 +1,5 @@
+import { Objects } from "../Extensions.Objects.Client";
+
 const findArg = (condition: Function | string, ...args: any[]) => {
   if (typeof condition == "string") {
     const type = condition;
@@ -22,65 +24,133 @@ namespace Graph {
   };
 
   export class Database {
-    private nodes: Node[];
-    private links: Link[];
-
     // #region nextID
     // Property that maps to this.data.nextID
     get nextID() {
-      return this.data.nextID as Number;
+      return this.data.nextID as number;
     }
-    set nextID(value: Number) {
+    set nextID(value: number) {
       this.data.nextID = value;
     }
     // #endregion
 
-    // #region Constructor
-
-    private constructor(private data: any) {
-      this.nodes = data.nodes as Node[];
-      this.links = data.links as Link[];
-
-      const Vue = (window as any)?.Vue as any;
-
-      if (Vue) {
-        for (const node of this.nodes) {
-          if ("value" in node) {
-            Vue.watch(
-              () => node.value,
-              (value: any) => this.onNodeChange(node, "value", value)
-            );
-          }
-        }
-      }
+    get nodes() {
+      return this.data.nodes as Node[];
     }
 
-    static async new(data: any) {
-      return new Database(data);
+    get links() {
+      return this.data.links as Link[];
+    }
+
+    // #region Constructor
+
+    private constructor(
+      private data: any,
+      private onNodesChange: (nodes: Node[]) => void
+    ) {}
+
+    static async new(data: any, onNodesChange: (nodes: Node[]) => void) {
+      return new Database(data, onNodesChange);
     }
 
     // #endregion
 
-    onNodeChange(node: Node, key: string, value: any) {
-      const targetNodes = this.getNodes(node, "data.bind") as any[];
-      for (const targetNode of targetNodes) {
-        targetNode[key] = value;
+    addNode(type: string, data: any, links: any[] = []) {
+      let node = {
+        id: this.getNextID(),
+        type,
+        data,
+      };
+      const affectedNodes = [] as any[];
+
+      for (const link of links) {
+        if (link.from) {
+          affectedNodes.push(this.getNode(link.from));
+          link.to = node.id;
+        } else {
+          if (link.to) {
+            affectedNodes.push(this.getNode(link.to));
+            link.from = node.id;
+          }
+        }
+      }
+
+      this.nodes.push(node);
+      this.links.push(...links);
+
+      this.onNodesChange(affectedNodes);
+
+      return node;
+    }
+
+    updateNodeField(node: Node, field: string, value: any) {
+      node = this.getNode(node.id) || node;
+      Objects.deepSet((node as any).data, field, value);
+      this.onNodesChange([node]);
+    }
+
+    replaceNode(oldNode: Node, newNode: Node) {
+      const node = this.getNode(oldNode.id);
+      if (!node) throw new Error(`Node not found: ${oldNode.id}`);
+      this.replaceNodeLinks(oldNode, newNode);
+      Object.assign(node, newNode);
+      this.onNodesChange([node]);
+      return node;
+    }
+
+    private replaceNodeLinks(oldNode: Node, newNode: Node) {
+      const oldLinks = this.getNodeLinks(oldNode);
+      for (const link of oldLinks) {
+        this.replaceLinkNode(link, oldNode, newNode);
       }
     }
 
-    getAllNodes() {
-      return [...this.nodes];
+    private replaceLinkNode(link: Link, oldNode: Node, newNode: Node) {
+      if (link.from == oldNode.id) link.from = newNode.id;
+      if (link.to == oldNode.id) link.to = newNode.id;
     }
 
-    getAllLinks() {
-      return [...this.links];
+    addLink(from: Node, type: string, to: Node) {
+      const link = {
+        id: this.getNextID(),
+        from: from.id,
+        to: to.id,
+        type,
+      };
+
+      this.links.push(link);
+
+      const affectedNodes = [from, to].map((n) => this.getNode(n.id));
+      this.onNodesChange(affectedNodes);
+
+      return link;
+    }
+
+    addChildNode(parent: Node, typeOrNode: string | Node, data: any) {
+      const child =
+        typeof typeOrNode == "object"
+          ? (typeOrNode as Node)
+          : this.addNode(typeOrNode, data);
+      this.addLink(child, "child.of", parent);
+      return child;
+    }
+
+    addChildNodes(
+      parent: Node,
+      typeOrNode: string | Node,
+      data: any,
+      count: number
+    ) {
+      for (let i = 0; i < count; i++) {
+        this.addChildNode(parent, typeOrNode, data);
+      }
     }
 
     getNodes(a: string | Node, b: string | Node) {
       const fromOrTo = this.fromOrTo(a, b);
       const oppFromOrTo = this.getOppositeFromOrTo(fromOrTo);
       const links = this.getLinks(a, b);
-      const nodes = links.map((l) => this.getNode(l[oppFromOrTo]));
+      const nodes = links.map((l: any) => this.getNode(l[oppFromOrTo]));
       return nodes;
     }
 
@@ -96,9 +166,15 @@ namespace Graph {
     }
 
     private getNode(id: Number) {
-      if (!id) return null;
       const node = this.nodes.find((n) => n.id == id);
       return node;
+    }
+
+    private getNodeLinks(node: Node) {
+      const links = this.links.filter(
+        (l) => l.from == node.id || l.to == node.id
+      );
+      return links;
     }
 
     private fromOrTo(a: string | Node, b: string | Node) {
@@ -123,6 +199,10 @@ namespace Graph {
       } else {
         return b;
       }
+    }
+
+    private getNextID() {
+      return this.nextID++;
     }
   }
 }

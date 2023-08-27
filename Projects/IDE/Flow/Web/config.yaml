@@ -16,9 +16,7 @@ handler: | #js
       if (req.url == "/script") {
         const yaml = ctx.fs.readFileSync(ctx.path.join(ctx.process.cwd(), "main.yaml"), 'utf8');
         const main = ctx.Objects.parseYaml(yaml, { addSuffixToDuplicateKeysUnder: ["dom"] });
-        const flowScript = new ctx.FlowScript(main);
-        const result = flowScript.transpile();
-        return res.end(result);
+        return res.end();
       }
     };
   }

@@ -24,17 +24,17 @@
   unmounted: {{{addCode unmounted ""}}},
   methods: {
     {{#each methods}}
-    {{@key}}: {{{this}}},
+    {{@key}}: {{{addCode this ""}}},
     {{/each}}
   },
   computed: {
     {{#each computed}}
     {{#if get}}
     {{@key}}: {
-      get: {{{get}}},
+      get: {{{addCode get ""}}},
     },
     {{else}}
-    {{@key}}: {{{this}}},
+    {{@key}}: {{{addCode this ""}}},
     {{/if}}
     {{/each}}
   },

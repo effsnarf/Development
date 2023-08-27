@@ -1,0 +1,54 @@
+dom:
+  div:
+    flow.node.base:
+      ':style': style
+      ':node': node
+      component:
+        ':is': node.type.kebabize()
+        ':node': node
+props:
+  node: null
+data:
+  style: null
+methods:
+  onNodeChange: | #js
+    function(node) {
+      this.style = this.getNodeStyle(node);
+    }
+  getNodeStyle: | #js
+    function(node) {
+      if (!node) return {};
+      const style = {};
+      if (node.data?.style) {
+        const values = node.data.style.values;
+        for (const styleKey in values)
+        {
+          if (!styleKey) continue;
+          style[styleKey] = values[styleKey].value;
+        }
+      }
+      return style;
+    }
+watch:
+  node:
+    handler: | #js
+      function(node) {
+        this.onNodeChange(node);
+      }
+    immediate: true
+    deep: true
+style:
+  .comp-flow-app-node:
+    min-width: 5em
+    min-height: 5em
+    margin: 0.5em
+    border: '2px dashed #ccc'
+_:
+  examples:
+    count: 0
+name: flow-app-node
+template: >-
+  <div class="comp-flow-app-node" path="1269169775."><flow-node-base
+  :style="style" :node="node" path="1269169775.0"><component
+  :is="node.type.kebabize()" :node="node"
+  path="1269169775.0.0"></component></flow-node-base></div>

@@ -8,19 +8,24 @@ dom:
     div: 
       slot: null
       div: 
-        v-text: getText()
+        v-html: getHtml()
     .ml-1.opacity-50:
       v-if: number
       v-text: getNumberText()
 props:
   icon: null
   text: null
+  html: null
   value: null
   number: null
 methods:
-  getText: | #js
+  getHtml: | #js
     function() {
-      return [this.text, this.value].filter(s => s).join(' ');
+      if (this.html) return this.html;
+      return [this.text, this.value]
+        .filter(s => s)
+        .join(' ')
+        .textToHtml();
     }
   getNumberText: | #js
     function() {
@@ -47,6 +52,6 @@ template: >-
   <div class="comp-ui-title flex" path="-2123702658."><div class="icon"
   :class="getIconClass()" v-if="icon" v-text="icon"
   path="-2123702658.0"></div><div path="-2123702658.1"><slot></slot><div
-  v-text="getText()" path="-2123702658.1.1"></div></div><div class="ml-1
+  v-html="getHtml()" path="-2123702658.1.1"></div></div><div class="ml-1
   opacity-50" v-if="number" v-text="getNumberText()"
   path="-2123702658.2"></div></div>

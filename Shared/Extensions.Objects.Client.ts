@@ -293,6 +293,20 @@ class Objects {
     throw new Error(_importMainFileToImplement);
   }
 
+  static deepSet(obj: any, path: string, value: any): void {
+    const keys = path.split(".");
+    let current = obj;
+
+    for (let i = 0; i < keys.length - 1; i++) {
+      if (!current[keys[i]]) {
+        current[keys[i]] = {};
+      }
+      current = current[keys[i]];
+    }
+
+    current[keys[keys.length - 1]] = value;
+  }
+
   static deepMerge(target: any, ...objects: any[]): any {
     const deepMerge = (tgt: any, src: any) => {
       if (Objects.is(tgt, Array) || Objects.is(src, Array)) {

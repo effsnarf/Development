@@ -1,11 +1,14 @@
 dom:
-  div:
+  div: 
     .tree-node:
       ':class': getCssClass()
       ui.expand:
         class: opacity-50
         v-if: showUiExpand
         v-model: isExpanded
+      div: 
+        class: w-l2
+        v-if: '!showUiExpand'
       component:
         v-if: itemType
         ':is': getItemType()
@@ -34,6 +37,7 @@ dom:
             @node-click: onChildClick
             @node-hover: onChildHover
             @node-unhover: onChildUnhover
+            @node-hovered: onChildHovered
 props:
   node: null
   depth: null
@@ -86,10 +90,16 @@ methods:
   onChildHover: | #js
     function (child) {
       this.$emit('node-hover', child);
+      this.$emit("node-hovered", child, true);
     }
   onChildUnhover: | #js
     function (child) {
       this.$emit('node-unhover', child);
+      this.$emit("node-hovered", child, false);
+    }
+  onChildHovered: | #js
+    function (child, isHovered) {
+      this.$emit("node-hovered", child, isHovered);
     }
   getItemType: | #js
     function() {
@@ -144,9 +154,10 @@ template: >-
   :class="getCssClass()" @click="onNodeClick" @mouseenter="onMouseEnter"
   @mouseleave="onMouseLeave" path="2053324664.0"><ui-expand class="opacity-50"
   v-if="showUiExpand" v-model="isExpanded"
-  path="2053324664.0.0"></ui-expand><component v-if="itemType"
-  :is="getItemType()" :item="getItem(node)"
-  path="2053324664.0.1"></component><slot></slot></div><transition
+  path="2053324664.0.0"></ui-expand><div class="w-l2" v-if="!showUiExpand"
+  path="2053324664.0.1"></div><component v-if="itemType" :is="getItemType()"
+  :item="getItem(node)"
+  path="2053324664.0.2"></component><slot></slot></div><transition
   name="slide-fast" path="2053324664.1"><ul class="ml-3" v-if="isExpanded"
   path="2053324664.1.0"><li v-for="child in getChildItems(node)"
   path="2053324664.1.0.0"><ui-tree-node :node="child" :depth="(depth + 1)"
@@ -154,5 +165,5 @@ template: >-
   :item-type="getItemType()" :get-item="getItem" :get-item-key="getItemKey"
   :get-children="getChildren" :selected-node="selectedNode"
   @node-click="onChildClick" @node-hover="onChildHover"
-  @node-unhover="onChildUnhover"
+  @node-unhover="onChildUnhover" @node-hovered="onChildHovered"
   path="2053324664.1.0.0.0"></ui-tree-node></li></ul></transition></div>

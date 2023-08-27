@@ -1,0 +1,15 @@
+dom:
+  div:
+    ui.input.color:
+      ':value': field.value
+      @input: $emit('input', $event)
+props:
+  field: null
+_:
+  examples:
+    count: 0
+name: flow-field-editor-color
+template: >-
+  <div class="comp-flow-field-editor-color" path="1296866518."><ui-input-color
+  :value="field.value" @input="$emit('input', $event)"
+  path="1296866518.0"></ui-input-color></div>

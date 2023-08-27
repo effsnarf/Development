@@ -1,0 +1,91 @@
+dom:
+  div:
+    ui.select:
+      ':options': '[''table'', ''short-list'', ''expanded-list'']'
+      input-type: value
+      type: toggle
+      v-model: view
+    transition: 
+      name: slide
+      table: 
+        v-if: (view.includes('list'))
+        tbody: 
+          tr: 
+            v-for: (item, index) in items
+            td: 
+              class: opacity-50
+              v-text: index
+            td: 
+              ui.value.preview: 
+                v-if: (view == 'short-list')
+                ':value': item
+              ui.value.any:
+                v-if: (view == 'expanded-list')
+                ':value': item
+    transition: 
+      name: slide
+      table: 
+        v-if: (view == 'table')
+        thead:
+          v-if: 'false'
+          tr: 
+            th:
+              v-for: field in fields
+              v-text: field
+        tbody: 
+          tr: 
+            v-for: item in items
+            td: 
+              v-for: field in Object.keys(item)
+              ui.value.preview: 
+                ':value': item[field]
+props:
+  value: null
+  reverse: false
+  view: table
+computed:
+  items: | #js
+    return [...this.value];
+  fields: | #js
+    // Get all the field names from the array of objects
+    const fields = this.value
+      .filter(item => ((typeof item) == "object"))
+      .map(item => Object.keys(item))
+      .flat()
+      .distinct();
+    return fields;
+style:
+  tr:
+    transition: 0s
+  tr:hover td:
+    background-color: '#ffffff20'
+    transition: 0s
+  th:
+    opacity: 0.5
+  td:
+    font-family: monospace
+    padding: 0 0.5em
+_:
+  examples:
+    count: 0
+name: ui-value-array
+template: >-
+  <div class="comp-ui-value-array" path="-621945022."><ui-select
+  :options="['table', 'short-list', 'expanded-list']" input-type="value"
+  type="toggle" v-model="view" path="-621945022.0"></ui-select><transition
+  name="slide" path="-621945022.1"><table v-if="(view.includes('list'))"
+  path="-621945022.1.0"><tbody path="-621945022.1.0.0"><tr v-for="(item, index)
+  in items" path="-621945022.1.0.0.0"><td class="opacity-50" v-text="index"
+  path="-621945022.1.0.0.0.0"></td><td
+  path="-621945022.1.0.0.0.1"><ui-value-preview v-if="(view == 'short-list')"
+  :value="item" path="-621945022.1.0.0.0.1.0"></ui-value-preview><ui-value-any
+  v-if="(view == 'expanded-list')" :value="item"
+  path="-621945022.1.0.0.0.1.1"></ui-value-any></td></tr></tbody></table></transition><transition
+  name="slide" path="-621945022.2"><table v-if="(view == 'table')"
+  path="-621945022.2.0"><thead v-if="false" path="-621945022.2.0.0"><tr
+  path="-621945022.2.0.0.0"><th v-for="field in fields" v-text="field"
+  path="-621945022.2.0.0.0.0"></th></tr></thead><tbody
+  path="-621945022.2.0.1"><tr v-for="item in items"
+  path="-621945022.2.0.1.0"><td v-for="field in Object.keys(item)"
+  path="-621945022.2.0.1.0.0"><ui-value-preview :value="item[field]"
+  path="-621945022.2.0.1.0.0.0"></ui-value-preview></td></tr></tbody></table></transition></div>

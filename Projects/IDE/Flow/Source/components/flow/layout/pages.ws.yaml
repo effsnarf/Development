@@ -1,0 +1,46 @@
+dom:
+  div: 
+    .flex:
+      div: 
+        ':style': '{ ''flex-grow'': 1 }'
+        v-for: (childNode, index) in childNodes
+        div: 
+          v-text: '''page '' + index'
+        flow.app.node: 
+          ':key': childNode.id
+          ':node': childNode
+    transition:
+      name: slide
+      flow.app.node: 
+        v-for: (childNode, index) in childNodes
+        v-if: (node.data.visiblePageIndex.value === index)
+        ':key': childNode.id
+        ':node': childNode
+props:
+  node: null
+methods:
+  getCssClass: | #js
+    function() {
+      const cls = {};
+      return cls;
+    }
+computed:
+  childNodes: | #js
+    function() {
+      return this.$root.gdb.getNodes('child.of', this.node);
+    }
+style: null
+_:
+  examples:
+    count: 0
+name: flow-layout-pages
+template: >-
+  <div class="comp-flow-layout-pages" path="1309562048."><div class="flex"
+  path="1309562048.0"><div :style="{ 'flex-grow': 1 }" v-for="(childNode, index)
+  in childNodes" path="1309562048.0.0"><div v-text="'page ' + index"
+  path="1309562048.0.0.0"></div><flow-app-node :key="childNode.id"
+  :node="childNode"
+  path="1309562048.0.0.1"></flow-app-node></div></div><transition name="slide"
+  path="1309562048.1"><flow-app-node v-for="(childNode, index) in childNodes"
+  v-if="(node.data.visiblePageIndex.value === index)" :key="childNode.id"
+  :node="childNode" path="1309562048.1.0"></flow-app-node></transition></div>

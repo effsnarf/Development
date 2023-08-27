@@ -1,0 +1,27 @@
+dom:
+  ui.dnd.dropzone:
+    slot: null
+    @drag-over: onDragOver
+    @drop-item: onDropItem
+props:
+  node: null
+methods:
+  onDragOver: | #js
+    function(isDragOver) {
+      this.$emit("drag-over", isDragOver);
+    }
+  onDropItem: | #js
+    function(dragItem) {
+      this.$root.$emit("user-action", {
+        type: "dnd.drop",
+        dragItem,
+        dropItem: this.node
+      });
+    }
+_:
+  examples:
+    count: 0
+name: flow-dnd-dropzone
+template: >-
+  <ui-dnd-dropzone class="comp-flow-dnd-dropzone" @drag-over="onDragOver"
+  @drop-item="onDropItem" path="267244079."><slot></slot></ui-dnd-dropzone>

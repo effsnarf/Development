@@ -396,7 +396,9 @@ interface MgParams {
     async () => await (await fetch(`/gdb.yaml`)).json(),
     { nodes: [], links: [] }
   );
-  const gdb = await GraphDatabase.new(gdbData);
+  const gdb = await GraphDatabase.new(gdbData, (nodes: any[]) => {
+    vueApp.onGraphNodesChange(nodes);
+  });
 
   const getNewParams = async () => {
     return (await Params.new(
@@ -1018,10 +1020,6 @@ interface MgParams {
           behavior: "smooth",
         });
       },
-      getGdbCompName(node: any, defaultName?: string) {
-        if (!node) return (defaultName as any)?.kebabize();
-        return `${node.type.kebabize()}`;
-      },
       getNodeVues(node: any) {
         if (!node) return [];
         const self = this as any;
@@ -1030,6 +1028,12 @@ interface MgParams {
           (v: any) => v.$props?.node?.id == node.id
         );
         return vues;
+      },
+      async onGraphNodesChange(nodes: any[]) {
+        const self = this as any;
+        await self.$nextTick();
+        const nodesMap = nodes.toMap((n: any) => n.id);
+        self.$emit("graph-nodes-change", nodesMap);
       },
     },
     watch: {

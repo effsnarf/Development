@@ -1,23 +1,24 @@
 dom:
   div:
-    class: layout view
-    component:
-      v-for: node in childNodes
-      ':is': $root.getGdbCompName(node)
-      ':node': node
+    flow.app.node:
+      v-for: (childNode, index) in childNodes
+      ':key': childNode.id
+      ':node': childNode
 props:
   node: null
 computed:
   childNodes: | #js
-    function () {
-      return this.$root.gdb.getNodes("inside", this.node);
+    function() {
+      return this.$root.gdb.getNodes('child.of', this.node);
     }
 style:
-  .view:
-    aspect-ratio: 4 / 5
-    height: 60vh
+  .comp-flow-layout-view:
+    min-width: 30em
+_:
+  examples:
+    count: 0
 name: flow-layout-view
 template: >-
-  <div class="comp-flow-layout-view layout view" path="1843545641."><component
-  v-for="node in childNodes" :is="$root.getGdbCompName(node)" :node="node"
-  path="1843545641.0"></component></div>
+  <div class="comp-flow-layout-view" path="1843545641."><flow-app-node
+  v-for="(childNode, index) in childNodes" :key="childNode.id" :node="childNode"
+  path="1843545641.0"></flow-app-node></div>

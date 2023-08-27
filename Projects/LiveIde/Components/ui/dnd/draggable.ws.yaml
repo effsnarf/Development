@@ -1,0 +1,21 @@
+dom:
+  div:
+    class: draggable
+    draggable: true
+    @dragstart: onDragStart
+    slot: null
+props:
+  dragItem: null
+methods:
+  onDragStart: | #js
+    function(e) {
+      this.$root.dragItem = this.dragItem;
+    }
+style: null
+_:
+  examples:
+    count: 0
+name: ui-dnd-draggable
+template: >-
+  <div class="comp-ui-dnd-draggable draggable" draggable="true"
+  @dragstart="onDragStart" path="-26676257."><slot></slot></div>

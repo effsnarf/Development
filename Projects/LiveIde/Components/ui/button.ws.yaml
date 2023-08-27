@@ -34,6 +34,68 @@ methods:
         }
       }
     }
+style:
+  button:
+    user-select: none
+name: ui-button
+frameworks:
+  vue: | #js
+    &lt;template&gt;
+      &lt;div class="text-center"&gt;
+        &lt;transition name="slide2"&gt;
+          &lt;button v-if="!isLoading" @click="onClick" style="user-select: none;"&gt;
+            &lt;ui-title :icon="icon" :text="text"&gt;&lt;/ui-title&gt;
+          &lt;/button&gt;
+        &lt;/transition&gt;
+        &lt;ui-loading :show="isLoading"&gt;&lt;/ui-loading&gt;
+      &lt;/div&gt;
+    &lt;/template&gt;
+
+    &lt;script&gt;
+    export default {
+      name: 'ui-button',
+      props: {
+        icon: {
+          default: null
+        },
+        text: {
+          default: null
+        },
+        click: {
+          type: Function,
+          default: null
+        },
+        showLoading: {
+          type: Boolean,
+          default: true
+        }
+      },
+      data() {
+        return {
+          isLoading: 0
+        };
+      },
+      methods: {
+        async onClick() {
+          this.$emit('click');
+          if (this.click) {
+            if (this.showLoading) this.isLoading++;
+            try {
+              await this.click();
+            } finally {
+              if (this.showLoading) this.isLoading--;
+            }
+          }
+        }
+      }
+    };
+    &lt;/script&gt;
+
+    &lt;style scoped&gt;
+    button {
+      user-select: none;
+    }
+    &lt;/style&gt;
 example:
   dom:
     ui.button:
@@ -45,10 +107,6 @@ example:
       async function() {
         await this.$root.wait(1000);
       }
-style:
-  button:
-    user-select: none
-name: ui-button
 _:
   examples:
     count: 1

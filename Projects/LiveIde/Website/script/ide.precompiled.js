@@ -272,10 +272,8 @@ class Component {
         else {
             console.log(this.name);
         }
-        let json = client.Handlebars.compile(client.templates.vue)(this.source);
         try {
-            //console.log(json);
-            const vueOptions = eval(`(${json})`);
+            const vueOptions = await this.getVueOptions();
             if (logGroup)
                 console.log(vueOptions);
             const vueName = Component.toVueName(this.name);
@@ -304,6 +302,18 @@ class Component {
         finally {
             if (logGroup)
                 console.groupEnd();
+        }
+    }
+    async getVueOptions() {
+        const client = await ClientContext_1.ClientContext.get();
+        let json = client.Handlebars.compile(client.templates.vue)(this.source);
+        try {
+            const vueOptions = eval(`(${json})`);
+            return vueOptions;
+        }
+        catch (ex) {
+            debugger;
+            throw ex;
         }
     }
     static toVueName(name) {
@@ -3654,6 +3664,17 @@ class Objects {
     static deepDiff(obj1, obj2) {
         throw new Error(_importMainFileToImplement);
     }
+    static deepSet(obj, path, value) {
+        const keys = path.split(".");
+        let current = obj;
+        for (let i = 0; i < keys.length - 1; i++) {
+            if (!current[keys[i]]) {
+                current[keys[i]] = {};
+            }
+            current = current[keys[i]];
+        }
+        current[keys[keys.length - 1]] = value;
+    }
     static deepMerge(target, ...objects) {
         const deepMerge = (tgt, src) => {
             if (Objects.is(tgt, Array) || Objects.is(src, Array)) {
@@ -4271,6 +4292,9 @@ if (typeof String !== "undefined") {
                 return a;
         }
         return this.toString();
+    };
+    String.prototype.capitalize = function () {
+        return this[0].toUpperCase() + this.slice(1);
     };
     String.prototype.severify = function (green, yellow, direction) {
         const valueStr = this.toString();
@@ -5530,7 +5554,7 @@ var __webpack_exports__ = {};
 (() => {
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/Website/script/1692882679359.ts ***!
+  !*** ../../../LiveIde/Website/script/1693095848181.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -5541,6 +5565,8 @@ const TaskQueue_1 = __webpack_require__(/*! ../../../../Shared/TaskQueue */ "../
 const ClientContext_1 = __webpack_require__(/*! ../../Classes/ClientContext */ "../../../LiveIde/Classes/ClientContext.ts");
 const VueHelper_1 = __webpack_require__(/*! ../../Classes/VueHelper */ "../../../LiveIde/Classes/VueHelper.ts");
 const VueManager_1 = __webpack_require__(/*! ../../Classes/VueManager */ "../../../LiveIde/Classes/VueManager.ts");
+const Component_1 = __webpack_require__(/*! ../../Classes/Component */ "../../../LiveIde/Classes/Component.ts");
+window.Component = Component_1.Component;
 const taskQueue = new TaskQueue_1.TaskQueue();
 let vueIdeApp;
 const waitUntilInit = async () => {

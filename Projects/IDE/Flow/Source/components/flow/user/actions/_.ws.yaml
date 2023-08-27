@@ -1,0 +1,96 @@
+dom:
+  div:
+    h3:
+      v-text: '''✨ Actions'''
+    ui.value.array:
+      ':value': actions
+      view: table
+      reverse: true
+props: null
+data:
+  actions: []
+mounted: | #js
+  this.$root.$on("user-action", this.onUserAction);
+methods:
+  onUserAction: | #js
+    function(action) {
+      const lastAction = this.actions[this.actions.length - 1];
+      if (this.isActionMergeable(lastAction, action)) this.actions.pop();
+      this.actions.push(action);
+      this.executeAction(action);
+    }
+  isActionMergeable: | #js
+    function(lastAction, action) {
+      if (!lastAction) return false;
+      if (lastAction.type != action.type) return false;
+      if (action.type != "node.update") return false;
+      if (lastAction.field != action.field) return false;
+      return true;
+    }
+  executeAction: | #js
+    function(action) {
+      const methodName = "on" + action.type
+        .split(".")
+        .map(s => s.capitalize())
+        .join("");
+      if (this[methodName]) this[methodName](action);
+      else throw new Error("Unknown action type: " + action.type);
+    }
+  onDndDrop: | #js
+    function(action) {
+      const { dragItem, dropItem } = action;
+      const parentNode = dropItem;
+      const newNodeType = dragItem;
+
+      const newNode = this.createNewNode(newNodeType);
+
+      if (parentNode.type == "flow.layout.empty")
+      {
+        this.$root.gdb.replaceNode(parentNode, newNode);
+        return;
+      }
+      else
+      {
+        this.$root.gdb.addChildNode(parentNode, newNode);
+      }
+    }
+  onNodeUpdate: | #js
+    function(action) {
+      this.$root.gdb.updateNodeField(action.node, `${action.field}.value`, action.value);
+    }
+  createNewNode: | #js
+    function(newNodeType) {
+      const data = {};
+
+      const isPanel = (newNodeType == "flow.layout.panel");
+      const isPages = (newNodeType == "flow.layout.pages");
+
+      data.style = { type: "style", values: { backgroundColor: { type: 'color', value: 'transparent' } } };
+      
+      if (isPanel) {
+        data.direction = { type: "direction", value: "vertical" };
+        data.size = { type: "percent", value: 50 };
+      }
+      
+      if (isPages) {
+        data.visiblePageIndex = { type: "number", value: 0 }
+      }
+
+      const newNode = this.$root.gdb.addNode(newNodeType, data);
+      
+      if (isPanel || isPages)
+      {
+        const count = (isPanel ? 2 : 3);
+        this.$root.gdb.addChildNodes(newNode, "flow.layout.empty", null, count);
+      }
+
+      return newNode;
+    }
+_:
+  examples:
+    count: 0
+name: flow-user-actions
+template: >-
+  <div class="comp-flow-user-actions" path="1351962266."><h3 v-text="'✨
+  Actions'" path="1351962266.0"></h3><ui-value-array :value="actions"
+  view="table" reverse="true" path="1351962266.1"></ui-value-array></div>

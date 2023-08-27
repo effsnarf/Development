@@ -1,21 +1,18 @@
 dom:
-  ul:
-    class: layout list
-    li:
-      v-for: i in 5
+  div:
+    flow.layout.empty:
+      v-for: index in 5
+      ':key': index
 props:
   node: null
+computed: null
 style:
-  .list:
-    display: flex
-    flex-direction: column
-    height: 100%
-    gap: 0.2em
-  li:
-    flex-grow: 1
-    border: 2px dashed gray
-    background: '#ffffff20'
+  .comp-flow-layout-empty:
+    border: 2px dashed white
+_:
+  examples:
+    count: 0
 name: flow-layout-list
 template: >-
-  <ul class="comp-flow-layout-list layout list" path="1843248162."><li v-for="i
-  in 5" path="1843248162.0"></li></ul>
+  <div class="comp-flow-layout-list" path="1843248162."><flow-layout-empty
+  v-for="index in 5" :key="index" path="1843248162.0"></flow-layout-empty></div>

@@ -5,6 +5,9 @@ import { TaskQueue } from "../../../../Shared/TaskQueue";
 import { ClientContext } from "../../Classes/ClientContext";
 import { VueHelper } from "../../Classes/VueHelper";
 import { VueManager } from "../../Classes/VueManager";
+import { Component } from "../../Classes/Component";
+
+(window as any).Component = Component;
 
 const taskQueue = new TaskQueue();
 

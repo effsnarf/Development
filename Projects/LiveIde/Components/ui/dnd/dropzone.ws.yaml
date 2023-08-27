@@ -1,0 +1,47 @@
+dom:
+  div:
+    class: dropzone
+    @dragover: onDragOver
+    @dragenter: onDragEnter
+    @dragleave: onDragLeave
+    @drop: onDrop
+    slot: null
+props: null
+methods:
+  onDragOver: | #js
+    function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      this.$el.classList.add('drag-over');
+    }
+  onDragEnter: | #js
+    function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      this.$emit('drag-over', true);
+    }
+  onDragLeave: | #js
+    function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      this.$el.classList.remove('drag-over');
+      this.$emit('drag-over', false);
+    }
+  onDrop: | #js
+    function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      this.$el.classList.remove('drag-over');
+      const dragItem = this.$root.dragItem;
+      this.$root.dragItem = null;
+      this.$emit('drag-over', false);
+      this.$emit('drop-item', dragItem);
+    }
+_:
+  examples:
+    count: 0
+name: ui-dnd-dropzone
+template: >-
+  <div class="comp-ui-dnd-dropzone dropzone" @dragover="onDragOver"
+  @dragenter="onDragEnter" @dragleave="onDragLeave" @drop="onDrop"
+  path="-2085012855."><slot></slot></div>

@@ -17,6 +17,25 @@ helpers:
     }
   addCode: | #ts
     (context, methodBody, code) => {
+      if (!methodBody?.length) methodBody = "function() {}";
+
+      // Remove lines starting with "//" at the beginning of the line
+      methodBody = methodBody.replace(/^\s*\/\/.*$/gm, "");
+      
+      methodBody = methodBody.trim();
+
+      if (!["function", "async"].some(s => methodBody.startsWith(s)))
+      {
+        methodBody = `function() {\n${methodBody}\n}`;
+        // If method body includes "await" (regex with word boundaries)
+        if (/\bawait\b/.test(methodBody))
+        {
+          methodBody = `async ${methodBody}`;
+        }
+      }
+
+      if (!code?.length) return methodBody;
+
       if (!methodBody) methodBody = "function() {}";
       methodBody = methodBody.replace(/\{/, `{\n${code}\n`);
       return methodBody;
