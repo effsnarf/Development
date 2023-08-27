@@ -1,30 +1,108 @@
 dom:
-  flow.dnd.dropzone:
-    ':node': node
-    @drag-over: onDragOver
-    slot: null
+  div: 
+    div: 
+      v-if: 'false'
+      ui.leader.line:
+        v-for: twinVue in twinVues
+        ':from': getThis
+        ':to': () => twinVue()
+        ':visible': isHighlighted
+    div: 
+      flow.dnd.dropzone:
+        ':class': cssClass
+        ':node': node
+        @drag-over: onDragOver
+        slot: null
 props:
   node: null
+data:
+  nodeDataIds: []
+  nodeDatas: []
+  highlightedNode: null
+  handlers:
+    onGraphNodesChange: onGraphNodesChange
+    onHighlightedNode: onHighlightedNode
+  twinVues: []
+  isMounted: false
 mounted: | #js
-  this.$root.$on("graph-nodes-change", (nodesMap) => {
-    const node = nodesMap[this.node.id];
-    if (!node) return;
-    if (this.$parent?.onNodeChange) this.$parent.onNodeChange(node);
-  });
-
-  this.$root.$on("node-highlight", (node, isHighlighted) => {
-    if (node.id === this.node.id) {
-      this.$el.classList.toggle("highlighted", isHighlighted);
-    }
-  });
+  this.isMounted = true;
+  this.$root.flow.ui.registerVue(this);
+  this.handlers.onGraphNodesChange = this.onGraphNodesChange.bind(this);
+  this.handlers.onHighlightedNode = this.onHighlightedNode.bind(this);
+  this.$root.$on("graph-nodes-change", this.handlers.onGraphNodesChange);
+  this.$root.$on("highlighted-node", this.handlers.onHighlightedNode);
+  this.updateTwinVues();
+unmounted: | #js
+  this.$root.flow.ui.unregisterVue(this);
+  this.$root.$off("graph-nodes-change", this.handlers.onGraphNodesChange);
+  this.$root.$off("highlighted-node", this.handlers.onHighlightedNode);
+  this.isMounted = false;
 methods:
+  getThis: | #js
+    function() {
+      return this;
+    }
+  updateTwinVues: | #js
+    function() {
+      if (!this.isMounted) return;
+      this.twinVues = this.getTwinVues()
+        .map(vue => () => vue);
+      setTimeout(this.updateTwinVues.bind(this), 100);
+    }
+  getTwinVues: | #js
+    function() {
+      // Twin vue means other vues that are connected to the same node.
+      if (!this.node) return [];
+      const vues = this.$root.flow.ui.getNodeVues(this.node);
+      const twinVues = vues.filter(vue => vue != this);
+      return twinVues;
+    }
+  onGraphNodesChange: | #js
+    function(nodesMap) {
+      const node = nodesMap[this.node.id];
+      if (!node) return;
+      if (this.$parent?.onNodeChange) this.$parent.onNodeChange(node);
+      this.refresh();
+    }
+  onHighlightedNode: | #js
+    function(highlightedNode) {
+      this.highlightedNode = highlightedNode;
+    }
+  getDataNodeIDs: | #js
+    function() {
+      if (!this.node) return [];
+      const dataNodes = this.$root.gdb.getNodes("data.send", this.node);
+      const dataNodeIDs = dataNodes.map(node => node.id);
+      return dataNodeIDs;
+    }
   onDragOver: | #js
     function(isDragOver) {
-      this.$root.$emit("node-highlight", this.node, isDragOver);
+    }
+  refresh: | #js
+    function() {
+      this.nodeDataIds = this.getDataNodeIDs();
+      this.nodeDatas = this.nodeDataIds.map(id => this.$root.flow.user.app.runtime.nodeDatas[id]);
+      this.$emit("node-datas", this.nodeDatas);
+    }
+computed:
+  cssClass: | #js
+    function() {
+      const cls = {};
+      cls["highlighted-node"] = this.isHighlighted;
+      return cls;
+    }
+  isHighlighted: | #js
+    function() {
+      return this.node?.id == this.highlightedNode?.id;
+    }
+watch:
+  highlightedNode: | #js
+    function(highlightedNode) { 
     }
 style:
-  .highlighted:
+  .highlighted-node:
     border: 3px dashed yellow !important
+    box-shadow: inset -3px 3px 3px black
     background: '#ffffff20'
     transition: 0s
 _:
@@ -32,5 +110,10 @@ _:
     count: 0
 name: flow-node-base
 template: >-
-  <flow-dnd-dropzone class="comp-flow-node-base" :node="node"
-  @drag-over="onDragOver" path="674641533."><slot></slot></flow-dnd-dropzone>
+  <div class="comp-flow-node-base" path="674641533."><div v-if="false"
+  path="674641533.0"><ui-leader-line v-for="twinVue in twinVues" :from="getThis"
+  :to="() =&gt; twinVue()" :visible="isHighlighted"
+  path="674641533.0.0"></ui-leader-line></div><div
+  path="674641533.1"><flow-dnd-dropzone :class="cssClass" :node="node"
+  @drag-over="onDragOver"
+  path="674641533.1.0"><slot></slot></flow-dnd-dropzone></div></div>

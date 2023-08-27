@@ -40,6 +40,14 @@ methods:
     function(action) {
       const { dragItem, dropItem } = action;
       const parentNode = dropItem;
+
+      if (typeof dragItem == "string") this.onDndDrop_newNode(action);
+      else this.onDndDrop_nodeToNode(action);
+    }
+  onDndDrop_newNode: | #js
+    function(action) {
+      const { dragItem, dropItem } = action;
+      const parentNode = dropItem;
       const newNodeType = dragItem;
 
       const newNode = this.createNewNode(newNodeType);
@@ -54,6 +62,10 @@ methods:
         this.$root.gdb.addChildNode(parentNode, newNode);
       }
     }
+  onDndDrop_nodeToNode: | #js
+    function(action) {
+      this.$root.gdb.addLink(action.dragItem, "data.send", action.dropItem);
+    }
   onNodeUpdate: | #js
     function(action) {
       this.$root.gdb.updateNodeField(action.node, `${action.field}.value`, action.value);
@@ -64,23 +76,15 @@ methods:
 
       const isPanel = (newNodeType == "flow.layout.panel");
       const isPages = (newNodeType == "flow.layout.pages");
-
-      data.style = { type: "style", values: { backgroundColor: { type: 'color', value: 'transparent' } } };
-      
-      if (isPanel) {
-        data.direction = { type: "direction", value: "vertical" };
-        data.size = { type: "percent", value: 50 };
-      }
-      
-      if (isPages) {
-        data.visiblePageIndex = { type: "number", value: 0 }
-      }
+      const isList = (newNodeType == "flow.layout.list");
+      const isFetch = (newNodeType == "flow.data.fetch");
+      const isUserAppComp = (newNodeType == "flow.app.comp");
 
       const newNode = this.$root.gdb.addNode(newNodeType, data);
       
-      if (isPanel || isPages)
+      if (isPanel || isPages || isUserAppComp || isList)
       {
-        const count = (isPanel ? 2 : 3);
+        const count = ((isList || isUserAppComp) ? 1 : (isPanel ? 2 : 3));
         this.$root.gdb.addChildNodes(newNode, "flow.layout.empty", null, count);
       }
 

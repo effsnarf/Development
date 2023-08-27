@@ -1,19 +1,24 @@
 dom:
-  div:
-    ui.select:
-      ':options': '[''horizontal'', ''vertical'']'
-      type: toggle
-      input-type: value
-      ':value': field.value
-      @input: $emit('input', $event)
+  flow.field.editor.options:
+    ':options': options
+    ':node': node
+    ':fieldName': fieldName
+    ':field': field
+    @input: $emit('input', $event)
 props:
+  node: null
+  fieldName: null
   field: null
+data:
+  options:
+    - horizontal
+    - vertical
 _:
   examples:
     count: 0
 name: flow-field-editor-direction
 template: >-
-  <div class="comp-flow-field-editor-direction" path="-1172601998."><ui-select
-  :options="['horizontal', 'vertical']" type="toggle" input-type="value"
-  :value="field.value" @input="$emit('input', $event)"
-  path="-1172601998.0"></ui-select></div>
+  <flow-field-editor-options class="comp-flow-field-editor-direction"
+  :options="options" :node="node" :fieldName="fieldName" :field="field"
+  @input="$emit('input', $event)"
+  path="-1172601998."></flow-field-editor-options>

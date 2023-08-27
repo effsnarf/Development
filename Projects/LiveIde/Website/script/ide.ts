@@ -11,10 +11,14 @@ import { Component } from "../../Classes/Component";
 
 const taskQueue = new TaskQueue();
 
+let vueApp: any;
 let vueIdeApp: any;
 
 const waitUntilInit = async () => {
-  while (!vueIdeApp) await new Promise((resolve) => setTimeout(resolve, 100));
+  while (!vueApp || !vueIdeApp) {
+    vueApp = (window as any).vueApp;
+    await new Promise((resolve) => setTimeout(resolve, 400));
+  }
 };
 
 const vueIdeCompMixin = {
@@ -27,9 +31,9 @@ const vueIdeCompMixin = {
       methodDatas: {},
     };
 
-    const watchInIde = true;
+    const trackState = false;
 
-    if (watchInIde) {
+    if (trackState) {
       // Watch all events
       Object.keys(self.$listeners).forEach((eventName) => {
         self.$on(eventName, async (...args: any[]) => {
@@ -164,14 +168,16 @@ const vueIdeCompMixin = {
   mounted() {
     taskQueue.enqueue(async () => {
       await waitUntilInit();
+      vueApp.vm.registerVue(this);
       vueIdeApp.vm.registerVue(this);
     });
   },
   beforeDestroy() {
+    (window as any).vueApp.vm.unregisterVue(this);
+
     taskQueue.enqueue(async () => {
-      // Wait until ideApp is assigned
-      while (!vueIdeApp)
-        await new Promise((resolve) => setTimeout(resolve, 100));
+      await waitUntilInit();
+      vueApp.vm.unregisterVue(this);
       vueIdeApp.vm.unregisterVue(this);
     });
   },

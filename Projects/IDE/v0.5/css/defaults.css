@@ -517,6 +517,11 @@ select, input[type=range]
 {
   cursor: pointer;
 }
+.clickable:hover
+{
+  background: #ffffff20;
+  transition: 0s;
+}
 
 
 progress

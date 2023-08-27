@@ -1,0 +1,12 @@
+dom:
+  flow.node.base:
+    ':node': node
+props:
+  node: null
+_:
+  examples:
+    count: 0
+name: flow-data-fetch
+template: >-
+  <flow-node-base class="comp-flow-data-fetch" :node="node"
+  path="-492294090."></flow-node-base>

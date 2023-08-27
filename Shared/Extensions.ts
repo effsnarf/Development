@@ -356,6 +356,7 @@ interface Array<T> {
   last(): any;
   back(): any;
   skip(count: number): T[];
+  getPairs(): [T, T][];
   joinColumns(columns: (number | null)[], ellipsis?: boolean): string;
   distinct(project?: ((item: T) => any) | null): T[];
   except(...items: T[]): T[];
@@ -411,8 +412,8 @@ if (typeof Number !== "undefined") {
       }
 
       // Handle strings
-      if (typeof obj1 === "string" && typeof obj2 === "string") {
-        return obj1.localeCompare(obj2);
+      if (typeof obj1 === "string" || typeof obj2 === "string") {
+        return (obj1 || "").localeCompare(obj2 || "");
       }
 
       // Handle dates
@@ -1594,6 +1595,16 @@ if (typeof Array !== "undefined") {
 
   Array.prototype.skip = function (count: number) {
     return this.slice(count);
+  };
+
+  Array.prototype.getPairs = function () {
+    let pairs = [] as [any, any][];
+    for (let i = 0; i < this.length - 1; i++) {
+      for (let j = i + 1; j < this.length; j++) {
+        pairs.push([this[i], this[j]]);
+      }
+    }
+    return pairs;
   };
 
   Array.prototype.joinColumns = function (

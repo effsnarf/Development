@@ -1,0 +1,27 @@
+dom:
+  flow.node.base:
+    ':node': node
+    @node-datas: nodeDatas=$event
+    flow.app.node:
+      v-for: (childNode, index) in childNodes
+      ':key': childNode.id
+      ':node': childNode
+props:
+  node: null
+computed:
+  childNodes: | #js
+    function() {
+      return this.$root.gdb.getNodes('child.of', this.node);
+    }
+data:
+  nodeDatas: []
+methods: null
+_:
+  examples:
+    count: 0
+name: flow-app-comp
+template: >-
+  <flow-node-base class="comp-flow-app-comp" :node="node"
+  @node-datas="nodeDatas=$event" path="1268842364."><flow-app-node
+  v-for="(childNode, index) in childNodes" :key="childNode.id" :node="childNode"
+  path="1268842364.0"></flow-app-node></flow-node-base>

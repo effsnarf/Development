@@ -32,7 +32,13 @@ class HttpServer {
     const server = http.createServer(this.requestListener.bind(this));
     server.listen(port, ip, () => {
       console.log(this.appName.green);
-      this.log(`${`Server is running on http://${ip}:${port}`.green}`);
+      this.log(
+        `${`Server is running on`.green} ${`http://${ip}:${port}`.yellow}`
+      );
+      this.log(`${`static folders`.gray}`);
+      for (const folder of staticFileFolders) {
+        this.log(`  ${folder.yellow}`);
+      }
     });
   }
 
@@ -75,14 +81,14 @@ class HttpServer {
       // #region Serve static files
       if (req.url.length > 1) {
         for (const folder of this.staticFileFolders) {
-          const filePath = path.join(
-            folder,
-            req.url.split("?")[0].replace(".js", ".ts")
-          );
-          if (fs.existsSync(filePath)) {
+          const filePath = path.join(folder, req.url.split("?")[0]);
+
+          const tsFilePath = filePath.replace(".js", ".ts");
+
+          if (fs.existsSync(tsFilePath)) {
             // If TypeScript file, serve as compiled JavaScript
-            if (path.extname(filePath) == ".ts") {
-              const precompiledPath = filePath.replace(
+            if (path.extname(tsFilePath) == ".ts") {
+              const precompiledPath = tsFilePath.replace(
                 ".ts",
                 ".precompiled.js"
               );
@@ -91,14 +97,17 @@ class HttpServer {
                   return res.end(fs.readFileSync(precompiledPath, "utf8"));
                 }
               }
-              const compiledJsCode = await TypeScript.webpackify(filePath);
+              const compiledJsCode = await TypeScript.webpackify(tsFilePath);
               fs.writeFileSync(precompiledPath, compiledJsCode);
               return res.end(compiledJsCode);
             }
+          }
+
+          if (fs.existsSync(filePath)) {
             if (filePath.endsWith(".yaml"))
               return res.end(
                 JSON.stringify(
-                  Objects.parseYaml(fs.readFileSync(filePath, "utf8"))
+                  Objects.parseYaml(fs.readFileSync(tsFilePath, "utf8"))
                 )
               );
             // If image file, serve as binary

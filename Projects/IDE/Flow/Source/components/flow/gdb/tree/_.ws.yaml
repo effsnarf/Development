@@ -1,10 +1,9 @@
 dom:
-  div:
-    ui.tree:
-      ':root': root
-      item-type: flow.gdb.tree.node
-      @node-click: onNodeClick
-      @node-hovered: onNodeHovered
+  ui.tree:
+    ':root': root
+    item-type: flow.gdb.tree.node
+    @node-click: onNodeClick
+    @node-hovered: onNodeHovered
 data:
   root: null
   selectedNode: null
@@ -66,6 +65,6 @@ _:
     count: 0
 name: flow-gdb-tree
 template: >-
-  <div class="comp-flow-gdb-tree" path="675361159."><ui-tree :root="root"
+  <ui-tree class="comp-flow-gdb-tree" :root="root"
   item-type="flow.gdb.tree.node" @node-click="onNodeClick"
-  @node-hovered="onNodeHovered" path="675361159.0"></ui-tree></div>
+  @node-hovered="onNodeHovered" path="675361159."></ui-tree>

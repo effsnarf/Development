@@ -141,9 +141,9 @@ class StateTracker {
     return true;
   }
 
-  isTrackable(value: any) {
+  isTrackable(value: any): boolean {
     if (!value) return true;
-    if (Array.isArray(value)) return value.all(this.isTrackable);
+    if (Array.isArray(value)) return value.all(this.isTrackable.bind(this));
     // HTML elements are not trackable
     if (value instanceof HTMLElement) return false;
     // Functions are not trackable

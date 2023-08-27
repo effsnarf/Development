@@ -21,6 +21,9 @@ methods:
       };
       return `ui.value.${getType(value)}`.replace(/\./g, "-");
     }
+style:
+  .comp-ui-value-any:
+    max-width: 20em
 name: ui-value-any
 _:
   examples:

@@ -8,8 +8,8 @@ import { ClientContext } from "../../Classes/ClientContext";
 import { Params } from "../../Classes/Params";
 import { DatabaseProxy } from "../../../../Apps/DatabaseProxy/Client/DbpClient";
 import { VueManager } from "../../Classes/VueManager";
-import { GraphDatabase } from "../../../../Shared/Database/GraphDatabase";
-import { Flow } from "../../../../Shared/Flow/Flow";
+import { Graph } from "../../../../Shared/Database/Graph";
+import { Flow } from "../../Classes/Flow";
 
 // To make it accessible to client code
 const win = window as any;
@@ -397,11 +397,12 @@ interface MgParams {
     async () => await (await fetch(`/gdb.yaml`)).json(),
     { nodes: [], links: [] }
   );
-  const gdb = await GraphDatabase.new(gdbData, (nodes: any[]) => {
-    vueApp.onGraphNodesChange(nodes);
-  });
 
-  const userApp = await Flow.UserApp.new();
+  const vueManager = await VueManager.new(client);
+
+  const gdb = await Graph.Database.new(gdbData);
+
+  const flow = new Flow.Manager(vueManager, gdb);
 
   const getNewParams = async () => {
     return (await Params.new(
@@ -412,8 +413,6 @@ interface MgParams {
   };
 
   const params = await getNewParams();
-
-  const vueManager = await VueManager.new(client);
 
   vueApp = new client.Vue({
     data: {
@@ -427,7 +426,7 @@ interface MgParams {
       client,
       dbp,
       gdb,
-      userApp,
+      flow,
       analytics: await AnalyticsTracker.new(),
       params: params,
       url: mgHelpers.url,
@@ -1053,6 +1052,8 @@ interface MgParams {
       },
     },
   });
+
+  gdb.events.on("nodes.change", vueApp.onGraphNodesChange);
 
   vueApp.$mount("#app");
 

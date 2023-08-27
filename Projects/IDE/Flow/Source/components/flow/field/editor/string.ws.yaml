@@ -1,0 +1,13 @@
+dom:
+  div:
+    ui.text.box:
+      v-model: field.value
+props:
+  field: null
+_:
+  examples:
+    count: 0
+name: flow-field-editor-string
+template: >-
+  <div class="comp-flow-field-editor-string" path="2011013374."><ui-text-box
+  v-model="field.value" path="2011013374.0"></ui-text-box></div>

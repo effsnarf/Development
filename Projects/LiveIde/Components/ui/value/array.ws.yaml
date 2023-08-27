@@ -4,11 +4,11 @@ dom:
       ':options': '[''table'', ''short-list'', ''expanded-list'']'
       input-type: value
       type: toggle
-      v-model: view
+      v-model: view1
     transition: 
       name: slide
       table: 
-        v-if: (view.includes('list'))
+        v-if: (view1.includes('list'))
         tbody: 
           tr: 
             v-for: (item, index) in items
@@ -17,15 +17,15 @@ dom:
               v-text: index
             td: 
               ui.value.preview: 
-                v-if: (view == 'short-list')
+                v-if: (view1 == 'short-list')
                 ':value': item
               ui.value.any:
-                v-if: (view == 'expanded-list')
+                v-if: (view1 == 'expanded-list')
                 ':value': item
     transition: 
       name: slide
       table: 
-        v-if: (view == 'table')
+        v-if: (view1 == 'table')
         thead:
           v-if: 'false'
           tr: 
@@ -36,13 +36,41 @@ dom:
           tr: 
             v-for: item in items
             td: 
-              v-for: field in Object.keys(item)
+              v-for: field in fields
               ui.value.preview: 
                 ':value': item[field]
 props:
   value: null
   reverse: false
   view: table
+data:
+  view1: null
+methods:
+  getFieldSortScore: | #js
+    function(a, b) {
+      const typeA = this.getFieldType(a);
+      const typeB = this.getFieldType(b);
+      const fieldTypeOrder = {
+        image: 1,
+        string: 2,
+        number: 3,
+        object: 4
+      };
+      if (typeA != typeB) return Objects.compare(fieldTypeOrder[typeA], fieldTypeOrder[typeB]);
+      return Objects.compare(a, b);
+    }
+  getFieldType: | #js
+    function(fieldName) {
+      if (!this.value?.length) return null;
+      if (this.isImageField(fieldName)) return "image";
+      return (typeof this.value[0][fieldName]);
+    }
+  isImageField: | #js
+    function(fieldName) {
+      if (!this.value?.length) return false;
+      if (['.jpg', '.jpeg', '.png'].some(ext => this.value.find(item => item[fieldName]?.toString().endsWith(ext)))) return true;
+      return false;
+    }
 computed:
   items: | #js
     return [...this.value];
@@ -52,9 +80,22 @@ computed:
       .filter(item => ((typeof item) == "object"))
       .map(item => Object.keys(item))
       .flat()
-      .distinct();
+      .distinct()
+      .sortBy(this.getFieldSortScore);
     return fields;
+watch:
+  view:
+    handler: | #js
+      function(view) {
+        this.view1 = view;
+      }
+    immediate: true
 style:
+  tr *:
+    max-height: 1.5em
+    overflow: hidden
+  img:
+    width: 5em
   tr:
     transition: 0s
   tr:hover td:
@@ -72,20 +113,20 @@ name: ui-value-array
 template: >-
   <div class="comp-ui-value-array" path="-621945022."><ui-select
   :options="['table', 'short-list', 'expanded-list']" input-type="value"
-  type="toggle" v-model="view" path="-621945022.0"></ui-select><transition
-  name="slide" path="-621945022.1"><table v-if="(view.includes('list'))"
+  type="toggle" v-model="view1" path="-621945022.0"></ui-select><transition
+  name="slide" path="-621945022.1"><table v-if="(view1.includes('list'))"
   path="-621945022.1.0"><tbody path="-621945022.1.0.0"><tr v-for="(item, index)
   in items" path="-621945022.1.0.0.0"><td class="opacity-50" v-text="index"
   path="-621945022.1.0.0.0.0"></td><td
-  path="-621945022.1.0.0.0.1"><ui-value-preview v-if="(view == 'short-list')"
+  path="-621945022.1.0.0.0.1"><ui-value-preview v-if="(view1 == 'short-list')"
   :value="item" path="-621945022.1.0.0.0.1.0"></ui-value-preview><ui-value-any
-  v-if="(view == 'expanded-list')" :value="item"
+  v-if="(view1 == 'expanded-list')" :value="item"
   path="-621945022.1.0.0.0.1.1"></ui-value-any></td></tr></tbody></table></transition><transition
-  name="slide" path="-621945022.2"><table v-if="(view == 'table')"
+  name="slide" path="-621945022.2"><table v-if="(view1 == 'table')"
   path="-621945022.2.0"><thead v-if="false" path="-621945022.2.0.0"><tr
   path="-621945022.2.0.0.0"><th v-for="field in fields" v-text="field"
   path="-621945022.2.0.0.0.0"></th></tr></thead><tbody
   path="-621945022.2.0.1"><tr v-for="item in items"
-  path="-621945022.2.0.1.0"><td v-for="field in Object.keys(item)"
+  path="-621945022.2.0.1.0"><td v-for="field in fields"
   path="-621945022.2.0.1.0.0"><ui-value-preview :value="item[field]"
   path="-621945022.2.0.1.0.0.0"></ui-value-preview></td></tr></tbody></table></transition></div>

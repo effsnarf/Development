@@ -1,10 +1,12 @@
 dom:
   flow.node.base:
     ':node': node
-    ui.title:
-      v-if: item
-      ':icon': getIcon(node)
-      ':text': getName(node)
+    flow.dnd.draggable:
+      ':node': node
+      ui.title:
+        v-if: item
+        ':icon': getIcon(node)
+        ':text': getName(node)
 props:
   item: null
 methods:
@@ -14,10 +16,7 @@ methods:
     }
   getIcon: | #js
     function(node) {
-      const type = node.type.split('.').skip(1)[0];
-      return ({
-        'layout': '📄',
-      })[type] || '❔';
+      return (eval(`(${this.$root.gdb.data.get.icon})`))(node.type);
     }
 computed:
   node: | #js
@@ -30,5 +29,7 @@ _:
 name: flow-gdb-tree-node
 template: >-
   <flow-node-base class="comp-flow-gdb-tree-node" :node="node"
-  path="1592758793."><ui-title v-if="item" :icon="getIcon(node)"
-  :text="getName(node)" path="1592758793.0"></ui-title></flow-node-base>
+  path="1592758793."><flow-dnd-draggable :node="node"
+  path="1592758793.0"><ui-title v-if="item" :icon="getIcon(node)"
+  :text="getName(node)"
+  path="1592758793.0.0"></ui-title></flow-dnd-draggable></flow-node-base>

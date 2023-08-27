@@ -1,0 +1,20 @@
+dom:
+  div:
+    img:
+      ':src': imageUrl
+props:
+  node: null
+  contextData: null
+  defaultImageUrl: /images/duck.png
+computed:
+  imageUrl: | #js
+    function() {
+      return (this.contextData?.imageUrl || this.defaultImageUrl);
+    }
+_:
+  examples:
+    count: 0
+name: flow-ui-image
+template: >-
+  <div class="comp-flow-ui-image" path="-1986999743."><img :src="imageUrl"
+  path="-1986999743.0"/></div>

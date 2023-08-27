@@ -2,6 +2,7 @@ dom:
   component:
     ':is': getComponentType(field)
     ':node': node
+    ':fieldName': fieldName
     ':field': field
     @input: onInput
 props:
@@ -23,10 +24,12 @@ methods:
       if (!field.type) debugger;
       return `flow.field.editor.${field.type}`.replace(/\./g, "-");
     }
+style: null
 _:
   examples:
     count: 0
 name: flow-field-editor
 template: >-
   <component class="comp-flow-field-editor" :is="getComponentType(field)"
-  :node="node" :field="field" @input="onInput" path="-187892319."></component>
+  :node="node" :fieldName="fieldName" :field="field" @input="onInput"
+  path="-187892319."></component>

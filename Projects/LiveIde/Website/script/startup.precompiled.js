@@ -638,6 +638,93 @@ exports.ComponentManager = ComponentManager;
 
 /***/ }),
 
+/***/ "../../../LiveIde/Classes/Flow.ts":
+/*!****************************************!*\
+  !*** ../../../LiveIde/Classes/Flow.ts ***!
+  \****************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Flow = void 0;
+const Vue = window.Vue;
+var Flow;
+(function (Flow) {
+    class Runtime {
+        nodeDatas = Vue.reactive({});
+    }
+    class UserApp {
+        gdb;
+        runtime = new Runtime();
+        constructor(gdb) {
+            this.gdb = gdb;
+            this.gdb.events.on("nodes.change", this.onNodesChange.bind(this));
+        }
+        async onNodesChange(nodes) {
+            for (const node of nodes) {
+                if (node.type == "flow.data.fetch") {
+                    const fetchResponse = await fetch(node.data.url.value);
+                    const fetchText = await fetchResponse.text();
+                    let fetchData = JSON.parse(fetchText);
+                    if (fetchData.result)
+                        fetchData = fetchData.result;
+                    this.runtime.nodeDatas[node.id] = fetchData;
+                }
+            }
+        }
+    }
+    Flow.UserApp = UserApp;
+    class UI {
+        vm;
+        nodeIdsToVueUids = new Map();
+        constructor(vm) {
+            this.vm = vm;
+        }
+        getNodeVues(node) {
+            const vueUids = this.nodeIdsToVueUids.get(node.id) || [];
+            const vues = vueUids
+                .map((uid) => this.vm.getVue(uid))
+                .filter((vue) => vue);
+            return vues;
+        }
+        registerVue(vue) {
+            if (!vue.node)
+                return;
+            const node = vue.node;
+            const vueUids = this.nodeIdsToVueUids.get(node.id) || [];
+            vueUids.push(vue._uid);
+            this.nodeIdsToVueUids.set(node.id, vueUids);
+        }
+        unregisterVue(vue) {
+            if (!vue.node)
+                return;
+            const node = vue.node;
+            const vueUids = this.nodeIdsToVueUids.get(node.id) || [];
+            vueUids.removeBy((uid) => uid == vue._uid);
+            this.nodeIdsToVueUids.set(node.id, vueUids);
+        }
+    }
+    Flow.UI = UI;
+    class Manager {
+        vm;
+        gdb;
+        ui;
+        user = {
+            app: null,
+        };
+        constructor(vm, gdb) {
+            this.vm = vm;
+            this.gdb = gdb;
+            this.ui = new UI(vm);
+            this.user.app = new UserApp(gdb);
+        }
+    }
+    Flow.Manager = Manager;
+})(Flow || (exports.Flow = Flow = {}));
+
+
+/***/ }),
+
 /***/ "../../../LiveIde/Classes/HtmlHelper.ts":
 /*!**********************************************!*\
   !*** ../../../LiveIde/Classes/HtmlHelper.ts ***!
@@ -3185,7 +3272,7 @@ class StateTracker {
         if (!value)
             return true;
         if (Array.isArray(value))
-            return value.all(this.isTrackable);
+            return value.all(this.isTrackable.bind(this));
         // HTML elements are not trackable
         if (value instanceof HTMLElement)
             return false;
@@ -3659,16 +3746,17 @@ exports.DataWatcher = DataWatcher;
 
 /***/ }),
 
-/***/ "../../../../Shared/Database/GraphDatabase.ts":
-/*!****************************************************!*\
-  !*** ../../../../Shared/Database/GraphDatabase.ts ***!
-  \****************************************************/
+/***/ "../../../../Shared/Database/Graph.ts":
+/*!********************************************!*\
+  !*** ../../../../Shared/Database/Graph.ts ***!
+  \********************************************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.GraphDatabase = void 0;
+exports.Graph = void 0;
 const Extensions_Objects_Client_1 = __webpack_require__(/*! ../Extensions.Objects.Client */ "../../../../Shared/Extensions.Objects.Client.ts");
+const Events_1 = __webpack_require__(/*! ../Events */ "../../../../Shared/Events.ts");
 const findArg = (condition, ...args) => {
     if (typeof condition == "string") {
         const type = condition;
@@ -3682,7 +3770,6 @@ var Graph;
 (function (Graph) {
     class Database {
         data;
-        onNodesChange;
         // #region nextID
         // Property that maps to this.data.nextID
         get nextID() {
@@ -3698,21 +3785,34 @@ var Graph;
         get links() {
             return this.data.links;
         }
+        events = new Events_1.Events();
         // #region Constructor
-        constructor(data, onNodesChange) {
+        constructor(data) {
             this.data = data;
-            this.onNodesChange = onNodesChange;
         }
-        static async new(data, onNodesChange) {
-            return new Database(data, onNodesChange);
+        static async new(data) {
+            return new Database(data);
+        }
+        // #endregion
+        // #region Events
+        onNodesChange(nodes) {
+            this.events.emit("nodes.change", nodes);
         }
         // #endregion
         addNode(type, data, links = []) {
+            data = data || {};
             let node = {
                 id: this.getNextID(),
                 type,
                 data,
             };
+            const types = type.split(".");
+            const commonData = Extensions_Objects_Client_1.Objects.clone(this.data.schema[types[0]][types[1]]._all.data);
+            Object.assign(node.data, commonData);
+            let defaultData = this.data.schema[types[0]][types[1]];
+            defaultData = defaultData[types[2]] ? defaultData[types[2]].data : {};
+            defaultData = Extensions_Objects_Client_1.Objects.clone(defaultData);
+            Object.assign(node.data, defaultData);
             const affectedNodes = [];
             for (const link of links) {
                 if (link.from) {
@@ -3728,7 +3828,7 @@ var Graph;
             }
             this.nodes.push(node);
             this.links.push(...links);
-            this.onNodesChange(affectedNodes);
+            this.onNodesChange([node, ...affectedNodes]);
             return node;
         }
         updateNodeField(node, field, value) {
@@ -3834,9 +3934,43 @@ var Graph;
         }
     }
     Graph.Database = Database;
-})(Graph || (Graph = {}));
-const GraphDatabase = Graph.Database;
-exports.GraphDatabase = GraphDatabase;
+})(Graph || (exports.Graph = Graph = {}));
+
+
+/***/ }),
+
+/***/ "../../../../Shared/Events.ts":
+/*!************************************!*\
+  !*** ../../../../Shared/Events.ts ***!
+  \************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+
+// Passing events between components
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Events = void 0;
+class Events {
+    listeners = {};
+    on(name, callback) {
+        if (!this.listeners[name]) {
+            this.listeners[name] = [];
+        }
+        this.listeners[name].push(callback);
+    }
+    emit(name, ...args) {
+        if (this.listeners["*"]) {
+            this.listeners["*"].forEach((callback) => {
+                callback(name, ...args);
+            });
+        }
+        if (this.listeners[name]) {
+            this.listeners[name].forEach((callback) => {
+                callback(...args);
+            });
+        }
+    }
+}
+exports.Events = Events;
 
 
 /***/ }),
@@ -4420,8 +4554,8 @@ if (typeof Number !== "undefined") {
                 }
             }
             // Handle strings
-            if (typeof obj1 === "string" && typeof obj2 === "string") {
-                return obj1.localeCompare(obj2);
+            if (typeof obj1 === "string" || typeof obj2 === "string") {
+                return (obj1 || "").localeCompare(obj2 || "");
             }
             // Handle dates
             if (obj1 instanceof Date && obj2 instanceof Date) {
@@ -5436,6 +5570,15 @@ if (typeof Array !== "undefined") {
     Array.prototype.skip = function (count) {
         return this.slice(count);
     };
+    Array.prototype.getPairs = function () {
+        let pairs = [];
+        for (let i = 0; i < this.length - 1; i++) {
+            for (let j = i + 1; j < this.length; j++) {
+                pairs.push([this[i], this[j]]);
+            }
+        }
+        return pairs;
+    };
     Array.prototype.joinColumns = function (columns, ellipsis) {
         if (!columns.length)
             return this.join(" ");
@@ -6012,7 +6155,7 @@ var __webpack_exports__ = {};
 (() => {
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/Website/script/1693095848855.ts ***!
+  !*** ../../../LiveIde/Website/script/1693120077143.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -6025,7 +6168,8 @@ const ClientContext_1 = __webpack_require__(/*! ../../Classes/ClientContext */ "
 const Params_1 = __webpack_require__(/*! ../../Classes/Params */ "../../../LiveIde/Classes/Params.ts");
 const DbpClient_1 = __webpack_require__(/*! ../../../../Apps/DatabaseProxy/Client/DbpClient */ "../../../../Apps/DatabaseProxy/Client/DbpClient.ts");
 const VueManager_1 = __webpack_require__(/*! ../../Classes/VueManager */ "../../../LiveIde/Classes/VueManager.ts");
-const GraphDatabase_1 = __webpack_require__(/*! ../../../../Shared/Database/GraphDatabase */ "../../../../Shared/Database/GraphDatabase.ts");
+const Graph_1 = __webpack_require__(/*! ../../../../Shared/Database/Graph */ "../../../../Shared/Database/Graph.ts");
+const Flow_1 = __webpack_require__(/*! ../../Classes/Flow */ "../../../LiveIde/Classes/Flow.ts");
 // To make it accessible to client code
 const win = window;
 win.Objects = Extensions_Objects_Client_1.Objects;
@@ -6373,14 +6517,13 @@ const mgHelpers = {
     const dbpHost = `https://db.memegenerator.net`;
     const dbp = (await DbpClient_1.DatabaseProxy.new(`${dbpHost}/MemeGenerator`));
     const gdbData = await Extensions_Objects_Client_1.Objects.try(async () => await (await fetch(`/gdb.yaml`)).json(), { nodes: [], links: [] });
-    const gdb = await GraphDatabase_1.GraphDatabase.new(gdbData, (nodes) => {
-        vueApp.onGraphNodesChange(nodes);
-    });
+    const vueManager = await VueManager_1.VueManager.new(client);
+    const gdb = await Graph_1.Graph.Database.new(gdbData);
+    const flow = new Flow_1.Flow.Manager(vueManager, gdb);
     const getNewParams = async () => {
         return (await Params_1.Params.new(() => vueApp, client.config.params, window.location.pathname));
     };
     const params = await getNewParams();
-    const vueManager = await VueManager_1.VueManager.new(client);
     vueApp = new client.Vue({
         data: {
             // MemeGenerator
@@ -6393,6 +6536,7 @@ const mgHelpers = {
             client,
             dbp,
             gdb,
+            flow,
             analytics: await AnalyticsTracker_1.AnalyticsTracker.new(),
             params: params,
             url: mgHelpers.url,
@@ -6986,6 +7130,7 @@ const mgHelpers = {
             },
         },
     });
+    gdb.events.on("nodes.change", vueApp.onGraphNodesChange);
     vueApp.$mount("#app");
     window.addEventListener("popstate", async function (event) {
         await vueApp.refresh();

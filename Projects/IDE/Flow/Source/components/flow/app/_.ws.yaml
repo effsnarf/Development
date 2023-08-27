@@ -14,19 +14,22 @@ dom:
             @update:active-node: activeNode = $event
           div: 
             class: spacer1
-          flow.node.editor:
-            ':key': activeNode?.id
-            ':node': activeNode
           div: 
             class: spacer1
-          flow.gdb.list: null
         div: 
-          ':style': '{ width: ''30em'' }'
+          ':style': '{ width: ''40em'' }'
           flow.app.node:
             v-if: gdb
             ':node': gdb.nodes[0]
         flow.toolbar: null
+        flow.node.editor:
+          ':key': activeNode?.id
+          ':node': activeNode
+      div: 
         flow.user.actions: null
+        div: 
+          class: spacer1
+        flow.gdb.list: null
     div: 
       ide.css.stylesheet:
         ':rules': $root.newCssRules
@@ -47,8 +50,7 @@ methods: null
 watch:
   activeNode: | #js
     function(activeNode, oldActiveNode) {
-      if (oldActiveNode) this.$root.$emit("node-highlight", oldActiveNode, false);
-      if (activeNode) this.$root.$emit("node-highlight", activeNode, true);
+      this.$root.$emit("highlighted-node", activeNode);
     }
 style:
   .spacer1:
@@ -81,13 +83,15 @@ template: >-
   path="2028346721.0.1"><div path="2028346721.0.1.0"><flow-gdb-tree
   @update:active-node="activeNode = $event"
   path="2028346721.0.1.0.0"></flow-gdb-tree><div class="spacer1"
-  path="2028346721.0.1.0.1"></div><flow-node-editor :key="activeNode?.id"
-  :node="activeNode" path="2028346721.0.1.0.2"></flow-node-editor><div
+  path="2028346721.0.1.0.1"></div><div class="spacer1"
+  path="2028346721.0.1.0.2"></div></div><div :style="{ width: '40em' }"
+  path="2028346721.0.1.1"><flow-app-node v-if="gdb" :node="gdb.nodes[0]"
+  path="2028346721.0.1.1.0"></flow-app-node></div><flow-toolbar></flow-toolbar><flow-node-editor
+  :key="activeNode?.id" :node="activeNode"
+  path="2028346721.0.1.3"></flow-node-editor></div><div
+  path="2028346721.0.2"><flow-user-actions></flow-user-actions><div
   class="spacer1"
-  path="2028346721.0.1.0.3"></div><flow-gdb-list></flow-gdb-list></div><div
-  :style="{ width: '30em' }" path="2028346721.0.1.1"><flow-app-node v-if="gdb"
-  :node="gdb.nodes[0]"
-  path="2028346721.0.1.1.0"></flow-app-node></div><flow-toolbar></flow-toolbar><flow-user-actions></flow-user-actions></div></div><div
+  path="2028346721.0.2.1"></div><flow-gdb-list></flow-gdb-list></div></div><div
   path="2028346721.1"><ide-css-stylesheet :rules="$root.newCssRules"
   path="2028346721.1.0"></ide-css-stylesheet><div
   path="2028346721.1.1"><ide-component-style v-for="comp in $root.comps"

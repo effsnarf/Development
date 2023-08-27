@@ -9,7 +9,8 @@ props:
 computed:
   childNodes: | #js
     function() {
-      return this.$root.gdb.getNodes('child.of', this.node);
+      return this.$root.gdb.getNodes('child.of', this.node)
+        .filter(node => !node.type.startsWith('flow.data'));
     }
 style:
   .comp-flow-layout-view: null

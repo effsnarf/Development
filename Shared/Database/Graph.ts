@@ -1,4 +1,5 @@
 import { Objects } from "../Extensions.Objects.Client";
+import { Events } from "../Events";
 
 const findArg = (condition: Function | string, ...args: any[]) => {
   if (typeof condition == "string") {
@@ -11,16 +12,17 @@ const findArg = (condition: Function | string, ...args: any[]) => {
 };
 
 namespace Graph {
-  type Node = {
-    id: Number;
-    type: String;
+  export type Node = {
+    id: number;
+    type: string;
+    data: any;
   };
 
-  type Link = {
-    id: Number;
-    from: Number;
-    to: Number;
-    type: String;
+  export type Link = {
+    id: number;
+    from: number;
+    to: number;
+    type: string;
   };
 
   export class Database {
@@ -42,25 +44,43 @@ namespace Graph {
       return this.data.links as Link[];
     }
 
+    events = new Events();
+
     // #region Constructor
 
-    private constructor(
-      private data: any,
-      private onNodesChange: (nodes: Node[]) => void
-    ) {}
+    private constructor(private data: any) {}
 
-    static async new(data: any, onNodesChange: (nodes: Node[]) => void) {
-      return new Database(data, onNodesChange);
+    static async new(data: any) {
+      return new Database(data);
     }
 
     // #endregion
 
+    // #region Events
+    private onNodesChange(nodes: Node[]) {
+      this.events.emit("nodes.change", nodes);
+    }
+    // #endregion
+
     addNode(type: string, data: any, links: any[] = []) {
+      data = data || ({} as any);
+
       let node = {
         id: this.getNextID(),
         type,
         data,
       };
+
+      const types = type.split(".");
+      const commonData = Objects.clone(
+        this.data.schema[types[0]][types[1]]._all.data
+      );
+      Object.assign(node.data, commonData);
+      let defaultData = this.data.schema[types[0]][types[1]];
+      defaultData = defaultData[types[2]] ? defaultData[types[2]].data : {};
+      defaultData = Objects.clone(defaultData);
+      Object.assign(node.data, defaultData);
+
       const affectedNodes = [] as any[];
 
       for (const link of links) {
@@ -78,7 +98,7 @@ namespace Graph {
       this.nodes.push(node);
       this.links.push(...links);
 
-      this.onNodesChange(affectedNodes);
+      this.onNodesChange([node, ...affectedNodes]);
 
       return node;
     }
@@ -120,7 +140,7 @@ namespace Graph {
 
       this.links.push(link);
 
-      const affectedNodes = [from, to].map((n) => this.getNode(n.id));
+      const affectedNodes = [from, to].map((n) => this.getNode(n.id)) as any[];
       this.onNodesChange(affectedNodes);
 
       return link;
@@ -207,6 +227,4 @@ namespace Graph {
   }
 }
 
-const GraphDatabase = Graph.Database;
-
-export { GraphDatabase };
+export { Graph };

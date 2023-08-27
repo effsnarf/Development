@@ -3,3 +3,67 @@ nodes:
   - id: 1
     type: flow.layout.view
 links: []
+schema:
+  flow:
+    layout:
+      _all:
+        data:
+          style:
+            type: style
+            values:
+              backgroundColor:
+                type: color
+                value: transparent
+      panel:
+        data:
+          direction:
+            type: direction
+            value: vertical
+          size:
+            type: percent
+            value: 50
+      pages:
+        data:
+          visiblePageIndex:
+            type: number
+            value: 0
+    data:
+      _all:
+        data:
+      fetch:
+        data:
+          url:
+            type: string
+            value: https://api.memegenerator.net//Generators_Select_ByPopular?pageIndex=0&pageSize=12&days=&apiKey=demo
+    app:
+      _all:
+        data:
+      comp:
+        data:
+    ui:
+      _all:
+        data:
+get:
+  icon: | #js
+    function(type) {
+      const cat = type.split('.')[1];
+
+      if (cat == "app") {
+        type = type.split('.')[2];
+        return ({
+          comp: '📦',
+        })[type] || '❔';
+      }
+
+      if (cat == "ui") {
+        type = type.split('.')[2];
+        return ({
+          image: '🖼️',
+        })[type] || '❔';
+      }
+
+      return ({
+        layout: '⬜',
+        data: '🧊',
+      })[cat] || '❔';
+    }

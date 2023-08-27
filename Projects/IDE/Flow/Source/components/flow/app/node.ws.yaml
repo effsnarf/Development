@@ -1,13 +1,14 @@
 dom:
-  div:
-    flow.node.base:
-      ':style': style
+  flow.node.base:
+    ':style': style
+    ':node': node
+    component:
+      ':is': node.type.kebabize()
       ':node': node
-      component:
-        ':is': node.type.kebabize()
-        ':node': node
+      ':context-data': contextData
 props:
   node: null
+  contextData: null
 data:
   style: null
 methods:
@@ -48,7 +49,6 @@ _:
     count: 0
 name: flow-app-node
 template: >-
-  <div class="comp-flow-app-node" path="1269169775."><flow-node-base
-  :style="style" :node="node" path="1269169775.0"><component
-  :is="node.type.kebabize()" :node="node"
-  path="1269169775.0.0"></component></flow-node-base></div>
+  <flow-node-base class="comp-flow-app-node" :style="style" :node="node"
+  path="1269169775."><component :is="node.type.kebabize()" :node="node"
+  :context-data="contextData" path="1269169775.0"></component></flow-node-base>

@@ -1,0 +1,93 @@
+dom:
+  div: null
+props:
+  from: null
+  to: null
+  visible: true
+data:
+  leaderLine: null
+mounted: | #js
+  this.redraw();
+  this.refresh();
+methods:
+  refresh: | #js
+    function() {
+      const fromEl = this.from().$el;
+      const toEl = this.to().$el;
+
+      if (this.leaderLine && (this.leaderLine.start == fromEl) && (this.leaderLine.end == toEl))
+      {
+        this.redraw();
+        return;
+      }
+
+      this.remove();
+
+      if ((!fromEl) || (!toEl)) return this.remove();
+      if (!fromEl.isConnected || !toEl.isConnected) return this.remove();
+
+      this.leaderLine = new LeaderLine(
+        fromEl,
+        toEl,
+        {
+          path: 'grid',
+          color: 'yellow',
+          dropShadow: {
+            dx: -3,
+            dy: 3,
+            blur: 0.2
+          }
+        }
+      );
+      this.setVisibility(this.visible);
+    }
+  redraw: | #js
+    function() {
+      if (this.leaderLine)
+      {
+        if (this.isConnected(this.leaderLine))
+        {
+          this.leaderLine.position();
+        }
+        else
+        {
+          this.remove();
+        }
+      }
+      setTimeout(this.redraw.bind(this), 100);
+    }
+  setVisibility: | #js
+    function(visible) {
+      if (!this.leaderLine) return;
+      if (visible) this.leaderLine.show();
+      else this.leaderLine.hide();
+    }
+  isConnected: | #js
+    function(leaderLine) {
+      const fromEl = leaderLine.start;
+      const toEl = leaderLine.end;
+      return (fromEl.isConnected && toEl.isConnected);
+    }
+  remove: | #js
+    function() {
+      if (this.leaderLine) this.leaderLine.remove();
+      this.leaderLine = null;
+    }
+watch:
+  from: | #js
+    function(from) {
+      this.refresh();
+    }
+  to: | #js
+    function(to) {
+      this.refresh();
+    }
+  visible: | #js
+    function(visible) {
+      this.setVisibility(visible);
+    }
+_:
+  examples:
+    count: 0
+name: ui-leader-line
+template: <div class="comp-ui-leader-line"></div>

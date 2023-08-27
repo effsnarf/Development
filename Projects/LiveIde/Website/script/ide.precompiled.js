@@ -2909,7 +2909,7 @@ class StateTracker {
         if (!value)
             return true;
         if (Array.isArray(value))
-            return value.all(this.isTrackable);
+            return value.all(this.isTrackable.bind(this));
         // HTML elements are not trackable
         if (value instanceof HTMLElement)
             return false;
@@ -3962,8 +3962,8 @@ if (typeof Number !== "undefined") {
                 }
             }
             // Handle strings
-            if (typeof obj1 === "string" && typeof obj2 === "string") {
-                return obj1.localeCompare(obj2);
+            if (typeof obj1 === "string" || typeof obj2 === "string") {
+                return (obj1 || "").localeCompare(obj2 || "");
             }
             // Handle dates
             if (obj1 instanceof Date && obj2 instanceof Date) {
@@ -4978,6 +4978,15 @@ if (typeof Array !== "undefined") {
     Array.prototype.skip = function (count) {
         return this.slice(count);
     };
+    Array.prototype.getPairs = function () {
+        let pairs = [];
+        for (let i = 0; i < this.length - 1; i++) {
+            for (let j = i + 1; j < this.length; j++) {
+                pairs.push([this[i], this[j]]);
+            }
+        }
+        return pairs;
+    };
     Array.prototype.joinColumns = function (columns, ellipsis) {
         if (!columns.length)
             return this.join(" ");
@@ -5554,7 +5563,7 @@ var __webpack_exports__ = {};
 (() => {
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/Website/script/1693095848181.ts ***!
+  !*** ../../../LiveIde/Website/script/1693120076384.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -5568,10 +5577,13 @@ const VueManager_1 = __webpack_require__(/*! ../../Classes/VueManager */ "../../
 const Component_1 = __webpack_require__(/*! ../../Classes/Component */ "../../../LiveIde/Classes/Component.ts");
 window.Component = Component_1.Component;
 const taskQueue = new TaskQueue_1.TaskQueue();
+let vueApp;
 let vueIdeApp;
 const waitUntilInit = async () => {
-    while (!vueIdeApp)
-        await new Promise((resolve) => setTimeout(resolve, 100));
+    while (!vueApp || !vueIdeApp) {
+        vueApp = window.vueApp;
+        await new Promise((resolve) => setTimeout(resolve, 400));
+    }
 };
 const vueIdeCompMixin = {
     created() {
@@ -5580,8 +5592,8 @@ const vueIdeCompMixin = {
         self._vueIde = {
             methodDatas: {},
         };
-        const watchInIde = true;
-        if (watchInIde) {
+        const trackState = false;
+        if (trackState) {
             // Watch all events
             Object.keys(self.$listeners).forEach((eventName) => {
                 self.$on(eventName, async (...args) => {
@@ -5678,14 +5690,15 @@ const vueIdeCompMixin = {
     mounted() {
         taskQueue.enqueue(async () => {
             await waitUntilInit();
+            vueApp.vm.registerVue(this);
             vueIdeApp.vm.registerVue(this);
         });
     },
     beforeDestroy() {
+        window.vueApp.vm.unregisterVue(this);
         taskQueue.enqueue(async () => {
-            // Wait until ideApp is assigned
-            while (!vueIdeApp)
-                await new Promise((resolve) => setTimeout(resolve, 100));
+            await waitUntilInit();
+            vueApp.vm.unregisterVue(this);
             vueIdeApp.vm.unregisterVue(this);
         });
     },

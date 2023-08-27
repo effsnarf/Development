@@ -1,12 +1,31 @@
 dom:
-  div:
-    flow.layout.empty:
-      v-for: index in 5
-      ':key': index
+  flow.node.base:
+    ':node': node
+    @node-datas: nodeDatas=$event
+    ul:
+      li:
+        v-for: item in items
+        flow.app.node:
+          ':node': templateNode
+          ':context-data': item
 props:
   node: null
-computed: null
+computed:
+  items: | #js
+    function() {
+      return this.nodeDatas[0] || [1,2,3,4,5,6];
+    }
+  templateNode: | #js
+    function() {
+      return this.$root.gdb.getNodes('child.of', this.node)[0];
+    }
+data:
+  nodeDatas: []
+methods: null
 style:
+  ul:
+    display: grid
+    grid-template: 1fr / 1fr 1fr 1fr
   .comp-flow-layout-empty:
     border: 2px dashed white
 _:
@@ -14,5 +33,8 @@ _:
     count: 0
 name: flow-layout-list
 template: >-
-  <div class="comp-flow-layout-list" path="1843248162."><flow-layout-empty
-  v-for="index in 5" :key="index" path="1843248162.0"></flow-layout-empty></div>
+  <flow-node-base class="comp-flow-layout-list" :node="node"
+  @node-datas="nodeDatas=$event" path="1843248162."><ul path="1843248162.0"><li
+  v-for="item in items" path="1843248162.0.0"><flow-app-node
+  :node="templateNode" :context-data="item"
+  path="1843248162.0.0.0"></flow-app-node></li></ul></flow-node-base>
