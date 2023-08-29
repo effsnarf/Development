@@ -103,7 +103,7 @@ methods:
           // Hide the original element
           if (el.style.visibility != 'hidden') setTimeout(() => {
             el.style.visibility = 'hidden';
-          }, 100);
+          }, 10);
           requestAnimationFrame(animate);
         } else {
           // Animation is done, revert to original styles

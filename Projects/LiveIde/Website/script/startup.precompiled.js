@@ -539,7 +539,7 @@ var Flow;
             for (let node of nodes) {
                 node = node;
                 const data = contextData || this.nodeDatas[node.id];
-                this.setNodeData(node, contextData);
+                //this.setNodeData(node, contextData);
             }
         }
         setNodeData(node, data, depth = 0) {
@@ -6157,7 +6157,7 @@ var __webpack_exports__ = {};
 (() => {
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/Website/script/1693290712420.ts ***!
+  !*** ../../../LiveIde/Website/script/1693302615386.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

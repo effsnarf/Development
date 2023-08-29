@@ -6,7 +6,7 @@ props:
   node: null
   contextData: null
   defaultImageUrl2: /images/duck2.png
-  defaultImageUrl: https://cdn.pixabay.com/photo/2018/05/04/16/50/cat-3374422_640.jpg
+  defaultImageUrl: https://cdn.pixabay.com/photo/2016/07/10/21/47/cat-1508613_640.jpg
 computed:
   imageUrl: | #js
     function() {
