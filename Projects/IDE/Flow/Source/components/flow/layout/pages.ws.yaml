@@ -48,8 +48,8 @@ methods:
       //const text2 = vTargetPage.$el.querySelector('.comp-flow-ui-text');
       this.tween(image1, image1, image2, false, duration);
       this.tween(image2, image1, image2, true, duration);
-      this.tween(text1, text1, text2, false);
-      this.tween(text2, text1, text2, true);
+      this.tween(text1, text1, text2, false, duration);
+      this.tween(text2, text1, text2, true, duration);
       this.fade(vSourcePage.$el, duration, 1, 0);
       this.fade(vTargetPage.$el, duration, 0, 1);
       setTimeout(this.toggleVisiblePage.bind(this), duration);
