@@ -104,9 +104,24 @@ methods:
   onDndDrop: | #js
     function(action) {
       const { dragItem, dropItem } = action;
-      const parentNode = dropItem;
+
+      if (dragItem.type == "flow.app.compInst")
+      {
+        if (dropItem.type == "flow.app.compInst")
+        {
+          this.$root.gdb.addLink(dragItem, "data.send", dropItem, { event: "click" });
+          return;
+        }
+      }
+
+      if (dropItem == "trash")
+      {
+        this.$root.gdb.deleteNode(dragItem);
+        return;
+      }
 
       if (typeof dragItem == "string") this.onDndDrop_newNode(action);
+
       else this.onDndDrop_nodeToNode(action);
     }
   onDndDrop_newNode: | #js

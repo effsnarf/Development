@@ -7,6 +7,7 @@ dom:
         @click: $emit('input', option)
         flow.app.node:
           ':node': getOptionNode(option)
+          ':is-select-option': true
     ui.select:
       ':options': options
       type: toggle
@@ -28,6 +29,7 @@ methods:
 style:
   ul:
     display: flex
+    gap: 1em
 _:
   examples:
     count: 0
@@ -37,6 +39,7 @@ template: >-
   path="-1450810543.0"><li :class="{ selected: (field.value == option),
   clickable2: true }" v-for="option in options" @click="$emit('input', option)"
   path="-1450810543.0.0"><flow-app-node :node="getOptionNode(option)"
+  :is-select-option="true"
   path="-1450810543.0.0.0"></flow-app-node></li></ul><ui-select
   :options="options" type="toggle" input-type="value" :value="field.value"
   @input="$emit('input', $event)" path="-1450810543.1"></ui-select></div>

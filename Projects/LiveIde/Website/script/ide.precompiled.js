@@ -3306,7 +3306,7 @@ class VueManager {
             return;
         delete this.vues[vue._uid];
         const vueCompName = vue.$options._componentTag;
-        this.vuesCounts[vueCompName]--;
+        //this.vuesCounts[vueCompName]--;
         this.vuesCount--;
         for (const refKey of Object.keys(vue.$refs)) {
             if (refKey[0].isLowerCase())
@@ -5575,7 +5575,7 @@ var __webpack_exports__ = {};
 (() => {
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/Website/script/1693275885899.ts ***!
+  !*** ../../../LiveIde/Website/script/1693290711968.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

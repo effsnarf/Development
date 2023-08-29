@@ -19,6 +19,25 @@ namespace Flow {
 
     async computeNodeData(node: Graph.Node) {
       if (node.type == "flow.data.fetch") {
+        if (false) {
+          const catalogUrl = `/fetch?url=https://a.4cdn.org/fit/catalog.json`;
+          const catalog = (await (await fetch(catalogUrl)).json()) as any[];
+          const threadID = catalog[0].threads.sortBy((t: any) => -t.replies)[0]
+            .no;
+          const threadUrl = `/fetch?url=https://a.4cdn.org/fit/thread/${threadID}.json`;
+          const thread = (await (await fetch(threadUrl)).json()) as any;
+          const posts = thread.posts
+            .filter((p: any) => p.ext)
+            .map((p: any) => ({
+              id: p.no,
+              text: p.com,
+              imageUrl: `https://i.4cdn.org/fit/${p.tim}s${p.ext}`,
+            }));
+          this.setNodeData(node, posts);
+
+          return;
+        }
+
         const imageUrls = [
           "https://cdn.pixabay.com/photo/2016/03/28/12/35/cat-1285634_640.png",
           "https://cdn.pixabay.com/photo/2015/11/16/14/43/cat-1045782_640.jpg",
@@ -53,11 +72,29 @@ namespace Flow {
         this.setNodeData(node, exampleData);
 
         return;
+
         const fetchResponse = await fetch(node.data.url.value);
         const fetchText = await fetchResponse.text();
         let fetchData = JSON.parse(fetchText);
         if (fetchData.result) fetchData = fetchData.result;
         this.setNodeData(node, fetchData);
+      }
+    }
+
+    onNodeClick(node: Graph.Node, contextData: any) {
+      const nodeLinks = this.gdb
+        .getNodeLinks(node)
+        .filter((l) => l.type == "data.send")
+        .filter((l) => l.data.event == "click");
+
+      const nodes = nodeLinks
+        .map((l) => this.gdb.getNode(l.to))
+        .filter((n) => n);
+
+      for (let node of nodes) {
+        node = node as Graph.Node;
+        const data = contextData || this.nodeDatas[node.id];
+        this.setNodeData(node, contextData);
       }
     }
 
@@ -70,7 +107,9 @@ namespace Flow {
       this.nodeDatas[node.id] = data;
       this.events.emit("node.data.change", node, data);
 
-      const sendToNodes = this.gdb.getNodes(node, "data.send") as Graph.Node[];
+      const sendToNodes = (
+        this.gdb.getNodes(node, "data.send") as Graph.Node[]
+      ).filter((node) => !node.data.event);
 
       for (const sendToNode of sendToNodes) {
         this.setNodeData(sendToNode, data, depth + 1);
@@ -89,6 +128,19 @@ namespace Flow {
 
     initialize() {
       const app = this.gdb.addTemplate("app");
+    }
+
+    onNodeClick(node: Graph.Node, contextData: any) {
+      this.runtimeData.onNodeClick(node, contextData);
+    }
+
+    isNodeClickable(node: Graph.Node) {
+      const nodeLinks = this.gdb
+        .getNodeLinks(node)
+        .filter((l) => l.from == node.id)
+        .filter((l) => l.data.event == "click");
+
+      return nodeLinks.length > 0;
     }
   }
 

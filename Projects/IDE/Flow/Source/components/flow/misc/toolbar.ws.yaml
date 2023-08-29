@@ -23,8 +23,10 @@ data:
     - app.comp
     - ui.text
     - ui.image
+    - ui.textbox
     - data.stuff
     - data.fetch
+    - data.variable
 methods:
   getNewTools: | #js
     function() {

@@ -171,7 +171,7 @@ class VueManager {
 
     delete this.vues[vue._uid];
     const vueCompName = vue.$options._componentTag;
-    this.vuesCounts[vueCompName]--;
+    //this.vuesCounts[vueCompName]--;
     this.vuesCount--;
 
     for (const refKey of Object.keys(vue.$refs)) {

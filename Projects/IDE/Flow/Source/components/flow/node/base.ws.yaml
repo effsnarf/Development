@@ -3,6 +3,7 @@ dom:
     ':class': cssClass
     ':node': node
     @drag-over: onDragOver
+    @click: onClick
     slot: null
     div:
       v-if: 'false'
@@ -18,6 +19,7 @@ dom:
         ':visible': isHighlighted
 props:
   node: null
+  contextData: null
 data:
   nodeDataIds: []
   nodeDatas: {}
@@ -27,6 +29,7 @@ data:
     onHighlightedNode: onHighlightedNode
   twinVues: []
   linkedVues: []
+  isClickable: false
   isMounted: false
 mounted: | #js
   this.isMounted = true;
@@ -87,7 +90,7 @@ methods:
     }
   onGraphNodeChange: | #js
     function(node) {
-      if (node.id != this.node.id) return;
+      if (node.id != this.node?.id) return;
       if (this.$parent?.onNodeChange) this.$parent.onNodeChange(node);
       this.refresh();
     }
@@ -114,6 +117,11 @@ methods:
   onDragOver: | #js
     function(isDragOver) {
     }
+  onClick: | #js
+    function(e) {
+      this.$root.flow.user.app.onNodeClick(this.node, this.contextData);
+      this.$emit("click", e);
+    }
   refresh: | #js
     function() {
       this.nodeDataIds = this.getNodeDataIds();
@@ -122,6 +130,7 @@ methods:
         const data = this.$root.flow.user.app.runtimeData.nodeDatas[id];
         this.nodeDatas[id] = data;
       }
+      this.isClickable = this.$root.flow.user.app.isNodeClickable(this.node);
       this.$emit("node-datas", this.nodeDatas);
     }
 computed:
@@ -129,6 +138,7 @@ computed:
     function() {
       const cls = {};
       cls["highlighted-node"] = this.isHighlighted;
+      cls.clickable = this.isClickable;
       return cls;
     }
   isHighlighted: | #js
@@ -151,9 +161,9 @@ _:
 name: flow-node-base
 template: >-
   <flow-dnd-dropzone class="comp-flow-node-base" :class="cssClass" :node="node"
-  @drag-over="onDragOver" path="674641533."><slot></slot><div v-if="false"
-  path="674641533.1"><ui-leader-line v-for="twinVue in twinVues" :from="getThis"
-  :to="() =&gt; twinVue()" :visible="isHighlighted"
+  @drag-over="onDragOver" @click="onClick" path="674641533."><slot></slot><div
+  v-if="false" path="674641533.1"><ui-leader-line v-for="twinVue in twinVues"
+  :from="getThis" :to="() =&gt; twinVue()" :visible="isHighlighted"
   path="674641533.1.0"></ui-leader-line><ui-leader-line v-for="linkedVue in
   linkedVues" :from="getThis" :to="() =&gt; linkedVue()"
   :visible="isHighlighted"

@@ -23,6 +23,7 @@ namespace Graph {
     from: number;
     to: number;
     type: string;
+    data: any;
   };
 
   export class Database {
@@ -156,12 +157,13 @@ namespace Graph {
       if (link.to == oldNode.id) link.to = newNode.id;
     }
 
-    addLink(from: Node, type: string, to: Node) {
+    addLink(from: Node, type: string, to: Node, data: any = {}) {
       const link = {
         id: this.getNextID(),
         from: from.id,
         to: to.id,
         type,
+        data,
       };
 
       this.links.push(link);
@@ -279,7 +281,8 @@ namespace Graph {
       }
     }
 
-    private getNodeLinks(node: Node) {
+    getNodeLinks(node: Node) {
+      if (!node) return [];
       const links = this.links.filter(
         (l) => l.from == node.id || l.to == node.id
       );

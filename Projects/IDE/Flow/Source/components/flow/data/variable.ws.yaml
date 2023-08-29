@@ -1,0 +1,26 @@
+dom:
+  flow.node.base:
+    ':node': node
+    @node-datas: onNodeDatas
+    div:
+      ui.value.any:
+        ':value': value
+props:
+  node: null
+data:
+  value: null
+methods:
+  onNodeDatas: | #js
+    function(nodeDatas) {
+      this.nodeDatas = nodeDatas;
+      this.value = this.nodeDatas[this.node.id];
+    }
+_:
+  examples:
+    count: 0
+name: flow-data-variable
+template: >-
+  <flow-node-base class="comp-flow-data-variable" :node="node"
+  @node-datas="onNodeDatas" path="-106600576."><div
+  path="-106600576.0"><ui-value-any :value="value"
+  path="-106600576.0.0"></ui-value-any></div></flow-node-base>

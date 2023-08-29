@@ -1,10 +1,12 @@
 dom:
-  img:
-    ':src': imageUrl
+  div:
+    img:
+      ':src': imageUrl
 props:
   node: null
   contextData: null
-  defaultImageUrl: /images/duck.png
+  defaultImageUrl2: /images/duck2.png
+  defaultImageUrl: https://cdn.pixabay.com/photo/2018/05/04/16/50/cat-3374422_640.jpg
 computed:
   imageUrl: | #js
     function() {
@@ -12,9 +14,13 @@ computed:
     }
 style:
   img:
-    aspect-ratio: 3 / 2
+    width: 100%
+    object-fit: cover
+    filter: grayscale(1) contrast(1) brightness(1)
 _:
   examples:
     count: 0
 name: flow-ui-image
-template: <img class="comp-flow-ui-image" :src="imageUrl" path="-1986999743."/>
+template: >-
+  <div class="comp-flow-ui-image" path="-1986999743."><img :src="imageUrl"
+  path="-1986999743.0"/></div>

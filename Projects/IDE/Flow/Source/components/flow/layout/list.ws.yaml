@@ -2,9 +2,13 @@ dom:
   flow.node.base:
     ':node': node
     @node-datas: onNodeDatas
-    ul:
+    transition.group:
+      tag: ul
+      class: list
+      name: list
       li:
         v-for: item in (items || emptyItems)
+        ':key': getItemKey(item)
         flow.app.node:
           ':node': templateNode
           ':context-data': item
@@ -26,15 +30,27 @@ methods:
       this.nodeDatas = nodeDatas;
       this.items = this.nodeDatas[this.node.id];
     }
+  getItemKey: | #js
+    function(item) {
+      if (item?.id) return item.id;
+      const key = (typeof item === 'number') ? ((item||0) * 1000) : JSON.stringify(item);
+      return key;
+    }
 computed:
   templateNode: | #js
     function() {
       return this.$root.gdb.getNodes('child.of', this.node)[0];
     }
 style:
-  ul:
-    display: grid
-    grid-template: 1fr / 1fr 1fr 1fr
+  .list:
+    display: flex
+    flex-wrap: wrap
+    justify-content: center
+  .list > *:
+    width: 30%
+    opacity: 0.8
+  .list > *:hover:
+    opacity: 1
   .comp-flow-layout-empty:
     border: 2px dashed white
 _:
@@ -43,7 +59,8 @@ _:
 name: flow-layout-list
 template: >-
   <flow-node-base class="comp-flow-layout-list" :node="node"
-  @node-datas="onNodeDatas" path="1843248162."><ul path="1843248162.0"><li
-  v-for="item in (items || emptyItems)" path="1843248162.0.0"><flow-app-node
+  @node-datas="onNodeDatas" path="1843248162."><transition-group class="list"
+  tag="ul" name="list" path="1843248162.0"><li v-for="item in (items ||
+  emptyItems)" :key="getItemKey(item)" path="1843248162.0.0"><flow-app-node
   :node="templateNode" :context-data="item"
-  path="1843248162.0.0.0"></flow-app-node></li></ul></flow-node-base>
+  path="1843248162.0.0.0"></flow-app-node></li></transition-group></flow-node-base>

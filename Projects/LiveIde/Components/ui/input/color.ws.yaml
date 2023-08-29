@@ -1,10 +1,15 @@
 dom:
   input:
+    class: color-input
     type: color
     ':value': value
     @input: $emit('input', $event.target.value)
 props:
   value: null
+style:
+  .color-input:
+    min-width: 2em
+    min-height: 2em
 desc:
   value: Use v-model to bind to a color value.
 example1:
@@ -23,5 +28,5 @@ _:
   examples:
     count: 0
 template: >-
-  <input class="comp-ui-input-color" type="color" :value="value"
+  <input class="comp-ui-input-color color-input" type="color" :value="value"
   @input="$emit('input', $event.target.value)" path="498432997."/>

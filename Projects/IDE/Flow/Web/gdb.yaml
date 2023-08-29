@@ -42,6 +42,11 @@ schema:
           url:
             type: string
             value: https://api.memegenerator.net//Generators_Select_ByPopular?pageIndex=0&pageSize=12&days=&apiKey=demo
+      variable:
+        data:
+          name:
+            type: string
+            value: variable
     app:
       _all:
         data:

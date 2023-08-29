@@ -1,18 +1,23 @@
 dom:
   flow.node.base:
     ':node': node
-    ui.title:
-      icon: 📦
-      ':text': compNode.data.name.value
-    @node-datas: nodeDatas=$event
+    ':context-data': contextData
+    @node-datas: onNodeDatas
     flow.app.node:
       ':node': compNode
-      ':context-data': contextData
+      ':context-data': appliedData
 props:
   node: null
   contextData: null
 data:
   nodeDatas: []
+  appliedData: null
+methods:
+  onNodeDatas: | #js
+    function(nodeDatas) {
+      this.nodeDatas = nodeDatas;
+      this.appliedData = (this.contextData || this.nodeDatas[this.node.id]);
+    }
 computed:
   compNode: | #js
     function() {
@@ -24,14 +29,12 @@ computed:
     function() {
       return this.$root.gdb.getNodes('child.of', this.node);
     }
-methods: null
 _:
   examples:
     count: 0
 name: flow-app-comp-inst
 template: >-
   <flow-node-base class="comp-flow-app-comp-inst" :node="node"
-  @node-datas="nodeDatas=$event" path="-226955912."><ui-title icon="📦"
-  :text="compNode.data.name.value" path="-226955912.0"></ui-title><flow-app-node
-  :node="compNode" :context-data="contextData"
-  path="-226955912.1"></flow-app-node></flow-node-base>
+  :context-data="contextData" @node-datas="onNodeDatas"
+  path="-226955912."><flow-app-node :node="compNode" :context-data="appliedData"
+  path="-226955912.0"></flow-app-node></flow-node-base>

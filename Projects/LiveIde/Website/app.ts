@@ -349,6 +349,12 @@ const _fetchAsJson = async (url: string) => {
         if (result) return result;
       }
 
+      if (req.url.startsWith("/fetch")) {
+        const url = req.url.split("?")[1].split("=")[1];
+        const response = await axios.get(url);
+        return res.end(JSON.stringify(response.data));
+      }
+
       if (req.url.startsWith("/img/") && !isLocalFile(req.url)) {
         // Redirect to img.memegenerator.net
         const url = `https://img.memegenerator.net/${req.url.replace(

@@ -1,0 +1,88 @@
+dom:
+  flow.node.base:
+    v-if: isNodeTypeRelevant(node)
+    ':style': mainStyle
+    ':node': node
+    .flex: 
+      flow.node.title: 
+        class: flex-equal
+        v-for: toHereNode in toHereNodes
+        ':node': toHereNode
+        full: true
+    div: 
+      class: text-center fs-l1
+      v-if: toHereNodes.length
+      v-text: '''↓'''
+    flow.node.title:
+      ':node': node
+      full: true
+    div: 
+      class: text-center fs-l1
+      v-if: fromHereNodes.length
+      v-text: '''↓'''
+    .flex: 
+      flow.node.title: 
+        class: flex-equal
+        v-for: fromHereNode in fromHereNodes
+        ':node': fromHereNode
+        full: true
+props:
+  node: null
+data:
+  toHereNodes: []
+  fromHereNodes: []
+methods:
+  refresh: | #js
+    function() {
+      const nodeLinks = this.$root.gdb.getNodeLinks(this.node);
+      this.toHereNodes = nodeLinks
+        .filter(l => (l.to === this.node.id))
+        .map(l => this.$root.gdb.getNode(l.from))
+        .filter(this.isNodeTypeRelevant);
+      this.fromHereNodes = nodeLinks
+        .filter(l => (l.from === this.node.id))
+        .map(l => this.$root.gdb.getNode(l.to))
+        .filter(this.isNodeTypeRelevant);
+    }
+  isNodeTypeRelevant: | #js
+    function(node) {
+      if (!node) return false;
+      if (['layout', 'folder'].some(t => node.type.includes(t))) return false;
+      return true;
+    }
+computed:
+  mainStyle: | #js
+    function() {
+      const style = {};
+      style['border'] = 'none !important';
+      style['background'] = 'none';
+      return style;
+    }
+watch:
+  node:
+    handler: | #js
+      function() {
+        this.refresh();
+      }
+    immediate: true
+style:
+  .comp-flow-node-title:
+    border: 1px solid gray
+    background: '#ffffff20'
+_:
+  examples:
+    count: 0
+name: flow-node-chain-link
+template: >-
+  <flow-node-base class="comp-flow-node-chain-link"
+  v-if="isNodeTypeRelevant(node)" :style="mainStyle" :node="node"
+  path="1392304563."><div class="flex" path="1392304563.0"><flow-node-title
+  class="flex-equal" v-for="toHereNode in toHereNodes" :node="toHereNode"
+  full="true" path="1392304563.0.0"></flow-node-title></div><div
+  class="text-center fs-l1" v-if="toHereNodes.length" v-text="'↓'"
+  path="1392304563.1"></div><flow-node-title :node="node" full="true"
+  path="1392304563.2"></flow-node-title><div class="text-center fs-l1"
+  v-if="fromHereNodes.length" v-text="'↓'" path="1392304563.3"></div><div
+  class="flex" path="1392304563.4"><flow-node-title class="flex-equal"
+  v-for="fromHereNode in fromHereNodes" :node="fromHereNode" full="true"
+  path="1392304563.4.0"></flow-node-title></div></flow-node-base>

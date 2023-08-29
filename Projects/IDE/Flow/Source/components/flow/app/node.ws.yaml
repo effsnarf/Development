@@ -3,13 +3,15 @@ dom:
     v-if: node
     ':style': style
     ':node': node
+    ':context-data': contextData
     component:
       ':is': node.type.kebabize()
-      ':node': node
-      ':context-data': contextData
+      v-bind: $props
 props:
   node: null
   contextData: null
+  isSelectOption: false
+  showAllPages: false
 data:
   style: null
 methods:
@@ -40,7 +42,7 @@ watch:
     immediate: true
     deep: true
 style:
-  .comp-flow-app-node:
+  .comp-flow-app-node .empty:
     min-width: 5em
     min-height: 5em
 _:
@@ -49,6 +51,6 @@ _:
 name: flow-app-node
 template: >-
   <flow-node-base class="comp-flow-app-node" v-if="node" :style="style"
-  :node="node" path="1269169775."><component :is="node.type.kebabize()"
-  :node="node" :context-data="contextData"
+  :node="node" :context-data="contextData" path="1269169775."><component
+  :is="node.type.kebabize()" v-bind="$props"
   path="1269169775.0"></component></flow-node-base>

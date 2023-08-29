@@ -488,6 +488,7 @@ var Flow;
         }
         async computeNodeData(node) {
             if (node.type == "flow.data.fetch") {
+                if (false) {}
                 const imageUrls = [
                     "https://cdn.pixabay.com/photo/2016/03/28/12/35/cat-1285634_640.png",
                     "https://cdn.pixabay.com/photo/2015/11/16/14/43/cat-1045782_640.jpg",
@@ -527,6 +528,20 @@ var Flow;
                 this.setNodeData(node, fetchData);
             }
         }
+        onNodeClick(node, contextData) {
+            const nodeLinks = this.gdb
+                .getNodeLinks(node)
+                .filter((l) => l.type == "data.send")
+                .filter((l) => l.data.event == "click");
+            const nodes = nodeLinks
+                .map((l) => this.gdb.getNode(l.to))
+                .filter((n) => n);
+            for (let node of nodes) {
+                node = node;
+                const data = contextData || this.nodeDatas[node.id];
+                this.setNodeData(node, contextData);
+            }
+        }
         setNodeData(node, data, depth = 0) {
             if (depth > 10) {
                 window.alertify.error("setNodeData: max depth reached");
@@ -534,7 +549,7 @@ var Flow;
             }
             this.nodeDatas[node.id] = data;
             this.events.emit("node.data.change", node, data);
-            const sendToNodes = this.gdb.getNodes(node, "data.send");
+            const sendToNodes = this.gdb.getNodes(node, "data.send").filter((node) => !node.data.event);
             for (const sendToNode of sendToNodes) {
                 this.setNodeData(sendToNode, data, depth + 1);
             }
@@ -551,6 +566,16 @@ var Flow;
         }
         initialize() {
             const app = this.gdb.addTemplate("app");
+        }
+        onNodeClick(node, contextData) {
+            this.runtimeData.onNodeClick(node, contextData);
+        }
+        isNodeClickable(node) {
+            const nodeLinks = this.gdb
+                .getNodeLinks(node)
+                .filter((l) => l.from == node.id)
+                .filter((l) => l.data.event == "click");
+            return nodeLinks.length > 0;
         }
     }
     Flow.UserApp = UserApp;
@@ -3564,7 +3589,7 @@ class VueManager {
             return;
         delete this.vues[vue._uid];
         const vueCompName = vue.$options._componentTag;
-        this.vuesCounts[vueCompName]--;
+        //this.vuesCounts[vueCompName]--;
         this.vuesCount--;
         for (const refKey of Object.keys(vue.$refs)) {
             if (refKey[0].isLowerCase())
@@ -3773,12 +3798,13 @@ var Graph;
             if (link.to == oldNode.id)
                 link.to = newNode.id;
         }
-        addLink(from, type, to) {
+        addLink(from, type, to, data = {}) {
             const link = {
                 id: this.getNextID(),
                 from: from.id,
                 to: to.id,
                 type,
+                data,
             };
             this.links.push(link);
             const affectedNodes = [from, to].map((n) => this.getNode(n.id));
@@ -3855,6 +3881,8 @@ var Graph;
             }
         }
         getNodeLinks(node) {
+            if (!node)
+                return [];
             const links = this.links.filter((l) => l.from == node.id || l.to == node.id);
             return links;
         }
@@ -6129,7 +6157,7 @@ var __webpack_exports__ = {};
 (() => {
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/Website/script/1693275886355.ts ***!
+  !*** ../../../LiveIde/Website/script/1693290712420.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

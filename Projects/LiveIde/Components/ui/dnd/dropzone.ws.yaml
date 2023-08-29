@@ -5,6 +5,7 @@ dom:
     @dragenter: onDragEnter
     @dragleave: onDragLeave
     @drop: onDrop
+    @click: onClick
     slot: null
 props: null
 methods:
@@ -37,6 +38,10 @@ methods:
       this.$emit('drag-over', false);
       this.$emit('drop-item', dragItem);
     }
+  onClick: | #js
+    function(e) {
+      this.$emit('click', e);
+    }
 _:
   examples:
     count: 0
@@ -44,4 +49,4 @@ name: ui-dnd-dropzone
 template: >-
   <div class="comp-ui-dnd-dropzone dropzone" @dragover="onDragOver"
   @dragenter="onDragEnter" @dragleave="onDragLeave" @drop="onDrop"
-  path="-2085012855."><slot></slot></div>
+  @click="onClick" path="-2085012855."><slot></slot></div>

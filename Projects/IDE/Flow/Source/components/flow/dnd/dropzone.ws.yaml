@@ -3,6 +3,7 @@ dom:
     slot: null
     @drag-over: onDragOver
     @drop-item: onDropItem
+    @click: onClick
 props:
   node: null
 methods:
@@ -18,10 +19,15 @@ methods:
         dropItem: this.node
       });
     }
+  onClick: | #js
+    function(e) {
+      this.$emit("click", e);
+    }
 _:
   examples:
     count: 0
 name: flow-dnd-dropzone
 template: >-
   <ui-dnd-dropzone class="comp-flow-dnd-dropzone" @drag-over="onDragOver"
-  @drop-item="onDropItem" path="267244079."><slot></slot></ui-dnd-dropzone>
+  @drop-item="onDropItem" @click="onClick"
+  path="267244079."><slot></slot></ui-dnd-dropzone>

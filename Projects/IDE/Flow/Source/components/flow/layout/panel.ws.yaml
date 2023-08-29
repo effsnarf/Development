@@ -2,7 +2,12 @@ dom:
   flow.node.base:
     ':node': node
     ':class': getCssClass()
+    div:
+      class: select-option
+      v-if: isSelectOption
+      v-for: (childNode, index) in childNodes
     flow.app.node:
+      v-if: '!isSelectOption'
       v-for: (childNode, index) in childNodes
       ':style': getChildStyle(index, childNode)
       ':key': childNode.id
@@ -11,6 +16,7 @@ dom:
 props:
   node: null
   contextData: null
+  isSelectOption: false
 methods:
   getCssClass: | #js
     function() {
@@ -35,6 +41,10 @@ computed:
       return this.$root.gdb.getNodes('child.of', this.node);
     }
 style:
+  .select-option:
+    min-width: 3em
+    min-height: 3em
+    border: 1px solid gray
   .comp-flow-layout-panel:
     display: flex
   .vertical:
@@ -47,7 +57,9 @@ _:
 name: flow-layout-panel
 template: >-
   <flow-node-base class="comp-flow-layout-panel" :node="node"
-  :class="getCssClass()" path="1309568768."><flow-app-node v-for="(childNode,
-  index) in childNodes" :style="getChildStyle(index, childNode)"
-  :key="childNode.id" :node="childNode" :context-data="contextData"
-  path="1309568768.0"></flow-app-node></flow-node-base>
+  :class="getCssClass()" path="1309568768."><div class="select-option"
+  v-if="isSelectOption" v-for="(childNode, index) in childNodes"
+  path="1309568768.0"></div><flow-app-node v-if="!isSelectOption"
+  v-for="(childNode, index) in childNodes" :style="getChildStyle(index,
+  childNode)" :key="childNode.id" :node="childNode" :context-data="contextData"
+  path="1309568768.1"></flow-app-node></flow-node-base>

@@ -1,9 +1,15 @@
 dom:
-  img:
-    src: /images/trash.png
+  flow.dnd.dropzone:
+    node: trash
+    img:
+      ':style': '{ width: ''10em'' }'
+      src: /images/trash.png
 props: null
 _:
   examples:
     count: 0
 name: flow-misc-trash
-template: <img class="comp-flow-misc-trash" src="/images/trash.png" path="504813686."/>
+template: >-
+  <flow-dnd-dropzone class="comp-flow-misc-trash" node="trash"
+  path="504813686."><img :style="{ width: '10em' }" src="/images/trash.png"
+  path="504813686.0"/></flow-dnd-dropzone>
