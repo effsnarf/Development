@@ -32,6 +32,7 @@ methods:
     function(e) {
       e?.preventDefault();
       e?.stopPropagation();
+      if (!this.$refs.vPages) return;
       const duration = 1000;
       const sourcePageIndex = this.visiblePageIndex;
       const targetPageIndex = (sourcePageIndex + 1) % this.childNodes.length;
