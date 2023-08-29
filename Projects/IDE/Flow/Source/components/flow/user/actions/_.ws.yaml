@@ -9,15 +9,49 @@ dom:
 props: null
 data:
   actions: []
+  pointer: -1
 mounted: | #js
   this.$root.$on("user-action", this.onUserAction);
+  this.$root.$on("app-init", this.load.bind(this));
 methods:
+  load: | #js
+    function() {
+      const data = JSON.parse(localStorage.getItem("flow.user.actions") || "[]");
+      this.actions = (data.actions || []);
+      this.pointer = -1;
+      if (this.actions[0]?.type != "no.op") this.actions.unshift({ type: "no.op" });
+      this.executeUpTo((data.pointer || 0));
+    }
+  save: | #js
+    function() {
+      localStorage.setItem("flow.user.actions", JSON.stringify({
+        actions: this.actions,
+        pointer: this.pointer,
+      }));
+    }
+  toPersistableAction: | #js
+    function(action) {
+      return Object.fromEntries(Object.entries(action).map(([key, value]) => {
+        if (value?.id) value = ({ id: value.id });
+        return [key, value];
+      }));
+    }
+  fromPersistableAction: | #js
+    function(action) {
+      return Object.fromEntries(Object.entries(action).map(([key, value]) => {
+        if (value?.id) value = this.$root.gdb.getNode(value.id);
+        return [key, value];
+      }));
+    }
   onUserAction: | #js
     function(action) {
       const lastAction = this.actions[this.actions.length - 1];
       if (this.isActionMergeable(lastAction, action)) this.actions.pop();
+      action = this.toPersistableAction(action);
+      // Clear actions above pointer
+      this.actions = this.actions.slice(0, this.pointer + 1);
       this.actions.push(action);
-      this.executeAction(action);
+      this.redo();
     }
   isActionMergeable: | #js
     function(lastAction, action) {
@@ -27,14 +61,45 @@ methods:
       if (lastAction.field != action.field) return false;
       return true;
     }
-  executeAction: | #js
+  redo: | #js
+    function() {
+      if (this.pointer >= this.actions.length - 1) return;
+      this.pointer++;
+      this.doAction(this.actions[this.pointer]);
+    }
+  undo: | #js
+    function() {
+      if (this.pointer < 0) return;
+      this.undoAction(this.actions[this.pointer]);
+      this.pointer--;
+    }
+  executeUpTo: | #js
+    function(index) {
+      if (index < this.pointer)
+      {
+        while (this.pointer > index) this.undo();
+      }
+      else
+      {
+        while (this.pointer < index) this.redo();
+      }
+    }
+  doAction: | #js
     function(action) {
+      action = this.fromPersistableAction(action);
       const methodName = "on" + action.type
         .split(".")
         .map(s => s.capitalize())
         .join("");
       if (this[methodName]) this[methodName](action);
       else throw new Error("Unknown action type: " + action.type);
+    }
+  undoAction: | #js
+    function(action) {
+      alertify.error("not implemented");
+    }
+  onNoOp: | #js
+    function(action) {
     }
   onDndDrop: | #js
     function(action) {
@@ -47,23 +112,48 @@ methods:
   onDndDrop_newNode: | #js
     function(action) {
       const { dragItem, dropItem } = action;
-      const parentNode = dropItem;
       const newNodeType = dragItem;
 
       const newNode = this.createNewNode(newNodeType);
 
-      if (parentNode.type == "flow.layout.empty")
+      if (dropItem.type == "flow.layout.empty")
       {
-        this.$root.gdb.replaceNode(parentNode, newNode);
+        this.$root.gdb.replaceNode(dropItem, newNode);
         return;
       }
       else
       {
-        this.$root.gdb.addChildNode(parentNode, newNode);
+        this.$root.gdb.addChildNode(dropItem, newNode);
       }
     }
   onDndDrop_nodeToNode: | #js
     function(action) {
+      const { dragItem, dropItem } = action;
+
+      if (action.dropItem.type == "flow.layout.empty")
+      {
+        if (action.dragItem.type == "flow.app.comp")
+        {
+          const compInst = this.$root.gdb.addNode("flow.app.compInst", {
+            compID: {
+              type: "noderef",
+              value: {
+                type: "flow.app.comp",
+                value: action.dragItem.id
+              }
+            },
+          });
+          this.$root.gdb.replaceNode(action.dropItem, compInst);
+          return;
+        }
+        // Move node to empty layout node
+        if (action.dragItem.type.startsWith("flow.layout"))
+        {
+          this.$root.gdb.replaceNode(action.dropItem, action.dragItem);
+          return;
+        }
+        throw new Error("Not implemented");
+      }
       this.$root.gdb.addLink(action.dragItem, "data.send", action.dropItem);
     }
   onNodeUpdate: | #js
@@ -74,22 +164,23 @@ methods:
     function(newNodeType) {
       const data = {};
 
-      const isPanel = (newNodeType == "flow.layout.panel");
-      const isPages = (newNodeType == "flow.layout.pages");
-      const isList = (newNodeType == "flow.layout.list");
-      const isFetch = (newNodeType == "flow.data.fetch");
-      const isUserAppComp = (newNodeType == "flow.app.comp");
-
       const newNode = this.$root.gdb.addNode(newNodeType, data);
       
-      if (isPanel || isPages || isUserAppComp || isList)
-      {
-        const count = ((isList || isUserAppComp) ? 1 : (isPanel ? 2 : 3));
-        this.$root.gdb.addChildNodes(newNode, "flow.layout.empty", null, count);
-      }
-
       return newNode;
     }
+watch:
+  actions:
+    handler: | #js
+      function() {
+        this.save();
+      }
+    deep: true
+  pointer:
+    handler: | #js
+      function() {
+        this.save();
+      }
+    deep: true
 _:
   examples:
     count: 0

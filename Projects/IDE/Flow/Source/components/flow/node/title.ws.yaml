@@ -1,0 +1,51 @@
+dom:
+  div: 
+    v-if: node
+    div: 
+      v-if: full
+      h2:
+        ui.title: 
+          ':icon': getIcon(node)
+          ':text': getName(node)
+      .opacity-50:
+        ui.title: 
+          ':icon': getIcon(node)
+          ':text': node.type
+          ':number': node.id
+    div: 
+      v-if: '!full'
+      ui.title:
+        ':icon': getIcon(node)
+        ':text': getName(node)
+props:
+  node: null
+  full: false
+methods:
+  getName: | #js
+    function(node) {
+      if (node.type == "flow.app.compInst")
+      {
+        const compID = node.data.compID.value.value;
+        const compNode = this.$root.gdb.getNode(compID);
+        return compNode.data.name.value;
+      }
+      return node.data.name?.value ||
+        node.type.split('.').reverse().take(1).reverse().join('.');
+    }
+  getIcon: | #js
+    function(node) {
+      return (eval(`(${this.$root.gdb.data.get.icon})`))(node.type);
+    }
+_:
+  examples:
+    count: 0
+name: flow-node-title
+template: >-
+  <div class="comp-flow-node-title" v-if="node" path="-544085972."><div
+  v-if="full" path="-544085972.0"><h2 path="-544085972.0.0"><ui-title
+  :icon="getIcon(node)" :text="getName(node)"
+  path="-544085972.0.0.0"></ui-title></h2><div class="opacity-50"
+  path="-544085972.0.1"><ui-title :icon="getIcon(node)" :text="node.type"
+  :number="node.id" path="-544085972.0.1.0"></ui-title></div></div><div
+  v-if="!full" path="-544085972.1"><ui-title :icon="getIcon(node)"
+  :text="getName(node)" path="-544085972.1.0"></ui-title></div></div>

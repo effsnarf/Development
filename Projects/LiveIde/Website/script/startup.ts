@@ -1,5 +1,6 @@
 import "../../../../Shared/Extensions";
 import { HtmlHelper } from "../../Classes/HtmlHelper";
+import { Events } from "../../../../Shared/Events";
 import { Component } from "../../Classes/Component";
 import { Objects } from "../../../../Shared/Extensions.Objects.Client";
 import { TaskQueue } from "../../../../Shared/TaskQueue";
@@ -10,6 +11,7 @@ import { DatabaseProxy } from "../../../../Apps/DatabaseProxy/Client/DbpClient";
 import { VueManager } from "../../Classes/VueManager";
 import { Graph } from "../../../../Shared/Database/Graph";
 import { Flow } from "../../Classes/Flow";
+import { on } from "events";
 
 // To make it accessible to client code
 const win = window as any;
@@ -391,7 +393,7 @@ interface MgParams {
   const isLocalHost = window.location.hostname == "localhost";
   const dbpHost = `https://db.memegenerator.net`;
 
-  const dbp = (await DatabaseProxy.new(`${dbpHost}/MemeGenerator`)) as any;
+  const dbp = null; // (await DatabaseProxy.new(`${dbpHost}/MemeGenerator`)) as any;
 
   const gdbData = await Objects.try(
     async () => await (await fetch(`/gdb.yaml`)).json(),
@@ -399,10 +401,10 @@ interface MgParams {
   );
 
   const vueManager = await VueManager.new(client);
-
   const gdb = await Graph.Database.new(gdbData);
-
   const flow = new Flow.Manager(vueManager, gdb);
+
+  flow.user.app?.initialize();
 
   const getNewParams = async () => {
     return (await Params.new(
@@ -416,6 +418,7 @@ interface MgParams {
 
   vueApp = new client.Vue({
     data: {
+      events: new Events(),
       // MemeGenerator
       builders: {
         all: {} as any,
@@ -446,8 +449,15 @@ interface MgParams {
     },
     async mounted() {
       await this.init();
+      this.events.forward(gdb.events, "gdb");
+      this.events.forward(flow.events, "flow");
+      this.events.on("*", this.onAppEvent.bind(this));
     },
     methods: {
+      async onAppEvent(name: string, ...args: any[]) {
+        const self = this as any;
+        self.$emit(name, ...args);
+      },
       async init() {
         const self = this as any;
         self.newCssRules = await (await fetch(`/css-tool`)).json();
@@ -458,6 +468,9 @@ interface MgParams {
         document.addEventListener("scroll", () => {
           self.$emit("scroll");
         });
+        setTimeout(() => {
+          self.$emit("app-init");
+        }, 100);
       },
       async getBuilder(urlNameOrID: string | number) {
         const self = this as any;
@@ -474,6 +487,7 @@ interface MgParams {
       },
       async ensureBuilders() {
         const self = this as any;
+        if (!self.dbp) return;
         if (!self.builders?.length) {
           const allBuilders = await self.dbp.builders.select.all();
           self.builders.mainMenu = allBuilders.filter(
@@ -1032,12 +1046,6 @@ interface MgParams {
         );
         return vues;
       },
-      async onGraphNodesChange(nodes: any[]) {
-        const self = this as any;
-        await self.$nextTick();
-        const nodesMap = nodes.toMap((n: any) => n.id);
-        self.$emit("graph-nodes-change", nodesMap);
-      },
     },
     watch: {
       newCssRules: {
@@ -1052,8 +1060,6 @@ interface MgParams {
       },
     },
   });
-
-  gdb.events.on("nodes.change", vueApp.onGraphNodesChange);
 
   vueApp.$mount("#app");
 

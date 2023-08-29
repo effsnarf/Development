@@ -1,0 +1,9 @@
+dom:
+  img:
+    src: /images/trash.png
+props: null
+_:
+  examples:
+    count: 0
+name: flow-misc-trash
+template: <img class="comp-flow-misc-trash" src="/images/trash.png" path="504813686."/>

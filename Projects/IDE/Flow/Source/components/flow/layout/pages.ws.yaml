@@ -1,5 +1,6 @@
 dom:
-  div: 
+  flow.node.base:
+    ':node': node
     .flex:
       div: 
         ':style': '{ ''flex-grow'': 1 }'
@@ -35,12 +36,14 @@ _:
     count: 0
 name: flow-layout-pages
 template: >-
-  <div class="comp-flow-layout-pages" path="1309562048."><div class="flex"
-  path="1309562048.0"><div :style="{ 'flex-grow': 1 }" v-for="(childNode, index)
-  in childNodes" path="1309562048.0.0"><div v-text="'page ' + index"
+  <flow-node-base class="comp-flow-layout-pages" :node="node"
+  path="1309562048."><div class="flex" path="1309562048.0"><div :style="{
+  'flex-grow': 1 }" v-for="(childNode, index) in childNodes"
+  path="1309562048.0.0"><div v-text="'page ' + index"
   path="1309562048.0.0.0"></div><flow-app-node :key="childNode.id"
   :node="childNode"
   path="1309562048.0.0.1"></flow-app-node></div></div><transition name="slide"
   path="1309562048.1"><flow-app-node v-for="(childNode, index) in childNodes"
   v-if="(node.data.visiblePageIndex.value === index)" :key="childNode.id"
-  :node="childNode" path="1309562048.1.0"></flow-app-node></transition></div>
+  :node="childNode"
+  path="1309562048.1.0"></flow-app-node></transition></flow-node-base>

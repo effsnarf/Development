@@ -1,0 +1,31 @@
+dom:
+  div:
+    ':class': cssClass
+    v-text: text
+props:
+  node: null
+  contextData: null
+data:
+  defaultText: '[text]'
+computed:
+  text: | #js
+    function() {
+      return (this.contextData?.text || this.defaultText);
+    }
+  cssClass: | #js
+    function() {
+      return {
+        'text-center': true,
+        'empty': !this.contextData?.text,
+      }
+    }
+style:
+  .empty:
+    opacity: 0.5
+_:
+  examples:
+    count: 0
+name: flow-ui-text
+template: >-
+  <div class="comp-flow-ui-text" :class="cssClass" v-text="text"
+  path="1183149959."></div>

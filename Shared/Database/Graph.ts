@@ -58,28 +58,43 @@ namespace Graph {
 
     // #region Events
     private onNodesChange(nodes: Node[]) {
-      this.events.emit("nodes.change", nodes);
+      for (const node of nodes) {
+        this.events.emit("node.change", node);
+      }
     }
     // #endregion
 
-    addNode(type: string, data: any, links: any[] = []) {
-      data = data || ({} as any);
+    addTemplate(name: string) {
+      const template = this.data.templates[name];
+      const node = this.addNode(template.type, template.data);
+      for (const child of template.children) {
+        this.addChildNode(node, child.type, child.data, child.children);
+      }
+      return node;
+    }
 
-      let node = {
-        id: this.getNextID(),
-        type,
-        data,
-      };
+    addNode(type: string, data: any, links: any[] = []) {
+      data = JSON.parse(JSON.stringify(data || {}));
+
+      const newData = {} as any;
 
       const types = type.split(".");
       const commonData = Objects.clone(
         this.data.schema[types[0]][types[1]]._all.data
       );
-      Object.assign(node.data, commonData);
+      Object.assign(newData, commonData);
       let defaultData = this.data.schema[types[0]][types[1]];
       defaultData = defaultData[types[2]] ? defaultData[types[2]].data : {};
       defaultData = Objects.clone(defaultData);
-      Object.assign(node.data, defaultData);
+      Object.assign(newData, defaultData);
+
+      Object.assign(newData, data);
+
+      let node = {
+        id: this.getNextID(),
+        type,
+        data: newData,
+      };
 
       const affectedNodes = [] as any[];
 
@@ -100,6 +115,19 @@ namespace Graph {
 
       this.onNodesChange([node, ...affectedNodes]);
 
+      let defaultChildren = this.data.schema[types[0]][types[1]];
+      defaultChildren = defaultChildren[types[2]]
+        ? defaultChildren[types[2]].children || []
+        : [];
+      for (const child of defaultChildren) {
+        const childNode = this.addChildNode(
+          node,
+          child.type,
+          child.data,
+          child.children
+        );
+      }
+
       return node;
     }
 
@@ -110,12 +138,10 @@ namespace Graph {
     }
 
     replaceNode(oldNode: Node, newNode: Node) {
-      const node = this.getNode(oldNode.id);
-      if (!node) throw new Error(`Node not found: ${oldNode.id}`);
       this.replaceNodeLinks(oldNode, newNode);
-      Object.assign(node, newNode);
-      this.onNodesChange([node]);
-      return node;
+      this.deleteNode(oldNode);
+      this.onNodesChange([newNode]);
+      return newNode;
     }
 
     private replaceNodeLinks(oldNode: Node, newNode: Node) {
@@ -141,17 +167,34 @@ namespace Graph {
       this.links.push(link);
 
       const affectedNodes = [from, to].map((n) => this.getNode(n.id)) as any[];
+
       this.onNodesChange(affectedNodes);
 
       return link;
     }
 
-    addChildNode(parent: Node, typeOrNode: string | Node, data: any) {
+    addChildNode(
+      parent: Node,
+      typeOrNode: string | Node,
+      data: any,
+      children: any[] = []
+    ) {
       const child =
         typeof typeOrNode == "object"
           ? (typeOrNode as Node)
           : this.addNode(typeOrNode, data);
+
       this.addLink(child, "child.of", parent);
+
+      for (const subChild of children) {
+        this.addChildNode(
+          child,
+          subChild.type,
+          subChild.data,
+          subChild.children
+        );
+      }
+
       return child;
     }
 
@@ -188,6 +231,16 @@ namespace Graph {
       return nodes;
     }
 
+    getLinkedNodes2(linkType: string, fromOrTo: string, node: Node) {
+      const links = this.links.filter(
+        (l: any) => l.type == linkType && l[fromOrTo] == node.id
+      );
+      const nodes = links.map((l) =>
+        this.getNode(l[this.getOppositeFromOrTo(fromOrTo)])
+      );
+      return nodes;
+    }
+
     private getLinks(a: string | Node, b: string | Node) {
       const fromOrTo = this.fromOrTo(a, b);
       const type = findArg("string", a, b);
@@ -199,9 +252,31 @@ namespace Graph {
       return links;
     }
 
-    private getNode(id: Number) {
-      const node = this.nodes.find((n) => n.id == id);
-      return node;
+    getNode(idOrPath: Number | string, fromNode?: Node) {
+      if (typeof idOrPath == "number") {
+        const id = idOrPath as number;
+        const node = this.nodes.find((n) => n.id == id);
+        return node;
+      } else {
+        const path = idOrPath as string;
+        const paths = path.split(".");
+        const findPathPart = (parent: Node | null, part: string) => {
+          const children = !parent
+            ? [...this.nodes]
+            : this.getLinkedNodes2("child.of", "to", parent);
+          const child = part.startsWith("[")
+            ? children[0]
+            : children.find(
+                (c: any) => c.data.name?.value == part || c.type == part
+              );
+          return child || null;
+        };
+        let node = fromNode as unknown as Node | null;
+        for (const pathPart of paths) {
+          node = findPathPart(node, pathPart);
+        }
+        return node;
+      }
     }
 
     private getNodeLinks(node: Node) {
@@ -232,6 +307,17 @@ namespace Graph {
         return a.type;
       } else {
         return b;
+      }
+    }
+
+    deleteNode(node: Node) {
+      this.deleteLinks(this.getNodeLinks(node));
+      this.nodes.removeBy((n) => n.id == node.id);
+    }
+
+    deleteLinks(links: Link[]) {
+      for (const link of links) {
+        this.links.removeBy((l) => l.id == link.id);
       }
     }
 

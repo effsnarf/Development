@@ -1,5 +1,7 @@
 dom:
-  .empty:
+  flow.node.base:
+    ':node': node
+    class: empty
     .absolute-center:
       v-text: '''empty'''
 props:
@@ -15,5 +17,6 @@ _:
     count: 0
 name: flow-layout-empty
 template: >-
-  <div class="comp-flow-layout-empty empty" path="1299769929."><div
-  class="absolute-center" v-text="'empty'" path="1299769929.0"></div></div>
+  <flow-node-base class="comp-flow-layout-empty empty" :node="node"
+  path="1299769929."><div class="absolute-center" v-text="'empty'"
+  path="1299769929.0"></div></flow-node-base>

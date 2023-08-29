@@ -1,5 +1,6 @@
 dom:
   ul:
+    v-if: root
     li:
       ui.tree.node:
         ':node': root
@@ -94,7 +95,7 @@ _:
   examples:
     count: 0
 template: >-
-  <ul class="comp-ui-tree" path="-484140360."><li
+  <ul class="comp-ui-tree" v-if="root" path="-484140360."><li
   path="-484140360.0"><ui-tree-node :node="root" :depth="0"
   :initial-expanded="initialExpanded" :expandable="initialExpandable"
   :item-type="itemType" :get-item="getItem || ((node) =&gt; node?.item)"

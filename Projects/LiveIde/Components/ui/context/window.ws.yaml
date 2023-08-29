@@ -10,7 +10,7 @@ dom:
       transition: 
         name: fade
         .context-menu:
-          v-show: isVisible
+          v-if: isVisible
           ref: menu1
           ':class': '{ pinned: isPinned, inited: isInited, visible: isVisible }'
           ':style': style
@@ -269,8 +269,8 @@ template: >-
   @right-click="e =&gt; onRightClick(e, true)"
   path="1458497449.0"></ui-mouse><ui-mouse @drag="onDrag"
   path="1458497449.1"><transition name="fade" path="1458497449.1.0"><div
-  class="context-menu" v-show="isVisible" ref="menu1" :class="{ pinned:
-  isPinned, inited: isInited, visible: isVisible }" :style="style"
+  class="context-menu" v-if="isVisible" ref="menu1" :class="{ pinned: isPinned,
+  inited: isInited, visible: isVisible }" :style="style"
   path="1458497449.1.0.0"><div path="1458497449.1.0.0.0"><div
   class="close-button" v-if="isPinned" v-text="'✖️'" @click="isPinned=false"
   path="1458497449.1.0.0.0.0"></div><transition name="slide"

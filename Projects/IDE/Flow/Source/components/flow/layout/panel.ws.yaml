@@ -1,13 +1,16 @@
 dom:
-  div:
+  flow.node.base:
+    ':node': node
     ':class': getCssClass()
     flow.app.node:
       v-for: (childNode, index) in childNodes
       ':style': getChildStyle(index, childNode)
       ':key': childNode.id
       ':node': childNode
+      ':context-data': contextData
 props:
   node: null
+  contextData: null
 methods:
   getCssClass: | #js
     function() {
@@ -43,7 +46,8 @@ _:
     count: 0
 name: flow-layout-panel
 template: >-
-  <div class="comp-flow-layout-panel" :class="getCssClass()"
-  path="1309568768."><flow-app-node v-for="(childNode, index) in childNodes"
-  :style="getChildStyle(index, childNode)" :key="childNode.id" :node="childNode"
-  path="1309568768.0"></flow-app-node></div>
+  <flow-node-base class="comp-flow-layout-panel" :node="node"
+  :class="getCssClass()" path="1309568768."><flow-app-node v-for="(childNode,
+  index) in childNodes" :style="getChildStyle(index, childNode)"
+  :key="childNode.id" :node="childNode" :context-data="contextData"
+  path="1309568768.0"></flow-app-node></flow-node-base>

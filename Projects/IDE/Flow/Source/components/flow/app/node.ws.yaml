@@ -1,5 +1,6 @@
 dom:
   flow.node.base:
+    v-if: node
     ':style': style
     ':node': node
     component:
@@ -42,13 +43,12 @@ style:
   .comp-flow-app-node:
     min-width: 5em
     min-height: 5em
-    margin: 0.5em
-    border: '2px dashed #ccc'
 _:
   examples:
     count: 0
 name: flow-app-node
 template: >-
-  <flow-node-base class="comp-flow-app-node" :style="style" :node="node"
-  path="1269169775."><component :is="node.type.kebabize()" :node="node"
-  :context-data="contextData" path="1269169775.0"></component></flow-node-base>
+  <flow-node-base class="comp-flow-app-node" v-if="node" :style="style"
+  :node="node" path="1269169775."><component :is="node.type.kebabize()"
+  :node="node" :context-data="contextData"
+  path="1269169775.0"></component></flow-node-base>

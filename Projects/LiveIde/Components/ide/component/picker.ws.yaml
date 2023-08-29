@@ -84,7 +84,7 @@ methods:
     }
   onHoveredElement: | #js
     function(el) {
-      if (this.$refs.context1.isPinned) return;
+      if (this.$refs.context1?.isPinned) return;
       this.hoveredElement = el;
     }
   getParentChainUIDs: | #js

@@ -331,6 +331,7 @@ interface String {
 interface Array<T> {
   all(predicate: (item: T) => boolean): boolean;
   toMap(getKey: (item: T) => any): object;
+  toMapValue(getValue: (item: T) => any): object;
   contains(item: T, getItemKey?: (item: T) => any): boolean;
   reversed(): T[];
   removeAt(index: number): void;
@@ -1439,6 +1440,14 @@ if (typeof Array !== "undefined") {
     const map = {} as any;
     this.forEach((item) => {
       map[getKey(item)] = getValue!(item);
+    });
+    return map;
+  };
+
+  Array.prototype.toMapValue = function (getValue: (item: any) => any) {
+    const map = {} as any;
+    this.forEach((item) => {
+      map[item] = getValue(item);
     });
     return map;
   };

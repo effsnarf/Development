@@ -2,22 +2,27 @@ dom:
   ui.tree:
     ':root': root
     item-type: flow.gdb.tree.node
+    ':initial-expanded': 10
     @node-click: onNodeClick
     @node-hovered: onNodeHovered
+props:
+  node: null
 data:
   root: null
   selectedNode: null
   hoveredNode: null
 mounted: | #js
-  this.$root.$on("graph-nodes-change", this.refresh.bind(this));
+  this.$root.$on("gdb.node.change", this.refresh.bind(this));
   this.refresh();
 methods:
   buildTree: | #js
     function() {
-      const rootItem = this.$root.gdb.nodes.find(node => node.type === "flow.layout.view");
+      this.root = null;
+      const rootNode = this.node;
+      if (!rootNode) return;
       const root = {
-        id: rootItem.id,
-        item: rootItem,
+        id: rootNode.id,
+        item: rootNode,
         children: []
       };
       root.children = this.getChildNodes(root);
@@ -66,5 +71,6 @@ _:
 name: flow-gdb-tree
 template: >-
   <ui-tree class="comp-flow-gdb-tree" :root="root"
-  item-type="flow.gdb.tree.node" @node-click="onNodeClick"
-  @node-hovered="onNodeHovered" path="675361159."></ui-tree>
+  item-type="flow.gdb.tree.node" :initial-expanded="10"
+  @node-click="onNodeClick" @node-hovered="onNodeHovered"
+  path="675361159."></ui-tree>

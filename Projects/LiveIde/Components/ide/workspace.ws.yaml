@@ -4,7 +4,7 @@ dom:
       v-if: showWorkspace
       class: workspace
       h3:
-        ui.title:
+        ui.title: 
           icon: 🎄
           ':value': $root.vm.vuesCount?.toLocaleString()
         div: 
@@ -19,11 +19,18 @@ dom:
             ':selected': (selectedEditor == editor)
             ':key': editor
             v-text: editor
+      div: 
+        ui.title: 
+          v-for: entry in Object.entries($root.vm.vuesCounts).sortBy(e => -e[1])
+          icon: 🎄
+          ':text': entry[0]
+          ':number': entry[1]
       ide.debug: null
-      ide.component.picker:
-        v-if: (selectedEditor == 'component')
-      ide.element.picker:
-        v-if: (selectedEditor == 'css')
+      div: 
+        ide.component.picker:
+          v-if: (selectedEditor == 'component')
+        ide.element.picker:
+          v-if: (selectedEditor == 'css')
 props: null
 data:
   showWorkspace: false
@@ -64,8 +71,13 @@ template: >-
   path="-1163457967.0.0.1.0"></ui-button></div><select v-model="selectedEditor"
   path="-1163457967.0.0.2"><option v-for="editor in ['component', 'css']"
   :selected="(selectedEditor == editor)" :key="editor" v-text="editor"
-  path="-1163457967.0.0.2.0"></option></select></h3><ide-debug></ide-debug><ide-component-picker
-  v-if="(selectedEditor == 'component')"
-  path="-1163457967.0.2"></ide-component-picker><ide-element-picker
+  path="-1163457967.0.0.2.0"></option></select></h3><div
+  path="-1163457967.0.1"><ui-title v-for="entry in
+  Object.entries($root.vm.vuesCounts).sortBy(e =&gt; -e[1])" icon="🎄"
+  :text="entry[0]" :number="entry[1]"
+  path="-1163457967.0.1.0"></ui-title></div><ide-debug></ide-debug><div
+  path="-1163457967.0.3"><ide-component-picker v-if="(selectedEditor ==
+  'component')"
+  path="-1163457967.0.3.0"></ide-component-picker><ide-element-picker
   v-if="(selectedEditor == 'css')"
-  path="-1163457967.0.3"></ide-element-picker></div></div>
+  path="-1163457967.0.3.1"></ide-element-picker></div></div></div>

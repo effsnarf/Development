@@ -2,182 +2,6 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "../../../../Apps/DatabaseProxy/Client/DbpClient.ts":
-/*!**********************************************************!*\
-  !*** ../../../../Apps/DatabaseProxy/Client/DbpClient.ts ***!
-  \**********************************************************/
-/***/ ((__unused_webpack_module, exports) => {
-
-
-// This version is for public clients like Meme Generator
-// Doesn't have direct access to the database, but can still use the API
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.DatabaseProxy = void 0;
-// Lowercase the first letter of a string
-String.prototype.untitleize = function () {
-    return this.charAt(0).toLowerCase() + this.slice(1);
-};
-class DatabaseProxy {
-    urlBase;
-    fetchAsJson;
-    constructor(urlBase, _fetchAsJson) {
-        this.urlBase = urlBase;
-        this.fetchAsJson =
-            _fetchAsJson ||
-                (async (url, ...args) => {
-                    const response = await fetch(url, ...args);
-                    const text = await response.text();
-                    if (!text?.length)
-                        return null;
-                    return JSON.parse(text);
-                });
-    }
-    static async new(urlBase, _fetchAsJson) {
-        const dbp = new DatabaseProxy(urlBase, _fetchAsJson);
-        await dbp.init();
-        return dbp;
-    }
-    async init() {
-        const api = await this.createApiMethods();
-        for (const key of Object.keys(api)) {
-            this[key] = api[key];
-        }
-    }
-    static setValue(obj, value) {
-        if (Array.isArray(obj)) {
-            obj[0][obj[1]] = value;
-        }
-        else {
-            obj.value = value;
-        }
-    }
-    async fetchJson(url, options = {}) {
-        // $set also implies cached
-        if (!options.$set) {
-            if (options.cached) {
-                // Even though we're returning from the cache,
-                // we still want to fetch in the background
-                // to update for the next time
-                const fetchItem = async () => {
-                    const item = await this.fetchAsJson(url, options);
-                    //localStorage.setItem(url, JSON.stringify(item));
-                    return item;
-                };
-                //const cachedItem = Objects.json.parse(localStorage.getItem(url) || "null");
-                const cachedItem = null;
-                if (!cachedItem)
-                    return await fetchItem();
-                // Fetch in the background
-                fetchItem();
-                return cachedItem;
-            }
-            return await this.fetchAsJson(url, options);
-        }
-        // Check the local cache
-        //const cachedItem = Objects.json.parse(localStorage.getItem(url) || "null");
-        const cachedItem = null;
-        if (cachedItem)
-            DatabaseProxy.setValue(options.$set, cachedItem);
-        // Fetch in the background
-        const item = await this.fetchAsJson(url, options);
-        // Update the local cache
-        //localStorage.setItem(url, JSON.stringify(item));
-        DatabaseProxy.setValue(options.$set, item);
-        return item;
-    }
-    async callApiMethod(entity, group, method, args, extraArgs) {
-        // We're using { $set: [obj, prop] } as a callback syntax
-        // This is because sometimes we use the local cache and also fetch in the background
-        // in which case we'll need to resolve twice which is not possible with a promise
-        const options = extraArgs.find((a) => a?.$set) || {};
-        let url = `${this.urlBase}/api/${entity}/${group}/${method}`;
-        const isHttpPost = group == "create";
-        if (isHttpPost) {
-            const data = {};
-            args.forEach((a) => (data[a.name] = a.value));
-            const isCreateCall = url.includes("/create/one");
-            if (isCreateCall) {
-                data._uid = DatabaseProxy.getRandomUniqueID();
-            }
-            const fetchOptions = {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(data),
-                mode: "no-cors",
-            };
-            let result = await this.fetchJson(url, fetchOptions);
-            // If we got an _id back, select the item
-            // This is because when POSTing from localhost I'm having trouble getting the actual object back
-            const _id = parseInt(result);
-            if (isCreateCall && (!result || typeof result != "object")) {
-                if (_id) {
-                    const idFieldName = `${entity
-                        .substring(0, entity.length - 1)
-                        .toLowerCase()}ID`;
-                    result = await this.callApiMethod(entity, "select", "one", [{ name: idFieldName, value: _id }], []);
-                }
-                else {
-                    result = await this.callApiMethod(entity, "select", "one", [{ name: "_uid", value: data._uid }], []);
-                }
-            }
-            return result;
-        }
-        const argsStr = args
-            .map((a) => `${a.name}=${JSON.stringify(a.value || null)}`)
-            .join("&");
-        const getUrl = `${url}?${argsStr}`;
-        const result = await this.fetchJson(getUrl, options);
-        return result;
-    }
-    async createApiMethods() {
-        const api = {};
-        const apiMethods = await this.getApiMethods();
-        apiMethods.forEach((e) => {
-            const entityName = e.entity.untitleize();
-            api[entityName] = {};
-            e.groups.forEach((g) => {
-                api[entityName][g.name] = {};
-                g.methods.forEach((m) => {
-                    api[entityName][g.name][m.name] = async (...args) => {
-                        let result = await this.callApiMethod(e.entity, g.name, m.name, (m.args || []).map((a, i) => {
-                            return { name: a, value: args[i] };
-                        }), args.slice((m.args || []).length));
-                        if (m.then) {
-                            const thenArgs = [`api`, ...(m.then.args || [])];
-                            const then = eval(`async (${thenArgs.join(`,`)}) => { ${m.then.body} }`);
-                            if (m.then.chainResult) {
-                                result = await then(api, result);
-                            }
-                            else {
-                                then(api, result);
-                            }
-                        }
-                        return result;
-                    };
-                });
-            });
-        });
-        return api;
-    }
-    async getApiMethods() {
-        const result = await this.fetchJson(`${this.urlBase}/api`, {
-            cached: true,
-        });
-        return result;
-    }
-    static getRandomUniqueID() {
-        return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (char) => {
-            const random = (Math.random() * 16) | 0;
-            const value = char === "x" ? random : (random & 0x3) | 0x8;
-            return value.toString(16);
-        });
-    }
-}
-exports.DatabaseProxy = DatabaseProxy;
-
-
-/***/ }),
-
 /***/ "../../../LiveIde/Classes/AnalyticsTracker.ts":
 /*!****************************************************!*\
   !*** ../../../LiveIde/Classes/AnalyticsTracker.ts ***!
@@ -642,35 +466,91 @@ exports.ComponentManager = ComponentManager;
 /*!****************************************!*\
   !*** ../../../LiveIde/Classes/Flow.ts ***!
   \****************************************/
-/***/ ((__unused_webpack_module, exports) => {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Flow = void 0;
+const Events_1 = __webpack_require__(/*! ../../../Shared/Events */ "../../../../Shared/Events.ts");
 const Vue = window.Vue;
 var Flow;
 (function (Flow) {
-    class Runtime {
+    class RuntimeData {
+        gdb;
+        events = new Events_1.Events();
         nodeDatas = Vue.reactive({});
+        constructor(gdb) {
+            this.gdb = gdb;
+            this.gdb.events.on("node.change", this.onNodeChange.bind(this));
+        }
+        async onNodeChange(node) {
+            this.computeNodeData(node);
+        }
+        async computeNodeData(node) {
+            if (node.type == "flow.data.fetch") {
+                const imageUrls = [
+                    "https://cdn.pixabay.com/photo/2016/03/28/12/35/cat-1285634_640.png",
+                    "https://cdn.pixabay.com/photo/2015/11/16/14/43/cat-1045782_640.jpg",
+                    "https://cdn.pixabay.com/photo/2016/07/10/21/47/cat-1508613_640.jpg",
+                    "https://cdn.pixabay.com/photo/2013/05/30/18/21/cat-114782_640.jpg",
+                    "https://cdn.pixabay.com/photo/2016/06/14/00/14/cat-1455468_640.jpg",
+                    "https://cdn.pixabay.com/photo/2018/05/04/16/50/cat-3374422_640.jpg",
+                    "https://cdn.pixabay.com/photo/2020/10/05/10/51/cat-5628953_640.jpg",
+                    "https://cdn.pixabay.com/photo/2016/09/07/22/38/cat-1652822_640.jpg",
+                    "https://cdn.pixabay.com/photo/2020/06/24/19/41/cat-5337501_640.jpg",
+                    "https://cdn.pixabay.com/photo/2015/06/07/19/42/animal-800760_640.jpg",
+                ];
+                const texts = [
+                    "Fluffo the Frog",
+                    "Giggly Garry",
+                    "MemeMaster Mike",
+                    "Chillax Charlie",
+                    "Dank Dave",
+                    "Lolita Llama",
+                    "Pepe's Peculiar Pal",
+                    "Roflcopter Rick",
+                    "Sassy Sally",
+                    "Woke Wendy",
+                ];
+                const exampleData = imageUrls.map((url, index) => ({
+                    id: index,
+                    text: texts[index],
+                    imageUrl: url,
+                }));
+                this.setNodeData(node, exampleData);
+                return;
+                const fetchResponse = await fetch(node.data.url.value);
+                const fetchText = await fetchResponse.text();
+                let fetchData = JSON.parse(fetchText);
+                if (fetchData.result)
+                    fetchData = fetchData.result;
+                this.setNodeData(node, fetchData);
+            }
+        }
+        setNodeData(node, data, depth = 0) {
+            if (depth > 10) {
+                window.alertify.error("setNodeData: max depth reached");
+                return;
+            }
+            this.nodeDatas[node.id] = data;
+            this.events.emit("node.data.change", node, data);
+            const sendToNodes = this.gdb.getNodes(node, "data.send");
+            for (const sendToNode of sendToNodes) {
+                this.setNodeData(sendToNode, data, depth + 1);
+            }
+        }
     }
     class UserApp {
         gdb;
-        runtime = new Runtime();
+        events = new Events_1.Events();
+        runtimeData;
         constructor(gdb) {
             this.gdb = gdb;
-            this.gdb.events.on("nodes.change", this.onNodesChange.bind(this));
+            this.runtimeData = new RuntimeData(gdb);
+            this.events.forward(this.runtimeData.events, "runtime.data");
         }
-        async onNodesChange(nodes) {
-            for (const node of nodes) {
-                if (node.type == "flow.data.fetch") {
-                    const fetchResponse = await fetch(node.data.url.value);
-                    const fetchText = await fetchResponse.text();
-                    let fetchData = JSON.parse(fetchText);
-                    if (fetchData.result)
-                        fetchData = fetchData.result;
-                    this.runtime.nodeDatas[node.id] = fetchData;
-                }
-            }
+        initialize() {
+            const app = this.gdb.addTemplate("app");
         }
     }
     Flow.UserApp = UserApp;
@@ -721,6 +601,7 @@ var Flow;
     class Manager {
         vm;
         gdb;
+        events = new Events_1.Events();
         ui;
         user = {
             app: null,
@@ -730,6 +611,7 @@ var Flow;
             this.gdb = gdb;
             this.ui = new UI(vm, gdb);
             this.user.app = new UserApp(gdb);
+            this.events.forward(this.user.app.events, "user.app");
         }
     }
     Flow.Manager = Manager;
@@ -3538,6 +3420,7 @@ class VueManager {
     client;
     vues = {};
     vuesCount = 0;
+    vuesCounts = {};
     // Tracking by uid or vue tree path are unreliable because vue recreates components
     // We use $refs to track components
     // Any ref that starts with a capital letter is a global reference
@@ -3665,6 +3548,8 @@ class VueManager {
         if (this.vues[vue._uid])
             return;
         this.vues[vue._uid] = () => vue;
+        const vueCompName = vue.$options._componentTag;
+        this.vuesCounts[vueCompName] = (this.vuesCounts[vueCompName] || 0) + 1;
         this.vuesCount++;
         //const compName = vue.$data._.comp.name;
         //if (["e.", "ui."].some((prefix) => compName.startsWith(prefix))) return;
@@ -3678,6 +3563,8 @@ class VueManager {
         if (!vue)
             return;
         delete this.vues[vue._uid];
+        const vueCompName = vue.$options._componentTag;
+        this.vuesCounts[vueCompName]--;
         this.vuesCount--;
         for (const refKey of Object.keys(vue.$refs)) {
             if (refKey[0].isLowerCase())
@@ -3809,23 +3696,35 @@ var Graph;
         // #endregion
         // #region Events
         onNodesChange(nodes) {
-            this.events.emit("nodes.change", nodes);
+            for (const node of nodes) {
+                this.events.emit("node.change", node);
+            }
         }
         // #endregion
+        addTemplate(name) {
+            const template = this.data.templates[name];
+            const node = this.addNode(template.type, template.data);
+            for (const child of template.children) {
+                this.addChildNode(node, child.type, child.data, child.children);
+            }
+            return node;
+        }
         addNode(type, data, links = []) {
-            data = data || {};
-            let node = {
-                id: this.getNextID(),
-                type,
-                data,
-            };
+            data = JSON.parse(JSON.stringify(data || {}));
+            const newData = {};
             const types = type.split(".");
             const commonData = Extensions_Objects_Client_1.Objects.clone(this.data.schema[types[0]][types[1]]._all.data);
-            Object.assign(node.data, commonData);
+            Object.assign(newData, commonData);
             let defaultData = this.data.schema[types[0]][types[1]];
             defaultData = defaultData[types[2]] ? defaultData[types[2]].data : {};
             defaultData = Extensions_Objects_Client_1.Objects.clone(defaultData);
-            Object.assign(node.data, defaultData);
+            Object.assign(newData, defaultData);
+            Object.assign(newData, data);
+            let node = {
+                id: this.getNextID(),
+                type,
+                data: newData,
+            };
             const affectedNodes = [];
             for (const link of links) {
                 if (link.from) {
@@ -3842,6 +3741,13 @@ var Graph;
             this.nodes.push(node);
             this.links.push(...links);
             this.onNodesChange([node, ...affectedNodes]);
+            let defaultChildren = this.data.schema[types[0]][types[1]];
+            defaultChildren = defaultChildren[types[2]]
+                ? defaultChildren[types[2]].children || []
+                : [];
+            for (const child of defaultChildren) {
+                const childNode = this.addChildNode(node, child.type, child.data, child.children);
+            }
             return node;
         }
         updateNodeField(node, field, value) {
@@ -3850,13 +3756,10 @@ var Graph;
             this.onNodesChange([node]);
         }
         replaceNode(oldNode, newNode) {
-            const node = this.getNode(oldNode.id);
-            if (!node)
-                throw new Error(`Node not found: ${oldNode.id}`);
             this.replaceNodeLinks(oldNode, newNode);
-            Object.assign(node, newNode);
-            this.onNodesChange([node]);
-            return node;
+            this.deleteNode(oldNode);
+            this.onNodesChange([newNode]);
+            return newNode;
         }
         replaceNodeLinks(oldNode, newNode) {
             const oldLinks = this.getNodeLinks(oldNode);
@@ -3882,11 +3785,14 @@ var Graph;
             this.onNodesChange(affectedNodes);
             return link;
         }
-        addChildNode(parent, typeOrNode, data) {
+        addChildNode(parent, typeOrNode, data, children = []) {
             const child = typeof typeOrNode == "object"
                 ? typeOrNode
                 : this.addNode(typeOrNode, data);
             this.addLink(child, "child.of", parent);
+            for (const subChild of children) {
+                this.addChildNode(child, subChild.type, subChild.data, subChild.children);
+            }
             return child;
         }
         addChildNodes(parent, typeOrNode, data, count) {
@@ -3909,6 +3815,11 @@ var Graph;
             const nodes = nodeIds.map((id) => this.getNode(id));
             return nodes;
         }
+        getLinkedNodes2(linkType, fromOrTo, node) {
+            const links = this.links.filter((l) => l.type == linkType && l[fromOrTo] == node.id);
+            const nodes = links.map((l) => this.getNode(l[this.getOppositeFromOrTo(fromOrTo)]));
+            return nodes;
+        }
         getLinks(a, b) {
             const fromOrTo = this.fromOrTo(a, b);
             const type = findArg("string", a, b);
@@ -3918,9 +3829,30 @@ var Graph;
             const links = this.links.filter((l) => l.type == type && l[fromOrTo] == node.id);
             return links;
         }
-        getNode(id) {
-            const node = this.nodes.find((n) => n.id == id);
-            return node;
+        getNode(idOrPath, fromNode) {
+            if (typeof idOrPath == "number") {
+                const id = idOrPath;
+                const node = this.nodes.find((n) => n.id == id);
+                return node;
+            }
+            else {
+                const path = idOrPath;
+                const paths = path.split(".");
+                const findPathPart = (parent, part) => {
+                    const children = !parent
+                        ? [...this.nodes]
+                        : this.getLinkedNodes2("child.of", "to", parent);
+                    const child = part.startsWith("[")
+                        ? children[0]
+                        : children.find((c) => c.data.name?.value == part || c.type == part);
+                    return child || null;
+                };
+                let node = fromNode;
+                for (const pathPart of paths) {
+                    node = findPathPart(node, pathPart);
+                }
+                return node;
+            }
         }
         getNodeLinks(node) {
             const links = this.links.filter((l) => l.from == node.id || l.to == node.id);
@@ -3950,6 +3882,15 @@ var Graph;
                 return b;
             }
         }
+        deleteNode(node) {
+            this.deleteLinks(this.getNodeLinks(node));
+            this.nodes.removeBy((n) => n.id == node.id);
+        }
+        deleteLinks(links) {
+            for (const link of links) {
+                this.links.removeBy((l) => l.id == link.id);
+            }
+        }
         getNextID() {
             return this.nextID++;
         }
@@ -3972,6 +3913,11 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Events = void 0;
 class Events {
     listeners = {};
+    forward(events, prefix) {
+        events.on("*", (name, ...args) => {
+            this.emit(`${prefix}.${name}`, ...args);
+        });
+    }
     on(name, callback) {
         if (!this.listeners[name]) {
             this.listeners[name] = [];
@@ -5471,6 +5417,13 @@ if (typeof Array !== "undefined") {
         });
         return map;
     };
+    Array.prototype.toMapValue = function (getValue) {
+        const map = {};
+        this.forEach((item) => {
+            map[item] = getValue(item);
+        });
+        return map;
+    };
     Array.prototype.all = function (predicate) {
         return this.findIndex((item) => !predicate(item)) == -1;
     };
@@ -6176,18 +6129,18 @@ var __webpack_exports__ = {};
 (() => {
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/Website/script/1693126434327.ts ***!
+  !*** ../../../LiveIde/Website/script/1693275886355.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 __webpack_require__(/*! ../../../../Shared/Extensions */ "../../../../Shared/Extensions.ts");
 const HtmlHelper_1 = __webpack_require__(/*! ../../Classes/HtmlHelper */ "../../../LiveIde/Classes/HtmlHelper.ts");
+const Events_1 = __webpack_require__(/*! ../../../../Shared/Events */ "../../../../Shared/Events.ts");
 const Extensions_Objects_Client_1 = __webpack_require__(/*! ../../../../Shared/Extensions.Objects.Client */ "../../../../Shared/Extensions.Objects.Client.ts");
 const TaskQueue_1 = __webpack_require__(/*! ../../../../Shared/TaskQueue */ "../../../../Shared/TaskQueue.ts");
 const AnalyticsTracker_1 = __webpack_require__(/*! ../../Classes/AnalyticsTracker */ "../../../LiveIde/Classes/AnalyticsTracker.ts");
 const ClientContext_1 = __webpack_require__(/*! ../../Classes/ClientContext */ "../../../LiveIde/Classes/ClientContext.ts");
 const Params_1 = __webpack_require__(/*! ../../Classes/Params */ "../../../LiveIde/Classes/Params.ts");
-const DbpClient_1 = __webpack_require__(/*! ../../../../Apps/DatabaseProxy/Client/DbpClient */ "../../../../Apps/DatabaseProxy/Client/DbpClient.ts");
 const VueManager_1 = __webpack_require__(/*! ../../Classes/VueManager */ "../../../LiveIde/Classes/VueManager.ts");
 const Graph_1 = __webpack_require__(/*! ../../../../Shared/Database/Graph */ "../../../../Shared/Database/Graph.ts");
 const Flow_1 = __webpack_require__(/*! ../../Classes/Flow */ "../../../LiveIde/Classes/Flow.ts");
@@ -6536,17 +6489,19 @@ const mgHelpers = {
     let vueApp = null;
     const isLocalHost = window.location.hostname == "localhost";
     const dbpHost = `https://db.memegenerator.net`;
-    const dbp = (await DbpClient_1.DatabaseProxy.new(`${dbpHost}/MemeGenerator`));
+    const dbp = null; // (await DatabaseProxy.new(`${dbpHost}/MemeGenerator`)) as any;
     const gdbData = await Extensions_Objects_Client_1.Objects.try(async () => await (await fetch(`/gdb.yaml`)).json(), { nodes: [], links: [] });
     const vueManager = await VueManager_1.VueManager.new(client);
     const gdb = await Graph_1.Graph.Database.new(gdbData);
     const flow = new Flow_1.Flow.Manager(vueManager, gdb);
+    flow.user.app?.initialize();
     const getNewParams = async () => {
         return (await Params_1.Params.new(() => vueApp, client.config.params, window.location.pathname));
     };
     const params = await getNewParams();
     vueApp = new client.Vue({
         data: {
+            events: new Events_1.Events(),
             // MemeGenerator
             builders: {
                 all: {},
@@ -6576,8 +6531,15 @@ const mgHelpers = {
         },
         async mounted() {
             await this.init();
+            this.events.forward(gdb.events, "gdb");
+            this.events.forward(flow.events, "flow");
+            this.events.on("*", this.onAppEvent.bind(this));
         },
         methods: {
+            async onAppEvent(name, ...args) {
+                const self = this;
+                self.$emit(name, ...args);
+            },
             async init() {
                 const self = this;
                 self.newCssRules = await (await fetch(`/css-tool`)).json();
@@ -6588,6 +6550,9 @@ const mgHelpers = {
                 document.addEventListener("scroll", () => {
                     self.$emit("scroll");
                 });
+                setTimeout(() => {
+                    self.$emit("app-init");
+                }, 100);
             },
             async getBuilder(urlNameOrID) {
                 const self = this;
@@ -6602,6 +6567,8 @@ const mgHelpers = {
             },
             async ensureBuilders() {
                 const self = this;
+                if (!self.dbp)
+                    return;
                 if (!self.builders?.length) {
                     const allBuilders = await self.dbp.builders.select.all();
                     self.builders.mainMenu = allBuilders.filter((b) => b.visible?.mainMenu);
@@ -7131,12 +7098,6 @@ const mgHelpers = {
                 const vues = self.vm.getDescendants(this, (v) => v.$props?.node?.id == node.id);
                 return vues;
             },
-            async onGraphNodesChange(nodes) {
-                const self = this;
-                await self.$nextTick();
-                const nodesMap = nodes.toMap((n) => n.id);
-                self.$emit("graph-nodes-change", nodesMap);
-            },
         },
         watch: {
             newCssRules: {
@@ -7151,7 +7112,6 @@ const mgHelpers = {
             },
         },
     });
-    gdb.events.on("nodes.change", vueApp.onGraphNodesChange);
     vueApp.$mount("#app");
     window.addEventListener("popstate", async function (event) {
         await vueApp.refresh();

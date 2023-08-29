@@ -9,6 +9,8 @@ class VueManager {
 
   vuesCount = 0;
 
+  vuesCounts = {} as any;
+
   // Tracking by uid or vue tree path are unreliable because vue recreates components
   // We use $refs to track components
   // Any ref that starts with a capital letter is a global reference
@@ -151,6 +153,8 @@ class VueManager {
     if (this.vues[vue._uid]) return;
 
     this.vues[vue._uid] = () => vue;
+    const vueCompName = vue.$options._componentTag;
+    this.vuesCounts[vueCompName] = (this.vuesCounts[vueCompName] || 0) + 1;
     this.vuesCount++;
 
     //const compName = vue.$data._.comp.name;
@@ -166,6 +170,8 @@ class VueManager {
     if (!vue) return;
 
     delete this.vues[vue._uid];
+    const vueCompName = vue.$options._componentTag;
+    this.vuesCounts[vueCompName]--;
     this.vuesCount--;
 
     for (const refKey of Object.keys(vue.$refs)) {

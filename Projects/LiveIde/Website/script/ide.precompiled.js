@@ -3162,6 +3162,7 @@ class VueManager {
     client;
     vues = {};
     vuesCount = 0;
+    vuesCounts = {};
     // Tracking by uid or vue tree path are unreliable because vue recreates components
     // We use $refs to track components
     // Any ref that starts with a capital letter is a global reference
@@ -3289,6 +3290,8 @@ class VueManager {
         if (this.vues[vue._uid])
             return;
         this.vues[vue._uid] = () => vue;
+        const vueCompName = vue.$options._componentTag;
+        this.vuesCounts[vueCompName] = (this.vuesCounts[vueCompName] || 0) + 1;
         this.vuesCount++;
         //const compName = vue.$data._.comp.name;
         //if (["e.", "ui."].some((prefix) => compName.startsWith(prefix))) return;
@@ -3302,6 +3305,8 @@ class VueManager {
         if (!vue)
             return;
         delete this.vues[vue._uid];
+        const vueCompName = vue.$options._componentTag;
+        this.vuesCounts[vueCompName]--;
         this.vuesCount--;
         for (const refKey of Object.keys(vue.$refs)) {
             if (refKey[0].isLowerCase())
@@ -4858,6 +4863,13 @@ if (typeof Array !== "undefined") {
         });
         return map;
     };
+    Array.prototype.toMapValue = function (getValue) {
+        const map = {};
+        this.forEach((item) => {
+            map[item] = getValue(item);
+        });
+        return map;
+    };
     Array.prototype.all = function (predicate) {
         return this.findIndex((item) => !predicate(item)) == -1;
     };
@@ -5563,7 +5575,7 @@ var __webpack_exports__ = {};
 (() => {
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/Website/script/1693126433722.ts ***!
+  !*** ../../../LiveIde/Website/script/1693275885899.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

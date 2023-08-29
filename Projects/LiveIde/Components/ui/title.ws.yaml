@@ -9,7 +9,7 @@ dom:
       slot: null
       div: 
         v-html: getHtml()
-    .ml-1.opacity-50:
+    .ml-1.opacity-40:
       v-if: number
       v-text: getNumberText()
 props:
@@ -53,5 +53,5 @@ template: >-
   :class="getIconClass()" v-if="icon" v-text="icon"
   path="-2123702658.0"></div><div path="-2123702658.1"><slot></slot><div
   v-html="getHtml()" path="-2123702658.1.1"></div></div><div class="ml-1
-  opacity-50" v-if="number" v-text="getNumberText()"
+  opacity-40" v-if="number" v-text="getNumberText()"
   path="-2123702658.2"></div></div>

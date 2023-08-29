@@ -1,6 +1,7 @@
 dom:
   flow.node.base:
     ':node': node
+    ref: base1
     flow.app.node:
       v-for: (childNode, index) in childNodes
       ':key': childNode.id
@@ -10,17 +11,16 @@ props:
 computed:
   childNodes: | #js
     function() {
-      return this.$root.gdb.getNodes('child.of', this.node)
-        .filter(node => !node.type.startsWith('flow.data'));
+      return this.$root.gdb.getNodes('child.of', this.node);
     }
 style:
   .comp-flow-layout-view: null
 _:
   examples:
     count: 0
-name: flow-layout-view
+name: flow-node-folder
 template: >-
-  <flow-node-base class="comp-flow-layout-view" :node="node"
-  path="1843545641."><flow-app-node v-for="(childNode, index) in childNodes"
+  <flow-node-base class="comp-flow-node-folder" :node="node" ref="base1"
+  path="-82308838."><flow-app-node v-for="(childNode, index) in childNodes"
   :key="childNode.id" :node="childNode"
-  path="1843545641.0"></flow-app-node></flow-node-base>
+  path="-82308838.0"></flow-app-node></flow-node-base>

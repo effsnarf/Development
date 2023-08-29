@@ -1,7 +1,6 @@
 dom:
-  div:
-    img:
-      ':src': imageUrl
+  img:
+    ':src': imageUrl
 props:
   node: null
   contextData: null
@@ -11,10 +10,11 @@ computed:
     function() {
       return (this.contextData?.imageUrl || this.defaultImageUrl);
     }
+style:
+  img:
+    aspect-ratio: 3 / 2
 _:
   examples:
     count: 0
 name: flow-ui-image
-template: >-
-  <div class="comp-flow-ui-image" path="-1986999743."><img :src="imageUrl"
-  path="-1986999743.0"/></div>
+template: <img class="comp-flow-ui-image" :src="imageUrl" path="-1986999743."/>

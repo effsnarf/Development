@@ -1,36 +1,45 @@
 dom:
-  div:
-    class: box
+  flow.node.base:
     v-if: node
-    table:
+    ':node': node
+    @node-datas: nodeDatas=$event
+    class: box
+    flow.node.title: 
+      ':node': node
+      ':full': true
+    hr: null
+    table: 
       tr: 
         v-for: fieldName in getEditableFieldNames(node)
-        th: 
+        th:
           v-text: fieldName
         td: 
           flow.field.editor:
             ':node': node
             ':field-name': fieldName
             ':field': node.data[fieldName]
-      tr: 
-        th: 
-          v-text: '''data'''
-        td: 
-          ui.value.any:
-            ':value': nodeData
+    div:
+      h3:
+        v-text: '''nodeDatas'''
+      table: 
+        tr: 
+          v-for: entry in Object.entries(nodeDatas)
+          td: 
+            flow.node.title: 
+              ':node': $root.gdb.getNode(entry[0])
+              ':full': true
+          td: 
+            ui.value.any:
+              ':value': entry[1]
 props:
   node: null
+data:
+  nodeDatas: {}
 methods:
   getEditableFieldNames: | #js
     function(node) {
       if (!node.data) return [];
       return Object.keys(node.data);
-    }
-computed:
-  nodeData: | #js
-    function() {
-      if (!this.node) return null;
-      return this.$root.flow.user.app.runtime.nodeDatas[this.node.id];
     }
 style:
   th:
@@ -46,12 +55,18 @@ _:
     count: 0
 name: flow-node-editor
 template: >-
-  <div class="comp-flow-node-editor box" v-if="node" path="-121170407."><table
-  path="-121170407.0"><tr v-for="fieldName in getEditableFieldNames(node)"
-  path="-121170407.0.0"><th v-text="fieldName" path="-121170407.0.0.0"></th><td
-  path="-121170407.0.0.1"><flow-field-editor :node="node"
+  <flow-node-base class="comp-flow-node-editor box" v-if="node" :node="node"
+  @node-datas="nodeDatas=$event" path="-121170407."><flow-node-title
+  :node="node" :full="true" path="-121170407.0"></flow-node-title><table
+  path="-121170407.1"><tr v-for="fieldName in getEditableFieldNames(node)"
+  path="-121170407.1.0"><th v-text="fieldName" path="-121170407.1.0.0"></th><td
+  path="-121170407.1.0.1"><flow-field-editor :node="node"
   :field-name="fieldName" :field="node.data[fieldName]"
-  path="-121170407.0.0.1.0"></flow-field-editor></td></tr><tr
-  path="-121170407.0.1"><th v-text="'data'" path="-121170407.0.1.0"></th><td
-  path="-121170407.0.1.1"><ui-value-any :value="nodeData"
-  path="-121170407.0.1.1.0"></ui-value-any></td></tr></table></div>
+  path="-121170407.1.0.1.0"></flow-field-editor></td></tr></table><div
+  path="-121170407.2"><h3 v-text="'nodeDatas'" path="-121170407.2.0"></h3><table
+  path="-121170407.2.1"><tr v-for="entry in Object.entries(nodeDatas)"
+  path="-121170407.2.1.0"><td path="-121170407.2.1.0.0"><flow-node-title
+  :node="$root.gdb.getNode(entry[0])" :full="true"
+  path="-121170407.2.1.0.0.0"></flow-node-title></td><td
+  path="-121170407.2.1.0.1"><ui-value-any :value="entry[1]"
+  path="-121170407.2.1.0.1.0"></ui-value-any></td></tr></table></div></flow-node-base>

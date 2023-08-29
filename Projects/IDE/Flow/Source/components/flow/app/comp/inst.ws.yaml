@@ -1,0 +1,37 @@
+dom:
+  flow.node.base:
+    ':node': node
+    ui.title:
+      icon: 📦
+      ':text': compNode.data.name.value
+    @node-datas: nodeDatas=$event
+    flow.app.node:
+      ':node': compNode
+      ':context-data': contextData
+props:
+  node: null
+  contextData: null
+data:
+  nodeDatas: []
+computed:
+  compNode: | #js
+    function() {
+      const compNodeID = this.node.data.compID.value.value;
+      const compNode = this.$root.gdb.getNode(compNodeID);
+      return compNode;
+    }
+  childNodes: | #js
+    function() {
+      return this.$root.gdb.getNodes('child.of', this.node);
+    }
+methods: null
+_:
+  examples:
+    count: 0
+name: flow-app-comp-inst
+template: >-
+  <flow-node-base class="comp-flow-app-comp-inst" :node="node"
+  @node-datas="nodeDatas=$event" path="-226955912."><ui-title icon="📦"
+  :text="compNode.data.name.value" path="-226955912.0"></ui-title><flow-app-node
+  :node="compNode" :context-data="contextData"
+  path="-226955912.1"></flow-app-node></flow-node-base>

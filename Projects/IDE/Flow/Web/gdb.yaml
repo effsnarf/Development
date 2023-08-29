@@ -1,7 +1,5 @@
-nextID: 2
-nodes:
-  - id: 1
-    type: flow.layout.view
+nextID: 1
+nodes: []
 links: []
 schema:
   flow:
@@ -22,11 +20,20 @@ schema:
           size:
             type: percent
             value: 50
+        children:
+          - type: flow.layout.empty
+          - type: flow.layout.empty
       pages:
         data:
           visiblePageIndex:
             type: number
             value: 0
+        children:
+          - type: flow.layout.empty
+      list:
+        data:
+        children:
+          - type: flow.layout.empty
     data:
       _all:
         data:
@@ -40,9 +47,68 @@ schema:
         data:
       comp:
         data:
+          name:
+            type: string
+            value: comp
+        children:
+          - type: flow.node.folder
+            data:
+              name:
+                type: string
+                value: view
+            children:
+              - type: flow.layout.empty
+          - type: flow.node.folder
+            data:
+              name:
+                type: string
+                value: data
+      compInst:
+        data:
+          compID:
+            type: number
+            value: null
+    node:
+      _all:
+        data:
+      folder:
+        data:
+          name:
+            type: string
+            value: folder
     ui:
       _all:
         data:
+      text:
+        data:
+          text:
+            type: string
+            value: text
+templates:
+  app:
+    type: flow.node.folder
+    data:
+      name:
+        type: string
+        value: app
+    children:
+      - type: flow.node.folder
+        data:
+          name:
+            type: string
+            value: view
+        children:
+          - type: flow.layout.empty
+      - type: flow.node.folder
+        data:
+          name:
+            type: string
+            value: data
+      - type: flow.node.folder
+        data:
+          name:
+            type: string
+            value: comps
 get:
   icon: | #js
     function(type) {
@@ -52,12 +118,21 @@ get:
         type = type.split('.')[2];
         return ({
           comp: '📦',
+          compInst: '💎',
+        })[type] || '❔';
+      }
+
+      if (cat == "node") {
+        type = type.split('.')[2];
+        return ({
+          folder: '📁',
         })[type] || '❔';
       }
 
       if (cat == "ui") {
         type = type.split('.')[2];
         return ({
+          text: '🆎',
           image: '🖼️',
         })[type] || '❔';
       }

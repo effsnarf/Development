@@ -1,6 +1,10 @@
 dom:
-  div: 
-    div: 
+  flow.dnd.dropzone:
+    ':class': cssClass
+    ':node': node
+    @drag-over: onDragOver
+    slot: null
+    div:
       v-if: 'false'
       ui.leader.line: 
         v-for: twinVue in twinVues
@@ -12,17 +16,11 @@ dom:
         ':from': getThis
         ':to': () => linkedVue()
         ':visible': isHighlighted
-    div: 
-      flow.dnd.dropzone:
-        ':class': cssClass
-        ':node': node
-        @drag-over: onDragOver
-        slot: null
 props:
   node: null
 data:
   nodeDataIds: []
-  nodeDatas: []
+  nodeDatas: {}
   highlightedNode: null
   handlers:
     onGraphNodesChange: onGraphNodesChange
@@ -32,16 +30,35 @@ data:
   isMounted: false
 mounted: | #js
   this.isMounted = true;
+
   this.$root.flow.ui.registerVue(this);
-  this.handlers.onGraphNodesChange = this.onGraphNodesChange.bind(this);
+
+  this.handlers.onGraphNodeChange = this.onGraphNodeChange.bind(this);
+
+  this.handlers.onGraphNodeDataChange = this.onGraphNodeDataChange.bind(this);
+
   this.handlers.onHighlightedNode = this.onHighlightedNode.bind(this);
-  this.$root.$on("graph-nodes-change", this.handlers.onGraphNodesChange);
+
+  this.$root.$on("gdb.node.change", this.handlers.onGraphNodeChange);
+
+  this.$root.$on("flow.user.app.runtime.data.node.data.change",
+  this.handlers.onGraphNodeDataChange)
+
   this.$root.$on("highlighted-node", this.handlers.onHighlightedNode);
+
   this.updateRelatedVues();
+
+  this.refresh();
 unmounted: | #js
   this.$root.flow.ui.unregisterVue(this);
-  this.$root.$off("graph-nodes-change", this.handlers.onGraphNodesChange);
+
+  this.$root.$off("gdb.node.change", this.handlers.onGraphNodeChange);
+
+  this.$root.$off("flow.user.app.runtime.data.node.data.change",
+  this.handlers.onGraphNodeDataChange)
+
   this.$root.$off("highlighted-node", this.handlers.onHighlightedNode);
+
   this.isMounted = false;
 methods:
   getThis: | #js
@@ -68,22 +85,30 @@ methods:
       vues = vues.filter(v => (v.$parent.$options._componentTag != this.$parent.$options._componentTag));
       return vues;
     }
-  onGraphNodesChange: | #js
-    function(nodesMap) {
-      const node = nodesMap[this.node.id];
-      if (!node) return;
+  onGraphNodeChange: | #js
+    function(node) {
+      if (node.id != this.node.id) return;
       if (this.$parent?.onNodeChange) this.$parent.onNodeChange(node);
       this.refresh();
+    }
+  onGraphNodeDataChange: | #js
+    function(node, data) {
+      if (!this.nodeDataIds.includes(node.id)) return;
+      this.nodeDatas[node.id] = data;
+      this.$emit("node-datas", this.nodeDatas);
     }
   onHighlightedNode: | #js
     function(highlightedNode) {
       this.highlightedNode = highlightedNode;
     }
-  getDataNodeIDs: | #js
+  getNodeDataIds: | #js
     function() {
+      // This node might be receiving data from other nodes via data.send links.
+      // nodeDataIds is a list of node IDs whose data is relevant to this node.
+      // That includes this node itself, and all nodes that send data to this node.
       if (!this.node) return [];
       const dataNodes = this.$root.gdb.getNodes("data.send", this.node);
-      const dataNodeIDs = dataNodes.map(node => node.id);
+      const dataNodeIDs = [this.node.id, ...dataNodes.map(node => node.id)].distinct();
       return dataNodeIDs;
     }
   onDragOver: | #js
@@ -91,8 +116,12 @@ methods:
     }
   refresh: | #js
     function() {
-      this.nodeDataIds = this.getDataNodeIDs();
-      this.nodeDatas = this.nodeDataIds.map(id => this.$root.flow.user.app.runtime.nodeDatas[id]);
+      this.nodeDataIds = this.getNodeDataIds();
+      this.$set(this, "nodeDatas", {});
+      for (const id of this.nodeDataIds) {
+        const data = this.$root.flow.user.app.runtimeData.nodeDatas[id];
+        this.nodeDatas[id] = data;
+      }
       this.$emit("node-datas", this.nodeDatas);
     }
 computed:
@@ -121,12 +150,11 @@ _:
     count: 0
 name: flow-node-base
 template: >-
-  <div class="comp-flow-node-base" path="674641533."><div v-if="false"
-  path="674641533.0"><ui-leader-line v-for="twinVue in twinVues" :from="getThis"
+  <flow-dnd-dropzone class="comp-flow-node-base" :class="cssClass" :node="node"
+  @drag-over="onDragOver" path="674641533."><slot></slot><div v-if="false"
+  path="674641533.1"><ui-leader-line v-for="twinVue in twinVues" :from="getThis"
   :to="() =&gt; twinVue()" :visible="isHighlighted"
-  path="674641533.0.0"></ui-leader-line><ui-leader-line v-for="linkedVue in
+  path="674641533.1.0"></ui-leader-line><ui-leader-line v-for="linkedVue in
   linkedVues" :from="getThis" :to="() =&gt; linkedVue()"
-  :visible="isHighlighted" path="674641533.0.1"></ui-leader-line></div><div
-  path="674641533.1"><flow-dnd-dropzone :class="cssClass" :node="node"
-  @drag-over="onDragOver"
-  path="674641533.1.0"><slot></slot></flow-dnd-dropzone></div></div>
+  :visible="isHighlighted"
+  path="674641533.1.1"></ui-leader-line></div></flow-dnd-dropzone>
