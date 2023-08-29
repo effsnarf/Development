@@ -20,6 +20,7 @@ dom:
             ':key': editor
             v-text: editor
       div: 
+        v-if: 'false'
         ui.title: 
           v-for: entry in Object.entries($root.vm.vuesCounts).sortBy(e => -e[1])
           icon: 🎄
@@ -71,7 +72,7 @@ template: >-
   path="-1163457967.0.0.1.0"></ui-button></div><select v-model="selectedEditor"
   path="-1163457967.0.0.2"><option v-for="editor in ['component', 'css']"
   :selected="(selectedEditor == editor)" :key="editor" v-text="editor"
-  path="-1163457967.0.0.2.0"></option></select></h3><div
+  path="-1163457967.0.0.2.0"></option></select></h3><div v-if="false"
   path="-1163457967.0.1"><ui-title v-for="entry in
   Object.entries($root.vm.vuesCounts).sortBy(e =&gt; -e[1])" icon="🎄"
   :text="entry[0]" :number="entry[1]"
