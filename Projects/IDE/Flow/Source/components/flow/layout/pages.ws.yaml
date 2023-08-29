@@ -30,10 +30,9 @@ props:
 methods:
   transitionPages: | #js
     function(e) {
-      alertify.message('transition pages');
       e?.preventDefault();
       e?.stopPropagation();
-      const duration = 2000;
+      const duration = 1000;
       const sourcePageIndex = this.visiblePageIndex;
       const targetPageIndex = (sourcePageIndex + 1) % this.childNodes.length;
       // Find twin elements, meaning that they transition to each other.
@@ -41,9 +40,12 @@ methods:
       const vTargetPage = this.$refs.vPages[targetPageIndex];
       let image1 = (e?.target?.tagName == 'IMG' ? e.target : null);
       image1 = image1 || vSourcePage.$el.querySelector('img');
-      const image2 = vTargetPage.$el.querySelector('img');
-      const text1 = vSourcePage.$el.querySelector('.comp-flow-ui-text');
-      const text2 = vTargetPage.$el.querySelector('.comp-flow-ui-text');
+      const images2 = [...vTargetPage.$el.querySelectorAll('img')];
+      const image2 = images2.find(img => (img.src == image1.src)) || images2[0];
+      const text1 = image1.parentElement.parentElement.nextElementSibling;
+      const text2 = image2.parentElement.parentElement.nextElementSibling;
+      //const text1 = vSourcePage.$el.querySelector('.comp-flow-ui-text');
+      //const text2 = vTargetPage.$el.querySelector('.comp-flow-ui-text');
       this.tween(image1, image1, image2, false, duration);
       this.tween(image2, image1, image2, true, duration);
       this.tween(text1, text1, text2, false);
@@ -76,6 +78,7 @@ methods:
       cloneEl.style.opacity = startOpacity;
       cloneEl.style.visibility = '';
       cloneEl.style.objectFit = 'cover';
+      cloneEl.style.zIndex = 1000;
       document.body.appendChild(cloneEl);
 
       function animate() {
