@@ -63,6 +63,10 @@ methods:
       const startRect = sourceEl.getBoundingClientRect();
       const endRect = targetEl.getBoundingClientRect();
 
+      const startFontSize = parseFloat(window.getComputedStyle(el).fontSize);
+      const scaleFont = endRect.width / startRect.width;
+      const endFontSize = startFontSize * scaleFont;
+
       const startOpacity = appear ? 0 : 1;
       const endOpacity = appear ? 1 : 0;
 
@@ -72,13 +76,9 @@ methods:
       cloneEl.style.position = 'fixed';
       cloneEl.style.top = `${startRect.top}px`;
       cloneEl.style.left = `${startRect.left}px`;
-      cloneEl.style.width = `${startRect.width}px`;
-      cloneEl.style.height = `${startRect.height}px`;
-      cloneEl.style.transform = '';
+      cloneEl.style.transformOrigin = 'top left';
       cloneEl.style.opacity = startOpacity;
       cloneEl.style.visibility = '';
-      cloneEl.style.objectFit = 'cover';
-      cloneEl.style.zIndex = 1000;
       document.body.appendChild(cloneEl);
 
       function animate() {
@@ -90,11 +90,14 @@ methods:
         const width = tweenValue(startRect.width, endRect.width, progress);
         const height = tweenValue(startRect.height, endRect.height, progress);
         const opacity = tweenValue(startOpacity, endOpacity, progress);
+        const fontSize = tweenValue(startFontSize, endFontSize, progress);
 
-        cloneEl.style.transform = `translate(${x - startRect.left}px, ${y - startRect.top}px)`;
+        cloneEl.style.top = `${y}px`;
+        cloneEl.style.left = `${x}px`;
         cloneEl.style.width = `${width}px`;
         cloneEl.style.height = `${height}px`;
         cloneEl.style.opacity = opacity;
+        cloneEl.style.fontSize = `${fontSize}px`;
 
         if (progress < 1) {
           // Hide the original element
