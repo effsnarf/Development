@@ -70,6 +70,9 @@ methods:
       const startOpacity = appear ? 0 : 1;
       const endOpacity = appear ? 1 : 0;
 
+      const documentScrollLeft1 = document.documentElement.scrollLeft;
+      const documentScrollTop1 = document.documentElement.scrollTop;
+
       // Clone the element and set its styles
       const cloneEl = el.cloneNode(true);
       this.copyStyle(cloneEl, el);
@@ -85,8 +88,10 @@ methods:
         const elapsed = Date.now() - startTime;
         const progress = Math.min(elapsed / duration, 1);
 
-        const x = tweenValue(startRect.left, endRect.left, progress);
-        const y = tweenValue(startRect.top, endRect.top, progress);
+        let x = tweenValue(startRect.left, endRect.left, progress);
+        x += (documentScrollLeft1 - document.documentElement.scrollLeft);
+        let y = tweenValue(startRect.top, endRect.top, progress);
+        y += (documentScrollTop1 - document.documentElement.scrollTop);
         const width = tweenValue(startRect.width, endRect.width, progress);
         const height = tweenValue(startRect.height, endRect.height, progress);
         const opacity = tweenValue(startOpacity, endOpacity, progress);
