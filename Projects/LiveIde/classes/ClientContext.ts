@@ -108,9 +108,12 @@ class ClientContext {
     }
   }
 
-  async compileAll(filter: (comp: Component) => boolean = (c) => true) {
+  async compileAll(
+    filter: (comp: Component) => boolean = (c) => true,
+    mixins: any[] = []
+  ) {
     for (const comp of this.comps.filter(filter)) {
-      await comp.compile();
+      await comp.compile(mixins);
     }
   }
 

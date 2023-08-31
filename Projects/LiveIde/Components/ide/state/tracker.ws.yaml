@@ -25,6 +25,8 @@ dom:
           name: slide
           li:
             v-for: field in watchedFields
+            class: clickable
+            @click: console.log($root.vm.getVue(uid)[field.key])
             ':key': field.key
             h3: 
               class: opacity-50
@@ -87,6 +89,10 @@ computed:
       const fields = this.$root.vm.getFields(this.uid);
       return fields.filter(f => this.watchedFieldKeys.includes(f.key));
     }
+  console: | #js
+    function() {
+      return console;
+    }
 style:
   .comp-ide-state-tracker:
     overflow: hidden
@@ -127,10 +133,11 @@ template: >-
   path="-483235177.0.1.0.0"></ide-state-tracker-item></table></transition></div><transition
   name="slide-hor" path="-483235177.1"><div class="watches"
   v-if="watchedFieldKeys.length" path="-483235177.1.0"><transition-group
-  tag="ul" name="slide" path="-483235177.1.0.0"><li v-for="field in
-  watchedFields" :key="field.key" path="-483235177.1.0.0.0"><h3
-  class="opacity-50" path="-483235177.1.0.0.0.0"><ui-title
-  :icon="$root.getIcon(field)" :text="field.key"
-  path="-483235177.1.0.0.0.0.0"></ui-title></h3><ui-value-any
+  tag="ul" name="slide" path="-483235177.1.0.0"><li class="clickable"
+  v-for="field in watchedFields"
+  @click="console.log($root.vm.getVue(uid)[field.key])" :key="field.key"
+  path="-483235177.1.0.0.0"><h3 class="opacity-50"
+  path="-483235177.1.0.0.0.0"><ui-title :icon="$root.getIcon(field)"
+  :text="field.key" path="-483235177.1.0.0.0.0.0"></ui-title></h3><ui-value-any
   :value="field.newValue.value" :preview="false"
   path="-483235177.1.0.0.0.1"></ui-value-any></li></transition-group></div></transition></div>

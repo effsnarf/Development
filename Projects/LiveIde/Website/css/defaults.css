@@ -429,6 +429,7 @@ select, input[type=range]
   filter: grayscale(1) blur(3px);
   opacity: 0.5;
   overflow: hidden;
+  transition: 1s;
 }
 .slider-closed:hover, .slider-opened
 {

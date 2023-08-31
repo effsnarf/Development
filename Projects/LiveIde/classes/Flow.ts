@@ -87,6 +87,10 @@ namespace Flow {
         .filter((l) => l.type == "data.send")
         .filter((l) => l.data.event == "click");
 
+      for (const link of nodeLinks) {
+        this.events.emit("link.data.send", link);
+      }
+
       const nodes = nodeLinks
         .map((l) => this.gdb.getNode(l.to))
         .filter((n) => n);
@@ -107,11 +111,14 @@ namespace Flow {
       this.nodeDatas[node.id] = data;
       this.events.emit("node.data.change", node, data);
 
-      const sendToNodes = (
-        this.gdb.getNodes(node, "data.send") as Graph.Node[]
-      ).filter((node) => !node.data.event);
+      const sendToNodes = this.gdb.getNodes(node, "data.send") as Graph.Node[];
 
       for (const sendToNode of sendToNodes) {
+        const links = this.gdb.getLinks(node, sendToNode);
+        for (const link of links) {
+          this.events.emit("link.data.send", link);
+        }
+
         this.setNodeData(sendToNode, data, depth + 1);
       }
     }

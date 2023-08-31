@@ -1,18 +1,28 @@
 dom:
-  div: 
-    div: 
-      ':class': cssClass
-      v-text: text
+  flow.node.base:
+    ':node': node
+    @node-datas: refresh
+    ':class': cssClass
+    v-text: text
 props:
   node: null
   contextData: null
 data:
   defaultText: '[text]'
-computed:
-  text: | #js
+  key1: 1
+  text: null
+mounted: | #js
+  this.refresh();
+methods:
+  getText: | #js
     function() {
-      return (this.contextData?.text || this.defaultText);
+      return (this.contextData?.text || this.$nodeDatas[this.node.id] || this.defaultText);
     }
+  refresh: | #js
+    function() {
+      this.text = this.getText();
+    }
+computed:
   cssClass: | #js
     function() {
       return {
@@ -20,6 +30,12 @@ computed:
         'empty': !this.contextData?.text,
       }
     }
+watch:
+  contextData:
+    handler: | #js
+      function() {
+        this.refresh();
+      }
 style:
   .empty:
     opacity: 0.5
@@ -30,5 +46,5 @@ _:
     count: 0
 name: flow-ui-text
 template: >-
-  <div class="comp-flow-ui-text" path="1183149959."><div :class="cssClass"
-  v-text="text" path="1183149959.0"></div></div>
+  <flow-node-base class="comp-flow-ui-text" :node="node" @node-datas="refresh"
+  :class="cssClass" v-text="text" path="1183149959."></flow-node-base>

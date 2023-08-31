@@ -211,7 +211,12 @@ namespace Graph {
       }
     }
 
-    getNodes(a: string | Node, b: string | Node) {
+    getNodes(a: string | Node | number[], b: string | Node) {
+      if (Array.isArray(a)) {
+        const ids = a as number[];
+        const nodes = ids.map((id) => this.getNode(id));
+        return nodes;
+      }
       const fromOrTo = this.fromOrTo(a, b);
       const oppFromOrTo = this.getOppositeFromOrTo(fromOrTo);
       const links = this.getLinks(a, b);
@@ -243,7 +248,13 @@ namespace Graph {
       return nodes;
     }
 
-    private getLinks(a: string | Node, b: string | Node) {
+    getLinks(a: string | Node, b: string | Node) {
+      if (typeof a == "object" && typeof b == "object") {
+        const links = this.links.filter(
+          (link) => this.linkIncludes(link, a) && this.linkIncludes(link, b)
+        );
+        return links;
+      }
       const fromOrTo = this.fromOrTo(a, b);
       const type = findArg("string", a, b);
       const node = findArg("object", a, b);
@@ -287,6 +298,11 @@ namespace Graph {
         (l) => l.from == node.id || l.to == node.id
       );
       return links;
+    }
+
+    linkIncludes(link: Link, node: Node) {
+      if (!link || !node) return false;
+      return link.from == node.id || link.to == node.id;
     }
 
     private fromOrTo(a: string | Node, b: string | Node) {

@@ -11,7 +11,7 @@ props:
 computed:
   childNodes: | #js
     function() {
-      return this.$root.gdb.getNodes('child.of', this.node);
+      return this.$gdb.getNodes('child.of', this.node);
     }
 style:
   .comp-flow-layout-view: null

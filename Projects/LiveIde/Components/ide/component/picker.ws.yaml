@@ -38,9 +38,9 @@ dom:
         transition:
           name: slide-hor
           div: 
-            v-show: selectedVueUID
+            v-show: activeVueUID
             ide.component.editor:
-              ':vue-uid': (selectedVueUID||hoveredVueUID)
+              ':vue-uid': activeVueUID
               @selected-view-node: selectedViewNode=$event
               @selected-tab-index: selectedEditorTabIndex=$event
 props: null
@@ -90,7 +90,7 @@ methods:
   getParentChainUIDs: | #js
     function(vue) {
       this.$root.vm.registerVue(vue);
-      const maxChainLength = 4;
+      const maxChainLength = 6;
       let chain = [];
       let parent = vue;
       while (parent && (chain.length < maxChainLength)) {
@@ -103,6 +103,8 @@ methods:
     }
   getChildChainUIDs: | #js
     function(vue) {
+      return this.$root.vm.getDescendants(vue).map(v => v._uid);
+      
       this.$root.vm.registerVue(vue);
       const children = [];
       const addChildren = (vue) => {
@@ -235,6 +237,12 @@ style:
     margin-left: 2em
   .parent-chain > :nth-child(5):
     margin-left: 2.5em
+  .parent-chain > :nth-child(6):
+    margin-left: 3em
+  .parent-chain > :nth-child(7):
+    margin-left: 3.5em
+  .parent-chain > :nth-child(8):
+    margin-left: 4em
 name: ide-component-picker
 _:
   examples:
@@ -260,9 +268,8 @@ template: >-
   path="-646340253.2.0.0.1"></ide-element-inspector></div><h2 v-if="false"
   path="-646340253.2.0.1"><ui-title icon="📦" :text="getTitle(hoveredVueUID)"
   path="-646340253.2.0.1.0"></ui-title></h2><transition name="slide-hor"
-  path="-646340253.2.0.2"><div v-show="selectedVueUID"
-  path="-646340253.2.0.2.0"><ide-component-editor
-  :vue-uid="(selectedVueUID||hoveredVueUID)"
+  path="-646340253.2.0.2"><div v-show="activeVueUID"
+  path="-646340253.2.0.2.0"><ide-component-editor :vue-uid="activeVueUID"
   @selected-view-node="selectedViewNode=$event"
   @selected-tab-index="selectedEditorTabIndex=$event"
   path="-646340253.2.0.2.0.0"></ide-component-editor></div></transition></div></ui-context-window></div>

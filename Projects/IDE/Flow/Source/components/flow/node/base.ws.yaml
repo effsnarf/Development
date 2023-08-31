@@ -1,36 +1,28 @@
 dom:
   flow.dnd.dropzone:
+    v-if: node
     ':class': cssClass
     ':node': node
     @drag-over: onDragOver
     @click: onClick
     slot: null
-    div:
-      v-if: 'false'
-      ui.leader.line: 
-        v-for: twinVue in twinVues
-        ':from': getThis
-        ':to': () => twinVue()
-        ':visible': isHighlighted
-      ui.leader.line: 
-        v-for: linkedVue in linkedVues
-        ':from': getThis
-        ':to': () => linkedVue()
-        ':visible': isHighlighted
+    flow.node.leader.lines:
+      v-if: showLeaderLines && isHighlighted
+      ':node': node
 props:
   node: null
   contextData: null
+  showLeaderLines: false
 data:
   nodeDataIds: []
   nodeDatas: {}
-  highlightedNode: null
   handlers:
     onGraphNodesChange: onGraphNodesChange
-    onHighlightedNode: onHighlightedNode
   twinVues: []
   linkedVues: []
   isClickable: false
   isMounted: false
+  isFlashing: false
 mounted: | #js
   this.isMounted = true;
 
@@ -40,14 +32,10 @@ mounted: | #js
 
   this.handlers.onGraphNodeDataChange = this.onGraphNodeDataChange.bind(this);
 
-  this.handlers.onHighlightedNode = this.onHighlightedNode.bind(this);
-
   this.$root.$on("gdb.node.change", this.handlers.onGraphNodeChange);
 
   this.$root.$on("flow.user.app.runtime.data.node.data.change",
   this.handlers.onGraphNodeDataChange)
-
-  this.$root.$on("highlighted-node", this.handlers.onHighlightedNode);
 
   this.updateRelatedVues();
 
@@ -60,13 +48,34 @@ unmounted: | #js
   this.$root.$off("flow.user.app.runtime.data.node.data.change",
   this.handlers.onGraphNodeDataChange)
 
-  this.$root.$off("highlighted-node", this.handlers.onHighlightedNode);
-
   this.isMounted = false;
 methods:
   getThis: | #js
     function() {
       return this;
+    }
+  flash: | #js
+    async function() {
+      if (this.isFlashing) return;
+      this.isFlashing = true;
+      try
+      {
+        const flashTimes = 1;
+        const delay = 400;
+        const flashOnce = (async (delayEnd = true) => {
+          this.$el.classList.add("flashed");
+          await this.$root.wait(delay);
+          this.$el.classList.remove("flashed");
+          if (delayEnd) await this.$root.wait(delay);
+        });
+        for (let i = 0; i < flashTimes; i++) {
+          await flashOnce((i < flashTimes - 1));
+        }
+      }
+      finally
+      {
+        this.isFlashing = false;
+      }
     }
   updateRelatedVues: | #js
     function() {
@@ -97,12 +106,9 @@ methods:
   onGraphNodeDataChange: | #js
     function(node, data) {
       if (!this.nodeDataIds.includes(node.id)) return;
+      this.flash();
       this.nodeDatas[node.id] = data;
       this.$emit("node-datas", this.nodeDatas);
-    }
-  onHighlightedNode: | #js
-    function(highlightedNode) {
-      this.highlightedNode = highlightedNode;
     }
   getNodeDataIds: | #js
     function() {
@@ -110,7 +116,7 @@ methods:
       // nodeDataIds is a list of node IDs whose data is relevant to this node.
       // That includes this node itself, and all nodes that send data to this node.
       if (!this.node) return [];
-      const dataNodes = this.$root.gdb.getNodes("data.send", this.node);
+      const dataNodes = this.$gdb.getNodes("data.send", this.node);
       const dataNodeIDs = [this.node.id, ...dataNodes.map(node => node.id)].distinct();
       return dataNodeIDs;
     }
@@ -143,13 +149,13 @@ computed:
     }
   isHighlighted: | #js
     function() {
-      return this.node?.id == this.highlightedNode?.id;
-    }
-watch:
-  highlightedNode: | #js
-    function(highlightedNode) { 
+      if (this.ui.is.hovered && (this.$parent.$options.name == "flow-app-comp-inst")) return true;
+      if (this.node?.id == this.$global.active.node?.id) return true;
+      return false;
     }
 style:
+  .flashed:
+    border: 1px solid white
   .highlighted-node:
     border: 3px dashed yellow !important
     box-shadow: inset -3px 3px 3px black
@@ -160,11 +166,8 @@ _:
     count: 0
 name: flow-node-base
 template: >-
-  <flow-dnd-dropzone class="comp-flow-node-base" :class="cssClass" :node="node"
-  @drag-over="onDragOver" @click="onClick" path="674641533."><slot></slot><div
-  v-if="false" path="674641533.1"><ui-leader-line v-for="twinVue in twinVues"
-  :from="getThis" :to="() =&gt; twinVue()" :visible="isHighlighted"
-  path="674641533.1.0"></ui-leader-line><ui-leader-line v-for="linkedVue in
-  linkedVues" :from="getThis" :to="() =&gt; linkedVue()"
-  :visible="isHighlighted"
-  path="674641533.1.1"></ui-leader-line></div></flow-dnd-dropzone>
+  <flow-dnd-dropzone class="comp-flow-node-base" v-if="node" :class="cssClass"
+  :node="node" @drag-over="onDragOver" @click="onClick"
+  path="674641533."><slot></slot><flow-node-leader-lines v-if="showLeaderLines
+  &amp;&amp; isHighlighted" :node="node"
+  path="674641533.1"></flow-node-leader-lines></flow-dnd-dropzone>

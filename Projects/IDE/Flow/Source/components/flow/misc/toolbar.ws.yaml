@@ -37,7 +37,7 @@ methods:
     }
   getIcon: | #js
     function(name) {
-      return (eval(`(${this.$root.gdb.data.get.icon})`))(name);
+      return (eval(`(${this.$gdb.data.get.node.icon})`))(name);
     }
 computed: null
 style:

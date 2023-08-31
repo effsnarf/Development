@@ -1,0 +1,34 @@
+dom:
+  div:
+    v-if: node
+    slot: null
+    flow.link.leader.line:
+      v-if: showLeaderLines
+      v-for: relatedLink in relatedLinks
+      ':key': relatedLink.id
+      ':vue': getThis
+      ':link': relatedLink
+props:
+  node: null
+  showLeaderLines: true
+methods:
+  getThis: | #js
+    function() {
+      return this;
+    }
+computed:
+  relatedLinks: | #js
+    function() {
+      let links = this.$gdb.getNodeLinks(this.node);
+      links = links.filter(link => (link.type != "child.of"));
+      return links;
+    }
+_:
+  examples:
+    count: 0
+name: flow-node-leader-lines
+template: >-
+  <div class="comp-flow-node-leader-lines" v-if="node"
+  path="622762374."><slot></slot><flow-link-leader-line v-if="showLeaderLines"
+  v-for="relatedLink in relatedLinks" :key="relatedLink.id" :vue="getThis"
+  :link="relatedLink" path="622762374.1"></flow-link-leader-line></div>

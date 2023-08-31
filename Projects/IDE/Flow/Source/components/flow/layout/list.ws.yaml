@@ -39,7 +39,7 @@ methods:
 computed:
   templateNode: | #js
     function() {
-      return this.$root.gdb.getNodes('child.of', this.node)[0];
+      return this.$gdb.getNodes('child.of', this.node)[0];
     }
 style:
   .list:

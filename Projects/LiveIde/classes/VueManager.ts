@@ -72,7 +72,12 @@ class VueManager {
     return this.getDescendants(vue, filter, 1)[0];
   }
 
-  getDescendants(vue: any, filter: any, maxCount: number): any[] {
+  getDescendants(
+    vue: any,
+    filter: (vue: any) => boolean = (vue) => true,
+    maxCount: number
+  ): any[] {
+    if (!vue) return [];
     if (typeof filter == "string") {
       const compName = filter;
       filter = (vue: any) => vue.$data._?.comp.name == compName;

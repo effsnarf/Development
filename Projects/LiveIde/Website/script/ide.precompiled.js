@@ -90,9 +90,9 @@ class ClientContext {
             });
         }
     }
-    async compileAll(filter = (c) => true) {
+    async compileAll(filter = (c) => true, mixins = []) {
         for (const comp of this.comps.filter(filter)) {
-            await comp.compile();
+            await comp.compile(mixins);
         }
     }
     async compileApp() {
@@ -260,7 +260,7 @@ class Component {
         if (this.source)
             this.source.name = this.name.replace(/\./g, "-");
     }
-    async compile() {
+    async compile(mixins = []) {
         if (this.isCompiled)
             return;
         const logGroup = false;
@@ -274,6 +274,8 @@ class Component {
         }
         try {
             const vueOptions = await this.getVueOptions();
+            const compMixins = mixins.filter((m) => m.matchComp(this));
+            vueOptions.mixins = [...(vueOptions.mixins || []), ...compMixins];
             if (logGroup)
                 console.log(vueOptions);
             const vueName = Component.toVueName(this.name);
@@ -3219,7 +3221,9 @@ class VueManager {
     getDescendant(vue, filter) {
         return this.getDescendants(vue, filter, 1)[0];
     }
-    getDescendants(vue, filter, maxCount) {
+    getDescendants(vue, filter = (vue) => true, maxCount) {
+        if (!vue)
+            return [];
         if (typeof filter == "string") {
             const compName = filter;
             filter = (vue) => vue.$data._?.comp.name == compName;
@@ -5575,7 +5579,7 @@ var __webpack_exports__ = {};
 (() => {
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/Website/script/1693302795510.ts ***!
+  !*** ../../../LiveIde/Website/script/1693494938720.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

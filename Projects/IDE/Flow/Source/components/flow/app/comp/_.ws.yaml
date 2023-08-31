@@ -11,7 +11,7 @@ props:
 computed:
   viewRootNode: | #js
     function() {
-      return this.$root.gdb.getNode('view.[0]', this.node);
+      return this.$gdb.getNode('view.[0]', this.node);
     }
 data:
   nodeDatas: []

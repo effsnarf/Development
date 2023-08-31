@@ -1,0 +1,104 @@
+dom:
+  div: 
+    div: 
+      v-if: (link.from == vue().node.id)
+      div: 
+        v-for: 'toVue in getVues({ id: link.to })'
+        ui.leader.line: 
+          ref: leaderLines
+          ':key': getKey(vue, toVue)
+          ':from-vue': vue
+          ':to-vue': toVue
+          ':color': getColor(link)
+          ':start-plug': getStartPlug(link)
+          ':end-plug': getEndPlug(link)
+    div: 
+      v-if: (link.to == vue().node.id)
+      ui.leader.line: 
+        ref: leaderLines
+        v-for: 'fromVue in getVues({ id: link.from })'
+        ':key': getKey(fromVue, vue)
+        ':from-vue': fromVue
+        ':to-vue': vue
+        ':color': getColor(link)
+        ':start-plug': getStartPlug(link)
+        ':end-plug': getEndPlug(link)
+props:
+  vue: null
+  link: null
+data:
+  tasks: null
+  handlers:
+    onLinkDataSend: null
+mounted: | #js
+  function() {
+    this.tasks = new TaskQueue();
+    this.handlers.onLinkDataSend = this.onLinkDataSend.bind(this);
+    this.$root.$on("flow.user.app.runtime.data.link.data.send", this.handlers.onLinkDataSend);
+  }
+unmounted: | #js
+  function() {
+    this.$root.$off("flow.user.app.runtime.data.link.data.send", this.handlers.onLinkDataSend);
+  }
+methods:
+  flash: | #js
+    function() {
+      this.$refs.leaderLines.forEach((leaderLine) => {
+        leaderLine.flash();
+      });
+    }
+  onLinkDataSend: | #js
+    function(link) {
+      if (link.id != this.link.id) return;
+      this.tasks.enqueue(this.flash.bind(this));
+    }
+  getKey: | #js
+    function(fromVue, toVue) {
+      return `${fromVue()._uid}-${toVue()._uid}`;
+    }
+  getVues: | #js
+    function(node) {
+      let nodeVues = this.$root.getNodeVues(node);
+      const vueTypes = ["flow-app-comp-inst", "flow-layout-", "flow-ui-", "flow-node-editor"];
+      nodeVues = nodeVues.filter(vue => (vueTypes.some(type => vue.$options.name.startsWith(type))));
+      return nodeVues.map(v => () => v);
+    }
+  getColor: | #js
+    function(link) {
+      return {
+        'child.of': 'gray',
+        'data.send': '#0099CC',
+      }[link.type] || 'yellow';
+    }
+  getStartPlug: | #js
+    function(link) {
+      return null;
+    }
+  getEndPlug: | #js
+    function(link) {
+      if (link.data.event == "click") return "hand";
+      return null;
+    }
+computed:
+  console: | #js
+    function() {
+      return console;
+    }
+style: null
+_:
+  examples:
+    count: 0
+name: flow-link-leader-line
+template: >-
+  <div class="comp-flow-link-leader-line" path="-2073803131."><div
+  v-if="(link.from == vue().node.id)" path="-2073803131.0"><div v-for="toVue in
+  getVues({ id: link.to })" path="-2073803131.0.0"><ui-leader-line
+  ref="leaderLines" :key="getKey(vue, toVue)" :from-vue="vue" :to-vue="toVue"
+  :color="getColor(link)" :start-plug="getStartPlug(link)"
+  :end-plug="getEndPlug(link)"
+  path="-2073803131.0.0.0"></ui-leader-line></div></div><div v-if="(link.to ==
+  vue().node.id)" path="-2073803131.1"><ui-leader-line ref="leaderLines"
+  v-for="fromVue in getVues({ id: link.from })" :key="getKey(fromVue, vue)"
+  :from-vue="fromVue" :to-vue="vue" :color="getColor(link)"
+  :start-plug="getStartPlug(link)" :end-plug="getEndPlug(link)"
+  path="-2073803131.1.0"></ui-leader-line></div></div>

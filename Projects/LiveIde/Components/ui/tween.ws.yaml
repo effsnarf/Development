@@ -1,0 +1,210 @@
+dom:
+  .slots:
+    ':class': '{ ''hide'': !slotsAreVisible }'
+    div:
+      ref: vSlots
+      v-for: i in [0, 1]
+      ':class': getSlotClass(i)
+      slot:
+        ':name': '''slot'' + i'
+props:
+  visibleIndex: 0
+data:
+  visibleIndex1: 0
+  slotsAreVisible: true
+methods:
+  transitionSlots: | #js
+    function(e) {
+      e?.preventDefault();
+      e?.stopPropagation();
+      const duration = 1000;
+      const sourceIndex = this.visibleIndex1;
+      const targetIndex = (sourceIndex + 1) % 2;
+      // Find tween elements, meaning that they transition to each other.
+      // Find all class names that begin with 'tween-' on the elements
+      const sourceElements = [...this.$refs.vSlots[sourceIndex].querySelectorAll('*')];
+      const targetElements = [...this.$refs.vSlots[targetIndex].querySelectorAll('*')];
+      const sourceTweenElements = sourceElements.filter(el => [...el.classList].some(cls => cls.startsWith('tween-')));
+      const targetTweenElements = targetElements.filter(el => [...el.classList].some(cls => cls.startsWith('tween-')));
+      const sourceTweenClasses = sourceTweenElements.flatMap(el => [...el.classList].filter(cls => cls.startsWith('tween-')));
+      const targetTweenClasses = targetTweenElements.flatMap(el => [...el.classList].filter(cls => cls.startsWith('tween-')));
+      const tweenClasses = [...sourceTweenClasses, ...targetTweenClasses].distinct();
+
+      // Find all the pairs of elements that have the same tween class
+      const tweenPairs = tweenClasses.map(cls => {
+        const sourceEl = sourceTweenElements.find(el => el.classList.contains(cls));
+        const targetEl = targetTweenElements.find(el => el.classList.contains(cls));
+        const opacity = {
+          start: parseFloat(window.getComputedStyle(sourceEl).opacity),
+          end: parseFloat(window.getComputedStyle(targetEl).opacity),
+        }
+        return { sourceEl, targetEl, opacity };
+      });
+
+      const vSourceSlot = this.$refs.vSlots[sourceIndex];
+      const vTargetSlot = this.$refs.vSlots[targetIndex];
+
+      this.slotsAreVisible = false;
+
+      // Hide the original tween pair elements (since we're tweening their clones)
+      //for (const { sourceEl, targetEl } of tweenPairs) {
+      //  sourceEl.style.visibility = 'hidden';
+      //  targetEl.style.visibility = 'hidden';
+      //}
+
+      for (const { sourceEl, targetEl, opacity } of tweenPairs) {
+        this.tween(sourceEl, sourceEl, targetEl, opacity, duration);
+        this.tween(targetEl, sourceEl, targetEl, opacity, duration);
+      }
+      this.fade(vSourceSlot, duration, 1, 0);
+      this.fade(vTargetSlot, duration, 0, 1);
+      setTimeout(() => {
+        this.visibleIndex1 = targetIndex;
+        this.slotsAreVisible = true;
+        // Show the original tween pair elements
+        //for (const { sourceEl, targetEl } of tweenPairs) {
+        //  sourceEl.style.visibility = '';
+        //  targetEl.style.visibility = '';
+        //}
+      }, (duration - 100));
+    }
+  tween: | #js
+    function(el, sourceEl, targetEl, opacity, duration) {
+      const tweenValue = this.tweenValue;
+
+      const startTime = Date.now();
+
+      const startRect = sourceEl.getBoundingClientRect();
+      const endRect = targetEl.getBoundingClientRect();
+
+      const startFontSize = parseFloat(window.getComputedStyle(el).fontSize);
+      const scaleFont = endRect.width / startRect.width;
+      const endFontSize = startFontSize * scaleFont;
+
+      const documentScrollLeft1 = document.documentElement.scrollLeft;
+      const documentScrollTop1 = document.documentElement.scrollTop;
+
+      // Clone the element and set its styles
+      const cloneEl = el.cloneNode(true);
+      this.copyStyle(cloneEl, el);
+      cloneEl.style.position = 'fixed';
+      cloneEl.style.top = `${startRect.top}px`;
+      cloneEl.style.left = `${startRect.left}px`;
+      cloneEl.style.transformOrigin = 'top left';
+      cloneEl.style.opacity = opacity.start;
+      cloneEl.style.visibility = '';
+      document.body.appendChild(cloneEl);
+
+      function animate() {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+
+        let x = tweenValue(startRect.left, endRect.left, progress);
+        x += (documentScrollLeft1 - document.documentElement.scrollLeft);
+        let y = tweenValue(startRect.top, endRect.top, progress);
+        y += (documentScrollTop1 - document.documentElement.scrollTop);
+        const width = tweenValue(startRect.width, endRect.width, progress);
+        const height = tweenValue(startRect.height, endRect.height, progress);
+        const opacityValue = tweenValue(opacity.start, opacity.end, progress);
+        const fontSize = tweenValue(startFontSize, endFontSize, progress);
+
+        cloneEl.style.top = `${y}px`;
+        cloneEl.style.left = `${x}px`;
+        cloneEl.style.width = `${width}px`;
+        cloneEl.style.height = `${height}px`;
+        cloneEl.style.opacity = opacityValue;
+        //cloneEl.style.fontSize = `${fontSize}px`;
+
+        if (progress < 1) {
+          // Hide the original element
+          if (el.style.visibility != 'hidden') setTimeout(() => {
+            el.style.visibility = 'hidden';
+          }, 10);
+          requestAnimationFrame(animate);
+        } else {
+          // Animation is done, revert to original styles
+          document.body.removeChild(cloneEl); // Remove the cloned element
+          el.style.visibility = ''; // Show the original element
+        }
+      }
+
+      requestAnimationFrame(animate);
+    }
+  fade: | #js
+    function(el, duration, startOpacity = 1, endOpacity = 0) {
+      const startTime = Date.now();
+      const originalOpacity = window.getComputedStyle(el).opacity; // Get the original opacity before animation
+
+      const tweenValue = this.tweenValue;
+
+      function animate() {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const opacity = tweenValue(startOpacity, endOpacity, progress);
+
+        el.style.opacity = opacity;
+
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          // Animation is done, revert to original opacity
+          //el.style.opacity = originalOpacity;
+        }
+      }
+
+      requestAnimationFrame(animate);
+    }
+  tweenValue: | #js
+    function(startValue, endValue, progress) {
+      // Cubic ease-in-out function
+      function cubicEaseInOut(t) {
+        return t < 0.5
+          ? 4 * t * t * t
+          : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
+      }
+      const easedProgress = cubicEaseInOut(progress);
+      return startValue + (endValue - startValue) * easedProgress;
+    }
+  copyStyle: | #js
+    function(targetEl, sourceEl) {
+      let computedStyle = window.getComputedStyle(sourceEl);
+      computedStyle = Object.keys(computedStyle)
+        .filter(k => parseInt(k) != k)
+        .toMapValue(k => computedStyle[k]);
+      Object.assign(targetEl.style, computedStyle);
+    }
+  getSlotClass: | #js
+    function(i) {
+      const cls = {};
+      cls.slot = true;
+      if (i === this.visibleIndex1) {
+        cls['visible'] = true;
+      }
+      return cls;
+    }
+watch:
+  visibleIndex:
+    handler: | #js
+      function() {
+        this.transitionSlots();
+      }
+style:
+  .hide, .hide *:
+    visibility: hidden !important
+  .slot:
+    position: absolute
+    width: 100%
+    opacity: 0
+    pointer-events: none
+  .visible:
+    opacity: 1
+    pointer-events: auto
+_:
+  examples:
+    count: 0
+name: ui-tween
+template: >-
+  <div class="comp-ui-tween slots" :class="{ 'hide': !slotsAreVisible }"
+  path="-2123300207."><div ref="vSlots" v-for="i in [0, 1]"
+  :class="getSlotClass(i)" path="-2123300207.0"><slot :name="'slot' + i"
+  path="-2123300207.0.0"></slot></div></div>

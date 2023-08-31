@@ -1,19 +1,49 @@
 dom:
   div: null
 props:
-  from: null
-  to: null
+  fromVue: null
+  toVue: null
   visible: true
+  color: yellow
+  startPlug: null
+  endPlug: null
 data:
   leaderLine: null
+  isFlashing: false
 mounted: | #js
   this.redraw();
   this.refresh();
+unmounted: | #js
+  this.remove();
 methods:
+  flash: | #js
+    async function() {
+      if (!this.leaderLine) return;
+      if (this.isFlashing) return;
+      this.isFlashing = true;
+      try
+      {
+        const flashTimes = 1;
+        const delay = 400;
+        const flashOnce = (async (delayEnd = true) => {
+          this.leaderLine.color = 'white';
+          await this.$root.wait(delay);
+          this.leaderLine.color = this.color;
+          if (delayEnd) await this.$root.wait(delay);
+        });
+        for (let i = 0; i < flashTimes; i++) {
+          await flashOnce((i < flashTimes - 1));
+        }
+      }
+      finally
+      {
+        this.isFlashing = false;
+      }
+    }
   refresh: | #js
     function() {
-      const fromEl = this.from().$el;
-      const toEl = this.to().$el;
+      const fromEl = this.fromVue().$el;
+      const toEl = this.toVue().$el;
 
       if (this.leaderLine && (this.leaderLine.start == fromEl) && (this.leaderLine.end == toEl))
       {
@@ -30,8 +60,10 @@ methods:
         fromEl,
         toEl,
         {
-          path: 'grid',
-          color: 'yellow',
+          path: 'fluid',
+          color: this.color,
+          startPlug: this.startPlug,
+          endPlug: this.endPlug,
           dropShadow: {
             dx: -3,
             dy: 3,
@@ -54,7 +86,13 @@ methods:
           this.remove();
         }
       }
-      setTimeout(this.redraw.bind(this), 100);
+      if (this.$el.isConnected) {
+        setTimeout(this.redraw.bind(this), 100);
+      }
+      else
+      {
+        this.remove();
+      }
     }
   setVisibility: | #js
     function(visible) {
@@ -74,18 +112,19 @@ methods:
       this.leaderLine = null;
     }
 watch:
-  from: | #js
-    function(from) {
+  fromVue: | #js
+    function(fromVue) {
       this.refresh();
     }
-  to: | #js
-    function(to) {
+  toVue: | #js
+    function(toVue) {
       this.refresh();
     }
   visible: | #js
     function(visible) {
       this.setVisibility(visible);
     }
+style: null
 _:
   examples:
     count: 0

@@ -1,14 +1,17 @@
 dom:
-  div:
+  div: 
     ':key': key1
-    h3: 
-      v-text: '''Nodes'''
-    ui.value.any: 
-      ':value': '[...$root.gdb.nodes].sortBy(n => -n.id)'
-    h3: 
-      v-text: '''Links'''
-    ui.value.any: 
-      ':value': '[...$root.gdb.links].sortBy(n => -n.id)'
+    .flex:
+      div: 
+        h3: 
+          v-text: '''Nodes'''
+        ui.value.any: 
+          ':value': '[...$root.gdb.nodes].sortBy(n => -n.id)'
+      div: 
+        h3: 
+          v-text: '''Links'''
+        ui.value.any: 
+          ':value': '[...$root.gdb.links].sortBy(n => -n.id)'
 props: null
 data:
   key1: 1
@@ -24,9 +27,11 @@ _:
     count: 0
 name: flow-gdb-list
 template: >-
-  <div class="comp-flow-gdb-list" :key="key1" path="675114631."><h3
-  v-text="'Nodes'" path="675114631.0"></h3><ui-value-any
+  <div class="comp-flow-gdb-list" :key="key1" path="675114631."><div
+  class="flex" path="675114631.0"><div path="675114631.0.0"><h3 v-text="'Nodes'"
+  path="675114631.0.0.0"></h3><ui-value-any
   :value="[...$root.gdb.nodes].sortBy(n =&gt; -n.id)"
-  path="675114631.1"></ui-value-any><h3 v-text="'Links'"
-  path="675114631.2"></h3><ui-value-any :value="[...$root.gdb.links].sortBy(n
-  =&gt; -n.id)" path="675114631.3"></ui-value-any></div>
+  path="675114631.0.0.1"></ui-value-any></div><div path="675114631.0.1"><h3
+  v-text="'Links'" path="675114631.0.1.0"></h3><ui-value-any
+  :value="[...$root.gdb.links].sortBy(n =&gt; -n.id)"
+  path="675114631.0.1.1"></ui-value-any></div></div></div>

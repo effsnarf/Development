@@ -1,0 +1,51 @@
+dom:
+  div: 
+    v-if: node
+    div: 
+      div: 
+        v-for: relatedNode in getRelatedNodes(node)
+        flow.link.title:
+          ':link': getRelatedLink(node, relatedNode)
+        flow.node.editor:
+          ':node': relatedNode
+          ':show-datas': 'true'
+props:
+  node: null
+  depth: 0
+data:
+  maxDepth: 10
+methods:
+  getRelatedNodes: | #js
+    function(node) {
+      const relatedNodeIds = this.getRelatedLinks(node)
+        .filter(link => (link.type != "child.of"))
+        .flatMap(link => [link.from, link.to])
+        .distinct()
+        .except(this.node.id);
+      const relatedNodes = this.$gdb.getNodes(relatedNodeIds);
+      return relatedNodes;
+    }
+  getRelatedLinks: | #js
+    function(node) {
+      let links = this.$gdb.getNodeLinks(node);
+      links = links.filter(link => (link.type != "child.of"));
+      return links;
+    }
+  getRelatedLink: | #js
+    function(node, relatedNode) {
+      const links = this.getRelatedLinks(node);
+      const link1 = links.find(link => ((link.from == node.id) && (link.to == relatedNode.id)));
+      const link2 = links.find(link => ((link.from == relatedNode.id) && (link.to == node.id)));
+      return (link1 || link2);
+    }
+_:
+  examples:
+    count: 0
+name: flow-related-nodes
+template: >-
+  <div class="comp-flow-related-nodes" v-if="node" path="1277764206."><div
+  path="1277764206.0"><div v-for="relatedNode in getRelatedNodes(node)"
+  path="1277764206.0.0"><flow-link-title :link="getRelatedLink(node,
+  relatedNode)" path="1277764206.0.0.0"></flow-link-title><flow-node-editor
+  :node="relatedNode" :show-datas="true"
+  path="1277764206.0.0.1"></flow-node-editor></div></div></div>

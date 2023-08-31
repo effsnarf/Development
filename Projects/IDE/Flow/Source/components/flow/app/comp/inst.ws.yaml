@@ -2,6 +2,7 @@ dom:
   flow.node.base:
     ':node': node
     ':context-data': contextData
+    ':show-leader-lines': 'true'
     @node-datas: onNodeDatas
     flow.app.node:
       ':node': compNode
@@ -22,12 +23,12 @@ computed:
   compNode: | #js
     function() {
       const compNodeID = this.node.data.compID.value.value;
-      const compNode = this.$root.gdb.getNode(compNodeID);
+      const compNode = this.$gdb.getNode(compNodeID);
       return compNode;
     }
   childNodes: | #js
     function() {
-      return this.$root.gdb.getNodes('child.of', this.node);
+      return this.$gdb.getNodes('child.of', this.node);
     }
 _:
   examples:
@@ -35,6 +36,7 @@ _:
 name: flow-app-comp-inst
 template: >-
   <flow-node-base class="comp-flow-app-comp-inst" :node="node"
-  :context-data="contextData" @node-datas="onNodeDatas"
-  path="-226955912."><flow-app-node :node="compNode" :context-data="appliedData"
+  :context-data="contextData" :show-leader-lines="true"
+  @node-datas="onNodeDatas" path="-226955912."><flow-app-node :node="compNode"
+  :context-data="appliedData"
   path="-226955912.0"></flow-app-node></flow-node-base>

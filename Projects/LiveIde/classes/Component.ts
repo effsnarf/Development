@@ -23,7 +23,7 @@ class Component {
     if (this.source) this.source.name = this.name.replace(/\./g, "-");
   }
 
-  async compile() {
+  async compile(mixins: any[] = []) {
     if (this.isCompiled) return;
 
     const logGroup = false;
@@ -39,6 +39,8 @@ class Component {
 
     try {
       const vueOptions = await this.getVueOptions();
+      const compMixins = mixins.filter((m: any) => m.matchComp(this));
+      vueOptions.mixins = [...(vueOptions.mixins || []), ...compMixins];
 
       if (logGroup) console.log(vueOptions);
       const vueName = Component.toVueName(this.name);

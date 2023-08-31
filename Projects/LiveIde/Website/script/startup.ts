@@ -18,6 +18,73 @@ const win = window as any;
 win.Objects = Objects;
 win.TaskQueue = TaskQueue;
 
+const generalMixin = {
+  matchComp: (c: Component) => true,
+  data() {
+    return {
+      ui: {
+        is: {
+          hovered: false,
+          mounted: false,
+        },
+      },
+      handlers: {
+        mouseover: null as any,
+        mouseout: null as any,
+      },
+    };
+  },
+  mounted() {
+    const self = this as any;
+    self.ui.is.mounted = true;
+    self.handlers.mouseover = (e: Event) => {
+      self.ui.is.hovered = true;
+    };
+    self.handlers.mouseout = (e: Event) => {
+      self.ui.is.hovered = false;
+    };
+    self.$el.addEventListener("mouseover", self.handlers.mouseover);
+    self.$el.addEventListener("mouseout", self.handlers.mouseout);
+  },
+  unmounted() {
+    const self = this as any;
+    self.ui.is.mounted = false;
+    self.$el.removeEventListener("mouseover", self.handlers.mouseover);
+    self.$el.removeEventListener("mouseout", self.handlers.mouseout);
+  },
+};
+
+const flowAppMixin = {
+  data() {
+    return {
+      global: {
+        active: {
+          node: null,
+        },
+      },
+    };
+  },
+};
+
+const flowAppComponentMixin = {
+  matchComp: (c: Component) => c.name.startsWith("flow."),
+  computed: {
+    $global() {
+      return (this as any).$root.global;
+    },
+    $gdb() {
+      return (this as any).$root.gdb;
+    },
+    $nodeDatas() {
+      return (this as any).$root.flow.user.app.runtimeData.nodeDatas;
+    },
+  },
+};
+
+const vueAppMixins = [flowAppMixin];
+
+const webScriptMixins = [generalMixin, flowAppComponentMixin];
+
 const mgHelpers = {
   url: {
     thread: (thread: any, full: boolean = false) => {
@@ -92,6 +159,19 @@ const mgHelpers = {
       if (full) return `https://memegenerator.net${path}`;
       return path;
     },
+  },
+};
+
+const mgMixin = {
+  match: (c: Component) => c.name.startsWith("mg."),
+  data() {
+    return {
+      url: mgHelpers.url,
+      builders: {
+        all: {} as any,
+        mainMenu: {} as any,
+      },
+    };
   },
 };
 
@@ -386,7 +466,7 @@ interface MgParams {
     },
   });
 
-  await client.compileAll();
+  await client.compileAll((c) => true, webScriptMixins);
 
   let vueApp: any = null;
 
@@ -417,14 +497,9 @@ interface MgParams {
   const params = await getNewParams();
 
   vueApp = new client.Vue({
+    mixins: vueAppMixins,
     data: {
       events: new Events(),
-      // MemeGenerator
-      builders: {
-        all: {} as any,
-        mainMenu: {} as any,
-      },
-      // General
       vm: vueManager,
       client,
       dbp,
@@ -432,7 +507,6 @@ interface MgParams {
       flow,
       analytics: await AnalyticsTracker.new(),
       params: params,
-      url: mgHelpers.url,
       html: new HtmlHelper(),
       comps: client.Vue.ref(client.comps),
       compsDic: {},

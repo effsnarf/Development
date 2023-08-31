@@ -30,7 +30,7 @@ methods:
     }
   getChildNodes: | #js
     function(node) {
-      let childNodes = this.$root.gdb.getNodes("child.of", node);
+      let childNodes = this.$gdb.getNodes("child.of", node);
       childNodes = childNodes.map(childNode => {
         return {
           id: childNode.id,

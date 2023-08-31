@@ -1,0 +1,38 @@
+dom:
+  div: 
+    h3:
+      flow.node.title:
+        ':node': folderNode
+    .flex.flex-column.gap-2:
+      div: 
+        v-for: dataNode in dataNodes
+        flow.node.editor:
+          ':node': dataNode
+props:
+  folderNode: null
+  node: null
+methods:
+  isRelatedToNode: | #js
+    function(dataNode, node) {
+      const links = this.$gdb.getNodeLinks(dataNode);
+      const isRelated = links.some(link => this.$gdb.linkIncludes(link, this.node));
+      return isRelated;
+    }
+computed:
+  dataNodes: | #js
+    function() {
+      let dataNodes = this.$gdb.getNodes('child.of', this.folderNode);
+      dataNodes = dataNodes.filter(dataNode => this.isRelatedToNode(dataNode, this.node));
+      return dataNodes;
+    }
+_:
+  examples:
+    count: 0
+name: flow-node-list
+template: >-
+  <div class="comp-flow-node-list" path="674947146."><h3
+  path="674947146.0"><flow-node-title :node="folderNode"
+  path="674947146.0.0"></flow-node-title></h3><div class="flex flex-column
+  gap-2" path="674947146.1"><div v-for="dataNode in dataNodes"
+  path="674947146.1.0"><flow-node-editor :node="dataNode"
+  path="674947146.1.0.0"></flow-node-editor></div></div></div>

@@ -1,191 +1,67 @@
 dom:
   flow.node.base:
     ':node': node
-    @click: transitionPages
-    div: 
-      v-if: showAllPages
-      class: flex
-      flow.app.node: 
-        v-for: (childNode, index) in childNodes
-        class: flex-equal
-        ':key': childNode.id
-        ':node': childNode
-    div: 
+    ':class': '{ ''all-visible2'': allPagesVisible2 }'
+    div:
+      ui.button: 
+        ':text': '''all-visible'''
+        @click: toggleAllVisible
       ui.button: 
         ':text': visiblePageIndex.toString()
-      ui.button: 
-        ':text': '''transition pages'''
-        @click: transitionPages
-    .pages:
-      v-if: '!showAllPages'
-      flow.app.node: 
-        ref: vPages
-        v-for: (childNode, index) in childNodes
-        ':style': getPageStyle(childNode, index)
-        ':key': childNode.id
-        ':node': childNode
+    ui.tween:
+      ':visible-index': '(allPagesVisible ? 1 : 0)'
+      template: 
+        v-slot: slot0
+        .pages: 
+          ':class': '{ ''all-visible'': false }'
+          flow.app.node: 
+            ref: vPages
+            v-for: (childNode, index) in childNodes
+            class: page
+            ':class': getPageCssClass(childNode, index)
+            ':key': childNode.id
+            ':node': childNode
+      template: 
+        v-slot: slot1
+        .pages: 
+          ':class': '{ ''all-visible'': true }'
+          flow.app.node: 
+            ref: vPages
+            v-for: (childNode, index) in childNodes
+            class: page
+            @click: selectPage(index)
+            ':class': getPageCssClass(childNode, index)
+            ':key': childNode.id
+            ':node': childNode
 props:
   node: null
-  showAllPages: false
+data:
+  allPagesVisible: false
+  allPagesVisible2: false
 methods:
-  transitionPages: | #js
-    function(e) {
-      e?.preventDefault();
-      e?.stopPropagation();
-      if (!this.$refs.vPages) return;
-      const duration = 1000;
-      const sourcePageIndex = this.visiblePageIndex;
-      const targetPageIndex = (sourcePageIndex + 1) % this.childNodes.length;
-      // Find twin elements, meaning that they transition to each other.
-      const vSourcePage = this.$refs.vPages[sourcePageIndex];
-      const vTargetPage = this.$refs.vPages[targetPageIndex];
-      let image1 = (e?.target?.tagName == 'IMG' ? e.target : null);
-      image1 = image1 || vSourcePage.$el.querySelector('img');
-      const images2 = [...vTargetPage.$el.querySelectorAll('img')];
-      const image2 = images2.find(img => (img.src == image1.src)) || images2[0];
-      const text1 = image1.parentElement.parentElement.nextElementSibling;
-      const text2 = image2.parentElement.parentElement.nextElementSibling;
-      //const text1 = vSourcePage.$el.querySelector('.comp-flow-ui-text');
-      //const text2 = vTargetPage.$el.querySelector('.comp-flow-ui-text');
-      this.tween(image1, image1, image2, false, duration);
-      this.tween(image2, image1, image2, true, duration);
-      this.tween(text1, text1, text2, false, duration);
-      this.tween(text2, text1, text2, true, duration);
-      this.fade(vSourcePage.$el, duration, 1, 0);
-      this.fade(vTargetPage.$el, duration, 0, 1);
-      setTimeout(this.toggleVisiblePage.bind(this), duration);
-    }
-  tween: | #js
-    function(el, sourceEl, targetEl, appear = true, duration = 1000) {
-      const tweenValue = this.tweenValue;
-
-      const startTime = Date.now();
-
-      const startRect = sourceEl.getBoundingClientRect();
-      const endRect = targetEl.getBoundingClientRect();
-
-      const startFontSize = parseFloat(window.getComputedStyle(el).fontSize);
-      const scaleFont = endRect.width / startRect.width;
-      const endFontSize = startFontSize * scaleFont;
-
-      const startOpacity = appear ? 0 : 1;
-      const endOpacity = appear ? 1 : 0;
-
-      const documentScrollLeft1 = document.documentElement.scrollLeft;
-      const documentScrollTop1 = document.documentElement.scrollTop;
-
-      // Clone the element and set its styles
-      const cloneEl = el.cloneNode(true);
-      this.copyStyle(cloneEl, el);
-      cloneEl.style.position = 'fixed';
-      cloneEl.style.top = `${startRect.top}px`;
-      cloneEl.style.left = `${startRect.left}px`;
-      cloneEl.style.transformOrigin = 'top left';
-      cloneEl.style.opacity = startOpacity;
-      cloneEl.style.visibility = '';
-      document.body.appendChild(cloneEl);
-
-      function animate() {
-        const elapsed = Date.now() - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-
-        let x = tweenValue(startRect.left, endRect.left, progress);
-        x += (documentScrollLeft1 - document.documentElement.scrollLeft);
-        let y = tweenValue(startRect.top, endRect.top, progress);
-        y += (documentScrollTop1 - document.documentElement.scrollTop);
-        const width = tweenValue(startRect.width, endRect.width, progress);
-        const height = tweenValue(startRect.height, endRect.height, progress);
-        const opacity = tweenValue(startOpacity, endOpacity, progress);
-        const fontSize = tweenValue(startFontSize, endFontSize, progress);
-
-        cloneEl.style.top = `${y}px`;
-        cloneEl.style.left = `${x}px`;
-        cloneEl.style.width = `${width}px`;
-        cloneEl.style.height = `${height}px`;
-        cloneEl.style.opacity = opacity;
-        cloneEl.style.fontSize = `${fontSize}px`;
-
-        if (progress < 1) {
-          // Hide the original element
-          if (el.style.visibility != 'hidden') setTimeout(() => {
-            el.style.visibility = 'hidden';
-          }, 10);
-          requestAnimationFrame(animate);
-        } else {
-          // Animation is done, revert to original styles
-          document.body.removeChild(cloneEl); // Remove the cloned element
-          el.style.visibility = ''; // Show the original element
-        }
-      }
-
-      requestAnimationFrame(animate);
-    }
-  fade: | #js
-    function(el, duration = 1000, startOpacity = 1, endOpacity = 0) {
-      const startTime = Date.now();
-      const originalOpacity = window.getComputedStyle(el).opacity; // Get the original opacity before animation
-
-      const tweenValue = this.tweenValue;
-
-      function animate() {
-        const elapsed = Date.now() - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        const opacity = tweenValue(startOpacity, endOpacity, progress);
-
-        el.style.opacity = opacity;
-
-        if (progress < 1) {
-          requestAnimationFrame(animate);
-        } else {
-          // Animation is done, revert to original opacity
-          //el.style.opacity = originalOpacity;
-        }
-      }
-
-      requestAnimationFrame(animate);
-    }
-  tweenValue: | #js
-    function(startValue, endValue, progress) {
-      // Cubic ease-in-out function
-      function cubicEaseInOut(t) {
-        return t < 0.5
-          ? 4 * t * t * t
-          : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
-      }
-      const easedProgress = cubicEaseInOut(progress);
-      return startValue + (endValue - startValue) * easedProgress;
-    }
-  copyStyle: | #js
-    function(targetEl, sourceEl) {
-      let computedStyle = window.getComputedStyle(sourceEl);
-      computedStyle = Object.keys(computedStyle)
-        .filter(k => parseInt(k) != k)
-        .toMapValue(k => computedStyle[k]);
-      Object.assign(targetEl.style, computedStyle);
-    }
-  getPageStyle: | #js
+  getPageCssClass: | #js
     function(childNode, index) {
-      const style = {};
-      if (this.isPageVisible(childNode, index)) {
-        style.opacity = 1;
-        style.pointerEvents = 'auto';
-        style.zIndex = 10;
-      } else {
-        style.opacity = 0;
-        style.pointerEvents = 'none';
-        style.zIndex = 0;
-      }
-      return style;
+      const cls = {};
+      cls.visible = this.isPageVisible(childNode, index);
+      cls[`tween-page-${index}`] = true;
+      cls['flex-equal'] = true;
+      return cls;
+    }
+  toggleAllVisible: | #js
+    async function() {
+      this.allPagesVisible = !this.allPagesVisible;
+      await this.$root.wait(1000);
+      this.allPagesVisible2 = this.allPagesVisible;
+    }
+  selectPage: | #js
+    async function(index) {
+      this.node.data.visiblePageIndex.value = index;
+      await this.$nextTick();
+      this.toggleAllVisible();
     }
   isPageVisible: | #js
     function(childNode, index) {
       return (this.visiblePageIndex === index);
-    }
-  toggleVisiblePage: | #js
-    function() {
-      const visiblePageIndex = this.visiblePageIndex;
-      const newVisiblePageIndex = (visiblePageIndex + 1) % this.childNodes.length;
-      this.node.data.visiblePageIndex.value = newVisiblePageIndex;
     }
   getCssClass: | #js
     function() {
@@ -195,7 +71,7 @@ methods:
 computed:
   childNodes: | #js
     function() {
-      return this.$root.gdb.getNodes('child.of', this.node);
+      return this.$gdb.getNodes('child.of', this.node);
     }
   visiblePageIndex:
     get: | #js
@@ -207,25 +83,55 @@ computed:
         this.node.data.visiblePageIndex.value = value;
       }
 style:
+  .comp-flow-layout-pages:
+    width: 30em
+    transition: width 1s
+  .comp-flow-layout-pages.all-visible2:
+    width: 50em
   .pages:
-    aspect-ratio: 2 / 4
-  .pages > *:
+    aspect-ratio: 3 / 4
+  .all-visible:
+    display: flex
+    gap: 2em
+  .all-visible .page:
+    position: relative
+    border: 2px solid transparent
+    transition: padding 0.4s
+  .all-visible .page *:
+    pointer-events: none !important
+  .all-visible .page:hover:
+    border: '2px solid #ffffff80'
+    cursor: pointer
+  .page:
     position: absolute
     width: 100%
+    opacity: 0
+  .page *:
+    pointer-events: none
+  .page.visible *:
+    pointer-events: auto
+  .page.visible, .all-visible .page:
+    opacity: 1
 _:
   examples:
     count: 0
 name: flow-layout-pages
 template: >-
-  <flow-node-base class="comp-flow-layout-pages" :node="node"
-  @click="transitionPages" path="1309562048."><div class="flex"
-  v-if="showAllPages" path="1309562048.0"><flow-app-node class="flex-equal"
-  v-for="(childNode, index) in childNodes" :key="childNode.id" :node="childNode"
-  path="1309562048.0.0"></flow-app-node></div><div
-  path="1309562048.1"><ui-button :text="visiblePageIndex.toString()"
-  path="1309562048.1.0"></ui-button><ui-button :text="'transition pages'"
-  @click="transitionPages" path="1309562048.1.1"></ui-button></div><div
-  class="pages" v-if="!showAllPages" path="1309562048.2"><flow-app-node
-  ref="vPages" v-for="(childNode, index) in childNodes"
-  :style="getPageStyle(childNode, index)" :key="childNode.id" :node="childNode"
-  path="1309562048.2.0"></flow-app-node></div></flow-node-base>
+  <flow-node-base class="comp-flow-layout-pages" :node="node" :class="{
+  'all-visible2': allPagesVisible2 }" path="1309562048."><div
+  path="1309562048.0"><ui-button :text="'all-visible'" @click="toggleAllVisible"
+  path="1309562048.0.0"></ui-button><ui-button
+  :text="visiblePageIndex.toString()"
+  path="1309562048.0.1"></ui-button></div><ui-tween
+  :visible-index="(allPagesVisible ? 1 : 0)" path="1309562048.1"><template
+  v-slot:slot0 path="1309562048.1.0"><div class="pages" :class="{ 'all-visible':
+  false }" path="1309562048.1.0.0"><flow-app-node class="page" ref="vPages"
+  v-for="(childNode, index) in childNodes" :class="getPageCssClass(childNode,
+  index)" :key="childNode.id" :node="childNode"
+  path="1309562048.1.0.0.0"></flow-app-node></div></template><template
+  v-slot:slot1 path="1309562048.1.1"><div class="pages" :class="{ 'all-visible':
+  true }" path="1309562048.1.1.0"><flow-app-node class="page" ref="vPages"
+  v-for="(childNode, index) in childNodes" @click="selectPage(index)"
+  :class="getPageCssClass(childNode, index)" :key="childNode.id"
+  :node="childNode"
+  path="1309562048.1.1.0.0"></flow-app-node></div></template></ui-tween></flow-node-base>

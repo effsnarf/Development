@@ -34,14 +34,14 @@ data:
 methods:
   refresh: | #js
     function() {
-      const nodeLinks = this.$root.gdb.getNodeLinks(this.node);
+      const nodeLinks = this.$gdb.getNodeLinks(this.node);
       this.toHereNodes = nodeLinks
         .filter(l => (l.to === this.node.id))
-        .map(l => this.$root.gdb.getNode(l.from))
+        .map(l => this.$gdb.getNode(l.from))
         .filter(this.isNodeTypeRelevant);
       this.fromHereNodes = nodeLinks
         .filter(l => (l.from === this.node.id))
-        .map(l => this.$root.gdb.getNode(l.to))
+        .map(l => this.$gdb.getNode(l.to))
         .filter(this.isNodeTypeRelevant);
     }
   isNodeTypeRelevant: | #js

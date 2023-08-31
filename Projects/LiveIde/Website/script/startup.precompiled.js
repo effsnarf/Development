@@ -140,9 +140,9 @@ class ClientContext {
             });
         }
     }
-    async compileAll(filter = (c) => true) {
+    async compileAll(filter = (c) => true, mixins = []) {
         for (const comp of this.comps.filter(filter)) {
-            await comp.compile();
+            await comp.compile(mixins);
         }
     }
     async compileApp() {
@@ -310,7 +310,7 @@ class Component {
         if (this.source)
             this.source.name = this.name.replace(/\./g, "-");
     }
-    async compile() {
+    async compile(mixins = []) {
         if (this.isCompiled)
             return;
         const logGroup = false;
@@ -324,6 +324,8 @@ class Component {
         }
         try {
             const vueOptions = await this.getVueOptions();
+            const compMixins = mixins.filter((m) => m.matchComp(this));
+            vueOptions.mixins = [...(vueOptions.mixins || []), ...compMixins];
             if (logGroup)
                 console.log(vueOptions);
             const vueName = Component.toVueName(this.name);
@@ -533,6 +535,9 @@ var Flow;
                 .getNodeLinks(node)
                 .filter((l) => l.type == "data.send")
                 .filter((l) => l.data.event == "click");
+            for (const link of nodeLinks) {
+                this.events.emit("link.data.send", link);
+            }
             const nodes = nodeLinks
                 .map((l) => this.gdb.getNode(l.to))
                 .filter((n) => n);
@@ -549,8 +554,12 @@ var Flow;
             }
             this.nodeDatas[node.id] = data;
             this.events.emit("node.data.change", node, data);
-            const sendToNodes = this.gdb.getNodes(node, "data.send").filter((node) => !node.data.event);
+            const sendToNodes = this.gdb.getNodes(node, "data.send");
             for (const sendToNode of sendToNodes) {
+                const links = this.gdb.getLinks(node, sendToNode);
+                for (const link of links) {
+                    this.events.emit("link.data.send", link);
+                }
                 this.setNodeData(sendToNode, data, depth + 1);
             }
         }
@@ -3502,7 +3511,9 @@ class VueManager {
     getDescendant(vue, filter) {
         return this.getDescendants(vue, filter, 1)[0];
     }
-    getDescendants(vue, filter, maxCount) {
+    getDescendants(vue, filter = (vue) => true, maxCount) {
+        if (!vue)
+            return [];
         if (typeof filter == "string") {
             const compName = filter;
             filter = (vue) => vue.$data._?.comp.name == compName;
@@ -3827,6 +3838,11 @@ var Graph;
             }
         }
         getNodes(a, b) {
+            if (Array.isArray(a)) {
+                const ids = a;
+                const nodes = ids.map((id) => this.getNode(id));
+                return nodes;
+            }
             const fromOrTo = this.fromOrTo(a, b);
             const oppFromOrTo = this.getOppositeFromOrTo(fromOrTo);
             const links = this.getLinks(a, b);
@@ -3847,6 +3863,10 @@ var Graph;
             return nodes;
         }
         getLinks(a, b) {
+            if (typeof a == "object" && typeof b == "object") {
+                const links = this.links.filter((link) => this.linkIncludes(link, a) && this.linkIncludes(link, b));
+                return links;
+            }
             const fromOrTo = this.fromOrTo(a, b);
             const type = findArg("string", a, b);
             const node = findArg("object", a, b);
@@ -3885,6 +3905,11 @@ var Graph;
                 return [];
             const links = this.links.filter((l) => l.from == node.id || l.to == node.id);
             return links;
+        }
+        linkIncludes(link, node) {
+            if (!link || !node)
+                return false;
+            return link.from == node.id || link.to == node.id;
         }
         fromOrTo(a, b) {
             if (typeof a !== "string") {
@@ -6157,7 +6182,7 @@ var __webpack_exports__ = {};
 (() => {
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/Website/script/1693302796690.ts ***!
+  !*** ../../../LiveIde/Website/script/1693494939476.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -6176,6 +6201,68 @@ const Flow_1 = __webpack_require__(/*! ../../Classes/Flow */ "../../../LiveIde/C
 const win = window;
 win.Objects = Extensions_Objects_Client_1.Objects;
 win.TaskQueue = TaskQueue_1.TaskQueue;
+const generalMixin = {
+    matchComp: (c) => true,
+    data() {
+        return {
+            ui: {
+                is: {
+                    hovered: false,
+                    mounted: false,
+                },
+            },
+            handlers: {
+                mouseover: null,
+                mouseout: null,
+            },
+        };
+    },
+    mounted() {
+        const self = this;
+        self.ui.is.mounted = true;
+        self.handlers.mouseover = (e) => {
+            self.ui.is.hovered = true;
+        };
+        self.handlers.mouseout = (e) => {
+            self.ui.is.hovered = false;
+        };
+        self.$el.addEventListener("mouseover", self.handlers.mouseover);
+        self.$el.addEventListener("mouseout", self.handlers.mouseout);
+    },
+    unmounted() {
+        const self = this;
+        self.ui.is.mounted = false;
+        self.$el.removeEventListener("mouseover", self.handlers.mouseover);
+        self.$el.removeEventListener("mouseout", self.handlers.mouseout);
+    },
+};
+const flowAppMixin = {
+    data() {
+        return {
+            global: {
+                active: {
+                    node: null,
+                },
+            },
+        };
+    },
+};
+const flowAppComponentMixin = {
+    matchComp: (c) => c.name.startsWith("flow."),
+    computed: {
+        $global() {
+            return this.$root.global;
+        },
+        $gdb() {
+            return this.$root.gdb;
+        },
+        $nodeDatas() {
+            return this.$root.flow.user.app.runtimeData.nodeDatas;
+        },
+    },
+};
+const vueAppMixins = [flowAppMixin];
+const webScriptMixins = [generalMixin, flowAppComponentMixin];
 const mgHelpers = {
     url: {
         thread: (thread, full = false) => {
@@ -6257,6 +6344,18 @@ const mgHelpers = {
                 return `https://memegenerator.net${path}`;
             return path;
         },
+    },
+};
+const mgMixin = {
+    match: (c) => c.name.startsWith("mg."),
+    data() {
+        return {
+            url: mgHelpers.url,
+            builders: {
+                all: {},
+                mainMenu: {},
+            },
+        };
     },
 };
 (async () => {
@@ -6513,7 +6612,7 @@ const mgHelpers = {
             }
         },
     });
-    await client.compileAll();
+    await client.compileAll((c) => true, webScriptMixins);
     let vueApp = null;
     const isLocalHost = window.location.hostname == "localhost";
     const dbpHost = `https://db.memegenerator.net`;
@@ -6528,14 +6627,9 @@ const mgHelpers = {
     };
     const params = await getNewParams();
     vueApp = new client.Vue({
+        mixins: vueAppMixins,
         data: {
             events: new Events_1.Events(),
-            // MemeGenerator
-            builders: {
-                all: {},
-                mainMenu: {},
-            },
-            // General
             vm: vueManager,
             client,
             dbp,
@@ -6543,7 +6637,6 @@ const mgHelpers = {
             flow,
             analytics: await AnalyticsTracker_1.AnalyticsTracker.new(),
             params: params,
-            url: mgHelpers.url,
             html: new HtmlHelper_1.HtmlHelper(),
             comps: client.Vue.ref(client.comps),
             compsDic: {},

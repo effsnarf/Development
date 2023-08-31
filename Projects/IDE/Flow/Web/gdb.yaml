@@ -115,35 +115,44 @@ templates:
             type: string
             value: comps
 get:
-  icon: | #js
-    function(type) {
-      const cat = type.split('.')[1];
+  node:
+    icon: | #js
+      function(type) {
+        const cat = type.split('.')[1];
 
-      if (cat == "app") {
-        type = type.split('.')[2];
+        if (cat == "app") {
+          type = type.split('.')[2];
+          return ({
+            comp: '📦',
+            compInst: '💎',
+          })[type] || '❔';
+        }
+
+        if (cat == "node") {
+          type = type.split('.')[2];
+          return ({
+            folder: '📁',
+          })[type] || '❔';
+        }
+
+        if (cat == "ui") {
+          type = type.split('.')[2];
+          return ({
+            text: '🆎',
+            image: '🖼️',
+          })[type] || '❔';
+        }
+
         return ({
-          comp: '📦',
-          compInst: '💎',
+          layout: '⬜',
+          data: '🧊',
+        })[cat] || '❔';
+      }
+  link:
+    icon: | #js
+      function(type) {
+        return ({
+          'child.of': '➕',
+          'data.send': '🧊',
         })[type] || '❔';
       }
-
-      if (cat == "node") {
-        type = type.split('.')[2];
-        return ({
-          folder: '📁',
-        })[type] || '❔';
-      }
-
-      if (cat == "ui") {
-        type = type.split('.')[2];
-        return ({
-          text: '🆎',
-          image: '🖼️',
-        })[type] || '❔';
-      }
-
-      return ({
-        layout: '⬜',
-        data: '🧊',
-      })[cat] || '❔';
-    }

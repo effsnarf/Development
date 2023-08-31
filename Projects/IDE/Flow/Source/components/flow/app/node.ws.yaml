@@ -1,6 +1,7 @@
 dom:
   flow.node.base:
     v-if: node
+    @click: () => $emit('click')
     ':style': style
     ':node': node
     ':context-data': contextData
@@ -11,7 +12,6 @@ props:
   node: null
   contextData: null
   isSelectOption: false
-  showAllPages: false
 data:
   style: null
 methods:
@@ -50,7 +50,7 @@ _:
     count: 0
 name: flow-app-node
 template: >-
-  <flow-node-base class="comp-flow-app-node" v-if="node" :style="style"
-  :node="node" :context-data="contextData" path="1269169775."><component
-  :is="node.type.kebabize()" v-bind="$props"
+  <flow-node-base class="comp-flow-app-node" v-if="node" @click="() =&gt;
+  $emit('click')" :style="style" :node="node" :context-data="contextData"
+  path="1269169775."><component :is="node.type.kebabize()" v-bind="$props"
   path="1269169775.0"></component></flow-node-base>
