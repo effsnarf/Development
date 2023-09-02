@@ -35,7 +35,7 @@ namespace Graph {
     links: Link[];
     events: Events;
 
-    addTemplate(name: string): Node;
+    addTemplate(name: string): Promise<Node>;
     addNode(type: string, data: any, links?: any[]): Node;
     updateNodeField(node: Node, field: string, value: any): void;
     replaceNode(oldNode: Node, newNode: Node): Node;
@@ -101,7 +101,7 @@ namespace Graph {
     }
     // #endregion
 
-    addTemplate(name: string) {
+    async addTemplate(name: string) {
       const template = this.data.templates[name];
       const node = this.addNode(template.type, template.data);
       for (const child of template.children) {
@@ -420,19 +420,21 @@ namespace Graph {
       return gdb;
     }
 
-    addTemplate(name: string) {
-      const pointer = this.actionStack.pointer.value;
-
+    async addTemplate(name: string) {
       const redo = {
         method: "add.template",
         args: [name],
       };
 
+      await this.actionStack.beginGroup();
+
       const node = super.addTemplate(name);
 
+      const groupActions = await this.actionStack.endGroup();
+
       const undo = {
-        method: "go.to.action",
-        args: [pointer],
+        method: "undo.group",
+        args: [groupActions],
       };
 
       const action = { redo, undo } as Actionable.Action;
@@ -538,6 +540,10 @@ namespace Graph {
         return !Objects.areEqual(oldNode, newNode);
       });
       this.onNodesChange(changedNodes);
+    }
+
+    private async undoGroup(actions: Actionable.Action[]) {
+      await this.actionStack.undoGroup(actions);
     }
 
     private toMethodName(method: string) {

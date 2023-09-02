@@ -17,6 +17,7 @@ namespace Actionable {
   export class ActionStack {
     actions!: Data.List;
     pointer!: Data.Value;
+    groupStartID!: number;
 
     toPersistableAction: (action: Action) => Promise<any> = async (
       action: Action
@@ -71,9 +72,7 @@ namespace Actionable {
     async add(action: Action | any) {
       action = Objects.clone(action);
       action = await this.toPersistableAction(action);
-      const actionAtPointer = await this.actions.getActionAt(
-        this.pointer.value
-      );
+      const actionAtPointer = await this.actions.getItemAt(this.pointer.value);
       if (actionAtPointer)
         await this.actions.deleteMany(
           (action: Action) => action._id > actionAtPointer._id
@@ -97,9 +96,32 @@ namespace Actionable {
       }
     }
 
+    async undoGroup(actions: Actionable.Action[]) {
+      throw new Error("brb dinner");
+    }
+
+    async beginGroup() {
+      const startAction = await this.actions.getItemAt(this.pointer.value);
+      this.groupStartID = startAction._id;
+    }
+
+    async endGroup() {
+      const groupActions = await this.actions.getMany((action: Action) => {
+        return action._id >= this.groupStartID;
+      });
+
+      await this.actions.deleteMany((action: Action) => {
+        return action._id >= this.groupStartID;
+      });
+
+      (this.groupStartID as any) = null;
+
+      return groupActions;
+    }
+
     async undo() {
       if (this.pointer.value < 0) return;
-      const action = await this.actions.getActionAt(this.pointer.value);
+      const action = await this.actions.getItemAt(this.pointer.value);
       if (!action) return;
       //await this.fromPersistableAction(action);
       await this.executeAction({
@@ -111,7 +133,7 @@ namespace Actionable {
 
     async redo() {
       if (this.pointer.value >= this.actions.count - 1) return;
-      const action = await this.actions.getActionAt(this.pointer.value + 1);
+      const action = await this.actions.getItemAt(this.pointer.value + 1);
       if (!action) return;
       await this.fromPersistableAction(action);
       await this.executeAction(action);

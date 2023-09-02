@@ -343,8 +343,12 @@ namespace Data {
       await this.refresh();
     }
 
-    async getActionAt(index: number): Promise<any> {
+    async getItemAt(index: number): Promise<any> {
       return await this.collection.getItemAt(index);
+    }
+
+    async getMany(filter: (item: any) => boolean): Promise<any[]> {
+      return await this.collection.getItems(filter);
     }
 
     private async refresh(): Promise<void> {
