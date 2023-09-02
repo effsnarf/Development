@@ -118,6 +118,8 @@ get:
   node:
     icon: | #js
       function(type) {
+        if (!type) return '❔';
+
         const cat = type.split('.')[1];
 
         if (cat == "app") {
@@ -151,6 +153,8 @@ get:
   link:
     icon: | #js
       function(type) {
+        if (!type) return '❔';
+        
         return ({
           'child.of': '➕',
           'data.send': '🧊',

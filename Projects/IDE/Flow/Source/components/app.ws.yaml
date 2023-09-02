@@ -1,7 +1,7 @@
 dom:
-  flow.misc.app: null
+  flow.interface.app: null
 _:
   examples:
     count: 0
 name: app
-template: <flow-misc-app class="comp-app"></flow-misc-app>
+template: <flow-interface-app class="comp-app"></flow-interface-app>

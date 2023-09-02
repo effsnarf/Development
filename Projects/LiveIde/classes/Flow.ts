@@ -1,10 +1,18 @@
+import { Objects } from "../../../Shared/Extensions.Objects.Client";
+import { Data } from "../../../Shared/Data";
 import { Events } from "../../../Shared/Events";
 import { Graph } from "../../../Shared/Database/Graph";
 import { VueManager } from "./VueManager";
+import { Actionable } from "../../../Shared/Actionable";
 
 const Vue = (window as any).Vue;
 
 namespace Flow {
+  interface Persisters {
+    memory: Data.Persister.Base;
+    localStorage: Data.Persister.Base;
+  }
+
   class RuntimeData {
     events = new Events();
     private nodeDatas = Vue.reactive({});
@@ -133,10 +141,6 @@ namespace Flow {
       this.events.forward(this.runtimeData.events, "runtime.data");
     }
 
-    initialize() {
-      const app = this.gdb.addTemplate("app");
-    }
-
     onNodeClick(node: Graph.Node, contextData: any) {
       this.runtimeData.onNodeClick(node, contextData);
     }
@@ -195,17 +199,211 @@ namespace Flow {
     }
   }
 
+  export class Interface {
+    private constructor(
+      private userAppGdb: Graph.ActionableDatabase,
+      public userActions: Actionable.ActionStack
+    ) {
+      userActions.executeAction = this.executeAction.bind(this);
+    }
+
+    static async new(
+      vueApp: any,
+      userAppGdb: Graph.ActionableDatabase,
+      persisters: Persisters
+    ) {
+      const userActions = await Actionable.ActionStack.new(
+        persisters.localStorage,
+        "user.actions"
+      );
+
+      vueApp.$on("user-action", (redo: any) => userActions.do({ redo }));
+
+      const interface1 = new Interface(userAppGdb, userActions);
+
+      if (userActions.actions.count == 1) {
+        userActions.do({
+          redo: {
+            method: "initialize.user.app.source",
+            args: [],
+          },
+        });
+      }
+
+      return interface1;
+    }
+
+    async executeAction(action: any) {
+      const self = this as any;
+      const { redo } = action;
+      // no op
+      const methodName =
+        "on" +
+        redo.method
+          .split(".")
+          .map((s: string) => s.capitalize())
+          .join("");
+      if (self[methodName]) return await self[methodName](action);
+      else throw new Error("Unknown action type: " + redo.type);
+    }
+
+    private async onInitializeUserAppSource(action: any) {
+      await this.userAppGdb.addTemplate("app");
+
+      action.undo = { method: "gdb.undo" };
+
+      return action;
+    }
+
+    private async onDndDrop(action: any) {
+      const { dragItem, dropItem } = action.redo;
+
+      if (dragItem.type == "flow.app.compInst") {
+        if (dropItem.type == "flow.app.compInst") {
+          await this.userAppGdb.addLink(dragItem, "data.send", dropItem, {
+            event: "click",
+          });
+          return;
+        }
+      }
+
+      if (dropItem == "trash") {
+        await this.userAppGdb.deleteNode(dragItem);
+        return;
+      }
+
+      if (typeof dragItem == "string")
+        return await this.onDndDrop_newNode(action);
+      else return await this.onDndDrop_nodeToNode(action);
+    }
+
+    private async onDndDrop_newNode(action: any) {
+      const { dragItem, dropItem } = action.redo;
+      const newNodeType = dragItem;
+
+      const newNode = await this.createNewNode(newNodeType);
+
+      if (dropItem.type == "flow.layout.empty") {
+        action.undo = Objects.clone({
+          type: "array",
+          oldNode: newNode,
+          newNode: dropItem,
+        });
+        this.userAppGdb.replaceNode(dropItem, newNode);
+        return action;
+      } else {
+        throw new Error("Not implemented");
+      }
+    }
+
+    private async onDndDrop_nodeToNode(action: any) {
+      const { dragItem, dropItem } = action;
+
+      if (action.dropItem.type == "flow.layout.empty") {
+        if (action.dragItem.type == "flow.app.comp") {
+          const compInst = this.userAppGdb.addNode("flow.app.compInst", {
+            compID: {
+              type: "noderef",
+              value: {
+                type: "flow.app.comp",
+                value: action.dragItem.id,
+              },
+            },
+          });
+          this.userAppGdb.replaceNode(action.dropItem, compInst);
+          return;
+        }
+        // Move node to empty layout node
+        if (action.dragItem.type.startsWith("flow.layout")) {
+          this.userAppGdb.replaceNode(action.dropItem, action.dragItem);
+          return;
+        }
+        throw new Error("Not implemented");
+      }
+      this.userAppGdb.addLink(action.dragItem, "data.send", action.dropItem);
+    }
+
+    private async createNewNode(newNodeType: string) {
+      const data = {};
+
+      const newNode = this.userAppGdb.addNode(newNodeType, data);
+
+      return newNode;
+    }
+
+    private async onGdbRollback(action: any) {
+      const redo = action.redo;
+      const pointer = redo.args[0];
+      await this.userAppGdb.actionStack.goToAction(pointer);
+    }
+
+    private toPersistableAction(action: any) {
+      return Objects.clone({
+        redo: this.toPersistableDoable(action.redo),
+        undo: this.toPersistableDoable(action.undo),
+      });
+    }
+
+    private fromPersistableAction(action: any) {
+      return Objects.clone({
+        redo: this.fromPersistableDoable(action.redo),
+        undo: this.fromPersistableDoable(action.undo),
+      });
+    }
+
+    private toPersistableDoable(doable: any) {
+      if (!doable) return null;
+      return Object.fromEntries(
+        Object.entries(doable).map(([key, value]: [string, any]) => {
+          if (value?.id) value = { id: value.id };
+          return [key, value];
+        })
+      );
+    }
+
+    private fromPersistableDoable(doable: any) {
+      if (!doable) return null;
+      return Object.fromEntries(
+        Object.entries(doable).map(([key, value]: [string, any]) => {
+          if (value?.id) value = this.userAppGdb.getNode(value.id);
+          return [key, value];
+        })
+      );
+    }
+  }
+
   export class Manager {
     events = new Events();
     ui: UI;
+    interface!: Interface;
     user = {
       app: null as UserApp | null,
     };
 
-    constructor(private vm: VueManager, private gdb: Graph.Database) {
+    private constructor(private vm: VueManager, private gdb: Graph.Database) {
       this.ui = new UI(vm, gdb);
       this.user.app = new UserApp(gdb);
+      this.events.forward(gdb.events, "gdb");
       this.events.forward(this.user.app.events, "user.app");
+    }
+
+    static async new(vueApp: any, vm: VueManager, gdbData: any) {
+      const persisters = {
+        memory: Data.Persister.Memory.new(),
+        localStorage: Data.Persister.LocalStorage.new("flow"),
+      } as Persisters;
+
+      const userAppGdb = await Graph.ActionableDatabase.new2(
+        persisters.memory,
+        "gdb",
+        gdbData
+      );
+
+      const manager = new Manager(vm, userAppGdb);
+
+      manager.interface = await Interface.new(vueApp, userAppGdb, persisters);
+
+      return manager;
     }
   }
 }

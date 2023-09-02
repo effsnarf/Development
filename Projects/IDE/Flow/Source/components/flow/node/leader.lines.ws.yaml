@@ -1,7 +1,19 @@
 dom:
-  div:
+  div: 
     v-if: node
     slot: null
+    h3:
+      class: flex
+      div: 
+        v-text: '''Links from '''
+      flow.node.title:
+        ':node': node
+    ul:
+      li:
+        v-for: relatedLink in relatedLinks
+        ':key': relatedLink.id
+        flow.link.title:
+          ':link': relatedLink
     flow.link.leader.line:
       v-if: showLeaderLines
       v-for: relatedLink in relatedLinks
@@ -29,6 +41,13 @@ _:
 name: flow-node-leader-lines
 template: >-
   <div class="comp-flow-node-leader-lines" v-if="node"
-  path="622762374."><slot></slot><flow-link-leader-line v-if="showLeaderLines"
-  v-for="relatedLink in relatedLinks" :key="relatedLink.id" :vue="getThis"
-  :link="relatedLink" path="622762374.1"></flow-link-leader-line></div>
+  path="622762374."><slot></slot><h3 class="flex" path="622762374.1"><div
+  v-text="'Links from '" path="622762374.1.0"></div><flow-node-title
+  :node="node" path="622762374.1.1"></flow-node-title></h3><ul
+  path="622762374.2"><li v-for="relatedLink in relatedLinks"
+  :key="relatedLink.id" path="622762374.2.0"><flow-link-title
+  :link="relatedLink"
+  path="622762374.2.0.0"></flow-link-title></li></ul><flow-link-leader-line
+  v-if="showLeaderLines" v-for="relatedLink in relatedLinks"
+  :key="relatedLink.id" :vue="getThis" :link="relatedLink"
+  path="622762374.3"></flow-link-leader-line></div>

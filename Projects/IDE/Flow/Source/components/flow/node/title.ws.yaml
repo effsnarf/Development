@@ -1,6 +1,7 @@
 dom:
   div: 
     v-if: node
+    @click: () => $emit('click', node)
     div: 
       v-if: full
       h2:
@@ -8,14 +9,9 @@ dom:
           ':icon': getIcon(node)
           ':text': getName(node)
           ':number': node.id
-      .opacity-50:
-        ui.title: 
-          ':icon': getIcon(node)
-          ':text': node.type
-          ':number': node.id
     div: 
       v-if: '!full'
-      ui.title:
+      ui.title: 
         ':icon': getIcon(node)
         ':text': getName(node)
         ':number': node.id
@@ -31,7 +27,7 @@ methods:
         const compNode = this.$gdb.getNode(compID);
         return compNode.data.name.value;
       }
-      return node.data.name?.value ||
+      return node.data?.name?.value ||
         node.type.split('.').reverse().take(1).reverse().join('.');
     }
   getIcon: | #js
@@ -43,12 +39,10 @@ _:
     count: 0
 name: flow-node-title
 template: >-
-  <div class="comp-flow-node-title" v-if="node" path="-544085972."><div
-  v-if="full" path="-544085972.0"><h2 path="-544085972.0.0"><ui-title
-  :icon="getIcon(node)" :text="getName(node)" :number="node.id"
-  path="-544085972.0.0.0"></ui-title></h2><div class="opacity-50"
-  path="-544085972.0.1"><ui-title :icon="getIcon(node)" :text="node.type"
-  :number="node.id" path="-544085972.0.1.0"></ui-title></div></div><div
+  <div class="comp-flow-node-title" v-if="node" @click="() =&gt; $emit('click',
+  node)" path="-544085972."><div v-if="full" path="-544085972.0"><h2
+  path="-544085972.0.0"><ui-title :icon="getIcon(node)" :text="getName(node)"
+  :number="node.id" path="-544085972.0.0.0"></ui-title></h2></div><div
   v-if="!full" path="-544085972.1"><ui-title :icon="getIcon(node)"
   :text="getName(node)" :number="node.id"
   path="-544085972.1.0"></ui-title></div></div>

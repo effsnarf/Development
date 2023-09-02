@@ -1,5 +1,4 @@
 /******/ (() => { // webpackBootstrap
-/******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
 /***/ "../../../LiveIde/Classes/AnalyticsTracker.ts":
@@ -8,6 +7,7 @@
   \****************************************************/
 /***/ ((__unused_webpack_module, exports) => {
 
+"use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AnalyticsTracker = void 0;
@@ -58,6 +58,7 @@ exports.AnalyticsTracker = AnalyticsTracker;
   \*************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
+"use strict";
 
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -228,6 +229,7 @@ exports.ClientContext = ClientContext;
   \**************************************************/
 /***/ ((__unused_webpack_module, exports) => {
 
+"use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ClientDatabase = void 0;
@@ -285,6 +287,7 @@ exports.ClientDatabase = ClientDatabase;
   \*********************************************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
+"use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Component = void 0;
@@ -383,6 +386,7 @@ exports.Component = Component;
   \****************************************************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
+"use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ComponentManager = void 0;
@@ -470,10 +474,15 @@ exports.ComponentManager = ComponentManager;
   \****************************************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
+"use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Flow = void 0;
+const Extensions_Objects_Client_1 = __webpack_require__(/*! ../../../Shared/Extensions.Objects.Client */ "../../../../Shared/Extensions.Objects.Client.ts");
+const Data_1 = __webpack_require__(/*! ../../../Shared/Data */ "../../../../Shared/Data.ts");
 const Events_1 = __webpack_require__(/*! ../../../Shared/Events */ "../../../../Shared/Events.ts");
+const Graph_1 = __webpack_require__(/*! ../../../Shared/Database/Graph */ "../../../../Shared/Database/Graph.ts");
+const Actionable_1 = __webpack_require__(/*! ../../../Shared/Actionable */ "../../../../Shared/Actionable.ts");
 const Vue = window.Vue;
 var Flow;
 (function (Flow) {
@@ -573,9 +582,6 @@ var Flow;
             this.runtimeData = new RuntimeData(gdb);
             this.events.forward(this.runtimeData.events, "runtime.data");
         }
-        initialize() {
-            const app = this.gdb.addTemplate("app");
-        }
         onNodeClick(node, contextData) {
             this.runtimeData.onNodeClick(node, contextData);
         }
@@ -632,11 +638,158 @@ var Flow;
         }
     }
     Flow.UI = UI;
+    class Interface {
+        userAppGdb;
+        userActions;
+        constructor(userAppGdb, userActions) {
+            this.userAppGdb = userAppGdb;
+            this.userActions = userActions;
+            userActions.executeAction = this.executeAction.bind(this);
+        }
+        static async new(vueApp, userAppGdb, persisters) {
+            const userActions = await Actionable_1.Actionable.ActionStack.new(persisters.localStorage, "user.actions");
+            vueApp.$on("user-action", (redo) => userActions.do({ redo }));
+            const interface1 = new Interface(userAppGdb, userActions);
+            if (userActions.actions.count == 1) {
+                userActions.do({
+                    redo: {
+                        method: "initialize.user.app.source",
+                        args: [],
+                    },
+                });
+            }
+            return interface1;
+        }
+        async executeAction(action) {
+            const self = this;
+            const { redo } = action;
+            // no op
+            const methodName = "on" +
+                redo.method
+                    .split(".")
+                    .map((s) => s.capitalize())
+                    .join("");
+            if (self[methodName])
+                return await self[methodName](action);
+            else
+                throw new Error("Unknown action type: " + redo.type);
+        }
+        async onInitializeUserAppSource(action) {
+            const pointer = this.userAppGdb.actionStack.pointer.value;
+            debugger;
+            await this.userAppGdb.addTemplate("app");
+            action.undo = { method: "gdb.rollback", args: [pointer] };
+            return action;
+        }
+        async onDndDrop(action) {
+            const { dragItem, dropItem } = action.redo;
+            if (dragItem.type == "flow.app.compInst") {
+                if (dropItem.type == "flow.app.compInst") {
+                    await this.userAppGdb.addLink(dragItem, "data.send", dropItem, {
+                        event: "click",
+                    });
+                    return;
+                }
+            }
+            if (dropItem == "trash") {
+                await this.userAppGdb.deleteNode(dragItem);
+                return;
+            }
+            if (typeof dragItem == "string")
+                return await this.onDndDrop_newNode(action);
+            else
+                return await this.onDndDrop_nodeToNode(action);
+        }
+        async onDndDrop_newNode(action) {
+            const { dragItem, dropItem } = action.redo;
+            const newNodeType = dragItem;
+            const newNode = await this.createNewNode(newNodeType);
+            if (dropItem.type == "flow.layout.empty") {
+                action.undo = Extensions_Objects_Client_1.Objects.clone({
+                    type: "array",
+                    oldNode: newNode,
+                    newNode: dropItem,
+                });
+                this.userAppGdb.replaceNode(dropItem, newNode);
+                return action;
+            }
+            else {
+                throw new Error("Not implemented");
+            }
+        }
+        async onDndDrop_nodeToNode(action) {
+            const { dragItem, dropItem } = action;
+            if (action.dropItem.type == "flow.layout.empty") {
+                if (action.dragItem.type == "flow.app.comp") {
+                    const compInst = this.userAppGdb.addNode("flow.app.compInst", {
+                        compID: {
+                            type: "noderef",
+                            value: {
+                                type: "flow.app.comp",
+                                value: action.dragItem.id,
+                            },
+                        },
+                    });
+                    this.userAppGdb.replaceNode(action.dropItem, compInst);
+                    return;
+                }
+                // Move node to empty layout node
+                if (action.dragItem.type.startsWith("flow.layout")) {
+                    this.userAppGdb.replaceNode(action.dropItem, action.dragItem);
+                    return;
+                }
+                throw new Error("Not implemented");
+            }
+            this.userAppGdb.addLink(action.dragItem, "data.send", action.dropItem);
+        }
+        async createNewNode(newNodeType) {
+            const data = {};
+            const newNode = this.userAppGdb.addNode(newNodeType, data);
+            return newNode;
+        }
+        async onGdbRollback(action) {
+            const redo = action.redo;
+            const pointer = redo.args[0];
+            await this.userAppGdb.actionStack.goToAction(pointer);
+        }
+        toPersistableAction(action) {
+            return Extensions_Objects_Client_1.Objects.clone({
+                redo: this.toPersistableDoable(action.redo),
+                undo: this.toPersistableDoable(action.undo),
+            });
+        }
+        fromPersistableAction(action) {
+            return Extensions_Objects_Client_1.Objects.clone({
+                redo: this.fromPersistableDoable(action.redo),
+                undo: this.fromPersistableDoable(action.undo),
+            });
+        }
+        toPersistableDoable(doable) {
+            if (!doable)
+                return null;
+            return Object.fromEntries(Object.entries(doable).map(([key, value]) => {
+                if (value?.id)
+                    value = { id: value.id };
+                return [key, value];
+            }));
+        }
+        fromPersistableDoable(doable) {
+            if (!doable)
+                return null;
+            return Object.fromEntries(Object.entries(doable).map(([key, value]) => {
+                if (value?.id)
+                    value = this.userAppGdb.getNode(value.id);
+                return [key, value];
+            }));
+        }
+    }
+    Flow.Interface = Interface;
     class Manager {
         vm;
         gdb;
         events = new Events_1.Events();
         ui;
+        interface;
         user = {
             app: null,
         };
@@ -645,7 +798,18 @@ var Flow;
             this.gdb = gdb;
             this.ui = new UI(vm, gdb);
             this.user.app = new UserApp(gdb);
+            this.events.forward(gdb.events, "gdb");
             this.events.forward(this.user.app.events, "user.app");
+        }
+        static async new(vueApp, vm, gdbData) {
+            const persisters = {
+                memory: Data_1.Data.Persister.Memory.new(),
+                localStorage: Data_1.Data.Persister.LocalStorage.new("flow"),
+            };
+            const userAppGdb = await Graph_1.Graph.ActionableDatabase.new2(persisters.memory, "gdb", gdbData);
+            const manager = new Manager(vm, userAppGdb);
+            manager.interface = await Interface.new(vueApp, userAppGdb, persisters);
+            return manager;
         }
     }
     Flow.Manager = Manager;
@@ -660,6 +824,7 @@ var Flow;
   \**********************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
+"use strict";
 
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -3030,6 +3195,7 @@ exports.HtmlHelper = HtmlHelper;
   \******************************************/
 /***/ ((__unused_webpack_module, exports) => {
 
+"use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Params = void 0;
@@ -3080,6 +3246,7 @@ exports.Params = Params;
   \************************************************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
+"use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StateValue = exports.StateTracker = void 0;
@@ -3333,6 +3500,7 @@ exports.StateTracker = StateTracker;
   \*********************************************/
 /***/ ((__unused_webpack_module, exports) => {
 
+"use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.VueHelper = void 0;
@@ -3443,6 +3611,7 @@ exports.VueHelper = VueHelper;
   \**********************************************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
+"use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.VueManager = void 0;
@@ -3578,6 +3747,32 @@ class VueManager {
     getRefKeys() {
         return this.vueRefsToUIDs.keys();
     }
+    getVueFromElement(el) {
+        const vue = this.getVueFromVnode(this.getVnodeFromElement(el));
+        return vue;
+    }
+    getVnodeFromElement(el) {
+        if (!el)
+            return null;
+        if (el.__vue__)
+            return el.__vue__;
+        if (!el.parentElement)
+            return null;
+        return this.getVnodeFromElement(el.parentElement);
+    }
+    getVueFromVnode(vnode) {
+        // Skip vnodes like <keep-alive>, <transition>, etc.
+        if (!vnode)
+            return null;
+        if (this.vNodeIsVue(vnode))
+            return vnode;
+        return this.getVueFromVnode(vnode.$parent);
+    }
+    vNodeIsVue(vnode) {
+        if ([`transition`, `transition-group`, `keep-alive`].includes(vnode.$options._componentTag))
+            return false;
+        return true;
+    }
     registerVue(vue) {
         if (!vue)
             return;
@@ -3614,12 +3809,416 @@ exports.VueManager = VueManager;
 
 /***/ }),
 
+/***/ "../../../../Shared/Actionable.ts":
+/*!****************************************!*\
+  !*** ../../../../Shared/Actionable.ts ***!
+  \****************************************/
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Actionable = void 0;
+const Data_1 = __webpack_require__(/*! ./Data */ "../../../../Shared/Data.ts");
+const Extensions_Objects_Client_1 = __webpack_require__(/*! ./Extensions.Objects.Client */ "../../../../Shared/Extensions.Objects.Client.ts");
+var Actionable;
+(function (Actionable) {
+    class ActionStack {
+        persister;
+        varName;
+        actions;
+        pointer;
+        toPersistableAction = async (action) => action;
+        fromPersistableAction = async (action) => action;
+        executeAction;
+        constructor(persister, varName) {
+            this.persister = persister;
+            this.varName = varName;
+        }
+        static async new(persister, varName) {
+            const actionStack = new ActionStack(persister, varName);
+            actionStack.actions = await Data_1.Data.List.new(persister, `${varName}.actions`);
+            actionStack.pointer = await Data_1.Data.Value.new(persister, `${varName}.actions.pointer`, -1);
+            if (actionStack.actions.count === 0) {
+                // Add a blank action to start
+                await actionStack.do({
+                    redo: { noop: true },
+                    undo: { noop: true },
+                });
+            }
+            return actionStack;
+        }
+        async do(action) {
+            action = await this.fromPersistableAction(action);
+            action = await this._executeAction(action);
+            if (!action)
+                throw new Error("executeAction must return an action");
+            if (!action.undo)
+                throw new Error("executeAction must set action.undo");
+            await this.add(action);
+        }
+        async add(action) {
+            action = Extensions_Objects_Client_1.Objects.clone(action);
+            action = await this.toPersistableAction(action);
+            const actionAtPointer = await this.actions.getActionAt(this.pointer.value);
+            if (actionAtPointer)
+                await this.actions.deleteMany((action) => action._id > actionAtPointer._id);
+            await this.actions.upsert(action);
+            this.pointer.value++;
+        }
+        async goToAction(toPointer) {
+            if (this.pointer.value > toPointer) {
+                while (this.pointer.value > toPointer) {
+                    await this.undo();
+                    return;
+                }
+            }
+            if (this.pointer.value < toPointer) {
+                while (this.pointer.value < toPointer) {
+                    await this.redo();
+                    return;
+                }
+            }
+        }
+        async undo() {
+            if (this.pointer.value < 0)
+                return;
+            const action = await this.actions.getActionAt(this.pointer.value);
+            if (!action)
+                return;
+            //await this.fromPersistableAction(action);
+            await this.executeAction({
+                undo: action.redo,
+                redo: action.undo,
+            });
+            this.pointer.value--;
+        }
+        async redo() {
+            if (this.pointer.value >= this.actions.count - 1)
+                return;
+            const action = await this.actions.getActionAt(this.pointer.value + 1);
+            if (!action)
+                return;
+            await this.fromPersistableAction(action);
+            await this.executeAction(action);
+            this.pointer.value++;
+        }
+        async clear() {
+            await this.actions.clear();
+            this.pointer.value = -1;
+            this.do({
+                redo: { type: null },
+            });
+        }
+        async _executeAction(action) {
+            action = Extensions_Objects_Client_1.Objects.clone(action);
+            if (action.redo.noop)
+                return action;
+            return await this.executeAction(action);
+        }
+    }
+    Actionable.ActionStack = ActionStack;
+})(Actionable || (exports.Actionable = Actionable = {}));
+
+
+/***/ }),
+
+/***/ "../../../../Shared/Data.ts":
+/*!**********************************!*\
+  !*** ../../../../Shared/Data.ts ***!
+  \**********************************/
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Data = void 0;
+const Extensions_Objects_Client_1 = __webpack_require__(/*! ./Extensions.Objects.Client */ "../../../../Shared/Extensions.Objects.Client.ts");
+var Data;
+(function (Data) {
+    let Persister;
+    (function (Persister) {
+        class Base {
+            getCollection(collection) {
+                return Collection.new(this, collection);
+            }
+        }
+        Persister.Base = Base;
+        class Collection {
+            persister;
+            collection;
+            constructor(persister, collection) {
+                this.persister = persister;
+                this.collection = collection;
+            }
+            static new(persister, collection) {
+                return new Collection(persister, collection);
+            }
+            async addItem(item) {
+                await this.persister.addItem(this.collection, item);
+            }
+            async updateItem(item) {
+                await this.persister.updateItem(this.collection, item);
+            }
+            async upsertItem(item) {
+                await this.persister.upsertItem(this.collection, item);
+            }
+            async deleteItem(_id) {
+                await this.persister.deleteItem(this.collection, _id);
+            }
+            async deleteMany(filter) {
+                await this.persister.deleteMany(this.collection, filter);
+            }
+            async getItems(filter = () => true, sort = (item) => item._id, limit) {
+                return await this.persister.getItems(this.collection, filter, sort, limit);
+            }
+            async getItemAt(index) {
+                return await this.persister.getItemAt(this.collection, index);
+            }
+            async count() {
+                return await this.persister.count(this.collection);
+            }
+        }
+        Persister.Collection = Collection;
+        class Memory extends Base {
+            nextID = 1;
+            values = {};
+            collections = {};
+            constructor() {
+                super();
+            }
+            static new() {
+                return new Memory();
+            }
+            async get(key, defaultValue) {
+                return this.values[key] || defaultValue;
+            }
+            async set(key, value) {
+                this.values[key] = value;
+            }
+            async addItem(collection, item) {
+                const items = await this.getCollectionArray(collection);
+                if (!item._id)
+                    item._id = await this.getNewID();
+                items.push(item);
+            }
+            async updateItem(collection, item) {
+                let items = await this.getCollectionArray(collection);
+                const index = items.findIndex((i) => i._id === item._id);
+                if (index >= 0)
+                    items[index] = item;
+            }
+            async upsertItem(collection, item) {
+                if (item._id) {
+                    await this.updateItem(collection, item);
+                }
+                else {
+                    await this.addItem(collection, item);
+                }
+            }
+            async deleteItem(collection, _id) {
+                let items = await this.getCollectionArray(collection);
+                items = items.filter((item) => item._id !== _id);
+            }
+            async deleteMany(collection, filter) {
+                let items = await this.getCollectionArray(collection);
+                items = items.filter((item) => !filter(item));
+            }
+            async getItems(collection, filter = () => true, sort = (item) => item._id, limit) {
+                let items = await this.getCollectionArray(collection);
+                items = items.filter(filter);
+                items = items.sort(sort);
+                items = items.slice(0, limit || items.length);
+                items = Extensions_Objects_Client_1.Objects.clone(items);
+                return items;
+            }
+            async getItemAt(collection, index) {
+                const items = await this.getCollectionArray(collection);
+                return items[index];
+            }
+            async count(collection) {
+                const items = await this.getCollectionArray(collection);
+                return items.length;
+            }
+            getCollectionArray(collection) {
+                if (!this.collections[collection])
+                    this.collections[collection] = [];
+                return this.collections[collection];
+            }
+            async getNewID() {
+                return this.nextID++;
+            }
+        }
+        Persister.Memory = Memory;
+        class LocalStorage extends Base {
+            name;
+            constructor(name) {
+                super();
+                this.name = name;
+            }
+            static new(name) {
+                return new LocalStorage(name);
+            }
+            async get(key, defaultValue = null) {
+                return JSON.parse(localStorage.getItem(`${this.name}.${key}`) ||
+                    JSON.stringify(defaultValue));
+            }
+            async set(key, value) {
+                localStorage.setItem(`${this.name}.${key}`, JSON.stringify(value));
+            }
+            async addItem(collection, item) {
+                const items = await this.get(collection, []);
+                if (!item._id)
+                    item._id = await this.getNewId();
+                items.push(item);
+                await this.set(collection, items);
+            }
+            async updateItem(collection, item) {
+                let items = await this.get(collection);
+                const index = items.findIndex((i) => i._id === item._id);
+                if (index >= 0)
+                    items[index] = item;
+                await this.set(collection, items);
+            }
+            async upsertItem(collection, item) {
+                if (item._id) {
+                    await this.updateItem(collection, item);
+                }
+                else {
+                    await this.addItem(collection, item);
+                }
+            }
+            async deleteItem(collection, _id) {
+                let items = await this.get(collection);
+                items = items.filter((item) => item._id !== _id);
+                await this.set(collection, items);
+            }
+            async deleteMany(collection, filter) {
+                let items = await this.get(collection);
+                items = items.filter((item) => !filter(item));
+                await this.set(collection, items);
+            }
+            async getItems(collection, filter = () => true, sort = (item) => item._id, limit) {
+                let items = await this.get(collection, []);
+                items = items.filter(filter);
+                items = items.sort(sort);
+                items = items.slice(0, limit || items.length);
+                return items;
+            }
+            async getItemAt(collection, index) {
+                const items = await this.get(collection, []);
+                return items[index];
+            }
+            async count(collection) {
+                const items = await this.get(collection, []);
+                return items.length;
+            }
+            async getNewId() {
+                const nextIdKey = "next.id";
+                const id = await this.get(nextIdKey, 1);
+                await this.set(nextIdKey, id + 1);
+                return id;
+            }
+        }
+        Persister.LocalStorage = LocalStorage;
+    })(Persister = Data.Persister || (Data.Persister = {}));
+    class Value {
+        persister;
+        key;
+        defaultValue;
+        _saveTimer = null;
+        _value = null;
+        constructor(persister, key, defaultValue = null) {
+            this.persister = persister;
+            this.key = key;
+            this.defaultValue = defaultValue;
+            this.load();
+        }
+        static async new(persister, key, defaultValue = null) {
+            const value = new Value(persister, key, defaultValue);
+            await value.load();
+            return value;
+        }
+        get value() {
+            return this._value;
+        }
+        set value(value) {
+            this._value = value;
+            this.save();
+        }
+        async load() {
+            this._value = await this.persister.get(this.key, this.defaultValue);
+        }
+        async save() {
+            if (this._saveTimer)
+                clearTimeout(this._saveTimer);
+            this._saveTimer = setTimeout(this.saveNow.bind(this), 1000);
+        }
+        async saveNow() {
+            await this.persister.set(this.key, this._value);
+        }
+    }
+    Data.Value = Value;
+    class List {
+        persister;
+        lastItemsCount;
+        collection;
+        lastItems = [];
+        count = 0;
+        constructor(persister, collection, lastItemsCount = 10) {
+            this.persister = persister;
+            this.lastItemsCount = lastItemsCount;
+            this.collection = persister.getCollection(collection);
+        }
+        static async new(persister, collection, lastItemsCount = 10) {
+            const list = new List(persister, collection, lastItemsCount);
+            await list.refresh();
+            return list;
+        }
+        async add(item) {
+            await this.collection.addItem(item);
+            await this.refresh();
+        }
+        async delete(item) {
+            await this.collection.deleteItem(item._id);
+            await this.refresh();
+        }
+        async deleteMany(filter) {
+            await this.collection.deleteMany(filter);
+        }
+        async update(item) {
+            await this.collection.updateItem(item);
+            await this.refresh();
+        }
+        async upsert(item) {
+            await this.collection.upsertItem(item);
+            await this.refresh();
+        }
+        async getActionAt(index) {
+            return await this.collection.getItemAt(index);
+        }
+        async refresh() {
+            this.lastItems = await this.collection.getItems((item) => true, (item) => -item._id, this.lastItemsCount);
+            this.count = await this.collection.count();
+        }
+        async clear() {
+            await this.collection.deleteMany(() => true);
+            await this.refresh();
+        }
+    }
+    Data.List = List;
+})(Data || (exports.Data = Data = {}));
+
+
+/***/ }),
+
 /***/ "../../../../Shared/DataWatcher.ts":
 /*!*****************************************!*\
   !*** ../../../../Shared/DataWatcher.ts ***!
   \*****************************************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
+"use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.DataWatcher = void 0;
@@ -3688,11 +4287,14 @@ exports.DataWatcher = DataWatcher;
   \********************************************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
+"use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Graph = void 0;
 const Extensions_Objects_Client_1 = __webpack_require__(/*! ../Extensions.Objects.Client */ "../../../../Shared/Extensions.Objects.Client.ts");
 const Events_1 = __webpack_require__(/*! ../Events */ "../../../../Shared/Events.ts");
+const Diff_1 = __webpack_require__(/*! ../Diff */ "../../../../Shared/Diff.ts");
+const Actionable_1 = __webpack_require__(/*! ../Actionable */ "../../../../Shared/Actionable.ts");
 const findArg = (condition, ...args) => {
     if (typeof condition == "string") {
         const type = condition;
@@ -3849,12 +4451,16 @@ var Graph;
             const nodes = links.map((l) => this.getNode(l[oppFromOrTo]));
             return nodes;
         }
-        getLinkedNodes(node) {
+        getLinkedNodes(node, linkFilter = (link) => true) {
             if (!node)
                 return [];
-            const links = this.links.filter((l) => l.from == node.id || l.to == node.id);
+            const links = this.links
+                .filter((l) => l.from == node.id || l.to == node.id)
+                .filter(linkFilter);
             const nodeIds = links.flatMap((l) => [l.from, l.to]).except(node.id);
-            const nodes = nodeIds.map((id) => this.getNode(id));
+            const nodes = nodeIds
+                .map((id) => this.getNode(id))
+                .filter((n) => n != null);
             return nodes;
         }
         getLinkedNodes2(linkType, fromOrTo, node) {
@@ -3936,20 +4542,174 @@ var Graph;
             }
         }
         deleteNode(node) {
+            const affectedNodes = this.getLinkedNodes(node);
             this.deleteLinks(this.getNodeLinks(node));
             this.nodes.removeBy((n) => n.id == node.id);
+            this.onNodesChange(affectedNodes);
         }
         deleteLinks(links) {
+            const affectedNodes = links
+                .flatMap((l) => [this.getNode(l.from), this.getNode(l.to)])
+                .filter((l) => l)
+                .distinct((l) => l?.id)
+                .map((l) => l);
             for (const link of links) {
                 this.links.removeBy((l) => l.id == link.id);
             }
+            this.onNodesChange(affectedNodes);
         }
         getNextID() {
             return this.nextID++;
         }
     }
     Graph.Database = Database;
+    class ActionableDatabase extends Graph.Database {
+        actionStack;
+        isReplaying = false;
+        constructor(actionStack, data) {
+            super(data);
+            this.actionStack = actionStack;
+            this.actionStack.executeAction = this.executeAction.bind(this);
+        }
+        static async new(data) {
+            throw new Error("Use new2 to create an ActionableDatabase");
+        }
+        static async new2(persister, varName, data) {
+            const actionStack = await Actionable_1.Actionable.ActionStack.new(persister, varName);
+            const gdb = new ActionableDatabase(actionStack, data);
+            return gdb;
+        }
+        addTemplate(name) {
+            const pointer = this.actionStack.pointer.value;
+            const redo = {
+                method: "add.template",
+                args: [name],
+            };
+            const node = super.addTemplate(name);
+            const undo = {
+                method: "go.to.action",
+                args: [pointer],
+            };
+            const action = { redo, undo };
+            this.addAction(action);
+            return node;
+        }
+        addNode(type, data, links) {
+            const redo = {
+                method: "addNode",
+                args: [type, data, links],
+            };
+            const node = super.addNode(type, data, links);
+            const undo = {
+                method: "deleteNode",
+                args: [node],
+            };
+            const action = { redo, undo };
+            this.addAction(action);
+            return node;
+        }
+        addLink(from, type, to, data) {
+            const redo = {
+                method: "addLink",
+                args: [from, type, to, data],
+            };
+            const link = super.addLink(from, type, to, data);
+            const undo = {
+                method: "deleteLinks",
+                args: [[link]],
+            };
+            const action = { redo, undo };
+            this.addAction(action);
+            return link;
+        }
+        replaceNode(oldNode, newNode) {
+            const redo = {
+                method: "replaceNode",
+                args: [oldNode, newNode],
+            };
+            const oldData = Extensions_Objects_Client_1.Objects.clone(this.data);
+            const result = super.replaceNode(oldNode, newNode);
+            const newData = Extensions_Objects_Client_1.Objects.clone(this.data);
+            const dataChanges = Diff_1.Diff.getChanges(oldData, newData);
+            const undo = {
+                method: "applyDataChanges",
+                args: [dataChanges],
+            };
+            const action = { redo, undo };
+            this.addAction(action);
+            return result;
+        }
+        async executeAction(action) {
+            this.isReplaying = true;
+            try {
+                const redo = action.redo;
+                const method = this.toMethodName(redo.method);
+                const args = redo.args;
+                const result = await this[method](...args);
+                return result;
+            }
+            finally {
+                this.isReplaying = false;
+            }
+        }
+        async goToAction(pointer) {
+            await this.actionStack.goToAction(pointer);
+        }
+        addAction(action) {
+            if (this.isReplaying)
+                return;
+            this.actionStack.add(action);
+        }
+        async applyDataChanges(dataChanges) {
+            const oldData = Extensions_Objects_Client_1.Objects.clone(this.data);
+            const newData = Diff_1.Diff.applyChanges(oldData, dataChanges);
+            this.data = newData;
+            const changedNodes = this.nodes.filter((newNode) => {
+                const oldNode = oldData.nodes.find((on) => on.id == newNode.id);
+                return !Extensions_Objects_Client_1.Objects.areEqual(oldNode, newNode);
+            });
+            this.onNodesChange(changedNodes);
+        }
+        toMethodName(method) {
+            const parts = method
+                .split(".")
+                .map((p) => p[0].toUpperCase() + p.substring(1));
+            parts[0] = parts[0].toLowerCase();
+            return parts.join("");
+        }
+    }
+    Graph.ActionableDatabase = ActionableDatabase;
 })(Graph || (exports.Graph = Graph = {}));
+
+
+/***/ }),
+
+/***/ "../../../../Shared/Diff.ts":
+/*!**********************************!*\
+  !*** ../../../../Shared/Diff.ts ***!
+  \**********************************/
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Diff = void 0;
+const deepDiff = __webpack_require__(/*! deep-diff */ "../../../../Shared/node_modules/deep-diff/index.js");
+var Diff;
+(function (Diff) {
+    function getChanges(source, target) {
+        return deepDiff.diff(source, target);
+    }
+    Diff.getChanges = getChanges;
+    function applyChanges(target, changes) {
+        target = JSON.parse(JSON.stringify(target));
+        for (const change of changes) {
+            deepDiff.applyChange(target, target, change);
+        }
+        return target;
+    }
+    Diff.applyChanges = applyChanges;
+})(Diff || (exports.Diff = Diff = {}));
 
 
 /***/ }),
@@ -3960,6 +4720,7 @@ var Graph;
   \************************************/
 /***/ ((__unused_webpack_module, exports) => {
 
+"use strict";
 
 // Passing events between components
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -4001,6 +4762,7 @@ exports.Events = Events;
   \*******************************************************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
+"use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Objects = void 0;
@@ -4361,6 +5123,7 @@ exports.Objects = Objects;
   \****************************************/
 /***/ (() => {
 
+"use strict";
 
 class Time {
     static units = [
@@ -5737,6 +6500,7 @@ if (typeof Function !== "undefined") {
   \**********************************/
 /***/ ((__unused_webpack_module, exports) => {
 
+"use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Lock = void 0;
@@ -5780,6 +6544,7 @@ exports.Lock = Lock;
   \************************************************/
 /***/ ((__unused_webpack_module, exports) => {
 
+"use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.RepeatingTaskQueue = void 0;
@@ -5818,6 +6583,7 @@ exports.RepeatingTaskQueue = RepeatingTaskQueue;
   \***************************************/
 /***/ ((__unused_webpack_module, exports) => {
 
+"use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.TaskQueue = void 0;
@@ -5849,6 +6615,7 @@ exports.TaskQueue = TaskQueue;
   \***************************************/
 /***/ ((__unused_webpack_module, exports) => {
 
+"use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.TwoWayMap = void 0;
@@ -5933,6 +6700,7 @@ exports.TwoWayMap = TwoWayMap;
   \*************************************************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
+"use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const Extensions_Objects_Client_1 = __webpack_require__(/*! ../Extensions.Objects.Client */ "../../../../Shared/Extensions.Objects.Client.ts");
@@ -5966,6 +6734,7 @@ exports["default"] = (context, compName, dom) => {
   \*********************************************************/
 /***/ ((__unused_webpack_module, exports) => {
 
+"use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports["default"] = (componentNames, name) => {
@@ -6030,6 +6799,7 @@ exports["default"] = (componentNames, name) => {
   \***************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
+"use strict";
 
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -6148,6 +6918,530 @@ exports["default"] = (context, dom, indent, compName) => {
 };
 
 
+/***/ }),
+
+/***/ "../../../../Shared/node_modules/deep-diff/index.js":
+/*!**********************************************************!*\
+  !*** ../../../../Shared/node_modules/deep-diff/index.js ***!
+  \**********************************************************/
+/***/ (function(module, exports, __webpack_require__) {
+
+var __WEBPACK_AMD_DEFINE_RESULT__;;(function(root, factory) { // eslint-disable-line no-extra-semi
+  var deepDiff = factory(root);
+  // eslint-disable-next-line no-undef
+  if (true) {
+      // AMD
+      !(__WEBPACK_AMD_DEFINE_RESULT__ = (function() { // eslint-disable-line no-undef
+          return deepDiff;
+      }).call(exports, __webpack_require__, exports, module),
+		__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+  } else { var _deepdiff; }
+}(this, function(root) {
+  var validKinds = ['N', 'E', 'A', 'D'];
+
+  // nodejs compatible on server side and in the browser.
+  function inherits(ctor, superCtor) {
+    ctor.super_ = superCtor;
+    ctor.prototype = Object.create(superCtor.prototype, {
+      constructor: {
+        value: ctor,
+        enumerable: false,
+        writable: true,
+        configurable: true
+      }
+    });
+  }
+
+  function Diff(kind, path) {
+    Object.defineProperty(this, 'kind', {
+      value: kind,
+      enumerable: true
+    });
+    if (path && path.length) {
+      Object.defineProperty(this, 'path', {
+        value: path,
+        enumerable: true
+      });
+    }
+  }
+
+  function DiffEdit(path, origin, value) {
+    DiffEdit.super_.call(this, 'E', path);
+    Object.defineProperty(this, 'lhs', {
+      value: origin,
+      enumerable: true
+    });
+    Object.defineProperty(this, 'rhs', {
+      value: value,
+      enumerable: true
+    });
+  }
+  inherits(DiffEdit, Diff);
+
+  function DiffNew(path, value) {
+    DiffNew.super_.call(this, 'N', path);
+    Object.defineProperty(this, 'rhs', {
+      value: value,
+      enumerable: true
+    });
+  }
+  inherits(DiffNew, Diff);
+
+  function DiffDeleted(path, value) {
+    DiffDeleted.super_.call(this, 'D', path);
+    Object.defineProperty(this, 'lhs', {
+      value: value,
+      enumerable: true
+    });
+  }
+  inherits(DiffDeleted, Diff);
+
+  function DiffArray(path, index, item) {
+    DiffArray.super_.call(this, 'A', path);
+    Object.defineProperty(this, 'index', {
+      value: index,
+      enumerable: true
+    });
+    Object.defineProperty(this, 'item', {
+      value: item,
+      enumerable: true
+    });
+  }
+  inherits(DiffArray, Diff);
+
+  function arrayRemove(arr, from, to) {
+    var rest = arr.slice((to || from) + 1 || arr.length);
+    arr.length = from < 0 ? arr.length + from : from;
+    arr.push.apply(arr, rest);
+    return arr;
+  }
+
+  function realTypeOf(subject) {
+    var type = typeof subject;
+    if (type !== 'object') {
+      return type;
+    }
+
+    if (subject === Math) {
+      return 'math';
+    } else if (subject === null) {
+      return 'null';
+    } else if (Array.isArray(subject)) {
+      return 'array';
+    } else if (Object.prototype.toString.call(subject) === '[object Date]') {
+      return 'date';
+    } else if (typeof subject.toString === 'function' && /^\/.*\//.test(subject.toString())) {
+      return 'regexp';
+    }
+    return 'object';
+  }
+
+  // http://werxltd.com/wp/2010/05/13/javascript-implementation-of-javas-string-hashcode-method/
+  function hashThisString(string) {
+    var hash = 0;
+    if (string.length === 0) { return hash; }
+    for (var i = 0; i < string.length; i++) {
+      var char = string.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32bit integer
+    }
+    return hash;
+  }
+
+  // Gets a hash of the given object in an array order-independent fashion
+  // also object key order independent (easier since they can be alphabetized)
+  function getOrderIndependentHash(object) {
+    var accum = 0;
+    var type = realTypeOf(object);
+
+    if (type === 'array') {
+      object.forEach(function (item) {
+        // Addition is commutative so this is order indep
+        accum += getOrderIndependentHash(item);
+      });
+
+      var arrayString = '[type: array, hash: ' + accum + ']';
+      return accum + hashThisString(arrayString);
+    }
+
+    if (type === 'object') {
+      for (var key in object) {
+        if (object.hasOwnProperty(key)) {
+          var keyValueString = '[ type: object, key: ' + key + ', value hash: ' + getOrderIndependentHash(object[key]) + ']';
+          accum += hashThisString(keyValueString);
+        }
+      }
+
+      return accum;
+    }
+
+    // Non object, non array...should be good?
+    var stringToHash = '[ type: ' + type + ' ; value: ' + object + ']';
+    return accum + hashThisString(stringToHash);
+  }
+
+  function deepDiff(lhs, rhs, changes, prefilter, path, key, stack, orderIndependent) {
+    changes = changes || [];
+    path = path || [];
+    stack = stack || [];
+    var currentPath = path.slice(0);
+    if (typeof key !== 'undefined' && key !== null) {
+      if (prefilter) {
+        if (typeof (prefilter) === 'function' && prefilter(currentPath, key)) {
+          return;
+        } else if (typeof (prefilter) === 'object') {
+          if (prefilter.prefilter && prefilter.prefilter(currentPath, key)) {
+            return;
+          }
+          if (prefilter.normalize) {
+            var alt = prefilter.normalize(currentPath, key, lhs, rhs);
+            if (alt) {
+              lhs = alt[0];
+              rhs = alt[1];
+            }
+          }
+        }
+      }
+      currentPath.push(key);
+    }
+
+    // Use string comparison for regexes
+    if (realTypeOf(lhs) === 'regexp' && realTypeOf(rhs) === 'regexp') {
+      lhs = lhs.toString();
+      rhs = rhs.toString();
+    }
+
+    var ltype = typeof lhs;
+    var rtype = typeof rhs;
+    var i, j, k, other;
+
+    var ldefined = ltype !== 'undefined' ||
+      (stack && (stack.length > 0) && stack[stack.length - 1].lhs &&
+        Object.getOwnPropertyDescriptor(stack[stack.length - 1].lhs, key));
+    var rdefined = rtype !== 'undefined' ||
+      (stack && (stack.length > 0) && stack[stack.length - 1].rhs &&
+        Object.getOwnPropertyDescriptor(stack[stack.length - 1].rhs, key));
+
+    if (!ldefined && rdefined) {
+      changes.push(new DiffNew(currentPath, rhs));
+    } else if (!rdefined && ldefined) {
+      changes.push(new DiffDeleted(currentPath, lhs));
+    } else if (realTypeOf(lhs) !== realTypeOf(rhs)) {
+      changes.push(new DiffEdit(currentPath, lhs, rhs));
+    } else if (realTypeOf(lhs) === 'date' && (lhs - rhs) !== 0) {
+      changes.push(new DiffEdit(currentPath, lhs, rhs));
+    } else if (ltype === 'object' && lhs !== null && rhs !== null) {
+      for (i = stack.length - 1; i > -1; --i) {
+        if (stack[i].lhs === lhs) {
+          other = true;
+          break;
+        }
+      }
+      if (!other) {
+        stack.push({ lhs: lhs, rhs: rhs });
+        if (Array.isArray(lhs)) {
+          // If order doesn't matter, we need to sort our arrays
+          if (orderIndependent) {
+            lhs.sort(function (a, b) {
+              return getOrderIndependentHash(a) - getOrderIndependentHash(b);
+            });
+
+            rhs.sort(function (a, b) {
+              return getOrderIndependentHash(a) - getOrderIndependentHash(b);
+            });
+          }
+          i = rhs.length - 1;
+          j = lhs.length - 1;
+          while (i > j) {
+            changes.push(new DiffArray(currentPath, i, new DiffNew(undefined, rhs[i--])));
+          }
+          while (j > i) {
+            changes.push(new DiffArray(currentPath, j, new DiffDeleted(undefined, lhs[j--])));
+          }
+          for (; i >= 0; --i) {
+            deepDiff(lhs[i], rhs[i], changes, prefilter, currentPath, i, stack, orderIndependent);
+          }
+        } else {
+          var akeys = Object.keys(lhs);
+          var pkeys = Object.keys(rhs);
+          for (i = 0; i < akeys.length; ++i) {
+            k = akeys[i];
+            other = pkeys.indexOf(k);
+            if (other >= 0) {
+              deepDiff(lhs[k], rhs[k], changes, prefilter, currentPath, k, stack, orderIndependent);
+              pkeys[other] = null;
+            } else {
+              deepDiff(lhs[k], undefined, changes, prefilter, currentPath, k, stack, orderIndependent);
+            }
+          }
+          for (i = 0; i < pkeys.length; ++i) {
+            k = pkeys[i];
+            if (k) {
+              deepDiff(undefined, rhs[k], changes, prefilter, currentPath, k, stack, orderIndependent);
+            }
+          }
+        }
+        stack.length = stack.length - 1;
+      } else if (lhs !== rhs) {
+        // lhs is contains a cycle at this element and it differs from rhs
+        changes.push(new DiffEdit(currentPath, lhs, rhs));
+      }
+    } else if (lhs !== rhs) {
+      if (!(ltype === 'number' && isNaN(lhs) && isNaN(rhs))) {
+        changes.push(new DiffEdit(currentPath, lhs, rhs));
+      }
+    }
+  }
+
+  function observableDiff(lhs, rhs, observer, prefilter, orderIndependent) {
+    var changes = [];
+    deepDiff(lhs, rhs, changes, prefilter, null, null, null, orderIndependent);
+    if (observer) {
+      for (var i = 0; i < changes.length; ++i) {
+        observer(changes[i]);
+      }
+    }
+    return changes;
+  }
+
+  function orderIndependentDeepDiff(lhs, rhs, changes, prefilter, path, key, stack) {
+    return deepDiff(lhs, rhs, changes, prefilter, path, key, stack, true);
+  }
+
+  function accumulateDiff(lhs, rhs, prefilter, accum) {
+    var observer = (accum) ?
+      function (difference) {
+        if (difference) {
+          accum.push(difference);
+        }
+      } : undefined;
+    var changes = observableDiff(lhs, rhs, observer, prefilter);
+    return (accum) ? accum : (changes.length) ? changes : undefined;
+  }
+
+  function accumulateOrderIndependentDiff(lhs, rhs, prefilter, accum) {
+    var observer = (accum) ?
+      function (difference) {
+        if (difference) {
+          accum.push(difference);
+        }
+      } : undefined;
+    var changes = observableDiff(lhs, rhs, observer, prefilter, true);
+    return (accum) ? accum : (changes.length) ? changes : undefined;
+  }
+
+  function applyArrayChange(arr, index, change) {
+    if (change.path && change.path.length) {
+      var it = arr[index],
+        i, u = change.path.length - 1;
+      for (i = 0; i < u; i++) {
+        it = it[change.path[i]];
+      }
+      switch (change.kind) {
+        case 'A':
+          applyArrayChange(it[change.path[i]], change.index, change.item);
+          break;
+        case 'D':
+          delete it[change.path[i]];
+          break;
+        case 'E':
+        case 'N':
+          it[change.path[i]] = change.rhs;
+          break;
+      }
+    } else {
+      switch (change.kind) {
+        case 'A':
+          applyArrayChange(arr[index], change.index, change.item);
+          break;
+        case 'D':
+          arr = arrayRemove(arr, index);
+          break;
+        case 'E':
+        case 'N':
+          arr[index] = change.rhs;
+          break;
+      }
+    }
+    return arr;
+  }
+
+  function applyChange(target, source, change) {
+    if (typeof change === 'undefined' && source && ~validKinds.indexOf(source.kind)) {
+      change = source;
+    }
+    if (target && change && change.kind) {
+      var it = target,
+        i = -1,
+        last = change.path ? change.path.length - 1 : 0;
+      while (++i < last) {
+        if (typeof it[change.path[i]] === 'undefined') {
+          it[change.path[i]] = (typeof change.path[i + 1] !== 'undefined' && typeof change.path[i + 1] === 'number') ? [] : {};
+        }
+        it = it[change.path[i]];
+      }
+      switch (change.kind) {
+        case 'A':
+          if (change.path && typeof it[change.path[i]] === 'undefined') {
+            it[change.path[i]] = [];
+          }
+          applyArrayChange(change.path ? it[change.path[i]] : it, change.index, change.item);
+          break;
+        case 'D':
+          delete it[change.path[i]];
+          break;
+        case 'E':
+        case 'N':
+          it[change.path[i]] = change.rhs;
+          break;
+      }
+    }
+  }
+
+  function revertArrayChange(arr, index, change) {
+    if (change.path && change.path.length) {
+      // the structure of the object at the index has changed...
+      var it = arr[index],
+        i, u = change.path.length - 1;
+      for (i = 0; i < u; i++) {
+        it = it[change.path[i]];
+      }
+      switch (change.kind) {
+        case 'A':
+          revertArrayChange(it[change.path[i]], change.index, change.item);
+          break;
+        case 'D':
+          it[change.path[i]] = change.lhs;
+          break;
+        case 'E':
+          it[change.path[i]] = change.lhs;
+          break;
+        case 'N':
+          delete it[change.path[i]];
+          break;
+      }
+    } else {
+      // the array item is different...
+      switch (change.kind) {
+        case 'A':
+          revertArrayChange(arr[index], change.index, change.item);
+          break;
+        case 'D':
+          arr[index] = change.lhs;
+          break;
+        case 'E':
+          arr[index] = change.lhs;
+          break;
+        case 'N':
+          arr = arrayRemove(arr, index);
+          break;
+      }
+    }
+    return arr;
+  }
+
+  function revertChange(target, source, change) {
+    if (target && source && change && change.kind) {
+      var it = target,
+        i, u;
+      u = change.path.length - 1;
+      for (i = 0; i < u; i++) {
+        if (typeof it[change.path[i]] === 'undefined') {
+          it[change.path[i]] = {};
+        }
+        it = it[change.path[i]];
+      }
+      switch (change.kind) {
+        case 'A':
+          // Array was modified...
+          // it will be an array...
+          revertArrayChange(it[change.path[i]], change.index, change.item);
+          break;
+        case 'D':
+          // Item was deleted...
+          it[change.path[i]] = change.lhs;
+          break;
+        case 'E':
+          // Item was edited...
+          it[change.path[i]] = change.lhs;
+          break;
+        case 'N':
+          // Item is new...
+          delete it[change.path[i]];
+          break;
+      }
+    }
+  }
+
+  function applyDiff(target, source, filter) {
+    if (target && source) {
+      var onChange = function (change) {
+        if (!filter || filter(target, source, change)) {
+          applyChange(target, source, change);
+        }
+      };
+      observableDiff(target, source, onChange);
+    }
+  }
+
+  Object.defineProperties(accumulateDiff, {
+
+    diff: {
+      value: accumulateDiff,
+      enumerable: true
+    },
+    orderIndependentDiff: {
+      value: accumulateOrderIndependentDiff,
+      enumerable: true
+    },
+    observableDiff: {
+      value: observableDiff,
+      enumerable: true
+    },
+    orderIndependentObservableDiff: {
+      value: orderIndependentDeepDiff,
+      enumerable: true
+    },
+    orderIndepHash: {
+      value: getOrderIndependentHash,
+      enumerable: true
+    },
+    applyDiff: {
+      value: applyDiff,
+      enumerable: true
+    },
+    applyChange: {
+      value: applyChange,
+      enumerable: true
+    },
+    revertChange: {
+      value: revertChange,
+      enumerable: true
+    },
+    isConflict: {
+      value: function () {
+        return typeof $conflict !== 'undefined';
+      },
+      enumerable: true
+    }
+  });
+
+  // hackish...
+  accumulateDiff.DeepDiff = accumulateDiff;
+  // ...but works with:
+  // import DeepDiff from 'deep-diff'
+  // import { DeepDiff } from 'deep-diff'
+  // const DeepDiff = require('deep-diff');
+  // const { DeepDiff } = require('deep-diff');
+
+  if (root) {
+    root.DeepDiff = accumulateDiff;
+  }
+
+  return accumulateDiff;
+}));
+
+
 /***/ })
 
 /******/ 	});
@@ -6178,11 +7472,12 @@ exports["default"] = (context, dom, indent, compName) => {
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
+// This entry need to be wrapped in an IIFE because it need to be in strict mode.
 (() => {
+"use strict";
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/Website/script/1693494939476.ts ***!
+  !*** ../../../LiveIde/Website/script/1693676204334.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -6191,16 +7486,20 @@ const HtmlHelper_1 = __webpack_require__(/*! ../../Classes/HtmlHelper */ "../../
 const Events_1 = __webpack_require__(/*! ../../../../Shared/Events */ "../../../../Shared/Events.ts");
 const Extensions_Objects_Client_1 = __webpack_require__(/*! ../../../../Shared/Extensions.Objects.Client */ "../../../../Shared/Extensions.Objects.Client.ts");
 const TaskQueue_1 = __webpack_require__(/*! ../../../../Shared/TaskQueue */ "../../../../Shared/TaskQueue.ts");
+const Actionable_1 = __webpack_require__(/*! ../../../../Shared/Actionable */ "../../../../Shared/Actionable.ts");
 const AnalyticsTracker_1 = __webpack_require__(/*! ../../Classes/AnalyticsTracker */ "../../../LiveIde/Classes/AnalyticsTracker.ts");
 const ClientContext_1 = __webpack_require__(/*! ../../Classes/ClientContext */ "../../../LiveIde/Classes/ClientContext.ts");
 const Params_1 = __webpack_require__(/*! ../../Classes/Params */ "../../../LiveIde/Classes/Params.ts");
 const VueManager_1 = __webpack_require__(/*! ../../Classes/VueManager */ "../../../LiveIde/Classes/VueManager.ts");
-const Graph_1 = __webpack_require__(/*! ../../../../Shared/Database/Graph */ "../../../../Shared/Database/Graph.ts");
+const Data_1 = __webpack_require__(/*! ../../../../Shared/Data */ "../../../../Shared/Data.ts");
 const Flow_1 = __webpack_require__(/*! ../../Classes/Flow */ "../../../LiveIde/Classes/Flow.ts");
+const window1 = window;
+const Vue = window1.Vue;
 // To make it accessible to client code
-const win = window;
-win.Objects = Extensions_Objects_Client_1.Objects;
-win.TaskQueue = TaskQueue_1.TaskQueue;
+window1.Objects = Extensions_Objects_Client_1.Objects;
+window1.TaskQueue = TaskQueue_1.TaskQueue;
+window1.Data = Data_1.Data;
+window1.Actionable = Actionable_1.Actionable;
 const generalMixin = {
     matchComp: (c) => true,
     data() {
@@ -6242,9 +7541,35 @@ const flowAppMixin = {
             global: {
                 active: {
                     node: null,
+                    related: {
+                        nodes: [],
+                    },
+                },
+                highlighted: {
+                    nodes: {},
                 },
             },
         };
+    },
+    methods: {
+        highlightNodes(...nodes) {
+            nodes = nodes.filter((n) => n);
+            const self = this;
+            for (const node of nodes) {
+                self.global.highlighted.nodes[node.id] =
+                    (self.global.highlighted.nodes[node.id] || 0) + 1;
+            }
+            self.events.emit("highlighted.nodes.change", self.global.highlighted.nodes);
+        },
+        unhighlightNodes(...nodes) {
+            nodes = nodes.filter((n) => n);
+            const self = this;
+            for (const node of nodes) {
+                self.global.highlighted.nodes[node.id] =
+                    (self.global.highlighted.nodes[node.id] || 0) - 1;
+            }
+            self.events.emit("highlighted.nodes.change", self.global.highlighted.nodes);
+        },
     },
 };
 const flowAppComponentMixin = {
@@ -6254,7 +7579,7 @@ const flowAppComponentMixin = {
             return this.$root.global;
         },
         $gdb() {
-            return this.$root.gdb;
+            return this.$root.flow.gdb;
         },
         $nodeDatas() {
             return this.$root.flow.user.app.runtimeData.nodeDatas;
@@ -6618,10 +7943,6 @@ const mgMixin = {
     const dbpHost = `https://db.memegenerator.net`;
     const dbp = null; // (await DatabaseProxy.new(`${dbpHost}/MemeGenerator`)) as any;
     const gdbData = await Extensions_Objects_Client_1.Objects.try(async () => await (await fetch(`/gdb.yaml`)).json(), { nodes: [], links: [] });
-    const vueManager = await VueManager_1.VueManager.new(client);
-    const gdb = await Graph_1.Graph.Database.new(gdbData);
-    const flow = new Flow_1.Flow.Manager(vueManager, gdb);
-    flow.user.app?.initialize();
     const getNewParams = async () => {
         return (await Params_1.Params.new(() => vueApp, client.config.params, window.location.pathname));
     };
@@ -6630,11 +7951,10 @@ const mgMixin = {
         mixins: vueAppMixins,
         data: {
             events: new Events_1.Events(),
-            vm: vueManager,
+            vm: null,
+            flow: null,
             client,
             dbp,
-            gdb,
-            flow,
             analytics: await AnalyticsTracker_1.AnalyticsTracker.new(),
             params: params,
             html: new HtmlHelper_1.HtmlHelper(),
@@ -6652,7 +7972,6 @@ const mgMixin = {
         },
         async mounted() {
             await this.init();
-            this.events.forward(gdb.events, "gdb");
             this.events.forward(flow.events, "flow");
             this.events.on("*", this.onAppEvent.bind(this));
         },
@@ -7233,6 +8552,10 @@ const mgMixin = {
             },
         },
     });
+    const vueManager = await VueManager_1.VueManager.new(client);
+    const flow = await Flow_1.Flow.Manager.new(vueApp, vueManager, gdbData);
+    vueApp.vm = vueManager;
+    vueApp.flow = flow;
     vueApp.$mount("#app");
     window.addEventListener("popstate", async function (event) {
         await vueApp.refresh();

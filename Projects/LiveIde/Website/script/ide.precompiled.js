@@ -3288,6 +3288,32 @@ class VueManager {
     getRefKeys() {
         return this.vueRefsToUIDs.keys();
     }
+    getVueFromElement(el) {
+        const vue = this.getVueFromVnode(this.getVnodeFromElement(el));
+        return vue;
+    }
+    getVnodeFromElement(el) {
+        if (!el)
+            return null;
+        if (el.__vue__)
+            return el.__vue__;
+        if (!el.parentElement)
+            return null;
+        return this.getVnodeFromElement(el.parentElement);
+    }
+    getVueFromVnode(vnode) {
+        // Skip vnodes like <keep-alive>, <transition>, etc.
+        if (!vnode)
+            return null;
+        if (this.vNodeIsVue(vnode))
+            return vnode;
+        return this.getVueFromVnode(vnode.$parent);
+    }
+    vNodeIsVue(vnode) {
+        if ([`transition`, `transition-group`, `keep-alive`].includes(vnode.$options._componentTag))
+            return false;
+        return true;
+    }
     registerVue(vue) {
         if (!vue)
             return;
@@ -5579,7 +5605,7 @@ var __webpack_exports__ = {};
 (() => {
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/Website/script/1693494938720.ts ***!
+  !*** ../../../LiveIde/Website/script/1693676202644.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

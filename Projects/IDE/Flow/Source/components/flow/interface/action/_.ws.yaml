@@ -1,0 +1,20 @@
+dom:
+  div: 
+    div: 
+      v-text: getActionText(action)
+props:
+  action: null
+methods:
+  getActionText: | #js
+    function(action) {
+      const redo = action.redo;
+      if (redo.noop) return 'no.op';
+      return (redo.method || redo.type);
+    }
+_:
+  examples:
+    count: 0
+name: flow-interface-action
+template: >-
+  <div class="comp-flow-interface-action" path="715503947."><div
+  v-text="getActionText(action)" path="715503947.0"></div></div>

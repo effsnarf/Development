@@ -4,19 +4,24 @@ import { Events } from "../../../../Shared/Events";
 import { Component } from "../../Classes/Component";
 import { Objects } from "../../../../Shared/Extensions.Objects.Client";
 import { TaskQueue } from "../../../../Shared/TaskQueue";
+import { Actionable } from "../../../../Shared/Actionable";
 import { AnalyticsTracker } from "../../Classes/AnalyticsTracker";
 import { ClientContext } from "../../Classes/ClientContext";
 import { Params } from "../../Classes/Params";
 import { DatabaseProxy } from "../../../../Apps/DatabaseProxy/Client/DbpClient";
 import { VueManager } from "../../Classes/VueManager";
-import { Graph } from "../../../../Shared/Database/Graph";
+import { Data } from "../../../../Shared/Data";
 import { Flow } from "../../Classes/Flow";
-import { on } from "events";
+
+const window1 = window as any;
+
+const Vue = (window1 as any).Vue;
 
 // To make it accessible to client code
-const win = window as any;
-win.Objects = Objects;
-win.TaskQueue = TaskQueue;
+window1.Objects = Objects;
+window1.TaskQueue = TaskQueue;
+window1.Data = Data;
+window1.Actionable = Actionable;
 
 const generalMixin = {
   matchComp: (c: Component) => true,
@@ -60,9 +65,41 @@ const flowAppMixin = {
       global: {
         active: {
           node: null,
+          related: {
+            nodes: [],
+          },
+        },
+        highlighted: {
+          nodes: {},
         },
       },
     };
+  },
+  methods: {
+    highlightNodes(...nodes: any[]) {
+      nodes = nodes.filter((n) => n);
+      const self = this as any;
+      for (const node of nodes) {
+        self.global.highlighted.nodes[node.id] =
+          (self.global.highlighted.nodes[node.id] || 0) + 1;
+      }
+      self.events.emit(
+        "highlighted.nodes.change",
+        self.global.highlighted.nodes
+      );
+    },
+    unhighlightNodes(...nodes: any[]) {
+      nodes = nodes.filter((n) => n);
+      const self = this as any;
+      for (const node of nodes) {
+        self.global.highlighted.nodes[node.id] =
+          (self.global.highlighted.nodes[node.id] || 0) - 1;
+      }
+      self.events.emit(
+        "highlighted.nodes.change",
+        self.global.highlighted.nodes
+      );
+    },
   },
 };
 
@@ -73,7 +110,7 @@ const flowAppComponentMixin = {
       return (this as any).$root.global;
     },
     $gdb() {
-      return (this as any).$root.gdb;
+      return (this as any).$root.flow.gdb;
     },
     $nodeDatas() {
       return (this as any).$root.flow.user.app.runtimeData.nodeDatas;
@@ -480,12 +517,6 @@ interface MgParams {
     { nodes: [], links: [] }
   );
 
-  const vueManager = await VueManager.new(client);
-  const gdb = await Graph.Database.new(gdbData);
-  const flow = new Flow.Manager(vueManager, gdb);
-
-  flow.user.app?.initialize();
-
   const getNewParams = async () => {
     return (await Params.new(
       () => vueApp,
@@ -500,11 +531,10 @@ interface MgParams {
     mixins: vueAppMixins,
     data: {
       events: new Events(),
-      vm: vueManager,
+      vm: null as unknown as VueManager,
+      flow: null as unknown as Flow.Manager,
       client,
       dbp,
-      gdb,
-      flow,
       analytics: await AnalyticsTracker.new(),
       params: params,
       html: new HtmlHelper(),
@@ -523,7 +553,6 @@ interface MgParams {
     },
     async mounted() {
       await this.init();
-      this.events.forward(gdb.events, "gdb");
       this.events.forward(flow.events, "flow");
       this.events.on("*", this.onAppEvent.bind(this));
     },
@@ -1134,6 +1163,12 @@ interface MgParams {
       },
     },
   });
+
+  const vueManager = await VueManager.new(client);
+  const flow = await Flow.Manager.new(vueApp, vueManager, gdbData);
+
+  vueApp.vm = vueManager;
+  vueApp.flow = flow;
 
   vueApp.$mount("#app");
 

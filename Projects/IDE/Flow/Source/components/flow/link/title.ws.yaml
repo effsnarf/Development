@@ -1,18 +1,18 @@
 dom:
-  .flex:
-    flow.node.title: 
-      ':node': $gdb.getNode(link.from)
-    div: 
-      v-text: '''->'''
-    ui.title:
+  div: 
+    v-if: full
+    h2:
+      ui.title: 
+        ':icon': getLinkIcon(link)
+        ':text': getLinkText(link)
+  div: 
+    v-else-if: '!full'
+    ui.title: 
       ':icon': getLinkIcon(link)
       ':text': getLinkText(link)
-    div: 
-      v-text: '''->'''
-    flow.node.title: 
-      ':node': $gdb.getNode(link.to)
 props:
   link: null
+  full: false
 methods:
   getLinkIcon: | #js
     function(link) {
@@ -27,9 +27,8 @@ _:
     count: 0
 name: flow-link-title
 template: >-
-  <div class="comp-flow-link-title flex" path="-912945116."><flow-node-title
-  :node="$gdb.getNode(link.from)" path="-912945116.0"></flow-node-title><div
-  v-text="'-&gt;'" path="-912945116.1"></div><ui-title :icon="getLinkIcon(link)"
-  :text="getLinkText(link)" path="-912945116.2"></ui-title><div v-text="'-&gt;'"
-  path="-912945116.3"></div><flow-node-title :node="$gdb.getNode(link.to)"
-  path="-912945116.4"></flow-node-title></div>
+  <div class="comp-flow-link-title" v-if="full" path="-912945116."><h2
+  path="-912945116.0"><ui-title :icon="getLinkIcon(link)"
+  :text="getLinkText(link)" path="-912945116.0.0"></ui-title></h2></div><div
+  v-else-if="!full"><ui-title :icon="getLinkIcon(link)"
+  :text="getLinkText(link)"></ui-title></div>

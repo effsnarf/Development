@@ -35,6 +35,7 @@ methods:
     }
   _getItemKey: | #js
     function(item) {
+      if (item.id) return item.id;
       const stringKey = (typeof item === 'string') ? item : JSON.stringify(item);
       if (this.getItemKey) return this.getItemKey(item) || stringKey;
       return this.$root.getKey(item) || stringKey;
@@ -95,6 +96,7 @@ watch:
   value:
     handler: | #js
       function(value) {
+        this.mySelectedIndex = (this.valueType == 'index') ? value : this.items.indexOf(value);
       }
     immediate: true
   selectedIndex:

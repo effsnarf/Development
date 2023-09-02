@@ -2,7 +2,6 @@ dom:
   flow.node.base:
     ':node': node
     ':context-data': contextData
-    ':show-leader-lines': 'true'
     @node-datas: onNodeDatas
     flow.app.node:
       ':node': compNode
@@ -36,7 +35,6 @@ _:
 name: flow-app-comp-inst
 template: >-
   <flow-node-base class="comp-flow-app-comp-inst" :node="node"
-  :context-data="contextData" :show-leader-lines="true"
-  @node-datas="onNodeDatas" path="-226955912."><flow-app-node :node="compNode"
-  :context-data="appliedData"
+  :context-data="contextData" @node-datas="onNodeDatas"
+  path="-226955912."><flow-app-node :node="compNode" :context-data="appliedData"
   path="-226955912.0"></flow-app-node></flow-node-base>

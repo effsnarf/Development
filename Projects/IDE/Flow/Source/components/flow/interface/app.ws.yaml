@@ -1,0 +1,118 @@
+dom:
+  div: 
+    div: 
+      .flex:
+        div: 
+          class: logo
+        h2: 
+          ui.title: 
+            class: title1
+            text: Flow
+      .flex1:
+        div: 
+          flow.gdb.tree:
+            ':node': $root.flow?.gdb.nodes[0]
+            @update:active-node: setGlobalActiveNode
+          div: 
+            class: spacer1
+          div: 
+            class: spacer1
+        div: 
+          v-if: gdb
+          flow.app.node: 
+            ':node': appViewRootNode
+          flow.app.node: 
+            v-if: 'false'
+            ':node': appViewRootNode
+        flow.interface.toolbar: null
+        flow.interface.action.stack: null
+        flow.interface.trash: null
+      flow.node.picker: null
+      div: 
+        h2: 
+          @click: showExtraInfo = !showExtraInfo
+          ui.title: 
+            icon: ✨
+            text: Extra Info
+          class: clickable
+        div: 
+          div: 
+            class: spacer1
+          flow.gdb.list:
+            v-if: showExtraInfo
+    div: 
+      ide.css.stylesheet:
+        ':rules': $root.newCssRules
+      div: 
+        ide.component.style:
+          v-for: comp in $root.comps
+          ':component': comp
+props:
+  comps: null
+data:
+  gdb: null
+  showExtraInfo: false
+mounted: | #js
+  async function() {
+    this.gdb = (await (await fetch(`/gdb.yaml`)).json());
+  }
+methods:
+  setGlobalActiveNode: | #js
+    function(node) {
+      this.$global.active.node = node;
+      this.$global.active.related.nodes = this.$gdb.getLinkedNodes(node, l => (l.type != "child.of"));
+    }
+watch: null
+computed:
+  appViewRootNode: | #js
+    function() {
+      return this.$gdb.getNode("app.view.[0]");
+    }
+style:
+  .spacer1:
+    height: 5em
+  .logo:
+    width: 8em
+    aspect-ratio: 6 / 5
+    background-image: url(/images/duck2.png)
+    background-size: contain
+  .flex1:
+    display: flex
+    flex-direction: row
+    gap: 1em
+  .flex1 > div:nth-child(1):
+    width: auto
+  .flex1 > div:nth-child(2):
+    width: auto
+  .comp-ui-title.title1:
+    font-size: 200%
+name: flow-interface-app
+_:
+  examples:
+    count: 0
+template: >-
+  <div class="comp-flow-interface-app" path="-1584259284."><div
+  path="-1584259284.0"><div class="flex" path="-1584259284.0.0"><div
+  class="logo" path="-1584259284.0.0.0"></div><h2
+  path="-1584259284.0.0.1"><ui-title class="title1" text="Flow"
+  path="-1584259284.0.0.1.0"></ui-title></h2></div><div class="flex1"
+  path="-1584259284.0.1"><div path="-1584259284.0.1.0"><flow-gdb-tree
+  :node="$root.flow?.gdb.nodes[0]" @update:active-node="setGlobalActiveNode"
+  path="-1584259284.0.1.0.0"></flow-gdb-tree><div class="spacer1"
+  path="-1584259284.0.1.0.1"></div><div class="spacer1"
+  path="-1584259284.0.1.0.2"></div></div><div v-if="gdb"
+  path="-1584259284.0.1.1"><flow-app-node :node="appViewRootNode"
+  path="-1584259284.0.1.1.0"></flow-app-node><flow-app-node v-if="false"
+  :node="appViewRootNode"
+  path="-1584259284.0.1.1.1"></flow-app-node></div><flow-interface-toolbar></flow-interface-toolbar><flow-interface-action-stack></flow-interface-action-stack><flow-interface-trash></flow-interface-trash></div><flow-node-picker></flow-node-picker><div
+  path="-1584259284.0.3"><h2 class="clickable" @click="showExtraInfo =
+  !showExtraInfo" path="-1584259284.0.3.0"><ui-title icon="✨" text="Extra Info"
+  path="-1584259284.0.3.0.0"></ui-title></h2><div path="-1584259284.0.3.1"><div
+  class="spacer1" path="-1584259284.0.3.1.0"></div><flow-gdb-list
+  v-if="showExtraInfo"
+  path="-1584259284.0.3.1.1"></flow-gdb-list></div></div></div><div
+  path="-1584259284.1"><ide-css-stylesheet :rules="$root.newCssRules"
+  path="-1584259284.1.0"></ide-css-stylesheet><div
+  path="-1584259284.1.1"><ide-component-style v-for="comp in $root.comps"
+  :component="comp"
+  path="-1584259284.1.1.0"></ide-component-style></div></div></div>

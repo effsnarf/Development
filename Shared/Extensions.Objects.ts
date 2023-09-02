@@ -2,7 +2,7 @@ import { Objects } from "./Extensions.Objects.Client";
 
 import util from "util";
 import pug from "pug";
-const deepDiff = require("deep-diff").diff;
+const deepDiff = require("deep-diff");
 const jsyaml = require("js-yaml");
 
 Objects.stringify = (obj: any): string => {
@@ -96,7 +96,7 @@ Objects.jsonify = (obj: any, depth: number = 100): string => {
 };
 
 Objects.deepDiff = (obj1: any, obj2: any): any => {
-  return deepDiff(obj1, obj2) || [];
+  return deepDiff.diff(obj1, obj2) || [];
 };
 
 export { Objects };

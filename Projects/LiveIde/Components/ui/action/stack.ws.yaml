@@ -1,0 +1,63 @@
+dom:
+  div:
+    .flex:
+      ui.button: 
+        icon: ↺
+        text: undo
+        ':click': () => doVerb('undo')
+      ui.button: 
+        icon: ↻
+        text: redo
+        ':click': () => doVerb('redo')
+      ui.button: 
+        icon: ✖
+        text: clear
+        ':click': () => doVerb('clear')
+    ul:
+      li:
+        v-for: (action, index) in actionStack?.actions.lastItems
+        ':class': getActionCssClass(action, index)
+        slot:
+          ':action': action
+props:
+  actionStack: null
+data:
+  visibleActions: null
+methods:
+  doVerb: | #js
+    async function(verb) {
+      await this.actionStack[verb]();
+    }
+  getActionCssClass: | #js
+    function(action, index) {
+      return {
+        done: false
+      };
+    }
+watch: null
+style:
+  ul:
+    display: flex
+    flex-direction: column-reverse
+    font-family: monospace
+  li:hover:
+    background-color: '#ffffff10'
+  .done:
+    background-color: '#ffffff20'
+  .done:hover:
+    background-color: '#ffffff30'
+_:
+  examples:
+    count: 0
+name: ui-action-stack
+template: >-
+  <div class="comp-ui-action-stack" path="-1417831958."><div class="flex"
+  path="-1417831958.0"><ui-button icon="↺" text="undo" :click="() =&gt;
+  doVerb('undo')" path="-1417831958.0.0"></ui-button><ui-button icon="↻"
+  text="redo" :click="() =&gt; doVerb('redo')"
+  path="-1417831958.0.1"></ui-button><ui-button icon="✖" text="clear" :click="()
+  =&gt; doVerb('clear')" path="-1417831958.0.2"></ui-button></div><ul
+  path="-1417831958.1"><li v-for="(action, index) in
+  actionStack?.actions.lastItems" :class="getActionCssClass(action, index)"
+  path="-1417831958.1.0"><slot :action="action"
+  path="-1417831958.1.0.0"></slot></li></ul></div>

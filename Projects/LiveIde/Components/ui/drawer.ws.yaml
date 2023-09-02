@@ -1,0 +1,22 @@
+dom:
+  .drawer:
+    ':class': '{ open }'
+    slot: null
+props:
+  open: false
+style:
+  .drawer:
+    max-width: 5em
+    overflow: hidden
+    transition: 1s
+    filter: blur(0.3em)
+  .drawer.open, .drawer:hover:
+    max-width: 20em
+    filter: none
+_:
+  examples:
+    count: 0
+name: ui-drawer
+template: >-
+  <div class="comp-ui-drawer drawer" :class="{ open }"
+  path="-1860583029."><slot></slot></div>

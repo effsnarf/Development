@@ -12,7 +12,7 @@ data:
   selectedNode: null
   hoveredNode: null
 mounted: | #js
-  this.$root.$on("gdb.node.change", this.refresh.bind(this));
+  this.$root.$on("flow.gdb.node.change", this.refresh.bind(this));
   this.refresh();
 methods:
   buildTree: | #js

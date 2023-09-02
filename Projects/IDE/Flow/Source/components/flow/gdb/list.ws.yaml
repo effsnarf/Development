@@ -6,7 +6,7 @@ dom:
         h3: 
           v-text: '''Nodes'''
         ui.value.any: 
-          ':value': '[...$root.gdb.nodes].sortBy(n => -n.id)'
+          ':value': '[...$root.flow?.gdb.nodes].sortBy(n => -n.id)'
       div: 
         h3: 
           v-text: '''Links'''
@@ -30,7 +30,7 @@ template: >-
   <div class="comp-flow-gdb-list" :key="key1" path="675114631."><div
   class="flex" path="675114631.0"><div path="675114631.0.0"><h3 v-text="'Nodes'"
   path="675114631.0.0.0"></h3><ui-value-any
-  :value="[...$root.gdb.nodes].sortBy(n =&gt; -n.id)"
+  :value="[...$root.flow?.gdb.nodes].sortBy(n =&gt; -n.id)"
   path="675114631.0.0.1"></ui-value-any></div><div path="675114631.0.1"><h3
   v-text="'Links'" path="675114631.0.1.0"></h3><ui-value-any
   :value="[...$root.gdb.links].sortBy(n =&gt; -n.id)"

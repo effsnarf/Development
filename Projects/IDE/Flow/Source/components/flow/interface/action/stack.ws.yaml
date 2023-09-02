@@ -1,0 +1,34 @@
+dom:
+  div:
+    v-if: actionStack
+    h3:
+      v-text: '''✨ Actions'''
+    ui.action.stack:
+      ':action-stack': actionStack
+      v-slot: slotProps
+      template:
+        flow.interface.action:
+          ':action': slotProps.action
+    h2:
+      v-text: actionStack.pointer.value
+props: null
+mounted: null
+methods: null
+computed:
+  actionStack: | #js
+    function() {
+      return this.$root.flow.interface.userActions;
+    }
+watch: null
+_:
+  examples:
+    count: 0
+name: flow-interface-action-stack
+template: >-
+  <div class="comp-flow-interface-action-stack" v-if="actionStack"
+  path="271844389."><h3 v-text="'✨ Actions'"
+  path="271844389.0"></h3><ui-action-stack :action-stack="actionStack"
+  v-slot="slotProps" path="271844389.1"><template
+  path="271844389.1.0"><flow-interface-action :action="slotProps.action"
+  path="271844389.1.0.0"></flow-interface-action></template></ui-action-stack><h2
+  v-text="actionStack.pointer.value" path="271844389.2"></h2></div>

@@ -9,6 +9,7 @@ props:
   endPlug: null
 data:
   leaderLine: null
+  leaderLineElement: null
   isFlashing: false
 mounted: | #js
   this.redraw();
@@ -111,6 +112,11 @@ methods:
       if (this.leaderLine) this.leaderLine.remove();
       this.leaderLine = null;
     }
+  getLeaderLineElement: | #js
+    function() {
+      if (!this.leaderLine) return null;
+      return document.getElementById(`leader-line-${this.leaderLine._id}-line-path`).parentElement.parentElement;
+    }
 watch:
   fromVue: | #js
     function(fromVue) {
@@ -123,6 +129,10 @@ watch:
   visible: | #js
     function(visible) {
       this.setVisibility(visible);
+    }
+  leaderLine: | #js
+    function(leaderLine) {
+      this.leaderLineElement = this.getLeaderLineElement();
     }
 style: null
 _:

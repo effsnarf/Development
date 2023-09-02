@@ -8,6 +8,7 @@ dom:
         @click: toggleAllVisible
       ui.button: 
         ':text': visiblePageIndex.toString()
+        @click: toggleVisiblePage
     ui.tween:
       ':visible-index': '(allPagesVisible ? 1 : 0)'
       template: 
@@ -29,7 +30,6 @@ dom:
             ref: vPages
             v-for: (childNode, index) in childNodes
             class: page
-            @click: selectPage(index)
             ':class': getPageCssClass(childNode, index)
             ':key': childNode.id
             ':node': childNode
@@ -52,6 +52,11 @@ methods:
       this.allPagesVisible = !this.allPagesVisible;
       await this.$root.wait(1000);
       this.allPagesVisible2 = this.allPagesVisible;
+    }
+  toggleVisiblePage: | #js
+    async function() {
+      const newIndex = (this.visiblePageIndex + 1) % this.childNodes.length;
+      this.node.data.visiblePageIndex.value = newIndex;
     }
   selectPage: | #js
     async function(index) {
@@ -97,8 +102,6 @@ style:
     position: relative
     border: 2px solid transparent
     transition: padding 0.4s
-  .all-visible .page *:
-    pointer-events: none !important
   .all-visible .page:hover:
     border: '2px solid #ffffff80'
     cursor: pointer
@@ -106,10 +109,9 @@ style:
     position: absolute
     width: 100%
     opacity: 0
-  .page *:
-    pointer-events: none
-  .page.visible *:
-    pointer-events: auto
+    display: none
+  .page.visible:
+    display: block
   .page.visible, .all-visible .page:
     opacity: 1
 _:
@@ -121,7 +123,7 @@ template: >-
   'all-visible2': allPagesVisible2 }" path="1309562048."><div
   path="1309562048.0"><ui-button :text="'all-visible'" @click="toggleAllVisible"
   path="1309562048.0.0"></ui-button><ui-button
-  :text="visiblePageIndex.toString()"
+  :text="visiblePageIndex.toString()" @click="toggleVisiblePage"
   path="1309562048.0.1"></ui-button></div><ui-tween
   :visible-index="(allPagesVisible ? 1 : 0)" path="1309562048.1"><template
   v-slot:slot0 path="1309562048.1.0"><div class="pages" :class="{ 'all-visible':
@@ -131,7 +133,6 @@ template: >-
   path="1309562048.1.0.0.0"></flow-app-node></div></template><template
   v-slot:slot1 path="1309562048.1.1"><div class="pages" :class="{ 'all-visible':
   true }" path="1309562048.1.1.0"><flow-app-node class="page" ref="vPages"
-  v-for="(childNode, index) in childNodes" @click="selectPage(index)"
-  :class="getPageCssClass(childNode, index)" :key="childNode.id"
-  :node="childNode"
+  v-for="(childNode, index) in childNodes" :class="getPageCssClass(childNode,
+  index)" :key="childNode.id" :node="childNode"
   path="1309562048.1.1.0.0"></flow-app-node></div></template></ui-tween></flow-node-base>

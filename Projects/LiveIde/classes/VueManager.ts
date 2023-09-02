@@ -152,6 +152,35 @@ class VueManager {
     return this.vueRefsToUIDs.keys();
   }
 
+  getVueFromElement(el: HTMLElement) {
+    const vue = this.getVueFromVnode(this.getVnodeFromElement(el));
+    return vue;
+  }
+
+  getVnodeFromElement(el: HTMLElement) {
+    if (!el) return null;
+    if ((el as any).__vue__) return (el as any).__vue__;
+    if (!el.parentElement) return null;
+    return this.getVnodeFromElement(el.parentElement);
+  }
+
+  getVueFromVnode(vnode: any) {
+    // Skip vnodes like <keep-alive>, <transition>, etc.
+    if (!vnode) return null;
+    if (this.vNodeIsVue(vnode)) return vnode;
+    return this.getVueFromVnode(vnode.$parent);
+  }
+
+  vNodeIsVue(vnode: any) {
+    if (
+      [`transition`, `transition-group`, `keep-alive`].includes(
+        vnode.$options._componentTag
+      )
+    )
+      return false;
+    return true;
+  }
+
   registerVue(vue: any) {
     if (!vue) return;
 
