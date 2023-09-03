@@ -1,0 +1,88 @@
+dom:
+  div: 
+    v-if: module
+    h2:
+      ui.title: 
+        icon: 📦
+        ':text': module.name
+    .flex.gap-2:
+      ui.select:
+        ':options': module.source.methods
+        item-icon: 🔴
+        ':get-item-text': (m) => m.name
+        input-type: value
+        v-model: selectedMethod
+      div: 
+        v-if: selectedMethod
+        ui.button:
+          icon: ▶
+          ':text': selectedMethod.name
+          ':click': () => invokeMethod(selectedMethod)
+        ide.module.method:
+          ':method': selectedMethod
+      div: 
+        ':key': key1
+        ide.module.data:
+          ':module-instance': moduleInstance
+      div: 
+        h3:
+          ui.title: 
+            icon: 📜
+            text: Log
+        ui.value.array:
+          ':value': logItems
+          ':reverse': 'true'
+props:
+  module: null
+data:
+  selectedMethod: null
+  moduleInstance: null
+  logItems: []
+  key1: 1
+methods:
+  invokeMethod: | #js
+    async function(method) {
+      const moduleInstance = this.moduleInstance;
+      if (!moduleInstance) return;
+      const args = [];
+      const result = await moduleInstance[method.name](...args);
+      this.logItems.add({ method: method.name, args, result });
+      this.refresh();
+    }
+  getNewModuleInstance: | #js
+    async function(module) {
+      const moduleClass = eval(module.name);
+      return await moduleClass._new();
+    }
+  refresh: | #js
+    async function() {
+      await this.$nextTick();
+      this.key1++;
+    }
+watch:
+  module: | #js
+    async function() {
+      this.moduleInstance = (!this.module) ? null :
+        (await this.getNewModuleInstance(this.module));
+    }
+_:
+  examples:
+    count: 0
+name: ide-module
+template: >-
+  <div class="comp-ide-module" v-if="module" path="1515962928."><h2
+  path="1515962928.0"><ui-title icon="📦" :text="module.name"
+  path="1515962928.0.0"></ui-title></h2><div class="flex gap-2"
+  path="1515962928.1"><ui-select :options="module.source.methods" item-icon="🔴"
+  :get-item-text="(m) =&gt; m.name" input-type="value" v-model="selectedMethod"
+  path="1515962928.1.0"></ui-select><div v-if="selectedMethod"
+  path="1515962928.1.1"><ui-button icon="▶" :text="selectedMethod.name"
+  :click="() =&gt; invokeMethod(selectedMethod)"
+  path="1515962928.1.1.0"></ui-button><ide-module-method
+  :method="selectedMethod"
+  path="1515962928.1.1.1"></ide-module-method></div><div :key="key1"
+  path="1515962928.1.2"><ide-module-data :module-instance="moduleInstance"
+  path="1515962928.1.2.0"></ide-module-data></div><div path="1515962928.1.3"><h3
+  path="1515962928.1.3.0"><ui-title icon="📜" text="Log"
+  path="1515962928.1.3.0.0"></ui-title></h3><ui-value-array :value="logItems"
+  :reverse="true" path="1515962928.1.3.1"></ui-value-array></div></div></div>

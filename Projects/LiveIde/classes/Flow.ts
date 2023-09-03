@@ -310,7 +310,7 @@ namespace Flow {
       if (dropItem.type == "flow.layout.empty") {
         const oldPointer = this.userAppGdb.actionStack.pointer.value;
         const newNode = await this.createNewNode(newNodeType);
-        this.userAppGdb.replaceNode(dropItem, newNode);
+        await this.userAppGdb.replaceNode(dropItem, newNode);
         const newPointer = this.userAppGdb.actionStack.pointer.value;
         const newActionsCount = newPointer - oldPointer + 1;
 

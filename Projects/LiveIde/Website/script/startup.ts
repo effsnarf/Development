@@ -217,7 +217,8 @@ interface MgParams {
 }
 
 (async () => {
-  const client = await ClientContext.get();
+  await ClientContext.waitUntilLoaded();
+  const client = ClientContext.context!;
 
   client.Vue.directive("html-raw", {
     bind(el: HTMLElement, binding: any) {

@@ -1,0 +1,8 @@
+constructor:
+  args: [impl]
+methods:
+  - name: getNextID
+    args: []
+    code: | #js
+      return;
+      return impl.getNextID();

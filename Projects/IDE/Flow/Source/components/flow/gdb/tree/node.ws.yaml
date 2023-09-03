@@ -16,6 +16,9 @@ computed:
 _:
   examples:
     count: 0
+style:
+  .comp-flow-gdb-tree-node:
+    width: 100%
 name: flow-gdb-tree-node
 template: >-
   <flow-node-base class="comp-flow-gdb-tree-node" :node="node"

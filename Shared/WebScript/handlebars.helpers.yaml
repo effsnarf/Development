@@ -55,3 +55,7 @@ helpers:
     (context, str) => {
       return str?.replace(/-/g, ".");
     }
+  methodSignature: | #ts
+    (context, name, args) => {
+      return `${name}(${args.join(", ")})`;
+    }

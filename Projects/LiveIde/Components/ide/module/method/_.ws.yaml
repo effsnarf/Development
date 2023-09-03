@@ -1,0 +1,20 @@
+dom:
+  div:
+    v-if: method
+    h3:
+      ui.title:
+        icon: 🔴
+        ':text': method.name
+      pre:
+        v-html: method.code
+props:
+  method: null
+_:
+  examples:
+    count: 0
+name: ide-module-method
+template: >-
+  <div class="comp-ide-module-method" v-if="method" path="-1197285793."><h3
+  path="-1197285793.0"><ui-title icon="🔴" :text="method.name"
+  path="-1197285793.0.0"></ui-title><pre v-html="method.code"
+  path="-1197285793.0.1"></pre></h3></div>

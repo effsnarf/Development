@@ -1,5 +1,6 @@
 dom:
   div:
+    ':class': '{ reversed: reverse }'
     ui.select:
       ':options': '[''table'', ''short-list'', ''expanded-list'']'
       input-type: value
@@ -91,6 +92,9 @@ watch:
       }
     immediate: true
 style:
+  .reversed > table > tbody:
+    display: flex
+    flex-direction: column-reverse
   tr *:
     max-height: 1.5em
     overflow: hidden
@@ -111,10 +115,11 @@ _:
     count: 0
 name: ui-value-array
 template: >-
-  <div class="comp-ui-value-array" path="-621945022."><ui-select
-  :options="['table', 'short-list', 'expanded-list']" input-type="value"
-  type="toggle" v-model="view1" path="-621945022.0"></ui-select><transition
-  name="slide" path="-621945022.1"><table v-if="(view1.includes('list'))"
+  <div class="comp-ui-value-array" :class="{ reversed: reverse }"
+  path="-621945022."><ui-select :options="['table', 'short-list',
+  'expanded-list']" input-type="value" type="toggle" v-model="view1"
+  path="-621945022.0"></ui-select><transition name="slide"
+  path="-621945022.1"><table v-if="(view1.includes('list'))"
   path="-621945022.1.0"><tbody path="-621945022.1.0.0"><tr v-for="(item, index)
   in items" path="-621945022.1.0.0.0"><td class="opacity-50" v-text="index"
   path="-621945022.1.0.0.0.0"></td><td

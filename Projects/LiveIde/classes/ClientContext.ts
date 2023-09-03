@@ -3,40 +3,51 @@ import toTemplate from "../../../Shared/WebScript/to.template";
 import isAttributeName from "../../../Shared/WebScript/is.attribute.name";
 import { Component } from "./Component";
 import { ComponentManager } from "./ComponentManager";
+import { ModuleManager } from "./ModuleManager";
 import { ClientDatabase } from "./ClientDatabase";
 
 const isDevEnv = window.location.hostname == "localhost";
 
 class ClientContext {
+  static _fetch: any;
+  static context: ClientContext | null = null;
+
   // #region Globals
-  static async get() {
-    const lock = ((window as any)._clientContextLock ||
-      ((window as any)._clientContextLock = new Lock())) as Lock;
-    await lock.acquire();
-    try {
-      return ((window as any)._clientContext ||
-        ((window as any)._clientContext =
-          await ClientContext.new())) as ClientContext;
-    } finally {
-      lock.release();
-    }
+  static waitUntilLoaded() {
+    return new Promise((resolve: Function) => {
+      if (ClientContext.context) return resolve();
+      const interval = setInterval(() => {
+        if (ClientContext.context) {
+          clearInterval(interval);
+          resolve();
+        }
+      }, 100);
+    });
   }
 
-  static _fetch: any;
+  static async initialize() {
+    ClientContext.context = await ClientContext.new();
+  }
   // #endregion
 
   db!: ClientDatabase;
 
   private componentManager!: ComponentManager;
+  private moduleManager!: ModuleManager;
 
   get comps() {
     return this.componentManager.comps;
+  }
+
+  get modules() {
+    return this.moduleManager.modules;
   }
 
   Handlebars: any;
   Vue: any;
 
   templates!: {
+    module: string;
     vue: string;
     style: string;
   };
@@ -68,6 +79,7 @@ class ClientContext {
     });
 
     this.componentManager = await ComponentManager.get();
+    this.moduleManager = await ModuleManager.new();
 
     this.templates = {} as any;
     this.config = {} as any;
@@ -112,6 +124,8 @@ class ClientContext {
     filter: (comp: Component) => boolean = (c) => true,
     mixins: any[] = []
   ) {
+    await this.moduleManager.compileModules();
+
     for (const comp of this.comps.filter(filter)) {
       await comp.compile(mixins);
     }
@@ -199,5 +213,7 @@ class ClientContext {
     return ClientContext.alertify;
   }
 }
+
+ClientContext.initialize();
 
 export { ClientContext };

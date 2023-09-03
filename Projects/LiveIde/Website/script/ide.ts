@@ -15,7 +15,7 @@ let vueApp: any;
 let vueIdeApp: any;
 
 const waitUntilInit = async () => {
-  while (!vueApp || !vueIdeApp) {
+  while (!vueApp) {
     vueApp = (window as any).vueApp;
     await new Promise((resolve) => setTimeout(resolve, 400));
   }
@@ -187,7 +187,8 @@ const vueIdeCompMixin = {
 (window as any).vueIdeCompMixin = vueIdeCompMixin;
 
 (async () => {
-  const client = await ClientContext.get();
+  await ClientContext.waitUntilLoaded();
+  const client = ClientContext.context!;
 
   await waitUntilInit();
 

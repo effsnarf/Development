@@ -1,0 +1,20 @@
+data:
+  nextID: 1
+methods:
+  - name: getNextID
+    args: []
+    code: | #js
+      const oldID = this.nextID;
+      const newID = this.nextID++;
+
+      return {
+        returnValue: newID,
+        undo: {
+          method: '_setNextID',
+          args: [oldID]
+        }
+      }
+  - name: _setNextID
+    args: [id]
+    code: | #js
+      this.nextID = id;

@@ -11,9 +11,12 @@ dom:
       div: 
         div: 
           ':style': '{ height: ''4em'' }'
-          flow.node.title: 
-            ':node': activeNode
-            full: true
+          transition: 
+            name: slide4
+            flow.node.title: 
+              ':key': activeNode?.id
+              ':node': activeNode
+              full: true
         .flex.gap-2:
           ui.drawer:
             ':open': '!selectedNode'
@@ -27,7 +30,7 @@ dom:
                 ':class': '''ml-l'' + slotProps.index'
                 ':node': slotProps.item
           div: 
-            transition:
+            transition: 
               flow.node.editor:
                 v-if: selectedActiveNode
                 ':key': selectedActiveNode.id
@@ -102,9 +105,11 @@ template: >-
   path="198180154.0"></ui-mouse><ui-context-window ref="context1" :global="true"
   :ctrl-right-click="false" @pinned="onContextPinned" path="198180154.1"><div
   path="198180154.1.0"><div :style="{ height: '4em' }"
-  path="198180154.1.0.0"><flow-node-title :node="activeNode" full="true"
-  path="198180154.1.0.0.0"></flow-node-title></div><div class="flex gap-2"
-  path="198180154.1.0.1"><ui-drawer :open="!selectedNode"
+  path="198180154.1.0.0"><transition name="slide4"
+  path="198180154.1.0.0.0"><flow-node-title :key="activeNode?.id"
+  :node="activeNode" full="true"
+  path="198180154.1.0.0.0.0"></flow-node-title></transition></div><div
+  class="flex gap-2" path="198180154.1.0.1"><ui-drawer :open="!selectedNode"
   path="198180154.1.0.1.0"><ui-list :items="[...contextNodes].reverse()"
   value-type="value" @item-hover="(e) =&gt; hoveredNode = e.item"
   v-model="selectedNode" v-slot="slotProps"

@@ -65,33 +65,40 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ClientContext = void 0;
-const Lock_1 = __webpack_require__(/*! ../../../Shared/Lock */ "../../../../Shared/Lock.ts");
 const to_template_1 = __importDefault(__webpack_require__(/*! ../../../Shared/WebScript/to.template */ "../../../../Shared/WebScript/to.template.ts"));
 const is_attribute_name_1 = __importDefault(__webpack_require__(/*! ../../../Shared/WebScript/is.attribute.name */ "../../../../Shared/WebScript/is.attribute.name.ts"));
 const ComponentManager_1 = __webpack_require__(/*! ./ComponentManager */ "../../../LiveIde/Classes/ComponentManager.ts");
+const ModuleManager_1 = __webpack_require__(/*! ./ModuleManager */ "../../../LiveIde/Classes/ModuleManager.ts");
 const ClientDatabase_1 = __webpack_require__(/*! ./ClientDatabase */ "../../../LiveIde/Classes/ClientDatabase.ts");
 const isDevEnv = window.location.hostname == "localhost";
 class ClientContext {
-    // #region Globals
-    static async get() {
-        const lock = (window._clientContextLock ||
-            (window._clientContextLock = new Lock_1.Lock()));
-        await lock.acquire();
-        try {
-            return (window._clientContext ||
-                (window._clientContext =
-                    await ClientContext.new()));
-        }
-        finally {
-            lock.release();
-        }
-    }
     static _fetch;
+    static context = null;
+    // #region Globals
+    static waitUntilLoaded() {
+        return new Promise((resolve) => {
+            if (ClientContext.context)
+                return resolve();
+            const interval = setInterval(() => {
+                if (ClientContext.context) {
+                    clearInterval(interval);
+                    resolve();
+                }
+            }, 100);
+        });
+    }
+    static async initialize() {
+        ClientContext.context = await ClientContext.new();
+    }
     // #endregion
     db;
     componentManager;
+    moduleManager;
     get comps() {
         return this.componentManager.comps;
+    }
+    get modules() {
+        return this.moduleManager.modules;
     }
     Handlebars;
     Vue;
@@ -112,6 +119,7 @@ class ClientContext {
             ModifiedItems: ["key", "modifiedAt", "item"],
         });
         this.componentManager = await ComponentManager_1.ComponentManager.get();
+        this.moduleManager = await ModuleManager_1.ModuleManager.new();
         this.templates = {};
         this.config = {};
         this.helpers = window.helpers;
@@ -142,6 +150,7 @@ class ClientContext {
         }
     }
     async compileAll(filter = (c) => true, mixins = []) {
+        await this.moduleManager.compileModules();
         for (const comp of this.comps.filter(filter)) {
             await comp.compile(mixins);
         }
@@ -219,6 +228,7 @@ class ClientContext {
     }
 }
 exports.ClientContext = ClientContext;
+ClientContext.initialize();
 
 
 /***/ }),
@@ -317,7 +327,8 @@ class Component {
         if (this.isCompiled)
             return;
         const logGroup = false;
-        const client = await ClientContext_1.ClientContext.get();
+        await ClientContext_1.ClientContext.waitUntilLoaded();
+        const client = ClientContext_1.ClientContext.context;
         if (logGroup) {
             console.groupCollapsed(this.name);
             console.log(this);
@@ -360,7 +371,8 @@ class Component {
         }
     }
     async getVueOptions() {
-        const client = await ClientContext_1.ClientContext.get();
+        await ClientContext_1.ClientContext.waitUntilLoaded();
+        const client = ClientContext_1.ClientContext.context;
         let json = client.Handlebars.compile(client.templates.vue)(this.source);
         try {
             const vueOptions = eval(`(${json})`);
@@ -438,7 +450,8 @@ class ComponentManager {
         this.saveModifiedItems();
     }
     async saveModifiedItems() {
-        const client = await ClientContext_1.ClientContext.get();
+        await ClientContext_1.ClientContext.waitUntilLoaded();
+        const client = ClientContext_1.ClientContext.context;
         // Item needs to be not modified for this time to be saved
         // This is to throtte typing etc
         // This can be a bit longer time because we're saving the changed in IndexedDB
@@ -452,7 +465,8 @@ class ComponentManager {
         setTimeout(this.saveModifiedItems.bind(this), 400);
     }
     async onComponentChanged(newComp) {
-        const client = await ClientContext_1.ClientContext.get();
+        await ClientContext_1.ClientContext.waitUntilLoaded();
+        const client = ClientContext_1.ClientContext.context;
         client.db.upsert("ModifiedItems", {
             key: newComp.name,
             modifiedAt: Date.now(),
@@ -719,7 +733,7 @@ var Flow;
             if (dropItem.type == "flow.layout.empty") {
                 const oldPointer = this.userAppGdb.actionStack.pointer.value;
                 const newNode = await this.createNewNode(newNodeType);
-                this.userAppGdb.replaceNode(dropItem, newNode);
+                await this.userAppGdb.replaceNode(dropItem, newNode);
                 const newPointer = this.userAppGdb.actionStack.pointer.value;
                 const newActionsCount = newPointer - oldPointer + 1;
                 action.undo = { method: "gdb.undo", args: [newActionsCount] };
@@ -3197,6 +3211,107 @@ class HtmlHelper {
     }
 }
 exports.HtmlHelper = HtmlHelper;
+
+
+/***/ }),
+
+/***/ "../../../LiveIde/Classes/Module.ts":
+/*!******************************************!*\
+  !*** ../../../LiveIde/Classes/Module.ts ***!
+  \******************************************/
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Module = void 0;
+__webpack_require__(/*! ../../../../Shared/Extensions.Objects.Client */ "../../../../Shared/Extensions.Objects.Client.ts");
+const ClientContext_1 = __webpack_require__(/*! ./ClientContext */ "../../../LiveIde/Classes/ClientContext.ts");
+class Module {
+    name;
+    path;
+    source;
+    className;
+    constructor(obj) {
+        this.name = obj.name;
+        this.path = obj.path;
+        this.source = obj.source;
+        this.className = this.name.split(".").last();
+        this.source.name = this.className;
+    }
+    async compile() {
+        await ClientContext_1.ClientContext.waitUntilLoaded();
+        const client = ClientContext_1.ClientContext.context;
+        const namespace = this.getNamespace();
+        const moduleClass = await this.getModuleClass(client);
+        const className = this.name.split(".").last();
+        namespace[className] = moduleClass;
+    }
+    async getModuleClass(client) {
+        let classCode = client.Handlebars.compile(client.templates.module)(this.source);
+        const class1 = eval(`(${classCode})`);
+        return class1;
+    }
+    getNamespace() {
+        const parts = this.name.split(".");
+        let nsnode = window;
+        for (const part of parts.take(parts.length - 1)) {
+            nsnode = nsnode[part] = nsnode[part] || {};
+        }
+        return nsnode;
+    }
+}
+exports.Module = Module;
+
+
+/***/ }),
+
+/***/ "../../../LiveIde/Classes/ModuleManager.ts":
+/*!*************************************************!*\
+  !*** ../../../LiveIde/Classes/ModuleManager.ts ***!
+  \*************************************************/
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ModuleManager = void 0;
+__webpack_require__(/*! ../../../Shared/Extensions */ "../../../../Shared/Extensions.ts");
+const Module_1 = __webpack_require__(/*! ./Module */ "../../../LiveIde/Classes/Module.ts");
+class ModuleManager {
+    modules = [];
+    constructor() { }
+    static async new() {
+        const manager = new ModuleManager();
+        await manager.init();
+        return manager;
+    }
+    async init(options = {}) {
+        await this.loadModules(options);
+    }
+    async compileModules() {
+        for (const comp of this.modules) {
+            await comp.compile();
+        }
+    }
+    async loadModules(options = {}) {
+        const url = options.onlyChanged ? "/changed/modules" : "/modules";
+        if (window.location.hostname == "localhost") {
+            const newComps = (await (await fetch(url)).json()).map((m) => new Module_1.Module(m));
+            for (const newComp of newComps) {
+                const index = this.modules.findIndex((m) => m.name == newComp.name);
+                if (index != -1)
+                    this.modules.removeAt(index);
+            }
+            this.modules.add(newComps);
+        }
+        else {
+            this.modules = window.components.map((m) => new Module_1.Module(m));
+        }
+        this.modules = this.modules.sortBy((m) => m.name);
+    }
+}
+exports.ModuleManager = ModuleManager;
 
 
 /***/ }),
@@ -7515,7 +7630,7 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/Website/script/1693719597018.ts ***!
+  !*** ../../../LiveIde/website/script/1693731896773.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -7722,7 +7837,8 @@ const mgMixin = {
     },
 };
 (async () => {
-    const client = await ClientContext_1.ClientContext.get();
+    await ClientContext_1.ClientContext.waitUntilLoaded();
+    const client = ClientContext_1.ClientContext.context;
     client.Vue.directive("html-raw", {
         bind(el, binding) {
             el.innerHTML = binding.value;

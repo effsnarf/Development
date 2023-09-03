@@ -50,6 +50,11 @@ const _fetchAsJson = async (url: string) => {
     });
   };
 
+  const moduleFolders = [
+    path.join(config.liveIde.folder, "Modules"),
+    path.join(config.project.folder, "Modules"),
+  ];
+
   const componentFolders = [
     path.join(config.liveIde.folder, "Components"),
     path.join(config.project.folder, "Components"),
@@ -86,6 +91,49 @@ const _fetchAsJson = async (url: string) => {
     if (!info) return true;
     const lastModified = fs.statSync(getCompFilePath(comp.path)).mtimeMs;
     return lastModified > info.last.served;
+  };
+
+  const getModules = async (modulesFolder?: string): Promise<any[]> => {
+    if (!modulesFolder) {
+      const modules = [];
+      for (const folder of moduleFolders) {
+        modules.push(...((await getModules(folder)) as any[]));
+      }
+      return modules;
+    }
+
+    const now = Date.now();
+
+    const moduleScriptToModule = (
+      moduleFilePath: string,
+      moduleScriptOrYaml: any
+    ) => {
+      let moduleScript = moduleScriptOrYaml;
+      if (typeof moduleScript == "string")
+        moduleScript = Objects.parseYaml(moduleScript);
+      const module = {
+        name: getModuleName(modulesFolder, moduleFilePath),
+        path: moduleFilePath.replace(modulesFolder, ""),
+        source: moduleScript,
+      } as any;
+
+      return module;
+    };
+
+    const modules = Files.getFiles(modulesFolder, {
+      recursive: true,
+    })
+      .filter((moduleFilePath) => moduleFilePath.endsWith(".yaml"))
+      .map((moduleFilePath) => {
+        const module = moduleScriptToModule(
+          moduleFilePath,
+          fs.readFileSync(moduleFilePath, "utf8")
+        );
+        return module;
+      })
+      .flatMap((modules) => modules);
+
+    return modules;
   };
 
   const getComponents = async (componentsFolder?: string): Promise<any[]> => {
@@ -166,7 +214,7 @@ const _fetchAsJson = async (url: string) => {
       })
       .flatMap((comps) => comps);
 
-    return comps as any[];
+    return comps;
   };
 
   const getChangedComponents = async () => {
@@ -182,6 +230,10 @@ const _fetchAsJson = async (url: string) => {
 
   const getTemplates = async () => {
     return {
+      module: fs.readFileSync(
+        path.join(config.webscript.folder, "module.template.hbs"),
+        "utf8"
+      ),
       vue: fs.readFileSync(
         path.join(config.webscript.folder, "vue.client.template.hbs"),
         "utf8"
@@ -259,6 +311,18 @@ const _fetchAsJson = async (url: string) => {
     let name = path
       .replace(componentsFolder, "")
       .replace(".ws.yaml", "")
+      .replace(/\\/g, ".")
+      .substring(1);
+
+    if (name.endsWith("_")) name = name.substring(0, name.length - 2);
+
+    return name;
+  };
+
+  const getModuleName = (modulesFolder: string, path: string) => {
+    let name = path
+      .replace(modulesFolder, "")
+      .replace(".yaml", "")
       .replace(/\\/g, ".")
       .substring(1);
 
@@ -403,6 +467,11 @@ const _fetchAsJson = async (url: string) => {
             fs.writeFileSync(cssToolFilePath, JSON.stringify(data.css));
             return res.end("ok");
         }
+      }
+
+      if (req.url == "/modules") {
+        const modules = await getModules();
+        return res.end(JSON.stringify(modules));
       }
 
       if (req.url == "/components") {

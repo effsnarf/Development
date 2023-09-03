@@ -1,0 +1,48 @@
+class {{name}}
+{
+    {{#each data}}
+    {{@key}} = {{{this}}};
+    {{/each}}
+
+    static async _new()
+    {
+        const instance = new {{namespace}}.{{name}}();
+
+        const persister = await Data.Persister.Memory.new();
+        const varName = "test1";
+        const actionStack = await Actionable.ActionStack.new(persister, varName);
+        instance._actionStack = actionStack;
+        instance._actionStack.executeAction = instance._executeAction.bind(instance);
+    }
+
+    {{#each methods}}
+    {{methodSignature name args}}
+    {
+        const actionResult = await this._{{name}}(args);
+
+        const action = {
+            redo: {
+                name: "{{name}}",
+                args: args
+            },
+            undo: actionResult.undo
+        };
+
+        this._actionStack.add(action);
+
+        return actionResult.returnValue;
+    }
+    {{/each}}
+
+    _executeAction(action, inReplay)
+    {
+        
+    }
+
+    {{#each methods}}
+    {{methodSignature name args}}
+    {
+        {{{code}}}
+    }
+    {{/each}}
+}

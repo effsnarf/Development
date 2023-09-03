@@ -60,7 +60,8 @@ class ComponentManager {
   }
 
   private async saveModifiedItems() {
-    const client = await ClientContext.get();
+    await ClientContext.waitUntilLoaded();
+    const client = ClientContext.context!;
 
     // Item needs to be not modified for this time to be saved
     // This is to throtte typing etc
@@ -83,7 +84,8 @@ class ComponentManager {
   }
 
   async onComponentChanged(newComp: Component) {
-    const client = await ClientContext.get();
+    await ClientContext.waitUntilLoaded();
+    const client = ClientContext.context!;
 
     client.db.upsert("ModifiedItems", {
       key: newComp.name,

@@ -307,6 +307,27 @@
 
 
 
+.slide4-enter-active,
+.slide4-leave-active,
+.slide4-move {
+  transition: 0.3s;
+}
+.slide4-enter,
+.slide4-leave-to {
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+}
+.slide4-enter-to,
+.slide4-leave {
+  opacity: 1;
+  max-height: 5rem;
+  overflow: hidden;
+}
+
+
+
+
 
 .slide-large-enter-active,
 .slide-large-leave-active,

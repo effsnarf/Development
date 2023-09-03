@@ -23,6 +23,7 @@ import { Coder } from "@shared/Coder";
 import { Cache } from "@shared/Cache";
 import { LiveTree } from "@shared/LiveTree";
 import { Diff } from "@shared/Diff";
+const esprima = require("esprima");
 
 type malkovich = string;
 
@@ -41,33 +42,26 @@ function removeQuoteLinks(s: string) {
 }
 
 (async () => {
-  var lhs = {
-    name: "my object",
-    description: "it's an object!",
-    details: {
-      it: "has",
-      an: "array",
-      with: ["a", "few", "elements"],
-    },
-  };
+  function breakIntoStatements(fn: Function) {
+    const code = fn.toString();
+    const parsed = esprima.parseScript(code, { loc: true });
+    const statements = parsed.body[0].body.body;
 
-  var rhs = {
-    name: "updated object",
-    description: "it's an object!",
-    details: {
-      it: "has",
-      an: "array",
-      with: ["a", "few", "more", "elements", { than: "before" }],
-    },
-  };
+    return statements.map((stmt: any) => {
+      const startLine = stmt.loc.start.line;
+      const endLine = stmt.loc.end.line;
+      const lines = code.split("\n").slice(startLine - 1, endLine);
+      return lines.join("\n").trim();
+    });
+  }
 
-  const changes = Diff.getChanges(lhs, rhs);
+  // Test function
+  function test() {
+    let x = 1;
+    let y = 2;
+    return x + y;
+  }
 
-  console.log(lhs);
-
-  console.log(changes);
-
-  const newLhs = Diff.applyChanges(lhs, changes);
-
-  console.log(newLhs);
+  const result = breakIntoStatements(test);
+  console.log(result);
 })();

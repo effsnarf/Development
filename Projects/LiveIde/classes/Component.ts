@@ -28,7 +28,8 @@ class Component {
 
     const logGroup = false;
 
-    const client = await ClientContext.get();
+    await ClientContext.waitUntilLoaded();
+    const client = ClientContext.context!;
 
     if (logGroup) {
       console.groupCollapsed(this.name);
@@ -69,7 +70,8 @@ class Component {
   }
 
   async getVueOptions() {
-    const client = await ClientContext.get();
+    await ClientContext.waitUntilLoaded();
+    const client = ClientContext.context!;
     let json = client.Handlebars.compile(client.templates.vue)(this.source);
     try {
       const vueOptions = eval(`(${json})`);
