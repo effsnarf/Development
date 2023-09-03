@@ -3,6 +3,9 @@ dom:
     v-if: actionStack
     h3:
       v-text: '''✨ Actions'''
+    ui.button:
+      text: Init App
+      ':click': initUserAppSource
     ui.action.stack:
       ':action-stack': actionStack
       v-slot: slotProps
@@ -13,7 +16,14 @@ dom:
       v-text: actionStack.pointer.value
 props: null
 mounted: null
-methods: null
+methods:
+  initUserAppSource: | #js
+    function() {
+      this.$root.$emit("user.action", {
+        method: "init.user.app.source",
+        args: [],
+      });
+    }
 computed:
   actionStack: | #js
     function() {
@@ -26,9 +36,10 @@ _:
 name: flow-interface-action-stack
 template: >-
   <div class="comp-flow-interface-action-stack" v-if="actionStack"
-  path="271844389."><h3 v-text="'✨ Actions'"
-  path="271844389.0"></h3><ui-action-stack :action-stack="actionStack"
-  v-slot="slotProps" path="271844389.1"><template
-  path="271844389.1.0"><flow-interface-action :action="slotProps.action"
-  path="271844389.1.0.0"></flow-interface-action></template></ui-action-stack><h2
-  v-text="actionStack.pointer.value" path="271844389.2"></h2></div>
+  path="271844389."><h3 v-text="'✨ Actions'" path="271844389.0"></h3><ui-button
+  text="Init App" :click="initUserAppSource"
+  path="271844389.1"></ui-button><ui-action-stack :action-stack="actionStack"
+  v-slot="slotProps" path="271844389.2"><template
+  path="271844389.2.0"><flow-interface-action :action="slotProps.action"
+  path="271844389.2.0.0"></flow-interface-action></template></ui-action-stack><h2
+  v-text="actionStack.pointer.value" path="271844389.3"></h2></div>

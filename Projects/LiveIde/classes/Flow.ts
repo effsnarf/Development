@@ -26,6 +26,8 @@ namespace Flow {
     }
 
     async computeNodeData(node: Graph.Node) {
+      if (!node) return;
+
       if (node.type == "flow.data.fetch") {
         if (false) {
           const catalogUrl = `/fetch?url=https://a.4cdn.org/fit/catalog.json`;
@@ -217,14 +219,14 @@ namespace Flow {
         "user.actions"
       );
 
-      vueApp.$on("user-action", (redo: any) => userActions.do({ redo }));
+      vueApp.$on("user.action", (redo: any) => userActions.do({ redo }));
 
       const interface1 = new Interface(userAppGdb, userActions);
 
       if (userActions.actions.count == 1) {
         userActions.do({
           redo: {
-            method: "initialize.user.app.source",
+            method: "init.user.app.source",
             args: [],
           },
         });
@@ -236,18 +238,42 @@ namespace Flow {
     async executeAction(action: any) {
       const self = this as any;
       const { redo } = action;
-      // no op
-      const methodName =
-        "on" +
-        redo.method
-          .split(".")
-          .map((s: string) => s.capitalize())
-          .join("");
-      if (self[methodName]) return await self[methodName](action);
-      else throw new Error("Unknown action type: " + redo.type);
+
+      if (redo.method) {
+        const methodName =
+          "on" +
+          redo.method
+            .split(".")
+            .map((s: string) => s.capitalize())
+            .join("");
+
+        if (!self[methodName])
+          throw new Error("Unknown method: " + redo.method);
+
+        return await self[methodName](action);
+      }
+
+      if (redo.type) {
+        const methodName =
+          "on" +
+          redo.type
+            .split(".")
+            .map((s: string) => s.capitalize())
+            .join("");
+
+        if (!self[methodName]) throw new Error("Unknown type: " + redo.type);
+
+        return await self[methodName](action);
+      }
+
+      throw new Error("Unknown action type: " + redo.type);
     }
 
-    private async onInitializeUserAppSource(action: any) {
+    private async onInitUserAppSource(action: any) {
+      this.userActions.clear();
+
+      await this.userAppGdb.clear();
+
       await this.userAppGdb.addTemplate("app");
 
       action.undo = { method: "gdb.undo" };
@@ -281,15 +307,15 @@ namespace Flow {
       const { dragItem, dropItem } = action.redo;
       const newNodeType = dragItem;
 
-      const newNode = await this.createNewNode(newNodeType);
-
       if (dropItem.type == "flow.layout.empty") {
-        action.undo = Objects.clone({
-          type: "array",
-          oldNode: newNode,
-          newNode: dropItem,
-        });
+        const oldPointer = this.userAppGdb.actionStack.pointer.value;
+        const newNode = await this.createNewNode(newNodeType);
         this.userAppGdb.replaceNode(dropItem, newNode);
+        const newPointer = this.userAppGdb.actionStack.pointer.value;
+        const newActionsCount = newPointer - oldPointer + 1;
+
+        action.undo = { method: "gdb.undo", args: [newActionsCount] };
+
         return action;
       } else {
         throw new Error("Not implemented");
@@ -331,10 +357,10 @@ namespace Flow {
       return newNode;
     }
 
-    private async onGdbRollback(action: any) {
-      const redo = action.redo;
-      const pointer = redo.args[0];
-      await this.userAppGdb.actionStack.goToAction(pointer);
+    private async onGdbUndo(action: any) {
+      const args = action.redo.args || [];
+      const count = args[0];
+      await this.userAppGdb.actionStack.undo(count);
     }
 
     private toPersistableAction(action: any) {

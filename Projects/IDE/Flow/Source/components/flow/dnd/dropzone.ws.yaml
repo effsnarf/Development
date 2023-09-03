@@ -13,7 +13,7 @@ methods:
     }
   onDropItem: | #js
     function(dragItem) {
-      this.$root.$emit("user-action", {
+      this.$root.$emit("user.action", {
         type: "dnd.drop",
         dragItem,
         dropItem: this.node

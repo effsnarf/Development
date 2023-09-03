@@ -17,7 +17,6 @@ namespace Actionable {
   export class ActionStack {
     actions!: Data.List;
     pointer!: Data.Value;
-    groupStartID!: number;
 
     toPersistableAction: (action: Action) => Promise<any> = async (
       action: Action
@@ -96,30 +95,14 @@ namespace Actionable {
       }
     }
 
-    async undoGroup(actions: Actionable.Action[]) {
-      throw new Error("brb dinner");
+    async undo(count: number = 1) {
+      if (count < 1) return;
+      for (let i = 0; i < count; i++) {
+        await this._undo();
+      }
     }
 
-    async beginGroup() {
-      const startAction = await this.actions.getItemAt(this.pointer.value);
-      this.groupStartID = startAction._id;
-    }
-
-    async endGroup() {
-      const groupActions = await this.actions.getMany((action: Action) => {
-        return action._id >= this.groupStartID;
-      });
-
-      await this.actions.deleteMany((action: Action) => {
-        return action._id >= this.groupStartID;
-      });
-
-      (this.groupStartID as any) = null;
-
-      return groupActions;
-    }
-
-    async undo() {
+    async _undo() {
       if (this.pointer.value < 0) return;
       const action = await this.actions.getItemAt(this.pointer.value);
       if (!action) return;
@@ -143,9 +126,6 @@ namespace Actionable {
     async clear() {
       await this.actions.clear();
       this.pointer.value = -1;
-      this.do({
-        redo: { type: null },
-      });
     }
 
     private async _executeAction(action: Action) {

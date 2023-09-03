@@ -10,6 +10,7 @@ dom:
             text: Flow
       .flex1:
         div: 
+          ':style': '{ width: ''15em'' }'
           flow.gdb.tree:
             ':node': $root.flow?.gdb.nodes[0]
             @update:active-node: setGlobalActiveNode
@@ -26,6 +27,12 @@ dom:
             ':node': appViewRootNode
         flow.interface.toolbar: null
         flow.interface.action.stack: null
+        ui.action.stack:
+          ':action-stack': $gdb.actionStack
+          v-slot: slotProps
+          template:
+            flow.interface.action:
+              ':action': slotProps.action
         flow.interface.trash: null
       flow.node.picker: null
       div: 
@@ -41,10 +48,8 @@ dom:
           flow.gdb.list:
             v-if: showExtraInfo
     div: 
-      ide.css.stylesheet:
-        ':rules': $root.newCssRules
       div: 
-        ide.component.style:
+        ui.html.style:
           v-for: comp in $root.comps
           ':component': comp
 props:
@@ -96,23 +101,26 @@ template: >-
   class="logo" path="-1584259284.0.0.0"></div><h2
   path="-1584259284.0.0.1"><ui-title class="title1" text="Flow"
   path="-1584259284.0.0.1.0"></ui-title></h2></div><div class="flex1"
-  path="-1584259284.0.1"><div path="-1584259284.0.1.0"><flow-gdb-tree
-  :node="$root.flow?.gdb.nodes[0]" @update:active-node="setGlobalActiveNode"
+  path="-1584259284.0.1"><div :style="{ width: '15em' }"
+  path="-1584259284.0.1.0"><flow-gdb-tree :node="$root.flow?.gdb.nodes[0]"
+  @update:active-node="setGlobalActiveNode"
   path="-1584259284.0.1.0.0"></flow-gdb-tree><div class="spacer1"
   path="-1584259284.0.1.0.1"></div><div class="spacer1"
   path="-1584259284.0.1.0.2"></div></div><div v-if="gdb"
   path="-1584259284.0.1.1"><flow-app-node :node="appViewRootNode"
   path="-1584259284.0.1.1.0"></flow-app-node><flow-app-node v-if="false"
   :node="appViewRootNode"
-  path="-1584259284.0.1.1.1"></flow-app-node></div><flow-interface-toolbar></flow-interface-toolbar><flow-interface-action-stack></flow-interface-action-stack><flow-interface-trash></flow-interface-trash></div><flow-node-picker></flow-node-picker><div
+  path="-1584259284.0.1.1.1"></flow-app-node></div><flow-interface-toolbar></flow-interface-toolbar><flow-interface-action-stack></flow-interface-action-stack><ui-action-stack
+  :action-stack="$gdb.actionStack" v-slot="slotProps"
+  path="-1584259284.0.1.4"><template
+  path="-1584259284.0.1.4.0"><flow-interface-action :action="slotProps.action"
+  path="-1584259284.0.1.4.0.0"></flow-interface-action></template></ui-action-stack><flow-interface-trash></flow-interface-trash></div><flow-node-picker></flow-node-picker><div
   path="-1584259284.0.3"><h2 class="clickable" @click="showExtraInfo =
   !showExtraInfo" path="-1584259284.0.3.0"><ui-title icon="✨" text="Extra Info"
   path="-1584259284.0.3.0.0"></ui-title></h2><div path="-1584259284.0.3.1"><div
   class="spacer1" path="-1584259284.0.3.1.0"></div><flow-gdb-list
   v-if="showExtraInfo"
   path="-1584259284.0.3.1.1"></flow-gdb-list></div></div></div><div
-  path="-1584259284.1"><ide-css-stylesheet :rules="$root.newCssRules"
-  path="-1584259284.1.0"></ide-css-stylesheet><div
-  path="-1584259284.1.1"><ide-component-style v-for="comp in $root.comps"
-  :component="comp"
-  path="-1584259284.1.1.0"></ide-component-style></div></div></div>
+  path="-1584259284.1"><div path="-1584259284.1.0"><ui-html-style v-for="comp in
+  $root.comps" :component="comp"
+  path="-1584259284.1.0.0"></ui-html-style></div></div></div>

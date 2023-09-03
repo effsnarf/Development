@@ -188,7 +188,7 @@ const vueIdeCompMixin = {
 (async () => {
   const client = await ClientContext.get();
 
-  await client.compileAll();
+  await client.compileAll((c) => c.name.startsWith("ide."), [vueIdeCompMixin]);
 
   const vueManager = VueManager.new(client);
 

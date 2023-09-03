@@ -114,7 +114,7 @@ methods:
     }
   onGraphNodeChange: | #js
     function(node) {
-      if (node.id != this.node?.id) return;
+      if (node?.id != this.node?.id) return;
       if (this.$parent?.onNodeChange) this.$parent.onNodeChange(node);
       this.refresh();
     }

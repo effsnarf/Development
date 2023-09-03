@@ -9,10 +9,6 @@ dom:
         icon: ↻
         text: redo
         ':click': () => doVerb('redo')
-      ui.button: 
-        icon: ✖
-        text: clear
-        ':click': () => doVerb('clear')
     ul:
       li:
         v-for: (action, index) in actionStack?.actions.lastItems
@@ -55,9 +51,7 @@ template: >-
   path="-1417831958.0"><ui-button icon="↺" text="undo" :click="() =&gt;
   doVerb('undo')" path="-1417831958.0.0"></ui-button><ui-button icon="↻"
   text="redo" :click="() =&gt; doVerb('redo')"
-  path="-1417831958.0.1"></ui-button><ui-button icon="✖" text="clear" :click="()
-  =&gt; doVerb('clear')" path="-1417831958.0.2"></ui-button></div><ul
-  path="-1417831958.1"><li v-for="(action, index) in
-  actionStack?.actions.lastItems" :class="getActionCssClass(action, index)"
-  path="-1417831958.1.0"><slot :action="action"
-  path="-1417831958.1.0.0"></slot></li></ul></div>
+  path="-1417831958.0.1"></ui-button></div><ul path="-1417831958.1"><li
+  v-for="(action, index) in actionStack?.actions.lastItems"
+  :class="getActionCssClass(action, index)" path="-1417831958.1.0"><slot
+  :action="action" path="-1417831958.1.0.0"></slot></li></ul></div>

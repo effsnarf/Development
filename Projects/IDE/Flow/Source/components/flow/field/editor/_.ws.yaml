@@ -12,7 +12,7 @@ props:
 methods:
   onInput: | #js
     function(value) {
-      this.$root.$emit("user-action", {
+      this.$root.$emit("user.action", {
         type: "node.update",
         node: { id: this.node.id },
         field: this.fieldName,

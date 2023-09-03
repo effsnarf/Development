@@ -498,6 +498,8 @@ var Flow;
             this.computeNodeData(node);
         }
         async computeNodeData(node) {
+            if (!node)
+                return;
             if (node.type == "flow.data.fetch") {
                 if (false) {}
                 const imageUrls = [
@@ -648,12 +650,12 @@ var Flow;
         }
         static async new(vueApp, userAppGdb, persisters) {
             const userActions = await Actionable_1.Actionable.ActionStack.new(persisters.localStorage, "user.actions");
-            vueApp.$on("user-action", (redo) => userActions.do({ redo }));
+            vueApp.$on("user.action", (redo) => userActions.do({ redo }));
             const interface1 = new Interface(userAppGdb, userActions);
             if (userActions.actions.count == 1) {
                 userActions.do({
                     redo: {
-                        method: "initialize.user.app.source",
+                        method: "init.user.app.source",
                         args: [],
                     },
                 });
@@ -663,22 +665,32 @@ var Flow;
         async executeAction(action) {
             const self = this;
             const { redo } = action;
-            // no op
-            const methodName = "on" +
-                redo.method
-                    .split(".")
-                    .map((s) => s.capitalize())
-                    .join("");
-            if (self[methodName])
+            if (redo.method) {
+                const methodName = "on" +
+                    redo.method
+                        .split(".")
+                        .map((s) => s.capitalize())
+                        .join("");
+                if (!self[methodName])
+                    throw new Error("Unknown method: " + redo.method);
                 return await self[methodName](action);
-            else
-                throw new Error("Unknown action type: " + redo.type);
+            }
+            if (redo.type) {
+                const methodName = "on" +
+                    redo.type
+                        .split(".")
+                        .map((s) => s.capitalize())
+                        .join("");
+                if (!self[methodName])
+                    throw new Error("Unknown type: " + redo.type);
+                return await self[methodName](action);
+            }
+            throw new Error("Unknown action type: " + redo.type);
         }
-        async onInitializeUserAppSource(action) {
-            const pointer = this.userAppGdb.actionStack.pointer.value;
-            debugger;
+        async onInitUserAppSource(action) {
+            await this.userAppGdb.clear();
             await this.userAppGdb.addTemplate("app");
-            action.undo = { method: "gdb.rollback", args: [pointer] };
+            action.undo = { method: "gdb.undo" };
             return action;
         }
         async onDndDrop(action) {
@@ -703,14 +715,13 @@ var Flow;
         async onDndDrop_newNode(action) {
             const { dragItem, dropItem } = action.redo;
             const newNodeType = dragItem;
-            const newNode = await this.createNewNode(newNodeType);
             if (dropItem.type == "flow.layout.empty") {
-                action.undo = Extensions_Objects_Client_1.Objects.clone({
-                    type: "array",
-                    oldNode: newNode,
-                    newNode: dropItem,
-                });
+                const oldPointer = this.userAppGdb.actionStack.pointer.value;
+                const newNode = await this.createNewNode(newNodeType);
                 this.userAppGdb.replaceNode(dropItem, newNode);
+                const newPointer = this.userAppGdb.actionStack.pointer.value;
+                const newActionsCount = newPointer - oldPointer + 1;
+                action.undo = { method: "gdb.undo", args: [newActionsCount] };
                 return action;
             }
             else {
@@ -747,10 +758,10 @@ var Flow;
             const newNode = this.userAppGdb.addNode(newNodeType, data);
             return newNode;
         }
-        async onGdbRollback(action) {
-            const redo = action.redo;
-            const pointer = redo.args[0];
-            await this.userAppGdb.actionStack.goToAction(pointer);
+        async onGdbUndo(action) {
+            const args = action.redo.args || [];
+            const count = args[0];
+            await this.userAppGdb.actionStack.undo(count);
         }
         toPersistableAction(action) {
             return Extensions_Objects_Client_1.Objects.clone({
@@ -3860,7 +3871,7 @@ var Actionable;
         async add(action) {
             action = Extensions_Objects_Client_1.Objects.clone(action);
             action = await this.toPersistableAction(action);
-            const actionAtPointer = await this.actions.getActionAt(this.pointer.value);
+            const actionAtPointer = await this.actions.getItemAt(this.pointer.value);
             if (actionAtPointer)
                 await this.actions.deleteMany((action) => action._id > actionAtPointer._id);
             await this.actions.upsert(action);
@@ -3880,10 +3891,17 @@ var Actionable;
                 }
             }
         }
-        async undo() {
+        async undo(count = 1) {
+            if (count < 1)
+                return;
+            for (let i = 0; i < count; i++) {
+                await this._undo();
+            }
+        }
+        async _undo() {
             if (this.pointer.value < 0)
                 return;
-            const action = await this.actions.getActionAt(this.pointer.value);
+            const action = await this.actions.getItemAt(this.pointer.value);
             if (!action)
                 return;
             //await this.fromPersistableAction(action);
@@ -3896,7 +3914,7 @@ var Actionable;
         async redo() {
             if (this.pointer.value >= this.actions.count - 1)
                 return;
-            const action = await this.actions.getActionAt(this.pointer.value + 1);
+            const action = await this.actions.getItemAt(this.pointer.value + 1);
             if (!action)
                 return;
             await this.fromPersistableAction(action);
@@ -3906,9 +3924,6 @@ var Actionable;
         async clear() {
             await this.actions.clear();
             this.pointer.value = -1;
-            this.do({
-                redo: { type: null },
-            });
         }
         async _executeAction(action) {
             action = Extensions_Objects_Client_1.Objects.clone(action);
@@ -4194,8 +4209,11 @@ var Data;
             await this.collection.upsertItem(item);
             await this.refresh();
         }
-        async getActionAt(index) {
+        async getItemAt(index) {
             return await this.collection.getItemAt(index);
+        }
+        async getMany(filter) {
+            return await this.collection.getItems(filter);
         }
         async refresh() {
             this.lastItems = await this.collection.getItems((item) => true, (item) => -item._id, this.lastItemsCount);
@@ -4334,12 +4352,16 @@ var Graph;
         // #endregion
         // #region Events
         onNodesChange(nodes) {
+            if (!nodes?.length) {
+                this.events.emit("node.change", null);
+                return;
+            }
             for (const node of nodes) {
                 this.events.emit("node.change", node);
             }
         }
         // #endregion
-        addTemplate(name) {
+        async addTemplate(name) {
             const template = this.data.templates[name];
             const node = this.addNode(template.type, template.data);
             for (const child of template.children) {
@@ -4565,7 +4587,7 @@ var Graph;
     Graph.Database = Database;
     class ActionableDatabase extends Graph.Database {
         actionStack;
-        isReplaying = false;
+        addNewActions = false;
         constructor(actionStack, data) {
             super(data);
             this.actionStack = actionStack;
@@ -4579,16 +4601,20 @@ var Graph;
             const gdb = new ActionableDatabase(actionStack, data);
             return gdb;
         }
-        addTemplate(name) {
-            const pointer = this.actionStack.pointer.value;
+        async addTemplate(name) {
             const redo = {
                 method: "add.template",
                 args: [name],
             };
-            const node = super.addTemplate(name);
+            const oldData = Extensions_Objects_Client_1.Objects.clone(this.data);
+            this.addNewActions = false;
+            const node = await super.addTemplate(name);
+            this.addNewActions = true;
+            const newData = Extensions_Objects_Client_1.Objects.clone(this.data);
+            const undoDataChanges = Diff_1.Diff.getChanges(newData, oldData);
             const undo = {
-                method: "go.to.action",
-                args: [pointer],
+                method: "apply.data.changes",
+                args: [undoDataChanges],
             };
             const action = { redo, undo };
             this.addAction(action);
@@ -4596,12 +4622,12 @@ var Graph;
         }
         addNode(type, data, links) {
             const redo = {
-                method: "addNode",
+                method: "add.node",
                 args: [type, data, links],
             };
             const node = super.addNode(type, data, links);
             const undo = {
-                method: "deleteNode",
+                method: "delete.node",
                 args: [node],
             };
             const action = { redo, undo };
@@ -4610,12 +4636,12 @@ var Graph;
         }
         addLink(from, type, to, data) {
             const redo = {
-                method: "addLink",
+                method: "add.link",
                 args: [from, type, to, data],
             };
             const link = super.addLink(from, type, to, data);
             const undo = {
-                method: "deleteLinks",
+                method: "delete.links",
                 args: [[link]],
             };
             const action = { redo, undo };
@@ -4624,7 +4650,7 @@ var Graph;
         }
         replaceNode(oldNode, newNode) {
             const redo = {
-                method: "replaceNode",
+                method: "replace.node",
                 args: [oldNode, newNode],
             };
             const oldData = Extensions_Objects_Client_1.Objects.clone(this.data);
@@ -4632,15 +4658,21 @@ var Graph;
             const newData = Extensions_Objects_Client_1.Objects.clone(this.data);
             const dataChanges = Diff_1.Diff.getChanges(oldData, newData);
             const undo = {
-                method: "applyDataChanges",
+                method: "apply.data.changes",
                 args: [dataChanges],
             };
             const action = { redo, undo };
             this.addAction(action);
             return result;
         }
+        async clear() {
+            this.actionStack.clear();
+            this.nextID = 1;
+            this.nodes.clear();
+            this.links.clear();
+        }
         async executeAction(action) {
-            this.isReplaying = true;
+            this.addNewActions = false;
             try {
                 const redo = action.redo;
                 const method = this.toMethodName(redo.method);
@@ -4649,14 +4681,14 @@ var Graph;
                 return result;
             }
             finally {
-                this.isReplaying = false;
+                this.addNewActions = true;
             }
         }
         async goToAction(pointer) {
             await this.actionStack.goToAction(pointer);
         }
         addAction(action) {
-            if (this.isReplaying)
+            if (!this.addNewActions)
                 return;
             this.actionStack.add(action);
         }
@@ -7477,7 +7509,7 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/Website/script/1693676204334.ts ***!
+  !*** ../../../LiveIde/Website/script/1693716079848.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -7937,7 +7969,7 @@ const mgMixin = {
             }
         },
     });
-    await client.compileAll((c) => true, webScriptMixins);
+    await client.compileAll((c) => !c.name.startsWith("ide."), webScriptMixins);
     let vueApp = null;
     const isLocalHost = window.location.hostname == "localhost";
     const dbpHost = `https://db.memegenerator.net`;

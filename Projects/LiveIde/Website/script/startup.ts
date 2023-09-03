@@ -503,7 +503,7 @@ interface MgParams {
     },
   });
 
-  await client.compileAll((c) => true, webScriptMixins);
+  await client.compileAll((c) => !c.name.startsWith("ide."), webScriptMixins);
 
   let vueApp: any = null;
 

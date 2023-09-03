@@ -27,10 +27,10 @@ watch:
         this.css = this.getCss(component);
       }
     immediate: true
-name: ide-component-style
+name: ui-html-style
 _:
   examples:
     count: 0
 template: >-
-  <style class="comp-ide-component-style" :class="component.name" v-html="css"
-  path="259364412."></style>
+  <style class="comp-ui-html-style" :class="component.name" v-html="css"
+  path="951734600."></style>

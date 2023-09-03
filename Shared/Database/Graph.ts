@@ -95,6 +95,11 @@ namespace Graph {
 
     // #region Events
     protected onNodesChange(nodes: Node[]) {
+      if (!nodes?.length) {
+        this.events.emit("node.change", null);
+        return;
+      }
+
       for (const node of nodes) {
         this.events.emit("node.change", node);
       }
@@ -398,7 +403,7 @@ namespace Graph {
 
   export class ActionableDatabase extends Graph.Database {
     actionStack!: Actionable.ActionStack;
-    private isReplaying = false;
+    private addNewActions = false;
 
     private constructor(actionStack: Actionable.ActionStack, data: any) {
       super(data);
@@ -426,15 +431,21 @@ namespace Graph {
         args: [name],
       };
 
-      await this.actionStack.beginGroup();
+      const oldData = Objects.clone(this.data);
 
-      const node = super.addTemplate(name);
+      this.addNewActions = false;
 
-      const groupActions = await this.actionStack.endGroup();
+      const node = await super.addTemplate(name);
+
+      this.addNewActions = true;
+
+      const newData = Objects.clone(this.data);
+
+      const undoDataChanges = Diff.getChanges(newData, oldData);
 
       const undo = {
-        method: "undo.group",
-        args: [groupActions],
+        method: "apply.data.changes",
+        args: [undoDataChanges],
       };
 
       const action = { redo, undo } as Actionable.Action;
@@ -446,14 +457,14 @@ namespace Graph {
 
     addNode(type: string, data: any, links?: any[]) {
       const redo = {
-        method: "addNode",
+        method: "add.node",
         args: [type, data, links],
       };
 
       const node = super.addNode(type, data, links);
 
       const undo = {
-        method: "deleteNode",
+        method: "delete.node",
         args: [node],
       };
 
@@ -466,14 +477,14 @@ namespace Graph {
 
     addLink(from: Node, type: string, to: Node, data?: any) {
       const redo = {
-        method: "addLink",
+        method: "add.link",
         args: [from, type, to, data],
       };
 
       const link = super.addLink(from, type, to, data);
 
       const undo = {
-        method: "deleteLinks",
+        method: "delete.links",
         args: [[link]],
       };
 
@@ -486,7 +497,7 @@ namespace Graph {
 
     replaceNode(oldNode: Node, newNode: Node) {
       const redo = {
-        method: "replaceNode",
+        method: "replace.node",
         args: [oldNode, newNode],
       };
 
@@ -498,7 +509,7 @@ namespace Graph {
       const dataChanges = Diff.getChanges(oldData, newData);
 
       const undo = {
-        method: "applyDataChanges",
+        method: "apply.data.changes",
         args: [dataChanges],
       };
 
@@ -509,8 +520,16 @@ namespace Graph {
       return result;
     }
 
+    async clear() {
+      this.actionStack.clear();
+
+      this.nextID = 1;
+      this.nodes.clear();
+      this.links.clear();
+    }
+
     private async executeAction(action: Actionable.Action) {
-      this.isReplaying = true;
+      this.addNewActions = false;
       try {
         const redo = action.redo as any;
         const method = this.toMethodName(redo.method);
@@ -518,7 +537,7 @@ namespace Graph {
         const result = await (this as any)[method](...args);
         return result;
       } finally {
-        this.isReplaying = false;
+        this.addNewActions = true;
       }
     }
 
@@ -527,7 +546,7 @@ namespace Graph {
     }
 
     private addAction(action: Actionable.Action) {
-      if (this.isReplaying) return;
+      if (!this.addNewActions) return;
       this.actionStack.add(action);
     }
 
@@ -540,10 +559,6 @@ namespace Graph {
         return !Objects.areEqual(oldNode, newNode);
       });
       this.onNodesChange(changedNodes);
-    }
-
-    private async undoGroup(actions: Actionable.Action[]) {
-      await this.actionStack.undoGroup(actions);
     }
 
     private toMethodName(method: string) {

@@ -21,6 +21,7 @@
     %link{rel: "stylesheet", href: "/css/layout.css"}
     %link{rel: "stylesheet", href: "/css/transitions.css"}
     %link{rel: "stylesheet", href: "/js/lib/prism/prism.css"}
+    %script{src: "https://cdn.jsdelivr.net/npm/deep-diff@1.0.2/dist/deep-diff.min.js"}
     %script{src: "//cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/alertify.js"}
     %script{src: "https://cdnjs.cloudflare.com/ajax/libs/dexie/3.2.3/dexie.js"}
     %script{src: "https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.js"}
@@ -36,7 +37,7 @@
       window.helpers = (((helpers)));
     %script
       window.config = (((config)));
-    %script{src: "/script/ide.js?_uid=(((scriptUrlCacheInvalidator)))", defer: "true"}
+    / %script{src: "/script/ide.js?_uid=(((scriptUrlCacheInvalidator)))", defer: "true"}
     %script{src: "/script/startup.js?_uid=(((scriptUrlCacheInvalidator)))", defer: "true"}
   %body
     %div
