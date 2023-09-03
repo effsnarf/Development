@@ -270,7 +270,7 @@ namespace Flow {
     }
 
     private async onInitUserAppSource(action: any) {
-      this.userActions.clear();
+      await this.userActions.clear();
 
       await this.userAppGdb.clear();
 

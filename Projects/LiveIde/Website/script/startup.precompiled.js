@@ -688,6 +688,7 @@ var Flow;
             throw new Error("Unknown action type: " + redo.type);
         }
         async onInitUserAppSource(action) {
+            await this.userActions.clear();
             await this.userAppGdb.clear();
             await this.userAppGdb.addTemplate("app");
             action.undo = { method: "gdb.undo" };
@@ -4034,10 +4035,12 @@ var Data;
             async deleteItem(collection, _id) {
                 let items = await this.getCollectionArray(collection);
                 items = items.filter((item) => item._id !== _id);
+                this.setCollectionArray(collection, items);
             }
             async deleteMany(collection, filter) {
                 let items = await this.getCollectionArray(collection);
                 items = items.filter((item) => !filter(item));
+                this.setCollectionArray(collection, items);
             }
             async getItems(collection, filter = () => true, sort = (item) => item._id, limit) {
                 let items = await this.getCollectionArray(collection);
@@ -4059,6 +4062,9 @@ var Data;
                 if (!this.collections[collection])
                     this.collections[collection] = [];
                 return this.collections[collection];
+            }
+            setCollectionArray(collection, items) {
+                this.collections[collection] = items;
             }
             async getNewID() {
                 return this.nextID++;
@@ -7509,7 +7515,7 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/Website/script/1693716079848.ts ***!
+  !*** ../../../LiveIde/Website/script/1693719597018.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

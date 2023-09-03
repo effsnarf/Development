@@ -124,11 +124,13 @@ namespace Data {
       async deleteItem(collection: string, _id: number): Promise<void> {
         let items = await this.getCollectionArray(collection);
         items = items.filter((item: any) => item._id !== _id);
+        this.setCollectionArray(collection, items);
       }
 
       async deleteMany(collection: string, filter: (item: any) => boolean) {
         let items = await this.getCollectionArray(collection);
         items = items.filter((item: any) => !filter(item));
+        this.setCollectionArray(collection, items);
       }
 
       async getItems(
@@ -158,6 +160,10 @@ namespace Data {
       private getCollectionArray(collection: string): any[] {
         if (!this.collections[collection]) this.collections[collection] = [];
         return this.collections[collection];
+      }
+
+      private setCollectionArray(collection: string, items: any[]): void {
+        this.collections[collection] = items;
       }
 
       private async getNewID(): Promise<number> {

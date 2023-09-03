@@ -22,6 +22,7 @@ const waitUntilInit = async () => {
 };
 
 const vueIdeCompMixin = {
+  matchComp: (c: any) => c.name.startsWith("ide."),
   created() {
     const self = this as any;
 
@@ -187,6 +188,8 @@ const vueIdeCompMixin = {
 
 (async () => {
   const client = await ClientContext.get();
+
+  await waitUntilInit();
 
   await client.compileAll((c) => c.name.startsWith("ide."), [vueIdeCompMixin]);
 

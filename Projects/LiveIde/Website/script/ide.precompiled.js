@@ -5605,7 +5605,7 @@ var __webpack_exports__ = {};
 (() => {
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/Website/script/1693714302612.ts ***!
+  !*** ../../../LiveIde/Website/script/1693719596307.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -5628,6 +5628,7 @@ const waitUntilInit = async () => {
     }
 };
 const vueIdeCompMixin = {
+    matchComp: (c) => c.name.startsWith("ide."),
     created() {
         const self = this;
         const compName = self.$options.name;
@@ -5748,7 +5749,8 @@ const vueIdeCompMixin = {
 window.vueIdeCompMixin = vueIdeCompMixin;
 (async () => {
     const client = await ClientContext_1.ClientContext.get();
-    await client.compileAll((c) => c.name.startsWith("ide."));
+    await waitUntilInit();
+    await client.compileAll((c) => c.name.startsWith("ide."), [vueIdeCompMixin]);
     const vueManager = VueManager_1.VueManager.new(client);
     const state = StateTracker_1.StateTracker.new(vueManager, client);
     vueIdeApp = new client.Vue({
