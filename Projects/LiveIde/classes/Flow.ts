@@ -308,11 +308,11 @@ namespace Flow {
       const newNodeType = dragItem;
 
       if (dropItem.type == "flow.layout.empty") {
-        const oldPointer = this.userAppGdb.actionStack.pointer.value;
+        const oldActionID = this.userAppGdb.actionStack.doneAction._id.value;
         const newNode = await this.createNewNode(newNodeType);
         await this.userAppGdb.replaceNode(dropItem, newNode);
-        const newPointer = this.userAppGdb.actionStack.pointer.value;
-        const newActionsCount = newPointer - oldPointer + 1;
+        const newActionID = this.userAppGdb.actionStack.doneAction._id.value;
+        const newActionsCount = newActionID - oldActionID + 1;
 
         action.undo = { method: "gdb.undo", args: [newActionsCount] };
 
@@ -416,7 +416,7 @@ namespace Flow {
     static async new(vueApp: any, vm: VueManager, gdbData: any) {
       const persisters = {
         memory: Data.Persister.Memory.new(),
-        localStorage: Data.Persister.LocalStorage.new("flow"),
+        localStorage: Data.Persister.LocalStorage.new2("flow"),
       } as Persisters;
 
       const userAppGdb = await Graph.ActionableDatabase.new2(

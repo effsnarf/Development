@@ -7,6 +7,7 @@ props:
 methods:
   getActionText: | #js
     function(action) {
+      if (!action) return null;
       const redo = action.redo;
       if (redo.noop) return 'no.op';
       return (redo.method || redo.type);

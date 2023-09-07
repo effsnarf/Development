@@ -35,7 +35,8 @@ dom:
               v-text: field
         tbody: 
           tr: 
-            v-for: item in items
+            v-for: (item, index) in items
+            ':class': _getItemClass(item, index)
             td: 
               v-for: field in fields
               ui.value.preview: 
@@ -44,6 +45,7 @@ props:
   value: null
   reverse: false
   view: table
+  getItemClass: null
 data:
   view1: null
 methods:
@@ -71,6 +73,12 @@ methods:
       if (!this.value?.length) return false;
       if (['.jpg', '.jpeg', '.png'].some(ext => this.value.find(item => item[fieldName]?.toString().endsWith(ext)))) return true;
       return false;
+    }
+  _getItemClass: | #js
+    function(item, index) {
+      const classes = [];
+      if (this.getItemClass) classes.push(this.getItemClass(item, index));
+      return classes;
     }
 computed:
   items: | #js
@@ -131,7 +139,7 @@ template: >-
   path="-621945022.2.0"><thead v-if="false" path="-621945022.2.0.0"><tr
   path="-621945022.2.0.0.0"><th v-for="field in fields" v-text="field"
   path="-621945022.2.0.0.0.0"></th></tr></thead><tbody
-  path="-621945022.2.0.1"><tr v-for="item in items"
-  path="-621945022.2.0.1.0"><td v-for="field in fields"
-  path="-621945022.2.0.1.0.0"><ui-value-preview :value="item[field]"
+  path="-621945022.2.0.1"><tr v-for="(item, index) in items"
+  :class="_getItemClass(item, index)" path="-621945022.2.0.1.0"><td v-for="field
+  in fields" path="-621945022.2.0.1.0.0"><ui-value-preview :value="item[field]"
   path="-621945022.2.0.1.0.0.0"></ui-value-preview></td></tr></tbody></table></transition></div>

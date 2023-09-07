@@ -3,6 +3,7 @@ import { HtmlHelper } from "../../Classes/HtmlHelper";
 import { Events } from "../../../../Shared/Events";
 import { Component } from "../../Classes/Component";
 import { Objects } from "../../../../Shared/Extensions.Objects.Client";
+import { Diff } from "../../../../Shared/Diff";
 import { TaskQueue } from "../../../../Shared/TaskQueue";
 import { Actionable } from "../../../../Shared/Actionable";
 import { AnalyticsTracker } from "../../Classes/AnalyticsTracker";
@@ -19,6 +20,7 @@ const Vue = (window1 as any).Vue;
 
 // To make it accessible to client code
 window1.Objects = Objects;
+window1.Diff = Diff;
 window1.TaskQueue = TaskQueue;
 window1.Data = Data;
 window1.Actionable = Actionable;

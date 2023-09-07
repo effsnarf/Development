@@ -4,5 +4,4 @@ methods:
   - name: getNextID
     args: []
     code: | #js
-      return;
       return impl.getNextID();

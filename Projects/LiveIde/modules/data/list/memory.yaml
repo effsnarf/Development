@@ -1,6 +1,21 @@
 data:
   nextID: 1
+  testID: 1
+  items: "[]"
 methods:
+  - name: getTestID
+    args: []
+    code: | #js
+      const oldID = this.testID;
+      const newID = this.testID++;
+
+      return {
+        returnValue: newID,
+        undo: {
+          method: '_setField',
+          args: ["testID", oldID]
+        }
+      }
   - name: getNextID
     args: []
     code: | #js
@@ -10,11 +25,40 @@ methods:
       return {
         returnValue: newID,
         undo: {
-          method: '_setNextID',
-          args: [oldID]
+          method: '_setField',
+          args: ["nextID", oldID]
         }
       }
-  - name: _setNextID
-    args: [id]
+  - name: _setField
+    args: [key, value]
     code: | #js
-      this.nextID = id;
+      this[key] = value;
+  - name: add
+    args: [item]
+    code: | #js
+      if (!item._id) item._id = await this.getNextID();
+
+      await this.getTestID();
+
+      this.items.add(item);
+
+      return {
+        returnValue: null,
+        undo: {
+          method: 'delete',
+          args: [item._id]
+        }
+      }
+  - name: delete
+    args: [_id]
+    code: | #js
+      const item = this.items.find(item => (item._id === _id));
+      this.items.removeByField("_id", _id);
+
+      return {
+        returnValue: null,
+        undo: {
+          method: 'add',
+          args: [item]
+        }
+      }

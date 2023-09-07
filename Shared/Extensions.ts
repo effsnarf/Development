@@ -330,8 +330,8 @@ interface String {
 
 interface Array<T> {
   all(predicate: (item: T) => boolean): boolean;
-  toMap(getKey: (item: T) => any): object;
-  toMapValue(getValue: (item: T) => any): object;
+  toMap(getKey: (item: T, index: number) => any): object;
+  toMapValue(getValue: (item: T, index: number) => any): object;
   contains(item: T, getItemKey?: (item: T) => any): boolean;
   reversed(): T[];
   removeAt(index: number): void;
@@ -1433,21 +1433,23 @@ if (typeof String !== "undefined") {
 // #region Array
 if (typeof Array !== "undefined") {
   Array.prototype.toMap = function (
-    getKey: (item: any) => any,
-    getValue?: (item: any) => any
+    getKey: (item: any, index: number) => any,
+    getValue?: (item: any, index: number) => any
   ) {
     if (!getValue) getValue = (item) => item;
     const map = {} as any;
-    this.forEach((item) => {
-      map[getKey(item)] = getValue!(item);
+    this.forEach((item, index) => {
+      map[getKey(item, index)] = getValue!(item, index);
     });
     return map;
   };
 
-  Array.prototype.toMapValue = function (getValue: (item: any) => any) {
+  Array.prototype.toMapValue = function (
+    getValue: (item: any, index: number) => any
+  ) {
     const map = {} as any;
-    this.forEach((item) => {
-      map[item] = getValue(item);
+    this.forEach((item, index) => {
+      map[item] = getValue(item, index);
     });
     return map;
   };

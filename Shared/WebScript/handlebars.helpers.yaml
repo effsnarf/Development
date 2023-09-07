@@ -56,6 +56,6 @@ helpers:
       return str?.replace(/-/g, ".");
     }
   methodSignature: | #ts
-    (context, name, args) => {
-      return `${name}(${args.join(", ")})`;
+    (context, prefix, name, args) => {
+      return `async ${prefix}${name}(${args.join(", ")})`;
     }

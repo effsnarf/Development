@@ -17,8 +17,8 @@ methods:
     }
   includeData: | #js
     function(key, value) {
+      if (key.startsWith('_')) return false;
       if (typeof value == 'function') return false;
-      
       return true;
     }
 _:

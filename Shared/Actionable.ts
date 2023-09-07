@@ -1,5 +1,6 @@
 import { Data } from "./Data";
 import { Objects } from "./Extensions.Objects.Client";
+import { TaskQueue } from "./TaskQueue";
 
 namespace Actionable {
   export interface Doable {
@@ -12,11 +13,59 @@ namespace Actionable {
     _id: number;
     redo: Doable;
     undo: Doable;
+    parent?: { _id: number };
+  }
+
+  export interface ActionResult {
+    action: Action;
+    returnValue: any;
+  }
+
+  class ActionPointer {
+    _id!: Data.Value<number>;
+    action: Action | null = null;
+    isFirstAction: boolean = false;
+    isLastAction: boolean = false;
+
+    private constructor(
+      persister: Data.Persister.Base,
+      private actions: Data.List
+    ) {}
+
+    static async new(
+      persister: Data.Persister.Base,
+      actions: Data.List
+    ): Promise<ActionPointer> {
+      const actionPointer = new ActionPointer(persister, actions);
+      actionPointer._id = await Data.Value.new<number>(
+        persister,
+        "actionPointer",
+        null
+      );
+      const firstAction = await actionPointer.actions.getItemAt(0);
+      actionPointer.isFirstAction =
+        actionPointer._id.value === firstAction?._id;
+      return actionPointer;
+    }
+
+    async set(action: Action) {
+      this._id.value = action._id;
+      this.action = action;
+      const firstAction = await this.actions.getItemAt(0);
+      const lastAction = await this.actions.getNewest();
+      this.isFirstAction = this._id.value === firstAction?._id;
+      this.isLastAction = this._id.value === lastAction?._id;
+    }
   }
 
   export class ActionStack {
     actions!: Data.List;
-    pointer!: Data.Value;
+    isRolledBack: boolean = false;
+    doneAction!: ActionPointer;
+    taskQueue!: TaskQueue;
+    methodStack: number[] = [];
+    methodStack2: number[] = [];
+    idToId: { [id: number]: number } = {};
 
     toPersistableAction: (action: Action) => Promise<any> = async (
       action: Action
@@ -26,11 +75,14 @@ namespace Actionable {
     ) => action;
 
     executeAction!: (action: Action) => Promise<Action>;
+    executeDoable!: (doable: Doable) => Promise<any>;
 
     private constructor(
       private persister: Data.Persister.Base,
       private varName: string
-    ) {}
+    ) {
+      this.taskQueue = new TaskQueue();
+    }
 
     static async new(
       persister: Data.Persister.Base,
@@ -43,19 +95,12 @@ namespace Actionable {
         `${varName}.actions`
       );
 
-      actionStack.pointer = await Data.Value.new(
+      actionStack.doneAction = await ActionPointer.new(
         persister,
-        `${varName}.actions.pointer`,
-        -1
+        actionStack.actions
       );
 
-      if (actionStack.actions.count === 0) {
-        // Add a blank action to start
-        await actionStack.do({
-          redo: { noop: true },
-          undo: { noop: true },
-        });
-      }
+      actionStack.ensureNoopAction();
 
       return actionStack;
     }
@@ -68,31 +113,75 @@ namespace Actionable {
       await this.add(action);
     }
 
-    async add(action: Action | any) {
-      action = Objects.clone(action);
-      action = await this.toPersistableAction(action);
-      const actionAtPointer = await this.actions.getItemAt(this.pointer.value);
-      if (actionAtPointer)
-        await this.actions.deleteMany(
-          (action: Action) => action._id > actionAtPointer._id
-        );
-      await this.actions.upsert(action);
-      this.pointer.value++;
+    async enteringMethod() {
+      const actionID = await this.actions.getNewID();
+      this.methodStack.push(actionID);
     }
 
-    async goToAction(toPointer: number) {
-      if (this.pointer.value > toPointer) {
-        while (this.pointer.value > toPointer) {
+    async add(action: Action | any, options?: { exitingMethod?: boolean }) {
+      action = Objects.clone(action);
+
+      if (options?.exitingMethod) {
+        if (this.methodStack.length) {
+          const newActionID = this.methodStack.pop();
+          action._id = newActionID;
+          if (this.methodStack.length) {
+            action.parent = {
+              _id: this.methodStack[this.methodStack.length - 1],
+            };
+          }
+        }
+      }
+
+      action = await this.toPersistableAction(action);
+
+      if (!this.doneAction.isLastAction)
+        await this.actions.deleteMany(
+          (action: Action) => action._id > this.doneAction._id.value
+        );
+      await this.actions.upsert(action);
+
+      if (options?.exitingMethod && !this.methodStack.length) {
+        // Exited the method stack
+        // Now we want to reverse all the action ids in the method call stack
+        const ids = this.methodStack2;
+        const idToId = ids.toMap((a, i) => ids[ids.length - i - 1]) as any;
+        const stackActions = await this.actions.getNewest(ids.length);
+        for (const stackAction of stackActions) {
+          stackAction._id = idToId[stackAction._id];
+          if (stackAction.parent)
+            stackAction.parent._id = idToId[stackAction.parent._id];
+        }
+        await this.actions.upsertMany(stackActions);
+        this.methodStack2.clear();
+      }
+
+      this.doneAction.set(action);
+    }
+
+    async goToAction(toActionID: number) {
+      if (this.doneAction._id.value > toActionID) {
+        while (this.doneAction._id.value > toActionID) {
           await this.undo();
           return;
         }
       }
-      if (this.pointer.value < toPointer) {
-        while (this.pointer.value < toPointer) {
+      if (this.doneAction._id.value < toActionID) {
+        while (this.doneAction._id.value < toActionID) {
           await this.redo();
           return;
         }
       }
+    }
+
+    async getActions(parentID?: number): Promise<Action[]> {
+      return await this.actions.getMany(
+        (action: Action) => action.parent?._id === parentID
+      );
+    }
+
+    async getAllActions(): Promise<Action[]> {
+      return await this.actions.getMany((a) => true);
     }
 
     async undo(count: number = 1) {
@@ -103,29 +192,37 @@ namespace Actionable {
     }
 
     async _undo() {
-      if (this.pointer.value < 0) return;
-      const action = await this.actions.getItemAt(this.pointer.value);
-      if (!action) return;
-      //await this.fromPersistableAction(action);
-      await this.executeAction({
-        undo: action.redo,
-        redo: action.undo,
-      } as Action);
-      this.pointer.value--;
+      if (this.doneAction.isFirstAction) return;
+      if (!this.doneAction.action) return;
+      await this._executeDoable(this.doneAction.action.undo);
+      const index = await this.actions.getIndex(this.doneAction._id.value);
+      if (index == null) throw new Error("Action not found");
+      this.doneAction.set(await this.actions.getItemAt(index - 1));
     }
 
     async redo() {
-      if (this.pointer.value >= this.actions.count - 1) return;
-      const action = await this.actions.getItemAt(this.pointer.value + 1);
-      if (!action) return;
-      await this.fromPersistableAction(action);
-      await this.executeAction(action);
-      this.pointer.value++;
+      if (this.doneAction.isLastAction) return;
+      if (!this.doneAction.action) return;
+      await this._executeDoable(this.doneAction.action.redo);
+      const index = await this.actions.getIndex(this.doneAction._id.value);
+      if (index == null) throw new Error("Action not found");
+      this.doneAction.set(await this.actions.getItemAt(index + 1));
     }
 
     async clear() {
       await this.actions.clear();
-      this.pointer.value = -1;
+      await this.ensureNoopAction();
+      this.doneAction.set(await this.actions.getNewest());
+    }
+
+    private async ensureNoopAction() {
+      if (this.actions.count === 0) {
+        // Add a blank action to start
+        await this.do({
+          redo: { noop: true },
+          undo: { noop: true },
+        });
+      }
     }
 
     private async _executeAction(action: Action) {
@@ -134,6 +231,14 @@ namespace Actionable {
       if (action.redo.noop) return action;
 
       return await this.executeAction(action);
+    }
+
+    private async _executeDoable(doable: Doable) {
+      doable = Objects.clone(doable);
+
+      if (doable.noop) return;
+
+      return await this.executeDoable(doable);
     }
   }
 }

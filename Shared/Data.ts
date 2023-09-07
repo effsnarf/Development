@@ -1,4 +1,5 @@
 import { Objects } from "./Extensions.Objects.Client";
+import { Events } from "./Events";
 
 namespace Data {
   export namespace Persister {
@@ -10,10 +11,14 @@ namespace Data {
       abstract get(key: any, defaultValue: any): Promise<any>;
       abstract set(key: any, value: any): Promise<void>;
 
+      abstract getItem(collection: string, _id: number): Promise<any>;
       abstract addItem(collection: string, item: any): Promise<void>;
       abstract updateItem(collection: string, item: any): Promise<void>;
       abstract upsertItem(collection: string, item: any): Promise<void>;
-      abstract deleteItem(collection: string, _id: number): Promise<void>;
+      abstract upsertMany(collection: string, items: any[]): Promise<void>;
+      async deleteItem(collection: string, _id: number): Promise<void> {
+        await this.deleteMany(collection, (item: any) => item._id === _id);
+      }
       abstract deleteMany(
         collection: string,
         filter: (item: any) => boolean
@@ -25,7 +30,11 @@ namespace Data {
         limit?: number
       ): Promise<any[]>;
       abstract getItemAt(collection: string, index: number): Promise<any>;
+      abstract getNewest(collection: string, count: number): Promise<any>;
+      abstract getIndex(collection: string, item: any): Promise<number | null>;
       abstract count(collection: string): Promise<number>;
+
+      abstract getNewID(): Promise<number>;
     }
 
     export class Collection {
@@ -38,6 +47,10 @@ namespace Data {
         return new Collection(persister, collection);
       }
 
+      async getItem(_id: number): Promise<any> {
+        return await this.persister.getItem(this.collection, _id);
+      }
+
       async addItem(item: any): Promise<void> {
         await this.persister.addItem(this.collection, item);
       }
@@ -48,6 +61,10 @@ namespace Data {
 
       async upsertItem(item: any): Promise<void> {
         await this.persister.upsertItem(this.collection, item);
+      }
+
+      async upsertMany(items: any[]): Promise<void> {
+        await this.persister.upsertMany(this.collection, items);
       }
 
       async deleteItem(_id: number): Promise<void> {
@@ -75,17 +92,30 @@ namespace Data {
         return await this.persister.getItemAt(this.collection, index);
       }
 
+      async getNewest(count: number): Promise<any> {
+        return await this.persister.getNewest(this.collection, count);
+      }
+
+      async getIndex(item: any): Promise<number | null> {
+        return await this.persister.getIndex(this.collection, item);
+      }
+
       async count(): Promise<number> {
         return await this.persister.count(this.collection);
+      }
+
+      async getNewID(): Promise<number> {
+        return await this.persister.getNewID();
       }
     }
 
     export class Memory extends Base {
-      private nextID: number = 1;
-      private values: any = {};
-      private collections: any = {};
+      protected nextID: number = 1;
+      protected values: any = {};
+      protected collections: any = {};
+      protected idToIndex: any = {};
 
-      private constructor() {
+      constructor() {
         super();
       }
 
@@ -101,10 +131,17 @@ namespace Data {
         this.values[key] = value;
       }
 
+      async getItem(collection: string, _id: number): Promise<any> {
+        const index = this.getIdToIndexCollection(collection)[_id];
+        if (!index) return null;
+        return await this.getItemAt(collection, index);
+      }
+
       async addItem(collection: string, item: any): Promise<void> {
         const items = await this.getCollectionArray(collection);
         if (!item._id) item._id = await this.getNewID();
         items.push(item);
+        this.getIdToIndexCollection(collection)[item._id] = items.length - 1;
       }
 
       async updateItem(collection: string, item: any): Promise<void> {
@@ -114,23 +151,28 @@ namespace Data {
       }
 
       async upsertItem(collection: string, item: any): Promise<void> {
-        if (item._id) {
+        if (await this.getItem(collection, item._id)) {
           await this.updateItem(collection, item);
         } else {
           await this.addItem(collection, item);
         }
       }
 
-      async deleteItem(collection: string, _id: number): Promise<void> {
-        let items = await this.getCollectionArray(collection);
-        items = items.filter((item: any) => item._id !== _id);
-        this.setCollectionArray(collection, items);
+      async upsertMany(collection: string, items: any[]): Promise<void> {
+        for (const item of items) {
+          await this.upsertItem(collection, item);
+        }
       }
 
       async deleteMany(collection: string, filter: (item: any) => boolean) {
+        const deletedItems = await this.getItems(collection, filter);
         let items = await this.getCollectionArray(collection);
         items = items.filter((item: any) => !filter(item));
         this.setCollectionArray(collection, items);
+        const idToIndex = this.getIdToIndexCollection(collection);
+        for (const item of deletedItems) {
+          delete idToIndex[item._id];
+        }
       }
 
       async getItems(
@@ -152,6 +194,16 @@ namespace Data {
         return items[index];
       }
 
+      async getNewest(collection: string, count: number): Promise<any> {
+        const items = await this.getCollectionArray(collection);
+        return items.slice(-count);
+      }
+
+      async getIndex(collection: string, item: any): Promise<number | null> {
+        const _id = (item._id || item) as number;
+        return this.getIdToIndexCollection(collection)[_id];
+      }
+
       async count(collection: string): Promise<number> {
         const items = await this.getCollectionArray(collection);
         return items.length;
@@ -166,114 +218,88 @@ namespace Data {
         this.collections[collection] = items;
       }
 
-      private async getNewID(): Promise<number> {
+      async getNewID(): Promise<number> {
         return this.nextID++;
+      }
+
+      private getIdToIndexCollection(collection: string): any {
+        if (!this.idToIndex[collection]) this.idToIndex[collection] = {};
+        return this.idToIndex[collection];
       }
     }
 
-    export class LocalStorage extends Base {
+    export class LocalStorage extends Memory {
       private constructor(private name: string) {
         super();
-      }
-
-      static new(name: string): LocalStorage {
-        return new LocalStorage(name);
-      }
-
-      async get(key: any, defaultValue: any = null): Promise<any> {
-        return JSON.parse(
-          localStorage.getItem(`${this.name}.${key}`) ||
-            JSON.stringify(defaultValue)
-        );
-      }
-
-      async set(key: any, value: any): Promise<void> {
-        localStorage.setItem(`${this.name}.${key}`, JSON.stringify(value));
-      }
-
-      async addItem(collection: string, item: any): Promise<void> {
-        const items = await this.get(collection, []);
-        if (!item._id) item._id = await this.getNewId();
-        items.push(item);
-        await this.set(collection, items);
-      }
-
-      async updateItem(collection: string, item: any): Promise<void> {
-        let items = await this.get(collection);
-        const index = items.findIndex((i: any) => i._id === item._id);
-        if (index >= 0) items[index] = item;
-        await this.set(collection, items);
-      }
-
-      async upsertItem(collection: string, item: any): Promise<void> {
-        if (item._id) {
-          await this.updateItem(collection, item);
-        } else {
-          await this.addItem(collection, item);
+        // Whenever one of these is called, save the data to local storage
+        const members = [
+          "set",
+          "addItem",
+          "updateItem",
+          "upsertItem",
+          "deleteItem",
+          "deleteMany",
+          "getNewID",
+        ];
+        const self = this as any;
+        for (const member of members) {
+          const original = self[member];
+          self[member] = async (...args: any[]) => {
+            const result = await original.apply(this, args);
+            this.save();
+            return result;
+          };
         }
       }
 
-      async deleteItem(collection: string, _id: number): Promise<void> {
-        let items = await this.get(collection);
-        items = items.filter((item: any) => item._id !== _id);
-        await this.set(collection, items);
+      static new2(name: string): LocalStorage {
+        const storage = new LocalStorage(name);
+        storage.load();
+        return storage;
       }
 
-      async deleteMany(collection: string, filter: (item: any) => boolean) {
-        let items = await this.get(collection);
-        items = items.filter((item: any) => !filter(item));
-        await this.set(collection, items);
+      static new(): LocalStorage {
+        throw new Error("Use new2 to create a LocalStorage instance");
       }
 
-      async getItems(
-        collection: string,
-        filter: (item: any) => boolean = () => true,
-        sort: (item: any) => any = (item: any) => item._id,
-        limit?: number
-      ): Promise<any[]> {
-        let items = await this.get(collection, []);
-        items = items.filter(filter);
-        items = items.sort(sort);
-        items = items.slice(0, limit || items.length);
-        return items;
+      private save(): void {
+        const data = {
+          nextID: this.nextID,
+          values: this.values,
+          collections: this.collections,
+          idToIndex: this.idToIndex,
+        };
+        localStorage.setItem(this.name, JSON.stringify(this));
       }
 
-      async getItemAt(collection: string, index: number): Promise<any> {
-        const items = await this.get(collection, []);
-        return items[index];
-      }
-
-      async count(collection: string): Promise<number> {
-        const items = await this.get(collection, []);
-        return items.length;
-      }
-
-      private async getNewId(): Promise<number> {
-        const nextIdKey = "next.id";
-        const id = await this.get(nextIdKey, 1);
-        await this.set(nextIdKey, id + 1);
-        return id;
+      private load(): void {
+        const data = JSON.parse(localStorage.getItem(this.name) || "{}");
+        this.nextID = data.nextID || 1;
+        this.values = data.values || {};
+        this.collections = data.collections || {};
+        this.idToIndex = data.idToIndex || {};
       }
     }
   }
 
-  export class Value {
+  export class Value<T> {
     private _saveTimer: any = null;
     private _value: any = null;
+    events: Events = new Events();
 
     private constructor(
       private persister: Persister.Base,
       private key: string,
-      private defaultValue: any = null
+      private defaultValue: T | null = null
     ) {
       this.load();
     }
 
-    static async new(
+    static async new<T>(
       persister: Persister.Base,
       key: string,
-      defaultValue: any = null
-    ): Promise<Value> {
+      defaultValue: T | null = null
+    ): Promise<Value<T>> {
       const value = new Value(persister, key, defaultValue);
       await value.load();
       return value;
@@ -286,6 +312,7 @@ namespace Data {
     set value(value: any) {
       this._value = value;
       this.save();
+      this.events.emit("change", value);
     }
 
     async load() {
@@ -349,6 +376,11 @@ namespace Data {
       await this.refresh();
     }
 
+    async upsertMany(items: any[]): Promise<void> {
+      await this.collection.upsertMany(items);
+      await this.refresh();
+    }
+
     async getItemAt(index: number): Promise<any> {
       return await this.collection.getItemAt(index);
     }
@@ -357,10 +389,18 @@ namespace Data {
       return await this.collection.getItems(filter);
     }
 
+    async getNewest(count: number = 1): Promise<any> {
+      return await this.collection.getNewest(count);
+    }
+
+    async getIndex(item: any): Promise<number | null> {
+      return await this.collection.getIndex(item);
+    }
+
     private async refresh(): Promise<void> {
       this.lastItems = await this.collection.getItems(
         (item: any) => true,
-        (item: any) => -item._id,
+        (item: any) => item._id,
         this.lastItemsCount
       );
       this.count = await this.collection.count();
@@ -369,6 +409,10 @@ namespace Data {
     async clear(): Promise<void> {
       await this.collection.deleteMany(() => true);
       await this.refresh();
+    }
+
+    async getNewID(): Promise<number> {
+      return await this.collection.getNewID();
     }
   }
 }

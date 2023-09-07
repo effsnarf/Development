@@ -12,8 +12,6 @@ dom:
       template:
         flow.interface.action:
           ':action': slotProps.action
-    h2:
-      v-text: actionStack.pointer.value
 props: null
 mounted: null
 methods:
@@ -41,5 +39,4 @@ template: >-
   path="271844389.1"></ui-button><ui-action-stack :action-stack="actionStack"
   v-slot="slotProps" path="271844389.2"><template
   path="271844389.2.0"><flow-interface-action :action="slotProps.action"
-  path="271844389.2.0.0"></flow-interface-action></template></ui-action-stack><h2
-  v-text="actionStack.pointer.value" path="271844389.3"></h2></div>
+  path="271844389.2.0.0"></flow-interface-action></template></ui-action-stack></div>

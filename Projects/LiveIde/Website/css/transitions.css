@@ -236,7 +236,7 @@
 .slide-hor-enter-to,
 .slide-hor-leave {
   opacity: 1;
-  max-width: 20rem;
+  max-width: 30rem;
   overflow: hidden;
 }
 

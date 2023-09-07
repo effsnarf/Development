@@ -731,11 +731,11 @@ var Flow;
             const { dragItem, dropItem } = action.redo;
             const newNodeType = dragItem;
             if (dropItem.type == "flow.layout.empty") {
-                const oldPointer = this.userAppGdb.actionStack.pointer.value;
+                const oldActionID = this.userAppGdb.actionStack.doneAction._id.value;
                 const newNode = await this.createNewNode(newNodeType);
                 await this.userAppGdb.replaceNode(dropItem, newNode);
-                const newPointer = this.userAppGdb.actionStack.pointer.value;
-                const newActionsCount = newPointer - oldPointer + 1;
+                const newActionID = this.userAppGdb.actionStack.doneAction._id.value;
+                const newActionsCount = newActionID - oldActionID + 1;
                 action.undo = { method: "gdb.undo", args: [newActionsCount] };
                 return action;
             }
@@ -830,7 +830,7 @@ var Flow;
         static async new(vueApp, vm, gdbData) {
             const persisters = {
                 memory: Data_1.Data.Persister.Memory.new(),
-                localStorage: Data_1.Data.Persister.LocalStorage.new("flow"),
+                localStorage: Data_1.Data.Persister.LocalStorage.new2("flow"),
             };
             const userAppGdb = await Graph_1.Graph.ActionableDatabase.new2(persisters.memory, "gdb", gdbData);
             const manager = new Manager(vm, userAppGdb);
@@ -3237,6 +3237,7 @@ class Module {
         this.path = obj.path;
         this.source = obj.source;
         this.className = this.name.split(".").last();
+        this.source.namespace = this.getNamespaceName(this.name);
         this.source.name = this.className;
     }
     async compile() {
@@ -3259,6 +3260,10 @@ class Module {
             nsnode = nsnode[part] = nsnode[part] || {};
         }
         return nsnode;
+    }
+    getNamespaceName(name) {
+        const parts = name.split(".");
+        return parts.take(parts.length - 1).join(".");
     }
 }
 exports.Module = Module;
@@ -3948,31 +3953,59 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Actionable = void 0;
 const Data_1 = __webpack_require__(/*! ./Data */ "../../../../Shared/Data.ts");
 const Extensions_Objects_Client_1 = __webpack_require__(/*! ./Extensions.Objects.Client */ "../../../../Shared/Extensions.Objects.Client.ts");
+const TaskQueue_1 = __webpack_require__(/*! ./TaskQueue */ "../../../../Shared/TaskQueue.ts");
 var Actionable;
 (function (Actionable) {
+    class ActionPointer {
+        actions;
+        _id;
+        action = null;
+        isFirstAction = false;
+        isLastAction = false;
+        constructor(persister, actions) {
+            this.actions = actions;
+        }
+        static async new(persister, actions) {
+            const actionPointer = new ActionPointer(persister, actions);
+            actionPointer._id = await Data_1.Data.Value.new(persister, "actionPointer", null);
+            const firstAction = await actionPointer.actions.getItemAt(0);
+            actionPointer.isFirstAction =
+                actionPointer._id.value === firstAction?._id;
+            return actionPointer;
+        }
+        async set(action) {
+            this._id.value = action._id;
+            this.action = action;
+            const firstAction = await this.actions.getItemAt(0);
+            const lastAction = await this.actions.getNewest();
+            this.isFirstAction = this._id.value === firstAction?._id;
+            this.isLastAction = this._id.value === lastAction?._id;
+        }
+    }
     class ActionStack {
         persister;
         varName;
         actions;
-        pointer;
+        isRolledBack = false;
+        doneAction;
+        taskQueue;
+        methodStack = [];
+        methodStack2 = [];
+        idToId = {};
         toPersistableAction = async (action) => action;
         fromPersistableAction = async (action) => action;
         executeAction;
+        executeDoable;
         constructor(persister, varName) {
             this.persister = persister;
             this.varName = varName;
+            this.taskQueue = new TaskQueue_1.TaskQueue();
         }
         static async new(persister, varName) {
             const actionStack = new ActionStack(persister, varName);
             actionStack.actions = await Data_1.Data.List.new(persister, `${varName}.actions`);
-            actionStack.pointer = await Data_1.Data.Value.new(persister, `${varName}.actions.pointer`, -1);
-            if (actionStack.actions.count === 0) {
-                // Add a blank action to start
-                await actionStack.do({
-                    redo: { noop: true },
-                    undo: { noop: true },
-                });
-            }
+            actionStack.doneAction = await ActionPointer.new(persister, actionStack.actions);
+            actionStack.ensureNoopAction();
             return actionStack;
         }
         async do(action) {
@@ -3984,28 +4017,62 @@ var Actionable;
                 throw new Error("executeAction must set action.undo");
             await this.add(action);
         }
-        async add(action) {
-            action = Extensions_Objects_Client_1.Objects.clone(action);
-            action = await this.toPersistableAction(action);
-            const actionAtPointer = await this.actions.getItemAt(this.pointer.value);
-            if (actionAtPointer)
-                await this.actions.deleteMany((action) => action._id > actionAtPointer._id);
-            await this.actions.upsert(action);
-            this.pointer.value++;
+        async enteringMethod() {
+            const actionID = await this.actions.getNewID();
+            this.methodStack.push(actionID);
         }
-        async goToAction(toPointer) {
-            if (this.pointer.value > toPointer) {
-                while (this.pointer.value > toPointer) {
+        async add(action, options) {
+            action = Extensions_Objects_Client_1.Objects.clone(action);
+            if (options?.exitingMethod) {
+                if (this.methodStack.length) {
+                    const newActionID = this.methodStack.pop();
+                    action._id = newActionID;
+                    if (this.methodStack.length) {
+                        action.parent = {
+                            _id: this.methodStack[this.methodStack.length - 1],
+                        };
+                    }
+                }
+            }
+            action = await this.toPersistableAction(action);
+            if (!this.doneAction.isLastAction)
+                await this.actions.deleteMany((action) => action._id > this.doneAction._id.value);
+            await this.actions.upsert(action);
+            if (options?.exitingMethod && !this.methodStack.length) {
+                // Exited the method stack
+                // Now we want to reverse all the action ids in the method call stack
+                const ids = this.methodStack2;
+                const idToId = ids.toMap((a, i) => ids[ids.length - i - 1]);
+                const stackActions = await this.actions.getNewest(ids.length);
+                for (const stackAction of stackActions) {
+                    stackAction._id = idToId[stackAction._id];
+                    if (stackAction.parent)
+                        stackAction.parent._id = idToId[stackAction.parent._id];
+                }
+                await this.actions.upsertMany(stackActions);
+                this.methodStack2.clear();
+            }
+            this.doneAction.set(action);
+        }
+        async goToAction(toActionID) {
+            if (this.doneAction._id.value > toActionID) {
+                while (this.doneAction._id.value > toActionID) {
                     await this.undo();
                     return;
                 }
             }
-            if (this.pointer.value < toPointer) {
-                while (this.pointer.value < toPointer) {
+            if (this.doneAction._id.value < toActionID) {
+                while (this.doneAction._id.value < toActionID) {
                     await this.redo();
                     return;
                 }
             }
+        }
+        async getActions(parentID) {
+            return await this.actions.getMany((action) => action.parent?._id === parentID);
+        }
+        async getAllActions() {
+            return await this.actions.getMany((a) => true);
         }
         async undo(count = 1) {
             if (count < 1)
@@ -4015,37 +4082,52 @@ var Actionable;
             }
         }
         async _undo() {
-            if (this.pointer.value < 0)
+            if (this.doneAction.isFirstAction)
                 return;
-            const action = await this.actions.getItemAt(this.pointer.value);
-            if (!action)
+            if (!this.doneAction.action)
                 return;
-            //await this.fromPersistableAction(action);
-            await this.executeAction({
-                undo: action.redo,
-                redo: action.undo,
-            });
-            this.pointer.value--;
+            await this._executeDoable(this.doneAction.action.undo);
+            const index = await this.actions.getIndex(this.doneAction._id.value);
+            if (index == null)
+                throw new Error("Action not found");
+            this.doneAction.set(await this.actions.getItemAt(index - 1));
         }
         async redo() {
-            if (this.pointer.value >= this.actions.count - 1)
+            if (this.doneAction.isLastAction)
                 return;
-            const action = await this.actions.getItemAt(this.pointer.value + 1);
-            if (!action)
+            if (!this.doneAction.action)
                 return;
-            await this.fromPersistableAction(action);
-            await this.executeAction(action);
-            this.pointer.value++;
+            await this._executeDoable(this.doneAction.action.redo);
+            const index = await this.actions.getIndex(this.doneAction._id.value);
+            if (index == null)
+                throw new Error("Action not found");
+            this.doneAction.set(await this.actions.getItemAt(index + 1));
         }
         async clear() {
             await this.actions.clear();
-            this.pointer.value = -1;
+            await this.ensureNoopAction();
+            this.doneAction.set(await this.actions.getNewest());
+        }
+        async ensureNoopAction() {
+            if (this.actions.count === 0) {
+                // Add a blank action to start
+                await this.do({
+                    redo: { noop: true },
+                    undo: { noop: true },
+                });
+            }
         }
         async _executeAction(action) {
             action = Extensions_Objects_Client_1.Objects.clone(action);
             if (action.redo.noop)
                 return action;
             return await this.executeAction(action);
+        }
+        async _executeDoable(doable) {
+            doable = Extensions_Objects_Client_1.Objects.clone(doable);
+            if (doable.noop)
+                return;
+            return await this.executeDoable(doable);
         }
     }
     Actionable.ActionStack = ActionStack;
@@ -4065,6 +4147,7 @@ var Actionable;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Data = void 0;
 const Extensions_Objects_Client_1 = __webpack_require__(/*! ./Extensions.Objects.Client */ "../../../../Shared/Extensions.Objects.Client.ts");
+const Events_1 = __webpack_require__(/*! ./Events */ "../../../../Shared/Events.ts");
 var Data;
 (function (Data) {
     let Persister;
@@ -4072,6 +4155,9 @@ var Data;
         class Base {
             getCollection(collection) {
                 return Collection.new(this, collection);
+            }
+            async deleteItem(collection, _id) {
+                await this.deleteMany(collection, (item) => item._id === _id);
             }
         }
         Persister.Base = Base;
@@ -4085,6 +4171,9 @@ var Data;
             static new(persister, collection) {
                 return new Collection(persister, collection);
             }
+            async getItem(_id) {
+                return await this.persister.getItem(this.collection, _id);
+            }
             async addItem(item) {
                 await this.persister.addItem(this.collection, item);
             }
@@ -4093,6 +4182,9 @@ var Data;
             }
             async upsertItem(item) {
                 await this.persister.upsertItem(this.collection, item);
+            }
+            async upsertMany(items) {
+                await this.persister.upsertMany(this.collection, items);
             }
             async deleteItem(_id) {
                 await this.persister.deleteItem(this.collection, _id);
@@ -4106,8 +4198,17 @@ var Data;
             async getItemAt(index) {
                 return await this.persister.getItemAt(this.collection, index);
             }
+            async getNewest(count) {
+                return await this.persister.getNewest(this.collection, count);
+            }
+            async getIndex(item) {
+                return await this.persister.getIndex(this.collection, item);
+            }
             async count() {
                 return await this.persister.count(this.collection);
+            }
+            async getNewID() {
+                return await this.persister.getNewID();
             }
         }
         Persister.Collection = Collection;
@@ -4115,6 +4216,7 @@ var Data;
             nextID = 1;
             values = {};
             collections = {};
+            idToIndex = {};
             constructor() {
                 super();
             }
@@ -4127,11 +4229,18 @@ var Data;
             async set(key, value) {
                 this.values[key] = value;
             }
+            async getItem(collection, _id) {
+                const index = this.getIdToIndexCollection(collection)[_id];
+                if (!index)
+                    return null;
+                return await this.getItemAt(collection, index);
+            }
             async addItem(collection, item) {
                 const items = await this.getCollectionArray(collection);
                 if (!item._id)
                     item._id = await this.getNewID();
                 items.push(item);
+                this.getIdToIndexCollection(collection)[item._id] = items.length - 1;
             }
             async updateItem(collection, item) {
                 let items = await this.getCollectionArray(collection);
@@ -4140,22 +4249,27 @@ var Data;
                     items[index] = item;
             }
             async upsertItem(collection, item) {
-                if (item._id) {
+                if (await this.getItem(collection, item._id)) {
                     await this.updateItem(collection, item);
                 }
                 else {
                     await this.addItem(collection, item);
                 }
             }
-            async deleteItem(collection, _id) {
-                let items = await this.getCollectionArray(collection);
-                items = items.filter((item) => item._id !== _id);
-                this.setCollectionArray(collection, items);
+            async upsertMany(collection, items) {
+                for (const item of items) {
+                    await this.upsertItem(collection, item);
+                }
             }
             async deleteMany(collection, filter) {
+                const deletedItems = await this.getItems(collection, filter);
                 let items = await this.getCollectionArray(collection);
                 items = items.filter((item) => !filter(item));
                 this.setCollectionArray(collection, items);
+                const idToIndex = this.getIdToIndexCollection(collection);
+                for (const item of deletedItems) {
+                    delete idToIndex[item._id];
+                }
             }
             async getItems(collection, filter = () => true, sort = (item) => item._id, limit) {
                 let items = await this.getCollectionArray(collection);
@@ -4168,6 +4282,14 @@ var Data;
             async getItemAt(collection, index) {
                 const items = await this.getCollectionArray(collection);
                 return items[index];
+            }
+            async getNewest(collection, count) {
+                const items = await this.getCollectionArray(collection);
+                return items.slice(-count);
+            }
+            async getIndex(collection, item) {
+                const _id = (item._id || item);
+                return this.getIdToIndexCollection(collection)[_id];
             }
             async count(collection) {
                 const items = await this.getCollectionArray(collection);
@@ -4184,76 +4306,61 @@ var Data;
             async getNewID() {
                 return this.nextID++;
             }
+            getIdToIndexCollection(collection) {
+                if (!this.idToIndex[collection])
+                    this.idToIndex[collection] = {};
+                return this.idToIndex[collection];
+            }
         }
         Persister.Memory = Memory;
-        class LocalStorage extends Base {
+        class LocalStorage extends Memory {
             name;
             constructor(name) {
                 super();
                 this.name = name;
-            }
-            static new(name) {
-                return new LocalStorage(name);
-            }
-            async get(key, defaultValue = null) {
-                return JSON.parse(localStorage.getItem(`${this.name}.${key}`) ||
-                    JSON.stringify(defaultValue));
-            }
-            async set(key, value) {
-                localStorage.setItem(`${this.name}.${key}`, JSON.stringify(value));
-            }
-            async addItem(collection, item) {
-                const items = await this.get(collection, []);
-                if (!item._id)
-                    item._id = await this.getNewId();
-                items.push(item);
-                await this.set(collection, items);
-            }
-            async updateItem(collection, item) {
-                let items = await this.get(collection);
-                const index = items.findIndex((i) => i._id === item._id);
-                if (index >= 0)
-                    items[index] = item;
-                await this.set(collection, items);
-            }
-            async upsertItem(collection, item) {
-                if (item._id) {
-                    await this.updateItem(collection, item);
-                }
-                else {
-                    await this.addItem(collection, item);
+                // Whenever one of these is called, save the data to local storage
+                const members = [
+                    "set",
+                    "addItem",
+                    "updateItem",
+                    "upsertItem",
+                    "deleteItem",
+                    "deleteMany",
+                    "getNewID",
+                ];
+                const self = this;
+                for (const member of members) {
+                    const original = self[member];
+                    self[member] = async (...args) => {
+                        const result = await original.apply(this, args);
+                        this.save();
+                        return result;
+                    };
                 }
             }
-            async deleteItem(collection, _id) {
-                let items = await this.get(collection);
-                items = items.filter((item) => item._id !== _id);
-                await this.set(collection, items);
+            static new2(name) {
+                const storage = new LocalStorage(name);
+                storage.load();
+                return storage;
             }
-            async deleteMany(collection, filter) {
-                let items = await this.get(collection);
-                items = items.filter((item) => !filter(item));
-                await this.set(collection, items);
+            static new() {
+                throw new Error("Use new2 to create a LocalStorage instance");
             }
-            async getItems(collection, filter = () => true, sort = (item) => item._id, limit) {
-                let items = await this.get(collection, []);
-                items = items.filter(filter);
-                items = items.sort(sort);
-                items = items.slice(0, limit || items.length);
-                return items;
+            save() {
+                const data = {
+                    nextID: this.nextID,
+                    values: this.values,
+                    collections: this.collections,
+                    idToIndex: this.idToIndex,
+                };
+                localStorage.setItem(this.name, JSON.stringify(this));
             }
-            async getItemAt(collection, index) {
-                const items = await this.get(collection, []);
-                return items[index];
-            }
-            async count(collection) {
-                const items = await this.get(collection, []);
-                return items.length;
-            }
-            async getNewId() {
-                const nextIdKey = "next.id";
-                const id = await this.get(nextIdKey, 1);
-                await this.set(nextIdKey, id + 1);
-                return id;
+            load() {
+                const data = JSON.parse(localStorage.getItem(this.name) || "{}");
+                this.nextID = data.nextID || 1;
+                this.values = data.values || {};
+                this.collections = data.collections || {};
+                this.idToIndex = data.idToIndex || {};
             }
         }
         Persister.LocalStorage = LocalStorage;
@@ -4264,6 +4371,7 @@ var Data;
         defaultValue;
         _saveTimer = null;
         _value = null;
+        events = new Events_1.Events();
         constructor(persister, key, defaultValue = null) {
             this.persister = persister;
             this.key = key;
@@ -4281,6 +4389,7 @@ var Data;
         set value(value) {
             this._value = value;
             this.save();
+            this.events.emit("change", value);
         }
         async load() {
             this._value = await this.persister.get(this.key, this.defaultValue);
@@ -4330,19 +4439,32 @@ var Data;
             await this.collection.upsertItem(item);
             await this.refresh();
         }
+        async upsertMany(items) {
+            await this.collection.upsertMany(items);
+            await this.refresh();
+        }
         async getItemAt(index) {
             return await this.collection.getItemAt(index);
         }
         async getMany(filter) {
             return await this.collection.getItems(filter);
         }
+        async getNewest(count = 1) {
+            return await this.collection.getNewest(count);
+        }
+        async getIndex(item) {
+            return await this.collection.getIndex(item);
+        }
         async refresh() {
-            this.lastItems = await this.collection.getItems((item) => true, (item) => -item._id, this.lastItemsCount);
+            this.lastItems = await this.collection.getItems((item) => true, (item) => item._id, this.lastItemsCount);
             this.count = await this.collection.count();
         }
         async clear() {
             await this.collection.deleteMany(() => true);
             await this.refresh();
+        }
+        async getNewID() {
+            return await this.collection.getNewID();
         }
     }
     Data.List = List;
@@ -6381,15 +6503,15 @@ if (typeof Array !== "undefined") {
         if (!getValue)
             getValue = (item) => item;
         const map = {};
-        this.forEach((item) => {
-            map[getKey(item)] = getValue(item);
+        this.forEach((item, index) => {
+            map[getKey(item, index)] = getValue(item, index);
         });
         return map;
     };
     Array.prototype.toMapValue = function (getValue) {
         const map = {};
-        this.forEach((item) => {
-            map[item] = getValue(item);
+        this.forEach((item, index) => {
+            map[item] = getValue(item, index);
         });
         return map;
     };
@@ -6748,6 +6870,7 @@ class TaskQueue {
     }
     enqueue(task) {
         this.tasks.push(task);
+        return task;
     }
     async next() {
         const task = this.tasks.shift();
@@ -7630,7 +7753,7 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/website/script/1693731896773.ts ***!
+  !*** ../../../LiveIde/website/script/1694001178671.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -7638,6 +7761,7 @@ __webpack_require__(/*! ../../../../Shared/Extensions */ "../../../../Shared/Ext
 const HtmlHelper_1 = __webpack_require__(/*! ../../Classes/HtmlHelper */ "../../../LiveIde/Classes/HtmlHelper.ts");
 const Events_1 = __webpack_require__(/*! ../../../../Shared/Events */ "../../../../Shared/Events.ts");
 const Extensions_Objects_Client_1 = __webpack_require__(/*! ../../../../Shared/Extensions.Objects.Client */ "../../../../Shared/Extensions.Objects.Client.ts");
+const Diff_1 = __webpack_require__(/*! ../../../../Shared/Diff */ "../../../../Shared/Diff.ts");
 const TaskQueue_1 = __webpack_require__(/*! ../../../../Shared/TaskQueue */ "../../../../Shared/TaskQueue.ts");
 const Actionable_1 = __webpack_require__(/*! ../../../../Shared/Actionable */ "../../../../Shared/Actionable.ts");
 const AnalyticsTracker_1 = __webpack_require__(/*! ../../Classes/AnalyticsTracker */ "../../../LiveIde/Classes/AnalyticsTracker.ts");
@@ -7650,6 +7774,7 @@ const window1 = window;
 const Vue = window1.Vue;
 // To make it accessible to client code
 window1.Objects = Extensions_Objects_Client_1.Objects;
+window1.Diff = Diff_1.Diff;
 window1.TaskQueue = TaskQueue_1.TaskQueue;
 window1.Data = Data_1.Data;
 window1.Actionable = Actionable_1.Actionable;

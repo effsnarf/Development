@@ -1,0 +1,87 @@
+dom:
+  div: 
+    v-if: actionStack
+    ul: 
+      class: actions
+      li: 
+        v-for: (action, index) in actions
+        ':class': getActionCssClass(action, index)
+        div: 
+          slot: 
+            ':action': action
+          .pl-l3:
+            ui.action.list:
+              ':action-stack': actionStack
+              ':action': action
+              v-slot: slotProps
+              template:
+                slot: 
+                  ':action': slotProps.action
+    ul: 
+      v-if: '!action'
+      class: actions mt-l4
+      li: 
+        v-for: (action, index) in allActions
+        ':class': getActionCssClass(action, index)
+        div: 
+          slot: 
+            ':action': action
+props:
+  actionStack: null
+  action: null
+data:
+  actions: []
+  allActions: []
+methods:
+  getActionCssClass: | #js
+    function(action, index) {
+      return {
+        done: this.isActionDone(action)
+      };
+    }
+  isActionDone: | #js
+    function(action) {
+      const doneAction = this.actionStack.doneAction;
+      return (action._id <= doneAction._id.value);
+    }
+watch:
+  action:
+    handler: | #js
+      async function(action) {
+        this.actions = await this.actionStack.getActions(action?._id);
+        this.allActions = await this.actionStack.getAllActions();
+      }
+    immediate: true
+style:
+  li:
+    background-color: '#303030'
+  .done:
+    background-color: '#404040'
+  .done:hover:
+    background-color: '#505050'
+  .done:first-child > td:first-child:
+    border-radius: 0.5em 0 0 0
+  .done:first-child > td:last-child:
+    border-radius: 0 0.5em 0 0
+  .done:last-child > td:first-child:
+    border-radius: 0em 0 0 0.5em
+  .done:last-child > td:last-child:
+    border-radius: 0 0 0.5em 0
+_:
+  examples:
+    count: 0
+name: ui-action-list
+template: >-
+  <div class="comp-ui-action-list" v-if="actionStack" path="-877239044."><ul
+  class="actions" path="-877239044.0"><li v-for="(action, index) in actions"
+  :class="getActionCssClass(action, index)" path="-877239044.0.0"><div
+  path="-877239044.0.0.0"><slot :action="action"
+  path="-877239044.0.0.0.0"></slot><div class="pl-l3"
+  path="-877239044.0.0.0.1"><ui-action-list :action-stack="actionStack"
+  :action="action" v-slot="slotProps" path="-877239044.0.0.0.1.0"><template
+  path="-877239044.0.0.0.1.0.0"><slot :action="slotProps.action"
+  path="-877239044.0.0.0.1.0.0.0"></slot></template></ui-action-list></div></div></li></ul><ul
+  class="actions mt-l4" v-if="!action" path="-877239044.1"><li v-for="(action,
+  index) in allActions" :class="getActionCssClass(action, index)"
+  path="-877239044.1.0"><div path="-877239044.1.0.0"><slot :action="action"
+  path="-877239044.1.0.0.0"></slot></div></li></ul></div>

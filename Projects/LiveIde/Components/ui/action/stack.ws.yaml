@@ -1,57 +1,53 @@
 dom:
-  div:
-    .flex:
+  div: 
+    v-if: actionStack
+    .flex.justify-between:
       ui.button: 
-        icon: ↺
-        text: undo
+        class: flex-equal
+        text: 👈 undo
         ':click': () => doVerb('undo')
       ui.button: 
-        icon: ↻
-        text: redo
+        class: flex-equal
+        text: redo 👉
         ':click': () => doVerb('redo')
-    ul:
-      li:
-        v-for: (action, index) in actionStack?.actions.lastItems
-        ':class': getActionCssClass(action, index)
-        slot:
-          ':action': action
+    h2:
+      v-text: actionStack.doneAction._id.value
+    div: 
+      ui.action.list:
+        ':action-stack': actionStack
+        v-slot: slotProps
+        template:
+          slot:
+            ':action': slotProps.action
 props:
   actionStack: null
-data:
-  visibleActions: null
+data: null
 methods:
   doVerb: | #js
     async function(verb) {
       await this.actionStack[verb]();
     }
-  getActionCssClass: | #js
-    function(action, index) {
-      return {
-        done: false
-      };
-    }
 watch: null
 style:
-  ul:
+  ul.actions:
     display: flex
     flex-direction: column-reverse
     font-family: monospace
   li:hover:
     background-color: '#ffffff10'
-  .done:
-    background-color: '#ffffff20'
-  .done:hover:
-    background-color: '#ffffff30'
 _:
   examples:
     count: 0
 name: ui-action-stack
 template: >-
-  <div class="comp-ui-action-stack" path="-1417831958."><div class="flex"
-  path="-1417831958.0"><ui-button icon="↺" text="undo" :click="() =&gt;
-  doVerb('undo')" path="-1417831958.0.0"></ui-button><ui-button icon="↻"
-  text="redo" :click="() =&gt; doVerb('redo')"
-  path="-1417831958.0.1"></ui-button></div><ul path="-1417831958.1"><li
-  v-for="(action, index) in actionStack?.actions.lastItems"
-  :class="getActionCssClass(action, index)" path="-1417831958.1.0"><slot
-  :action="action" path="-1417831958.1.0.0"></slot></li></ul></div>
+  <div class="comp-ui-action-stack" v-if="actionStack" path="-1417831958."><div
+  class="flex justify-between" path="-1417831958.0"><ui-button
+  class="flex-equal" text="👈 undo" :click="() =&gt; doVerb('undo')"
+  path="-1417831958.0.0"></ui-button><ui-button class="flex-equal" text="redo
+  👉" :click="() =&gt; doVerb('redo')"
+  path="-1417831958.0.1"></ui-button></div><h2
+  v-text="actionStack.doneAction._id.value" path="-1417831958.1"></h2><div
+  path="-1417831958.2"><ui-action-list :action-stack="actionStack"
+  v-slot="slotProps" path="-1417831958.2.0"><template
+  path="-1417831958.2.0.0"><slot :action="slotProps.action"
+  path="-1417831958.2.0.0.0"></slot></template></ui-action-list></div></div>

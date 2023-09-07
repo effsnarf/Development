@@ -2819,6 +2819,7 @@ class Module {
         this.path = obj.path;
         this.source = obj.source;
         this.className = this.name.split(".").last();
+        this.source.namespace = this.getNamespaceName(this.name);
         this.source.name = this.className;
     }
     async compile() {
@@ -2841,6 +2842,10 @@ class Module {
             nsnode = nsnode[part] = nsnode[part] || {};
         }
         return nsnode;
+    }
+    getNamespaceName(name) {
+        const parts = name.split(".");
+        return parts.take(parts.length - 1).join(".");
     }
 }
 exports.Module = Module;
@@ -5001,15 +5006,15 @@ if (typeof Array !== "undefined") {
         if (!getValue)
             getValue = (item) => item;
         const map = {};
-        this.forEach((item) => {
-            map[getKey(item)] = getValue(item);
+        this.forEach((item, index) => {
+            map[getKey(item, index)] = getValue(item, index);
         });
         return map;
     };
     Array.prototype.toMapValue = function (getValue) {
         const map = {};
-        this.forEach((item) => {
-            map[item] = getValue(item);
+        this.forEach((item, index) => {
+            map[item] = getValue(item, index);
         });
         return map;
     };
@@ -5365,6 +5370,7 @@ class TaskQueue {
     }
     enqueue(task) {
         this.tasks.push(task);
+        return task;
     }
     async next() {
         const task = this.tasks.shift();
@@ -5718,7 +5724,7 @@ var __webpack_exports__ = {};
 (() => {
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/website/script/1693731896241.ts ***!
+  !*** ../../../LiveIde/website/script/1694001177867.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

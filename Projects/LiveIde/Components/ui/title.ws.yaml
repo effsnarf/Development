@@ -42,6 +42,9 @@ style:
     text-align: center
   .flex:
     gap: 0.5em
+  .flex > *:
+    flex-grow: 0 !important
+    flex-shrink: 1 !important
   div:
     white-space: nowrap
     text-wrap: nowrap

@@ -1,0 +1,62 @@
+dom:
+  .flex:
+    v-if: action
+    ui.context.window:
+      h2:
+        ui.title: 
+          icon: 🔴
+          ':text': action.redo.method
+      ui.value.any:
+        ':value': action
+    div: 
+      class: opacity-30 px-3
+      v-text: action._id
+    ui.title: 
+      ':style': '{ width: ''10em'' }'
+      ':icon': getIcon(action)
+      ':text': getText(action)
+      ':number': action?.redo?.args?.length
+    div: 
+      class: pl-l2
+      ui.data.changes:
+        ':data-changes': action._info?.dataChanges
+props:
+  action: null
+methods:
+  getIcon: | #js
+    function(action) {
+      const redo = action.redo;
+      if (redo.noop) return '⚪';
+      if (redo.method) return '🔴';
+      return '';
+    }
+  getText: | #js
+    function(action) {
+      const redo = action.redo;
+      if (redo.noop) return 'no.op';
+      if (redo.method) return redo.method;
+      return '';
+    }
+computed:
+  redo: | #js
+    function() {
+      return this.action.redo;
+    }
+style: null
+_:
+  examples:
+    count: 0
+name: ide-module-action
+template: >-
+  <div class="comp-ide-module-action flex" v-if="action"
+  path="-1542681676."><ui-context-window path="-1542681676.0"><h2
+  path="-1542681676.0.0"><ui-title icon="🔴" :text="action.redo.method"
+  path="-1542681676.0.0.0"></ui-title></h2><ui-value-any :value="action"
+  path="-1542681676.0.1"></ui-value-any></ui-context-window><div
+  class="opacity-30 px-3" v-text="action._id"
+  path="-1542681676.1"></div><ui-title :style="{ width: '10em' }"
+  :icon="getIcon(action)" :text="getText(action)"
+  :number="action?.redo?.args?.length" path="-1542681676.2"></ui-title><div
+  class="pl-l2" path="-1542681676.3"><ui-data-changes
+  :data-changes="action._info?.dataChanges"
+  path="-1542681676.3.0"></ui-data-changes></div></div>

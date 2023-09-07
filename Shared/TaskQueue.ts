@@ -1,13 +1,14 @@
 // Enqueue async tasks and run them in order
 class TaskQueue {
-  private tasks: Array<() => Promise<void>> = [];
+  private tasks: Array<Function> = [];
 
   constructor() {
     this.next();
   }
 
-  public enqueue(task: () => Promise<void>): void {
+  public enqueue(task: Function) {
     this.tasks.push(task);
+    return task;
   }
 
   private async next() {

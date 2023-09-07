@@ -1,0 +1,59 @@
+dom:
+  div:
+    .flex:
+      v-if: onlyKeys
+      ui.title: 
+        v-for: (dataChange, index) in dataChanges
+        ':icon': getIcon(dataChange)
+        ':text': dataChange.path
+    table:
+      v-if: '!onlyKeys'
+      tr:
+        v-for: (dataChange, index) in dataChanges
+        td: 
+          ui.title: 
+            ':icon': getIcon(dataChange)
+            ':text': dataChange.path
+        td: 
+          class: px-l2
+          ui.value.preview:
+            ':value': dataChange.rhs || dataChange.item.rhs
+props:
+  dataChanges: null
+  onlyKeys: false
+methods:
+  getText: | #js
+    function(dataChange) {
+      let text = dataChange.path;
+      if (dataChange.kind == "A") text += ` [${dataChange.index}]`;
+      return text;
+    }
+  getIcon: | #js
+    function(dataChange) {
+      let icon = '';
+      if (dataChange.item)
+      {
+        icon = {
+          N: '🟢',
+          D: '🔴',
+          E: '🟡',
+        }[dataChange.item.kind];
+      }
+      return `🧊${icon}`;
+    }
+_:
+  examples:
+    count: 0
+name: ui-data-changes
+template: >-
+  <div class="comp-ui-data-changes" path="-1299348071."><div class="flex"
+  v-if="onlyKeys" path="-1299348071.0"><ui-title v-for="(dataChange, index) in
+  dataChanges" :icon="getIcon(dataChange)" :text="dataChange.path"
+  path="-1299348071.0.0"></ui-title></div><table v-if="!onlyKeys"
+  path="-1299348071.1"><tr v-for="(dataChange, index) in dataChanges"
+  path="-1299348071.1.0"><td path="-1299348071.1.0.0"><ui-title
+  :icon="getIcon(dataChange)" :text="dataChange.path"
+  path="-1299348071.1.0.0.0"></ui-title></td><td class="px-l2"
+  path="-1299348071.1.0.1"><ui-value-preview :value="dataChange.rhs ||
+  dataChange.item.rhs"
+  path="-1299348071.1.0.1.0"></ui-value-preview></td></tr></table></div>
