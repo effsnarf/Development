@@ -1,31 +1,96 @@
 dom:
-  div:
+  div: 
     v-if: actionStack
-    h3:
-      v-text: '''✨ Actions'''
-    ui.button:
-      text: Init App
-      ':click': initUserAppSource
     ui.action.stack:
       ':action-stack': actionStack
       v-slot: slotProps
       template:
         flow.interface.action:
           ':action': slotProps.action
-props: null
-mounted: null
+    div: 
+      ui.value.any:
+        ':value': boxes
+props:
+  persisters: null
+data:
+  actionStack: null
+  boxes: []
+  nextBoxID: 1
+mounted: | #js
+  async function() {
+    await this.init();
+  }
 methods:
-  initUserAppSource: | #js
-    function() {
-      this.$root.$emit("user.action", {
-        method: "init.user.app.source",
-        args: [],
-      });
+  create_box: | #js
+    async function(action, box) {
+      if (!box) box = {
+        _id: this.nextBoxID++,
+        title: "Box " + this.nextBoxID,
+      };
+      this.boxes.add(box);
+      action.undo = {
+        method: "delete.box",
+        args: [box._id]
+      };
+      return action;
+    }
+  delete_box: | #js
+    async function(action, boxID, options) {
+      const box = this.boxes.find(box => box._id === boxID);
+      if (!box) {
+        throw new Error(`Box not found: ${boxID}`);
+      }
+      action.undo = {
+        method: "create.box",
+        args: []
+      };
+      action.undo.args.push(box);
+      this.boxes = this.boxes.filter(box => box._id !== boxID);
+      if (options?.isUndoing) {
+        this.nextBoxID--;
+      }
+      return action;
+    }
+  clear: | #js
+    async function(action) {
+      await this.actionStack.clear();
+      this.boxes = [];
+      this.nextBoxID = 1;
+      action.undo = {
+        noop: true
+      };
+      return action;
+    }
+  executeAction: | #js
+    async function(action, options) {
+      const redo = action.redo;
+      const methodName = redo.method.replace(/\./g, "_");
+      let actionMethod = this[methodName];
+      if (!actionMethod) {
+        throw new Error(`Action method not found: ${redo.method}`);
+      }
+      action = await actionMethod(action, ...redo.args, options);
+      return action;
+    }
+  onUserAction: | #js
+    async function(action) {
+      await this.actionStack.do(action);
+    }
+  init: | #js
+    async function() {
+      this.actionStack = await Actionable.ActionStack.new(
+        this.persisters.localStorage,
+        "flow.user.actions"
+      );
+
+      this.actionStack.executeAction = this.executeAction.bind(this);
+
+      this.$root.$on("user.action", this.onUserAction.bind(this));
     }
 computed:
-  actionStack: | #js
+  jsyaml: | #js
     function() {
-      return this.$root.flow.interface.userActions;
+      return jsyaml;
     }
 watch: null
 _:
@@ -34,9 +99,9 @@ _:
 name: flow-interface-action-stack
 template: >-
   <div class="comp-flow-interface-action-stack" v-if="actionStack"
-  path="271844389."><h3 v-text="'✨ Actions'" path="271844389.0"></h3><ui-button
-  text="Init App" :click="initUserAppSource"
-  path="271844389.1"></ui-button><ui-action-stack :action-stack="actionStack"
-  v-slot="slotProps" path="271844389.2"><template
-  path="271844389.2.0"><flow-interface-action :action="slotProps.action"
-  path="271844389.2.0.0"></flow-interface-action></template></ui-action-stack></div>
+  path="271844389."><ui-action-stack :action-stack="actionStack"
+  v-slot="slotProps" path="271844389.0"><template
+  path="271844389.0.0"><flow-interface-action :action="slotProps.action"
+  path="271844389.0.0.0"></flow-interface-action></template></ui-action-stack><div
+  path="271844389.1"><ui-value-any :value="boxes"
+  path="271844389.1.0"></ui-value-any></div></div>

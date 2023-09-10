@@ -1,3 +1,4 @@
+import { Events } from "./Events";
 import { Data } from "./Data";
 import { Objects } from "./Extensions.Objects.Client";
 import { TaskQueue } from "./TaskQueue";
@@ -21,11 +22,16 @@ namespace Actionable {
     returnValue: any;
   }
 
+  export interface ActionOptions {
+    isUndoing?: boolean;
+  }
+
   class ActionPointer {
     _id!: Data.Value<number>;
     action: Action | null = null;
     isFirstAction: boolean = false;
     isLastAction: boolean = false;
+    events = new Events();
 
     private constructor(
       persister: Data.Persister.Base,
@@ -39,7 +45,7 @@ namespace Actionable {
       const actionPointer = new ActionPointer(persister, actions);
       actionPointer._id = await Data.Value.new<number>(
         persister,
-        "actionPointer",
+        "action.pointer",
         null
       );
       const firstAction = await actionPointer.actions.getItemAt(0);
@@ -52,9 +58,10 @@ namespace Actionable {
       this._id.value = action._id;
       this.action = action;
       const firstAction = await this.actions.getItemAt(0);
-      const lastAction = await this.actions.getNewest();
+      const lastAction = (await this.actions.getNewest())[0];
       this.isFirstAction = this._id.value === firstAction?._id;
       this.isLastAction = this._id.value === lastAction?._id;
+      this.events.emit("change");
     }
   }
 
@@ -66,6 +73,7 @@ namespace Actionable {
     methodStack: number[] = [];
     methodStack2: number[] = [];
     idToId: { [id: number]: number } = {};
+    events = new Events();
 
     toPersistableAction: (action: Action) => Promise<any> = async (
       action: Action
@@ -74,8 +82,10 @@ namespace Actionable {
       action: Action
     ) => action;
 
-    executeAction!: (action: Action) => Promise<Action>;
-    executeDoable!: (doable: Doable) => Promise<any>;
+    executeAction!: (
+      action: Action,
+      options?: ActionOptions
+    ) => Promise<Action>;
 
     private constructor(
       private persister: Data.Persister.Base,
@@ -98,6 +108,10 @@ namespace Actionable {
       actionStack.doneAction = await ActionPointer.new(
         persister,
         actionStack.actions
+      );
+
+      actionStack.doneAction.events.on("change", () =>
+        actionStack.events.emit("change")
       );
 
       actionStack.ensureNoopAction();
@@ -195,7 +209,7 @@ namespace Actionable {
       if (this.doneAction.isFirstAction) return;
       if (!this.doneAction.action) return;
       const action = this.invertAction(this.doneAction.action);
-      await this._executeAction(action);
+      await this._executeAction(action, { isUndoing: true });
       const index = await this.actions.getIndex(this.doneAction._id.value);
       if (index == null) throw new Error("Action not found");
       this.doneAction.set(await this.actions.getItemAt(index - 1));
@@ -204,17 +218,21 @@ namespace Actionable {
     async redo() {
       if (this.doneAction.isLastAction) return;
       if (!this.doneAction.action) return;
-      const action = Objects.clone(this.doneAction.action);
-      await this._executeAction(action);
-      const index = await this.actions.getIndex(this.doneAction._id.value);
-      if (index == null) throw new Error("Action not found");
-      this.doneAction.set(await this.actions.getItemAt(index + 1));
+      const nextAction = await this.getNextAction();
+      await this._executeAction(nextAction);
+      this.doneAction.set(nextAction);
     }
 
     async clear() {
       await this.actions.clear();
       await this.ensureNoopAction();
-      this.doneAction.set(await this.actions.getNewest());
+      this.doneAction.set((await this.actions.getNewest())[0]);
+    }
+
+    private async getNextAction(): Promise<Action> {
+      const index = await this.actions.getIndex(this.doneAction._id.value);
+      if (index == null) throw new Error("Action not found");
+      return await this.actions.getItemAt(index + 1);
     }
 
     private invertAction(action: Action): Action {
@@ -236,12 +254,14 @@ namespace Actionable {
       }
     }
 
-    private async _executeAction(action: Action) {
+    private async _executeAction(action: Action, options?: ActionOptions) {
       action = Objects.clone(action);
 
-      if (action.redo.noop) return action;
+      if (action.redo.noop) {
+        return action;
+      }
 
-      return await this.executeAction(action);
+      return await this.executeAction(action, options);
     }
   }
 }

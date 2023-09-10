@@ -36,7 +36,11 @@ methods:
     }
 style:
   button:
+    opacity: 0.8
     user-select: none
+    transition: 0s
+  button:hover:
+    opacity: 1
 name: ui-button
 frameworks:
   vue: | #js

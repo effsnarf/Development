@@ -1,5 +1,5 @@
 dom:
-  div:
+  .box1:
     ':class': '{ reversed: reverse }'
     ui.select:
       ':options': '[''table'', ''short-list'', ''expanded-list'']'
@@ -28,7 +28,6 @@ dom:
       table: 
         v-if: (view1 == 'table')
         thead:
-          v-if: 'false'
           tr: 
             th:
               v-for: field in fields
@@ -100,6 +99,10 @@ watch:
       }
     immediate: true
 style:
+  .box1:
+    border: '1px solid #ffffff80'
+    border-radius: 0.5em
+    padding: 0.5em
   .reversed > table > tbody:
     display: flex
     flex-direction: column-reverse
@@ -123,7 +126,7 @@ _:
     count: 0
 name: ui-value-array
 template: >-
-  <div class="comp-ui-value-array" :class="{ reversed: reverse }"
+  <div class="comp-ui-value-array box1" :class="{ reversed: reverse }"
   path="-621945022."><ui-select :options="['table', 'short-list',
   'expanded-list']" input-type="value" type="toggle" v-model="view1"
   path="-621945022.0"></ui-select><transition name="slide"
@@ -136,7 +139,7 @@ template: >-
   v-if="(view1 == 'expanded-list')" :value="item"
   path="-621945022.1.0.0.0.1.1"></ui-value-any></td></tr></tbody></table></transition><transition
   name="slide" path="-621945022.2"><table v-if="(view1 == 'table')"
-  path="-621945022.2.0"><thead v-if="false" path="-621945022.2.0.0"><tr
+  path="-621945022.2.0"><thead path="-621945022.2.0.0"><tr
   path="-621945022.2.0.0.0"><th v-for="field in fields" v-text="field"
   path="-621945022.2.0.0.0.0"></th></tr></thead><tbody
   path="-621945022.2.0.1"><tr v-for="(item, index) in items"

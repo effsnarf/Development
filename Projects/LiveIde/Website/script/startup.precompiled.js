@@ -482,381 +482,6 @@ exports.ComponentManager = ComponentManager;
 
 /***/ }),
 
-/***/ "../../../LiveIde/Classes/Flow.ts":
-/*!****************************************!*\
-  !*** ../../../LiveIde/Classes/Flow.ts ***!
-  \****************************************/
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.Flow = void 0;
-const Extensions_Objects_Client_1 = __webpack_require__(/*! ../../../Shared/Extensions.Objects.Client */ "../../../../Shared/Extensions.Objects.Client.ts");
-const Data_1 = __webpack_require__(/*! ../../../Shared/Data */ "../../../../Shared/Data.ts");
-const Events_1 = __webpack_require__(/*! ../../../Shared/Events */ "../../../../Shared/Events.ts");
-const Graph_1 = __webpack_require__(/*! ../../../Shared/Database/Graph */ "../../../../Shared/Database/Graph.ts");
-const Actionable_1 = __webpack_require__(/*! ../../../Shared/Actionable */ "../../../../Shared/Actionable.ts");
-const Vue = window.Vue;
-var Flow;
-(function (Flow) {
-    class RuntimeData {
-        gdb;
-        events = new Events_1.Events();
-        nodeDatas = Vue.reactive({});
-        constructor(gdb) {
-            this.gdb = gdb;
-            this.gdb.events.on("node.change", this.onNodeChange.bind(this));
-        }
-        async onNodeChange(node) {
-            this.computeNodeData(node);
-        }
-        async computeNodeData(node) {
-            if (!node)
-                return;
-            if (node.type == "flow.data.fetch") {
-                if (false) {}
-                const imageUrls = [
-                    "https://cdn.pixabay.com/photo/2016/03/28/12/35/cat-1285634_640.png",
-                    "https://cdn.pixabay.com/photo/2015/11/16/14/43/cat-1045782_640.jpg",
-                    "https://cdn.pixabay.com/photo/2016/07/10/21/47/cat-1508613_640.jpg",
-                    "https://cdn.pixabay.com/photo/2013/05/30/18/21/cat-114782_640.jpg",
-                    "https://cdn.pixabay.com/photo/2016/06/14/00/14/cat-1455468_640.jpg",
-                    "https://cdn.pixabay.com/photo/2018/05/04/16/50/cat-3374422_640.jpg",
-                    "https://cdn.pixabay.com/photo/2020/10/05/10/51/cat-5628953_640.jpg",
-                    "https://cdn.pixabay.com/photo/2016/09/07/22/38/cat-1652822_640.jpg",
-                    "https://cdn.pixabay.com/photo/2020/06/24/19/41/cat-5337501_640.jpg",
-                    "https://cdn.pixabay.com/photo/2015/06/07/19/42/animal-800760_640.jpg",
-                ];
-                const texts = [
-                    "Fluffo the Frog",
-                    "Giggly Garry",
-                    "MemeMaster Mike",
-                    "Chillax Charlie",
-                    "Dank Dave",
-                    "Lolita Llama",
-                    "Pepe's Peculiar Pal",
-                    "Roflcopter Rick",
-                    "Sassy Sally",
-                    "Woke Wendy",
-                ];
-                const exampleData = imageUrls.map((url, index) => ({
-                    id: index,
-                    text: texts[index],
-                    imageUrl: url,
-                }));
-                this.setNodeData(node, exampleData);
-                return;
-                const fetchResponse = await fetch(node.data.url.value);
-                const fetchText = await fetchResponse.text();
-                let fetchData = JSON.parse(fetchText);
-                if (fetchData.result)
-                    fetchData = fetchData.result;
-                this.setNodeData(node, fetchData);
-            }
-        }
-        onNodeClick(node, contextData) {
-            const nodeLinks = this.gdb
-                .getNodeLinks(node)
-                .filter((l) => l.type == "data.send")
-                .filter((l) => l.data.event == "click");
-            for (const link of nodeLinks) {
-                this.events.emit("link.data.send", link);
-            }
-            const nodes = nodeLinks
-                .map((l) => this.gdb.getNode(l.to))
-                .filter((n) => n);
-            for (let node of nodes) {
-                node = node;
-                const data = contextData || this.nodeDatas[node.id];
-                this.setNodeData(node, contextData);
-            }
-        }
-        setNodeData(node, data, depth = 0) {
-            if (depth > 10) {
-                window.alertify.error("setNodeData: max depth reached");
-                return;
-            }
-            this.nodeDatas[node.id] = data;
-            this.events.emit("node.data.change", node, data);
-            const sendToNodes = this.gdb.getNodes(node, "data.send");
-            for (const sendToNode of sendToNodes) {
-                const links = this.gdb.getLinks(node, sendToNode);
-                for (const link of links) {
-                    this.events.emit("link.data.send", link);
-                }
-                this.setNodeData(sendToNode, data, depth + 1);
-            }
-        }
-    }
-    class UserApp {
-        gdb;
-        events = new Events_1.Events();
-        runtimeData;
-        constructor(gdb) {
-            this.gdb = gdb;
-            this.runtimeData = new RuntimeData(gdb);
-            this.events.forward(this.runtimeData.events, "runtime.data");
-        }
-        onNodeClick(node, contextData) {
-            this.runtimeData.onNodeClick(node, contextData);
-        }
-        isNodeClickable(node) {
-            const nodeLinks = this.gdb
-                .getNodeLinks(node)
-                .filter((l) => l.from == node.id)
-                .filter((l) => l.data.event == "click");
-            return nodeLinks.length > 0;
-        }
-    }
-    Flow.UserApp = UserApp;
-    class UI {
-        vm;
-        gdb;
-        nodeIdsToVueUids = new Map();
-        constructor(vm, gdb) {
-            this.vm = vm;
-            this.gdb = gdb;
-        }
-        getNodeVues(node, options = {}) {
-            if (!node)
-                return [];
-            const vueUids = this.nodeIdsToVueUids.get(node.id) || [];
-            return this.uidsToVues(vueUids, options);
-        }
-        getLinkedVues(node, options = {}) {
-            const linkedNodes = this.gdb.getLinkedNodes(node);
-            const vues = linkedNodes
-                .flatMap(this.getNodeVues.bind(this))
-                .distinct((vue) => vue._uid);
-            return vues;
-        }
-        uidsToVues(vueUids, options = {}) {
-            let vues = vueUids.map((uid) => this.vm.getVue(uid)).filter((vue) => vue);
-            vues = vues.except(options.except);
-            return vues;
-        }
-        registerVue(vue) {
-            if (!vue.node)
-                return;
-            const node = vue.node;
-            const vueUids = this.nodeIdsToVueUids.get(node.id) || [];
-            vueUids.push(vue._uid);
-            this.nodeIdsToVueUids.set(node.id, vueUids);
-        }
-        unregisterVue(vue) {
-            if (!vue.node)
-                return;
-            const node = vue.node;
-            const vueUids = this.nodeIdsToVueUids.get(node.id) || [];
-            vueUids.removeBy((uid) => uid == vue._uid);
-            this.nodeIdsToVueUids.set(node.id, vueUids);
-        }
-    }
-    Flow.UI = UI;
-    class Interface {
-        userAppGdb;
-        userActions;
-        constructor(userAppGdb, userActions) {
-            this.userAppGdb = userAppGdb;
-            this.userActions = userActions;
-            userActions.executeAction = this.executeAction.bind(this);
-        }
-        static async new(vueApp, userAppGdb, persisters) {
-            const userActions = await Actionable_1.Actionable.ActionStack.new(persisters.localStorage, "user.actions");
-            vueApp.$on("user.action", (redo) => userActions.do({ redo }));
-            const interface1 = new Interface(userAppGdb, userActions);
-            if (false) {}
-            return interface1;
-        }
-        async executeAction(action) {
-            const self = this;
-            const { redo } = action;
-            if (redo.method) {
-                const methodName = "on" +
-                    redo.method
-                        .split(".")
-                        .map((s) => s.capitalize())
-                        .join("");
-                if (!self[methodName])
-                    throw new Error("Unknown method: " + redo.method);
-                return await self[methodName](action);
-            }
-            if (redo.type) {
-                const methodName = "on" +
-                    redo.type
-                        .split(".")
-                        .map((s) => s.capitalize())
-                        .join("");
-                if (!self[methodName])
-                    throw new Error("Unknown type: " + redo.type);
-                return await self[methodName](action);
-            }
-            throw new Error("Unknown action type: " + redo.type);
-        }
-        async onClear(action) {
-            await this.userAppGdb.clear();
-            action.undo = {
-                method: "no.op",
-                args: [],
-            };
-            return action;
-        }
-        async onCreateBox(action) {
-            const args = action.redo.args || {};
-            const data = {
-                type: args.type,
-            };
-            const boxNode = await this.userAppGdb.addNode("flow.box", data);
-            action.undo = {
-                method: "gdb.undo",
-                args: [],
-            };
-            return action;
-        }
-        async onInitUserAppSource(action) {
-            await this.userActions.clear();
-            await this.userAppGdb.clear();
-            await this.userAppGdb.addTemplate("app");
-            action.undo = { method: "gdb.undo" };
-            return action;
-        }
-        async onDndDrop(action) {
-            const { dragItem, dropItem } = action.redo;
-            if (dragItem.type == "flow.app.compInst") {
-                if (dropItem.type == "flow.app.compInst") {
-                    await this.userAppGdb.addLink(dragItem, "data.send", dropItem, {
-                        event: "click",
-                    });
-                    return;
-                }
-            }
-            if (dropItem == "trash") {
-                await this.userAppGdb.deleteNode(dragItem);
-                return;
-            }
-            if (typeof dragItem == "string")
-                return await this.onDndDrop_newNode(action);
-            else
-                return await this.onDndDrop_nodeToNode(action);
-        }
-        async onDndDrop_newNode(action) {
-            const { dragItem, dropItem } = action.redo;
-            const newNodeType = dragItem;
-            if (dropItem.type == "flow.layout.empty") {
-                const oldActionID = this.userAppGdb.actionStack.doneAction._id.value;
-                const newNode = await this.createNewNode(newNodeType);
-                await this.userAppGdb.replaceNode(dropItem, newNode);
-                const newActionID = this.userAppGdb.actionStack.doneAction._id.value;
-                const newActionsCount = newActionID - oldActionID + 1;
-                action.undo = { method: "gdb.undo", args: [newActionsCount] };
-                return action;
-            }
-            else {
-                throw new Error("Not implemented");
-            }
-        }
-        async onDndDrop_nodeToNode(action) {
-            const { dragItem, dropItem } = action;
-            if (action.dropItem.type == "flow.layout.empty") {
-                if (action.dragItem.type == "flow.app.comp") {
-                    const compInst = this.userAppGdb.addNode("flow.app.compInst", {
-                        compID: {
-                            type: "noderef",
-                            value: {
-                                type: "flow.app.comp",
-                                value: action.dragItem.id,
-                            },
-                        },
-                    });
-                    this.userAppGdb.replaceNode(action.dropItem, compInst);
-                    return;
-                }
-                // Move node to empty layout node
-                if (action.dragItem.type.startsWith("flow.layout")) {
-                    this.userAppGdb.replaceNode(action.dropItem, action.dragItem);
-                    return;
-                }
-                throw new Error("Not implemented");
-            }
-            this.userAppGdb.addLink(action.dragItem, "data.send", action.dropItem);
-        }
-        async createNewNode(newNodeType) {
-            const data = {};
-            const newNode = this.userAppGdb.addNode(newNodeType, data);
-            return newNode;
-        }
-        async onGdbUndo(action) {
-            const args = action.redo.args || [];
-            const count = args[0];
-            await this.userAppGdb.actionStack.undo(count);
-        }
-        toPersistableAction(action) {
-            return Extensions_Objects_Client_1.Objects.clone({
-                redo: this.toPersistableDoable(action.redo),
-                undo: this.toPersistableDoable(action.undo),
-            });
-        }
-        fromPersistableAction(action) {
-            return Extensions_Objects_Client_1.Objects.clone({
-                redo: this.fromPersistableDoable(action.redo),
-                undo: this.fromPersistableDoable(action.undo),
-            });
-        }
-        toPersistableDoable(doable) {
-            if (!doable)
-                return null;
-            return Object.fromEntries(Object.entries(doable).map(([key, value]) => {
-                if (value?.id)
-                    value = { id: value.id };
-                return [key, value];
-            }));
-        }
-        fromPersistableDoable(doable) {
-            if (!doable)
-                return null;
-            return Object.fromEntries(Object.entries(doable).map(([key, value]) => {
-                if (value?.id)
-                    value = this.userAppGdb.getNode(value.id);
-                return [key, value];
-            }));
-        }
-    }
-    Flow.Interface = Interface;
-    class Manager {
-        vm;
-        gdb;
-        events = new Events_1.Events();
-        ui;
-        interface;
-        user = {
-            app: null,
-        };
-        constructor(vm, gdb) {
-            this.vm = vm;
-            this.gdb = gdb;
-            this.ui = new UI(vm, gdb);
-            this.user.app = new UserApp(gdb);
-            this.events.forward(gdb.events, "gdb");
-            this.events.forward(this.user.app.events, "user.app");
-        }
-        static async new(vueApp, vm, gdbData) {
-            const persisters = {
-                memory: Data_1.Data.Persister.Memory.new(),
-                localStorage: Data_1.Data.Persister.LocalStorage.new2("flow"),
-            };
-            const userAppGdb = await Graph_1.Graph.ActionableDatabase.new2(persisters.memory, "gdb", gdbData);
-            const manager = new Manager(vm, userAppGdb);
-            manager.interface = await Interface.new(vueApp, userAppGdb, persisters);
-            return manager;
-        }
-    }
-    Flow.Manager = Manager;
-})(Flow || (exports.Flow = Flow = {}));
-
-
-/***/ }),
-
 /***/ "../../../LiveIde/Classes/HtmlHelper.ts":
 /*!**********************************************!*\
   !*** ../../../LiveIde/Classes/HtmlHelper.ts ***!
@@ -3968,6 +3593,7 @@ exports.VueManager = VueManager;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Actionable = void 0;
+const Events_1 = __webpack_require__(/*! ./Events */ "../../../../Shared/Events.ts");
 const Data_1 = __webpack_require__(/*! ./Data */ "../../../../Shared/Data.ts");
 const Extensions_Objects_Client_1 = __webpack_require__(/*! ./Extensions.Objects.Client */ "../../../../Shared/Extensions.Objects.Client.ts");
 const TaskQueue_1 = __webpack_require__(/*! ./TaskQueue */ "../../../../Shared/TaskQueue.ts");
@@ -3979,12 +3605,13 @@ var Actionable;
         action = null;
         isFirstAction = false;
         isLastAction = false;
+        events = new Events_1.Events();
         constructor(persister, actions) {
             this.actions = actions;
         }
         static async new(persister, actions) {
             const actionPointer = new ActionPointer(persister, actions);
-            actionPointer._id = await Data_1.Data.Value.new(persister, "actionPointer", null);
+            actionPointer._id = await Data_1.Data.Value.new(persister, "action.pointer", null);
             const firstAction = await actionPointer.actions.getItemAt(0);
             actionPointer.isFirstAction =
                 actionPointer._id.value === firstAction?._id;
@@ -3994,9 +3621,10 @@ var Actionable;
             this._id.value = action._id;
             this.action = action;
             const firstAction = await this.actions.getItemAt(0);
-            const lastAction = await this.actions.getNewest();
+            const lastAction = (await this.actions.getNewest())[0];
             this.isFirstAction = this._id.value === firstAction?._id;
             this.isLastAction = this._id.value === lastAction?._id;
+            this.events.emit("change");
         }
     }
     class ActionStack {
@@ -4009,10 +3637,10 @@ var Actionable;
         methodStack = [];
         methodStack2 = [];
         idToId = {};
+        events = new Events_1.Events();
         toPersistableAction = async (action) => action;
         fromPersistableAction = async (action) => action;
         executeAction;
-        executeDoable;
         constructor(persister, varName) {
             this.persister = persister;
             this.varName = varName;
@@ -4022,6 +3650,7 @@ var Actionable;
             const actionStack = new ActionStack(persister, varName);
             actionStack.actions = await Data_1.Data.List.new(persister, `${varName}.actions`);
             actionStack.doneAction = await ActionPointer.new(persister, actionStack.actions);
+            actionStack.doneAction.events.on("change", () => actionStack.events.emit("change"));
             actionStack.ensureNoopAction();
             return actionStack;
         }
@@ -4104,7 +3733,7 @@ var Actionable;
             if (!this.doneAction.action)
                 return;
             const action = this.invertAction(this.doneAction.action);
-            await this._executeAction(action);
+            await this._executeAction(action, { isUndoing: true });
             const index = await this.actions.getIndex(this.doneAction._id.value);
             if (index == null)
                 throw new Error("Action not found");
@@ -4115,17 +3744,20 @@ var Actionable;
                 return;
             if (!this.doneAction.action)
                 return;
-            const action = Extensions_Objects_Client_1.Objects.clone(this.doneAction.action);
-            await this._executeAction(action);
-            const index = await this.actions.getIndex(this.doneAction._id.value);
-            if (index == null)
-                throw new Error("Action not found");
-            this.doneAction.set(await this.actions.getItemAt(index + 1));
+            const nextAction = await this.getNextAction();
+            await this._executeAction(nextAction);
+            this.doneAction.set(nextAction);
         }
         async clear() {
             await this.actions.clear();
             await this.ensureNoopAction();
-            this.doneAction.set(await this.actions.getNewest());
+            this.doneAction.set((await this.actions.getNewest())[0]);
+        }
+        async getNextAction() {
+            const index = await this.actions.getIndex(this.doneAction._id.value);
+            if (index == null)
+                throw new Error("Action not found");
+            return await this.actions.getItemAt(index + 1);
         }
         invertAction(action) {
             action = Extensions_Objects_Client_1.Objects.clone(action);
@@ -4144,11 +3776,12 @@ var Actionable;
                 });
             }
         }
-        async _executeAction(action) {
+        async _executeAction(action, options) {
             action = Extensions_Objects_Client_1.Objects.clone(action);
-            if (action.redo.noop)
+            if (action.redo.noop) {
                 return action;
-            return await this.executeAction(action);
+            }
+            return await this.executeAction(action, options);
         }
     }
     Actionable.ActionStack = ActionStack;
@@ -4610,7 +4243,7 @@ var Graph;
         constructor(data) {
             this.data = data;
         }
-        static async new(data) {
+        static async new(data = { nextID: 1, nodes: [], links: [] }) {
             return new Database(data);
         }
         // #endregion
@@ -4637,13 +4270,15 @@ var Graph;
             data = JSON.parse(JSON.stringify(data || {}));
             const newData = {};
             const types = type.split(".");
-            const typeSchema = this.data.schema[types[0]][types[1]];
-            const commonData = Extensions_Objects_Client_1.Objects.clone((typeSchema?._all?.data || {}));
-            Object.assign(newData, commonData);
-            let defaultData = (this.data.schema[types[0]][types[1]] || {});
-            defaultData = defaultData[types[2]] ? defaultData[types[2]].data : {};
-            defaultData = Extensions_Objects_Client_1.Objects.clone(defaultData);
-            Object.assign(newData, defaultData);
+            if (this.data.schema) {
+                const typeSchema = this.data.schema[types[0]][types[1]];
+                const commonData = Extensions_Objects_Client_1.Objects.clone((typeSchema?._all?.data || {}));
+                Object.assign(newData, commonData);
+                let defaultData = (this.data.schema[types[0]][types[1]] || {});
+                defaultData = defaultData[types[2]] ? defaultData[types[2]].data : {};
+                defaultData = Extensions_Objects_Client_1.Objects.clone(defaultData);
+                Object.assign(newData, defaultData);
+            }
             Object.assign(newData, data);
             let node = {
                 id: this.getNextID(),
@@ -4666,12 +4301,15 @@ var Graph;
             this.nodes.push(node);
             this.links.push(...links);
             this.onNodesChange([node, ...affectedNodes]);
-            let defaultChildren = (this.data.schema[types[0]][types[1]] || {});
-            defaultChildren = defaultChildren[types[2]]
-                ? defaultChildren[types[2]].children || []
-                : [];
-            for (const child of defaultChildren) {
-                const childNode = this.addChildNode(node, child.type, child.data, child.children);
+            if (this.data.schema) {
+                let defaultChildren = (this.data.schema[types[0]][types[1]] ||
+                    {});
+                defaultChildren = defaultChildren[types[2]]
+                    ? defaultChildren[types[2]].children || []
+                    : [];
+                for (const child of defaultChildren) {
+                    const childNode = this.addChildNode(node, child.type, child.data, child.children);
+                }
             }
             return node;
         }
@@ -7775,7 +7413,7 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/website/script/1694115238615.ts ***!
+  !*** ../../../LiveIde/website/script/1694360334992.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -7791,7 +7429,7 @@ const ClientContext_1 = __webpack_require__(/*! ../../Classes/ClientContext */ "
 const Params_1 = __webpack_require__(/*! ../../Classes/Params */ "../../../LiveIde/Classes/Params.ts");
 const VueManager_1 = __webpack_require__(/*! ../../Classes/VueManager */ "../../../LiveIde/Classes/VueManager.ts");
 const Data_1 = __webpack_require__(/*! ../../../../Shared/Data */ "../../../../Shared/Data.ts");
-const Flow_1 = __webpack_require__(/*! ../../Classes/Flow */ "../../../LiveIde/Classes/Flow.ts");
+const Graph_1 = __webpack_require__(/*! ../../../../Shared/Database/Graph */ "../../../../Shared/Database/Graph.ts");
 const window1 = window;
 const Vue = window1.Vue;
 // To make it accessible to client code
@@ -7800,6 +7438,7 @@ window1.Diff = Diff_1.Diff;
 window1.TaskQueue = TaskQueue_1.TaskQueue;
 window1.Data = Data_1.Data;
 window1.Actionable = Actionable_1.Actionable;
+window1.Graph = Graph_1.Graph;
 const generalMixin = {
     matchComp: (c) => true,
     data() {
@@ -8253,7 +7892,6 @@ const mgMixin = {
         data: {
             events: new Events_1.Events(),
             vm: null,
-            flow: null,
             client,
             dbp,
             analytics: await AnalyticsTracker_1.AnalyticsTracker.new(),
@@ -8273,7 +7911,6 @@ const mgMixin = {
         },
         async mounted() {
             await this.init();
-            this.events.forward(flow.events, "flow");
             this.events.on("*", this.onAppEvent.bind(this));
         },
         methods: {
@@ -8854,9 +8491,7 @@ const mgMixin = {
         },
     });
     const vueManager = await VueManager_1.VueManager.new(client);
-    const flow = await Flow_1.Flow.Manager.new(vueApp, vueManager, gdbData);
     vueApp.vm = vueManager;
-    vueApp.flow = flow;
     vueApp.$mount("#app");
     window.addEventListener("popstate", async function (event) {
         await vueApp.refresh();

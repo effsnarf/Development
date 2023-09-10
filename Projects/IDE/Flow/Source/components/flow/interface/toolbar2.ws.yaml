@@ -1,0 +1,41 @@
+dom:
+  div:
+    .flex.gap-1:
+      ui.button:
+        v-for: button in buttons
+        ':icon': button.icon
+        ':text': button.text
+        ':click': () => eval(button.click)()
+data:
+  buttons:
+    - icon: ➕
+      text: create box
+      click: | #js
+        () => this.$root.$emit('user.action', this.ua('create.box'))
+    - icon: 🗑
+      text: clear
+      click: | #js
+        () => this.$root.$emit('user.action', this.ua('clear'))
+methods:
+  ua: | #js
+    function(method) {
+      return {
+        redo: {
+          method: method,
+          args: []
+        }
+      };
+    }
+  eval: | #js
+    function(code) {
+      return eval(`(${code})`);
+    }
+_:
+  examples:
+    count: 0
+name: flow-interface-toolbar2
+template: >-
+  <div class="comp-flow-interface-toolbar2" path="1077521900."><div class="flex
+  gap-1" path="1077521900.0"><ui-button v-for="button in buttons"
+  :icon="button.icon" :text="button.text" :click="() =&gt; eval(button.click)()"
+  path="1077521900.0.0"></ui-button></div></div>

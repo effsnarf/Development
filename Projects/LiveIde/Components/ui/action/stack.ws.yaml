@@ -1,6 +1,11 @@
 dom:
   .box:
     v-if: actionStack
+    h3: 
+      ui.title: 
+        icon: ✨
+        text: Actions
+        ':number': actionStack.actions.count
     .flex.justify-between:
       ui.button: 
         class: flex-equal
@@ -22,13 +27,30 @@ dom:
         template:
           slot:
             ':action': slotProps.action
+      h3: 
+        ui.title: 
+          icon: ✨
+          text: done
+          ':number': actionStack.doneAction._id.value
 props:
   actionStack: null
-data: null
+data:
+  actionItems: []
 mounted: | #js
   function() {
+    this.refresh();
   }
 methods:
+  getActions: | #js
+    async function() {
+      let actions = await this.actionStack.actions.getMany();
+      actions = actions.map(a => ({
+        _id: a._id,
+        method: a.redo.noop ? "no.op" : a.redo.method,
+      }));
+      actions = [...actions].reverse();
+      return actions;
+    }
   doVerb: | #js
     async function(verb) {
       await this.actionStack[verb]();
@@ -36,9 +58,16 @@ methods:
     }
   refresh: | #js
     async function() {
+      this.actionItems = await this.getActions();
       this.$refs.list1.refresh();
     }
-watch: null
+watch:
+  actionStack:
+    handler: | #js
+      async function(actionStack) {
+        actionStack.events.on("change", this.refresh.bind(this));
+      }
+    immediate: true
 style:
   .box:
     border: '1px solid #ffffff80'
@@ -46,22 +75,25 @@ style:
     display: flex
     flex-direction: column-reverse
     font-family: monospace
-  li:hover:
-    background-color: '#ffffff10'
 _:
   examples:
     count: 0
 name: ui-action-stack
 template: >-
   <div class="comp-ui-action-stack box" v-if="actionStack"
-  path="-1417831958."><div class="flex justify-between"
-  path="-1417831958.0"><ui-button class="flex-equal" text="👈 undo" :click="()
-  =&gt; doVerb('undo')" path="-1417831958.0.0"></ui-button><ui-button
+  path="-1417831958."><h3 path="-1417831958.0"><ui-title icon="✨" text="Actions"
+  :number="actionStack.actions.count"
+  path="-1417831958.0.0"></ui-title></h3><div class="flex justify-between"
+  path="-1417831958.1"><ui-button class="flex-equal" text="👈 undo" :click="()
+  =&gt; doVerb('undo')" path="-1417831958.1.0"></ui-button><ui-button
   class="flex-equal" text="redo 👉" :click="() =&gt; doVerb('redo')"
-  path="-1417831958.0.1"></ui-button><ui-button class="flex-equal" text="✖
+  path="-1417831958.1.1"></ui-button><ui-button class="flex-equal" text="✖
   clear" :click="() =&gt; doVerb('clear')"
-  path="-1417831958.0.2"></ui-button></div><div
-  path="-1417831958.1"><ui-action-list ref="list1" :action-stack="actionStack"
-  v-slot="slotProps" path="-1417831958.1.0"><template
-  path="-1417831958.1.0.0"><slot :action="slotProps.action"
-  path="-1417831958.1.0.0.0"></slot></template></ui-action-list></div></div>
+  path="-1417831958.1.2"></ui-button></div><div
+  path="-1417831958.2"><ui-action-list ref="list1" :action-stack="actionStack"
+  v-slot="slotProps" path="-1417831958.2.0"><template
+  path="-1417831958.2.0.0"><slot :action="slotProps.action"
+  path="-1417831958.2.0.0.0"></slot></template></ui-action-list><h3
+  path="-1417831958.2.1"><ui-title icon="✨" text="done"
+  :number="actionStack.doneAction._id.value"
+  path="-1417831958.2.1.0"></ui-title></h3></div></div>

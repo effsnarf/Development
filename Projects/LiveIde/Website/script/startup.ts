@@ -12,7 +12,7 @@ import { Params } from "../../Classes/Params";
 import { DatabaseProxy } from "../../../../Apps/DatabaseProxy/Client/DbpClient";
 import { VueManager } from "../../Classes/VueManager";
 import { Data } from "../../../../Shared/Data";
-import { Flow } from "../../Classes/Flow";
+import { Graph } from "../../../../Shared/Database/Graph";
 
 const window1 = window as any;
 
@@ -24,6 +24,7 @@ window1.Diff = Diff;
 window1.TaskQueue = TaskQueue;
 window1.Data = Data;
 window1.Actionable = Actionable;
+window1.Graph = Graph;
 
 const generalMixin = {
   matchComp: (c: Component) => true,
@@ -535,7 +536,6 @@ interface MgParams {
     data: {
       events: new Events(),
       vm: null as unknown as VueManager,
-      flow: null as unknown as Flow.Manager,
       client,
       dbp,
       analytics: await AnalyticsTracker.new(),
@@ -556,7 +556,6 @@ interface MgParams {
     },
     async mounted() {
       await this.init();
-      this.events.forward(flow.events, "flow");
       this.events.on("*", this.onAppEvent.bind(this));
     },
     methods: {
@@ -1168,10 +1167,8 @@ interface MgParams {
   });
 
   const vueManager = await VueManager.new(client);
-  const flow = await Flow.Manager.new(vueApp, vueManager, gdbData);
 
   vueApp.vm = vueManager;
-  vueApp.flow = flow;
 
   vueApp.$mount("#app");
 

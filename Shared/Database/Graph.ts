@@ -87,7 +87,7 @@ namespace Graph {
 
     protected constructor(protected data: any) {}
 
-    static async new(data: any) {
+    static async new(data: any = { nextID: 1, nodes: [], links: [] }) {
       return new Database(data);
     }
 
@@ -121,13 +121,15 @@ namespace Graph {
       const newData = {} as any;
 
       const types = type.split(".");
-      const typeSchema = this.data.schema[types[0]][types[1]];
-      const commonData = Objects.clone((typeSchema?._all?.data || {}) as any);
-      Object.assign(newData, commonData);
-      let defaultData = (this.data.schema[types[0]][types[1]] || {}) as any;
-      defaultData = defaultData[types[2]] ? defaultData[types[2]].data : {};
-      defaultData = Objects.clone(defaultData);
-      Object.assign(newData, defaultData);
+      if (this.data.schema) {
+        const typeSchema = this.data.schema[types[0]][types[1]];
+        const commonData = Objects.clone((typeSchema?._all?.data || {}) as any);
+        Object.assign(newData, commonData);
+        let defaultData = (this.data.schema[types[0]][types[1]] || {}) as any;
+        defaultData = defaultData[types[2]] ? defaultData[types[2]].data : {};
+        defaultData = Objects.clone(defaultData);
+        Object.assign(newData, defaultData);
+      }
 
       Object.assign(newData, data);
 
@@ -156,17 +158,20 @@ namespace Graph {
 
       this.onNodesChange([node, ...affectedNodes]);
 
-      let defaultChildren = (this.data.schema[types[0]][types[1]] || {}) as any;
-      defaultChildren = defaultChildren[types[2]]
-        ? defaultChildren[types[2]].children || []
-        : [];
-      for (const child of defaultChildren) {
-        const childNode = this.addChildNode(
-          node,
-          child.type,
-          child.data,
-          child.children
-        );
+      if (this.data.schema) {
+        let defaultChildren = (this.data.schema[types[0]][types[1]] ||
+          {}) as any;
+        defaultChildren = defaultChildren[types[2]]
+          ? defaultChildren[types[2]].children || []
+          : [];
+        for (const child of defaultChildren) {
+          const childNode = this.addChildNode(
+            node,
+            child.type,
+            child.data,
+            child.children
+          );
+        }
       }
 
       return node;
