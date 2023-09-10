@@ -16,7 +16,10 @@ helpers:
       return hasKey;
     }
   addCode: | #ts
-    (context, methodBody, code) => {
+    (context, methodBody, code, methodName) => {
+      code = (code || "").trim();
+      code = code.replace("{{method}}", methodName);
+
       if (!methodBody?.length) methodBody = "function() {}";
 
       // Remove lines starting with "//" at the beginning of the line

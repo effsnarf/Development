@@ -194,7 +194,8 @@ namespace Actionable {
     async _undo() {
       if (this.doneAction.isFirstAction) return;
       if (!this.doneAction.action) return;
-      await this._executeDoable(this.doneAction.action.undo);
+      const action = this.invertAction(this.doneAction.action);
+      await this._executeAction(action);
       const index = await this.actions.getIndex(this.doneAction._id.value);
       if (index == null) throw new Error("Action not found");
       this.doneAction.set(await this.actions.getItemAt(index - 1));
@@ -203,7 +204,8 @@ namespace Actionable {
     async redo() {
       if (this.doneAction.isLastAction) return;
       if (!this.doneAction.action) return;
-      await this._executeDoable(this.doneAction.action.redo);
+      const action = Objects.clone(this.doneAction.action);
+      await this._executeAction(action);
       const index = await this.actions.getIndex(this.doneAction._id.value);
       if (index == null) throw new Error("Action not found");
       this.doneAction.set(await this.actions.getItemAt(index + 1));
@@ -213,6 +215,15 @@ namespace Actionable {
       await this.actions.clear();
       await this.ensureNoopAction();
       this.doneAction.set(await this.actions.getNewest());
+    }
+
+    private invertAction(action: Action): Action {
+      action = Objects.clone(action);
+      const redo = action.redo;
+      const undo = action.undo;
+      action.redo = undo;
+      action.undo = redo;
+      return action;
     }
 
     private async ensureNoopAction() {
@@ -231,14 +242,6 @@ namespace Actionable {
       if (action.redo.noop) return action;
 
       return await this.executeAction(action);
-    }
-
-    private async _executeDoable(doable: Doable) {
-      doable = Objects.clone(doable);
-
-      if (doable.noop) return;
-
-      return await this.executeDoable(doable);
     }
   }
 }

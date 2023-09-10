@@ -1,81 +1,61 @@
 dom:
   div: 
     div: 
-      .flex:
+      .flex: 
         div: 
           class: logo
-        h2: 
-          ui.title: 
+        h2:
+          ui.title:
             class: title1
             text: Flow
-      .flex1:
-        div: 
-          ':style': '{ width: ''15em'' }'
-          flow.gdb.tree:
-            ':node': $root.flow?.gdb.nodes[0]
-            @update:active-node: setGlobalActiveNode
-          div: 
-            class: spacer1
-          div: 
-            class: spacer1
-        div: 
-          v-if: gdb
-          flow.app.node: 
-            ':node': appViewRootNode
-          flow.app.node: 
-            v-if: 'false'
-            ':node': appViewRootNode
-        flow.interface.toolbar: null
-        flow.interface.action.stack: null
-        ui.action.stack:
-          ':action-stack': $gdb.actionStack
-          v-slot: slotProps
-          template:
-            flow.interface.action:
-              ':action': slotProps.action
-        flow.interface.trash: null
-      flow.node.picker: null
       div: 
-        h2: 
-          @click: showExtraInfo = !showExtraInfo
-          ui.title: 
-            icon: ✨
-            text: Extra Info
-          class: clickable
         div: 
-          div: 
-            class: spacer1
+          ':style': '{ width: ''20em'' }'
+          ':key': key1
+          ui.action.stack:
+            ref: actionStack1
+            ':action-stack': $root.flow.interface.userActions
+            v-slot: slotProps
+            template:
+              flow.interface.action:
+                ':action': slotProps.action
+        .flex: 
+          ui.button: 
+            text: ✖
+            ':click': >-
+              () => $root.$emit('user.action', { method: 'clear', args: { type:
+              'text' } })
+          ui.button: 
+            text: 🆎
+            ':click': >-
+              () => $root.$emit('user.action', { method: 'create.box', args: {
+              type: 'text' } })
+        div: 
           flow.gdb.list:
-            v-if: showExtraInfo
+            ':gdb': $gdb
+        div: 
+          flow.box: null
     div: 
       div: 
         ui.html.style:
           v-for: comp in $root.comps
           ':component': comp
-props:
-  comps: null
+props: null
 data:
   gdb: null
-  showExtraInfo: false
+  key1: 1
 mounted: | #js
   async function() {
-    this.gdb = (await (await fetch(`/gdb.yaml`)).json());
+    this.$root.$on("user.action", this.refresh.bind(this));
   }
 methods:
-  setGlobalActiveNode: | #js
-    function(node) {
-      this.$global.active.node = node;
-      this.$global.active.related.nodes = this.$gdb.getLinkedNodes(node, l => (l.type != "child.of"));
+  refresh: | #js
+    async function() {
+      this.$refs.actionStack1.refresh();
     }
 watch: null
-computed:
-  appViewRootNode: | #js
-    function() {
-      return this.$gdb.getNode("app.view.[0]");
-    }
+computed: null
 style:
-  .spacer1:
-    height: 5em
   .logo:
     width: 8em
     aspect-ratio: 6 / 5
@@ -100,27 +80,21 @@ template: >-
   path="-1584259284.0"><div class="flex" path="-1584259284.0.0"><div
   class="logo" path="-1584259284.0.0.0"></div><h2
   path="-1584259284.0.0.1"><ui-title class="title1" text="Flow"
-  path="-1584259284.0.0.1.0"></ui-title></h2></div><div class="flex1"
-  path="-1584259284.0.1"><div :style="{ width: '15em' }"
-  path="-1584259284.0.1.0"><flow-gdb-tree :node="$root.flow?.gdb.nodes[0]"
-  @update:active-node="setGlobalActiveNode"
-  path="-1584259284.0.1.0.0"></flow-gdb-tree><div class="spacer1"
-  path="-1584259284.0.1.0.1"></div><div class="spacer1"
-  path="-1584259284.0.1.0.2"></div></div><div v-if="gdb"
-  path="-1584259284.0.1.1"><flow-app-node :node="appViewRootNode"
-  path="-1584259284.0.1.1.0"></flow-app-node><flow-app-node v-if="false"
-  :node="appViewRootNode"
-  path="-1584259284.0.1.1.1"></flow-app-node></div><flow-interface-toolbar></flow-interface-toolbar><flow-interface-action-stack></flow-interface-action-stack><ui-action-stack
-  :action-stack="$gdb.actionStack" v-slot="slotProps"
-  path="-1584259284.0.1.4"><template
-  path="-1584259284.0.1.4.0"><flow-interface-action :action="slotProps.action"
-  path="-1584259284.0.1.4.0.0"></flow-interface-action></template></ui-action-stack><flow-interface-trash></flow-interface-trash></div><flow-node-picker></flow-node-picker><div
-  path="-1584259284.0.3"><h2 class="clickable" @click="showExtraInfo =
-  !showExtraInfo" path="-1584259284.0.3.0"><ui-title icon="✨" text="Extra Info"
-  path="-1584259284.0.3.0.0"></ui-title></h2><div path="-1584259284.0.3.1"><div
-  class="spacer1" path="-1584259284.0.3.1.0"></div><flow-gdb-list
-  v-if="showExtraInfo"
-  path="-1584259284.0.3.1.1"></flow-gdb-list></div></div></div><div
+  path="-1584259284.0.0.1.0"></ui-title></h2></div><div
+  path="-1584259284.0.1"><div :style="{ width: '20em' }" :key="key1"
+  path="-1584259284.0.1.0"><ui-action-stack ref="actionStack1"
+  :action-stack="$root.flow.interface.userActions" v-slot="slotProps"
+  path="-1584259284.0.1.0.0"><template
+  path="-1584259284.0.1.0.0.0"><flow-interface-action :action="slotProps.action"
+  path="-1584259284.0.1.0.0.0.0"></flow-interface-action></template></ui-action-stack></div><div
+  class="flex" path="-1584259284.0.1.1"><ui-button text="✖" :click="() =&gt;
+  $root.$emit('user.action', { method: 'clear', args: { type: 'text' } })"
+  path="-1584259284.0.1.1.0"></ui-button><ui-button text="🆎" :click="() =&gt;
+  $root.$emit('user.action', { method: 'create.box', args: { type: 'text' } })"
+  path="-1584259284.0.1.1.1"></ui-button></div><div
+  path="-1584259284.0.1.2"><flow-gdb-list :gdb="$gdb"
+  path="-1584259284.0.1.2.0"></flow-gdb-list></div><div
+  path="-1584259284.0.1.3"><flow-box></flow-box></div></div></div><div
   path="-1584259284.1"><div path="-1584259284.1.0"><ui-html-style v-for="comp in
   $root.comps" :component="comp"
   path="-1584259284.1.0.0"></ui-html-style></div></div></div>

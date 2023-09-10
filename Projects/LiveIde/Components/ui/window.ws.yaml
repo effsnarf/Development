@@ -1,0 +1,142 @@
+dom:
+  .window:
+    ui.mouse:
+      @drag: onMouseDrag
+    ':style': style
+    .flex:
+      slot: 
+        name: title
+    .content:
+      ':style': contentStyle
+      slot: 
+        name: content
+    .footer:
+      .flex.justify-between:
+        div:
+          v-for: size in sizes
+          ui.button:
+            ':text': size.width + 'x' + size.height
+            @click: rect1.size = size
+props:
+  rect: null
+data:
+  sizes:
+    - width: 300
+      height: 200
+    - width: 400
+      height: 300
+    - width: 500
+      height: 400
+  rect1:
+    pos:
+      x: 0
+      'y': 0
+    size:
+      width: 300
+      height: 200
+  center:
+    x: 0
+    'y': 0
+  isDragging: false
+  dragTimeout: null
+mounted: | #js
+  function() {
+    this.center = this.getWindowCenter();
+    window.addEventListener("resize", this.getWindowCenter.bind(this));
+  }
+methods:
+  getWindowCenter: | #js
+    function() {
+      return {
+        x: window.innerWidth / 2,
+        y: window.innerHeight / 2
+      };
+    }
+  onMouseDrag: | #js
+    async function(dpos) {
+      this.isDragging = true;
+      const pos = this.rect1.pos;
+      pos.x += dpos.dx;
+      pos.y -= dpos.dy;
+      clearTimeout(this.dragTimeout);
+      this.dragTimeout = setTimeout(() => {
+        this.isDragging = false;
+      }, 100);
+    }
+computed:
+  style: | #js
+    function()
+    {
+      const style = {};
+      style.position = "fixed";
+      const pos = this.rect1.pos;
+      const size = this.rect1.size;
+      style.left = ((this.center.x + pos.x - (size.width / 2)) + "px");
+      style.top = ((this.center.y - pos.y - (size.height / 2)) + "px");
+      if (!this.isDragging) style.transition = "0.3s";
+      return style;
+    }
+  contentStyle: | #js
+    function()
+    {
+      const style = {};
+      const size = this.rect1.size;
+      style.width = (size.width + "px");
+      style.height = (size.height + "px");
+      style.transition = "0.3s";
+      return style;
+    }
+watch:
+  rect:
+    handler: | #js
+      function(rect) {
+        this.rect1 = rect;
+      }
+  rect1:
+    handler: | #js
+      function(rect) {
+        this.$emit("input", rect);
+      }
+    deep: true
+style:
+  .window:
+    padding: 1em
+    background: 'linear-gradient(to right, #303030, #101010)'
+    border: '1px solid #ffffff30'
+    overflow: hidden
+    cursor: move
+    user-select: none
+  .footer:
+    margin-top: 1em
+    opacity: 0
+    max-height: 0.5em
+    overflow: hidden
+    transition: 0.3s
+  .footer:hover:
+    opacity: 1
+    max-height: 3em
+  .handle:
+    position: absolute
+    right: 0
+    bottom: 0
+    width: 1em
+    height: 1em
+    background: '#ffffff20'
+    cursor: se-resize
+    user-select: none
+_:
+  examples:
+    count: 0
+name: ui-window
+template: >-
+  <div class="comp-ui-window window" :style="style"
+  path="-1324571510."><ui-mouse @drag="onMouseDrag"
+  path="-1324571510.0"></ui-mouse><div class="flex" path="-1324571510.1"><slot
+  name="title" path="-1324571510.1.0"></slot></div><div class="content"
+  :style="contentStyle" path="-1324571510.2"><slot name="content"
+  path="-1324571510.2.0"></slot></div><div class="footer"
+  path="-1324571510.3"><div class="flex justify-between"
+  path="-1324571510.3.0"><div v-for="size in sizes"
+  path="-1324571510.3.0.0"><ui-button :text="size.width + 'x' + size.height"
+  @click="rect1.size = size"
+  path="-1324571510.3.0.0.0"></ui-button></div></div></div></div>

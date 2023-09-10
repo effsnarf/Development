@@ -73,7 +73,7 @@ dom:
                             div: 
                               v-if: field.value
                               v-text: field.name
-                            ui.text.box:
+                            ui.input.text.box:
                               ':style': '{ width: ''5em'' }'
                               v-if: '!field.value'
                               v-model: field.name
@@ -374,9 +374,9 @@ template: >-
   path="-1978980996.0.2.0.0.1.0.0.0.0.0.0.0"></div><div
   path="-1978980996.0.2.0.0.1.0.0.0.0.0.0.1"><div v-if="field.value"
   v-text="field.name"
-  path="-1978980996.0.2.0.0.1.0.0.0.0.0.0.1.0"></div><ui-text-box :style="{
-  width: '5em' }" v-if="!field.value" v-model="field.name"
-  path="-1978980996.0.2.0.0.1.0.0.0.0.0.0.1.1"></ui-text-box></div></div></th><td
+  path="-1978980996.0.2.0.0.1.0.0.0.0.0.0.1.0"></div><ui-input-text-box
+  :style="{ width: '5em' }" v-if="!field.value" v-model="field.name"
+  path="-1978980996.0.2.0.0.1.0.0.0.0.0.0.1.1"></ui-input-text-box></div></div></th><td
   path="-1978980996.0.2.0.0.1.0.0.0.0.1"><ide-css-field-editor :field="field"
   @input="(value) =&gt; setNewCssRule(field.name, value)"
   path="-1978980996.0.2.0.0.1.0.0.0.0.1.0"></ide-css-field-editor></td></tr></table><div

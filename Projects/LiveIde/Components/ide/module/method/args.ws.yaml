@@ -8,7 +8,7 @@ dom:
             icon: 🧊
             ':text': argName
         td: 
-          ui.text.box:
+          ui.input.text.box:
             v-model: argJsons[argName]
         td: 
           ui.value.any:
@@ -50,7 +50,7 @@ template: >-
   path="-716550388.0"><tr v-for="argName in method.args"
   path="-716550388.0.0"><td path="-716550388.0.0.0"><ui-title icon="🧊"
   :text="argName" path="-716550388.0.0.0.0"></ui-title></td><td
-  path="-716550388.0.0.1"><ui-text-box v-model="argJsons[argName]"
-  path="-716550388.0.0.1.0"></ui-text-box></td><td
+  path="-716550388.0.0.1"><ui-input-text-box v-model="argJsons[argName]"
+  path="-716550388.0.0.1.0"></ui-input-text-box></td><td
   path="-716550388.0.0.2"><ui-value-any :value="args[argName]"
   path="-716550388.0.0.2.0"></ui-value-any></td></tr></table></div>

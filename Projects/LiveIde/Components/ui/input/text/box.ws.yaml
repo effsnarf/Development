@@ -1,0 +1,82 @@
+dom:
+  div:
+    v-if: '!multiline'
+    ':class': '{ disabled: !enabled }'
+    .icon:
+      v-if: icon
+      v-text: icon
+    input:
+      ':class': '{ hasIcon: icon }'
+      ':type': type
+      ':placeholder': hint
+      ':value': value
+      ':disabled': '!enabled'
+      @input: onInput
+  textarea:
+    v-else-if: multiline
+    ':value': value
+    ':placeholder': hint
+    @focus: $emit('focus')
+    @blur: $emit('blur')
+    @input: onTextAreaInput
+    @keydown: onTextAreaKeyDown
+props:
+  type: text
+  value: null
+  hint: null
+  icon: null
+  enabled: true
+  multiline: false
+  autoResize: true
+methods:
+  onInput: | #js
+    function(e) {
+      this.$emit('input', e.target.value);
+    }
+  onTextAreaInput: | #js
+    function(e) {
+      const heightLimit = 200;
+      const textarea = e.target;
+      this.$emit('input', textarea.value);
+      if (this.autoResize) this.resizeTextArea(textarea, heightLimit);
+    }
+  resizeTextArea: | #js
+    function(textarea, heightLimit) {
+      textarea.style.height = "";
+      textarea.style.height = Math.min(textarea.scrollHeight, heightLimit) + "px";
+    }  
+  onTextAreaKeyDown: | #js
+    function(e) {
+      if (e.key == 'Tab') {
+        e.preventDefault();
+        let start = e.target.selectionStart;
+        let end = e.target.selectionEnd;
+        let value = e.target.value;
+        e.target.value = value.substring(0, start) + "  " + value.substring(end);
+        e.target.selectionStart = e.target.selectionEnd = start + 2;
+      }
+      return false;
+    }
+name: ui-input-text-box
+style:
+  input.hasIcon:
+    padding-left: 2em !important
+  .icon:
+    position: absolute
+    margin: 0.25em
+examples:
+  - dom:
+      ui.input.text.box:
+        icon: 🔎
+        hint: search…
+_:
+  examples:
+    count: 1
+template: >-
+  <div class="comp-ui-input-text-box" v-if="!multiline" :class="{ disabled:
+  !enabled }" path="739613128."><div class="icon" v-if="icon" v-text="icon"
+  path="739613128.0"></div><input :class="{ hasIcon: icon }" :type="type"
+  :placeholder="hint" :value="value" :disabled="!enabled" @input="onInput"
+  path="739613128.1"/></div><textarea v-else-if="multiline" :value="value"
+  :placeholder="hint" @focus="$emit('focus')" @blur="$emit('blur')"
+  @input="onTextAreaInput" @keydown="onTextAreaKeyDown"></textarea>

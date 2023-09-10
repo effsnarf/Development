@@ -1,0 +1,47 @@
+dom:
+  div:
+    table:
+      thead:
+        tr: 
+          th:
+            v-text: '''pause'''
+      tbody:
+        tr: 
+          v-for: method in component.source.methods
+          td:
+            ui.checkbox:
+              ':text': '''🔴 '' + method.name'
+              @input: (value) => onDebugMethodInput(method, value)
+    ui.value.any:
+      ':value': isDebugMethod
+props:
+  component: null
+data:
+  isDebugMethod: {}
+methods:
+  onDebugMethodInput: | #js
+    function(method, value) {
+      const compName = this.component.name.replace(/-/g, '.');
+      const comp = vueIdeApp.comps.find(c => (c.name == compName));
+      comp.debug = (comp.debug || {});
+      comp.debug.methods = (comp.debug.methods || {});
+      comp.debug.methods[method.name] = (comp.debug.methods[method.name] || {});
+      comp.debug.methods[method.name].pause = value;
+    }
+style:
+  th:first-child:
+    width: 2em
+_:
+  examples:
+    count: 0
+name: ide-component-methods
+template: >-
+  <div class="comp-ide-component-methods" path="-1323119235."><table
+  path="-1323119235.0"><thead path="-1323119235.0.0"><tr
+  path="-1323119235.0.0.0"><th v-text="'pause'"
+  path="-1323119235.0.0.0.0"></th></tr></thead><tbody path="-1323119235.0.1"><tr
+  v-for="method in component.source.methods" path="-1323119235.0.1.0"><td
+  path="-1323119235.0.1.0.0"><ui-checkbox :text="'🔴 ' + method.name"
+  @input="(value) =&gt; onDebugMethodInput(method, value)"
+  path="-1323119235.0.1.0.0.0"></ui-checkbox></td></tr></tbody></table><ui-value-any
+  :value="isDebugMethod" path="-1323119235.1"></ui-value-any></div>

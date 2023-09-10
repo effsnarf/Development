@@ -1,0 +1,44 @@
+dom:
+  ui.window:
+    v-model: rect
+    template: 
+      v-slot: title
+      h3:
+        v-text: '''🆎'''
+    template: 
+      v-slot: content
+      ui.input.text.box:
+        ':style': '{ height: ''100%'' }'
+        multiline: true
+        ':auto-resize': 'false'
+props: null
+data:
+  rect: null
+  boxes:
+    - type: text
+      value: Hello World!
+mounted: | #js
+  function() {
+  }
+methods: null
+computed:
+  jsyaml: | #js
+    function() {
+      return jsyaml;
+    }
+style:
+  .box:
+    padding: 1em
+    background: 'linear-gradient(to right, #303030, #101010)'
+    cursor: move
+_:
+  examples:
+    count: 0
+name: flow-box
+template: >-
+  <ui-window class="comp-flow-box" v-model="rect" path="2028347659."><template
+  v-slot:title path="2028347659.0"><h3 v-text="'🆎'"
+  path="2028347659.0.0"></h3></template><template v-slot:content
+  path="2028347659.1"><ui-input-text-box :style="{ height: '100%' }"
+  multiline="true" :auto-resize="false"
+  path="2028347659.1.0"></ui-input-text-box></template></ui-window>

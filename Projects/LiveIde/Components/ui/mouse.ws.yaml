@@ -8,18 +8,13 @@ data:
   pos: {}
   hoveredElement: null
   posQueue: []
-  updateInterval: 50
+  updateInterval: 20
   isMounted: false
   dragStart: null
 mounted: | #js
   function() {
     this.isMounted = true;
-    const element = this.getElement();
-    element.addEventListener("mousedown", this.onMouseDown);
-    element.addEventListener("mouseup", this.onMouseUp);
-    window.addEventListener("mousemove", this.onMouseMove);
-    element.addEventListener("contextmenu", this.onContextMenu);
-    this.update();
+    this.bindToElement();
   }
 unmounted: | #js
   function() {
@@ -27,17 +22,32 @@ unmounted: | #js
     alertify.message("unmounted");
   }
 methods:
+  bindToElement: | #js
+    function() {
+      const element = this.getElement();
+      if (!element) {
+        setTimeout(this.bindToElement.bind(this), 100);
+        return;
+      }
+      element.addEventListener("mousedown", this.onMouseDown);
+      element.addEventListener("mouseup", this.onMouseUp);
+      window.addEventListener("mousemove", this.onMouseMove);
+      element.addEventListener("contextmenu", this.onContextMenu);
+      this.update();
+    }
   onMouseDown: | #js
     function(e) {
       if (!this.global && e.target.tagName != "DIV") return;
       if (e.button != 0) return;
       if (this.dragStart) return;
       this.dragStart = { x: e.clientX, y: e.clientY };
+      this.$emit("down", e);
     }
   onMouseUp: | #js
     function(e) {
       if (e.button != 0) return;
       this.dragStart = null;
+      this.$emit("up", e);
     }
   onMouseMove: | #js
     function(e) {     

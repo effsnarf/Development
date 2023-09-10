@@ -1,6 +1,6 @@
 dom:
   div:
-    ui.text.box:
+    ui.input.text.box:
       type: search
       icon: 🔎
       hint: search…

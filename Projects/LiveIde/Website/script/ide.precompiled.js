@@ -3167,20 +3167,24 @@ exports.VueHelper = void 0;
 const Vue = window.Vue;
 class VueHelper {
     static cid = 1;
-    static toIdeComponent(vue) {
+    static toIdeComponent(vue, comp) {
         if (!vue)
             return null;
         const compName = vue.$options._componentTag;
         if (!compName)
             return null;
         const vueComp = Vue.component(vue.$options._componentTag);
-        const comp = {};
-        comp.uid = vue._uid;
-        comp.name = compName;
-        comp.source = {
+        const ideComp = {};
+        ideComp.uid = vue._uid;
+        ideComp.name = compName;
+        ideComp.source = {
             dom: VueHelper.htmlToJson(vueComp.options.template),
+            methods: Object.entries(comp.source.methods).map(([key, value]) => ({
+                name: key,
+                code: value,
+            })),
         };
-        return comp;
+        return ideComp;
     }
     static htmlToJson(htmlString) {
         const parser = new DOMParser();
@@ -5724,7 +5728,7 @@ var __webpack_exports__ = {};
 (() => {
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/website/script/1694001177867.ts ***!
+  !*** ../../../LiveIde/website/script/1694115238060.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -5930,6 +5934,7 @@ window.vueIdeCompMixin = vueIdeCompMixin;
                 return yaml;
             },
             getComponent(uidOrName) {
+                const self = this;
                 const uid = typeof uidOrName == "number" ? uidOrName : null;
                 let name = typeof uidOrName == "string" ? uidOrName : null;
                 if (name)
@@ -5938,12 +5943,24 @@ window.vueIdeCompMixin = vueIdeCompMixin;
                     return null;
                 if (uid) {
                     const vue = vueManager.getVue(uid);
-                    return VueHelper_1.VueHelper.toIdeComponent(vue);
+                    const compName = vue.$options.name.replace(/-/g, ".");
+                    const comp = self.comps.find((c) => c.name == compName);
+                    return VueHelper_1.VueHelper.toIdeComponent(vue, comp);
                 }
                 if (name) {
                     const comp = this.compsDic[name.hashCode()];
                     return comp;
                 }
+            },
+            isPauseOnMethod(compName, methodName) {
+                compName = compName.replace(/-/g, ".");
+                const comp = vueIdeApp.comps.find((c) => c.name == compName);
+                if (!comp)
+                    return false;
+                const debugMethod = comp.debug?.methods?.[methodName];
+                if (debugMethod?.pause)
+                    return true;
+                return false;
             },
             getIcon(item) {
                 const stateItemIcons = {

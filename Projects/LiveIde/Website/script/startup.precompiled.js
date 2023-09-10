@@ -666,14 +666,7 @@ var Flow;
             const userActions = await Actionable_1.Actionable.ActionStack.new(persisters.localStorage, "user.actions");
             vueApp.$on("user.action", (redo) => userActions.do({ redo }));
             const interface1 = new Interface(userAppGdb, userActions);
-            if (userActions.actions.count == 1) {
-                userActions.do({
-                    redo: {
-                        method: "init.user.app.source",
-                        args: [],
-                    },
-                });
-            }
+            if (false) {}
             return interface1;
         }
         async executeAction(action) {
@@ -700,6 +693,26 @@ var Flow;
                 return await self[methodName](action);
             }
             throw new Error("Unknown action type: " + redo.type);
+        }
+        async onClear(action) {
+            await this.userAppGdb.clear();
+            action.undo = {
+                method: "no.op",
+                args: [],
+            };
+            return action;
+        }
+        async onCreateBox(action) {
+            const args = action.redo.args || {};
+            const data = {
+                type: args.type,
+            };
+            const boxNode = await this.userAppGdb.addNode("flow.box", data);
+            action.undo = {
+                method: "gdb.undo",
+                args: [],
+            };
+            return action;
         }
         async onInitUserAppSource(action) {
             await this.userActions.clear();
@@ -3639,20 +3652,24 @@ exports.VueHelper = void 0;
 const Vue = window.Vue;
 class VueHelper {
     static cid = 1;
-    static toIdeComponent(vue) {
+    static toIdeComponent(vue, comp) {
         if (!vue)
             return null;
         const compName = vue.$options._componentTag;
         if (!compName)
             return null;
         const vueComp = Vue.component(vue.$options._componentTag);
-        const comp = {};
-        comp.uid = vue._uid;
-        comp.name = compName;
-        comp.source = {
+        const ideComp = {};
+        ideComp.uid = vue._uid;
+        ideComp.name = compName;
+        ideComp.source = {
             dom: VueHelper.htmlToJson(vueComp.options.template),
+            methods: Object.entries(comp.source.methods).map(([key, value]) => ({
+                name: key,
+                code: value,
+            })),
         };
-        return comp;
+        return ideComp;
     }
     static htmlToJson(htmlString) {
         const parser = new DOMParser();
@@ -4086,7 +4103,8 @@ var Actionable;
                 return;
             if (!this.doneAction.action)
                 return;
-            await this._executeDoable(this.doneAction.action.undo);
+            const action = this.invertAction(this.doneAction.action);
+            await this._executeAction(action);
             const index = await this.actions.getIndex(this.doneAction._id.value);
             if (index == null)
                 throw new Error("Action not found");
@@ -4097,7 +4115,8 @@ var Actionable;
                 return;
             if (!this.doneAction.action)
                 return;
-            await this._executeDoable(this.doneAction.action.redo);
+            const action = Extensions_Objects_Client_1.Objects.clone(this.doneAction.action);
+            await this._executeAction(action);
             const index = await this.actions.getIndex(this.doneAction._id.value);
             if (index == null)
                 throw new Error("Action not found");
@@ -4107,6 +4126,14 @@ var Actionable;
             await this.actions.clear();
             await this.ensureNoopAction();
             this.doneAction.set(await this.actions.getNewest());
+        }
+        invertAction(action) {
+            action = Extensions_Objects_Client_1.Objects.clone(action);
+            const redo = action.redo;
+            const undo = action.undo;
+            action.redo = undo;
+            action.undo = redo;
+            return action;
         }
         async ensureNoopAction() {
             if (this.actions.count === 0) {
@@ -4122,12 +4149,6 @@ var Actionable;
             if (action.redo.noop)
                 return action;
             return await this.executeAction(action);
-        }
-        async _executeDoable(doable) {
-            doable = Extensions_Objects_Client_1.Objects.clone(doable);
-            if (doable.noop)
-                return;
-            return await this.executeDoable(doable);
         }
     }
     Actionable.ActionStack = ActionStack;
@@ -4616,9 +4637,10 @@ var Graph;
             data = JSON.parse(JSON.stringify(data || {}));
             const newData = {};
             const types = type.split(".");
-            const commonData = Extensions_Objects_Client_1.Objects.clone(this.data.schema[types[0]][types[1]]._all.data);
+            const typeSchema = this.data.schema[types[0]][types[1]];
+            const commonData = Extensions_Objects_Client_1.Objects.clone((typeSchema?._all?.data || {}));
             Object.assign(newData, commonData);
-            let defaultData = this.data.schema[types[0]][types[1]];
+            let defaultData = (this.data.schema[types[0]][types[1]] || {});
             defaultData = defaultData[types[2]] ? defaultData[types[2]].data : {};
             defaultData = Extensions_Objects_Client_1.Objects.clone(defaultData);
             Object.assign(newData, defaultData);
@@ -4644,7 +4666,7 @@ var Graph;
             this.nodes.push(node);
             this.links.push(...links);
             this.onNodesChange([node, ...affectedNodes]);
-            let defaultChildren = this.data.schema[types[0]][types[1]];
+            let defaultChildren = (this.data.schema[types[0]][types[1]] || {});
             defaultChildren = defaultChildren[types[2]]
                 ? defaultChildren[types[2]].children || []
                 : [];
@@ -7753,7 +7775,7 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/website/script/1694001178671.ts ***!
+  !*** ../../../LiveIde/website/script/1694115238615.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

@@ -15,7 +15,7 @@ dom:
         ':key': key1
       transition:
         name: slide
-        ui.text.box:
+        ui.input.text.box:
           v-if: showEditor
           ':class': getCssClass(item)
           v-model: item.text

@@ -24,7 +24,7 @@
   unmounted: {{{addCode unmounted ""}}},
   methods: {
     {{#each methods}}
-    {{@key}}: {{{addCode this ""}}},
+    {{@key}}: {{{addCode this "if (window.vueIdeApp?.isPauseOnMethod(this.$options._componentTag, '{{method}}')) debugger;" @key}}},
     {{/each}}
   },
   computed: {

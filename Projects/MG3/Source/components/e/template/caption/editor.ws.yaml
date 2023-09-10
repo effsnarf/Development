@@ -1,6 +1,6 @@
 dom:
   div: 
-    ui.text.box:
+    ui.input.text.box:
       ':hint': item.hint
       v-model: item.text
     div: 

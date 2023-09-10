@@ -121,11 +121,10 @@ namespace Graph {
       const newData = {} as any;
 
       const types = type.split(".");
-      const commonData = Objects.clone(
-        this.data.schema[types[0]][types[1]]._all.data
-      );
+      const typeSchema = this.data.schema[types[0]][types[1]];
+      const commonData = Objects.clone((typeSchema?._all?.data || {}) as any);
       Object.assign(newData, commonData);
-      let defaultData = this.data.schema[types[0]][types[1]];
+      let defaultData = (this.data.schema[types[0]][types[1]] || {}) as any;
       defaultData = defaultData[types[2]] ? defaultData[types[2]].data : {};
       defaultData = Objects.clone(defaultData);
       Object.assign(newData, defaultData);
@@ -157,7 +156,7 @@ namespace Graph {
 
       this.onNodesChange([node, ...affectedNodes]);
 
-      let defaultChildren = this.data.schema[types[0]][types[1]];
+      let defaultChildren = (this.data.schema[types[0]][types[1]] || {}) as any;
       defaultChildren = defaultChildren[types[2]]
         ? defaultChildren[types[2]].children || []
         : [];

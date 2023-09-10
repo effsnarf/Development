@@ -15,7 +15,7 @@ dom:
           v-if: '!media'
           ':show-tooltip': 'false'
           ':show-anonymous': 'true'
-    ui.textarea:
+    ui.input.text.area:
       ':hint': hint
       ':value': value
       @input: onInputText

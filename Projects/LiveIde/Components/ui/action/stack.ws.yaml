@@ -1,5 +1,5 @@
 dom:
-  div: 
+  .box:
     v-if: actionStack
     .flex.justify-between:
       ui.button: 
@@ -10,10 +10,13 @@ dom:
         class: flex-equal
         text: redo 👉
         ':click': () => doVerb('redo')
-    h2:
-      v-text: actionStack.doneAction._id.value
-    div: 
+      ui.button: 
+        class: flex-equal
+        text: ✖ clear
+        ':click': () => doVerb('clear')
+    div:
       ui.action.list:
+        ref: list1
         ':action-stack': actionStack
         v-slot: slotProps
         template:
@@ -22,13 +25,23 @@ dom:
 props:
   actionStack: null
 data: null
+mounted: | #js
+  function() {
+  }
 methods:
   doVerb: | #js
     async function(verb) {
       await this.actionStack[verb]();
+      await this.refresh();
+    }
+  refresh: | #js
+    async function() {
+      this.$refs.list1.refresh();
     }
 watch: null
 style:
+  .box:
+    border: '1px solid #ffffff80'
   ul.actions:
     display: flex
     flex-direction: column-reverse
@@ -40,14 +53,15 @@ _:
     count: 0
 name: ui-action-stack
 template: >-
-  <div class="comp-ui-action-stack" v-if="actionStack" path="-1417831958."><div
-  class="flex justify-between" path="-1417831958.0"><ui-button
-  class="flex-equal" text="👈 undo" :click="() =&gt; doVerb('undo')"
-  path="-1417831958.0.0"></ui-button><ui-button class="flex-equal" text="redo
-  👉" :click="() =&gt; doVerb('redo')"
-  path="-1417831958.0.1"></ui-button></div><h2
-  v-text="actionStack.doneAction._id.value" path="-1417831958.1"></h2><div
-  path="-1417831958.2"><ui-action-list :action-stack="actionStack"
-  v-slot="slotProps" path="-1417831958.2.0"><template
-  path="-1417831958.2.0.0"><slot :action="slotProps.action"
-  path="-1417831958.2.0.0.0"></slot></template></ui-action-list></div></div>
+  <div class="comp-ui-action-stack box" v-if="actionStack"
+  path="-1417831958."><div class="flex justify-between"
+  path="-1417831958.0"><ui-button class="flex-equal" text="👈 undo" :click="()
+  =&gt; doVerb('undo')" path="-1417831958.0.0"></ui-button><ui-button
+  class="flex-equal" text="redo 👉" :click="() =&gt; doVerb('redo')"
+  path="-1417831958.0.1"></ui-button><ui-button class="flex-equal" text="✖
+  clear" :click="() =&gt; doVerb('clear')"
+  path="-1417831958.0.2"></ui-button></div><div
+  path="-1417831958.1"><ui-action-list ref="list1" :action-stack="actionStack"
+  v-slot="slotProps" path="-1417831958.1.0"><template
+  path="-1417831958.1.0.0"><slot :action="slotProps.action"
+  path="-1417831958.1.0.0.0"></slot></template></ui-action-list></div></div>

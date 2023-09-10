@@ -223,13 +223,15 @@ namespace Flow {
 
       const interface1 = new Interface(userAppGdb, userActions);
 
-      if (userActions.actions.count == 1) {
-        userActions.do({
-          redo: {
-            method: "init.user.app.source",
-            args: [],
-          },
-        });
+      if (false) {
+        if (userActions.actions.count == 1) {
+          userActions.do({
+            redo: {
+              method: "init.user.app.source",
+              args: [],
+            },
+          });
+        }
       }
 
       return interface1;
@@ -267,6 +269,34 @@ namespace Flow {
       }
 
       throw new Error("Unknown action type: " + redo.type);
+    }
+
+    async onClear(action: any) {
+      await this.userAppGdb.clear();
+
+      action.undo = {
+        method: "no.op",
+        args: [],
+      };
+
+      return action;
+    }
+
+    async onCreateBox(action: any) {
+      const args = action.redo.args || {};
+
+      const data = {
+        type: args.type,
+      };
+
+      const boxNode = await this.userAppGdb.addNode("flow.box", data);
+
+      action.undo = {
+        method: "gdb.undo",
+        args: [],
+      };
+
+      return action;
     }
 
     private async onInitUserAppSource(action: any) {

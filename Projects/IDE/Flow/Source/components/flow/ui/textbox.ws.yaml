@@ -1,7 +1,7 @@
 dom:
   flow.node.base:
     ':node': node
-    ui.text.box:
+    ui.input.text.box:
       icon: ❔
       v-model: text
 props:
@@ -22,5 +22,5 @@ _:
 name: flow-ui-textbox
 template: >-
   <flow-node-base class="comp-flow-ui-textbox" :node="node"
-  path="-1576071964."><ui-text-box icon="❔" v-model="text"
-  path="-1576071964.0"></ui-text-box></flow-node-base>
+  path="-1576071964."><ui-input-text-box icon="❔" v-model="text"
+  path="-1576071964.0"></ui-input-text-box></flow-node-base>

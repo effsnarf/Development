@@ -2,7 +2,7 @@ dom:
   div: 
     v-if: node
     div: 
-      ui.text.box: 
+      ui.input.text.box: 
         class: fs-m3
         v-model: node.tag
         ':enabled': 'false'
@@ -14,7 +14,7 @@ dom:
             div: 
               v-text: key
           td:
-            ui.text.box: 
+            ui.input.text.box: 
               v-model: node.attributes[key]
               ':enabled': 'false'
 props:
@@ -38,12 +38,13 @@ _:
     count: 0
 template: >-
   <div class="comp-ide-component-view-node-editor" v-if="node"
-  path="-981981275."><div path="-981981275.0"><ui-text-box class="fs-m3"
+  path="-981981275."><div path="-981981275.0"><ui-input-text-box class="fs-m3"
   v-model="node.tag" :enabled="false"
-  path="-981981275.0.0"></ui-text-box></div><div path="-981981275.1"><table
-  path="-981981275.1.0"><tr v-for="(key) in getVisibleKeys(node.attributes)"
-  path="-981981275.1.0.0"><th path="-981981275.1.0.0.0"><div v-text="key"
+  path="-981981275.0.0"></ui-input-text-box></div><div
+  path="-981981275.1"><table path="-981981275.1.0"><tr v-for="(key) in
+  getVisibleKeys(node.attributes)" path="-981981275.1.0.0"><th
+  path="-981981275.1.0.0.0"><div v-text="key"
   path="-981981275.1.0.0.0.0"></div></th><td
-  path="-981981275.1.0.0.1"><ui-text-box v-model="node.attributes[key]"
+  path="-981981275.1.0.0.1"><ui-input-text-box v-model="node.attributes[key]"
   :enabled="false"
-  path="-981981275.1.0.0.1.0"></ui-text-box></td></tr></table></div></div>
+  path="-981981275.1.0.0.1.0"></ui-input-text-box></td></tr></table></div></div>

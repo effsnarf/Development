@@ -13,21 +13,25 @@ type HtmlJson = {
 class VueHelper {
   private static cid = 1;
 
-  static toIdeComponent(vue: any) {
+  static toIdeComponent(vue: any, comp: any) {
     if (!vue) return null;
     const compName = vue.$options._componentTag;
     if (!compName) return null;
     const vueComp = Vue.component(vue.$options._componentTag);
 
-    const comp = {} as any;
+    const ideComp = {} as any;
 
-    comp.uid = vue._uid;
-    comp.name = compName;
-    comp.source = {
+    ideComp.uid = vue._uid;
+    ideComp.name = compName;
+    ideComp.source = {
       dom: VueHelper.htmlToJson(vueComp.options.template),
+      methods: Object.entries(comp.source.methods).map(([key, value]) => ({
+        name: key,
+        code: value,
+      })),
     };
 
-    return comp;
+    return ideComp;
   }
 
   private static htmlToJson(htmlString: string) {

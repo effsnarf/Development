@@ -89,6 +89,21 @@ schema:
           text:
             type: string
             value: text
+    box:
+      _all:
+        data:
+          rect:
+            pos:
+              x: 0
+              y: 0
+            size:
+              width: 300
+              height: 200
+      text:
+        data:
+          text:
+            type: string
+            value: text
 templates:
   app:
     type: flow.node.folder

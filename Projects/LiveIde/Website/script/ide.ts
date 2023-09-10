@@ -255,18 +255,29 @@ const vueIdeCompMixin = {
         return yaml;
       },
       getComponent(uidOrName: number | string) {
+        const self = this as any;
         const uid = typeof uidOrName == "number" ? uidOrName : null;
         let name = typeof uidOrName == "string" ? uidOrName : null;
         if (name) name = name.replace(/-/g, ".");
         if (!uid && !name) return null;
         if (uid) {
           const vue = vueManager.getVue(uid);
-          return VueHelper.toIdeComponent(vue);
+          const compName = vue.$options.name.replace(/-/g, ".");
+          const comp = self.comps.find((c: any) => c.name == compName);
+          return VueHelper.toIdeComponent(vue, comp);
         }
         if (name) {
           const comp = (this as any).compsDic[name.hashCode()];
           return comp;
         }
+      },
+      isPauseOnMethod(compName: string, methodName: string) {
+        compName = compName.replace(/-/g, ".");
+        const comp = vueIdeApp.comps.find((c: any) => c.name == compName);
+        if (!comp) return false;
+        const debugMethod = comp.debug?.methods?.[methodName];
+        if (debugMethod?.pause) return true;
+        return false;
       },
       getIcon(item: any) {
         const stateItemIcons = {

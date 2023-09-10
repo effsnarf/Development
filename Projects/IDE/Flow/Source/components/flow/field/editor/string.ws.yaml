@@ -1,6 +1,6 @@
 dom:
   div:
-    ui.text.box:
+    ui.input.text.box:
       v-model: field.value
 props:
   field: null
@@ -9,5 +9,6 @@ _:
     count: 0
 name: flow-field-editor-string
 template: >-
-  <div class="comp-flow-field-editor-string" path="2011013374."><ui-text-box
-  v-model="field.value" path="2011013374.0"></ui-text-box></div>
+  <div class="comp-flow-field-editor-string"
+  path="2011013374."><ui-input-text-box v-model="field.value"
+  path="2011013374.0"></ui-input-text-box></div>
