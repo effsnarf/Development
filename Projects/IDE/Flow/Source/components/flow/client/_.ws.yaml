@@ -2,14 +2,12 @@ dom:
   flow.module:
     icon: 💻
     .box1:
-      ui.gesture.select.box:
-        ':center-coords': true
       .flex.justify-around:
         flow.ui.events: null
-        flow.user.actions: null
+        flow.ui.actions: null
       div: 
         flow.data.list.view:
-          ':fuid': userID + '/boxes'
+          ':fuid': userID + '/data/boxes'
           v-model: boxes
         div: 
           flow.ui.box:
@@ -24,17 +22,17 @@ mounted: | #js
   function() {
   }
 methods: null
+style: null
 _:
   examples:
     count: 0
 name: flow-client
 template: >-
   <flow-module class="comp-flow-client" icon="💻" path="635734155."><div
-  class="box1" path="635734155.0"><ui-gesture-select-box :center-coords="true"
-  path="635734155.0.0"></ui-gesture-select-box><div class="flex justify-around"
-  path="635734155.0.1"><flow-ui-events></flow-ui-events><flow-user-actions></flow-user-actions></div><div
-  path="635734155.0.2"><flow-data-list-view :fuid="userID + '/boxes'"
-  v-model="boxes" path="635734155.0.2.0"></flow-data-list-view><div
-  path="635734155.0.2.1"><flow-ui-box v-for="box in boxes" :key="box._id"
+  class="box1" path="635734155.0"><div class="flex justify-around"
+  path="635734155.0.0"><flow-ui-events></flow-ui-events><flow-ui-actions></flow-ui-actions></div><div
+  path="635734155.0.1"><flow-data-list-view :fuid="userID + '/data/boxes'"
+  v-model="boxes" path="635734155.0.1.0"></flow-data-list-view><div
+  path="635734155.0.1.1"><flow-ui-box v-for="box in boxes" :key="box._id"
   :box="box"
-  path="635734155.0.2.1.0"></flow-ui-box></div></div></div></flow-module>
+  path="635734155.0.1.1.0"></flow-ui-box></div></div></div></flow-module>

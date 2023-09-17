@@ -3,7 +3,7 @@ dom:
     ref: window1
     ':rect': box.rect
     template:
-      name: title
+      v-slot: title
       div:
         v-text: '''box'''
 props:
@@ -23,5 +23,5 @@ _:
 name: flow-ui-box
 template: >-
   <ui-window class="comp-flow-ui-box" ref="window1" :rect="box.rect"
-  path="1146527793."><template name="title" path="1146527793.0"><div
+  path="1146527793."><template v-slot:title path="1146527793.0"><div
   v-text="'box'" path="1146527793.0.0"></div></template></ui-window>

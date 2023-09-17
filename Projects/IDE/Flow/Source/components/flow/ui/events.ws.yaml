@@ -2,9 +2,13 @@ dom:
   flow.module:
     icon: ⚡
 methods:
-  ui_gesture_select_box_mark: | #js
+  flow_ui_toolbar_select_box_mark: | #js
     function(rect) {
       this.$emit("new.box", rect);
+    }
+  flow_ui_toolbar_clear: | #js
+    function() {
+      this.$emit("clear");
     }
 _:
   examples:

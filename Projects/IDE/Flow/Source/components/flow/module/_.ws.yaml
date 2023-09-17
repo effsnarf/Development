@@ -1,13 +1,13 @@
 dom:
   div: 
-    class: box2 show-on-hover-container
+    class: box2
     h3:
       ui.title:
         ':icon': icon
         ':text': compName
         ':number': title
     ui.console:
-      class: show-on-hover
+      v-show: 'false'
       ref: console1
     div: 
       slot: null
@@ -21,10 +21,49 @@ mounted: | #js
     this.$parent.$emit = async (emitName, ...args) => {
       await this.$parent.$nextTick();
       this.$refs.console1.log("➕", emitName);
-      emit(emitName, ...args);
+      this.$root.$emit("flow.event", this.compName, emitName, args);
     };
+
+    this.$root.$on("flow.event", this.onFlowEvent);
   }
 methods:
+  onFlowEvent: | #js
+    async function(compName, emitName, args) {
+      if (["ui.mouse"].includes(compName)) return;
+
+      const vue = this.$parent;
+
+      if (emitName == "to")
+      {
+        const to = {
+          compName: args[0],
+          fuid: args[1],
+          methodName: args[2],
+          args: args[3],
+        };
+        
+        if (to.compName != vue.$data._.comp.name) return;
+        if (to.fuid != vue.fuid) return;
+
+        const method = vue[to.methodName];
+        if (!method) throw new Error(`Method not found: ${to.methodName}`);
+        
+        //console.log("🔴", to.compName, "🚀", vue.$data._.comp.name, to.methodName, to.args)
+        await (method.bind(vue))(...(to.args||[]));
+
+        return;
+      }
+
+      if (vue.onAllEvents) {
+        //console.log("🔴", vue.$data._.comp.name, "onAllEvents", "🚀", compName, emitName, args)
+        vue.onAllEvents(compName, emitName, args);
+      }
+      const methodName = `${compName}_${emitName}`.replace(/\./g, "_");
+      const method = vue[methodName];
+      if (!method) return;
+      console.log("🔴", compName, "🚀", vue.$data._.comp.name, emitName, args);
+      (method.bind(vue))(...args);
+    }
   onAllEvents: | #js
     function(compName, emitName, args) {
       const methodName = `${compName}_${emitName}`.replace(/\./g, "_");
@@ -51,9 +90,8 @@ _:
     count: 0
 name: flow-module
 template: >-
-  <div class="comp-flow-module box2 show-on-hover-container"
-  path="924662572."><h3 path="924662572.0"><ui-title :icon="icon"
-  :text="compName" :number="title"
-  path="924662572.0.0"></ui-title></h3><ui-console class="show-on-hover"
-  ref="console1" path="924662572.1"></ui-console><div
+  <div class="comp-flow-module box2" path="924662572."><h3
+  path="924662572.0"><ui-title :icon="icon" :text="compName" :number="title"
+  path="924662572.0.0"></ui-title></h3><ui-console v-show="false" ref="console1"
+  path="924662572.1"></ui-console><div
   path="924662572.2"><slot></slot></div></div>

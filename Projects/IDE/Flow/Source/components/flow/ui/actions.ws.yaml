@@ -1,0 +1,20 @@
+dom:
+  flow.module:
+    icon: 👤🖱️
+data: null
+methods:
+  flow_ui_events_new_box: | #js
+    function(rect) {
+      this.$emit("create.box", rect);
+    }
+  flow_ui_events_clear: | #js
+    function() {
+      this.$emit("clear");
+    }
+_:
+  examples:
+    count: 0
+name: flow-ui-actions
+template: >-
+  <flow-module class="comp-flow-ui-actions" icon="👤🖱️"
+  path="-1320040349."></flow-module>

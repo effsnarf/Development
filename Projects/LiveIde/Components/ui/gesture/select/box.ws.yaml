@@ -18,6 +18,7 @@ dom:
         ':style': selectBoxStyle
 props:
   centerCoords: false
+  isLayerElement: null
 data:
   mousePos: null
   dragStart: null
@@ -28,6 +29,8 @@ methods:
     function(e) {
       if (e.button != 0) return;
       if (this.dragStart) return;
+      if (!this.isLayerElement) throw new Error("Pass isLayerElement prop to ui.gesture.select.box to know where the select box is active");
+      if (!this.isLayerElement(e.target)) return;
       e.preventDefault();
       e.stopPropagation();
       this.dragStart = { x: e.clientX, y: e.clientY };

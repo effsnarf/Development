@@ -1,10 +1,10 @@
 dom:
   component:
-    ':is': getComponentType(value)
-    ':value': value
-    ':title': title
-    ':preview': 'false'
-    ':depth': (depth + 1)
+    ":is": getComponentType(value)
+    ":value": value
+    ":title": title
+    ":preview": "false"
+    ":depth": (depth + 1)
 props:
   value: null
   title: null
@@ -23,7 +23,6 @@ methods:
     }
 style:
   .comp-ui-value-any:
-    max-width: 20em
 name: ui-value-any
 _:
   examples:

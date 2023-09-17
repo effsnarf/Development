@@ -2,6 +2,9 @@ dom:
   div: 
     div: 
       flow.app.logo: null
+      flow.ui.toolbar: null
+      div: 
+        class: surface
       .flex.justify-around:
         class: mt-l4
         flow.events: null
@@ -10,51 +13,23 @@ dom:
         flow.server: null
 mounted: | #js
   function() {
-    this.connectEmitsToMethods();
   }
-methods:
-  connectEmitsToMethods: | #js
-    function() {
-      const vm = this.$root.vm;
-      const vues = vm.getDescendants(this);
-      for (const vue of vues) {
-        vm.onAllEvents(vue, async (compName, emitName, args) => {
-          if (["ui.mouse"].includes(compName)) return;
-          if (emitName == "to")
-          {
-            const to = {
-              compName: args[0],
-              fuid: args[1],
-              methodName: args[2],
-              args: args[3],
-            };
-            const toVues = vues
-              .filter(vue => (vue.$data._.comp.name == to.compName))
-              .filter(vue => (vue.fuid == to.fuid));
-            for (const vue of toVues) {
-              await vue[to.methodName](...to.args);
-            }
-            return;
-          }
-          for (const vue of vues) this.sendToVue(vue, compName, emitName, args);
-        });
-      }
-    }
-  sendToVue: | #js
-    function(vue, compName, emitName, args) {
-      if (vue.onAllEvents) vue.onAllEvents(compName, emitName, args);
-          const methodName = `${compName}_${emitName}`.replace(/\./g, "_");
-      if (vue[methodName]) {
-        vue[methodName](...args);
-      }
-    }
+methods: null
+style:
+  .surface:
+    min-height: 50vh
+    background-size: 40px 40px;
+    background-image: >-
+      linear-gradient(to right, #303030 1px, transparent 1px),
+      linear-gradient(to bottom, #303030 1px, transparent 1px);
 _:
   examples:
     count: 0
 name: flow-app
 template: >-
   <div class="comp-flow-app" path="2028346721."><div
-  path="2028346721.0"><flow-app-logo></flow-app-logo><div class="mt-l4 flex
-  justify-around" path="2028346721.0.1"><flow-events></flow-events><flow-client
+  path="2028346721.0"><flow-app-logo></flow-app-logo><flow-ui-toolbar></flow-ui-toolbar><div
+  class="surface" path="2028346721.0.2"></div><div class="mt-l4 flex
+  justify-around" path="2028346721.0.3"><flow-events></flow-events><flow-client
   :userID="1"
-  path="2028346721.0.1.1"></flow-client><flow-server></flow-server></div></div></div>
+  path="2028346721.0.3.1"></flow-client><flow-server></flow-server></div></div></div>

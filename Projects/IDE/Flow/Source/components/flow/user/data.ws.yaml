@@ -1,28 +1,22 @@
 dom:
   flow.module:
     icon: 👤🧊
+    ':title': userID + '/data'
     div:
+      flow.user.actions:
+        ':userID': userID
       flow.data.list:
-        ref: boxList1
-        ':fuid': userID + '/boxes'
+        ':fuid': userID + '/data/boxes'
 props:
   userID: null
-data:
-  nextID: 1
-methods:
-  flow_user_actions_create_box: | #js
-    async function(rect) {
-      const box = {
-        _id: this.nextID++,
-        rect
-      };
-      this.$emit("to", "flow.data.list", `${this.userID}/boxes`, "add", [box])
-    }
+data: null
+methods: null
 _:
   examples:
     count: 0
 name: flow-user-data
 template: >-
-  <flow-module class="comp-flow-user-data" icon="👤🧊" path="548411181."><div
-  path="548411181.0"><flow-data-list ref="boxList1" :fuid="userID + '/boxes'"
-  path="548411181.0.0"></flow-data-list></div></flow-module>
+  <flow-module class="comp-flow-user-data" icon="👤🧊" :title="userID + '/data'"
+  path="548411181."><div path="548411181.0"><flow-user-actions :userID="userID"
+  path="548411181.0.0"></flow-user-actions><flow-data-list :fuid="userID +
+  '/data/boxes'" path="548411181.0.1"></flow-data-list></div></flow-module>

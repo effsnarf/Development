@@ -53,6 +53,7 @@ props:
   getItemClass: null
 data:
   view1: null
+  maxVisibleItems: 20
 methods:
   onRowClick: | #js
     function(item, index) {
@@ -78,7 +79,7 @@ methods:
     }
 computed:
   items: | #js
-    return [...this.value].take(5);
+    return [...this.value].take(this.maxVisibleItems);
   fields: | #js
     // Get all the field names from the array of objects
     const fields = this.value

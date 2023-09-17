@@ -13,8 +13,18 @@ methods:
   add: | #js
     function(item) {
       this.items.add(item);
+      this.onChange();
+    }
+  clear: | #js
+    function() {
+      this.items.clear();
+      this.onChange();
+    }
+  onChange: | #js
+    function() {
       this.$emit("change", { fuid: this.fuid, items: this.items });
     }
+watch: null
 _:
   examples:
     count: 0

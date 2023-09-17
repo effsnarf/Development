@@ -1,16 +1,27 @@
 dom:
   flow.module:
-    icon: 👤🖱️
-data: null
+    icon: 👤👈
+props:
+  userID: null
+data:
+  nextID: 1
 methods:
-  flow_ui_events_new_box: | #js
-    function(rect) {
-      this.$emit("create.box", rect);
+  flow_ui_actions_create_box: | #js
+    async function(rect) {
+      const box = {
+        _id: this.nextID++,
+        rect
+      };
+      this.$emit("to", "flow.data.list", `${this.userID}/data/boxes`, "add", [box]);
+    }
+  flow_ui_actions_clear: | #js
+    function() {
+      this.$emit("to", "flow.data.list", `${this.userID}/data/boxes`, "clear");
     }
 _:
   examples:
     count: 0
 name: flow-user-actions
 template: >-
-  <flow-module class="comp-flow-user-actions" icon="👤🖱️"
+  <flow-module class="comp-flow-user-actions" icon="👤👈"
   path="1351962266."></flow-module>

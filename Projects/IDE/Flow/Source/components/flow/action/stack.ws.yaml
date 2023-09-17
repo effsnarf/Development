@@ -10,7 +10,7 @@ dom:
           fuid: actions
 data: null
 methods:
-  flow_user_actions_create_box: | #js
+  flow_ui_actions_create_box: | #js
     function(rect) {
     }
   onAllEvents: | #js
