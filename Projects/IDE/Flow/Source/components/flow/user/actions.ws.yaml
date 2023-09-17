@@ -1,22 +1,39 @@
 dom:
   flow.module:
     icon: 👤👈
+    flow.data.list:
+      ':fuid': userID+'/user/actions'
+    flow.user.action.stack:
+      ':userID': userID
 props:
   userID: null
-data:
-  nextID: 1
+data: null
 methods:
   flow_ui_actions_create_box: | #js
-    async function(rect) {
+    async function(userID, rect) {
       const box = {
-        _id: this.nextID++,
         rect
       };
-      this.$femit("to", "flow.data.list", `${this.userID}/data/boxes`, "add", [box]);
+      const action = { redo: { method: "create.box", args: [box] } };
+      this.$femit("do", userID, action);
+    }
+  flow_ui_box_move_box: | #js
+    async function(boxID, pos) {
+      const action = { redo: { method: "move.box", args: [boxID, pos] } };
+      this.$femit("do", this.userID, action);
+    }
+  flow_ui_actions_undo: | #js
+    function(userID) {
+      this.$femit("undo", userID);
+    }
+  flow_ui_actions_redo: | #js
+    function(userID) {
+      this.$femit("redo", userID);
     }
   flow_ui_actions_clear: | #js
-    function() {
-      this.$femit("to", "flow.data.list", `${this.userID}/data/boxes`, "clear");
+    function(userID) {
+      const action = { redo: { method: "clear" } };
+      this.$femit("do", userID, action);
     }
 _:
   examples:
@@ -24,4 +41,6 @@ _:
 name: flow-user-actions
 template: >-
   <flow-module class="comp-flow-user-actions" icon="👤👈"
-  path="1351962266."></flow-module>
+  path="1351962266."><flow-data-list :fuid="userID+'/user/actions'"
+  path="1351962266.0"></flow-data-list><flow-user-action-stack :userID="userID"
+  path="1351962266.1"></flow-user-action-stack></flow-module>

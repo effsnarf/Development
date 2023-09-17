@@ -1,5 +1,17 @@
 dom:
   .flex:
+    flow.data.list.view: 
+      v-show: 'false'
+      ':fuid': userID+'/user/actions'
+      v-model: userActions
+    div: 
+      table:
+        tr:
+          v-for: action in userActions
+          td: 
+            v-text: getActionIcon(action)
+          td: 
+            v-text: action.redo.method
     div: 
       class: surface flex-grow-1
     div: 
@@ -7,13 +19,23 @@ dom:
         v-for: box in boxes
         ':key': box._id
         ':box': box
-      flow.data.list.view:
+      flow.data.list.view: 
         ':fuid': userID + '/data/boxes'
         v-model: boxes
 props:
   userID: null
 data:
   boxes: []
+  userActions: []
+methods:
+  getActionIcon: | #js
+    function(action) {
+      const method = action.redo.method;
+      if (method.startsWith("create.")) return "➕";
+      if (method.startsWith("delete.")) return "➖";
+      if (method === "no.op") return null;
+      return "❔";
+    }
 style:
   .surface:
     min-height: 50vh
@@ -26,9 +48,16 @@ _:
     count: 0
 name: flow-client-workspace
 template: >-
-  <div class="comp-flow-client-workspace flex" path="-1756244238."><div
-  class="surface flex-grow-1" path="-1756244238.0"></div><div
-  path="-1756244238.1"><flow-ui-box v-for="box in boxes" :key="box._id"
-  :box="box" path="-1756244238.1.0"></flow-ui-box><flow-data-list-view
-  :fuid="userID + '/data/boxes'" v-model="boxes"
-  path="-1756244238.1.1"></flow-data-list-view></div></div>
+  <div class="comp-flow-client-workspace flex"
+  path="-1756244238."><flow-data-list-view v-show="false"
+  :fuid="userID+'/user/actions'" v-model="userActions"
+  path="-1756244238.0"></flow-data-list-view><div path="-1756244238.1"><table
+  path="-1756244238.1.0"><tr v-for="action in userActions"
+  path="-1756244238.1.0.0"><td v-text="getActionIcon(action)"
+  path="-1756244238.1.0.0.0"></td><td v-text="action.redo.method"
+  path="-1756244238.1.0.0.1"></td></tr></table></div><div class="surface
+  flex-grow-1" path="-1756244238.2"></div><div path="-1756244238.3"><flow-ui-box
+  v-for="box in boxes" :key="box._id" :box="box"
+  path="-1756244238.3.0"></flow-ui-box><flow-data-list-view :fuid="userID +
+  '/data/boxes'" v-model="boxes"
+  path="-1756244238.3.1"></flow-data-list-view></div></div>

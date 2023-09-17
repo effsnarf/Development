@@ -38,6 +38,7 @@ dom:
 props:
   rect: null
   autoExpand: false
+  centerCoords: false
 data:
   sizes:
     - width: 300
@@ -71,7 +72,7 @@ mounted: | #js
 methods:
   move: | #js
     async function(pos) {
-      this.rect1.pos = pos;
+      this.rect1.pos = this.adjustCoords(pos);
     }
   onMouseDrag: | #js
     async function(dpos) {
@@ -95,7 +96,7 @@ methods:
       this.isDragging = false;
       const pos = this.rect1.pos;
       if (Objects.areEqual(pos, this.dragStartPos)) return;
-      this.$emit("drag-stop");
+      this.$emit("drag-stop", this.adjustCoords(pos));
     }
   getWindowCenter: | #js
     function() {
@@ -103,6 +104,26 @@ methods:
         x: window.innerWidth / 2,
         y: window.innerHeight / 2
       };
+    }
+  adjustRectCoords: | #js
+    function(rect) {
+      if (!this.centerCoords) return rect;
+      const center = this.getWindowCenter();
+      const pos = rect.pos;
+      const size = rect.size;
+      const x = pos.x + center.x;
+      const y = center.y - pos.y;
+      const width = size.width;
+      const height = size.height;
+      return { pos: { x, y }, size: { width, height } };
+    }
+  adjustCoords: | #js
+    function(pos) {
+      if (!this.centerCoords) return pos;
+      const center = this.getWindowCenter();
+      const x = pos.x - center.x;
+      const y = center.y - pos.y;
+      return { x, y };
     }
 computed:
   style: | #js
@@ -131,7 +152,7 @@ watch:
   rect:
     handler: | #js
       function(rect) {
-        this.rect1 = Objects.clone(rect);
+        this.rect1 = Objects.clone(this.adjustRectCoords(rect));
       }
     deep: true
   rect1:

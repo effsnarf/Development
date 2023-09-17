@@ -2,38 +2,13 @@ dom:
   div: 
     flow.module:
       icon: 👤📃
-      div: 
-        flow.action.processor:
-          ref: actionProcessor1
-        flow.data.list:
-          ref: actionList1
-          fuid: actions
+      div:  null
 data: null
-methods:
-  flow_ui_actions_create_box: | #js
-    function(rect) {
-    }
-  onAllEvents: | #js
-    async function(compName, emitName, args) {
-      if (compName != "flow.user.actions") return;
-
-      let action = {
-        name: emitName,
-        args
-      };
-
-      action = await this.$refs.actionProcessor1.execute(action);
-
-      await this.$refs.actionList1.add(action);
-    }
+methods: null
 _:
   examples:
     count: 0
 name: flow-action-stack
 template: >-
   <div class="comp-flow-action-stack" path="934424976."><flow-module icon="👤📃"
-  path="934424976.0"><div path="934424976.0.0"><flow-action-processor
-  ref="actionProcessor1"
-  path="934424976.0.0.0"></flow-action-processor><flow-data-list
-  ref="actionList1" fuid="actions"
-  path="934424976.0.0.1"></flow-data-list></div></flow-module></div>
+  path="934424976.0"><div></div></flow-module></div>

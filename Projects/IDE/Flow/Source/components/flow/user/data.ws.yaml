@@ -1,12 +1,11 @@
 dom:
   flow.module:
     icon: 👤🧊
-    ':title': userID + '/data'
     div:
       flow.user.actions:
         ':userID': userID
       flow.data.list:
-        ':fuid': userID + '/data/boxes'
+        ':fuid': userID+'/data/boxes'
 props:
   userID: null
 data: null
@@ -16,7 +15,8 @@ _:
     count: 0
 name: flow-user-data
 template: >-
-  <flow-module class="comp-flow-user-data" icon="👤🧊" :title="userID + '/data'"
-  path="548411181."><div path="548411181.0"><flow-user-actions :userID="userID"
-  path="548411181.0.0"></flow-user-actions><flow-data-list :fuid="userID +
-  '/data/boxes'" path="548411181.0.1"></flow-data-list></div></flow-module>
+  <flow-module class="comp-flow-user-data" icon="👤🧊" path="548411181."><div
+  path="548411181.0"><flow-user-actions :userID="userID"
+  path="548411181.0.0"></flow-user-actions><flow-data-list
+  :fuid="userID+'/data/boxes'"
+  path="548411181.0.1"></flow-data-list></div></flow-module>

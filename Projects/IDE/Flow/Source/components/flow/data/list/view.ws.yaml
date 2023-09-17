@@ -3,7 +3,11 @@ dom:
     icon: 🧊📃
     ':title': fuid
     div:
+      ui.title:
+        icon: 📃
+        ':text': fuid
       ui.value:
+        v-if: 'false'
         ':value': items
 props:
   fuid: null
@@ -23,5 +27,6 @@ _:
 name: flow-data-list-view
 template: >-
   <flow-module class="comp-flow-data-list-view" icon="🧊📃" :title="fuid"
-  path="-196443791."><div path="-196443791.0"><ui-value :value="items"
-  path="-196443791.0.0"></ui-value></div></flow-module>
+  path="-196443791."><div path="-196443791.0"><ui-title icon="📃" :text="fuid"
+  path="-196443791.0.0"></ui-title><ui-value v-if="false" :value="items"
+  path="-196443791.0.1"></ui-value></div></flow-module>

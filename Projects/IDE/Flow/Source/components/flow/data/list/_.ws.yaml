@@ -3,8 +3,8 @@ dom:
     icon: 🧊📃
     ':title': fuid
     div:
-      flow.data.list.view:
-        ':fuid': fuid
+      ui.value:
+        ':value': items
 props:
   fuid: null
 data:
@@ -13,6 +13,19 @@ methods:
   add: | #js
     function(item) {
       this.items.add(item);
+      this.onChange();
+    }
+  update: | #js
+    function(itemID, data) {
+      const item = this.items.find(item => (item._id == itemID));
+      let changes = DeepDiff.diff(item, data);
+      changes = changes.filter(change => (change.kind !== "D"));
+      for (const change of changes) DeepDiff.applyChange(item, change);
+      this.onChange();
+    }
+  delete: | #js
+    function(itemID) {
+      this.items.removeByField("_id", itemID);
       this.onChange();
     }
   clear: | #js
@@ -31,5 +44,5 @@ _:
 name: flow-data-list
 template: >-
   <flow-module class="comp-flow-data-list" icon="🧊📃" :title="fuid"
-  path="-154245214."><div path="-154245214.0"><flow-data-list-view :fuid="fuid"
-  path="-154245214.0.0"></flow-data-list-view></div></flow-module>
+  path="-154245214."><div path="-154245214.0"><ui-value :value="items"
+  path="-154245214.0.0"></ui-value></div></flow-module>

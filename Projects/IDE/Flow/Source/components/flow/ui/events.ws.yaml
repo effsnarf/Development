@@ -4,11 +4,14 @@ dom:
 methods:
   flow_ui_toolbar_select_box_mark: | #js
     function(rect) {
-      this.$femit("new.box", rect);
+      this.$femit("create.box", rect);
     }
-  flow_ui_toolbar_clear: | #js
-    function() {
-      this.$femit("clear");
+  onAllEvents: | #js
+    function(compName, emitName, args) {
+      return;
+      if (compName === "flow.ui.toolbar") {
+        this.$femit(emitName, ...args);
+      }
     }
 _:
   examples:

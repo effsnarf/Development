@@ -1,15 +1,19 @@
 dom:
   flow.module:
     icon: 👤🖱️
+props:
+  userID: null
 data: null
 methods:
-  flow_ui_events_new_box: | #js
+  flow_ui_toolbar_select_box_mark: | #js
     function(rect) {
-      this.$femit("create.box", rect);
+      this.$femit("create.box", this.userID, rect);
     }
-  flow_ui_events_clear: | #js
-    function() {
-      this.$femit("clear");
+  onAllEvents: | #js
+    function(compName, emitName, args) {
+      if (compName != "flow.ui.toolbar") return;
+      if (emitName == "select.box.mark") return;
+      this.$femit(emitName, this.userID, ...args);
     }
 _:
   examples:

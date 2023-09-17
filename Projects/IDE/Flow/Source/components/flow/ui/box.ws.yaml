@@ -1,10 +1,27 @@
 dom:
-  div:
-    ui.title:
+  flow.module:
+    icon: 📦
+    ui.window:
+      ':rect': box.rect
+      ':center-coords': 'true'
+      @drag-stop: onMoveWindow
+      template:
+        v-slot: title
+        ui.title: 
+          icon: 📦
+          text: box
+          ':number': box._id
+    ui.title: 
       icon: 📦
       text: box
+      ':number': box._id
 props:
   box: null
+methods:
+  onMoveWindow: | #js
+    function(pos) {
+      this.$femit("move.box", this.box._id, pos);
+    }
 watch:
   box:
     handler: | #js
@@ -17,5 +34,9 @@ _:
     count: 0
 name: flow-ui-box
 template: >-
-  <div class="comp-flow-ui-box" path="1146527793."><ui-title icon="📦"
-  text="box" path="1146527793.0"></ui-title></div>
+  <flow-module class="comp-flow-ui-box" icon="📦" path="1146527793."><ui-window
+  :rect="box.rect" :center-coords="true" @drag-stop="onMoveWindow"
+  path="1146527793.0"><template v-slot:title path="1146527793.0.0"><ui-title
+  icon="📦" text="box" :number="box._id"
+  path="1146527793.0.0.0"></ui-title></template></ui-window><ui-title icon="📦"
+  text="box" :number="box._id" path="1146527793.1"></ui-title></flow-module>

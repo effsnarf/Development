@@ -4,7 +4,14 @@ dom:
     .box1:
       .flex.justify-around:
         flow.ui.events: null
-        flow.ui.actions: null
+        flow.ui.actions:
+          ':userID': userID
+      div: 
+        ui.title:
+          icon: 👤💻🖱️
+          text: flow.client.workspace
+        .opacity-50:
+          v-text: '''In flow.app (vue), but structurally part of flow.client'''
       div: 
         div:  null
 props:
@@ -22,5 +29,10 @@ name: flow-client
 template: >-
   <flow-module class="comp-flow-client" icon="💻" path="635734155."><div
   class="box1" path="635734155.0"><div class="flex justify-around"
-  path="635734155.0.0"><flow-ui-events></flow-ui-events><flow-ui-actions></flow-ui-actions></div><div
-  path="635734155.0.1"><div></div></div></div></flow-module>
+  path="635734155.0.0"><flow-ui-events></flow-ui-events><flow-ui-actions
+  :userID="userID" path="635734155.0.0.1"></flow-ui-actions></div><div
+  path="635734155.0.1"><ui-title icon="👤💻🖱️" text="flow.client.workspace"
+  path="635734155.0.1.0"></ui-title><div class="opacity-50" v-text="'In flow.app
+  (vue), but structurally part of flow.client'"
+  path="635734155.0.1.1"></div></div><div
+  path="635734155.0.2"><div></div></div></div></flow-module>
