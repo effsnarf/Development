@@ -17,8 +17,7 @@ props:
 mounted: | #js
   function() {
     // We want to know what the module is sending out
-    const emit = this.$parent.$emit.bind(this.$parent);
-    this.$parent.$emit = async (emitName, ...args) => {
+    this.$parent.$femit = async (emitName, ...args) => {
       await this.$parent.$nextTick();
       this.$refs.console1.log("➕", emitName);
       this.$root.$emit("flow.event", this.compName, emitName, args);

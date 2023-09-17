@@ -12,11 +12,11 @@ dom:
 methods:
   onSelectBoxMark: | #js
     function(rect) {
-      this.$emit("select.box.mark", rect);
+      this.$femit("select.box.mark", rect);
     }
   onClear: | #js
     function() {
-      this.$emit("clear");
+      this.$femit("clear");
     }
   isSelectBoxLayerElement: | #js
     function(el) {

@@ -6,18 +6,10 @@ dom:
         flow.ui.events: null
         flow.ui.actions: null
       div: 
-        flow.data.list.view:
-          ':fuid': userID + '/data/boxes'
-          v-model: boxes
-        div: 
-          flow.ui.box:
-            v-for: box in boxes
-            ':key': box._id
-            ':box': box
+        div:  null
 props:
   userID: null
-data:
-  boxes: []
+data: null
 mounted: | #js
   function() {
   }
@@ -31,8 +23,4 @@ template: >-
   <flow-module class="comp-flow-client" icon="💻" path="635734155."><div
   class="box1" path="635734155.0"><div class="flex justify-around"
   path="635734155.0.0"><flow-ui-events></flow-ui-events><flow-ui-actions></flow-ui-actions></div><div
-  path="635734155.0.1"><flow-data-list-view :fuid="userID + '/data/boxes'"
-  v-model="boxes" path="635734155.0.1.0"></flow-data-list-view><div
-  path="635734155.0.1.1"><flow-ui-box v-for="box in boxes" :key="box._id"
-  :box="box"
-  path="635734155.0.1.1.0"></flow-ui-box></div></div></div></flow-module>
+  path="635734155.0.1"><div></div></div></div></flow-module>

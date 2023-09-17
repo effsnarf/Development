@@ -4,11 +4,11 @@ dom:
 methods:
   flow_ui_toolbar_select_box_mark: | #js
     function(rect) {
-      this.$emit("new.box", rect);
+      this.$femit("new.box", rect);
     }
   flow_ui_toolbar_clear: | #js
     function() {
-      this.$emit("clear");
+      this.$femit("clear");
     }
 _:
   examples:

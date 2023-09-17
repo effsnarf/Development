@@ -22,7 +22,7 @@ methods:
     }
   onChange: | #js
     function() {
-      this.$emit("change", { fuid: this.fuid, items: this.items });
+      this.$femit("change", { fuid: this.fuid, items: this.items });
     }
 watch: null
 _:

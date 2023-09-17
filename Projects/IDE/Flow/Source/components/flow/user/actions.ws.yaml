@@ -12,11 +12,11 @@ methods:
         _id: this.nextID++,
         rect
       };
-      this.$emit("to", "flow.data.list", `${this.userID}/data/boxes`, "add", [box]);
+      this.$femit("to", "flow.data.list", `${this.userID}/data/boxes`, "add", [box]);
     }
   flow_ui_actions_clear: | #js
     function() {
-      this.$emit("to", "flow.data.list", `${this.userID}/data/boxes`, "clear");
+      this.$femit("to", "flow.data.list", `${this.userID}/data/boxes`, "clear");
     }
 _:
   examples:

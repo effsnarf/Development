@@ -1,0 +1,34 @@
+dom:
+  .flex:
+    div: 
+      class: surface flex-grow-1
+    div: 
+      flow.ui.box:
+        v-for: box in boxes
+        ':key': box._id
+        ':box': box
+      flow.data.list.view:
+        ':fuid': userID + '/data/boxes'
+        v-model: boxes
+props:
+  userID: null
+data:
+  boxes: []
+style:
+  .surface:
+    min-height: 50vh
+    background-size: 40px 40px;
+    background-image: >-
+      linear-gradient(to right, #303030 1px, transparent 1px),
+      linear-gradient(to bottom, #303030 1px, transparent 1px);
+_:
+  examples:
+    count: 0
+name: flow-client-workspace
+template: >-
+  <div class="comp-flow-client-workspace flex" path="-1756244238."><div
+  class="surface flex-grow-1" path="-1756244238.0"></div><div
+  path="-1756244238.1"><flow-ui-box v-for="box in boxes" :key="box._id"
+  :box="box" path="-1756244238.1.0"></flow-ui-box><flow-data-list-view
+  :fuid="userID + '/data/boxes'" v-model="boxes"
+  path="-1756244238.1.1"></flow-data-list-view></div></div>

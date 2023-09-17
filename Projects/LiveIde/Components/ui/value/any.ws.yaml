@@ -1,10 +1,10 @@
 dom:
   component:
-    ":is": getComponentType(value)
-    ":value": value
-    ":title": title
-    ":preview": "false"
-    ":depth": (depth + 1)
+    ':is': getComponentType(value)
+    ':value': value
+    ':title': title
+    ':preview': 'false'
+    ':depth': (depth + 1)
 props:
   value: null
   title: null
@@ -22,7 +22,7 @@ methods:
       return `ui.value.${getType(value)}`.replace(/\./g, "-");
     }
 style:
-  .comp-ui-value-any:
+  .comp-ui-value-any: null
 name: ui-value-any
 _:
   examples:

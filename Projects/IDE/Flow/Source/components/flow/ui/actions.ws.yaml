@@ -5,11 +5,11 @@ data: null
 methods:
   flow_ui_events_new_box: | #js
     function(rect) {
-      this.$emit("create.box", rect);
+      this.$femit("create.box", rect);
     }
   flow_ui_events_clear: | #js
     function() {
-      this.$emit("clear");
+      this.$femit("clear");
     }
 _:
   examples:
