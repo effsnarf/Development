@@ -7,6 +7,7 @@ props:
   color: yellow
   startPlug: null
   endPlug: null
+  linePath: fluid
 data:
   leaderLine: null
   leaderLineElement: null
@@ -43,8 +44,8 @@ methods:
     }
   refresh: | #js
     function() {
-      const fromEl = this.fromVue().$el;
-      const toEl = this.toVue().$el;
+      const fromEl = this.getEdgeElement(this.fromVue);
+      const toEl = this.getEdgeElement(this.toVue);
 
       if (this.leaderLine && (this.leaderLine.start == fromEl) && (this.leaderLine.end == toEl))
       {
@@ -61,7 +62,7 @@ methods:
         fromEl,
         toEl,
         {
-          path: 'fluid',
+          path: this.linePath,
           color: this.color,
           startPlug: this.startPlug,
           endPlug: this.endPlug,
@@ -75,7 +76,7 @@ methods:
       this.setVisibility(this.visible);
     }
   redraw: | #js
-    function() {
+    function(onlyOnce = false) {
       if (this.leaderLine)
       {
         if (this.isConnected(this.leaderLine))
@@ -88,7 +89,10 @@ methods:
         }
       }
       if (this.$el.isConnected) {
-        setTimeout(this.redraw.bind(this), 100);
+        if (!onlyOnce)
+        {
+          setTimeout(this.redraw.bind(this), 20);
+        }
       }
       else
       {
@@ -116,6 +120,20 @@ methods:
     function() {
       if (!this.leaderLine) return null;
       return document.getElementById(`leader-line-${this.leaderLine._id}-line-path`).parentElement.parentElement;
+    }
+  getEdgeElement: | #js
+    function(vue) {
+      const getElement = () => {
+        if (!vue) return null;
+        if (typeof vue == "function") {
+          const el = vue();
+          if (el?.$el) return el.$el;
+          return el;
+        }
+        return vue;
+      }
+      const el = getElement();
+      return el;
     }
 watch:
   fromVue: | #js

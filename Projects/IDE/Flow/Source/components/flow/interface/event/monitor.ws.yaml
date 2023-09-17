@@ -1,0 +1,91 @@
+dom:
+  div: 
+    div: 
+      class: box1
+      table:
+        tr:
+          v-for: (event, index) in visibleEvents
+          td: 
+            class: opacity-50 px-4 text-center
+            v-text: event.count
+          td: 
+            v-text: event.comp.name
+          td: 
+            v-text: event.name
+    .flex:
+      class: box1
+      div: 
+        ui.checkbox: 
+          v-for: compName in compNames
+          ':text': compName
+          ':value-array': showCompNames
+          ':value-key': compName
+      div: 
+        ui.checkbox: 
+          v-for: eventName in eventNames
+          ':text': eventName
+          ':value-array': showEventNames
+          ':value-key': eventName
+props: null
+data:
+  eventID: 1
+  events: []
+  compNames: []
+  eventNames: []
+  showCompNames: []
+  showEventNames: []
+  maxEvents: 1000
+  maxVisibleEvents: 20
+methods:
+  log: | #js
+    function(compName, eventName, args) {
+      if (!this.compNames.includes(compName)) {
+        this.compNames.push(compName);
+        if (compName != "ui.mouse") this.showCompNames.push(compName);
+      }
+      if (!this.eventNames.includes(eventName)) {
+        this.eventNames.push(eventName);
+        this.showEventNames.push(eventName);
+      }
+      const event = { id: this.eventID++, count: 1, comp: { name: compName }, name: eventName, args };
+      const lastEvent = this.events[this.events.length - 1];
+      if (this.isGroupable(event, lastEvent)) {
+        event.count = lastEvent.count + 1;
+        this.events.pop();
+      }
+      this.events.push(event);
+      while (this.events.length > this.maxEvents) this.events.shift();
+    }
+  isGroupable: | #js
+    function(event, lastEvent) {
+      if (!lastEvent) return false;
+      if (event.comp.name != lastEvent.comp.name) return false;
+      if (event.name != lastEvent.name) return false;
+      return true;
+    }
+computed:
+  visibleEvents: | #js
+    function() {
+      let events = this.events.filter(event => this.showCompNames.includes(event.comp.name));
+      events = events.filter(event => this.showEventNames.includes(event.name));
+      events.reverse();
+      events = events.take(this.maxVisibleEvents);
+      return events;
+    }
+_:
+  examples:
+    count: 0
+name: flow-interface-event-monitor
+template: >-
+  <div class="comp-flow-interface-event-monitor" path="958404945."><div
+  class="box1" path="958404945.0"><table path="958404945.0.0"><tr v-for="(event,
+  index) in visibleEvents" path="958404945.0.0.0"><td class="opacity-50 px-4
+  text-center" v-text="event.count" path="958404945.0.0.0.0"></td><td
+  v-text="event.comp.name" path="958404945.0.0.0.1"></td><td v-text="event.name"
+  path="958404945.0.0.0.2"></td></tr></table></div><div class="box1 flex"
+  path="958404945.1"><div path="958404945.1.0"><ui-checkbox v-for="compName in
+  compNames" :text="compName" :value-array="showCompNames" :value-key="compName"
+  path="958404945.1.0.0"></ui-checkbox></div><div
+  path="958404945.1.1"><ui-checkbox v-for="eventName in eventNames"
+  :text="eventName" :value-array="showEventNames" :value-key="eventName"
+  path="958404945.1.1.0"></ui-checkbox></div></div></div>

@@ -20,6 +20,8 @@ helpers:
       code = (code || "").trim();
       code = code.replace("{{method}}", methodName);
 
+      //code = `${code} \n\n console.log(this.$data._.comp.name, "${methodName}");`;
+
       if (!methodBody?.length) methodBody = "function() {}";
 
       // Remove lines starting with "//" at the beginning of the line

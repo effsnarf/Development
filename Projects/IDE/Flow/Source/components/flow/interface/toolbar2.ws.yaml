@@ -8,21 +8,35 @@ dom:
         ':click': () => eval(button.click)()
 data:
   buttons:
-    - icon: ➕
-      text: create box
-      click: | #js
-        () => this.$root.$emit('user.action', this.ua('create.box'))
+    - icon: ➕🧊
+      text: null
+      click: >
+        () => this.$root.$emit('user.action', this.ua('create.box', { type:
+        'variable', data: { map: "obj => obj", value: null }, sockets: { inputs:
+        ['data'], outputs: ['data'] } }))
+    - icon: ➕𝑓(𝑥)
+      text: null
+      click: >
+        () => this.$root.$emit('user.action', this.ua('create.box', { type:
+        'function', data: { name: null, argNames: null, code: null, error: null
+        }, sockets: { inputs: ['arg0'], outputs: ['result'] } }))
+    - icon: ➕📦
+      text: null
+      click: >
+        () => this.$root.$emit('user.action', this.ua('create.box', { type:
+        'vue.comp', data: { comp: { name: "ui.list" } }, sockets: { inputs: [],
+        outputs: [] } }))
     - icon: 🗑
       text: clear
       click: | #js
         () => this.$root.$emit('user.action', this.ua('clear'))
 methods:
   ua: | #js
-    function(method) {
+    function(method, ...args) {
       return {
         redo: {
           method: method,
-          args: []
+          args: [...args]
         }
       };
     }
@@ -30,6 +44,9 @@ methods:
     function(code) {
       return eval(`(${code})`);
     }
+style:
+  .comp-flow-interface-toolbar2:
+    height: min-content
 _:
   examples:
     count: 0

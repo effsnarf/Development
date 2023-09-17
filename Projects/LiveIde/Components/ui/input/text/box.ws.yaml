@@ -1,7 +1,7 @@
 dom:
   div:
     v-if: '!multiline'
-    ':class': '{ disabled: !enabled }'
+    ':class': '{ disabled: !enabled, camouflage }'
     .icon:
       v-if: icon
       v-text: icon
@@ -13,6 +13,7 @@ dom:
       ':disabled': '!enabled'
       @input: onInput
   textarea:
+    ref: textarea1
     v-else-if: multiline
     ':value': value
     ':placeholder': hint
@@ -28,6 +29,7 @@ props:
   enabled: true
   multiline: false
   autoResize: true
+  camouflage: false
 methods:
   onInput: | #js
     function(e) {
@@ -35,13 +37,14 @@ methods:
     }
   onTextAreaInput: | #js
     function(e) {
-      const heightLimit = 200;
       const textarea = e.target;
       this.$emit('input', textarea.value);
-      if (this.autoResize) this.resizeTextArea(textarea, heightLimit);
+      this.resizeTextArea(textarea);
     }
   resizeTextArea: | #js
     function(textarea, heightLimit) {
+      if (!this.autoResize) return;
+      heightLimit = heightLimit || 200;
       textarea.style.height = "";
       textarea.style.height = Math.min(textarea.scrollHeight, heightLimit) + "px";
     }  
@@ -57,8 +60,22 @@ methods:
       }
       return false;
     }
+watch:
+  value:
+    handler: | #js
+      async function(value) {
+        await this.$nextTick();
+        if (this.multiline) {
+          this.resizeTextArea(this.$refs.textarea1);
+        }
+      }
+    immediate: true
 name: ui-input-text-box
 style:
+  .camouflage:not(:hover) input, .camouflage:not(:hover) textarea:
+    border: none
+    background: no-repeat
+    box-shadow: none
   input.hasIcon:
     padding-left: 2em !important
   .icon:
@@ -74,9 +91,10 @@ _:
     count: 1
 template: >-
   <div class="comp-ui-input-text-box" v-if="!multiline" :class="{ disabled:
-  !enabled }" path="739613128."><div class="icon" v-if="icon" v-text="icon"
-  path="739613128.0"></div><input :class="{ hasIcon: icon }" :type="type"
-  :placeholder="hint" :value="value" :disabled="!enabled" @input="onInput"
-  path="739613128.1"/></div><textarea v-else-if="multiline" :value="value"
-  :placeholder="hint" @focus="$emit('focus')" @blur="$emit('blur')"
-  @input="onTextAreaInput" @keydown="onTextAreaKeyDown"></textarea>
+  !enabled, camouflage }" path="739613128."><div class="icon" v-if="icon"
+  v-text="icon" path="739613128.0"></div><input :class="{ hasIcon: icon }"
+  :type="type" :placeholder="hint" :value="value" :disabled="!enabled"
+  @input="onInput" path="739613128.1"/></div><textarea ref="textarea1"
+  v-else-if="multiline" :value="value" :placeholder="hint"
+  @focus="$emit('focus')" @blur="$emit('blur')" @input="onTextAreaInput"
+  @keydown="onTextAreaKeyDown"></textarea>

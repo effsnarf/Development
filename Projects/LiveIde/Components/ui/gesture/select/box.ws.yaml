@@ -1,0 +1,154 @@
+dom:
+  div: 
+    ui.mouse:
+      global: true
+      @down: onMouseDown
+      @up: onMouseUp
+      @move: onMouseMove
+    div: 
+      v-if: 'false'
+      .x-axis:
+        ':style': xAxisStyle
+      .y-axis:
+        ':style': yAxisStyle
+    transition:
+      name: fade
+      .select-box:
+        v-if: isVisible
+        ':style': selectBoxStyle
+props: null
+data:
+  mousePos: null
+  dragStart: null
+  dragEnd: null
+  isVisible: false
+methods:
+  onMouseDown: | #js
+    function(e) {
+      if (e.button != 0) return;
+      if (this.dragStart) return;
+      e.preventDefault();
+      e.stopPropagation();
+      this.dragStart = { x: e.clientX, y: e.clientY };
+      this.isVisible = false;
+    }
+  onMouseUp: | #js
+    function(e) {
+      if (e.button != 0) return;
+      if (!this.isVisible) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const rect = {
+        pos: this.dragStart,
+        size: this.size
+      };
+      this.dragStart = null;
+      this.dragEnd = null;
+      this.isVisible = false;
+      if (!this.isMinimumSize(rect.size)) return;
+      this.$emit("create", rect);
+    }
+  onMouseMove: | #js
+    function(e) {
+      this.mousePos = e;
+      if (!this.dragStart) return;
+      if (!this.isVisible) this.isVisible = this.isMinimumSize(this.size);
+      this.dragEnd = { x: e.x, y: e.y };
+    }
+  isMinimumSize: | #js
+    function(size) {
+      if (!size) return false;
+      if (size.width < 10) return false;
+      if (size.height < 10) return false;
+      return true;
+    }
+  getCorner: | #js
+    function(minOrMax) {
+      const dragStart = this.dragStart;
+      const dragEnd = this.dragEnd;
+      if (!dragStart) return null;
+      if (!dragEnd) return null;
+      const x = Math[minOrMax](dragStart.x, dragEnd.x);
+      const y = Math[minOrMax](dragStart.y, dragEnd.y);
+      return { x, y };
+    }
+computed:
+  selectBoxStyle: | #js
+    function() {
+      if (!this.isVisible) return null;
+      const topLeft = this.topLeft;
+      const size = this.size;
+      const style = {};
+      style.position = "fixed";
+      style.left = `${topLeft.x}px`;
+      style.top = `${topLeft.y}px`;
+      style.width = `${size.width}px`;
+      style.height = `${size.height}px`;
+      return style;
+    }
+  xAxisStyle: | #js
+    function() {
+      const mousePos = this.mousePos;
+      if (!mousePos) return null;
+      const style = {};
+      style.position = "fixed";
+      style.left = `${0}px`;
+      style.top = `${mousePos.y}px`;
+      style.width = `${100}vw`;
+      style.height = `${1}px`;
+      return style;
+    }
+  yAxisStyle: | #js
+    function() {
+      const mousePos = this.mousePos;
+      if (!mousePos) return null;
+      const style = {};
+      style.position = "fixed";
+      style.left = `${mousePos.x}px`;
+      style.top = `${0}px`;
+      style.width = `${1}px`;
+      style.height = `${100}vh`;
+      return style;
+    }
+  topLeft: | #js
+    function() {
+      return this.getCorner("min");
+    }
+  bottomRight: | #js
+    function() {
+      return this.getCorner("max");
+    }
+  size: | #js
+    function() {
+      const topLeft = this.topLeft;
+      const bottomRight = this.bottomRight;
+      if (!topLeft) return null;
+      if (!bottomRight) return null;
+      const width = bottomRight.x - topLeft.x;
+      const height = bottomRight.y - topLeft.y;
+      return { width, height };
+    }
+style:
+  .select-box:
+    border: 3px dashed yellow
+    position: fixed
+    filter: 'drop-shadow(-3px 3px 1px #000000)'
+    transition: opacity 0.6s !important
+    pointer-events: none
+    z-index: 1000
+  .x-axis, .y-axis:
+    border: 1px dashed gray
+    opacity: 0.1
+_:
+  examples:
+    count: 0
+name: ui-gesture-select-box
+template: >-
+  <div class="comp-ui-gesture-select-box" path="-2052114120."><ui-mouse
+  global="true" @down="onMouseDown" @up="onMouseUp" @move="onMouseMove"
+  path="-2052114120.0"></ui-mouse><div v-if="false" path="-2052114120.1"><div
+  class="x-axis" :style="xAxisStyle" path="-2052114120.1.0"></div><div
+  class="y-axis" :style="yAxisStyle"
+  path="-2052114120.1.1"></div></div><transition name="fade"
+  path="-2052114120.2"><div class="select-box" v-if="isVisible"
+  :style="selectBoxStyle" path="-2052114120.2.0"></div></transition></div>

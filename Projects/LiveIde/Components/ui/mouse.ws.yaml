@@ -52,12 +52,12 @@ methods:
   onMouseMove: | #js
     function(e) {     
       const pos = { x: e.clientX, y: e.clientY };
-      this.posQueue.push(pos);
+      this.pos = pos;
     }
   onContextMenu: | #js
     function(e) {
-      if (!e.ctrlKey) return;
-      e.preventDefault();
+      if (this.ctrlRightClick && !e.ctrlKey) return;
+      //e.preventDefault();
       e.stopPropagation();
       this.$emit("right-click", e);
     }
@@ -68,6 +68,7 @@ methods:
     }
   update: | #js
     async function() {
+      return;
       if (!this.isMounted) return;
       const pos = this.posQueue.pop();
       if (pos) this.pos = pos;

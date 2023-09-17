@@ -12,6 +12,7 @@ namespace Actionable {
 
   export interface Action {
     _id: number;
+    dt: number;
     redo: Doable;
     undo: Doable;
     parent?: { _id: number };
@@ -24,6 +25,7 @@ namespace Actionable {
 
   export interface ActionOptions {
     isUndoing?: boolean;
+    prevAction?: Action | null;
   }
 
   class ActionPointer {
@@ -48,6 +50,11 @@ namespace Actionable {
         "action.pointer",
         null
       );
+      actionPointer.action = (
+        await actionPointer.actions.getMany(
+          (a) => a._id === actionPointer._id.value
+        )
+      )[0];
       const firstAction = await actionPointer.actions.getItemAt(0);
       actionPointer.isFirstAction =
         actionPointer._id.value === firstAction?._id;
@@ -120,11 +127,14 @@ namespace Actionable {
     }
 
     async do(action: Action | any) {
+      const prevAction = this.doneAction.action;
       action = await this.fromPersistableAction(action);
-      action = await this._executeAction(action);
+      action = await this._executeAction(action, { prevAction });
       if (!action) throw new Error("executeAction must return an action");
       if (!action.undo) throw new Error("executeAction must set action.undo");
-      await this.add(action);
+      const groupWithPrevAction = action.groupWithPrevAction;
+      delete action.groupWithPrevAction;
+      await this.add(action, { groupWithPrevAction });
     }
 
     async enteringMethod() {
@@ -132,8 +142,13 @@ namespace Actionable {
       this.methodStack.push(actionID);
     }
 
-    async add(action: Action | any, options?: { exitingMethod?: boolean }) {
+    async add(
+      action: Action | any,
+      options?: { exitingMethod?: boolean; groupWithPrevAction?: boolean }
+    ) {
       action = Objects.clone(action);
+
+      action.dt = Date.now();
 
       if (options?.exitingMethod) {
         if (this.methodStack.length) {
@@ -153,6 +168,15 @@ namespace Actionable {
         await this.actions.deleteMany(
           (action: Action) => action._id > this.doneAction._id.value
         );
+
+      if (options?.groupWithPrevAction && this.doneAction.action) {
+        const prevAction = this.doneAction.action;
+        action.undo = Objects.clone(prevAction.undo);
+        await this.actions.deleteMany(
+          (action: Action) => action._id >= prevAction._id
+        );
+      }
+
       await this.actions.upsert(action);
 
       if (options?.exitingMethod && !this.methodStack.length) {
@@ -221,6 +245,14 @@ namespace Actionable {
       const nextAction = await this.getNextAction();
       await this._executeAction(nextAction);
       this.doneAction.set(nextAction);
+    }
+
+    async doAll() {
+      const upToAction = this.doneAction.action;
+      await this.doneAction.set(await this.actions.getItemAt(0));
+      while (this.doneAction.action?._id !== upToAction?._id) {
+        await this.redo();
+      }
     }
 
     async clear() {

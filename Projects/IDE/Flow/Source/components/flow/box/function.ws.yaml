@@ -1,0 +1,66 @@
+dom:
+  div: 
+    div: 
+      class: show-on-hover
+      ui.input.text.box: 
+        ':style': '{ height: ''2rem'' }'
+        hint: arg1, arg2, arg3…
+        v-model: box1.data.argNames
+        @input: (value) => onInput('argNames', value)
+    div: 
+      class: show-on-hover
+      ':style': '{ height: ''calc(100% - 2rem)'' }'
+      ui.input.text.box: 
+        ':style': '{ height: ''10em'' }'
+        hint: return 'Hello World!';
+        multiline: true
+        ':auto-resize': 'false'
+        v-model: box1.data.code
+        @input: (value) => onInput('code', value)
+    ui.error:
+      class: absolute-bottom h-l3
+      ':error': box1.data.error
+props:
+  box: null
+data:
+  box1: null
+methods:
+  onInput: | #js
+    function(field, value) {
+      const data = {};
+      data[field] = value;
+      this.getParentBox().onBoxDataChange(this.box, data);
+    }
+  getParentBox: | #js
+    function() {
+      let parent = this.$parent;
+      while (parent && parent.$data._?.comp.name != "flow.box") {
+        parent = parent.$parent;
+      }
+      return parent;
+    }
+watch:
+  box:
+    handler: | #js
+      function(box) {
+        this.box1 = Objects.clone(box);
+      }
+    immediate: true
+    deep: true
+_:
+  examples:
+    count: 0
+name: flow-box-function
+template: >-
+  <div class="comp-flow-box-function" path="389169499."><div
+  class="show-on-hover" path="389169499.0"><ui-input-text-box :style="{ height:
+  '2rem' }" hint="arg1, arg2, arg3…" v-model="box1.data.argNames"
+  @input="(value) =&gt; onInput('argNames', value)"
+  path="389169499.0.0"></ui-input-text-box></div><div class="show-on-hover"
+  :style="{ height: 'calc(100% - 2rem)' }" path="389169499.1"><ui-input-text-box
+  :style="{ height: '10em' }" hint="return 'Hello World!';" multiline="true"
+  :auto-resize="false" v-model="box1.data.code" @input="(value) =&gt;
+  onInput('code', value)"
+  path="389169499.1.0"></ui-input-text-box></div><ui-error
+  class="absolute-bottom h-l3" :error="box1.data.error"
+  path="389169499.2"></ui-error></div>

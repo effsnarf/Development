@@ -2,6 +2,7 @@ dom:
   transition:
     name: slide
     .error:
+      @click: () => error = null
       v-if: errorText
       v-text: errorText
       ':key': errorText
@@ -22,5 +23,5 @@ _:
     count: 0
 template: >-
   <transition class="comp-ui-error" name="slide" path="-2137289170."><div
-  class="error" v-if="errorText" v-text="errorText" :key="errorText"
-  path="-2137289170.0"></div></transition>
+  class="error" @click="() =&gt; error = null" v-if="errorText"
+  v-text="errorText" :key="errorText" path="-2137289170.0"></div></transition>

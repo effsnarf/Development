@@ -1,8 +1,8 @@
 dom:
   .box:
     v-if: actionStack
-    h3: 
-      ui.title: 
+    h3:
+      ui.title:
         icon: ✨
         text: Actions
         ':number': actionStack.actions.count
@@ -17,30 +17,42 @@ dom:
         ':click': () => doVerb('redo')
       ui.button: 
         class: flex-equal
+        text: ♻ all
+        ':click': () => doVerb('doAll')
+      ui.button: 
+        class: flex-equal
         text: ✖ clear
         ':click': () => doVerb('clear')
     div:
+      ui.context.window:
+        ref: context1
+        v-show: hovered.action
+        ':ctrl-right-click': 'false'
+        ui.value.any:
+          ':value': hovered.action
       ui.action.list:
         ref: list1
+        class: list1
         ':action-stack': actionStack
+        @hovered-action: onHoveredAction
         v-slot: slotProps
         template:
           slot:
             ':action': slotProps.action
-      h3: 
-        ui.title: 
-          icon: ✨
-          text: done
-          ':number': actionStack.doneAction._id.value
 props:
   actionStack: null
 data:
-  actionItems: []
+  hovered:
+    action: null
 mounted: | #js
   function() {
-    this.refresh();
   }
 methods:
+  onHoveredAction: | #js
+    function(action) {
+      if (this.$refs.context1?.isPinned) return;
+      this.hovered.action = action;
+    }
   getActions: | #js
     async function() {
       let actions = await this.actionStack.actions.getMany();
@@ -54,21 +66,12 @@ methods:
   doVerb: | #js
     async function(verb) {
       await this.actionStack[verb]();
-      await this.refresh();
     }
-  refresh: | #js
-    async function() {
-      this.actionItems = await this.getActions();
-      this.$refs.list1.refresh();
-    }
-watch:
-  actionStack:
-    handler: | #js
-      async function(actionStack) {
-        actionStack.events.on("change", this.refresh.bind(this));
-      }
-    immediate: true
+watch: null
 style:
+  .list1:
+    max-height: 30em
+    overflow-y: auto
   .box:
     border: '1px solid #ffffff80'
   ul.actions:
@@ -87,13 +90,17 @@ template: >-
   path="-1417831958.1"><ui-button class="flex-equal" text="👈 undo" :click="()
   =&gt; doVerb('undo')" path="-1417831958.1.0"></ui-button><ui-button
   class="flex-equal" text="redo 👉" :click="() =&gt; doVerb('redo')"
-  path="-1417831958.1.1"></ui-button><ui-button class="flex-equal" text="✖
+  path="-1417831958.1.1"></ui-button><ui-button class="flex-equal" text="♻ all"
+  :click="() =&gt; doVerb('doAll')"
+  path="-1417831958.1.2"></ui-button><ui-button class="flex-equal" text="✖
   clear" :click="() =&gt; doVerb('clear')"
-  path="-1417831958.1.2"></ui-button></div><div
-  path="-1417831958.2"><ui-action-list ref="list1" :action-stack="actionStack"
-  v-slot="slotProps" path="-1417831958.2.0"><template
-  path="-1417831958.2.0.0"><slot :action="slotProps.action"
-  path="-1417831958.2.0.0.0"></slot></template></ui-action-list><h3
-  path="-1417831958.2.1"><ui-title icon="✨" text="done"
-  :number="actionStack.doneAction._id.value"
-  path="-1417831958.2.1.0"></ui-title></h3></div></div>
+  path="-1417831958.1.3"></ui-button></div><div
+  path="-1417831958.2"><ui-context-window ref="context1" v-show="hovered.action"
+  :ctrl-right-click="false" path="-1417831958.2.0"><ui-value-any
+  :value="hovered.action"
+  path="-1417831958.2.0.0"></ui-value-any></ui-context-window><ui-action-list
+  class="list1" ref="list1" :action-stack="actionStack"
+  @hovered-action="onHoveredAction" v-slot="slotProps"
+  path="-1417831958.2.1"><template path="-1417831958.2.1.0"><slot
+  :action="slotProps.action"
+  path="-1417831958.2.1.0.0"></slot></template></ui-action-list></div></div>

@@ -144,17 +144,11 @@ class ClientContext {
                 ClientContext.alertify.error(`<h3>${ex.message}</h3>`);
                 return;
             }
-            //if (window.location.hostname == "localhost") {
-            if (!ex.message.includes("Object reference not set to an instance of an object")) {
-                // ClientContext.alertify
-                //   .error(`<h3>${url}</h3><pre>${ex.message}</pre>`)
-                //   .delay(0);
-            }
-            //}
+            throw ex;
             // Try again
             // Wait a bit
-            await new Promise((resolve) => setTimeout(resolve, 1000));
-            return await ClientContext.fetch(...args);
+            //await new Promise((resolve) => setTimeout(resolve, 1000));
+            //return await ClientContext.fetch(...args);
         }
     }
     static getStringHashCode(str) {
@@ -5728,7 +5722,7 @@ var __webpack_exports__ = {};
 (() => {
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/website/script/1694360334483.ts ***!
+  !*** ../../../LiveIde/website/script/1694661910062.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

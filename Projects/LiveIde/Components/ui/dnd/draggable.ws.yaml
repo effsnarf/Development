@@ -3,6 +3,8 @@ dom:
     class: draggable
     draggable: true
     @dragstart: onDragStart
+    @dragend: onDragEnd
+    @drag: onDrag
     slot: null
 props:
   dragItem: null
@@ -10,6 +12,17 @@ methods:
   onDragStart: | #js
     function(e) {
       this.$root.dragItem = this.dragItem;
+      this.$emit('drag-start', this.dragItem);
+    }
+  onDragEnd: | #js
+    async function(e) {
+      await this.$nextTick();
+      this.$emit('drag-end', this.dragItem);
+      this.$root.dragItem = null;
+    }
+  onDrag: | #js
+    function(e) {
+      this.$emit('drag', e);
     }
 style: null
 _:
@@ -18,4 +31,5 @@ _:
 name: ui-dnd-draggable
 template: >-
   <div class="comp-ui-dnd-draggable draggable" draggable="true"
-  @dragstart="onDragStart" path="-26676257."><slot></slot></div>
+  @dragstart="onDragStart" @dragend="onDragEnd" @drag="onDrag"
+  path="-26676257."><slot></slot></div>

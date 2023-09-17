@@ -174,21 +174,11 @@ class ClientContext {
         return;
       }
 
-      //if (window.location.hostname == "localhost") {
-      if (
-        !ex.message.includes(
-          "Object reference not set to an instance of an object"
-        )
-      ) {
-        // ClientContext.alertify
-        //   .error(`<h3>${url}</h3><pre>${ex.message}</pre>`)
-        //   .delay(0);
-      }
-      //}
+      throw ex;
       // Try again
       // Wait a bit
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      return await ClientContext.fetch(...args);
+      //await new Promise((resolve) => setTimeout(resolve, 1000));
+      //return await ClientContext.fetch(...args);
     }
   }
 

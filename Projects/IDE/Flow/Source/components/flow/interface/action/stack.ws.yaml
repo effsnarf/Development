@@ -1,75 +1,39 @@
 dom:
   div: 
     v-if: actionStack
-    ui.action.stack:
-      ':action-stack': actionStack
-      v-slot: slotProps
-      template:
-        flow.interface.action:
-          ':action': slotProps.action
     div: 
-      ui.value.any:
-        ':value': boxes
+      ui.action.stack:
+        ':action-stack': actionStack
+        v-slot: slotProps
+        template:
+          flow.interface.action:
+            ':action': slotProps.action
+    flow.interface.action.interpreter:
+      ref: interpreter1
+      ':action-stack': actionStack
 props:
   persisters: null
 data:
   actionStack: null
-  boxes: []
-  nextBoxID: 1
 mounted: | #js
   async function() {
     await this.init();
   }
 methods:
-  create_box: | #js
-    async function(action, box) {
-      if (!box) box = {
-        _id: this.nextBoxID++,
-        title: "Box " + this.nextBoxID,
-      };
-      this.boxes.add(box);
-      action.undo = {
-        method: "delete.box",
-        args: [box._id]
-      };
-      return action;
-    }
-  delete_box: | #js
-    async function(action, boxID, options) {
-      const box = this.boxes.find(box => box._id === boxID);
-      if (!box) {
-        throw new Error(`Box not found: ${boxID}`);
-      }
-      action.undo = {
-        method: "create.box",
-        args: []
-      };
-      action.undo.args.push(box);
-      this.boxes = this.boxes.filter(box => box._id !== boxID);
-      if (options?.isUndoing) {
-        this.nextBoxID--;
-      }
-      return action;
-    }
-  clear: | #js
-    async function(action) {
-      await this.actionStack.clear();
-      this.boxes = [];
-      this.nextBoxID = 1;
-      action.undo = {
-        noop: true
-      };
-      return action;
+  flow_ui_interpreter_create_box: | #js
+    function(box) {
+      this.actionStack.do( {
+        redo: {
+          method: "create.box",
+          args: [box]
+        }
+      });
     }
   executeAction: | #js
     async function(action, options) {
       const redo = action.redo;
-      const methodName = redo.method.replace(/\./g, "_");
-      let actionMethod = this[methodName];
-      if (!actionMethod) {
-        throw new Error(`Action method not found: ${redo.method}`);
-      }
-      action = await actionMethod(action, ...redo.args, options);
+      const interpreter = this.$refs.interpreter1;
+      action = await interpreter.onAction(action, options);
       return action;
     }
   onUserAction: | #js
@@ -99,9 +63,9 @@ _:
 name: flow-interface-action-stack
 template: >-
   <div class="comp-flow-interface-action-stack" v-if="actionStack"
-  path="271844389."><ui-action-stack :action-stack="actionStack"
-  v-slot="slotProps" path="271844389.0"><template
-  path="271844389.0.0"><flow-interface-action :action="slotProps.action"
-  path="271844389.0.0.0"></flow-interface-action></template></ui-action-stack><div
-  path="271844389.1"><ui-value-any :value="boxes"
-  path="271844389.1.0"></ui-value-any></div></div>
+  path="271844389."><div path="271844389.0"><ui-action-stack
+  :action-stack="actionStack" v-slot="slotProps" path="271844389.0.0"><template
+  path="271844389.0.0.0"><flow-interface-action :action="slotProps.action"
+  path="271844389.0.0.0.0"></flow-interface-action></template></ui-action-stack></div><flow-interface-action-interpreter
+  ref="interpreter1" :action-stack="actionStack"
+  path="271844389.1"></flow-interface-action-interpreter></div>

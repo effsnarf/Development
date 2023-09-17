@@ -85,9 +85,11 @@ namespace Graph {
 
     // #region Constructor
 
-    protected constructor(protected data: any) {}
+    protected constructor(
+      protected data: any = { nextID: 1, nodes: [], links: [] }
+    ) {}
 
-    static async new(data: any = { nextID: 1, nodes: [], links: [] }) {
+    static async new(data: any) {
       return new Database(data);
     }
 
@@ -402,175 +404,6 @@ namespace Graph {
 
     private getNextID() {
       return this.nextID++;
-    }
-  }
-
-  export class ActionableDatabase extends Graph.Database {
-    actionStack!: Actionable.ActionStack;
-    private addNewActions = false;
-
-    private constructor(actionStack: Actionable.ActionStack, data: any) {
-      super(data);
-      this.actionStack = actionStack;
-      this.actionStack.executeAction = this.executeAction.bind(this);
-    }
-
-    static async new(data: any): Promise<ActionableDatabase> {
-      throw new Error("Use new2 to create an ActionableDatabase");
-    }
-
-    static async new2(
-      persister: Data.Persister.Base,
-      varName: string,
-      data: any
-    ) {
-      const actionStack = await Actionable.ActionStack.new(persister, varName);
-      const gdb = new ActionableDatabase(actionStack, data);
-      return gdb;
-    }
-
-    async addTemplate(name: string) {
-      const redo = {
-        method: "add.template",
-        args: [name],
-      };
-
-      const oldData = Objects.clone(this.data);
-
-      this.addNewActions = false;
-
-      const node = await super.addTemplate(name);
-
-      this.addNewActions = true;
-
-      const newData = Objects.clone(this.data);
-
-      const undoDataChanges = Diff.getChanges(newData, oldData);
-
-      const undo = {
-        method: "apply.data.changes",
-        args: [undoDataChanges],
-      };
-
-      const action = { redo, undo } as Actionable.Action;
-
-      this.addAction(action);
-
-      return node;
-    }
-
-    addNode(type: string, data: any, links?: any[]) {
-      const redo = {
-        method: "add.node",
-        args: [type, data, links],
-      };
-
-      const node = super.addNode(type, data, links);
-
-      const undo = {
-        method: "delete.node",
-        args: [node],
-      };
-
-      const action = { redo, undo } as Actionable.Action;
-
-      this.addAction(action);
-
-      return node;
-    }
-
-    addLink(from: Node, type: string, to: Node, data?: any) {
-      const redo = {
-        method: "add.link",
-        args: [from, type, to, data],
-      };
-
-      const link = super.addLink(from, type, to, data);
-
-      const undo = {
-        method: "delete.links",
-        args: [[link]],
-      };
-
-      const action = { redo, undo } as Actionable.Action;
-
-      this.addAction(action);
-
-      return link;
-    }
-
-    replaceNode(oldNode: Node, newNode: Node) {
-      const redo = {
-        method: "replace.node",
-        args: [oldNode, newNode],
-      };
-
-      const oldData = Objects.clone(this.data);
-
-      const result = super.replaceNode(oldNode, newNode);
-
-      const newData = Objects.clone(this.data);
-      const dataChanges = Diff.getChanges(oldData, newData);
-
-      const undo = {
-        method: "apply.data.changes",
-        args: [dataChanges],
-      };
-
-      const action = { redo, undo } as Actionable.Action;
-
-      this.addAction(action);
-
-      return result;
-    }
-
-    async clear() {
-      this.actionStack.clear();
-
-      this.nextID = 1;
-      this.nodes.clear();
-      this.links.clear();
-    }
-
-    private async executeAction(action: Actionable.Action) {
-      this.addNewActions = false;
-      try {
-        const redo = action.redo as any;
-        const method = this.toMethodName(redo.method);
-        const args = redo.args;
-        const result = await (this as any)[method](...args);
-        return result;
-      } finally {
-        this.addNewActions = true;
-      }
-    }
-
-    private async goToAction(pointer: number) {
-      await this.actionStack.goToAction(pointer);
-    }
-
-    private addAction(action: Actionable.Action) {
-      if (!this.addNewActions) return;
-      this.actionStack.add(action);
-    }
-
-    private async applyDataChanges(dataChanges: any) {
-      const oldData = Objects.clone(this.data);
-      const newData = Diff.applyChanges(oldData, dataChanges);
-      this.data = newData;
-      const changedNodes = this.nodes.filter((newNode) => {
-        const oldNode = oldData.nodes.find((on: any) => on.id == newNode.id);
-        return !Objects.areEqual(oldNode, newNode);
-      });
-      this.onNodesChange(changedNodes);
-    }
-
-    private toMethodName(method: string) {
-      const parts = method
-        .split(".")
-        .map((p) => p[0].toUpperCase() + p.substring(1));
-      parts[0] = parts[0].toLowerCase();
-      return parts.join("");
     }
   }
 }

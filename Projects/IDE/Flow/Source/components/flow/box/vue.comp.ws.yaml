@@ -1,0 +1,43 @@
+dom:
+  component:
+    ':is': compName
+    ':items': '[1,2,3]'
+props:
+  box: null
+data:
+  box1: null
+methods:
+  onInput: | #js
+    function(field, value) {
+      const data = {};
+      data[field] = value;
+      this.getParentBox().onBoxDataChange(this.box, data);
+    }
+  getParentBox: | #js
+    function() {
+      let parent = this.$parent;
+      while (parent && parent.$data._?.comp.name != "flow.box") {
+        parent = parent.$parent;
+      }
+      return parent;
+    }
+computed:
+  compName: | #js
+    function() {
+      return this.box1.data.comp.name.replace(/\./g, "-");
+    }
+watch:
+  box:
+    handler: | #js
+      function(box) {
+        this.box1 = Objects.clone(box);
+      }
+    immediate: true
+    deep: true
+_:
+  examples:
+    count: 0
+name: flow-box-vue-comp
+template: >-
+  <component class="comp-flow-box-vue-comp" :is="compName" :items="[1,2,3]"
+  path="-2097745926."></component>

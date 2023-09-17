@@ -1,0 +1,12 @@
+dom:
+  div: null
+methods:
+  ui_gesture_select_box_create: | #js
+    function(rect) {
+      this.$emit("create.box", rect);
+    }
+_:
+  examples:
+    count: 0
+name: flow-interface-user-intent
+template: <div class="comp-flow-interface-user-intent"></div>

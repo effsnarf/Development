@@ -1,28 +1,59 @@
 dom:
-  div: 
+  div:
     v-if: actionStack
     transition.group:
       tag: ul
       name: slide
       class: actions
-      li:
-        v-for: (action, index) in allActions
-        ':key': action._id
-        ':class': getActionCssClass(action, index)
-        div: 
-          slot:
-            ':action': action
+      li: 
+        v-for: (actionGroup, index) in actionGroups
+        ':key': actionGroup._id
+        ':class': getActionGroupCssClass(actionGroup)
+        .flex.justify-between:
+          .flex:
+            ui.expand:
+              ':style': getActionGroupVisibilityStyle(actionGroup)
+              v-model: isActionGroupExpanded[actionGroup._id]
+            slot: 
+              ':action': actionGroup.actions[0]
+          .opacity-50:
+            ':style': getActionGroupVisibilityStyle(actionGroup)
+            v-text: '''('' + actionGroup.actions.length + '')'''
+        transition:
+          name: slide
+          .actions.ml-l2:
+            v-if: isActionGroupExpanded[actionGroup._id]
+            ul:
+              li: 
+                v-for: (action, index) in actionGroup.actions
+                @mouseenter: () => $emit('hovered-action', action)
+                @mouseleave: () => $emit('hovered-action', null)
+                slot: 
+                  ':action': actionGroup.actions[0]
 props:
   actionStack: null
   action: null
 data:
   actions: []
   allActions: []
+  actionGroups: []
+  isActionGroupExpanded: {}
 mounted: | #js
   async function() {
-    this.$root.$on("user.action", this.refresh.bind(this));
   }
 methods:
+  getActionGroupCssClass: | #js
+    function(actionGroup) {
+      return {
+        done: actionGroup.actions.all(this.isActionDone.bind(this))
+      };
+    }
+  getActionGroupVisibilityStyle: | #js
+    function(actionGroup) {
+      return {
+        visibility: ((actionGroup.actions.length > 1) ? 'visible' : 'hidden')
+      };
+    }
   getActionCssClass: | #js
     function(action, index) {
       return {
@@ -34,12 +65,39 @@ methods:
       const doneAction = this.actionStack.doneAction;
       return (action._id <= doneAction._id.value);
     }
+  getActionGroups: | #js
+    async function() {
+      let actionGroupID = 1;
+      const actionGroups = [];
+      let actionGroup = null;
+      for (const action of this.actions)
+      {
+        if (!actionGroup || actionGroup.method !== action.redo.method)
+        {
+          actionGroup = {
+            _id: actionGroupID++,
+            method: action.redo.method,
+            actions: []
+          };
+          actionGroups.push(actionGroup);
+        }
+        actionGroup.actions.push(action);
+      }
+      return actionGroups;
+    }
   refresh: | #js
     async function() {
       this.actions = await this.actionStack.getActions(this.action?._id);
       this.allActions = await this.actionStack.getAllActions();
+      this.actionGroups = await this.getActionGroups();
     }
 watch:
+  actionStack:
+    handler: | #js
+      async function(actionStack) {
+        actionStack.events.on("change", this.refresh.bind(this).debounce(400));
+      }
+    immediate: true
   action:
     handler: | #js
       async function(action) {
@@ -48,7 +106,6 @@ watch:
     immediate: true
 style:
   li:
-    padding: 0.2em 0.5em
     background-color: '#202020'
   .done, .done:hover:
     background-color: '#404040'
@@ -69,7 +126,21 @@ name: ui-action-list
 template: >-
   <div class="comp-ui-action-list" v-if="actionStack"
   path="-877239044."><transition-group class="actions" tag="ul" name="slide"
-  path="-877239044.0"><li v-for="(action, index) in allActions"
-  :key="action._id" :class="getActionCssClass(action, index)"
-  path="-877239044.0.0"><div path="-877239044.0.0.0"><slot :action="action"
-  path="-877239044.0.0.0.0"></slot></div></li></transition-group></div>
+  path="-877239044.0"><li v-for="(actionGroup, index) in actionGroups"
+  :key="actionGroup._id" :class="getActionGroupCssClass(actionGroup)"
+  path="-877239044.0.0"><div class="flex justify-between"
+  path="-877239044.0.0.0"><div class="flex" path="-877239044.0.0.0.0"><ui-expand
+  :style="getActionGroupVisibilityStyle(actionGroup)"
+  v-model="isActionGroupExpanded[actionGroup._id]"
+  path="-877239044.0.0.0.0.0"></ui-expand><slot :action="actionGroup.actions[0]"
+  path="-877239044.0.0.0.0.1"></slot></div><div class="opacity-50"
+  :style="getActionGroupVisibilityStyle(actionGroup)" v-text="'(' +
+  actionGroup.actions.length + ')'"
+  path="-877239044.0.0.0.1"></div></div><transition name="slide"
+  path="-877239044.0.0.1"><div class="actions ml-l2"
+  v-if="isActionGroupExpanded[actionGroup._id]" path="-877239044.0.0.1.0"><ul
+  path="-877239044.0.0.1.0.0"><li v-for="(action, index) in actionGroup.actions"
+  @mouseenter="() =&gt; $emit('hovered-action', action)" @mouseleave="() =&gt;
+  $emit('hovered-action', null)" path="-877239044.0.0.1.0.0.0"><slot
+  :action="actionGroup.actions[0]"
+  path="-877239044.0.0.1.0.0.0.0"></slot></li></ul></div></transition></li></transition-group></div>

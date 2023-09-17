@@ -195,17 +195,11 @@ class ClientContext {
                 ClientContext.alertify.error(`<h3>${ex.message}</h3>`);
                 return;
             }
-            //if (window.location.hostname == "localhost") {
-            if (!ex.message.includes("Object reference not set to an instance of an object")) {
-                // ClientContext.alertify
-                //   .error(`<h3>${url}</h3><pre>${ex.message}</pre>`)
-                //   .delay(0);
-            }
-            //}
+            throw ex;
             // Try again
             // Wait a bit
-            await new Promise((resolve) => setTimeout(resolve, 1000));
-            return await ClientContext.fetch(...args);
+            //await new Promise((resolve) => setTimeout(resolve, 1000));
+            //return await ClientContext.fetch(...args);
         }
     }
     static getStringHashCode(str) {
@@ -3612,6 +3606,7 @@ var Actionable;
         static async new(persister, actions) {
             const actionPointer = new ActionPointer(persister, actions);
             actionPointer._id = await Data_1.Data.Value.new(persister, "action.pointer", null);
+            actionPointer.action = (await actionPointer.actions.getMany((a) => a._id === actionPointer._id.value))[0];
             const firstAction = await actionPointer.actions.getItemAt(0);
             actionPointer.isFirstAction =
                 actionPointer._id.value === firstAction?._id;
@@ -3655,13 +3650,16 @@ var Actionable;
             return actionStack;
         }
         async do(action) {
+            const prevAction = this.doneAction.action;
             action = await this.fromPersistableAction(action);
-            action = await this._executeAction(action);
+            action = await this._executeAction(action, { prevAction });
             if (!action)
                 throw new Error("executeAction must return an action");
             if (!action.undo)
                 throw new Error("executeAction must set action.undo");
-            await this.add(action);
+            const groupWithPrevAction = action.groupWithPrevAction;
+            delete action.groupWithPrevAction;
+            await this.add(action, { groupWithPrevAction });
         }
         async enteringMethod() {
             const actionID = await this.actions.getNewID();
@@ -3669,6 +3667,7 @@ var Actionable;
         }
         async add(action, options) {
             action = Extensions_Objects_Client_1.Objects.clone(action);
+            action.dt = Date.now();
             if (options?.exitingMethod) {
                 if (this.methodStack.length) {
                     const newActionID = this.methodStack.pop();
@@ -3683,6 +3682,11 @@ var Actionable;
             action = await this.toPersistableAction(action);
             if (!this.doneAction.isLastAction)
                 await this.actions.deleteMany((action) => action._id > this.doneAction._id.value);
+            if (options?.groupWithPrevAction && this.doneAction.action) {
+                const prevAction = this.doneAction.action;
+                action.undo = Extensions_Objects_Client_1.Objects.clone(prevAction.undo);
+                await this.actions.deleteMany((action) => action._id >= prevAction._id);
+            }
             await this.actions.upsert(action);
             if (options?.exitingMethod && !this.methodStack.length) {
                 // Exited the method stack
@@ -3747,6 +3751,13 @@ var Actionable;
             const nextAction = await this.getNextAction();
             await this._executeAction(nextAction);
             this.doneAction.set(nextAction);
+        }
+        async doAll() {
+            const upToAction = this.doneAction.action;
+            await this.doneAction.set(await this.actions.getItemAt(0));
+            while (this.doneAction.action?._id !== upToAction?._id) {
+                await this.redo();
+            }
         }
         async clear() {
             await this.actions.clear();
@@ -4208,8 +4219,6 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Graph = void 0;
 const Extensions_Objects_Client_1 = __webpack_require__(/*! ../Extensions.Objects.Client */ "../../../../Shared/Extensions.Objects.Client.ts");
 const Events_1 = __webpack_require__(/*! ../Events */ "../../../../Shared/Events.ts");
-const Diff_1 = __webpack_require__(/*! ../Diff */ "../../../../Shared/Diff.ts");
-const Actionable_1 = __webpack_require__(/*! ../Actionable */ "../../../../Shared/Actionable.ts");
 const findArg = (condition, ...args) => {
     if (typeof condition == "string") {
         const type = condition;
@@ -4240,10 +4249,10 @@ var Graph;
         }
         events = new Events_1.Events();
         // #region Constructor
-        constructor(data) {
+        constructor(data = { nextID: 1, nodes: [], links: [] }) {
             this.data = data;
         }
-        static async new(data = { nextID: 1, nodes: [], links: [] }) {
+        static async new(data) {
             return new Database(data);
         }
         // #endregion
@@ -4488,132 +4497,6 @@ var Graph;
         }
     }
     Graph.Database = Database;
-    class ActionableDatabase extends Graph.Database {
-        actionStack;
-        addNewActions = false;
-        constructor(actionStack, data) {
-            super(data);
-            this.actionStack = actionStack;
-            this.actionStack.executeAction = this.executeAction.bind(this);
-        }
-        static async new(data) {
-            throw new Error("Use new2 to create an ActionableDatabase");
-        }
-        static async new2(persister, varName, data) {
-            const actionStack = await Actionable_1.Actionable.ActionStack.new(persister, varName);
-            const gdb = new ActionableDatabase(actionStack, data);
-            return gdb;
-        }
-        async addTemplate(name) {
-            const redo = {
-                method: "add.template",
-                args: [name],
-            };
-            const oldData = Extensions_Objects_Client_1.Objects.clone(this.data);
-            this.addNewActions = false;
-            const node = await super.addTemplate(name);
-            this.addNewActions = true;
-            const newData = Extensions_Objects_Client_1.Objects.clone(this.data);
-            const undoDataChanges = Diff_1.Diff.getChanges(newData, oldData);
-            const undo = {
-                method: "apply.data.changes",
-                args: [undoDataChanges],
-            };
-            const action = { redo, undo };
-            this.addAction(action);
-            return node;
-        }
-        addNode(type, data, links) {
-            const redo = {
-                method: "add.node",
-                args: [type, data, links],
-            };
-            const node = super.addNode(type, data, links);
-            const undo = {
-                method: "delete.node",
-                args: [node],
-            };
-            const action = { redo, undo };
-            this.addAction(action);
-            return node;
-        }
-        addLink(from, type, to, data) {
-            const redo = {
-                method: "add.link",
-                args: [from, type, to, data],
-            };
-            const link = super.addLink(from, type, to, data);
-            const undo = {
-                method: "delete.links",
-                args: [[link]],
-            };
-            const action = { redo, undo };
-            this.addAction(action);
-            return link;
-        }
-        replaceNode(oldNode, newNode) {
-            const redo = {
-                method: "replace.node",
-                args: [oldNode, newNode],
-            };
-            const oldData = Extensions_Objects_Client_1.Objects.clone(this.data);
-            const result = super.replaceNode(oldNode, newNode);
-            const newData = Extensions_Objects_Client_1.Objects.clone(this.data);
-            const dataChanges = Diff_1.Diff.getChanges(oldData, newData);
-            const undo = {
-                method: "apply.data.changes",
-                args: [dataChanges],
-            };
-            const action = { redo, undo };
-            this.addAction(action);
-            return result;
-        }
-        async clear() {
-            this.actionStack.clear();
-            this.nextID = 1;
-            this.nodes.clear();
-            this.links.clear();
-        }
-        async executeAction(action) {
-            this.addNewActions = false;
-            try {
-                const redo = action.redo;
-                const method = this.toMethodName(redo.method);
-                const args = redo.args;
-                const result = await this[method](...args);
-                return result;
-            }
-            finally {
-                this.addNewActions = true;
-            }
-        }
-        async goToAction(pointer) {
-            await this.actionStack.goToAction(pointer);
-        }
-        addAction(action) {
-            if (!this.addNewActions)
-                return;
-            this.actionStack.add(action);
-        }
-        async applyDataChanges(dataChanges) {
-            const oldData = Extensions_Objects_Client_1.Objects.clone(this.data);
-            const newData = Diff_1.Diff.applyChanges(oldData, dataChanges);
-            this.data = newData;
-            const changedNodes = this.nodes.filter((newNode) => {
-                const oldNode = oldData.nodes.find((on) => on.id == newNode.id);
-                return !Extensions_Objects_Client_1.Objects.areEqual(oldNode, newNode);
-            });
-            this.onNodesChange(changedNodes);
-        }
-        toMethodName(method) {
-            const parts = method
-                .split(".")
-                .map((p) => p[0].toUpperCase() + p.substring(1));
-            parts[0] = parts[0].toLowerCase();
-            return parts.join("");
-        }
-    }
-    Graph.ActionableDatabase = ActionableDatabase;
 })(Graph || (exports.Graph = Graph = {}));
 
 
@@ -7413,7 +7296,7 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/website/script/1694360334992.ts ***!
+  !*** ../../../LiveIde/website/script/1694661910839.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
