@@ -97,6 +97,33 @@ class VueManager {
     return vues;
   }
 
+  onAllEvents(
+    vue: any,
+    handler: (compName: string, emitName: string, args: any[]) => void
+  ) {
+    const compName = vue.$data._?.comp?.name;
+    if (!compName) throw new Error("Only supported for comp vues");
+    const emitNames = this.getEmitNames(vue);
+    for (const emitName of emitNames) {
+      vue.$on(emitName, (...args: any[]) => handler(compName, emitName, args));
+    }
+  }
+
+  private getEmitNames(vue: any) {
+    const compName = vue.$data._?.comp?.name;
+    if (!compName) throw new Error("Only supported for comp vues");
+    const comp = this.client.comps.find((c) => c.name == compName);
+    if (!comp) throw new Error(`Comp not found: ${compName}`);
+    const allMethods = {
+      ...comp.source.methods,
+      mounted: comp.source.mounted,
+    };
+    const methodsCode = Object.values(allMethods).join("\n");
+    const emitsRegex = /this\.\$emit\("([^"]+)"(, .*)?\)/g;
+    const emitNames = [...methodsCode.matchAll(emitsRegex)].map((m) => m[1]);
+    return emitNames;
+  }
+
   // Vues are recreated occasionally
   // Because we're tracking refs, in some cases we can map from the old vue to the new vue
   private toRecentVueUID(uid: number) {
@@ -157,14 +184,14 @@ class VueManager {
     return vue;
   }
 
-  getVnodeFromElement(el: HTMLElement) {
+  getVnodeFromElement(el: HTMLElement): any {
     if (!el) return null;
     if ((el as any).__vue__) return (el as any).__vue__;
     if (!el.parentElement) return null;
     return this.getVnodeFromElement(el.parentElement);
   }
 
-  getVueFromVnode(vnode: any) {
+  getVueFromVnode(vnode: any): any {
     // Skip vnodes like <keep-alive>, <transition>, etc.
     if (!vnode) return null;
     if (this.vNodeIsVue(vnode)) return vnode;

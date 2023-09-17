@@ -6,16 +6,60 @@ dom:
       ui.title:
         class: title1
         text: Flow
+    .texts:
+      class: w-50vw
+      .tagline:
+        v-text: texts.tagline
+      .signature:
+        v-text: texts.signature
+      .teaser:
+        v-if: 'false'
+        v-text: texts.teaser
+data:
+  texts:
+    tagline: Are you dumb, stupid, or dumb, huh?
+    signature: >-
+      - an Oscar Wilde quote, that quotes Oscar Wilde on his views on Software
+      Development in a quote.
+    teaser: >-
+      Software development is the unnecessary, optional, slightly overwhelming
+      and constant ever-lasting long-term usage of either needless,
+      tautological, pleonastic, superfluous or unnecessary code, by which one
+      repeats, in duplication, the same, identical, aforesaid functions over and
+      over and over and over and over again, beyond what would be needed or
+      required to explain, or make comprehensible, the intended or signified
+      functionality of that which one wishes, or wants, to put across and
+      convey. These things can be and most likely will be referred to as
+      developing software. Usually, it is often common in software development
+      to repeat, sometimes with different phrasing or variables, the same idea
+      or reasoning, thus restating one's algorithms, sometimes paraphrasing
+      oneself and effectively coding the same thing twice, or double, or thrice,
+      or three times, triply so or treble of, or a small handful of times, or
+      any number of excessive, unnecessary restatements greater than zero
+      (none).
 style:
   .logo:
     width: 8em
     aspect-ratio: 6 / 5
     background-image: url(/images/duck2.png)
     background-size: contain
+    background-repeat: no-repeat
+  .texts:
+    opacity: 0.5
   .title1:
     font-size: 4rem
-    color: black
+    color: '#ffffff40'
     filter: drop-shadow(-1px 1px 1px white)
+    text-shadow: '-1px 1px 1px black'
+  .tagline:
+    font-family: Allura
+    font-size: 4rem
+    line-height: 1em
+    margin-top: 0.3em
+  .signature:
+    font-family: serif
+    font-size: 1.5rem
+    text-align: right
 _:
   examples:
     count: 0
@@ -23,4 +67,8 @@ name: flow-app-logo
 template: >-
   <div class="comp-flow-app-logo flex gap-2" path="1269110296."><div
   class="logo" path="1269110296.0"></div><h2 path="1269110296.1"><ui-title
-  class="title1" text="Flow" path="1269110296.1.0"></ui-title></h2></div>
+  class="title1" text="Flow" path="1269110296.1.0"></ui-title></h2><div
+  class="w-50vw texts" path="1269110296.2"><div class="tagline"
+  v-text="texts.tagline" path="1269110296.2.0"></div><div class="signature"
+  v-text="texts.signature" path="1269110296.2.1"></div><div class="teaser"
+  v-if="false" v-text="texts.teaser" path="1269110296.2.2"></div></div></div>

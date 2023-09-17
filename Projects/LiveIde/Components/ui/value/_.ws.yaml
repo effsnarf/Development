@@ -1,0 +1,16 @@
+dom:
+  ui.value.any:
+    ':value': value
+    ':title': title
+    ':depth': (depth + 1)
+props:
+  value: null
+  title: null
+  depth: 0
+_:
+  examples:
+    count: 0
+name: ui-value
+template: >-
+  <ui-value-any class="comp-ui-value" :value="value" :title="title"
+  :depth="(depth + 1)" path="-2122101353."></ui-value-any>

@@ -3364,6 +3364,31 @@ class VueManager {
             vues.length = maxCount;
         return vues;
     }
+    onAllEvents(vue, handler) {
+        const compName = vue.$data._?.comp?.name;
+        if (!compName)
+            throw new Error("Only supported for comp vues");
+        const emitNames = this.getEmitNames(vue);
+        for (const emitName of emitNames) {
+            vue.$on(emitName, (...args) => handler(compName, emitName, args));
+        }
+    }
+    getEmitNames(vue) {
+        const compName = vue.$data._?.comp?.name;
+        if (!compName)
+            throw new Error("Only supported for comp vues");
+        const comp = this.client.comps.find((c) => c.name == compName);
+        if (!comp)
+            throw new Error(`Comp not found: ${compName}`);
+        const allMethods = {
+            ...comp.source.methods,
+            mounted: comp.source.mounted,
+        };
+        const methodsCode = Object.values(allMethods).join("\n");
+        const emitsRegex = /this\.\$emit\("([^"]+)"(, .*)?\)/g;
+        const emitNames = [...methodsCode.matchAll(emitsRegex)].map((m) => m[1]);
+        return emitNames;
+    }
     // Vues are recreated occasionally
     // Because we're tracking refs, in some cases we can map from the old vue to the new vue
     toRecentVueUID(uid) {
@@ -5724,7 +5749,7 @@ var __webpack_exports__ = {};
 (() => {
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/website/script/1694932166447.ts ***!
+  !*** ../../../LiveIde/website/script/1694934623455.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

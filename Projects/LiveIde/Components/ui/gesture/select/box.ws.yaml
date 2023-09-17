@@ -16,7 +16,8 @@ dom:
       .select-box:
         v-if: isVisible
         ':style': selectBoxStyle
-props: null
+props:
+  centerCoords: false
 data:
   mousePos: null
   dragStart: null
@@ -46,7 +47,7 @@ methods:
       this.dragEnd = null;
       this.isVisible = false;
       if (!this.isMinimumSize(rect.size)) return;
-      this.$emit("create", rect);
+      this.$emit("mark", this.adjustCoords(rect));
     }
   onMouseMove: | #js
     function(e) {
@@ -71,6 +72,25 @@ methods:
       const x = Math[minOrMax](dragStart.x, dragEnd.x);
       const y = Math[minOrMax](dragStart.y, dragEnd.y);
       return { x, y };
+    }
+  getWindowCenter: | #js
+    function() {
+      return {
+        x: window.innerWidth / 2,
+        y: window.innerHeight / 2
+      };
+    }
+  adjustCoords: | #js
+    function(rect) {
+      if (!this.centerCoords) return rect;
+      const center = this.getWindowCenter();
+      const pos = rect.pos;
+      const size = rect.size;
+      const x = pos.x - center.x;
+      const y = center.y - pos.y;
+      const width = size.width;
+      const height = size.height;
+      return { pos: { x, y }, size: { width, height } };
     }
 computed:
   selectBoxStyle: | #js

@@ -53,11 +53,11 @@ data:
     size:
       width: 300
       height: 200
+  isDraggingMoving: false
+  isDragging: false
   center:
     x: 0
     'y': 0
-  isDraggingMoving: false
-  isDragging: false
   dragStartPos:
     x: 0
     'y': 0
@@ -72,13 +72,6 @@ methods:
   move: | #js
     async function(pos) {
       this.rect1.pos = pos;
-    }
-  getWindowCenter: | #js
-    function() {
-      return {
-        x: window.innerWidth / 2,
-        y: window.innerHeight / 2
-      };
     }
   onMouseDrag: | #js
     async function(dpos) {
@@ -103,6 +96,13 @@ methods:
       const pos = this.rect1.pos;
       if (Objects.areEqual(pos, this.dragStartPos)) return;
       this.$emit("drag-stop");
+    }
+  getWindowCenter: | #js
+    function() {
+      return {
+        x: window.innerWidth / 2,
+        y: window.innerHeight / 2
+      };
     }
 computed:
   style: | #js

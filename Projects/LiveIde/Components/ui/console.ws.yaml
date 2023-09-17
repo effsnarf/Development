@@ -1,9 +1,10 @@
 dom:
   div:
+    v-if: items.length
     class: box1
     table:
       tr:
-        v-for: item in items
+        v-for: item in [...items].reverse()
         td:
           v-for: (arg) in item
           v-text: arg
@@ -22,7 +23,7 @@ _:
     count: 0
 name: ui-console
 template: >-
-  <div class="comp-ui-console box1" path="1489973245."><table
-  path="1489973245.0"><tr v-for="item in items" path="1489973245.0.0"><td
-  v-for="(arg) in item" v-text="arg"
-  path="1489973245.0.0.0"></td></tr></table></div>
+  <div class="comp-ui-console box1" v-if="items.length"
+  path="1489973245."><table path="1489973245.0"><tr v-for="item in
+  [...items].reverse()" path="1489973245.0.0"><td v-for="(arg) in item"
+  v-text="arg" path="1489973245.0.0.0"></td></tr></table></div>

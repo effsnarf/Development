@@ -41,6 +41,7 @@ dom:
           tr: 
             v-for: (item, index) in items
             ':class': _getItemClass(item, index)
+            @click: () => onRowClick(item, index)
             td: 
               v-for: field in fields
               ui.value.preview: 
@@ -53,6 +54,10 @@ props:
 data:
   view1: null
 methods:
+  onRowClick: | #js
+    function(item, index) {
+      console.log(item);
+    }
   getFieldType: | #js
     function(fieldName) {
       if (!this.value?.length) return null;
@@ -136,6 +141,7 @@ template: >-
   path="-621945022.3.0.0.0"><th v-for="field in fields" v-text="field"
   path="-621945022.3.0.0.0.0"></th></tr></thead><tbody
   path="-621945022.3.0.1"><tr v-for="(item, index) in items"
-  :class="_getItemClass(item, index)" path="-621945022.3.0.1.0"><td v-for="field
-  in fields" path="-621945022.3.0.1.0.0"><ui-value-preview :value="item[field]"
+  :class="_getItemClass(item, index)" @click="() =&gt; onRowClick(item, index)"
+  path="-621945022.3.0.1.0"><td v-for="field in fields"
+  path="-621945022.3.0.1.0.0"><ui-value-preview :value="item[field]"
   path="-621945022.3.0.1.0.0.0"></ui-value-preview></td></tr></tbody></table></transition></div>

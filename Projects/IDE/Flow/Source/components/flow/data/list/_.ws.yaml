@@ -1,0 +1,25 @@
+dom:
+  flow.module:
+    icon: 🧊📃
+    ':title': fuid
+    div:
+      flow.data.list.view:
+        ':fuid': fuid
+props:
+  fuid: null
+data:
+  items: []
+methods:
+  add: | #js
+    function(item) {
+      this.items.add(item);
+      this.$emit("change", { fuid: this.fuid, items: this.items });
+    }
+_:
+  examples:
+    count: 0
+name: flow-data-list
+template: >-
+  <flow-module class="comp-flow-data-list" icon="🧊📃" :title="fuid"
+  path="-154245214."><div path="-154245214.0"><flow-data-list-view :fuid="fuid"
+  path="-154245214.0.0"></flow-data-list-view></div></flow-module>

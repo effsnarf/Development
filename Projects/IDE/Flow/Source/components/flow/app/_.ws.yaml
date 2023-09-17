@@ -2,11 +2,59 @@ dom:
   div: 
     div: 
       flow.app.logo: null
-      flow.box.ui: null
+      .flex.justify-around:
+        class: mt-l4
+        flow.events: null
+        flow.client:
+          ':userID': 1
+        flow.server: null
+mounted: | #js
+  function() {
+    this.connectEmitsToMethods();
+  }
+methods:
+  connectEmitsToMethods: | #js
+    function() {
+      const vm = this.$root.vm;
+      const vues = vm.getDescendants(this);
+      for (const vue of vues) {
+        vm.onAllEvents(vue, async (compName, emitName, args) => {
+          if (["ui.mouse"].includes(compName)) return;
+          if (emitName == "to")
+          {
+            const to = {
+              compName: args[0],
+              fuid: args[1],
+              methodName: args[2],
+              args: args[3],
+            };
+            const toVues = vues
+              .filter(vue => (vue.$data._.comp.name == to.compName))
+              .filter(vue => (vue.fuid == to.fuid));
+            for (const vue of toVues) {
+              await vue[to.methodName](...to.args);
+            }
+            return;
+          }
+          for (const vue of vues) this.sendToVue(vue, compName, emitName, args);
+        });
+      }
+    }
+  sendToVue: | #js
+    function(vue, compName, emitName, args) {
+      if (vue.onAllEvents) vue.onAllEvents(compName, emitName, args);
+          const methodName = `${compName}_${emitName}`.replace(/\./g, "_");
+      if (vue[methodName]) {
+        vue[methodName](...args);
+      }
+    }
 _:
   examples:
     count: 0
 name: flow-app
 template: >-
   <div class="comp-flow-app" path="2028346721."><div
-  path="2028346721.0"><flow-app-logo></flow-app-logo><flow-box-ui></flow-box-ui></div></div>
+  path="2028346721.0"><flow-app-logo></flow-app-logo><div class="mt-l4 flex
+  justify-around" path="2028346721.0.1"><flow-events></flow-events><flow-client
+  :userID="1"
+  path="2028346721.0.1.1"></flow-client><flow-server></flow-server></div></div></div>

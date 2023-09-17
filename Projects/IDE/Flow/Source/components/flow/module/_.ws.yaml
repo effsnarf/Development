@@ -1,0 +1,59 @@
+dom:
+  div: 
+    class: box2 show-on-hover-container
+    h3:
+      ui.title:
+        ':icon': icon
+        ':text': compName
+        ':number': title
+    ui.console:
+      class: show-on-hover
+      ref: console1
+    div: 
+      slot: null
+props:
+  icon: null
+  title: null
+mounted: | #js
+  function() {
+    // We want to know what the module is sending out
+    const emit = this.$parent.$emit.bind(this.$parent);
+    this.$parent.$emit = async (emitName, ...args) => {
+      await this.$parent.$nextTick();
+      this.$refs.console1.log("➕", emitName);
+      emit(emitName, ...args);
+    };
+  }
+methods:
+  onAllEvents: | #js
+    function(compName, emitName, args) {
+      const methodName = `${compName}_${emitName}`.replace(/\./g, "_");
+      if (this.$parent[methodName]) {
+        // Module caught an event
+        this.$refs.console1.log("➖", compName, emitName);
+      }
+    }
+computed:
+  compName: | #js
+    function() {
+      return this.$parent?.$data?._?.comp?.name;
+    }
+style:
+  h3:
+    font-weight: normal
+  .box2:
+    margin: 1em
+    border: '1px dashed #ccc'
+  .box2 > *:
+    margin-left: 1em
+_:
+  examples:
+    count: 0
+name: flow-module
+template: >-
+  <div class="comp-flow-module box2 show-on-hover-container"
+  path="924662572."><h3 path="924662572.0"><ui-title :icon="icon"
+  :text="compName" :number="title"
+  path="924662572.0.0"></ui-title></h3><ui-console class="show-on-hover"
+  ref="console1" path="924662572.1"></ui-console><div
+  path="924662572.2"><slot></slot></div></div>
