@@ -35,7 +35,7 @@ methods:
   onMouseUp: | #js
     function(e) {
       if (e.button != 0) return;
-      if (!this.isVisible) return;
+      if (!this.dragStart) return;
       e.preventDefault();
       e.stopPropagation();
       const rect = {
@@ -134,6 +134,7 @@ style:
     position: fixed
     filter: 'drop-shadow(-3px 3px 1px #000000)'
     transition: opacity 0.6s !important
+    background: '#ffffff10'
     pointer-events: none
     z-index: 1000
   .x-axis, .y-axis:

@@ -1,0 +1,28 @@
+dom:
+  div:
+    class: box1
+    table:
+      tr:
+        v-for: item in items
+        td:
+          v-for: (arg) in item
+          v-text: arg
+data:
+  items: []
+methods:
+  log: | #js
+    function(...args) {
+      this.items.push(args);
+    }
+style:
+  td:
+    padding: 0 0.5em
+_:
+  examples:
+    count: 0
+name: ui-console
+template: >-
+  <div class="comp-ui-console box1" path="1489973245."><table
+  path="1489973245.0"><tr v-for="item in items" path="1489973245.0.0"><td
+  v-for="(arg) in item" v-text="arg"
+  path="1489973245.0.0.0"></td></tr></table></div>

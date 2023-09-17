@@ -491,18 +491,6 @@ const _fetchAsJson = async (url: string) => {
         )
           return res.end("ok");
 
-        // Save a log of updates, just in case
-        const updateLogFolder = path.join(
-          config.project.folder,
-          "../",
-          "Temp/Component/Updates",
-          new Date().toISOString().substring(0, 10)
-        );
-        fs.mkdirSync(updateLogFolder, { recursive: true });
-        const fileName = `${Date.now()}.json`;
-        const updateLogFilePath = path.join(updateLogFolder, fileName);
-        fs.writeFileSync(updateLogFilePath, JSON.stringify(data, null, 2));
-
         const compPath = getCompFilePath(comp.path);
         const existingComp = Objects.parseYaml(
           preProcessYaml(fs.readFileSync(compPath, "utf8"))

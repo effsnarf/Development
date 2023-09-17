@@ -1,0 +1,12 @@
+dom:
+  div: 
+    div: 
+      flow.app.logo: null
+      flow.box.ui: null
+_:
+  examples:
+    count: 0
+name: flow-app
+template: >-
+  <div class="comp-flow-app" path="2028346721."><div
+  path="2028346721.0"><flow-app-logo></flow-app-logo><flow-box-ui></flow-box-ui></div></div>

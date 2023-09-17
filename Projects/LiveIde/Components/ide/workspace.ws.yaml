@@ -32,6 +32,10 @@ dom:
           v-if: (selectedEditor == 'component')
         ide.element.picker:
           v-if: (selectedEditor == 'css')
+    div: 
+      ui.html.style:
+        v-for: comp in $root.comps
+        ':component': comp
 props: null
 data:
   showWorkspace: true
@@ -80,4 +84,6 @@ template: >-
   'component')"
   path="-1163457967.0.3.0"></ide-component-picker><ide-element-picker
   v-if="(selectedEditor == 'css')"
-  path="-1163457967.0.3.1"></ide-element-picker></div></div></div>
+  path="-1163457967.0.3.1"></ide-element-picker></div></div><div
+  path="-1163457967.1"><ui-html-style v-for="comp in $root.comps"
+  :component="comp" path="-1163457967.1.0"></ui-html-style></div></div>

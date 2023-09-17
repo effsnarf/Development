@@ -15,6 +15,7 @@ class VueHelper {
 
   static toIdeComponent(vue: any, comp: any) {
     if (!vue) return null;
+    if (!comp) return null;
     const compName = vue.$options._componentTag;
     if (!compName) return null;
     const vueComp = Vue.component(vue.$options._componentTag);
@@ -25,10 +26,12 @@ class VueHelper {
     ideComp.name = compName;
     ideComp.source = {
       dom: VueHelper.htmlToJson(vueComp.options.template),
-      methods: Object.entries(comp.source.methods).map(([key, value]) => ({
-        name: key,
-        code: value,
-      })),
+      methods: Object.entries(comp?.source?.methods || {}).map(
+        ([key, value]) => ({
+          name: key,
+          code: value,
+        })
+      ),
     };
 
     return ideComp;

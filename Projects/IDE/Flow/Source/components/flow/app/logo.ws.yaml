@@ -1,0 +1,26 @@
+dom:
+  .flex.gap-2:
+    div:
+      class: logo
+    h2:
+      ui.title:
+        class: title1
+        text: Flow
+style:
+  .logo:
+    width: 8em
+    aspect-ratio: 6 / 5
+    background-image: url(/images/duck2.png)
+    background-size: contain
+  .title1:
+    font-size: 4rem
+    color: black
+    filter: drop-shadow(-1px 1px 1px white)
+_:
+  examples:
+    count: 0
+name: flow-app-logo
+template: >-
+  <div class="comp-flow-app-logo flex gap-2" path="1269110296."><div
+  class="logo" path="1269110296.0"></div><h2 path="1269110296.1"><ui-title
+  class="title1" text="Flow" path="1269110296.1.0"></ui-title></h2></div>

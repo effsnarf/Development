@@ -3164,6 +3164,8 @@ class VueHelper {
     static toIdeComponent(vue, comp) {
         if (!vue)
             return null;
+        if (!comp)
+            return null;
         const compName = vue.$options._componentTag;
         if (!compName)
             return null;
@@ -3173,7 +3175,7 @@ class VueHelper {
         ideComp.name = compName;
         ideComp.source = {
             dom: VueHelper.htmlToJson(vueComp.options.template),
-            methods: Object.entries(comp.source.methods).map(([key, value]) => ({
+            methods: Object.entries(comp?.source?.methods || {}).map(([key, value]) => ({
                 name: key,
                 code: value,
             })),
@@ -5722,7 +5724,7 @@ var __webpack_exports__ = {};
 (() => {
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/website/script/1694661910062.ts ***!
+  !*** ../../../LiveIde/website/script/1694932166447.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

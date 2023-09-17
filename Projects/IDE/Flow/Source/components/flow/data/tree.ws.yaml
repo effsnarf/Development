@@ -1,8 +1,0 @@
-dom: null
-props:
-  node: null
-_:
-  examples:
-    count: 0
-name: flow-data-tree
-template: ''

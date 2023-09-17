@@ -1,0 +1,46 @@
+dom:
+  div:
+    ui.gesture.select.box: null
+    .flex.justify-between:
+      flow.box.ui.events:
+        ref: flowBoxUiEvents1
+mounted: | #js
+  function() {
+    const vues = this.$root.vm.getDescendants(this);
+
+    for (const vue of vues) {
+      const compName = vue.$data._?.comp?.name;
+      if (!compName) continue;
+      const emitNames = this.getEmitNames(vue);
+      for (const emitName of emitNames) {
+        vue.$on(emitName, (...args) => {
+          this.$refs.flowBoxUiEvents1.onClientEvent(compName, emitName, ...args);
+        });
+      }
+    }
+  }
+methods:
+  getEmitNames: | #js
+    function(vue) {
+      const compName = vue.$data._?.comp?.name;
+      if (!compName) return [];
+      const comp = this.$root.comps.find(c => c.name == compName);
+      const allMethods = {
+        ...comp.source.methods,
+        mounted: comp.mounted
+      };
+      const methodsCode = Object.values(allMethods).join("\n");
+      const emitsRegex = /this\.\$emit\("([^"]+)"(, .*)?\)/g;
+      const emitNames = [...methodsCode.matchAll(emitsRegex)].map(m => m[1]);
+      console.log(emitNames);
+      return emitNames;
+    }
+_:
+  examples:
+    count: 0
+name: flow-box-ui
+template: >-
+  <div class="comp-flow-box-ui"
+  path="610269783."><ui-gesture-select-box></ui-gesture-select-box><div
+  class="flex justify-between" path="610269783.1"><flow-box-ui-events
+  ref="flowBoxUiEvents1" path="610269783.1.0"></flow-box-ui-events></div></div>
