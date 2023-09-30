@@ -4,7 +4,7 @@ dom:
       v-text: '''Data flow'''
     ui.tree:
       ':root': dataFlow
-      item-type: ide.component.flow.tree.node
+      item-type: ide.component.grid.tree.node
       ':initial-expanded': '2'
 props:
   uid: null
@@ -15,7 +15,7 @@ methods:
   getDataFlow: | #js
     function(vue) {
       const dataFlow = { children: [] };
-      dataFlow.children.push(...this.getDfProps(vue));
+      datagrid.children.push(...this.getDfProps(vue));
       return dataFlow;
     }
   getDfProps: | #js
@@ -96,5 +96,5 @@ _:
 template: >-
   <div class="comp-ide-component-flow" path="-1793143997."><h3 v-text="'Data
   flow'" path="-1793143997.0"></h3><ui-tree :root="dataFlow"
-  item-type="ide.component.flow.tree.node" :initial-expanded="2"
+  item-type="ide.component.grid.tree.node" :initial-expanded="2"
   path="-1793143997.1"></ui-tree></div>

@@ -866,10 +866,57 @@ img[src=""]
   color: #0e7abd;
 }
 
+
 .ajs-message
 {
-  background: #404040;
+  background: linear-gradient(142deg, rgba(126,126,126,0.9) 0%, rgba(80,80,80,0.6) 66%);
+  box-shadow: -6px 6px 6px #00000080;
 }
+
+.ajs-warning
+{
+  background: #FFFF9960 !important;
+}
+
+.ajs-message *
+{
+  text-shadow: -0.1em 0.1em 0.05em black;
+}
+
+.ajs-message progress
+{
+  margin-top: 0.5em;
+}
+
+.ajs-message progress::-webkit-progress-value
+{
+  background: #ffffffa0;
+}
+
+.ajs-message progress::-webkit-progress-bar
+{
+  background: #00000010;
+  border: 1px solid #ffffff40;
+  box-shadow: -3px 3px 3px black;
+}
+
+
+.ajs-dialog .ajs-header
+{
+  display: none;
+}
+
+.ajs-dialog, .ajs-header, .ajs-footer
+{
+  background: #606060 !important;
+}
+
+.ajs-content
+{
+  font-size: 140%;
+}
+
+
 
 
 /* scrollbars */

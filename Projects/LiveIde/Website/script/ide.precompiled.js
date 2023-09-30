@@ -4439,6 +4439,8 @@ if (typeof String !== "undefined") {
     String.prototype.singularize = function () {
         if (this.endsWith("ies"))
             return this.slice(0, -3) + "y";
+        if (this.endsWith("es"))
+            return this.slice(0, -2);
         if (this.endsWith("s"))
             return this.slice(0, -1);
         return this.toString();
@@ -5749,7 +5751,7 @@ var __webpack_exports__ = {};
 (() => {
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/website/script/1694934623455.ts ***!
+  !*** ../../../LiveIde/website/script/1696073625747.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

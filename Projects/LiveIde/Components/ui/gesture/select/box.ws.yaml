@@ -17,6 +17,7 @@ dom:
         v-if: isVisible
         ':style': selectBoxStyle
 props:
+  surfaceElement: null
   centerCoords: false
   isLayerElement: null
 data:
@@ -50,7 +51,7 @@ methods:
       this.dragEnd = null;
       this.isVisible = false;
       if (!this.isMinimumSize(rect.size)) return;
-      this.$emit("mark", this.adjustCoords(rect));
+      this.$emit("mark", this.adjustRect(rect));
     }
   onMouseMove: | #js
     function(e) {
@@ -76,24 +77,43 @@ methods:
       const y = Math[minOrMax](dragStart.y, dragEnd.y);
       return { x, y };
     }
-  getWindowCenter: | #js
+  getSurfaceCenter: | #js
     function() {
+      const surface = this.surfaceElement || window;
+      const surfaceRect = this.$root.getAbsoluteRect(surface);
       return {
-        x: window.innerWidth / 2,
-        y: window.innerHeight / 2
+        x: Math.round(surfaceRect.left + surfaceRect.width / 2),
+        y: Math.round(surfaceRect.top + surfaceRect.height / 2)
       };
     }
-  adjustCoords: | #js
+  adjustRect: | #js
     function(rect) {
       if (!this.centerCoords) return rect;
-      const center = this.getWindowCenter();
+      const center = this.getSurfaceCenter("fixed");
       const pos = rect.pos;
       const size = rect.size;
       const x = pos.x - center.x;
       const y = center.y - pos.y;
       const width = size.width;
       const height = size.height;
-      return { pos: { x, y }, size: { width, height } };
+      return this.toCenteredRect({ pos: { x, y }, size: { width, height } });
+    }
+  adjustPos: | #js
+    function(pos) {
+      if (!pos) return null;
+      if (!this.centerCoords) return pos;
+      const center = this.getSurfaceCenter("fixed");
+      const x = pos.x - center.x;
+      const y = center.y - pos.y;
+      return { x, y };
+    }
+  toCenteredRect: | #js
+    function(rect) {
+      const pos = rect.pos;
+      const size = rect.size;
+      const x = pos.x + size.width / 2;
+      const y = pos.y - size.height / 2;
+      return { pos: { x, y }, size };
     }
 computed:
   selectBoxStyle: | #js
@@ -150,6 +170,19 @@ computed:
       const width = bottomRight.x - topLeft.x;
       const height = bottomRight.y - topLeft.y;
       return { width, height };
+    }
+watch:
+  mousePos: | #js
+    function() {
+      this.$emit("mouse-pos", this.adjustPos(this.mousePos));
+    }
+  dragStart: | #js
+    function() {
+      this.$emit("drag-start", this.adjustPos(this.dragStart));
+    }
+  dragEnd: | #js
+    function() {
+      this.$emit("drag-end", this.adjustPos(this.dragEnd));
     }
 style:
   .select-box:

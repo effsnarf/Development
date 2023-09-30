@@ -1,0 +1,177 @@
+nextID: 1
+nodes: []
+links: []
+schema:
+  flow:
+    layout:
+      _all:
+        data:
+          style:
+            type: style
+            values:
+              backgroundColor:
+                type: color
+                value: transparent
+      panel:
+        data:
+          direction:
+            type: direction
+            value: vertical
+          size:
+            type: percent
+            value: 50
+        children:
+          - type: grid.layout.empty
+          - type: grid.layout.empty
+      pages:
+        data:
+          visiblePageIndex:
+            type: number
+            value: 0
+        children:
+          - type: grid.layout.empty
+      list:
+        data:
+        children:
+          - type: grid.layout.empty
+    data:
+      _all:
+        data:
+      fetch:
+        data:
+          url:
+            type: string
+            value: https://api.memegenerator.net//Generators_Select_ByPopular?pageIndex=0&pageSize=12&days=&apiKey=demo
+      variable:
+        data:
+          name:
+            type: string
+            value: variable
+    app:
+      _all:
+        data:
+      comp:
+        data:
+          name:
+            type: string
+            value: comp
+        children:
+          - type: grid.node.folder
+            data:
+              name:
+                type: string
+                value: view
+            children:
+              - type: grid.layout.empty
+          - type: grid.node.folder
+            data:
+              name:
+                type: string
+                value: data
+      compInst:
+        data:
+          compID:
+            type: number
+            value: null
+    node:
+      _all:
+        data:
+      folder:
+        data:
+          name:
+            type: string
+            value: folder
+    ui:
+      _all:
+        data:
+      text:
+        data:
+          text:
+            type: string
+            value: text
+    box:
+      _all:
+        data:
+          rect:
+            pos:
+              x: 0
+              y: 0
+            size:
+              width: 300
+              height: 200
+      text:
+        data:
+          text:
+            type: string
+            value: text
+templates:
+  app:
+    type: grid.node.folder
+    data:
+      name:
+        type: string
+        value: app
+    children:
+      - type: grid.node.folder
+        data:
+          name:
+            type: string
+            value: view
+        children:
+          - type: grid.layout.empty
+      - type: grid.node.folder
+        data:
+          name:
+            type: string
+            value: data
+      - type: grid.node.folder
+        data:
+          name:
+            type: string
+            value: comps
+get:
+  node:
+    icon: | #js
+      function(type) {
+        if (!type) return '❔';
+
+        const cat = type.split('.')[1];
+
+        if (cat == "app") {
+          type = type.split('.')[2];
+          return ({
+            comp: '📦',
+            compInst: '💎',
+          })[type] || '❔';
+        }
+
+        if (cat == "node") {
+          type = type.split('.')[2];
+          return ({
+            folder: '📁',
+          })[type] || '❔';
+        }
+
+        if (cat == "ui") {
+          type = type.split('.')[2];
+          return ({
+            text: '🆎',
+            image: '🖼️',
+          })[type] || '❔';
+        }
+
+        return ({
+          layout: '⬜',
+          data: '🧊',
+        })[cat] || '❔';
+      }
+  link:
+    icon: | #js
+      function(type) {
+        if (!type) return '❔';
+        
+        return ({
+          'child.of': '➕',
+          'data.send': '🧊',
+        })[type] || '❔';
+      }

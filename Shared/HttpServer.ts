@@ -17,6 +17,10 @@ Handlebars.registerHelper("json", function (obj: any) {
   return JSON.stringify(obj);
 });
 
+interface HttpServerOptions {
+  log?: { exclude?: string[] };
+}
+
 class HttpServer {
   private currentRequestsCount = 0;
 
@@ -27,7 +31,8 @@ class HttpServer {
     private handler: (req: any, res: any, data: any) => any,
     private getIndexPageTemplateData: (req: any) => Promise<any>,
     private indexPagePath: string | null,
-    private staticFileFolders: string[]
+    private staticFileFolders: string[],
+    private options?: HttpServerOptions
   ) {
     const server = http.createServer(this.requestListener.bind(this));
     server.listen(port, ip, () => {
@@ -49,7 +54,8 @@ class HttpServer {
     handler: (req: any, res: any, data: any) => any,
     getIndexPageTemplateData: (req: any) => Promise<any>,
     indexPagePath: string | null,
-    staticFileFolders: string[]
+    staticFileFolders: string[],
+    options?: HttpServerOptions
   ) {
     const server = new HttpServer(
       appName,
@@ -58,7 +64,8 @@ class HttpServer {
       handler,
       getIndexPageTemplateData,
       indexPagePath,
-      staticFileFolders
+      staticFileFolders,
+      options
     );
     return server;
   }
@@ -170,6 +177,8 @@ class HttpServer {
   }
 
   private logResponse(timer: Timer, req: any, res?: any) {
+    if (this.options?.log?.exclude?.includes(req.url)) return;
+
     this.log(
       `${timer.elapsed
         ?.unitifyTime()

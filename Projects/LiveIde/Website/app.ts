@@ -528,6 +528,11 @@ const _fetchAsJson = async (url: string) => {
     },
     async (req: any) => await getProjectPageTemplateObject(req),
     path.join(config.liveIde.folder, "Website", "index.haml"),
-    staticFileFolders
+    staticFileFolders,
+    {
+      log: {
+        exclude: ["/component/update", "/pug"],
+      },
+    }
   );
 })();

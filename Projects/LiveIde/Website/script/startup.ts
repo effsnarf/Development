@@ -107,16 +107,16 @@ const flowAppMixin = {
 };
 
 const flowAppComponentMixin = {
-  matchComp: (c: Component) => c.name.startsWith("flow."),
+  matchComp: (c: Component) => c.name.startsWith("grid."),
   computed: {
     $global() {
       return (this as any).$root.global;
     },
     $gdb() {
-      return (this as any).$root.flow.gdb;
+      return (this as any).$root.grid.gdb;
     },
     $nodeDatas() {
-      return (this as any).$root.flow.user.app.runtimeData.nodeDatas;
+      return (this as any).$root.grid.user.app.runtimeData.nodeDatas;
     },
   },
 };
@@ -1150,6 +1150,16 @@ interface MgParams {
           (v: any) => v.$props?.node?.id == node.id
         );
         return vues;
+      },
+      getAbsoluteRect(el: any) {
+        const rect = el.getBoundingClientRect();
+        const scrollLeft = document.documentElement.scrollLeft;
+        const scrollTop = document.documentElement.scrollTop;
+        const top = rect.top + scrollTop;
+        const left = rect.left + scrollLeft;
+        const width = rect.width;
+        const height = rect.height;
+        return { top, left, width, height };
       },
     },
     watch: {

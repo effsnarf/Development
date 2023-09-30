@@ -1,0 +1,22 @@
+title: grid.Web
+server:
+  host: localhost
+  port: 5051
+project:
+  folder: (env) => env.path.resolve(env.process.cwd(), '../Source')
+webscript:
+  folder: (env) => env.path.join(env.process.cwd(), "../../../../Shared/WebScript")
+liveIde:
+  folder: (env) => env.path.resolve(env.process.cwd(), '../../../LiveIde')
+static:
+  folder: (env) => env.process.cwd()
+handler: | #js
+  (ctx) => {
+    return async (req, res) => {
+      if (req.url == "/script") {
+        const yaml = ctx.fs.readFileSync(ctx.path.join(ctx.process.cwd(), "main.yaml"), 'utf8');
+        const main = ctx.Objects.parseYaml(yaml, { addSuffixToDuplicateKeysUnder: ["dom"] });
+        return res.end();
+      }
+    };
+  }

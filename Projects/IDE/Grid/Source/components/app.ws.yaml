@@ -1,0 +1,7 @@
+dom:
+  grid.app: null
+_:
+  examples:
+    count: 0
+name: app
+template: <grid-app class="comp-app"></grid-app>

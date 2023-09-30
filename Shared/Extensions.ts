@@ -765,6 +765,7 @@ if (typeof String !== "undefined") {
 
   String.prototype.singularize = function (): string {
     if (this.endsWith("ies")) return this.slice(0, -3) + "y";
+    if (this.endsWith("es")) return this.slice(0, -2);
     if (this.endsWith("s")) return this.slice(0, -1);
     return this.toString();
   };

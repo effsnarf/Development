@@ -1,14 +1,18 @@
 dom:
-  div:
+  div: 
     transition:
       name: slide2
       .alert:
         v-if: isVisible
-        ':key': text1
-        v-text: text1
+        div: 
+          v-if: text1
+          ':key': text1
+          v-text: text1
         @click: onClick
+        slot: null
 props:
   text: null
+  timeout: 3000
 data:
   text1: null
   isVisible: true
@@ -16,7 +20,12 @@ methods:
   show: | #js
     function(text) {
       if (text) this.text1 = text;
-      this.isVisible = this.text1?.length;
+      this.isVisible = this.text1?.length || this.$slots.default?.length;
+      setTimeout(this.hide.bind(this), this.timeout);
+    }
+  hide: | #js
+    function() {
+      this.isVisible = false;
     }
   onClick: | #js
     function() {
@@ -46,6 +55,7 @@ example:
 style:
   .alert:
     background: '#ffffff20'
+    border: 1px solid '#ffffff40'
     padding: 0.5em 1em
     text-align: center
     cursor: pointer
@@ -232,6 +242,6 @@ _:
     count: 1
 template: >-
   <div class="comp-ui-alert" path="-2141174398."><transition name="slide2"
-  path="-2141174398.0"><div class="alert" v-if="isVisible" :key="text1"
-  v-text="text1" @click="onClick"
-  path="-2141174398.0.0"></div></transition></div>
+  path="-2141174398.0"><div class="alert" v-if="isVisible" @click="onClick"
+  path="-2141174398.0.0"><div v-if="text1" :key="text1" v-text="text1"
+  path="-2141174398.0.0.0"></div><slot></slot></div></transition></div>

@@ -1,0 +1,51 @@
+dom:
+  grid.module:
+    icon: 🧊📃
+    ':title': fuid
+    grid.data.list.view:
+      ':fuid': fuid
+props:
+  fuid: null
+data:
+  items: []
+methods:
+  add: | #js
+    function(item) {
+      this.items.add(item);
+      this.onChange();
+    }
+  update: | #js
+    function(itemID, data) {
+      const item = this.items.find(item => (item._id == itemID));
+      let changes = DeepDiff.diff(item, data);
+      changes = changes.filter(change => (change.kind !== "D"));
+      for (const change of changes) DeepDiff.applyChange(item, change);
+      this.onChange();
+    }
+  delete: | #js
+    function(itemIDs) {
+      if (!Array.isArray(itemIDs)) itemIDs = [itemIDs];
+      for (const itemID of itemIDs)
+      {
+        this.items.removeByField("_id", itemID);
+        this.onChange();
+      }
+    }
+  clear: | #js
+    function() {
+      this.items.clear();
+      this.onChange();
+    }
+  onChange: | #js
+    function() {
+      this.$femit("change", { fuid: this.fuid, items: this.items });
+    }
+watch: null
+_:
+  examples:
+    count: 0
+name: grid-data-list
+template: >-
+  <grid-module class="comp-grid-data-list" icon="🧊📃" :title="fuid"
+  path="882586554."><grid-data-list-view :fuid="fuid"
+  path="882586554.0"></grid-data-list-view></grid-module>

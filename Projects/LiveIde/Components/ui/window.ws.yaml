@@ -39,6 +39,7 @@ props:
   rect: null
   autoExpand: false
   centerCoords: false
+  surfaceElement: null
 data:
   sizes:
     - width: 300
@@ -56,9 +57,6 @@ data:
       height: 200
   isDraggingMoving: false
   isDragging: false
-  center:
-    x: 0
-    'y': 0
   dragStartPos:
     x: 0
     'y': 0
@@ -66,13 +64,11 @@ data:
   isHovered: 0
 mounted: | #js
   function() {
-    this.center = this.getWindowCenter();
-    window.addEventListener("resize", this.getWindowCenter.bind(this));
   }
 methods:
   move: | #js
     async function(pos) {
-      this.rect1.pos = this.adjustCoords(pos);
+      this.rect1.pos = this.adjustPos(pos);
     }
   onMouseDrag: | #js
     async function(dpos) {
@@ -96,19 +92,36 @@ methods:
       this.isDragging = false;
       const pos = this.rect1.pos;
       if (Objects.areEqual(pos, this.dragStartPos)) return;
-      this.$emit("drag-stop", this.adjustCoords(pos));
+      this.$emit("drag-stop", this.adjustPos(pos));
     }
-  getWindowCenter: | #js
+  getSurfaceCenter: | #js
+    function(cssPosition) {
+      const surfaceRect = this.getSurfaceRect();
+      if (cssPosition == "fixed")
+      {
+        return {
+          x: Math.round(surfaceRect.left + surfaceRect.width / 2),
+          y: Math.round(surfaceRect.top + surfaceRect.height / 2)
+        };
+      }
+      else
+      {
+        return {
+          x: Math.round(surfaceRect.width / 2),
+          y: Math.round(surfaceRect.height / 2)
+        };
+      }
+    }
+  getSurfaceRect: | #js
     function() {
-      return {
-        x: window.innerWidth / 2,
-        y: window.innerHeight / 2
-      };
+      const surface = this.surfaceElement || window;
+      const surfaceRect = this.$root.getAbsoluteRect(surface);
+      return surfaceRect;
     }
   adjustRectCoords: | #js
     function(rect) {
       if (!this.centerCoords) return rect;
-      const center = this.getWindowCenter();
+      const center = this.getSurfaceCenter();
       const pos = rect.pos;
       const size = rect.size;
       const x = pos.x + center.x;
@@ -117,24 +130,32 @@ methods:
       const height = size.height;
       return { pos: { x, y }, size: { width, height } };
     }
-  adjustCoords: | #js
+  adjustPos: | #js
     function(pos) {
+      if (!pos) return pos;
       if (!this.centerCoords) return pos;
-      const center = this.getWindowCenter();
+      const center = this.getSurfaceCenter();
       const x = pos.x - center.x;
       const y = center.y - pos.y;
       return { x, y };
+    }
+  yamlify: | #js
+    function(obj) {
+      return jsyaml.dump(obj);
     }
 computed:
   style: | #js
     function()
     {
-      const style = {};
-      style.position = "fixed";
+      const center = this.getSurfaceCenter();
       const pos = this.rect1.pos;
       const size = this.rect1.size;
-      style.left = ((this.center.x + pos.x - (size.width / 2)) + "px");
-      style.top = ((this.center.y - pos.y - (size.height / 2)) + "px");
+      const style = {};
+      style.position = "absolute";
+      style.left = `${center.x + pos.x - (size.width / 2)}px`;
+      style.top = `${center.y - pos.y - (size.height / 2)}px`;
+      style.width = (size.width + "px");
+      style.height = (size.height + "px");
       if (!this.isDraggingMoving) style.transition = "0.3s";
       return style;
     }
@@ -152,8 +173,9 @@ watch:
   rect:
     handler: | #js
       function(rect) {
-        this.rect1 = Objects.clone(this.adjustRectCoords(rect));
+        this.rect1 = Objects.clone(rect);
       }
+    immediate: true
     deep: true
   rect1:
     handler: | #js
@@ -178,6 +200,7 @@ style:
   .comp-ui-window.hovered .below:
     transform: none
   .window:
+    height: 100%
     padding: 0.5em
     background: 'linear-gradient(to right, #303030, #101010)'
     border: '1px solid #ffffff30'

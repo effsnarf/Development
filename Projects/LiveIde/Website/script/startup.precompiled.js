@@ -5481,6 +5481,8 @@ if (typeof String !== "undefined") {
     String.prototype.singularize = function () {
         if (this.endsWith("ies"))
             return this.slice(0, -3) + "y";
+        if (this.endsWith("es"))
+            return this.slice(0, -2);
         if (this.endsWith("s"))
             return this.slice(0, -1);
         return this.toString();
@@ -7323,7 +7325,7 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/website/script/1694934624385.ts ***!
+  !*** ../../../LiveIde/website/script/1696073626347.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -7422,16 +7424,16 @@ const flowAppMixin = {
     },
 };
 const flowAppComponentMixin = {
-    matchComp: (c) => c.name.startsWith("flow."),
+    matchComp: (c) => c.name.startsWith("grid."),
     computed: {
         $global() {
             return this.$root.global;
         },
         $gdb() {
-            return this.$root.flow.gdb;
+            return this.$root.grid.gdb;
         },
         $nodeDatas() {
-            return this.$root.flow.user.app.runtimeData.nodeDatas;
+            return this.$root.grid.user.app.runtimeData.nodeDatas;
         },
     },
 };
@@ -8385,6 +8387,16 @@ const mgMixin = {
                 const self = this;
                 const vues = self.vm.getDescendants(this, (v) => v.$props?.node?.id == node.id);
                 return vues;
+            },
+            getAbsoluteRect(el) {
+                const rect = el.getBoundingClientRect();
+                const scrollLeft = document.documentElement.scrollLeft;
+                const scrollTop = document.documentElement.scrollTop;
+                const top = rect.top + scrollTop;
+                const left = rect.left + scrollLeft;
+                const width = rect.width;
+                const height = rect.height;
+                return { top, left, width, height };
             },
         },
         watch: {

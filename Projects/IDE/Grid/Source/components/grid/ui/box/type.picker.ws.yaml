@@ -1,0 +1,24 @@
+dom:
+  div:
+    ui.select:
+      ':options': '[''🧊 data'', ''🔴 func'']'
+      input-type: value
+      v-model: type
+props:
+  box: null
+data:
+  type: null
+watch:
+  type:
+    handler: | #js
+      async function(type) {
+        this.$emit("input", type.split(" ")[1]);
+      }
+_:
+  examples:
+    count: 0
+name: grid-ui-box-type-picker
+template: >-
+  <div class="comp-grid-ui-box-type-picker" path="1672760941."><ui-select
+  :options="['🧊 data', '🔴 func']" input-type="value" v-model="type"
+  path="1672760941.0"></ui-select></div>

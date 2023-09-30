@@ -1,0 +1,62 @@
+dom:
+  grid.module:
+    icon: 👤💻🖱️
+    .flex:
+      div: 
+        ref: surface1
+        class: surface flex-grow-1
+        grid.ui.box:
+          v-for: box in boxes
+          ':key': box._id
+          ':box': box
+          ':surface-element': surfaceElement
+      div: 
+        grid.ui.tools:
+          ':surface-element': surfaceElement
+        grid.data.list.view: 
+          ':fuid': userID+'/user/actions'
+          v-model: userActions
+        grid.data.list.view: 
+          ':fuid': userID + '/data/boxes'
+          v-model: boxes
+props:
+  userID: null
+data:
+  boxes: []
+  userActions: []
+  surfaceElement: null
+mounted: | #js
+  function() {
+    this.surfaceElement = this.$refs.surface1;
+  }
+methods: null
+computed:
+  surface1: | #js
+    function() {
+      return this.$refs.surface1;
+    }
+style:
+  .surface:
+    height: 80vh
+    overflow: hidden
+    background-size: 40px 40px;
+    background-image: >-
+      linear-gradient(to right, #303030 1px, transparent 1px),
+      linear-gradient(to bottom, #303030 1px, transparent 1px);
+    cursor: crosshair
+_:
+  examples:
+    count: 0
+name: grid-client-workspace
+template: >-
+  <grid-module class="comp-grid-client-workspace" icon="👤💻🖱️"
+  path="-1461469222."><div class="flex" path="-1461469222.0"><div class="surface
+  flex-grow-1" ref="surface1" path="-1461469222.0.0"><grid-ui-box v-for="box in
+  boxes" :key="box._id" :box="box" :surface-element="surfaceElement"
+  path="-1461469222.0.0.0"></grid-ui-box></div><div
+  path="-1461469222.0.1"><grid-ui-tools :surface-element="surfaceElement"
+  path="-1461469222.0.1.0"></grid-ui-tools><grid-data-list-view
+  :fuid="userID+'/user/actions'" v-model="userActions"
+  path="-1461469222.0.1.1"></grid-data-list-view><grid-data-list-view
+  :fuid="userID + '/data/boxes'" v-model="boxes"
+  path="-1461469222.0.1.2"></grid-data-list-view></div></div></grid-module>

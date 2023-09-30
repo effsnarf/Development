@@ -1,0 +1,32 @@
+dom:
+  grid.module:
+    icon: 👤🖱️
+props:
+  userID: null
+data: null
+methods:
+  grid_ui_tools_select_box_mark: | #js
+    function(rect) {
+      this.$femit("create.box", this.userID, rect);
+    }
+  grid_ui_tools_undo: | #js
+    function() {
+      this.$femit("undo", this.userID);
+    }
+  grid_ui_tools_redo: | #js
+    function() {
+      this.$femit("redo", this.userID);
+    }
+  onAllEvents: | #js
+    function(compName, emitName, args) {
+      if (compName != "grid.ui.toolbar") return;
+      if (emitName == "select.box.mark") return;
+      this.$femit(emitName, this.userID, ...args);
+    }
+_:
+  examples:
+    count: 0
+name: grid-ui-actions
+template: >-
+  <grid-module class="comp-grid-ui-actions" icon="👤🖱️"
+  path="756973387."></grid-module>

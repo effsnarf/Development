@@ -1,7 +1,0 @@
-dom:
-  flow.app: null
-_:
-  examples:
-    count: 0
-name: app
-template: <flow-app class="comp-app"></flow-app>

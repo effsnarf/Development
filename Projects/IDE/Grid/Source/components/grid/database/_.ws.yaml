@@ -1,0 +1,11 @@
+dom:
+  grid.module:
+    icon: 🖥️💾
+    path: null
+_:
+  examples:
+    count: 0
+name: grid-database
+template: >-
+  <grid-module class="comp-grid-database" icon="🖥️💾"
+  path="-247085277."></grid-module>

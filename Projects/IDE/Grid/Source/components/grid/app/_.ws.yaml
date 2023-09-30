@@ -1,0 +1,28 @@
+dom:
+  div: 
+    div: 
+      grid.app.logo: null
+      div: 
+        grid.client:
+          class: flex-grow-1
+          ':userID': userID
+        grid.server: null
+        grid.events: null
+mounted: | #js
+  function() {
+  }
+methods: null
+data:
+  userID: 1
+style:
+  .comp-flow-app:
+    font-family: Electrolize
+_:
+  examples:
+    count: 0
+name: grid-app
+template: >-
+  <div class="comp-grid-app" path="316922745."><div
+  path="316922745.0"><grid-app-logo></grid-app-logo><div
+  path="316922745.0.1"><grid-client class="flex-grow-1" :userID="userID"
+  path="316922745.0.1.0"></grid-client><grid-server></grid-server><grid-events></grid-events></div></div></div>

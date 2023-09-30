@@ -1,0 +1,22 @@
+dom:
+  grid.module:
+    icon: 👤🧊
+    div:
+      grid.user.actions:
+        ':userID': userID
+      grid.data.list:
+        ':fuid': userID+'/data/boxes'
+props:
+  userID: null
+data: null
+methods: null
+_:
+  examples:
+    count: 0
+name: grid-user-data
+template: >-
+  <grid-module class="comp-grid-user-data" icon="👤🧊" path="1585242949."><div
+  path="1585242949.0"><grid-user-actions :userID="userID"
+  path="1585242949.0.0"></grid-user-actions><grid-data-list
+  :fuid="userID+'/data/boxes'"
+  path="1585242949.0.1"></grid-data-list></div></grid-module>

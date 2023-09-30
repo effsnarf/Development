@@ -1,0 +1,18 @@
+dom:
+  grid.module:
+    icon: 🖥️
+    div:
+      grid.user.data:
+        ':userID': 1
+methods:
+  onAllEvents: | #js
+    function(compName, emitName, args) {
+    }
+_:
+  examples:
+    count: 0
+name: grid-server
+template: >-
+  <grid-module class="comp-grid-server" icon="🖥️" path="1612721899."><div
+  path="1612721899.0"><grid-user-data :userID="1"
+  path="1612721899.0.0"></grid-user-data></div></grid-module>

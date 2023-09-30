@@ -1,0 +1,55 @@
+dom:
+  grid.module:
+    icon: 🧊📃
+    ':show-title': 'false'
+    div:
+      h3:
+        ui.title:
+          ':icon': getFuidIcon(fuid)
+          ':text': fuid
+      ul:
+        li:
+          v-for: item in items
+          slot:
+            component:
+              ':is': getItemCompName(fuid)
+              ':item': item
+props:
+  fuid: null
+data:
+  items: []
+methods:
+  grid_data_list_change: | #js
+    function(e) {
+      const { fuid, items } = e;
+      if (fuid !== this.fuid) return;
+      this.items = items;
+      this.$emit("input", items);
+    }
+  getItemCompName: | #js
+    function(fuid) {
+      // 1/data/boxes -> grid.data.box
+      // 1/user/actions -> grid.user.action
+      const parts = fuid.split("/");
+      const type = parts[1];
+      const name = parts[2].singularize();
+      return `grid.${type}.${name}`.replace(/\./g, "-");
+    }
+  getFuidIcon: | #js
+    function(fuid) {
+      if (fuid.includes("/data/boxes")) return "🧊📦";
+      if (fuid.includes("/user/actions")) return "👤🔴";
+      return "❔";
+    }
+_:
+  examples:
+    count: 0
+name: grid-data-list-view
+template: >-
+  <grid-module class="comp-grid-data-list-view" icon="🧊📃" :show-title="false"
+  path="-1148091303."><div path="-1148091303.0"><h3
+  path="-1148091303.0.0"><ui-title :icon="getFuidIcon(fuid)" :text="fuid"
+  path="-1148091303.0.0.0"></ui-title></h3><ul path="-1148091303.0.1"><li
+  v-for="item in items" path="-1148091303.0.1.0"><slot
+  path="-1148091303.0.1.0.0"><component :is="getItemCompName(fuid)" :item="item"
+  path="-1148091303.0.1.0.0.0"></component></slot></li></ul></div></grid-module>
