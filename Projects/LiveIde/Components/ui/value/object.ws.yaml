@@ -8,7 +8,7 @@ dom:
         v-text: title
       .title: 
         class: opacity-50
-        v-if: specialTypeName
+        v-if: false && specialTypeName
         v-text: specialTypeName
     ui.tabs:
       ':options': '[''🎄'', ''🆎'']'
@@ -101,8 +101,8 @@ template: >-
   <div class="comp-ui-value-object" path="-1714629770."><div class="flex"
   :style="{ gap: '1em' }" v-if="(title || specialTypeName)"
   path="-1714629770.0"><div class="title" v-if="title" v-text="title"
-  path="-1714629770.0.0"></div><div class="opacity-50 title"
-  v-if="specialTypeName" v-text="specialTypeName"
+  path="-1714629770.0.0"></div><div class="opacity-50 title" v-if="false
+  &amp;&amp; specialTypeName" v-text="specialTypeName"
   path="-1714629770.0.1"></div></div><ui-tabs :options="['🎄', '🆎']"
   direction="toggle" path="-1714629770.1"><template v-slot:tab0
   path="-1714629770.1.0"><pre class="pre"

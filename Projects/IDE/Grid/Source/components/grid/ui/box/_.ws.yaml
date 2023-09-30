@@ -6,41 +6,54 @@ dom:
       ':rect': box.rect
       ':surface-element': surfaceElement
       ':center-coords': 'true'
-      @drag-stop: onMoveWindow
-      template:
+      @drag-stop: onDragStop
+      template: 
         v-slot: title
+        grid.ui.box.header:
+          ':box': box
+          ':box-icon': boxIcon
+      template: 
+        v-slot: content
         div:
-          ui.title:
-            ':icon': getBoxIcon(box)
-            ':text': getBoxTitle(box)
-          transition:
-            name: slide
-            grid.ui.box.type.picker:
-              v-if: '!box.type'
-              ':box': box
-              @input: onChangeType
+          component:
+            ':is': getBoxCompName(box)
+            ':box': box
+            @update:icon: boxIcon = $event
+          grid.ui.box.type.picker:
+            v-if: '!box.type'
+            ':box': box
+            @input: onChangeType
 props:
   box: null
   surfaceElement: null
+data:
+  boxIcon: null
 methods:
-  getBoxIcon: | #js
-    function(box) {
-      return `${({
-        data: "🧊",
-        func: "🔴",
-      })[box.type] || "❔"}`;
-    }
   getBoxTitle: | #js
     function(box) {
       return box.type;
     }
-  onMoveWindow: | #js
-    function(pos) {
-      this.$femit("move.box", this.box._id, pos);
+  getBoxCompName: | #js
+    function(box) {
+      if (!box.type) return null;
+      return `grid.ui.box.${box.type}`.replace(/\./g, "-");
+    }
+  onDragStop: | #js
+    function(rect, dragType) {
+      if (dragType === "resize")
+      {
+        this.$femit("resize.box", this.box._id, rect.size);
+      }
+      else
+      {
+        this.$femit("move.box", this.box._id, rect.pos);
+      }
     }
   onChangeType: | #js
     function(type) {
-      this.$femit("edit.box", this.box._id, { type });
+      const boxData = { type };
+      if (!this.box.name) boxData.name = type;
+      this.$femit("edit.box", this.box._id, boxData);
     }
   yamlify: | #js
     function(obj) {
@@ -65,10 +78,11 @@ template: >-
   <grid-module class="comp-grid-ui-box" icon="📦" :show-title="false"
   path="1671629593."><ui-window :rect="box.rect"
   :surface-element="surfaceElement" :center-coords="true"
-  @drag-stop="onMoveWindow" path="1671629593.0"><template v-slot:title
-  path="1671629593.0.0"><div path="1671629593.0.0.0"><ui-title
-  :icon="getBoxIcon(box)" :text="getBoxTitle(box)"
-  path="1671629593.0.0.0.0"></ui-title><transition name="slide"
-  path="1671629593.0.0.0.1"><grid-ui-box-type-picker v-if="!box.type" :box="box"
-  @input="onChangeType"
-  path="1671629593.0.0.0.1.0"></grid-ui-box-type-picker></transition></div></template></ui-window></grid-module>
+  @drag-stop="onDragStop" path="1671629593.0"><template v-slot:title
+  path="1671629593.0.0"><grid-ui-box-header :box="box" :box-icon="boxIcon"
+  path="1671629593.0.0.0"></grid-ui-box-header></template><template
+  v-slot:content path="1671629593.0.1"><div path="1671629593.0.1.0"><component
+  :is="getBoxCompName(box)" :box="box" @update:icon="boxIcon = $event"
+  path="1671629593.0.1.0.0"></component><grid-ui-box-type-picker
+  v-if="!box.type" :box="box" @input="onChangeType"
+  path="1671629593.0.1.0.1"></grid-ui-box-type-picker></div></template></ui-window></grid-module>

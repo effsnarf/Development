@@ -6,7 +6,6 @@ dom:
       @up: onMouseUp
       @move: onMouseMove
     div: 
-      v-if: 'false'
       .x-axis:
         ':style': xAxisStyle
       .y-axis:
@@ -139,6 +138,7 @@ computed:
       style.top = `${mousePos.y}px`;
       style.width = `${100}vw`;
       style.height = `${1}px`;
+      style.pointerEvents = "none";
       return style;
     }
   yAxisStyle: | #js
@@ -151,6 +151,7 @@ computed:
       style.top = `${0}px`;
       style.width = `${1}px`;
       style.height = `${100}vh`;
+      style.pointerEvents = "none";
       return style;
     }
   topLeft: | #js
@@ -203,9 +204,8 @@ name: ui-gesture-select-box
 template: >-
   <div class="comp-ui-gesture-select-box" path="-2052114120."><ui-mouse
   global="true" @down="onMouseDown" @up="onMouseUp" @move="onMouseMove"
-  path="-2052114120.0"></ui-mouse><div v-if="false" path="-2052114120.1"><div
-  class="x-axis" :style="xAxisStyle" path="-2052114120.1.0"></div><div
-  class="y-axis" :style="yAxisStyle"
-  path="-2052114120.1.1"></div></div><transition name="fade"
+  path="-2052114120.0"></ui-mouse><div path="-2052114120.1"><div class="x-axis"
+  :style="xAxisStyle" path="-2052114120.1.0"></div><div class="y-axis"
+  :style="yAxisStyle" path="-2052114120.1.1"></div></div><transition name="fade"
   path="-2052114120.2"><div class="select-box" v-if="isVisible"
   :style="selectBoxStyle" path="-2052114120.2.0"></div></transition></div>

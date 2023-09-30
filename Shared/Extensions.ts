@@ -1749,11 +1749,11 @@ if (typeof Function !== "undefined") {
     const fn = this;
     let timeout: any;
     return function (this: any, ...args) {
-      fn.prototype.nextArgs = args;
+      (fn as any).nextArgs = args;
       const context = this;
       if (!timeout) {
         timeout = setTimeout(async function () {
-          await fn.apply(context, fn.prototype.nextArgs);
+          await fn.apply(context, (fn as any).nextArgs);
           timeout = null;
         }, delay);
       }

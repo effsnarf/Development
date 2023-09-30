@@ -1,0 +1,65 @@
+dom:
+  div:
+    ui.input.text.box:
+      v-if: showTextBox
+      multiline: 'true'
+      v-model: boxValue
+      @input: onTextInput
+    ui.value:
+      ':value': boxValue
+props:
+  box: null
+data:
+  boxValue: null
+methods:
+  onTextInput: | #js
+    function(value) {
+      const gridUiBoxVue = this.$root.vm.getAncestors(this, "grid.ui.box")[0];
+      gridUiBoxVue.$femit("edit.box", this.box._id, { value });
+    }
+computed:
+  showTextBox: | #js
+    function() {
+      const value = this.box.value;
+      if (value === undefined) return true;
+      if (value === null) return true;
+      if (typeof value === "string") return true;
+      return false;
+    }
+  icon: | #js
+    function() {
+      const icons = [];
+      const value = this.boxValue;
+      
+      if (typeof value === "string") {
+        icons.add("🆎");
+        const isUrl = value.startsWith("http");
+        if (isUrl) icons.add("🔗");
+      }
+
+      return icons
+        .filter((icon) => icon)
+        .join("");
+    }
+watch:
+  box:
+    handler: | #js
+      async function(box) {
+        this.boxValue = box.value;
+      }
+    immediate: true
+  icon:
+    handler: | #js
+      async function(icon) {
+        this.$emit("update:icon", icon);
+      }
+    immediate: true
+_:
+  examples:
+    count: 0
+name: grid-ui-box-data
+template: >-
+  <div class="comp-grid-ui-box-data" path="1558979935."><ui-input-text-box
+  v-if="showTextBox" multiline="true" v-model="boxValue" @input="onTextInput"
+  path="1558979935.0"></ui-input-text-box><ui-value :value="boxValue"
+  path="1558979935.1"></ui-value></div>

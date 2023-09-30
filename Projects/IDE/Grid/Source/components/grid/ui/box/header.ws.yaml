@@ -1,0 +1,58 @@
+dom:
+  grid.module:
+    .flex:
+      .icons:
+        v-text: getBoxIcon(box)
+      ui.input.text.box:
+        ':style': '{ ''margin-top'': ''-0.4em'' }'
+        hint: name
+        camouflage: true
+        v-model: boxName
+        @input: onEditBoxName
+props:
+  box: null
+  boxIcon: null
+data:
+  boxName: null
+methods:
+  onEditBoxName: | #js
+    function(name) {
+      const gridUiBoxVue = this.$root.vm.getAncestors(this, "grid.ui.box")[0];
+      gridUiBoxVue.$femit("edit.box", this.box._id, { name });
+    }
+  getBoxIcon: | #js
+    function(box) {
+      const icons = [];
+
+      icons.add(`${({
+        data: "🧊",
+        func: "🔴",
+      })[box.type] || "❔"}`)
+
+      icons.add(this.boxIcon);
+
+      return icons
+        .filter((icon) => icon)
+        .join("");
+    }
+watch:
+  box:
+    handler: | #js
+      async function(box) {
+        this.boxName = box.name;
+      }
+    immediate: true
+style:
+  .icons:
+    white-space: nowrap
+_:
+  examples:
+    count: 0
+name: grid-ui-box-header
+template: >-
+  <grid-module class="comp-grid-ui-box-header" path="-646217982."><div
+  class="flex" path="-646217982.0"><div class="icons" v-text="getBoxIcon(box)"
+  path="-646217982.0.0"></div><ui-input-text-box :style="{ 'margin-top':
+  '-0.4em' }" hint="name" camouflage="true" v-model="boxName"
+  @input="onEditBoxName"
+  path="-646217982.0.1"></ui-input-text-box></div></grid-module>

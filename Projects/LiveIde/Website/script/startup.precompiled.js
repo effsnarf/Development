@@ -6325,11 +6325,11 @@ if (typeof Function !== "undefined") {
         const fn = this;
         let timeout;
         return function (...args) {
-            fn.prototype.nextArgs = args;
+            fn.nextArgs = args;
             const context = this;
             if (!timeout) {
                 timeout = setTimeout(async function () {
-                    await fn.apply(context, fn.prototype.nextArgs);
+                    await fn.apply(context, fn.nextArgs);
                     timeout = null;
                 }, delay);
             }
@@ -7325,7 +7325,7 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/website/script/1696073626347.ts ***!
+  !*** ../../../LiveIde/website/script/1696095039483.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

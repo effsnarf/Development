@@ -45,8 +45,9 @@ methods:
     function(textarea, heightLimit) {
       if (!this.autoResize) return;
       heightLimit = heightLimit || 200;
+      const height = `${Math.min(textarea.scrollHeight, heightLimit)}px`;
       textarea.style.height = "";
-      textarea.style.height = Math.min(textarea.scrollHeight, heightLimit) + "px";
+      textarea.style.height = `${height}`;
     }  
   onTextAreaKeyDown: | #js
     function(e) {

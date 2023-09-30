@@ -1,8 +1,19 @@
 dom:
-  div:
-    ui.title:
-      ':icon': getActionIcon(action)
-      ':text': action.redo.method
+  div: 
+    ui.context.window:
+      ui.value: 
+        ':value': action
+    .flex:
+      div: 
+        class: w-l2
+        v-text: getActionIcon(action)
+      div: 
+        class: w-l8
+        v-text: action.redo.method
+      div: 
+        class: actionArg1
+        ui.value: 
+          ':value': (action.redo.args[1])
 props:
   item: null
 computed:
@@ -16,14 +27,24 @@ methods:
       const method = action.redo.method;
       if (method.startsWith("create.")) return "➕";
       if (method.startsWith("delete.")) return "➖";
+      if (method.startsWith("edit.")) return "✏️";
       if (method === "no.op") return null;
       return "❔";
     }
+style:
+  .actionArg1:
+    width: 8em
+    overflow: hidden
 _:
   examples:
     count: 0
 name: grid-user-action
 template: >-
-  <div class="comp-grid-user-action" path="-1378945263."><ui-title
-  :icon="getActionIcon(action)" :text="action.redo.method"
-  path="-1378945263.0"></ui-title></div>
+  <div class="comp-grid-user-action" path="-1378945263."><ui-context-window
+  path="-1378945263.0"><ui-value :value="action"
+  path="-1378945263.0.0"></ui-value></ui-context-window><div class="flex"
+  path="-1378945263.1"><div class="w-l2" v-text="getActionIcon(action)"
+  path="-1378945263.1.0"></div><div class="w-l8" v-text="action.redo.method"
+  path="-1378945263.1.1"></div><div class="actionArg1"
+  path="-1378945263.1.2"><ui-value :value="(action.redo.args[1])"
+  path="-1378945263.1.2.0"></ui-value></div></div></div>

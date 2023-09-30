@@ -23,6 +23,11 @@ methods:
       const action = { redo: { method: "move.box", args: [boxID, pos] } };
       this.$femit("do", this.userID, action);
     }
+  grid_ui_box_resize_box: | #js
+    async function(boxID, size) {
+      const action = { redo: { method: "resize.box", args: [boxID, size] } };
+      this.$femit("do", this.userID, action);
+    }
   grid_ui_box_edit_box: | #js
     async function(boxID, data) {
       const action = { redo: { method: "edit.box", args: [boxID, data] } };

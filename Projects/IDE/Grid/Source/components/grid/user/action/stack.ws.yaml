@@ -15,10 +15,17 @@ data:
   userActions: []
   boxes: []
   pointer: -1
+mounted: | #js
+  async function() {
+    await this.doUntilLastAction();
+  }
 methods:
   create_box: | #js
     async function(userID, action, box) {
-      box._id = this.nextID++;
+      if (!box._id) {
+        box._id = this.nextID++;
+        action.redo.args[0] = box;
+      }
       this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "add", [box]);
       action.undo = { method: "delete.box", args: [box._id] };
       return action;
@@ -31,6 +38,14 @@ methods:
       action.undo = { method: "move.box", args: [boxID, oldPos] };
       return action;
     }
+  resize_box: | #js
+    async function(userID, action, boxID, size) {
+      const box = this.boxes.find((box) => box._id === boxID);
+      const oldSize = box.rect.size;
+      this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "update", [boxID, { rect: { size } }]);
+      action.undo = { method: "resize.box", args: [boxID, oldSize] };
+      return action;
+    }
   delete_box: | #js
     async function(userID, action, boxID) {
       this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "delete", [boxID]);
@@ -39,9 +54,13 @@ methods:
     }
   edit_box: | #js
     async function(userID, action, boxID, data) {
+      const toValue = (value) => {
+        if (value === undefined) return null;
+        return value;
+      };
       const box = this.boxes.find((box) => box._id === boxID);
-      const oldData = { ...box };
-      const changes = DeepDiff.diff(oldData, data);
+      const oldData = Object.fromEntries(Object.keys(data)
+        .map((key) => [key, toValue(box[key])]));
       //for (const change of changes) DeepDiff.applyChange(box, change);
       this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "update", [boxID, data]);
       action.undo = { method: "edit.box", args: [boxID, oldData] };
@@ -51,9 +70,7 @@ methods:
     async function(userID, action, addToStack = true, overwriteRedoActions) {
       action._id = this.nextActionID++;
 
-      const hasRedoActions = (this.pointer < this.userActions.length - 1);
-
-      if (hasRedoActions) {
+      if (addToStack && (this.nextRedoActions.length > 5) && (this.nextRedoActions[0]._id != action._id)) {
         // When deleting the next redo actions from the stack, we're emitting to data.list
         // which we don't know how long it could take (could go to the server)
         // so we're invoking the method again after a timeout
@@ -82,6 +99,7 @@ methods:
         });
         return;
       }
+
       const redo = action.redo;
       const methodName = redo.method.replace(/\./g, "_");
       const method = this[methodName];
@@ -91,11 +109,14 @@ methods:
         throw new Error(errorMessage);
         return;
       }
+      
       action = await method.apply(this, [userID, action, ...redo.args]);
+
       if (addToStack) {
-        this.$femit("to", "grid.data.list", `${userID}/user/actions`, "add", [action]);
-        this.pointer++;
+        this.addToStack(action);
       }
+
+      return action;
     }
   grid_user_actions_undo: | #js
     async function(userID) {
@@ -110,7 +131,7 @@ methods:
     }
   grid_user_actions_redo: | #js
     async function(userID) {
-      if (this.pointer >= this.userActions.length - 1)
+      if (!this.hasRedoActions)
       {
         alertify.error("No more actions to redo");
         return;
@@ -123,7 +144,75 @@ methods:
     function() {
       debugger;
     }
-computed: null
+  doUntilLastAction: | #js
+    async function() {
+      setTimeout(async () => {
+        const lastAction = this.userActions[this.userActions.length - 1];
+        await this.doUntil(lastAction?._id);
+      }, 1500);
+    }
+  doUntil: | #js
+    async function(actionID) {
+      if (!actionID) return;
+      if (!this.nextAction) return;
+      while (this.nextAction && (this.nextAction._id != actionID))
+      {
+        await this.$nextTick();
+        await this.grid_user_actions_redo(this.userID);
+      }
+      await this.$nextTick();
+      await this.grid_user_actions_redo(this.userID);
+    }
+  addToStack: | #js
+    function(action) {
+      const userID = this.userID;
+      const lastAction = this.userActions[this.pointer];
+      if (lastAction && this.isGroupable(action, lastAction)) {
+        action = this.groupActions(action, lastAction);
+        this.$femit("to", "grid.data.list", `${userID}/user/actions`, "delete", [lastAction._id]);
+        this.pointer--;
+      }
+      this.$femit("to", "grid.data.list", `${userID}/user/actions`, "add", [action]);
+      this.pointer++;
+    }
+  isGroupable: | #js
+    function(action, lastAction) {
+      if (!lastAction) return false;
+      if (action.redo.method != lastAction.redo.method) return false;
+      if (action.redo.method == "edit.box")
+      {
+        // box._id
+        if (action.redo.args[0] != lastAction.redo.args[0]) return false;
+        if (Object.keys(action.redo.args[1]).join(",") != Object.keys(lastAction.redo.args[1]).join(",")) return false;
+        return true;
+      }
+      return false;
+    }
+  groupActions: | #js
+    function(action, lastAction) {
+      action = Objects.clone(action);
+      action.undo = Objects.clone(lastAction.undo);
+      return action;
+    }
+computed:
+  hasRedoActions: | #js
+    function() {
+      return (this.nextRedoActions.length > 0);
+    }
+  nextRedoActions: | #js
+    function() {
+      return this.userActions.slice(this.pointer + 1);
+    }
+  nextAction: | #js
+    function() {
+      return this.nextRedoActions[0];
+    }
+watch:
+  userActions:
+    handler: | #js
+      async function() {
+      }
+    deep: true
 _:
   examples:
     count: 0

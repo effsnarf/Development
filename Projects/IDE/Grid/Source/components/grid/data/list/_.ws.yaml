@@ -8,6 +8,10 @@ props:
   fuid: null
 data:
   items: []
+mounted: | #js
+  function() {
+    this.load();
+  }
 methods:
   add: | #js
     function(item) {
@@ -39,8 +43,24 @@ methods:
   onChange: | #js
     function() {
       this.$femit("change", { fuid: this.fuid, items: this.items });
+      this.save();
     }
-watch: null
+  save: | #js
+    function() {
+      if (!this.isPersisted) return;
+      localStorage.setItem(this.fuid, JSON.stringify(this.items));
+    }
+  load: | #js
+    function() {
+      if (!this.isPersisted) return;
+      this.items = JSON.parse(localStorage.getItem(this.fuid) || "[]");
+      this.onChange();
+    }
+computed:
+  isPersisted: | #js
+    function() {
+      return this.fuid.includes("/user/actions");
+    }
 _:
   examples:
     count: 0

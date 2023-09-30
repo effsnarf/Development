@@ -1,7 +1,7 @@
 dom:
   grid.module:
-    icon: 🚀
-    ':show-events': 'true'
+    icon: 🛠️
+    ':show-events': '[''mouse.pos'']'
     .flex.justify-around:
       ui.button: 
         icon: ✖
@@ -56,12 +56,13 @@ _:
     count: 0
 name: grid-ui-tools
 template: >-
-  <grid-module class="comp-grid-ui-tools" icon="🚀" :show-events="true"
-  path="134888361."><div class="flex justify-around"
-  path="134888361.0"><ui-button icon="✖" text="clear" @click="$femit('clear')"
-  path="134888361.0.0"></ui-button><ui-button icon="👈" text="undo"
-  @click="$femit('undo')" path="134888361.0.1"></ui-button><ui-button icon="👉"
-  text="redo" @click="$femit('redo')"
+  <grid-module class="comp-grid-ui-tools" icon="🛠️"
+  :show-events="['mouse.pos']" path="134888361."><div class="flex
+  justify-around" path="134888361.0"><ui-button icon="✖" text="clear"
+  @click="$femit('clear')" path="134888361.0.0"></ui-button><ui-button icon="👈"
+  text="undo" @click="$femit('undo')"
+  path="134888361.0.1"></ui-button><ui-button icon="👉" text="redo"
+  @click="$femit('redo')"
   path="134888361.0.2"></ui-button></div><ui-gesture-select-box
   :surface-element="surfaceElement" :center-coords="true"
   :is-layer-element="isSelectBoxLayerElement" @mouse-pos="onMousePos"

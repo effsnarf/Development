@@ -2,6 +2,7 @@ dom:
   grid.module:
     icon: ⚡
     ui.value:
+      v-if: 'false'
       ':value': '[...events].reverse()'
 data:
   events: []
@@ -20,4 +21,5 @@ _:
 name: grid-events
 template: >-
   <grid-module class="comp-grid-events" icon="⚡" path="1227219137."><ui-value
-  :value="[...events].reverse()" path="1227219137.0"></ui-value></grid-module>
+  v-if="false" :value="[...events].reverse()"
+  path="1227219137.0"></ui-value></grid-module>

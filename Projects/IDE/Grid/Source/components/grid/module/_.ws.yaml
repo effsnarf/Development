@@ -2,7 +2,7 @@ dom:
   div: 
     class: box2
     h3:
-      v-if: showTitle
+      v-if: icon && showTitle
       ui.title:
         ':icon': icon
         ':text': compName
@@ -16,7 +16,6 @@ dom:
       v-if: showEvents
       ':key': key1
       class: mt-l1
-      ':style': '{ ''max-width'': ''10em'' }'
       ui.value: 
         v-if: Object.keys(femitsOutLog).length
         ':value': femitsOutLog
@@ -34,6 +33,7 @@ data:
   femitsInLog: {}
   femitsOutID: 1
   key1: 1
+  _refresh: null
 mounted: | #js
   function() {
     // We want to know what the module is sending out
@@ -137,7 +137,10 @@ methods:
     }
   refresh: | #js
     function() {
-      this.key1++;
+      if (!this._refresh) {
+        this._refresh = (() => { this.key1++; }).throttle(100);
+      }
+      this._refresh();
     }
 computed:
   compName: | #js
@@ -164,12 +167,13 @@ _:
     count: 0
 name: grid-module
 template: >-
-  <div class="comp-grid-module box2" path="1449764372."><h3 v-if="showTitle"
-  path="1449764372.0"><ui-title :icon="icon" :text="compName"
-  :number="getTitle()" path="1449764372.0.0"></ui-title></h3><ui-console
-  v-show="false" ref="console1" path="1449764372.1"></ui-console><div
+  <div class="comp-grid-module box2" path="1449764372."><h3 v-if="icon
+  &amp;&amp; showTitle" path="1449764372.0"><ui-title :icon="icon"
+  :text="compName" :number="getTitle()"
+  path="1449764372.0.0"></ui-title></h3><ui-console v-show="false"
+  ref="console1" path="1449764372.1"></ui-console><div
   path="1449764372.2"><slot></slot></div><div class="mt-l1" v-if="showEvents"
-  :key="key1" :style="{ 'max-width': '10em' }" path="1449764372.3"><ui-value
+  :key="key1" path="1449764372.3"><ui-value
   v-if="Object.keys(femitsOutLog).length" :value="femitsOutLog"
   path="1449764372.3.0"></ui-value><ui-value
   v-if="Object.keys(femitsInLog).length" :value="femitsInLog"
