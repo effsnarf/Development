@@ -9,20 +9,32 @@ dom:
       @is-minimized: onToggleMinimized
       @drag-stop: onDragStop
       template: 
+        v-slot: above
+        grid.ui.box.sockets: 
+          ':box': box
+          direction: input
+      template: 
         v-slot: header
         grid.ui.box.header:
           ':box': box
           ':box-icon': boxIcon
       template: 
         v-slot: content
-        div:
+        .h-100pc:
           component:
+            v-if: box.type
+            class: h-100pc
             ':is': getBoxCompName(box)
             ':box': box
             @update:icon: boxIcon = $event
           grid.ui.box.type.picker:
             v-if: '!box.type'
             ':box': box
+      template: 
+        v-slot: below
+        grid.ui.box.sockets: 
+          ':box': box
+          direction: output
 props:
   box: null
   surfaceElement: null
@@ -63,6 +75,10 @@ _:
   examples:
     count: 0
 style:
+  .header:
+    font-size: 120%
+  .comp-grid-module .module-content:
+    height: 100%
   .box2:
     margin: 0
     border: none
@@ -72,11 +88,18 @@ template: >-
   path="1671629593."><ui-window :rect="box.rect"
   :surface-element="surfaceElement" :center-coords="true"
   @is-minimized="onToggleMinimized" @drag-stop="onDragStop"
-  path="1671629593.0"><template v-slot:header
-  path="1671629593.0.0"><grid-ui-box-header :box="box" :box-icon="boxIcon"
-  path="1671629593.0.0.0"></grid-ui-box-header></template><template
-  v-slot:content path="1671629593.0.1"><div path="1671629593.0.1.0"><component
+  path="1671629593.0"><template v-slot:above
+  path="1671629593.0.0"><grid-ui-box-sockets :box="box" direction="input"
+  path="1671629593.0.0.0"></grid-ui-box-sockets></template><template
+  v-slot:header path="1671629593.0.1"><grid-ui-box-header :box="box"
+  :box-icon="boxIcon"
+  path="1671629593.0.1.0"></grid-ui-box-header></template><template
+  v-slot:content path="1671629593.0.2"><div class="h-100pc"
+  path="1671629593.0.2.0"><component class="h-100pc" v-if="box.type"
   :is="getBoxCompName(box)" :box="box" @update:icon="boxIcon = $event"
-  path="1671629593.0.1.0.0"></component><grid-ui-box-type-picker
+  path="1671629593.0.2.0.0"></component><grid-ui-box-type-picker
   v-if="!box.type" :box="box"
-  path="1671629593.0.1.0.1"></grid-ui-box-type-picker></div></template></ui-window></grid-module>
+  path="1671629593.0.2.0.1"></grid-ui-box-type-picker></div></template><template
+  v-slot:below path="1671629593.0.3"><grid-ui-box-sockets :box="box"
+  direction="output"
+  path="1671629593.0.3.0"></grid-ui-box-sockets></template></ui-window></grid-module>

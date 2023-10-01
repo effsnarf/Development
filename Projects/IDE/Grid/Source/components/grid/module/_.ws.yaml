@@ -1,6 +1,6 @@
 dom:
   div: 
-    class: box2
+    class: grid-module box2
     h3:
       v-if: icon && showTitle
       ui.title:
@@ -10,7 +10,7 @@ dom:
     ui.console:
       v-show: 'false'
       ref: console1
-    div: 
+    .module-content:
       slot: null
     div: 
       v-if: showEvents
@@ -167,11 +167,11 @@ _:
     count: 0
 name: grid-module
 template: >-
-  <div class="comp-grid-module box2" path="1449764372."><h3 v-if="icon
-  &amp;&amp; showTitle" path="1449764372.0"><ui-title :icon="icon"
+  <div class="comp-grid-module grid-module box2" path="1449764372."><h3
+  v-if="icon &amp;&amp; showTitle" path="1449764372.0"><ui-title :icon="icon"
   :text="compName" :number="getTitle()"
   path="1449764372.0.0"></ui-title></h3><ui-console v-show="false"
-  ref="console1" path="1449764372.1"></ui-console><div
+  ref="console1" path="1449764372.1"></ui-console><div class="module-content"
   path="1449764372.2"><slot></slot></div><div class="mt-l1" v-if="showEvents"
   :key="key1" path="1449764372.3"><ui-value
   v-if="Object.keys(femitsOutLog).length" :value="femitsOutLog"

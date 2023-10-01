@@ -1,0 +1,135 @@
+dom:
+  div: 
+    ref: socket1
+    ui.dnd.dropzone:
+      @drop-item: onNewLinkDrop
+      ui.dnd.draggable:
+        ':show-drag-ghost': 'false'
+        ':drag-item': '{ box, direction, socket }'
+        @drag-start: onNewLinkDragStart
+        @drag-end: onNewLinkDragEnd
+        @drag: onNewLinkDrag
+        .socket:
+          ':class': direction + '-socket'
+          div: 
+            v-text: '''🔌'''
+          div: 
+            v-text: getSocketIcon(socket)
+          div: 
+            class: mx-2
+            v-text: socket.name
+    ui.leader.line:
+      v-if: isNewLinkDragging
+      ':from': socketEl
+      ':to': targetPlugEl
+      line-path: fluid
+      color: '#404040'
+    div: 
+      ref: targetPlug1
+      ':style': targetPlugStyle
+props:
+  box: null
+  socket: null
+  direction: null
+data:
+  socketEl: null
+  targetPlugPos: null
+  targetPlugEl: null
+  isNewLinkDragging: false
+mounted: | #js
+  function() {
+    this.socketEl = this.$refs.socket1;
+    this.targetPlugEl = this.$refs.targetPlug1;
+
+    this.$root.els = this.$root.els || {};
+    this.$root.els[this.socketElPath] = this.$el;
+  }
+unmounted: | #js
+  function() {
+    delete this.$root.els[this.socketElPath];
+  }
+methods:
+  onNewLinkDragStart: | #js
+    function(e) {
+      this.isNewLinkDragging = true;
+    }
+  onNewLinkDragEnd: | #js
+    function(e) {
+      this.isNewLinkDragging = false;
+    }
+  onNewLinkDrag: | #js
+    function(e) {
+      this.targetPlugPos = { x: (e.clientX - 20), y: (e.clientY) };
+    }
+  onNewLinkDrop: | #js
+    function(linkSource) {
+      if (linkSource.direction == this.direction) {
+        alertify.error('You must connect an output socket to an input socket.');
+        return;
+      }
+
+      const isReversed = (linkSource.direction == 'input');
+
+      const fromBox = isReversed ? this.box : linkSource.box;
+      const toBox = isReversed ? linkSource.box : this.box;
+      const fromSocket = isReversed ? this.socket : linkSource.socket;
+      const toSocket = isReversed ? linkSource.socket : this.socket;
+
+      const from = {
+        box: { _id: fromBox._id },
+        socket: { name: fromSocket.name },
+      };
+      const to = {
+        box: { _id: toBox._id },
+        socket: { name: toSocket.name },
+      };
+
+      const gridUiBoxVue = this.$root.vm.getAncestors(this, "grid.ui.box")[0];
+      gridUiBoxVue.$femit('create.link', from, to);
+    }
+  getSocketIcon: | #js
+    function(socket) {
+      return {
+        data: '🧊',
+        event: '⚡',
+      }[socket.type];
+    }
+computed:
+  socketElPath: | #js
+    function() {
+      return `/box/${this.box._id}/sockets/${this.direction}/${this.socket.name}`;
+    }
+  targetPlugStyle: | #js
+    function() {
+      if (!this.targetPlugPos) return null;
+      return {
+        position: 'fixed',
+        left: this.targetPlugPos.x + 'px',
+        top: this.targetPlugPos.y + 'px',
+      };
+    }
+style:
+  .socket:
+    display: flex
+    cursor: grab
+  .output-socket:
+    display: flex
+    flex-direction: row-reverse
+_:
+  examples:
+    count: 0
+name: grid-ui-box-socket
+template: >-
+  <div class="comp-grid-ui-box-socket" ref="socket1"
+  path="-321995800."><ui-dnd-dropzone @drop-item="onNewLinkDrop"
+  path="-321995800.0"><ui-dnd-draggable :show-drag-ghost="false" :drag-item="{
+  box, direction, socket }" @drag-start="onNewLinkDragStart"
+  @drag-end="onNewLinkDragEnd" @drag="onNewLinkDrag" path="-321995800.0.0"><div
+  class="socket" :class="direction + '-socket'" path="-321995800.0.0.0"><div
+  v-text="'🔌'" path="-321995800.0.0.0.0"></div><div
+  v-text="getSocketIcon(socket)" path="-321995800.0.0.0.1"></div><div
+  class="mx-2" v-text="socket.name"
+  path="-321995800.0.0.0.2"></div></div></ui-dnd-draggable></ui-dnd-dropzone><ui-leader-line
+  v-if="isNewLinkDragging" :from="socketEl" :to="targetPlugEl" line-path="fluid"
+  color="#404040" path="-321995800.1"></ui-leader-line><div ref="targetPlug1"
+  :style="targetPlugStyle" path="-321995800.2"></div></div>

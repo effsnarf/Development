@@ -1,0 +1,100 @@
+dom:
+  grid.module:
+    icon: 🏃‍♂️
+    grid.data.list.view: 
+      ':fuid': userID + '/data/boxes'
+      v-model: boxes
+    grid.data.list.view: 
+      ':fuid': userID + '/data/links'
+      v-model: links
+props:
+  userID: null
+data:
+  socket:
+    runtime:
+      data: {}
+  boxes: []
+  links: []
+methods:
+  grid_ui_box_socket_data_change: | #js
+    function(boxID, socketDirection, socketName, socketValue) {
+      this.setSocketValue(boxID, socketDirection, socketName, socketValue);
+    }
+  setSocketValue: | #js
+    function(boxID, sDirection, sName, sValue) {
+      this.ensure(boxID);
+      this.socket.runtime.data
+        [boxID]
+        [sDirection]
+        [sName] =
+          sValue;
+      this.onSocketValueChange(boxID, sDirection, sName, sValue);
+    }
+  onSocketValueChange: | #js
+    function(boxID, sDirection, sName, sValue) {
+      this.$femit("socket.data.change", boxID, sDirection, sName, sValue);
+      this.processBoxChange(boxID, sDirection, sName, sValue);
+      this.propagateSocketLinks(boxID, sDirection, sName);
+    }
+  processBoxChange: | #js
+    function(boxID, sDirection, sName, sValue) {
+      const box = this.getBox(boxID);
+      if (!box) return;
+
+      if (box.type == "data")
+      {
+        if (sDirection == "input" && sName == "data")
+        {
+          this.setSocketValue(boxID, "output", "data", sValue);
+        }
+      }
+    }
+  propagateSocketLinks: | #js
+    function(boxID, sDirection, sName) {
+      if (sDirection != "output") return;
+
+      const box = this.getBox(boxID);
+
+      const sValue = this.socket.runtime.data[boxID][sDirection][sName];
+
+      const links = this.links
+        .filter((link) => link.from.box._id === boxID)
+        .filter((link) => link.from.socket.name === sName);
+
+      for (const link of links) {
+        this.$femit("link.flash", link.to.box._id, link._id);
+        this.setSocketValue(link.to.box._id, "input", link.to.socket.name, sValue);
+      }
+    }
+  ensure: | #js
+    function(boxID) {
+      this.getSocketRuntimeData(boxID);
+    }
+  getSocketRuntimeData: | #js
+    function(boxID) {
+      let runtimeData = this.socket.runtime.data[boxID];
+      if (!runtimeData) {
+        runtimeData = {
+          input: {},
+          output: {},
+        };
+        this.$set(this.socket.runtime.data, boxID, runtimeData);
+      }
+      return runtimeData;
+    }
+  getBox: | #js
+    function(boxID) {
+      // #TODO: Slow
+      return this.boxes.find((box) => box._id === boxID);
+    }
+_:
+  examples:
+    count: 0
+name: grid-client-runtime
+template: >-
+  <grid-module class="comp-grid-client-runtime" icon="🏃‍♂️"
+  path="-1405898659."><grid-data-list-view :fuid="userID + '/data/boxes'"
+  v-model="boxes"
+  path="-1405898659.0"></grid-data-list-view><grid-data-list-view :fuid="userID
+  + '/data/links'" v-model="links"
+  path="-1405898659.1"></grid-data-list-view></grid-module>

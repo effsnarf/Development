@@ -29,6 +29,7 @@ dom:
       div: 
         ide.component.style:
           v-for: comp in $root.comps
+          :key: comp.name
           ':component': comp
 props:
   comps: null

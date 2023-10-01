@@ -162,9 +162,10 @@ class Objects {
       if (remainingKeys.length === 0) {
         subtree[firstKey] = Objects.getProperty(sourceObj, path);
       } else {
+        const nextSourceObj = sourceObj ? sourceObj[firstKey] : undefined;
         subtree[firstKey] = {
           ...subtree[firstKey],
-          ...Objects.getPropertiesAsTree(sourceObj[firstKey] || {}, [
+          ...Objects.getPropertiesAsTree(nextSourceObj, [
             remainingKeys.join("."),
           ]),
         };

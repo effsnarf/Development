@@ -1,0 +1,27 @@
+dom:
+  div:
+    ui.leader.line:
+      ':from': getSocketEl(link.from, 'output')
+      ':to': getSocketEl(link.to, 'input')
+      color: '#404040'
+props:
+  link: null
+methods:
+  getSocketEl: | #js
+    function(socketRef, direction) {
+      const socketElPath = this.getSocketElPath(socketRef, direction);
+      return this.$root.els[socketElPath];
+    }
+  getSocketElPath: | #js
+    function(socketRef, direction) {
+      const socketElPath = `/box/${socketRef.box._id}/sockets/${direction}/${socketRef.socket.name}`;
+      return socketElPath;
+    }
+_:
+  examples:
+    count: 0
+name: grid-ui-link
+template: >-
+  <div class="comp-grid-ui-link" path="281201772."><ui-leader-line
+  :from="getSocketEl(link.from, 'output')" :to="getSocketEl(link.to, 'input')"
+  color="#404040" path="281201772.0"></ui-leader-line></div>

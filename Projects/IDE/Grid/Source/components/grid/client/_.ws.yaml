@@ -5,6 +5,8 @@ dom:
       div: 
         grid.client.workspace:
           ':userID': userID
+      grid.client.runtime:
+        ':userID': userID
       grid.ui.actions:
         ':userID': userID
 props:
@@ -23,5 +25,6 @@ template: >-
   <grid-module class="comp-grid-client" icon="💻" path="1160835955."><div
   path="1160835955.0"><div path="1160835955.0.0"><grid-client-workspace
   :userID="userID"
-  path="1160835955.0.0.0"></grid-client-workspace></div><grid-ui-actions
-  :userID="userID" path="1160835955.0.1"></grid-ui-actions></div></grid-module>
+  path="1160835955.0.0.0"></grid-client-workspace></div><grid-client-runtime
+  :userID="userID" path="1160835955.0.1"></grid-client-runtime><grid-ui-actions
+  :userID="userID" path="1160835955.0.2"></grid-ui-actions></div></grid-module>

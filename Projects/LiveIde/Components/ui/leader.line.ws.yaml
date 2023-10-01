@@ -1,8 +1,8 @@
 dom:
   div: null
 props:
-  fromVue: null
-  toVue: null
+  from: null
+  to: null
   visible: true
   color: yellow
   startPlug: null
@@ -44,8 +44,8 @@ methods:
     }
   refresh: | #js
     function() {
-      const fromEl = this.getEdgeElement(this.fromVue);
-      const toEl = this.getEdgeElement(this.toVue);
+      const fromEl = this.getEdgeElement(this.from);
+      const toEl = this.getEdgeElement(this.to);
 
       if (this.leaderLine && (this.leaderLine.start == fromEl) && (this.leaderLine.end == toEl))
       {
@@ -73,6 +73,11 @@ methods:
           }
         }
       );
+
+      // If fromEl or toEl's DOM position changes, redraw the leader line
+      this.$root.html.when.element.moves(fromEl, this.redraw.bind(this));
+      this.$root.html.when.element.moves(toEl, this.redraw.bind(this));
+      
       this.setVisibility(this.visible);
     }
   redraw: | #js
@@ -88,10 +93,11 @@ methods:
           this.remove();
         }
       }
+
       if (this.$el.isConnected) {
         if (!onlyOnce)
         {
-          setTimeout(this.redraw.bind(this), 20);
+          //setTimeout(() => { this.redraw(false); }, 100);
         }
       }
       else
@@ -136,12 +142,12 @@ methods:
       return el;
     }
 watch:
-  fromVue: | #js
-    function(fromVue) {
+  from: | #js
+    function(from) {
       this.refresh();
     }
-  toVue: | #js
-    function(toVue) {
+  to: | #js
+    function(to) {
       this.refresh();
     }
   visible: | #js

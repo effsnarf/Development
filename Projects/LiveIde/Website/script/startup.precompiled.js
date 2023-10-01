@@ -2660,6 +2660,32 @@ class HtmlHelper {
             values: ["auto", "[number]", "initial", "inherit"],
         },
     };
+    when = {
+        element: {
+            moves: (element, callback) => {
+                let lastPosition = element.getBoundingClientRect();
+                let animationFrameId;
+                const checkPosition = () => {
+                    const newPosition = element.getBoundingClientRect();
+                    if (newPosition.top !== lastPosition.top ||
+                        newPosition.left !== lastPosition.left) {
+                        callback();
+                    }
+                    lastPosition = newPosition;
+                    animationFrameId = requestAnimationFrame(checkPosition);
+                };
+                // Start the loop
+                animationFrameId = requestAnimationFrame(checkPosition);
+                // Check every second if the element is still in the DOM
+                const intervalId = setInterval(() => {
+                    if (!document.body.contains(element)) {
+                        cancelAnimationFrame(animationFrameId);
+                        clearInterval(intervalId);
+                    }
+                }, 1000);
+            },
+        },
+    };
     getPossibleCssValues(prop) {
         let values = this.cssProperties[prop]?.values || [];
         values = values.filter((v) => !["inherit", "initial", "unset"].includes(v));
@@ -4769,9 +4795,10 @@ class Objects {
                 subtree[firstKey] = Objects.getProperty(sourceObj, path);
             }
             else {
+                const nextSourceObj = sourceObj ? sourceObj[firstKey] : undefined;
                 subtree[firstKey] = {
                     ...subtree[firstKey],
-                    ...Objects.getPropertiesAsTree(sourceObj[firstKey] || {}, [
+                    ...Objects.getPropertiesAsTree(nextSourceObj, [
                         remainingKeys.join("."),
                     ]),
                 };
@@ -7371,7 +7398,7 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/website/script/1696143301720.ts ***!
+  !*** ../../../LiveIde/website/script/1696164960361.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

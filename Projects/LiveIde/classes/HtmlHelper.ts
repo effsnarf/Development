@@ -2233,6 +2233,38 @@ class HtmlHelper {
     },
   } as any;
 
+  when = {
+    element: {
+      moves: (element: HTMLElement, callback: Function) => {
+        let lastPosition = element.getBoundingClientRect();
+        let animationFrameId: number;
+
+        const checkPosition = () => {
+          const newPosition = element.getBoundingClientRect();
+          if (
+            newPosition.top !== lastPosition.top ||
+            newPosition.left !== lastPosition.left
+          ) {
+            callback();
+          }
+          lastPosition = newPosition;
+          animationFrameId = requestAnimationFrame(checkPosition);
+        };
+
+        // Start the loop
+        animationFrameId = requestAnimationFrame(checkPosition);
+
+        // Check every second if the element is still in the DOM
+        const intervalId = setInterval(() => {
+          if (!document.body.contains(element)) {
+            cancelAnimationFrame(animationFrameId);
+            clearInterval(intervalId);
+          }
+        }, 1000);
+      },
+    },
+  };
+
   getPossibleCssValues(prop: string) {
     let values = this.cssProperties[prop]?.values || [];
     values = values.filter(

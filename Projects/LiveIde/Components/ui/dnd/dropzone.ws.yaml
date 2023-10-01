@@ -12,19 +12,16 @@ methods:
   onDragOver: | #js
     function(e) {
       e.preventDefault();
-      e.stopPropagation();
       this.$el.classList.add('drag-over');
     }
   onDragEnter: | #js
     function(e) {
       e.preventDefault();
-      e.stopPropagation();
       this.$emit('drag-over', true);
     }
   onDragLeave: | #js
     function(e) {
       e.preventDefault();
-      e.stopPropagation();
       this.$el.classList.remove('drag-over');
       this.$emit('drag-over', false);
     }

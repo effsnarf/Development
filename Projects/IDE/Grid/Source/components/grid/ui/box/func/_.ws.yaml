@@ -1,0 +1,118 @@
+dom:
+  grid.module:
+    ':show-title': 'false'
+    .flex.flex-column.h-100pc:
+      ui.input.text.box: 
+        hint: arg0, arg1, arg2…
+        v-model: argNamesStr
+      ui.input.text.box: 
+        ':hint': codeHint
+        multiline: 'true'
+        ':auto-resize': 'false'
+        v-model: code
+props:
+  box: null
+data:
+  argNamesStr: null
+  code: null
+  codeHint: null
+  is:
+    inited: false
+mounted: | #js
+  function() {
+    this.codeHint = `for (let i = 0; i < 10; i++) {\n  console.log(i);\n}`;
+  }
+methods:
+  init: | #js
+    function(box) {
+      if (this.is.inited) return;
+      this.is.inited = true;
+      this.argNamesStr = box.argNamesStr;
+      this.code = box.code;
+    }
+  grid_client_runtime_socket_data_change: | #js
+    function(boxID, sDirection, sName, sValue) {
+      if (boxID != this.box._id) return;
+      if (sDirection != "input") return;
+    }
+  getBoxVue: | #js
+    function() {
+      return this.$root.vm.getAncestors(this, "grid.ui.box")[0];
+    }
+computed:
+  icon: | #js
+    function() {
+      const icons = [];
+      
+      icons.add("🔴");
+
+      return icons
+        .filter((icon) => icon)
+        .join("");
+    }
+watch:
+  code:
+    handler: | #js
+      async function(code) {
+        this.getBoxVue().$femit("edit.box", this.box._id, { code });
+      }
+  argNamesStr:
+    handler: | #js
+      async function(argNamesStr) {
+        argNamesStr = (argNamesStr || "").trim();
+        const argNames = argNamesStr
+          .split(",")
+          .filter(s => s)
+          .map(s => s.trim());
+
+        const newBoxData = {
+          argNamesStr: argNamesStr,
+          argNames: argNames,
+          sockets: {
+            input: [],
+            output: [
+              {
+                type: "data",
+                name: "result",
+              }
+            ]
+          }
+        };
+
+        for (const argName of newBoxData.argNames) {
+          newBoxData.sockets.input.push({
+            type: "data",
+            name: argName,
+          });
+        }
+
+        this.getBoxVue().$femit("edit.box", this.box._id, newBoxData);
+      }
+  box:
+    handler: | #js
+      async function(box) {
+        this.init(box);
+      }
+    immediate: true
+  icon:
+    handler: | #js
+      async function(icon) {
+        this.$emit("update:icon", icon);
+      }
+    immediate: true
+style:
+  textarea:
+    height: 100%
+    resize: none
+_:
+  examples:
+    count: 0
+name: grid-ui-box-func
+template: >-
+  <grid-module class="comp-grid-ui-box-func" :show-title="false"
+  path="1559058553."><div class="flex flex-column h-100pc"
+  path="1559058553.0"><ui-input-text-box hint="arg0, arg1, arg2…"
+  v-model="argNamesStr"
+  path="1559058553.0.0"></ui-input-text-box><ui-input-text-box :hint="codeHint"
+  multiline="true" :auto-resize="false" v-model="code"
+  path="1559058553.0.1"></ui-input-text-box></div></grid-module>

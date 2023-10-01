@@ -1,0 +1,19 @@
+dom:
+  div:
+    ui.context.window:
+      ui.value:
+        ':value': item
+    ui.title:
+      icon: 🔌
+      ':text': '''link '' + item._id'
+props:
+  item: null
+_:
+  examples:
+    count: 0
+name: grid-data-link
+template: >-
+  <div class="comp-grid-data-link" path="882586390."><ui-context-window
+  path="882586390.0"><ui-value :value="item"
+  path="882586390.0.0"></ui-value></ui-context-window><ui-title icon="🔌"
+  :text="'link ' + item._id" path="882586390.1"></ui-title></div>

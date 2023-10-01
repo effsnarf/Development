@@ -64,16 +64,31 @@ methods:
     }
   edit_box: | #js
     async function(userID, action, boxID, newData, oldData) {
-      const toValue = (value) => {
-        if (value === undefined) return null;
-        return value;
-      };
+      // If we're changing the box type, set default sockets
+      if (newData.type)
+      {
+        Object.assign(newData, this.getDefaultBoxData(newData.type));
+        newData.sockets = this.getNewSockets(newData.type);
+      }
       const box = this.boxes.find((box) => box._id === boxID);
       oldData = oldData ||
         Objects.getPropertiesAsTree(box, Objects.getPaths(newData));
       //for (const change of changes) DeepDiff.applyChange(box, change);
       this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "update", [boxID, newData]);
       action.undo = { method: "edit.box", args: [boxID, oldData, newData] };
+      return action;
+    }
+  create_link: | #js
+    async function(userID, action, from, to) {
+      const link = { _id: this.nextID++, from, to };
+      this.$femit("to", "grid.data.list", `${userID}/data/links`, "add", [link]);
+      action.undo = { method: "delete.link", args: [link._id] };
+      return action;
+    }
+  delete_link: | #js
+    async function(userID, action, linkID) {
+      this.$femit("to", "grid.data.list", `${userID}/data/links`, "delete", [linkID]);
+      action.undo = { method: "no.op" };
       return action;
     }
   grid_user_actions_do: | #js
@@ -132,6 +147,8 @@ methods:
         throw new Error(errorMessage);
         return;
       }
+
+      action = Objects.clone(action);
       
       action = await method.apply(this, [userID, action, ...redo.args]);
 
@@ -171,6 +188,7 @@ methods:
         this.$femit("to", "grid.data.variable", `${userID}/user/actions/pointer`, "clear", []);
         this.$femit("to", "grid.data.list", `${userID}/user/actions`, "clear", []);
         this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "clear", []);
+        this.$femit("to", "grid.data.list", `${userID}/data/links`, "clear", []);
       }
 
       alertify.confirm("This will delete all actions from the stack. Are you sure?", clearAll);
@@ -217,6 +235,59 @@ methods:
       action = Objects.clone(action);
       action.undo = Objects.clone(lastAction.undo);
       return action;
+    }
+  getDefaultBoxData: | #js
+    function(type) {
+      switch (type) {
+        case "text":
+          return {
+            value: null
+          }
+        case "data":
+          return {
+            value: null
+          }
+        case "func":
+          return {
+            argNamesStr: "",
+            argNames: [],
+            code: ""
+          }
+      }
+      throw new Error(`Unknown box type: ${type}`);
+    }
+  getNewSockets: | #js
+    function(type) {
+      switch (type) {
+        case "text":
+          return {
+            input: [
+              { type: "data", name: "text" }
+            ],
+            output: [
+              { type: "data", name: "text" }
+            ]
+          }
+        case "data":
+          return {
+            input: [
+              { type: "data", name: "data" }
+            ],
+            output: [
+              { type: "data", name: "data" }
+            ]
+          }
+        case "func":
+          return {
+            input: [
+              {  }
+            ],
+            output: [
+              { type: "data", name: "result" }
+            ]
+          }
+      }
+      throw new Error(`Unknown box type: ${type}`);
     }
 computed:
   hasRedoActions: | #js

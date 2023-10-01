@@ -1,35 +1,32 @@
 dom:
-  div:
-    ui.input.text.box:
-      v-if: showTextBox
-      multiline: 'true'
-      v-model: boxValue
-      @input: onTextInput
+  grid.module:
+    icon: 🧊
+    ':show-title': 'false'
     ui.value:
-      ':value': boxValue
+      ':value': dataValue
 props:
   box: null
 data:
-  boxValue: null
+  dataValue: null
 methods:
-  onTextInput: | #js
-    function(text) {
-      const gridUiBoxVue = this.$root.vm.getAncestors(this, "grid.ui.box")[0];
-      gridUiBoxVue.$femit("edit.box", this.box._id, { value: text });
+  init: | #js
+    function(box) {
+      this.boxValue = box.value;
+    }
+  grid_client_runtime_socket_data_change: | #js
+    function(boxID, sDirection, sName, sValue) {
+      if (boxID != this.box._id) return;
+      if (sDirection != "input") return;
+      if (sName != "data") return;
+      this.dataValue = sValue;
     }
 computed:
-  showTextBox: | #js
-    function() {
-      const value = this.box.value;
-      if (value === undefined) return true;
-      if (value === null) return true;
-      if (typeof value === "string") return true;
-      return false;
-    }
   icon: | #js
     function() {
       const icons = [];
       const value = this.boxValue;
+
+      icons.add("🧊");
       
       if (typeof value === "string") {
         icons.add("🆎");
@@ -45,9 +42,13 @@ watch:
   box:
     handler: | #js
       async function(box) {
-        this.boxValue = box.value;
+        this.init(box);
       }
     immediate: true
+  boxValue:
+    handler: | #js
+      async function(value) {
+      }
   icon:
     handler: | #js
       async function(icon) {
@@ -59,7 +60,6 @@ _:
     count: 0
 name: grid-ui-box-data
 template: >-
-  <div class="comp-grid-ui-box-data" path="1558979935."><ui-input-text-box
-  v-if="showTextBox" multiline="true" v-model="boxValue" @input="onTextInput"
-  path="1558979935.0"></ui-input-text-box><ui-value :value="boxValue"
-  path="1558979935.1"></ui-value></div>
+  <grid-module class="comp-grid-ui-box-data" icon="🧊" :show-title="false"
+  path="1558979935."><ui-value :value="dataValue"
+  path="1558979935.0"></ui-value></grid-module>

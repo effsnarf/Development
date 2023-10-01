@@ -10,10 +10,10 @@ methods:
   grid_ui_actions_create_box: | #js
     async function(userID, rect) {
       rect.is = (rect.is || {});
-      rect.is.minimized = (rect.is.minimized || true);
+      rect.is.minimized = (rect.is.minimized || false);
       const box = {
         type: null,
-        rect
+        rect,
       };
       const action = { redo: { method: "create.box", args: [box] } };
       this.$femit("do", userID, action);
@@ -31,6 +31,11 @@ methods:
   grid_ui_box_edit_box: | #js
     async function(boxID, newData, oldData) {
       const action = { redo: { method: "edit.box", args: [boxID, newData, oldData] } };
+      this.$femit("do", this.userID, action);
+    }
+  grid_ui_box_create_link: | #js
+    async function(from, to) {
+      const action = { redo: { method: "create.link", args: [from, to] } };
       this.$femit("do", this.userID, action);
     }
   grid_ui_actions_undo: | #js
