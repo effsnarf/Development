@@ -4,6 +4,7 @@ dom:
     ':title': fuid
     grid.data.list.view:
       ':fuid': fuid
+      @input: (value) => $emit('input', value)
 props:
   fuid: null
 data:
@@ -67,5 +68,5 @@ _:
 name: grid-data-list
 template: >-
   <grid-module class="comp-grid-data-list" icon="🧊📃" :title="fuid"
-  path="882586554."><grid-data-list-view :fuid="fuid"
-  path="882586554.0"></grid-data-list-view></grid-module>
+  path="882586554."><grid-data-list-view :fuid="fuid" @input="(value) =&gt;
+  $emit('input', value)" path="882586554.0"></grid-data-list-view></grid-module>

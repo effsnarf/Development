@@ -4711,6 +4711,8 @@ class Objects {
         return undefined;
     }
     static subtract(target, source) {
+        if (!target || !source)
+            return target || source;
         if (Array.isArray(target) && Array.isArray(source)) {
             const result = [];
             for (let i = 0; i < target.length; i++) {
@@ -4732,7 +4734,7 @@ class Objects {
                     if (typeof target[key] === "object" &&
                         typeof source[key] === "object") {
                         const nestedResult = Objects.subtract(target[key], source[key]); // Recursively subtract nested objects
-                        if (Object.keys(nestedResult).length > 0) {
+                        if (Object.keys(nestedResult || {}).length > 0) {
                             result[key] = nestedResult;
                         }
                     }
@@ -4743,6 +4745,50 @@ class Objects {
             }
             return result;
         }
+    }
+    static getPaths(obj, currentPath = []) {
+        let paths = [];
+        for (const key in obj) {
+            const newPath = currentPath.concat(key);
+            if (obj[key] !== null && typeof obj[key] === "object") {
+                paths = paths.concat(Objects.getPaths(obj[key], newPath));
+            }
+            else {
+                paths.push(newPath.join("."));
+            }
+        }
+        return paths;
+    }
+    static getPropertiesAsTree(sourceObj, pathList) {
+        const subtree = {};
+        for (const path of pathList) {
+            const [firstKey, ...remainingKeys] = path.split(".");
+            if (!firstKey)
+                continue;
+            if (remainingKeys.length === 0) {
+                subtree[firstKey] = Objects.getProperty(sourceObj, path);
+            }
+            else {
+                subtree[firstKey] = {
+                    ...subtree[firstKey],
+                    ...Objects.getPropertiesAsTree(sourceObj[firstKey] || {}, [
+                        remainingKeys.join("."),
+                    ]),
+                };
+            }
+        }
+        return subtree;
+    }
+    static getProperty(obj, path) {
+        const keys = path.split(".");
+        let currentObj = obj;
+        for (const key of keys) {
+            if (currentObj === null || typeof currentObj !== "object") {
+                return undefined;
+            }
+            currentObj = currentObj[key];
+        }
+        return currentObj;
     }
     static withoutFalsyValues(obj) {
         const result = {};
@@ -7325,7 +7371,7 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/website/script/1696095039483.ts ***!
+  !*** ../../../LiveIde/website/script/1696143301720.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

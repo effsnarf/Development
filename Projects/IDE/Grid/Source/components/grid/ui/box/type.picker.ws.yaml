@@ -3,6 +3,7 @@ dom:
     ui.select:
       ':options': '[''🧊 data'', ''🔴 func'']'
       input-type: value
+      ':can-select-none': 'false'
       v-model: type
 props:
   box: null
@@ -12,7 +13,9 @@ watch:
   type:
     handler: | #js
       async function(type) {
-        this.$emit("input", type.split(" ")[1]);
+        type = type.split(" ")[1];
+        const gridUiBoxVue = this.$root.vm.getAncestors(this, "grid.ui.box")[0];
+        gridUiBoxVue.$femit("edit.box", this.box._id, { type });
       }
 _:
   examples:
@@ -20,5 +23,5 @@ _:
 name: grid-ui-box-type-picker
 template: >-
   <div class="comp-grid-ui-box-type-picker" path="1672760941."><ui-select
-  :options="['🧊 data', '🔴 func']" input-type="value" v-model="type"
-  path="1672760941.0"></ui-select></div>
+  :options="['🧊 data', '🔴 func']" input-type="value" :can-select-none="false"
+  v-model="type" path="1672760941.0"></ui-select></div>

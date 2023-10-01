@@ -1,8 +1,6 @@
 dom:
   grid.module:
     icon: 👤👈
-    grid.data.list:
-      ':fuid': userID+'/user/actions'
     grid.user.action.stack:
       ':userID': userID
 props:
@@ -11,6 +9,8 @@ data: null
 methods:
   grid_ui_actions_create_box: | #js
     async function(userID, rect) {
+      rect.is = (rect.is || {});
+      rect.is.minimized = (rect.is.minimized || true);
       const box = {
         type: null,
         rect
@@ -29,8 +29,8 @@ methods:
       this.$femit("do", this.userID, action);
     }
   grid_ui_box_edit_box: | #js
-    async function(boxID, data) {
-      const action = { redo: { method: "edit.box", args: [boxID, data] } };
+    async function(boxID, newData, oldData) {
+      const action = { redo: { method: "edit.box", args: [boxID, newData, oldData] } };
       this.$femit("do", this.userID, action);
     }
   grid_ui_actions_undo: | #js
@@ -43,8 +43,7 @@ methods:
     }
   grid_ui_actions_clear: | #js
     function(userID) {
-      const action = { redo: { method: "clear" } };
-      this.$femit("do", userID, action);
+      this.$femit("clear", userID);
     }
 _:
   examples:
@@ -52,6 +51,5 @@ _:
 name: grid-user-actions
 template: >-
   <grid-module class="comp-grid-user-actions" icon="👤👈"
-  path="202369922."><grid-data-list :fuid="userID+'/user/actions'"
-  path="202369922.0"></grid-data-list><grid-user-action-stack :userID="userID"
-  path="202369922.1"></grid-user-action-stack></grid-module>
+  path="202369922."><grid-user-action-stack :userID="userID"
+  path="202369922.0"></grid-user-action-stack></grid-module>

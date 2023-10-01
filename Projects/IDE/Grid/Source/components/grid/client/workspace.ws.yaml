@@ -14,6 +14,8 @@ dom:
       div: 
         grid.ui.tools:
           ':surface-element': surfaceElement
+        grid.data.variable.view:
+          ':fuid': userID+'/user/actions/pointer'
         grid.data.list.view: 
           ':fuid': userID+'/user/actions'
           v-model: userActions
@@ -66,8 +68,10 @@ template: >-
   :box="box" :surface-element="surfaceElement"
   path="-1461469222.0.0.0"></grid-ui-box></div><div
   path="-1461469222.0.1"><grid-ui-tools :surface-element="surfaceElement"
-  path="-1461469222.0.1.0"></grid-ui-tools><grid-data-list-view
+  path="-1461469222.0.1.0"></grid-ui-tools><grid-data-variable-view
+  :fuid="userID+'/user/actions/pointer'"
+  path="-1461469222.0.1.1"></grid-data-variable-view><grid-data-list-view
   :fuid="userID+'/user/actions'" v-model="userActions"
-  path="-1461469222.0.1.1"></grid-data-list-view><grid-data-list-view
+  path="-1461469222.0.1.2"></grid-data-list-view><grid-data-list-view
   :fuid="userID + '/data/boxes'" v-model="boxes"
-  path="-1461469222.0.1.2"></grid-data-list-view></div></div></grid-module>
+  path="-1461469222.0.1.3"></grid-data-list-view></div></div></grid-module>

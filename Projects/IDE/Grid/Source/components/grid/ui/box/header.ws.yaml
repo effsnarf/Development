@@ -2,7 +2,8 @@ dom:
   grid.module:
     .flex:
       .icons:
-        v-text: getBoxIcon(box)
+        div:
+          v-text: getBoxIcon(box)
       ui.input.text.box:
         ':style': '{ ''margin-top'': ''-0.4em'' }'
         hint: name
@@ -20,15 +21,18 @@ methods:
       const gridUiBoxVue = this.$root.vm.getAncestors(this, "grid.ui.box")[0];
       gridUiBoxVue.$femit("edit.box", this.box._id, { name });
     }
+  getBoxTypeIcon: | #js
+    function(box) {
+      return `${({
+        data: "🧊",
+        func: "🔴",
+      })[box.type] || "❔"}`;
+    }
   getBoxIcon: | #js
     function(box) {
       const icons = [];
 
-      icons.add(`${({
-        data: "🧊",
-        func: "🔴",
-      })[box.type] || "❔"}`)
-
+      icons.add(this.getBoxTypeIcon(box));
       icons.add(this.boxIcon);
 
       return icons
@@ -44,6 +48,7 @@ watch:
     immediate: true
 style:
   .icons:
+    display: flex
     white-space: nowrap
 _:
   examples:
@@ -51,8 +56,9 @@ _:
 name: grid-ui-box-header
 template: >-
   <grid-module class="comp-grid-ui-box-header" path="-646217982."><div
-  class="flex" path="-646217982.0"><div class="icons" v-text="getBoxIcon(box)"
-  path="-646217982.0.0"></div><ui-input-text-box :style="{ 'margin-top':
+  class="flex" path="-646217982.0"><div class="icons" path="-646217982.0.0"><div
+  v-text="getBoxIcon(box)"
+  path="-646217982.0.0.0"></div></div><ui-input-text-box :style="{ 'margin-top':
   '-0.4em' }" hint="name" camouflage="true" v-model="boxName"
   @input="onEditBoxName"
   path="-646217982.0.1"></ui-input-text-box></div></grid-module>

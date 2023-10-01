@@ -1,0 +1,41 @@
+dom:
+  grid.module:
+    icon: 🧊
+    ':show-title': 'false'
+    div:
+      h3:
+        ui.title:
+          ':icon': getFuidIcon(fuid)
+          ':text': fuid
+      .flex.justify-around:
+        ui.value:
+          ':value': value
+props:
+  fuid: null
+data:
+  value: []
+methods:
+  grid_data_variable_change: | #js
+    function(e) {
+      const { fuid, value } = e;
+      if (fuid !== this.fuid) return;
+      this.value = value;
+      this.$emit("input", value);
+    }
+  getFuidIcon: | #js
+    function(fuid) {
+      if (fuid.includes("/data/boxes")) return "🧊📦";
+      if (fuid.includes("/user/actions")) return "👤🔴";
+      return "❔";
+    }
+_:
+  examples:
+    count: 0
+name: grid-data-variable-view
+template: >-
+  <grid-module class="comp-grid-data-variable-view" icon="🧊"
+  :show-title="false" path="-628487365."><div path="-628487365.0"><h3
+  path="-628487365.0.0"><ui-title :icon="getFuidIcon(fuid)" :text="fuid"
+  path="-628487365.0.0.0"></ui-title></h3><div class="flex justify-around"
+  path="-628487365.0.1"><ui-value :value="value"
+  path="-628487365.0.1.0"></ui-value></div></div></grid-module>

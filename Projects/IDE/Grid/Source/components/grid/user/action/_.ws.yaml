@@ -1,5 +1,6 @@
 dom:
   div: 
+    class: actionClass
     ui.context.window:
       ui.value: 
         ':value': action
@@ -16,7 +17,14 @@ dom:
           ':value': (action.redo.args[1])
 props:
   item: null
+data:
+  pointer: null
 computed:
+  actionClass: | #js
+    function() {
+      const cls = {};
+      return cls;
+    }
   action: | #js
     function() {
       return this.item;
@@ -40,11 +48,12 @@ _:
     count: 0
 name: grid-user-action
 template: >-
-  <div class="comp-grid-user-action" path="-1378945263."><ui-context-window
-  path="-1378945263.0"><ui-value :value="action"
-  path="-1378945263.0.0"></ui-value></ui-context-window><div class="flex"
-  path="-1378945263.1"><div class="w-l2" v-text="getActionIcon(action)"
-  path="-1378945263.1.0"></div><div class="w-l8" v-text="action.redo.method"
-  path="-1378945263.1.1"></div><div class="actionArg1"
-  path="-1378945263.1.2"><ui-value :value="(action.redo.args[1])"
+  <div class="comp-grid-user-action actionClass"
+  path="-1378945263."><ui-context-window path="-1378945263.0"><ui-value
+  :value="action" path="-1378945263.0.0"></ui-value></ui-context-window><div
+  class="flex" path="-1378945263.1"><div class="w-l2"
+  v-text="getActionIcon(action)" path="-1378945263.1.0"></div><div class="w-l8"
+  v-text="action.redo.method" path="-1378945263.1.1"></div><div
+  class="actionArg1" path="-1378945263.1.2"><ui-value
+  :value="(action.redo.args[1])"
   path="-1378945263.1.2.0"></ui-value></div></div></div>

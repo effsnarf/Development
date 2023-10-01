@@ -51,7 +51,7 @@ mounted: | #js
     };
 
     // #TODO: Instead of listening to all events, add listeners by method/event names
-    this.$root.$on("grid.event", this.onFlowEvent);
+    this.$root.$on("grid.event", this.onGridEvent);
   }
 methods:
   getTitle: | #js
@@ -60,7 +60,7 @@ methods:
       if (this.userID) return this.userID;
       return null;
     }
-  onFlowEvent: | #js
+  onGridEvent: | #js
     async function(compName, emitName, args) {
       //if (["ui.mouse"].includes(compName)) return;
 

@@ -1,0 +1,57 @@
+dom:
+  grid.module:
+    icon: 🧊
+    ':title': fuid
+    grid.data.variable.view:
+      ':fuid': fuid
+      @input: (value) => $emit('input', value)
+props:
+  fuid: null
+  defaultValue: null
+data:
+  value: null
+mounted: | #js
+  function() {
+    this.load();
+  }
+methods:
+  set: | #js
+    function(value) {
+      this.value = value;
+      this.onChange();
+    }
+  clear: | #js
+    function() {
+      this.value = this.defaultValue;
+      this.onChange();
+    }
+  onChange: | #js
+    function() {
+      this.$femit("change", { fuid: this.fuid, value: this.value });
+      this.save();
+    }
+  save: | #js
+    function() {
+      if (!this.isPersisted) return;
+      localStorage.setItem(this.fuid, JSON.stringify(this.value));
+    }
+  load: | #js
+    function() {
+      if (!this.isPersisted) return;
+      this.value = JSON.parse(localStorage.getItem(this.fuid) || this.defaultValue);
+      this.onChange();
+    }
+computed:
+  isPersisted: | #js
+    function() {
+      return this.fuid.includes("/user/actions");
+    }
+_:
+  examples:
+    count: 0
+name: grid-data-variable
+template: >-
+  <grid-module class="comp-grid-data-variable" icon="🧊" :title="fuid"
+  path="-1384224872."><grid-data-variable-view :fuid="fuid" @input="(value)
+  =&gt; $emit('input', value)"
+  path="-1384224872.0"></grid-data-variable-view></grid-module>

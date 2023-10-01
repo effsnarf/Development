@@ -99,6 +99,8 @@ class Objects {
   }
 
   static subtract(target: any, source: any): any {
+    if (!target || !source) return target || source;
+
     if (Array.isArray(target) && Array.isArray(source)) {
       const result = [] as any[];
       for (let i = 0; i < target.length; i++) {
@@ -124,7 +126,7 @@ class Objects {
             typeof source[key] === "object"
           ) {
             const nestedResult = Objects.subtract(target[key], source[key]); // Recursively subtract nested objects
-            if (Object.keys(nestedResult).length > 0) {
+            if (Object.keys(nestedResult || {}).length > 0) {
               result[key] = nestedResult;
             }
           } else if (target[key] !== source[key]) {
@@ -135,6 +137,55 @@ class Objects {
 
       return result;
     }
+  }
+
+  static getPaths(obj: any, currentPath: string[] = []) {
+    let paths: string[] = [];
+    for (const key in obj) {
+      const newPath = currentPath.concat(key);
+      if (obj[key] !== null && typeof obj[key] === "object") {
+        paths = paths.concat(Objects.getPaths(obj[key], newPath));
+      } else {
+        paths.push(newPath.join("."));
+      }
+    }
+    return paths;
+  }
+
+  static getPropertiesAsTree(sourceObj: any, pathList: string[]): any {
+    const subtree: any = {};
+
+    for (const path of pathList) {
+      const [firstKey, ...remainingKeys] = path.split(".");
+      if (!firstKey) continue;
+
+      if (remainingKeys.length === 0) {
+        subtree[firstKey] = Objects.getProperty(sourceObj, path);
+      } else {
+        subtree[firstKey] = {
+          ...subtree[firstKey],
+          ...Objects.getPropertiesAsTree(sourceObj[firstKey] || {}, [
+            remainingKeys.join("."),
+          ]),
+        };
+      }
+    }
+
+    return subtree;
+  }
+
+  static getProperty(obj: any, path: string) {
+    const keys = path.split(".");
+    let currentObj = obj;
+
+    for (const key of keys) {
+      if (currentObj === null || typeof currentObj !== "object") {
+        return undefined;
+      }
+      currentObj = currentObj[key];
+    }
+
+    return currentObj;
   }
 
   static withoutFalsyValues(obj: any): any {

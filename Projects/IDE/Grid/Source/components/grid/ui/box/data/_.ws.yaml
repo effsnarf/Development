@@ -13,9 +13,9 @@ data:
   boxValue: null
 methods:
   onTextInput: | #js
-    function(value) {
+    function(text) {
       const gridUiBoxVue = this.$root.vm.getAncestors(this, "grid.ui.box")[0];
-      gridUiBoxVue.$femit("edit.box", this.box._id, { value });
+      gridUiBoxVue.$femit("edit.box", this.box._id, { value: text });
     }
 computed:
   showTextBox: | #js

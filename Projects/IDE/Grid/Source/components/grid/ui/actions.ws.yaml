@@ -17,6 +17,10 @@ methods:
     function() {
       this.$femit("redo", this.userID);
     }
+  grid_ui_tools_clear: | #js
+    function() {
+      this.$femit("clear", this.userID);
+    }
   onAllEvents: | #js
     function(compName, emitName, args) {
       if (compName != "grid.ui.toolbar") return;

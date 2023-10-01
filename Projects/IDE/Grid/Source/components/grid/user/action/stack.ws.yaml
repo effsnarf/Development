@@ -1,12 +1,17 @@
 dom:
   grid.module:
     icon: 👤👈
-    grid.data.list.view: 
+    grid.data.list.view:
       ':fuid': userID+'/data/boxes'
       v-model: boxes
-    grid.data.list.view: 
-      ':fuid': userID+'/user/actions'
-      v-model: userActions
+    .flex:
+      grid.data.list:
+        ':fuid': userID+'/user/actions'
+        v-model: userActions
+      grid.data.variable:
+        ':fuid': userID+'/user/actions/pointer'
+        ':default-value': -1
+        v-model: pointer
 props:
   userID: null
 data:
@@ -14,10 +19,15 @@ data:
   nextID: 1
   userActions: []
   boxes: []
-  pointer: -1
+  pointer: null
 mounted: | #js
   async function() {
-    await this.doUntilLastAction();
+    setTimeout(async () => {
+      const lastDoneAction = this.lastDoneAction;
+      if (!lastDoneAction) return;
+      this.pointer = -1;
+      await this.doUntil(lastDoneAction?._id);
+    }, 1500);
   }
 methods:
   create_box: | #js
@@ -53,24 +63,24 @@ methods:
       return action;
     }
   edit_box: | #js
-    async function(userID, action, boxID, data) {
+    async function(userID, action, boxID, newData, oldData) {
       const toValue = (value) => {
         if (value === undefined) return null;
         return value;
       };
       const box = this.boxes.find((box) => box._id === boxID);
-      const oldData = Object.fromEntries(Object.keys(data)
-        .map((key) => [key, toValue(box[key])]));
+      oldData = oldData ||
+        Objects.getPropertiesAsTree(box, Objects.getPaths(newData));
       //for (const change of changes) DeepDiff.applyChange(box, change);
-      this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "update", [boxID, data]);
-      action.undo = { method: "edit.box", args: [boxID, oldData] };
+      this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "update", [boxID, newData]);
+      action.undo = { method: "edit.box", args: [boxID, oldData, newData] };
       return action;
     }
   grid_user_actions_do: | #js
     async function(userID, action, addToStack = true, overwriteRedoActions) {
       action._id = this.nextActionID++;
 
-      if (addToStack && (this.nextRedoActions.length > 5) && (this.nextRedoActions[0]._id != action._id)) {
+      if (addToStack && (this.nextRedoAction) && (this.nextRedoAction._id != action._id)) {
         // When deleting the next redo actions from the stack, we're emitting to data.list
         // which we don't know how long it could take (could go to the server)
         // so we're invoking the method again after a timeout
@@ -81,6 +91,25 @@ methods:
           }, 100);
           return;
         }
+        
+        const deleteNextActions = () => {
+          const actionIDs = this.userActions
+            .slice(this.pointer + 1)
+            .map((action) => action._id);
+
+          this.$femit("to", "grid.data.list", `${userID}/user/actions`, "delete", actionIDs);
+          setTimeout(() => {
+            this.grid_user_actions_do(userID, action, addToStack, true);
+          }, 100);
+        };
+
+        const askUser = (this.nextRedoActions.length > 5);
+
+        if (!askUser) {
+          deleteNextActions();
+          return;
+        }
+
         const question = `This will delete ${this.userActions.length - this.pointer - 1} redo actions from the stack:
         ${this.userActions.slice(this.pointer + 1)
           .map((action) => action.redo.method)
@@ -88,15 +117,9 @@ methods:
           .join("\n")}
         Are you sure?`
           .replace(/\n/g, "<br/>");
-        alertify.confirm(question, () => {
-          const actionIDs = this.userActions
-            .slice(this.pointer + 1)
-            .map((action) => action._id);
-          this.$femit("to", "grid.data.list", `${userID}/user/actions`, "delete", actionIDs);
-          setTimeout(() => {
-            this.grid_user_actions_do(userID, action, addToStack, true);
-          }, 100);
-        });
+
+        alertify.confirm(question, deleteNextActions);
+        
         return;
       }
 
@@ -141,15 +164,16 @@ methods:
       this.pointer++;
     }
   grid_user_actions_clear: | #js
-    function() {
-      debugger;
-    }
-  doUntilLastAction: | #js
-    async function() {
-      setTimeout(async () => {
-        const lastAction = this.userActions[this.userActions.length - 1];
-        await this.doUntil(lastAction?._id);
-      }, 1500);
+    function(userID) {
+      if (this.userActions.length == 0) return;
+
+      const clearAll = () => {
+        this.$femit("to", "grid.data.variable", `${userID}/user/actions/pointer`, "clear", []);
+        this.$femit("to", "grid.data.list", `${userID}/user/actions`, "clear", []);
+        this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "clear", []);
+      }
+
+      alertify.confirm("This will delete all actions from the stack. Are you sure?", clearAll);
     }
   doUntil: | #js
     async function(actionID) {
@@ -179,7 +203,7 @@ methods:
     function(action, lastAction) {
       if (!lastAction) return false;
       if (action.redo.method != lastAction.redo.method) return false;
-      if (action.redo.method == "edit.box")
+      if (["edit.box", "resize.box", "move.box"].includes(action.redo.method))
       {
         // box._id
         if (action.redo.args[0] != lastAction.redo.args[0]) return false;
@@ -199,6 +223,14 @@ computed:
     function() {
       return (this.nextRedoActions.length > 0);
     }
+  lastDoneAction: | #js
+    function() {
+      return this.userActions[this.pointer];
+    }
+  nextRedoAction: | #js
+    function() {
+      return this.nextRedoActions[0];
+    }
   nextRedoActions: | #js
     function() {
       return this.userActions.slice(this.pointer + 1);
@@ -213,6 +245,11 @@ watch:
       async function() {
       }
     deep: true
+  pointer:
+    handler: | #js
+      async function(pointer) {
+        this.$femit("to", "grid.data.variable", `${this.userID}/user/actions/pointer`, "set", [pointer])
+      }
 _:
   examples:
     count: 0
@@ -220,7 +257,9 @@ name: grid-user-action-stack
 template: >-
   <grid-module class="comp-grid-user-action-stack" icon="👤👈"
   path="-1764928149."><grid-data-list-view :fuid="userID+'/data/boxes'"
-  v-model="boxes"
-  path="-1764928149.0"></grid-data-list-view><grid-data-list-view
-  :fuid="userID+'/user/actions'" v-model="userActions"
-  path="-1764928149.1"></grid-data-list-view></grid-module>
+  v-model="boxes" path="-1764928149.0"></grid-data-list-view><div class="flex"
+  path="-1764928149.1"><grid-data-list :fuid="userID+'/user/actions'"
+  v-model="userActions"
+  path="-1764928149.1.0"></grid-data-list><grid-data-variable
+  :fuid="userID+'/user/actions/pointer'" :default-value="-1" v-model="pointer"
+  path="-1764928149.1.1"></grid-data-variable></div></grid-module>
