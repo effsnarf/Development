@@ -1,0 +1,28 @@
+dom:
+  grid.module:
+    ':show-title': 'false'
+    ui.select:
+      ':options': '[''client'', ''server'']'
+      input-type: value
+      direction: horizontal
+      ':value': box.runs.on
+      @input: '(runsOn) => editBox({ runs: { on: runsOn } })'
+props:
+  box: null
+data: null
+methods:
+  editBox: | #js
+    function(data) {
+      const gridUiBoxVue = this.$root.vm.getAncestors(this, "grid.ui.box")[0];
+      gridUiBoxVue.$femit("edit.box", this.box._id, data);
+    }
+_:
+  examples:
+    count: 0
+name: grid-ui-box-func-settings
+template: >-
+  <grid-module class="comp-grid-ui-box-func-settings" :show-title="false"
+  path="-1927623176."><ui-select :options="['client', 'server']"
+  input-type="value" direction="horizontal" :value="box.runs.on"
+  @input="(runsOn) =&gt; editBox({ runs: { on: runsOn } })"
+  path="-1927623176.0"></ui-select></grid-module>

@@ -6,9 +6,10 @@ dom:
         ui.title:
           ':icon': getFuidIcon(fuid)
           ':text': fuid
+          ':number': items.length
       ul:
         li:
-          v-for: item in items
+          v-for: item in [...items].reverse().take(5)
           slot:
             component:
               ':is': getItemCompName(fuid)
@@ -48,7 +49,8 @@ template: >-
   <grid-module class="comp-grid-data-list-view" icon="🧊📃"
   path="-1148091303."><div path="-1148091303.0"><h3
   path="-1148091303.0.0"><ui-title :icon="getFuidIcon(fuid)" :text="fuid"
-  path="-1148091303.0.0.0"></ui-title></h3><ul path="-1148091303.0.1"><li
-  v-for="item in items" path="-1148091303.0.1.0"><slot
-  path="-1148091303.0.1.0.0"><component :is="getItemCompName(fuid)" :item="item"
+  :number="items.length" path="-1148091303.0.0.0"></ui-title></h3><ul
+  path="-1148091303.0.1"><li v-for="item in [...items].reverse().take(5)"
+  path="-1148091303.0.1.0"><slot path="-1148091303.0.1.0.0"><component
+  :is="getItemCompName(fuid)" :item="item"
   path="-1148091303.0.1.0.0.0"></component></slot></li></ul></div></grid-module>

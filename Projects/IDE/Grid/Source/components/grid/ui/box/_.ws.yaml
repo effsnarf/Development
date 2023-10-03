@@ -3,9 +3,12 @@ dom:
     icon: 📦
     ':show-title': 'false'
     ui.window:
+      ':style': windowStyle
       ':rect': box.rect
       ':surface-element': surfaceElement
+      ':surface-scale': surfaceScale
       ':center-coords': 'true'
+      ':show-header': '!!box.type'
       @is-minimized: onToggleMinimized
       @drag-stop: onDragStop
       template: 
@@ -15,9 +18,12 @@ dom:
           direction: input
       template: 
         v-slot: header
-        grid.ui.box.header:
-          ':box': box
-          ':box-icon': boxIcon
+        .flex:
+          grid.ui.box.header:
+            v-if: box.type
+            class: flex-grow-1
+            ':box': box
+            ':box-icon': boxIcon
       template: 
         v-slot: content
         .h-100pc:
@@ -26,7 +32,6 @@ dom:
             class: h-100pc
             ':is': getBoxCompName(box)
             ':box': box
-            @update:icon: boxIcon = $event
           grid.ui.box.type.picker:
             v-if: '!box.type'
             ':box': box
@@ -35,13 +40,33 @@ dom:
         grid.ui.box.sockets: 
           ':box': box
           direction: output
+        .error:
+          v-if: error
+          v-text: error
 props:
   box: null
   surfaceElement: null
 data:
   boxIcon: null
   oldBox: null
+  error: null
+  boxIsLoading: false
+  surfaceScale: 1
 methods:
+  grid_client_runtime_box_is_loading: | #js
+    function(boxID, isLoading) {
+      if (boxID != this.box._id) return;
+      this.boxIsLoading = isLoading;
+    }
+  grid_client_runtime_box_error: | #js
+    function(boxID, error) {
+      if (boxID != this.box._id) return;
+      this.error = error;
+    }
+  grid_client_workspace_surface_scale: | #js
+    function(scale) {
+      this.surfaceScale = scale;
+    }
   getBoxTitle: | #js
     function(box) {
       return box.type;
@@ -70,36 +95,66 @@ methods:
     function(obj) {
       return jsyaml.dump(obj);
     }
+computed:
+  windowStyle: | #js
+    function() {
+      const style = {};
+      if (this.boxIsLoading) style.border = `2px solid yellow`;
+      if (this.error) style.border = `4px solid red`;
+      return style;
+    }
 watch: null
 _:
   examples:
     count: 0
 style:
+  .sockets:
+    z-index: 10
+  .above .sockets, .below .sockets:
+    position: absolute
+    width: 100%
+    opacity: 0
+    transition: transform 0.4s
+  .below .sockets:
+    transform: translate(0, -100%)
+  .hovered .above .sockets, .hovered .below .sockets:
+    opacity: 1
+  .hovered .above .sockets:
+    transform: translate(0, -100%)
+  .hovered .below .sockets:
+    transform: none
   .header:
     font-size: 120%
   .comp-grid-module .module-content:
     height: 100%
+  .error:
+    position: absolute
+    top: 0
+    width: 100%
   .box2:
     margin: 0
     border: none
 name: grid-ui-box
 template: >-
   <grid-module class="comp-grid-ui-box" icon="📦" :show-title="false"
-  path="1671629593."><ui-window :rect="box.rect"
-  :surface-element="surfaceElement" :center-coords="true"
+  path="1671629593."><ui-window :style="windowStyle" :rect="box.rect"
+  :surface-element="surfaceElement" :surface-scale="surfaceScale"
+  :center-coords="true" :show-header="!!box.type"
   @is-minimized="onToggleMinimized" @drag-stop="onDragStop"
   path="1671629593.0"><template v-slot:above
   path="1671629593.0.0"><grid-ui-box-sockets :box="box" direction="input"
   path="1671629593.0.0.0"></grid-ui-box-sockets></template><template
-  v-slot:header path="1671629593.0.1"><grid-ui-box-header :box="box"
-  :box-icon="boxIcon"
-  path="1671629593.0.1.0"></grid-ui-box-header></template><template
+  v-slot:header path="1671629593.0.1"><div class="flex"
+  path="1671629593.0.1.0"><grid-ui-box-header class="flex-grow-1"
+  v-if="box.type" :box="box" :box-icon="boxIcon"
+  path="1671629593.0.1.0.0"></grid-ui-box-header></div></template><template
   v-slot:content path="1671629593.0.2"><div class="h-100pc"
   path="1671629593.0.2.0"><component class="h-100pc" v-if="box.type"
-  :is="getBoxCompName(box)" :box="box" @update:icon="boxIcon = $event"
+  :is="getBoxCompName(box)" :box="box"
   path="1671629593.0.2.0.0"></component><grid-ui-box-type-picker
   v-if="!box.type" :box="box"
   path="1671629593.0.2.0.1"></grid-ui-box-type-picker></div></template><template
   v-slot:below path="1671629593.0.3"><grid-ui-box-sockets :box="box"
-  direction="output"
-  path="1671629593.0.3.0"></grid-ui-box-sockets></template></ui-window></grid-module>
+  direction="output" path="1671629593.0.3.0"></grid-ui-box-sockets><div
+  class="error" v-if="error" v-text="error"
+  path="1671629593.0.3.1"></div></template></ui-window></grid-module>

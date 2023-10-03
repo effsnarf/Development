@@ -8,10 +8,18 @@ dom:
       grid.data.list:
         ':fuid': userID+'/user/actions'
         v-model: userActions
-      grid.data.variable:
+      grid.data.variable: 
         ':fuid': userID+'/user/actions/pointer'
         ':default-value': -1
         v-model: pointer
+      grid.data.variable: 
+        ':fuid': userID+'/user/actions/next/id'
+        ':default-value': 1
+        v-model: nextID
+      grid.data.variable: 
+        ':fuid': userID+'/user/actions/next/action/id'
+        ':default-value': 1
+        v-model: nextActionID
 props:
   userID: null
 data:
@@ -25,8 +33,8 @@ mounted: | #js
     setTimeout(async () => {
       const lastDoneAction = this.lastDoneAction;
       if (!lastDoneAction) return;
-      this.pointer = -1;
-      await this.doUntil(lastDoneAction?._id);
+      //this.pointer = -1;
+      //await this.doUntil(lastDoneAction?._id);
     }, 1500);
   }
 methods:
@@ -36,7 +44,11 @@ methods:
         box._id = this.nextID++;
         action.redo.args[0] = box;
       }
+
       this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "add", [box]);
+      
+      this.$femit("new.box.created", box);
+
       action.undo = { method: "delete.box", args: [box._id] };
       return action;
     }
@@ -186,6 +198,8 @@ methods:
 
       const clearAll = () => {
         this.$femit("to", "grid.data.variable", `${userID}/user/actions/pointer`, "clear", []);
+        this.$femit("to", "grid.data.variable", `${userID}/user/actions/next/id`, "clear", []);
+        this.$femit("to", "grid.data.variable", `${userID}/user/actions/next/action/id`, "clear", []);
         this.$femit("to", "grid.data.list", `${userID}/user/actions`, "clear", []);
         this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "clear", []);
         this.$femit("to", "grid.data.list", `${userID}/data/links`, "clear", []);
@@ -251,7 +265,10 @@ methods:
           return {
             argNamesStr: "",
             argNames: [],
-            code: ""
+            code: "",
+            runs: {
+              on: "client"
+            }
           }
       }
       throw new Error(`Unknown box type: ${type}`);
@@ -262,28 +279,28 @@ methods:
         case "text":
           return {
             input: [
-              { type: "data", name: "text" }
+              { _id: 1, type: "data", name: "text" }
             ],
             output: [
-              { type: "data", name: "text" }
+              { _id: 1, type: "data", name: "text" }
             ]
           }
         case "data":
           return {
             input: [
-              { type: "data", name: "data" }
+              { _id: 1, type: "data", name: "data" }
             ],
             output: [
-              { type: "data", name: "data" }
+              { _id: 1, type: "data", name: "data" }
             ]
           }
         case "func":
           return {
             input: [
-              {  }
+              { _id: 1, type: "data", name: "arg0" }
             ],
             output: [
-              { type: "data", name: "result" }
+              { _id: 1, type: "data", name: "result" }
             ]
           }
       }
@@ -316,11 +333,6 @@ watch:
       async function() {
       }
     deep: true
-  pointer:
-    handler: | #js
-      async function(pointer) {
-        this.$femit("to", "grid.data.variable", `${this.userID}/user/actions/pointer`, "set", [pointer])
-      }
 _:
   examples:
     count: 0
@@ -333,4 +345,9 @@ template: >-
   v-model="userActions"
   path="-1764928149.1.0"></grid-data-list><grid-data-variable
   :fuid="userID+'/user/actions/pointer'" :default-value="-1" v-model="pointer"
-  path="-1764928149.1.1"></grid-data-variable></div></grid-module>
+  path="-1764928149.1.1"></grid-data-variable><grid-data-variable
+  :fuid="userID+'/user/actions/next/id'" :default-value="1" v-model="nextID"
+  path="-1764928149.1.2"></grid-data-variable><grid-data-variable
+  :fuid="userID+'/user/actions/next/action/id'" :default-value="1"
+  v-model="nextActionID"
+  path="-1764928149.1.3"></grid-data-variable></div></grid-module>

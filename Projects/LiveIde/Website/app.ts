@@ -419,6 +419,18 @@ const _fetchAsJson = async (url: string) => {
         return res.end(JSON.stringify(response.data));
       }
 
+      if (req.url.startsWith("/execute/code")) {
+        const { argNames, argValues, code } = data;
+
+        const func = eval(
+          `(async function(${argNames.join(", ")}) { ${code} })`
+        );
+
+        const result = await func(...argValues);
+
+        return res.end(JSON.stringify(result));
+      }
+
       if (req.url.startsWith("/img/") && !isLocalFile(req.url)) {
         // Redirect to img.memegenerator.net
         const url = `https://img.memegenerator.net/${req.url.replace(

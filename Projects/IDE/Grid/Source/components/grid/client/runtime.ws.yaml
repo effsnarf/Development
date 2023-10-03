@@ -16,59 +16,129 @@ data:
   boxes: []
   links: []
 methods:
-  grid_ui_box_socket_data_change: | #js
-    function(boxID, socketDirection, socketName, socketValue) {
-      this.setSocketValue(boxID, socketDirection, socketName, socketValue);
+  grid_ui_box_socket_value_change: | #js
+    function(boxID, socketDirection, sID, socketValue) {
+      this.setSocketValue(boxID, socketDirection, sID, socketValue);
+    }
+  grid_ui_box_execute_func: | #js
+    function(boxID) {
+      this.processBoxChange_func(this.getBox(boxID));
     }
   setSocketValue: | #js
-    function(boxID, sDirection, sName, sValue) {
+    function(boxID, sDirection, sID, sValue) {
       this.ensure(boxID);
       this.socket.runtime.data
         [boxID]
         [sDirection]
-        [sName] =
+        [sID] =
           sValue;
-      this.onSocketValueChange(boxID, sDirection, sName, sValue);
+      this.onSocketValueChange(boxID, sDirection, sID, sValue);
     }
   onSocketValueChange: | #js
-    function(boxID, sDirection, sName, sValue) {
-      this.$femit("socket.data.change", boxID, sDirection, sName, sValue);
-      this.processBoxChange(boxID, sDirection, sName, sValue);
-      this.propagateSocketLinks(boxID, sDirection, sName);
+    function(boxID, sDirection, sID, sValue) {
+      this.$femit("socket.value.change", boxID, sDirection, sID, sValue);
+      this.processBoxChange(boxID, sDirection, sID, sValue);
+      this.propagateSocketLinks(boxID, sDirection, sID);
     }
   processBoxChange: | #js
-    function(boxID, sDirection, sName, sValue) {
+    async function(boxID, sDirection, sID, sValue) {
       const box = this.getBox(boxID);
       if (!box) return;
 
       if (box.type == "data")
       {
-        if (sDirection == "input" && sName == "data")
+        if (sDirection == "input" && sID == 1)
         {
-          this.setSocketValue(boxID, "output", "data", sValue);
+          this.setSocketValue(boxID, "output", 1, sValue);
+        }
+      }
+
+      if (box.type == "func")
+      {
+        if (sDirection == "input")
+        {
+          this.processBoxChange_func(box);
         }
       }
     }
   propagateSocketLinks: | #js
-    function(boxID, sDirection, sName) {
+    function(boxID, sDirection, sID) {
       if (sDirection != "output") return;
 
       const box = this.getBox(boxID);
 
-      const sValue = this.socket.runtime.data[boxID][sDirection][sName];
+      const sValue = this.socket.runtime.data[boxID][sDirection][sID];
 
       const links = this.links
         .filter((link) => link.from.box._id === boxID)
-        .filter((link) => link.from.socket.name === sName);
+        .filter((link) => link.from.socket._id == sID);
 
       for (const link of links) {
-        this.$femit("link.flash", link.to.box._id, link._id);
-        this.setSocketValue(link.to.box._id, "input", link.to.socket.name, sValue);
+        this.$femit("link.flash", link._id, sValue);
+        this.setSocketValue(link.to.box._id, "input", link.to.socket._id, sValue);
       }
     }
-  ensure: | #js
-    function(boxID) {
-      this.getSocketRuntimeData(boxID);
+  processBoxChange_func: | #js
+    async function(box) {
+      const result = await this.runFunc(box);
+      this.setSocketValue(box._id, "output", 1, result);
+      this.$femit("func.result.change", box._id, result);
+    }
+  runFunc: | #js
+    async function(box) {
+      try
+      {
+        this.$femit("box.error", box._id, null);
+        this.$femit("box.is.loading", box._id, true);
+        await this.$root.wait(2000);
+        const argNames = box.argNames;
+        const argValues = Object.values(this.socket.runtime.data[box._id].input);
+        if (box.runs.on == "server") return await this.runFuncOnServer(box, argNames, argValues, box.code);
+        else return await this.runFuncOnClient(box, argNames, argValues, box.code);
+      }
+      catch (ex)
+      {
+        this.$femit("box.error", box._id, ex.message);
+        throw ex;
+      }
+      finally
+      {
+        this.$femit("box.is.loading", box._id, false);
+      }
+    }
+  runFuncOnServer: | #js
+    async function(box, argNames, argValues, code) {
+      try
+      {
+        const response = await fetch("/execute/code", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            argNames,
+            argValues,
+            code,
+          }),
+        });
+        const result = await response.json();
+        return result;
+      }
+      catch (ex)
+      {
+        const message = ex.message.split('\n')[0];
+        throw new Error(message);
+      }
+    }
+  runFuncOnClient: | #js
+    async function(box, argNames, argValues, code) {
+      const func = eval(
+        `(async function(${argNames.join(", ")}) { ${code} })`
+      );
+
+      const result = await func(...argValues);
+
+      return result;
     }
   getSocketRuntimeData: | #js
     function(boxID) {
@@ -86,6 +156,10 @@ methods:
     function(boxID) {
       // #TODO: Slow
       return this.boxes.find((box) => box._id === boxID);
+    }
+  ensure: | #js
+    function(boxID) {
+      this.getSocketRuntimeData(boxID);
     }
 _:
   examples:

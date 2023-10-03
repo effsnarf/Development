@@ -20,8 +20,6 @@ methods:
     function(text) {
       const gridUiBoxVue = this.$root.vm.getAncestors(this, "grid.ui.box")[0];
       gridUiBoxVue.$femit("edit.box", this.box._id, { value: text });
-      const outputSocketName = "data";
-      gridUiBoxVue.$femit("socket.data.change", this.box._id, "output", outputSocketName, text);
     }
   grid_client_runtime_socket_data_change: | #js
     function(boxID, sDirection, sName, sValue) {
@@ -55,14 +53,8 @@ watch:
     handler: | #js
       async function(value) {
         const gridUiBoxVue = this.$root.vm.getAncestors(this, "grid.ui.box")[0];
-        gridUiBoxVue.$femit("socket.data.change", this.box._id, "output", "text", value);
+        gridUiBoxVue.$femit("socket.value.change", this.box._id, "output", 1, value);
       }
-  icon:
-    handler: | #js
-      async function(icon) {
-        this.$emit("update:icon", icon);
-      }
-    immediate: true
 style:
   textarea:
     height: 100%

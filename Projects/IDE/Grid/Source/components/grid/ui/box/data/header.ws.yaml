@@ -1,0 +1,44 @@
+dom:
+  grid.module:
+    ':show-title': 'false'
+    .flex:
+      div:
+        v-text: '''🧊'''
+      .short-value:
+        v-text: shortValueDesc
+props:
+  box: null
+data:
+  dataValue: null
+methods:
+  grid_client_runtime_socket_value_change: | #js
+    function(boxID, sDirection, sID, sValue) {
+      if (boxID != this.box._id) return;
+      if (sDirection != "input") return;
+      if (sID != 1) return;
+      this.dataValue = sValue;
+    }
+computed:
+  shortValueDesc: | #js
+    function() {
+      const value = this.dataValue;
+      if ((value == null) || (value == undefined)) return '❔';
+      if (typeof value === "string") return '🆎';
+      if (Array.isArray(value)) return `[${value.length}]`;
+      if (typeof value === "object") return `{ }`;
+      return "❔"
+    }
+watch: null
+style:
+  .short-value:
+    color: cyan
+    white-space: nowrap
+_:
+  examples:
+    count: 0
+name: grid-ui-box-data-header
+template: >-
+  <grid-module class="comp-grid-ui-box-data-header" :show-title="false"
+  path="-768382468."><div class="flex" path="-768382468.0"><div v-text="'🧊'"
+  path="-768382468.0.0"></div><div class="short-value" v-text="shortValueDesc"
+  path="-768382468.0.1"></div></div></grid-module>

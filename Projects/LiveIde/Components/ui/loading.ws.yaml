@@ -1,17 +1,83 @@
 dom:
   transition:
     name: slide2
-    .center:
+    .flex.justify-center:
       v-if: show
       img:
         class: loading
         ':src': $root.loadingImageUrl
+      .timer:
+        v-if: showMs
+        .number:
+          v-text: elapsedNumber
+        .unit:
+          v-text: elapsedUnit
 props:
   show: true
+  showMs: false
+data:
+  isRunning: true
+  started: null
+  elapsed: 0
+mounted: | #js
+  function() {
+    this.start();
+  }
+unmounted: | #js
+  function() {
+    this.stop();
+  }
+methods:
+  start: | #js
+    function() {
+      this.started = Date.now();
+      this.ms = 0;
+      this.isRunning = true;
+      this.updateElapsed();
+    }
+  stop: | #js
+    function() {
+      this.isRunning = false;
+    }
+  updateElapsed: | #js
+    function() {
+      if (!this.isRunning) return;
+      this.elapsed = Math.round((Date.now() - this.started));
+      setTimeout(this.updateElapsed.bind(this), 100);
+    }
+computed:
+  elapsedUnitified: | #js
+    function() {
+      if (!this.elapsed) return null;
+      if (this.elapsed < 1000) return `${this.elapsed}ms`;
+      if (this.elapsed < 60 * 1000) return `${(this.elapsed / 1000).toFixed(1)}s`;
+      return `${(this.elapsed / 1000).toFixed(1)}s`;
+    }
+  elapsedNumber: | #js
+    function() {
+      return parseFloat(this.elapsedUnitified);
+    }
+  elapsedUnit: | #js
+    function() {
+      return this.elapsedUnitified?.replace(this.elapsedNumber, "");
+    }
+watch:
+  show:
+    handler: | #js
+      function(show) {
+        if (show) {
+          this.start();
+        }
+      }
+    immediate: true
 style:
-  .center:
-    display: flex
-    justify-content: center
+  .timer:
+    font-size: 80%
+    opacity: 0.4
+    white-space: nowrap
+  .number:
+    color: green
+  .unit: null
   .loading:
     max-width: min-content
 name: ui-loading
@@ -20,5 +86,8 @@ _:
     count: 0
 template: >-
   <transition class="comp-ui-loading" name="slide2" path="875113442."><div
-  class="center" v-if="show" path="875113442.0"><img class="loading"
-  :src="$root.loadingImageUrl" path="875113442.0.0"/></div></transition>
+  class="flex justify-center" v-if="show" path="875113442.0"><img
+  class="loading" :src="$root.loadingImageUrl" path="875113442.0.0"/><div
+  class="timer" v-if="showMs" path="875113442.0.1"><div class="number"
+  v-text="elapsedNumber" path="875113442.0.1.0"></div><div class="unit"
+  v-text="elapsedUnit" path="875113442.0.1.1"></div></div></div></transition>

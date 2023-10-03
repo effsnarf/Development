@@ -7398,7 +7398,7 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/website/script/1696164960361.ts ***!
+  !*** ../../../LiveIde/website/script/1696360304854.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -7830,10 +7830,10 @@ const mgMixin = {
                 // Position the tooltip based on mouse position
                 //const left: number = e.clientX + 30; // 10px offset from the mouse pointer
                 //const top: number = e.clientY - 10;
-                // Position the tooltip to the right of the element
+                // Position the tooltip
                 const rect = el.getBoundingClientRect();
                 const left = rect.right + 10;
-                const top = rect.top + rect.height / 2 - 20;
+                const top = rect.top - rect.height;
                 tooltipElem.style.left = `${left}px`;
                 tooltipElem.style.top = `${top}px`;
                 // Fade in effect

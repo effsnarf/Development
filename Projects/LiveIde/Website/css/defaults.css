@@ -917,6 +917,14 @@ img[src=""]
 }
 
 
+/* Leader line SVG element */
+.leader-line text
+{
+  stroke: black !important;
+  fill: white !important;
+  visibility: hidden;
+}
+
 
 /* scrollbars */
 ::-webkit-scrollbar {

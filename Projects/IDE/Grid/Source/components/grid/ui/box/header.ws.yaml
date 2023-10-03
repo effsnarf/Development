@@ -1,41 +1,47 @@
 dom:
   grid.module:
     .flex:
-      .icons:
-        div:
-          v-text: getBoxIcon(box)
+      transition:
+        name: slide-hor
+        ui.loading:
+          v-if: boxIsLoading
+      component:
+        v-if: box.type
+        ':is': getBoxCompName(box) + '-header'
+        ':box': box
       ui.input.text.box:
         ':style': '{ ''margin-top'': ''-0.4em'' }'
-        ':hint': nameHint
+        class: flex-grow-1
+        ':hint': nameHint + '…'
         camouflage: true
         v-model: boxName
         @input: onEditBoxName
 props:
   box: null
-  boxIcon: null
 data:
   boxName: null
+  boxIsLoading: false
 methods:
+  grid_client_runtime_box_is_loading: | #js
+    function(boxID, isLoading) {
+      if (boxID != this.box._id) return;
+      this.boxIsLoading = isLoading;
+    }
   onEditBoxName: | #js
     function(name) {
       const gridUiBoxVue = this.$root.vm.getAncestors(this, "grid.ui.box")[0];
       gridUiBoxVue.$femit("edit.box", this.box._id, { name });
     }
-  getBoxIcon: | #js
+  getBoxCompName: | #js
     function(box) {
-      const icons = [];
-
-      icons.add(this.boxIcon);
-
-      return icons
-        .filter((icon) => icon)
-        .join("");
+      if (!box.type) return null;
+      return `grid.ui.box.${box.type}`.replace(/\./g, "-");
     }
 computed:
   nameHint: | #js
     function() {
       const boxType = this.box.type;
-      if (boxType === "func") return "function name";
+      if (boxType === "func") return "function";
       return "name";
     }
 watch:
@@ -55,9 +61,11 @@ _:
 name: grid-ui-box-header
 template: >-
   <grid-module class="comp-grid-ui-box-header" path="-646217982."><div
-  class="flex" path="-646217982.0"><div class="icons" path="-646217982.0.0"><div
-  v-text="getBoxIcon(box)"
-  path="-646217982.0.0.0"></div></div><ui-input-text-box :style="{ 'margin-top':
-  '-0.4em' }" :hint="nameHint" camouflage="true" v-model="boxName"
-  @input="onEditBoxName"
-  path="-646217982.0.1"></ui-input-text-box></div></grid-module>
+  class="flex" path="-646217982.0"><transition name="slide-hor"
+  path="-646217982.0.0"><ui-loading v-if="boxIsLoading"
+  path="-646217982.0.0.0"></ui-loading></transition><component v-if="box.type"
+  :is="getBoxCompName(box) + '-header'" :box="box"
+  path="-646217982.0.1"></component><ui-input-text-box class="flex-grow-1"
+  :style="{ 'margin-top': '-0.4em' }" :hint="nameHint + '…'" camouflage="true"
+  v-model="boxName" @input="onEditBoxName"
+  path="-646217982.0.2"></ui-input-text-box></div></grid-module>

@@ -39,7 +39,6 @@ computed:
     }
   class1: | #js
     function() {
-      if (this.direction === 'toggle') return 'flex-reverse';
       return null;
     }
 methods:
@@ -94,9 +93,6 @@ style:
     width: 1.5em
     aspect-ratio: 1
     margin: auto
-  .flex-reverse:
-    display: flex
-    flex-direction: row-reverse
   .comp-ui-select:
     margin-bottom: 0.1em
   .corner:

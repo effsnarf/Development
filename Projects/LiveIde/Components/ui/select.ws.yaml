@@ -16,6 +16,7 @@ dom:
             .clickable:
               ':key': valueIndex
               v-html: getOptionText(valueIndex)
+              v-tooltip: getOptionTooltip(valueIndex)
               @click: toggleValue($event, +1)
               @contextmenu: toggleValue($event, -1)
         select:
@@ -57,6 +58,7 @@ props:
   isOptionVisible: null
   getItemText: null
   getItemIcon: null
+  getItemTooltip: null
   getItemKey: null
   canSelectNone: true
 data:
@@ -74,9 +76,14 @@ methods:
       if (this.getItemText) s = this.getItemText(s);
       if (this.itemIcon) s = `${this.itemIcon} ${s}`;
       if (this.type === "toggle") {
-        if (s?.length > 2) s = `[ ${s} ]`;
+        if (s?.length > 2) s = `${s}`;
       }
       return s;
+    }
+  getOptionTooltip: | #js
+    function(index) {
+      if (this.getItemTooltip) return this.getItemTooltip(this.options[index]);
+      return null;
     }
   onItemHover: | #js
     function(e) {
@@ -167,8 +174,8 @@ template: >-
   path="-1442841194.0.1"><div v-if="(type=='toggle')"
   path="-1442841194.0.1.0"><transition name="slide2"
   path="-1442841194.0.1.0.0"><div class="clickable" :key="valueIndex"
-  v-html="getOptionText(valueIndex)" @click="toggleValue($event, +1)"
-  @contextmenu="toggleValue($event, -1)"
+  v-html="getOptionText(valueIndex)" v-tooltip="getOptionTooltip(valueIndex)"
+  @click="toggleValue($event, +1)" @contextmenu="toggleValue($event, -1)"
   path="-1442841194.0.1.0.0.0"></div></transition></div><select
   v-if="(type=='dropdown')" :value="valueIndex"
   @input="onInput(parseInt($event.target.value))"

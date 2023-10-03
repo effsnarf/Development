@@ -3,6 +3,7 @@ dom:
     icon: 🧊📃
     ':title': fuid
     grid.data.list.view:
+      v-if: 'false'
       ':fuid': fuid
       @input: (value) => $emit('input', value)
 props:
@@ -60,7 +61,8 @@ methods:
 computed:
   isPersisted: | #js
     function() {
-      return this.fuid.includes("/user/actions");
+      if (["/user/actions", "/data/boxes", "/data/links"].some(s => this.fuid.includes(s))) return true;
+      return false;
     }
 _:
   examples:
@@ -68,5 +70,6 @@ _:
 name: grid-data-list
 template: >-
   <grid-module class="comp-grid-data-list" icon="🧊📃" :title="fuid"
-  path="882586554."><grid-data-list-view :fuid="fuid" @input="(value) =&gt;
-  $emit('input', value)" path="882586554.0"></grid-data-list-view></grid-module>
+  path="882586554."><grid-data-list-view v-if="false" :fuid="fuid"
+  @input="(value) =&gt; $emit('input', value)"
+  path="882586554.0"></grid-data-list-view></grid-module>

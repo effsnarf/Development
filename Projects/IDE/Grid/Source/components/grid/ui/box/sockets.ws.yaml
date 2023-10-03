@@ -1,6 +1,8 @@
 dom:
   ul:
+    ':class': '''sockets '' + direction + ''-sockets'''
     li:
+      ':class': direction + '-socket'
       v-for: socket in sockets
       grid.ui.box.socket:
         ':box': box
@@ -15,11 +17,27 @@ computed:
       if (!this.box?.sockets) return [];
       return this.box.sockets[this.direction];
     }
+style:
+  .comp-grid-ui-box-sockets:
+    transition: 0.3s
+  .comp-grid-ui-box-sockets:hover:
+    transition: 0.3s
+  .comp-grid-ui-box-sockets.input-sockets:
+    transform-origin: left bottom
+  .comp-grid-ui-box-sockets.output-sockets:
+    transform-origin: right top
+  .input-socket, .output-socket:
+    display: flex
+    cursor: grab
+  .output-socket:
+    flex-direction: row-reverse
 _:
   examples:
     count: 0
 name: grid-ui-box-sockets
 template: >-
-  <ul class="comp-grid-ui-box-sockets" path="-1391935093."><li v-for="socket in
-  sockets" path="-1391935093.0"><grid-ui-box-socket :box="box" :socket="socket"
-  :direction="direction" path="-1391935093.0.0"></grid-ui-box-socket></li></ul>
+  <ul class="comp-grid-ui-box-sockets" :class="'sockets ' + direction +
+  '-sockets'" path="-1391935093."><li :class="direction + '-socket'"
+  v-for="socket in sockets" path="-1391935093.0"><grid-ui-box-socket :box="box"
+  :socket="socket" :direction="direction"
+  path="-1391935093.0.0"></grid-ui-box-socket></li></ul>

@@ -1,5 +1,6 @@
 dom:
-  div: 
+  grid.module:
+    ':show-title': 'false'
     ref: socket1
     ui.dnd.dropzone:
       @drop-item: onNewLinkDrop
@@ -24,9 +25,13 @@ dom:
       ':to': targetPlugEl
       line-path: fluid
       color: '#404040'
-    div: 
+    div:
       ref: targetPlug1
       ':style': targetPlugStyle
+      grid.ui.box:
+        v-if: showGhostBox
+        ':surface-element': targetPlugEl
+        ':box': ghostBox
 props:
   box: null
   socket: null
@@ -36,29 +41,77 @@ data:
   targetPlugPos: null
   targetPlugEl: null
   isNewLinkDragging: false
+  ghostBox: null
+  newBox: null
+  socketValue: null
 mounted: | #js
   function() {
-    this.socketEl = this.$refs.socket1;
+    this.socketEl = this.$refs.socket1.$el;
     this.targetPlugEl = this.$refs.targetPlug1;
 
     this.$root.els = this.$root.els || {};
     this.$root.els[this.socketElPath] = this.$el;
+
+    this.ghostBox = {
+      _id: `${this.box._id}/${this.socket.name}/ghost/box`,
+      type: null,
+      name: null,
+      rect: {
+        pos: { x: 150, y: -100 },
+        size: { width: 300, height: 200 },
+        is: {
+          minimized: true,
+        }
+      },
+      sockets: {
+        input: [ ],
+        output: [ ],
+      },
+    };
   }
 unmounted: | #js
   function() {
     delete this.$root.els[this.socketElPath];
   }
 methods:
+  grid_client_runtime_socket_value_change: | #js
+    function(boxID, sDirection, sID, sValue) {
+      // #TODO: Slow
+      if (boxID != this.box._id) return;
+      if (sDirection != this.direction) return;
+      if (sID != this.socket._id) return;
+      this.socketValue = sValue;
+    }
+  grid_user_action_stack_new_box_created: | #js
+    function(box) {
+      this.newBox = box;
+    }
   onNewLinkDragStart: | #js
     function(e) {
       this.isNewLinkDragging = true;
     }
   onNewLinkDragEnd: | #js
-    function(e) {
+    async function(e) {
       this.isNewLinkDragging = false;
+
+      // Dropped on the surface
+      if (this.targetPlugPos == null) return;
+
+      const newBox = this.getNewBox(this.ghostBox);
+     
+      // Create the box
+      this.$femit("create.box", newBox);
+
+      // Wait for the box to be created
+      this.newBox = null;
+      await this.$root.wait(() => this.newBox);
+
+      // Link this socket to the new box
+      this.onNewLinkDrop({ box: this.newBox, socket: this.newBox.sockets.input[0], direction: 'input' });
     }
   onNewLinkDrag: | #js
     function(e) {
+      if ((e.clientX == 0) && (e.clientY == 0)) return;
       this.targetPlugPos = { x: (e.clientX - 20), y: (e.clientY) };
     }
   onNewLinkDrop: | #js
@@ -77,11 +130,11 @@ methods:
 
       const from = {
         box: { _id: fromBox._id },
-        socket: { name: fromSocket.name },
+        socket: { _id: fromSocket._id },
       };
       const to = {
         box: { _id: toBox._id },
-        socket: { name: toSocket.name },
+        socket: { _id: toSocket._id },
       };
 
       const gridUiBoxVue = this.$root.vm.getAncestors(this, "grid.ui.box")[0];
@@ -94,10 +147,42 @@ methods:
         event: '⚡',
       }[socket.type];
     }
+  getSurfaceElement: | #js
+    function() {
+      const gridUiBoxVue = this.$root.vm.getAncestors(this, "grid.ui.box")[0];
+      return gridUiBoxVue.surfaceElement;
+    }
+  getNewBox: | #js
+    function(ghostBox) {
+      const surfaceElement = this.getSurfaceElement();
+      const surfaceRect = this.$root.getAbsoluteRect(surfaceElement);
+      
+      const newBox = Objects.clone(ghostBox);
+      delete newBox._id;
+
+      newBox.sockets.input.add({ _id: 1, type: "data", name: "" });
+
+      const { x, y } = this.targetPlugPos;
+      let pos = { x, y };
+      // Translate targetPlugPos, which is relative to the window, to be relative to the surface
+      pos = { x: (x - surfaceRect.left), y: (y - surfaceRect.top) };
+      // Box coordinates are relative to the center of the surface
+      pos = { x: (pos.x - (surfaceRect.width / 2)), y: ((surfaceRect.height / 2) - pos.y) };
+      // Box coordinates mark the center of the box, not the top-left corner
+      pos = { x: (pos.x + (newBox.rect.size.width / 2)), y: (pos.y - (newBox.rect.size.height / 2)) };
+
+      newBox.rect.pos = pos;
+
+      return newBox;
+    }
 computed:
+  showGhostBox: | #js
+    function() {
+      return this.isNewLinkDragging;
+    }
   socketElPath: | #js
     function() {
-      return `/box/${this.box._id}/sockets/${this.direction}/${this.socket.name}`;
+      return `/box/${this.box._id}/sockets/${this.direction}/${this.socket._id}`;
     }
   targetPlugStyle: | #js
     function() {
@@ -109,18 +194,17 @@ computed:
       };
     }
 style:
-  .socket:
+  .input-socket, .output-socket:
     display: flex
     cursor: grab
   .output-socket:
-    display: flex
     flex-direction: row-reverse
 _:
   examples:
     count: 0
 name: grid-ui-box-socket
 template: >-
-  <div class="comp-grid-ui-box-socket" ref="socket1"
+  <grid-module class="comp-grid-ui-box-socket" :show-title="false" ref="socket1"
   path="-321995800."><ui-dnd-dropzone @drop-item="onNewLinkDrop"
   path="-321995800.0"><ui-dnd-draggable :show-drag-ghost="false" :drag-item="{
   box, direction, socket }" @drag-start="onNewLinkDragStart"
@@ -132,4 +216,6 @@ template: >-
   path="-321995800.0.0.0.2"></div></div></ui-dnd-draggable></ui-dnd-dropzone><ui-leader-line
   v-if="isNewLinkDragging" :from="socketEl" :to="targetPlugEl" line-path="fluid"
   color="#404040" path="-321995800.1"></ui-leader-line><div ref="targetPlug1"
-  :style="targetPlugStyle" path="-321995800.2"></div></div>
+  :style="targetPlugStyle" path="-321995800.2"><grid-ui-box v-if="showGhostBox"
+  :surface-element="targetPlugEl" :box="ghostBox"
+  path="-321995800.2.0"></grid-ui-box></div></grid-module>

@@ -18,6 +18,11 @@ methods:
       const action = { redo: { method: "create.box", args: [box] } };
       this.$femit("do", userID, action);
     }
+  grid_ui_box_socket_create_box: | #js
+    function(box) {
+      const action = { redo: { method: "create.box", args: [box] } };
+      this.$femit("do", this.userID, action);
+    }
   grid_ui_box_move_box: | #js
     async function(boxID, pos) {
       const action = { redo: { method: "move.box", args: [boxID, pos] } };
@@ -34,8 +39,8 @@ methods:
       this.$femit("do", this.userID, action);
     }
   grid_ui_box_create_link: | #js
-    async function(from, to) {
-      const action = { redo: { method: "create.link", args: [from, to] } };
+    async function(...args) {
+      const action = { redo: { method: "create.link", args: args } };
       this.$femit("do", this.userID, action);
     }
   grid_ui_actions_undo: | #js

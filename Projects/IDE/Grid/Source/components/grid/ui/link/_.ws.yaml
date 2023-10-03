@@ -1,27 +1,67 @@
 dom:
-  div:
+  grid.module:
+    ':show-title': 'false'
+    ':key': key1
     ui.leader.line:
+      ref: leaderLine1
       ':from': getSocketEl(link.from, 'output')
       ':to': getSocketEl(link.to, 'input')
       color: '#404040'
+      template:
+        v-slot: middle
+        transition:
+          name: slide2
+          ui.value.preview:
+            v-if: flashingValue
+            class: flex justify-center
+            ':value': flashingValue
 props:
   link: null
+data:
+  flashingValue: null
+  key1: 1
 methods:
+  grid_client_runtime_link_flash: | #js
+    async function(linkID, sValue) {
+      // #TODO: Slow
+      if (linkID !== this.link._id) return;
+      
+      const vLeaderLine = this.$root.vm.getDescendant(this, "ui.leader.line");
+      vLeaderLine.flash(sValue);
+
+      //this.flashingValue = sValue;
+      await this.$nextTick();
+      this.flashingValue = null;
+    }
   getSocketEl: | #js
     function(socketRef, direction) {
+      if (!this.$root.els) {
+        setTimeout(this.refresh.bind(this), 100);
+        return null;
+      }
       const socketElPath = this.getSocketElPath(socketRef, direction);
       return this.$root.els[socketElPath];
     }
   getSocketElPath: | #js
     function(socketRef, direction) {
-      const socketElPath = `/box/${socketRef.box._id}/sockets/${direction}/${socketRef.socket.name}`;
+      const socketElPath = `/box/${socketRef.box._id}/sockets/${direction}/${socketRef.socket._id}`;
       return socketElPath;
     }
+  refresh: | #js
+    function() {
+      this.key1++;
+    }
+computed: null
 _:
   examples:
     count: 0
 name: grid-ui-link
 template: >-
-  <div class="comp-grid-ui-link" path="281201772."><ui-leader-line
+  <grid-module class="comp-grid-ui-link" :show-title="false" :key="key1"
+  path="281201772."><ui-leader-line ref="leaderLine1"
   :from="getSocketEl(link.from, 'output')" :to="getSocketEl(link.to, 'input')"
-  color="#404040" path="281201772.0"></ui-leader-line></div>
+  color="#404040" path="281201772.0"><template v-slot:middle
+  path="281201772.0.0"><transition name="slide2"
+  path="281201772.0.0.0"><ui-value-preview class="flex justify-center"
+  v-if="flashingValue" :value="flashingValue"
+  path="281201772.0.0.0.0"></ui-value-preview></transition></template></ui-leader-line></grid-module>

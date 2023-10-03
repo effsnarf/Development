@@ -8,21 +8,16 @@ dom:
 props:
   fuid: null
   defaultValue: null
-data:
   value: null
+data: null
 mounted: | #js
   function() {
     this.load();
   }
 methods:
-  set: | #js
-    function(value) {
-      this.value = value;
-      this.onChange();
-    }
   clear: | #js
     function() {
-      this.value = this.defaultValue;
+      this.$emit("input", this.defaultValue);
       this.onChange();
     }
   onChange: | #js
@@ -38,13 +33,19 @@ methods:
   load: | #js
     function() {
       if (!this.isPersisted) return;
-      this.value = JSON.parse(localStorage.getItem(this.fuid) || this.defaultValue);
+      const value = JSON.parse(localStorage.getItem(this.fuid) || this.defaultValue);
+      this.$emit("input", value);
       this.onChange();
     }
 computed:
   isPersisted: | #js
     function() {
       return this.fuid.includes("/user/actions");
+    }
+watch:
+  value: | #js
+    function(value) {
+      this.onChange();
     }
 _:
   examples:

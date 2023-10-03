@@ -6,6 +6,8 @@ dom:
         ':key': surfaceKey
         ref: surface1
         class: surface flex-grow-1
+        ':style': surfaceStyle
+        @wheel: onWheel
         grid.ui.box:
           v-for: box in boxes
           ':key': '''box/'' + box._id'
@@ -36,6 +38,7 @@ data:
   links: []
   userActions: []
   surfaceElement: null
+  surfaceScale: 1
   surfaceKey: 1
 mounted: | #js
   function() {
@@ -45,12 +48,30 @@ mounted: | #js
     //window.addEventListener("resize", this.refreshSurface.bind(this));
   }
 methods:
+  onWheel: | #js
+    function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      // Adjust surfaceScale based on the wheel event
+      const scrollSize = (e.deltaY / 100);
+      this.surfaceScale += (scrollSize * -0.03);
+      this.$femit("surface.scale", this.surfaceScale);
+    }
   refreshSurface: | #js
-    function() {
+    async function() {
+      await this.$nextTick();
       this.surfaceKey++;
       alertify.message("Surface refreshed");
     }
 computed:
+  surfaceStyle: | #js
+    function() {
+      return {
+        width: "70vw",
+        height: "80vh",
+        transform: `scale(${this.surfaceScale})`,
+      };
+    }
   surface1: | #js
     function() {
       return this.$refs.surface1;
@@ -71,9 +92,9 @@ name: grid-client-workspace
 template: >-
   <grid-module class="comp-grid-client-workspace" icon="👤💻🖱️"
   path="-1461469222."><div class="flex" path="-1461469222.0"><div class="surface
-  flex-grow-1" :key="surfaceKey" ref="surface1"
-  path="-1461469222.0.0"><grid-ui-box v-for="box in boxes" :key="'box/' +
-  box._id" :box="box" :surface-element="surfaceElement"
+  flex-grow-1" :key="surfaceKey" ref="surface1" :style="surfaceStyle"
+  @wheel="onWheel" path="-1461469222.0.0"><grid-ui-box v-for="box in boxes"
+  :key="'box/' + box._id" :box="box" :surface-element="surfaceElement"
   path="-1461469222.0.0.0"></grid-ui-box><grid-ui-link v-for="link in links"
   :key="'link/' + link._id" :link="link"
   path="-1461469222.0.0.1"></grid-ui-link></div><div
