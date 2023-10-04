@@ -27,6 +27,7 @@ methods:
   setSocketValue: | #js
     function(boxID, sDirection, sID, sValue) {
       this.ensure(boxID);
+      const box = this.getBox(boxID);
       this.socket.runtime.data
         [boxID]
         [sDirection]
@@ -90,11 +91,15 @@ methods:
       {
         this.$femit("box.error", box._id, null);
         this.$femit("box.is.loading", box._id, true);
-        await this.$root.wait(2000);
+
         const argNames = box.argNames;
         const argValues = Object.values(this.socket.runtime.data[box._id].input);
-        if (box.runs.on == "server") return await this.runFuncOnServer(box, argNames, argValues, box.code);
-        else return await this.runFuncOnClient(box, argNames, argValues, box.code);
+
+        const result = (box.runs.on == "server")
+          ? await this.runFuncOnServer(box, argNames, argValues, box.code)
+          : await this.runFuncOnClient(box, argNames, argValues, box.code);
+
+        return result;
       }
       catch (ex)
       {
