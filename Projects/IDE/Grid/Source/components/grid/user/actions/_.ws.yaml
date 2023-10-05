@@ -2,21 +2,42 @@ dom:
   grid.module:
     icon: 👤👈
     grid.user.action.stack:
-      ':userID': userID
+      ":userID": userID
+    grid.data.list.view:
+      ":fuid": userID+'/data/boxes'
+      v-model: boxes
 props:
   userID: null
-data: null
+data:
+  boxes: []
 methods:
+  grid_ui_actions_mark_select_box: | #js
+    function(rect) {
+      // Check if any boxes fit into the selection box
+      const selectedBoxes = this.boxes.filter(box => this.isBoxInRect(box, rect));
+      // If any boxes fit into the selection box, select them
+      if (selectedBoxes.length) {
+        const boxIDs = selectedBoxes.map(box => box._id);
+        const action = { redo: { method: "select.boxes", args: [boxIDs, true] } };
+        this.$femit("do", this.userID, action);
+      }
+        // If no boxes fit into the selection box, create a new box
+      if (!selectedBoxes.length) {
+        rect.is = (rect.is || {});
+        rect.is.minimized = (rect.is.minimized || false);
+        const box = {
+          type: null,
+          rect,
+          is: {
+            selected: false
+          },
+        };
+        const action = { redo: { method: "create.box", args: [box] } };
+        this.$femit("do", userID, action);
+      }
+    }
   grid_ui_actions_create_box: | #js
     async function(userID, rect) {
-      rect.is = (rect.is || {});
-      rect.is.minimized = (rect.is.minimized || false);
-      const box = {
-        type: null,
-        rect,
-      };
-      const action = { redo: { method: "create.box", args: [box] } };
-      this.$femit("do", userID, action);
     }
   grid_ui_box_socket_create_box: | #js
     function(box) {
@@ -55,11 +76,46 @@ methods:
     function(userID) {
       this.$femit("clear", userID);
     }
+  isBoxInRect: | #js
+    function(box, rect) {
+      // Check if box is completely inside rect
+      // rect.pos / box.rect.pos mark the center of the rectangle
+      // rect.size / box.rect.size marks the size of the rectangle
+      // If box.rect.is.minimized, we consider its height to be 40
+      // but we need to calculate a new center pos for it, since the
+      // height is different
+
+      // If box.rect.is.minimized, we consider its height to be 40
+      const boxHeight = box.rect.is.minimized ? 40 : box.rect.size.height;
+      
+      // Calculate new center position if the box is minimized
+      const boxCenterY = box.rect.is.minimized ? (box.rect.pos.y + box.rect.size.height / 2) - boxHeight / 2 : box.rect.pos.y;
+      
+      const boxCoords = this.centeredToTraditional({ x: box.rect.pos.x, y: boxCenterY }, { width: box.rect.size.width, height: boxHeight });
+      const rectCoords = this.centeredToTraditional(rect.pos, rect.size);
+      
+      return (
+        boxCoords.left >= rectCoords.left &&
+        boxCoords.right <= rectCoords.right &&
+        boxCoords.top >= rectCoords.top &&
+        boxCoords.bottom <= rectCoords.bottom
+      );
+    }
+  centeredToTraditional: | #js
+    function (centerPos, size) {
+      const left = centerPos.x - size.width / 2;
+      const right = centerPos.x + size.width / 2;
+      const top = centerPos.y - size.height / 2;
+      const bottom = centerPos.y + size.height / 2;
+      return { left, right, top, bottom };
+    }
+name: grid-user-actions
 _:
   examples:
     count: 0
-name: grid-user-actions
 template: >-
   <grid-module class="comp-grid-user-actions" icon="👤👈"
   path="202369922."><grid-user-action-stack :userID="userID"
-  path="202369922.0"></grid-user-action-stack></grid-module>
+  path="202369922.0"></grid-user-action-stack><grid-data-list-view
+  :fuid="userID+'/data/boxes'" v-model="boxes"
+  path="202369922.1"></grid-data-list-view></grid-module>

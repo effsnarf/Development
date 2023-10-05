@@ -90,6 +90,13 @@ methods:
       action.undo = { method: "edit.box", args: [boxID, oldData, newData] };
       return action;
     }
+  select_boxes: | #js
+    async function(userID, action, boxIDs, isSelected) {
+      const boxes = this.boxes.filter((box) => boxIDs.includes(box._id));
+      this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "update", [boxIDs, { is: { selected: isSelected } }]);
+      action.undo = { method: "select.boxes", args: [boxIDs, !isSelected] };
+      return action;
+    }
   create_link: | #js
     async function(userID, action, from, to) {
       const link = { _id: this.nextID++, from, to };

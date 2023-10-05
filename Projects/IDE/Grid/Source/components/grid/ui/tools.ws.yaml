@@ -40,7 +40,7 @@ methods:
     }
   onSelectBoxMark: | #js
     function(rect) {
-      this.$femit("select.box.mark", rect);
+      this.$femit("mark.select.box", rect);
     }
   onClear: | #js
     function() {

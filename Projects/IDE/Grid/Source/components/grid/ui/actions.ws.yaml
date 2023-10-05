@@ -5,9 +5,9 @@ props:
   userID: null
 data: null
 methods:
-  grid_ui_tools_select_box_mark: | #js
+  grid_ui_tools_mark_select_box: | #js
     function(rect) {
-      this.$femit("create.box", this.userID, rect);
+      this.$femit("mark.select.box", rect);
     }
   grid_ui_tools_undo: | #js
     function() {
@@ -24,7 +24,7 @@ methods:
   onAllEvents: | #js
     function(compName, emitName, args) {
       if (compName != "grid.ui.toolbar") return;
-      if (emitName == "select.box.mark") return;
+      if (emitName == "mark.select.box") return;
       this.$femit(emitName, this.userID, ...args);
     }
 _:

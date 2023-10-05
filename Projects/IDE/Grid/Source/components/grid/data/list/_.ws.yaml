@@ -3,7 +3,7 @@ dom:
     icon: 🧊📃
     ':title': fuid
     grid.data.list.view:
-      v-if: 'false'
+      v-show: 'false'
       ':fuid': fuid
       @input: (value) => $emit('input', value)
 props:
@@ -21,12 +21,21 @@ methods:
       this.onChange();
     }
   update: | #js
-    function(itemID, data) {
-      const item = this.items.find(item => (item._id == itemID));
-      let changes = DeepDiff.diff(item, data);
-      changes = changes.filter(change => (change.kind !== "D"));
-      for (const change of changes) DeepDiff.applyChange(item, change);
-      this.onChange();
+    function(itemIDs, datas) {
+      if (!Array.isArray(itemIDs)) itemIDs = [itemIDs];
+      if (!Array.isArray(datas)) datas = [datas];
+      const updateItem = (itemID, data) => {
+        const item = this.items.find(item => (item._id == itemID));
+        let changes = DeepDiff.diff(item, data);
+        changes = changes.filter(change => (change.kind !== "D"));
+        for (const change of changes) DeepDiff.applyChange(item, change);
+        this.onChange();
+      };
+      for (let i = 0; i < itemIDs.length; i++)
+      {
+        const dataIndex = (i % datas.length)
+        updateItem(itemIDs[i], datas[dataIndex]);
+      }
     }
   delete: | #js
     function(itemIDs) {
@@ -70,6 +79,6 @@ _:
 name: grid-data-list
 template: >-
   <grid-module class="comp-grid-data-list" icon="🧊📃" :title="fuid"
-  path="882586554."><grid-data-list-view v-if="false" :fuid="fuid"
+  path="882586554."><grid-data-list-view v-show="false" :fuid="fuid"
   @input="(value) =&gt; $emit('input', value)"
   path="882586554.0"></grid-data-list-view></grid-module>

@@ -1,6 +1,8 @@
 dom:
   .flex:
-    div:
+    div: 
+      v-text: '''🆎'''
+    div: 
       v-text: getDataTypeIcon(dataValue)
 props:
   box: null
@@ -23,7 +25,6 @@ methods:
       const icons = [];
       
       if (typeof value === "string") {
-        icons.add("🆎");
         const isUrl = value.startsWith("http");
         if (isUrl) icons.add("🔗");
       }
@@ -46,4 +47,5 @@ _:
 name: grid-ui-box-text-header
 template: >-
   <div class="comp-grid-ui-box-text-header flex" path="-127112423."><div
-  v-text="getDataTypeIcon(dataValue)" path="-127112423.0"></div></div>
+  v-text="'🆎'" path="-127112423.0"></div><div
+  v-text="getDataTypeIcon(dataValue)" path="-127112423.1"></div></div>
