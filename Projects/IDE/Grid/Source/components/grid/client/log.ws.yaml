@@ -2,11 +2,12 @@ dom:
   grid.module:
     icon: 💻📃
     ui.console:
-      v-show: 'false'
+      v-if: 'false'
       ref: console1
 props: null
 mounted: | #js
   function() {
+    return;
     this.$root.$on("grid.event", this.onGridEvent);
   }
 methods:
@@ -21,5 +22,5 @@ _:
 name: grid-client-log
 template: >-
   <grid-module class="comp-grid-client-log" icon="💻📃"
-  path="-1813344695."><ui-console v-show="false" ref="console1"
+  path="-1813344695."><ui-console v-if="false" ref="console1"
   path="-1813344695.0"></ui-console></grid-module>

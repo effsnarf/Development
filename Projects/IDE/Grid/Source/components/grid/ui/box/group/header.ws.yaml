@@ -1,0 +1,21 @@
+dom:
+  .flex:
+    .clickable:
+      v-text: '''📦'''
+      @click: $emit('title-icon-click')
+props:
+  box: null
+data:
+  dataValue: null
+methods:
+  init: | #js
+    function(box) {
+    }
+_:
+  examples:
+    count: 0
+name: grid-ui-box-group-header
+template: >-
+  <div class="comp-grid-ui-box-group-header flex" path="262260113."><div
+  class="clickable" v-text="'📦'" @click="$emit('title-icon-click')"
+  path="262260113.0"></div></div>

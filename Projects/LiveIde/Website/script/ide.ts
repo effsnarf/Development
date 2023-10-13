@@ -170,7 +170,7 @@ const vueIdeCompMixin = {
   mounted() {
     vueIdeApp?.vm.registerVue(this);
   },
-  beforeDestroy() {
+  unmounted() {
     vueIdeApp?.vm.unregisterVue(this);
   },
 };

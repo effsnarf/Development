@@ -139,10 +139,10 @@ template: >-
   path="-604919625.1.0.1.0"></ui-value-any></td><td
   v-if="!isPrimitive(row.value)" colspan="2" path="-604919625.1.0.2"><div
   class="flex clickable" @click="toggleExpanded(row.key)"
-  path="-604919625.1.0.2.0"><ui-expand class="opacity-40" :value="expandAll ||
-  isExpanded[row.key]" :text="row.key"
+  path="-604919625.1.0.2.0"><ui-expand class="opacity-40"
+  :value="isExpanded[row.key]" :text="row.key"
   path="-604919625.1.0.2.0.0"></ui-expand></div><transition name="slide"
-  path="-604919625.1.0.2.1"><div class="ml-l1" v-if="expandAll ||
-  isExpanded[row.key]" path="-604919625.1.0.2.1.0"><ui-value-any
-  :value="row.value" :depth="(depth + 1)"
+  path="-604919625.1.0.2.1"><div class="ml-l1" v-if="isExpanded[row.key]"
+  path="-604919625.1.0.2.1.0"><ui-value-any :value="row.value" :depth="(depth +
+  1)"
   path="-604919625.1.0.2.1.0.0"></ui-value-any></div></transition></td></tr></table></div>

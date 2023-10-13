@@ -138,6 +138,11 @@ methods:
     }
   onNewLinkDrag: | #js
     async function(e) {
+      if (!this.nldt) this.nldt = this._onNewLinkDrag.bind(this).throttle(100);
+      this.nldt(e);
+    }
+  _onNewLinkDrag: | #js
+    async function(e) {
       const pos = { x: e.e.clientX, y: e.e.clientY };
       if (pos.x == 0 && pos.y == 0) return;
       //const pos = e.relative.pos;
@@ -223,6 +228,7 @@ computed:
     }
   showGhostBox: | #js
     function() {
+      return false;
       return this.isNewLinkDragging;
     }
   socketElPath: | #js

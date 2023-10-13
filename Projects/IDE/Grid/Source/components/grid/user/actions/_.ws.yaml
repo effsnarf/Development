@@ -13,12 +13,12 @@ data:
 methods:
   grid_client_workspace_create_group: | #js
     function() {
-      const action = { redo: { method: "create.group" } };
+      const action = { redo: { method: "create.group", args: [] } };
       this.$femit("do", this.userID, action);
     }
   grid_client_workspace_delete_selected: | #js
     function() {
-      const action = { redo: { method: "delete.selected" } };
+      const action = { redo: { method: "delete.selected", args: [] } };
       this.$femit("do", this.userID, action);
     }
   grid_ui_actions_mark_select_box: | #js

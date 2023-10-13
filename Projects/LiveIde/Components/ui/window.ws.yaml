@@ -166,7 +166,7 @@ methods:
   getStyleHeight: | #js
     function() {
       const size = this.rect1.size;
-      const minimizedHeight = "2.5em";
+      const minimizedHeight = "40px";
       const fullHeight = (size.height + "px");
       if (this.isHovered || this.isResizing) return fullHeight;
       if (this.rect1.is?.minimized) return minimizedHeight;
@@ -200,6 +200,7 @@ methods:
 computed:
   showContent: | #js
     function() {
+      return true;
       if (!this.rect.is.minimized) return true;
       if (this.isHovered) return true;
       if (this.isResizing) return true;
@@ -213,11 +214,12 @@ computed:
       const size = this.rect1.size;
       const style = {};
       style.position = "absolute";
-      style.left = `${center.x + pos.x - (size.width / 2)}px`;
-      style.top = `${center.y - pos.y - (size.height / 2)}px`;
       style.width = (size.width + "px");
       style.height = this.getStyleHeight();
-      if (!this.isDraggingMoving && !this.isResizing) style.transition = "all 1s, border 0s";
+      const height = parseInt(style.height);
+      style.left = `${center.x + pos.x - (size.width / 2)}px`;
+      style.top = `${center.y - pos.y - (height / 2)}px`;
+      if (!this.isDraggingMoving && !this.isResizing) style.transition = "all 0.6s, border 0s";
       return style;
     }
   contentStyle: | #js

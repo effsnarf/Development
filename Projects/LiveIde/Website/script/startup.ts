@@ -549,6 +549,7 @@ interface MgParams {
       compsDic: {},
       compNames: [],
       templates: client.templates,
+      isDevToolsOpen: false,
       isLoading: 0,
       error: null,
       loadingImageUrl:
@@ -561,6 +562,9 @@ interface MgParams {
     async mounted() {
       await this.init();
       this.events.on("*", this.onAppEvent.bind(this));
+      window.addEventListener("resize", () => {
+        this.isDevToolsOpen = window.outerWidth - window.innerWidth > 100;
+      });
     },
     methods: {
       async onAppEvent(name: string, ...args: any[]) {

@@ -8,7 +8,7 @@ dom:
         ':text': compName
         ':number': getTitle()
     ui.console:
-      v-show: 'false'
+      v-if: 'false'
       ref: console1
     .module-content:
       slot: null
@@ -49,7 +49,7 @@ mounted: | #js
       await this.$parent.$nextTick();
 
       this.femitsOutLog[emitName] = args;
-      this.$refs.console1.log("➕", emitName);
+      this.$refs.console1?.log("➕", emitName);
       this.refresh();
 
       this.$root.$emit("grid.event", this.compName, emitName, args);
@@ -121,7 +121,7 @@ methods:
       if (this.$parent[methodName]) {
         // Module caught an event
         this.femitsInLog[emitName] = args;
-        this.$refs.console1.log("➖", compName, emitName);
+        this.$refs.console1?.log("➖", compName, emitName);
         this.refresh();
       }
     }
@@ -175,8 +175,8 @@ template: >-
   <div class="comp-grid-module grid-module box2" path="1449764372."><h3
   v-if="icon &amp;&amp; showTitle" path="1449764372.0"><ui-title :icon="icon"
   :text="compName" :number="getTitle()"
-  path="1449764372.0.0"></ui-title></h3><ui-console v-show="false"
-  ref="console1" path="1449764372.1"></ui-console><div class="module-content"
+  path="1449764372.0.0"></ui-title></h3><ui-console v-if="false" ref="console1"
+  path="1449764372.1"></ui-console><div class="module-content"
   path="1449764372.2"><slot></slot></div><div class="mt-l1" v-if="showEvents"
   :key="key1" path="1449764372.3"><ui-value
   v-if="Object.keys(femitsOutLog).length" :value="femitsOutLog"

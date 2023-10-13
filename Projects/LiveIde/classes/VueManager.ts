@@ -213,6 +213,11 @@ class VueManager {
 
     if (this.vues[vue._uid]) return;
 
+    console.log(
+      `Registering vue ${vue._uid} (${vue.$options._componentTag})) (total: ${this.vuesCount})`,
+      vue
+    );
+
     this.vues[vue._uid] = () => vue;
     const vueCompName = vue.$options._componentTag;
     this.vuesCounts[vueCompName] = (this.vuesCounts[vueCompName] || 0) + 1;
@@ -229,6 +234,8 @@ class VueManager {
 
   unregisterVue(vue: any) {
     if (!vue) return;
+
+    console.log(`Unregistering vue ${vue._uid}`);
 
     delete this.vues[vue._uid];
     const vueCompName = vue.$options._componentTag;

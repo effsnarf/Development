@@ -20,6 +20,15 @@ dom:
             ':selected': (selectedEditor == editor)
             ':key': editor
             v-text: editor
+      div: 
+        v-if: 'true'
+        @click: refresh
+        ui.title: 
+          v-for: entry in appVuesCounts
+          icon: 🎄
+          ':text': entry[0]
+          ':number': entry[1]
+      ide.debug: null
       .clickable:
         @click: refresh
         h2:
@@ -28,13 +37,6 @@ dom:
           ':value': perfStats
       div: 
         v-if: 'false'
-        ui.title: 
-          v-for: entry in appVuesCounts
-          icon: 🎄
-          ':text': entry[0]
-          ':number': entry[1]
-      ide.debug: null
-      div: 
         ide.component.picker:
           v-if: (selectedEditor == 'component')
         ide.element.picker:
@@ -49,10 +51,12 @@ data:
   showWorkspace: true
   selectedEditor: component
   perfStats: null
+  appVuesCounts: null
 mounted: | #js
   function() {
     this.showWorkspace = (window.location.hostname == "localhost");
     this.refresh();
+    setInterval(this.refresh.bind(this), 1000);
   }
 methods:
   refresh: | #js
@@ -64,15 +68,14 @@ methods:
           average: e[1].duration.average,
           measures: e[1].duration.measures
         }));
+
+      this.appVuesCounts = Object.entries(vueApp.vm.vuesCounts)
+        .sortBy(e => -e[1]);
     }
 computed:
   appVuesCount: | #js
     function() {
       return vueApp.vm.vuesCount;
-    }
-  appVuesCounts: | #js
-    function() {
-      return Object.entries(vueApp.vm.vuesCounts).sortBy(e => -e[1]);
     }
 name: ide-workspace
 style:
@@ -82,7 +85,7 @@ style:
     right: 1rem
     display: flex
     flex-direction: column
-    width: 5em
+    width: 10em
     gap: 3em
     background: '#303030'
     padding: 1rem
@@ -106,13 +109,13 @@ template: >-
   path="-1163457967.0.0.1.0"></ui-button></div><select v-model="selectedEditor"
   path="-1163457967.0.0.2"><option v-for="editor in ['component', 'css']"
   :selected="(selectedEditor == editor)" :key="editor" v-text="editor"
-  path="-1163457967.0.0.2.0"></option></select></h3><div class="clickable"
-  @click="refresh" path="-1163457967.0.1"><h2 v-text="'Performance'"
-  path="-1163457967.0.1.0"></h2><ui-value :value="perfStats"
-  path="-1163457967.0.1.1"></ui-value></div><div v-if="false"
-  path="-1163457967.0.2"><ui-title v-for="entry in appVuesCounts" icon="🎄"
-  :text="entry[0]" :number="entry[1]"
-  path="-1163457967.0.2.0"></ui-title></div><ide-debug></ide-debug><div
+  path="-1163457967.0.0.2.0"></option></select></h3><div v-if="true"
+  @click="refresh" path="-1163457967.0.1"><ui-title v-for="entry in
+  appVuesCounts" icon="🎄" :text="entry[0]" :number="entry[1]"
+  path="-1163457967.0.1.0"></ui-title></div><ide-debug></ide-debug><div
+  class="clickable" @click="refresh" path="-1163457967.0.3"><h2
+  v-text="'Performance'" path="-1163457967.0.3.0"></h2><ui-value
+  :value="perfStats" path="-1163457967.0.3.1"></ui-value></div><div v-if="false"
   path="-1163457967.0.4"><ide-component-picker v-if="(selectedEditor ==
   'component')"
   path="-1163457967.0.4.0"></ide-component-picker><ide-element-picker

@@ -23,6 +23,7 @@ dom:
           ':key': '''link/'' + link._id'
           ':link': link
       div: 
+        v-show: showGridTools
         grid.ui.tools:
           ':surface-element': surfaceElement
         grid.data.variable.view:
@@ -74,6 +75,10 @@ methods:
       alertify.message("Surface refreshed");
     }
 computed:
+  showGridTools: | #js
+    function() {
+      return !this.$root.isDevToolsOpen;
+    }
   surfaceStyle: | #js
     function() {
       return {
@@ -106,7 +111,7 @@ template: >-
   box._id" :userID="userID" :box="box" :surface-element="surfaceElement"
   path="-1461469222.1.0.0"></grid-ui-box><grid-ui-link v-for="link in links"
   :key="'link/' + link._id" :link="link"
-  path="-1461469222.1.0.1"></grid-ui-link></div><div
+  path="-1461469222.1.0.1"></grid-ui-link></div><div v-show="showGridTools"
   path="-1461469222.1.1"><grid-ui-tools :surface-element="surfaceElement"
   path="-1461469222.1.1.0"></grid-ui-tools><grid-data-variable-view
   :fuid="userID+'/user/actions/pointer'" v-model="userActionsPointer"

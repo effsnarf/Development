@@ -3599,6 +3599,7 @@ class VueManager {
             return;
         if (this.vues[vue._uid])
             return;
+        console.log(`Registering vue ${vue._uid} (${vue.$options._componentTag})) (total: ${this.vuesCount})`, vue);
         this.vues[vue._uid] = () => vue;
         const vueCompName = vue.$options._componentTag;
         this.vuesCounts[vueCompName] = (this.vuesCounts[vueCompName] || 0) + 1;
@@ -3614,6 +3615,7 @@ class VueManager {
     unregisterVue(vue) {
         if (!vue)
             return;
+        console.log(`Unregistering vue ${vue._uid}`);
         delete this.vues[vue._uid];
         const vueCompName = vue.$options._componentTag;
         //this.vuesCounts[vueCompName]--;
@@ -7443,7 +7445,7 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/website/script/1697191079808.ts ***!
+  !*** ../../../LiveIde/website/script/1697209441708.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -7933,6 +7935,7 @@ const mgMixin = {
             compsDic: {},
             compNames: [],
             templates: client.templates,
+            isDevToolsOpen: false,
             isLoading: 0,
             error: null,
             loadingImageUrl: "https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/images/loading.gif",
@@ -7944,6 +7947,9 @@ const mgMixin = {
         async mounted() {
             await this.init();
             this.events.on("*", this.onAppEvent.bind(this));
+            window.addEventListener("resize", () => {
+                this.isDevToolsOpen = window.outerWidth - window.innerWidth > 100;
+            });
         },
         methods: {
             async onAppEvent(name, ...args) {

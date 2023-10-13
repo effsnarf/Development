@@ -6,14 +6,14 @@ dom:
       ui.button: 
         icon: ➕📦
         text: create group ✔️
-        @click: getWorkspace.$femit('create.group')
+        @click: getWorkspace().$femit('create.group')
     div: 
       v-if: canDelete
       ui.button: 
         icon: ❌🗑️
         text: delete
         confirm: Are you sure you want to delete the selected boxes?
-        @click: getWorkspace.$femit('delete.selected')
+        @click: getWorkspace().$femit('delete.selected')
 props:
   userID: null
   boxes: []
@@ -61,6 +61,14 @@ computed:
       const cans = [this.canCreateGroup, this.canDelete];
       return cans.some(c => c);
     }
+watch:
+  boxes:
+    handler: | #js
+      async function() {
+        await this.$nextTick();
+        this.refresh();
+      }
+    immediate: true
 _:
   examples:
     count: 0
@@ -69,9 +77,9 @@ template: >-
   <ui-context-window class="comp-grid-client-context-menu"
   :visible="showContextMenu" path="-1053034279."><div v-if="canCreateGroup"
   path="-1053034279.0"><ui-button icon="➕📦" text="create group ✔️"
-  @click="getWorkspace.$femit('create.group')"
+  @click="getWorkspace().$femit('create.group')"
   path="-1053034279.0.0"></ui-button></div><div v-if="canDelete"
   path="-1053034279.1"><ui-button icon="❌🗑️" text="delete" confirm="Are you
   sure you want to delete the selected boxes?"
-  @click="getWorkspace.$femit('delete.selected')"
+  @click="getWorkspace().$femit('delete.selected')"
   path="-1053034279.1.0"></ui-button></div></ui-context-window>

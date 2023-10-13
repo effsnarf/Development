@@ -40,27 +40,28 @@ mounted: | #js
 methods:
   create_group: | #js
     function(userID, action) {
-      const selectedBoxes = this.boxes.filter((box) => box.rect.is.selected);
+      const selectedBoxes = this.boxes.filter((box) => box.is?.selected);
       const memberBoxes = selectedBoxes;
       const memberBoxIDs = memberBoxes.map((box) => box._id);
       const type = "group";
       const displayBox = this.getDisplayBox(memberBoxes);
-      const rect = Objects.clone(shownBox.rect);
+      const rect = Objects.clone(displayBox.rect);
       const groupBox = {
         _id: this.nextID++,
         type,
         rect,
         sockets: this.getNewSockets(type),
         members: selectedBoxes.map((box) => box._id),
-        displayBox: displayBox._id,
+        displayBoxID: displayBox._id,
       };
 
       this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "add", [groupBox]);
-      this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "update", [memberBoxIDs, { parent: { group: groupBox._id} }]);
+      this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "update", [memberBoxIDs, { groupBoxID: groupBox._id } ]);
       
-      this.$femit("new.box.created", box);
+      this.$femit("new.box.created", groupBox);
 
-      action.undo = { method: "delete.group", args: [box._id] };
+      action.undo = { method: "delete.group", args: [groupBox._id] };
+      return action;
     }
   getDisplayBox: | #js
     function(boxes) {
@@ -229,6 +230,8 @@ methods:
       action = Objects.clone(action);
       
       action = await method.apply(this, [userID, action, ...redo.args]);
+
+      if (!action) throw new Error(`Implementer method ${methodName} must return an action`);
 
       if (addToStack) {
         this.addToStack(action);

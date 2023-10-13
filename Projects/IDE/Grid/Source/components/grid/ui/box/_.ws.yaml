@@ -3,6 +3,7 @@ dom:
     icon: 📦
     ':show-title': 'false'
     ui.window:
+      v-if: showBoxWindow
       ':window-style': windowStyle
       ':rect': box.rect
       ':surface-element': surfaceElement
@@ -123,6 +124,10 @@ methods:
       return jsyaml.dump(obj);
     }
 computed:
+  showBoxWindow: | #js
+    function() {
+      return !this.box?.groupBoxID;
+    }
   windowStyle: | #js
     function() {
       const style = {};
@@ -169,9 +174,9 @@ style:
 name: grid-ui-box
 template: >-
   <grid-module class="comp-grid-ui-box" icon="📦" :show-title="false"
-  path="1671629593."><ui-window :window-style="windowStyle" :rect="box.rect"
-  :surface-element="surfaceElement" :surface-scale="surfaceScale"
-  :center-coords="true" :show-header="!!box.type"
+  path="1671629593."><ui-window v-if="showBoxWindow" :window-style="windowStyle"
+  :rect="box.rect" :surface-element="surfaceElement"
+  :surface-scale="surfaceScale" :center-coords="true" :show-header="!!box.type"
   @is-minimized="onToggleMinimized" @drag-stop="onDragStop"
   path="1671629593.0"><template v-slot:above
   path="1671629593.0.0"><grid-ui-box-sockets :box="box" direction="input"
