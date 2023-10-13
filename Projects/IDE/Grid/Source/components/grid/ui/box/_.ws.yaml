@@ -3,7 +3,7 @@ dom:
     icon: 📦
     ':show-title': 'false'
     ui.window:
-      v-if: showBoxWindow
+      v-show: showBoxWindow
       ':window-style': windowStyle
       ':rect': box.rect
       ':surface-element': surfaceElement
@@ -174,8 +174,8 @@ style:
 name: grid-ui-box
 template: >-
   <grid-module class="comp-grid-ui-box" icon="📦" :show-title="false"
-  path="1671629593."><ui-window v-if="showBoxWindow" :window-style="windowStyle"
-  :rect="box.rect" :surface-element="surfaceElement"
+  path="1671629593."><ui-window v-show="showBoxWindow"
+  :window-style="windowStyle" :rect="box.rect" :surface-element="surfaceElement"
   :surface-scale="surfaceScale" :center-coords="true" :show-header="!!box.type"
   @is-minimized="onToggleMinimized" @drag-stop="onDragStop"
   path="1671629593.0"><template v-slot:above
