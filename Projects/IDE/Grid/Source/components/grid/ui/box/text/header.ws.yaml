@@ -1,8 +1,9 @@
 dom:
   .flex:
-    div: 
+    .clickable:
       v-text: '''🆎'''
-    div: 
+      @click: $emit('title-icon-click')
+    div:
       v-text: getDataTypeIcon(dataValue)
 props:
   box: null
@@ -47,5 +48,6 @@ _:
 name: grid-ui-box-text-header
 template: >-
   <div class="comp-grid-ui-box-text-header flex" path="-127112423."><div
-  v-text="'🆎'" path="-127112423.0"></div><div
-  v-text="getDataTypeIcon(dataValue)" path="-127112423.1"></div></div>
+  class="clickable" v-text="'🆎'" @click="$emit('title-icon-click')"
+  path="-127112423.0"></div><div v-text="getDataTypeIcon(dataValue)"
+  path="-127112423.1"></div></div>

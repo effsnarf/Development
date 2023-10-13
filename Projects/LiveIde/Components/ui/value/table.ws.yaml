@@ -14,7 +14,7 @@ dom:
           v-text: row.key
         td: 
           v-if: isPrimitive(row.value)
-          ui.value.any:
+          ui.value.any: 
             ':value': row.value
             ':depth': (depth + 1)
         td: 
@@ -31,12 +31,13 @@ dom:
             name: slide
             .ml-l1:
               v-if: isExpanded[row.key]
-              ui.value.table:
+              ui.value.any: 
                 ':value': row.value
                 ':depth': (depth + 1)
 props:
   value: null
   title: null
+  expandAll: true
   depth: 0
 data:
   isExpanded: {}
@@ -64,16 +65,20 @@ methods:
       if (value == null) return true;
       return ['string', 'number', 'boolean'].includes(typeof value);
     }
-computed:
-  type: | #js
-    function() {
-      if (Array.isArray(this.value)) {
+  getType: | #js
+    function(value) {
+      if (Array.isArray(value)) {
         return 'array'
       }
-      if (typeof this.value === 'object') {
+      if (typeof value === 'object') {
         return 'object'
       }
       return null;
+    }
+computed:
+  type: | #js
+    function() {
+      return this.getType(this.value);
     }
   isEmpty: | #js
     function() {
@@ -134,10 +139,10 @@ template: >-
   path="-604919625.1.0.1.0"></ui-value-any></td><td
   v-if="!isPrimitive(row.value)" colspan="2" path="-604919625.1.0.2"><div
   class="flex clickable" @click="toggleExpanded(row.key)"
-  path="-604919625.1.0.2.0"><ui-expand class="opacity-40"
-  :value="isExpanded[row.key]" :text="row.key"
+  path="-604919625.1.0.2.0"><ui-expand class="opacity-40" :value="expandAll ||
+  isExpanded[row.key]" :text="row.key"
   path="-604919625.1.0.2.0.0"></ui-expand></div><transition name="slide"
-  path="-604919625.1.0.2.1"><div class="ml-l1" v-if="isExpanded[row.key]"
-  path="-604919625.1.0.2.1.0"><ui-value-table :value="row.value" :depth="(depth
-  + 1)"
-  path="-604919625.1.0.2.1.0.0"></ui-value-table></div></transition></td></tr></table></div>
+  path="-604919625.1.0.2.1"><div class="ml-l1" v-if="expandAll ||
+  isExpanded[row.key]" path="-604919625.1.0.2.1.0"><ui-value-any
+  :value="row.value" :depth="(depth + 1)"
+  path="-604919625.1.0.2.1.0.0"></ui-value-any></div></transition></td></tr></table></div>

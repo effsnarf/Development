@@ -203,6 +203,7 @@ interface Number {
   _is(obj: any, type: any): boolean;
   _compare(obj1: any, obj2: any): number;
   _getObjectType(obj: any): any;
+  _getObjectTypeName(obj: any): string;
   is(type: any): boolean;
   seconds(): number;
   minutes(): number;
@@ -341,6 +342,7 @@ interface Array<T> {
   clear(stagger?: number): void;
   add(items: any[], stagger?: number): void;
   take(count: number): T[];
+  takeLast(count: number): T[];
   replace(
     getNewItems: () => Promise<any[]>,
     stagger: number,
@@ -360,11 +362,13 @@ interface Array<T> {
   getPairs(): [T, T][];
   joinColumns(columns: (number | null)[], ellipsis?: boolean): string;
   distinct(project?: ((item: T) => any) | null): T[];
+  selectFields(fields: string[]): T[];
   except(...items: T[]): T[];
   exceptBy(items: T[], getItemKey?: (item: T) => any): T[];
   exceptLast(count: number): T[];
   sortBy(...projects: ((item: T) => any)[]): T[];
   sortByDesc(...projects: ((item: T) => any)[]): T[];
+  sortByDirection(projects: ((item: any) => any)[], direction: number): T[];
   stringify(): string;
   onlyTruthy<T>(): T[];
   shuffle(): T[];
@@ -1530,6 +1534,10 @@ if (typeof Array !== "undefined") {
     return this.slice(0, count);
   };
 
+  Array.prototype.takeLast = function (count: number) {
+    return this.slice(-count);
+  };
+
   Array.prototype.replace = async function (
     getNewItems: () => Promise<any[]>,
     stagger: number = 0,
@@ -1644,6 +1652,16 @@ if (typeof Array !== "undefined") {
     return result;
   };
 
+  Array.prototype.selectFields = function (fields: string[]) {
+    return this.map((item) => {
+      const newItem = {} as any;
+      for (const field of fields) {
+        newItem[field] = item[field];
+      }
+      return newItem;
+    });
+  };
+
   Array.prototype.except = function (...items: any[]) {
     return this.filter((item) => !items.includes(item));
   };
@@ -1662,6 +1680,13 @@ if (typeof Array !== "undefined") {
   };
 
   Array.prototype.sortBy = function (...projects: ((item: any) => any)[]) {
+    if (!projects?.length) return [...this];
+    if (projects.all((p) => !p)) return [...this];
+
+    projects = projects.map((project) =>
+      typeof project == "string" ? (item) => item[project] : project
+    );
+
     return this.sort((a, b) => {
       const aVals = projects.map((project) => project(a));
       const bVals = projects.map((project) => project(b));
@@ -1671,6 +1696,15 @@ if (typeof Array !== "undefined") {
 
   Array.prototype.sortByDesc = function (...projects: ((item: any) => any)[]) {
     return [...this.sortBy(...projects)].reverse();
+  };
+
+  Array.prototype.sortByDirection = function (
+    projects: ((item: any) => any)[],
+    direction: number
+  ) {
+    return direction > 0
+      ? this.sortBy(...projects)
+      : this.sortByDesc(...projects);
   };
 
   Array.prototype.stringify = function (): any {
@@ -1750,7 +1784,7 @@ if (typeof Function !== "undefined") {
     let timeout: any;
     return function (this: any, ...args) {
       (fn as any).nextArgs = args;
-      const context = this;
+      const context = this as any;
       if (!timeout) {
         timeout = setTimeout(async function () {
           await fn.apply(context, (fn as any).nextArgs);

@@ -13,6 +13,7 @@ import { DatabaseProxy } from "../../../Apps/DatabaseProxy/Client/DbpClient";
 import { MemoryCache } from "@shared/Cache";
 import { Analytics, ItemType } from "@shared/Analytics";
 import isAttributeName from "@shared/WebScript/is.attribute.name";
+import { ChatOpenAI, Roles } from "../../../Apis/OpenAI/classes/ChatOpenAI";
 
 Configuration.log = false;
 
@@ -413,14 +414,35 @@ const _fetchAsJson = async (url: string) => {
         if (result) return result;
       }
 
-      if (req.url.startsWith("/fetch")) {
-        const url = req.url.split("?")[1].split("=")[1];
-        const response = await axios.get(url);
-        return res.end(JSON.stringify(response.data));
+      if (req.url.startsWith("/write/function")) {
+        const chat = await ChatOpenAI.new(Roles.ChatGPT);
+        const { name, argNames, desc } = data;
+        for (const arg of ["name", "desc"])
+          if (!data[arg]) throw new Error(`${arg} is required`);
+
+        const reply = await chat.send(
+          `write a javascript function called ${name}: ${desc}.
+          the function should take ${
+            argNames.length
+          } arguments: ${argNames.join(", ")}
+          `
+        );
+
+        // Cut everything between "function ${name}([argNames...]) {" and "}\n```"
+        const code = reply
+          .replace(
+            new RegExp(`function ${name}\\(.*\\) {`, "s"),
+            `function ${name}(${argNames.join(", ")}) {`
+          )
+          .replace(/\}\n```/s, "}");
+
+        return res.end(JSON.stringify({ code }));
       }
 
       if (req.url.startsWith("/execute/code")) {
-        const { argNames, argValues, code } = data;
+        let { argNames, argValues, code } = data;
+
+        if (!Array.isArray(argNames)) argNames = Object.values(argNames);
 
         const func = eval(
           `(async function(${argNames.join(", ")}) { ${code} })`

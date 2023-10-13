@@ -1,8 +1,5 @@
 dom:
   div:
-    ui.context.window:
-      ui.value:
-        ':value': item
     ui.title:
       icon: 📦
       ':text': '''box '' + item._id'
@@ -13,7 +10,5 @@ _:
     count: 0
 name: grid-data-box
 template: >-
-  <div class="comp-grid-data-box" path="-248633553."><ui-context-window
-  path="-248633553.0"><ui-value :value="item"
-  path="-248633553.0.0"></ui-value></ui-context-window><ui-title icon="📦"
-  :text="'box ' + item._id" path="-248633553.1"></ui-title></div>
+  <div class="comp-grid-data-box" path="-248633553."><ui-title icon="📦"
+  :text="'box ' + item._id" path="-248633553.0"></ui-title></div>

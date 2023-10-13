@@ -24,7 +24,7 @@
   unmounted: {{{addCode unmounted ""}}},
   methods: {
     {{#each methods}}
-    {{@key}}: {{{addCode this "if (window.vueIdeApp?.isPauseOnMethod(this.$options._componentTag, '{{method}}')) debugger;" @key}}},
+    {{@key}}: {{{addCode this "window.vueIdeApp?.perf.track.start(this.$options._componentTag + '.{{method}}'); if (window.vueIdeApp?.isPauseOnMethod(this.$options._componentTag, '{{method}}')) debugger;" @key "window.vueIdeApp?.perf.track.stop(this.$options._componentTag + '.{{method}}');"}}},
     {{/each}}
   },
   computed: {
@@ -34,7 +34,7 @@
       get: {{{addCode get ""}}},
     },
     {{else}}
-    {{@key}}: {{{addCode this ""}}},
+    {{@key}}: {{{addCode this "window.vueIdeApp?.perf.track.start(this.$options._componentTag + '.{{method}}');" @key "window.vueIdeApp?.perf.track.stop(this.$options._componentTag + '.{{method}}');"}}},
     {{/if}}
     {{/each}}
   },

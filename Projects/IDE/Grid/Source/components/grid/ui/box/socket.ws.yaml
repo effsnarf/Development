@@ -4,6 +4,12 @@ dom:
     ref: socket1
     ui.dnd.dropzone:
       @drop-item: onNewLinkDrop
+      ui.context.window:
+        v-if: '!isNewLinkDragging'
+        div: 
+          ':style': dataTooltipStyle
+          ui.value: 
+            ':value': null
       ui.dnd.draggable:
         ':show-drag-ghost': 'false'
         ':drag-item': '{ box, direction, socket }'
@@ -25,7 +31,13 @@ dom:
       ':to': targetPlugEl
       line-path: fluid
       color: '#404040'
-    div:
+    div: 
+      ref: socketValue1
+      v-show: 'false'
+      ui.value: 
+        ':value': socketValue
+    div: 
+      v-if: 'false'
       ref: targetPlug1
       ':style': targetPlugStyle
       grid.ui.box:
@@ -47,7 +59,6 @@ data:
 mounted: | #js
   function() {
     this.socketEl = this.$refs.socket1.$el;
-    this.targetPlugEl = this.$refs.targetPlug1;
 
     this.$root.els = this.$root.els || {};
     this.$root.els[this.socketElPath] = this.$el;
@@ -87,15 +98,31 @@ methods:
       this.newBox = box;
     }
   onNewLinkDragStart: | #js
-    function(e) {
+    async function(e) {
       this.isNewLinkDragging = true;
+      // Create a new element to be the target plug and append it to the body
+      const div = document.createElement('div');
+      div.style.background = "linear-gradient(to right, #303030, #101010)";
+      div.style.border = "1px solid #ffffff30";
+      div.style.width = "fit-content";
+      div.style.height = "fit-content";
+      div.style.padding = "0.5em";
+      div.style.overflow = "hidden";
+      Object.assign(div.style, this.dataTooltipStyle);
+      this.targetPlugEl?.remove();
+      this.targetPlugEl = div;
+      // Copy socketValue1's content to targetPlugEl
+      this.targetPlugEl.innerHTML = this.$refs.socketValue1.innerHTML;
+      document.body.appendChild(this.targetPlugEl);
     }
   onNewLinkDragEnd: | #js
     async function(e) {
       this.isNewLinkDragging = false;
 
-      // Dropped on the surface
-      if (this.targetPlugPos == null) return;
+      this.targetPlugEl?.remove();
+
+      // Didn't drop on the surface
+      if (!this.targetPlugPos) return;
 
       const newBox = this.getNewBox(this.ghostBox);
      
@@ -110,9 +137,13 @@ methods:
       this.onNewLinkDrop({ box: this.newBox, socket: this.newBox.sockets.input[0], direction: 'input' });
     }
   onNewLinkDrag: | #js
-    function(e) {
-      if ((e.clientX == 0) && (e.clientY == 0)) return;
-      this.targetPlugPos = { x: (e.clientX - 20), y: (e.clientY) };
+    async function(e) {
+      const pos = { x: e.e.clientX, y: e.e.clientY };
+      if (pos.x == 0 && pos.y == 0) return;
+      //const pos = e.relative.pos;
+      this.targetPlugPos = { x: (pos.x - 20), y: (pos.y) };
+      // Set targetPlugStyle to targetPlugEl
+      Object.assign(this.targetPlugEl.style, this.targetPlugStyle);
     }
   onNewLinkDrop: | #js
     function(linkSource) {
@@ -144,6 +175,7 @@ methods:
     function(socket) {
       return {
         data: '🧊',
+        view: '⬜',
         event: '⚡',
       }[socket.type];
     }
@@ -175,7 +207,20 @@ methods:
 
       return newBox;
     }
+  getBoxVue: | #js
+    function() {
+      return this.$root.vm.getAncestors(this, "grid.ui.box")[0];
+    }
 computed:
+  dataTooltipStyle: | #js
+    function() {
+      const style = {};
+      style["max-width"] = "20em";
+      style["max-height"] = "10em";
+      style.overflow = "hidden";
+      style["pointer-events"] = "none";
+      return style;
+    }
   showGhostBox: | #js
     function() {
       return this.isNewLinkDragging;
@@ -193,7 +238,18 @@ computed:
         top: this.targetPlugPos.y + 'px',
       };
     }
+watch:
+  box: | #js
+    function(box) {
+    }
 style:
+  .socket:
+    font-size: 100%
+    filter: grayscale(1)
+    opacity: 0.4
+  .socket:hover:
+    filter: grayscale(0)
+    opacity: 1
   .input-socket, .output-socket:
     display: flex
     cursor: grab
@@ -206,16 +262,21 @@ name: grid-ui-box-socket
 template: >-
   <grid-module class="comp-grid-ui-box-socket" :show-title="false" ref="socket1"
   path="-321995800."><ui-dnd-dropzone @drop-item="onNewLinkDrop"
-  path="-321995800.0"><ui-dnd-draggable :show-drag-ghost="false" :drag-item="{
-  box, direction, socket }" @drag-start="onNewLinkDragStart"
-  @drag-end="onNewLinkDragEnd" @drag="onNewLinkDrag" path="-321995800.0.0"><div
-  class="socket" :class="direction + '-socket'" path="-321995800.0.0.0"><div
-  v-text="'🔌'" path="-321995800.0.0.0.0"></div><div
-  v-text="getSocketIcon(socket)" path="-321995800.0.0.0.1"></div><div
-  class="mx-2" v-text="socket.name"
-  path="-321995800.0.0.0.2"></div></div></ui-dnd-draggable></ui-dnd-dropzone><ui-leader-line
+  path="-321995800.0"><ui-context-window v-if="!isNewLinkDragging"
+  path="-321995800.0.0"><div :style="dataTooltipStyle"
+  path="-321995800.0.0.0"><ui-value
+  path="-321995800.0.0.0.0"></ui-value></div></ui-context-window><ui-dnd-draggable
+  :show-drag-ghost="false" :drag-item="{ box, direction, socket }"
+  @drag-start="onNewLinkDragStart" @drag-end="onNewLinkDragEnd"
+  @drag="onNewLinkDrag" path="-321995800.0.1"><div class="socket"
+  :class="direction + '-socket'" path="-321995800.0.1.0"><div v-text="'🔌'"
+  path="-321995800.0.1.0.0"></div><div v-text="getSocketIcon(socket)"
+  path="-321995800.0.1.0.1"></div><div class="mx-2" v-text="socket.name"
+  path="-321995800.0.1.0.2"></div></div></ui-dnd-draggable></ui-dnd-dropzone><ui-leader-line
   v-if="isNewLinkDragging" :from="socketEl" :to="targetPlugEl" line-path="fluid"
-  color="#404040" path="-321995800.1"></ui-leader-line><div ref="targetPlug1"
-  :style="targetPlugStyle" path="-321995800.2"><grid-ui-box v-if="showGhostBox"
+  color="#404040" path="-321995800.1"></ui-leader-line><div ref="socketValue1"
+  v-show="false" path="-321995800.2"><ui-value :value="socketValue"
+  path="-321995800.2.0"></ui-value></div><div v-if="false" ref="targetPlug1"
+  :style="targetPlugStyle" path="-321995800.3"><grid-ui-box v-if="showGhostBox"
   :surface-element="targetPlugEl" :box="ghostBox"
-  path="-321995800.2.0"></grid-ui-box></div></grid-module>
+  path="-321995800.3.0"></grid-ui-box></div></grid-module>

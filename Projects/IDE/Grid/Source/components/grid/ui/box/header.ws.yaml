@@ -9,9 +9,11 @@ dom:
         v-if: box.type
         ':is': getBoxCompName(box) + '-header'
         ':box': box
+        @title-icon-click: $emit('title-icon-click')
       ui.input.text.box:
-        ':style': '{ ''margin-top'': ''-0.4em'' }'
+        ':text-box-style': textBoxStyle
         class: flex-grow-1
+        ':auto-resize': true
         ':hint': nameHint + '…'
         camouflage: true
         v-model: boxName
@@ -38,6 +40,15 @@ methods:
       return `grid.ui.box.${box.type}`.replace(/\./g, "-");
     }
 computed:
+  textBoxStyle: | #js
+    function() {
+      const style = {};
+      if (this.$root.boxTypeColors) style.color = this.$root.boxTypeColors[this.box.type?.split('.')[0]];
+      style.padding = "0.1em 0.3em !important";
+      style.margin = "-0.5em 0";
+      
+      return style;
+    }
   nameHint: | #js
     function() {
       const boxType = this.box.type;
@@ -65,7 +76,8 @@ template: >-
   path="-646217982.0.0"><ui-loading v-if="boxIsLoading"
   path="-646217982.0.0.0"></ui-loading></transition><component v-if="box.type"
   :is="getBoxCompName(box) + '-header'" :box="box"
+  @title-icon-click="$emit('title-icon-click')"
   path="-646217982.0.1"></component><ui-input-text-box class="flex-grow-1"
-  :style="{ 'margin-top': '-0.4em' }" :hint="nameHint + '…'" camouflage="true"
-  v-model="boxName" @input="onEditBoxName"
+  :text-box-style="textBoxStyle" :auto-resize="true" :hint="nameHint + '…'"
+  camouflage="true" v-model="boxName" @input="onEditBoxName"
   path="-646217982.0.2"></ui-input-text-box></div></grid-module>

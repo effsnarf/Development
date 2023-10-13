@@ -6,7 +6,9 @@ dom:
       v-if: icon
       v-text: icon
     input:
+      ref: input1
       ':class': '{ hasIcon: icon }'
+      ':style': textBoxStyle
       ':type': type
       ':placeholder': hint
       ':value': value
@@ -28,18 +30,29 @@ props:
   icon: null
   enabled: true
   multiline: false
-  autoResize: true
+  autoResize: false
   camouflage: false
+  textBoxStyle: null
 methods:
   onInput: | #js
     function(e) {
-      this.$emit('input', e.target.value);
+      const input = e.target;
+      this.$emit('input', input.value);
+      this.resizeInput(input);
     }
   onTextAreaInput: | #js
     function(e) {
       const textarea = e.target;
       this.$emit('input', textarea.value);
       this.resizeTextArea(textarea);
+    }
+  resizeInput: | #js
+    function(input) {
+      if (!this.autoResize) return;
+      const chars = (Math.max(input.value.length, 8) + 2);
+      const width = `${chars}ch`;
+      input.style.width = "";
+      input.style.width = `${width}`;
     }
   resizeTextArea: | #js
     function(textarea, heightLimit) {
@@ -66,6 +79,7 @@ watch:
     handler: | #js
       async function(value) {
         await this.$nextTick();
+        this.resizeInput(this.$refs.input1);
         if (this.multiline) {
           this.resizeTextArea(this.$refs.textarea1);
         }
@@ -93,9 +107,9 @@ _:
 template: >-
   <div class="comp-ui-input-text-box" v-if="!multiline" :class="{ disabled:
   !enabled, camouflage }" path="739613128."><div class="icon" v-if="icon"
-  v-text="icon" path="739613128.0"></div><input :class="{ hasIcon: icon }"
-  :type="type" :placeholder="hint" :value="value" :disabled="!enabled"
-  @input="onInput" path="739613128.1"/></div><textarea ref="textarea1"
-  v-else-if="multiline" :value="value" :placeholder="hint"
+  v-text="icon" path="739613128.0"></div><input ref="input1" :class="{ hasIcon:
+  icon }" :style="textBoxStyle" :type="type" :placeholder="hint" :value="value"
+  :disabled="!enabled" @input="onInput" path="739613128.1"/></div><textarea
+  ref="textarea1" v-else-if="multiline" :value="value" :placeholder="hint"
   @focus="$emit('focus')" @blur="$emit('blur')" @input="onTextAreaInput"
   @keydown="onTextAreaKeyDown"></textarea>

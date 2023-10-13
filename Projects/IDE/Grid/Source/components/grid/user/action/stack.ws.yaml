@@ -38,6 +38,36 @@ mounted: | #js
     }, 1500);
   }
 methods:
+  create_group: | #js
+    function(userID, action) {
+      const selectedBoxes = this.boxes.filter((box) => box.rect.is.selected);
+      const memberBoxes = selectedBoxes;
+      const memberBoxIDs = memberBoxes.map((box) => box._id);
+      const type = "group";
+      const displayBox = this.getDisplayBox(memberBoxes);
+      const rect = Objects.clone(shownBox.rect);
+      const groupBox = {
+        _id: this.nextID++,
+        type,
+        rect,
+        sockets: this.getNewSockets(type),
+        members: selectedBoxes.map((box) => box._id),
+        displayBox: displayBox._id,
+      };
+
+      this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "add", [groupBox]);
+      this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "update", [memberBoxIDs, { parent: { group: groupBox._id} }]);
+      
+      this.$femit("new.box.created", box);
+
+      action.undo = { method: "delete.group", args: [box._id] };
+    }
+  getDisplayBox: | #js
+    function(boxes) {
+      const dataBox = boxes.find((box) => box.type == "data");
+      if (dataBox) return dataBox;
+      throw new Error("No data box found");
+    }
   create_box: | #js
     async function(userID, action, box) {
       if (!box._id) {
@@ -45,11 +75,14 @@ methods:
         action.redo.args[0] = box;
       }
 
+      box.rect.is.minimized = false;
+
       this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "add", [box]);
       
       this.$femit("new.box.created", box);
 
       action.undo = { method: "delete.box", args: [box._id] };
+
       return action;
     }
   move_box: | #js
@@ -90,6 +123,19 @@ methods:
       action.undo = { method: "edit.box", args: [boxID, oldData, newData] };
       return action;
     }
+  edit_socket: >
+    async function(userID, action, boxID, direction, socketID, newData, oldData)
+    {
+      const box = this.boxes.find((box) => box._id === boxID);
+      const socket = box.sockets[direction].find((socket) => socket._id === socketID);
+      const socketIndex = box.sockets[direction].findIndex((socket) => socket._id === socketID);
+      oldData = oldData ||
+        Objects.getPropertiesAsTree(socket, Objects.getPaths(newData));
+      //for (const change of changes) DeepDiff.applyChange(socket, change);
+      this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "update", [boxID, { sockets: { [direction]: { [socketIndex]: newData } } }]);
+      action.undo = { method: "edit.socket", args: [boxID, direction, socketID, oldData, newData] };
+      return action;
+    }
   select_boxes: | #js
     async function(userID, action, boxIDs, isSelected) {
       const boxes = this.boxes.filter((box) => boxIDs.includes(box._id));
@@ -107,6 +153,19 @@ methods:
   delete_link: | #js
     async function(userID, action, linkID) {
       this.$femit("to", "grid.data.list", `${userID}/data/links`, "delete", [linkID]);
+      action.undo = { method: "no.op" };
+      return action;
+    }
+  delete_selected: | #js
+    async function(userID, action) {
+      alertify.message('mike hunt');
+      return;
+      const boxes = this.boxes.filter((box) => box.rect.is.selected);
+      const boxIDs = boxes.map((box) => box._id);
+      const links = this.links.filter((link) => boxIDs.includes(link.from) || boxIDs.includes(link.to));
+      const linkIDs = links.map((link) => link._id);
+      this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "delete", [boxIDs]);
+      this.$femit("to", "grid.data.list", `${userID}/data/links`, "delete", [linkIDs]);
       action.undo = { method: "no.op" };
       return action;
     }
@@ -174,6 +233,8 @@ methods:
       if (addToStack) {
         this.addToStack(action);
       }
+
+      this.$femit("do", action);
 
       return action;
     }
@@ -262,11 +323,21 @@ methods:
       switch (type) {
         case "text":
           return {
-            value: null
+            value: null,
+            rect: {
+              is: {
+                minimized: true
+              }
+            }
           }
         case "data":
           return {
-            value: null
+            value: null,
+            rect: {
+              is: {
+                minimized: false
+              }
+            }
           }
         case "func":
           return {
@@ -275,6 +346,38 @@ methods:
             code: "",
             runs: {
               on: "client"
+            },
+            rect: {
+              is: {
+                minimized: true
+              }
+            }
+          }
+        case "view.image":
+          return {
+            url: null,
+            rect: {
+              is: {
+                minimized: false
+              }
+            }
+          }
+        case "view.label":
+          return {
+            text: null,
+            field: null,
+            rect: {
+              is: {
+                minimized: true
+              }
+            }
+          }
+        case "view.layout":
+          return {
+            rect: {
+              is: {
+                minimized: false
+              }
             }
           }
       }
@@ -283,6 +386,13 @@ methods:
   getNewSockets: | #js
     function(type) {
       switch (type) {
+        case "group":
+          return {
+            input: [
+            ],
+            output: [
+            ]
+          }
         case "text":
           return {
             input: [
@@ -308,6 +418,35 @@ methods:
             ],
             output: [
               { _id: 1, type: "data", name: "result" }
+            ]
+          }
+        case "view.image":
+          return {
+            input: [
+              { _id: 1, type: "data", name: "url" }
+            ],
+            output: [
+              { _id: 1, type: "view", name: "image" }
+            ]
+          }
+        case "view.label":
+          return {
+            input: [
+              { _id: 1, type: "data", name: "text" },
+            ],
+            output: [
+              { _id: 1, type: "view", name: "view" }
+            ]
+          }
+        case "view.layout":
+          return {
+            input: [
+              { _id: 1, type: "data", name: "items" },
+              { _id: 2, type: "view", name: "item view" }
+            ],
+            output: [
+              { _id: 1, type: "iterator", name: "iterator" },
+              { _id: 2, type: "view", name: "view" },
             ]
           }
       }

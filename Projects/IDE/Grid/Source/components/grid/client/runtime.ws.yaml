@@ -15,10 +15,25 @@ data:
       data: {}
   boxes: []
   links: []
+mounted: | #js
+  function() {
+    this.$root.socket = this.socket;
+  }
 methods:
+  grid_ui_box_execute: | #js
+    function(boxID) {
+      const box = this.getBox(boxID);
+      const method = this[`grid_ui_box_execute_${box.type}`];
+      if (!method) throw new Error(`Unknown box type: ${box.type}`);
+      method.call(this, boxID);
+    }
   grid_ui_box_socket_value_change: | #js
     function(boxID, socketDirection, sID, socketValue) {
       this.setSocketValue(boxID, socketDirection, sID, socketValue);
+    }
+  grid_ui_box_execute_text: | #js
+    function(boxID) {
+      this.propagateSocketLinks(boxID, "output", 1);
     }
   grid_ui_box_execute_func: | #js
     function(boxID) {
@@ -92,8 +107,10 @@ methods:
         this.$femit("box.error", box._id, null);
         this.$femit("box.is.loading", box._id, true);
 
+        const runtimeData = this.socket.runtime.data[box._id];
+
         const argNames = box.argNames;
-        const argValues = Object.values(this.socket.runtime.data[box._id].input);
+        const argValues = Object.values(runtimeData?.input||{});
 
         const result = (box.runs.on == "server")
           ? await this.runFuncOnServer(box, argNames, argValues, box.code)
@@ -103,8 +120,10 @@ methods:
       }
       catch (ex)
       {
-        this.$femit("box.error", box._id, ex.message);
-        throw ex;
+        const ideEx = {};
+        ideEx.message = ex.message;
+        ideEx.stack = ex.stack;
+        this.$femit("box.error", box._id, ideEx);
       }
       finally
       {
@@ -166,6 +185,19 @@ methods:
     function(boxID) {
       this.getSocketRuntimeData(boxID);
     }
+watch:
+  boxes:
+    handler: | #js
+      function(boxes) {
+        this.$root.boxes = boxes;
+      }
+    immediate: true
+  links:
+    handler: | #js
+      function(links) {
+        this.$root.links = links;
+      }
+    immediate: true
 _:
   examples:
     count: 0

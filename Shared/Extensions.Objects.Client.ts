@@ -18,6 +18,21 @@ class Objects {
     return (0)._getObjectType(obj);
   }
 
+  static getTypeName(obj: any): string {
+    if (typeof obj === "string" || obj instanceof String) return "string";
+    if (typeof obj === "number" && isFinite(obj)) return "number";
+    if (typeof obj === "boolean") return "boolean";
+    if (Array.isArray(obj)) return "array";
+    if (obj !== null && typeof obj === "object" && !Array.isArray(obj))
+      return "object";
+    if (obj instanceof Date) return "date";
+    if (obj instanceof RegExp) return "regexp";
+    if (obj instanceof Function) return "function";
+    if (obj === null) return "null";
+    if (obj === undefined) return "undefined";
+    return "unknown";
+  }
+
   static isPrimitiveType(type: any): boolean {
     return [String, Number, Boolean, Date, RegExp].some((t) => t === type);
   }

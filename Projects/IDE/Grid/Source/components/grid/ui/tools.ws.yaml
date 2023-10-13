@@ -1,7 +1,6 @@
 dom:
   grid.module:
     icon: 🛠️
-    ':show-events': '[''mouse.pos'']'
     .flex.justify-around:
       ui.button: 
         icon: ✖
@@ -15,6 +14,8 @@ dom:
         icon: 👉
         text: redo
         @click: $femit('redo')
+    div:
+      grid.client.log: null
     ui.gesture.select.box:
       ':surface-element': surfaceElement
       ':center-coords': 'true'
@@ -56,15 +57,15 @@ _:
     count: 0
 name: grid-ui-tools
 template: >-
-  <grid-module class="comp-grid-ui-tools" icon="🛠️"
-  :show-events="['mouse.pos']" path="134888361."><div class="flex
-  justify-around" path="134888361.0"><ui-button icon="✖" text="clear"
-  @click="$femit('clear')" path="134888361.0.0"></ui-button><ui-button icon="👈"
-  text="undo" @click="$femit('undo')"
-  path="134888361.0.1"></ui-button><ui-button icon="👉" text="redo"
-  @click="$femit('redo')"
-  path="134888361.0.2"></ui-button></div><ui-gesture-select-box
+  <grid-module class="comp-grid-ui-tools" icon="🛠️" path="134888361."><div
+  class="flex justify-around" path="134888361.0"><ui-button icon="✖"
+  text="clear" @click="$femit('clear')"
+  path="134888361.0.0"></ui-button><ui-button icon="👈" text="undo"
+  @click="$femit('undo')" path="134888361.0.1"></ui-button><ui-button icon="👉"
+  text="redo" @click="$femit('redo')"
+  path="134888361.0.2"></ui-button></div><div
+  path="134888361.1"><grid-client-log></grid-client-log></div><ui-gesture-select-box
   :surface-element="surfaceElement" :center-coords="true"
   :is-layer-element="isSelectBoxLayerElement" @mouse-pos="onMousePos"
   @drag-start="onDragStart" @drag-end="onDragEnd" @mark="onSelectBoxMark"
-  path="134888361.1"></ui-gesture-select-box></grid-module>
+  path="134888361.2"></ui-gesture-select-box></grid-module>

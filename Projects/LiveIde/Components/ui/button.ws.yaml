@@ -14,11 +14,17 @@ props:
   icon: null
   text: null
   click: null
+  confirm: null
   showLoading: true
 data:
   isLoading: 0
 methods:
   onClick: | #js
+    async function() {
+      if (this.confirm) return alertify.confirm(this.confirm, this._onClick.bind(this));
+      this._onClick();
+    }
+  _onClick: | #js
     async function() {
       this.$emit('click');
       if (this.click)

@@ -1,0 +1,77 @@
+dom:
+  ui.context.window:
+    ':visible': showContextMenu
+    div: 
+      v-if: canCreateGroup
+      ui.button: 
+        icon: ➕📦
+        text: create group ✔️
+        @click: getWorkspace.$femit('create.group')
+    div: 
+      v-if: canDelete
+      ui.button: 
+        icon: ❌🗑️
+        text: delete
+        confirm: Are you sure you want to delete the selected boxes?
+        @click: getWorkspace.$femit('delete.selected')
+props:
+  userID: null
+  boxes: []
+  links: []
+data:
+  canCreateGroup: false
+  canDelete: false
+mounted: | #js
+  function() {
+    // We're binding manually instead of using grid.module because we can't put the context menu inside the grid.module
+    this.$root.$on("grid.event", this.onGridEvent.bind(this));
+  }
+methods:
+  onGridEvent: | #js
+    function(compName, eventName, args) {
+      if (["mouse.pos"].includes(eventName)) return;
+      const methodName = `${compName}.${eventName}`.replace(/\./g, "_");
+      const method = this[methodName]?.bind(this);
+      if (method) method(...args);
+    }
+  grid_user_action_stack_do: | #js
+    async function(action) {
+      if (!["select.boxes"].some(s => action.redo.method.includes(s))) return;
+      this.refresh();
+    }
+  getWorkspace: | #js
+    function() {
+      return this.$root.vm.getAncestors(this, "grid.client.workspace")[0];
+    }
+  refresh: | #js
+    async function(times = 10) {
+      await this._refresh();
+      if (times > 0) setTimeout(() => this.refresh(times - 1), 400);
+    }
+  _refresh: | #js
+    async function() {
+      const { boxes, links } = this;
+      const selectedBoxes = boxes.filter(box => box.is?.selected);
+      this.canCreateGroup = (selectedBoxes.length > 1);
+      this.canDelete = (selectedBoxes.length > 0);
+    }
+computed:
+  showContextMenu: | #js
+    function() {
+      const cans = [this.canCreateGroup, this.canDelete];
+      return cans.some(c => c);
+    }
+_:
+  examples:
+    count: 0
+name: grid-client-context-menu
+template: >-
+  <ui-context-window class="comp-grid-client-context-menu"
+  :visible="showContextMenu" path="-1053034279."><div v-if="canCreateGroup"
+  path="-1053034279.0"><ui-button icon="➕📦" text="create group ✔️"
+  @click="getWorkspace.$femit('create.group')"
+  path="-1053034279.0.0"></ui-button></div><div v-if="canDelete"
+  path="-1053034279.1"><ui-button icon="❌🗑️" text="delete" confirm="Are you
+  sure you want to delete the selected boxes?"
+  @click="getWorkspace.$femit('delete.selected')"
+  path="-1053034279.1.0"></ui-button></div></ui-context-window>

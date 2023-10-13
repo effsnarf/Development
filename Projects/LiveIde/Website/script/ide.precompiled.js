@@ -3608,6 +3608,29 @@ class Objects {
     static getType(obj) {
         return (0)._getObjectType(obj);
     }
+    static getTypeName(obj) {
+        if (typeof obj === "string" || obj instanceof String)
+            return "string";
+        if (typeof obj === "number" && isFinite(obj))
+            return "number";
+        if (typeof obj === "boolean")
+            return "boolean";
+        if (Array.isArray(obj))
+            return "array";
+        if (obj !== null && typeof obj === "object" && !Array.isArray(obj))
+            return "object";
+        if (obj instanceof Date)
+            return "date";
+        if (obj instanceof RegExp)
+            return "regexp";
+        if (obj instanceof Function)
+            return "function";
+        if (obj === null)
+            return "null";
+        if (obj === undefined)
+            return "undefined";
+        return "unknown";
+    }
     static isPrimitiveType(type) {
         return [String, Number, Boolean, Date, RegExp].some((t) => t === type);
     }
@@ -5179,6 +5202,9 @@ if (typeof Array !== "undefined") {
     Array.prototype.take = function (count) {
         return this.slice(0, count);
     };
+    Array.prototype.takeLast = function (count) {
+        return this.slice(-count);
+    };
     Array.prototype.replace = async function (getNewItems, stagger = 0, getItemKey) {
         if (getItemKey) {
             let newItems = await getNewItems();
@@ -5270,6 +5296,15 @@ if (typeof Array !== "undefined") {
         }
         return result;
     };
+    Array.prototype.selectFields = function (fields) {
+        return this.map((item) => {
+            const newItem = {};
+            for (const field of fields) {
+                newItem[field] = item[field];
+            }
+            return newItem;
+        });
+    };
     Array.prototype.except = function (...items) {
         return this.filter((item) => !items.includes(item));
     };
@@ -5283,6 +5318,11 @@ if (typeof Array !== "undefined") {
         return this.slice(0, this.length - count);
     };
     Array.prototype.sortBy = function (...projects) {
+        if (!projects?.length)
+            return [...this];
+        if (projects.all((p) => !p))
+            return [...this];
+        projects = projects.map((project) => typeof project == "string" ? (item) => item[project] : project);
         return this.sort((a, b) => {
             const aVals = projects.map((project) => project(a));
             const bVals = projects.map((project) => project(b));
@@ -5291,6 +5331,11 @@ if (typeof Array !== "undefined") {
     };
     Array.prototype.sortByDesc = function (...projects) {
         return [...this.sortBy(...projects)].reverse();
+    };
+    Array.prototype.sortByDirection = function (projects, direction) {
+        return direction > 0
+            ? this.sortBy(...projects)
+            : this.sortByDesc(...projects);
     };
     Array.prototype.stringify = function () {
         return JSON.stringify(this);
@@ -5411,6 +5456,76 @@ class Lock {
     }
 }
 exports.Lock = Lock;
+
+
+/***/ }),
+
+/***/ "../../../../Shared/Performance.ts":
+/*!*****************************************!*\
+  !*** ../../../../Shared/Performance.ts ***!
+  \*****************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Performance = void 0;
+var Eff;
+(function (Eff) {
+    let Performance;
+    (function (Performance) {
+        class Tracker {
+            stats = {};
+            constructor() { }
+            static new() {
+                const tracker = new Tracker();
+                return tracker;
+            }
+            track = {
+                invoke: (name) => this.trackInvoke(name),
+                start: (name) => this.trackDurationStart(name),
+                stop: (name) => this.trackDurationStop(name),
+            };
+            trackInvoke(name) {
+                if (!this.stats[name]) {
+                    this.initializeStat(name);
+                }
+                this.stats[name].invokes++;
+            }
+            trackDurationStart(name) {
+                if (!this.stats[name]) {
+                    this.initializeStat(name);
+                }
+                this.stats[name].startTime = performance.now();
+                this.stats[name].duration.measures++;
+            }
+            trackDurationStop(name) {
+                if (!this.stats[name] || !this.stats[name].startTime) {
+                    console.error(`No start time for ${name}`);
+                    return;
+                }
+                const endTime = performance.now();
+                const duration = endTime - this.stats[name].startTime;
+                // Update total duration
+                this.stats[name].duration.total += duration;
+                // Update and round average duration
+                this.stats[name].duration.average = Math.round(this.stats[name].duration.total / this.stats[name].duration.measures);
+            }
+            initializeStat(name) {
+                this.stats[name] = {
+                    invokes: 0,
+                    duration: {
+                        average: 0,
+                        measures: 0,
+                        total: 0,
+                    },
+                };
+            }
+        }
+        Performance.Tracker = Tracker;
+    })(Performance = Eff.Performance || (Eff.Performance = {}));
+})(Eff || (Eff = {}));
+const perf = Eff.Performance;
+exports.Performance = perf;
 
 
 /***/ }),
@@ -5824,7 +5939,7 @@ var __webpack_exports__ = {};
 (() => {
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/website/script/1696403979511.ts ***!
+  !*** ../../../LiveIde/website/script/1697191079104.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -5836,6 +5951,7 @@ const ClientContext_1 = __webpack_require__(/*! ../../Classes/ClientContext */ "
 const VueHelper_1 = __webpack_require__(/*! ../../Classes/VueHelper */ "../../../LiveIde/Classes/VueHelper.ts");
 const VueManager_1 = __webpack_require__(/*! ../../Classes/VueManager */ "../../../LiveIde/Classes/VueManager.ts");
 const Component_1 = __webpack_require__(/*! ../../Classes/Component */ "../../../LiveIde/Classes/Component.ts");
+const Performance_1 = __webpack_require__(/*! ../../../../Shared/Performance */ "../../../../Shared/Performance.ts");
 window.Component = Component_1.Component;
 const taskQueue = new TaskQueue_1.TaskQueue();
 let vueApp;
@@ -5950,19 +6066,10 @@ const vueIdeCompMixin = {
         }
     },
     mounted() {
-        taskQueue.enqueue(async () => {
-            await waitUntilInit();
-            vueApp.vm.registerVue(this);
-            vueIdeApp.vm.registerVue(this);
-        });
+        vueIdeApp?.vm.registerVue(this);
     },
     beforeDestroy() {
-        window.vueApp.vm.unregisterVue(this);
-        taskQueue.enqueue(async () => {
-            await waitUntilInit();
-            vueApp.vm.unregisterVue(this);
-            vueIdeApp.vm.unregisterVue(this);
-        });
+        vueIdeApp?.vm.unregisterVue(this);
     },
 };
 window.vueIdeCompMixin = vueIdeCompMixin;
@@ -5973,12 +6080,14 @@ window.vueIdeCompMixin = vueIdeCompMixin;
     await client.compileAll((c) => c.name.startsWith("ide."), [vueIdeCompMixin]);
     const vueManager = VueManager_1.VueManager.new(client);
     const state = StateTracker_1.StateTracker.new(vueManager, client);
+    const performanceTracker = Performance_1.Performance.Tracker.new();
     vueIdeApp = new client.Vue({
         data: {
             vm: vueManager,
             html: new HtmlHelper_1.HtmlHelper(),
             comps: client.Vue.ref(client.comps),
             templates: client.templates,
+            perf: performanceTracker,
         },
         async mounted() {
             await this.init();

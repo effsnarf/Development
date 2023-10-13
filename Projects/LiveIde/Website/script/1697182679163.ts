@@ -6,7 +6,6 @@ import { ClientContext } from "../../Classes/ClientContext";
 import { VueHelper } from "../../Classes/VueHelper";
 import { VueManager } from "../../Classes/VueManager";
 import { Component } from "../../Classes/Component";
-import { Performance } from "@shared/Performance";
 
 (window as any).Component = Component;
 
@@ -168,10 +167,20 @@ const vueIdeCompMixin = {
     }
   },
   mounted() {
-    vueIdeApp?.vm.registerVue(this);
+    taskQueue.enqueue(async () => {
+      await waitUntilInit();
+      vueApp.vm.registerVue(this);
+      vueIdeApp.vm.registerVue(this);
+    });
   },
   beforeDestroy() {
-    vueIdeApp?.vm.unregisterVue(this);
+    (window as any).vueApp.vm.unregisterVue(this);
+
+    taskQueue.enqueue(async () => {
+      await waitUntilInit();
+      vueApp.vm.unregisterVue(this);
+      vueIdeApp.vm.unregisterVue(this);
+    });
   },
 };
 
@@ -189,15 +198,12 @@ const vueIdeCompMixin = {
 
   const state = StateTracker.new(vueManager, client);
 
-  const performanceTracker = Performance.Tracker.new();
-
   vueIdeApp = new client.Vue({
     data: {
       vm: vueManager,
       html: new HtmlHelper(),
       comps: client.Vue.ref(client.comps),
       templates: client.templates,
-      perf: performanceTracker,
     },
     async mounted() {
       await this.init();

@@ -1,7 +1,8 @@
 dom:
   div: 
     div: 
-      grid.app.logo: null
+      grid.app.logo:
+        v-if: 'false'
       div: 
         grid.client:
           class: flex-grow-1
@@ -23,6 +24,7 @@ _:
 name: grid-app
 template: >-
   <div class="comp-grid-app" path="316922745."><div
-  path="316922745.0"><grid-app-logo></grid-app-logo><div
-  path="316922745.0.1"><grid-client class="flex-grow-1" :userID="userID"
+  path="316922745.0"><grid-app-logo v-if="false"
+  path="316922745.0.0"></grid-app-logo><div path="316922745.0.1"><grid-client
+  class="flex-grow-1" :userID="userID"
   path="316922745.0.1.0"></grid-client><grid-server></grid-server><grid-events></grid-events></div></div></div>

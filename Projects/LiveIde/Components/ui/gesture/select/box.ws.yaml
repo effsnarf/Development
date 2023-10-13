@@ -10,6 +10,11 @@ dom:
         ':style': xAxisStyle
       .y-axis:
         ':style': yAxisStyle
+      .debugger:
+        v-if: 'false'
+        ':style': debuggerStyle
+        ui.value:
+          ':value': debugInfo
     transition:
       name: fade
       .select-box:
@@ -19,12 +24,23 @@ props:
   surfaceElement: null
   centerCoords: false
   isLayerElement: null
+  showAxes: false
 data:
   mousePos: null
   dragStart: null
   dragEnd: null
   isVisible: false
+mounted: | #js
+  function() {
+    // If [esc] is pressed, cancel the select box
+    window.addEventListener("keydown", this.onKeyDown);
+  }
 methods:
+  onKeyDown: | #js
+    function(e) {
+      if (e.key != "Escape") return;
+      this.clear();
+    }
   onMouseDown: | #js
     function(e) {
       if (e.button != 0) return;
@@ -42,14 +58,10 @@ methods:
       if (!this.dragStart) return;
       e.preventDefault();
       e.stopPropagation();
-      const rect = {
-        pos: this.dragStart,
-        size: this.size
-      };
-      this.dragStart = null;
-      this.dragEnd = null;
-      this.isVisible = false;
+      const rect = this.rect;
+      this.clear();
       if (!this.isMinimumSize(rect.size)) return;
+      this.$emit("drag-end", this.adjustPos(this.dragEnd));
       this.$emit("mark", this.adjustRect(rect));
     }
   onMouseMove: | #js
@@ -114,7 +126,27 @@ methods:
       const y = pos.y - size.height / 2;
       return { pos: { x, y }, size };
     }
+  clear: | #js
+    function() {
+      this.dragStart = null;
+      this.dragEnd = null;
+      this.isVisible = false;
+    }
 computed:
+  debugInfo: | #js
+    function() {
+      const info = {};
+      try
+      {
+        info.mousePos = this.adjustPos(this.mousePos);
+        info.rect = this.adjustRect(this.rect);
+      }
+      catch (ex)
+      {
+        info.error = ex.message;
+      }
+      return info;
+    }
   selectBoxStyle: | #js
     function() {
       if (!this.isVisible) return null;
@@ -154,6 +186,19 @@ computed:
       style.pointerEvents = "none";
       return style;
     }
+  debuggerStyle: | #js
+    function() {
+      const mousePos = this.mousePos;
+      if (!mousePos) return null;
+      const spacer = 20;
+      const style = {};
+      style.position = "fixed";
+      style.left = `${mousePos.x + spacer}px`;
+      style.top = `${mousePos.y + spacer}px`;
+      style.pointerEvents = "none";
+      return style;
+
+    }
   topLeft: | #js
     function() {
       return this.getCorner("min");
@@ -172,6 +217,14 @@ computed:
       const height = bottomRight.y - topLeft.y;
       return { width, height };
     }
+  rect: | #js
+    function() {
+      if (!this.dragStart) return null;
+      return {
+        pos: { x: this.topLeft.x, y: this.topLeft.y },
+        size: this.size
+      }
+    }
 watch:
   mousePos: | #js
     function() {
@@ -180,10 +233,6 @@ watch:
   dragStart: | #js
     function() {
       this.$emit("drag-start", this.adjustPos(this.dragStart));
-    }
-  dragEnd: | #js
-    function() {
-      this.$emit("drag-end", this.adjustPos(this.dragEnd));
     }
 style:
   .select-box:
@@ -206,6 +255,8 @@ template: >-
   global="true" @down="onMouseDown" @up="onMouseUp" @move="onMouseMove"
   path="-2052114120.0"></ui-mouse><div path="-2052114120.1"><div class="x-axis"
   :style="xAxisStyle" path="-2052114120.1.0"></div><div class="y-axis"
-  :style="yAxisStyle" path="-2052114120.1.1"></div></div><transition name="fade"
-  path="-2052114120.2"><div class="select-box" v-if="isVisible"
+  :style="yAxisStyle" path="-2052114120.1.1"></div><div class="debugger"
+  v-if="false" :style="debuggerStyle" path="-2052114120.1.2"><ui-value
+  :value="debugInfo" path="-2052114120.1.2.0"></ui-value></div></div><transition
+  name="fade" path="-2052114120.2"><div class="select-box" v-if="isVisible"
   :style="selectBoxStyle" path="-2052114120.2.0"></div></transition></div>

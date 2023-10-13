@@ -2,27 +2,54 @@ dom:
   grid.module:
     icon: 🧊
     ':show-title': 'false'
-    div:
+    div: 
       ':style': '{ ''width'': ''100%'', overflow: ''auto'' }'
+      div: 
+        v-if: 'false'
+        ui.expand:
+          icon: 📋
+          text: fields
+          ':number': selectedFields.length
+          v-model: showFieldsFilter
+        transition:
+          name: slide2
+          div: 
+            v-if: showFieldsFilter
+            ui.checkbox:
+              v-for: field in fields
+              ':text': field
+              ':value-array': selectedFields
+              ':value-key': field
       ui.value:
-        ':value': dataValue
+        ':value': boxValue
 props:
   box: null
 data:
-  dataValue: null
+  selectedFields: []
+  showFieldsFilter: false
 methods:
+  getBoxVue: | #js
+    function() {
+      return this.$root.vm.getAncestors(this, "grid.ui.box")[0];
+    }
   init: | #js
     function(box) {
-      this.dataValue = box.value;
+      this.selectedFields = (box.selected?.fields || []);
     }
-  grid_client_runtime_socket_value_change: | #js
-    function(boxID, sDirection, sID, sValue) {
-      if (boxID != this.box._id) return;
-      if (sDirection != "input") return;
-      if (sID != 1) return;
-      this.dataValue = sValue;
+computed:
+  boxValue: | #js
+    function() {
+      const socketData = this.$root.socket?.runtime.data[this.box._id];
+      return socketData?.input?.[1] || this.box.value;
     }
-computed: null
+  fields: | #js
+    function() {
+      if (!Array.isArray(this.boxValue)) return [];
+      if (!this.boxValue.length) return [];
+      const firstItem = this.boxValue[0];
+      if (typeof firstItem !== "object") return [];
+      return Object.keys(firstItem);
+    }
 watch:
   box:
     handler: | #js
@@ -30,6 +57,10 @@ watch:
         this.init(box);
       }
     immediate: true
+  selectedFields: | #js
+    function(selectedFields) {
+      //this.getBoxVue().$femit("edit.box", this.box._id, { selected: { fields: selectedFields } });
+    }
 _:
   examples:
     count: 0
@@ -37,5 +68,11 @@ name: grid-ui-box-data
 template: >-
   <grid-module class="comp-grid-ui-box-data" icon="🧊" :show-title="false"
   path="1558979935."><div :style="{ 'width': '100%', overflow: 'auto' }"
-  path="1558979935.0"><ui-value :value="dataValue"
-  path="1558979935.0.0"></ui-value></div></grid-module>
+  path="1558979935.0"><div v-if="false" path="1558979935.0.0"><ui-expand
+  icon="📋" text="fields" :number="selectedFields.length"
+  v-model="showFieldsFilter" path="1558979935.0.0.0"></ui-expand><transition
+  name="slide2" path="1558979935.0.0.1"><div v-if="showFieldsFilter"
+  path="1558979935.0.0.1.0"><ui-checkbox v-for="field in fields" :text="field"
+  :value-array="selectedFields" :value-key="field"
+  path="1558979935.0.0.1.0.0"></ui-checkbox></div></transition></div><ui-value
+  :value="boxValue" path="1558979935.0.1"></ui-value></div></grid-module>

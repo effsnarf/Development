@@ -4649,6 +4649,29 @@ class Objects {
     static getType(obj) {
         return (0)._getObjectType(obj);
     }
+    static getTypeName(obj) {
+        if (typeof obj === "string" || obj instanceof String)
+            return "string";
+        if (typeof obj === "number" && isFinite(obj))
+            return "number";
+        if (typeof obj === "boolean")
+            return "boolean";
+        if (Array.isArray(obj))
+            return "array";
+        if (obj !== null && typeof obj === "object" && !Array.isArray(obj))
+            return "object";
+        if (obj instanceof Date)
+            return "date";
+        if (obj instanceof RegExp)
+            return "regexp";
+        if (obj instanceof Function)
+            return "function";
+        if (obj === null)
+            return "null";
+        if (obj === undefined)
+            return "undefined";
+        return "unknown";
+    }
     static isPrimitiveType(type) {
         return [String, Number, Boolean, Date, RegExp].some((t) => t === type);
     }
@@ -6221,6 +6244,9 @@ if (typeof Array !== "undefined") {
     Array.prototype.take = function (count) {
         return this.slice(0, count);
     };
+    Array.prototype.takeLast = function (count) {
+        return this.slice(-count);
+    };
     Array.prototype.replace = async function (getNewItems, stagger = 0, getItemKey) {
         if (getItemKey) {
             let newItems = await getNewItems();
@@ -6312,6 +6338,15 @@ if (typeof Array !== "undefined") {
         }
         return result;
     };
+    Array.prototype.selectFields = function (fields) {
+        return this.map((item) => {
+            const newItem = {};
+            for (const field of fields) {
+                newItem[field] = item[field];
+            }
+            return newItem;
+        });
+    };
     Array.prototype.except = function (...items) {
         return this.filter((item) => !items.includes(item));
     };
@@ -6325,6 +6360,11 @@ if (typeof Array !== "undefined") {
         return this.slice(0, this.length - count);
     };
     Array.prototype.sortBy = function (...projects) {
+        if (!projects?.length)
+            return [...this];
+        if (projects.all((p) => !p))
+            return [...this];
+        projects = projects.map((project) => typeof project == "string" ? (item) => item[project] : project);
         return this.sort((a, b) => {
             const aVals = projects.map((project) => project(a));
             const bVals = projects.map((project) => project(b));
@@ -6333,6 +6373,11 @@ if (typeof Array !== "undefined") {
     };
     Array.prototype.sortByDesc = function (...projects) {
         return [...this.sortBy(...projects)].reverse();
+    };
+    Array.prototype.sortByDirection = function (projects, direction) {
+        return direction > 0
+            ? this.sortBy(...projects)
+            : this.sortByDesc(...projects);
     };
     Array.prototype.stringify = function () {
         return JSON.stringify(this);
@@ -7398,7 +7443,7 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/website/script/1696403980194.ts ***!
+  !*** ../../../LiveIde/website/script/1697191079808.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -7417,6 +7462,7 @@ const Data_1 = __webpack_require__(/*! ../../../../Shared/Data */ "../../../../S
 const Graph_1 = __webpack_require__(/*! ../../../../Shared/Database/Graph */ "../../../../Shared/Database/Graph.ts");
 const window1 = window;
 const Vue = window1.Vue;
+let vueApp;
 // To make it accessible to client code
 window1.Objects = Extensions_Objects_Client_1.Objects;
 window1.Diff = Diff_1.Diff;
@@ -7451,12 +7497,14 @@ const generalMixin = {
         };
         self.$el.addEventListener("mouseover", self.handlers.mouseover);
         self.$el.addEventListener("mouseout", self.handlers.mouseout);
+        vueApp?.vm.registerVue(this);
     },
     unmounted() {
         const self = this;
         self.ui.is.mounted = false;
         self.$el.removeEventListener("mouseover", self.handlers.mouseover);
         self.$el.removeEventListener("mouseout", self.handlers.mouseout);
+        vueApp?.vm.registerVue(this);
     },
 };
 const flowAppMixin = {
@@ -7863,7 +7911,6 @@ const mgMixin = {
         },
     });
     await client.compileAll((c) => !c.name.startsWith("ide."), webScriptMixins);
-    let vueApp = null;
     const isLocalHost = window.location.hostname == "localhost";
     const dbpHost = `https://db.memegenerator.net`;
     const dbp = null; // (await DatabaseProxy.new(`${dbpHost}/MemeGenerator`)) as any;

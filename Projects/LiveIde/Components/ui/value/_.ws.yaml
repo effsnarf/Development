@@ -1,16 +1,29 @@
 dom:
-  ui.value.any:
+  ui.value.any: 
+    v-if: '!overflow'
     ':value': value
     ':title': title
     ':depth': (depth + 1)
+  div:
+    v-else-if: 'true'
+    ':style': '{ ''max-height'': ''30em'', overflow: ''auto'' }'
+    ui.value.any: 
+      ':value': value
+      ':title': title
+      ':depth': (depth + 1)
 props:
   value: null
   title: null
   depth: 0
+  overflow: false
+style: null
 _:
   examples:
     count: 0
 name: ui-value
 template: >-
-  <ui-value-any class="comp-ui-value" :value="value" :title="title"
-  :depth="(depth + 1)" path="-2122101353."></ui-value-any>
+  <ui-value-any class="comp-ui-value" v-if="!overflow" :value="value"
+  :title="title" :depth="(depth + 1)" path="-2122101353."></ui-value-any><div
+  v-else-if="true" :style="{ 'max-height': '30em', overflow: 'auto'
+  }"><ui-value-any :value="value" :title="title" :depth="(depth +
+  1)"></ui-value-any></div>

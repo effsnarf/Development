@@ -30,7 +30,7 @@ methods:
     async function() {
       if (!this.leaderLine) return;
       const yellow = "#ffff00";
-      this.flashColors = this.tweenColors(yellow, this.color, 100);
+      this.flashColors = this.tweenColors(yellow, this.color, 20);
       if (!this.isFlashing) this.flashOneFrame();
       for (let i = 0; i < 10; i++) {
         setTimeout(() => {

@@ -2,23 +2,41 @@ dom:
   grid.module:
     icon: 🧊📃
     div:
+      ui.context.window:
+        ref: context1
+        ui.value:
+          ':value': hoveredItem
+          overflow: true
       h3:
         ui.title:
           ':icon': getFuidIcon(fuid)
           ':text': fuid
           ':number': items.length
       ul:
+        class: '{ reverse }'
         li:
-          v-for: item in [...items].reverse().take(5)
+          v-for: (item, index) in visibleItems
+          @mouseenter: () => onItemHover(item, true)
+          @mouseleave: () => onItemHover(item, false)
           slot:
             component:
               ':is': getItemCompName(fuid)
+              ':index': index
               ':item': item
+              v-bind: itemProps
 props:
   fuid: null
+  itemProps: null
+  reverse: false
 data:
   items: []
+  hoveredItem: null
 methods:
+  onItemHover: | #js
+    function(item, hovered) {
+      if (this.$refs.context1.isPinned) return false;
+      this.hoveredItem = hovered ? item : null;
+    }
   grid_data_list_change: | #js
     function(e) {
       const { fuid, items } = e;
@@ -41,16 +59,29 @@ methods:
       if (fuid.includes("/user/actions")) return "👤🔴";
       return "❔";
     }
+computed:
+  visibleItems: | #js
+    function() {
+      return this.items.takeLast(10);
+    }
+style:
+  .reverse:
+    display: flex
+    flex-direction: column-reverse
 _:
   examples:
     count: 0
 name: grid-data-list-view
 template: >-
   <grid-module class="comp-grid-data-list-view" icon="🧊📃"
-  path="-1148091303."><div path="-1148091303.0"><h3
-  path="-1148091303.0.0"><ui-title :icon="getFuidIcon(fuid)" :text="fuid"
-  :number="items.length" path="-1148091303.0.0.0"></ui-title></h3><ul
-  path="-1148091303.0.1"><li v-for="item in [...items].reverse().take(5)"
-  path="-1148091303.0.1.0"><slot path="-1148091303.0.1.0.0"><component
-  :is="getItemCompName(fuid)" :item="item"
-  path="-1148091303.0.1.0.0.0"></component></slot></li></ul></div></grid-module>
+  path="-1148091303."><div path="-1148091303.0"><ui-context-window
+  ref="context1" path="-1148091303.0.0"><ui-value :value="hoveredItem"
+  overflow="true" path="-1148091303.0.0.0"></ui-value></ui-context-window><h3
+  path="-1148091303.0.1"><ui-title :icon="getFuidIcon(fuid)" :text="fuid"
+  :number="items.length" path="-1148091303.0.1.0"></ui-title></h3><ul class="{
+  reverse }" path="-1148091303.0.2"><li v-for="(item, index) in visibleItems"
+  @mouseenter="() =&gt; onItemHover(item, true)" @mouseleave="() =&gt;
+  onItemHover(item, false)" path="-1148091303.0.2.0"><slot
+  path="-1148091303.0.2.0.0"><component :is="getItemCompName(fuid)"
+  :index="index" :item="item" v-bind="itemProps"
+  path="-1148091303.0.2.0.0.0"></component></slot></li></ul></div></grid-module>

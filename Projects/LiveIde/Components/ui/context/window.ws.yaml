@@ -10,7 +10,6 @@ dom:
       transition: 
         name: fade
         .context-menu:
-          v-if: isVisible
           ref: menu1
           ':class': '{ pinned: isPinned, inited: isInited, visible: isVisible }'
           ':style': style
@@ -131,7 +130,6 @@ methods:
     }
   onMouseMove: | #js
     function(pos) {
-      if (!this.isVisible) return;
       if (this.isPinned) return;
       this.mousePos = pos;
     }
@@ -217,14 +215,13 @@ style:
     opacity: 1
     transition: 0s
   .context-menu.visible:
-    display: block
+    opacity: 0.7
   .context-menu:
-    display: none
     padding: 1rem 2rem 1rem 1rem
     background: 'linear-gradient(to right, #303030, #101010)'
     box-shadow: '-12px 12px 6px #000000'
-    opacity: 0.7
-    transition: 0s !important
+    opacity: 0
+    transition: all 0s, transform 0.3s, opacity 0.3s !important
     cursor: move
     pointer-events: none
     z-index: 1000
@@ -232,7 +229,6 @@ style:
     opacity: 1
     border: '1px solid #ffffff60'
     transform: translateY(-5em)
-    transition: transform 0.3s !important
     pointer-events: all
   h2:
     border-radius: 0
@@ -270,10 +266,10 @@ template: >-
   @right-click="e =&gt; onRightClick(e, true)"
   path="1458497449.0"></ui-mouse><ui-mouse @drag="onDrag"
   path="1458497449.1"><transition name="fade" path="1458497449.1.0"><div
-  class="context-menu" v-if="isVisible" ref="menu1" :class="{ pinned: isPinned,
-  inited: isInited, visible: isVisible }" :style="style"
-  path="1458497449.1.0.0"><div path="1458497449.1.0.0.0"><div
-  class="close-button" v-if="isPinned" v-text="'✖️'" @click="isPinned=false"
+  class="context-menu" ref="menu1" :class="{ pinned: isPinned, inited: isInited,
+  visible: isVisible }" :style="style" path="1458497449.1.0.0"><div
+  path="1458497449.1.0.0.0"><div class="close-button" v-if="isPinned"
+  v-text="'✖️'" @click="isPinned=false"
   path="1458497449.1.0.0.0.0"></div><transition name="slide"
   path="1458497449.1.0.0.0.1"><h2 v-if="(showTitle) &amp;&amp; (icon || title)"
   :key="icon+title" path="1458497449.1.0.0.0.1.0"><ui-title :icon="icon"

@@ -19,19 +19,19 @@ dom:
           hint: arg0, arg1, arg2…
           v-model: argNamesStr
         ui.input.text.box: 
+          hint: description…
+          v-model: desc
+        ui.input.text.box: 
           ':hint': codeHint
           multiline: 'true'
           ':auto-resize': 'false'
           v-model: code
-      .flex.justify-center.absolute-bottom:
-        ui.value.preview:
-          v-if: resultValue
-          ':value': resultValue
 props:
   box: null
 data:
   selectedFunc: null
   argNamesStr: null
+  desc: null
   code: null
   codeHint: null
   is:
@@ -42,16 +42,45 @@ mounted: | #js
     this.codeHint = `for (let i = 0; i < 10; i++) {\n  console.log(i);\n}`;
   }
 methods:
+  onTitleIconClick: | #js
+    function() {
+      this.reexecute();
+    }
   grid_client_runtime_func_result_change: | #js
     function(boxID, resultValue) {
       if (boxID != this.box._id) return;
       this.resultValue = resultValue;
+    }
+  writeUsingAI: | #js
+    async function() {
+      const name = this.funcName;
+      const argNames = (this.argNamesStr||"").split(",").map(s => s.trim());
+      const desc = this.desc;
+      const data = { name, argNames, desc };
+      try
+      {
+        // Make a GET request to /write/function
+        const response = await fetch("/write/function", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(data),
+        });
+        const reply = await response.json();
+        this.code = reply.code;
+      }
+      catch (ex)
+      {
+        alertify.error(ex.message);
+      }
     }
   init: | #js
     function(box) {
       if (this.is.inited) return;
       this.is.inited = true;
       this.argNamesStr = box.argNamesStr;
+      this.description = box.description;
       this.code = box.code;
     }
   onSelectedFuncChange: | #js
@@ -60,6 +89,10 @@ methods:
   getBoxVue: | #js
     function() {
       return this.$root.vm.getAncestors(this, "grid.ui.box")[0];
+    }
+  reexecute: | #js
+    function() {
+      this.getBoxVue().$femit("execute.func", this.box._id);
     }
 computed:
   funcName: | #js
@@ -91,6 +124,11 @@ computed:
         .join("");
     }
 watch:
+  description:
+    handler: | #js
+      async function(description) {
+        this.getBoxVue().$femit("edit.box", this.box._id, { description });
+      }
   code:
     handler: | #js
       async function(code) {
@@ -162,8 +200,7 @@ template: >-
   path="1559058553.2.0.0"></grid-ui-box-func-settings><ui-input-text-box
   hint="arg0, arg1, arg2…" v-model="argNamesStr"
   path="1559058553.2.0.1"></ui-input-text-box><ui-input-text-box
+  hint="description…" v-model="desc"
+  path="1559058553.2.0.2"></ui-input-text-box><ui-input-text-box
   :hint="codeHint" multiline="true" :auto-resize="false" v-model="code"
-  path="1559058553.2.0.2"></ui-input-text-box></div><div class="flex
-  justify-center absolute-bottom" path="1559058553.2.1"><ui-value-preview
-  v-if="resultValue" :value="resultValue"
-  path="1559058553.2.1.0"></ui-value-preview></div></div></grid-module>
+  path="1559058553.2.0.3"></ui-input-text-box></div></div></grid-module>

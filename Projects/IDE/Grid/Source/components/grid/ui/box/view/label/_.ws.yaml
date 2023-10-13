@@ -1,0 +1,63 @@
+dom:
+  grid.module:
+    icon: 🆎
+    ':show-title': 'false'
+    div:
+      v-for: boxValue in boxValues
+      v-text: boxValue
+props:
+  box: null
+data:
+  field: null
+methods:
+  getBoxVue: | #js
+    function() {
+      return this.$root.vm.getAncestors(this, "grid.ui.box")[0];
+    }
+computed:
+  boxValues: | #js
+    function() {
+      const boxValue = this.boxValue;
+      if (!Array.isArray(boxValue)) return [];
+      return boxValue.map(this.fieldFunc);
+    }
+  boxValue: | #js
+    function() {
+      return this.fieldFunc(this.boxItem) || "[❔ text]";
+    }
+  boxItem: | #js
+    function() {
+      // Take the box value from the input socket
+      const socketData = this.$root.socket?.runtime.data[this.box._id];
+      const item = (socketData?.input?.[1] || this.box.value);
+      return item;
+    }
+  fieldFunc: | #js
+    function() {
+      if (typeof this.field == "string") return (item) => item[this.field];
+      if (typeof this.field == "function") return this.field;
+      return ((item) => item);
+    }
+watch:
+  box:
+    handler: | #js
+      async function(box) {
+        this.field = box?.field;
+      }
+    immediate: true
+  field:
+    handler: | #js
+      async function(field) {
+        if (field == this.box.field) return;
+        await this.$nextTick();
+        this.getBoxVue().$femit("edit.box", this.box._id, { field });
+      }
+    immediate: false
+_:
+  examples:
+    count: 0
+name: grid-ui-box-view-label
+template: >-
+  <grid-module class="comp-grid-ui-box-view-label" icon="🆎" :show-title="false"
+  path="2104471648."><div v-for="boxValue in boxValues" v-text="boxValue"
+  path="2104471648.0"></div></grid-module>

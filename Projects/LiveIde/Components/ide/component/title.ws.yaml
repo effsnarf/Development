@@ -13,16 +13,17 @@ dom:
           ':value': vue.$options._componentTag
 props:
   item: null
+data:
+  vue: null
 methods:
   onClick: | #js
     function() {
       console.log(this.vue);
     }
-computed:
-  vue: | #js
-    function() {
-      if (!this.item) return null;
-      return this.item();
+watch:
+  item: | #js
+    function(item) {
+      this.vue = (!item ? null : item());
     }
 name: ide-component-title
 _:

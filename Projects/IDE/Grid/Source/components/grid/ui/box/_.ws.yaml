@@ -3,7 +3,7 @@ dom:
     icon: 📦
     ':show-title': 'false'
     ui.window:
-      ':style': windowStyle
+      ':window-style': windowStyle
       ':rect': box.rect
       ':surface-element': surfaceElement
       ':surface-scale': surfaceScale
@@ -24,13 +24,16 @@ dom:
             class: flex-grow-1
             ':box': box
             ':box-icon': boxIcon
+            @title-icon-click: onTitleIconClick
       template: 
         v-slot: content
         .h-100pc:
           component:
+            ref: boxComp1
             v-if: box.type
             class: h-100pc
             ':is': getBoxCompName(box)
+            ':userID': userID
             ':box': box
           grid.ui.box.type.picker:
             v-if: '!box.type'
@@ -42,21 +45,34 @@ dom:
           direction: output
         .error:
           v-if: error
-          v-text: error
+          h3:
+            v-text: error.message
 props:
+  userID: null
   box: null
   surfaceElement: null
 data:
   boxIcon: null
   oldBox: null
   error: null
-  boxIsLoading: false
+  boxIsLoading: 0
   surfaceScale: 1
 methods:
+  onTitleIconClick: | #js
+    function() {
+      this.$femit("execute", this.box._id);
+    }
+  grid_ui_box_socket_value_change: | #js
+    async function(boxID, socketDirection, sID, socketValue) {
+      if (boxID != this.box._id) return;
+      this.boxIsLoading++;
+      await this.$root.wait(600);
+      this.boxIsLoading--;
+    }
   grid_client_runtime_box_is_loading: | #js
     function(boxID, isLoading) {
       if (boxID != this.box._id) return;
-      this.boxIsLoading = isLoading;
+      this.boxIsLoading += (isLoading ? 1 : -1);
     }
   grid_client_runtime_box_error: | #js
     function(boxID, error) {
@@ -91,6 +107,17 @@ methods:
         this.$femit("move.box", this.box._id, rect.pos);
       }
     }
+  getGradientBackground: | #js
+    function(hexColor, opacity) {
+      let r = parseInt(hexColor.substring(1, 3), 16);
+      let g = parseInt(hexColor.substring(3, 5), 16);
+      let b = parseInt(hexColor.substring(5, 7), 16);
+
+      let darkColor = `rgba(${Math.floor(r * 0.8)}, ${Math.floor(g * 0.8)}, ${Math.floor(b * 0.8)}, ${opacity * 0.8})`;
+      let lightColor = `rgba(${Math.floor(r * 0.9)}, ${Math.floor(g * 0.9)}, ${Math.floor(b * 0.9)}, ${opacity * 0.9})`;
+
+      return `linear-gradient(to right, ${darkColor}, ${lightColor})`;
+    }
   yamlify: | #js
     function(obj) {
       return jsyaml.dump(obj);
@@ -102,6 +129,7 @@ computed:
       if (this.boxIsLoading) style.border = `2px solid yellow`;
       if (this.box.is?.selected) style.border = `4px dashed yellow`;
       if (this.error) style.border = `4px solid red`;
+      if (this.$root.boxTypeColors) style.background = this.getGradientBackground(this.$root.boxTypeColors[this.box.type?.split('.')[0]] || "#000000", 0.2);
       return style;
     }
 watch: null
@@ -111,17 +139,20 @@ _:
 style:
   .sockets:
     z-index: 10
+  .sockets:hover: null
+  .above .sockets:
+    transform-origin: 0 top
   .above .sockets, .below .sockets:
     position: absolute
     width: 100%
     opacity: 0
-    transition: transform 0.4s
+    transition: 0.4s
   .below .sockets:
     transform: translate(0, -100%)
   .hovered .above .sockets, .hovered .below .sockets:
     opacity: 1
   .hovered .above .sockets:
-    transform: translate(0, -100%)
+    transform: translate(0, -100%) !important
   .hovered .below .sockets:
     transform: none
   .header:
@@ -138,7 +169,7 @@ style:
 name: grid-ui-box
 template: >-
   <grid-module class="comp-grid-ui-box" icon="📦" :show-title="false"
-  path="1671629593."><ui-window :style="windowStyle" :rect="box.rect"
+  path="1671629593."><ui-window :window-style="windowStyle" :rect="box.rect"
   :surface-element="surfaceElement" :surface-scale="surfaceScale"
   :center-coords="true" :show-header="!!box.type"
   @is-minimized="onToggleMinimized" @drag-stop="onDragStop"
@@ -148,14 +179,15 @@ template: >-
   v-slot:header path="1671629593.0.1"><div class="flex"
   path="1671629593.0.1.0"><grid-ui-box-header class="flex-grow-1"
   v-if="box.type" :box="box" :box-icon="boxIcon"
+  @title-icon-click="onTitleIconClick"
   path="1671629593.0.1.0.0"></grid-ui-box-header></div></template><template
   v-slot:content path="1671629593.0.2"><div class="h-100pc"
-  path="1671629593.0.2.0"><component class="h-100pc" v-if="box.type"
-  :is="getBoxCompName(box)" :box="box"
+  path="1671629593.0.2.0"><component class="h-100pc" ref="boxComp1"
+  v-if="box.type" :is="getBoxCompName(box)" :userID="userID" :box="box"
   path="1671629593.0.2.0.0"></component><grid-ui-box-type-picker
   v-if="!box.type" :box="box"
   path="1671629593.0.2.0.1"></grid-ui-box-type-picker></div></template><template
   v-slot:below path="1671629593.0.3"><grid-ui-box-sockets :box="box"
   direction="output" path="1671629593.0.3.0"></grid-ui-box-sockets><div
-  class="error" v-if="error" v-text="error"
-  path="1671629593.0.3.1"></div></template></ui-window></grid-module>
+  class="error" v-if="error" path="1671629593.0.3.1"><h3 v-text="error.message"
+  path="1671629593.0.3.1.0"></h3></div></template></ui-window></grid-module>

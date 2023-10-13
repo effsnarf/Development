@@ -35,14 +35,12 @@ dom:
           ui.title:
             icon: 📦
             ':text': getTitle(hoveredVueUID)
-        transition:
-          name: slide-hor
-          div: 
-            v-show: activeVueUID
-            ide.component.editor:
-              ':vue-uid': activeVueUID
-              @selected-view-node: selectedViewNode=$event
-              @selected-tab-index: selectedEditorTabIndex=$event
+        div: 
+          v-show: activeVueUID
+          ide.component.editor:
+            ':vue-uid': activeVueUID
+            @selected-view-node: selectedViewNode=$event
+            @selected-tab-index: selectedEditorTabIndex=$event
 props: null
 data:
   hoveredElement: null
@@ -267,9 +265,8 @@ template: >-
   class="hidden" :element="hoveredElement"
   path="-646340253.2.0.0.1"></ide-element-inspector></div><h2 v-if="false"
   path="-646340253.2.0.1"><ui-title icon="📦" :text="getTitle(hoveredVueUID)"
-  path="-646340253.2.0.1.0"></ui-title></h2><transition name="slide-hor"
-  path="-646340253.2.0.2"><div v-show="activeVueUID"
-  path="-646340253.2.0.2.0"><ide-component-editor :vue-uid="activeVueUID"
+  path="-646340253.2.0.1.0"></ui-title></h2><div v-show="activeVueUID"
+  path="-646340253.2.0.2"><ide-component-editor :vue-uid="activeVueUID"
   @selected-view-node="selectedViewNode=$event"
   @selected-tab-index="selectedEditorTabIndex=$event"
-  path="-646340253.2.0.2.0.0"></ide-component-editor></div></transition></div></ui-context-window></div>
+  path="-646340253.2.0.2.0"></ide-component-editor></div></div></ui-context-window></div>

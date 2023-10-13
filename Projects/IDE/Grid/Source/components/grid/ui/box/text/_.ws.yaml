@@ -11,15 +11,34 @@ props:
 data:
   boxValue: null
   inputSocketDataValue: null
+mounted: | #js
+  async function() {
+    await this.$root.wait(2000);
+    this.reexecute();
+  }
 methods:
   init: | #js
     function(box) {
       this.boxValue = box.value;
     }
+  reexecute: | #js
+    async function() {
+      await this.onBoxValueChange(this.boxValue);
+    }
+  onTitleIconClick: | #js
+    function() {
+      this.reexecute();
+    }
   onTextInput: | #js
     function(text) {
       const gridUiBoxVue = this.$root.vm.getAncestors(this, "grid.ui.box")[0];
       gridUiBoxVue.$femit("edit.box", this.box._id, { value: text });
+    }
+  onBoxValueChange: | #js
+    async function(value) {
+      await this.$nextTick();
+      const gridUiBoxVue = this.$root.vm.getAncestors(this, "grid.ui.box")[0];
+      gridUiBoxVue.$femit("socket.value.change", this.box._id, "output", 1, value);
     }
   grid_client_runtime_socket_data_change: | #js
     function(boxID, sDirection, sName, sValue) {
@@ -52,8 +71,7 @@ watch:
   boxValue:
     handler: | #js
       async function(value) {
-        const gridUiBoxVue = this.$root.vm.getAncestors(this, "grid.ui.box")[0];
-        gridUiBoxVue.$femit("socket.value.change", this.box._id, "output", 1, value);
+        this.onBoxValueChange(value);
       }
 style:
   textarea:

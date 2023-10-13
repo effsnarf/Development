@@ -8,7 +8,6 @@ data:
   pos: {}
   hoveredElement: null
   posQueue: []
-  updateInterval: 20
   isMounted: false
   dragStart: null
 mounted: | #js
@@ -33,7 +32,6 @@ methods:
       element.addEventListener("mouseup", this.onMouseUp);
       window.addEventListener("mousemove", this.onMouseMove);
       element.addEventListener("contextmenu", this.onContextMenu);
-      this.update();
     }
   onMouseDown: | #js
     function(e) {
@@ -50,7 +48,7 @@ methods:
       this.$emit("up", e);
     }
   onMouseMove: | #js
-    function(e) {     
+    function(e) {
       const pos = { x: e.clientX, y: e.clientY };
       this.pos = pos;
     }
@@ -63,17 +61,13 @@ methods:
     }
   updateHoveredElement: | #js
     function(pos) {
+      if (!this.updateHoveredElementThrottled) this.updateHoveredElementThrottled = this._updateHoveredElement.bind(this).throttle(400);
+      this.updateHoveredElementThrottled(pos);
+    }
+  _updateHoveredElement: | #js
+    function(pos) {
       var el = document.elementFromPoint(pos.x, pos.y);
       this.hoveredElement = el;
-    }
-  update: | #js
-    async function() {
-      return;
-      if (!this.isMounted) return;
-      const pos = this.posQueue.pop();
-      if (pos) this.pos = pos;
-      this.posQueue = [];
-      setTimeout(this.update.bind(this), this.updateInterval);
     }
   getElement: | #js
     function() {

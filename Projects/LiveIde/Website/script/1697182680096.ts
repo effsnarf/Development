@@ -13,12 +13,11 @@ import { DatabaseProxy } from "../../../../Apps/DatabaseProxy/Client/DbpClient";
 import { VueManager } from "../../Classes/VueManager";
 import { Data } from "../../../../Shared/Data";
 import { Graph } from "../../../../Shared/Database/Graph";
+import { Performance } from "@shared/Performance";
 
 const window1 = window as any;
 
 const Vue = (window1 as any).Vue;
-
-let vueApp: any;
 
 // To make it accessible to client code
 window1.Objects = Objects;
@@ -27,6 +26,7 @@ window1.TaskQueue = TaskQueue;
 window1.Data = Data;
 window1.Actionable = Actionable;
 window1.Graph = Graph;
+window1.Performance = Performance;
 
 const generalMixin = {
   matchComp: (c: Component) => true,
@@ -55,16 +55,12 @@ const generalMixin = {
     };
     self.$el.addEventListener("mouseover", self.handlers.mouseover);
     self.$el.addEventListener("mouseout", self.handlers.mouseout);
-
-    vueApp?.vm.registerVue(this);
   },
   unmounted() {
     const self = this as any;
     self.ui.is.mounted = false;
     self.$el.removeEventListener("mouseover", self.handlers.mouseover);
     self.$el.removeEventListener("mouseout", self.handlers.mouseout);
-
-    vueApp?.vm.registerVue(this);
   },
 };
 
@@ -514,6 +510,8 @@ interface MgParams {
   });
 
   await client.compileAll((c) => !c.name.startsWith("ide."), webScriptMixins);
+
+  let vueApp: any = null;
 
   const isLocalHost = window.location.hostname == "localhost";
   const dbpHost = `https://db.memegenerator.net`;

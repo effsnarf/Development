@@ -8,27 +8,23 @@ dom:
         v-text: shortValueDesc
 props:
   box: null
-data:
-  dataValue: null
-methods:
-  grid_client_runtime_socket_value_change: | #js
-    function(boxID, sDirection, sID, sValue) {
-      if (boxID != this.box._id) return;
-      if (sDirection != "input") return;
-      if (sID != 1) return;
-      this.dataValue = sValue;
-    }
+data: null
+methods: null
 computed:
   shortValueDesc: | #js
     function() {
-      const value = this.dataValue;
+      const value = this.boxValue;
       if ((value == null) || (value == undefined)) return '❔';
       if (typeof value === "string") return '🆎';
       if (Array.isArray(value)) return `[${value.length}]`;
       if (typeof value === "object") return `{ }`;
       return "❔"
     }
-watch: null
+  boxValue: | #js
+    function() {
+      const socketData = this.$root.socket?.runtime.data[this.box._id];
+      return socketData?.input?.[1] || this.box.value;
+    }
 style:
   .short-value:
     color: cyan

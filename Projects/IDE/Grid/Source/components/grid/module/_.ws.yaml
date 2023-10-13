@@ -164,7 +164,7 @@ style:
     overflow: auto
   .box2:
     margin: 1em
-    border: '1px dashed #ccc'
+    border: '1px transparent #ccc'
   .box2 > *:
     margin-left: 0em
 _:

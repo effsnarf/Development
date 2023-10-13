@@ -1,5 +1,6 @@
 dom:
   div:
+    ref: dragElement1
     ':class': '{ draggable: true }'
     draggable: true
     @dragstart: onDragStart
@@ -10,11 +11,14 @@ props:
   dragItem: null
   showDragGhost: true
 data:
+  dragElementPos: null
   isDragging: false
 methods:
   onDragStart: | #js
     function(e) {
       this.isDragging = true;
+
+      this.dragElementPos = { x: e.clientX, y: e.clientY };
 
       if (!this.showDragGhost)
       {
@@ -29,13 +33,22 @@ methods:
   onDragEnd: | #js
     async function(e) {
       this.isDragging = false;
+      this.dragElementPos = null;
       await this.$nextTick();
       this.$emit('drag-end', this.dragItem);
       this.$root.dragItem = null;
     }
   onDrag: | #js
     function(e) {
-      this.$emit('drag', e);
+      const dep = this.dragElementPos;
+      const relativePos = { x: (e.clientX - dep.x), y: (e.clientY - dep.y) };
+      const data = {
+        e,
+        relative: {
+          pos: relativePos,
+        }
+      };
+      this.$emit('drag', data);
     }
 style:
   .draggable:
@@ -45,6 +58,6 @@ _:
     count: 0
 name: ui-dnd-draggable
 template: >-
-  <div class="comp-ui-dnd-draggable" :class="{ draggable: true }"
-  draggable="true" @dragstart="onDragStart" @dragend="onDragEnd" @drag="onDrag"
-  path="-26676257."><slot></slot></div>
+  <div class="comp-ui-dnd-draggable" ref="dragElement1" :class="{ draggable:
+  true }" draggable="true" @dragstart="onDragStart" @dragend="onDragEnd"
+  @drag="onDrag" path="-26676257."><slot></slot></div>

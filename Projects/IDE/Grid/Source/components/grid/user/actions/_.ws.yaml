@@ -2,15 +2,25 @@ dom:
   grid.module:
     icon: 👤👈
     grid.user.action.stack:
-      ":userID": userID
+      ':userID': userID
     grid.data.list.view:
-      ":fuid": userID+'/data/boxes'
+      ':fuid': userID+'/data/boxes'
       v-model: boxes
 props:
   userID: null
 data:
   boxes: []
 methods:
+  grid_client_workspace_create_group: | #js
+    function() {
+      const action = { redo: { method: "create.group" } };
+      this.$femit("do", this.userID, action);
+    }
+  grid_client_workspace_delete_selected: | #js
+    function() {
+      const action = { redo: { method: "delete.selected" } };
+      this.$femit("do", this.userID, action);
+    }
   grid_ui_actions_mark_select_box: | #js
     function(rect) {
       // Check if any boxes fit into the selection box
@@ -33,7 +43,7 @@ methods:
           },
         };
         const action = { redo: { method: "create.box", args: [box] } };
-        this.$femit("do", userID, action);
+        this.$femit("do", this.userID, action);
       }
     }
   grid_ui_actions_create_box: | #js
@@ -57,6 +67,11 @@ methods:
   grid_ui_box_edit_box: | #js
     async function(boxID, newData, oldData) {
       const action = { redo: { method: "edit.box", args: [boxID, newData, oldData] } };
+      this.$femit("do", this.userID, action);
+    }
+  grid_ui_box_edit_socket: | #js
+    function(boxID, direction, socketID, newData, oldData) {
+      const action = { redo: { method: "edit.socket", args: [boxID, direction, socketID, newData, oldData] } };
       this.$femit("do", this.userID, action);
     }
   grid_ui_box_create_link: | #js

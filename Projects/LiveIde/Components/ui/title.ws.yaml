@@ -3,13 +3,13 @@ dom:
     @click: $emit('click')
     class: flex
     .icon:
-      ':class': getIconClass()
+      ':class': iconClass
       v-if: icon
       v-text: icon
     div: 
       slot: null
       div: 
-        v-html: getHtml()
+        v-html: cHtml
     .ml-1.opacity-40:
       v-if: number
       v-text: getNumberText()
@@ -20,14 +20,6 @@ props:
   value: null
   number: null
 methods:
-  getHtml: | #js
-    function() {
-      if (this.html) return this.html;
-      return [this.text, this.value]
-        .filter(s => s)
-        .join(' ')
-        .textToHtml();
-    }
   getNumberText: | #js
     function() {
       return !this.number ? '' : `(${this.number})`;
@@ -36,6 +28,19 @@ methods:
     function() {
       if (this.icon == "📁") return "opacity-50";
       return null;
+    }
+computed:
+  cHtml: | #js
+    function() {
+      if (this.html) return this.html;
+      return [this.text, this.value]
+        .filter(s => s)
+        .join(' ')
+        .textToHtml();
+    }
+  iconClass: | #js
+    function() {
+      return this.getIconClass();
     }
 style:
   .icon:
@@ -54,8 +59,8 @@ _:
     count: 0
 template: >-
   <div class="comp-ui-title flex" @click="$emit('click')"
-  path="-2123702658."><div class="icon" :class="getIconClass()" v-if="icon"
+  path="-2123702658."><div class="icon" :class="iconClass" v-if="icon"
   v-text="icon" path="-2123702658.0"></div><div
-  path="-2123702658.1"><slot></slot><div v-html="getHtml()"
+  path="-2123702658.1"><slot></slot><div v-html="cHtml"
   path="-2123702658.1.1"></div></div><div class="ml-1 opacity-40" v-if="number"
   v-text="getNumberText()" path="-2123702658.2"></div></div>

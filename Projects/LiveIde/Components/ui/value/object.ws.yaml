@@ -90,9 +90,6 @@ style:
     background: '#ffffff20'
   .box1:
     font-size: 100%
-    max-width: 20em
-    max-height: 50vh
-    overflow: auto
 name: ui-value-object
 _:
   examples:

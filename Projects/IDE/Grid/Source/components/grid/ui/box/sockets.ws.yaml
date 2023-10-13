@@ -18,10 +18,6 @@ computed:
       return this.box.sockets[this.direction];
     }
 style:
-  .comp-grid-ui-box-sockets:
-    transition: 0.3s
-  .comp-grid-ui-box-sockets:hover:
-    transition: 0.3s
   .comp-grid-ui-box-sockets.input-sockets:
     transform-origin: left bottom
   .comp-grid-ui-box-sockets.output-sockets:

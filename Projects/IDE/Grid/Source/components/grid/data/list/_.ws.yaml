@@ -24,6 +24,7 @@ methods:
     function(itemIDs, datas) {
       if (!Array.isArray(itemIDs)) itemIDs = [itemIDs];
       if (!Array.isArray(datas)) datas = [datas];
+      while (datas.length < itemIDs.length) datas.push(datas.last());
       const updateItem = (itemID, data) => {
         const item = this.items.find(item => (item._id == itemID));
         let changes = DeepDiff.diff(item, data);

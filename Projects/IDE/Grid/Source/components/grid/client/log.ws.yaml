@@ -1,0 +1,25 @@
+dom:
+  grid.module:
+    icon: 💻📃
+    ui.console:
+      v-show: 'false'
+      ref: console1
+props: null
+mounted: | #js
+  function() {
+    this.$root.$on("grid.event", this.onGridEvent);
+  }
+methods:
+  onGridEvent: | #js
+    function(compName, eventName, args) {
+      if (["mouse.pos"].includes(eventName)) return;
+      this.$refs.console1.log(compName, eventName, args);
+    }
+_:
+  examples:
+    count: 0
+name: grid-client-log
+template: >-
+  <grid-module class="comp-grid-client-log" icon="💻📃"
+  path="-1813344695."><ui-console v-show="false" ref="console1"
+  path="-1813344695.0"></ui-console></grid-module>

@@ -1,0 +1,21 @@
+dom:
+  component:
+    ':is': getCompName(input)
+    ':input': input
+    ':value': value
+    @input: $emit('input', $event)
+props:
+  input: null
+  value: null
+methods:
+  getCompName: | #js
+    function(obj) {
+      return `ui.linq.${Objects.getTypeName(obj)}`.replace(/\./g, "-");
+    }
+_:
+  examples:
+    count: 0
+name: ui-linq
+template: >-
+  <component class="comp-ui-linq" :is="getCompName(input)" :input="input"
+  :value="value" @input="$emit('input', $event)" path="-484387046."></component>

@@ -1,0 +1,25 @@
+dom:
+  grid.module:
+    icon: 🖼️
+    ':show-title': 'false'
+    img:
+      ':style': '{ ''width'': ''100%''}'
+      src: /images/cat2.png
+props:
+  box: null
+data: null
+methods: null
+computed:
+  boxValue: | #js
+    function() {
+      const socketData = this.$root.socket?.runtime.data[this.box._id];
+      return socketData?.input?.[1] || this.box.value;
+    }
+_:
+  examples:
+    count: 0
+name: grid-ui-box-view-image
+template: >-
+  <grid-module class="comp-grid-ui-box-view-image" icon="🖼️"
+  :show-title="false" path="2102057671."><img :style="{ 'width': '100%'}"
+  src="/images/cat2.png" path="2102057671.0"/></grid-module>

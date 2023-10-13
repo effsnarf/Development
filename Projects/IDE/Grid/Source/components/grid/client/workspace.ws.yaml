@@ -1,6 +1,10 @@
 dom:
   grid.module:
     icon: 👤💻🖱️
+    grid.client.context.menu:
+      ':userID': userID
+      ':boxes': boxes
+      ':links': links
     .flex:
       div: 
         ':key': surfaceKey
@@ -11,6 +15,7 @@ dom:
         grid.ui.box:
           v-for: box in boxes
           ':key': '''box/'' + box._id'
+          ':userID': userID
           ':box': box
           ':surface-element': surfaceElement
         grid.ui.link:
@@ -22,9 +27,12 @@ dom:
           ':surface-element': surfaceElement
         grid.data.variable.view:
           ':fuid': userID+'/user/actions/pointer'
+          v-model: userActionsPointer
         grid.data.list.view: 
           ':fuid': userID+'/user/actions'
           v-model: userActions
+          ':item-props': '{ userActionsPointer }'
+          ':reverse': true
         grid.data.list.view: 
           ':fuid': userID + '/data/boxes'
           v-model: boxes
@@ -37,6 +45,7 @@ data:
   boxes: []
   links: []
   userActions: []
+  userActionsPointer: null
   surfaceElement: null
   surfaceScale: 1
   surfaceKey: 1
@@ -50,6 +59,7 @@ mounted: | #js
 methods:
   onWheel: | #js
     function(e) {
+      return;
       e.preventDefault();
       e.stopPropagation();
       // Adjust surfaceScale based on the wheel event
@@ -80,10 +90,7 @@ style:
   .surface:
     height: 80vh
     overflow: hidden
-    background-size: 40px 40px;
-    background-image: >-
-      linear-gradient(to right, #303030 1px, transparent 1px),
-      linear-gradient(to bottom, #303030 1px, transparent 1px);
+    border: 1px solid gray
     cursor: crosshair
 _:
   examples:
@@ -91,20 +98,23 @@ _:
 name: grid-client-workspace
 template: >-
   <grid-module class="comp-grid-client-workspace" icon="👤💻🖱️"
-  path="-1461469222."><div class="flex" path="-1461469222.0"><div class="surface
-  flex-grow-1" :key="surfaceKey" ref="surface1" :style="surfaceStyle"
-  @wheel="onWheel" path="-1461469222.0.0"><grid-ui-box v-for="box in boxes"
-  :key="'box/' + box._id" :box="box" :surface-element="surfaceElement"
-  path="-1461469222.0.0.0"></grid-ui-box><grid-ui-link v-for="link in links"
+  path="-1461469222."><grid-client-context-menu :userID="userID" :boxes="boxes"
+  :links="links" path="-1461469222.0"></grid-client-context-menu><div
+  class="flex" path="-1461469222.1"><div class="surface flex-grow-1"
+  :key="surfaceKey" ref="surface1" :style="surfaceStyle" @wheel="onWheel"
+  path="-1461469222.1.0"><grid-ui-box v-for="box in boxes" :key="'box/' +
+  box._id" :userID="userID" :box="box" :surface-element="surfaceElement"
+  path="-1461469222.1.0.0"></grid-ui-box><grid-ui-link v-for="link in links"
   :key="'link/' + link._id" :link="link"
-  path="-1461469222.0.0.1"></grid-ui-link></div><div
-  path="-1461469222.0.1"><grid-ui-tools :surface-element="surfaceElement"
-  path="-1461469222.0.1.0"></grid-ui-tools><grid-data-variable-view
-  :fuid="userID+'/user/actions/pointer'"
-  path="-1461469222.0.1.1"></grid-data-variable-view><grid-data-list-view
-  :fuid="userID+'/user/actions'" v-model="userActions"
-  path="-1461469222.0.1.2"></grid-data-list-view><grid-data-list-view
+  path="-1461469222.1.0.1"></grid-ui-link></div><div
+  path="-1461469222.1.1"><grid-ui-tools :surface-element="surfaceElement"
+  path="-1461469222.1.1.0"></grid-ui-tools><grid-data-variable-view
+  :fuid="userID+'/user/actions/pointer'" v-model="userActionsPointer"
+  path="-1461469222.1.1.1"></grid-data-variable-view><grid-data-list-view
+  :fuid="userID+'/user/actions'" v-model="userActions" :item-props="{
+  userActionsPointer }" :reverse="true"
+  path="-1461469222.1.1.2"></grid-data-list-view><grid-data-list-view
   :fuid="userID + '/data/boxes'" v-model="boxes"
-  path="-1461469222.0.1.3"></grid-data-list-view><grid-data-list-view
+  path="-1461469222.1.1.3"></grid-data-list-view><grid-data-list-view
   :fuid="userID + '/data/links'" v-model="links"
-  path="-1461469222.0.1.4"></grid-data-list-view></div></div></grid-module>
+  path="-1461469222.1.1.4"></grid-data-list-view></div></div></grid-module>

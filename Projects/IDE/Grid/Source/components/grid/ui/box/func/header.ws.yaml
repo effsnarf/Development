@@ -3,9 +3,9 @@ dom:
     ':show-title': 'false'
     .flex:
       .clickable:
-        v-text: '''🔴'''
+        v-text: '''💡'''
         v-tooltip: '''Click to execute the function'''
-        @click: executeFunc
+        @click: $emit('title-icon-click')
       ui.select:
         ':options': runsOnOptions
         type: toggle
@@ -20,7 +20,7 @@ data:
   runsOn: null
   runsOnOptions:
     - _id: client
-      icon: 🌐
+      icon: 💻
       desc: The function will be executed in the client browser
     - _id: server
       icon: 🖥️
@@ -29,12 +29,7 @@ mounted: | #js
   function() {
     this.runsOn = this.runsOnOptions[0];
   }
-methods:
-  executeFunc: | #js
-    function() {
-      const gridUiBoxVue = this.$root.vm.getAncestors(this, "grid.ui.box")[0];
-      gridUiBoxVue.$femit("execute.func", this.box._id);
-    }
+methods: null
 _:
   examples:
     count: 0
@@ -42,8 +37,8 @@ name: grid-ui-box-func-header
 template: >-
   <grid-module class="comp-grid-ui-box-func-header" :show-title="false"
   path="1742824866."><div class="flex" path="1742824866.0"><div
-  class="clickable" v-text="'🔴'" v-tooltip="'Click to execute the function'"
-  @click="executeFunc" path="1742824866.0.0"></div><ui-select
+  class="clickable" v-text="'💡'" v-tooltip="'Click to execute the function'"
+  @click="$emit('title-icon-click')" path="1742824866.0.0"></div><ui-select
   :options="runsOnOptions" type="toggle" input-type="value"
   :get-item-text="(item) =&gt; item?.icon" :get-item-key="(item) =&gt;
   item?._id" :get-item-tooltip="(item) =&gt; item?.desc" v-model="runsOn"
