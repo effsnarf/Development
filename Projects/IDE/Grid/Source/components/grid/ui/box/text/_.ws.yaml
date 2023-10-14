@@ -13,21 +13,11 @@ data:
   inputSocketDataValue: null
 mounted: | #js
   async function() {
-    await this.$root.wait(2000);
-    this.reexecute();
   }
 methods:
   init: | #js
     function(box) {
       this.boxValue = box.value;
-    }
-  reexecute: | #js
-    async function() {
-      await this.onBoxValueChange(this.boxValue);
-    }
-  onTitleIconClick: | #js
-    function() {
-      this.reexecute();
     }
   onTextInput: | #js
     function(text) {

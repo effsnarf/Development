@@ -1,11 +1,11 @@
 dom:
   div:
-    h2:
-      v-text: '''display box: '' + displayBox?._id'
     component:
-      v-if: 'false'
+      v-for: item in items
       ':is': getBoxCompName(displayBox)
       ':box': displayBox
+      ':data-bound-items': '[item]'
+    @click: onClick
 props:
   box: null
   surfaceElement: null
@@ -13,11 +13,22 @@ data:
   groupBox: null
   displayBox: null
 methods:
+  onClick: | #js
+    function() {
+      // #TODO: Find a way to not refresh manually
+      this.refresh();
+      alertify.success("Refreshed");
+    }
+  onBoxIsLoading: | #js
+    function(boxID, isLoading) {
+      if (!this.groupBox.members.includes(boxID)) return;
+      if (isLoading) return;
+      // Whenever a member box is done loading, refresh the group box
+      this.refresh();
+    }
   init: | #js
     async function(box) {
       this.groupBox = box;
-      // #TODO: Fix
-      await this.$root.wait(2000);
       this.refresh();
     }
   refresh: | #js
@@ -28,8 +39,18 @@ methods:
     }
   getBoxCompName: | #js
     function(box) {
-      if (!box.type) return null;
+      if (!box?.type) return null;
       return `grid.ui.box.${box.type}`.replace(/\./g, "-");
+    }
+computed:
+  items: | #js
+    function() {
+      const socketData = this.$root.socket?.runtime.data[this.box._id];
+      const item = socketData?.input?.[1];
+      if (!item) return [0, 1];
+      const slotCanMultiplyView = true;
+      const items = (slotCanMultiplyView && Array.isArray(item)) ? item : [item];
+      return items;
     }
 watch:
   box:
@@ -43,7 +64,7 @@ _:
     count: 0
 name: grid-ui-box-group
 template: >-
-  <div class="comp-grid-ui-box-group" path="1087010666."><h2 v-text="'display
-  box: ' + displayBox?._id" path="1087010666.0"></h2><component v-if="false"
-  :is="getBoxCompName(displayBox)" :box="displayBox"
-  path="1087010666.1"></component></div>
+  <div class="comp-grid-ui-box-group" @click="onClick"
+  path="1087010666."><component v-for="item in items"
+  :is="getBoxCompName(displayBox)" :box="displayBox" :data-bound-items="[item]"
+  path="1087010666.0"></component></div>

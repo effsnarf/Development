@@ -12,8 +12,8 @@ data:
   boxes: []
 methods:
   grid_client_workspace_create_group: | #js
-    function() {
-      const action = { redo: { method: "create.group", args: [] } };
+    function(displayBoxID) {
+      const action = { redo: { method: "create.group", args: [displayBoxID] } };
       this.$femit("do", this.userID, action);
     }
   grid_client_workspace_delete_selected: | #js
@@ -94,6 +94,10 @@ methods:
   isBoxInRect: | #js
     function(box, rect) {
       // Check if box is completely inside rect
+
+      // If box is inside a group, we don't want to select it
+      if (box.groupBoxID) return false;
+      
       // rect.pos / box.rect.pos mark the center of the rectangle
       // rect.size / box.rect.size marks the size of the rectangle
       // If box.rect.is.minimized, we consider its height to be 40
@@ -104,7 +108,7 @@ methods:
       const boxHeight = box.rect.is.minimized ? 40 : box.rect.size.height;
       
       // Calculate new center position if the box is minimized
-      const boxCenterY = box.rect.is.minimized ? (box.rect.pos.y + box.rect.size.height / 2) - boxHeight / 2 : box.rect.pos.y;
+      const boxCenterY = box.rect.is.minimized ? (box.rect.pos.y - boxHeight / 2) : box.rect.pos.y;
       
       const boxCoords = this.centeredToTraditional({ x: box.rect.pos.x, y: boxCenterY }, { width: box.rect.size.width, height: boxHeight });
       const rectCoords = this.centeredToTraditional(rect.pos, rect.size);

@@ -2,37 +2,24 @@ dom:
   grid.module:
     icon: ⬜
     ':show-title': 'false'
-    div: 
-      div: 
-        v-if: items
-        v-for: (item, index) in items
-        div: 
-          v-if: '!iteratorSlotBox'
-          class: item-row
-          v-text: JSON.stringify(item)
-        component: 
-          v-if: iteratorSlotBox
-          ':is': getBoxCompName(iteratorSlotBox)
-          ':userID': userID
-          ':box': iteratorSlotBox
-          ':iterator-item': '{ item, index }'
     .slots:
-      v-if: 'false'
       @click: refresh
       div: 
-        v-for: (i, index) in 2
-        ':class': '''slot-'' + i'
+        v-for: (item, index) in items
+        ':class': '''slot-'' + index'
         div: 
           v-if: slotBoxes
-          component: 
+          component:
             v-if: slotBoxes[index]?.type
             class: h-100pc
             ':is': getBoxCompName(slotBoxes[index])
             ':userID': userID
             ':box': slotBoxes[index]
+            ':data-bound-items': dataBoundItems
 props:
   userID: null
   box: null
+  dataBoundItems: null
 data:
   slotBoxes: null
   boxes: []
@@ -64,7 +51,7 @@ methods:
     }
   getBoxCompName: | #js
     function(box) {
-      if (!box.type) return null;
+      if (!box?.type) return null;
       return `grid.ui.box.${box.type}`.replace(/\./g, "-");
     }
   getInputSocket: | #js
@@ -76,11 +63,11 @@ computed:
   items: | #js
     function() {
       const socketData = this.$root.socket?.runtime.data[this.box._id];
-      return socketData?.input?.[1];
-    }
-  iteratorSlotBox: | #js
-    function() {
-      return this.slotBoxes?.[0];
+      const item = socketData?.input?.[1];
+      if (!item) return [0, 1];
+      const slotCanMultiplyView = true;
+      const items = (slotCanMultiplyView && Array.isArray(item)) ? item : [item];
+      return items;
     }
 watch: null
 style:
@@ -93,9 +80,9 @@ style:
     height: 100%
   .slots > div:
     border: 2px dashed white
-  .slot-1:
+  .slot-0:
     width: 30%
-  .slot-2:
+  .slot-1:
     width: 70%
 _:
   examples:
@@ -103,16 +90,10 @@ _:
 name: grid-ui-box-view-layout
 template: >-
   <grid-module class="comp-grid-ui-box-view-layout" icon="⬜" :show-title="false"
-  path="814806846."><div path="814806846.0"><div v-if="items" v-for="(item,
-  index) in items" path="814806846.0.0"><div class="item-row"
-  v-if="!iteratorSlotBox" v-text="JSON.stringify(item)"
-  path="814806846.0.0.0"></div><component v-if="iteratorSlotBox"
-  :is="getBoxCompName(iteratorSlotBox)" :userID="userID" :box="iteratorSlotBox"
-  :iterator-item="{ item, index }"
-  path="814806846.0.0.1"></component></div></div><div class="slots" v-if="false"
-  @click="refresh" path="814806846.1"><div v-for="(i, index) in 2"
-  :class="'slot-' + i" path="814806846.1.0"><div v-if="slotBoxes"
-  path="814806846.1.0.0"><component class="h-100pc"
-  v-if="slotBoxes[index]?.type" :is="getBoxCompName(slotBoxes[index])"
-  :userID="userID" :box="slotBoxes[index]"
-  path="814806846.1.0.0.0"></component></div></div></div></grid-module>
+  path="814806846."><div class="slots" @click="refresh" path="814806846.0"><div
+  v-for="(item, index) in items" :class="'slot-' + index"
+  path="814806846.0.0"><div v-if="slotBoxes" path="814806846.0.0.0"><component
+  class="h-100pc" v-if="slotBoxes[index]?.type"
+  :is="getBoxCompName(slotBoxes[index])" :userID="userID"
+  :box="slotBoxes[index]" :data-bound-items="dataBoundItems"
+  path="814806846.0.0.0.0"></component></div></div></div></grid-module>

@@ -1,15 +1,17 @@
 dom:
   ui.context.window:
+    ref: context1
     ':visible': showContextMenu
-    div: 
-      v-if: canCreateGroup
-      ui.button: 
-        icon: ➕📦
-        text: create group ✔️
-        @click: getWorkspace().$femit('create.group')
-    div: 
+    @pinned: contextIsPinned = $event
+    grid.client.context.create.group:
+      ':selected-boxes': selectedBoxes
+      ':userID': userID
+      ':boxes': boxes
+      ':links': links
+      ':context-is-pinned': contextIsPinned
+    div:
       v-if: canDelete
-      ui.button: 
+      ui.button:
         icon: ❌🗑️
         text: delete
         confirm: Are you sure you want to delete the selected boxes?
@@ -19,8 +21,10 @@ props:
   boxes: []
   links: []
 data:
-  canCreateGroup: false
+  selectedBoxes: []
+  showContextMenu: false
   canDelete: false
+  contextIsPinned: false
 mounted: | #js
   function() {
     // We're binding manually instead of using grid.module because we can't put the context menu inside the grid.module
@@ -45,21 +49,16 @@ methods:
     }
   refresh: | #js
     async function(times = 10) {
-      await this._refresh();
-      if (times > 0) setTimeout(() => this.refresh(times - 1), 400);
+      const self = this;
+      await self._refresh();
+      if (times > 0) setTimeout(() => self.refresh(times - 1), 400);
     }
   _refresh: | #js
     async function() {
       const { boxes, links } = this;
-      const selectedBoxes = boxes.filter(box => box.is?.selected);
-      this.canCreateGroup = (selectedBoxes.length > 1);
-      this.canDelete = (selectedBoxes.length > 0);
-    }
-computed:
-  showContextMenu: | #js
-    function() {
-      const cans = [this.canCreateGroup, this.canDelete];
-      return cans.some(c => c);
+      this.selectedBoxes = boxes.filter(box => box.is?.selected);
+      this.canDelete = (this.selectedBoxes.length > 0);
+      this.showContextMenu = (this.canCreateGroup || this.canDelete);
     }
 watch:
   boxes:
@@ -69,16 +68,18 @@ watch:
         this.refresh();
       }
     immediate: true
+style: null
 _:
   examples:
     count: 0
 name: grid-client-context-menu
 template: >-
-  <ui-context-window class="comp-grid-client-context-menu"
-  :visible="showContextMenu" path="-1053034279."><div v-if="canCreateGroup"
-  path="-1053034279.0"><ui-button icon="➕📦" text="create group ✔️"
-  @click="getWorkspace().$femit('create.group')"
-  path="-1053034279.0.0"></ui-button></div><div v-if="canDelete"
+  <ui-context-window class="comp-grid-client-context-menu" ref="context1"
+  :visible="showContextMenu" @pinned="contextIsPinned = $event"
+  path="-1053034279."><grid-client-context-create-group
+  :selected-boxes="selectedBoxes" :userID="userID" :boxes="boxes" :links="links"
+  :context-is-pinned="contextIsPinned"
+  path="-1053034279.0"></grid-client-context-create-group><div v-if="canDelete"
   path="-1053034279.1"><ui-button icon="❌🗑️" text="delete" confirm="Are you
   sure you want to delete the selected boxes?"
   @click="getWorkspace().$femit('delete.selected')"

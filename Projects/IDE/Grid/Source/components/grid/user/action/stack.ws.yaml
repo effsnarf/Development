@@ -39,16 +39,22 @@ mounted: | #js
   }
 methods:
   create_group: | #js
-    function(userID, action) {
+    function(userID, action, displayBoxID) {
       const selectedBoxes = this.boxes.filter((box) => box.is?.selected);
+      const selectedBoxIDs = selectedBoxes.map((box) => box._id);
+      // Unselect the boxes
+      this.select_boxes(userID, {}, selectedBoxIDs, false);
       const memberBoxes = selectedBoxes;
       const memberBoxIDs = memberBoxes.map((box) => box._id);
       const type = "group";
-      const displayBox = this.getDisplayBox(memberBoxes);
+      const displayBox = this.getBox(displayBoxID);
+      const name = displayBox.name;
       const rect = Objects.clone(displayBox.rect);
+
       const groupBox = {
         _id: this.nextID++,
         type,
+        name,
         rect,
         sockets: this.getNewSockets(type),
         members: selectedBoxes.map((box) => box._id),
@@ -61,6 +67,18 @@ methods:
       this.$femit("new.box.created", groupBox);
 
       action.undo = { method: "delete.group", args: [groupBox._id] };
+      return action;
+    }
+  delete_group: | #js
+    function(userID, action, groupBoxID, options) {
+      const groupBox = this.getBox(groupBoxID);
+      // Select the boxes
+      this.select_boxes(userID, {}, groupBox.members, true);
+      // Unset the groupBoxID on the members
+      this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "update", [groupBox.members, { groupBoxID: null } ]);
+      // Delete the group box
+      this.delete_box(userID, {}, groupBoxID, options);
+      action.undo = { method: "no.op" };
       return action;
     }
   getDisplayBox: | #js
@@ -103,7 +121,9 @@ methods:
       return action;
     }
   delete_box: | #js
-    async function(userID, action, boxID) {
+    async function(userID, action, boxID, options) {
+      if (!options.isUndoing) throw new Error("Not implemented");
+      if (options.isUndoing) this.nextID--;
       this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "delete", [boxID]);
       action.undo = { method: "no.op" };
       return action;
@@ -170,9 +190,10 @@ methods:
       action.undo = { method: "no.op" };
       return action;
     }
-  grid_user_actions_do: | #js
-    async function(userID, action, addToStack = true, overwriteRedoActions) {
-      action._id = this.nextActionID++;
+  grid_user_actions_do: >
+    async function(userID, action, addToStack = true, overwriteRedoActions =
+    false, options) {
+      if (!action._id) action._id = this.nextActionID++;
 
       if (addToStack && (this.nextRedoAction) && (this.nextRedoAction._id != action._id)) {
         // When deleting the next redo actions from the stack, we're emitting to data.list
@@ -229,7 +250,7 @@ methods:
 
       action = Objects.clone(action);
       
-      action = await method.apply(this, [userID, action, ...redo.args]);
+      action = await method.apply(this, [userID, action, ...redo.args, options]);
 
       if (!action) throw new Error(`Implementer method ${methodName} must return an action`);
 
@@ -249,7 +270,7 @@ methods:
       }
       const lastAction = this.userActions[this.pointer];
       const undoAction = { redo: lastAction.undo };
-      await this.grid_user_actions_do(userID, undoAction, false);
+      await this.grid_user_actions_do(userID, undoAction, false, false, { isUndoing: true });
       this.pointer--;
     }
   grid_user_actions_redo: | #js
@@ -260,7 +281,9 @@ methods:
         return;
       }
       const nextAction = this.userActions[this.pointer + 1];
-      await this.grid_user_actions_do(userID, nextAction, false);
+      const doneAction = await this.grid_user_actions_do(userID, nextAction, false);
+      // We need to update the undo
+      this.updateStack(nextAction._id, { undo: doneAction.undo });
       this.pointer++;
     }
   grid_user_actions_clear: | #js
@@ -301,6 +324,11 @@ methods:
       }
       this.$femit("to", "grid.data.list", `${userID}/user/actions`, "add", [action]);
       this.pointer++;
+    }
+  updateStack: | #js
+    function(actionID, changes) {
+      const userID = this.userID;
+      this.$femit("to", "grid.data.list", `${userID}/user/actions`, "update", [actionID, changes]);
     }
   isGroupable: | #js
     function(action, lastAction) {
@@ -392,6 +420,7 @@ methods:
         case "group":
           return {
             input: [
+              { _id: 1, type: "data", name: "item" }
             ],
             output: [
             ]
@@ -444,16 +473,19 @@ methods:
         case "view.layout":
           return {
             input: [
-              { _id: 1, type: "data", name: "items" },
-              { _id: 2, type: "view", name: "item view" }
+              { _id: 1, type: "view", name: "slot 1" },
+              { _id: 2, type: "view", name: "slot 2" },
             ],
             output: [
-              { _id: 1, type: "iterator", name: "iterator" },
-              { _id: 2, type: "view", name: "view" },
+              { _id: 1, type: "view", name: "view" },
             ]
           }
       }
       throw new Error(`Unknown box type: ${type}`);
+    }
+  getBox: | #js
+    function(boxID) {
+      return this.boxes.find((box) => box._id === boxID);
     }
 computed:
   hasRedoActions: | #js

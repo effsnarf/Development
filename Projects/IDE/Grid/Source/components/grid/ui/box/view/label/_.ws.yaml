@@ -2,11 +2,11 @@ dom:
   grid.module:
     icon: 🆎
     ':show-title': 'false'
-    div:
-      v-for: boxValue in boxValues
-      v-text: boxValue
+    h2:
+      v-text: text
 props:
   box: null
+  dataBoundItems: null
 data:
   field: null
 methods:
@@ -15,6 +15,12 @@ methods:
       return this.$root.vm.getAncestors(this, "grid.ui.box")[0];
     }
 computed:
+  text: | #js
+    function() {
+      if (!this.boxValue) return "[❔ text]";
+      if (typeof this.boxValue == "object") return this.boxValue.title;
+      return this.boxValue;
+    }
   boxValues: | #js
     function() {
       const boxValue = this.boxValue;
@@ -27,6 +33,7 @@ computed:
     }
   boxItem: | #js
     function() {
+      if (this.dataBoundItems) return this.dataBoundItems.last();
       // Take the box value from the input socket
       const socketData = this.$root.socket?.runtime.data[this.box._id];
       const item = (socketData?.input?.[1] || this.box.value);
@@ -59,5 +66,4 @@ _:
 name: grid-ui-box-view-label
 template: >-
   <grid-module class="comp-grid-ui-box-view-label" icon="🆎" :show-title="false"
-  path="2104471648."><div v-for="boxValue in boxValues" v-text="boxValue"
-  path="2104471648.0"></div></grid-module>
+  path="2104471648."><h2 v-text="text" path="2104471648.0"></h2></grid-module>

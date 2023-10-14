@@ -22,13 +22,8 @@ props:
   box: null
 data:
   boxName: null
-  boxIsLoading: false
+  boxIsLoading: 0
 methods:
-  grid_client_runtime_box_is_loading: | #js
-    function(boxID, isLoading) {
-      if (boxID != this.box._id) return;
-      this.boxIsLoading = isLoading;
-    }
   onEditBoxName: | #js
     function(name) {
       const gridUiBoxVue = this.$root.vm.getAncestors(this, "grid.ui.box")[0];
@@ -36,7 +31,7 @@ methods:
     }
   getBoxCompName: | #js
     function(box) {
-      if (!box.type) return null;
+      if (!box?.type) return null;
       return `grid.ui.box.${box.type}`.replace(/\./g, "-");
     }
 computed:

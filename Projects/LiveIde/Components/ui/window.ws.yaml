@@ -237,6 +237,11 @@ computed:
       return alertify;
     }
 watch:
+  isHovered:
+    handler: | #js
+      function(isHovered) {
+        this.$emit("is-hovered", !!isHovered);
+      }
   rect:
     handler: | #js
       function(rect) {

@@ -62,7 +62,7 @@ methods:
 computed:
   visibleItems: | #js
     function() {
-      return this.items.takeLast(10);
+      return this.items;
     }
 style:
   .reverse:

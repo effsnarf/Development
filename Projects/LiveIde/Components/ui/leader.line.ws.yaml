@@ -131,7 +131,8 @@ methods:
     }
   remove: | #js
     function() {
-      if (this.leaderLine) this.leaderLine.remove();
+      if (!this.leaderLine) return;
+      this.leaderLine.remove();
       this.leaderLine = null;
     }
   getLeaderLineElement: | #js
@@ -209,8 +210,8 @@ watch:
   leaderLineElement: | #js
     function(leaderLineElement) {
       // Find the <text> element with the text being the middle label
-      const textElements = this.leaderLineElement.querySelectorAll("text");
-      this.middleLabelElement = textElements[0];
+      const textElements = leaderLineElement?.querySelectorAll("text");
+      this.middleLabelElement = textElements?.[0];
     }
 style: null
 _:

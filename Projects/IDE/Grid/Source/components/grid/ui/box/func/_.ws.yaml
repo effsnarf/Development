@@ -42,10 +42,6 @@ mounted: | #js
     this.codeHint = `for (let i = 0; i < 10; i++) {\n  console.log(i);\n}`;
   }
 methods:
-  onTitleIconClick: | #js
-    function() {
-      this.reexecute();
-    }
   grid_client_runtime_func_result_change: | #js
     function(boxID, resultValue) {
       if (boxID != this.box._id) return;
@@ -77,8 +73,8 @@ methods:
     }
   init: | #js
     function(box) {
-      if (this.is.inited) return;
-      this.is.inited = true;
+      //if (this.is.inited) return;
+      //this.is.inited = true;
       this.argNamesStr = box.argNamesStr;
       this.description = box.description;
       this.code = box.code;
@@ -127,17 +123,21 @@ watch:
   description:
     handler: | #js
       async function(description) {
+        if (description == this.box.description) return;
         this.getBoxVue().$femit("edit.box", this.box._id, { description });
       }
   code:
     handler: | #js
       async function(code) {
+        if (code == this.box.code) return;
         this.getBoxVue().$femit("edit.box", this.box._id, { code });
       }
   argNamesStr:
     handler: | #js
       async function(argNamesStr) {
         argNamesStr = (argNamesStr || "").trim();
+
+        if (argNamesStr == this.box.argNamesStr) return;
 
         const argNames = argNamesStr
           .split(",")
@@ -177,6 +177,7 @@ watch:
         this.init(box);
       }
     immediate: true
+    deep: true
   selectedFunc: | #js
     function(selectedFunc) {
       this.onSelectedFuncChange(selectedFunc);

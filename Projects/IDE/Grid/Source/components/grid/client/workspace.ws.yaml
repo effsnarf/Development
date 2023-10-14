@@ -11,7 +11,7 @@ dom:
         ref: surface1
         class: surface flex-grow-1
         ':style': surfaceStyle
-        @wheel: onWheel
+        @wheel: onWheelSurface
         grid.ui.box:
           v-for: box in boxes
           ':key': '''box/'' + box._id'
@@ -58,7 +58,7 @@ mounted: | #js
     //window.addEventListener("resize", this.refreshSurface.bind(this));
   }
 methods:
-  onWheel: | #js
+  onWheelSurface: | #js
     function(e) {
       return;
       e.preventDefault();
@@ -77,7 +77,7 @@ methods:
 computed:
   showGridTools: | #js
     function() {
-      return !this.$root.isDevToolsOpen;
+      return true || !this.$root.isDevToolsOpen;
     }
   surfaceStyle: | #js
     function() {
@@ -106,7 +106,7 @@ template: >-
   path="-1461469222."><grid-client-context-menu :userID="userID" :boxes="boxes"
   :links="links" path="-1461469222.0"></grid-client-context-menu><div
   class="flex" path="-1461469222.1"><div class="surface flex-grow-1"
-  :key="surfaceKey" ref="surface1" :style="surfaceStyle" @wheel="onWheel"
+  :key="surfaceKey" ref="surface1" :style="surfaceStyle" @wheel="onWheelSurface"
   path="-1461469222.1.0"><grid-ui-box v-for="box in boxes" :key="'box/' +
   box._id" :userID="userID" :box="box" :surface-element="surfaceElement"
   path="-1461469222.1.0.0"></grid-ui-box><grid-ui-link v-for="link in links"

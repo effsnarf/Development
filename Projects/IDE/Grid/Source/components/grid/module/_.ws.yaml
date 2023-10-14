@@ -1,14 +1,15 @@
 dom:
   div: 
     class: grid-module box2
-    h3:
+    div: 
       v-if: icon && showTitle
-      ui.title:
-        ':icon': icon
-        ':text': compName
-        ':number': getTitle()
+      h3:
+        ui.title:
+          ':icon': icon
+          ':text': compName
+          ':number': getTitle()
     ui.console:
-      v-if: 'false'
+      v-if: showConsole
       ref: console1
     .module-content:
       slot: null
@@ -27,6 +28,7 @@ props:
   title: null
   showEvents: false
   showTitle: true
+  showConsole: false
 data:
   compMethodArgNames: {}
   femitsOutLog: {}
@@ -49,7 +51,7 @@ mounted: | #js
       await this.$parent.$nextTick();
 
       this.femitsOutLog[emitName] = args;
-      this.$refs.console1?.log("➕", emitName);
+      this.$refs.console1?.log("🚀", emitName);
       this.refresh();
 
       this.$root.$emit("grid.event", this.compName, emitName, args);
@@ -112,6 +114,7 @@ methods:
       }
 
       //console.log("🔴", compName, "🚀", vue.$data._.comp.name, emitName, args);
+      this.$refs.console1?.log("🔴", methodName);
       
       (method.bind(vue))(...args);
     }
@@ -172,13 +175,13 @@ _:
     count: 0
 name: grid-module
 template: >-
-  <div class="comp-grid-module grid-module box2" path="1449764372."><h3
-  v-if="icon &amp;&amp; showTitle" path="1449764372.0"><ui-title :icon="icon"
-  :text="compName" :number="getTitle()"
-  path="1449764372.0.0"></ui-title></h3><ui-console v-if="false" ref="console1"
-  path="1449764372.1"></ui-console><div class="module-content"
-  path="1449764372.2"><slot></slot></div><div class="mt-l1" v-if="showEvents"
-  :key="key1" path="1449764372.3"><ui-value
+  <div class="comp-grid-module grid-module box2" path="1449764372."><div
+  v-if="icon &amp;&amp; showTitle" path="1449764372.0"><h3
+  path="1449764372.0.0"><ui-title :icon="icon" :text="compName"
+  :number="getTitle()" path="1449764372.0.0.0"></ui-title></h3></div><ui-console
+  v-if="showConsole" ref="console1" path="1449764372.1"></ui-console><div
+  class="module-content" path="1449764372.2"><slot></slot></div><div
+  class="mt-l1" v-if="showEvents" :key="key1" path="1449764372.3"><ui-value
   v-if="Object.keys(femitsOutLog).length" :value="femitsOutLog"
   path="1449764372.3.0"></ui-value><ui-value
   v-if="Object.keys(femitsInLog).length" :value="femitsInLog"

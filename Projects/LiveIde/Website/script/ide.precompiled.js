@@ -3488,7 +3488,10 @@ class VueManager {
             return;
         if (this.vues[vue._uid])
             return;
-        console.log(`Registering vue ${vue._uid} (${vue.$options._componentTag})) (total: ${this.vuesCount})`, vue);
+        // console.log(
+        //   `Registering vue ${vue._uid} (${vue.$options._componentTag})) (total: ${this.vuesCount})`,
+        //   vue
+        // );
         this.vues[vue._uid] = () => vue;
         const vueCompName = vue.$options._componentTag;
         this.vuesCounts[vueCompName] = (this.vuesCounts[vueCompName] || 0) + 1;
@@ -3504,7 +3507,7 @@ class VueManager {
     unregisterVue(vue) {
         if (!vue)
             return;
-        console.log(`Unregistering vue ${vue._uid}`);
+        // console.log(`Unregistering vue ${vue._uid}`);
         delete this.vues[vue._uid];
         const vueCompName = vue.$options._componentTag;
         //this.vuesCounts[vueCompName]--;
@@ -5941,7 +5944,7 @@ var __webpack_exports__ = {};
 (() => {
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/website/script/1697209440375.ts ***!
+  !*** ../../../LiveIde/website/script/1697281437801.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

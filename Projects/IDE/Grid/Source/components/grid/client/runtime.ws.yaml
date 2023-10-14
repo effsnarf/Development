@@ -13,6 +13,8 @@ data:
   socket:
     runtime:
       data: {}
+  is:
+    startuped: false
   boxes: []
   links: []
 mounted: | #js
@@ -20,6 +22,18 @@ mounted: | #js
     this.$root.socket = this.socket;
   }
 methods:
+  startup: | #js
+    function() {
+      if (this.is.startuped) return;
+      this.is.startuped = true;
+      const executableTypes = Object.keys(this)
+        .filter((key) => key.startsWith("grid_ui_box_execute_"))
+        .map((key) => key.replace("grid_ui_box_execute_", ""));
+      const boxes = this.boxes.filter((box) => executableTypes.includes(box.type));
+      for (const box of boxes) {
+        this.grid_ui_box_execute(box._id);
+      }
+    }
   grid_ui_box_execute: | #js
     function(boxID) {
       const box = this.getBox(boxID);
@@ -38,6 +52,11 @@ methods:
   grid_ui_box_execute_func: | #js
     function(boxID) {
       this.processBoxChange_func(this.getBox(boxID));
+    }
+  grid_client_runtime_box_is_loading: | #js
+    function(boxID, isLoading) {
+      const box = this.getBox(boxID);
+      if (box.groupBoxID) this.$femit("box.is.loading", box.groupBoxID, isLoading);
     }
   setSocketValue: | #js
     function(boxID, sDirection, sID, sValue) {
@@ -189,6 +208,7 @@ watch:
   boxes:
     handler: | #js
       function(boxes) {
+        if (boxes?.length) this.startup();
         this.$root.boxes = boxes;
       }
     immediate: true

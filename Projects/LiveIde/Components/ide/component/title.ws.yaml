@@ -21,10 +21,12 @@ methods:
       console.log(this.vue);
     }
 watch:
-  item: | #js
-    function(item) {
-      this.vue = (!item ? null : item());
-    }
+  item:
+    handler: | #js
+      function(item) {
+        this.vue = (!item ? null : item());
+      }
+    immediate: true
 name: ide-component-title
 _:
   examples:

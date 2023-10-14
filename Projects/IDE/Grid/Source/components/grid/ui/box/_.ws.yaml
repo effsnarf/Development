@@ -10,6 +10,7 @@ dom:
       ':surface-scale': surfaceScale
       ':center-coords': 'true'
       ':show-header': '!!box.type'
+      @is-hovered: onWindowHovered
       @is-minimized: onToggleMinimized
       @drag-stop: onDragStop
       template: 
@@ -22,6 +23,7 @@ dom:
         .flex:
           grid.ui.box.header:
             v-if: box.type
+            ref: header1
             class: flex-grow-1
             ':box': box
             ':box-icon': boxIcon
@@ -59,6 +61,10 @@ data:
   boxIsLoading: 0
   surfaceScale: 1
 methods:
+  onWindowHovered: | #js
+    function(isHovered) {
+      this.$femit("hovered", this.box, isHovered);
+    }
   onTitleIconClick: | #js
     function() {
       this.$femit("execute", this.box._id);
@@ -72,8 +78,11 @@ methods:
     }
   grid_client_runtime_box_is_loading: | #js
     function(boxID, isLoading) {
+      const boxComp1 = this.$refs.boxComp1;
+      if (boxComp1.onBoxIsLoading) boxComp1.onBoxIsLoading(boxID, isLoading);
       if (boxID != this.box._id) return;
       this.boxIsLoading += (isLoading ? 1 : -1);
+      if (this.$refs.header1) this.$refs.header1.boxIsLoading = this.boxIsLoading;
     }
   grid_client_runtime_box_error: | #js
     function(boxID, error) {
@@ -90,7 +99,7 @@ methods:
     }
   getBoxCompName: | #js
     function(box) {
-      if (!box.type) return null;
+      if (!box?.type) return null;
       return `grid.ui.box.${box.type}`.replace(/\./g, "-");
     }
   onToggleMinimized: | #js
@@ -177,13 +186,13 @@ template: >-
   path="1671629593."><ui-window v-show="showBoxWindow"
   :window-style="windowStyle" :rect="box.rect" :surface-element="surfaceElement"
   :surface-scale="surfaceScale" :center-coords="true" :show-header="!!box.type"
-  @is-minimized="onToggleMinimized" @drag-stop="onDragStop"
-  path="1671629593.0"><template v-slot:above
+  @is-hovered="onWindowHovered" @is-minimized="onToggleMinimized"
+  @drag-stop="onDragStop" path="1671629593.0"><template v-slot:above
   path="1671629593.0.0"><grid-ui-box-sockets :box="box" direction="input"
   path="1671629593.0.0.0"></grid-ui-box-sockets></template><template
   v-slot:header path="1671629593.0.1"><div class="flex"
   path="1671629593.0.1.0"><grid-ui-box-header class="flex-grow-1"
-  v-if="box.type" :box="box" :box-icon="boxIcon"
+  v-if="box.type" ref="header1" :box="box" :box-icon="boxIcon"
   @title-icon-click="onTitleIconClick"
   path="1671629593.0.1.0.0"></grid-ui-box-header></div></template><template
   v-slot:content path="1671629593.0.2"><div class="h-100pc"
