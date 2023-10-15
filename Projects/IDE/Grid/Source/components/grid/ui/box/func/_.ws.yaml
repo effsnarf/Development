@@ -19,9 +19,6 @@ dom:
           hint: arg0, arg1, arg2…
           v-model: argNamesStr
         ui.input.text.box: 
-          hint: description…
-          v-model: desc
-        ui.input.text.box: 
           ':hint': codeHint
           multiline: 'true'
           ':auto-resize': 'false'
@@ -201,7 +198,5 @@ template: >-
   path="1559058553.2.0.0"></grid-ui-box-func-settings><ui-input-text-box
   hint="arg0, arg1, arg2…" v-model="argNamesStr"
   path="1559058553.2.0.1"></ui-input-text-box><ui-input-text-box
-  hint="description…" v-model="desc"
-  path="1559058553.2.0.2"></ui-input-text-box><ui-input-text-box
   :hint="codeHint" multiline="true" :auto-resize="false" v-model="code"
-  path="1559058553.2.0.3"></ui-input-text-box></div></div></grid-module>
+  path="1559058553.2.0.2"></ui-input-text-box></div></div></grid-module>

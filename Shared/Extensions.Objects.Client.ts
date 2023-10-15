@@ -376,12 +376,14 @@ class Objects {
 
   static deepMerge(target: any, ...objects: any[]): any {
     const deepMerge = (tgt: any, src: any) => {
-      if (Objects.is(tgt, Array) || Objects.is(src, Array)) {
+      if (Objects.is(src, Array)) {
         return src.map((s: any, i: number) => deepMerge(tgt[i], s));
       }
 
-      if (!Objects.is(tgt, Object) || !Objects.is(src, Object)) {
-        return src;
+      if (!Objects.is(tgt, Array)) {
+        if (!Objects.is(tgt, Object) || !Objects.is(src, Object)) {
+          return src;
+        }
       }
 
       const merged = Objects.clone(tgt);

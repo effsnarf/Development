@@ -27,21 +27,33 @@ props:
 data:
   selectedFields: []
   showFieldsFilter: false
+  boxValue: null
 methods:
+  grid_client_runtime_socket_value_change: | #js
+    function(boxID, socketDirection, sID, socketValue) {
+      if (boxID != this.box._id) return;
+      this.refresh();
+    }
   getBoxVue: | #js
     function() {
       return this.$root.vm.getAncestors(this, "grid.ui.box")[0];
     }
-  init: | #js
-    function(box) {
-      this.selectedFields = (box.selected?.fields || []);
-    }
-computed:
-  boxValue: | #js
+  getBoxValue: | #js
     function() {
+      alertify.message(`getBoxValue: ${this.box._id}`);
       const socketData = this.$root.socket?.runtime.data[this.box._id];
       return socketData?.input?.[1] || this.box.value;
     }
+  refresh: | #js
+    function() {
+      this.boxValue = this.getBoxValue();
+    }
+  init: | #js
+    function(box) {
+      this.selectedFields = (box.selected?.fields || []);
+      this.refresh();
+    }
+computed:
   fields: | #js
     function() {
       if (!Array.isArray(this.boxValue)) return [];

@@ -46,17 +46,42 @@ methods:
       this.select_boxes(userID, {}, selectedBoxIDs, false);
       const memberBoxes = selectedBoxes;
       const memberBoxIDs = memberBoxes.map((box) => box._id);
+
       const type = "group";
       const displayBox = this.getBox(displayBoxID);
       const name = displayBox.name;
       const rect = Objects.clone(displayBox.rect);
+
+      const sockets = this.getNewSockets(type);
+      const addExportedMemberSockets = (direction) => {
+        for (const memberBox of memberBoxes)
+        {
+          const memberBoxSockets = memberBox.sockets[direction];
+          for (const memberBoxSocket of memberBoxSockets)
+          {
+            if (!memberBoxSocket.is?.exported) continue;
+            const socket = Objects.clone(memberBoxSocket);
+            socket._id = sockets[direction].length + 1;
+            socket.is.exported = false;
+            socket.imported = {
+              from: {
+                box: { _id: memberBox._id },
+                socket: { _id: memberBoxSocket._id }
+              }
+            }
+            sockets[direction].push(socket);
+          }
+        }
+      }
+      addExportedMemberSockets("input");
+      addExportedMemberSockets("output");
 
       const groupBox = {
         _id: this.nextID++,
         type,
         name,
         rect,
-        sockets: this.getNewSockets(type),
+        sockets: sockets,
         members: selectedBoxes.map((box) => box._id),
         displayBoxID: displayBox._id,
       };
@@ -144,7 +169,7 @@ methods:
       action.undo = { method: "edit.box", args: [boxID, oldData, newData] };
       return action;
     }
-  edit_socket: >
+  edit_socket: | #js
     async function(userID, action, boxID, direction, socketID, newData, oldData)
     {
       const box = this.boxes.find((box) => box._id === boxID);
@@ -153,15 +178,25 @@ methods:
       oldData = oldData ||
         Objects.getPropertiesAsTree(socket, Objects.getPaths(newData));
       //for (const change of changes) DeepDiff.applyChange(socket, change);
-      this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "update", [boxID, { sockets: { [direction]: { [socketIndex]: newData } } }]);
+      const updateData = { sockets: { [direction]: { [socketIndex]: newData } } };
+      this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "update", [boxID, updateData]);
       action.undo = { method: "edit.socket", args: [boxID, direction, socketID, oldData, newData] };
       return action;
     }
   select_boxes: | #js
     async function(userID, action, boxIDs, isSelected) {
+      // #TODO: Undo should set the boxes that were selected before
       const boxes = this.boxes.filter((box) => boxIDs.includes(box._id));
       this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "update", [boxIDs, { is: { selected: isSelected } }]);
       action.undo = { method: "select.boxes", args: [boxIDs, !isSelected] };
+      return action;
+    }
+  unselect_boxes: | #js
+    async function(userID, action) {
+      const selectedBoxes = this.boxes.filter((box) => box.is?.selected);
+      const boxIDs = selectedBoxes.map((box) => box._id);
+      this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "update", [boxIDs, { is: { selected: false } }]);
+      action.undo = { method: "select.boxes", args: [boxIDs, true] };
       return action;
     }
   create_link: | #js
@@ -172,7 +207,9 @@ methods:
       return action;
     }
   delete_link: | #js
-    async function(userID, action, linkID) {
+    async function(userID, action, linkID, options) {
+      if (!options.isUndoing) throw new Error("Not implemented");
+      if (options.isUndoing) this.nextID--;
       this.$femit("to", "grid.data.list", `${userID}/data/links`, "delete", [linkID]);
       action.undo = { method: "no.op" };
       return action;
@@ -420,7 +457,6 @@ methods:
         case "group":
           return {
             input: [
-              { _id: 1, type: "data", name: "item" }
             ],
             output: [
             ]
@@ -428,46 +464,46 @@ methods:
         case "text":
           return {
             input: [
-              { _id: 1, type: "data", name: "text" }
+              { _id: 1, type: "data", name: "text", is: { exported: false } }
             ],
             output: [
-              { _id: 1, type: "data", name: "text" }
+              { _id: 1, type: "data", name: "text", is: { exported: false } }
             ]
           }
         case "data":
           return {
             input: [
-              { _id: 1, type: "data", name: "data" }
+              { _id: 1, type: "data", name: "data", is: { exported: false } }
             ],
             output: [
-              { _id: 1, type: "data", name: "data" }
+              { _id: 1, type: "data", name: "data", is: { exported: false } }
             ]
           }
         case "func":
           return {
             input: [
-              { _id: 1, type: "data", name: "arg0" }
+              { _id: 1, type: "data", name: "arg0", is: { exported: false } }
             ],
             output: [
-              { _id: 1, type: "data", name: "result" }
+              { _id: 1, type: "data", name: "result", is: { exported: false } }
             ]
           }
         case "view.image":
           return {
             input: [
-              { _id: 1, type: "data", name: "url" }
+              { _id: 1, type: "data", name: "url", is: { exported: false } }
             ],
             output: [
-              { _id: 1, type: "view", name: "image" }
+              { _id: 1, type: "view", name: "image", is: { exported: false } }
             ]
           }
         case "view.label":
           return {
             input: [
-              { _id: 1, type: "data", name: "text" },
+              { _id: 1, type: "data", name: "text", is: { exported: false } },
             ],
             output: [
-              { _id: 1, type: "view", name: "view" }
+              { _id: 1, type: "view", name: "view", is: { exported: false } }
             ]
           }
         case "view.layout":

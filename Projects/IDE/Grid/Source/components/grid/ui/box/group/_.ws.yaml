@@ -47,7 +47,7 @@ computed:
     function() {
       const socketData = this.$root.socket?.runtime.data[this.box._id];
       const item = socketData?.input?.[1];
-      if (!item) return [0, 1];
+      if (!item) return [0];
       const slotCanMultiplyView = true;
       const items = (slotCanMultiplyView && Array.isArray(item)) ? item : [item];
       return items;

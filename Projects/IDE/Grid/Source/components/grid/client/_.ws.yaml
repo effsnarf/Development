@@ -20,8 +20,20 @@ mounted: | #js
       text: "#ffff00",
       view: "#00ff00",
     };
+
+    // Catch all JS errors
+    window.onerror = (message, source, lineno, colno, ex) => {
+      this.onGlobalError(ex);
+    };
+    Vue.config.errorHandler = (ex, vm, info) => {
+      this.onGlobalError(ex, vm, info);
+    };
   }
-methods: null
+methods:
+  onGlobalError: | #js
+    function(ex, vm, info) {
+      alertify.error(`Error: ${ex.message}`);
+    }
 style: null
 _:
   examples:

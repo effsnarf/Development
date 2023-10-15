@@ -20,6 +20,11 @@ dom:
             icon: ➕📦
             text: create group ✔️
             @click: onCreateGroup
+        div: 
+          ui.button: 
+            icon: ✖️✨
+            text: unselect
+            @click: onUnselectBoxes
 data:
   hoveredBox: null
   displayBox: null
@@ -32,8 +37,12 @@ mounted: | #js
 methods:
   onCreateGroup: | #js
     function() {
-      this.getWorkspace().$femit('create.group', this.displayBox._id);
+      this.getUiActions().$femit('create.group', this.displayBox._id);
       this.clear();
+    }
+  onUnselectBoxes: | #js
+    function() {
+      this.getUiActions().$femit('unselect.boxes');
     }
   grid_ui_box_hovered: | #js
     function(box, isHovered) {
@@ -44,9 +53,12 @@ methods:
     function() {
       this.displayBox = null;
     }
-  getWorkspace: | #js
+  getUiActions: | #js
     function() {
-      return this.$root.vm.getAncestors(this, "grid.client.workspace")[0];
+      const client = this.$root.vm.getAncestors(this, "grid.client")[0];
+      const module = client.$children[0];
+      const uiActions = module.$children.find((c) => c.$options.name === "grid-ui-actions");
+      return uiActions;
     }
 computed:
   canCreateGroup: | #js
@@ -76,4 +88,7 @@ template: >-
   displayBox?.name" path="-1413308281.0.0.0.1"></h3></div><div class="mt-l1"
   v-if="canCreateGroup" path="-1413308281.0.0.1"><ui-button icon="➕📦"
   text="create group ✔️" @click="onCreateGroup"
-  path="-1413308281.0.0.1.0"></ui-button></div></div></div></grid-module>
+  path="-1413308281.0.0.1.0"></ui-button></div><div
+  path="-1413308281.0.0.2"><ui-button icon="✖️✨" text="unselect"
+  @click="onUnselectBoxes"
+  path="-1413308281.0.0.2.0"></ui-button></div></div></div></grid-module>

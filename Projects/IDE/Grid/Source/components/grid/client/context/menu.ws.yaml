@@ -15,7 +15,7 @@ dom:
         icon: ❌🗑️
         text: delete
         confirm: Are you sure you want to delete the selected boxes?
-        @click: getWorkspace().$femit('delete.selected')
+        @click: getUiActions().$femit('delete.selected')
 props:
   userID: null
   boxes: []
@@ -43,10 +43,6 @@ methods:
       if (!["select.boxes"].some(s => action.redo.method.includes(s))) return;
       this.refresh();
     }
-  getWorkspace: | #js
-    function() {
-      return this.$root.vm.getAncestors(this, "grid.client.workspace")[0];
-    }
   refresh: | #js
     async function(times = 10) {
       const self = this;
@@ -59,6 +55,10 @@ methods:
       this.selectedBoxes = boxes.filter(box => box.is?.selected);
       this.canDelete = (this.selectedBoxes.length > 0);
       this.showContextMenu = (this.canCreateGroup || this.canDelete);
+    }
+  getUiActions: | #js
+    function() {
+      return this.$parent.$parent.getUiActions();
     }
 watch:
   boxes:
@@ -82,5 +82,5 @@ template: >-
   path="-1053034279.0"></grid-client-context-create-group><div v-if="canDelete"
   path="-1053034279.1"><ui-button icon="❌🗑️" text="delete" confirm="Are you
   sure you want to delete the selected boxes?"
-  @click="getWorkspace().$femit('delete.selected')"
+  @click="getUiActions().$femit('delete.selected')"
   path="-1053034279.1.0"></ui-button></div></ui-context-window>

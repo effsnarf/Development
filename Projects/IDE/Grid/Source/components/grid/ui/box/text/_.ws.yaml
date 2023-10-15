@@ -18,6 +18,7 @@ methods:
   init: | #js
     function(box) {
       this.boxValue = box.value;
+      this.onBoxValueChange(this.boxValue);
     }
   onTextInput: | #js
     function(text) {
@@ -54,13 +55,13 @@ computed:
 watch:
   box:
     handler: | #js
-      async function(box) {
+      function(box) {
         this.init(box);
       }
     immediate: true
   boxValue:
     handler: | #js
-      async function(value) {
+      function(value) {
         this.onBoxValueChange(value);
       }
 style:

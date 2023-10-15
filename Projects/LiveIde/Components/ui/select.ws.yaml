@@ -16,7 +16,6 @@ dom:
             .clickable:
               ':key': valueIndex
               v-html: getOptionText(valueIndex)
-              v-tooltip: getOptionTooltip(valueIndex)
               @click: toggleValue($event, +1)
               @contextmenu: toggleValue($event, -1)
         select:
@@ -174,8 +173,8 @@ template: >-
   path="-1442841194.0.1"><div v-if="(type=='toggle')"
   path="-1442841194.0.1.0"><transition name="slide2"
   path="-1442841194.0.1.0.0"><div class="clickable" :key="valueIndex"
-  v-html="getOptionText(valueIndex)" v-tooltip="getOptionTooltip(valueIndex)"
-  @click="toggleValue($event, +1)" @contextmenu="toggleValue($event, -1)"
+  v-html="getOptionText(valueIndex)" @click="toggleValue($event, +1)"
+  @contextmenu="toggleValue($event, -1)"
   path="-1442841194.0.1.0.0.0"></div></transition></div><select
   v-if="(type=='dropdown')" :value="valueIndex"
   @input="onInput(parseInt($event.target.value))"

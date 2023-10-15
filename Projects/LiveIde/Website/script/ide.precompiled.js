@@ -3956,11 +3956,13 @@ class Objects {
     }
     static deepMerge(target, ...objects) {
         const deepMerge = (tgt, src) => {
-            if (Objects.is(tgt, Array) || Objects.is(src, Array)) {
+            if (Objects.is(src, Array)) {
                 return src.map((s, i) => deepMerge(tgt[i], s));
             }
-            if (!Objects.is(tgt, Object) || !Objects.is(src, Object)) {
-                return src;
+            if (!Objects.is(tgt, Array)) {
+                if (!Objects.is(tgt, Object) || !Objects.is(src, Object)) {
+                    return src;
+                }
             }
             const merged = Objects.clone(tgt);
             for (const key of Object.keys(src)) {
@@ -5944,7 +5946,7 @@ var __webpack_exports__ = {};
 (() => {
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/website/script/1697281437801.ts ***!
+  !*** ../../../LiveIde/website/script/1697352540459.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

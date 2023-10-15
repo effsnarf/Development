@@ -79,7 +79,7 @@ methods:
   grid_client_runtime_box_is_loading: | #js
     function(boxID, isLoading) {
       const boxComp1 = this.$refs.boxComp1;
-      if (boxComp1.onBoxIsLoading) boxComp1.onBoxIsLoading(boxID, isLoading);
+      if (boxComp1?.onBoxIsLoading) boxComp1.onBoxIsLoading(boxID, isLoading);
       if (boxID != this.box._id) return;
       this.boxIsLoading += (isLoading ? 1 : -1);
       if (this.$refs.header1) this.$refs.header1.boxIsLoading = this.boxIsLoading;

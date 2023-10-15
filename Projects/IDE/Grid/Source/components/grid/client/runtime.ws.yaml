@@ -34,6 +34,12 @@ methods:
         this.grid_ui_box_execute(box._id);
       }
     }
+  grid_user_action_stack_new_box_created: | #js
+    function(box) {
+      // Clear the runtime data for the new box
+      // Because when we're undoing and redoing, the old data remains
+      delete this.socket.runtime.data[box._id];
+    }
   grid_ui_box_execute: | #js
     function(boxID) {
       const box = this.getBox(boxID);
@@ -74,6 +80,7 @@ methods:
       this.$femit("socket.value.change", boxID, sDirection, sID, sValue);
       this.processBoxChange(boxID, sDirection, sID, sValue);
       this.propagateSocketLinks(boxID, sDirection, sID);
+      if (sDirection == "output") this.propagateGroupMemberSockets(boxID, sID, sValue);
     }
   processBoxChange: | #js
     async function(boxID, sDirection, sID, sValue) {
@@ -102,7 +109,7 @@ methods:
 
       const box = this.getBox(boxID);
 
-      const sValue = this.socket.runtime.data[boxID][sDirection][sID];
+      const sValue = this.getSocketRuntimeValue(boxID, sDirection, sID);
 
       const links = this.links
         .filter((link) => link.from.box._id === boxID)
@@ -112,6 +119,29 @@ methods:
         this.$femit("link.flash", link._id, sValue);
         this.setSocketValue(link.to.box._id, "input", link.to.socket._id, sValue);
       }
+    }
+  propagateGroupMemberSockets: | #js
+    function(boxID, sID) {
+      const sValue = this.getSocketRuntimeValue(boxID, "output", sID);
+      const memberBox = this.getBox(boxID);
+      if (!memberBox.groupBoxID) return;
+      const memberOutputSocket = memberBox.sockets.output.find(socket => socket._id == sID);
+      if (!memberOutputSocket.is.exported) return;
+      const groupBox = this.getBox(memberBox.groupBoxID);
+      const groupSocket = this.getImportedSocket(groupBox, boxID, "output", sID);
+      this.setSocketValue(groupBox._id, "output", groupSocket._id, sValue);
+    }
+  getImportedSocket: | #js
+    function(groupBox, boxID, sDirection, sID) {
+      const groupSocket = groupBox.sockets[sDirection].find(socket => this.isImportedSocket(socket, boxID, sID));
+      return groupSocket;
+    }
+  isImportedSocket: | #js
+    function(socket, boxID, sID) {
+      if (!socket.imported) return false;
+      if (socket.imported.from.box._id != boxID) return false;
+      if (socket.imported.from.socket._id != sID) return false;
+      return true;
     }
   processBoxChange_func: | #js
     async function(box) {
@@ -130,6 +160,8 @@ methods:
 
         const argNames = box.argNames;
         const argValues = Object.values(runtimeData?.input||{});
+
+        if (argValues.some(value => (value == undefined))) return;
 
         const result = (box.runs.on == "server")
           ? await this.runFuncOnServer(box, argNames, argValues, box.code)
@@ -194,6 +226,11 @@ methods:
         this.$set(this.socket.runtime.data, boxID, runtimeData);
       }
       return runtimeData;
+    }
+  getSocketRuntimeValue: | #js
+    function(boxID, sDirection, sID) {
+      const runtimeData = this.getSocketRuntimeData(boxID);
+      return runtimeData[sDirection][sID];
     }
   getBox: | #js
     function(boxID) {
