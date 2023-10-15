@@ -18,7 +18,7 @@ computed:
   text: | #js
     function() {
       if (!this.boxValue) return "[❔ text]";
-      if (typeof this.boxValue == "object") return this.boxValue.title;
+      if (typeof this.boxValue == "object") return this.boxValue.title || this.boxValue.com;
       return this.boxValue;
     }
   boxValues: | #js

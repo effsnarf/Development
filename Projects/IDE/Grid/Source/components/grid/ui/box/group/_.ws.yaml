@@ -1,10 +1,8 @@
 dom:
   div:
     component:
-      v-for: item in items
       ':is': getBoxCompName(displayBox)
       ':box': displayBox
-      ':data-bound-items': '[item]'
     @click: onClick
 props:
   box: null
@@ -29,6 +27,7 @@ methods:
   init: | #js
     async function(box) {
       this.groupBox = box;
+      await this.$nextTick();
       this.refresh();
     }
   refresh: | #js
@@ -41,16 +40,6 @@ methods:
     function(box) {
       if (!box?.type) return null;
       return `grid.ui.box.${box.type}`.replace(/\./g, "-");
-    }
-computed:
-  items: | #js
-    function() {
-      const socketData = this.$root.socket?.runtime.data[this.box._id];
-      const item = socketData?.input?.[1];
-      if (!item) return [0];
-      const slotCanMultiplyView = true;
-      const items = (slotCanMultiplyView && Array.isArray(item)) ? item : [item];
-      return items;
     }
 watch:
   box:
@@ -65,6 +54,5 @@ _:
 name: grid-ui-box-group
 template: >-
   <div class="comp-grid-ui-box-group" @click="onClick"
-  path="1087010666."><component v-for="item in items"
-  :is="getBoxCompName(displayBox)" :box="displayBox" :data-bound-items="[item]"
-  path="1087010666.0"></component></div>
+  path="1087010666."><component :is="getBoxCompName(displayBox)"
+  :box="displayBox" path="1087010666.0"></component></div>

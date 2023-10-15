@@ -844,6 +844,12 @@ img[src=""]
 }
 
 
+.h-40pc
+{
+  height: 40%;
+}
+
+
 
 [tooltip]:hover::before {
   content: attr(tooltip);

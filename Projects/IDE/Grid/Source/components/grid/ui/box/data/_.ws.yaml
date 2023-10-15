@@ -5,29 +5,33 @@ dom:
     div: 
       ':style': '{ ''width'': ''100%'', overflow: ''auto'' }'
       div: 
-        v-if: 'false'
-        ui.expand:
-          icon: 📋
-          text: fields
-          ':number': selectedFields.length
-          v-model: showFieldsFilter
-        transition:
-          name: slide2
-          div: 
-            v-if: showFieldsFilter
-            ui.checkbox:
-              v-for: field in fields
-              ':text': field
-              ':value-array': selectedFields
-              ':value-key': field
+        v-if: 'true'
+        .box1:
+          ui.expand:
+            icon: 📋
+            text: exported fields
+            ':number': exportedFields.length
+            v-model: showFieldsFilter
+          transition:
+            name: slide2
+            div: 
+              v-if: showFieldsFilter
+              ui.checkbox:
+                v-for: field in fields
+                ':text': field
+                ':value-array': exportedFields
+                ':value-key': field
+                @input: onExportedFieldsChanged
       ui.value:
-        ':value': boxValue
+        ':value': exportedBoxValue
 props:
   box: null
 data:
-  selectedFields: []
+  fields: []
+  exportedFields: []
   showFieldsFilter: false
   boxValue: null
+  exportedBoxValue: null
 methods:
   grid_client_runtime_socket_value_change: | #js
     function(boxID, socketDirection, sID, socketValue) {
@@ -40,28 +44,41 @@ methods:
     }
   getBoxValue: | #js
     function() {
-      alertify.message(`getBoxValue: ${this.box._id}`);
       const socketData = this.$root.socket?.runtime.data[this.box._id];
-      return socketData?.input?.[1] || this.box.value;
+      let data = socketData?.input?.[1] || this.box.value;
+      return data;
+    }
+  getExportedBoxValue: | #js
+    function(boxValue, exportedFields) {
+      if (!boxValue) return null;
+      let data = boxValue;
+      if (exportedFields?.length) data = data[exportedFields[0]];
+      return data;
+    }
+  onExportedFieldsChanged: | #js
+    async function() {
+      await this.$nextTick();
+      this.getBoxVue().$femit("edit.box", this.box._id, { exported: { fields: this.exportedFields } });
+    }
+  getFields: | #js
+    function(obj) {
+      if (!obj) return [];
+      if (Array.isArray(obj)) return [];
+      if (typeof obj != "object") return [];
+      return Object.keys(obj);
     }
   refresh: | #js
     function() {
       this.boxValue = this.getBoxValue();
+      this.fields = this.getFields(this.boxValue);
+      this.exportedBoxValue = this.getExportedBoxValue(this.boxValue, this.exportedFields);
     }
   init: | #js
     function(box) {
-      this.selectedFields = (box.selected?.fields || []);
+      this.exportedFields = (box.exported?.fields || []);
       this.refresh();
     }
-computed:
-  fields: | #js
-    function() {
-      if (!Array.isArray(this.boxValue)) return [];
-      if (!this.boxValue.length) return [];
-      const firstItem = this.boxValue[0];
-      if (typeof firstItem !== "object") return [];
-      return Object.keys(firstItem);
-    }
+computed: null
 watch:
   box:
     handler: | #js
@@ -69,10 +86,11 @@ watch:
         this.init(box);
       }
     immediate: true
-  selectedFields: | #js
-    function(selectedFields) {
-      //this.getBoxVue().$femit("edit.box", this.box._id, { selected: { fields: selectedFields } });
-    }
+style:
+  .box1:
+    border: '1px solid #ccc'
+    padding: 0.5em
+    margin-bottom: 1em
 _:
   examples:
     count: 0
@@ -80,11 +98,14 @@ name: grid-ui-box-data
 template: >-
   <grid-module class="comp-grid-ui-box-data" icon="🧊" :show-title="false"
   path="1558979935."><div :style="{ 'width': '100%', overflow: 'auto' }"
-  path="1558979935.0"><div v-if="false" path="1558979935.0.0"><ui-expand
-  icon="📋" text="fields" :number="selectedFields.length"
-  v-model="showFieldsFilter" path="1558979935.0.0.0"></ui-expand><transition
-  name="slide2" path="1558979935.0.0.1"><div v-if="showFieldsFilter"
-  path="1558979935.0.0.1.0"><ui-checkbox v-for="field in fields" :text="field"
-  :value-array="selectedFields" :value-key="field"
-  path="1558979935.0.0.1.0.0"></ui-checkbox></div></transition></div><ui-value
-  :value="boxValue" path="1558979935.0.1"></ui-value></div></grid-module>
+  path="1558979935.0"><div v-if="true" path="1558979935.0.0"><div class="box1"
+  path="1558979935.0.0.0"><ui-expand icon="📋" text="exported fields"
+  :number="exportedFields.length" v-model="showFieldsFilter"
+  path="1558979935.0.0.0.0"></ui-expand><transition name="slide2"
+  path="1558979935.0.0.0.1"><div v-if="showFieldsFilter"
+  path="1558979935.0.0.0.1.0"><ui-checkbox v-for="field in fields" :text="field"
+  :value-array="exportedFields" :value-key="field"
+  @input="onExportedFieldsChanged"
+  path="1558979935.0.0.0.1.0.0"></ui-checkbox></div></transition></div></div><ui-value
+  :value="exportedBoxValue"
+  path="1558979935.0.1"></ui-value></div></grid-module>

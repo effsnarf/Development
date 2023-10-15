@@ -18,7 +18,8 @@ mounted: | #js
       func: "#dddddd",
       data: "#00ffff",
       text: "#ffff00",
-      view: "#00ff00",
+      view: "#00aa88",
+      "view.items": "#0088aa",
     };
 
     // Catch all JS errors

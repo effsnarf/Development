@@ -2,8 +2,8 @@ dom:
   div:
     ui.select:
       ':options': >-
-        ['🆎 text', '🔴 func', '🧊 data', '⬜ view.layout', '🖼️ view.image', '🆎
-        view.label']
+        ['🆎 text', '🔴 func', '🧊 data', '⬜ view.items', '⬜ view.layout', '🖼️
+        view.image', '🆎 view.label']
       input-type: value
       ':can-select-none': 'false'
       v-model: type
@@ -25,6 +25,6 @@ _:
 name: grid-ui-box-type-picker
 template: >-
   <div class="comp-grid-ui-box-type-picker" path="1672760941."><ui-select
-  :options="['🆎 text', '🔴 func', '🧊 data', '⬜ view.layout', '🖼️ view.image',
-  '🆎 view.label']" input-type="value" :can-select-none="false" v-model="type"
-  path="1672760941.0"></ui-select></div>
+  :options="['🆎 text', '🔴 func', '🧊 data', '⬜ view.items', '⬜ view.layout',
+  '🖼️ view.image', '🆎 view.label']" input-type="value"
+  :can-select-none="false" v-model="type" path="1672760941.0"></ui-select></div>

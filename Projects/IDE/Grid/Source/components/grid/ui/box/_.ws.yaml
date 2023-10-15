@@ -3,6 +3,7 @@ dom:
     icon: 📦
     ':show-title': 'false'
     ui.window:
+      ref: window1
       v-show: showBoxWindow
       ':window-style': windowStyle
       ':rect': box.rect
@@ -60,6 +61,14 @@ data:
   error: null
   boxIsLoading: 0
   surfaceScale: 1
+mounted: | #js
+  function() {
+    this.$root.els[`/box/window/${this.box._id}`] = this.$refs.window1.$refs.window;
+  }
+unmounted: | #js
+  function() {
+    delete this.$root.els[`/box/window/${this.box._id}`];
+  }
 methods:
   onWindowHovered: | #js
     function(isHovered) {
@@ -143,7 +152,7 @@ computed:
       if (this.boxIsLoading) style.border = `2px solid yellow`;
       if (this.box.is?.selected) style.border = `4px dashed yellow`;
       if (this.error) style.border = `4px solid red`;
-      if (this.$root.boxTypeColors) style.background = this.getGradientBackground(this.$root.boxTypeColors[this.box.type?.split('.')[0]] || "#000000", 0.2);
+      if (this.$root.boxTypeColors) style.background = this.getGradientBackground(this.$root.boxTypeColors[this.box.type || this.box.type?.split('.')[0]] || "#000000", 0.2);
       return style;
     }
 watch: null
@@ -151,6 +160,10 @@ _:
   examples:
     count: 0
 style:
+  .func-box-result:
+    max-height: 10em
+    overflow: auto
+    opacity: 0.5
   .sockets:
     z-index: 10
   .sockets:hover: null
@@ -183,7 +196,7 @@ style:
 name: grid-ui-box
 template: >-
   <grid-module class="comp-grid-ui-box" icon="📦" :show-title="false"
-  path="1671629593."><ui-window v-show="showBoxWindow"
+  path="1671629593."><ui-window ref="window1" v-show="showBoxWindow"
   :window-style="windowStyle" :rect="box.rect" :surface-element="surfaceElement"
   :surface-scale="surfaceScale" :center-coords="true" :show-header="!!box.type"
   @is-hovered="onWindowHovered" @is-minimized="onToggleMinimized"

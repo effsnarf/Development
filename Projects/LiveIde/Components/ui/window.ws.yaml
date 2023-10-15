@@ -32,6 +32,7 @@ dom:
         slot: 
           name: left-side
       .window:
+        ref: window
         ':style': windowStyle
         @click: () => isHovered = 1
         .header:
@@ -365,9 +366,10 @@ template: >-
   class="resize-handle es" @mousedown="() =&gt; isResizing = 'es'"
   path="-1324571510.1.4"></div><div class="left-side"
   path="-1324571510.1.5"><slot name="left-side"
-  path="-1324571510.1.5.0"></slot></div><div class="window" :style="windowStyle"
-  @click="() =&gt; isHovered = 1" path="-1324571510.1.6"><div class="header"
-  v-if="showHeader" path="-1324571510.1.6.0"><div class="flex w-100pc"
+  path="-1324571510.1.5.0"></slot></div><div class="window" ref="window"
+  :style="windowStyle" @click="() =&gt; isHovered = 1"
+  path="-1324571510.1.6"><div class="header" v-if="showHeader"
+  path="-1324571510.1.6.0"><div class="flex w-100pc"
   path="-1324571510.1.6.0.0"><div class="flex-grow-1"
   path="-1324571510.1.6.0.0.0"><slot name="header"
   path="-1324571510.1.6.0.0.0.0"></slot></div><div class="buttons"

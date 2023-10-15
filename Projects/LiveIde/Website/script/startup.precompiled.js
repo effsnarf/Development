@@ -4813,6 +4813,21 @@ class Objects {
         }
         return paths;
     }
+    static getPathValues(obj, paths = []) {
+        const newObj = {};
+        for (const path of paths) {
+            const parts = path.split(".");
+            let node = newObj;
+            const getNextPart = () => parts.shift() || "";
+            while (parts.length > 1) {
+                const part = getNextPart();
+                node = node[part] || (node[part] = {});
+                node = node[part];
+            }
+            node[getNextPart()] = Objects.getProperty(obj, path);
+        }
+        return newObj;
+    }
     static getPropertiesAsTree(sourceObj, pathList) {
         const subtree = {};
         for (const path of pathList) {
@@ -7450,7 +7465,7 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/website/script/1697352540895.ts ***!
+  !*** ../../../LiveIde/website/script/1697377767336.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

@@ -4,8 +4,9 @@ dom:
     ':key': key1
     ui.leader.line:
       ref: leaderLine1
-      ':from': getSocketEl(link.from, 'output')
-      ':to': getSocketEl(link.to, 'input')
+      ':from': getFromEl()
+      ':to': getToEl()
+      ':start-plug': getStartPlug()
       color: '#404040'
       template:
         v-slot: middle
@@ -21,6 +22,10 @@ data:
   flashingValue: null
   key1: 1
 methods:
+  grid_user_action_stack_do: | #js
+    function(box) {
+      this.refresh();
+    }
   grid_client_runtime_link_flash: | #js
     async function(linkID, sValue) {
       // #TODO: Slow
@@ -32,6 +37,24 @@ methods:
       //this.flashingValue = sValue;
       await this.$nextTick();
       this.flashingValue = null;
+    }
+  getFromEl: | #js
+    function() {
+      return this.getSocketEl(this.link.from, 'output');
+    }
+  getToEl: | #js
+    function() {
+      const toBox = this.getTopGroupBox(this.link.to.box);
+      // If the link is going to a box inside a group box, we need to find the group box's window
+      if ((toBox) && (toBox._id != this.link.to.box._id)) {
+        return this.$root.els[`/box/window/${toBox._id}`];
+      }
+      return this.getSocketEl(this.link.to, 'input');
+    }
+  getStartPlug: | #js
+    function() {
+      if (this.link.from.socket.type === "iterator") return "arrow1";
+      return null;
     }
   getSocketEl: | #js
     function(socketRef, direction) {
@@ -47,21 +70,28 @@ methods:
       const socketElPath = `/box/${socketRef.box._id}/sockets/${direction}/${socketRef.socket._id}`;
       return socketElPath;
     }
+  getTopGroupBox: | #js
+    function(boxRef) {
+      if (!boxRef) return null;
+      const box = this.$root.boxes.find(b => b._id == boxRef._id);
+      if (!box) return null;
+      if (box.groupBoxID) return this.getTopGroupBox({ _id: box.groupBoxID });
+      return box;
+    }
   refresh: | #js
-    function() {
+    async function() {
+      await this.$nextTick();
       this.key1++;
     }
-computed: null
 _:
   examples:
     count: 0
 name: grid-ui-link
 template: >-
   <grid-module class="comp-grid-ui-link" :show-title="false" :key="key1"
-  path="281201772."><ui-leader-line ref="leaderLine1"
-  :from="getSocketEl(link.from, 'output')" :to="getSocketEl(link.to, 'input')"
-  color="#404040" path="281201772.0"><template v-slot:middle
-  path="281201772.0.0"><transition name="slide2"
-  path="281201772.0.0.0"><ui-value-preview class="flex justify-center"
-  v-if="flashingValue" :value="flashingValue"
+  path="281201772."><ui-leader-line ref="leaderLine1" :from="getFromEl()"
+  :to="getToEl()" :start-plug="getStartPlug()" color="#404040"
+  path="281201772.0"><template v-slot:middle path="281201772.0.0"><transition
+  name="slide2" path="281201772.0.0.0"><ui-value-preview class="flex
+  justify-center" v-if="flashingValue" :value="flashingValue"
   path="281201772.0.0.0.0"></ui-value-preview></transition></template></ui-leader-line></grid-module>

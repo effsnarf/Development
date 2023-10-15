@@ -68,7 +68,8 @@ data:
   sortByField: null
   sortByFieldDirection: 1
   hoveredItem: null
-  maxVisibleItems: 20
+  maxVisibleItems: 10
+  maxVisibleFields: 5
 methods:
   onSortByField: | #js
     function(field) {
@@ -115,12 +116,10 @@ computed:
     return items;
   fields: | #js
     // Get all the field names from the array of objects
-    const fields = this.value
-      .filter(item => ((typeof item) == "object"))
-      .map(item => Object.keys(item || {}))
-      .flat()
-      .distinct();
-      //.sortBy(this.getFieldSortScore);
+    const firstItem = this.value[0];
+    if (!firstItem) return [];
+    if (this.isPrimitive(firstItem)) return [];
+    const fields = Object.keys(firstItem).take(this.maxVisibleFields);
     return fields;
   view1: | #js
     function() {

@@ -40,16 +40,26 @@ methods:
       // Because when we're undoing and redoing, the old data remains
       delete this.socket.runtime.data[box._id];
     }
+  grid_user_action_stack_new_link_created: | #js
+    function(link) {
+      this.repropagateSocketLinks(link.from.box._id);
+    }
   grid_ui_box_execute: | #js
     function(boxID) {
       const box = this.getBox(boxID);
       const method = this[`grid_ui_box_execute_${box.type}`];
-      if (!method) throw new Error(`Unknown box type: ${box.type}`);
+      if (!method) return;
       method.call(this, boxID);
     }
   grid_ui_box_socket_value_change: | #js
     function(boxID, socketDirection, sID, socketValue) {
       this.setSocketValue(boxID, socketDirection, sID, socketValue);
+    }
+  grid_ui_box_execute_group: | #js
+    function(groupBoxID) {
+      const groupBox = this.getBox(groupBoxID);
+      const displayBox = this.getBox(groupBox.displayBoxID);
+      this.grid_ui_box_execute(displayBox._id);
     }
   grid_ui_box_execute_text: | #js
     function(boxID) {
@@ -58,6 +68,10 @@ methods:
   grid_ui_box_execute_func: | #js
     function(boxID) {
       this.processBoxChange_func(this.getBox(boxID));
+    }
+  grid_ui_box_execute_data: | #js
+    function(boxID) {
+      this.propagateSocketLinks(boxID, "output", 1);
     }
   grid_client_runtime_box_is_loading: | #js
     function(boxID, isLoading) {
@@ -101,6 +115,17 @@ methods:
         {
           this.processBoxChange_func(box);
         }
+      }
+    }
+  repropagateSocketLinks: | #js
+    function(boxID) {
+      const box = this.getBox(boxID);
+      const links = this.links
+        .filter((link) => (link.from.box._id === boxID))
+        .filter((link) => (link.from.socket.type == "data"));
+      for (const link of links) {
+        this.$femit("link.flash", link._id, null);
+        this.setSocketValue(link.to.box._id, "input", link.to.socket._id, null);
       }
     }
   propagateSocketLinks: | #js
@@ -229,8 +254,15 @@ methods:
     }
   getSocketRuntimeValue: | #js
     function(boxID, sDirection, sID) {
+      const box = this.getBox(boxID);
       const runtimeData = this.getSocketRuntimeData(boxID);
-      return runtimeData[sDirection][sID];
+      let value = runtimeData[sDirection][sID];
+      if (value && (box.type == "data"))
+      {
+        const inputValue = runtimeData.input[1];
+        if (box.exported?.fields?.length) value = value[box.exported.fields[0]];
+      }
+      return value;
     }
   getBox: | #js
     function(boxID) {

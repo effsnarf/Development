@@ -1,0 +1,120 @@
+dom:
+  grid.module:
+    icon: ⬜
+    ':show-title': 'false'
+    div: 
+      class: item
+      v-for: (item, index) in items
+      @mouseenter: hoveredItem = item
+      @mouseleave: hoveredItem = null
+      @click: onClickItem(item)
+      div: 
+        v-if: '!iteratorBox'
+        h3:
+          v-text: '''item '' + index'
+        div: 
+          class: item-value
+          ui.value:
+            ':value': item
+      component:
+        v-if: iteratorBox
+        ':is': getBoxCompName(iteratorBox)
+        ':box': iteratorBox
+        ':data-bound-items': '[item]'
+props:
+  userID: null
+  box: null
+data:
+  items: null
+  iteratorBox: null
+  hoveredItem: null
+  selectedItem: null
+methods:
+  grid_user_action_stack_do: | #js
+    function(box) {
+      this.refresh();
+    }
+  grid_client_runtime_socket_value_change: | #js
+    function(boxID, sDirection, sID, sValue) {
+      if (boxID != this.box._id) return;
+      this.refresh();
+    }
+  onClickItem: | #js
+    function(item) {
+      if (item == this.selectedItem) item = null;
+      this.selectedItem = item;
+    }
+  getBoxCompName: | #js
+    function(box) {
+      if (!box?.type) return null;
+      return `grid.ui.box.${box.type}`.replace(/\./g, "-");
+    }
+  getInputSocket: | #js
+    function(socketID) {
+      const socket = this.box.sockets.input.find(s => s._id == socketID);
+      return socket;
+    }
+  getIteratorBox: | #js
+    function() {
+      const iteratorSocket = this.box.sockets.output.find(s => s.type == "iterator");
+      const iteratorLink = this.$root.links
+        .filter(l => (l.from.box._id == this.box._id))
+        .find(l => (l.from.socket._id == iteratorSocket._id));
+      if (!iteratorLink) return null;
+      const iteratorBox = this.$root.boxes.find(b => b._id == iteratorLink.to.box._id);
+      return iteratorBox;
+    }
+  getItems: | #js
+    function() {
+      const socketData = this.$root.socket?.runtime.data[this.box._id];
+      const items = socketData?.input?.[1];
+      return items;
+    }
+  refresh: | #js
+    async function() {
+      this.iteratorBox = this.getIteratorBox();
+      this.items = this.getItems();
+    }
+computed: null
+watch:
+  items:
+    handler: | #js
+      function(items) {
+        this.refresh();
+      }
+  hoveredItem:
+    handler: | #js
+      function(hoveredItem) {
+        const gridUiBoxVue = this.$root.vm.getAncestors(this, "grid.ui.box")[0];
+        const hoveredItemSocket = this.box.sockets.output.find(s => s.name == "hovered item");
+        gridUiBoxVue.$femit("socket.value.change", this.box._id, "output", hoveredItemSocket._id, hoveredItem);
+      }
+  selectedItem:
+    handler: | #js
+      function(selectedItem) {
+        const gridUiBoxVue = this.$root.vm.getAncestors(this, "grid.ui.box")[0];
+        const selectedItemSocket = this.box.sockets.output.find(s => s.name == "selected item");
+        gridUiBoxVue.$femit("socket.value.change", this.box._id, "output", selectedItemSocket._id, selectedItem);
+      }
+style:
+  .item:hover:
+    background-color: '#ffffff20'
+  .item-value:
+    max-height: 4em
+    overflow: hidden
+_:
+  examples:
+    count: 0
+name: grid-ui-box-view-items
+template: >-
+  <grid-module class="comp-grid-ui-box-view-items" icon="⬜" :show-title="false"
+  path="2102270252."><div class="item" v-for="(item, index) in items"
+  @mouseenter="hoveredItem = item" @mouseleave="hoveredItem = null"
+  @click="onClickItem(item)" path="2102270252.0"><div v-if="!iteratorBox"
+  path="2102270252.0.0"><h3 v-text="'item ' + index"
+  path="2102270252.0.0.0"></h3><div class="item-value"
+  path="2102270252.0.0.1"><ui-value :value="item"
+  path="2102270252.0.0.1.0"></ui-value></div></div><component v-if="iteratorBox"
+  :is="getBoxCompName(iteratorBox)" :box="iteratorBox"
+  :data-bound-items="[item]"
+  path="2102270252.0.1"></component></div></grid-module>

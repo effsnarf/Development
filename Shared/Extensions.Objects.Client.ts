@@ -167,6 +167,22 @@ class Objects {
     return paths;
   }
 
+  static getPathValues(obj: any, paths: string[] = []) {
+    const newObj = {} as any;
+    for (const path of paths) {
+      const parts = path.split(".");
+      let node = newObj;
+      const getNextPart = () => parts.shift() || "";
+      while (parts.length > 1) {
+        const part = getNextPart();
+        node = node[part] || (node[part] = {});
+        node = node[part];
+      }
+      node[getNextPart()] = Objects.getProperty(obj, path);
+    }
+    return newObj;
+  }
+
   static getPropertiesAsTree(sourceObj: any, pathList: string[]): any {
     const subtree: any = {};
 

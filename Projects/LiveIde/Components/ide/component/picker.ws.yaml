@@ -1,7 +1,7 @@
 dom:
   div: 
     ui.keyboard:
-      @ctrl: toggleVisibility
+      @ctrl: isCtrl=$event
     ui.mouse:
       @hovered-element: onHoveredElement
       ':global': true
@@ -49,6 +49,7 @@ data:
   parentChainUIDs: null
   childChainUIDs: null
   showPicker: false
+  isCtrl: false
   selectedViewNode: null
   selectedEditorTabIndex: 0
   isPinned: false
@@ -71,10 +72,6 @@ methods:
     function(uid) {
       if (uid == this.selectedVueUID) uid = null;
       this.selectedVueUID = uid;
-    }
-  toggleVisibility: | #js
-    function(visible) {
-      this.showPicker = visible;
     }
   getTitle: | #js
     function(vue) {
@@ -177,6 +174,11 @@ computed:
       return this.hoveredVueUID || this.selectedVueUID;
     }
 watch:
+  isCtrl:
+    handler: | #js
+      function(isCtrl) {
+        this.showPicker = (isCtrl || this.$refs.context1?.isPinned);
+      }
   hoveredElement: | #js
     function(newEl, oldEl) {
       const vue = this.getVueFromElement(newEl);
@@ -247,7 +249,7 @@ _:
     count: 0
 template: >-
   <div class="comp-ide-component-picker" path="-646340253."><ui-keyboard
-  @ctrl="toggleVisibility" path="-646340253.0"></ui-keyboard><ui-mouse
+  @ctrl="isCtrl=$event" path="-646340253.0"></ui-keyboard><ui-mouse
   @hovered-element="onHoveredElement" :global="true"
   path="-646340253.1"></ui-mouse><ui-context-window v-if="showPicker"
   ref="context1" :global="true" @pinned="onPinned" path="-646340253.2"><div

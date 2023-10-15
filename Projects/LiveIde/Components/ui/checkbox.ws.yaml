@@ -35,6 +35,7 @@ methods:
     function(value) {
       if (this.valueArray && this.valueKey) {
         this.toggleArrayValue(this.valueArray, this.valueKey);
+        this.$emit("input", this.valueArray);
       } else {
         this.value1 = value;
         this.$emit("input", value);

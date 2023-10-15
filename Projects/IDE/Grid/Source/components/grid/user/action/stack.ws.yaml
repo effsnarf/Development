@@ -204,6 +204,7 @@ methods:
       const link = { _id: this.nextID++, from, to };
       this.$femit("to", "grid.data.list", `${userID}/data/links`, "add", [link]);
       action.undo = { method: "delete.link", args: [link._id] };
+      this.$femit("new.link.created", box);
       return action;
     }
   delete_link: | #js
@@ -421,6 +422,14 @@ methods:
               }
             }
           }
+        case "view.items":
+          return {
+            rect: {
+              is: {
+                minimized: false
+              }
+            }
+          }
         case "view.image":
           return {
             url: null,
@@ -486,6 +495,17 @@ methods:
             ],
             output: [
               { _id: 1, type: "data", name: "result", is: { exported: false } }
+            ]
+          }
+        case "view.items":
+          return {
+            input: [
+              { _id: 1, type: "data", name: "items", is: { exported: false } }
+            ],
+            output: [
+              { _id: 1, type: "iterator", name: "item", is: { exported: false } },
+              { _id: 2, type: "data", name: "hovered item", is: { exported: false } },
+              { _id: 3, type: "data", name: "selected item", is: { exported: false } },
             ]
           }
         case "view.image":

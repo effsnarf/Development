@@ -18,6 +18,8 @@ dom:
         camouflage: true
         v-model: boxName
         @input: onEditBoxName
+      div:
+        v-text: box._id
 props:
   box: null
 data:
@@ -75,4 +77,5 @@ template: >-
   path="-646217982.0.1"></component><ui-input-text-box class="flex-grow-1"
   :text-box-style="textBoxStyle" :auto-resize="true" :hint="nameHint + '…'"
   camouflage="true" v-model="boxName" @input="onEditBoxName"
-  path="-646217982.0.2"></ui-input-text-box></div></grid-module>
+  path="-646217982.0.2"></ui-input-text-box><div v-text="box._id"
+  path="-646217982.0.3"></div></div></grid-module>

@@ -1,7 +1,5 @@
 dom:
-  transition.group:
-    tag: div
-    name: list
+  div: 
     ':class': className
     div: 
       v-for: uid in uids.take(maxVisibleVues)
@@ -32,12 +30,11 @@ _:
   examples:
     count: 0
 template: >-
-  <transition-group class="comp-ide-component-picker-vue-list" tag="div"
-  name="list" :class="className" path="-912894927."><div v-for="uid in
-  uids.take(maxVisibleVues)" :key="uid" path="-912894927.0"><ide-component-title
-  :item="getVue(uid)" :class="{ 'selected': uid === selectedVueUID }"
-  @mouseenter="$emit('hover', uid)" @mouseleave="$emit('hover', null)"
-  @click="$emit('select', uid)"
+  <div class="comp-ide-component-picker-vue-list" :class="className"
+  path="-912894927."><div v-for="uid in uids.take(maxVisibleVues)" :key="uid"
+  path="-912894927.0"><ide-component-title :item="getVue(uid)" :class="{
+  'selected': uid === selectedVueUID }" @mouseenter="$emit('hover', uid)"
+  @mouseleave="$emit('hover', null)" @click="$emit('select', uid)"
   path="-912894927.0.0"></ide-component-title></div><div v-if="(uids.length &gt;
   maxVisibleVues)" v-text="'⏬' + (uids.length - maxVisibleVues) + ' more...'"
-  path="-912894927.1"></div></transition-group>
+  path="-912894927.1"></div></div>
