@@ -14,12 +14,17 @@ dom:
           class: surface flex-grow-1
           ':style': surfaceStyle
           @wheel: onWheelSurface
+          h2:
+            ui.button:
+              ':text': groupZoomIns?.map(g => g.groupBoxID)
+              @click: popSurfaceGroupBox
           grid.ui.box:
             v-for: box in boxes
             ':key': '''box/'' + box._id'
             ':userID': userID
             ':box': box
             ':surface-element': surfaceElement
+            ':surface-group-box-i-d': groupZoomIns.last()?.groupBoxID
           grid.ui.link:
             v-for: link in links
             ':key': '''link/'' + link._id'
@@ -56,6 +61,8 @@ data:
   surfaceElement: null
   surfaceScale: 1
   surfaceKey: 1
+  groupZoomIns: []
+  surfaceGroupBoxID: null
 mounted: | #js
   function() {
     this.surfaceElement = this.$refs.surface1;
@@ -64,6 +71,42 @@ mounted: | #js
     //window.addEventListener("resize", this.refreshSurface.bind(this));
   }
 methods:
+  grid_ui_box_toggle_group_maximized: | #js
+    function(groupBoxID) {
+      if (groupBoxID == this.surfaceGroupBoxIDs?.last()) {
+        this.popSurfaceGroupBox();
+      } else {
+        this.pushSurfaceGroupBox(groupBoxID);
+      }
+    }
+  pushSurfaceGroupBox: | #js
+    async function(groupBoxID) {
+      // Animate moving into the box
+      // Fade out all irrelevant boxes
+      const vBoxes = this.$root.vm.getDescendants(this, "grid.ui.box");
+      const groupSiblingVBoxes = vBoxes.filter(vBox => vBox.showBoxWindow);
+      const groupSiblingBoxIDs = visibleVBoxes.map(vBox => vBox.box._id);
+      const groupSiblingBoxes = this.boxes.filter(box => groupSiblingBoxIDs.includes(box._id));
+      for (const box of groupSiblingBoxes) box.rect.opacity = 0.3;
+
+      await this.$root.wait(1000);
+
+      this.groupZoomIns.push({
+        groupBoxID,
+        groupSiblingBoxIDs: groupSiblingBoxIDs,
+      });
+    }
+  popSurfaceGroupBox: | #js
+    async function() {
+      const zoomIn = this.groupZoomIns.last();
+      // Fade in relevant boxes
+      const groupSiblingBoxes = this.boxes.filter(box => zoomIn.groupSiblingBoxIDs.includes(box._id));
+      for (const box of groupSiblingBoxes) box.rect.opacity = 1;
+
+      await this.$root.wait(1000);
+
+      this.groupZoomIns.pop();
+    }
   onSurfaceDropItem: | #js
     function(dragItem) {
       this.$femit("surface.drop.item", dragItem);
@@ -118,12 +161,16 @@ template: >-
   class="flex" path="-1461469222.1"><ui-dnd-dropzone
   @drop-item="onSurfaceDropItem" path="-1461469222.1.0"><div class="surface
   flex-grow-1" :key="surfaceKey" ref="surface1" :style="surfaceStyle"
-  @wheel="onWheelSurface" path="-1461469222.1.0.0"><grid-ui-box v-for="box in
+  @wheel="onWheelSurface" path="-1461469222.1.0.0"><h2
+  path="-1461469222.1.0.0.0"><ui-button :text="groupZoomIns?.map(g =&gt;
+  g.groupBoxID)" @click="popSurfaceGroupBox"
+  path="-1461469222.1.0.0.0.0"></ui-button></h2><grid-ui-box v-for="box in
   boxes" :key="'box/' + box._id" :userID="userID" :box="box"
   :surface-element="surfaceElement"
-  path="-1461469222.1.0.0.0"></grid-ui-box><grid-ui-link v-for="link in links"
+  :surface-group-box-i-d="groupZoomIns.last()?.groupBoxID"
+  path="-1461469222.1.0.0.1"></grid-ui-box><grid-ui-link v-for="link in links"
   :key="'link/' + link._id" :link="link"
-  path="-1461469222.1.0.0.1"></grid-ui-link></div></ui-dnd-dropzone><div
+  path="-1461469222.1.0.0.2"></grid-ui-link></div></ui-dnd-dropzone><div
   v-show="showGridTools" path="-1461469222.1.1"><grid-ui-tools
   :surface-element="surfaceElement"
   path="-1461469222.1.1.0"></grid-ui-tools><grid-data-variable-view

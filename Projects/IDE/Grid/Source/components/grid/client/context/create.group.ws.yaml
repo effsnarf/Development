@@ -21,6 +21,8 @@ dom:
             text: create group ✔️
             @click: onCreateGroup
         div: 
+          class: mt-l3
+        div: 
           ui.button: 
             icon: ✖️✨
             text: unselect
@@ -36,9 +38,22 @@ mounted: | #js
   }
 methods:
   onCreateGroup: | #js
-    function() {
-      this.getUiActions().$femit('create.group', this.displayBox._id);
+    async function() {
+      const displayBox = this.displayBox;
+      // Some nice animation of the boxes grouping together
+      displayBox.rect.zOnTop = true;
+      const oldPoss = this.selectedBoxes.map((b) => b.rect.pos);
+      for (const selectedBox of this.selectedBoxes) {
+        selectedBox.rect.pos = displayBox.rect.pos;
+      }
+      await this.$root.wait(500);
+      this.getUiActions().$femit('create.group', displayBox._id);
       this.clear();
+      await this.$root.wait(400);
+      // Move the boxes back to their original positions
+      for (let i = 0; i < this.selectedBoxes.length; i++) {
+        this.selectedBoxes[i].rect.pos = oldPoss[i];
+      }
     }
   onUnselectBoxes: | #js
     function() {
@@ -88,7 +103,7 @@ template: >-
   displayBox?.name" path="-1413308281.0.0.0.1"></h3></div><div class="mt-l1"
   v-if="canCreateGroup" path="-1413308281.0.0.1"><ui-button icon="➕📦"
   text="create group ✔️" @click="onCreateGroup"
-  path="-1413308281.0.0.1.0"></ui-button></div><div
-  path="-1413308281.0.0.2"><ui-button icon="✖️✨" text="unselect"
-  @click="onUnselectBoxes"
-  path="-1413308281.0.0.2.0"></ui-button></div></div></div></grid-module>
+  path="-1413308281.0.0.1.0"></ui-button></div><div class="mt-l3"
+  path="-1413308281.0.0.2"></div><div path="-1413308281.0.0.3"><ui-button
+  icon="✖️✨" text="unselect" @click="onUnselectBoxes"
+  path="-1413308281.0.0.3.0"></ui-button></div></div></div></grid-module>

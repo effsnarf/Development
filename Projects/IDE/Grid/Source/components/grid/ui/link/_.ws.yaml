@@ -3,6 +3,7 @@ dom:
     ':show-title': 'false'
     ':key': key1
     ui.leader.line:
+      v-if: showLeaderLine
       ref: leaderLine1
       ':from': getFromEl()
       ':to': getToEl()
@@ -32,7 +33,7 @@ methods:
       if (linkID !== this.link._id) return;
       
       const vLeaderLine = this.$root.vm.getDescendant(this, "ui.leader.line");
-      vLeaderLine.flash(sValue);
+      vLeaderLine?.flash(sValue);
 
       //this.flashingValue = sValue;
       await this.$nextTick();
@@ -83,15 +84,23 @@ methods:
       await this.$nextTick();
       this.key1++;
     }
+computed:
+  showLeaderLine: | #js
+    function() {
+      if (!this.link) return false;
+      if (this.link.groupBoxID) return false;
+      return true;
+    }
 _:
   examples:
     count: 0
 name: grid-ui-link
 template: >-
   <grid-module class="comp-grid-ui-link" :show-title="false" :key="key1"
-  path="281201772."><ui-leader-line ref="leaderLine1" :from="getFromEl()"
-  :to="getToEl()" :start-plug="getStartPlug()" color="#404040"
-  path="281201772.0"><template v-slot:middle path="281201772.0.0"><transition
-  name="slide2" path="281201772.0.0.0"><ui-value-preview class="flex
-  justify-center" v-if="flashingValue" :value="flashingValue"
+  path="281201772."><ui-leader-line v-if="showLeaderLine" ref="leaderLine1"
+  :from="getFromEl()" :to="getToEl()" :start-plug="getStartPlug()"
+  color="#404040" path="281201772.0"><template v-slot:middle
+  path="281201772.0.0"><transition name="slide2"
+  path="281201772.0.0.0"><ui-value-preview class="flex justify-center"
+  v-if="flashingValue" :value="flashingValue"
   path="281201772.0.0.0.0"></ui-value-preview></transition></template></ui-leader-line></grid-module>

@@ -49,20 +49,21 @@ methods:
       if (!box?.type) return null;
       return `grid.ui.box.${box.type}`.replace(/\./g, "-");
     }
-  getInputSocket: | #js
-    function(socketID) {
-      const socket = this.box.sockets.input.find(s => s._id == socketID);
-      return socket;
-    }
   getIteratorBox: | #js
-    function() {
-      const iteratorSocket = this.box.sockets.output.find(s => s.type == "iterator");
+    function(itemsBox) {
+      const iteratorSocket = itemsBox.sockets.output.find(s => s.type == "iterator");
       const iteratorLink = this.$root.links
-        .filter(l => (l.from.box._id == this.box._id))
+        .filter(l => (l.from.box._id == itemsBox._id))
         .find(l => (l.from.socket._id == iteratorSocket._id));
-      if (!iteratorLink) return null;
-      const iteratorBox = this.$root.boxes.find(b => b._id == iteratorLink.to.box._id);
-      return iteratorBox;
+      if (iteratorLink) {
+        const iteratorBox = this.$root.boxes.find(b => b._id == iteratorLink.to.box._id);
+        return iteratorBox;
+      }
+      if (itemsBox.groupBoxID) {
+        const groupBox = this.$root.boxes.find(b => b._id == itemsBox.groupBoxID);
+        return this.getIteratorBox(groupBox);
+      }
+      return null;
     }
   getItems: | #js
     function() {
@@ -72,7 +73,7 @@ methods:
     }
   refresh: | #js
     async function() {
-      this.iteratorBox = this.getIteratorBox();
+      this.iteratorBox = this.getIteratorBox(this.box);
       this.items = this.getItems();
     }
 computed: null
@@ -100,7 +101,7 @@ style:
   .item:hover:
     background-color: '#ffffff20'
   .item-value:
-    max-height: 4em
+    max-height: 3.5em
     overflow: hidden
 _:
   examples:

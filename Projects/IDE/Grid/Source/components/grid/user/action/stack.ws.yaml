@@ -1,9 +1,12 @@
 dom:
   grid.module:
     icon: 👤👈
-    grid.data.list.view:
+    grid.data.list.view: 
       ':fuid': userID+'/data/boxes'
       v-model: boxes
+    grid.data.list.view: 
+      ':fuid': userID+'/data/links'
+      v-model: links
     .flex:
       grid.data.list:
         ':fuid': userID+'/user/actions'
@@ -27,6 +30,7 @@ data:
   nextID: 1
   userActions: []
   boxes: []
+  links: []
   pointer: null
 mounted: | #js
   async function() {
@@ -46,6 +50,8 @@ methods:
       this.select_boxes(userID, {}, selectedBoxIDs, false);
       const memberBoxes = selectedBoxes;
       const memberBoxIDs = memberBoxes.map((box) => box._id);
+      const insideLinks = this.links.filter((link) => memberBoxIDs.includes(link.from.box._id) && memberBoxIDs.includes(link.to.box._id));
+      const insideLinkIDs = insideLinks.map((link) => link._id);
 
       const type = "group";
       const displayBox = this.getBox(displayBoxID);
@@ -88,6 +94,7 @@ methods:
 
       this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "add", [groupBox]);
       this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "update", [memberBoxIDs, { groupBoxID: groupBox._id } ]);
+      this.$femit("to", "grid.data.list", `${userID}/data/links`, "update", [insideLinkIDs, { groupBoxID: groupBox._id } ]);
       
       this.$femit("new.box.created", groupBox);
 
@@ -99,8 +106,13 @@ methods:
       const groupBox = this.getBox(groupBoxID);
       // Select the boxes
       this.select_boxes(userID, {}, groupBox.members, true);
+      // Select the inside links
+      const insideLinks = this.links.filter((link) => groupBox.members.includes(link.from.box._id) && groupBox.members.includes(link.to.box._id));
+      const insideLinkIDs = insideLinks.map((link) => link._id);
       // Unset the groupBoxID on the members
       this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "update", [groupBox.members, { groupBoxID: null } ]);
+      // Unset the groupBoxID on the links
+      this.$femit("to", "grid.data.list", `${userID}/data/links`, "update", [insideLinkIDs, { groupBoxID: null } ]);
       // Delete the group box
       this.delete_box(userID, {}, groupBoxID, options);
       action.undo = { method: "no.op" };
@@ -120,6 +132,7 @@ methods:
       }
 
       box.rect.is.minimized = false;
+      box.rect.opacity = 1;
 
       this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "add", [box]);
       
@@ -149,8 +162,10 @@ methods:
     async function(userID, action, boxID, options) {
       if (!options.isUndoing) throw new Error("Not implemented");
       if (options.isUndoing) this.nextID--;
+      const box = this.getBox(boxID);
       this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "delete", [boxID]);
       action.undo = { method: "no.op" };
+      this.$femit("box.deleted", box);
       return action;
     }
   edit_box: | #js
@@ -204,7 +219,7 @@ methods:
       const link = { _id: this.nextID++, from, to };
       this.$femit("to", "grid.data.list", `${userID}/data/links`, "add", [link]);
       action.undo = { method: "delete.link", args: [link._id] };
-      this.$femit("new.link.created", box);
+      this.$femit("new.link.created", link);
       return action;
     }
   delete_link: | #js
@@ -577,14 +592,17 @@ name: grid-user-action-stack
 template: >-
   <grid-module class="comp-grid-user-action-stack" icon="👤👈"
   path="-1764928149."><grid-data-list-view :fuid="userID+'/data/boxes'"
-  v-model="boxes" path="-1764928149.0"></grid-data-list-view><div class="flex"
-  path="-1764928149.1"><grid-data-list :fuid="userID+'/user/actions'"
+  v-model="boxes"
+  path="-1764928149.0"></grid-data-list-view><grid-data-list-view
+  :fuid="userID+'/data/links'" v-model="links"
+  path="-1764928149.1"></grid-data-list-view><div class="flex"
+  path="-1764928149.2"><grid-data-list :fuid="userID+'/user/actions'"
   v-model="userActions"
-  path="-1764928149.1.0"></grid-data-list><grid-data-variable
+  path="-1764928149.2.0"></grid-data-list><grid-data-variable
   :fuid="userID+'/user/actions/pointer'" :default-value="-1" v-model="pointer"
-  path="-1764928149.1.1"></grid-data-variable><grid-data-variable
+  path="-1764928149.2.1"></grid-data-variable><grid-data-variable
   :fuid="userID+'/user/actions/next/id'" :default-value="1" v-model="nextID"
-  path="-1764928149.1.2"></grid-data-variable><grid-data-variable
+  path="-1764928149.2.2"></grid-data-variable><grid-data-variable
   :fuid="userID+'/user/actions/next/action/id'" :default-value="1"
   v-model="nextActionID"
-  path="-1764928149.1.3"></grid-data-variable></div></grid-module>
+  path="-1764928149.2.3"></grid-data-variable></div></grid-module>

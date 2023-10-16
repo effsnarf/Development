@@ -210,9 +210,10 @@ computed:
   style: | #js
     function()
     {
+      const rect1 = this.rect1;
       const center = this.getSurfaceCenter();
-      const pos = this.rect1.pos;
-      const size = this.rect1.size;
+      const pos = rect1.pos;
+      const size = rect1.size;
       const style = {};
       style.position = "absolute";
       style.width = (size.width + "px");
@@ -220,6 +221,8 @@ computed:
       const height = parseInt(style.height);
       style.left = `${center.x + pos.x - (size.width / 2)}px`;
       style.top = `${center.y - pos.y - (height / 2)}px`;
+      if (rect1.zOnTop) style["z-index"] = 1000;
+      if ("opacity" in rect1) style.opacity = rect1.opacity;
       if (!this.isDraggingMoving && !this.isResizing) style.transition = "all 0.6s, border 0s";
       return style;
     }

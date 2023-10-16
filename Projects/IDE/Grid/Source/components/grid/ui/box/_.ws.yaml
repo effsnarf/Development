@@ -55,6 +55,7 @@ props:
   userID: null
   box: null
   surfaceElement: null
+  surfaceGroupBoxID: null
 data:
   boxIcon: null
   oldBox: null
@@ -144,6 +145,7 @@ methods:
 computed:
   showBoxWindow: | #js
     function() {
+      if (this.surfaceGroupBoxID) return (this.box.groupBoxID == this.surfaceGroupBoxID);
       return !this.box?.groupBoxID;
     }
   windowStyle: | #js
@@ -167,21 +169,23 @@ style:
   .sockets:
     z-index: 10
   .sockets:hover: null
-  .above .sockets:
-    transform-origin: 0 top
   .above .sockets, .below .sockets:
     position: absolute
     width: 100%
+    margin: auto
     opacity: 0
     transition: 0.4s
+  .above .sockets:
+    transform: translate(1em, 0)
+    transform-origin: 0 top
   .below .sockets:
-    transform: translate(0, -100%)
+    transform: translate(-1em, -100%)
   .hovered .above .sockets, .hovered .below .sockets:
     opacity: 1
   .hovered .above .sockets:
-    transform: translate(0, -100%) !important
+    transform: translate(1em, -100%) !important
   .hovered .below .sockets:
-    transform: none
+    transform: translate(-1em, 0)
   .header:
     font-size: 120%
   .comp-grid-module .module-content:
