@@ -146,6 +146,7 @@ style:
     background-color: '#ffffff20'
     transition: 0s
   th:
+    padding-right: 1em
     opacity: 0.5
   td:
     font-family: monospace

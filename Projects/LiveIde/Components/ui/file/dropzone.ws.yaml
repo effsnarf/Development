@@ -86,18 +86,6 @@ methods:
         handler(e);
       }
     }
-examples:
-  - dom:
-      div:
-        class: w-100pc h-100pc
-        ui.file.dropzone:
-          @file-drop: onFileDrop
-    methods:
-      onFileDrop: | #js
-        function (files) {
-          console.log(files);
-          alertify.message(`Dropped files logged to console.`);
-        }
 style:
   .file-dropzone:
     width: 100%
@@ -144,7 +132,7 @@ style:
 name: ui-file-dropzone
 _:
   examples:
-    count: 1
+    count: 0
 template: >-
   <div class="comp-ui-file-dropzone w-100pc h-100pc"
   path="1956569459."><ui-loading class="absolute-center" v-show="isLoading"

@@ -1,28 +1,38 @@
 dom:
   grid.module:
     ':show-title': 'false'
-    ':key': key1
     ui.leader.line:
       v-if: showLeaderLine
       ref: leaderLine1
-      ':from': getFromEl()
-      ':to': getToEl()
+      ':from': fromEl
+      ':to': toEl
       ':start-plug': getStartPlug()
       color: '#404040'
       template:
         v-slot: middle
-        transition:
-          name: slide2
-          ui.value.preview:
-            v-if: flashingValue
-            class: flex justify-center
-            ':value': flashingValue
+        div:
+          class: show-on-hover-container
+          ':style': '{ height: ''3em'', border: ''2px solid red'' }'
+          ui.button:
+            class: show-on-hover
+            icon: ❌
+            text: delete link
+            @click: deleteLink
 props:
   link: null
 data:
   flashingValue: null
-  key1: 1
+  fromEl: null
+  toEl: null
+mounted: | #js
+  function() {
+    this.refresh();
+  }
 methods:
+  deleteLink: | #js
+    function() {
+      this.$femit("delete.link", this.link._id);
+    }
   grid_user_action_stack_do: | #js
     function(box) {
       this.refresh();
@@ -84,10 +94,10 @@ methods:
       return box;
     }
   refresh: | #js
-    async function() {
-      await this.$nextTick();
-      await this.$root.wait(100);
-      this.key1++;
+    function(again = 10) {
+      this.fromEl = this.getFromEl();
+      this.toEl = this.getToEl();
+      if (again) setTimeout(this.refresh.bind(this, again - 1), 400);
     }
 computed:
   showLeaderLine: | #js
@@ -101,11 +111,11 @@ _:
     count: 0
 name: grid-ui-link
 template: >-
-  <grid-module class="comp-grid-ui-link" :show-title="false" :key="key1"
+  <grid-module class="comp-grid-ui-link" :show-title="false"
   path="281201772."><ui-leader-line v-if="showLeaderLine" ref="leaderLine1"
-  :from="getFromEl()" :to="getToEl()" :start-plug="getStartPlug()"
-  color="#404040" path="281201772.0"><template v-slot:middle
-  path="281201772.0.0"><transition name="slide2"
-  path="281201772.0.0.0"><ui-value-preview class="flex justify-center"
-  v-if="flashingValue" :value="flashingValue"
-  path="281201772.0.0.0.0"></ui-value-preview></transition></template></ui-leader-line></grid-module>
+  :from="fromEl" :to="toEl" :start-plug="getStartPlug()" color="#404040"
+  path="281201772.0"><template v-slot:middle path="281201772.0.0"><div
+  class="show-on-hover-container" :style="{ height: '3em', border: '2px solid
+  red' }" path="281201772.0.0.0"><ui-button class="show-on-hover" icon="❌"
+  text="delete link" @click="deleteLink"
+  path="281201772.0.0.0.0"></ui-button></div></template></ui-leader-line></grid-module>

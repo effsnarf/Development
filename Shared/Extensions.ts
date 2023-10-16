@@ -339,6 +339,7 @@ interface Array<T> {
   insertAt(index: number, item: T, appendToEnd: boolean): void;
   removeBy(predicate: (item: T) => boolean): void;
   removeByField(key: string, value: any): void;
+  count(predicate: (item: T) => boolean): number;
   clear(stagger?: number): void;
   add(items: any[], stagger?: number): void;
   take(count: number): T[];
@@ -1498,6 +1499,12 @@ if (typeof Array !== "undefined") {
 
   Array.prototype.removeByField = function (key: string, value: any) {
     this.removeBy((item) => item[key] == value);
+  };
+
+  Array.prototype.count = function (predicate: (item: any) => boolean) {
+    if (typeof predicate != "function")
+      return this.filter((item) => item == predicate).length;
+    return this.filter(predicate).length;
   };
 
   Array.prototype.clear = function (stagger?: number) {

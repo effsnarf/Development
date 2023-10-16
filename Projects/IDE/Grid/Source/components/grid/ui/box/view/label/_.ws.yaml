@@ -6,7 +6,7 @@ dom:
       v-text: text
 props:
   box: null
-  dataBoundItems: null
+  dataBoundSocketData: null
 data:
   field: null
 methods:
@@ -33,10 +33,8 @@ computed:
     }
   boxItem: | #js
     function() {
-      if (this.dataBoundItems) return this.dataBoundItems.last();
       // Take the box value from the input socket
-      const socketData = this.$root.socket?.runtime.data[this.box._id];
-      const item = (socketData?.input?.[1] || this.box.value);
+      const item = (this.activeSocketData?.input?.[1] || this.box.value);
       return item;
     }
   fieldFunc: | #js
@@ -44,6 +42,12 @@ computed:
       if (typeof this.field == "string") return (item) => item[this.field];
       if (typeof this.field == "function") return this.field;
       return ((item) => item);
+    }
+  activeSocketData: | #js
+    function() {
+      let boxData = (this.$root.socket?.runtime.data[this.box._id] || {});
+      boxData = Objects.deepMerge(boxData, this.dataBoundSocketData);
+      return boxData;
     }
 watch:
   box:

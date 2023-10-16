@@ -6234,6 +6234,11 @@ if (typeof Array !== "undefined") {
     Array.prototype.removeByField = function (key, value) {
         this.removeBy((item) => item[key] == value);
     };
+    Array.prototype.count = function (predicate) {
+        if (typeof predicate != "function")
+            return this.filter((item) => item == predicate).length;
+        return this.filter(predicate).length;
+    };
     Array.prototype.clear = function (stagger) {
         if (!stagger) {
             this.splice(0, this.length);
@@ -7465,7 +7470,7 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/website/script/1697410078677.ts ***!
+  !*** ../../../LiveIde/website/script/1697451562954.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

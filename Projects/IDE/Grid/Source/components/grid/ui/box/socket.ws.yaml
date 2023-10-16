@@ -61,6 +61,7 @@ data:
   newBox: null
   socketValue: null
   socketIsExported: null
+  socketAlertValue: null
   isLoading: 0
 mounted: | #js
   function() {
@@ -103,7 +104,9 @@ methods:
       if (sID != this.socket._id) return;
       this.socketValue = sValue;
       this.isLoading++;
-      setTimeout(() => this.isLoading--, 400);
+      setTimeout(() => {
+        this.isLoading--;
+      }, 2000);
     }
   grid_user_action_stack_new_box_created: | #js
     function(box) {
@@ -273,6 +276,10 @@ watch:
       this.$femit("edit.socket", this.box._id, this.direction, this.socket._id, { is: { exported: socketIsExported } });
     }
 style:
+  .socket-alert-value-box:
+    max-width: 10em
+    max-height: 10em
+    overflow: hidden
   .socket:
     font-size: 100%
     opacity: 0.4

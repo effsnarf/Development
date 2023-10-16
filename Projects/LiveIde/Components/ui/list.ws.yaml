@@ -113,34 +113,9 @@ style:
   .horizontal > *:
     flex-grow: 1
     text-align: center
-examples:
-  - dom:
-      .flex.flex-column.gap-1:
-        ui.list:
-          ':items': listItems
-          value-type: value
-          @item-hover: (e) => hoveredItem = e.item
-          v-model: selectedItem
-        div:
-          div:
-            v-text: '''🧊 hovered: '' + hoveredItem'
-          span:
-            v-text: '''🧊 selected: '' + selectedItem'
-    data:
-      listItems: []
-      hoveredItem: null
-      selectedItem: null
-    mounted: | #js #js
-      function() {
-        this.listItems = [
-          '🧊 item 1',
-          '✨ item 2',
-          '📁 item 3',
-        ];
-      }
 _:
   examples:
-    count: 1
+    count: 0
 template: >-
   <div class="comp-ui-list" path="-484386888."><transition-group tag="ul"
   name="list" :class="getMainCssClass()" path="-484386888.0"><li

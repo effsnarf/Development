@@ -5192,6 +5192,11 @@ if (typeof Array !== "undefined") {
     Array.prototype.removeByField = function (key, value) {
         this.removeBy((item) => item[key] == value);
     };
+    Array.prototype.count = function (predicate) {
+        if (typeof predicate != "function")
+            return this.filter((item) => item == predicate).length;
+        return this.filter(predicate).length;
+    };
     Array.prototype.clear = function (stagger) {
         if (!stagger) {
             this.splice(0, this.length);
@@ -5504,35 +5509,24 @@ var Eff;
             }
             track = {
                 invoke: (name) => this.trackInvoke(name),
-                start: (name) => this.trackDurationStart(name),
-                stop: (name) => this.trackDurationStop(name),
+                elapsed: (name, elapsed) => this.trackDurationElapsed(name, elapsed),
             };
             trackInvoke(name) {
-                if (!this.stats[name]) {
-                    this.initializeStat(name);
-                }
+                this.initializeStat(name);
                 this.stats[name].invokes++;
             }
-            trackDurationStart(name) {
-                if (!this.stats[name]) {
-                    this.initializeStat(name);
-                }
-                this.stats[name].startTime = performance.now();
-                this.stats[name].duration.measures++;
-            }
-            trackDurationStop(name) {
-                if (!this.stats[name] || !this.stats[name].startTime) {
-                    console.error(`No start time for ${name}`);
-                    return;
-                }
-                const endTime = performance.now();
-                const duration = endTime - this.stats[name].startTime;
+            trackDurationElapsed(name, elapsed) {
+                this.initializeStat(name);
                 // Update total duration
-                this.stats[name].duration.total += duration;
+                this.stats[name].duration.total += elapsed;
+                // Update number of measures
+                this.stats[name].duration.measures++;
                 // Update and round average duration
                 this.stats[name].duration.average = Math.round(this.stats[name].duration.total / this.stats[name].duration.measures);
             }
             initializeStat(name) {
+                if (this.stats[name])
+                    return;
                 this.stats[name] = {
                     invokes: 0,
                     duration: {
@@ -5961,7 +5955,7 @@ var __webpack_exports__ = {};
 (() => {
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/website/script/1697410077895.ts ***!
+  !*** ../../../LiveIde/website/script/1697451561872.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

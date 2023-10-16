@@ -3,7 +3,9 @@ dom:
     icon: 📦
     ':show-title': 'false'
     ui.window:
+      v-if: showBoxWindow
       ref: window1
+      ':css-class': windowCssClass
       ':window-style': windowStyle
       ':rect': boxRect
       ':surface-element': surfaceElement
@@ -61,10 +63,11 @@ data:
   boxIsLoading: 0
   surfaceScale: 1
   boxRect: null
+  showSockets: 0
 mounted: | #js
   async function() {
     await this.$nextTick();
-    await this.$root.wait(() => this.$refs.window1.$refs.window);
+    await this.$root.wait(() => this.$refs.window1?.$refs.window);
     this.$root.els[`/box/window/${this.box._id}`] = this.$refs.window1.$refs.window;
   }
 unmounted: | #js
@@ -79,6 +82,15 @@ methods:
   onTitleIconClick: | #js
     function() {
       this.$femit("execute", this.box._id);
+    }
+  grid_client_runtime_socket_value_change: | #js
+    function(boxID, sDirection, sID, sValue) {
+      if (boxID != this.box._id) return;
+      // When a socket value changes, we want to flash the sockets
+      this.showSockets++;
+      setTimeout(() => {
+        this.showSockets--;
+      }, 2000);
     }
   grid_ui_box_socket_value_change: | #js
     async function(boxID, socketDirection, sID, socketValue) {
@@ -152,14 +164,6 @@ methods:
         rect = Objects.clone(groupBox.rect);
         rect.opacity = 0;
       }
-      if (box.rect.is.highlighted) {
-        // Highlighted boxes are placed in the top right corner of the surface
-        // Surface center is (0, 0), +y is up
-        rect.pos = {
-          x: (this.surfaceElement.offsetWidth / 2) - (rect.size.width / 2),
-          y: (this.surfaceElement.offsetHeight / 2) - (rect.size.height / 2),
-        }
-      }
       if (!("opacity" in rect)) rect.opacity = (box.rect.is.visible ? 1 : 0);
       return rect;
     }
@@ -168,6 +172,18 @@ methods:
       return jsyaml.dump(obj);
     }
 computed:
+  showBoxWindow: | #js
+    function() {
+      if (this.box.rect.is.grouped) return false;
+      if (this.box.rect.is.visible) return true;
+      return true;
+    }
+  windowCssClass: | #js
+    function() {
+      const cls = {};
+      if (this.showSockets) cls["hovered"] = true;
+      return cls;
+    }
   windowStyle: | #js
     function() {
       const style = {};
@@ -227,11 +243,12 @@ style:
 name: grid-ui-box
 template: >-
   <grid-module class="comp-grid-ui-box" icon="📦" :show-title="false"
-  path="1671629593."><ui-window ref="window1" :window-style="windowStyle"
-  :rect="boxRect" :surface-element="surfaceElement"
-  :surface-scale="surfaceScale" :center-coords="true" :show-header="!!box.type"
-  @is-hovered="onWindowHovered" @is-minimized="onToggleMinimized"
-  @drag-stop="onDragStop" path="1671629593.0"><template v-slot:above
+  path="1671629593."><ui-window v-if="showBoxWindow" ref="window1"
+  :css-class="windowCssClass" :window-style="windowStyle" :rect="boxRect"
+  :surface-element="surfaceElement" :surface-scale="surfaceScale"
+  :center-coords="true" :show-header="!!box.type" @is-hovered="onWindowHovered"
+  @is-minimized="onToggleMinimized" @drag-stop="onDragStop"
+  path="1671629593.0"><template v-slot:above
   path="1671629593.0.0"><grid-ui-box-sockets :box="box" direction="input"
   path="1671629593.0.0.0"></grid-ui-box-sockets></template><template
   v-slot:header path="1671629593.0.1"><div class="flex"

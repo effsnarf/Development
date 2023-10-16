@@ -142,7 +142,6 @@ methods:
       box.rect.is.minimized = false;
       box.rect.is.visible = true;
       box.rect.is.grouped = false;
-      box.rect.is.highlighted = false;
 
       this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "add", [box]);
       
@@ -225,8 +224,10 @@ methods:
       return action;
     }
   create_link: | #js
-    async function(userID, action, from, to) {
-      const link = { _id: this.nextID++, from, to };
+    async function(userID, action, from, to, linkData) {
+      const link = { from, to };
+      if (linkData) Object.assign(link, linkData);
+      link._id = this.nextID++;
       link.is = (link.is || {});
       link.is.grouped = false;
       this.$femit("to", "grid.data.list", `${userID}/data/links`, "add", [link]);
@@ -236,10 +237,11 @@ methods:
     }
   delete_link: | #js
     async function(userID, action, linkID, options) {
-      if (!options.isUndoing) throw new Error("Not implemented");
       if (options.isUndoing) this.nextID--;
+      const oldLink = Objects.clone(this.links.find((link) => link._id === linkID));
+      delete oldLink._id;
       this.$femit("to", "grid.data.list", `${userID}/data/links`, "delete", [linkID]);
-      action.undo = { method: "no.op" };
+      action.undo = { method: "create.link", from: oldLink.from, to: oldLink.to, oldLink };
       return action;
     }
   delete_selected: | #js

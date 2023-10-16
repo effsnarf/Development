@@ -185,6 +185,7 @@ computed:
       style.left = ((pos.x + this.space) + "px");
       style.top = ((pos.y + this.space) + "px");
       if (!this.semiTransparent) style.opacity = 1;
+      style.transition = "0.3s !important";
       return style;
     }
 watch:
@@ -236,30 +237,10 @@ style:
     margin-bottom: 0.5em
     user-select: none
     font-size: 2rem
-examples:
-  - dom:
-      div:
-        ui.alert:
-          ':text': '''hover for context'''
-        ui.context.window:
-          ':ctrl-right-click': 'false'
-          .flex.flex-column:
-            ':style': '{ gap: ''1em'' }'
-            div:
-              ':style': '{ width: ''20em'' }'
-              v-text: >-
-                'Context window will appear when the parent is hovered. Right
-                click to pin it.'
-            span:
-              div:
-                v-text: '''Context window can contain other components.'''
-              ui.button:
-                icon: ✔️
-                text: Button
 name: ui-context-window
 _:
   examples:
-    count: 1
+    count: 0
 template: >-
   <div class="comp-ui-context-window" path="1458497449."><ui-mouse
   :global="true" :ctrl-right-click="ctrlRightClick" @move="onMouseMove"

@@ -2,7 +2,7 @@ dom:
   div:
     ui.floating:
       ref: floating1
-      v-if: 'false'
+      v-if: 'true'
       ':attach-to': middleLabelElement
       attach-origin: center center
       slot:
@@ -31,7 +31,7 @@ methods:
     async function() {
       if (!this.leaderLine) return;
       const yellow = "#ffff00";
-      this.flashColors = this.tweenColors(yellow, this.color, 20);
+      this.flashColors = this.tweenColors(yellow, this.color, 100);
       if (!this.isFlashing) this.flashOneFrame();
       for (let i = 0; i < 10; i++) {
         setTimeout(() => {
@@ -54,43 +54,50 @@ methods:
       setTimeout(this.flashOneFrame.bind(this), 1);
     }
   refresh: | #js
-    function() {
-      const fromEl = this.getEdgeElement(this.from);
-      const toEl = this.getEdgeElement(this.to);
-
-      if (this.leaderLine && (this.leaderLine.start == fromEl) && (this.leaderLine.end == toEl))
+    function(again = 20) {
+      try
       {
-        this.redraw();
-        return;
-      }
+        const fromEl = this.getEdgeElement(this.from);
+        const toEl = this.getEdgeElement(this.to);
 
-      this.remove();
-
-      if ((!fromEl) || (!toEl)) return this.remove();
-      if (!fromEl.isConnected || !toEl.isConnected) return this.remove();
-
-      this.leaderLine = new LeaderLine(
-        fromEl,
-        toEl,
+        if (this.leaderLine && (this.leaderLine.start == fromEl) && (this.leaderLine.end == toEl))
         {
-          path: this.linePath,
-          color: this.color,
-          startPlug: this.startPlug,
-          endPlug: this.endPlug,
-          middleLabel: this.middleLabel,
-          dropShadow: {
-            dx: -3,
-            dy: 3,
-            blur: 0.2
-          }
+          this.redraw();
+          return;
         }
-      );
 
-      // If fromEl or toEl's DOM position changes, redraw the leader line
-      this.$root.html.when.element.moves(fromEl, this.redraw.bind(this));
-      this.$root.html.when.element.moves(toEl, this.redraw.bind(this));
-      
-      this.setVisibility(this.visible);
+        this.remove();
+
+        if ((!fromEl) || (!toEl)) return this.remove();
+        if (!fromEl.isConnected || !toEl.isConnected) return this.remove();
+
+        this.leaderLine = new LeaderLine(
+          fromEl,
+          toEl,
+          {
+            path: this.linePath,
+            color: this.color,
+            startPlug: this.startPlug,
+            endPlug: this.endPlug,
+            middleLabel: this.middleLabel,
+            dropShadow: {
+              dx: -3,
+              dy: 3,
+              blur: 0.2
+            }
+          }
+        );
+
+        // If fromEl or toEl's DOM position changes, redraw the leader line
+        this.$root.html.when.element.moves(fromEl, this.redraw.bind(this));
+        this.$root.html.when.element.moves(toEl, this.redraw.bind(this));
+        
+        this.setVisibility(this.visible);
+      }
+      finally
+      {
+        if (again) setTimeout(() => { this.refresh(again - 1); }, 300);
+      }
     }
   redraw: | #js
     function(onlyOnce = false) {
@@ -220,6 +227,6 @@ _:
 name: ui-leader-line
 template: >-
   <div class="comp-ui-leader-line" path="125299039."><ui-floating
-  ref="floating1" v-if="false" :attach-to="middleLabelElement"
+  ref="floating1" v-if="true" :attach-to="middleLabelElement"
   attach-origin="center center" path="125299039.0"><slot name="middle"
   path="125299039.0.0"></slot></ui-floating></div>

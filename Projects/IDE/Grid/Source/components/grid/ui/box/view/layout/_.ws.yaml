@@ -15,11 +15,11 @@ dom:
             ':is': getBoxCompName(slotBoxes[index])
             ':userID': userID
             ':box': slotBoxes[index]
-            ':data-bound-items': dataBoundItems
+            ':data-bound-socket-data': dataBoundSocketData
 props:
   userID: null
   box: null
-  dataBoundItems: null
+  dataBoundSocketData: null
 data:
   slotBoxes: null
   boxes: []
@@ -95,5 +95,5 @@ template: >-
   path="814806846.0.0"><div v-if="slotBoxes" path="814806846.0.0.0"><component
   class="h-100pc" v-if="slotBoxes[index]?.type"
   :is="getBoxCompName(slotBoxes[index])" :userID="userID"
-  :box="slotBoxes[index]" :data-bound-items="dataBoundItems"
+  :box="slotBoxes[index]" :data-bound-socket-data="dataBoundSocketData"
   path="814806846.0.0.0.0"></component></div></div></div></grid-module>

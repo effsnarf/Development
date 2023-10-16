@@ -57,12 +57,17 @@ helpers:
         let wrappedBody = methodBody.substring(first + 1, last).trim();
 
         // Insert startCode and endCode
-        if (startCode?.length) {
-          wrappedBody = `${startCode}\n${wrappedBody}`;
+        wrappedBody = `
+        ${startCode}
+        try
+        {
+          ${wrappedBody}
         }
-        if (endCode?.length) {
-          wrappedBody = `try {\n${wrappedBody}\n} finally {\n${endCode}\n}`;
+        finally
+        {
+          ${endCode}
         }
+        `;
 
         // Reconstruct the final method body
         const finalMethodBody = `${methodBody.substring(0, first + 1)}\n${wrappedBody}\n${methodBody.substring(last)}`;
@@ -71,7 +76,8 @@ helpers:
       } catch (error) {
         console.error(`Error in addCode: ${error.message}`);
         return methodBody; // Return the original method body in case of an error
-      }    }
+      }
+    }
   prefixCssSelectors: | #ts
     (context, compName, selectors) => {
       const s = [];

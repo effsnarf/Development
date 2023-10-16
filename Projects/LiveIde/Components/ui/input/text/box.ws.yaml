@@ -96,14 +96,9 @@ style:
   .icon:
     position: absolute
     margin: 0.25em
-examples:
-  - dom:
-      ui.input.text.box:
-        icon: 🔎
-        hint: search…
 _:
   examples:
-    count: 1
+    count: 0
 template: >-
   <div class="comp-ui-input-text-box" v-if="!multiline" :class="{ disabled:
   !enabled, camouflage }" path="739613128."><div class="icon" v-if="icon"

@@ -3,10 +3,12 @@ dom:
     component:
       ':is': getBoxCompName(displayBox)
       ':box': displayBox
+      ':data-bound-socket-data': dataBoundSocketData
     @click: onClick
 props:
   box: null
   surfaceElement: null
+  dataBoundSocketData: null
 data:
   groupBox: null
   displayBox: null
@@ -55,4 +57,5 @@ name: grid-ui-box-group
 template: >-
   <div class="comp-grid-ui-box-group" @click="onClick"
   path="1087010666."><component :is="getBoxCompName(displayBox)"
-  :box="displayBox" path="1087010666.0"></component></div>
+  :box="displayBox" :data-bound-socket-data="dataBoundSocketData"
+  path="1087010666.0"></component></div>

@@ -7,7 +7,6 @@ namespace Eff {
         measures: number;
         total: number;
       };
-      startTime?: number;
     }
 
     export class Tracker {
@@ -22,35 +21,22 @@ namespace Eff {
 
       track = {
         invoke: (name: string) => this.trackInvoke(name),
-        start: (name: string) => this.trackDurationStart(name),
-        stop: (name: string) => this.trackDurationStop(name),
+        elapsed: (name: string, elapsed: number) =>
+          this.trackDurationElapsed(name, elapsed),
       };
 
       private trackInvoke(name: string) {
-        if (!this.stats[name]) {
-          this.initializeStat(name);
-        }
+        this.initializeStat(name);
         this.stats[name].invokes++;
       }
 
-      private trackDurationStart(name: string) {
-        if (!this.stats[name]) {
-          this.initializeStat(name);
-        }
-        this.stats[name].startTime = performance.now();
-        this.stats[name].duration.measures++;
-      }
-
-      private trackDurationStop(name: string) {
-        if (!this.stats[name] || !this.stats[name].startTime) {
-          console.error(`No start time for ${name}`);
-          return;
-        }
-        const endTime = performance.now();
-        const duration = endTime - this.stats[name].startTime!;
+      private trackDurationElapsed(name: string, elapsed: number) {
+        this.initializeStat(name);
 
         // Update total duration
-        this.stats[name].duration.total += duration;
+        this.stats[name].duration.total += elapsed;
+        // Update number of measures
+        this.stats[name].duration.measures++;
 
         // Update and round average duration
         this.stats[name].duration.average = Math.round(
@@ -59,6 +45,7 @@ namespace Eff {
       }
 
       private initializeStat(name: string) {
+        if (this.stats[name]) return;
         this.stats[name] = {
           invokes: 0,
           duration: {

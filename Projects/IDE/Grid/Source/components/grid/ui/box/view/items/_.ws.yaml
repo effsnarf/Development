@@ -20,7 +20,7 @@ dom:
         v-if: iteratorBox
         ':is': getBoxCompName(iteratorBox)
         ':box': iteratorBox
-        ':data-bound-items': '[item]'
+        ':data-bound-socket-data': getDataBoundSocketData(item)
 props:
   userID: null
   box: null
@@ -48,6 +48,26 @@ methods:
     function(box) {
       if (!box?.type) return null;
       return `grid.ui.box.${box.type}`.replace(/\./g, "-");
+    }
+  getDataBoundSocketData: | #js
+    function(item) {
+      const customData = {};
+      customData.input = {};
+      const dataSocket = this.getIteratorDataSocket(this.box);
+      customData.input[dataSocket._id] = item;
+      return customData;
+    }
+  getIteratorDataSocket: | #js
+    function(itemsBox) {
+      const iteratorSocket = itemsBox.sockets.output.find(s => s.type == "iterator");
+      const iteratorLink = this.$root.links
+        .filter(l => (l.from.box._id == itemsBox._id))
+        .find(l => (l.from.socket._id == iteratorSocket._id));
+      if (!iteratorLink) return null;
+
+      const iteratorBox = this.$root.boxes.find(b => b._id == iteratorLink.to.box._id);
+      const dataSocket = iteratorBox.sockets.input.find(s => s._id == iteratorLink.to.socket._id);
+      return dataSocket;
     }
   getIteratorBox: | #js
     function(itemsBox) {
@@ -117,5 +137,5 @@ template: >-
   path="2102270252.0.0.1"><ui-value :value="item"
   path="2102270252.0.0.1.0"></ui-value></div></div><component v-if="iteratorBox"
   :is="getBoxCompName(iteratorBox)" :box="iteratorBox"
-  :data-bound-items="[item]"
+  :data-bound-socket-data="getDataBoundSocketData(item)"
   path="2102270252.0.1"></component></div></grid-module>

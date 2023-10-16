@@ -35,6 +35,7 @@ mounted: | #js
 methods:
   onGlobalError: | #js
     function(ex, vm, info) {
+      if (!ex) return;
       alertify.error(`Error: ${ex.message}`);
     }
 style: null

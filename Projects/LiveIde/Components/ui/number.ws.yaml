@@ -45,16 +45,10 @@ style:
     font-size: 110%
     opacity: 0.6
     line-height: 1.2em
-examples:
-  - dom:
-      ui.number:
-        icon: 📁
-        value: 1042
-        unit: mb
 name: ui-number
 _:
   examples:
-    count: 1
+    count: 0
 template: >-
   <div class="comp-ui-number card" path="-1571183645."><div class="top"
   path="-1571183645.0"><div class="icon" v-text="icon"
