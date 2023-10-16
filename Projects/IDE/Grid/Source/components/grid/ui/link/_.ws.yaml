@@ -12,11 +12,11 @@ dom:
         v-slot: middle
         div:
           class: show-on-hover-container
-          ':style': '{ height: ''3em'', border: ''2px solid red'' }'
+          ':style': '{ ''min-width'': ''10em'', height: ''3em'', ''z-index'': 1000 }'
           ui.button:
             class: show-on-hover
             icon: ❌
-            text: delete link
+            ':text': linkDesc
             @click: deleteLink
 props:
   link: null
@@ -24,6 +24,7 @@ data:
   flashingValue: null
   fromEl: null
   toEl: null
+  linkDesc: null
 mounted: | #js
   function() {
     this.refresh();
@@ -93,10 +94,31 @@ methods:
       if (box.groupBoxID) return this.getTopGroupBox({ _id: box.groupBoxID });
       return box;
     }
+  getLinkDesc: | #js
+    function() {
+      const fromBox = this.$root.boxes.find(b => b._id == this.link.from.box._id);
+      const toBox = this.$root.boxes.find(b => b._id == this.link.to.box._id);
+      if (!fromBox || !toBox) return "";
+      const fromSocket = fromBox.sockets.output.find(s => s._id == this.link.from.socket._id);
+      const toSocket = toBox.sockets.input.find(s => s._id == this.link.to.socket._id);
+      const fromSocketIcon = this.getSocketIcon(fromSocket);
+      const toSocketIcon = this.getSocketIcon(toSocket);
+      return `${fromSocketIcon}${fromSocket.name} -> ${toSocketIcon}${toSocket.name}`;
+    }
+  getSocketIcon: | #js
+    function(socket) {
+      return {
+        data: '🧊',
+        iterator: '🔗🖇️',
+        view: '⬜',
+        event: '⚡',
+      }[socket.type];
+    }
   refresh: | #js
     function(again = 10) {
       this.fromEl = this.getFromEl();
       this.toEl = this.getToEl();
+      this.linkDesc = this.getLinkDesc();
       if (again) setTimeout(this.refresh.bind(this, again - 1), 400);
     }
 computed:
@@ -115,7 +137,7 @@ template: >-
   path="281201772."><ui-leader-line v-if="showLeaderLine" ref="leaderLine1"
   :from="fromEl" :to="toEl" :start-plug="getStartPlug()" color="#404040"
   path="281201772.0"><template v-slot:middle path="281201772.0.0"><div
-  class="show-on-hover-container" :style="{ height: '3em', border: '2px solid
-  red' }" path="281201772.0.0.0"><ui-button class="show-on-hover" icon="❌"
-  text="delete link" @click="deleteLink"
+  class="show-on-hover-container" :style="{ 'min-width': '10em', height: '3em',
+  'z-index': 1000 }" path="281201772.0.0.0"><ui-button class="show-on-hover"
+  icon="❌" :text="linkDesc" @click="deleteLink"
   path="281201772.0.0.0.0"></ui-button></div></template></ui-leader-line></grid-module>

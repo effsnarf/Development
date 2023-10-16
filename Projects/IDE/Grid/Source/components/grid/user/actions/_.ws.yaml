@@ -84,6 +84,11 @@ methods:
       const action = { redo: { method: "create.link", args: args } };
       this.$femit("do", this.userID, action);
     }
+  grid_ui_link_delete_link: | #js
+    async function(linkID) {
+      const action = { redo: { method: "delete.link", args: [linkID] } };
+      this.$femit("do", this.userID, action);
+    }
   grid_ui_box_socket_edit_socket: | #js
     function(boxID, direction, socketID, newData) {
       const action = { redo: { method: "edit.socket", args: [boxID, direction, socketID, newData] } };

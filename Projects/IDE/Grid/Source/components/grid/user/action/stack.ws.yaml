@@ -169,8 +169,8 @@ methods:
     }
   delete_box: | #js
     async function(userID, action, boxID, options) {
-      if (!options.isUndoing) throw new Error("Not implemented");
-      if (options.isUndoing) this.nextID--;
+      if (!options?.isUndoing) throw new Error("Not implemented");
+      if (options?.isUndoing) this.nextID--;
       const box = this.getBox(boxID);
       this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "delete", [boxID]);
       action.undo = { method: "no.op" };
@@ -237,11 +237,11 @@ methods:
     }
   delete_link: | #js
     async function(userID, action, linkID, options) {
-      if (options.isUndoing) this.nextID--;
+      if (options?.isUndoing) this.nextID--;
       const oldLink = Objects.clone(this.links.find((link) => link._id === linkID));
       delete oldLink._id;
       this.$femit("to", "grid.data.list", `${userID}/data/links`, "delete", [linkID]);
-      action.undo = { method: "create.link", from: oldLink.from, to: oldLink.to, oldLink };
+      action.undo = { method: "create.link", args: [oldLink.from, oldLink.to, oldLink] };
       return action;
     }
   delete_selected: | #js

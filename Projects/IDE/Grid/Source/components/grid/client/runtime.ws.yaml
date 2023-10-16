@@ -95,6 +95,7 @@ methods:
       this.$femit("socket.value.change", boxID, sDirection, sID, sValue);
       this.processBoxChange(boxID, sDirection, sID, sValue);
       this.propagateSocketLinks(boxID, sDirection, sID);
+      if (sDirection == "input") this.propagateGroupSockets(boxID, sID, sValue);
       if (sDirection == "output") this.propagateGroupMemberSockets(boxID, sID, sValue);
     }
   processBoxChange: | #js
@@ -145,6 +146,21 @@ methods:
         this.$femit("link.flash", link._id, sValue);
         this.setSocketValue(link.to.box._id, "input", link.to.socket._id, sValue);
       }
+    }
+  propagateGroupSockets: | #js
+    function(boxID, sID, sValue) {
+      // Input sockets on the group are propagated inward to the group members
+      const groupBox = this.getBox(boxID);
+      if (groupBox.type != "group") return;
+      const socket = groupBox.sockets.input.find(socket => socket._id == sID);
+      if (!socket) return;
+      if (!socket.imported) return;
+      // Find the related member socket
+      const memberBox = this.getBox(socket.imported.from.box._id);
+      const memberSocket = memberBox.sockets.input.find(s2 => s2._id == socket.imported?.from.socket._id);
+      if (!memberSocket) return;
+      // Set the value on the member socket
+      this.setSocketValue(memberBox._id, "input", memberSocket._id, sValue);
     }
   propagateGroupMemberSockets: | #js
     function(boxID, sID) {
