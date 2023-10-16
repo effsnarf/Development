@@ -17,14 +17,13 @@ dom:
           h2:
             ui.button:
               ':text': groupZoomIns?.map(g => g.groupBoxID)
-              @click: popSurfaceGroupBox
+              @click: zoomOutGroupBox
           grid.ui.box:
             v-for: box in boxes
             ':key': '''box/'' + box._id'
             ':userID': userID
             ':box': box
             ':surface-element': surfaceElement
-            ':surface-group-box-i-d': groupZoomIns.last()?.groupBoxID
           grid.ui.link:
             v-for: link in links
             ':key': '''link/'' + link._id'
@@ -62,7 +61,6 @@ data:
   surfaceScale: 1
   surfaceKey: 1
   groupZoomIns: []
-  surfaceGroupBoxID: null
 mounted: | #js
   function() {
     this.surfaceElement = this.$refs.surface1;
@@ -73,39 +71,47 @@ mounted: | #js
 methods:
   grid_ui_box_toggle_group_maximized: | #js
     function(groupBoxID) {
-      if (groupBoxID == this.surfaceGroupBoxIDs?.last()) {
-        this.popSurfaceGroupBox();
+      if (groupBoxID == this.groupZoomIns.last()?.groupBoxID) {
+        this.zoomOutGroupBox();
       } else {
-        this.pushSurfaceGroupBox(groupBoxID);
+        this.zoomInGroupBox(groupBoxID);
       }
     }
-  pushSurfaceGroupBox: | #js
+  zoomInGroupBox: | #js
     async function(groupBoxID) {
-      // Animate moving into the box
-      // Fade out all irrelevant boxes
+      const zoomedGroupBoxID = this.groupZoomIns.last()?.groupBoxID;
       const vBoxes = this.$root.vm.getDescendants(this, "grid.ui.box");
-      const groupSiblingVBoxes = vBoxes.filter(vBox => vBox.showBoxWindow);
-      const groupSiblingBoxIDs = visibleVBoxes.map(vBox => vBox.box._id);
-      const groupSiblingBoxes = this.boxes.filter(box => groupSiblingBoxIDs.includes(box._id));
-      for (const box of groupSiblingBoxes) box.rect.opacity = 0.3;
-
-      await this.$root.wait(1000);
+      const groupBox = this.boxes.find(box => box._id == groupBoxID);
+      const nonMemberBoxes = zoomedGroupBoxID ?
+        this.boxes.filter(box => (box.groupBoxID == zoomedGroupBoxID)) :
+        this.boxes.filter(box => (!box.groupBoxID));
+      const nonMemberBoxIDs = nonMemberBoxes.map(box => box._id);
+      for (const box of nonMemberBoxes) box.rect.is.visible = false;
+      const memberBoxes = this.boxes.filter(box => box.groupBoxID == groupBoxID);
+      for (const box of memberBoxes) box.rect.is.grouped = false;
+      const memberLinks = this.links.filter(link => (link.groupBoxID == groupBoxID));
+      for (const link of memberLinks) link.is.grouped = false;
 
       this.groupZoomIns.push({
         groupBoxID,
-        groupSiblingBoxIDs: groupSiblingBoxIDs,
+        nonMemberBoxIDs: nonMemberBoxIDs,
       });
     }
-  popSurfaceGroupBox: | #js
+  zoomOutGroupBox: | #js
     async function() {
-      const zoomIn = this.groupZoomIns.last();
-      // Fade in relevant boxes
-      const groupSiblingBoxes = this.boxes.filter(box => zoomIn.groupSiblingBoxIDs.includes(box._id));
-      for (const box of groupSiblingBoxes) box.rect.opacity = 1;
-
-      await this.$root.wait(1000);
-
-      this.groupZoomIns.pop();
+      const zoomIn = this.groupZoomIns.pop();
+      if (!zoomIn) return;
+      const groupBoxID = zoomIn.groupBoxID;
+      const groupBox = this.boxes.find(box => box._id == groupBoxID);
+      groupBox.rect.is.highlighted = false;
+      const memberBoxes = this.boxes.filter(box => box.groupBoxID == groupBoxID);
+      for (const box of memberBoxes) box.rect.is.grouped = true;
+      const nonMemberBoxes = this.boxes.filter(box => zoomIn.nonMemberBoxIDs.includes(box._id));
+      for (const box of nonMemberBoxes) box.rect.is.visible = true;
+      const memberLinks = this.links.filter(link => (link.groupBoxID == groupBoxID));
+      setTimeout(() => {
+        for (const link of memberLinks) link.is.grouped = true;
+      }, 300);
     }
   onSurfaceDropItem: | #js
     function(dragItem) {
@@ -163,11 +169,10 @@ template: >-
   flex-grow-1" :key="surfaceKey" ref="surface1" :style="surfaceStyle"
   @wheel="onWheelSurface" path="-1461469222.1.0.0"><h2
   path="-1461469222.1.0.0.0"><ui-button :text="groupZoomIns?.map(g =&gt;
-  g.groupBoxID)" @click="popSurfaceGroupBox"
+  g.groupBoxID)" @click="zoomOutGroupBox"
   path="-1461469222.1.0.0.0.0"></ui-button></h2><grid-ui-box v-for="box in
   boxes" :key="'box/' + box._id" :userID="userID" :box="box"
   :surface-element="surfaceElement"
-  :surface-group-box-i-d="groupZoomIns.last()?.groupBoxID"
   path="-1461469222.1.0.0.1"></grid-ui-box><grid-ui-link v-for="link in links"
   :key="'link/' + link._id" :link="link"
   path="-1461469222.1.0.0.2"></grid-ui-link></div></ui-dnd-dropzone><div

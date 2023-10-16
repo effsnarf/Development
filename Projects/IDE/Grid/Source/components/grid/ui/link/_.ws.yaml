@@ -45,10 +45,14 @@ methods:
     }
   getToEl: | #js
     function() {
-      const toBox = this.getTopGroupBox(this.link.to.box);
+      const toGroupBox = this.getTopGroupBox(this.link.to.box);
       // If the link is going to a box inside a group box, we need to find the group box's window
-      if ((toBox) && (toBox._id != this.link.to.box._id)) {
-        return this.$root.els[`/box/window/${toBox._id}`];
+      // If this box is not a member of the group box
+      if (toGroupBox)
+      {
+        if ((toGroupBox._id != this.link.to.box._id)) {
+          //return this.$root.els[`/box/window/${toBox._id}`];
+        }
       }
       return this.getSocketEl(this.link.to, 'input');
     }
@@ -82,13 +86,14 @@ methods:
   refresh: | #js
     async function() {
       await this.$nextTick();
+      await this.$root.wait(100);
       this.key1++;
     }
 computed:
   showLeaderLine: | #js
     function() {
       if (!this.link) return false;
-      if (this.link.groupBoxID) return false;
+      if (this.link.is.grouped) return false;
       return true;
     }
 _:

@@ -46,12 +46,17 @@ methods:
     function(userID, action, displayBoxID) {
       const selectedBoxes = this.boxes.filter((box) => box.is?.selected);
       const selectedBoxIDs = selectedBoxes.map((box) => box._id);
-      // Unselect the boxes
-      this.select_boxes(userID, {}, selectedBoxIDs, false);
+
       const memberBoxes = selectedBoxes;
       const memberBoxIDs = memberBoxes.map((box) => box._id);
-      const insideLinks = this.links.filter((link) => memberBoxIDs.includes(link.from.box._id) && memberBoxIDs.includes(link.to.box._id));
-      const insideLinkIDs = insideLinks.map((link) => link._id);
+      const memberLinks = this.links.filter((link) => memberBoxIDs.includes(link.from.box._id) && memberBoxIDs.includes(link.to.box._id));
+      const memberLinkIDs = memberLinks.map((link) => link._id);
+      const relatedLinks = this.links.filter((link) => memberBoxIDs.includes(link.from.box._id) || memberBoxIDs.includes(link.to.box._id));
+      if (relatedLinks.length > memberLinks.length) {
+        const errorMessage = `A new group must be independent from other boxes.`;
+        alertify.error(errorMessage);
+        throw new Error(errorMessage);
+      }
 
       const type = "group";
       const displayBox = this.getBox(displayBoxID);
@@ -93,12 +98,16 @@ methods:
       };
 
       this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "add", [groupBox]);
-      this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "update", [memberBoxIDs, { groupBoxID: groupBox._id } ]);
-      this.$femit("to", "grid.data.list", `${userID}/data/links`, "update", [insideLinkIDs, { groupBoxID: groupBox._id } ]);
+      this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "update", [memberBoxIDs, { groupBoxID: groupBox._id, rect: { is: { grouped: true } } } ]);
+      this.$femit("to", "grid.data.list", `${userID}/data/links`, "update", [memberLinkIDs, { groupBoxID: groupBox._id, is: { grouped: true } }]);
       
       this.$femit("new.box.created", groupBox);
 
+      // Unselect the boxes
+      this.select_boxes(userID, {}, selectedBoxIDs, false);
+
       action.undo = { method: "delete.group", args: [groupBox._id] };
+
       return action;
     }
   delete_group: | #js
@@ -107,12 +116,11 @@ methods:
       // Select the boxes
       this.select_boxes(userID, {}, groupBox.members, true);
       // Select the inside links
-      const insideLinks = this.links.filter((link) => groupBox.members.includes(link.from.box._id) && groupBox.members.includes(link.to.box._id));
-      const insideLinkIDs = insideLinks.map((link) => link._id);
-      // Unset the groupBoxID on the members
-      this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "update", [groupBox.members, { groupBoxID: null } ]);
-      // Unset the groupBoxID on the links
-      this.$femit("to", "grid.data.list", `${userID}/data/links`, "update", [insideLinkIDs, { groupBoxID: null } ]);
+      const memberLinks = this.links.filter((link) => groupBox.members.includes(link.from.box._id) && groupBox.members.includes(link.to.box._id));
+      const memberLinkIDs = memberLinks.map((link) => link._id);
+      // Unset the groupBoxID on the members and links
+      this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "update", [groupBox.members, { groupBoxID: null, rect: { is: { grouped: false } } } ]);
+      this.$femit("to", "grid.data.list", `${userID}/data/links`, "update", [memberLinkIDs, { groupBoxID: null, is: { grouped: false } } ]);
       // Delete the group box
       this.delete_box(userID, {}, groupBoxID, options);
       action.undo = { method: "no.op" };
@@ -132,7 +140,9 @@ methods:
       }
 
       box.rect.is.minimized = false;
-      box.rect.opacity = 1;
+      box.rect.is.visible = true;
+      box.rect.is.grouped = false;
+      box.rect.is.highlighted = false;
 
       this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "add", [box]);
       
@@ -217,6 +227,8 @@ methods:
   create_link: | #js
     async function(userID, action, from, to) {
       const link = { _id: this.nextID++, from, to };
+      link.is = (link.is || {});
+      link.is.grouped = false;
       this.$femit("to", "grid.data.list", `${userID}/data/links`, "add", [link]);
       action.undo = { method: "delete.link", args: [link._id] };
       this.$femit("new.link.created", link);

@@ -1,5 +1,6 @@
 dom:
   div: 
+    v-if: rect
     ':style': style
     ':class': '{ hovered: (isHovered || isResizing), ''auto-expand'': autoExpand }'
     @mouseenter: (e) => { isHovered++; $emit('mouseenter', e); }
@@ -211,6 +212,7 @@ computed:
     function()
     {
       const rect1 = this.rect1;
+      if (!rect1) return {};
       const center = this.getSurfaceCenter();
       const pos = rect1.pos;
       const size = rect1.size;
@@ -222,8 +224,18 @@ computed:
       style.left = `${center.x + pos.x - (size.width / 2)}px`;
       style.top = `${center.y - pos.y - (height / 2)}px`;
       if (rect1.zOnTop) style["z-index"] = 1000;
-      if ("opacity" in rect1) style.opacity = rect1.opacity;
-      if (!this.isDraggingMoving && !this.isResizing) style.transition = "all 0.6s, border 0s";
+      if ("opacity" in rect1)
+      {
+        style.opacity = rect1.opacity;
+        if (rect1.opacity == 0) style["pointer-events"] = "none";
+      }
+      if (!this.isDraggingMoving && !this.isResizing) {
+        style.transition = "all 0.6s, border 0s";
+      }
+      else
+      {
+        style.transition = "opacity 1s";
+      }
       return style;
     }
   contentStyle: | #js
@@ -352,14 +364,15 @@ _:
     count: 0
 name: ui-window
 template: >-
-  <div class="comp-ui-window" :style="style" :class="{ hovered: (isHovered ||
-  isResizing), 'auto-expand': autoExpand }" @mouseenter="(e) =&gt; {
-  isHovered++; $emit('mouseenter', e); }" @mouseleave="(e) =&gt; { isHovered--;
-  $emit('mouseleave', e); }" @dragenter="(e) =&gt; { isHovered++; }"
-  @dragleave="(e) =&gt; { isHovered--; }" path="-1324571510."><div class="above"
-  :style="{ width: rect1.size.width+'px' }" @dragenter="(e) =&gt; { isHovered++;
-  }" @dragleave="(e) =&gt; { isHovered--; }" path="-1324571510.0"><slot
-  name="above" path="-1324571510.0.0"></slot></div><div class="h-100pc"
+  <div class="comp-ui-window" v-if="rect" :style="style" :class="{ hovered:
+  (isHovered || isResizing), 'auto-expand': autoExpand }" @mouseenter="(e) =&gt;
+  { isHovered++; $emit('mouseenter', e); }" @mouseleave="(e) =&gt; {
+  isHovered--; $emit('mouseleave', e); }" @dragenter="(e) =&gt; { isHovered++;
+  }" @dragleave="(e) =&gt; { isHovered--; }" path="-1324571510."><div
+  class="above" :style="{ width: rect1.size.width+'px' }" @dragenter="(e) =&gt;
+  { isHovered++; }" @dragleave="(e) =&gt; { isHovered--; }"
+  path="-1324571510.0"><slot name="above"
+  path="-1324571510.0.0"></slot></div><div class="h-100pc"
   path="-1324571510.1"><ui-mouse @up="onMouseUp" @drag="onMouseDrag"
   path="-1324571510.1.0"></ui-mouse><div class="resize-handle en" @mousedown="()
   =&gt; isResizing = 'en'" path="-1324571510.1.1"></div><div

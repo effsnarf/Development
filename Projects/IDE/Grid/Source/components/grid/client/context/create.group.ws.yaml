@@ -40,20 +40,8 @@ methods:
   onCreateGroup: | #js
     async function() {
       const displayBox = this.displayBox;
-      // Some nice animation of the boxes grouping together
-      displayBox.rect.zOnTop = true;
-      const oldPoss = this.selectedBoxes.map((b) => b.rect.pos);
-      for (const selectedBox of this.selectedBoxes) {
-        selectedBox.rect.pos = displayBox.rect.pos;
-      }
-      await this.$root.wait(500);
       this.getUiActions().$femit('create.group', displayBox._id);
       this.clear();
-      await this.$root.wait(400);
-      // Move the boxes back to their original positions
-      for (let i = 0; i < this.selectedBoxes.length; i++) {
-        this.selectedBoxes[i].rect.pos = oldPoss[i];
-      }
     }
   onUnselectBoxes: | #js
     function() {

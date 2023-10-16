@@ -4,9 +4,8 @@ dom:
     ':show-title': 'false'
     ui.window:
       ref: window1
-      v-show: showBoxWindow
       ':window-style': windowStyle
-      ':rect': box.rect
+      ':rect': boxRect
       ':surface-element': surfaceElement
       ':surface-scale': surfaceScale
       ':center-coords': 'true'
@@ -55,15 +54,17 @@ props:
   userID: null
   box: null
   surfaceElement: null
-  surfaceGroupBoxID: null
 data:
   boxIcon: null
   oldBox: null
   error: null
   boxIsLoading: 0
   surfaceScale: 1
+  boxRect: null
 mounted: | #js
-  function() {
+  async function() {
+    await this.$nextTick();
+    await this.$root.wait(() => this.$refs.window1.$refs.window);
     this.$root.els[`/box/window/${this.box._id}`] = this.$refs.window1.$refs.window;
   }
 unmounted: | #js
@@ -138,16 +139,35 @@ methods:
 
       return `linear-gradient(to right, ${darkColor}, ${lightColor})`;
     }
+  getBoxRect: | #js
+    async function(box) {
+      if (!box) return null;
+      let rect = Objects.clone(box.rect);
+      if (box.rect.is.grouped) {
+        const groupBox = this.$root.boxes.find(b => b._id == box.groupBoxID);
+        if (!groupBox) {
+          await this.$root.wait(100);
+          return await this.getBoxRect(box);
+        }
+        rect = Objects.clone(groupBox.rect);
+        rect.opacity = 0;
+      }
+      if (box.rect.is.highlighted) {
+        // Highlighted boxes are placed in the top right corner of the surface
+        // Surface center is (0, 0), +y is up
+        rect.pos = {
+          x: (this.surfaceElement.offsetWidth / 2) - (rect.size.width / 2),
+          y: (this.surfaceElement.offsetHeight / 2) - (rect.size.height / 2),
+        }
+      }
+      if (!("opacity" in rect)) rect.opacity = (box.rect.is.visible ? 1 : 0);
+      return rect;
+    }
   yamlify: | #js
     function(obj) {
       return jsyaml.dump(obj);
     }
 computed:
-  showBoxWindow: | #js
-    function() {
-      if (this.surfaceGroupBoxID) return (this.box.groupBoxID == this.surfaceGroupBoxID);
-      return !this.box?.groupBoxID;
-    }
   windowStyle: | #js
     function() {
       const style = {};
@@ -157,7 +177,14 @@ computed:
       if (this.$root.boxTypeColors) style.background = this.getGradientBackground(this.$root.boxTypeColors[this.box.type || this.box.type?.split('.')[0]] || "#000000", 0.2);
       return style;
     }
-watch: null
+watch:
+  box:
+    handler: | #js
+      async function(box) {
+        this.boxRect = await this.getBoxRect(box);
+      }
+    immediate: true
+    deep: true
 _:
   examples:
     count: 0
@@ -200,8 +227,8 @@ style:
 name: grid-ui-box
 template: >-
   <grid-module class="comp-grid-ui-box" icon="📦" :show-title="false"
-  path="1671629593."><ui-window ref="window1" v-show="showBoxWindow"
-  :window-style="windowStyle" :rect="box.rect" :surface-element="surfaceElement"
+  path="1671629593."><ui-window ref="window1" :window-style="windowStyle"
+  :rect="boxRect" :surface-element="surfaceElement"
   :surface-scale="surfaceScale" :center-coords="true" :show-header="!!box.type"
   @is-hovered="onWindowHovered" @is-minimized="onToggleMinimized"
   @drag-stop="onDragStop" path="1671629593.0"><template v-slot:above
