@@ -3,8 +3,8 @@ dom:
     v-if: rect
     ':style': style
     ':class': >-
-      Object.assign({ hovered: (isHovered || isResizing), 'auto-expand':
-      autoExpand }, (cssClass||{}))
+      Object.assign({ hovered: (isFullSize), 'auto-expand': autoExpand },
+      (cssClass||{}))
     @mouseenter: (e) => { isHovered++; $emit('mouseenter', e); }
     @mouseleave: (e) => { isHovered--; $emit('mouseleave', e); }
     @dragenter: (e) => { isHovered++; }
@@ -37,7 +37,7 @@ dom:
       .window:
         ref: window
         ':style': windowStyle
-        @click: () => isHovered = 1
+        @click: () => { isHovered = 1; $emit('click'); }
         .header:
           v-if: showHeader
           .flex.w-100pc:
@@ -173,7 +173,7 @@ methods:
       const size = this.rect1.size;
       const minimizedHeight = "40px";
       const fullHeight = (size.height + "px");
-      if (this.isHovered || this.isResizing) return fullHeight;
+      if (this.isFullSize) return fullHeight;
       if (this.rect1.is?.minimized) return minimizedHeight;
       return fullHeight;
     }
@@ -203,6 +203,10 @@ methods:
       return jsyaml.dump(obj);
     }
 computed:
+  isFullSize: | #js
+    function() {
+      return (!!this.isHovered || !!this.isResizing || !!this.isDragging || !!this.isDraggingMoving);
+    }
   showContent: | #js
     function() {
       return true;
@@ -233,11 +237,7 @@ computed:
         if (rect1.opacity == 0) style["pointer-events"] = "none";
       }
       if (!this.isDraggingMoving && !this.isResizing) {
-        style.transition = "all 0.6s, border 0s";
-      }
-      else
-      {
-        style.transition = "opacity 1s";
+        style.transition = "all 1s, border 0s";
       }
       return style;
     }
@@ -300,27 +300,27 @@ style:
     background: '#ffffff10'
   .resize-handle:
     position: absolute
-    width: 1.5em
-    height: 1.5em
+    width: 2em
+    height: 2em
     user-select: none
     z-index: 100
   .resize-handle:hover:
     background: '#ffffff30'
   .resize-handle.wn:
-    top: '-0.5em'
-    left: '-0.5em'
+    top: '-1em'
+    left: '-1em'
     cursor: nwse-resize
   .resize-handle.ws:
-    bottom: '-0.5em'
-    left: '-0.5em'
+    bottom: '-1em'
+    left: '-1em'
     cursor: nesw-resize
   .resize-handle.es:
-    bottom: '-0.5em'
-    right: '-0.5em'
+    bottom: '-1em'
+    right: '-1em'
     cursor: nwse-resize
   .resize-handle.en:
-    top: '-0.5em'
-    right: '-0.5em'
+    top: '-1em'
+    right: '-1em'
     cursor: nesw-resize
   .left-side:
     position: absolute
@@ -368,9 +368,9 @@ _:
 name: ui-window
 template: >-
   <div class="comp-ui-window" v-if="rect" :style="style" :class="Object.assign({
-  hovered: (isHovered || isResizing), 'auto-expand': autoExpand },
-  (cssClass||{}))" @mouseenter="(e) =&gt; { isHovered++; $emit('mouseenter', e);
-  }" @mouseleave="(e) =&gt; { isHovered--; $emit('mouseleave', e); }"
+  hovered: (isFullSize), 'auto-expand': autoExpand }, (cssClass||{}))"
+  @mouseenter="(e) =&gt; { isHovered++; $emit('mouseenter', e); }"
+  @mouseleave="(e) =&gt; { isHovered--; $emit('mouseleave', e); }"
   @dragenter="(e) =&gt; { isHovered++; }" @dragleave="(e) =&gt; { isHovered--;
   }" path="-1324571510."><div class="above" :style="{ width:
   rect1.size.width+'px' }" @dragenter="(e) =&gt; { isHovered++; }"
@@ -386,7 +386,7 @@ template: >-
   path="-1324571510.1.4"></div><div class="left-side"
   path="-1324571510.1.5"><slot name="left-side"
   path="-1324571510.1.5.0"></slot></div><div class="window" ref="window"
-  :style="windowStyle" @click="() =&gt; isHovered = 1"
+  :style="windowStyle" @click="() =&gt; { isHovered = 1; $emit('click'); }"
   path="-1324571510.1.6"><div class="header" v-if="showHeader"
   path="-1324571510.1.6.0"><div class="flex w-100pc"
   path="-1324571510.1.6.0.0"><div class="flex-grow-1"

@@ -4,16 +4,44 @@ dom:
     ':show-title': 'false'
     img:
       ':style': '{ ''width'': ''100%''}'
-      src: /images/cat2.png
+      ':src': imageSrc
 props:
   box: null
-data: null
-methods: null
-computed:
-  boxValue: | #js
+  dataBoundSocketData: null
+data:
+  activeSocketData: null
+  boxValue: null
+  imageSrc: null
+mounted: | #js
+  async function() {
+    await this.$nextTick();
+    this.refresh();
+  }
+methods:
+  grid_client_runtime_socket_value_change: | #js
+    function(boxID, sDirection, sID, sValue) {
+      if (boxID != this.box._id) return;
+      this.refresh();
+    }
+  getBoxVue: | #js
     function() {
-      const socketData = this.$root.socket?.runtime.data[this.box._id];
-      return socketData?.input?.[1] || this.box.value;
+      return this.$root.vm.getAncestors(this, "grid.ui.box")[0];
+    }
+  getActiveSocketData: | #js
+    function() {
+      let boxData = (this.$root.socket?.runtime.data[this.box._id] || {});
+      boxData = Objects.deepMerge(boxData, (this.dataBoundSocketData || {}));
+      return boxData;
+    }
+  getImageSrc: | #js
+    function(boxValue) {
+      return "/images/cat2.png";
+    }
+  refresh: | #js
+    function() {
+      this.activeSocketData = this.getActiveSocketData();
+      this.boxValue = this.activeSocketData?.input?.[1];
+      this.imageSrc = this.getImageSrc(this.boxValue);
     }
 _:
   examples:
@@ -22,4 +50,4 @@ name: grid-ui-box-view-image
 template: >-
   <grid-module class="comp-grid-ui-box-view-image" icon="🖼️"
   :show-title="false" path="2102057671."><img :style="{ 'width': '100%'}"
-  src="/images/cat2.png" path="2102057671.0"/></grid-module>
+  :src="imageSrc" path="2102057671.0"/></grid-module>

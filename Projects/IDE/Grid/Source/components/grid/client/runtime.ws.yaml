@@ -40,9 +40,21 @@ methods:
       // Because when we're undoing and redoing, the old data remains
       delete this.socket.runtime.data[box._id];
     }
-  grid_user_action_stack_new_link_created: | #js
-    function(link) {
-      this.repropagateSocketLinks(link.from.box._id);
+  grid_data_list_added: | #js
+    function(fuid, links) {
+      if (!fuid.endsWith("/data/links")) return;
+
+      for (const link of links) {
+        this.repropagateSocketLinks(link.from.box._id);
+      }
+    }
+  grid_data_list_deleted: | #js
+    function(fuid, links) {
+      if (!fuid.endsWith("/data/links")) return;
+
+      for (const link of links) {
+        this.clearSocketValue(link.to, "input");
+      }
     }
   grid_ui_box_execute: | #js
     function(boxID) {
@@ -126,9 +138,14 @@ methods:
         .filter((link) => (link.from.box._id === boxID))
         .filter((link) => (link.from.socket.type == "data"));
       for (const link of links) {
-        this.$femit("link.flash", link._id, null);
-        this.setSocketValue(link.to.box._id, "input", link.to.socket._id, null);
+        const sValue = this.getSocketRuntimeValue(boxID, "output", 1);
+        this.$femit("link.flash", link._id, sValue);
+        this.setSocketValue(link.to.box._id, "input", link.to.socket._id, sValue);
       }
+    }
+  clearSocketValue: | #js
+    function(socketRef, direction) {
+      this.setSocketValue(socketRef.box._id, direction, socketRef.socket._id, null);
     }
   propagateSocketLinks: | #js
     function(boxID, sDirection, sID) {

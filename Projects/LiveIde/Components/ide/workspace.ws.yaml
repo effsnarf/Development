@@ -70,14 +70,14 @@ methods:
 
       if (false)
       {
-        const allVues = this.$root.vm.getDescendants(vueApp);
-        const compNames = allVues.map(v => v.$options.name);
+        var allVues = vueApp.vm.getDescendants(vueApp);
+        var vueNames = allVues.map(v => v.$options.name).distinct();
+        var counts = vueNames
+          .map(name => ({ name, count: allVues.filter(v => (v.$options.name == name)).length }))
+          .sortBy(c => -c.count)
+          .map(c => [c.name, c.count]);
         this.appVuesCount = allVues.length;
-        this.appVuesCounts = compNames
-          .distinct()
-          .map(name => ({ name, count: compNames.count(name) }))
-          .sortBy(e => -e.count)
-          .map(e => [e.name, e.count]);
+        this.appVuesCounts = counts;
       }
       
       setTimeout(this.refresh.bind(this), 5000);

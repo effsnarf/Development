@@ -28,19 +28,14 @@ unmounted: | #js
   this.remove();
 methods:
   flash: | #js
-    async function() {
+    function() {
       if (!this.leaderLine) return;
       const yellow = "#ffff00";
-      this.flashColors = this.tweenColors(yellow, this.color, 100);
+      this.flashColors = this.tweenColors(yellow, this.color, 30);
       if (!this.isFlashing) this.flashOneFrame();
-      for (let i = 0; i < 10; i++) {
-        setTimeout(() => {
-          this.$refs.floating1?.refresh();
-        }, i * 10);
-      }
     }
   flashOneFrame: | #js
-    async function() {
+    function() {
       this.isFlashing = true;
       if (!this.leaderLine) return;
       if (!this.flashColors.length) return;
@@ -51,14 +46,16 @@ methods:
         this.isFlashing = false;
         return;
       }
-      setTimeout(this.flashOneFrame.bind(this), 1);
+      requestAnimationFrame(this.flashOneFrame.bind(this));
     }
   refresh: | #js
-    function(again = 20) {
+    function(again = 2) {
       try
       {
         const fromEl = this.getEdgeElement(this.from);
         const toEl = this.getEdgeElement(this.to);
+
+        if (!fromEl || !toEl) return this.remove();
 
         if (this.leaderLine && (this.leaderLine.start == fromEl) && (this.leaderLine.end == toEl))
         {
@@ -96,7 +93,7 @@ methods:
       }
       finally
       {
-        if (again) setTimeout(() => { this.refresh(again - 1); }, 300);
+        if (again) setTimeout(() => { this.refresh(again - 1); }, 1000);
       }
     }
   redraw: | #js
@@ -105,6 +102,7 @@ methods:
       {
         if (this.isConnected(this.leaderLine))
         {
+          this.leaderLine.color = this.color;
           this.leaderLine.position();
         }
         else
@@ -205,6 +203,10 @@ watch:
   to: | #js
     function(to) {
       this.refresh();
+    }
+  color: | #js
+    function(color) {
+      this.redraw();
     }
   visible: | #js
     function(visible) {

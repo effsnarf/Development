@@ -16,8 +16,7 @@ methods:
   onClick: | #js
     function() {
       // #TODO: Find a way to not refresh manually
-      this.refresh();
-      alertify.success("Refreshed");
+      //this.refresh();
     }
   onBoxIsLoading: | #js
     function(boxID, isLoading) {

@@ -80,7 +80,7 @@ class ComponentManager {
       await client.updateComponent(modifiedItem.item);
     }
 
-    setTimeout(this.saveModifiedItems.bind(this), 400);
+    setTimeout(this.saveModifiedItems.bind(this), 2000);
   }
 
   async onComponentChanged(newComp: Component) {

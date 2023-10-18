@@ -33,11 +33,18 @@ props:
   autoResize: false
   camouflage: false
   textBoxStyle: null
+  debounce: 0
+data:
+  _onInput: null
 methods:
   onInput: | #js
     function(e) {
+      const self = this;
       const input = e.target;
-      this.$emit('input', input.value);
+      if (!this._onInput) this._onInput = ((value) => {
+        self.$emit('input', value);
+      }).debounce(this.debounce);
+      this._onInput(input.value);
       this.resizeInput(input);
     }
   onTextAreaInput: | #js

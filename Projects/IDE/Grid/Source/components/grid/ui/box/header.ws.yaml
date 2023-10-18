@@ -17,6 +17,7 @@ dom:
         ':hint': nameHint + '…'
         camouflage: true
         v-model: boxName
+        ':debounce': 400
         @input: onEditBoxName
       div:
         v-text: box._id
@@ -76,6 +77,6 @@ template: >-
   @title-icon-click="$emit('title-icon-click')"
   path="-646217982.0.1"></component><ui-input-text-box class="flex-grow-1"
   :text-box-style="textBoxStyle" :auto-resize="true" :hint="nameHint + '…'"
-  camouflage="true" v-model="boxName" @input="onEditBoxName"
+  camouflage="true" v-model="boxName" :debounce="400" @input="onEditBoxName"
   path="-646217982.0.2"></ui-input-text-box><div v-text="box._id"
   path="-646217982.0.3"></div></div></grid-module>

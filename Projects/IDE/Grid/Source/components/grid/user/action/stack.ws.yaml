@@ -203,6 +203,21 @@ methods:
         Objects.getPropertiesAsTree(socket, Objects.getPaths(newData));
       //for (const change of changes) DeepDiff.applyChange(socket, change);
       const updateData = { sockets: { [direction]: { [socketIndex]: newData } } };
+      // If this socket is on a member box and we exported it, we need to add/remove the socket on the group box
+      if (box.groupBoxID) {
+        const memberBox = box;
+        const groupBox = this.boxes.find((b) => b._id === box.groupBoxID);
+        const memberSocket = memberBox.sockets[direction][socketIndex];
+        if ("exported" in newData.is) {
+          if (newData.is.exported) {
+            this.createImportedSocket(userID, groupBox, memberBox, direction, memberSocket);
+          }
+          else {
+            const importedSocket = this.getImportedSocket(groupBox, memberBox, direction, memberSocket);
+            this.deleteSocket(userID, groupBox._id, direction, importedSocket._id);
+          }
+        }
+      }
       this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "update", [boxID, updateData]);
       action.undo = { method: "edit.socket", args: [boxID, direction, socketID, oldData, newData] };
       return action;
@@ -230,9 +245,9 @@ methods:
       link._id = this.nextID++;
       link.is = (link.is || {});
       link.is.grouped = false;
+      link.is.visible = true;
       this.$femit("to", "grid.data.list", `${userID}/data/links`, "add", [link]);
       action.undo = { method: "delete.link", args: [link._id] };
-      this.$femit("new.link.created", link);
       return action;
     }
   delete_link: | #js
@@ -416,6 +431,29 @@ methods:
       action.undo = Objects.clone(lastAction.undo);
       return action;
     }
+  createImportedSocket: | #js
+    function(userID, groupBox, memberBox, direction, memberSocket) {
+      const groupBoxSocket = Objects.clone(memberSocket);
+      groupBoxSocket._id = groupBox.sockets[direction].length + 1;
+      groupBoxSocket.is.exported = false;
+      groupBoxSocket.imported = {
+        from: {
+          box: { _id: memberBox._id },
+          socket: { _id: memberSocket._id }
+        }
+      }
+      const groupSockets = groupBox.sockets[direction];
+      groupSockets.add(groupBoxSocket);
+      this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "update", [groupBox._id, { sockets: { [direction]: groupSockets } }]);
+    }
+  deleteSocket: | #js
+    function(userID, boxID, direction, socketID) {
+      const box = this.boxes.find((box) => box._id === boxID);
+      const socketIndex = box.sockets[direction].findIndex((socket) => socket._id === socketID);
+      const groupSockets = box.sockets[direction];
+      groupSockets.splice(socketIndex, 1);
+      this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "update", [boxID, { sockets: { [direction]: groupSockets } }]);
+    }
   getDefaultBoxData: | #js
     function(type) {
       switch (type) {
@@ -474,7 +512,7 @@ methods:
             field: null,
             rect: {
               is: {
-                minimized: true
+                minimized: false
               }
             }
           }
@@ -532,9 +570,10 @@ methods:
               { _id: 1, type: "data", name: "items", is: { exported: false } }
             ],
             output: [
-              { _id: 1, type: "iterator", name: "item", is: { exported: false } },
+              { _id: 1, type: "iterator", name: "loop item", is: { exported: false } },
               { _id: 2, type: "data", name: "hovered item", is: { exported: false } },
               { _id: 3, type: "data", name: "selected item", is: { exported: false } },
+              { _id: 4, type: "view", name: "view", is: { exported: false } },
             ]
           }
         case "view.image":
@@ -567,6 +606,11 @@ methods:
           }
       }
       throw new Error(`Unknown box type: ${type}`);
+    }
+  getImportedSocket: | #js
+    function(groupBox, memberBox, direction, memberSocket) {
+      const groupBoxSocket = groupBox.sockets[direction].find((socket) => socket.imported?.from?.box?._id === memberBox._id && socket.imported?.from?.socket?._id === memberSocket._id);
+      return groupBoxSocket;
     }
   getBox: | #js
     function(boxID) {

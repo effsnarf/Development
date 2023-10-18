@@ -256,6 +256,7 @@ const vueIdeCompMixin = {
         if (!uid && !name) return null;
         if (uid) {
           const vue = vueManager.getVue(uid);
+          if (!vue) return null;
           const compName = vue.$options.name.replace(/-/g, ".");
           const comp = self.comps.find((c: any) => c.name == compName);
           return VueHelper.toIdeComponent(vue, comp);

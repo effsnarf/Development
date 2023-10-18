@@ -78,16 +78,6 @@ computed:
 style:
   .title1:
     opacity: 0.5
-  .console-log-button:
-    position: absolute
-    right: '-1em'
-    bottom: '-0.6em'
-    font-size: 160%
-    padding: 0 0.4em
-    cursor: pointer
-    z-index: 10
-  .console-log-button:hover:
-    background: '#ffffff20'
   .box1:
     font-size: 100%
 name: ui-value-object

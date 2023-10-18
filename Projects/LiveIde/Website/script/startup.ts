@@ -13,6 +13,7 @@ import { DatabaseProxy } from "../../../../Apps/DatabaseProxy/Client/DbpClient";
 import { VueManager } from "../../Classes/VueManager";
 import { Data } from "../../../../Shared/Data";
 import { Graph } from "../../../../Shared/Database/Graph";
+import { MovingPositionSmoother } from "../../../../Shared/MovingPositionSmoother";
 
 const window1 = window as any;
 
@@ -27,6 +28,7 @@ window1.TaskQueue = TaskQueue;
 window1.Data = Data;
 window1.Actionable = Actionable;
 window1.Graph = Graph;
+window1.MovingPositionSmoother = MovingPositionSmoother;
 
 const generalMixin = {
   matchComp: (c: Component) => true,
@@ -1169,6 +1171,9 @@ interface MgParams {
         const height = rect.height;
         return { top, left, width, height };
       },
+    },
+    computed: {
+      console: () => console,
     },
     watch: {
       newCssRules: {

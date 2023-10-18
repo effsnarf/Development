@@ -1,10 +1,11 @@
 dom:
   .box1:
     ':class': '{ reversed: reverse }'
-    ui.title:
-      icon: 🧊
-      text: Array
-      ':number': value?.length
+    .flex:
+      ui.title:
+        icon: 🧊
+        text: Array
+        ':number': value?.length
     ui.select:
       v-if: 'false'
       ':options': '[''table'', ''short-list'', ''expanded-list'']'
@@ -12,6 +13,7 @@ dom:
       type: toggle
       v-model: view1
     ui.context.window:
+      v-if: 'false'
       ref: hoveredItemContext1
       ':visible': hoveredItem
       ui.value: 
@@ -64,12 +66,12 @@ props:
   reverse: false
   view: null
   getItemClass: null
+  maxVisibleItems: 10
+  maxVisibleFields: 5
 data:
   sortByField: null
   sortByFieldDirection: 1
   hoveredItem: null
-  maxVisibleItems: 10
-  maxVisibleFields: 5
 methods:
   onSortByField: | #js
     function(field) {
@@ -78,7 +80,7 @@ methods:
     }
   onItemHover: | #js
     function(item, isHovered) {
-      if (this.$refs.hoveredItemContext1.isPinned) return;
+      if (this.$refs.hoveredItemContext1?.isPinned) return;
       this.hoveredItem = (isHovered ? item : null);
     }
   onRowClick: | #js
@@ -111,7 +113,7 @@ methods:
 computed:
   items: | #js
     const items = [...this.value]
-      .take(this.maxVisibleItems)
+      .take(this.maxVisibleItems || 1000)
       .sortByDirection([this.sortByField], this.sortByFieldDirection);
     return items;
   fields: | #js
@@ -119,7 +121,7 @@ computed:
     const firstItem = this.value[0];
     if (!firstItem) return [];
     if (this.isPrimitive(firstItem)) return [];
-    const fields = Object.keys(firstItem).take(this.maxVisibleFields);
+    const fields = Object.keys(firstItem).take(this.maxVisibleFields || 1000);
     return fields;
   view1: | #js
     function() {
@@ -157,10 +159,12 @@ _:
 name: ui-value-array
 template: >-
   <div class="comp-ui-value-array box1" :class="{ reversed: reverse }"
-  path="-621945022."><ui-title icon="🧊" text="Array" :number="value?.length"
-  path="-621945022.0"></ui-title><ui-select v-if="false" :options="['table',
-  'short-list', 'expanded-list']" input-type="value" type="toggle"
-  v-model="view1" path="-621945022.1"></ui-select><ui-context-window
+  path="-621945022."><div class="flex" path="-621945022.0"><ui-title icon="🧊"
+  text="Array" :number="value?.length"
+  path="-621945022.0.0"></ui-title></div><ui-select v-if="false"
+  :options="['table', 'short-list', 'expanded-list']" input-type="value"
+  type="toggle" v-model="view1"
+  path="-621945022.1"></ui-select><ui-context-window v-if="false"
   ref="hoveredItemContext1" :visible="hoveredItem" path="-621945022.2"><ui-value
   :value="hoveredItem"
   path="-621945022.2.0"></ui-value></ui-context-window><transition name="slide"

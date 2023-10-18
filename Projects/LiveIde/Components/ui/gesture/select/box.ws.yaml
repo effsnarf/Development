@@ -60,7 +60,7 @@ methods:
       e.stopPropagation();
       const rect = this.rect;
       this.clear();
-      if (!this.isMinimumSize(rect.size)) return;
+      if (!this.isMinimumSize(rect?.size)) return;
       this.$emit("drag-end", this.adjustPos(this.dragEnd));
       this.$emit("mark", this.adjustRect(rect));
     }
@@ -220,6 +220,7 @@ computed:
   rect: | #js
     function() {
       if (!this.dragStart) return null;
+      if (!this.topLeft) return null;
       return {
         pos: { x: this.topLeft.x, y: this.topLeft.y },
         size: this.size

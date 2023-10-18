@@ -1,0 +1,163 @@
+dom:
+  grid.module:
+    icon: 🧊📃
+    ui.dnd.dropzone:
+      @drop-item: onSurfaceDropItem
+      div: 
+        grid.ui.tools:
+          ':surface-element': surfaceElement
+      div: 
+        ':key': surfaceKey
+        ref: surface1
+        class: surface flex-grow-1
+        ':style': surfaceStyle
+        @wheel: onWheelSurface
+        h2:
+          ui.button:
+            ':text': groupZoomIns?.map(g => g.groupBoxID)
+            @click: zoomOutGroupBox
+        grid.ui.box:
+          v-for: box in boxes
+          ':key': '''box/'' + box._id'
+          ':userID': userID
+          ':box': box
+          ':surface-element': surfaceElement
+        grid.ui.link:
+          v-for: link in links
+          ':key': '''link/'' + link._id'
+          ':link': link
+    div:
+      grid.data.list.view: 
+        ':fuid': userID + '/data/boxes'
+        v-model: boxes
+      grid.data.list.view: 
+        ':fuid': userID + '/data/links'
+        v-model: links
+props:
+  userID: null
+data:
+  surfaceElement: null
+  surfaceScale: 1
+  surfaceKey: 1
+  boxes: []
+  links: []
+  groupZoomIns: []
+mounted: | #js
+  async function() {
+    this.surfaceElement = this.$refs.surface1;
+  }
+methods:
+  onSurfaceDropItem: | #js
+    function(dragItem) {
+      this.$femit("drop.item", dragItem);
+    }
+  onWheelSurface: | #js
+    function(e) {
+      return;
+      e.preventDefault();
+      e.stopPropagation();
+      // Adjust surfaceScale based on the wheel event
+      const scrollSize = (e.deltaY / 100);
+      this.surfaceScale += (scrollSize * -0.03);
+      this.$femit("scale", this.surfaceScale);
+    }
+  grid_ui_box_toggle_group_maximized: | #js
+    function(groupBoxID) {
+      if (groupBoxID == this.groupZoomIns.last()?.groupBoxID) {
+        this.zoomOutGroupBox();
+      } else {
+        this.zoomInGroupBox(groupBoxID);
+      }
+    }
+  zoomInGroupBox: | #js
+    async function(groupBoxID) {
+      const zoomedGroupBoxID = this.groupZoomIns.last()?.groupBoxID;
+      const vBoxes = this.$root.vm.getDescendants(this, "grid.ui.box");
+      const groupBox = this.boxes.find(box => box._id == groupBoxID);
+      const nonMemberBoxes = zoomedGroupBoxID ?
+        this.boxes.filter(box => (box.groupBoxID == zoomedGroupBoxID)) :
+        this.boxes.filter(box => (!box.groupBoxID));
+      const nonMemberBoxIDs = nonMemberBoxes.map(box => box._id);
+      for (const box of nonMemberBoxes) box.rect.is.visible = false;
+      const memberBoxes = this.boxes.filter(box => box.groupBoxID == groupBoxID);
+      for (const box of memberBoxes) box.rect.is.grouped = false;
+      for (const box of memberBoxes) box.rect.is.visible = true;
+      const memberLinks = this.links.filter(link => (link.groupBoxID == groupBoxID));
+      const nonMemberLinks = this.links.filter(link => (link.groupBoxID != groupBoxID));
+      for (const link of nonMemberLinks) link.is.visible = false;
+      setTimeout(() => {
+        for (const link of memberLinks) link.is.grouped = false;
+      }, 300);
+
+      this.groupZoomIns.push({
+        groupBoxID,
+        nonMemberBoxIDs: nonMemberBoxIDs,
+      });
+    }
+  zoomOutGroupBox: | #js
+    async function() {
+      const zoomIn = this.groupZoomIns.pop();
+      if (!zoomIn) return;
+      const groupBoxID = zoomIn.groupBoxID;
+      const groupBox = this.boxes.find(box => box._id == groupBoxID);
+      const memberBoxes = this.boxes.filter(box => box.groupBoxID == groupBoxID);
+      for (const box of memberBoxes) box.rect.is.grouped = true;
+      const nonMemberBoxes = this.boxes.filter(box => zoomIn.nonMemberBoxIDs.includes(box._id));
+      const memberLinks = this.links.filter(link => (link.groupBoxID == groupBoxID));
+      for (const link of memberLinks) link.is.grouped = true;
+      const nonMemberLinks = this.links.filter(link => (link.groupBoxID != groupBoxID));
+      for (const link of nonMemberLinks) link.is.visible = true;
+      setTimeout(() => {
+        for (const box of memberBoxes) box.rect.is.visible = false;
+        for (const box of nonMemberBoxes) box.rect.is.visible = true;
+      }, 400);
+    }
+  refreshSurface: | #js
+    async function() {
+      await this.$nextTick();
+      this.surfaceKey++;
+      alertify.message("Surface refreshed");
+    }
+computed:
+  surfaceStyle: | #js
+    function() {
+      return {
+        width: "70vw",
+        height: "80vh",
+        transform: `scale(${this.surfaceScale})`,
+      };
+    }
+  surface1: | #js
+    function() {
+      return this.$refs.surface1;
+    }
+style:
+  .surface:
+    height: 80vh
+    overflow: hidden
+    border: 1px solid gray
+    cursor: crosshair
+_:
+  examples:
+    count: 0
+name: grid-client-surface
+template: >-
+  <grid-module class="comp-grid-client-surface" icon="🧊📃"
+  path="-515125966."><ui-dnd-dropzone @drop-item="onSurfaceDropItem"
+  path="-515125966.0"><div path="-515125966.0.0"><grid-ui-tools
+  :surface-element="surfaceElement"
+  path="-515125966.0.0.0"></grid-ui-tools></div><div class="surface flex-grow-1"
+  :key="surfaceKey" ref="surface1" :style="surfaceStyle" @wheel="onWheelSurface"
+  path="-515125966.0.1"><h2 path="-515125966.0.1.0"><ui-button
+  :text="groupZoomIns?.map(g =&gt; g.groupBoxID)" @click="zoomOutGroupBox"
+  path="-515125966.0.1.0.0"></ui-button></h2><grid-ui-box v-for="box in boxes"
+  :key="'box/' + box._id" :userID="userID" :box="box"
+  :surface-element="surfaceElement"
+  path="-515125966.0.1.1"></grid-ui-box><grid-ui-link v-for="link in links"
+  :key="'link/' + link._id" :link="link"
+  path="-515125966.0.1.2"></grid-ui-link></div></ui-dnd-dropzone><div
+  path="-515125966.1"><grid-data-list-view :fuid="userID + '/data/boxes'"
+  v-model="boxes"
+  path="-515125966.1.0"></grid-data-list-view><grid-data-list-view :fuid="userID
+  + '/data/links'" v-model="links"
+  path="-515125966.1.1"></grid-data-list-view></div></grid-module>

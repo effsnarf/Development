@@ -10,6 +10,9 @@ data:
   posQueue: []
   isMounted: false
   dragStart: null
+  posSmoother: null
+  smoothPos: null
+  moveThrottleRate: 0.01
 mounted: | #js
   function() {
     this.isMounted = true;
@@ -30,7 +33,7 @@ methods:
       }
       element.addEventListener("mousedown", this.onMouseDown);
       element.addEventListener("mouseup", this.onMouseUp);
-      window.addEventListener("mousemove", this.onMouseMove);
+      window.addEventListener("mousemove", this.onMouseMove.bind(this).throttle(this.moveThrottleRate * 1000));
       element.addEventListener("contextmenu", this.onContextMenu);
     }
   onMouseDown: | #js
@@ -70,15 +73,13 @@ methods:
       this.hoveredElement = el;
     }
   onPosChanged: | #js
-    function() {
-      const pos = this.pos;
+    function(pos, delta) {
       this.$emit("move", pos);
       if (this.dragStart) {
         const delta = { dx: pos.x - this.dragStart.x, dy: pos.y - this.dragStart.y };
         this.dragStart = pos;
         this.$emit("drag", delta);
       }
-      this.updateHoveredElement(pos);
     }
   getElement: | #js
     function() {
@@ -93,9 +94,14 @@ watch:
   pos:
     handler: | #js
       function(pos) {
-        requestAnimationFrame(this.onPosChanged.bind(this));
+        //if (!this.posSmoother) this.posSmoother = new MovingPositionSmoother(pos, (this.moveThrottleRate * 2), this.onPosChanged.bind(this));
+        //this.posSmoother.updateThrottled(pos);
+        requestAnimationFrame(() => {
+          this.onPosChanged(pos);
+        });
+        this.updateHoveredElement(pos);
       }
-    deep: true
+    deep: false
   hoveredElement: | #js
     function(newHoveredElement) {
       this.$emit("hovered-element", newHoveredElement);

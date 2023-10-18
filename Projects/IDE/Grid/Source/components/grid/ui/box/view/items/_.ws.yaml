@@ -3,24 +3,27 @@ dom:
     icon: ⬜
     ':show-title': 'false'
     div: 
-      class: item
-      v-for: (item, index) in items
-      @mouseenter: hoveredItem = item
-      @mouseleave: hoveredItem = null
-      @click: onClickItem(item)
       div: 
-        v-if: '!iteratorBox'
-        h3:
-          v-text: '''item '' + index'
+        class: item
+        v-for: (item, index) in items
+        @mouseenter: hoveredItem = item
+        @mouseleave: hoveredItem = null
+        @click: onClickItem(item)
         div: 
-          class: item-value
-          ui.value:
-            ':value': item
-      component:
-        v-if: iteratorBox
-        ':is': getBoxCompName(iteratorBox)
-        ':box': iteratorBox
-        ':data-bound-socket-data': getDataBoundSocketData(item)
+          v-if: '!iteratorBox'
+          h3:
+            ui.title:
+              text: item
+              ':number': getTempItemIndex(index)
+          div: 
+            class: item-value
+            ui.value.preview:
+              ':value': item
+        component:
+          v-if: iteratorBox
+          ':is': getBoxCompName(iteratorBox)
+          ':box': iteratorBox
+          ':data-bound-socket-data': getDataBoundSocketData(item)
 props:
   userID: null
   box: null
@@ -29,7 +32,16 @@ data:
   iteratorBox: null
   hoveredItem: null
   selectedItem: null
+mounted: | #js
+  async function() {
+    await this.$nextTick();
+    this.refresh();
+  }
 methods:
+  getTempItemIndex: | #js
+    function(index) {
+      return `${index+1}/${this.items.length}`;
+    }
   grid_user_action_stack_do: | #js
     function(box) {
       this.refresh();
@@ -38,6 +50,26 @@ methods:
     function(boxID, sDirection, sID, sValue) {
       if (boxID != this.box._id) return;
       this.refresh();
+    }
+  grid_data_list_added: | #js
+    async function(fuid, links) {
+      if (!fuid.endsWith("/data/links")) return;
+      for (const link of links) {
+        if ((link.from.box._id == this.box._id) || (link.to.box._id == this.box._id)) {
+          setTimeout(this.refresh.bind(this), 100);
+          break;
+        }
+      }
+    }
+  grid_data_list_deleted: | #js
+    async function(fuid, links) {
+      if (!fuid.endsWith("/data/links")) return;
+      for (const link of links) {
+        if ((link.from.box._id == this.box._id) || (link.to.box._id == this.box._id)) {
+          setTimeout(this.refresh.bind(this), 100);
+          break;
+        }
+      }
     }
   onClickItem: | #js
     function(item) {
@@ -59,6 +91,7 @@ methods:
     }
   getIteratorDataSocket: | #js
     function(itemsBox) {
+      if (!itemsBox) return null;
       const iteratorSocket = itemsBox.sockets.output.find(s => s.type == "iterator");
       const iteratorLink = this.$root.links
         .filter(l => (l.from.box._id == itemsBox._id))
@@ -71,6 +104,7 @@ methods:
     }
   getIteratorBox: | #js
     function(itemsBox) {
+      if (!itemsBox) return null;
       const iteratorSocket = itemsBox.sockets.output.find(s => s.type == "iterator");
       const iteratorLink = this.$root.links
         .filter(l => (l.from.box._id == itemsBox._id))
@@ -118,8 +152,11 @@ watch:
         gridUiBoxVue.$femit("socket.value.change", this.box._id, "output", selectedItemSocket._id, selectedItem);
       }
 style:
+  .item:
+    transition: 0.3s
   .item:hover:
     background-color: '#ffffff20'
+    transition: 0s
   .item-value:
     max-height: 3.5em
     overflow: hidden
@@ -129,13 +166,15 @@ _:
 name: grid-ui-box-view-items
 template: >-
   <grid-module class="comp-grid-ui-box-view-items" icon="⬜" :show-title="false"
-  path="2102270252."><div class="item" v-for="(item, index) in items"
-  @mouseenter="hoveredItem = item" @mouseleave="hoveredItem = null"
-  @click="onClickItem(item)" path="2102270252.0"><div v-if="!iteratorBox"
-  path="2102270252.0.0"><h3 v-text="'item ' + index"
-  path="2102270252.0.0.0"></h3><div class="item-value"
-  path="2102270252.0.0.1"><ui-value :value="item"
-  path="2102270252.0.0.1.0"></ui-value></div></div><component v-if="iteratorBox"
-  :is="getBoxCompName(iteratorBox)" :box="iteratorBox"
+  path="2102270252."><div path="2102270252.0"><div class="item" v-for="(item,
+  index) in items" @mouseenter="hoveredItem = item" @mouseleave="hoveredItem =
+  null" @click="onClickItem(item)" path="2102270252.0.0"><div
+  v-if="!iteratorBox" path="2102270252.0.0.0"><h3
+  path="2102270252.0.0.0.0"><ui-title text="item"
+  :number="getTempItemIndex(index)"
+  path="2102270252.0.0.0.0.0"></ui-title></h3><div class="item-value"
+  path="2102270252.0.0.0.1"><ui-value-preview :value="item"
+  path="2102270252.0.0.0.1.0"></ui-value-preview></div></div><component
+  v-if="iteratorBox" :is="getBoxCompName(iteratorBox)" :box="iteratorBox"
   :data-bound-socket-data="getDataBoundSocketData(item)"
-  path="2102270252.0.1"></component></div></grid-module>
+  path="2102270252.0.0.1"></component></div></div></grid-module>

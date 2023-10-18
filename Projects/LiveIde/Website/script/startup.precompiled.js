@@ -6530,6 +6530,67 @@ exports.Lock = Lock;
 
 /***/ }),
 
+/***/ "../../../../Shared/MovingPositionSmoother.ts":
+/*!****************************************************!*\
+  !*** ../../../../Shared/MovingPositionSmoother.ts ***!
+  \****************************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.MovingPositionSmoother = void 0;
+class MovingPositionSmoother {
+    targetValue;
+    smoothValue;
+    smoothingFactor;
+    updateFunction;
+    animationFrameId = null;
+    constructor(initialValue, smoothingFactor, updateFunction) {
+        this.targetValue = { x: initialValue.x, y: initialValue.y };
+        this.smoothValue = { x: initialValue.x, y: initialValue.y };
+        this.smoothingFactor = smoothingFactor;
+        this.updateFunction = updateFunction;
+        this.animateInertia();
+    }
+    animateInertia() {
+        // Calculate the difference between the target and smooth values
+        const dx = this.targetValue.x - this.smoothValue.x;
+        const dy = this.targetValue.y - this.smoothValue.y;
+        const delta = { x: dx, y: dy };
+        // Check if the smooth value has moved significantly
+        if (Math.abs(dx) > 0.001 || Math.abs(dy) > 0.001) {
+            // Update the velocity based on the change in values
+            const velocityX = dx * this.smoothingFactor;
+            const velocityY = dy * this.smoothingFactor;
+            // Update the smooth value with the velocity
+            this.smoothValue.x += velocityX;
+            this.smoothValue.y += velocityY;
+            // Call the update function with the smoothed value
+            if (typeof this.updateFunction === "function") {
+                this.updateFunction(this.smoothValue, delta);
+            }
+        }
+        // Continue animating inertia
+        this.animationFrameId = requestAnimationFrame(() => this.animateInertia());
+    }
+    updateThrottled(newValue) {
+        // Update the target value with the new input
+        this.targetValue.x = newValue.x;
+        this.targetValue.y = newValue.y;
+    }
+    destroy() {
+        // Stop the inertia animation when the object is destroyed
+        if (this.animationFrameId !== null) {
+            cancelAnimationFrame(this.animationFrameId);
+        }
+    }
+}
+exports.MovingPositionSmoother = MovingPositionSmoother;
+
+
+/***/ }),
+
 /***/ "../../../../Shared/RepeatingTaskQueue.ts":
 /*!************************************************!*\
   !*** ../../../../Shared/RepeatingTaskQueue.ts ***!
@@ -7470,7 +7531,7 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/website/script/1697451562954.ts ***!
+  !*** ../../../LiveIde/website/script/1697608014491.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -7487,6 +7548,7 @@ const Params_1 = __webpack_require__(/*! ../../Classes/Params */ "../../../LiveI
 const VueManager_1 = __webpack_require__(/*! ../../Classes/VueManager */ "../../../LiveIde/Classes/VueManager.ts");
 const Data_1 = __webpack_require__(/*! ../../../../Shared/Data */ "../../../../Shared/Data.ts");
 const Graph_1 = __webpack_require__(/*! ../../../../Shared/Database/Graph */ "../../../../Shared/Database/Graph.ts");
+const MovingPositionSmoother_1 = __webpack_require__(/*! ../../../../Shared/MovingPositionSmoother */ "../../../../Shared/MovingPositionSmoother.ts");
 const window1 = window;
 const Vue = window1.Vue;
 let vueApp;
@@ -7497,6 +7559,7 @@ window1.TaskQueue = TaskQueue_1.TaskQueue;
 window1.Data = Data_1.Data;
 window1.Actionable = Actionable_1.Actionable;
 window1.Graph = Graph_1.Graph;
+window1.MovingPositionSmoother = MovingPositionSmoother_1.MovingPositionSmoother;
 const generalMixin = {
     matchComp: (c) => true,
     data() {
@@ -8549,6 +8612,9 @@ const mgMixin = {
                 const height = rect.height;
                 return { top, left, width, height };
             },
+        },
+        computed: {
+            console: () => console,
         },
         watch: {
             newCssRules: {

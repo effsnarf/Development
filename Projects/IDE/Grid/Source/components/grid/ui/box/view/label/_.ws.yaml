@@ -3,51 +3,55 @@ dom:
     icon: 🆎
     ':show-title': 'false'
     h2:
+      @click: refresh
       v-text: text
 props:
   box: null
   dataBoundSocketData: null
 data:
   field: null
+  activeSocketData: null
+  boxValue: null
+  text: null
+mounted: | #js
+  async function() {
+    await this.$nextTick();
+    this.refresh();
+  }
 methods:
+  grid_client_runtime_socket_value_change: | #js
+    function(boxID, sDirection, sID, sValue) {
+      if (boxID != this.box._id) return;
+      this.refresh();
+    }
   getBoxVue: | #js
     function() {
       return this.$root.vm.getAncestors(this, "grid.ui.box")[0];
     }
+  getActiveSocketData: | #js
+    function() {
+      let boxData = (this.$root.socket?.runtime.data[this.box._id] || {});
+      boxData = Objects.deepMerge(boxData, (this.dataBoundSocketData || {}));
+      return boxData;
+    }
+  getText: | #js
+    function(boxValue) {
+      if (!boxValue) return "[❔ text]";
+      if (typeof boxValue == "object") return (boxValue.sub || boxValue.title || boxValue.com);
+      return boxValue;
+    }
+  refresh: | #js
+    function() {
+      this.activeSocketData = this.getActiveSocketData();
+      this.boxValue = this.activeSocketData?.input?.[1];
+      this.text = this.getText(this.boxValue);
+    }
 computed:
-  text: | #js
-    function() {
-      if (!this.boxValue) return "[❔ text]";
-      if (typeof this.boxValue == "object") return (this.boxValue.sub || this.boxValue.title || this.boxValue.com);
-      return this.boxValue;
-    }
-  boxValues: | #js
-    function() {
-      const boxValue = this.boxValue;
-      if (!Array.isArray(boxValue)) return [];
-      return boxValue.map(this.fieldFunc);
-    }
-  boxValue: | #js
-    function() {
-      return this.fieldFunc(this.boxItem) || "[❔ text]";
-    }
-  boxItem: | #js
-    function() {
-      // Take the box value from the input socket
-      const item = (this.activeSocketData?.input?.[1] || this.box.value);
-      return item;
-    }
   fieldFunc: | #js
     function() {
       if (typeof this.field == "string") return (item) => item[this.field];
       if (typeof this.field == "function") return this.field;
       return ((item) => item);
-    }
-  activeSocketData: | #js
-    function() {
-      let boxData = (this.$root.socket?.runtime.data[this.box._id] || {});
-      boxData = Objects.deepMerge(boxData, this.dataBoundSocketData);
-      return boxData;
     }
 watch:
   box:
@@ -70,4 +74,5 @@ _:
 name: grid-ui-box-view-label
 template: >-
   <grid-module class="comp-grid-ui-box-view-label" icon="🆎" :show-title="false"
-  path="2104471648."><h2 v-text="text" path="2104471648.0"></h2></grid-module>
+  path="2104471648."><h2 @click="refresh" v-text="text"
+  path="2104471648.0"></h2></grid-module>

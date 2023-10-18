@@ -1,0 +1,31 @@
+dom:
+  .flex:
+    div: 
+      ':style': style
+    div: 
+      ':style': '{ color: ''gray'' }'
+      v-text: value
+props:
+  value: null
+methods:
+  getStyle: | #js
+    function() {
+      const style = {};
+      style.width = "1.5em";
+      style.height = "1.5em";
+      if (this.value) style.background = this.value;
+      return style;
+    }
+computed:
+  style: | #js
+    function() {
+      return this.getStyle();
+    }
+name: ui-value-color
+_:
+  examples:
+    count: 0
+template: >-
+  <div class="comp-ui-value-color flex" path="-620192692."><div :style="style"
+  path="-620192692.0"></div><div :style="{ color: 'gray' }" v-text="value"
+  path="-620192692.1"></div></div>

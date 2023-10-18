@@ -5955,7 +5955,7 @@ var __webpack_exports__ = {};
 (() => {
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/website/script/1697451561872.ts ***!
+  !*** ../../../LiveIde/website/script/1697608013590.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -6164,6 +6164,8 @@ window.vueIdeCompMixin = vueIdeCompMixin;
                     return null;
                 if (uid) {
                     const vue = vueManager.getVue(uid);
+                    if (!vue)
+                        return null;
                     const compName = vue.$options.name.replace(/-/g, ".");
                     const comp = self.comps.find((c) => c.name == compName);
                     return VueHelper_1.VueHelper.toIdeComponent(vue, comp);

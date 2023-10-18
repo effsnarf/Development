@@ -20,32 +20,13 @@ dom:
       ':surface-element': surfaceElement
       ':center-coords': 'true'
       ':is-layer-element': isSelectBoxLayerElement
-      @mouse-pos: onMousePos
-      @drag-start: onDragStart
-      @drag-end: onDragEnd
       @mark: onSelectBoxMark
 props:
   surfaceElement: null
 methods:
-  onMousePos: | #js
-    function(pos) {
-      this.$femit("mouse.pos", pos);
-    }
-  onDragStart: | #js
-    function(pos) {
-      this.$femit("drag.start", pos);
-    }
-  onDragEnd: | #js
-    function(pos) {
-      this.$femit("drag.end", pos);
-    }
   onSelectBoxMark: | #js
     function(rect) {
       this.$femit("mark.select.box", rect);
-    }
-  onClear: | #js
-    function() {
-      this.$femit("clear");
     }
   isSelectBoxLayerElement: | #js
     function(el) {
@@ -66,6 +47,5 @@ template: >-
   path="134888361.0.2"></ui-button></div><div
   path="134888361.1"><grid-client-log></grid-client-log></div><ui-gesture-select-box
   :surface-element="surfaceElement" :center-coords="true"
-  :is-layer-element="isSelectBoxLayerElement" @mouse-pos="onMousePos"
-  @drag-start="onDragStart" @drag-end="onDragEnd" @mark="onSelectBoxMark"
+  :is-layer-element="isSelectBoxLayerElement" @mark="onSelectBoxMark"
   path="134888361.2"></ui-gesture-select-box></grid-module>

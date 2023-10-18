@@ -10,8 +10,9 @@ dom:
       transition: 
         name: fade
         .context-menu:
+          v-if: isVisibleOuter
           ref: menu1
-          ':class': '{ pinned: isPinned, inited: isInited, visible: isVisible }'
+          ':class': '{ pinned: isPinned, inited: isInited, visible: isVisibleInner }'
           ':style': style
           div: 
             div: 
@@ -90,6 +91,9 @@ data:
   isInited: false
   isPinned: false
   isInsideContextElement: false
+  isVisibleOuter: false
+  isVisibleInner: false
+  taskQueue: null
 mounted: | #js
   async function() {
     this.bindToParent();
@@ -151,6 +155,19 @@ methods:
       e.stopPropagation();
       this.isPinned = !this.isPinned;
     }
+  enqueueTask: | #js
+    function(task, delay) {
+      if (!this.taskQueue) this.taskQueue = [];
+      this.taskQueue.add(task);
+      if (delay) this.taskQueue.add(async() => await this.$root.wait(delay));
+    }
+  nextTaskQueue: | #js
+    async function() {
+      if (this.taskQueue.length == 0) return;
+      const task = this.taskQueue.shift();
+      await task();
+      setTimeout(this.nextTaskQueue.bind(this), 0);
+    }
   _getContextElement: | #js
     function() {
       if (this.getContextElement) return this.getContextElement();
@@ -189,6 +206,20 @@ computed:
       return style;
     }
 watch:
+  isVisible:
+    handler: | #js
+      async function(isVisible) {
+        if (isVisible) {
+          this.enqueueTask(() => { this.isVisibleOuter = true; }, 100);
+          this.enqueueTask(() => { this.isVisibleInner = true; });
+        }
+        else {
+          this.enqueueTask(() => { this.isVisibleInner = false; }, 100);
+          this.enqueueTask(() => { this.isVisibleOuter = false; });
+        }
+        this.nextTaskQueue();
+      }
+    immediate: true
   isPinned:
     handler: | #js
       function(isPinned) {
@@ -247,10 +278,10 @@ template: >-
   @right-click="e =&gt; onRightClick(e, true)"
   path="1458497449.0"></ui-mouse><ui-mouse @drag="onDrag"
   path="1458497449.1"><transition name="fade" path="1458497449.1.0"><div
-  class="context-menu" ref="menu1" :class="{ pinned: isPinned, inited: isInited,
-  visible: isVisible }" :style="style" path="1458497449.1.0.0"><div
-  path="1458497449.1.0.0.0"><div class="close-button" v-if="isPinned"
-  v-text="'✖️'" @click="isPinned=false"
+  class="context-menu" v-if="isVisibleOuter" ref="menu1" :class="{ pinned:
+  isPinned, inited: isInited, visible: isVisibleInner }" :style="style"
+  path="1458497449.1.0.0"><div path="1458497449.1.0.0.0"><div
+  class="close-button" v-if="isPinned" v-text="'✖️'" @click="isPinned=false"
   path="1458497449.1.0.0.0.0"></div><transition name="slide"
   path="1458497449.1.0.0.0.1"><h2 v-if="(showTitle) &amp;&amp; (icon || title)"
   :key="icon+title" path="1458497449.1.0.0.0.1.0"><ui-title :icon="icon"

@@ -42,6 +42,7 @@ mounted: | #js
     // $femit is an emit that goes through the grid
     // Other components listen to events by method names (compName_emitName)
     this.$parent.$femit = async (emitName, ...args) => {
+      console.log("🔵", this.compName, "🚀", emitName, args);
       if (!["mouse.pos", "drag.start", "drag.end"].includes(emitName))
       {
         //console.log("🔵", this.compName, "🚀", emitName, args);
@@ -69,7 +70,7 @@ methods:
     }
   onGridEvent: | #js
     async function(compName, emitName, args) {
-      //if (["ui.mouse"].includes(compName)) return;
+      if (["ui.mouse"].includes(compName)) return;
 
       const vue = this.$parent;
 

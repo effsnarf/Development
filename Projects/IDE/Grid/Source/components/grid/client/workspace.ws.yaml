@@ -6,32 +6,10 @@ dom:
       ':boxes': boxes
       ':links': links
     .flex:
-      ui.dnd.dropzone:
-        @drop-item: onSurfaceDropItem
-        div: 
-          ':key': surfaceKey
-          ref: surface1
-          class: surface flex-grow-1
-          ':style': surfaceStyle
-          @wheel: onWheelSurface
-          h2:
-            ui.button:
-              ':text': groupZoomIns?.map(g => g.groupBoxID)
-              @click: zoomOutGroupBox
-          grid.ui.box:
-            v-for: box in boxes
-            ':key': '''box/'' + box._id'
-            ':userID': userID
-            ':box': box
-            ':surface-element': surfaceElement
-          grid.ui.link:
-            v-for: link in links
-            ':key': '''link/'' + link._id'
-            ':link': link
-      div: 
+      grid.client.surface:
+        ':userID': userID
+      div:
         v-show: showGridTools
-        grid.ui.tools:
-          ':surface-element': surfaceElement
         grid.data.variable.view: 
           ':fuid': userID+'/user/actions/pointer'
           v-model: userActionsPointer
@@ -57,13 +35,9 @@ data:
   links: []
   userActions: []
   userActionsPointer: null
-  surfaceElement: null
-  surfaceScale: 1
-  surfaceKey: 1
   groupZoomIns: []
 mounted: | #js
   function() {
-    this.surfaceElement = this.$refs.surface1;
     // When the window is resized, refresh the surface
     // #TODO: Doesn't work
     //window.addEventListener("resize", this.refreshSurface.bind(this));
@@ -89,8 +63,13 @@ methods:
       for (const box of nonMemberBoxes) box.rect.is.visible = false;
       const memberBoxes = this.boxes.filter(box => box.groupBoxID == groupBoxID);
       for (const box of memberBoxes) box.rect.is.grouped = false;
+      for (const box of memberBoxes) box.rect.is.visible = true;
       const memberLinks = this.links.filter(link => (link.groupBoxID == groupBoxID));
-      for (const link of memberLinks) link.is.grouped = false;
+      const nonMemberLinks = this.links.filter(link => (link.groupBoxID != groupBoxID));
+      for (const link of nonMemberLinks) link.is.visible = false;
+      setTimeout(() => {
+        for (const link of memberLinks) link.is.grouped = false;
+      }, 300);
 
       this.groupZoomIns.push({
         groupBoxID,
@@ -103,59 +82,35 @@ methods:
       if (!zoomIn) return;
       const groupBoxID = zoomIn.groupBoxID;
       const groupBox = this.boxes.find(box => box._id == groupBoxID);
-      groupBox.rect.is.highlighted = false;
       const memberBoxes = this.boxes.filter(box => box.groupBoxID == groupBoxID);
       for (const box of memberBoxes) box.rect.is.grouped = true;
       const nonMemberBoxes = this.boxes.filter(box => zoomIn.nonMemberBoxIDs.includes(box._id));
-      for (const box of nonMemberBoxes) box.rect.is.visible = true;
       const memberLinks = this.links.filter(link => (link.groupBoxID == groupBoxID));
+      for (const link of memberLinks) link.is.grouped = true;
+      const nonMemberLinks = this.links.filter(link => (link.groupBoxID != groupBoxID));
+      for (const link of nonMemberLinks) link.is.visible = true;
       setTimeout(() => {
-        for (const link of memberLinks) link.is.grouped = true;
-      }, 300);
-    }
-  onSurfaceDropItem: | #js
-    function(dragItem) {
-      this.$femit("surface.drop.item", dragItem);
-    }
-  onWheelSurface: | #js
-    function(e) {
-      return;
-      e.preventDefault();
-      e.stopPropagation();
-      // Adjust surfaceScale based on the wheel event
-      const scrollSize = (e.deltaY / 100);
-      this.surfaceScale += (scrollSize * -0.03);
-      this.$femit("surface.scale", this.surfaceScale);
-    }
-  refreshSurface: | #js
-    async function() {
-      await this.$nextTick();
-      this.surfaceKey++;
-      alertify.message("Surface refreshed");
+        for (const box of memberBoxes) box.rect.is.visible = false;
+        for (const box of nonMemberBoxes) box.rect.is.visible = true;
+      }, 400);
     }
 computed:
   showGridTools: | #js
     function() {
       return true || !this.$root.isDevToolsOpen;
     }
-  surfaceStyle: | #js
-    function() {
-      return {
-        width: "70vw",
-        height: "80vh",
-        transform: `scale(${this.surfaceScale})`,
-      };
-    }
-  surface1: | #js
-    function() {
-      return this.$refs.surface1;
-    }
-style:
-  .surface:
-    height: 80vh
-    overflow: hidden
-    border: 1px solid gray
-    cursor: crosshair
+watch:
+  links:
+    handler: | #js
+      function(links) {
+        if (!this.userID) return;
+        for (const link of links) {
+          if (!("visible" in link.is)) {
+            this.$femit("to", "grid.data.list", `${this.userID}/data/links`, "update", [link._id, { is: { visible: true } }]);
+          }
+        }
+      }
+    immediate: true
 _:
   examples:
     count: 0
@@ -164,31 +119,19 @@ template: >-
   <grid-module class="comp-grid-client-workspace" icon="👤💻🖱️"
   path="-1461469222."><grid-client-context-menu :userID="userID" :boxes="boxes"
   :links="links" path="-1461469222.0"></grid-client-context-menu><div
-  class="flex" path="-1461469222.1"><ui-dnd-dropzone
-  @drop-item="onSurfaceDropItem" path="-1461469222.1.0"><div class="surface
-  flex-grow-1" :key="surfaceKey" ref="surface1" :style="surfaceStyle"
-  @wheel="onWheelSurface" path="-1461469222.1.0.0"><h2
-  path="-1461469222.1.0.0.0"><ui-button :text="groupZoomIns?.map(g =&gt;
-  g.groupBoxID)" @click="zoomOutGroupBox"
-  path="-1461469222.1.0.0.0.0"></ui-button></h2><grid-ui-box v-for="box in
-  boxes" :key="'box/' + box._id" :userID="userID" :box="box"
-  :surface-element="surfaceElement"
-  path="-1461469222.1.0.0.1"></grid-ui-box><grid-ui-link v-for="link in links"
-  :key="'link/' + link._id" :link="link"
-  path="-1461469222.1.0.0.2"></grid-ui-link></div></ui-dnd-dropzone><div
-  v-show="showGridTools" path="-1461469222.1.1"><grid-ui-tools
-  :surface-element="surfaceElement"
-  path="-1461469222.1.1.0"></grid-ui-tools><grid-data-variable-view
+  class="flex" path="-1461469222.1"><grid-client-surface :userID="userID"
+  path="-1461469222.1.0"></grid-client-surface><div v-show="showGridTools"
+  path="-1461469222.1.1"><grid-data-variable-view
   :fuid="userID+'/user/actions/pointer'" v-model="userActionsPointer"
-  path="-1461469222.1.1.1"></grid-data-variable-view><grid-data-variable-view
+  path="-1461469222.1.1.0"></grid-data-variable-view><grid-data-variable-view
   :fuid="userID+'/user/actions/next/id'"
-  path="-1461469222.1.1.2"></grid-data-variable-view><grid-data-variable-view
+  path="-1461469222.1.1.1"></grid-data-variable-view><grid-data-variable-view
   :fuid="userID+'/user/actions/next/action/id'"
-  path="-1461469222.1.1.3"></grid-data-variable-view><grid-data-list-view
+  path="-1461469222.1.1.2"></grid-data-variable-view><grid-data-list-view
   :fuid="userID+'/user/actions'" v-model="userActions" :item-props="{
   userActionsPointer }" :reverse="true"
-  path="-1461469222.1.1.4"></grid-data-list-view><grid-data-list-view
+  path="-1461469222.1.1.3"></grid-data-list-view><grid-data-list-view
   :fuid="userID + '/data/boxes'" v-model="boxes"
-  path="-1461469222.1.1.5"></grid-data-list-view><grid-data-list-view
+  path="-1461469222.1.1.4"></grid-data-list-view><grid-data-list-view
   :fuid="userID + '/data/links'" v-model="links"
-  path="-1461469222.1.1.6"></grid-data-list-view></div></div></grid-module>
+  path="-1461469222.1.1.5"></grid-data-list-view></div></div></grid-module>

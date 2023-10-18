@@ -42,7 +42,7 @@
     {{#each watch}}
     {{#if handler}}
     {{@key}}: {
-      handler: {{{handler}}},
+      handler: {{{addCode handler "const _started = Date.now();" @key "window.vueIdeApp?.perf.track.elapsed(this.$options._componentTag + '.{{method}}', (Date.now() - _started));"}}},
       immediate: {{{or immediate false}}},
       deep: {{{or deep false}}},
     },
