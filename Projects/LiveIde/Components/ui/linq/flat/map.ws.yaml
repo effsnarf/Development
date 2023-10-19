@@ -1,0 +1,32 @@
+dom:
+  div: 
+    v-if: operation
+    div: 
+      v-text: '''flat map'''
+props:
+  input: null
+  value: null
+data:
+  operation: null
+  output: null
+methods: null
+watch:
+  operation:
+    handler: | #js
+      function(operation) {
+        this.$emit("input", operation);
+      }
+    deep: true
+  value:
+    handler: | #js
+      function(value) {
+        this.operation = value;
+      }
+    immediate: true
+_:
+  examples:
+    count: 0
+name: ui-linq-flat-map
+template: >-
+  <div class="comp-ui-linq-flat-map" v-if="operation" path="595239355."><div
+  v-text="'flat map'" path="595239355.0"></div></div>

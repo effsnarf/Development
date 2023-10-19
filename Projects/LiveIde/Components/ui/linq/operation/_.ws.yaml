@@ -19,15 +19,15 @@ dom:
       @output: lastOutput = $event
       @operation: (operation) => $emit('operation', operation)
       v-model: nextOperation
-    ui.button:
+    ui.button: 
       v-if: '!nextOperation'
       icon: ➕
       text: Add
       @click: onAdd()
-    ui.button:
+    ui.button: 
       v-if: '!nextOperation'
-      icon: ➕flatMap
-      text: ➕flatMap
+      icon: ➕
+      text: flatMap
       @click: onAdd2()
     div: 
       v-if: showIntermediateValues
@@ -100,6 +100,8 @@ template: >-
   @operation="(operation) =&gt; $emit('operation', operation)"
   v-model="nextOperation" path="-188258413.3"></ui-linq-operation><ui-button
   v-if="!nextOperation" icon="➕" text="Add" @click="onAdd()"
-  path="-188258413.4"></ui-button><div class="short-preview"
-  v-if="showIntermediateValues" path="-188258413.5"><ui-value
-  :value="lastOutput" path="-188258413.5.0"></ui-value></div></div>
+  path="-188258413.4"></ui-button><ui-button v-if="!nextOperation" icon="➕"
+  text="flatMap" @click="onAdd2()" path="-188258413.5"></ui-button><div
+  class="short-preview" v-if="showIntermediateValues"
+  path="-188258413.6"><ui-value :value="lastOutput"
+  path="-188258413.6.0"></ui-value></div></div>
