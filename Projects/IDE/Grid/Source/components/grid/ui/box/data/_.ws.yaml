@@ -4,37 +4,18 @@ dom:
     ':show-title': 'false'
     div:
       ':style': '{ ''width'': ''100%'', overflow: ''auto'' }'
-      ui.linq:
-        ':input': inputValue
-        v-model: linqExp
       ui.value:
-        ':value': inputValue
-        ':show-drilldown': 'true'
-        ':object-selected-path': selectedPath
-        ':array-selected-fields': selectedFields
-        @object-selected-path: (...args) => selectedPath = args[0]
-        @array-item-click: (...args) => emitBoxEvent('array-item-click', ...args)
-        @array-selected-fields: (...args) => selectedFields = args[0]
+        ':value': outputValue
 props:
   box: null
 data:
   inputValue: null
   outputValue: null
-  linqExp: []
-  selectedPath: []
-  selectedFields: []
+  operations: []
 methods:
-  onBoxEvent: | #js
-    function(...args) {
-      const eventName = `on${args[0].getWords().map(s => s.toTitleCase()).join("")}`;
-      args = args.skip(1);
-      const method = this[eventName];
-      if (!method) throw new Error(`Method not found: ${eventName}`);
-      method(...args);
-    }
-  emitBoxEvent: | #js
-    function(boxEventName, ...args) {
-      this.$emit("box-event", boxEventName, ...args);
+  onOperations: | #js
+    function(operations) {
+      this.operations = operations;
     }
   grid_client_runtime_socket_value_change: | #js
     function(boxID, socketDirection, sID, socketValue) {
@@ -58,30 +39,34 @@ methods:
     }
   init: | #js
     function(box) {
-      this.selectedPath = Objects.clone(box.selected?.path || []);
-      this.selectedFields = Objects.clone(box.selected?.fields || []);
       this.refresh();
+    }
+  emitBoxEvent: | #js
+    function(boxEventName, ...args) {
+      this.$emit("box-event", boxEventName, ...args);
+    }
+  onBoxEvent: | #js
+    function(...args) {
+      const eventName = `on${args[0].getWords().map(s => s.toTitleCase()).join("")}`;
+      args = args.skip(1);
+      const method = this[eventName];
+      if (!method) throw new Error(`Method not found: ${eventName}`);
+      method(...args);
     }
 computed: null
 watch:
+  operations:
+    handler: | #js
+      function(operations) {
+        this.getBoxVue().$femit("edit.box", this.box._id, { linq: { operations } });
+      }
+    deep: true
   box:
     handler: | #js
-      async function(box) {
+      function(box) {
         this.init(box);
       }
     immediate: true
-  selectedPath:
-    handler: | #js
-      function(selectedPath) {
-        if (selectedPath?.join(",") == this.box.selected?.path?.join(",")) return;
-        this.getBoxVue().$femit("edit.box", this.box._id, { selected: { path: this.selectedPath } });
-      }
-  selectedFields:
-    handler: | #js
-      function(selectedFields) {
-        if (selectedFields?.join(",") == this.box.selected?.fields?.join(",")) return;
-        this.getBoxVue().$femit("edit.box", this.box._id, { selected: { fields: this.selectedFields } });
-      }
 style:
   .box1:
     border: '1px solid #ccc'
@@ -94,11 +79,5 @@ name: grid-ui-box-data
 template: >-
   <grid-module class="comp-grid-ui-box-data" icon="🧊" :show-title="false"
   path="1558979935."><div :style="{ 'width': '100%', overflow: 'auto' }"
-  path="1558979935.0"><ui-linq :input="inputValue" v-model="linqExp"
-  path="1558979935.0.0"></ui-linq><ui-value :value="inputValue"
-  :show-drilldown="true" :object-selected-path="selectedPath"
-  :array-selected-fields="selectedFields" @object-selected-path="(...args) =&gt;
-  selectedPath = args[0]" @array-item-click="(...args) =&gt;
-  emitBoxEvent('array-item-click', ...args)" @array-selected-fields="(...args)
-  =&gt; selectedFields = args[0]"
-  path="1558979935.0.1"></ui-value></div></grid-module>
+  path="1558979935.0"><ui-value :value="outputValue"
+  path="1558979935.0.0"></ui-value></div></grid-module>

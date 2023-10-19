@@ -2,8 +2,12 @@ dom:
   div: 
     ui.linq.operation.any:
       ':input': input
-      @output: (output) => firstOutput = output
+      @operation: (operation) => $emit('operation', operation)
       v-model: operation
+    ui.linq.evaluator:
+      ':input': input
+      ':operation': operation
+      @output: firstOutput = $event
     div: 
       v-if: showIntermediateValues
       class: short-preview
@@ -13,12 +17,18 @@ dom:
       v-if: nextOperation
       ':input': firstOutput
       @output: lastOutput = $event
+      @operation: (operation) => $emit('operation', operation)
       v-model: nextOperation
     ui.button:
       v-if: '!nextOperation'
       icon: ➕
       text: Add
       @click: onAdd()
+    ui.button:
+      v-if: '!nextOperation'
+      icon: ➕flatMap
+      text: ➕flatMap
+      @click: onAdd2()
     div: 
       v-if: showIntermediateValues
       class: short-preview
@@ -38,6 +48,10 @@ methods:
     function() {
       this.nextOperation = { type: 'select.fields', fields: [] };
     }
+  onAdd2: | #js
+    function() {
+      this.nextOperation = { type: 'flat.map' };
+    }
 watch:
   firstOutput:
     handler: | #js
@@ -49,6 +63,12 @@ watch:
       function(lastOutput) {
         this.$emit("output", lastOutput);
       }
+  operation:
+    handler: | #js
+      function(operation) {
+        this.$emit("operation", operation);
+      }
+    deep: true
   value:
     handler: | #js
       function(value) {
@@ -69,14 +89,17 @@ _:
 name: ui-linq-operation
 template: >-
   <div class="comp-ui-linq-operation" path="-188258413."><ui-linq-operation-any
-  :input="input" @output="(output) =&gt; firstOutput = output"
-  v-model="operation" path="-188258413.0"></ui-linq-operation-any><div
-  class="short-preview" v-if="showIntermediateValues"
-  path="-188258413.1"><ui-value :value="firstOutput"
-  path="-188258413.1.0"></ui-value></div><ui-linq-operation v-if="nextOperation"
-  :input="firstOutput" @output="lastOutput = $event" v-model="nextOperation"
-  path="-188258413.2"></ui-linq-operation><ui-button v-if="!nextOperation"
-  icon="➕" text="Add" @click="onAdd()" path="-188258413.3"></ui-button><div
-  class="short-preview" v-if="showIntermediateValues"
-  path="-188258413.4"><ui-value :value="lastOutput"
-  path="-188258413.4.0"></ui-value></div></div>
+  :input="input" @operation="(operation) =&gt; $emit('operation', operation)"
+  v-model="operation"
+  path="-188258413.0"></ui-linq-operation-any><ui-linq-evaluator :input="input"
+  :operation="operation" @output="firstOutput = $event"
+  path="-188258413.1"></ui-linq-evaluator><div class="short-preview"
+  v-if="showIntermediateValues" path="-188258413.2"><ui-value
+  :value="firstOutput" path="-188258413.2.0"></ui-value></div><ui-linq-operation
+  v-if="nextOperation" :input="firstOutput" @output="lastOutput = $event"
+  @operation="(operation) =&gt; $emit('operation', operation)"
+  v-model="nextOperation" path="-188258413.3"></ui-linq-operation><ui-button
+  v-if="!nextOperation" icon="➕" text="Add" @click="onAdd()"
+  path="-188258413.4"></ui-button><div class="short-preview"
+  v-if="showIntermediateValues" path="-188258413.5"><ui-value
+  :value="lastOutput" path="-188258413.5.0"></ui-value></div></div>

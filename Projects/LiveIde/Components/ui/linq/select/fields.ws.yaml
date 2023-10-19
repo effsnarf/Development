@@ -10,40 +10,12 @@ props:
 data:
   operation: null
   output: null
-methods:
-  refresh: | #js
-    function() {
-      this.output = this.getOutput();
-    }
-  getOutput: | #js
-    function() {
-      if (!this.input) return null;
-      if (!this.operation?.fields?.length) return this.input;
-      if (Array.isArray(this.input)) {
-        return this.input.map(item => Objects.getObjectFields(item, this.operation?.fields));
-      }
-      if (typeof this.input == "object") {
-        return Objects.getObjectFields(this.input, this.operation?.fields);
-      }
-      return this.input;
-    }
+methods: null
 watch:
-  input:
-    handler: | #js
-      function(input) {
-        this.refresh();
-      }
-    immediate: true
-  output:
-    handler: | #js
-      function(output) {
-        this.$emit("output", output);
-      }
   operation:
     handler: | #js
       function(operation) {
         this.$emit("input", operation);
-        this.refresh();
       }
     deep: true
   value:

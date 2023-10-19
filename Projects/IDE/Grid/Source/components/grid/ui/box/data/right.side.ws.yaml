@@ -1,22 +1,36 @@
 dom:
-  div:
-    .value-preview:
-      transition:
-        name: slide
-        ui.value:
-          v-if: dataItem
-          ':key': JSON.stringify(dataItem)
-          ':value': dataItem
+  grid.module:
+    icon: 🧊
+    ':show-title': 'false'
+    div:
+      ui.linq:
+        ':input': inputValue
+        @operations: operations = $event
 props:
   box: null
-  dataBoundSocketData: null
 data:
-  dataItem: null
+  inputValue: null
+  outputValue: null
+  operations: null
 methods:
-  onArrayItemClick: | #js
-    function(dataItem) {
-      if (dataItem == this.dataItem) dataItem = null;
-      this.dataItem = dataItem;
+  grid_client_runtime_socket_value_change: | #js
+    function(boxID, socketDirection, sID, socketValue) {
+      if (boxID != this.box._id) return;
+      this.refresh();
+    }
+  getSocketValue: | #js
+    function(direction) {
+      const socketData = this.$root.socket?.runtime.data[this.box._id];
+      let data = socketData?.[direction]?.[1];
+      return data;
+    }
+  refresh: | #js
+    function() {
+      this.inputValue = this.getSocketValue("input");
+    }
+  init: | #js
+    function(box) {
+      this.refresh();
     }
   onBoxEvent: | #js
     function(...args) {
@@ -26,7 +40,18 @@ methods:
       if (!method) throw new Error(`Method not found: ${eventName}`);
       method(...args);
     }
-watch: null
+watch:
+  operations:
+    handler: | #js
+      function(operations) {
+        this.$emit("box-event", "operations", operations);
+      }
+  box:
+    handler: | #js
+      function(box) {
+        this.init(box);
+      }
+    immediate: true
 style:
   .value-preview:
     max-width: 20em
@@ -37,8 +62,7 @@ _:
     count: 0
 name: grid-ui-box-data-right-side
 template: >-
-  <div class="comp-grid-ui-box-data-right-side" path="-1961460264."><div
-  class="value-preview" path="-1961460264.0"><transition name="slide"
-  path="-1961460264.0.0"><ui-value v-if="dataItem"
-  :key="JSON.stringify(dataItem)" :value="dataItem"
-  path="-1961460264.0.0.0"></ui-value></transition></div></div>
+  <grid-module class="comp-grid-ui-box-data-right-side" icon="🧊"
+  :show-title="false" path="-1961460264."><div path="-1961460264.0"><ui-linq
+  :input="inputValue" @operations="operations = $event"
+  path="-1961460264.0.0"></ui-linq></div></grid-module>

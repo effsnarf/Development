@@ -7,6 +7,8 @@ dom:
     grid.data.list.view: 
       ':fuid': userID + '/data/links'
       v-model: links
+    ui.linq.evaluator:
+      ref: evaluator1
 props:
   userID: null
 data:
@@ -156,13 +158,7 @@ methods:
   processBoxChange_data: | #js
     function(box) {
       const inputValue = this.getSocketRuntimeValue(box._id, "input", 1);
-      let outputValue = inputValue;
-      if (Array.isArray(outputValue)) {
-        if (box.selected?.fields?.length) outputValue = outputValue.map(item => Objects.getObjectFields(item, box.selected.fields));
-      }
-      if (typeof outputValue == "object") {
-        if (box.selected?.path?.length) outputValue = Objects.getProperty(outputValue, box.selected.path.join("."));
-      }
+      const outputValue = this.$refs.evaluator1.evaluateOps(inputValue, box.linq?.operations);
       this.setSocketValue(box._id, "output", 1, outputValue);
     }
   processBoxChange_func: | #js
@@ -408,4 +404,5 @@ template: >-
   v-model="boxes"
   path="-1405898659.0"></grid-data-list-view><grid-data-list-view :fuid="userID
   + '/data/links'" v-model="links"
-  path="-1405898659.1"></grid-data-list-view></grid-module>
+  path="-1405898659.1"></grid-data-list-view><ui-linq-evaluator ref="evaluator1"
+  path="-1405898659.2"></ui-linq-evaluator></grid-module>

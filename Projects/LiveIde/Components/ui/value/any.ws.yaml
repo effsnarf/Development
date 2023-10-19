@@ -1,30 +1,16 @@
 dom:
   div:
-    ui.value.path.picker:
-      v-if: showDrilldown
-      ':obj': value
-      v-model: selectedPath
     component:
       ':is': getComponentType(visibleValue)
       ':value': visibleValue
       ':title': title
       ':preview': 'false'
       ':depth': (depth + 1)
-      ':show-drilldown': showDrilldown
-      ':object-selected-path': objectSelectedPath
-      ':array-selected-fields': arraySelectedFields
-      @object-selected-path: (...args) => $emit('object-selected-path', ...args)
-      @array-item-click: (...args) => $emit('array-item-click', ...args)
-      @array-selected-fields: (...args) => $emit('array-selected-fields', ...args)
 props:
   value: null
   title: null
   depth: 0
-  showDrilldown: false
-  objectSelectedPath: null
-  arraySelectedFields: null
-data:
-  selectedPath: []
+data: null
 methods:
   getComponentType: | #js
     function(value) {
@@ -49,18 +35,7 @@ computed:
       if (!this.selectedPath?.length) return this.value;
       return Objects.getProperty(this.value, this.selectedPath.join("."));
     }
-watch:
-  objectSelectedPath:
-    handler: | #js
-      function(objectSelectedPath) {
-        this.selectedPath = (objectSelectedPath || []);
-      }
-    immediate: true
-  selectedPath:
-    handler: | #js
-      function(selectedPath) {
-        this.$emit("object-selected-path", selectedPath);
-      }
+watch: null
 style:
   .console-log-button:
     position: absolute
@@ -77,14 +52,6 @@ _:
   examples:
     count: 0
 template: >-
-  <div class="comp-ui-value-any" path="1299909909."><ui-value-path-picker
-  v-if="showDrilldown" :obj="value" v-model="selectedPath"
-  path="1299909909.0"></ui-value-path-picker><component
+  <div class="comp-ui-value-any" path="1299909909."><component
   :is="getComponentType(visibleValue)" :value="visibleValue" :title="title"
-  :preview="false" :depth="(depth + 1)" :show-drilldown="showDrilldown"
-  :object-selected-path="objectSelectedPath"
-  :array-selected-fields="arraySelectedFields" @object-selected-path="(...args)
-  =&gt; $emit('object-selected-path', ...args)" @array-item-click="(...args)
-  =&gt; $emit('array-item-click', ...args)" @array-selected-fields="(...args)
-  =&gt; $emit('array-selected-fields', ...args)"
-  path="1299909909.1"></component></div>
+  :preview="false" :depth="(depth + 1)" path="1299909909.0"></component></div>

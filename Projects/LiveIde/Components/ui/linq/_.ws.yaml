@@ -2,24 +2,27 @@ dom:
   div:
     h2:
       v-text: '''linq'''
-      @click: onClick
+      @click: refresh
     ui.linq.operation:
       ':input': input
       @output: output = $event
+      @operation: refresh
       v-model: operation
 props:
   input: null
 data:
   operation: null
   output: null
+  operations: null
+  key1: 1
 mounted: | #js
   function() {
     this.operation = { type: 'select.path', path: [] };
   }
 methods:
-  onClick: | #js
+  refresh: | #js
     function() {
-      const operations = this.getOperations();
+      this.operations = this.getOperations();
     }
   getOperations: | #js
     function() {
@@ -32,13 +35,18 @@ methods:
       }
       return operations;
     }
-watch: null
+watch:
+  operations:
+    handler: | #js
+      function(operations) {
+        this.$emit("operations", operations);
+      }
 _:
   examples:
     count: 0
 name: ui-linq
 template: >-
   <div class="comp-ui-linq" path="-484387046."><h2 v-text="'linq'"
-  @click="onClick" path="-484387046.0"></h2><ui-linq-operation :input="input"
-  @output="output = $event" v-model="operation"
+  @click="refresh" path="-484387046.0"></h2><ui-linq-operation :input="input"
+  @output="output = $event" @operation="refresh" v-model="operation"
   path="-484387046.1"></ui-linq-operation></div>

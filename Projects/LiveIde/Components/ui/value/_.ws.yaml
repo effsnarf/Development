@@ -4,12 +4,6 @@ dom:
     ':value': value
     ':title': title
     ':depth': (depth + 1)
-    ':show-drilldown': showDrilldown
-    ':object-selected-path': objectSelectedPath
-    ':array-selected-fields': arraySelectedFields
-    @object-selected-path: (...args) => $emit('object-selected-path', ...args)
-    @array-item-click: (...args) => $emit('array-item-click', ...args)
-    @array-selected-fields: (...args) => $emit('array-selected-fields', ...args)
   div:
     v-else-if: 'true'
     ':style': '{ ''max-height'': ''30em'', overflow: ''auto'' }'
@@ -22,9 +16,6 @@ props:
   title: null
   depth: 0
   overflow: false
-  showDrilldown: false
-  objectSelectedPath: null
-  arraySelectedFields: null
 style: null
 _:
   examples:
@@ -32,12 +23,7 @@ _:
 name: ui-value
 template: >-
   <ui-value-any class="comp-ui-value" v-if="!overflow" :value="value"
-  :title="title" :depth="(depth + 1)" :show-drilldown="showDrilldown"
-  :object-selected-path="objectSelectedPath"
-  :array-selected-fields="arraySelectedFields" @object-selected-path="(...args)
-  =&gt; $emit('object-selected-path', ...args)" @array-item-click="(...args)
-  =&gt; $emit('array-item-click', ...args)" @array-selected-fields="(...args)
-  =&gt; $emit('array-selected-fields', ...args)"
-  path="-2122101353."></ui-value-any><div v-else-if="true" :style="{
-  'max-height': '30em', overflow: 'auto' }"><ui-value-any :value="value"
-  :title="title" :depth="(depth + 1)"></ui-value-any></div>
+  :title="title" :depth="(depth + 1)" path="-2122101353."></ui-value-any><div
+  v-else-if="true" :style="{ 'max-height': '30em', overflow: 'auto'
+  }"><ui-value-any :value="value" :title="title" :depth="(depth +
+  1)"></ui-value-any></div>
