@@ -433,6 +433,14 @@ class Objects {
     return Objects.map(obj, (key, value) => [key, func(value)]);
   }
 
+  static getObjectFields(obj: any, fields: string[]): string[] {
+    const result = {} as any;
+    for (const field of fields) {
+      result[field] = obj[field];
+    }
+    return result;
+  }
+
   static async try(func: Function, onCatch: any | ((ex: any) => void)) {
     try {
       return await func();

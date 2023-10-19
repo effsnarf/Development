@@ -24,11 +24,15 @@ methods:
       const gridUiBoxVue = this.$root.vm.getAncestors(this, "grid.ui.box")[0];
       gridUiBoxVue.$femit("edit.box", this.box._id, { value: text });
     }
-  onBoxValueChange: | #js
-    async function(value) {
-      await this.$nextTick();
-      const gridUiBoxVue = this.$root.vm.getAncestors(this, "grid.ui.box")[0];
-      gridUiBoxVue.$femit("socket.value.change", this.box._id, "output", 1, value);
+  grid_data_list_updated: | #js
+    function(fuid, items) {
+      if (fuid.endsWith("/data/boxes")) {
+        const boxes = items;
+        for (const box of boxes) {
+          if (box._id != this.box._id) continue;
+          this.init(box);
+        }
+      }
     }
   grid_client_runtime_socket_data_change: | #js
     function(boxID, sDirection, sName, sValue) {
@@ -58,11 +62,6 @@ watch:
         this.init(box);
       }
     immediate: true
-  boxValue:
-    handler: | #js
-      function(value) {
-        this.onBoxValueChange(value);
-      }
 style:
   textarea:
     height: 100%

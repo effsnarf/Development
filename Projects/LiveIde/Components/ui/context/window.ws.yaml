@@ -202,7 +202,7 @@ computed:
       style.left = ((pos.x + this.space) + "px");
       style.top = ((pos.y + this.space) + "px");
       if (!this.semiTransparent) style.opacity = 1;
-      style.transition = "0.3s !important";
+      style.transition = "all 0.3s, top 0s, left 0s !important";
       return style;
     }
 watch:

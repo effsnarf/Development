@@ -193,7 +193,7 @@ methods:
 computed:
   middleLabel: | #js
     function() {
-      return `&nbsp;`;
+      return `test`;
     }
 watch:
   from: | #js
@@ -220,6 +220,7 @@ watch:
     function(leaderLineElement) {
       // Find the <text> element with the text being the middle label
       const textElements = leaderLineElement?.querySelectorAll("text");
+      if (this.middleLabelElement == textElements?.[0]) return;
       this.middleLabelElement = textElements?.[0];
     }
 style: null

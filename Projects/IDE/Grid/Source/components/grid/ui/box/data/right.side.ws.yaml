@@ -1,0 +1,44 @@
+dom:
+  div:
+    .value-preview:
+      transition:
+        name: slide
+        ui.value:
+          v-if: dataItem
+          ':key': JSON.stringify(dataItem)
+          ':value': dataItem
+props:
+  box: null
+  dataBoundSocketData: null
+data:
+  dataItem: null
+methods:
+  onArrayItemClick: | #js
+    function(dataItem) {
+      if (dataItem == this.dataItem) dataItem = null;
+      this.dataItem = dataItem;
+    }
+  onBoxEvent: | #js
+    function(...args) {
+      const eventName = `on${args[0].getWords().map(s => s.toTitleCase()).join("")}`;
+      args = args.skip(1);
+      const method = this[eventName];
+      if (!method) throw new Error(`Method not found: ${eventName}`);
+      method(...args);
+    }
+watch: null
+style:
+  .value-preview:
+    max-width: 20em
+    max-height: 20em
+    overflow: auto
+_:
+  examples:
+    count: 0
+name: grid-ui-box-data-right-side
+template: >-
+  <div class="comp-grid-ui-box-data-right-side" path="-1961460264."><div
+  class="value-preview" path="-1961460264.0"><transition name="slide"
+  path="-1961460264.0.0"><ui-value v-if="dataItem"
+  :key="JSON.stringify(dataItem)" :value="dataItem"
+  path="-1961460264.0.0.0"></ui-value></transition></div></div>

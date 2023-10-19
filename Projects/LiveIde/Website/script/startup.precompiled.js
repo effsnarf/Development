@@ -456,7 +456,7 @@ class ComponentManager {
             await client.db.delete("ModifiedItems", modifiedItem.key);
             await client.updateComponent(modifiedItem.item);
         }
-        setTimeout(this.saveModifiedItems.bind(this), 400);
+        setTimeout(this.saveModifiedItems.bind(this), 2000);
     }
     async onComponentChanged(newComp) {
         await ClientContext_1.ClientContext.waitUntilLoaded();
@@ -5048,6 +5048,13 @@ class Objects {
     static mapValues(obj, func) {
         return Objects.map(obj, (key, value) => [key, func(value)]);
     }
+    static getObjectFields(obj, fields) {
+        const result = {};
+        for (const field of fields) {
+            result[field] = obj[field];
+        }
+        return result;
+    }
     static async try(func, onCatch) {
         try {
             return await func();
@@ -7531,7 +7538,7 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/website/script/1697608014491.ts ***!
+  !*** ../../../LiveIde/website/script/1697731844401.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

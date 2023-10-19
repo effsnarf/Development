@@ -75,6 +75,18 @@ computed:
         return null;
       }
     }
+watch:
+  objectSelectedPath:
+    handler: | #js
+      function(objectSelectedPath) {
+        this.selectedPath = (objectSelectedPath || []);
+      }
+    immediate: true
+  selectedPath:
+    handler: | #js
+      function(selectedPath) {
+        this.$emit("object-selected-path", selectedPath);
+      }
 style:
   .title1:
     opacity: 0.5

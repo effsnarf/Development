@@ -414,6 +414,23 @@ const _fetchAsJson = async (url: string) => {
         if (result) return result;
       }
 
+      // This is mainly used to proxy images, to bypass NotSameOrigin
+      if (req.url.startsWith("/fetch")) {
+        const url = req.url.replace("/fetch?url=", "");
+        const host = url.split("/")[2];
+        const refererHeader = `https://${host}`;
+        const res2 = await axios.get(url, {
+          headers: {
+            Referer: refererHeader,
+          },
+          responseType: "stream",
+        });
+        const contentType = res2.headers["content-type"];
+        res.setHeader("Content-Type", contentType);
+        res2.data.pipe(res);
+        return true;
+      }
+
       if (req.url.startsWith("/write/function")) {
         const chat = await ChatOpenAI.new(Roles.ChatGPT);
         const { name, argNames, desc } = data;

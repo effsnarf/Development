@@ -4,7 +4,8 @@ dom:
     ':title': fuid
     grid.data.variable.view:
       ':fuid': fuid
-      @input: (value) => $emit('input', value)
+    ui.value:
+      ':value': value
 props:
   fuid: null
   defaultValue: null
@@ -18,24 +19,23 @@ methods:
   clear: | #js
     function() {
       this.$emit("input", this.defaultValue);
-      this.onChange();
     }
   onChange: | #js
-    function() {
-      this.$femit("change", { fuid: this.fuid, value: this.value });
-      this.save();
+    function(value) {
+      this.$femit("change", { fuid: this.fuid, value: value });
+      this.save(value);
     }
   save: | #js
-    function() {
+    function(value) {
       if (!this.isPersisted) return;
-      localStorage.setItem(this.fuid, JSON.stringify(this.value));
+      localStorage.setItem(this.fuid, JSON.stringify(value));
     }
   load: | #js
     function() {
       if (!this.isPersisted) return;
-      const value = JSON.parse(localStorage.getItem(this.fuid) || this.defaultValue);
+      const value = JSON.parse(localStorage.getItem(this.fuid)) || this.defaultValue;
       this.$emit("input", value);
-      this.onChange();
+      this.onChange(value);
     }
 computed:
   isPersisted: | #js
@@ -45,7 +45,7 @@ computed:
 watch:
   value: | #js
     function(value) {
-      this.onChange();
+      this.onChange(value);
     }
 _:
   examples:
@@ -53,6 +53,6 @@ _:
 name: grid-data-variable
 template: >-
   <grid-module class="comp-grid-data-variable" icon="🧊" :title="fuid"
-  path="-1384224872."><grid-data-variable-view :fuid="fuid" @input="(value)
-  =&gt; $emit('input', value)"
-  path="-1384224872.0"></grid-data-variable-view></grid-module>
+  path="-1384224872."><grid-data-variable-view :fuid="fuid"
+  path="-1384224872.0"></grid-data-variable-view><ui-value :value="value"
+  path="-1384224872.1"></ui-value></grid-module>

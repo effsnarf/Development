@@ -6,7 +6,7 @@ dom:
       Object.assign({ hovered: (isFullSize), 'auto-expand': autoExpand },
       (cssClass||{}))
     @mouseenter: (e) => { isHovered++; $emit('mouseenter', e); }
-    @mouseleave: (e) => { isHovered--; $emit('mouseleave', e); }
+    @mouseleave: (e) => { isHovered=0; $emit('mouseleave', e); }
     @dragenter: (e) => { isHovered++; }
     @dragleave: (e) => { isHovered--; }
     .above:
@@ -16,55 +16,59 @@ dom:
       slot: 
         name: above
     .h-100pc:
-      ui.mouse:
-        @up: onMouseUp
-        @drag: onMouseDrag
-      .resize-handle.en:
-        v-text: ''
-        @mousedown: () => isResizing = 'en'
-      .resize-handle.wn:
-        v-text: ''
-        @mousedown: () => isResizing = 'wn'
-      .resize-handle.ws:
-        v-text: ''
-        @mousedown: () => isResizing = 'ws'
-      .resize-handle.es:
-        v-text: ''
-        @mousedown: () => isResizing = 'es'
+      .h-100pc:
+        ui.mouse:
+          @up: onMouseUp
+          @drag: onMouseDrag
+        .resize-handle.en:
+          v-text: ''
+          @mousedown: () => isResizing = 'en'
+        .resize-handle.wn:
+          v-text: ''
+          @mousedown: () => isResizing = 'wn'
+        .resize-handle.ws:
+          v-text: ''
+          @mousedown: () => isResizing = 'ws'
+        .resize-handle.es:
+          v-text: ''
+          @mousedown: () => isResizing = 'es'
+        .window:
+          ref: window
+          ':style': windowStyle
+          @click: () => { isHovered = 1; $emit('click'); }
+          .header:
+            v-if: showHeader
+            .flex.w-100pc:
+              .flex-grow-1:
+                slot: 
+                  name: header
+              .buttons:
+                .flex:
+                  transition:
+                    name: list2
+                    div: 
+                      ':key': rect.is.minimized
+                      v-text: 'rect.is.minimized ? ''🗖'' : ''🗕'''
+                      @click: onMinimizeToggle
+          .content:
+            v-if: showContent
+            ':style': contentStyle
+            slot: 
+              name: content
+          .footer:
+            v-if: 'false'
+            .flex.justify-between:
+              div: 
+                v-for: size in sizes
+                ui.button:
+                  ':text': size.width + 'x' + size.height
+                  @click: rect1.size = size
       .left-side:
         slot: 
           name: left-side
-      .window:
-        ref: window
-        ':style': windowStyle
-        @click: () => { isHovered = 1; $emit('click'); }
-        .header:
-          v-if: showHeader
-          .flex.w-100pc:
-            .flex-grow-1:
-              slot: 
-                name: header
-            .buttons:
-              .flex:
-                transition:
-                  name: list2
-                  div: 
-                    ':key': rect.is.minimized
-                    v-text: 'rect.is.minimized ? ''🗖'' : ''🗕'''
-                    @click: onMinimizeToggle
-        .content:
-          v-if: showContent
-          ':style': contentStyle
-          slot: 
-            name: content
-        .footer:
-          v-if: 'false'
-          .flex.justify-between:
-            div: 
-              v-for: size in sizes
-              ui.button:
-                ':text': size.width + 'x' + size.height
-                @click: rect1.size = size
+      .right-side:
+        slot: 
+          name: right-side
     .below:
       ':style': '{ width: rect1.size.width+''px'' }'
       slot: 
@@ -327,6 +331,18 @@ style:
     top: 0em
     left: 0em
     transform: translate(-100%, 0)
+  .right-side:
+    position: absolute
+    top: 50%
+    right: 0em
+    transform: translate(0, -50%)
+  .hovered .right-side:
+    transform: translate(100%, -50%)
+  .above, .below, .left-side, .right-side:
+    opacity: 0
+    transition: all 0s, opacity 0.6s, transform 0.6s
+  .hovered .above, .hovered .below, .hovered .left-side, .hovered .right-side:
+    opacity: 1
   .hovered .window: null
   .window:
     height: 100%
@@ -337,7 +353,7 @@ style:
     box-shadow: '-1em 1em 0.5em #00000080'
     cursor: move
     user-select: none
-    z-index: 10
+    z-index: 90
   .content:
     height: calc(100% - 2em)
     overflow: auto
@@ -346,12 +362,9 @@ style:
   .auto-expand:hover .content:
     max-height: none
   .footer:
-    opacity: 0
     max-height: 0.5em
     overflow: hidden
-    transition: 0.3s
   .footer:hover:
-    opacity: 1
     max-height: 3em
   .handle:
     position: absolute
@@ -370,41 +383,42 @@ template: >-
   <div class="comp-ui-window" v-if="rect" :style="style" :class="Object.assign({
   hovered: (isFullSize), 'auto-expand': autoExpand }, (cssClass||{}))"
   @mouseenter="(e) =&gt; { isHovered++; $emit('mouseenter', e); }"
-  @mouseleave="(e) =&gt; { isHovered--; $emit('mouseleave', e); }"
+  @mouseleave="(e) =&gt; { isHovered=0; $emit('mouseleave', e); }"
   @dragenter="(e) =&gt; { isHovered++; }" @dragleave="(e) =&gt; { isHovered--;
   }" path="-1324571510."><div class="above" :style="{ width:
   rect1.size.width+'px' }" @dragenter="(e) =&gt; { isHovered++; }"
   @dragleave="(e) =&gt; { isHovered--; }" path="-1324571510.0"><slot
   name="above" path="-1324571510.0.0"></slot></div><div class="h-100pc"
-  path="-1324571510.1"><ui-mouse @up="onMouseUp" @drag="onMouseDrag"
-  path="-1324571510.1.0"></ui-mouse><div class="resize-handle en" @mousedown="()
-  =&gt; isResizing = 'en'" path="-1324571510.1.1"></div><div
-  class="resize-handle wn" @mousedown="() =&gt; isResizing = 'wn'"
-  path="-1324571510.1.2"></div><div class="resize-handle ws" @mousedown="()
-  =&gt; isResizing = 'ws'" path="-1324571510.1.3"></div><div
-  class="resize-handle es" @mousedown="() =&gt; isResizing = 'es'"
-  path="-1324571510.1.4"></div><div class="left-side"
-  path="-1324571510.1.5"><slot name="left-side"
-  path="-1324571510.1.5.0"></slot></div><div class="window" ref="window"
-  :style="windowStyle" @click="() =&gt; { isHovered = 1; $emit('click'); }"
-  path="-1324571510.1.6"><div class="header" v-if="showHeader"
-  path="-1324571510.1.6.0"><div class="flex w-100pc"
-  path="-1324571510.1.6.0.0"><div class="flex-grow-1"
-  path="-1324571510.1.6.0.0.0"><slot name="header"
-  path="-1324571510.1.6.0.0.0.0"></slot></div><div class="buttons"
-  path="-1324571510.1.6.0.0.1"><div class="flex"
-  path="-1324571510.1.6.0.0.1.0"><transition name="list2"
-  path="-1324571510.1.6.0.0.1.0.0"><div :key="rect.is.minimized"
+  path="-1324571510.1"><div class="h-100pc" path="-1324571510.1.0"><ui-mouse
+  @up="onMouseUp" @drag="onMouseDrag" path="-1324571510.1.0.0"></ui-mouse><div
+  class="resize-handle en" @mousedown="() =&gt; isResizing = 'en'"
+  path="-1324571510.1.0.1"></div><div class="resize-handle wn" @mousedown="()
+  =&gt; isResizing = 'wn'" path="-1324571510.1.0.2"></div><div
+  class="resize-handle ws" @mousedown="() =&gt; isResizing = 'ws'"
+  path="-1324571510.1.0.3"></div><div class="resize-handle es" @mousedown="()
+  =&gt; isResizing = 'es'" path="-1324571510.1.0.4"></div><div class="window"
+  ref="window" :style="windowStyle" @click="() =&gt; { isHovered = 1;
+  $emit('click'); }" path="-1324571510.1.0.5"><div class="header"
+  v-if="showHeader" path="-1324571510.1.0.5.0"><div class="flex w-100pc"
+  path="-1324571510.1.0.5.0.0"><div class="flex-grow-1"
+  path="-1324571510.1.0.5.0.0.0"><slot name="header"
+  path="-1324571510.1.0.5.0.0.0.0"></slot></div><div class="buttons"
+  path="-1324571510.1.0.5.0.0.1"><div class="flex"
+  path="-1324571510.1.0.5.0.0.1.0"><transition name="list2"
+  path="-1324571510.1.0.5.0.0.1.0.0"><div :key="rect.is.minimized"
   v-text="rect.is.minimized ? '🗖' : '🗕'" @click="onMinimizeToggle"
-  path="-1324571510.1.6.0.0.1.0.0.0"></div></transition></div></div></div></div><div
+  path="-1324571510.1.0.5.0.0.1.0.0.0"></div></transition></div></div></div></div><div
   class="content" v-if="showContent" :style="contentStyle"
-  path="-1324571510.1.6.1"><slot name="content"
-  path="-1324571510.1.6.1.0"></slot></div><div class="footer" v-if="false"
-  path="-1324571510.1.6.2"><div class="flex justify-between"
-  path="-1324571510.1.6.2.0"><div v-for="size in sizes"
-  path="-1324571510.1.6.2.0.0"><ui-button :text="size.width + 'x' + size.height"
-  @click="rect1.size = size"
-  path="-1324571510.1.6.2.0.0.0"></ui-button></div></div></div></div></div><div
-  class="below" :style="{ width: rect1.size.width+'px' }"
-  path="-1324571510.2"><slot name="below"
+  path="-1324571510.1.0.5.1"><slot name="content"
+  path="-1324571510.1.0.5.1.0"></slot></div><div class="footer" v-if="false"
+  path="-1324571510.1.0.5.2"><div class="flex justify-between"
+  path="-1324571510.1.0.5.2.0"><div v-for="size in sizes"
+  path="-1324571510.1.0.5.2.0.0"><ui-button :text="size.width + 'x' +
+  size.height" @click="rect1.size = size"
+  path="-1324571510.1.0.5.2.0.0.0"></ui-button></div></div></div></div></div><div
+  class="left-side" path="-1324571510.1.1"><slot name="left-side"
+  path="-1324571510.1.1.0"></slot></div><div class="right-side"
+  path="-1324571510.1.2"><slot name="right-side"
+  path="-1324571510.1.2.0"></slot></div></div><div class="below" :style="{
+  width: rect1.size.width+'px' }" path="-1324571510.2"><slot name="below"
   path="-1324571510.2.0"></slot></div></div>

@@ -35,6 +35,7 @@ methods:
     }
   getImageSrc: | #js
     function(boxValue) {
+      if (boxValue?.tim) return `/fetch?url=https://i.4cdn.org/fit/${boxValue.tim}s.jpg`;
       return "/images/cat2.png";
     }
   refresh: | #js

@@ -4,12 +4,6 @@ dom:
     ref: socket1
     ui.dnd.dropzone:
       @drop-item: onNewLinkDrop
-      ui.context.window:
-        v-if: '!isNewLinkDragging'
-        div: 
-          ':style': dataTooltipStyle
-          ui.value:
-            ':value': socketValue
       ui.dnd.draggable:
         ':show-drag-ghost': 'false'
         ':drag-item': '{ box, direction, socket }'
@@ -18,19 +12,30 @@ dom:
         @drag: onNewLinkDrag
         .socket:
           ':class': 'direction + ''-socket'' + '' '' + (isLoading ? ''loading'' : '''')'
-          @click: onSocketClick
           div: 
-            title: Export socket
+            ui.context.window: 
+              v-if: false && !isNewLinkDragging
+              div: 
+                h3: 
+                  v-text: '''Export socket'''
             ui.checkbox:
               v-model: socketIsExported
-          div: 
-            v-if: 'false'
-            v-text: '''🔌'''
-          div: 
-            v-text: getSocketIcon(socket)
-          div: 
-            class: mx-2
-            v-text: socket.name
+          .flex:
+            ui.context.window: 
+              v-if: 'true'
+              div: 
+                h3: 
+                  ui.title: 
+                    ':icon': getSocketIcon(socket)
+                    ':text': socket.name
+                div: 
+                  class: data-preview
+                  ui.value:
+                    v-if: showSocketValueContextWindow
+                    ':value': socketValue
+            ui.title: 
+              ':icon': getSocketIcon(socket)
+              ':text': socket.name
     ui.leader.line:
       v-if: isNewLinkDragging
       ref: leaderLine1
@@ -54,7 +59,7 @@ data:
   targetPlugPos: null
   isNewLinkDragging: false
   ghostBox: null
-  newBox: null
+  linkToNewBox: null
   socketIsExported: null
   socketAlertValue: null
   isLoading: 0
@@ -93,6 +98,10 @@ methods:
       this.socketIsExported = socket.is?.exported;
       this.socketValue = this.getSocketValue();
     }
+  deleteLink: | #js
+    function(link) {
+      this.$femit("delete.link", link._id);
+    }
   onSocketClick: | #js
     function() {
       console.log(this.socketValue);
@@ -110,9 +119,19 @@ methods:
         this.isLoading--;
       }, 400);
     }
-  grid_user_action_stack_new_box_created: | #js
-    function(box) {
-      this.newBox = box;
+  grid_data_list_added: | #js
+    function(fuid, items) {
+      if (fuid.endsWith("/data/boxes"))
+      {
+        const boxes = items;
+        for (const newBox of boxes) {
+          if (this.linkToNewBox) {
+            // Link this socket to the new box
+            this.onNewLinkDrop({ box: newBox, socket: newBox.sockets.input[0], direction: 'input' });
+            this.linkToNewBox = null;
+          }
+        }
+      }
     }
   getSocketValue: | #js
     function() {
@@ -137,6 +156,7 @@ methods:
     }
   onNewLinkDragEnd: | #js
     function(e) {
+      alertify.message(`onNewLinkDragEnd`);
       this.isNewLinkDragging = false;
       this.targetPlugPos = null;
       this.targetPlugEl = null;
@@ -181,12 +201,7 @@ methods:
       // Create the box
       this.$femit("create.box", newBox);
 
-      // Wait for the box to be created
-      this.newBox = null;
-      await this.$root.wait(() => this.newBox);
-
-      // Link this socket to the new box
-      this.onNewLinkDrop({ box: this.newBox, socket: this.newBox.sockets.input[0], direction: 'input' });
+      this.linkToNewBox = newBox;
     }
   getSocketIcon: | #js
     function(socket) {
@@ -196,6 +211,17 @@ methods:
         view: '⬜',
         event: '⚡',
       }[socket?.type];
+    }
+  getLinkDesc: | #js
+    function(link) {
+      const fromBox = this.$root.boxes.find(b => b._id == link.from.box._id);
+      const toBox = this.$root.boxes.find(b => b._id == link.to.box._id);
+      if (!fromBox?.sockets || !toBox?.sockets) return "";
+      const fromSocket = fromBox.sockets.output.find(s => s._id == link.from.socket._id);
+      const toSocket = toBox.sockets.input.find(s => s._id == link.to.socket._id);
+      const fromSocketIcon = this.getSocketIcon(fromSocket);
+      const toSocketIcon = this.getSocketIcon(toSocket);
+      return `${fromSocketIcon}${fromSocket.name} -> ${toSocketIcon}${toSocket.name}`;
     }
   getSurfaceElement: | #js
     function() {
@@ -230,14 +256,22 @@ methods:
       return this.$root.vm.getAncestors(this, "grid.ui.box")[0];
     }
 computed:
-  dataTooltipStyle: | #js
+  socketLinks: | #js
     function() {
-      const style = {};
-      style["max-width"] = "20em";
-      style["max-height"] = "10em";
-      style.overflow = "hidden";
-      style["pointer-events"] = "none";
-      return style;
+      const links = this.$root.links;
+      if (!links) return [];
+      const socketLinks = links.filter(link => {
+        if (link.from.socket._id != this.socket._id) return false;
+        if (link.from.box._id != this.box._id) return false;
+        return true;
+      });
+      return socketLinks;
+    }
+  showSocketValueContextWindow: | #js
+    function() {
+      if (this.isNewLinkDragging) return false;
+      if (this.socket.type == 'iterator') return false;
+      return true;
     }
   showGhostBox: | #js
     function() {
@@ -283,6 +317,10 @@ watch:
       this.$femit("edit.socket", this.box._id, this.direction, this.socket._id, { is: { exported: socketIsExported } });
     }
 style:
+  .data-preview:
+    max-width: 20em
+    max-height: 10em
+    overflow: hidden
   .socket-alert-value-box:
     max-width: 10em
     max-height: 10em
@@ -306,21 +344,25 @@ name: grid-ui-box-socket
 template: >-
   <grid-module class="comp-grid-ui-box-socket" :show-title="false" ref="socket1"
   path="-321995800."><ui-dnd-dropzone @drop-item="onNewLinkDrop"
-  path="-321995800.0"><ui-context-window v-if="!isNewLinkDragging"
-  path="-321995800.0.0"><div :style="dataTooltipStyle"
-  path="-321995800.0.0.0"><ui-value :value="socketValue"
-  path="-321995800.0.0.0.0"></ui-value></div></ui-context-window><ui-dnd-draggable
-  :show-drag-ghost="false" :drag-item="{ box, direction, socket }"
-  @drag-start="onNewLinkDragStart" @drag-end="onNewLinkDragEnd"
-  @drag="onNewLinkDrag" path="-321995800.0.1"><div class="socket"
-  :class="direction + '-socket' + ' ' + (isLoading ? 'loading' : '')"
-  @click="onSocketClick" path="-321995800.0.1.0"><div title="Export socket"
-  path="-321995800.0.1.0.0"><ui-checkbox v-model="socketIsExported"
-  path="-321995800.0.1.0.0.0"></ui-checkbox></div><div v-if="false"
-  v-text="'🔌'" path="-321995800.0.1.0.1"></div><div
-  v-text="getSocketIcon(socket)" path="-321995800.0.1.0.2"></div><div
-  class="mx-2" v-text="socket.name"
-  path="-321995800.0.1.0.3"></div></div></ui-dnd-draggable></ui-dnd-dropzone><ui-leader-line
+  path="-321995800.0"><ui-dnd-draggable :show-drag-ghost="false" :drag-item="{
+  box, direction, socket }" @drag-start="onNewLinkDragStart"
+  @drag-end="onNewLinkDragEnd" @drag="onNewLinkDrag" path="-321995800.0.0"><div
+  class="socket" :class="direction + '-socket' + ' ' + (isLoading ? 'loading' :
+  '')" path="-321995800.0.0.0"><div path="-321995800.0.0.0.0"><ui-context-window
+  v-if="false &amp;&amp; !isNewLinkDragging" path="-321995800.0.0.0.0.0"><div
+  path="-321995800.0.0.0.0.0.0"><h3 v-text="'Export socket'"
+  path="-321995800.0.0.0.0.0.0.0"></h3></div></ui-context-window><ui-checkbox
+  v-model="socketIsExported"
+  path="-321995800.0.0.0.0.1"></ui-checkbox></div><div class="flex"
+  path="-321995800.0.0.0.1"><ui-context-window v-if="true"
+  path="-321995800.0.0.0.1.0"><div path="-321995800.0.0.0.1.0.0"><h3
+  path="-321995800.0.0.0.1.0.0.0"><ui-title :icon="getSocketIcon(socket)"
+  :text="socket.name" path="-321995800.0.0.0.1.0.0.0.0"></ui-title></h3><div
+  class="data-preview" path="-321995800.0.0.0.1.0.0.1"><ui-value
+  v-if="showSocketValueContextWindow" :value="socketValue"
+  path="-321995800.0.0.0.1.0.0.1.0"></ui-value></div></div></ui-context-window><ui-title
+  :icon="getSocketIcon(socket)" :text="socket.name"
+  path="-321995800.0.0.0.1.1"></ui-title></div></div></ui-dnd-draggable></ui-dnd-dropzone><ui-leader-line
   v-if="isNewLinkDragging" ref="leaderLine1" :from="socketEl" :to="targetPlugEl"
   line-path="fluid" color="#404040" path="-321995800.1"></ui-leader-line><div
   v-show="isNewLinkDragging" ref="targetPlug1" :style="targetPlugStyle"

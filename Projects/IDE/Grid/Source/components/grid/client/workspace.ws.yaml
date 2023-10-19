@@ -6,10 +6,11 @@ dom:
       ':boxes': boxes
       ':links': links
     .flex:
-      grid.client.surface:
-        ':userID': userID
-      div:
-        v-show: showGridTools
+      div: 
+        class: w-100pc
+        grid.client.surface:
+          ':userID': userID
+      div: 
         grid.data.variable.view: 
           ':fuid': userID+'/user/actions/pointer'
           v-model: userActionsPointer
@@ -94,11 +95,7 @@ methods:
         for (const box of nonMemberBoxes) box.rect.is.visible = true;
       }, 400);
     }
-computed:
-  showGridTools: | #js
-    function() {
-      return true || !this.$root.isDevToolsOpen;
-    }
+computed: null
 watch:
   links:
     handler: | #js
@@ -119,8 +116,9 @@ template: >-
   <grid-module class="comp-grid-client-workspace" icon="👤💻🖱️"
   path="-1461469222."><grid-client-context-menu :userID="userID" :boxes="boxes"
   :links="links" path="-1461469222.0"></grid-client-context-menu><div
-  class="flex" path="-1461469222.1"><grid-client-surface :userID="userID"
-  path="-1461469222.1.0"></grid-client-surface><div v-show="showGridTools"
+  class="flex" path="-1461469222.1"><div class="w-100pc"
+  path="-1461469222.1.0"><grid-client-surface :userID="userID"
+  path="-1461469222.1.0.0"></grid-client-surface></div><div
   path="-1461469222.1.1"><grid-data-variable-view
   :fuid="userID+'/user/actions/pointer'" v-model="userActionsPointer"
   path="-1461469222.1.1.0"></grid-data-variable-view><grid-data-variable-view

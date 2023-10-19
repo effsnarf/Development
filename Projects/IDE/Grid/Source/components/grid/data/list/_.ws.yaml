@@ -16,13 +16,14 @@ mounted: | #js
   }
 methods:
   add: | #js
-    function(item) {
+    async function(item) {
       this.items.add(item);
       this.onChange();
+      await this.$nextTick();
       this.$femit("added", this.fuid, [item]);
     }
   update: | #js
-    function(itemIDs, datas) {
+    async function(itemIDs, datas) {
       if (!Array.isArray(itemIDs)) itemIDs = [itemIDs];
       if (!Array.isArray(datas)) datas = [datas];
       while (datas.length < itemIDs.length) datas.push(datas.last());
@@ -42,10 +43,11 @@ methods:
         updatedItems.push(item);
       }
       this.onChange();
+      await this.$nextTick();
       this.$femit("updated", this.fuid, updatedItems);
     }
   delete: | #js
-    function(itemIDs) {
+    async function(itemIDs) {
       if (!Array.isArray(itemIDs)) itemIDs = [itemIDs];
       const deletedItems = this.items.filter(item => itemIDs.includes(item._id));
       for (const itemID of itemIDs)
@@ -53,6 +55,7 @@ methods:
         this.items.removeByField("_id", itemID);
         this.onChange();
       }
+      await this.$nextTick();
       this.$femit("deleted", this.fuid, deletedItems);
     }
   clear: | #js

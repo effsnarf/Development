@@ -8,21 +8,12 @@ dom:
           ':icon': icon
           ':text': compName
           ':number': getTitle()
-    ui.console:
-      v-if: showConsole
-      ref: console1
     .module-content:
       slot: null
     div: 
       v-if: showEvents
       ':key': key1
       class: mt-l1
-      ui.value: 
-        v-if: Object.keys(femitsOutLog).length
-        ':value': femitsOutLog
-      ui.value: 
-        v-if: Object.keys(femitsInLog).length
-        ':value': femitsInLog
 props:
   icon: null
   title: null
@@ -31,37 +22,63 @@ props:
   showConsole: false
 data:
   compMethodArgNames: {}
-  femitsOutLog: {}
-  femitsInLog: {}
-  femitsOutID: 1
+  isFemitting: false
+  femitQueue: []
+  femitDelay: 1
   key1: 1
-  _refresh: null
 mounted: | #js
   function() {
-    // We want to know what the module is sending out
+    const self = this;
     // $femit is an emit that goes through the grid
     // Other components listen to events by method names (compName_emitName)
-    this.$parent.$femit = async (emitName, ...args) => {
-      console.log("🔵", this.compName, "🚀", emitName, args);
-      if (!["mouse.pos", "drag.start", "drag.end"].includes(emitName))
-      {
-        //console.log("🔵", this.compName, "🚀", emitName, args);
-      }
-
+    this.$parent.$femit = async (eventName, ...args) => {
+      const compName = this.compName;
       args = Objects.clone(args);
-      await this.$parent.$nextTick();
-
-      this.femitsOutLog[emitName] = args;
-      this.$refs.console1?.log("🚀", emitName);
-      this.refresh();
-
-      this.$root.$emit("grid.event", this.compName, emitName, args);
+      const femit = Objects.clone({ compName: this.compName, eventName, args });
+      this.$root.$emit("grid.event", femit.compName, femit.eventName, femit.args);
+      return;
+      this.femitQueue.push(femit);
+      this.nextFemit();
+      //this.$root.$emit(emitName, ...args);
     };
 
+    // const handlerNames = Object.keys(this.$parent)
+    //   .filter(k => !k.startsWith("_"))
+    //   .filter(k => k.includes("_"));
+    
+    // for (const handlerName of handlerNames) {
+    //   const method = this.$parent[handlerName].bind(this.$parent);
+    //   console.log("🔴", handlerName);
+    //   this.$root.$on(handlerName, (...args) => {
+    //     method(...args);
+    //   });
+    // }
     // #TODO: Instead of listening to all events, add listeners by method/event names
-    this.$root.$on("grid.event", this.onGridEvent);
+    if (!this._onGridEvent) this._onGridEvent = this.onGridEvent.bind(this);
+    this.$root.$on("grid.event", this._onGridEvent);
+  }
+unmounted: | #js
+  function() {
+    alertify.error("unmounted");
+    this.$root.$off("grid.event", this._onGridEvent);
   }
 methods:
+  nextFemit: | #js
+    function(internal) {
+      if ((!internal) && this.isFemitting) return;
+      if (!this.femitQueue.length) {
+        this.isFemitting = false;
+        return;
+      }
+      this.isFemitting = true;
+      const femit = this.femitQueue.shift();
+      const emitName = `${femit.compName}_${femit.eventName}`.replace(/\./g, "_");
+      //console.log("🟢", emitName, femit.args)
+      this.$root.$emit("grid.event", femit.compName, femit.eventName, femit.args);
+      setTimeout((() => {
+        this.nextFemit(true);
+      }).bind(this), this.femitDelay);
+    }
   getTitle: | #js
     function() {
       if (this.title) return this.title;
@@ -69,12 +86,16 @@ methods:
       return null;
     }
   onGridEvent: | #js
-    async function(compName, emitName, args) {
+    async function(compName, eventName, args) {
+      // Vue still holds the component instance even if it's not rendered on the page anymore
+      // In this case, we don't pass grid events to the component
+      if (!this.$el.isConnected) return;
+
       if (["ui.mouse"].includes(compName)) return;
 
       const vue = this.$parent;
 
-      if (emitName == "to")
+      if (eventName == "to")
       {
         const to = {
           compName: args[0],
@@ -96,12 +117,16 @@ methods:
       }
 
       if (vue.onAllEvents) {
-        //console.log("🔴", vue.$data._.comp.name, "onAllEvents", "🚀", compName, emitName, args)
-        vue.onAllEvents(compName, emitName, args);
+        vue.onAllEvents(compName, eventName, args);
       }
-      const methodName = `${compName}_${emitName}`.replace(/\./g, "_");
+
+      const methodName = `${compName}_${eventName}`.replace(/\./g, "_");
       const method = vue[methodName];
       if (!method) return;
+
+      const targetCompName = vue.$data._.comp.name;
+
+      //console.log("🔴", targetCompName, compName, "🚀", eventName, args);
 
       const argNames = this.getCompMethodArgNames(vue.$data._.comp.name, methodName);
 
@@ -113,9 +138,6 @@ methods:
           if (args[0] != vue.userID) return;
         }
       }
-
-      //console.log("🔴", compName, "🚀", vue.$data._.comp.name, emitName, args);
-      this.$refs.console1?.log("🔴", methodName);
       
       (method.bind(vue))(...args);
     }
@@ -126,7 +148,6 @@ methods:
         // Module caught an event
         this.femitsInLog[emitName] = args;
         this.$refs.console1?.log("➖", compName, emitName);
-        this.refresh();
       }
     }
   getCompMethodArgNames: | #js
@@ -144,13 +165,6 @@ methods:
       this.compMethodArgNames[key] = argNames;
       return argNames;
     }
-  refresh: | #js
-    function() {
-      if (!this._refresh) {
-        this._refresh = (() => { this.key1++; }).throttle(100);
-      }
-      this._refresh();
-    }
 computed:
   compName: | #js
     function() {
@@ -167,7 +181,7 @@ style:
     max-height: 10em
     overflow: auto
   .box2:
-    margin: 1em
+    margin: 0.5em
     border: '1px transparent #ccc'
   .box2 > *:
     margin-left: 0em
@@ -179,11 +193,6 @@ template: >-
   <div class="comp-grid-module grid-module box2" path="1449764372."><div
   v-if="icon &amp;&amp; showTitle" path="1449764372.0"><h3
   path="1449764372.0.0"><ui-title :icon="icon" :text="compName"
-  :number="getTitle()" path="1449764372.0.0.0"></ui-title></h3></div><ui-console
-  v-if="showConsole" ref="console1" path="1449764372.1"></ui-console><div
-  class="module-content" path="1449764372.2"><slot></slot></div><div
-  class="mt-l1" v-if="showEvents" :key="key1" path="1449764372.3"><ui-value
-  v-if="Object.keys(femitsOutLog).length" :value="femitsOutLog"
-  path="1449764372.3.0"></ui-value><ui-value
-  v-if="Object.keys(femitsInLog).length" :value="femitsInLog"
-  path="1449764372.3.1"></ui-value></div></div>
+  :number="getTitle()" path="1449764372.0.0.0"></ui-title></h3></div><div
+  class="module-content" path="1449764372.1"><slot></slot></div><div
+  class="mt-l1" v-if="showEvents" :key="key1" path="1449764372.2"></div></div>

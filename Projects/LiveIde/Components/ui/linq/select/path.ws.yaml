@@ -1,0 +1,56 @@
+dom:
+  div:
+    v-if: operation
+    ui.value.path.picker:
+      ':obj': input
+      v-model: operation.path
+props:
+  input: null
+  value: null
+data:
+  operation: null
+  output: null
+methods:
+  refresh: | #js
+    function() {
+      this.output = this.getOutput();
+    }
+  getOutput: | #js
+    function() {
+      if (!this.input) return null;
+      if (!this.operation?.path?.length) return this.input;
+      return Objects.getProperty(this.input, this.operation?.path.join("."));
+    }
+watch:
+  input:
+    handler: | #js
+      function(input) {
+        this.refresh();
+      }
+    immediate: true
+  output:
+    handler: | #js
+      function(output) {
+        this.$emit("output", output);
+      }
+  operation:
+    handler: | #js
+      function(operation) {
+        this.$emit("input", operation);
+        this.refresh();
+      }
+    deep: true
+  value:
+    handler: | #js
+      function(value) {
+        this.operation = value;
+      }
+    immediate: true
+_:
+  examples:
+    count: 0
+name: ui-linq-select-path
+template: >-
+  <div class="comp-ui-linq-select-path" v-if="operation"
+  path="-487334653."><ui-value-path-picker :obj="input" v-model="operation.path"
+  path="-487334653.0"></ui-value-path-picker></div>

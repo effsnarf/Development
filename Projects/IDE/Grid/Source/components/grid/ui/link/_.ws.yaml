@@ -20,15 +20,16 @@ dom:
       ':color': leaderLineColor
       template:
         v-slot: middle
-        div: 
-          v-if: 'true'
-          class: show-on-hover-container
-          ':style': '{ ''min-width'': ''10em'', height: ''3em'', ''z-index'': 1000 }'
-          ui.button:
-            class: show-on-hover
-            icon: ❌
-            ':text': linkDesc
-            @click: deleteLink
+        .show-on-hover-container:
+          div: 
+            ':class': '{ box1: true, ''has-func'': (!!link?.func), ''show-on-hover'': true }'
+            grid.ui.link.func:
+              ':link': link
+            div: 
+              ui.button:
+                icon: ❌
+                text: delete link
+                @click: onDeleteLink
 props:
   link: null
 data:
@@ -45,10 +46,6 @@ mounted: | #js
     this.refresh();
   }
 methods:
-  deleteLink: | #js
-    function() {
-      this.$femit("delete.link", this.link._id);
-    }
   grid_user_action_stack_do: | #js
     function(box) {
       this.refresh();
@@ -109,17 +106,6 @@ methods:
       if (box.groupBoxID) return this.getTopGroupBox({ _id: box.groupBoxID });
       return box;
     }
-  getLinkDesc: | #js
-    function() {
-      const fromBox = this.$root.boxes.find(b => b._id == this.link.from.box._id);
-      const toBox = this.$root.boxes.find(b => b._id == this.link.to.box._id);
-      if (!fromBox?.sockets || !toBox?.sockets) return "";
-      const fromSocket = fromBox.sockets.output.find(s => s._id == this.link.from.socket._id);
-      const toSocket = toBox.sockets.input.find(s => s._id == this.link.to.socket._id);
-      const fromSocketIcon = this.getSocketIcon(fromSocket);
-      const toSocketIcon = this.getSocketIcon(toSocket);
-      return `${fromSocketIcon}${fromSocket.name} -> ${toSocketIcon}${toSocket.name}`;
-    }
   getSocketIcon: | #js
     function(socket) {
       return {
@@ -129,11 +115,14 @@ methods:
         event: '⚡',
       }[socket?.type];
     }
+  onDeleteLink: | #js
+    function() {
+      this.$femit("delete.link", this.link._id);
+    }
   refresh: | #js
     function(again = 10) {
       this.fromEl = this.getFromEl();
       this.toEl = this.getToEl();
-      this.linkDesc = this.getLinkDesc();
       if (again) setTimeout(this.refresh.bind(this, again - 1), 400);
     }
 computed:
@@ -153,6 +142,14 @@ watch:
     function() {
       this.refresh();
     }
+style:
+  .box1:
+    opacity: 0
+    transition: 0.3s
+  .box1:hover:
+    opacity: 0.5
+  .box1.has-func:
+    opacity: 1
 _:
   examples:
     count: 0
@@ -168,7 +165,10 @@ template: >-
   v-if="showLeaderLine" ref="leaderLine1" :from="fromEl" :to="toEl"
   :start-plug="getStartPlug()" :color="leaderLineColor"
   path="281201772.1"><template v-slot:middle path="281201772.1.0"><div
-  class="show-on-hover-container" v-if="true" :style="{ 'min-width': '10em',
-  height: '3em', 'z-index': 1000 }" path="281201772.1.0.0"><ui-button
-  class="show-on-hover" icon="❌" :text="linkDesc" @click="deleteLink"
-  path="281201772.1.0.0.0"></ui-button></div></template></ui-leader-line></grid-module>
+  class="show-on-hover-container" path="281201772.1.0.0"><div :class="{ box1:
+  true, 'has-func': (!!link?.func), 'show-on-hover': true }"
+  path="281201772.1.0.0.0"><grid-ui-link-func :link="link"
+  path="281201772.1.0.0.0.0"></grid-ui-link-func><div
+  path="281201772.1.0.0.0.1"><ui-button icon="❌" text="delete link"
+  @click="onDeleteLink"
+  path="281201772.1.0.0.0.1.0"></ui-button></div></div></div></template></ui-leader-line></grid-module>

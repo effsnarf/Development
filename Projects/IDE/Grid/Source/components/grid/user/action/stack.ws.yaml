@@ -185,12 +185,23 @@ methods:
         Object.assign(newData, this.getDefaultBoxData(newData.type));
         newData.sockets = this.getNewSockets(newData.type);
       }
+      
       const box = this.boxes.find((box) => box._id === boxID);
+      
       oldData = oldData ||
         Objects.getPropertiesAsTree(box, Objects.getPaths(newData));
-      //for (const change of changes) DeepDiff.applyChange(box, change);
+
       this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "update", [boxID, newData]);
       action.undo = { method: "edit.box", args: [boxID, oldData, newData] };
+      return action;
+    }
+  edit_link: | #js
+    function(userID, action, linkID, newData, oldData) {
+      const link = this.links.find((link) => link._id === linkID);
+      oldData = oldData ||
+        Objects.getPropertiesAsTree(link, Objects.getPaths(newData));
+      this.$femit("to", "grid.data.list", `${userID}/data/links`, "update", [linkID, newData]);
+      action.undo = { method: "edit.link", args: [linkID, oldData, newData] };
       return action;
     }
   edit_socket: | #js
@@ -261,7 +272,6 @@ methods:
     }
   delete_selected: | #js
     async function(userID, action) {
-      alertify.message('mike hunt');
       return;
       const boxes = this.boxes.filter((box) => box.rect.is.selected);
       const boxIDs = boxes.map((box) => box._id);
@@ -351,7 +361,7 @@ methods:
         return;
       }
       const lastAction = this.userActions[this.pointer];
-      const undoAction = { redo: lastAction.undo };
+      const undoAction = { _id: -1, redo: lastAction.undo };
       await this.grid_user_actions_do(userID, undoAction, false, false, { isUndoing: true });
       this.pointer--;
     }
@@ -462,7 +472,7 @@ methods:
             value: null,
             rect: {
               is: {
-                minimized: true
+                minimized: false
               }
             }
           }
@@ -485,7 +495,7 @@ methods:
             },
             rect: {
               is: {
-                minimized: true
+                minimized: false
               }
             }
           }
@@ -638,6 +648,9 @@ computed:
       return this.nextRedoActions[0];
     }
 watch:
+  pointer: | #js
+    function(pointer) {
+    }
   userActions:
     handler: | #js
       async function() {

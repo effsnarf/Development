@@ -11,11 +11,20 @@ dom:
 props:
   box: null
   direction: null
+  socketType: null
 computed:
   sockets: | #js
     function() {
       if (!this.box?.sockets) return [];
-      return this.box.sockets[this.direction];
+      let sockets = this.box.sockets[this.direction];
+      sockets = sockets.filter((socket) => this.socketTypeFilter(socket.type));
+      return sockets;
+    }
+  socketTypeFilter: | #js
+    function(socket) {
+      if (!this.socketType) return () => true;
+      if (typeof this.socketType == "string") return (type) => (type == this.socketType);
+      return this.socketType;
     }
 style:
   .comp-grid-ui-box-sockets.input-sockets:

@@ -54,30 +54,6 @@ methods:
       if (boxID != this.box._id) return;
       this.resultValue = resultValue;
     }
-  writeUsingAI: | #js
-    async function() {
-      const name = this.funcName;
-      const argNames = (this.argNamesStr||"").split(",").map(s => s.trim());
-      const desc = this.desc;
-      const data = { name, argNames, desc };
-      try
-      {
-        // Make a GET request to /write/function
-        const response = await fetch("/write/function", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(data),
-        });
-        const reply = await response.json();
-        this.code = reply.code;
-      }
-      catch (ex)
-      {
-        alertify.error(ex.message);
-      }
-    }
   init: | #js
     function(box) {
       //if (this.is.inited) return;

@@ -1,0 +1,58 @@
+dom:
+  grid.module:
+    icon: 🔴
+    ':show-title': 'false'
+    div: 
+      v-if: link
+      div: 
+        v-if: func
+        h2:
+          class: clickable
+          @click: func = null
+          ui.title:
+            icon: 🔴
+            ':text': func.name
+      grid.ui.func.picker:
+        v-if: '!func'
+        v-model: func
+props:
+  link: null
+data:
+  func: null
+  isLoading: false
+methods:
+  grid_client_runtime_link_is_loading: | #js
+    function(linkID, isLoading) {
+      if (linkID != this.link._id) return;
+      this.isLoading = isLoading;
+    }
+watch:
+  link:
+    handler: | #js
+      function(link) {
+        this.func = link?.func;
+      }
+    immediate: true
+    deep: true
+  func:
+    handler: | #js
+      function(func) {
+        if (func?._id == this.link?.func?._id) return;
+        const vLink = this.$root.vm.getAncestors(this, "grid.ui.link")[0];
+        vLink.$femit("edit.link", this.link._id, { func });
+      }
+style:
+  .loading:
+    border: 3px solid yellow
+_:
+  examples:
+    count: 0
+name: grid-ui-link-func
+template: >-
+  <grid-module class="comp-grid-ui-link-func" icon="🔴" :show-title="false"
+  path="-266308858."><div v-if="link" path="-266308858.0"><div v-if="func"
+  path="-266308858.0.0"><h2 class="clickable" @click="func = null"
+  path="-266308858.0.0.0"><ui-title icon="🔴" :text="func.name"
+  path="-266308858.0.0.0.0"></ui-title></h2></div><grid-ui-func-picker
+  v-if="!func" v-model="func"
+  path="-266308858.0.1"></grid-ui-func-picker></div></grid-module>

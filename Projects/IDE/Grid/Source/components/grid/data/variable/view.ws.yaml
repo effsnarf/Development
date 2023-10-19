@@ -13,7 +13,7 @@ dom:
 props:
   fuid: null
 data:
-  value: []
+  value: null
 methods:
   grid_data_variable_change: | #js
     function(e) {

@@ -74,6 +74,16 @@ methods:
       const action = { redo: { method: "edit.box", args: [boxID, newData, oldData] } };
       this.$femit("do", this.userID, action);
     }
+  grid_ui_link_edit_link: | #js
+    function(linkID, newData, oldData) {
+      const action = { redo: { method: "edit.link", args: [linkID, newData, oldData] } };
+      this.$femit("do", this.userID, action);
+    }
+  grid_ui_link_delete_link: | #js
+    async function(linkID) {
+      const action = { redo: { method: "delete.link", args: [linkID] } };
+      this.$femit("do", this.userID, action);
+    }
   grid_ui_box_edit_socket: | #js
     function(boxID, direction, socketID, newData, oldData) {
       const action = { redo: { method: "edit.socket", args: [boxID, direction, socketID, newData, oldData] } };
@@ -84,7 +94,7 @@ methods:
       const action = { redo: { method: "create.link", args: args } };
       this.$femit("do", this.userID, action);
     }
-  grid_ui_link_delete_link: | #js
+  grid_ui_box_socket_delete_link: | #js
     async function(linkID) {
       const action = { redo: { method: "delete.link", args: [linkID] } };
       this.$femit("do", this.userID, action);

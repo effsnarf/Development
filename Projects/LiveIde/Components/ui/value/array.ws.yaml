@@ -1,77 +1,87 @@
 dom:
-  .box1:
-    ':class': '{ reversed: reverse }'
-    .flex:
-      ui.title:
-        icon: 🧊
-        text: Array
-        ':number': value?.length
-    ui.select:
-      v-if: 'false'
-      ':options': '[''table'', ''short-list'', ''expanded-list'']'
-      input-type: value
-      type: toggle
-      v-model: view1
-    ui.context.window:
-      v-if: 'false'
-      ref: hoveredItemContext1
-      ':visible': hoveredItem
-      ui.value: 
-        ':value': hoveredItem
-    transition: 
-      name: slide
-      table: 
-        v-if: (view1.includes('list'))
-        tbody: 
-          tr: 
-            v-for: (item, index) in items
-            td: 
-              class: opacity-50
-              v-text: index
-            td: 
-              ui.value.preview: 
-                v-if: (view1 == 'short-list')
-                ':value': item
-              ui.value.any:
-                v-else-if: (view1 == 'expanded-list')
-                ':value': item
-              ui.value: 
-                v-else: null
-                ':value': item
-    transition: 
-      name: slide
-      table: 
-        v-if: (view1 == 'table')
-        thead:
-          tr: 
-            th:
-              v-for: field in fields
-              .clickable:
-                ':class': '{ selected: (sortByField == field) }'
-                v-text: field
-                @click: onSortByField(field)
-        tbody: 
-          tr: 
-            v-for: (item, index) in items
-            ':class': _getItemClass(item, index)
-            @mouseenter: () => onItemHover(item, true)
-            @mouseleave: () => onItemHover(item, false)
-            @click: () => onRowClick(item, index)
-            td: 
-              v-for: field in fields
-              ui.value.preview: 
-                ':value': item[field]
+  div: 
+    div: 
+      ui.value.field.picker:
+        v-if: showFieldPicker
+        ':obj': firstItem
+        v-model: selectedFields
+    .box1:
+      ':class': '{ reversed: reverse }'
+      .flex:
+        ui.title:
+          icon: 🧊
+          text: Array
+          ':number': value?.length
+      ui.select:
+        v-if: 'false'
+        ':options': '[''table'', ''short-list'', ''expanded-list'']'
+        input-type: value
+        type: toggle
+        v-model: view1
+      ui.context.window:
+        v-if: 'false'
+        ref: hoveredItemContext1
+        ':visible': hoveredItem
+        ui.value: 
+          ':value': hoveredItem
+      transition: 
+        name: slide
+        table: 
+          v-if: (view1.includes('list'))
+          tbody: 
+            tr: 
+              v-for: (item, index) in visibleItems
+              td: 
+                class: opacity-50
+                v-text: index
+              td: 
+                ui.value.preview: 
+                  v-if: (view1 == 'short-list')
+                  ':value': item
+                ui.value.any:
+                  v-else-if: (view1 == 'expanded-list')
+                  ':value': item
+                ui.value: 
+                  v-else: null
+                  ':value': item
+      transition: 
+        name: slide
+        table: 
+          v-if: (view1 == 'table')
+          thead:
+            tr: 
+              th:
+                v-for: field in visibleFields
+                .clickable:
+                  ':class': '{ selected: (sortByField == field) }'
+                  v-text: field
+                  @click: onSortByField(field)
+          tbody: 
+            tr: 
+              v-for: (item, index) in visibleItems
+              ':class': _getItemClass(item, index)
+              @mouseenter: () => onItemHover(item, true)
+              @mouseleave: () => onItemHover(item, false)
+              @click: () => onItemClick(item, index)
+              td: 
+                v-for: field in visibleFields
+                ui.value.preview: 
+                  ':value': item[field]
 props:
   value: null
   reverse: false
   view: null
   getItemClass: null
   maxVisibleItems: 10
-  maxVisibleFields: 5
+  maxVisibleFields: 1000
+  showDrilldown: false
+  arraySelectedFields: null
 data:
   sortByField: null
   sortByFieldDirection: 1
+  firstItem: null
   hoveredItem: null
+  selectedFields: []
 methods:
   onSortByField: | #js
     function(field) {
@@ -83,10 +93,10 @@ methods:
       if (this.$refs.hoveredItemContext1?.isPinned) return;
       this.hoveredItem = (isHovered ? item : null);
     }
-  onRowClick: | #js
+  onItemClick: | #js
     function(item, index) {
       console.log(item);
-      alertify.message(`Item logged to console`);
+      this.$emit("array-item-click", item, index);
     }
   getFieldType: | #js
     function(fieldName) {
@@ -111,6 +121,30 @@ methods:
       return (typeof value) != "object";
     }
 computed:
+  showFieldPicker: >
+    if (!this.showDrilldown) return false;
+
+    let parent = this.$parent;
+
+    while ((parent.$data._.comp.name == "ui.value.any") ||
+    (parent.$data._.comp.name == "ui.value")) {
+      parent = parent.$parent;
+    }
+
+    const parentCompName = parent.$data._.comp.name;
+
+    if (parentCompName.startsWith("ui.value.")) return false;
+
+    return true;
+  visibleItems: | #js
+    const items = [...this.value]
+      .take(this.maxVisibleItems || 1000)
+      .sortByDirection([this.sortByField], this.sortByFieldDirection)
+      .map(item => Objects.getObjectFields(item, this.visibleFields));
+    return items;
+  visibleFields: | #js
+    if (this.selectedFields.length) return this.selectedFields;
+    return this.fields;
   items: | #js
     const items = [...this.value]
       .take(this.maxVisibleItems || 1000)
@@ -118,7 +152,7 @@ computed:
     return items;
   fields: | #js
     // Get all the field names from the array of objects
-    const firstItem = this.value[0];
+    const firstItem = this.firstItem;
     if (!firstItem) return [];
     if (this.isPrimitive(firstItem)) return [];
     const fields = Object.keys(firstItem).take(this.maxVisibleFields || 1000);
@@ -129,11 +163,30 @@ computed:
       const view = (!value) ? null : (this.isPrimitive(value[0]) ? 'list' : 'table');
       return this.view || view;
     }
+watch:
+  arraySelectedFields:
+    handler: | #js
+      function(arraySelectedFields) {
+        this.selectedFields = (arraySelectedFields || []);
+      }
+    immediate: true
+  selectedFields:
+    handler: | #js
+      function(selectedFields) {
+        this.$emit("array-selected-fields", selectedFields);
+      }
+  value:
+    handler: | #js
+      function(value) {
+        this.firstItem = value?.[0];
+      }
+    immediate: true
 style:
   .box1:
     border: '1px solid #ffffff80'
     border-radius: 0.5em
     padding: 0.5em
+    overflow: hidden
   .reversed > table > tbody:
     display: flex
     flex-direction: column-reverse
@@ -158,34 +211,38 @@ _:
     count: 0
 name: ui-value-array
 template: >-
-  <div class="comp-ui-value-array box1" :class="{ reversed: reverse }"
-  path="-621945022."><div class="flex" path="-621945022.0"><ui-title icon="🧊"
-  text="Array" :number="value?.length"
-  path="-621945022.0.0"></ui-title></div><ui-select v-if="false"
+  <div class="comp-ui-value-array" path="-621945022."><div
+  path="-621945022.0"><ui-value-field-picker v-if="showFieldPicker"
+  :obj="firstItem" v-model="selectedFields"
+  path="-621945022.0.0"></ui-value-field-picker></div><div class="box1"
+  :class="{ reversed: reverse }" path="-621945022.1"><div class="flex"
+  path="-621945022.1.0"><ui-title icon="🧊" text="Array" :number="value?.length"
+  path="-621945022.1.0.0"></ui-title></div><ui-select v-if="false"
   :options="['table', 'short-list', 'expanded-list']" input-type="value"
   type="toggle" v-model="view1"
-  path="-621945022.1"></ui-select><ui-context-window v-if="false"
-  ref="hoveredItemContext1" :visible="hoveredItem" path="-621945022.2"><ui-value
-  :value="hoveredItem"
-  path="-621945022.2.0"></ui-value></ui-context-window><transition name="slide"
-  path="-621945022.3"><table v-if="(view1.includes('list'))"
-  path="-621945022.3.0"><tbody path="-621945022.3.0.0"><tr v-for="(item, index)
-  in items" path="-621945022.3.0.0.0"><td class="opacity-50" v-text="index"
-  path="-621945022.3.0.0.0.0"></td><td
-  path="-621945022.3.0.0.0.1"><ui-value-preview v-if="(view1 == 'short-list')"
-  :value="item" path="-621945022.3.0.0.0.1.0"></ui-value-preview><ui-value-any
+  path="-621945022.1.1"></ui-select><ui-context-window v-if="false"
+  ref="hoveredItemContext1" :visible="hoveredItem"
+  path="-621945022.1.2"><ui-value :value="hoveredItem"
+  path="-621945022.1.2.0"></ui-value></ui-context-window><transition
+  name="slide" path="-621945022.1.3"><table v-if="(view1.includes('list'))"
+  path="-621945022.1.3.0"><tbody path="-621945022.1.3.0.0"><tr v-for="(item,
+  index) in visibleItems" path="-621945022.1.3.0.0.0"><td class="opacity-50"
+  v-text="index" path="-621945022.1.3.0.0.0.0"></td><td
+  path="-621945022.1.3.0.0.0.1"><ui-value-preview v-if="(view1 == 'short-list')"
+  :value="item" path="-621945022.1.3.0.0.0.1.0"></ui-value-preview><ui-value-any
   v-else-if="(view1 == 'expanded-list')" :value="item"
-  path="-621945022.3.0.0.0.1.1"></ui-value-any><ui-value :value="item"
-  path="-621945022.3.0.0.0.1.2"></ui-value></td></tr></tbody></table></transition><transition
-  name="slide" path="-621945022.4"><table v-if="(view1 == 'table')"
-  path="-621945022.4.0"><thead path="-621945022.4.0.0"><tr
-  path="-621945022.4.0.0.0"><th v-for="field in fields"
-  path="-621945022.4.0.0.0.0"><div class="clickable" :class="{ selected:
+  path="-621945022.1.3.0.0.0.1.1"></ui-value-any><ui-value :value="item"
+  path="-621945022.1.3.0.0.0.1.2"></ui-value></td></tr></tbody></table></transition><transition
+  name="slide" path="-621945022.1.4"><table v-if="(view1 == 'table')"
+  path="-621945022.1.4.0"><thead path="-621945022.1.4.0.0"><tr
+  path="-621945022.1.4.0.0.0"><th v-for="field in visibleFields"
+  path="-621945022.1.4.0.0.0.0"><div class="clickable" :class="{ selected:
   (sortByField == field) }" v-text="field" @click="onSortByField(field)"
-  path="-621945022.4.0.0.0.0.0"></div></th></tr></thead><tbody
-  path="-621945022.4.0.1"><tr v-for="(item, index) in items"
+  path="-621945022.1.4.0.0.0.0.0"></div></th></tr></thead><tbody
+  path="-621945022.1.4.0.1"><tr v-for="(item, index) in visibleItems"
   :class="_getItemClass(item, index)" @mouseenter="() =&gt; onItemHover(item,
   true)" @mouseleave="() =&gt; onItemHover(item, false)" @click="() =&gt;
-  onRowClick(item, index)" path="-621945022.4.0.1.0"><td v-for="field in fields"
-  path="-621945022.4.0.1.0.0"><ui-value-preview :value="item[field]"
-  path="-621945022.4.0.1.0.0.0"></ui-value-preview></td></tr></tbody></table></transition></div>
+  onItemClick(item, index)" path="-621945022.1.4.0.1.0"><td v-for="field in
+  visibleFields" path="-621945022.1.4.0.1.0.0"><ui-value-preview
+  :value="item[field]"
+  path="-621945022.1.4.0.1.0.0.0"></ui-value-preview></td></tr></tbody></table></transition></div></div>

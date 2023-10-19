@@ -48,6 +48,21 @@ methods:
         this.repropagateSocketLinks(link.from.box._id);
       }
     }
+  grid_data_list_updated: | #js
+    function(fuid, items) {
+      if (fuid.endsWith("/data/boxes")) {
+        const boxes = items;
+        for (const box of boxes) {
+          this.grid_ui_box_execute(box._id);
+        }
+      }
+      if (fuid.endsWith("/data/links")) {
+        const links = items;
+        for (const link of links) {
+          this.repropagateSocketLinks(link.from.box._id);
+        }
+      }
+    }
   grid_data_list_deleted: | #js
     function(fuid, links) {
       if (!fuid.endsWith("/data/links")) return;
@@ -84,17 +99,24 @@ methods:
     }
   grid_ui_box_execute_data: | #js
     function(boxID) {
-      this.propagateSocketLinks(boxID, "output", 1);
+      this.processBoxChange_data(this.getBox(boxID));
     }
   grid_client_runtime_box_is_loading: | #js
     function(boxID, isLoading) {
       const box = this.getBox(boxID);
       if (box.groupBoxID) this.$femit("box.is.loading", box.groupBoxID, isLoading);
     }
+  grid_client_runtime_link_is_loading: | #js
+    function(linkID, isLoading) {
+      const link = this.links.find(link => link._id == linkID);
+      if (!link) return;
+      if (link.groupBoxID) this.$femit("box.is.loading", link.groupBoxID, isLoading);
+    }
   setSocketValue: | #js
     function(boxID, sDirection, sID, sValue) {
       this.ensure(boxID);
       const box = this.getBox(boxID);
+      const oldValue = this.getSocketRuntimeValue(boxID, sDirection, sID);
       this.socket.runtime.data
         [boxID]
         [sDirection]
@@ -119,7 +141,7 @@ methods:
       {
         if (sDirection == "input" && sID == 1)
         {
-          this.setSocketValue(boxID, "output", 1, sValue);
+          this.processBoxChange_data(box);
         }
       }
 
@@ -131,6 +153,24 @@ methods:
         }
       }
     }
+  processBoxChange_data: | #js
+    function(box) {
+      const inputValue = this.getSocketRuntimeValue(box._id, "input", 1);
+      let outputValue = inputValue;
+      if (Array.isArray(outputValue)) {
+        if (box.selected?.fields?.length) outputValue = outputValue.map(item => Objects.getObjectFields(item, box.selected.fields));
+      }
+      if (typeof outputValue == "object") {
+        if (box.selected?.path?.length) outputValue = Objects.getProperty(outputValue, box.selected.path.join("."));
+      }
+      this.setSocketValue(box._id, "output", 1, outputValue);
+    }
+  processBoxChange_func: | #js
+    async function(box) {
+      const result = await this.runFunc(box);
+      this.setSocketValue(box._id, "output", 1, result);
+      this.$femit("func.result.change", box._id, result);
+    }
   repropagateSocketLinks: | #js
     function(boxID) {
       const box = this.getBox(boxID);
@@ -138,9 +178,7 @@ methods:
         .filter((link) => (link.from.box._id === boxID))
         .filter((link) => (link.from.socket.type == "data"));
       for (const link of links) {
-        const sValue = this.getSocketRuntimeValue(boxID, "output", 1);
-        this.$femit("link.flash", link._id, sValue);
-        this.setSocketValue(link.to.box._id, "input", link.to.socket._id, sValue);
+        this.propagateSocketLinks(boxID, "output", link.from.socket._id);
       }
     }
   clearSocketValue: | #js
@@ -153,16 +191,27 @@ methods:
 
       const box = this.getBox(boxID);
 
-      const sValue = this.getSocketRuntimeValue(boxID, sDirection, sID);
+      const sourceValue = this.getSocketRuntimeValue(boxID, sDirection, sID);
 
       const links = this.links
         .filter((link) => link.from.box._id === boxID)
         .filter((link) => link.from.socket._id == sID);
 
       for (const link of links) {
-        this.$femit("link.flash", link._id, sValue);
-        this.setSocketValue(link.to.box._id, "input", link.to.socket._id, sValue);
+        this.propagateSocketLink(link, sourceValue);
       }
+    }
+  propagateSocketLink: | #js
+    async function(link, sourceValue) {
+      const targetValue = await this.getLinkTargetValue(link, sourceValue);
+      this.$femit("link.flash", link._id, targetValue);
+      this.setSocketValue(link.to.box._id, "input", link.to.socket._id, targetValue);
+    }
+  getLinkTargetValue: | #js
+    async function(link, sourceValue) {
+      if (!link.func) return sourceValue;
+      const result = await this.runLinkFunc(link, link.func, [sourceValue]);
+      return result;
     }
   propagateGroupSockets: | #js
     function(boxID, sID, sValue) {
@@ -202,18 +251,43 @@ methods:
       if (socket.imported.from.socket._id != sID) return false;
       return true;
     }
-  processBoxChange_func: | #js
-    async function(box) {
-      const result = await this.runFunc(box);
-      this.setSocketValue(box._id, "output", 1, result);
-      this.$femit("func.result.change", box._id, result);
+  runLinkFunc: | #js
+    async function(link, func, argValues) {
+      try
+      {
+        this.$femit("link.error", link._id, null);
+        this.$femit("link.is.loading", link._id, 1);
+
+        if (argValues.some(value => (value == undefined))) return;
+
+        const argNames = (func.argNamesStr || "").split(",").map((argName) => argName.trim());
+
+        const result = (func.runs.on == "server")
+          ? await this.runFuncOnServer({}, argNames, argValues, func.code)
+          : await this.runFuncOnClient({}, argNames, argValues, func.code);
+
+        return result;
+      }
+      catch (ex)
+      {
+        const ideEx = {};
+        ideEx.message = ex.message;
+        ideEx.stack = ex.stack;
+        this.$femit("link.error", link._id, ideEx);
+        alertify.error(ex.message);
+      }
+      finally
+      {
+        this.$femit("link.is.loading", link._id, -1);
+      }
+
     }
   runFunc: | #js
     async function(box) {
       try
       {
         this.$femit("box.error", box._id, null);
-        this.$femit("box.is.loading", box._id, true);
+        this.$femit("box.is.loading", box._id, 1);
 
         const runtimeData = this.socket.runtime.data[box._id];
 
@@ -237,7 +311,7 @@ methods:
       }
       finally
       {
-        this.$femit("box.is.loading", box._id, false);
+        this.$femit("box.is.loading", box._id, -1);
       }
     }
   runFuncOnServer: | #js
@@ -266,6 +340,9 @@ methods:
     }
   runFuncOnClient: | #js
     async function(box, argNames, argValues, code) {
+      if (code.startsWith("`")) {
+        code = `return ${code}`;
+      }
       const func = eval(
         `(async function(${argNames.join(", ")}) { ${code} })`
       );

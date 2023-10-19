@@ -2,37 +2,40 @@ dom:
   grid.module:
     icon: 🧊
     ':show-title': 'false'
-    div: 
+    div:
       ':style': '{ ''width'': ''100%'', overflow: ''auto'' }'
-      div: 
-        v-if: 'true'
-        .box1:
-          ui.expand:
-            icon: 📋
-            text: exported fields
-            ':number': exportedFields.length
-            v-model: showFieldsFilter
-          transition:
-            name: slide2
-            div: 
-              v-if: showFieldsFilter
-              ui.checkbox:
-                v-for: field in fields
-                ':text': field
-                ':value-array': exportedFields
-                ':value-key': field
-                @input: onExportedFieldsChanged
+      ui.linq:
+        ':input': inputValue
+        v-model: linqExp
       ui.value:
-        ':value': exportedBoxValue
+        ':value': inputValue
+        ':show-drilldown': 'true'
+        ':object-selected-path': selectedPath
+        ':array-selected-fields': selectedFields
+        @object-selected-path: (...args) => selectedPath = args[0]
+        @array-item-click: (...args) => emitBoxEvent('array-item-click', ...args)
+        @array-selected-fields: (...args) => selectedFields = args[0]
 props:
   box: null
 data:
-  fields: []
-  exportedFields: []
-  showFieldsFilter: false
-  boxValue: null
-  exportedBoxValue: null
+  inputValue: null
+  outputValue: null
+  linqExp: []
+  selectedPath: []
+  selectedFields: []
 methods:
+  onBoxEvent: | #js
+    function(...args) {
+      const eventName = `on${args[0].getWords().map(s => s.toTitleCase()).join("")}`;
+      args = args.skip(1);
+      const method = this[eventName];
+      if (!method) throw new Error(`Method not found: ${eventName}`);
+      method(...args);
+    }
+  emitBoxEvent: | #js
+    function(boxEventName, ...args) {
+      this.$emit("box-event", boxEventName, ...args);
+    }
   grid_client_runtime_socket_value_change: | #js
     function(boxID, socketDirection, sID, socketValue) {
       if (boxID != this.box._id) return;
@@ -42,40 +45,21 @@ methods:
     function() {
       return this.$root.vm.getAncestors(this, "grid.ui.box")[0];
     }
-  getBoxValue: | #js
-    function() {
+  getSocketValue: | #js
+    function(direction) {
       const socketData = this.$root.socket?.runtime.data[this.box._id];
-      let data = socketData?.input?.[1] || this.box.value;
+      let data = socketData?.[direction]?.[1];
       return data;
-    }
-  getExportedBoxValue: | #js
-    function(boxValue, exportedFields) {
-      if (!boxValue) return null;
-      let data = boxValue;
-      if (exportedFields?.length) data = data[exportedFields[0]];
-      return data;
-    }
-  onExportedFieldsChanged: | #js
-    async function() {
-      await this.$nextTick();
-      this.getBoxVue().$femit("edit.box", this.box._id, { exported: { fields: this.exportedFields } });
-    }
-  getFields: | #js
-    function(obj) {
-      if (!obj) return [];
-      if (Array.isArray(obj)) return [];
-      if (typeof obj != "object") return [];
-      return Object.keys(obj);
     }
   refresh: | #js
     function() {
-      this.boxValue = this.getBoxValue();
-      this.fields = this.getFields(this.boxValue);
-      this.exportedBoxValue = this.getExportedBoxValue(this.boxValue, this.exportedFields);
+      this.inputValue = this.getSocketValue("input");
+      this.outputValue = this.getSocketValue("output");
     }
   init: | #js
     function(box) {
-      this.exportedFields = (box.exported?.fields || []);
+      this.selectedPath = Objects.clone(box.selected?.path || []);
+      this.selectedFields = Objects.clone(box.selected?.fields || []);
       this.refresh();
     }
 computed: null
@@ -86,6 +70,18 @@ watch:
         this.init(box);
       }
     immediate: true
+  selectedPath:
+    handler: | #js
+      function(selectedPath) {
+        if (selectedPath?.join(",") == this.box.selected?.path?.join(",")) return;
+        this.getBoxVue().$femit("edit.box", this.box._id, { selected: { path: this.selectedPath } });
+      }
+  selectedFields:
+    handler: | #js
+      function(selectedFields) {
+        if (selectedFields?.join(",") == this.box.selected?.fields?.join(",")) return;
+        this.getBoxVue().$femit("edit.box", this.box._id, { selected: { fields: this.selectedFields } });
+      }
 style:
   .box1:
     border: '1px solid #ccc'
@@ -98,14 +94,11 @@ name: grid-ui-box-data
 template: >-
   <grid-module class="comp-grid-ui-box-data" icon="🧊" :show-title="false"
   path="1558979935."><div :style="{ 'width': '100%', overflow: 'auto' }"
-  path="1558979935.0"><div v-if="true" path="1558979935.0.0"><div class="box1"
-  path="1558979935.0.0.0"><ui-expand icon="📋" text="exported fields"
-  :number="exportedFields.length" v-model="showFieldsFilter"
-  path="1558979935.0.0.0.0"></ui-expand><transition name="slide2"
-  path="1558979935.0.0.0.1"><div v-if="showFieldsFilter"
-  path="1558979935.0.0.0.1.0"><ui-checkbox v-for="field in fields" :text="field"
-  :value-array="exportedFields" :value-key="field"
-  @input="onExportedFieldsChanged"
-  path="1558979935.0.0.0.1.0.0"></ui-checkbox></div></transition></div></div><ui-value
-  :value="exportedBoxValue"
+  path="1558979935.0"><ui-linq :input="inputValue" v-model="linqExp"
+  path="1558979935.0.0"></ui-linq><ui-value :value="inputValue"
+  :show-drilldown="true" :object-selected-path="selectedPath"
+  :array-selected-fields="selectedFields" @object-selected-path="(...args) =&gt;
+  selectedPath = args[0]" @array-item-click="(...args) =&gt;
+  emitBoxEvent('array-item-click', ...args)" @array-selected-fields="(...args)
+  =&gt; selectedFields = args[0]"
   path="1558979935.0.1"></ui-value></div></grid-module>

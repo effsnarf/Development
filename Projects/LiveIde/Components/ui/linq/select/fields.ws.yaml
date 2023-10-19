@@ -1,0 +1,62 @@
+dom:
+  div:
+    v-if: operation
+    ui.value.field.picker:
+      ':obj': input?.[0]
+      v-model: operation.fields
+props:
+  input: null
+  value: null
+data:
+  operation: null
+  output: null
+methods:
+  refresh: | #js
+    function() {
+      this.output = this.getOutput();
+    }
+  getOutput: | #js
+    function() {
+      if (!this.input) return null;
+      if (!this.operation?.fields?.length) return this.input;
+      if (Array.isArray(this.input)) {
+        return this.input.map(item => Objects.getObjectFields(item, this.operation?.fields));
+      }
+      if (typeof this.input == "object") {
+        return Objects.getObjectFields(this.input, this.operation?.fields);
+      }
+      return this.input;
+    }
+watch:
+  input:
+    handler: | #js
+      function(input) {
+        this.refresh();
+      }
+    immediate: true
+  output:
+    handler: | #js
+      function(output) {
+        this.$emit("output", output);
+      }
+  operation:
+    handler: | #js
+      function(operation) {
+        this.$emit("input", operation);
+        this.refresh();
+      }
+    deep: true
+  value:
+    handler: | #js
+      function(value) {
+        this.operation = value;
+      }
+    immediate: true
+_:
+  examples:
+    count: 0
+name: ui-linq-select-fields
+template: >-
+  <div class="comp-ui-linq-select-fields" v-if="operation"
+  path="-456509417."><ui-value-field-picker :obj="input?.[0]"
+  v-model="operation.fields" path="-456509417.0"></ui-value-field-picker></div>

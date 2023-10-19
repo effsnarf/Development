@@ -1,0 +1,82 @@
+dom:
+  div: 
+    ui.linq.operation.any:
+      ':input': input
+      @output: (output) => firstOutput = output
+      v-model: operation
+    div: 
+      v-if: showIntermediateValues
+      class: short-preview
+      ui.value: 
+        ':value': firstOutput
+    ui.linq.operation:
+      v-if: nextOperation
+      ':input': firstOutput
+      @output: lastOutput = $event
+      v-model: nextOperation
+    ui.button:
+      v-if: '!nextOperation'
+      icon: ➕
+      text: Add
+      @click: onAdd()
+    div: 
+      v-if: showIntermediateValues
+      class: short-preview
+      ui.value: 
+        ':value': lastOutput
+props:
+  input: null
+  value: null
+data:
+  firstOutput: null
+  lastOutput: null
+  operation: null
+  nextOperation: null
+  showIntermediateValues: false
+methods:
+  onAdd: | #js
+    function() {
+      this.nextOperation = { type: 'select.fields', fields: [] };
+    }
+watch:
+  firstOutput:
+    handler: | #js
+      function(firstOutput) {
+        this.$emit("output", firstOutput);
+      }
+  lastOutput:
+    handler: | #js
+      function(lastOutput) {
+        this.$emit("output", lastOutput);
+      }
+  value:
+    handler: | #js
+      function(value) {
+        this.operation = value;
+      }
+    immediate: true
+style:
+  .short-preview:
+    max-height: 4em
+    overflow: auto
+    border: 3px solid red
+    transition: 0.6s
+  .short-preview:hover:
+    max-height: 10em
+_:
+  examples:
+    count: 0
+name: ui-linq-operation
+template: >-
+  <div class="comp-ui-linq-operation" path="-188258413."><ui-linq-operation-any
+  :input="input" @output="(output) =&gt; firstOutput = output"
+  v-model="operation" path="-188258413.0"></ui-linq-operation-any><div
+  class="short-preview" v-if="showIntermediateValues"
+  path="-188258413.1"><ui-value :value="firstOutput"
+  path="-188258413.1.0"></ui-value></div><ui-linq-operation v-if="nextOperation"
+  :input="firstOutput" @output="lastOutput = $event" v-model="nextOperation"
+  path="-188258413.2"></ui-linq-operation><ui-button v-if="!nextOperation"
+  icon="➕" text="Add" @click="onAdd()" path="-188258413.3"></ui-button><div
+  class="short-preview" v-if="showIntermediateValues"
+  path="-188258413.4"><ui-value :value="lastOutput"
+  path="-188258413.4.0"></ui-value></div></div>

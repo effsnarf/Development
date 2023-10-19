@@ -34,22 +34,40 @@ dom:
       template: 
         v-slot: content
         .h-100pc:
-          component: 
-            ref: boxComp1
-            v-if: box.type
-            class: h-100pc
-            ':is': getBoxCompName(box)
-            ':userID': userID
-            ':box': box
-          grid.ui.box.type.picker:
-            v-if: '!box.type'
-            ':box': box
+          transition:
+            name: slide2
+            div: 
+              v-if: box.type
+              component: 
+                ref: boxComp1
+                class: h-100pc
+                ':is': getBoxCompName(box)
+                ':userID': userID
+                ':box': box
+                @box-event: onContentBoxEvent
+            grid.ui.box.type.picker:
+              v-if: '!box.type'
+              ':box': box
+      template: 
+        v-slot: right-side
+        component:
+          v-if: hasRightSideComp(boxType)
+          ref: rightSideComp1
+          ':is': getBoxRightSideCompName(boxType)
+          ':userID': userID
+          ':box': box
+          @box-event: onRightSideBoxEvent
+        grid.ui.box.sockets: 
+          ':box': box
+          direction: output
+          socket-type: iterator
       template: 
         v-slot: below
         grid.ui.box.sockets: 
           ':box': box
           direction: output
-        div:
+          ':socket-type': (type) => (type != 'iterator')
+        div: 
           transition.group:
             name: list
             .alert:
@@ -74,6 +92,7 @@ data:
   boxIsLoading: 0
   surfaceScale: 1
   boxRect: null
+  boxType: null
   showSockets: 0
   alerts: []
   nextAlertID: 1
@@ -88,6 +107,19 @@ unmounted: | #js
     delete this.$root.els[`/box/window/${this.box._id}`];
   }
 methods:
+  onContentBoxEvent: | #js
+    function(...args) {
+      this.$refs.rightSideComp1?.onBoxEvent?.(...args);
+    }
+  onRightSideBoxEvent: | #js
+    function(...args) {
+      this.$refs.boxComp1?.onBoxEvent?.(...args);
+    }
+  init: | #js
+    async function(box) {
+      this.boxRect = await this.getBoxRect(box);
+      this.boxType = box.type;
+    }
   onWindowHovered: | #js
     function(isHovered) {
       this.$femit("hovered", this.box, isHovered);
@@ -95,6 +127,19 @@ methods:
   onTitleIconClick: | #js
     function() {
       this.$femit("execute", this.box._id);
+    }
+  grid_data_list_updated: | #js
+    function(fuid, items) {
+      if (fuid.endsWith("/data/boxes")) {
+        const boxes = items;
+        for (const box of boxes) {
+          if (box._id != this.box._id) continue;
+          this.init(box);
+        }
+      }
+    }
+  grid_user_action_stack_do: | #js
+    function(action) {
     }
   grid_client_runtime_socket_value_change: | #js
     function(boxID, sDirection, sID, sValue) {
@@ -123,7 +168,7 @@ methods:
       const boxComp1 = this.$refs.boxComp1;
       if (boxComp1?.onBoxIsLoading) boxComp1.onBoxIsLoading(boxID, isLoading);
       if (boxID != this.box._id) return;
-      this.boxIsLoading += (isLoading ? 1 : -1);
+      this.boxIsLoading += isLoading;
       if (this.$refs.header1) this.$refs.header1.boxIsLoading = this.boxIsLoading;
     }
   grid_client_runtime_box_error: | #js
@@ -134,6 +179,16 @@ methods:
   grid_client_workspace_surface_scale: | #js
     function(scale) {
       this.surfaceScale = scale;
+    }
+  hasRightSideComp: | #js
+    function(type) {
+      if (["group", "data"].includes(type)) return true;
+      return false;
+    }
+  getBoxRightSideCompName: | #js
+    function(type) {
+      if (!type) return null;
+      return `grid.ui.box.${type}.right.side`.replace(/\./g, "-");
     }
   addAlert: | #js
     function(comp, props) {
@@ -157,8 +212,8 @@ methods:
     }
   getBoxCompName: | #js
     function(box) {
-      if (!box?.type) return null;
-      return `grid.ui.box.${box.type}`.replace(/\./g, "-");
+      if (!this.boxType) return null;
+      return `grid.ui.box.${this.boxType}`.replace(/\./g, "-");
     }
   onToggleMinimized: | #js
     function(isMinimized) {
@@ -221,6 +276,7 @@ methods:
 computed:
   showBoxWindow: | #js
     function() {
+      if (this.box.rect.is.grouped) return false;
       return this.box.rect.is.visible;
     }
   windowCssClass: | #js
@@ -241,8 +297,8 @@ computed:
 watch:
   box:
     handler: | #js
-      async function(box) {
-        this.boxRect = await this.getBoxRect(box);
+      function(box) {
+        this.init(box);
       }
     immediate: true
     deep: true
@@ -252,8 +308,9 @@ _:
 style:
   .comp-ui-window.selected:
     border: 4px dashed yellow
+    box-shadow: 'inset -6px 6px 2px #000000'
   .comp-ui-window.selected .window:
-    filter: grayscale(1)
+    filter: grayscale(1) contrast(1.2)
   .alert:
     width: 100%
     max-height: 10em
@@ -310,17 +367,28 @@ template: >-
   @title-icon-click="onTitleIconClick"
   path="1671629593.0.1.0.0"></grid-ui-box-header></div></template><template
   v-slot:content path="1671629593.0.2"><div class="h-100pc"
-  path="1671629593.0.2.0"><component class="h-100pc" ref="boxComp1"
-  v-if="box.type" :is="getBoxCompName(box)" :userID="userID" :box="box"
-  path="1671629593.0.2.0.0"></component><grid-ui-box-type-picker
+  path="1671629593.0.2.0"><transition name="slide2"
+  path="1671629593.0.2.0.0"><div v-if="box.type"
+  path="1671629593.0.2.0.0.0"><component class="h-100pc" ref="boxComp1"
+  :is="getBoxCompName(box)" :userID="userID" :box="box"
+  @box-event="onContentBoxEvent"
+  path="1671629593.0.2.0.0.0.0"></component></div><grid-ui-box-type-picker
   v-if="!box.type" :box="box"
-  path="1671629593.0.2.0.1"></grid-ui-box-type-picker></div></template><template
-  v-slot:below path="1671629593.0.3"><grid-ui-box-sockets :box="box"
-  direction="output" path="1671629593.0.3.0"></grid-ui-box-sockets><div
-  path="1671629593.0.3.1"><transition-group name="list"
-  path="1671629593.0.3.1.0"><div class="alert" v-for="alert in alerts"
+  path="1671629593.0.2.0.0.1"></grid-ui-box-type-picker></transition></div></template><template
+  v-slot:right-side path="1671629593.0.3"><component
+  v-if="hasRightSideComp(boxType)" ref="rightSideComp1"
+  :is="getBoxRightSideCompName(boxType)" :userID="userID" :box="box"
+  @box-event="onRightSideBoxEvent"
+  path="1671629593.0.3.0"></component><grid-ui-box-sockets :box="box"
+  direction="output" socket-type="iterator"
+  path="1671629593.0.3.1"></grid-ui-box-sockets></template><template
+  v-slot:below path="1671629593.0.4"><grid-ui-box-sockets :box="box"
+  direction="output" :socket-type="(type) =&gt; (type != 'iterator')"
+  path="1671629593.0.4.0"></grid-ui-box-sockets><div
+  path="1671629593.0.4.1"><transition-group name="list"
+  path="1671629593.0.4.1.0"><div class="alert" v-for="alert in alerts"
   :key="alert._id" @click="deleteAlert(alert._id)"
-  path="1671629593.0.3.1.0.0"><component :is="alert.comp" v-bind="alert.props"
-  path="1671629593.0.3.1.0.0.0"></component></div></transition-group></div><div
-  class="error" v-if="error" path="1671629593.0.3.2"><h3 v-text="error.message"
-  path="1671629593.0.3.2.0"></h3></div></template></ui-window></grid-module>
+  path="1671629593.0.4.1.0.0"><component :is="alert.comp" v-bind="alert.props"
+  path="1671629593.0.4.1.0.0.0"></component></div></transition-group></div><div
+  class="error" v-if="error" path="1671629593.0.4.2"><h3 v-text="error.message"
+  path="1671629593.0.4.2.0"></h3></div></template></ui-window></grid-module>
