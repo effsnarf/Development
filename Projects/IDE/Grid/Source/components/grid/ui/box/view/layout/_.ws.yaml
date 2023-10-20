@@ -2,7 +2,13 @@ dom:
   grid.module:
     icon: ⬜
     ':show-title': 'false'
+    grid.ui.node.view:
+      ':box': box
+      ':node': viewNodeRoot
+      ':hovered-node': hoveredNode
+      ':data-bound-socket-data': dataBoundSocketData
     .slots:
+      v-if: 'false'
       @click: refresh
       div: 
         v-for: (item, index) in items
@@ -24,12 +30,18 @@ data:
   slotBoxes: null
   boxes: []
   links: []
+  viewNodeRoot: null
+  hoveredNode: null
 mounted: | #js
   async function() {
     await this.$nextTick();
     this.refresh();
   }
 methods:
+  onNodeHovered: | #js
+    function(node, isHovered) {
+      this.hoveredNode = (isHovered ? node : null);
+    }
   onTitleIconClick: | #js
     function() {
       this.refresh();
@@ -59,6 +71,23 @@ methods:
       const socket = this.box.sockets.input.find(s => s._id == socketID);
       return socket;
     }
+  getNewViewNodeRoot: | #js
+    function() {
+      const viewNode = {
+        _id: 1,
+        type: "view",
+        children: [],
+      };
+      return viewNode;
+    }
+  getBoxVue: | #js
+    function() {
+      return this.$root.vm.getAncestors(this, "grid.ui.box")[0];
+    }
+  init: | #js
+    function(box) {
+      this.viewNodeRoot = (box.viewNodeRoot || this.getNewViewNodeRoot());
+    }
 computed:
   items: | #js
     function() {
@@ -69,7 +98,19 @@ computed:
       const items = (slotCanMultiplyView && Array.isArray(item)) ? item : [item];
       return items;
     }
-watch: null
+watch:
+  viewNodeRoot:
+    handler: | #js
+      function(viewNodeRoot) {
+        if (Objects.areEqual(viewNodeRoot, this.box.viewNodeRoot)) return;
+        this.getBoxVue().$femit("edit.box", this.box._id, { viewNodeRoot });
+      }
+  box:
+    handler: | #js
+      function(box) {
+        this.init(box);
+      }
+    immediate: true
 style:
   .item-row:
     height: 1.5em
@@ -90,10 +131,13 @@ _:
 name: grid-ui-box-view-layout
 template: >-
   <grid-module class="comp-grid-ui-box-view-layout" icon="⬜" :show-title="false"
-  path="814806846."><div class="slots" @click="refresh" path="814806846.0"><div
-  v-for="(item, index) in items" :class="'slot-' + index"
-  path="814806846.0.0"><div v-if="slotBoxes" path="814806846.0.0.0"><component
-  class="h-100pc" v-if="slotBoxes[index]?.type"
-  :is="getBoxCompName(slotBoxes[index])" :userID="userID"
-  :box="slotBoxes[index]" :data-bound-socket-data="dataBoundSocketData"
-  path="814806846.0.0.0.0"></component></div></div></div></grid-module>
+  path="814806846."><grid-ui-node-view :box="box" :node="viewNodeRoot"
+  :hovered-node="hoveredNode" :data-bound-socket-data="dataBoundSocketData"
+  path="814806846.0"></grid-ui-node-view><div class="slots" v-if="false"
+  @click="refresh" path="814806846.1"><div v-for="(item, index) in items"
+  :class="'slot-' + index" path="814806846.1.0"><div v-if="slotBoxes"
+  path="814806846.1.0.0"><component class="h-100pc"
+  v-if="slotBoxes[index]?.type" :is="getBoxCompName(slotBoxes[index])"
+  :userID="userID" :box="slotBoxes[index]"
+  :data-bound-socket-data="dataBoundSocketData"
+  path="814806846.1.0.0.0"></component></div></div></div></grid-module>

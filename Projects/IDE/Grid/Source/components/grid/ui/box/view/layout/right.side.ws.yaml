@@ -1,0 +1,10 @@
+dom:
+  div:
+    grid.ui.node.toolbar: null
+_:
+  examples:
+    count: 0
+name: grid-ui-box-view-layout-right-side
+template: >-
+  <div class="comp-grid-ui-box-view-layout-right-side"
+  path="-2068571495."><grid-ui-node-toolbar></grid-ui-node-toolbar></div>

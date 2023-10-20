@@ -1,10 +1,10 @@
 dom:
   grid.module:
     icon: 🧊
-    ":show-title": "false"
-    div:
+    ':show-title': 'false'
+    .ml-l1:
       ui.linq:
-        ":input": inputValue
+        ':input': inputValue
         v-model: operations
 props:
   box: null
@@ -33,14 +33,6 @@ methods:
       this.operations = Objects.clone(box.linq?.operations || []);
       this.refresh();
     }
-  onBoxEvent: | #js
-    function(...args) {
-      const eventName = `on${args[0].getWords().map(s => s.toTitleCase()).join("")}`;
-      args = args.skip(1);
-      const method = this[eventName];
-      if (!method) throw new Error(`Method not found: ${eventName}`);
-      method(...args);
-    }
 watch:
   operations:
     handler: | #js
@@ -54,6 +46,8 @@ watch:
       }
     immediate: true
 style:
+  .comp-ui-drawer:
+    white-space: nowrap
   .value-preview:
     max-width: 20em
     max-height: 20em
@@ -64,6 +58,6 @@ _:
 name: grid-ui-box-data-right-side
 template: >-
   <grid-module class="comp-grid-ui-box-data-right-side" icon="🧊"
-  :show-title="false" path="-1961460264."><div path="-1961460264.0"><ui-linq
-  :input="inputValue" v-model="operations"
+  :show-title="false" path="-1961460264."><div class="ml-l1"
+  path="-1961460264.0"><ui-linq :input="inputValue" v-model="operations"
   path="-1961460264.0.0"></ui-linq></div></grid-module>

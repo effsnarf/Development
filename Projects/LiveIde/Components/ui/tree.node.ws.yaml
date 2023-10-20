@@ -81,10 +81,12 @@ methods:
   onMouseEnter: | #js
     function() {
       this.$emit('node-hover', this.node);
+      this.$emit("node-hovered", this.node, true);
     }
   onMouseLeave: | #js
     function() {
       this.$emit('node-unhover', this.node);
+      this.$emit("node-hovered", this.node, false);
     }
   onChildClick: | #js
     function(child) {

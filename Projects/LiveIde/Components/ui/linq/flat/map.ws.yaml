@@ -1,7 +1,7 @@
 dom:
-  div: 
+  div:
     v-if: operation
-    div: 
+    .text-center:
       v-text: '''flat map'''
 props:
   input: null
@@ -28,4 +28,4 @@ _:
 name: ui-linq-flat-map
 template: >-
   <div class="comp-ui-linq-flat-map" v-if="operation" path="595239355."><div
-  v-text="'flat map'" path="595239355.0"></div></div>
+  class="text-center" v-text="'flat map'" path="595239355.0"></div></div>

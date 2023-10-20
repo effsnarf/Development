@@ -465,4 +465,77 @@ class Objects {
   };
 }
 
-export { Objects };
+class TreeObject {
+  static traverse(root: any, callback: Function) {
+    // Traverse a tree structure (children[] on each node)
+    const traverse = (node: any, callback: Function) => {
+      callback(node);
+      if (node.children) {
+        for (const child of node.children) {
+          traverse(child, callback);
+        }
+      }
+    };
+    traverse(root, callback);
+  }
+
+  static filter(root: any, predicate: Function) {
+    predicate = TreeObject._evalSelector(predicate);
+    const items = [] as any[];
+    TreeObject.traverse(root, (node: any) => {
+      if (predicate(node)) items.push(node);
+    });
+    return items;
+  }
+
+  static find(root: any, predicate: Function) {
+    const items = TreeObject.filter(root, predicate);
+    return items.length ? items[0] : null;
+  }
+
+  static map(root: any, selector: Function) {
+    selector = TreeObject._evalSelector(selector);
+    const items = [] as any[];
+    TreeObject.traverse(root, (node: any) => {
+      items.push(selector(node));
+    });
+    return items;
+  }
+
+  static max(root: any, selector: Function) {
+    const values = TreeObject.map(root, selector);
+    return Math.max(...values);
+  }
+
+  static deleteNode(root: any, isNode: Function) {
+    root = Objects.clone(root);
+    isNode = TreeObject._evalSelector(isNode);
+    const parentNode = TreeObject.getParentNode(root, isNode);
+    if (!parentNode) return root;
+    parentNode.children.removeBy(isNode);
+    return root;
+  }
+
+  static getParentNode(root: any, isNode: Function): any {
+    isNode = TreeObject._evalSelector(isNode);
+    let parentNode = null;
+    TreeObject.traverse(root, (n: any) => {
+      if (n.children && n.children.find(isNode)) parentNode = n;
+    });
+    return parentNode;
+  }
+
+  static _evalSelector(func: any) {
+    if (typeof func == "number") {
+      const id = func;
+      return (node: any) => node._id == id || node.id == id;
+    }
+    if (typeof func == "string") {
+      const key = func;
+      return (node: any) => node[key];
+    }
+    return func;
+  }
+}
+
+export { Objects, TreeObject };

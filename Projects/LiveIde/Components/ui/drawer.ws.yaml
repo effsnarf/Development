@@ -1,22 +1,32 @@
 dom:
   .drawer:
-    ':class': '{ open }'
+    @dragenter: isHovered++
+    @dragleave: isHovered--
+    @click: isHovered=0
+    ':class': '{ open, hovered: isHovered }'
     slot: null
 props:
   open: false
+data:
+  isHovered: 0
 style:
   .drawer:
-    max-width: 5em
+    max-height: 10em
+    max-width: 3em
     overflow: hidden
     transition: 1s
-    filter: blur(0.3em)
-  .drawer.open, .drawer:hover:
+    filter: grayscale(1) blur(0.1em)
+    opacity: 0.5
+  .drawer.open, .drawer:hover, .drawer.hovered:
+    max-height: 60em
     max-width: 20em
     filter: none
+    opacity: 1
 _:
   examples:
     count: 0
 name: ui-drawer
 template: >-
-  <div class="comp-ui-drawer drawer" :class="{ open }"
-  path="-1860583029."><slot></slot></div>
+  <div class="comp-ui-drawer drawer" @dragenter="isHovered++"
+  @dragleave="isHovered--" @click="isHovered=0" :class="{ open, hovered:
+  isHovered }" path="-1860583029."><slot></slot></div>

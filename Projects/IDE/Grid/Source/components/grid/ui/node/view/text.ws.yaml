@@ -1,0 +1,60 @@
+dom:
+  grid.module:
+    icon: 🆎
+    ':show-title': 'false'
+    h2:
+      @click: refresh
+      div:
+        v-if: text?.length
+        v-text: text
+      .opacity-50:
+        v-else-if: 'true'
+        v-text: '''[text]'''
+props:
+  box: null
+  node: null
+  dataBoundSocketData: null
+data:
+  activeSocketData: null
+mounted: | #js
+  async function() {
+    await this.$nextTick();
+    this.refresh();
+  }
+methods:
+  grid_client_runtime_socket_value_change: | #js
+    function(boxID, sDirection, sID, sValue) {
+      if (boxID != this.box._id) return;
+      this.refresh();
+    }
+  getActiveSocketData: | #js
+    function() {
+      let socketData = (this.$root.socket?.runtime.data[this.box._id] || {});
+      socketData = Objects.deepMerge(socketData, (this.dataBoundSocketData || {}));
+      return socketData;
+    }
+  refresh: | #js
+    function() {
+      this.activeSocketData = this.getActiveSocketData();
+    }
+computed:
+  text: | #js
+    function() {
+      const item = this.dataBoundItem;
+      return (item?.title || item?.sub);
+    }
+  dataBoundItem: | #js
+    function() {
+      return this.activeSocketData?.input?.[1];
+    }
+style: null
+_:
+  examples:
+    count: 0
+name: grid-ui-node-view-text
+template: >-
+  <grid-module class="comp-grid-ui-node-view-text" icon="🆎" :show-title="false"
+  path="-1435648036."><h2 @click="refresh" path="-1435648036.0"><div
+  v-if="text?.length" v-text="text" path="-1435648036.0.0"></div><div
+  class="opacity-50" v-else-if="true" v-text="'[text]'"
+  path="-1435648036.0.1"></div></h2></grid-module>

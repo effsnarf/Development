@@ -1,0 +1,24 @@
+dom:
+  div:
+    grid.ui.node.view:
+      v-for: childNode in node.children
+      ':box': box
+      ':node': childNode
+      ':hovered-node': hoveredNode
+      ':data-bound-socket-data': dataBoundSocketData
+props:
+  box: null
+  node: null
+  hoveredNode: null
+  dataBoundSocketData: null
+style: null
+_:
+  examples:
+    count: 0
+name: grid-ui-node-view-view
+template: >-
+  <div class="comp-grid-ui-node-view-view"
+  path="-1435585196."><grid-ui-node-view v-for="childNode in node.children"
+  :box="box" :node="childNode" :hovered-node="hoveredNode"
+  :data-bound-socket-data="dataBoundSocketData"
+  path="-1435585196.0"></grid-ui-node-view></div>

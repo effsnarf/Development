@@ -43,7 +43,7 @@ methods:
     function() {
       if (!this.isRunning) return;
       this.elapsed = Math.round((Date.now() - this.started));
-      setTimeout(this.updateElapsed.bind(this), 100);
+      //setTimeout(this.updateElapsed.bind(this), 100);
     }
 computed:
   elapsedUnitified: | #js

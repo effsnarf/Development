@@ -1,0 +1,40 @@
+dom:
+  component:
+    ':box': box
+    ':class': getViewClass(node)
+    ':is': getCompName(node)
+    ':node': node
+    ':hovered-node': hoveredNode
+    ':data-bound-socket-data': dataBoundSocketData
+props:
+  box: null
+  node: null
+  hoveredNode: null
+  dataBoundSocketData: null
+methods:
+  getViewClass: | #js
+    function(node) {
+      const cls = {};
+      cls["h-100pc"] = true;
+      cls["_grid-view-node"] = true;
+      cls["_grid-hovered"] = (node._id == this.hoveredNode?._id);
+      return cls;
+    }
+  getCompName: | #js
+    function(node) {
+      return `grid.ui.node.view.${node.type}`.replace(/\./g, "-");
+    }
+style:
+  ._grid-view-node:
+    height: 100%
+  ._grid-hovered:
+    border: '3px dashed #ffffff80'
+_:
+  examples:
+    count: 0
+name: grid-ui-node-view
+template: >-
+  <component class="comp-grid-ui-node-view" :box="box"
+  :class="getViewClass(node)" :is="getCompName(node)" :node="node"
+  :hovered-node="hoveredNode" :data-bound-socket-data="dataBoundSocketData"
+  path="1824264671."></component>

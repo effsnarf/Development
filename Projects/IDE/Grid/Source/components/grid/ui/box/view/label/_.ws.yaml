@@ -30,9 +30,9 @@ methods:
     }
   getActiveSocketData: | #js
     function() {
-      let boxData = (this.$root.socket?.runtime.data[this.box._id] || {});
-      boxData = Objects.deepMerge(boxData, (this.dataBoundSocketData || {}));
-      return boxData;
+      let socketData = (this.$root.socket?.runtime.data[this.box._id] || {});
+      socketData = Objects.deepMerge(socketData, (this.dataBoundSocketData || {}));
+      return socketData;
     }
   getText: | #js
     function(boxValue) {

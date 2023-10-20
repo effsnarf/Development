@@ -3,7 +3,12 @@ dom:
     icon: ⬜
     ':show-title': 'false'
     div: 
-      ':key': key1
+      div: 
+        v-if: '!items'
+        .flex.justify-center:
+          ui.title: 
+            icon: ❗
+            text: connect items data socket
       transition.group:
         name: list
         div: 
@@ -16,7 +21,7 @@ dom:
           div: 
             v-if: '!iteratorBox'
             h3:
-              ui.title:
+              ui.title: 
                 text: item
                 ':number': getTempItemIndex(index)
             div: 
@@ -36,7 +41,6 @@ data:
   iteratorBox: null
   hoveredItem: null
   selectedItem: null
-  key1: 1
 mounted: | #js
   async function() {
     await this.$nextTick();
@@ -81,17 +85,14 @@ methods:
       }
     }
   onItemHover: | #js
-    function(item) {
-      if (!this.onItemHoverT) this.onItemHoverT = this._onItemHover.bind(this).debounce(200);
-      this.onItemHoverT(item);
+    function(hoveredItem) {
+      if (!this.onItemHoverT) this.onItemHoverT = this._onItemHover.bind(this).debounce(10);
+      this.onItemHoverT(hoveredItem);
     }
   _onItemHover: | #js
-    function(hoveredItem) {
+    async function(hoveredItem) {
       if (hoveredItem == this.hoveredItem) return;
       this.hoveredItem = hoveredItem;
-      const gridUiBoxVue = this.$root.vm.getAncestors(this, "grid.ui.box")[0];
-      const hoveredItemSocket = this.box.sockets.output.find(s => s.name == "hovered item");
-      gridUiBoxVue.$femit("socket.value.change", this.box._id, "output", hoveredItemSocket._id, hoveredItem);
     }
   onItemClick: | #js
     function(item) {
@@ -159,6 +160,14 @@ watch:
       function(items) {
         this.refresh();
       }
+  hoveredItem:
+    handler: | #js
+      function(hoveredItem) {
+        this.$emit("box-event", "hovered-item", hoveredItem);
+        const gridUiBoxVue = this.$root.vm.getAncestors(this, "grid.ui.box")[0];
+        const hoveredItemSocket = this.box.sockets.output.find(s => s.name == "hovered item");
+        gridUiBoxVue.$femit("socket.value.change", this.box._id, "output", hoveredItemSocket._id, hoveredItem);
+      }
   selectedItem:
     handler: | #js
       function(selectedItem) {
@@ -181,16 +190,19 @@ _:
 name: grid-ui-box-view-items
 template: >-
   <grid-module class="comp-grid-ui-box-view-items" icon="⬜" :show-title="false"
-  path="2102270252."><div :key="key1" path="2102270252.0"><transition-group
-  name="list" path="2102270252.0.0"><div class="item" v-for="(item, index) in
-  items" :key="getItemKey(item)" @mouseenter="onItemHover(item)"
+  path="2102270252."><div path="2102270252.0"><div v-if="!items"
+  path="2102270252.0.0"><div class="flex justify-center"
+  path="2102270252.0.0.0"><ui-title icon="❗" text="connect items data socket"
+  path="2102270252.0.0.0.0"></ui-title></div></div><transition-group name="list"
+  path="2102270252.0.1"><div class="item" v-for="(item, index) in items"
+  :key="getItemKey(item)" @mouseenter="onItemHover(item)"
   @mouseleave="onItemHover(null)" @click="onItemClick(item)"
-  path="2102270252.0.0.0"><div v-if="!iteratorBox" path="2102270252.0.0.0.0"><h3
-  path="2102270252.0.0.0.0.0"><ui-title text="item"
+  path="2102270252.0.1.0"><div v-if="!iteratorBox" path="2102270252.0.1.0.0"><h3
+  path="2102270252.0.1.0.0.0"><ui-title text="item"
   :number="getTempItemIndex(index)"
-  path="2102270252.0.0.0.0.0.0"></ui-title></h3><div class="item-value"
-  path="2102270252.0.0.0.0.1"><ui-value-preview :value="item"
-  path="2102270252.0.0.0.0.1.0"></ui-value-preview></div></div><component
+  path="2102270252.0.1.0.0.0.0"></ui-title></h3><div class="item-value"
+  path="2102270252.0.1.0.0.1"><ui-value-preview :value="item"
+  path="2102270252.0.1.0.0.1.0"></ui-value-preview></div></div><component
   v-if="iteratorBox" :is="getBoxCompName(iteratorBox)" :box="iteratorBox"
   :data-bound-socket-data="getDataBoundSocketData(item)"
-  path="2102270252.0.0.0.1"></component></div></transition-group></div></grid-module>
+  path="2102270252.0.1.0.1"></component></div></transition-group></div></grid-module>

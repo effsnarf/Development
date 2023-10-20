@@ -3,82 +3,30 @@ dom:
     icon: 👤💻🖱️
     grid.client.context.menu:
       ':userID': userID
-      ':boxes': boxes
-      ':links': links
     .flex:
-      div: 
+      div:
         class: w-100pc
         grid.client.surface:
           ':userID': userID
-      div: 
-        grid.data.variable.view: 
-          ':fuid': userID+'/user/actions/pointer'
-          v-model: userActionsPointer
-        grid.data.variable.view: 
-          ':fuid': userID+'/user/actions/next/id'
-        grid.data.variable.view: 
-          ':fuid': userID+'/user/actions/next/action/id'
-        grid.data.list.view: 
-          ':fuid': userID+'/user/actions'
-          v-model: userActions
-          ':item-props': '{ userActionsPointer }'
-          ':reverse': true
-        grid.data.list.view: 
-          ':fuid': userID + '/data/boxes'
-          v-model: boxes
-        grid.data.list.view: 
-          ':fuid': userID + '/data/links'
-          v-model: links
+    grid.client.vars:
+      ':userID': userID
 props:
   userID: null
-data:
-  boxes: []
-  links: []
-  userActions: []
-  userActionsPointer: null
-  groupZoomIns: []
+data: null
 mounted: | #js
   function() {
-    // When the window is resized, refresh the surface
-    // #TODO: Doesn't work
-    //window.addEventListener("resize", this.refreshSurface.bind(this));
   }
 methods: null
 computed: null
-watch:
-  links:
-    handler: | #js
-      function(links) {
-        if (!this.userID) return;
-        for (const link of links) {
-          if (!("visible" in link.is)) {
-            this.$femit("to", "grid.data.list", `${this.userID}/data/links`, "update", [link._id, { is: { visible: true } }]);
-          }
-        }
-      }
-    immediate: true
 _:
   examples:
     count: 0
 name: grid-client-workspace
 template: >-
   <grid-module class="comp-grid-client-workspace" icon="👤💻🖱️"
-  path="-1461469222."><grid-client-context-menu :userID="userID" :boxes="boxes"
-  :links="links" path="-1461469222.0"></grid-client-context-menu><div
-  class="flex" path="-1461469222.1"><div class="w-100pc"
+  path="-1461469222."><grid-client-context-menu :userID="userID"
+  path="-1461469222.0"></grid-client-context-menu><div class="flex"
+  path="-1461469222.1"><div class="w-100pc"
   path="-1461469222.1.0"><grid-client-surface :userID="userID"
-  path="-1461469222.1.0.0"></grid-client-surface></div><div
-  path="-1461469222.1.1"><grid-data-variable-view
-  :fuid="userID+'/user/actions/pointer'" v-model="userActionsPointer"
-  path="-1461469222.1.1.0"></grid-data-variable-view><grid-data-variable-view
-  :fuid="userID+'/user/actions/next/id'"
-  path="-1461469222.1.1.1"></grid-data-variable-view><grid-data-variable-view
-  :fuid="userID+'/user/actions/next/action/id'"
-  path="-1461469222.1.1.2"></grid-data-variable-view><grid-data-list-view
-  :fuid="userID+'/user/actions'" v-model="userActions" :item-props="{
-  userActionsPointer }" :reverse="true"
-  path="-1461469222.1.1.3"></grid-data-list-view><grid-data-list-view
-  :fuid="userID + '/data/boxes'" v-model="boxes"
-  path="-1461469222.1.1.4"></grid-data-list-view><grid-data-list-view
-  :fuid="userID + '/data/links'" v-model="links"
-  path="-1461469222.1.1.5"></grid-data-list-view></div></div></grid-module>
+  path="-1461469222.1.0.0"></grid-client-surface></div></div><grid-client-vars
+  :userID="userID" path="-1461469222.2"></grid-client-vars></grid-module>

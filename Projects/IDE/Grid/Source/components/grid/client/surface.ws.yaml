@@ -25,10 +25,9 @@ dom:
             v-for: link in links
             ':key': '''link/'' + link._id'
             ':link': link
-        div: 
-          grid.ui.tools:
-            ':surface-element': surfaceElement
-    div:
+        grid.ui.tools:
+          ':surface-element': surfaceElement
+    div: 
       grid.data.list.view: 
         ':fuid': userID + '/data/boxes'
         @update: (newBoxes) => { boxes.splice(0, boxes.length, ...newBoxes); }
@@ -158,9 +157,9 @@ template: >-
   :surface-element="surfaceElement"
   path="-515125966.0.0.0.1"></grid-ui-box><grid-ui-link v-for="link in links"
   :key="'link/' + link._id" :link="link"
-  path="-515125966.0.0.0.2"></grid-ui-link></div><div
-  path="-515125966.0.0.1"><grid-ui-tools :surface-element="surfaceElement"
-  path="-515125966.0.0.1.0"></grid-ui-tools></div></div></ui-dnd-dropzone><div
+  path="-515125966.0.0.0.2"></grid-ui-link></div><grid-ui-tools
+  :surface-element="surfaceElement"
+  path="-515125966.0.0.1"></grid-ui-tools></div></ui-dnd-dropzone><div
   path="-515125966.1"><grid-data-list-view :fuid="userID + '/data/boxes'"
   @update="(newBoxes) =&gt; { boxes.splice(0, boxes.length, ...newBoxes); }"
   path="-515125966.1.0"></grid-data-list-view><grid-data-list-view :fuid="userID

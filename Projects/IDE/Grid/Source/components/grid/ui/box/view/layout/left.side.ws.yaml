@@ -1,0 +1,37 @@
+dom:
+  ui.tree:
+    ':root': viewNodeRoot
+    item-type: grid.ui.node.tree.item
+    ':initial-expanded': true
+    ':get-item': (node) => node
+    ':get-children': (node) => node.children
+    @node-hovered: onNodeHovered
+props:
+  box: null
+data:
+  viewNodeRoot: null
+methods:
+  onNodeHovered: | #js
+    function(node, isHovered) {
+      this.$emit('box-event', "node-hovered", node, isHovered);
+    }
+  init: | #js
+    function(box) {
+      this.viewNodeRoot = (box.viewNodeRoot);
+    }
+watch:
+  box:
+    handler: | #js
+      function(box) {
+        this.init(box);
+      }
+    immediate: true
+_:
+  examples:
+    count: 0
+name: grid-ui-box-view-layout-left-side
+template: >-
+  <ui-tree class="comp-grid-ui-box-view-layout-left-side" :root="viewNodeRoot"
+  item-type="grid.ui.node.tree.item" :initial-expanded="true" :get-item="(node)
+  =&gt; node" :get-children="(node) =&gt; node.children"
+  @node-hovered="onNodeHovered" path="-1094764498."></ui-tree>

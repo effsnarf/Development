@@ -328,9 +328,9 @@ style:
     cursor: nesw-resize
   .left-side:
     position: absolute
-    top: 0em
+    top: 50%
     left: 0em
-    transform: translate(-100%, 0)
+    transform: translate(-100%, -50%)
   .right-side:
     position: absolute
     top: 50%

@@ -46,14 +46,6 @@ methods:
     function(boxEventName, ...args) {
       this.$emit("box-event", boxEventName, ...args);
     }
-  onBoxEvent: | #js
-    function(...args) {
-      const eventName = `on${args[0].getWords().map(s => s.toTitleCase()).join("")}`;
-      args = args.skip(1);
-      const method = this[eventName];
-      if (!method) throw new Error(`Method not found: ${eventName}`);
-      method(...args);
-    }
 computed: null
 watch:
   operations:

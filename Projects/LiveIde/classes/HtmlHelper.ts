@@ -2246,17 +2246,19 @@ class HtmlHelper {
             newPosition.left !== lastPosition.left
           ) {
             callback();
+            lastPosition = newPosition;
           }
-          lastPosition = newPosition;
           animationFrameId = requestAnimationFrame(checkPosition);
+          //animationFrameId = setTimeout(checkPosition, 50);
         };
 
         // Start the loop
         animationFrameId = requestAnimationFrame(checkPosition);
+        //animationFrameId = setTimeout(checkPosition, 50);
 
         // Check every second if the element is still in the DOM
         const intervalId = setInterval(() => {
-          if (!document.body.contains(element)) {
+          if (!element.isConnected) {
             cancelAnimationFrame(animationFrameId);
             clearInterval(intervalId);
           }

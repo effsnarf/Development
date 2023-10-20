@@ -282,6 +282,31 @@ methods:
       action.undo = { method: "no.op" };
       return action;
     }
+  create_node: | #js
+    async function(userID, action, boxID, parentNodeID, newNode) {
+      const box = this.getBox(boxID);
+      const viewNodeRoot = Objects.clone(box.viewNodeRoot);
+      const maxNodeID = TreeObject.max(viewNodeRoot, "_id");
+      newNode._id = (maxNodeID + 1);
+      newNode.children = (newNode.children || []);
+      const parentNode = TreeObject.find(viewNodeRoot, parentNodeID);
+      parentNode.children.push(newNode);
+      const newData = { viewNodeRoot };
+      this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "update", [boxID, newData]);
+      action.undo = { method: "delete.node", args: [boxID, newNode._id] };
+      return action;
+    }
+  delete_node: | #js
+    async function(userID, action, boxID, nodeID) {
+      const box = this.getBox(boxID);
+      let viewNodeRoot = Objects.clone(box.viewNodeRoot);
+      const oldData = { viewNodeRoot }; 
+      viewNodeRoot = TreeObject.deleteNode(viewNodeRoot, nodeID);
+      const newData = { viewNodeRoot };
+      this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "update", [boxID, newData]);
+      action.undo = { method: "edit.box", args: [boxID, oldData] };
+      return action;
+    }
   grid_user_actions_do: >
     async function(userID, action, addToStack = true, overwriteRedoActions =
     false, options) {
@@ -472,7 +497,7 @@ methods:
             value: null,
             rect: {
               is: {
-                minimized: false
+                minimized: true
               }
             }
           }
@@ -607,8 +632,7 @@ methods:
         case "view.layout":
           return {
             input: [
-              { _id: 1, type: "view", name: "slot 1" },
-              { _id: 2, type: "view", name: "slot 2" },
+              { _id: 1, type: "data", name: "item" },
             ],
             output: [
               { _id: 1, type: "view", name: "view" },

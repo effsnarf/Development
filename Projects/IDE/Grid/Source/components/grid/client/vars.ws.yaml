@@ -1,0 +1,58 @@
+dom:
+  div:
+    grid.data.variable.view: 
+      ':fuid': userID+'/user/actions/pointer'
+      v-model: userActionsPointer
+    grid.data.variable.view: 
+      ':fuid': userID+'/user/actions/next/id'
+    grid.data.variable.view: 
+      ':fuid': userID+'/user/actions/next/action/id'
+    grid.data.list.view: 
+      ':fuid': userID+'/user/actions'
+      v-model: userActions
+      ':item-props': '{ userActionsPointer }'
+      ':reverse': true
+    grid.data.list.view: 
+      ':fuid': userID + '/data/boxes'
+      v-model: boxes
+    grid.data.list.view: 
+      ':fuid': userID + '/data/links'
+      v-model: links
+props:
+  userID: null
+data:
+  boxes: []
+  links: []
+  userActions: []
+  userActionsPointer: null
+watch:
+  links:
+    handler: | #js
+      function(links) {
+        if (!this.userID) return;
+        for (const link of links) {
+          if (!("visible" in link.is)) {
+            this.$femit("to", "grid.data.list", `${this.userID}/data/links`, "update", [link._id, { is: { visible: true } }]);
+          }
+        }
+      }
+    immediate: true
+_:
+  examples:
+    count: 0
+name: grid-client-vars
+template: >-
+  <div class="comp-grid-client-vars" path="-378825785."><grid-data-variable-view
+  :fuid="userID+'/user/actions/pointer'" v-model="userActionsPointer"
+  path="-378825785.0"></grid-data-variable-view><grid-data-variable-view
+  :fuid="userID+'/user/actions/next/id'"
+  path="-378825785.1"></grid-data-variable-view><grid-data-variable-view
+  :fuid="userID+'/user/actions/next/action/id'"
+  path="-378825785.2"></grid-data-variable-view><grid-data-list-view
+  :fuid="userID+'/user/actions'" v-model="userActions" :item-props="{
+  userActionsPointer }" :reverse="true"
+  path="-378825785.3"></grid-data-list-view><grid-data-list-view :fuid="userID +
+  '/data/boxes'" v-model="boxes"
+  path="-378825785.4"></grid-data-list-view><grid-data-list-view :fuid="userID +
+  '/data/links'" v-model="links"
+  path="-378825785.5"></grid-data-list-view></div>

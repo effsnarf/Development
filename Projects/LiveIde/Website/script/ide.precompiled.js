@@ -2615,15 +2615,17 @@ class HtmlHelper {
                     if (newPosition.top !== lastPosition.top ||
                         newPosition.left !== lastPosition.left) {
                         callback();
+                        lastPosition = newPosition;
                     }
-                    lastPosition = newPosition;
                     animationFrameId = requestAnimationFrame(checkPosition);
+                    //animationFrameId = setTimeout(checkPosition, 50);
                 };
                 // Start the loop
                 animationFrameId = requestAnimationFrame(checkPosition);
+                //animationFrameId = setTimeout(checkPosition, 50);
                 // Check every second if the element is still in the DOM
                 const intervalId = setInterval(() => {
-                    if (!document.body.contains(element)) {
+                    if (!element.isConnected) {
                         cancelAnimationFrame(animationFrameId);
                         clearInterval(intervalId);
                     }
@@ -3600,7 +3602,7 @@ exports.DataWatcher = DataWatcher;
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.Objects = void 0;
+exports.TreeObject = exports.Objects = void 0;
 __webpack_require__(/*! ./Extensions */ "../../../../Shared/Extensions.ts");
 const _importMainFileToImplement = "This is not supported on the client side. Import Extensions.Objects to implement";
 class Objects {
@@ -4044,6 +4046,75 @@ class Objects {
     };
 }
 exports.Objects = Objects;
+class TreeObject {
+    static traverse(root, callback) {
+        // Traverse a tree structure (children[] on each node)
+        const traverse = (node, callback) => {
+            callback(node);
+            if (node.children) {
+                for (const child of node.children) {
+                    traverse(child, callback);
+                }
+            }
+        };
+        traverse(root, callback);
+    }
+    static filter(root, predicate) {
+        predicate = TreeObject._evalSelector(predicate);
+        const items = [];
+        TreeObject.traverse(root, (node) => {
+            if (predicate(node))
+                items.push(node);
+        });
+        return items;
+    }
+    static find(root, predicate) {
+        const items = TreeObject.filter(root, predicate);
+        return items.length ? items[0] : null;
+    }
+    static map(root, selector) {
+        selector = TreeObject._evalSelector(selector);
+        const items = [];
+        TreeObject.traverse(root, (node) => {
+            items.push(selector(node));
+        });
+        return items;
+    }
+    static max(root, selector) {
+        const values = TreeObject.map(root, selector);
+        return Math.max(...values);
+    }
+    static deleteNode(root, isNode) {
+        root = Objects.clone(root);
+        isNode = TreeObject._evalSelector(isNode);
+        const parentNode = TreeObject.getParentNode(root, isNode);
+        if (!parentNode)
+            return root;
+        parentNode.children.removeBy(isNode);
+        return root;
+    }
+    static getParentNode(root, isNode) {
+        isNode = TreeObject._evalSelector(isNode);
+        let parentNode = null;
+        TreeObject.traverse(root, (n) => {
+            if (n.children && n.children.find(isNode))
+                parentNode = n;
+        });
+        return parentNode;
+    }
+    static _evalSelector(func) {
+        if (typeof func == "number") {
+            const id = func;
+            return (node) => node._id == id || node.id == id;
+        }
+        if (typeof func == "string") {
+            const key = func;
+            return (node) => node[key];
+        }
+        return func;
+    }
+}
+exports.TreeObject = TreeObject;
 
 
 /***/ }),
@@ -5964,7 +6035,7 @@ var __webpack_exports__ = {};
 (() => {
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/website/script/1697778389985.ts ***!
+  !*** ../../../LiveIde/website/script/1697811244085.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

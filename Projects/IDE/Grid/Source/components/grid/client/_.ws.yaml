@@ -18,10 +18,10 @@ mounted: | #js
 
     this.$root.boxTypeColors = {
       func: "#dddddd",
-      data: "#00ffff",
+      data: "#0066ee",
       text: "#ffff00",
       view: "#00aa88",
-      "view.items": "#0088aa",
+      "view.items": "#00ee66",
     };
 
     // Catch all JS errors
