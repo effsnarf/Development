@@ -2,8 +2,9 @@ dom:
   grid.module:
     icon: 🆎
     ':show-title': 'false'
+    ':box': box
+    ':data-bound-socket-data': dataBoundSocketData
     h2:
-      @click: refresh
       div:
         v-if: text?.length
         v-text: text
@@ -16,27 +17,8 @@ props:
   dataBoundSocketData: null
 data:
   activeSocketData: null
-mounted: | #js
-  async function() {
-    await this.$nextTick();
-    this.refresh();
-  }
-methods:
-  grid_client_runtime_socket_value_change: | #js
-    function(boxID, sDirection, sID, sValue) {
-      if (boxID != this.box._id) return;
-      this.refresh();
-    }
-  getActiveSocketData: | #js
-    function() {
-      let socketData = (this.$root.socket?.runtime.data[this.box._id] || {});
-      socketData = Objects.deepMerge(socketData, (this.dataBoundSocketData || {}));
-      return socketData;
-    }
-  refresh: | #js
-    function() {
-      this.activeSocketData = this.getActiveSocketData();
-    }
+mounted: ''
+methods: null
 computed:
   text: | #js
     function() {
@@ -54,7 +36,8 @@ _:
 name: grid-ui-node-view-text
 template: >-
   <grid-module class="comp-grid-ui-node-view-text" icon="🆎" :show-title="false"
-  path="-1435648036."><h2 @click="refresh" path="-1435648036.0"><div
-  v-if="text?.length" v-text="text" path="-1435648036.0.0"></div><div
-  class="opacity-50" v-else-if="true" v-text="'[text]'"
+  :box="box" :data-bound-socket-data="dataBoundSocketData"
+  path="-1435648036."><h2 path="-1435648036.0"><div v-if="text?.length"
+  v-text="text" path="-1435648036.0.0"></div><div class="opacity-50"
+  v-else-if="true" v-text="'[text]'"
   path="-1435648036.0.1"></div></h2></grid-module>

@@ -15,11 +15,13 @@ dom:
       ':key': key1
       class: mt-l1
 props:
+  box: null
   icon: null
   title: null
   showEvents: false
   showTitle: true
   showConsole: false
+  dataBoundSocketData: null
 data:
   compMethodArgNames: {}
   isFemitting: false
@@ -122,6 +124,10 @@ methods:
 
       const methodName = `${compName}_${eventName}`.replace(/\./g, "_");
       const method = vue[methodName];
+
+      const moduleMethod = this[methodName];
+      if (moduleMethod) moduleMethod(...args);
+
       if (!method) return;
 
       const targetCompName = vue.$data._.comp.name;
@@ -140,6 +146,22 @@ methods:
       }
       
       (method.bind(vue))(...args);
+    }
+  grid_client_runtime_socket_value_change: | #js
+    function(boxID, sDirection, sID, sValue) {
+      if (boxID != this.box?._id) return;
+      this.refresh();
+    }
+  getActiveSocketData: | #js
+    function() {
+      let socketData = (this.$root.socket?.runtime.data[this.box._id] || {});
+      socketData = Objects.deepMerge(socketData, (this.dataBoundSocketData || {}));
+      return socketData;
+    }
+  refresh: | #js
+    function() {
+      if ("activeSocketData" in this.$parent) this.$parent.activeSocketData = this.getActiveSocketData();
+      if ("refresh" in this.$parent) this.$parent.refresh();
     }
   onAllEvents: | #js
     function(compName, emitName, args) {
@@ -174,6 +196,13 @@ computed:
     function() {
       return this.$parent?.userID;
     }
+watch:
+  dataBoundSocketData:
+    handler: | #js
+      function(dataBoundSocketData) {
+        this.refresh();
+      }
+    immediate: true
 style:
   h3:
     font-weight: normal

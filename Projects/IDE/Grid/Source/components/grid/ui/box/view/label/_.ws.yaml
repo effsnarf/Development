@@ -2,6 +2,8 @@ dom:
   grid.module:
     icon: 🆎
     ':show-title': 'false'
+    :box: box
+    :data-bound-socket-data: dataBoundSocketData
     h2:
       @click: refresh
       v-text: text
@@ -14,25 +16,12 @@ data:
   boxValue: null
   text: null
 mounted: | #js
-  async function() {
-    await this.$nextTick();
-    this.refresh();
+  function() {
   }
 methods:
-  grid_client_runtime_socket_value_change: | #js
-    function(boxID, sDirection, sID, sValue) {
-      if (boxID != this.box._id) return;
-      this.refresh();
-    }
   getBoxVue: | #js
     function() {
       return this.$root.vm.getAncestors(this, "grid.ui.box")[0];
-    }
-  getActiveSocketData: | #js
-    function() {
-      let socketData = (this.$root.socket?.runtime.data[this.box._id] || {});
-      socketData = Objects.deepMerge(socketData, (this.dataBoundSocketData || {}));
-      return socketData;
     }
   getText: | #js
     function(boxValue) {
@@ -42,7 +31,6 @@ methods:
     }
   refresh: | #js
     function() {
-      this.activeSocketData = this.getActiveSocketData();
       this.boxValue = this.activeSocketData?.input?.[1];
       this.text = this.getText(this.boxValue);
     }

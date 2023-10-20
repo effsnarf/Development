@@ -1,10 +1,12 @@
 dom:
   grid.module:
     icon: 🖼️
-    ':show-title': 'false'
+    ":show-title": "false"
+    :box: box
+    :data-bound-socket-data: dataBoundSocketData
     img:
-      ':style': '{ ''width'': ''100%''}'
-      ':src': imageSrc
+      ":style": "{ 'width': '100%'}"
+      ":src": imageSrc
 props:
   box: null
   dataBoundSocketData: null
@@ -18,20 +20,9 @@ mounted: | #js
     this.refresh();
   }
 methods:
-  grid_client_runtime_socket_value_change: | #js
-    function(boxID, sDirection, sID, sValue) {
-      if (boxID != this.box._id) return;
-      this.refresh();
-    }
   getBoxVue: | #js
     function() {
       return this.$root.vm.getAncestors(this, "grid.ui.box")[0];
-    }
-  getActiveSocketData: | #js
-    function() {
-      let boxData = (this.$root.socket?.runtime.data[this.box._id] || {});
-      boxData = Objects.deepMerge(boxData, (this.dataBoundSocketData || {}));
-      return boxData;
     }
   getImageSrc: | #js
     function(boxValue) {
@@ -40,7 +31,6 @@ methods:
     }
   refresh: | #js
     function() {
-      this.activeSocketData = this.getActiveSocketData();
       this.boxValue = this.activeSocketData?.input?.[1];
       this.imageSrc = this.getImageSrc(this.boxValue);
     }
