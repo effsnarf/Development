@@ -434,6 +434,7 @@ class Objects {
   }
 
   static getObjectFields(obj: any, fields: string[]): string[] {
+    if (!obj) return obj;
     const result = {} as any;
     for (const field of fields) {
       result[field] = obj[field];

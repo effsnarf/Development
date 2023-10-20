@@ -1,11 +1,11 @@
 dom:
   grid.module:
     icon: 🧊
-    ':show-title': 'false'
+    ":show-title": "false"
     div:
       ui.linq:
-        ':input': inputValue
-        @operations: operations = $event
+        ":input": inputValue
+        v-model: operations
 props:
   box: null
 data:
@@ -30,6 +30,7 @@ methods:
     }
   init: | #js
     function(box) {
+      this.operations = Objects.clone(box.linq?.operations || []);
       this.refresh();
     }
   onBoxEvent: | #js
@@ -64,5 +65,5 @@ name: grid-ui-box-data-right-side
 template: >-
   <grid-module class="comp-grid-ui-box-data-right-side" icon="🧊"
   :show-title="false" path="-1961460264."><div path="-1961460264.0"><ui-linq
-  :input="inputValue" @operations="operations = $event"
+  :input="inputValue" v-model="operations"
   path="-1961460264.0.0"></ui-linq></div></grid-module>

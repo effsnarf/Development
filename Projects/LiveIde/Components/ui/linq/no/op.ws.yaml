@@ -2,7 +2,7 @@ dom:
   div: 
     v-if: operation
     div: 
-      v-text: '''flat map'''
+      v-text: '''no op'''
 props:
   input: null
   value: null
@@ -25,7 +25,7 @@ watch:
 _:
   examples:
     count: 0
-name: ui-linq-flat-map
+name: ui-linq-no-op
 template: >-
-  <div class="comp-ui-linq-flat-map" v-if="operation" path="595239355."><div
-  v-text="'flat map'" path="595239355.0"></div></div>
+  <div class="comp-ui-linq-no-op" v-if="operation" path="453366106."><div
+  v-text="'no op'" path="453366106.0"></div></div>

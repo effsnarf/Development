@@ -75,10 +75,6 @@ style:
     transition: 0.6s
   .picker:hover:
     max-height: 10em
-  .clickable:
-    padding: 0.2em 0.5em
-  .clickable:hover:
-    background: '#ffffff20'
   .parts:
     display: flex
     gap: 0.5em

@@ -1,10 +1,14 @@
 dom:
   div: 
     v-if: obj
-    class: box1 field-list
-    ui.value:
-      v-if: selectedFields?.length
-      ':value': selectedFields.join(', ')
+    class: field-list
+    .flex.justify-center:
+      ':key': selectedFields?.join('')
+      ui.value:
+        ':class': '{ ''opacity-50 grayscale'': (!selectedFields?.length) }'
+        ':value': >-
+          !selectedFields?.length ? '[select fields]' : '[' +
+          selectedFields.join(', ') + ']'
     div: 
       div: 
         v-for: field in fields
@@ -30,7 +34,9 @@ watch:
   obj:
     handler: | #js
       function(obj) {
-        this.fields = (!obj) ? [] : Object.keys(obj);
+        this.fields = ((!obj) ? [] : Object.keys(obj))
+          .concat(this.selectedFields)
+          .distinct();
       }
     immediate: true
   value:
@@ -42,19 +48,22 @@ watch:
     immediate: true
 style:
   .field-list:
-    max-height: 2.2em
+    max-height: 3em
     overflow: auto
     transition: 0.6s
   .field-list:hover:
-    max-height: 10em
+    max-height: 20em
 _:
   examples:
     count: 0
 name: ui-value-field-picker
 template: >-
-  <div class="comp-ui-value-field-picker box1 field-list" v-if="obj"
-  path="20302585."><ui-value v-if="selectedFields?.length"
-  :value="selectedFields.join(', ')" path="20302585.0"></ui-value><div
+  <div class="comp-ui-value-field-picker field-list" v-if="obj"
+  path="20302585."><div class="flex justify-center"
+  :key="selectedFields?.join('')" path="20302585.0"><ui-value :class="{
+  'opacity-50 grayscale': (!selectedFields?.length) }"
+  :value="!selectedFields?.length ? '[select fields]' : '[' +
+  selectedFields.join(', ') + ']'" path="20302585.0.0"></ui-value></div><div
   path="20302585.1"><div v-for="field in fields"
   path="20302585.1.0"><ui-checkbox :text="field" :value-array="selectedFields"
   :value-key="field" path="20302585.1.0.0"></ui-checkbox></div></div></div>

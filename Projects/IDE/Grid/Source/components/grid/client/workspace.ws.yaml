@@ -43,58 +43,7 @@ mounted: | #js
     // #TODO: Doesn't work
     //window.addEventListener("resize", this.refreshSurface.bind(this));
   }
-methods:
-  grid_ui_box_toggle_group_maximized: | #js
-    function(groupBoxID) {
-      if (groupBoxID == this.groupZoomIns.last()?.groupBoxID) {
-        this.zoomOutGroupBox();
-      } else {
-        this.zoomInGroupBox(groupBoxID);
-      }
-    }
-  zoomInGroupBox: | #js
-    async function(groupBoxID) {
-      const zoomedGroupBoxID = this.groupZoomIns.last()?.groupBoxID;
-      const vBoxes = this.$root.vm.getDescendants(this, "grid.ui.box");
-      const groupBox = this.boxes.find(box => box._id == groupBoxID);
-      const nonMemberBoxes = zoomedGroupBoxID ?
-        this.boxes.filter(box => (box.groupBoxID == zoomedGroupBoxID)) :
-        this.boxes.filter(box => (!box.groupBoxID));
-      const nonMemberBoxIDs = nonMemberBoxes.map(box => box._id);
-      for (const box of nonMemberBoxes) box.rect.is.visible = false;
-      const memberBoxes = this.boxes.filter(box => box.groupBoxID == groupBoxID);
-      for (const box of memberBoxes) box.rect.is.grouped = false;
-      for (const box of memberBoxes) box.rect.is.visible = true;
-      const memberLinks = this.links.filter(link => (link.groupBoxID == groupBoxID));
-      const nonMemberLinks = this.links.filter(link => (link.groupBoxID != groupBoxID));
-      for (const link of nonMemberLinks) link.is.visible = false;
-      setTimeout(() => {
-        for (const link of memberLinks) link.is.grouped = false;
-      }, 300);
-
-      this.groupZoomIns.push({
-        groupBoxID,
-        nonMemberBoxIDs: nonMemberBoxIDs,
-      });
-    }
-  zoomOutGroupBox: | #js
-    async function() {
-      const zoomIn = this.groupZoomIns.pop();
-      if (!zoomIn) return;
-      const groupBoxID = zoomIn.groupBoxID;
-      const groupBox = this.boxes.find(box => box._id == groupBoxID);
-      const memberBoxes = this.boxes.filter(box => box.groupBoxID == groupBoxID);
-      for (const box of memberBoxes) box.rect.is.grouped = true;
-      const nonMemberBoxes = this.boxes.filter(box => zoomIn.nonMemberBoxIDs.includes(box._id));
-      const memberLinks = this.links.filter(link => (link.groupBoxID == groupBoxID));
-      for (const link of memberLinks) link.is.grouped = true;
-      const nonMemberLinks = this.links.filter(link => (link.groupBoxID != groupBoxID));
-      for (const link of nonMemberLinks) link.is.visible = true;
-      setTimeout(() => {
-        for (const box of memberBoxes) box.rect.is.visible = false;
-        for (const box of nonMemberBoxes) box.rect.is.visible = true;
-      }, 400);
-    }
+methods: null
 computed: null
 watch:
   links:

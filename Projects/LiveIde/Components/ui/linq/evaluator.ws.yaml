@@ -9,12 +9,14 @@ data:
 methods:
   evaluateOps: | #js
     function(input, operations) {
-      if (!operations?.length) return input;
-      let output = input;
+      const datas = [];
+      datas.push(input);
+      if (!operations?.length) return datas;
       for (const operation of operations) {
-        output = this.evaluate(output, operation);
+        const output = this.evaluate(datas.last(), operation);
+        datas.push(output);
       }
-      return output;
+      return datas;
     }
   evaluate: | #js
     function(input, operation) {
@@ -46,6 +48,10 @@ methods:
       if (!Array.isArray(input)) return input;
       const key1 = Object.keys(input[0])[0];
       return input.flatMap(item => item[key1]);
+    }
+  no_op: | #js
+    function(input, op) {
+      return Objects.clone(input);
     }
 watch:
   output:

@@ -156,7 +156,6 @@ methods:
     }
   onNewLinkDragEnd: | #js
     function(e) {
-      alertify.message(`onNewLinkDragEnd`);
       this.isNewLinkDragging = false;
       this.targetPlugPos = null;
       this.targetPlugEl = null;

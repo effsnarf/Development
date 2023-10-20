@@ -1,52 +1,78 @@
 dom:
-  div:
-    h2:
-      v-text: '''linq'''
-      @click: refresh
-    ui.linq.operation:
-      ':input': input
-      @output: output = $event
-      @operation: refresh
-      v-model: operation
+  .box1:
+    div: 
+      v-for: (operation, index) in operations
+      ui.linq.operation:
+        ':input': datas[index]
+        ':value': operation
+        @input: (operation) => $set(operations, index, operation)
+      .next:
+        v-text: '''↓'''
+    div: 
+      .show-on-hover-container:
+        .text-center:
+          v-text: '''➕'''
+        .show-on-hover:
+          ui.linq.picker:
+            ':input': datas?.last()
+            @select: addOperation
+    ui.linq.evaluator:
+      ref: evaluator1
 props:
   input: null
+  value: null
 data:
-  operation: null
-  output: null
-  operations: null
-  key1: 1
-mounted: | #js
-  function() {
-    this.operation = { type: 'select.path', path: [] };
-  }
+  operations: []
+  datas: []
+mounted: ''
 methods:
-  refresh: | #js
+  evaluateChain: | #js
     function() {
-      this.operations = this.getOperations();
+      this.datas = this.$refs.evaluator1.evaluateOps(this.input, this.operations);
     }
-  getOperations: | #js
-    function() {
-      const operations = [];
-      operations.add(Objects.clone(this.operation));
-      const vues = this.$root.vm.getDescendants(this, "ui.linq.operation");
-      for (const vue of vues) {
-        if (!vue.nextOperation) continue;
-        operations.add(Objects.clone(vue.nextOperation));
-      }
-      return operations;
+  addOperation: | #js
+    function(operation) {
+      this.operations.add(operation);
     }
 watch:
+  input:
+    handler: | #js
+      async function(input) {
+        await this.$nextTick();
+        this.evaluateChain();
+      }
+    immediate: true
   operations:
     handler: | #js
       function(operations) {
-        this.$emit("operations", operations);
+        this.evaluateChain();
+        this.$emit("input", operations);
       }
+    deep: true
+  value:
+    handler: | #js
+      function(operations) {
+        this.operations = (operations || []);
+      }
+    immediate: true
+style:
+  .next:
+    font-size: 160%
+    text-align: center
 _:
   examples:
     count: 0
 name: ui-linq
 template: >-
-  <div class="comp-ui-linq" path="-484387046."><h2 v-text="'linq'"
-  @click="refresh" path="-484387046.0"></h2><ui-linq-operation :input="input"
-  @output="output = $event" @operation="refresh" v-model="operation"
-  path="-484387046.1"></ui-linq-operation></div>
+  <div class="comp-ui-linq box1" path="-484387046."><div v-for="(operation,
+  index) in operations" path="-484387046.0"><ui-linq-operation
+  :input="datas[index]" :value="operation" @input="(operation) =&gt;
+  $set(operations, index, operation)"
+  path="-484387046.0.0"></ui-linq-operation><div class="next" v-text="'↓'"
+  path="-484387046.0.1"></div></div><div path="-484387046.1"><div
+  class="show-on-hover-container" path="-484387046.1.0"><div class="text-center"
+  v-text="'➕'" path="-484387046.1.0.0"></div><div class="show-on-hover"
+  path="-484387046.1.0.1"><ui-linq-picker :input="datas?.last()"
+  @select="addOperation"
+  path="-484387046.1.0.1.0"></ui-linq-picker></div></div></div><ui-linq-evaluator
+  ref="evaluator1" path="-484387046.2"></ui-linq-evaluator></div>

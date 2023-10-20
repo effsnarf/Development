@@ -2,15 +2,20 @@ dom:
   div:
     v-if: operation
     ui.value.field.picker:
-      ':obj': input?.[0]
+      ':obj': fieldsObj
       v-model: operation.fields
 props:
   input: null
   value: null
 data:
   operation: null
-  output: null
 methods: null
+computed:
+  fieldsObj: | #js
+    function() {
+      if (Array.isArray(this.input)) return this.input[0];
+      return this.input;
+    }
 watch:
   operation:
     handler: | #js
@@ -30,5 +35,5 @@ _:
 name: ui-linq-select-fields
 template: >-
   <div class="comp-ui-linq-select-fields" v-if="operation"
-  path="-456509417."><ui-value-field-picker :obj="input?.[0]"
+  path="-456509417."><ui-value-field-picker :obj="fieldsObj"
   v-model="operation.fields" path="-456509417.0"></ui-value-field-picker></div>

@@ -39,6 +39,7 @@ methods:
     }
   init: | #js
     function(box) {
+      this.operations = (box.linq?.operations || []);
       this.refresh();
     }
   emitBoxEvent: | #js
@@ -58,6 +59,7 @@ watch:
   operations:
     handler: | #js
       function(operations) {
+        if (Objects.areEqual(operations, this.box.linq?.operations)) return;
         this.getBoxVue().$femit("edit.box", this.box._id, { linq: { operations } });
       }
     deep: true

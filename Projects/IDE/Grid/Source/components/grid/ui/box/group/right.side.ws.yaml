@@ -1,7 +1,7 @@
 dom:
   div:
     component:
-      v-if: getBoxVue()?.hasRightSideComp(displayBox?.type)
+      v-if: false && getBoxVue()?.hasRightSideComp(displayBox?.type)
       ref: rightSideComp1
       ':is': getBoxVue()?.getBoxRightSideCompName(displayBox?.type)
       ':box': displayBox
@@ -54,7 +54,8 @@ _:
 name: grid-ui-box-group-right-side
 template: >-
   <div class="comp-grid-ui-box-group-right-side" path="1813186285."><component
-  v-if="getBoxVue()?.hasRightSideComp(displayBox?.type)" ref="rightSideComp1"
+  v-if="false &amp;&amp; getBoxVue()?.hasRightSideComp(displayBox?.type)"
+  ref="rightSideComp1"
   :is="getBoxVue()?.getBoxRightSideCompName(displayBox?.type)" :box="displayBox"
   :data-bound-socket-data="dataBoundSocketData" @box-event="emitBoxEvent"
   path="1813186285.0"></component></div>

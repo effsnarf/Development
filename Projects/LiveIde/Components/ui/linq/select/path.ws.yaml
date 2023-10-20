@@ -9,7 +9,6 @@ props:
   value: null
 data:
   operation: null
-  output: null
 methods: null
 watch:
   operation:

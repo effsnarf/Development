@@ -1,72 +1,20 @@
 dom:
   div: 
-    ui.linq.operation.any:
-      ':input': input
-      @operation: (operation) => $emit('operation', operation)
-      v-model: operation
-    ui.linq.evaluator:
-      ':input': input
-      ':operation': operation
-      @output: firstOutput = $event
     div: 
-      v-if: showIntermediateValues
-      class: short-preview
-      ui.value: 
-        ':value': firstOutput
-    ui.linq.operation:
-      v-if: nextOperation
-      ':input': firstOutput
-      @output: lastOutput = $event
-      @operation: (operation) => $emit('operation', operation)
-      v-model: nextOperation
-    ui.button: 
-      v-if: '!nextOperation'
-      icon: ➕
-      text: Add
-      @click: onAdd()
-    ui.button: 
-      v-if: '!nextOperation'
-      icon: ➕
-      text: flatMap
-      @click: onAdd2()
-    div: 
-      v-if: showIntermediateValues
-      class: short-preview
-      ui.value: 
-        ':value': lastOutput
+      ui.linq.operation.any:
+        ':input': input
+        v-model: operation
 props:
   input: null
   value: null
 data:
-  firstOutput: null
-  lastOutput: null
   operation: null
-  nextOperation: null
-  showIntermediateValues: false
-methods:
-  onAdd: | #js
-    function() {
-      this.nextOperation = { type: 'select.fields', fields: [] };
-    }
-  onAdd2: | #js
-    function() {
-      this.nextOperation = { type: 'flat.map' };
-    }
+methods: null
 watch:
-  firstOutput:
-    handler: | #js
-      function(firstOutput) {
-        this.$emit("output", firstOutput);
-      }
-  lastOutput:
-    handler: | #js
-      function(lastOutput) {
-        this.$emit("output", lastOutput);
-      }
   operation:
     handler: | #js
       function(operation) {
-        this.$emit("operation", operation);
+        this.$emit("input", operation);
       }
     deep: true
   value:
@@ -75,33 +23,12 @@ watch:
         this.operation = value;
       }
     immediate: true
-style:
-  .short-preview:
-    max-height: 4em
-    overflow: auto
-    border: 3px solid red
-    transition: 0.6s
-  .short-preview:hover:
-    max-height: 10em
+style: null
 _:
   examples:
     count: 0
 name: ui-linq-operation
 template: >-
-  <div class="comp-ui-linq-operation" path="-188258413."><ui-linq-operation-any
-  :input="input" @operation="(operation) =&gt; $emit('operation', operation)"
-  v-model="operation"
-  path="-188258413.0"></ui-linq-operation-any><ui-linq-evaluator :input="input"
-  :operation="operation" @output="firstOutput = $event"
-  path="-188258413.1"></ui-linq-evaluator><div class="short-preview"
-  v-if="showIntermediateValues" path="-188258413.2"><ui-value
-  :value="firstOutput" path="-188258413.2.0"></ui-value></div><ui-linq-operation
-  v-if="nextOperation" :input="firstOutput" @output="lastOutput = $event"
-  @operation="(operation) =&gt; $emit('operation', operation)"
-  v-model="nextOperation" path="-188258413.3"></ui-linq-operation><ui-button
-  v-if="!nextOperation" icon="➕" text="Add" @click="onAdd()"
-  path="-188258413.4"></ui-button><ui-button v-if="!nextOperation" icon="➕"
-  text="flatMap" @click="onAdd2()" path="-188258413.5"></ui-button><div
-  class="short-preview" v-if="showIntermediateValues"
-  path="-188258413.6"><ui-value :value="lastOutput"
-  path="-188258413.6.0"></ui-value></div></div>
+  <div class="comp-ui-linq-operation" path="-188258413."><div
+  path="-188258413.0"><ui-linq-operation-any :input="input" v-model="operation"
+  path="-188258413.0.0"></ui-linq-operation-any></div></div>

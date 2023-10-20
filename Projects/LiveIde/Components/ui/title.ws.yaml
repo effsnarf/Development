@@ -2,6 +2,9 @@ dom:
   div: 
     @click: $emit('click')
     class: flex
+    .counter:
+      v-if: hasCounter
+      v-text: (counter) + '.'
     .icon:
       ':class': iconClass
       v-if: icon
@@ -14,6 +17,7 @@ dom:
       v-if: number
       v-text: getNumberText()
 props:
+  counter: null
   icon: null
   text: null
   html: null
@@ -30,6 +34,10 @@ methods:
       return null;
     }
 computed:
+  hasCounter: | #js
+    function() {
+      return (this.counter !== null) && (this.counter !== undefined);
+    }
   cHtml: | #js
     function() {
       if (this.html) return this.html;
@@ -43,6 +51,8 @@ computed:
       return this.getIconClass();
     }
 style:
+  .counter:
+    opacity: 0.3
   .icon:
     text-align: center
   .flex:
@@ -59,8 +69,9 @@ _:
     count: 0
 template: >-
   <div class="comp-ui-title flex" @click="$emit('click')"
-  path="-2123702658."><div class="icon" :class="iconClass" v-if="icon"
-  v-text="icon" path="-2123702658.0"></div><div
-  path="-2123702658.1"><slot></slot><div v-html="cHtml"
-  path="-2123702658.1.1"></div></div><div class="ml-1 opacity-40" v-if="number"
-  v-text="getNumberText()" path="-2123702658.2"></div></div>
+  path="-2123702658."><div class="counter" v-if="hasCounter" v-text="(counter) +
+  '.'" path="-2123702658.0"></div><div class="icon" :class="iconClass"
+  v-if="icon" v-text="icon" path="-2123702658.1"></div><div
+  path="-2123702658.2"><slot></slot><div v-html="cHtml"
+  path="-2123702658.2.1"></div></div><div class="ml-1 opacity-40" v-if="number"
+  v-text="getNumberText()" path="-2123702658.3"></div></div>

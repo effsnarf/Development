@@ -61,7 +61,7 @@ dom:
               td: 
                 v-for: field in visibleFields
                 ui.value.preview: 
-                  ':value': item[field]
+                  ':value': item?.[field]
 props:
   value: null
   reverse: false
@@ -131,7 +131,7 @@ computed:
     const objects = this.value
       .take(10)
       .filter(item => !this.isPrimitive(item));
-    const fields = objects.map(o => Object.keys(o))
+    const fields = objects.map(o => Object.keys(o||{}))
       .flatMap(f => f)
       .distinct()
       .take(this.maxVisibleFields || 1000);
@@ -208,5 +208,5 @@ template: >-
   true)" @mouseleave="() =&gt; onItemHover(item, false)" @click="() =&gt;
   onItemClick(item, index)" path="-621945022.0.4.0.1.0"><td v-for="field in
   visibleFields" path="-621945022.0.4.0.1.0.0"><ui-value-preview
-  :value="item[field]"
+  :value="item?.[field]"
   path="-621945022.0.4.0.1.0.0.0"></ui-value-preview></td></tr></tbody></table></transition></div></div>

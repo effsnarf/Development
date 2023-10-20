@@ -146,12 +146,14 @@ li
 
 .clickable
 {
+  padding: 0.2em 0.5em;
   cursor: pointer;
-  opacity: 0.9;
+  opacity: 0.8;
   transition: 0s;
 }
 .clickable:hover
 {
+  background: #ffffff20;
   opacity: 1;
   transition: 0s;
 }
@@ -590,7 +592,7 @@ select, input[type=range]
   max-height: 0;
   overflow: hidden;
   opacity: 0;
-  transition: 2;
+  transition: 1s !important;
 }
 
 .show-on-hover-container:hover > .show-on-hover

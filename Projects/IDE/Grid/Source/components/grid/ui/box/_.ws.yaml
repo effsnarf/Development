@@ -298,10 +298,10 @@ watch:
   box:
     handler: | #js
       function(box) {
+        console.log(`box: ${box._id}, ${box.rect.is.grouped}, ${box.rect.is.visible}`);
         this.init(box);
       }
     immediate: true
-    deep: true
 _:
   examples:
     count: 0

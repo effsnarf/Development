@@ -11,6 +11,7 @@ dom:
           ':style': surfaceStyle
           @wheel: onWheelSurface
           h2:
+            v-if: groupZoomIns?.length
             ui.button:
               ':text': groupZoomIns?.map(g => g.groupBoxID)
               @click: zoomOutGroupBox
@@ -97,6 +98,8 @@ methods:
     }
   zoomOutGroupBox: | #js
     async function() {
+      this.boxes = this.$root.boxes;
+      this.links = this.$root.links;
       const zoomIn = this.groupZoomIns.pop();
       if (!zoomIn) return;
       const groupBoxID = zoomIn.groupBoxID;
@@ -148,8 +151,8 @@ template: >-
   path="-515125966.0"><div class="flex" path="-515125966.0.0"><div
   class="surface flex-grow-1" :key="surfaceKey" ref="surface1"
   :style="surfaceStyle" @wheel="onWheelSurface" path="-515125966.0.0.0"><h2
-  path="-515125966.0.0.0.0"><ui-button :text="groupZoomIns?.map(g =&gt;
-  g.groupBoxID)" @click="zoomOutGroupBox"
+  v-if="groupZoomIns?.length" path="-515125966.0.0.0.0"><ui-button
+  :text="groupZoomIns?.map(g =&gt; g.groupBoxID)" @click="zoomOutGroupBox"
   path="-515125966.0.0.0.0.0"></ui-button></h2><grid-ui-box v-for="box in boxes"
   :key="'box/' + box._id" :userID="userID" :box="box"
   :surface-element="surfaceElement"

@@ -98,8 +98,8 @@ methods:
       };
 
       this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "add", [groupBox]);
-      this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "update", [memberBoxIDs, { groupBoxID: groupBox._id, rect: { is: { grouped: true } } } ]);
-      this.$femit("to", "grid.data.list", `${userID}/data/links`, "update", [memberLinkIDs, { groupBoxID: groupBox._id, is: { grouped: true } }]);
+      this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "update", [memberBoxIDs, { groupBoxID: groupBox._id, rect: { is: { grouped: true, visible: false } } } ]);
+      this.$femit("to", "grid.data.list", `${userID}/data/links`, "update", [memberLinkIDs, { groupBoxID: groupBox._id, is: { grouped: true, visible: false } }]);
       
       this.$femit("new.box.created", groupBox);
 

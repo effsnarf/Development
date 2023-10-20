@@ -1,13 +1,11 @@
 dom:
   div:
     v-if: operation
-    h3:
-      v-if: 'false'
-      v-text: operation.type
-    component:
-      ':is': getLinqCompName(operation.type)
-      ':input': input
-      v-model: operation
+    .box1:
+      component:
+        ':is': getLinqCompName(operation.type)
+        ':input': input
+        v-model: operation
 props:
   input: null
   value: null
@@ -22,7 +20,7 @@ watch:
   operation:
     handler: | #js
       function(operation) {
-        this.$emit("operation", operation);
+        this.$emit("update", operation);
       }
     deep: true
   value:
@@ -37,6 +35,6 @@ _:
 name: ui-linq-operation-any
 template: >-
   <div class="comp-ui-linq-operation-any" v-if="operation"
-  path="-320222959."><h3 v-if="false" v-text="operation.type"
-  path="-320222959.0"></h3><component :is="getLinqCompName(operation.type)"
-  :input="input" v-model="operation" path="-320222959.1"></component></div>
+  path="-320222959."><div class="box1" path="-320222959.0"><component
+  :is="getLinqCompName(operation.type)" :input="input" v-model="operation"
+  path="-320222959.0.0"></component></div></div>

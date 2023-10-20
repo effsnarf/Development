@@ -4008,6 +4008,8 @@ class Objects {
         return Objects.map(obj, (key, value) => [key, func(value)]);
     }
     static getObjectFields(obj, fields) {
+        if (!obj)
+            return obj;
         const result = {};
         for (const field of fields) {
             result[field] = obj[field];
@@ -5962,7 +5964,7 @@ var __webpack_exports__ = {};
 (() => {
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/website/script/1697731843579.ts ***!
+  !*** ../../../LiveIde/website/script/1697778389985.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
