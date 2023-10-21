@@ -7,22 +7,34 @@ dom:
     div:
       .flex:
         class: w-100pc
-        grid.client.surface: 
+        grid.client.surface:
+          v-for: surface in surfaces
           ':userID': userID
-        grid.client.surface: 
-          ':userID': userID
-          ':groupBoxID': 4
+          ':groupBoxID': surface.groupBoxID
     grid.client.vars:
       ':userID': userID
 props:
   userID: null
-data: null
+data:
+  surfaces: []
 mounted: | #js
   function() {
+    this.surfaces.add({ groupBoxID: null });
   }
-methods: null
+methods:
+  grid_ui_box_toggle_group_maximized: | #js
+    function(box) {
+      const surfaceIndex = this.surfaces.findIndex(s => s.groupBoxID === box._id);
+      if (surfaceIndex === -1) {
+        this.surfaces.add({ groupBoxID: box._id });
+      } else {
+        this.surfaces.splice(surfaceIndex, 1);
+      }
+    }
 computed: null
 style:
+  .comp-grid-client-surface:last-child:
+    width: 70%
   .flex.w-100pc > *:
     flex-grow: 1
 _:
@@ -34,8 +46,7 @@ template: >-
   path="-1461469222."><grid-client-context-menu :userID="userID"
   path="-1461469222.0"></grid-client-context-menu><grid-ui-tools-buttons></grid-ui-tools-buttons><div
   path="-1461469222.2"><div class="w-100pc flex"
-  path="-1461469222.2.0"><grid-client-surface :userID="userID"
-  path="-1461469222.2.0.0"></grid-client-surface><grid-client-surface
-  :userID="userID" :groupBoxID="4"
-  path="-1461469222.2.0.1"></grid-client-surface></div></div><grid-client-vars
+  path="-1461469222.2.0"><grid-client-surface v-for="surface in surfaces"
+  :userID="userID" :groupBoxID="surface.groupBoxID"
+  path="-1461469222.2.0.0"></grid-client-surface></div></div><grid-client-vars
   :userID="userID" path="-1461469222.3"></grid-client-vars></grid-module>

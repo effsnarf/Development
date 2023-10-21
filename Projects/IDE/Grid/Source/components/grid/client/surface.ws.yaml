@@ -4,56 +4,90 @@ dom:
     ui.dnd.dropzone:
       @drop-item: onSurfaceDropItem
       .flex:
-        div: 
+        div:
           ':key': surfaceKey
           ref: surface1
           class: surface flex-grow-1
           ':style': surfaceStyle
           @wheel: onWheelSurface
-          h2: 
-            v-if: groupZoomIns?.length
-            ui.button:
-              ':text': groupZoomIns?.map(g => g.groupBoxID)
-              @click: zoomOutGroupBox
           grid.ui.box:
             v-for: box in visibleBoxes
             ':key': '''box/'' + box._id'
             ':userID': userID
             ':box': box
             ':surface-element': surfaceElement
+            ':surface-camera': surfaceCamera
             ':surfaceGroupBoxID': groupBoxID
           grid.ui.link:
             v-for: link in visibleLinks
             ':key': '''link/'' + link._id'
             ':link': link
+            ':surface-camera': surfaceCamera
             ':surfaceGroupBoxID': groupBoxID
         grid.ui.tools:
           ':surface-element': surfaceElement
-    div: 
-      grid.data.list.view: 
-        ':fuid': userID + '/data/boxes'
-        @update: (newBoxes) => { boxes.splice(0, boxes.length, ...newBoxes); }
-      grid.data.list.view: 
-        ':fuid': userID + '/data/links'
-        v-model: links
-    h2: 
+    h2:
       ui.value:
         ':value': '{groupBoxID}'
 props:
   userID: null
   groupBoxID: null
 data:
-  surfaceElement: null
-  surfaceScale: 1
-  surfaceKey: 1
   boxes: []
   links: []
-  groupZoomIns: []
+  surfaceElement: null
+  surfaceCamera:
+    pos:
+      x: 0
+      'y': 0
+    scale: 1
+  surfaceKey: 1
 mounted: | #js
   async function() {
     this.surfaceElement = this.$refs.surface1;
+    // Detect if surfaceElement is resized
+    const resizeObserver = new ResizeObserver(() => {
+      this.adjustCamera();
+    });
+    resizeObserver.observe(this.surfaceElement);
+    await this.$root.wait(1000);
+    this.refresh();
+    this.adjustCamera();
   }
 methods:
+  grid_user_action_stack_do: | #js
+    async function(boxID, pos) {
+      await this.$root.wait(100);
+      this.adjustCamera();
+    }
+  adjustCamera: | #js
+    function() {
+      this.surfaceCamera = this.getCamera(this.visibleBoxes);
+    }
+  getCamera: | #js
+    function(boxes) {
+      // Returns a camera in which all the boxes are visible
+      const camera = {
+        pos: { x: 0, y: 0 },
+        scale: 1,
+      };
+      // Set camera.pos to the center of all boxes
+      const boxRects = boxes.map(box => box.rect);
+      camera.pos = this.getRectsCenter(boxRects);
+      return camera;
+    }
+  getRectsCenter: | #js
+    function(rects) {
+      // Returns the center of all the rects
+      // rect.pos is the center of the rect
+      const minX = rects.map(rect => rect.pos.x - rect.size.width / 2).min();
+      const maxX = rects.map(rect => rect.pos.x + rect.size.width / 2).max();
+      const minY = rects.map(rect => rect.pos.y - rect.size.height / 2).min();
+      const maxY = rects.map(rect => rect.pos.y + rect.size.height / 2).max();
+      const x = (minX + maxX) / 2;
+      const y = (minY + maxY) / 2;
+      return { x, y };
+    }
   onSurfaceDropItem: | #js
     function(dragItem) {
       this.$femit("drop.item", dragItem);
@@ -68,70 +102,32 @@ methods:
       this.surfaceScale += (scrollSize * -0.03);
       this.$femit("scale", this.surfaceScale);
     }
-  grid_ui_box_toggle_group_maximized: | #js
-    function(groupBoxID) {
-      if (groupBoxID == this.groupZoomIns.last()?.groupBoxID) {
-        this.zoomOutGroupBox();
-      } else {
-        this.zoomInGroupBox(groupBoxID);
-      }
-    }
-  zoomInGroupBox: | #js
-    async function(groupBoxID) {
-      const zoomedGroupBoxID = this.groupZoomIns.last()?.groupBoxID;
-      const vBoxes = this.$root.vm.getDescendants(this, "grid.ui.box");
-      const groupBox = this.boxes.find(box => box._id == groupBoxID);
-      const nonMemberBoxes = zoomedGroupBoxID ?
-        this.boxes.filter(box => (box.groupBoxID == zoomedGroupBoxID)) :
-        this.boxes.filter(box => (!box.groupBoxID));
-      const nonMemberBoxIDs = nonMemberBoxes.map(box => box._id);
-      for (const box of nonMemberBoxes) box.rect.is.visible = false;
-      const memberBoxes = this.boxes.filter(box => box.groupBoxID == groupBoxID);
-      for (const box of memberBoxes) box.rect.is.grouped = false;
-      for (const box of memberBoxes) box.rect.is.visible = true;
-      const memberLinks = this.links.filter(link => (link.groupBoxID == groupBoxID));
-      const nonMemberLinks = this.links.filter(link => (link.groupBoxID != groupBoxID));
-      for (const link of nonMemberLinks) link.is.visible = false;
-      setTimeout(() => {
-        for (const link of memberLinks) link.is.grouped = false;
-      }, 300);
-
-      this.groupZoomIns.push({
-        groupBoxID,
-        nonMemberBoxIDs: nonMemberBoxIDs,
-      });
-    }
-  zoomOutGroupBox: | #js
-    async function() {
-      this.boxes = this.$root.boxes;
-      this.links = this.$root.links;
-      const zoomIn = this.groupZoomIns.pop();
-      if (!zoomIn) return;
-      const groupBoxID = zoomIn.groupBoxID;
-      const groupBox = this.boxes.find(box => box._id == groupBoxID);
-      const memberBoxes = this.boxes.filter(box => box.groupBoxID == groupBoxID);
-      for (const box of memberBoxes) box.rect.is.grouped = true;
-      const nonMemberBoxes = this.boxes.filter(box => zoomIn.nonMemberBoxIDs.includes(box._id));
-      const memberLinks = this.links.filter(link => (link.groupBoxID == groupBoxID));
-      for (const link of memberLinks) link.is.grouped = true;
-      const nonMemberLinks = this.links.filter(link => (link.groupBoxID != groupBoxID));
-      for (const link of nonMemberLinks) link.is.visible = true;
-      setTimeout(() => {
-        for (const box of memberBoxes) box.rect.is.visible = false;
-        for (const box of nonMemberBoxes) box.rect.is.visible = true;
-      }, 400);
-    }
   getVisibleItems: | #js
     function(items) {
+      if (!items) return [];
       items = [...items];
-      if (this.groupBoxID) items = items.filter(item => item.groupBoxID == this.groupBoxID);
+      items = items.filter(this.isItemVisible);
       return items;
+    }
+  isItemVisible: | #js
+    function(item) {
+      if (this.groupBoxID) {
+        if (item.groupBoxID == this.groupBoxID) return true;
+      }
+      if (item.rect?.is.visible) return true;
+      if (item.is?.visible) return true;
+      return false;
     }
   refreshSurface: | #js
     async function() {
       await this.$nextTick();
       this.surfaceKey++;
       alertify.message("Surface refreshed");
+    }
+  refresh: | #js
+    async function() {
+      this.boxes = this.$root.boxes;
+      this.links = this.$root.links;
     }
 computed:
   visibleBoxes: | #js
@@ -147,7 +143,6 @@ computed:
       return {
         width: "100%",
         height: "80vh",
-        transform: `scale(${this.surfaceScale})`,
       };
     }
   surface1: | #js
@@ -169,22 +164,15 @@ template: >-
   path="-515125966."><ui-dnd-dropzone @drop-item="onSurfaceDropItem"
   path="-515125966.0"><div class="flex" path="-515125966.0.0"><div
   class="surface flex-grow-1" :key="surfaceKey" ref="surface1"
-  :style="surfaceStyle" @wheel="onWheelSurface" path="-515125966.0.0.0"><h2
-  v-if="groupZoomIns?.length" path="-515125966.0.0.0.0"><ui-button
-  :text="groupZoomIns?.map(g =&gt; g.groupBoxID)" @click="zoomOutGroupBox"
-  path="-515125966.0.0.0.0.0"></ui-button></h2><grid-ui-box v-for="box in
-  visibleBoxes" :key="'box/' + box._id" :userID="userID" :box="box"
-  :surface-element="surfaceElement" :surfaceGroupBoxID="groupBoxID"
-  path="-515125966.0.0.0.1"></grid-ui-box><grid-ui-link v-for="link in
+  :style="surfaceStyle" @wheel="onWheelSurface"
+  path="-515125966.0.0.0"><grid-ui-box v-for="box in visibleBoxes" :key="'box/'
+  + box._id" :userID="userID" :box="box" :surface-element="surfaceElement"
+  :surface-camera="surfaceCamera" :surfaceGroupBoxID="groupBoxID"
+  path="-515125966.0.0.0.0"></grid-ui-box><grid-ui-link v-for="link in
   visibleLinks" :key="'link/' + link._id" :link="link"
-  :surfaceGroupBoxID="groupBoxID"
-  path="-515125966.0.0.0.2"></grid-ui-link></div><grid-ui-tools
+  :surface-camera="surfaceCamera" :surfaceGroupBoxID="groupBoxID"
+  path="-515125966.0.0.0.1"></grid-ui-link></div><grid-ui-tools
   :surface-element="surfaceElement"
-  path="-515125966.0.0.1"></grid-ui-tools></div></ui-dnd-dropzone><div
-  path="-515125966.1"><grid-data-list-view :fuid="userID + '/data/boxes'"
-  @update="(newBoxes) =&gt; { boxes.splice(0, boxes.length, ...newBoxes); }"
-  path="-515125966.1.0"></grid-data-list-view><grid-data-list-view :fuid="userID
-  + '/data/links'" v-model="links"
-  path="-515125966.1.1"></grid-data-list-view></div><h2
-  path="-515125966.2"><ui-value :value="{groupBoxID}"
-  path="-515125966.2.0"></ui-value></h2></grid-module>
+  path="-515125966.0.0.1"></grid-ui-tools></div></ui-dnd-dropzone><h2
+  path="-515125966.1"><ui-value :value="{groupBoxID}"
+  path="-515125966.1.0"></ui-value></h2></grid-module>

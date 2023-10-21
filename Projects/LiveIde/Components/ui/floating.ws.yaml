@@ -20,11 +20,11 @@ methods:
       const parentRect = (!this.$el.parentElement) ? null : this.$root.getAbsoluteRect(this.$el.parentElement);
       const rect = this.$el.getBoundingClientRect();
 
-      //let top = this.getVerticalCoordinate(vertical, targetRect) - (vertical === 'center' ? floatingRect.height / 2 : 0);
-      //let left = this.getHorizontalCoordinate(horizontal, targetRect) - (horizontal === 'center' ? floatingRect.width / 2 : 0);
+      const top = this.getVerticalCoordinate(vertical, targetRect) - (vertical === 'center' ? floatingRect.height / 2 : 0);
+      const left = this.getHorizontalCoordinate(horizontal, targetRect) - (horizontal === 'center' ? floatingRect.width / 2 : 0);
 
-      const left = (targetRect.left - parentRect.left - (rect.width / 2));
-      const top = (targetRect.top - parentRect.top + (rect.height / 2));
+      //const left = (targetRect.left - parentRect.left - (rect.width / 2));
+      //const top = (targetRect.top - parentRect.top + (rect.height / 2));
 
       return {
         position: 'fixed',

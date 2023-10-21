@@ -32,6 +32,12 @@ dom:
                 @click: onDeleteLink
 props:
   link: null
+  surfaceCamera:
+    pos:
+      x: 0
+      'y': 0
+    scale: 1
+  surfaceGroupBoxID: null
 data:
   flashingValue: null
   fromEl: null
@@ -129,6 +135,9 @@ computed:
   showLeaderLine: | #js
     function() {
       if (!this.link) return false;
+      if (this.surfaceGroupBoxID) {
+        return (this.link.groupBoxID == this.surfaceGroupBoxID);
+      }
       if (this.link.is.grouped) return false;
       return this.link.is.visible;
     }

@@ -9,7 +9,7 @@ dom:
       ':window-style': windowStyle
       ':rect': boxRect
       ':surface-element': surfaceElement
-      ':surface-scale': surfaceScale
+      ':surface-camera': surfaceCamera
       ':center-coords': 'true'
       ':show-header': '!!box.type'
       @is-hovered: onWindowHovered
@@ -97,13 +97,17 @@ props:
   userID: null
   box: null
   surfaceElement: null
+  surfaceCamera:
+    pos:
+      x: 0
+      'y': 0
+    scale: 1
   surfaceGroupBoxID: null
 data:
   boxIcon: null
   oldBox: null
   error: null
   boxIsLoading: 0
-  surfaceScale: 1
   boxRect: null
   boxType: null
   showSockets: 0
@@ -198,10 +202,6 @@ methods:
     function(boxID, error) {
       if (boxID != this.box._id) return;
       this.error = error;
-    }
-  grid_client_workspace_surface_scale: | #js
-    function(scale) {
-      this.surfaceScale = scale;
     }
   hasLeftSideComp: | #js
     function(type) {
@@ -391,7 +391,7 @@ template: >-
   <grid-module class="comp-grid-ui-box" icon="📦" :show-title="false"
   path="1671629593."><ui-window v-if="showBoxWindow" ref="window1"
   :css-class="windowCssClass" :window-style="windowStyle" :rect="boxRect"
-  :surface-element="surfaceElement" :surface-scale="surfaceScale"
+  :surface-element="surfaceElement" :surface-camera="surfaceCamera"
   :center-coords="true" :show-header="!!box.type" @is-hovered="onWindowHovered"
   @is-minimized="onToggleMinimized" @drag-stop="onDragStop"
   @click="onBoxWindowClick" path="1671629593.0"><template v-slot:above

@@ -78,7 +78,11 @@ props:
   autoExpand: false
   centerCoords: false
   surfaceElement: null
-  surfaceScale: 1
+  surfaceCamera:
+    pos:
+      x: 0
+      'y': 0
+    scale: 1
   showHeader: true
   windowStyle: null
   cssClass: null
@@ -187,8 +191,8 @@ methods:
       const center = this.getSurfaceCenter();
       const pos = rect.pos;
       const size = rect.size;
-      const x = center.x + (pos.x * this.surfaceScale);
-      const y = center.y - (pos.y * this.surfaceScale);
+      const x = center.x + (pos.x);
+      const y = center.y - (pos.y);
       const width = size.width;
       const height = size.height;
       return { pos: { x, y }, size: { width, height } };
@@ -224,6 +228,7 @@ computed:
     {
       const rect1 = this.rect1;
       if (!rect1) return {};
+      const camera = this.surfaceCamera;
       const center = this.getSurfaceCenter();
       const pos = rect1.pos;
       const size = rect1.size;
@@ -232,8 +237,8 @@ computed:
       style.width = (size.width + "px");
       style.height = this.getStyleHeight();
       const height = parseInt(style.height);
-      style.left = `${center.x + pos.x - (size.width / 2)}px`;
-      style.top = `${center.y - pos.y - (height / 2)}px`;
+      style.left = `${center.x - camera.pos.x + pos.x - (size.width / 2)}px`;
+      style.top = `${center.y + camera.pos.y - pos.y - (height / 2)}px`;
       if (rect1.zOnTop) style["z-index"] = 1000;
       if ("opacity" in rect1)
       {
