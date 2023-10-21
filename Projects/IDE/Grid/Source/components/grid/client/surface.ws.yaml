@@ -42,24 +42,21 @@ data:
     scale: 1
   surfaceKey: 1
 mounted: | #js
-  async function() {
+  function() {
     this.surfaceElement = this.$refs.surface1;
     // Detect if surfaceElement is resized
-    const resizeObserver = new ResizeObserver(() => {
-      this.adjustCamera();
-    });
+    const resizeObserver = new ResizeObserver(this.adjustCamera.bind(this));
     resizeObserver.observe(this.surfaceElement);
-    await this.$nextTick();
     this.adjustCamera();
   }
 methods:
   grid_user_action_stack_do: | #js
-    async function(boxID, pos) {
-      await this.$nextTick();
+    function(boxID, pos) {
       this.adjustCamera();
     }
   adjustCamera: | #js
-    function() {
+    async function() {
+      await this.$nextTick();
       this.surfaceCamera = this.getCamera(this.getVisibleItems(this.$boxes));
     }
   getCamera: | #js

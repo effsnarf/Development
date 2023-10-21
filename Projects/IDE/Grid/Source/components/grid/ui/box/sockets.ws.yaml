@@ -8,10 +8,12 @@ dom:
         ':box': box
         ':socket': socket
         ':direction': direction
+        ':surface-camera': surfaceCamera
 props:
   box: null
   direction: null
   socketType: null
+  surfaceCamera: null
 computed:
   sockets: | #js
     function() {
@@ -44,5 +46,5 @@ template: >-
   <ul class="comp-grid-ui-box-sockets" :class="'sockets ' + direction +
   '-sockets'" path="-1391935093."><li :class="direction + '-socket'"
   v-for="socket in sockets" path="-1391935093.0"><grid-ui-box-socket :box="box"
-  :socket="socket" :direction="direction"
+  :socket="socket" :direction="direction" :surface-camera="surfaceCamera"
   path="-1391935093.0.0"></grid-ui-box-socket></li></ul>

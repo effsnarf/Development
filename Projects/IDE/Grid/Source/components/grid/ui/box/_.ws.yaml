@@ -73,12 +73,14 @@ dom:
           ':box': box
           direction: output
           socket-type: iterator
+          ':surface-camera': surfaceCamera
       template: 
         v-slot: below
         grid.ui.box.sockets: 
           ':box': box
           direction: output
           ':socket-type': (type) => (type != 'iterator')
+          ':surface-camera': surfaceCamera
         div: 
           transition.group:
             name: list
@@ -423,9 +425,11 @@ template: >-
   @box-event="onSideBoxEvent"
   path="1671629593.0.4.0.0.0"></component></ui-drawer></div><grid-ui-box-sockets
   :box="box" direction="output" socket-type="iterator"
+  :surface-camera="surfaceCamera"
   path="1671629593.0.4.1"></grid-ui-box-sockets></template><template
   v-slot:below path="1671629593.0.5"><grid-ui-box-sockets :box="box"
   direction="output" :socket-type="(type) =&gt; (type != 'iterator')"
+  :surface-camera="surfaceCamera"
   path="1671629593.0.5.0"></grid-ui-box-sockets><div
   path="1671629593.0.5.1"><transition-group name="list"
   path="1671629593.0.5.1.0"><div class="alert" v-for="alert in alerts"

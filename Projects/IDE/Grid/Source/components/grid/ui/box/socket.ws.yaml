@@ -53,6 +53,7 @@ props:
   box: null
   socket: null
   direction: null
+  surfaceCamera: null
 data:
   socketEl: null
   targetPlugEl: null
@@ -246,9 +247,18 @@ methods:
       // Box coordinates mark the center of the box, not the top-left corner
       pos = { x: (pos.x + (newBox.rect.size.width / 2)), y: (pos.y - (newBox.rect.size.height / 2)) };
 
+      pos = this.adjustToCamera(pos);
+
       newBox.rect.pos = pos;
 
       return newBox;
+    }
+  adjustToCamera: | #js
+    function(pos) {
+      const camera = this.surfaceCamera;
+      if (!camera) return pos;
+      pos = { x: (pos.x + camera.pos.x) * camera.scale, y: (pos.y + camera.pos.y) * camera.scale };
+      return pos;
     }
   getBoxVue: | #js
     function() {
