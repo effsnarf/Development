@@ -8,16 +8,11 @@ dom:
         @click: refresh
     ul:
       li:
-        v-for: link in links
+        v-for: link in $links
         grid.ui.link.item:
           ':link': link
 data:
-  links: []
 methods:
-  refresh: | #js
-    function() {
-      this.links = this.$root.links;
-    }
 watch: null
 _:
   examples:

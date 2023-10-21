@@ -1,12 +1,6 @@
 dom:
   grid.module:
     icon: 🏃‍♂️
-    grid.data.list.view: 
-      ':fuid': userID + '/data/boxes'
-      v-model: boxes
-    grid.data.list.view: 
-      ':fuid': userID + '/data/links'
-      v-model: links
     ui.linq.evaluator:
       ref: evaluator1
 props:
@@ -17,8 +11,6 @@ data:
       data: {}
   is:
     startuped: false
-  boxes: []
-  links: []
 mounted: | #js
   function() {
     this.$root.socket = this.socket;
@@ -31,7 +23,7 @@ methods:
       const executableTypes = Object.keys(this)
         .filter((key) => key.startsWith("grid_ui_box_execute_"))
         .map((key) => key.replace("grid_ui_box_execute_", ""));
-      const boxes = this.boxes.filter((box) => executableTypes.includes(box.type));
+      const boxes = this.$boxes.filter((box) => executableTypes.includes(box.type));
       for (const box of boxes) {
         this.grid_ui_box_execute(box._id);
       }
@@ -110,7 +102,7 @@ methods:
     }
   grid_client_runtime_link_is_loading: | #js
     function(linkID, isLoading) {
-      const link = this.links.find(link => link._id == linkID);
+      const link = this.$links.find(link => link._id == linkID);
       if (!link) return;
       if (link.groupBoxID) this.$femit("box.is.loading", link.groupBoxID, isLoading);
     }
@@ -171,7 +163,7 @@ methods:
   repropagateSocketLinks: | #js
     function(boxID) {
       const box = this.getBox(boxID);
-      const links = this.links
+      const links = this.$links
         .filter((link) => (link.from.box._id === boxID))
         .filter((link) => (link.from.socket.type == "data"));
       for (const link of links) {
@@ -190,7 +182,7 @@ methods:
 
       const sourceValue = this.getSocketRuntimeValue(boxID, sDirection, sID);
 
-      const links = this.links
+      const links = this.$links
         .filter((link) => link.from.box._id === boxID)
         .filter((link) => link.from.socket._id == sID);
 
@@ -375,7 +367,7 @@ methods:
   getBox: | #js
     function(boxID) {
       // #TODO: Slow
-      return this.boxes.find((box) => box._id === boxID);
+      return this.$boxes.find((box) => box._id === boxID);
     }
   ensure: | #js
     function(boxID) {

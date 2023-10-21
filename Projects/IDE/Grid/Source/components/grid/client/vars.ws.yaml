@@ -12,17 +12,9 @@ dom:
       v-model: userActions
       ':item-props': '{ userActionsPointer }'
       ':reverse': true
-    grid.data.list.view: 
-      ':fuid': userID + '/data/boxes'
-      v-model: boxes
-    grid.data.list.view: 
-      ':fuid': userID + '/data/links'
-      v-model: links
 props:
   userID: null
 data:
-  boxes: []
-  links: []
   userActions: []
   userActionsPointer: null
 watch:

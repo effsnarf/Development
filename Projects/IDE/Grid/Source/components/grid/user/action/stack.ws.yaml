@@ -1,12 +1,6 @@
 dom:
   grid.module:
     icon: 👤👈
-    grid.data.list.view: 
-      ':fuid': userID+'/data/boxes'
-      v-model: boxes
-    grid.data.list.view: 
-      ':fuid': userID+'/data/links'
-      v-model: links
     .flex:
       grid.data.list:
         ':fuid': userID+'/user/actions'
@@ -29,8 +23,6 @@ data:
   nextActionID: 1
   nextID: 1
   userActions: []
-  boxes: []
-  links: []
   pointer: null
 mounted: | #js
   async function() {
@@ -44,14 +36,14 @@ mounted: | #js
 methods:
   create_group: | #js
     function(userID, action, displayBoxID) {
-      const selectedBoxes = this.boxes.filter((box) => box.is?.selected);
+      const selectedBoxes = this.$boxes.filter((box) => box.is?.selected);
       const selectedBoxIDs = selectedBoxes.map((box) => box._id);
 
       const memberBoxes = selectedBoxes;
       const memberBoxIDs = memberBoxes.map((box) => box._id);
-      const memberLinks = this.links.filter((link) => memberBoxIDs.includes(link.from.box._id) && memberBoxIDs.includes(link.to.box._id));
+      const memberLinks = this.$links.filter((link) => memberBoxIDs.includes(link.from.box._id) && memberBoxIDs.includes(link.to.box._id));
       const memberLinkIDs = memberLinks.map((link) => link._id);
-      const relatedLinks = this.links.filter((link) => memberBoxIDs.includes(link.from.box._id) || memberBoxIDs.includes(link.to.box._id));
+      const relatedLinks = this.$links.filter((link) => memberBoxIDs.includes(link.from.box._id) || memberBoxIDs.includes(link.to.box._id));
       if (relatedLinks.length > memberLinks.length) {
         const errorMessage = `A new group must be independent from other boxes.`;
         alertify.error(errorMessage);
@@ -116,7 +108,7 @@ methods:
       // Select the boxes
       this.select_boxes(userID, {}, groupBox.members, true);
       // Select the inside links
-      const memberLinks = this.links.filter((link) => groupBox.members.includes(link.from.box._id) && groupBox.members.includes(link.to.box._id));
+      const memberLinks = this.$links.filter((link) => groupBox.members.includes(link.from.box._id) && groupBox.members.includes(link.to.box._id));
       const memberLinkIDs = memberLinks.map((link) => link._id);
       // Unset the groupBoxID on the members and links
       this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "update", [groupBox.members, { groupBoxID: null, rect: { is: { grouped: false, visible: true } } } ]);
@@ -153,7 +145,7 @@ methods:
     }
   move_box: | #js
     async function(userID, action, boxID, pos) {
-      const box = this.boxes.find((box) => box._id === boxID);
+      const box = this.$boxes.find((box) => box._id === boxID);
       const oldPos = box.rect.pos;
       this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "update", [boxID, { rect: { pos } }]);
       action.undo = { method: "move.box", args: [boxID, oldPos] };
@@ -161,7 +153,7 @@ methods:
     }
   resize_box: | #js
     async function(userID, action, boxID, size) {
-      const box = this.boxes.find((box) => box._id === boxID);
+      const box = this.$boxes.find((box) => box._id === boxID);
       const oldSize = box.rect.size;
       this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "update", [boxID, { rect: { size } }]);
       action.undo = { method: "resize.box", args: [boxID, oldSize] };
@@ -186,7 +178,7 @@ methods:
         newData.sockets = this.getNewSockets(newData.type);
       }
       
-      const box = this.boxes.find((box) => box._id === boxID);
+      const box = this.$boxes.find((box) => box._id === boxID);
       
       oldData = oldData ||
         Objects.getPropertiesAsTree(box, Objects.getPaths(newData));
@@ -197,7 +189,7 @@ methods:
     }
   edit_link: | #js
     function(userID, action, linkID, newData, oldData) {
-      const link = this.links.find((link) => link._id === linkID);
+      const link = this.$links.find((link) => link._id === linkID);
       oldData = oldData ||
         Objects.getPropertiesAsTree(link, Objects.getPaths(newData));
       this.$femit("to", "grid.data.list", `${userID}/data/links`, "update", [linkID, newData]);
@@ -207,7 +199,7 @@ methods:
   edit_socket: | #js
     async function(userID, action, boxID, direction, socketID, newData, oldData)
     {
-      const box = this.boxes.find((box) => box._id === boxID);
+      const box = this.$boxes.find((box) => box._id === boxID);
       const socket = box.sockets[direction].find((socket) => socket._id === socketID);
       const socketIndex = box.sockets[direction].findIndex((socket) => socket._id === socketID);
       oldData = oldData ||
@@ -217,7 +209,7 @@ methods:
       // If this socket is on a member box and we exported it, we need to add/remove the socket on the group box
       if (box.groupBoxID) {
         const memberBox = box;
-        const groupBox = this.boxes.find((b) => b._id === box.groupBoxID);
+        const groupBox = this.$boxes.find((b) => b._id === box.groupBoxID);
         const memberSocket = memberBox.sockets[direction][socketIndex];
         if ("exported" in newData.is) {
           if (newData.is.exported) {
@@ -236,14 +228,14 @@ methods:
   select_boxes: | #js
     async function(userID, action, boxIDs, isSelected) {
       // #TODO: Undo should set the boxes that were selected before
-      const boxes = this.boxes.filter((box) => boxIDs.includes(box._id));
+      const boxes = this.$boxes.filter((box) => boxIDs.includes(box._id));
       this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "update", [boxIDs, { is: { selected: isSelected } }]);
       action.undo = { method: "select.boxes", args: [boxIDs, !isSelected] };
       return action;
     }
   unselect_boxes: | #js
     async function(userID, action) {
-      const selectedBoxes = this.boxes.filter((box) => box.is?.selected);
+      const selectedBoxes = this.$boxes.filter((box) => box.is?.selected);
       const boxIDs = selectedBoxes.map((box) => box._id);
       this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "update", [boxIDs, { is: { selected: false } }]);
       action.undo = { method: "select.boxes", args: [boxIDs, true] };
@@ -264,7 +256,7 @@ methods:
   delete_link: | #js
     async function(userID, action, linkID, options) {
       if (options?.isUndoing) this.nextID--;
-      const oldLink = Objects.clone(this.links.find((link) => link._id === linkID));
+      const oldLink = Objects.clone(this.$links.find((link) => link._id === linkID));
       delete oldLink._id;
       this.$femit("to", "grid.data.list", `${userID}/data/links`, "delete", [linkID]);
       action.undo = { method: "create.link", args: [oldLink.from, oldLink.to, oldLink] };
@@ -272,9 +264,9 @@ methods:
     }
   delete_selected: | #js
     async function(userID, action) {
-      const boxes = this.boxes.filter((box) => box.is?.selected);
+      const boxes = this.$boxes.filter((box) => box.is?.selected);
       const boxIDs = boxes.map((box) => box._id);
-      const links = this.links.filter((link) => boxIDs.includes(link.from) || boxIDs.includes(link.to));
+      const links = this.$links.filter((link) => boxIDs.includes(link.from) || boxIDs.includes(link.to));
       const linkIDs = links.map((link) => link._id);
       this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "delete", [boxIDs]);
       this.$femit("to", "grid.data.list", `${userID}/data/links`, "delete", [linkIDs]);
@@ -482,7 +474,7 @@ methods:
     }
   deleteSocket: | #js
     function(userID, boxID, direction, socketID) {
-      const box = this.boxes.find((box) => box._id === boxID);
+      const box = this.$boxes.find((box) => box._id === boxID);
       const socketIndex = box.sockets[direction].findIndex((socket) => socket._id === socketID);
       const groupSockets = box.sockets[direction];
       groupSockets.splice(socketIndex, 1);
@@ -647,7 +639,7 @@ methods:
     }
   getBox: | #js
     function(boxID) {
-      return this.boxes.find((box) => box._id === boxID);
+      return this.$boxes.find((box) => box._id === boxID);
     }
 computed:
   hasRedoActions: | #js

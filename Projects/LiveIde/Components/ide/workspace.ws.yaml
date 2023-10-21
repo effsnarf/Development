@@ -85,7 +85,7 @@ name: ide-workspace
 style:
   .comp-ide-workspace:
     position: fixed
-    left: 1rem
+    right: 1rem
     bottom: 1rem
     display: flex
     flex-direction: column

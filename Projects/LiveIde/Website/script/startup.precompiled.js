@@ -7611,7 +7611,7 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/website/script/1697811244687.ts ***!
+  !*** ../../../LiveIde/website/script/1697902531680.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -7677,6 +7677,32 @@ const generalMixin = {
         self.$el.removeEventListener("mouseout", self.handlers.mouseout);
         vueApp?.vm.registerVue(this);
     },
+    computed: {
+        $store() {
+            return this.$root.store;
+        },
+    },
+};
+const gridAppMixin = {
+    created() {
+        const store = this.store;
+        store.boxes = Vue.ref([]);
+        store.links = Vue.ref([]);
+    },
+};
+const gridAppCompMixin = {
+    matchComp: (c) => c.name.startsWith("grid."),
+    computed: {
+        $boxes() {
+            return this.$store.boxes.value;
+        },
+        $links() {
+            return this.$store.links.value;
+        },
+        $store() {
+            return this.$root.store;
+        },
+    },
 };
 const flowAppMixin = {
     data() {
@@ -7715,8 +7741,8 @@ const flowAppMixin = {
         },
     },
 };
-const flowAppComponentMixin = {
-    matchComp: (c) => c.name.startsWith("grid."),
+const flowAppCompMixin = {
+    matchComp: (c) => c.name.startsWith("flow."),
     computed: {
         $global() {
             return this.$root.global;
@@ -7729,8 +7755,8 @@ const flowAppComponentMixin = {
         },
     },
 };
-const vueAppMixins = [flowAppMixin];
-const webScriptMixins = [generalMixin, flowAppComponentMixin];
+const vueAppMixins = [gridAppMixin];
+const webScriptMixins = [generalMixin, gridAppCompMixin];
 const mgHelpers = {
     url: {
         thread: (thread, full = false) => {
@@ -8104,6 +8130,7 @@ const mgMixin = {
             compsDic: {},
             compNames: [],
             templates: client.templates,
+            store: {},
             isDevToolsOpen: false,
             isLoading: 0,
             error: null,

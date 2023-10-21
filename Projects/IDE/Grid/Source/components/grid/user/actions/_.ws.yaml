@@ -2,14 +2,10 @@ dom:
   grid.module:
     icon: 👤👈
     grid.user.action.stack:
-      ':userID': userID
-    grid.data.list.view:
-      ':fuid': userID+'/data/boxes'
-      v-model: boxes
+      ":userID": userID
 props:
   userID: null
 data:
-  boxes: []
 methods:
   grid_ui_actions_create_group: | #js
     function(displayBoxID) {
@@ -24,7 +20,7 @@ methods:
   grid_ui_actions_mark_select_box: | #js
     function(rect) {
       // Check if any boxes fit into the selection box
-      const selectedBoxes = this.boxes.filter(box => this.isBoxInRect(box, rect));
+      const selectedBoxes = this.$boxes.filter(box => this.isBoxInRect(box, rect));
       // If any boxes fit into the selection box, select them
       if (selectedBoxes.length) {
         const boxIDs = selectedBoxes.map(box => box._id);

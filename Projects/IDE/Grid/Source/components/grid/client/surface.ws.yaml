@@ -33,8 +33,6 @@ props:
   userID: null
   groupBoxID: null
 data:
-  boxes: []
-  links: []
   surfaceElement: null
   surfaceCamera:
     pos:
@@ -51,7 +49,6 @@ mounted: | #js
     });
     resizeObserver.observe(this.surfaceElement);
     await this.$root.wait(1000);
-    this.refresh();
     this.adjustCamera();
   }
 methods:
@@ -62,7 +59,7 @@ methods:
     }
   adjustCamera: | #js
     function() {
-      this.surfaceCamera = this.getCamera(this.visibleBoxes);
+      this.surfaceCamera = this.getCamera(this.getVisibleItems(this.$boxes));
     }
   getCamera: | #js
     function(boxes) {
@@ -124,19 +121,14 @@ methods:
       this.surfaceKey++;
       alertify.message("Surface refreshed");
     }
-  refresh: | #js
-    async function() {
-      this.boxes = this.$root.boxes;
-      this.links = this.$root.links;
-    }
 computed:
   visibleBoxes: | #js
     function() {
-      return this.getVisibleItems(this.boxes);
+      return this.getVisibleItems(this.$boxes);
     }
   visibleLinks: | #js
     function() {
-      return this.getVisibleItems(this.links);
+      return this.getVisibleItems(this.$links);
     }
   surfaceStyle: | #js
     function() {

@@ -32,7 +32,6 @@ methods:
         const itemIndex = this.items.findIndex(item => (item._id == itemID));
         item = Objects.deepMerge(item, data);
         this.items[itemIndex] = item;
-        this.onChange();
       };
       const updatedItems = [];
       for (let i = 0; i < itemIDs.length; i++)
@@ -53,8 +52,8 @@ methods:
       for (const itemID of itemIDs)
       {
         this.items.removeByField("_id", itemID);
-        this.onChange();
       }
+      this.onChange();
       await this.$nextTick();
       this.$femit("deleted", this.fuid, deletedItems);
     }
@@ -65,6 +64,7 @@ methods:
     }
   onChange: | #js
     function() {
+      this.updateGlobalVariable();
       this.$femit("change", { fuid: this.fuid, items: this.items });
       this.save();
     }
@@ -79,12 +79,27 @@ methods:
       this.items = JSON.parse(localStorage.getItem(this.fuid) || "[]");
       this.onChange();
     }
+  updateGlobalVariable: | #js
+    function() {
+      const items = this.items;
+      if (this.fuid.includes("/data/")) {
+        const varName = `$${this.fuid.split("/").last()}`;
+        this[varName].clear();
+        this[varName].push(...items);
+      }
+    }
 computed:
   isPersisted: | #js
     function() {
       if (["/user/actions", "/data/boxes", "/data/links"].some(s => this.fuid.includes(s))) return true;
       return false;
     }
+watch:
+  items:
+    handler: | #js
+      function(items) {
+        this.updateGlobalVariable(items);
+      }
 _:
   examples:
     count: 0

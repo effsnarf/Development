@@ -72,6 +72,34 @@ const generalMixin = {
 
     vueApp?.vm.registerVue(this);
   },
+  computed: {
+    $store(): any {
+      return (this as any).$root.store;
+    },
+  },
+};
+
+const gridAppMixin = {
+  created() {
+    const store = (this as any).store;
+    store.boxes = Vue.ref([]);
+    store.links = Vue.ref([]);
+  },
+};
+
+const gridAppCompMixin = {
+  matchComp: (c: Component) => c.name.startsWith("grid."),
+  computed: {
+    $boxes() {
+      return (this as any).$store.boxes.value;
+    },
+    $links() {
+      return (this as any).$store.links.value;
+    },
+    $store() {
+      return (this as any).$root.store;
+    },
+  },
 };
 
 const flowAppMixin = {
@@ -118,8 +146,8 @@ const flowAppMixin = {
   },
 };
 
-const flowAppComponentMixin = {
-  matchComp: (c: Component) => c.name.startsWith("grid."),
+const flowAppCompMixin = {
+  matchComp: (c: Component) => c.name.startsWith("flow."),
   computed: {
     $global() {
       return (this as any).$root.global;
@@ -133,9 +161,9 @@ const flowAppComponentMixin = {
   },
 };
 
-const vueAppMixins = [flowAppMixin];
+const vueAppMixins = [gridAppMixin];
 
-const webScriptMixins = [generalMixin, flowAppComponentMixin];
+const webScriptMixins = [generalMixin, gridAppCompMixin];
 
 const mgHelpers = {
   url: {
@@ -555,6 +583,7 @@ interface MgParams {
       compsDic: {},
       compNames: [],
       templates: client.templates,
+      store: {},
       isDevToolsOpen: false,
       isLoading: 0,
       error: null,
