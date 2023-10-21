@@ -1,0 +1,38 @@
+dom:
+  grid.module:
+    icon: 🛠️
+    .flex.justify-around:
+      ui.button:
+        v-for: button of buttons
+        ':icon': button.icon
+        ':text': button.text
+        @click: onClickButton(button)
+data:
+  buttons:
+    - icon: ✖
+      text: clear
+      femit: clear
+    - icon: 👈
+      text: undo
+      femit: undo
+    - icon: 👉
+      text: redo
+      femit: redo
+methods:
+  onClickButton: | #js
+    function(button) {
+      if (button.femit) {
+        this.$femit(button.femit);
+        return;
+      }
+    }
+_:
+  examples:
+    count: 0
+name: grid-ui-tools-buttons
+template: >-
+  <grid-module class="comp-grid-ui-tools-buttons" icon="🛠️"
+  path="-1113238980."><div class="flex justify-around"
+  path="-1113238980.0"><ui-button v-for="button of buttons" :icon="button.icon"
+  :text="button.text" @click="onClickButton(button)"
+  path="-1113238980.0.0"></ui-button></div></grid-module>

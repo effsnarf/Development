@@ -1,7 +1,16 @@
 dom:
-  grid.app: null
+  div: 
+    grid.app: null
+    div: 
+      ui.html.style:
+        v-for: comp in $root.comps
+        ':key': comp.name
+        ':component': comp
 _:
   examples:
     count: 0
 name: app
-template: <grid-app class="comp-app"></grid-app>
+template: >-
+  <div class="comp-app" path="96801."><grid-app></grid-app><div
+  path="96801.1"><ui-html-style v-for="comp in $root.comps" :key="comp.name"
+  :component="comp" path="96801.1.0"></ui-html-style></div></div>

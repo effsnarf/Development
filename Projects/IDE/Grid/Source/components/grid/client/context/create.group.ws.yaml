@@ -58,10 +58,8 @@ methods:
     }
   getUiActions: | #js
     function() {
-      const client = this.$root.vm.getAncestors(this, "grid.client")[0];
-      const module = client.$children[0];
-      const uiActions = module.$children.find((c) => c.$options.name === "grid-ui-actions");
-      return uiActions;
+      const contextMenu = vueApp.vm.getAncestors(this, "grid.client.context.menu")[0];
+      return contextMenu.getUiActions();
     }
 computed:
   canCreateGroup: | #js

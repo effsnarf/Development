@@ -19,7 +19,7 @@ props:
   icon: null
   title: null
   showEvents: false
-  showTitle: true
+  showTitle: false
   showConsole: false
   dataBoundSocketData: null
 data:
@@ -154,13 +154,16 @@ methods:
     }
   getActiveSocketData: | #js
     function() {
-      let socketData = (this.$root.socket?.runtime.data[this.box._id] || {});
+      let socketData = (!this.box) ? {} : (this.$root.socket?.runtime.data[this.box._id] || {});
       socketData = Objects.deepMerge(socketData, (this.dataBoundSocketData || {}));
       return socketData;
     }
   refresh: | #js
     function() {
-      if ("activeSocketData" in this.$parent) this.$parent.activeSocketData = this.getActiveSocketData();
+      const activeSocketData = this.getActiveSocketData();
+      if ("activeSocketData" in this.$parent) this.$parent.activeSocketData = activeSocketData;
+      if ("inputs" in this.$parent) this.$parent.inputs = activeSocketData.input;
+      if ("outputs" in this.$parent) this.$parent.outputs = activeSocketData.output;
       if ("refresh" in this.$parent) this.$parent.refresh();
     }
   onAllEvents: | #js

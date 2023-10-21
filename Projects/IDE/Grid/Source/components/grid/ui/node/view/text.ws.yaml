@@ -1,7 +1,5 @@
 dom:
   grid.module:
-    icon: 🆎
-    ':show-title': 'false'
     ':box': box
     ':data-bound-socket-data': dataBoundSocketData
     h2:
@@ -16,18 +14,14 @@ props:
   node: null
   dataBoundSocketData: null
 data:
-  activeSocketData: null
+  inputs: null
 mounted: ''
 methods: null
 computed:
   text: | #js
     function() {
-      const item = this.dataBoundItem;
+      const item = this.inputs?.[1];
       return (item?.title || item?.sub);
-    }
-  dataBoundItem: | #js
-    function() {
-      return this.activeSocketData?.input?.[1];
     }
 style: null
 _:
@@ -35,9 +29,8 @@ _:
     count: 0
 name: grid-ui-node-view-text
 template: >-
-  <grid-module class="comp-grid-ui-node-view-text" icon="🆎" :show-title="false"
-  :box="box" :data-bound-socket-data="dataBoundSocketData"
-  path="-1435648036."><h2 path="-1435648036.0"><div v-if="text?.length"
-  v-text="text" path="-1435648036.0.0"></div><div class="opacity-50"
-  v-else-if="true" v-text="'[text]'"
-  path="-1435648036.0.1"></div></h2></grid-module>
+  <grid-module class="comp-grid-ui-node-view-text" :box="box"
+  :data-bound-socket-data="dataBoundSocketData" path="-1435648036."><h2
+  path="-1435648036.0"><div v-if="text?.length" v-text="text"
+  path="-1435648036.0.0"></div><div class="opacity-50" v-else-if="true"
+  v-text="'[text]'" path="-1435648036.0.1"></div></h2></grid-module>

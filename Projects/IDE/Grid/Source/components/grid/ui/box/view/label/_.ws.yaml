@@ -2,11 +2,14 @@ dom:
   grid.module:
     icon: 🆎
     ':show-title': 'false'
-    :box: box
-    :data-bound-socket-data: dataBoundSocketData
-    h2:
-      @click: refresh
-      v-text: text
+    ':box': box
+    ':data-bound-socket-data': dataBoundSocketData
+    transition:
+      name: slide
+      h2:
+        ':key': text
+        @click: refresh
+        v-text: text
 props:
   box: null
   dataBoundSocketData: null
@@ -62,5 +65,7 @@ _:
 name: grid-ui-box-view-label
 template: >-
   <grid-module class="comp-grid-ui-box-view-label" icon="🆎" :show-title="false"
-  path="2104471648."><h2 @click="refresh" v-text="text"
-  path="2104471648.0"></h2></grid-module>
+  :box="box" :data-bound-socket-data="dataBoundSocketData"
+  path="2104471648."><transition name="slide" path="2104471648.0"><h2
+  :key="text" @click="refresh" v-text="text"
+  path="2104471648.0.0"></h2></transition></grid-module>

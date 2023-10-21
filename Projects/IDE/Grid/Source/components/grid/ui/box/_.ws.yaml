@@ -97,6 +97,7 @@ props:
   userID: null
   box: null
   surfaceElement: null
+  surfaceGroupBoxID: null
 data:
   boxIcon: null
   oldBox: null
@@ -272,7 +273,7 @@ methods:
     async function(box) {
       if (!box) return null;
       let rect = Objects.clone(box.rect);
-      if (box.rect.is.grouped) {
+      if (box.rect.is.grouped && (box.groupBoxID != this.surfaceGroupBoxID)) {
         const groupBox = this.$root.boxes.find(b => b._id == box.groupBoxID);
         if (!groupBox) {
           await this.$root.wait(100);
@@ -281,8 +282,18 @@ methods:
         rect = Objects.clone(groupBox.rect);
         rect.opacity = 0;
       }
-      if (!("opacity" in rect)) rect.opacity = (box.rect.is.visible ? 1 : 0);
+      if (!("opacity" in rect)) {
+        rect.opacity = (this.isBoxWindowVisible(box) ? 1 : 0);
+      }
       return rect;
+    }
+  isBoxWindowVisible: | #js
+    function(box) {
+      if (this.surfaceGroupBoxID) {
+        return (box.groupBoxID == this.surfaceGroupBoxID);
+      }
+      if (box.rect.is.grouped) return false;
+      return box.rect.is.visible;
     }
   onBoxWindowClick: | #js
     function() {
@@ -303,8 +314,7 @@ methods:
 computed:
   showBoxWindow: | #js
     function() {
-      if (this.box.rect.is.grouped) return false;
-      return this.box.rect.is.visible;
+      return this.isBoxWindowVisible(this.box);
     }
   windowCssClass: | #js
     function() {

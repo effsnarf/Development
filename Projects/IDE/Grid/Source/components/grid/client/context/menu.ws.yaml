@@ -38,7 +38,6 @@ methods:
     }
   grid_user_action_stack_do: | #js
     async function(action) {
-      if (!["select.boxes"].some(s => action.redo.method.includes(s))) return;
       this.refresh();
     }
   refresh: | #js
@@ -56,7 +55,10 @@ methods:
     }
   getUiActions: | #js
     function() {
-      return this.$parent.$parent.getUiActions();
+      const client = this.$root.vm.getAncestors(this, "grid.client")[0];
+      const module = client.$children[0];
+      const uiActions = module.$children.find((c) => c.$options.name === "grid-ui-actions");
+      return uiActions;
     }
 watch:
   boxes:

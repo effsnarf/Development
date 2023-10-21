@@ -1,12 +1,12 @@
 dom:
   grid.module:
     icon: 🖼️
-    ":show-title": "false"
-    :box: box
-    :data-bound-socket-data: dataBoundSocketData
+    ':show-title': 'false'
+    ':box': box
+    ':data-bound-socket-data': dataBoundSocketData
     img:
-      ":style": "{ 'width': '100%'}"
-      ":src": imageSrc
+      ':style': '{ ''width'': ''100%''}'
+      ':src': imageSrc
 props:
   box: null
   dataBoundSocketData: null
@@ -40,5 +40,6 @@ _:
 name: grid-ui-box-view-image
 template: >-
   <grid-module class="comp-grid-ui-box-view-image" icon="🖼️"
-  :show-title="false" path="2102057671."><img :style="{ 'width': '100%'}"
-  :src="imageSrc" path="2102057671.0"/></grid-module>
+  :show-title="false" :box="box" :data-bound-socket-data="dataBoundSocketData"
+  path="2102057671."><img :style="{ 'width': '100%'}" :src="imageSrc"
+  path="2102057671.0"/></grid-module>

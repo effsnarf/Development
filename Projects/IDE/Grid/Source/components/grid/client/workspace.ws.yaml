@@ -3,11 +3,15 @@ dom:
     icon: 👤💻🖱️
     grid.client.context.menu:
       ':userID': userID
-    .flex:
-      div:
+    grid.ui.tools.buttons: null
+    div:
+      .flex:
         class: w-100pc
-        grid.client.surface:
+        grid.client.surface: 
           ':userID': userID
+        grid.client.surface: 
+          ':userID': userID
+          ':groupBoxID': 4
     grid.client.vars:
       ':userID': userID
 props:
@@ -18,6 +22,9 @@ mounted: | #js
   }
 methods: null
 computed: null
+style:
+  .flex.w-100pc > *:
+    flex-grow: 1
 _:
   examples:
     count: 0
@@ -25,8 +32,10 @@ name: grid-client-workspace
 template: >-
   <grid-module class="comp-grid-client-workspace" icon="👤💻🖱️"
   path="-1461469222."><grid-client-context-menu :userID="userID"
-  path="-1461469222.0"></grid-client-context-menu><div class="flex"
-  path="-1461469222.1"><div class="w-100pc"
-  path="-1461469222.1.0"><grid-client-surface :userID="userID"
-  path="-1461469222.1.0.0"></grid-client-surface></div></div><grid-client-vars
-  :userID="userID" path="-1461469222.2"></grid-client-vars></grid-module>
+  path="-1461469222.0"></grid-client-context-menu><grid-ui-tools-buttons></grid-ui-tools-buttons><div
+  path="-1461469222.2"><div class="w-100pc flex"
+  path="-1461469222.2.0"><grid-client-surface :userID="userID"
+  path="-1461469222.2.0.0"></grid-client-surface><grid-client-surface
+  :userID="userID" :groupBoxID="4"
+  path="-1461469222.2.0.1"></grid-client-surface></div></div><grid-client-vars
+  :userID="userID" path="-1461469222.3"></grid-client-vars></grid-module>

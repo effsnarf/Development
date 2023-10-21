@@ -1,16 +1,24 @@
 dom:
-  component:
+  grid.module:
     ':box': box
-    ':class': getViewClass(node)
-    ':is': getCompName(node)
-    ':node': node
-    ':hovered-node': hoveredNode
     ':data-bound-socket-data': dataBoundSocketData
+    transition:
+      name: list
+      component:
+        ':key': JSON.stringify(inputs?.[1])
+        ':box': box
+        ':class': getViewClass(node)
+        ':is': getCompName(node)
+        ':node': node
+        ':hovered-node': hoveredNode
+        ':data-bound-socket-data': dataBoundSocketData
 props:
   box: null
   node: null
   hoveredNode: null
   dataBoundSocketData: null
+data:
+  inputs: null
 methods:
   getViewClass: | #js
     function(node) {
@@ -34,7 +42,9 @@ _:
     count: 0
 name: grid-ui-node-view
 template: >-
-  <component class="comp-grid-ui-node-view" :box="box"
-  :class="getViewClass(node)" :is="getCompName(node)" :node="node"
+  <grid-module class="comp-grid-ui-node-view" :box="box"
+  :data-bound-socket-data="dataBoundSocketData" path="1824264671."><transition
+  name="list" path="1824264671.0"><component :key="JSON.stringify(inputs?.[1])"
+  :box="box" :class="getViewClass(node)" :is="getCompName(node)" :node="node"
   :hovered-node="hoveredNode" :data-bound-socket-data="dataBoundSocketData"
-  path="1824264671."></component>
+  path="1824264671.0.0"></component></transition></grid-module>

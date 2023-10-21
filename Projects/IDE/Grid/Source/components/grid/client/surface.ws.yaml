@@ -10,21 +10,23 @@ dom:
           class: surface flex-grow-1
           ':style': surfaceStyle
           @wheel: onWheelSurface
-          h2:
+          h2: 
             v-if: groupZoomIns?.length
             ui.button:
               ':text': groupZoomIns?.map(g => g.groupBoxID)
               @click: zoomOutGroupBox
           grid.ui.box:
-            v-for: box in boxes
+            v-for: box in visibleBoxes
             ':key': '''box/'' + box._id'
             ':userID': userID
             ':box': box
             ':surface-element': surfaceElement
+            ':surfaceGroupBoxID': groupBoxID
           grid.ui.link:
-            v-for: link in links
+            v-for: link in visibleLinks
             ':key': '''link/'' + link._id'
             ':link': link
+            ':surfaceGroupBoxID': groupBoxID
         grid.ui.tools:
           ':surface-element': surfaceElement
     div: 
@@ -34,8 +36,12 @@ dom:
       grid.data.list.view: 
         ':fuid': userID + '/data/links'
         v-model: links
+    h2: 
+      ui.value:
+        ':value': '{groupBoxID}'
 props:
   userID: null
+  groupBoxID: null
 data:
   surfaceElement: null
   surfaceScale: 1
@@ -115,6 +121,12 @@ methods:
         for (const box of nonMemberBoxes) box.rect.is.visible = true;
       }, 400);
     }
+  getVisibleItems: | #js
+    function(items) {
+      items = [...items];
+      if (this.groupBoxID) items = items.filter(item => item.groupBoxID == this.groupBoxID);
+      return items;
+    }
   refreshSurface: | #js
     async function() {
       await this.$nextTick();
@@ -122,6 +134,14 @@ methods:
       alertify.message("Surface refreshed");
     }
 computed:
+  visibleBoxes: | #js
+    function() {
+      return this.getVisibleItems(this.boxes);
+    }
+  visibleLinks: | #js
+    function() {
+      return this.getVisibleItems(this.links);
+    }
   surfaceStyle: | #js
     function() {
       return {
@@ -152,11 +172,12 @@ template: >-
   :style="surfaceStyle" @wheel="onWheelSurface" path="-515125966.0.0.0"><h2
   v-if="groupZoomIns?.length" path="-515125966.0.0.0.0"><ui-button
   :text="groupZoomIns?.map(g =&gt; g.groupBoxID)" @click="zoomOutGroupBox"
-  path="-515125966.0.0.0.0.0"></ui-button></h2><grid-ui-box v-for="box in boxes"
-  :key="'box/' + box._id" :userID="userID" :box="box"
-  :surface-element="surfaceElement"
-  path="-515125966.0.0.0.1"></grid-ui-box><grid-ui-link v-for="link in links"
-  :key="'link/' + link._id" :link="link"
+  path="-515125966.0.0.0.0.0"></ui-button></h2><grid-ui-box v-for="box in
+  visibleBoxes" :key="'box/' + box._id" :userID="userID" :box="box"
+  :surface-element="surfaceElement" :surfaceGroupBoxID="groupBoxID"
+  path="-515125966.0.0.0.1"></grid-ui-box><grid-ui-link v-for="link in
+  visibleLinks" :key="'link/' + link._id" :link="link"
+  :surfaceGroupBoxID="groupBoxID"
   path="-515125966.0.0.0.2"></grid-ui-link></div><grid-ui-tools
   :surface-element="surfaceElement"
   path="-515125966.0.0.1"></grid-ui-tools></div></ui-dnd-dropzone><div
@@ -164,4 +185,6 @@ template: >-
   @update="(newBoxes) =&gt; { boxes.splice(0, boxes.length, ...newBoxes); }"
   path="-515125966.1.0"></grid-data-list-view><grid-data-list-view :fuid="userID
   + '/data/links'" v-model="links"
-  path="-515125966.1.1"></grid-data-list-view></div></grid-module>
+  path="-515125966.1.1"></grid-data-list-view></div><h2
+  path="-515125966.2"><ui-value :value="{groupBoxID}"
+  path="-515125966.2.0"></ui-value></h2></grid-module>

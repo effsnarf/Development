@@ -144,7 +144,7 @@ watch:
     }
 style:
   .box1:
-    opacity: 0
+    opacity: 0.2
     transition: 0.3s
   .box1:hover:
     opacity: 0.5

@@ -9,15 +9,15 @@ methods:
     function(rect) {
       this.$femit("mark.select.box", rect);
     }
-  grid_ui_tools_undo: | #js
+  grid_ui_tools_buttons_undo: | #js
     function() {
       this.$femit("undo", this.userID);
     }
-  grid_ui_tools_redo: | #js
+  grid_ui_tools_buttons_redo: | #js
     function() {
       this.$femit("redo", this.userID);
     }
-  grid_ui_tools_clear: | #js
+  grid_ui_tools_buttons_clear: | #js
     function() {
       this.$femit("clear", this.userID);
     }

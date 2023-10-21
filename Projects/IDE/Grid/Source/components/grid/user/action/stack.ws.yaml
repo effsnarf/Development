@@ -119,8 +119,8 @@ methods:
       const memberLinks = this.links.filter((link) => groupBox.members.includes(link.from.box._id) && groupBox.members.includes(link.to.box._id));
       const memberLinkIDs = memberLinks.map((link) => link._id);
       // Unset the groupBoxID on the members and links
-      this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "update", [groupBox.members, { groupBoxID: null, rect: { is: { grouped: false } } } ]);
-      this.$femit("to", "grid.data.list", `${userID}/data/links`, "update", [memberLinkIDs, { groupBoxID: null, is: { grouped: false } } ]);
+      this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "update", [groupBox.members, { groupBoxID: null, rect: { is: { grouped: false, visible: true } } } ]);
+      this.$femit("to", "grid.data.list", `${userID}/data/links`, "update", [memberLinkIDs, { groupBoxID: null, is: { grouped: false, visible: true } } ]);
       // Delete the group box
       this.delete_box(userID, {}, groupBoxID, options);
       action.undo = { method: "no.op" };
@@ -272,8 +272,7 @@ methods:
     }
   delete_selected: | #js
     async function(userID, action) {
-      return;
-      const boxes = this.boxes.filter((box) => box.rect.is.selected);
+      const boxes = this.boxes.filter((box) => box.is?.selected);
       const boxIDs = boxes.map((box) => box._id);
       const links = this.links.filter((link) => boxIDs.includes(link.from) || boxIDs.includes(link.to));
       const linkIDs = links.map((link) => link._id);
