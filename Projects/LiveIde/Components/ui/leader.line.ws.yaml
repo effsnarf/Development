@@ -32,10 +32,10 @@ methods:
       if (!this.leaderLine) return;
       const yellow = "#ffff00";
       this.flashColors = this.tweenColors(yellow, this.color, 30);
-      if (!this.isFlashing) this.flashOneFrame();
     }
   flashOneFrame: | #js
     function() {
+      if (this.isFlashing) return;
       this.isFlashing = true;
       if (!this.leaderLine) return;
       if (!this.flashColors.length) return;
@@ -205,8 +205,12 @@ watch:
       this.refresh();
     }
   color: | #js
-    function(color) {
-      this.redraw();
+    function(newColor, oldColor) {
+      this.flashColors = this.tweenColors(oldColor, newColor, 120);
+    }
+  flashColors: | #js
+    function(flashColors) {
+      this.flashOneFrame();
     }
   visible: | #js
     function(visible) {

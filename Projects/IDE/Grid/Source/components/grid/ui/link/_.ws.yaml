@@ -8,6 +8,8 @@ dom:
       @mouseleave: isHighlighted = false
       div: 
         v-text: linkDesc
+      div: 
+        v-text: isDimmed
       ui.context.window:
         ui.value:
           ':value': link
@@ -38,14 +40,16 @@ props:
       'y': 0
     scale: 1
   surfaceGroupBoxID: null
+  isDimmed: false
 data:
   flashingValue: null
   fromEl: null
   toEl: null
   linkDesc: null
-  normalColor: '#404040'
+  normalColor: '#303030'
   highlightedColor: cyan
-  leaderLineColor: '#404040'
+  dimmedColor: '#202020'
+  leaderLineColor: '#303030'
   isHighlighted: false
 mounted: | #js
   function() {
@@ -125,6 +129,12 @@ methods:
     function() {
       this.$femit("delete.link", this.link._id);
     }
+  setColor: | #js
+    function() {
+      this.leaderLineColor = this.isDimmed ? this.dimmedColor :
+        this.isHighlighted ? this.highlightedColor :
+        this.normalColor;
+    }
   refresh: | #js
     function(again = 10) {
       this.fromEl = this.getFromEl();
@@ -145,7 +155,12 @@ watch:
   isHighlighted: | #js
     function(isHighlighted) {
       if (!this.$refs.leaderLine1) return;
-      this.leaderLineColor = (isHighlighted ? this.highlightedColor : this.normalColor);
+      this.setColor();
+    }
+  isDimmed: | #js
+    function(isDimmed) {
+      if (!this.$refs.leaderLine1) return;
+      this.setColor();
     }
   showLeaderLine: | #js
     function() {
@@ -185,9 +200,10 @@ template: >-
   path="281201772."><div v-if="false" :class="{ hoverable: true, 'opacity-30':
   (!showLeaderLine) }" @mouseenter="isHighlighted = true"
   @mouseleave="isHighlighted = false" path="281201772.0"><div v-text="linkDesc"
-  path="281201772.0.0"></div><ui-context-window path="281201772.0.1"><ui-value
+  path="281201772.0.0"></div><div v-text="isDimmed"
+  path="281201772.0.1"></div><ui-context-window path="281201772.0.2"><ui-value
   :value="link"
-  path="281201772.0.1.0"></ui-value></ui-context-window></div><ui-leader-line
+  path="281201772.0.2.0"></ui-value></ui-context-window></div><ui-leader-line
   v-if="showLeaderLine" ref="leaderLine1" :from="fromEl" :to="toEl"
   :start-plug="getStartPlug()" :color="leaderLineColor"
   path="281201772.1"><template v-slot:middle path="281201772.1.0"><div

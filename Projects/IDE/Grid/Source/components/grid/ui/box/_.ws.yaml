@@ -322,7 +322,6 @@ computed:
   windowCssClass: | #js
     function() {
       const cls = {};
-      if (this.showSockets) cls["hovered"] = true;
       if (this.box.is?.selected) cls["selected"] = true;
       return cls;
     }

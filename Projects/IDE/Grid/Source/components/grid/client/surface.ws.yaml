@@ -8,6 +8,7 @@ dom:
           ':key': surfaceKey
           ref: surface1
           class: surface flex-grow-1
+          ':class': surfaceClass
           ':style': surfaceStyle
           @wheel: onWheelSurface
           ui.button:
@@ -29,6 +30,7 @@ dom:
             ':link': link
             ':surface-camera': surfaceCamera
             ':surfaceGroupBoxID': options.groupBoxID
+            ':is-dimmed': '!!hoveredBox'
         grid.ui.tools:
           ':surface-element': surfaceElement
           ':surface-camera': surfaceCamera
@@ -44,6 +46,7 @@ data:
       'y': 0
     scale: 1
   surfaceKey: 1
+  hoveredBox: null
 mounted: | #js
   function() {
     this.surfaceElement = this.$refs.surface1;
@@ -53,6 +56,10 @@ mounted: | #js
     this.adjustCamera(true);
   }
 methods:
+  grid_ui_box_hovered: | #js
+    function(box, isHovered) {
+      this.hoveredBox = (!isHovered ? null : box);
+    }
   grid_user_action_stack_do: | #js
     function(boxID, pos) {
       this.adjustCamera();
@@ -148,6 +155,14 @@ methods:
       alertify.message("Surface refreshed");
     }
 computed:
+  surfaceClass: | #js
+    function() {
+      const cls = {};
+      if (this.hoveredBox) {
+        cls["has-hovered-box"] = true;
+      }
+      return cls;
+    }
   visibleBoxes: | #js
     function() {
       return this.getVisibleItems(this.$boxes);
@@ -168,6 +183,12 @@ computed:
       return this.$refs.surface1;
     }
 style:
+  .surface.has-hovered-box .comp-ui-window:
+    opacity: 0.3 !important
+    filter: grayscale(1)
+  .surface.has-hovered-box .comp-ui-window.hovered:
+    opacity: 1 !important
+    filter: none
   .surface:
     height: 80vh
     overflow: hidden
@@ -187,7 +208,7 @@ template: >-
   path="-515125966."><ui-dnd-dropzone @drop-item="onSurfaceDropItem"
   path="-515125966.0"><div class="flex" path="-515125966.0.0"><div
   class="surface flex-grow-1" :key="surfaceKey" ref="surface1"
-  :style="surfaceStyle" @wheel="onWheelSurface"
+  :class="surfaceClass" :style="surfaceStyle" @wheel="onWheelSurface"
   path="-515125966.0.0.0"><ui-button class="close-button"
   v-if="options.groupBoxID" icon="✖" @click="$emit('close')"
   path="-515125966.0.0.0.0"></ui-button><grid-ui-box v-for="box in visibleBoxes"
@@ -197,6 +218,7 @@ template: >-
   path="-515125966.0.0.0.1"></grid-ui-box><grid-ui-link v-for="link in
   visibleLinks" :key="'link/' + link._id" :link="link"
   :surface-camera="surfaceCamera" :surfaceGroupBoxID="options.groupBoxID"
+  :is-dimmed="!!hoveredBox"
   path="-515125966.0.0.0.2"></grid-ui-link></div><grid-ui-tools
   :surface-element="surfaceElement" :surface-camera="surfaceCamera"
   :surfaceGroupBoxID="options.groupBoxID"
