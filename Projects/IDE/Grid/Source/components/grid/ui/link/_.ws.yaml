@@ -107,7 +107,7 @@ methods:
   getTopGroupBox: | #js
     function(boxRef) {
       if (!boxRef) return null;
-      const box = this.$root.boxes.find(b => b._id == boxRef._id);
+      const box = this.$boxes.find(b => b._id == boxRef._id);
       if (!box) return null;
       if (box.groupBoxID) return this.getTopGroupBox({ _id: box.groupBoxID });
       return box;

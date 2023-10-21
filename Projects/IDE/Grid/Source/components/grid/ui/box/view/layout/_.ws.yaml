@@ -53,8 +53,8 @@ methods:
   getSlotBoxes: | #js
     function(box) {
       // Find all boxes that link to this box's input sockets (type=view)
-      const boxes = this.$root.boxes;
-      const links = this.$root.links;
+      const boxes = this.$boxes;
+      const links = this.$links;
       const slotBoxes = [];
       const linksToThis = links.filter(l => l.to.box._id == box._id && (this.getInputSocket(l.to.socket._id).type == "view"));
       const fromBoxIDs = linksToThis.map(l => l.from.box._id);

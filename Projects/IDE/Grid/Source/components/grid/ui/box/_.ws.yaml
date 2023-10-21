@@ -274,7 +274,7 @@ methods:
       if (!box) return null;
       let rect = Objects.clone(box.rect);
       if (box.rect.is.grouped && (box.groupBoxID != this.surfaceGroupBoxID)) {
-        const groupBox = this.$root.boxes.find(b => b._id == box.groupBoxID);
+        const groupBox = this.$boxes.find(b => b._id == box.groupBoxID);
         if (!groupBox) {
           await this.$root.wait(100);
           return await this.getBoxRect(box);

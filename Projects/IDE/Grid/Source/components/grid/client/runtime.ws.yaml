@@ -374,13 +374,6 @@ methods:
       this.getSocketRuntimeData(boxID);
     }
 watch:
-  boxes:
-    handler: | #js
-      function(boxes) {
-        if (boxes?.length) this.startup();
-        this.$root.boxes = boxes;
-      }
-    immediate: true
   links:
     handler: | #js
       function(links) {
@@ -393,9 +386,5 @@ _:
 name: grid-client-runtime
 template: >-
   <grid-module class="comp-grid-client-runtime" icon="🏃‍♂️"
-  path="-1405898659."><grid-data-list-view :fuid="userID + '/data/boxes'"
-  v-model="boxes"
-  path="-1405898659.0"></grid-data-list-view><grid-data-list-view :fuid="userID
-  + '/data/links'" v-model="links"
-  path="-1405898659.1"></grid-data-list-view><ui-linq-evaluator ref="evaluator1"
-  path="-1405898659.2"></ui-linq-evaluator></grid-module>
+  path="-1405898659."><ui-linq-evaluator ref="evaluator1"
+  path="-1405898659.0"></ui-linq-evaluator></grid-module>

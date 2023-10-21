@@ -2,10 +2,10 @@ dom:
   grid.module:
     icon: 👤👈
     grid.user.action.stack:
-      ":userID": userID
+      ':userID': userID
 props:
   userID: null
-data:
+data: null
 methods:
   grid_ui_actions_create_group: | #js
     function(displayBoxID) {
@@ -161,6 +161,4 @@ _:
 template: >-
   <grid-module class="comp-grid-user-actions" icon="👤👈"
   path="202369922."><grid-user-action-stack :userID="userID"
-  path="202369922.0"></grid-user-action-stack><grid-data-list-view
-  :fuid="userID+'/data/boxes'" v-model="boxes"
-  path="202369922.1"></grid-data-list-view></grid-module>
+  path="202369922.0"></grid-user-action-stack></grid-module>

@@ -42,9 +42,7 @@ methods:
     }
   refresh: | #js
     function() {
-      const boxes = this.$root.boxes;
-      const links = this.$root.links;
-      this.displayBox = boxes.find(b => b._id == this.groupBox.displayBoxID);
+      this.displayBox = this.$boxes.find(b => b._id == this.groupBox.displayBoxID);
     }
   getBoxCompName: | #js
     function(box) {

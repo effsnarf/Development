@@ -213,8 +213,8 @@ methods:
     }
   getLinkDesc: | #js
     function(link) {
-      const fromBox = this.$root.boxes.find(b => b._id == link.from.box._id);
-      const toBox = this.$root.boxes.find(b => b._id == link.to.box._id);
+      const fromBox = this.$boxes.find(b => b._id == link.from.box._id);
+      const toBox = this.$boxes.find(b => b._id == link.to.box._id);
       if (!fromBox?.sockets || !toBox?.sockets) return "";
       const fromSocket = fromBox.sockets.output.find(s => s._id == link.from.socket._id);
       const toSocket = toBox.sockets.input.find(s => s._id == link.to.socket._id);

@@ -121,7 +121,7 @@ methods:
         .find(l => (l.from.socket._id == iteratorSocket._id));
       if (!iteratorLink) return null;
 
-      const iteratorBox = this.$root.boxes.find(b => b._id == iteratorLink.to.box._id);
+      const iteratorBox = this.$boxes.find(b => b._id == iteratorLink.to.box._id);
       const dataSocket = iteratorBox.sockets.input.find(s => s._id == iteratorLink.to.socket._id);
       return dataSocket;
     }
@@ -133,11 +133,11 @@ methods:
         .filter(l => (l.from.box._id == itemsBox._id))
         .find(l => (l.from.socket._id == iteratorSocket._id));
       if (iteratorLink) {
-        const iteratorBox = this.$root.boxes.find(b => b._id == iteratorLink.to.box._id);
+        const iteratorBox = this.$boxes.find(b => b._id == iteratorLink.to.box._id);
         return iteratorBox;
       }
       if (itemsBox.groupBoxID) {
-        const groupBox = this.$root.boxes.find(b => b._id == itemsBox.groupBoxID);
+        const groupBox = this.$boxes.find(b => b._id == itemsBox.groupBoxID);
         return this.getIteratorBox(groupBox);
       }
       return null;

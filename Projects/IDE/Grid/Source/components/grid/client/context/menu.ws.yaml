@@ -6,8 +6,8 @@ dom:
     grid.client.context.create.group:
       ':selected-boxes': selectedBoxes
       ':userID': userID
-      ':boxes': $root.boxes
-      ':links': $root.links
+      ':boxes': $boxes
+      ':links': $links
       ':context-is-pinned': contextIsPinned
     div:
       v-if: canDelete
@@ -48,8 +48,7 @@ methods:
     }
   _refresh: | #js
     async function() {
-      const { boxes, links } = this.$root;
-      this.selectedBoxes = boxes.filter(box => box.is?.selected);
+      this.selectedBoxes = this.$boxes.filter(box => box.is?.selected);
       this.canDelete = (this.selectedBoxes.length > 0);
       this.showContextMenu = (this.canCreateGroup || this.canDelete);
     }

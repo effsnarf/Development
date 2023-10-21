@@ -677,18 +677,13 @@ _:
 name: grid-user-action-stack
 template: >-
   <grid-module class="comp-grid-user-action-stack" icon="👤👈"
-  path="-1764928149."><grid-data-list-view :fuid="userID+'/data/boxes'"
-  v-model="boxes"
-  path="-1764928149.0"></grid-data-list-view><grid-data-list-view
-  :fuid="userID+'/data/links'" v-model="links"
-  path="-1764928149.1"></grid-data-list-view><div class="flex"
-  path="-1764928149.2"><grid-data-list :fuid="userID+'/user/actions'"
-  v-model="userActions"
-  path="-1764928149.2.0"></grid-data-list><grid-data-variable
+  path="-1764928149."><div class="flex" path="-1764928149.0"><grid-data-list
+  :fuid="userID+'/user/actions'" v-model="userActions"
+  path="-1764928149.0.0"></grid-data-list><grid-data-variable
   :fuid="userID+'/user/actions/pointer'" :default-value="-1" v-model="pointer"
-  path="-1764928149.2.1"></grid-data-variable><grid-data-variable
+  path="-1764928149.0.1"></grid-data-variable><grid-data-variable
   :fuid="userID+'/user/actions/next/id'" :default-value="1" v-model="nextID"
-  path="-1764928149.2.2"></grid-data-variable><grid-data-variable
+  path="-1764928149.0.2"></grid-data-variable><grid-data-variable
   :fuid="userID+'/user/actions/next/action/id'" :default-value="1"
   v-model="nextActionID"
-  path="-1764928149.2.3"></grid-data-variable></div></grid-module>
+  path="-1764928149.0.3"></grid-data-variable></div></grid-module>
