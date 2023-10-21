@@ -159,6 +159,7 @@ style:
     flex-direction: column-reverse
   tr *:
     max-height: 1.5em
+    line-height: 1.1em
     overflow: hidden
   img:
     width: 5em

@@ -14,9 +14,9 @@ dom:
       v-else-if: 'true'
       ':class': cssClass
       div: 
-        ':class': '{ clickable: isLargeType }'
+        ':class': '{ clickable: true, ''value-as-string'': true }'
         v-text: valueAsString
-        @click: isMoreVisible = !isMoreVisible
+        @click: onClickValue(valueAsString)
       transition:
         name: slide
         ui.value.any:
@@ -27,6 +27,35 @@ props:
   preview: true
 data:
   isMoreVisible: false
+methods:
+  onClickValue: | #js
+    function(value) {
+      if (typeof value == "string") return this.$root.html.copyToClipboard(value);
+      this.console.log(value);
+      alertify.message(`Logged to console`);
+    }
+  getCssClass: | #js
+    function(value) {
+      const cls = [];
+      if ([undefined, null].includes(value)) cls.push("opacity-30");
+      cls.push(this.typeColor);
+      return cls;
+    }
+  valueToString: | #js
+    function(value, depth) {
+      if (!depth) depth = 0;
+      if (depth > 4) return "…";
+      if (value == undefined) return "undefined";
+      if (value == null) return "null";
+      if (typeof value == "string") return `${!this.preview ? value : value}`;
+      if (typeof value == "number") return value.toString();
+      if (typeof value == "boolean") return value ? "✔️" : "✖";
+      if (typeof value == "function") return value.toString();
+      if (Array.isArray(value)) return `[${value.length}…]`;
+      //if (typeof value == "object") return `{${Object.keys(value).take(5).map(k => `${k}: ${this.valueToString(value[k], depth+1)}`).join(', ')}}`;
+      if (typeof value == "object") return `{${Object.keys(value).take(10).join(', ')}}`;
+      return value.toString();
+    }
 computed:
   cssClass: | #js
     function() {
@@ -76,30 +105,12 @@ computed:
       if (value.length != 7) return false;
       return true;
     }
-methods:
-  getCssClass: | #js
-    function(value) {
-      const cls = [];
-      if ([undefined, null].includes(value)) cls.push("opacity-30");
-      cls.push(this.typeColor);
-      return cls;
-    }
-  valueToString: | #js
-    function(value, depth) {
-      if (!depth) depth = 0;
-      if (depth > 4) return "…";
-      if (value == undefined) return "undefined";
-      if (value == null) return "null";
-      if (typeof value == "string") return `${!this.preview ? value : value.shorten(50)}`;
-      if (typeof value == "number") return value.toString();
-      if (typeof value == "boolean") return value ? "✔️" : "✖";
-      if (typeof value == "function") return value.toString();
-      if (Array.isArray(value)) return `[${value.length}…]`;
-      //if (typeof value == "object") return `{${Object.keys(value).take(5).map(k => `${k}: ${this.valueToString(value[k], depth+1)}`).join(', ')}}`;
-      if (typeof value == "object") return `{${Object.keys(value).take(10).join(', ')}}`;
-      return value.toString();
-    }
 style:
+  .value-as-string:
+    max-width: 12em
+    white-space: nowrap
+    overflow: hidden
+    text-overflow: ellipsis
   .comp-ui-image:
     width: 15em
   .preview .comp-ui-image:
@@ -116,8 +127,8 @@ template: >-
   path="-272450959.1"></ui-value-preview-function><ui-value-color
   v-else-if="isColor" :value="value" path="-272450959.2"></ui-value-color><div
   v-else-if="true" :class="cssClass" path="-272450959.3"><div :class="{
-  clickable: isLargeType }" v-text="valueAsString" @click="isMoreVisible =
-  !isMoreVisible" path="-272450959.3.0"></div><transition name="slide"
-  path="-272450959.3.1"><ui-value-any v-if="isLargeType &amp;&amp;
+  clickable: true, 'value-as-string': true }" v-text="valueAsString"
+  @click="onClickValue(valueAsString)" path="-272450959.3.0"></div><transition
+  name="slide" path="-272450959.3.1"><ui-value-any v-if="isLargeType &amp;&amp;
   isMoreVisible" :value="value"
   path="-272450959.3.1.0"></ui-value-any></transition></div></div>

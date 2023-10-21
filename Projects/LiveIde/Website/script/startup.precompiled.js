@@ -2858,6 +2858,16 @@ class HtmlHelper {
     addPaths(compName, dom) {
         return (0, add_paths_1.default)(this, compName, dom);
     }
+    copyToClipboard(text) {
+        const textarea = document.createElement("textarea");
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+        const alrt = window.alertify?.message || alert;
+        alrt("Copied to clipboard");
+    }
     encode(s) {
         if (!s)
             return null;
@@ -7611,7 +7621,7 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/website/script/1697902531680.ts ***!
+  !*** ../../../LiveIde/website/script/1697905975941.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

@@ -2450,6 +2450,17 @@ class HtmlHelper {
     return addPaths(this, compName, dom);
   }
 
+  copyToClipboard(text: string) {
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand("copy");
+    document.body.removeChild(textarea);
+    const alrt = (window as any).alertify?.message || alert;
+    alrt("Copied to clipboard");
+  }
+
   encode(s: string) {
     if (!s) return null;
     // HTML encode
