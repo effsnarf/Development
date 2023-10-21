@@ -76,8 +76,8 @@ template: >-
   <ui-context-window class="comp-grid-client-context-menu" ref="context1"
   :visible="showContextMenu" @pinned="contextIsPinned = $event"
   path="-1053034279."><grid-client-context-create-group
-  :selected-boxes="selectedBoxes" :userID="userID" :boxes="$root.boxes"
-  :links="$root.links" :context-is-pinned="contextIsPinned"
+  :selected-boxes="selectedBoxes" :userID="userID" :boxes="$boxes"
+  :links="$links" :context-is-pinned="contextIsPinned"
   path="-1053034279.0"></grid-client-context-create-group><div v-if="canDelete"
   path="-1053034279.1"><ui-button icon="❌🗑️" text="delete" confirm="Are you
   sure you want to delete the selected boxes?"

@@ -5,11 +5,13 @@ dom:
       grid.client.log: null
     ui.gesture.select.box:
       ':surface-element': surfaceElement
+      ':surface-camera': surfaceCamera
       ':center-coords': 'true'
       ':is-layer-element': isSelectBoxLayerElement
       @mark: onSelectBoxMark
 props:
   surfaceElement: null
+  surfaceCamera: null
 methods:
   onSelectBoxMark: | #js
     function(rect) {
@@ -27,6 +29,7 @@ name: grid-ui-tools
 template: >-
   <grid-module class="comp-grid-ui-tools" icon="🛠️" path="134888361."><div
   path="134888361.0"><grid-client-log></grid-client-log></div><ui-gesture-select-box
-  :surface-element="surfaceElement" :center-coords="true"
-  :is-layer-element="isSelectBoxLayerElement" @mark="onSelectBoxMark"
+  :surface-element="surfaceElement" :surface-camera="surfaceCamera"
+  :center-coords="true" :is-layer-element="isSelectBoxLayerElement"
+  @mark="onSelectBoxMark"
   path="134888361.1"></ui-gesture-select-box></grid-module>

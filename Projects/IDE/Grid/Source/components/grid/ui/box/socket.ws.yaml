@@ -257,7 +257,7 @@ methods:
 computed:
   socketLinks: | #js
     function() {
-      const links = this.$root.links;
+      const links = this.$links;
       if (!links) return [];
       const socketLinks = links.filter(link => {
         if (link.from.socket._id != this.socket._id) return false;

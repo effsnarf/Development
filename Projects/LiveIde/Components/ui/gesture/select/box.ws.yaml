@@ -23,6 +23,7 @@ dom:
         ':style': selectBoxStyle
 props:
   surfaceElement: null
+  surfaceCamera: null
   centerCoords: false
   isLayerElement: null
   showAxes: false
@@ -108,7 +109,9 @@ methods:
       const y = center.y - pos.y;
       const width = size.width;
       const height = size.height;
-      return this.toCenteredRect({ pos: { x, y }, size: { width, height } });
+      rect = this.toCenteredRect({ pos: { x, y }, size: { width, height } });
+      rect = this.adjustToCamera(rect);
+      return rect;
     }
   adjustPos: | #js
     function(pos) {
@@ -117,7 +120,9 @@ methods:
       const center = this.getSurfaceCenter("fixed");
       const x = pos.x - center.x;
       const y = center.y - pos.y;
-      return { x, y };
+      pos = { x, y };
+      pos = this.adjustToCamera(pos);
+      return pos;
     }
   toCenteredRect: | #js
     function(rect) {
@@ -126,6 +131,22 @@ methods:
       const x = pos.x + size.width / 2;
       const y = pos.y - size.height / 2;
       return { pos: { x, y }, size };
+    }
+  adjustToCamera: | #js
+    function(posOrRect) {
+      const camera = this.surfaceCamera;
+      if (!camera) return posOrRect;
+      if (posOrRect.pos) {
+        const pos = posOrRect.pos;
+        pos.x = (pos.x + camera.pos.x) / camera.scale;
+        pos.y = (pos.y + camera.pos.y) / camera.scale;
+      }
+      else {
+        const pos = posOrRect;
+        pos.x = (pos.x + camera.pos.x) / camera.scale;
+        pos.y = (pos.y + camera.pos.y) / camera.scale;
+      }
+      return posOrRect;
     }
   clear: | #js
     function() {

@@ -116,7 +116,7 @@ methods:
     function(itemsBox) {
       if (!itemsBox) return null;
       const iteratorSocket = itemsBox.sockets.output.find(s => s.type == "iterator");
-      const iteratorLink = this.$root.links
+      const iteratorLink = this.$links
         .filter(l => (l.from.box._id == itemsBox._id))
         .find(l => (l.from.socket._id == iteratorSocket._id));
       if (!iteratorLink) return null;
@@ -129,7 +129,7 @@ methods:
     function(itemsBox) {
       if (!itemsBox) return null;
       const iteratorSocket = itemsBox.sockets.output.find(s => s.type == "iterator");
-      const iteratorLink = this.$root.links
+      const iteratorLink = this.$links
         .filter(l => (l.from.box._id == itemsBox._id))
         .find(l => (l.from.socket._id == iteratorSocket._id));
       if (iteratorLink) {

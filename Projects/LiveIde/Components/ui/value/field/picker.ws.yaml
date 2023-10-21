@@ -1,21 +1,21 @@
 dom:
-  div: 
+  div:
     v-if: obj
     class: field-list
     .flex.justify-center:
-      ':key': selectedFields?.join('')
+      ":key": selectedFields?.join('')
       ui.value:
-        ':class': '{ ''opacity-50 grayscale'': (!selectedFields?.length) }'
-        ':value': >-
+        ":class": "{ 'opacity-50 grayscale': (!selectedFields?.length) }"
+        ":value": >-
           !selectedFields?.length ? '[select fields]' : '[' +
           selectedFields.join(', ') + ']'
-    div: 
-      div: 
+    div:
+      div:
         v-for: field in fields
         ui.checkbox:
-          ':text': field
-          ':value-array': selectedFields
-          ':value-key': field
+          ":text": field
+          ":value-array": selectedFields
+          ":value-key": field
 props:
   obj: null
   value: null
@@ -27,8 +27,6 @@ watch:
     handler: | #js
       async function(selectedFields) {
         if (selectedFields?.join(',') == this.value?.join(',')) return;
-        await this.$nextTick();
-        await this.$root.wait(100);
         this.$emit("input", selectedFields);
       }
   obj:

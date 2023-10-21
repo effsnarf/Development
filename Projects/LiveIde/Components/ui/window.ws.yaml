@@ -185,18 +185,6 @@ methods:
       if (this.rect1.is?.minimized) return minimizedHeight;
       return fullHeight;
     }
-  adjustRectCoords: | #js
-    function(rect) {
-      if (!this.centerCoords) return rect;
-      const center = this.getSurfaceCenter();
-      const pos = rect.pos;
-      const size = rect.size;
-      const x = center.x + (pos.x);
-      const y = center.y - (pos.y);
-      const width = size.width;
-      const height = size.height;
-      return { pos: { x, y }, size: { width, height } };
-    }
   adjustPos: | #js
     function(pos) {
       if (!pos) return pos;

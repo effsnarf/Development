@@ -115,7 +115,6 @@ example:
   methods:
     onClick: | #js
       async function() {
-        await this.$root.wait(1000);
       }
 _:
   examples:

@@ -12,8 +12,10 @@ data:
   is:
     startuped: false
 mounted: | #js
-  function() {
+  async function() {
     this.$root.socket = this.socket;
+    await this.$nextTick();
+    this.startup();
   }
 methods:
   startup: | #js
@@ -373,13 +375,6 @@ methods:
     function(boxID) {
       this.getSocketRuntimeData(boxID);
     }
-watch:
-  links:
-    handler: | #js
-      function(links) {
-        this.$root.links = links;
-      }
-    immediate: true
 _:
   examples:
     count: 0

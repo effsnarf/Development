@@ -26,6 +26,7 @@ dom:
             ':surfaceGroupBoxID': groupBoxID
         grid.ui.tools:
           ':surface-element': surfaceElement
+          ':surface-camera': surfaceCamera
     h2:
       ui.value:
         ':value': '{groupBoxID}'
@@ -48,13 +49,13 @@ mounted: | #js
       this.adjustCamera();
     });
     resizeObserver.observe(this.surfaceElement);
-    await this.$root.wait(1000);
+    await this.$nextTick();
     this.adjustCamera();
   }
 methods:
   grid_user_action_stack_do: | #js
     async function(boxID, pos) {
-      await this.$root.wait(100);
+      await this.$nextTick();
       this.adjustCamera();
     }
   adjustCamera: | #js
@@ -164,7 +165,7 @@ template: >-
   visibleLinks" :key="'link/' + link._id" :link="link"
   :surface-camera="surfaceCamera" :surfaceGroupBoxID="groupBoxID"
   path="-515125966.0.0.0.1"></grid-ui-link></div><grid-ui-tools
-  :surface-element="surfaceElement"
+  :surface-element="surfaceElement" :surface-camera="surfaceCamera"
   path="-515125966.0.0.1"></grid-ui-tools></div></ui-dnd-dropzone><h2
   path="-515125966.1"><ui-value :value="{groupBoxID}"
   path="-515125966.1.0"></ui-value></h2></grid-module>
