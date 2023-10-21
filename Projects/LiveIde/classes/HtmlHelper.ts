@@ -2236,24 +2236,28 @@ class HtmlHelper {
   when = {
     element: {
       moves: (element: HTMLElement, callback: Function) => {
-        let lastPosition = element.getBoundingClientRect();
+        let lastRect = element.getBoundingClientRect();
         let animationFrameId: number;
 
-        const checkPosition = () => {
-          const newPosition = element.getBoundingClientRect();
+        const checkRect = () => {
+          const newRect = element.getBoundingClientRect();
           if (
-            newPosition.top !== lastPosition.top ||
-            newPosition.left !== lastPosition.left
+            newRect.top !== lastRect.top ||
+            newRect.left !== lastRect.left ||
+            newRect.right !== lastRect.right ||
+            newRect.bottom !== lastRect.bottom ||
+            newRect.width !== lastRect.width ||
+            newRect.height !== lastRect.height
           ) {
             callback();
-            lastPosition = newPosition;
+            lastRect = newRect;
           }
-          animationFrameId = requestAnimationFrame(checkPosition);
+          animationFrameId = requestAnimationFrame(checkRect);
           //animationFrameId = setTimeout(checkPosition, 50);
         };
 
         // Start the loop
-        animationFrameId = requestAnimationFrame(checkPosition);
+        animationFrameId = requestAnimationFrame(checkRect);
         //animationFrameId = setTimeout(checkPosition, 50);
 
         // Check every second if the element is still in the DOM

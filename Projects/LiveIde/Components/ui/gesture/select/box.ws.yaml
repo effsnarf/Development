@@ -46,6 +46,7 @@ methods:
   onMouseDown: | #js
     function(e) {
       if (e.button != 0) return;
+      if (e.target != this.surfaceElement) return;
       if (this.dragStart) return;
       if (!this.isLayerElement) throw new Error("Pass isLayerElement prop to ui.gesture.select.box to know where the select box is active");
       if (!this.isLayerElement(e.target)) return;
@@ -57,6 +58,7 @@ methods:
   onMouseUp: | #js
     function(e) {
       if (e.button != 0) return;
+      if (e.target != this.surfaceElement) return;
       if (!this.dragStart) return;
       e.preventDefault();
       e.stopPropagation();

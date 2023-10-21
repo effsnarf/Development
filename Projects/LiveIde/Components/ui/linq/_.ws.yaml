@@ -2,10 +2,15 @@ dom:
   .box1:
     div: 
       v-for: (operation, index) in operations
-      ui.linq.operation:
-        ':input': datas[index]
-        ':value': operation
-        @input: (operation) => $set(operations, index, operation)
+      .flex.items-center.gap-1.show-on-hover-container:
+        ui.linq.operation:
+          ':input': datas[index]
+          ':value': operation
+          @input: (operation) => $set(operations, index, operation)
+        .show-on-hover.hor:
+          ui.button:
+            ':icon': 'isConfirmed[index] ? ''❌'' : ''✖'''
+            @click: onClickDelete(index)
       .next:
         v-text: '''↓'''
     div: 
@@ -24,8 +29,15 @@ props:
 data:
   operations: []
   datas: []
+  isConfirmed: {}
 mounted: ''
 methods:
+  onClickDelete: | #js
+    function(index) {
+      if (this.isConfirmed[index]) return this.operations.splice(index, 1);
+      this.$set(this.isConfirmed, index, true);
+      setTimeout(() => this.$delete(this.isConfirmed, index), 1000);
+    }
   evaluateChain: | #js
     function() {
       this.datas = this.$refs.evaluator1.evaluateOps(this.input, this.operations);
@@ -56,6 +68,8 @@ watch:
       }
     immediate: true
 style:
+  .show-on-hover-container:hover > .show-on-hover.hor:
+    max-width: 3em
   .next:
     font-size: 160%
     text-align: center
@@ -65,11 +79,15 @@ _:
 name: ui-linq
 template: >-
   <div class="comp-ui-linq box1" path="-484387046."><div v-for="(operation,
-  index) in operations" path="-484387046.0"><ui-linq-operation
+  index) in operations" path="-484387046.0"><div class="flex items-center gap-1
+  show-on-hover-container" path="-484387046.0.0"><ui-linq-operation
   :input="datas[index]" :value="operation" @input="(operation) =&gt;
   $set(operations, index, operation)"
-  path="-484387046.0.0"></ui-linq-operation><div class="next" v-text="'↓'"
-  path="-484387046.0.1"></div></div><div path="-484387046.1"><div
+  path="-484387046.0.0.0"></ui-linq-operation><div class="show-on-hover hor"
+  path="-484387046.0.0.1"><ui-button :icon="isConfirmed[index] ? '❌' : '✖'"
+  @click="onClickDelete(index)"
+  path="-484387046.0.0.1.0"></ui-button></div></div><div class="next"
+  v-text="'↓'" path="-484387046.0.1"></div></div><div path="-484387046.1"><div
   class="show-on-hover-container" path="-484387046.1.0"><div class="text-center"
   v-text="'➕'" path="-484387046.1.0.0"></div><div class="show-on-hover"
   path="-484387046.1.0.1"><ui-linq-picker :input="datas?.last()"

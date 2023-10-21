@@ -12,10 +12,11 @@ dom:
 props:
   surfaceElement: null
   surfaceCamera: null
+  surfaceGroupBoxID: null
 methods:
   onSelectBoxMark: | #js
     function(rect) {
-      this.$femit("mark.select.box", rect);
+      this.$femit("mark.select.box", rect, this.surfaceGroupBoxID);
     }
   isSelectBoxLayerElement: | #js
     function(el) {

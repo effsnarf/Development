@@ -20,7 +20,7 @@ dom:
       ':color': leaderLineColor
       template:
         v-slot: middle
-        .show-on-hover-container:
+        .middle.show-on-hover-container:
           div: 
             ':class': '{ box1: true, ''has-func'': (!!link?.func), ''show-on-hover'': true }'
             grid.ui.link.func:
@@ -152,11 +152,28 @@ watch:
       this.refresh();
     }
 style:
+  .middle .show-on-hover:
+    max-width: 3em
+    max-height: 3em
+  .middle.show-on-hover-container:hover .show-on-hover:
+    max-width: 20em
+    max-height: 20em
+  .middle .show-on-hover > *:
+    opacity: 0
+  .middle.show-on-hover-container:hover .show-on-hover > *:
+    opacity: 1
+  .middle .box1:
+    border-radius: 50%
+    border: none
+  .middle:hover .box1:
+    box-shadow: 'inset -3px 3px 3px #000'
+    border: '2px solid #ffffff30'
+    border-radius: 1em
   .box1:
-    opacity: 0.2
+    opacity: 0.3
     transition: 0.3s
   .box1:hover:
-    opacity: 0.5
+    opacity: 0.7
   .box1.has-func:
     opacity: 1
 _:
@@ -174,8 +191,8 @@ template: >-
   v-if="showLeaderLine" ref="leaderLine1" :from="fromEl" :to="toEl"
   :start-plug="getStartPlug()" :color="leaderLineColor"
   path="281201772.1"><template v-slot:middle path="281201772.1.0"><div
-  class="show-on-hover-container" path="281201772.1.0.0"><div :class="{ box1:
-  true, 'has-func': (!!link?.func), 'show-on-hover': true }"
+  class="middle show-on-hover-container" path="281201772.1.0.0"><div :class="{
+  box1: true, 'has-func': (!!link?.func), 'show-on-hover': true }"
   path="281201772.1.0.0.0"><grid-ui-link-func :link="link"
   path="281201772.1.0.0.0.0"></grid-ui-link-func><div
   path="281201772.1.0.0.0.1"><ui-button icon="❌" text="delete link"

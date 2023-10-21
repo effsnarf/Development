@@ -12,7 +12,7 @@ data:
 style:
   .drawer:
     max-height: 10em
-    max-width: 3em
+    max-width: 5em
     overflow: hidden
     transition: 1s
     filter: grayscale(1) blur(0.1em)

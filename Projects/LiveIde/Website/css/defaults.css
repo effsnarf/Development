@@ -601,6 +601,19 @@ select, input[type=range]
   opacity: 1;
 }
 
+.show-on-hover-container > .show-on-hover.hor
+{
+  max-width: 0;
+  max-height: auto;
+}
+
+.show-on-hover-container:hover > .show-on-hover.hor
+{
+  max-width: 20rem;
+  opacity: 1;
+}
+
+
 
 .full-screen-overlay
 {

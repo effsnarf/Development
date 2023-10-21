@@ -6,8 +6,8 @@ props:
 data: null
 methods:
   grid_ui_tools_mark_select_box: | #js
-    function(rect) {
-      this.$femit("mark.select.box", rect);
+    function(rect, groupBoxID) {
+      this.$femit("mark.select.box", rect, groupBoxID);
     }
   grid_ui_tools_buttons_undo: | #js
     function() {

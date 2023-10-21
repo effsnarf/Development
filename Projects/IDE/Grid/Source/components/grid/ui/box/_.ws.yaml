@@ -81,6 +81,7 @@ dom:
           direction: output
           ':socket-type': (type) => (type != 'iterator')
           ':surface-camera': surfaceCamera
+          ':surfaceGroupBoxID': surfaceGroupBoxID
         div: 
           transition.group:
             name: list
@@ -429,7 +430,7 @@ template: >-
   path="1671629593.0.4.1"></grid-ui-box-sockets></template><template
   v-slot:below path="1671629593.0.5"><grid-ui-box-sockets :box="box"
   direction="output" :socket-type="(type) =&gt; (type != 'iterator')"
-  :surface-camera="surfaceCamera"
+  :surface-camera="surfaceCamera" :surfaceGroupBoxID="surfaceGroupBoxID"
   path="1671629593.0.5.0"></grid-ui-box-sockets><div
   path="1671629593.0.5.1"><transition-group name="list"
   path="1671629593.0.5.1.0"><div class="alert" v-for="alert in alerts"

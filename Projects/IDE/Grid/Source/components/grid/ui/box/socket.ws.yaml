@@ -54,6 +54,7 @@ props:
   socket: null
   direction: null
   surfaceCamera: null
+  surfaceGroupBoxID: null
 data:
   socketEl: null
   targetPlugEl: null
@@ -199,7 +200,7 @@ methods:
       const newBox = this.getNewBox(this.ghostBox);
      
       // Create the box
-      this.$femit("create.box", newBox);
+      this.$femit("create.box", newBox, this.surfaceGroupBoxID);
 
       this.linkToNewBox = newBox;
     }

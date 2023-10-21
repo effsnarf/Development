@@ -18,7 +18,7 @@ methods:
       this.$femit("do", this.userID, action);
     }
   grid_ui_actions_mark_select_box: | #js
-    function(rect) {
+    function(rect, groupBoxID) {
       // Check if any boxes fit into the selection box
       const selectedBoxes = this.$boxes.filter(box => this.isBoxInRect(box, rect));
       // If any boxes fit into the selection box, select them
@@ -38,7 +38,7 @@ methods:
             selected: false
           },
         };
-        const action = { redo: { method: "create.box", args: [box] } };
+        const action = { redo: { method: "create.box", args: [box, groupBoxID] } };
         this.$femit("do", this.userID, action);
       }
     }
@@ -51,8 +51,8 @@ methods:
     async function(userID, rect) {
     }
   grid_ui_box_socket_create_box: | #js
-    function(box) {
-      const action = { redo: { method: "create.box", args: [box] } };
+    function(box, groupBoxID) {
+      const action = { redo: { method: "create.box", args: [box, groupBoxID] } };
       this.$femit("do", this.userID, action);
     }
   grid_ui_box_move_box: | #js

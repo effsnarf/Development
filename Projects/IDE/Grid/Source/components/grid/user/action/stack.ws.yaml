@@ -125,7 +125,7 @@ methods:
       throw new Error("No data box found");
     }
   create_box: | #js
-    async function(userID, action, box) {
+    async function(userID, action, box, groupBoxID) {
       if (!box._id) {
         box._id = this.nextID++;
         action.redo.args[0] = box;
@@ -134,6 +134,11 @@ methods:
       box.rect.is.minimized = false;
       box.rect.is.visible = true;
       box.rect.is.grouped = false;
+
+      if (groupBoxID) {
+        box.groupBoxID = groupBoxID;
+        box.rect.is.grouped = true;
+      }
 
       this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "add", [box]);
       

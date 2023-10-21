@@ -11,7 +11,8 @@ dom:
           v-for: surface in surfaces
           ':key': surface._id
           ':userID': userID
-          ':groupBoxID': surface.groupBoxID
+          ':options': surface
+          @close: grid_ui_box_toggle_group_maximized(surface.groupBoxID)
     grid.client.vars:
       ':userID': userID
 props:
@@ -21,15 +22,17 @@ data:
   surfaces: []
 mounted: | #js
   function() {
-    this.surfaces.add({ _id: this.nextSurfaceID++, groupBoxID: null });
+    this.surfaces.add({ _id: this.nextSurfaceID++, groupBoxID: null, focusedBoxID: null });
   }
 methods:
   grid_ui_box_toggle_group_maximized: | #js
-    function(box) {
-      const surfaceIndex = this.surfaces.findIndex(s => s.groupBoxID === box._id);
+    function(boxID) {
+      const surfaceIndex = this.surfaces.findIndex(s => s.groupBoxID === boxID);
       if (surfaceIndex === -1) {
-        this.surfaces.add({ _id: this.nextSurfaceID++, groupBoxID: box._id });
+        this.surfaces.last().focusedBoxID = boxID;
+        this.surfaces.add({ _id: this.nextSurfaceID++, groupBoxID: boxID, focusedBoxID: null });
       } else {
+        this.surfaces[surfaceIndex - 1].focusedBoxID = null;
         this.surfaces.splice(surfaceIndex, 1);
       }
     }
@@ -49,6 +52,7 @@ template: >-
   path="-1461469222.0"></grid-client-context-menu><grid-ui-tools-buttons></grid-ui-tools-buttons><div
   path="-1461469222.2"><div class="w-100pc flex"
   path="-1461469222.2.0"><grid-client-surface v-for="surface in surfaces"
-  :key="surface._id" :userID="userID" :groupBoxID="surface.groupBoxID"
+  :key="surface._id" :userID="userID" :options="surface"
+  @close="grid_ui_box_toggle_group_maximized(surface.groupBoxID)"
   path="-1461469222.2.0.0"></grid-client-surface></div></div><grid-client-vars
   :userID="userID" path="-1461469222.3"></grid-client-vars></grid-module>

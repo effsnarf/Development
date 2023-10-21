@@ -13,7 +13,7 @@ methods:
   onToggleGroupMaximized: | #js
     function() {
       const vBox = this.$root.vm.getAncestors(this, "grid.ui.box")[0];
-      vBox.$femit("toggle.group.maximized", this.box);
+      vBox.$femit("toggle.group.maximized", this.box._id);
     }
   init: | #js
     function(box) {

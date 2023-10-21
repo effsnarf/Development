@@ -2608,20 +2608,24 @@ class HtmlHelper {
     when = {
         element: {
             moves: (element, callback) => {
-                let lastPosition = element.getBoundingClientRect();
+                let lastRect = element.getBoundingClientRect();
                 let animationFrameId;
-                const checkPosition = () => {
-                    const newPosition = element.getBoundingClientRect();
-                    if (newPosition.top !== lastPosition.top ||
-                        newPosition.left !== lastPosition.left) {
+                const checkRect = () => {
+                    const newRect = element.getBoundingClientRect();
+                    if (newRect.top !== lastRect.top ||
+                        newRect.left !== lastRect.left ||
+                        newRect.right !== lastRect.right ||
+                        newRect.bottom !== lastRect.bottom ||
+                        newRect.width !== lastRect.width ||
+                        newRect.height !== lastRect.height) {
                         callback();
-                        lastPosition = newPosition;
+                        lastRect = newRect;
                     }
-                    animationFrameId = requestAnimationFrame(checkPosition);
+                    animationFrameId = requestAnimationFrame(checkRect);
                     //animationFrameId = setTimeout(checkPosition, 50);
                 };
                 // Start the loop
-                animationFrameId = requestAnimationFrame(checkPosition);
+                animationFrameId = requestAnimationFrame(checkRect);
                 //animationFrameId = setTimeout(checkPosition, 50);
                 // Check every second if the element is still in the DOM
                 const intervalId = setInterval(() => {
@@ -6045,7 +6049,7 @@ var __webpack_exports__ = {};
 (() => {
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/website/script/1697905975267.ts ***!
+  !*** ../../../LiveIde/website/script/1697914296871.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

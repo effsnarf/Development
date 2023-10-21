@@ -9,11 +9,13 @@ dom:
         ':socket': socket
         ':direction': direction
         ':surface-camera': surfaceCamera
+        ':surfaceGroupBoxID': surfaceGroupBoxID
 props:
   box: null
   direction: null
   socketType: null
   surfaceCamera: null
+  surfaceGroupBoxID: null
 computed:
   sockets: | #js
     function() {
@@ -47,4 +49,5 @@ template: >-
   '-sockets'" path="-1391935093."><li :class="direction + '-socket'"
   v-for="socket in sockets" path="-1391935093.0"><grid-ui-box-socket :box="box"
   :socket="socket" :direction="direction" :surface-camera="surfaceCamera"
+  :surfaceGroupBoxID="surfaceGroupBoxID"
   path="-1391935093.0.0"></grid-ui-box-socket></li></ul>

@@ -7,6 +7,10 @@ props:
   attachOrigin: null
 data:
   floatingStyle: null
+mounted: | #js
+  function() {
+    this.$root.html.when.element.moves(this.$el, this.refresh.bind(this));
+  }
 methods:
   getFloatingStyle: | #js
     function() {

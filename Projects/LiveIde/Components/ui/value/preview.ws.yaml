@@ -106,8 +106,9 @@ computed:
       return true;
     }
 style:
-  .value-as-string:
+  tr .value-as-string:
     max-width: 12em
+  .value-as-string:
     white-space: nowrap
     overflow: hidden
     text-overflow: ellipsis
