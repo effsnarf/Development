@@ -161,6 +161,8 @@ style:
     max-height: 1.5em
     line-height: 1.1em
     overflow: hidden
+  tr .value-as-string:
+    max-width: 12em
   img:
     width: 5em
   tr:

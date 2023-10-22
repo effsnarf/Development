@@ -47,7 +47,8 @@ watch:
 style:
   .field-list:
     max-height: 3em
-    overflow: auto
+    overflow-x: hidden
+    overflow-y: auto
     transition: 0.6s
   .field-list:hover:
     max-height: 20em

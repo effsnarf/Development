@@ -24,14 +24,17 @@ dom:
         v-slot: middle
         .middle.show-on-hover-container:
           div: 
-            ':class': '{ box1: true, ''has-func'': (!!link?.func), ''show-on-hover'': true }'
-            grid.ui.link.func:
-              ':link': link
-            div: 
-              ui.button:
-                icon: ❌
-                text: delete link
-                @click: onDeleteLink
+            ':class': '{ box1: true, ''has-func'': (!!link?.func), loading: isLoading }'
+            ui.loading:
+              ':class': '{ loader: true, visible: isLoading }'
+            .show-on-hover:
+              grid.ui.link.func:
+                ':link': link
+              div: 
+                ui.button:
+                  icon: ❌
+                  text: delete link
+                  @click: onDeleteLink
 props:
   link: null
   surfaceCamera:
@@ -42,7 +45,6 @@ props:
   surfaceGroupBoxID: null
   isDimmed: false
 data:
-  flashingValue: null
   fromEl: null
   toEl: null
   linkDesc: null
@@ -51,6 +53,7 @@ data:
   dimmedColor: '#202020'
   leaderLineColor: '#303030'
   isHighlighted: false
+  isLoading: 0
 mounted: | #js
   function() {
     this.refresh();
@@ -60,17 +63,16 @@ methods:
     function(box) {
       this.refresh();
     }
+  grid_client_runtime_link_is_loading: | #js
+    function(linkID, loadingCount) {
+      if (linkID != this.link._id) return;
+      this.isLoading += loadingCount;
+    }
   grid_client_runtime_link_flash: | #js
     async function(linkID, sValue) {
       // #TODO: Slow
       if (linkID !== this.link._id) return;
-      
-      const vLeaderLine = this.$root.vm.getDescendant(this, "ui.leader.line");
-      vLeaderLine?.flash(sValue);
-
-      //this.flashingValue = sValue;
-      await this.$nextTick();
-      this.flashingValue = null;
+      this.$refs.leaderLine1.flash();
     }
   getFromEl: | #js
     function() {
@@ -131,8 +133,9 @@ methods:
     }
   setColor: | #js
     function() {
-      this.leaderLineColor = this.isDimmed ? this.dimmedColor :
+      this.leaderLineColor = false ? null :
         this.isHighlighted ? this.highlightedColor :
+        this.isDimmed ? this.dimmedColor :
         this.normalColor;
     }
   refresh: | #js
@@ -154,12 +157,10 @@ computed:
 watch:
   isHighlighted: | #js
     function(isHighlighted) {
-      if (!this.$refs.leaderLine1) return;
       this.setColor();
     }
   isDimmed: | #js
     function(isDimmed) {
-      if (!this.$refs.leaderLine1) return;
       this.setColor();
     }
   showLeaderLine: | #js
@@ -167,9 +168,17 @@ watch:
       this.refresh();
     }
 style:
+  .box1.loading:
+    border: 3px solid yellow !important
+  .loader:
+    opacity: 0
+  .loader.visible:
+    opacity: 1
   .middle .show-on-hover:
-    max-width: 3em
-    max-height: 3em
+    max-width: 0em
+    max-height: 0em
+    overflow: hidden
+    transition: 0.6s
   .middle.show-on-hover-container:hover .show-on-hover:
     max-width: 20em
     max-height: 20em
@@ -208,9 +217,11 @@ template: >-
   :start-plug="getStartPlug()" :color="leaderLineColor"
   path="281201772.1"><template v-slot:middle path="281201772.1.0"><div
   class="middle show-on-hover-container" path="281201772.1.0.0"><div :class="{
-  box1: true, 'has-func': (!!link?.func), 'show-on-hover': true }"
-  path="281201772.1.0.0.0"><grid-ui-link-func :link="link"
-  path="281201772.1.0.0.0.0"></grid-ui-link-func><div
-  path="281201772.1.0.0.0.1"><ui-button icon="❌" text="delete link"
+  box1: true, 'has-func': (!!link?.func), loading: isLoading }"
+  path="281201772.1.0.0.0"><ui-loading :class="{ loader: true, visible:
+  isLoading }" path="281201772.1.0.0.0.0"></ui-loading><div
+  class="show-on-hover" path="281201772.1.0.0.0.1"><grid-ui-link-func
+  :link="link" path="281201772.1.0.0.0.1.0"></grid-ui-link-func><div
+  path="281201772.1.0.0.0.1.1"><ui-button icon="❌" text="delete link"
   @click="onDeleteLink"
-  path="281201772.1.0.0.0.1.0"></ui-button></div></div></div></template></ui-leader-line></grid-module>
+  path="281201772.1.0.0.0.1.1.0"></ui-button></div></div></div></div></template></ui-leader-line></grid-module>

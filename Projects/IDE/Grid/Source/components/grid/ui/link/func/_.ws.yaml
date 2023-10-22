@@ -19,13 +19,7 @@ props:
   link: null
 data:
   func: null
-  isLoading: false
-methods:
-  grid_client_runtime_link_is_loading: | #js
-    function(linkID, isLoading) {
-      if (linkID != this.link._id) return;
-      this.isLoading = isLoading;
-    }
+methods: null
 watch:
   link:
     handler: | #js

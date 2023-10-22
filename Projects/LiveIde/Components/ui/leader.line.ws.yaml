@@ -20,7 +20,6 @@ data:
   leaderLineElement: null
   middleLabelElement: null
   flashColors: []
-  isFlashing: false
 mounted: | #js
   this.redraw();
   this.refresh();
@@ -30,23 +29,17 @@ methods:
   flash: | #js
     function() {
       if (!this.leaderLine) return;
-      const yellow = "#ffff00";
-      this.flashColors = this.tweenColors(yellow, this.color, 30);
+      const yellow = "#606000";
+      this.flashColors = this.tweenColors(yellow, this.color, 360);
     }
   flashOneFrame: | #js
     function() {
-      if (this.isFlashing) return;
-      this.isFlashing = true;
       if (!this.leaderLine) return;
       if (!this.flashColors.length) return;
       const color = this.flashColors.shift();
       this.leaderLine.color = color;
-      if (!this.flashColors.length)
-      {
-        this.isFlashing = false;
-        return;
-      }
-      requestAnimationFrame(this.flashOneFrame.bind(this));
+      if (!this.flashColors.length) return;
+      requestAnimationFrame(() => this.flashOneFrame());
     }
   refresh: | #js
     function(again = 2) {
@@ -210,7 +203,7 @@ watch:
     }
   flashColors: | #js
     function(flashColors) {
-      this.flashOneFrame();
+      requestAnimationFrame(this.flashOneFrame.bind(this));
     }
   visible: | #js
     function(visible) {

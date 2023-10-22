@@ -32,12 +32,14 @@ methods:
       return `hoverable ${this.size}`;
     }
   onInput: | #js
-    function(value) {
+    async function(value) {
       if (this.valueArray && this.valueKey) {
         this.toggleArrayValue(this.valueArray, this.valueKey);
+        await this.$nextTick();
         this.$emit("input", this.valueArray);
       } else {
         this.value1 = value;
+        await this.$nextTick();
         this.$emit("input", value);
       }
     }

@@ -106,8 +106,6 @@ computed:
       return true;
     }
 style:
-  tr .value-as-string:
-    max-width: 12em
   .value-as-string:
     white-space: nowrap
     overflow: hidden
