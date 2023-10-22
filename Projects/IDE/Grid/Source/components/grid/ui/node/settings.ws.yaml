@@ -16,11 +16,13 @@ props:
   dataBoundSocketData: null
 data:
   inputs: null
-  linq: {}
+  linq:
+    operations: null
 methods:
   init: | #js
     function(node) {
-      this.linq = Objects.clone(node.linq);
+      this.linq = (Objects.clone(node.linq) || {});
+      this.linq.operations = (this.linq.operations || []);
     }
 watch:
   linq:

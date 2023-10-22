@@ -153,15 +153,10 @@ methods:
       this.isDirty++;
     }
   _refresh: | #js
-    function() {
+    async function() {
       const stagger = 0.5;
       this.iteratorBox = this.getIteratorBox(this.box);
-      if (!this.items) this.items = [];
-      const newItems = this.getItems();
-      const addItems = newItems?.filter(i => !this.items?.find(ii => this.getItemKey(ii) == this.getItemKey(i)));
-      const delItems = this.items?.filter(i => !newItems?.find(ii => this.getItemKey(ii) == this.getItemKey(i)));
-      delItems.map((item, i) => (() => this.items.removeBy(i => this.getItemKey(i) == this.getItemKey(item))).postpone(i*stagger*1000)());
-      addItems.map((item, i) => (() => this.items.push(item)).postpone(i*stagger*1000)());
+      this.items = this.getItems();
     }
 computed: null
 watch:

@@ -70,6 +70,7 @@ methods:
   grid_ui_box_execute: | #js
     function(boxID) {
       const box = this.getBox(boxID);
+      if (!box.type) return;
       const methodName = `grid_ui_box_execute_${box.type.replace(/\./g, "_")}`;
       const method = this[methodName];
       if (!method) return;
@@ -96,7 +97,8 @@ methods:
     }
   grid_ui_box_execute_data: | #js
     function(boxID) {
-      this.processBoxChange_data(this.getBox(boxID));
+      const box = this.getBox(boxID);
+      this.processBoxChange_data(box);
     }
   grid_client_runtime_box_is_loading: | #js
     function(boxID, isLoading) {
@@ -142,7 +144,7 @@ methods:
   processBoxChange: | #js
     async function(boxID, sDirection, sID, sValue) {
       const box = this.getBox(boxID);
-      if (!box) return;
+      if (!box.type) return;
 
       const methodName = `processBoxChange_${box.type.replace(/\./g, "_")}`;
       const method = this[methodName];
@@ -151,7 +153,7 @@ methods:
     }
   processBoxChange_data: | #js
     function(box, sDirection, sID, sValue) {
-      if (sDirection != "input") return;
+      if (sDirection == "output") return;
       const inputValue = this.getSocketRuntimeValue(box._id, "input", 1);
       const datas = this.$refs.evaluator1.evaluateOps(inputValue, box.linq?.operations);
       const outputValue = datas.last();

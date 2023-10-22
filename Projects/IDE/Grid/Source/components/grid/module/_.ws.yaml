@@ -166,16 +166,22 @@ methods:
       return socketData;
     }
   getNodeItem: | #js
-    function(activeSocketData) {
+    async function(activeSocketData) {
       const inputItem = activeSocketData.input?.[1];
-      const nodeItems = this.$refs.evaluator1?.evaluateOps(inputItem, this.node?.linq?.operations);
+      if (!this.$refs.evaluator1) {
+        await this.$nextTick();
+        await this.$root.wait(100);
+        return this.getNodeItem(activeSocketData);
+      }
+      const nodeItems = this.$refs.evaluator1.evaluateOps(inputItem, this.node?.linq?.operations);
       const nodeItem = nodeItems?.last();
+      //if (inputItem && this.node?.linq?.operations.length && !nodeItem) debugger;
       return nodeItem;
     }
   refresh: | #js
-    function() {
+    async function() {
       const activeSocketData = this.getActiveSocketData();
-      const nodeItem = this.getNodeItem(activeSocketData);
+      const nodeItem = await this.getNodeItem(activeSocketData);
       if ("activeSocketData" in this.$parent) this.$parent.activeSocketData = activeSocketData;
       if ("inputs" in this.$parent) this.$parent.inputs = activeSocketData.input;
       if ("outputs" in this.$parent) this.$parent.outputs = activeSocketData.output;
