@@ -1,10 +1,9 @@
 dom:
-  div:
-    ui.dnd.dropzone:
-      @drop-item: onDropItem
-      ui.title:
-        icon: 🌲
-        ':text': node.type
+  ui.dnd.dropzone:
+    @drop-item: onDropItem
+    ui.title:
+      icon: 🌲
+      ':text': node.type
 props:
   box: null
   item: null
@@ -30,6 +29,6 @@ _:
     count: 0
 name: grid-ui-node-tree-item
 template: >-
-  <div class="comp-grid-ui-node-tree-item" path="169046121."><ui-dnd-dropzone
-  @drop-item="onDropItem" path="169046121.0"><ui-title icon="🌲"
-  :text="node.type" path="169046121.0.0"></ui-title></ui-dnd-dropzone></div>
+  <ui-dnd-dropzone class="comp-grid-ui-node-tree-item" @drop-item="onDropItem"
+  path="169046121."><ui-title icon="🌲" :text="node.type"
+  path="169046121.0"></ui-title></ui-dnd-dropzone>

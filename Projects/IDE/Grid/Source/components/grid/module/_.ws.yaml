@@ -14,8 +14,11 @@ dom:
       v-if: showEvents
       ':key': key1
       class: mt-l1
+    ui.linq.evaluator:
+      ref: evaluator1
 props:
   box: null
+  node: null
   icon: null
   title: null
   showEvents: false
@@ -145,7 +148,11 @@ methods:
         }
       }
       
-      (method.bind(vue))(...args);
+      const started = Date.now();
+      await (method.bind(vue))(...args);
+      const elapsed = (Date.now() - started);
+
+      //console.log(`${elapsed}ms`, "🔴", targetCompName, "🚀", compName, eventName);
     }
   grid_client_runtime_socket_value_change: | #js
     function(boxID, sDirection, sID, sValue) {
@@ -158,12 +165,21 @@ methods:
       socketData = Objects.deepMerge(socketData, (this.dataBoundSocketData || {}));
       return socketData;
     }
+  getNodeItem: | #js
+    function(activeSocketData) {
+      const inputItem = activeSocketData.input?.[1];
+      const nodeItems = this.$refs.evaluator1?.evaluateOps(inputItem, this.node?.linq?.operations);
+      const nodeItem = nodeItems?.last();
+      return nodeItem;
+    }
   refresh: | #js
     function() {
       const activeSocketData = this.getActiveSocketData();
+      const nodeItem = this.getNodeItem(activeSocketData);
       if ("activeSocketData" in this.$parent) this.$parent.activeSocketData = activeSocketData;
       if ("inputs" in this.$parent) this.$parent.inputs = activeSocketData.input;
       if ("outputs" in this.$parent) this.$parent.outputs = activeSocketData.output;
+      if ("nodeItem" in this.$parent) this.$parent.nodeItem = nodeItem;
       if ("refresh" in this.$parent) this.$parent.refresh();
     }
   onAllEvents: | #js
@@ -206,6 +222,12 @@ watch:
         this.refresh();
       }
     immediate: true
+  node:
+    handler: | #js
+      function(node) {
+        this.refresh();
+      }
+    immediate: true
 style:
   h3:
     font-weight: normal
@@ -227,4 +249,6 @@ template: >-
   path="1449764372.0.0"><ui-title :icon="icon" :text="compName"
   :number="getTitle()" path="1449764372.0.0.0"></ui-title></h3></div><div
   class="module-content" path="1449764372.1"><slot></slot></div><div
-  class="mt-l1" v-if="showEvents" :key="key1" path="1449764372.2"></div></div>
+  class="mt-l1" v-if="showEvents" :key="key1"
+  path="1449764372.2"></div><ui-linq-evaluator ref="evaluator1"
+  path="1449764372.3"></ui-linq-evaluator></div>

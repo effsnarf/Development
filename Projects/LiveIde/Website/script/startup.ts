@@ -79,11 +79,60 @@ const generalMixin = {
   },
 };
 
+interface AppLogItem {
+  _id: number;
+  icon: string;
+  names: string[];
+  data: any;
+  started: number;
+  elapsed: number | null;
+}
+
+class AppLog {
+  private _nextID = 1;
+  items = Vue.ref([]);
+  events = new Events();
+
+  start(icon: string, names: string[], data: any) {
+    if (!Array.isArray(names)) names = [names];
+    const logItem = Vue.ref({}) as AppLogItem;
+    logItem.icon = icon;
+    logItem.names = names;
+    logItem.data = data;
+    logItem._id = this._nextID++;
+    logItem.started = Date.now();
+    this.items.value.push(logItem);
+    return logItem;
+  }
+
+  stop(logItem: AppLogItem) {
+    logItem.elapsed = Date.now() - logItem.started;
+    this.events.emit("item.elapsed", logItem);
+  }
+
+  item(icon: string, names: string[], data: any) {
+    const logItem = this.start(icon, names, data);
+    logItem.elapsed = null;
+    return logItem;
+  }
+
+  on = {
+    item: {
+      elapsed: (callback: (logItem: AppLogItem) => void) => {
+        this.events.on("item.elapsed", callback);
+      },
+    },
+  };
+}
+
 const gridAppMixin = {
   created() {
     const store = (this as any).store;
     store.boxes = Vue.ref([]);
     store.links = Vue.ref([]);
+    store.runtime = {
+      log: new AppLog(),
+    };
   },
 };
 
@@ -95,6 +144,11 @@ const gridAppCompMixin = {
     },
     $links() {
       return (this as any).$store.links.value;
+    },
+    $runtime() {
+      return {
+        log: (this as any).$store.runtime.log,
+      };
     },
     $store() {
       return (this as any).$root.store;

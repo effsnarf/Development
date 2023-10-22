@@ -1,16 +1,23 @@
 dom:
-  ui.tree:
-    ':root': viewNodeRoot
-    item-type: grid.ui.node.tree.item
-    ':initial-expanded': true
-    ':get-item': (node) => node
-    ':get-children': (node) => node.children
-    @node-hovered: onNodeHovered
+  div:
+    ui.tree:
+      ':root': viewNodeRoot
+      item-type: grid.ui.node.tree.item
+      ':initial-expanded': true
+      ':get-item': (node) => node
+      ':get-children': (node) => node.children
+      @node-select: onNodeSelect
+      @node-hovered: onNodeHovered
 props:
   box: null
 data:
   viewNodeRoot: null
+  selectedNode: null
 methods:
+  onNodeSelect: | #js
+    function(node) {
+      this.selectedNode = node;
+    }
   onNodeHovered: | #js
     function(node, isHovered) {
       this.$emit('box-event', "node-hovered", node, isHovered);
@@ -26,12 +33,19 @@ watch:
         this.init(box);
       }
     immediate: true
+  selectedNode:
+    handler: | #js
+      function(node) {
+        this.$emit('box-event', "node-select", node);
+      }
 _:
   examples:
     count: 0
 name: grid-ui-box-view-layout-left-side
 template: >-
-  <ui-tree class="comp-grid-ui-box-view-layout-left-side" :root="viewNodeRoot"
+  <div class="comp-grid-ui-box-view-layout-left-side"
+  path="-1094764498."><ui-tree :root="viewNodeRoot"
   item-type="grid.ui.node.tree.item" :initial-expanded="true" :get-item="(node)
   =&gt; node" :get-children="(node) =&gt; node.children"
-  @node-hovered="onNodeHovered" path="-1094764498."></ui-tree>
+  @node-select="onNodeSelect" @node-hovered="onNodeHovered"
+  path="-1094764498.0"></ui-tree></div>

@@ -1,6 +1,7 @@
 dom:
   grid.module:
     ':box': box
+    ':node': node
     ':data-bound-socket-data': dataBoundSocketData
     h2:
       div:
@@ -14,14 +15,12 @@ props:
   node: null
   dataBoundSocketData: null
 data:
-  inputs: null
-mounted: ''
+  nodeItem: null
 methods: null
 computed:
   text: | #js
     function() {
-      const item = this.inputs?.[1];
-      return (item?.title || item?.sub);
+      return this.nodeItem;
     }
 style: null
 _:
@@ -29,7 +28,7 @@ _:
     count: 0
 name: grid-ui-node-view-text
 template: >-
-  <grid-module class="comp-grid-ui-node-view-text" :box="box"
+  <grid-module class="comp-grid-ui-node-view-text" :box="box" :node="node"
   :data-bound-socket-data="dataBoundSocketData" path="-1435648036."><h2
   path="-1435648036.0"><div v-if="text?.length" v-text="text"
   path="-1435648036.0.0"></div><div class="opacity-50" v-else-if="true"

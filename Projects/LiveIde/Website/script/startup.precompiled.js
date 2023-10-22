@@ -7625,7 +7625,7 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/website/script/1697914297356.ts ***!
+  !*** ../../../LiveIde/website/script/1697968367750.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -7697,11 +7697,47 @@ const generalMixin = {
         },
     },
 };
+class AppLog {
+    _nextID = 1;
+    items = Vue.ref([]);
+    events = new Events_1.Events();
+    start(icon, names, data) {
+        if (!Array.isArray(names))
+            names = [names];
+        const logItem = Vue.ref({});
+        logItem.icon = icon;
+        logItem.names = names;
+        logItem.data = data;
+        logItem._id = this._nextID++;
+        logItem.started = Date.now();
+        this.items.value.push(logItem);
+        return logItem;
+    }
+    stop(logItem) {
+        logItem.elapsed = Date.now() - logItem.started;
+        this.events.emit("item.elapsed", logItem);
+    }
+    item(icon, names, data) {
+        const logItem = this.start(icon, names, data);
+        logItem.elapsed = null;
+        return logItem;
+    }
+    on = {
+        item: {
+            elapsed: (callback) => {
+                this.events.on("item.elapsed", callback);
+            },
+        },
+    };
+}
 const gridAppMixin = {
     created() {
         const store = this.store;
         store.boxes = Vue.ref([]);
         store.links = Vue.ref([]);
+        store.runtime = {
+            log: new AppLog(),
+        };
     },
 };
 const gridAppCompMixin = {
@@ -7712,6 +7748,11 @@ const gridAppCompMixin = {
         },
         $links() {
             return this.$store.links.value;
+        },
+        $runtime() {
+            return {
+                log: this.$store.runtime.log,
+            };
         },
         $store() {
             return this.$root.store;

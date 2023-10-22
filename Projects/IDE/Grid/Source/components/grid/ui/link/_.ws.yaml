@@ -174,17 +174,19 @@ style:
     opacity: 0
   .loader.visible:
     opacity: 1
+  .middle:hover .loader:not(.visible):
+    display: none !important
   .middle .show-on-hover:
     max-width: 0em
     max-height: 0em
     overflow: hidden
     transition: 0.6s
-  .middle.show-on-hover-container:hover .show-on-hover:
+  .middle:hover .show-on-hover:
     max-width: 20em
     max-height: 20em
   .middle .show-on-hover > *:
     opacity: 0
-  .middle.show-on-hover-container:hover .show-on-hover > *:
+  .middle:hover .show-on-hover > *:
     opacity: 1
   .middle .box1:
     border-radius: 50%

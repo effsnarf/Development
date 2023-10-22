@@ -9,11 +9,10 @@ dom:
           ui.title: 
             icon: ❗
             text: connect items data socket
-      transition.group:
-        name: list
+      div: 
         div: 
           class: item
-          v-for: (item, index) in items
+          v-for: (item, index) in items?.take(5)
           ':key': getItemKey(item)
           @mouseenter: onItemHover(item)
           @mouseleave: onItemHover(null)
@@ -41,6 +40,7 @@ data:
   iteratorBox: null
   hoveredItem: null
   selectedItem: null
+  isDirty: 0
 mounted: | #js
   async function() {
     await this.$nextTick();
@@ -49,7 +49,7 @@ mounted: | #js
 methods:
   getItemKey: | #js
     function(item) {
-      return item?._id || item?.id || item?.no || JSON.stringify(item);
+      return item?._id || item?.id || item?.no;
     }
   getTempItemIndex: | #js
     function(index) {
@@ -86,7 +86,7 @@ methods:
     }
   onItemHover: | #js
     function(hoveredItem) {
-      if (!this.onItemHoverT) this.onItemHoverT = this._onItemHover.bind(this).debounce(10);
+      if (!this.onItemHoverT) this.onItemHoverT = this._onItemHover.bind(this).debounce(100);
       this.onItemHoverT(hoveredItem);
     }
   _onItemHover: | #js
@@ -145,13 +145,23 @@ methods:
   getItems: | #js
     function() {
       const socketData = this.$root.socket?.runtime.data[this.box._id];
-      const items = socketData?.input?.[1];
+      const items = (socketData?.input?.[1] || []);
       return items;
     }
   refresh: | #js
-    async function() {
+    function() {
+      this.isDirty++;
+    }
+  _refresh: | #js
+    function() {
+      const stagger = 0.5;
       this.iteratorBox = this.getIteratorBox(this.box);
-      this.items = this.getItems();
+      if (!this.items) this.items = [];
+      const newItems = this.getItems();
+      const addItems = newItems?.filter(i => !this.items?.find(ii => this.getItemKey(ii) == this.getItemKey(i)));
+      const delItems = this.items?.filter(i => !newItems?.find(ii => this.getItemKey(ii) == this.getItemKey(i)));
+      delItems.map((item, i) => (() => this.items.removeBy(i => this.getItemKey(i) == this.getItemKey(item))).postpone(i*stagger*1000)());
+      addItems.map((item, i) => (() => this.items.push(item)).postpone(i*stagger*1000)());
     }
 computed: null
 watch:
@@ -166,7 +176,7 @@ watch:
         this.$emit("box-event", "hovered-item", hoveredItem);
         const gridUiBoxVue = this.$root.vm.getAncestors(this, "grid.ui.box")[0];
         const hoveredItemSocket = this.box.sockets.output.find(s => s.name == "hovered item");
-        gridUiBoxVue.$femit("socket.value.change", this.box._id, "output", hoveredItemSocket._id, hoveredItem);
+        //gridUiBoxVue.$femit("socket.value.change", this.box._id, "output", hoveredItemSocket._id, hoveredItem);
       }
   selectedItem:
     handler: | #js
@@ -174,6 +184,15 @@ watch:
         const gridUiBoxVue = this.$root.vm.getAncestors(this, "grid.ui.box")[0];
         const selectedItemSocket = this.box.sockets.output.find(s => s.name == "selected item");
         gridUiBoxVue.$femit("socket.value.change", this.box._id, "output", selectedItemSocket._id, selectedItem);
+      }
+  isDirty:
+    handler: | #js
+      async function(isDirty) {
+        await this.$nextTick();
+        if (!isDirty) return;
+        this._refresh();
+        await this.$nextTick();
+        this.isDirty = 0;
       }
 style:
   .item:
@@ -193,9 +212,9 @@ template: >-
   path="2102270252."><div path="2102270252.0"><div v-if="!items"
   path="2102270252.0.0"><div class="flex justify-center"
   path="2102270252.0.0.0"><ui-title icon="❗" text="connect items data socket"
-  path="2102270252.0.0.0.0"></ui-title></div></div><transition-group name="list"
-  path="2102270252.0.1"><div class="item" v-for="(item, index) in items"
-  :key="getItemKey(item)" @mouseenter="onItemHover(item)"
+  path="2102270252.0.0.0.0"></ui-title></div></div><div
+  path="2102270252.0.1"><div class="item" v-for="(item, index) in
+  items?.take(5)" :key="getItemKey(item)" @mouseenter="onItemHover(item)"
   @mouseleave="onItemHover(null)" @click="onItemClick(item)"
   path="2102270252.0.1.0"><div v-if="!iteratorBox" path="2102270252.0.1.0.0"><h3
   path="2102270252.0.1.0.0.0"><ui-title text="item"
@@ -205,4 +224,4 @@ template: >-
   path="2102270252.0.1.0.0.1.0"></ui-value-preview></div></div><component
   v-if="iteratorBox" :is="getBoxCompName(iteratorBox)" :box="iteratorBox"
   :data-bound-socket-data="getDataBoundSocketData(item)"
-  path="2102270252.0.1.0.1"></component></div></transition-group></div></grid-module>
+  path="2102270252.0.1.0.1"></component></div></div></div></grid-module>

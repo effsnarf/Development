@@ -1,11 +1,25 @@
 dom:
-  div:
+  grid.module:
+    ':box': box
+    ':node': node
+    ':data-bound-socket-data': dataBoundSocketData
     img:
-      src: /images/cat2.png
+      ':src': imageSrc
 props:
   box: null
   node: null
   dataBoundSocketData: null
+data: null
+methods:
+  getImageSrc: | #js
+    function() {
+      return "/images/cat2.png";
+    }
+computed:
+  imageSrc: | #js
+    function() {
+      return this.getImageSrc();
+    }
 style:
   img:
     width: 100%
@@ -14,5 +28,6 @@ _:
     count: 0
 name: grid-ui-node-view-image
 template: >-
-  <div class="comp-grid-ui-node-view-image" path="-1565358964."><img
-  src="/images/cat2.png" path="-1565358964.0"/></div>
+  <grid-module class="comp-grid-ui-node-view-image" :box="box" :node="node"
+  :data-bound-socket-data="dataBoundSocketData" path="-1565358964."><img
+  :src="imageSrc" path="-1565358964.0"/></grid-module>

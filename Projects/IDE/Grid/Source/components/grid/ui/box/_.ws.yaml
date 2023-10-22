@@ -57,7 +57,7 @@ dom:
               ':is': getBoxSideCompName(boxType, 'left')
               ':userID': userID
               ':box': box
-              @box-event: onSideBoxEvent
+              @box-event: (...args) => onSideBoxEvent('left', ...args)
       template: 
         v-slot: right-side
         div: 
@@ -68,7 +68,7 @@ dom:
               ':is': getBoxSideCompName(boxType, 'right')
               ':userID': userID
               ':box': box
-              @box-event: onSideBoxEvent
+              @box-event: (...args) => onSideBoxEvent('right', ...args)
         grid.ui.box.sockets: 
           ':box': box
           direction: output
@@ -133,8 +133,10 @@ methods:
       this.callBoxEvent(this.$refs.rightSideComp1, ...args);
     }
   onSideBoxEvent: | #js
-    function(...args) {
+    function(side, ...args) {
       this.callBoxEvent(this.$refs.boxComp1, ...args);
+      const otherSide = (side == "left" ? "right" : "left");
+      this.callBoxEvent(this.$refs[`${otherSide}SideComp1`], ...args);
     }
   callBoxEvent: | #js
     function(vBox, ...args) {
@@ -208,7 +210,7 @@ methods:
     }
   hasLeftSideComp: | #js
     function(type) {
-      if (["view.layout", "view.items"].includes(type)) return true;
+      if (["view.layout"].includes(type)) return true;
       return false;
     }
   hasRightSideComp: | #js
@@ -416,13 +418,13 @@ template: >-
   path="1671629593.0.3.0"><ui-drawer v-if="hasLeftSideComp(boxType)"
   path="1671629593.0.3.0.0"><component ref="leftSideComp1"
   :is="getBoxSideCompName(boxType, 'left')" :userID="userID" :box="box"
-  @box-event="onSideBoxEvent"
+  @box-event="(...args) =&gt; onSideBoxEvent('left', ...args)"
   path="1671629593.0.3.0.0.0"></component></ui-drawer></div></template><template
   v-slot:right-side path="1671629593.0.4"><div
   path="1671629593.0.4.0"><ui-drawer v-if="hasRightSideComp(boxType)"
   path="1671629593.0.4.0.0"><component ref="rightSideComp1"
   :is="getBoxSideCompName(boxType, 'right')" :userID="userID" :box="box"
-  @box-event="onSideBoxEvent"
+  @box-event="(...args) =&gt; onSideBoxEvent('right', ...args)"
   path="1671629593.0.4.0.0.0"></component></ui-drawer></div><grid-ui-box-sockets
   :box="box" direction="output" socket-type="iterator"
   :surface-camera="surfaceCamera"

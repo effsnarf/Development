@@ -1,0 +1,52 @@
+dom:
+  grid.module:
+    ':box': box
+    ':data-bound-socket-data': dataBoundSocketData
+    div:
+      h3:
+        ui.title:
+          icon: 🧊
+          ':text': node.type + ' item'
+      ui.linq:
+        ':input': inputs?.[1]
+        v-model: linq.operations
+props:
+  box: null
+  node: null
+  dataBoundSocketData: null
+data:
+  inputs: null
+  linq: {}
+methods:
+  init: | #js
+    function(node) {
+      this.linq = Objects.clone(node.linq);
+    }
+watch:
+  linq:
+    handler: | #js
+      function() {
+        const vBox = this.$root.vm.getAncestors(this, "grid.ui.box")[0];
+        const viewNodeRoot = Objects.clone(this.box.viewNodeRoot);
+        const node = TreeObject.find(viewNodeRoot, this.node._id);
+        node.linq = this.linq;
+        vBox.$femit("edit.box", this.box._id, { viewNodeRoot });
+      }
+    deep: true
+  node:
+    handler: | #js
+      function(node) {
+        this.init(node);
+      }
+    immediate: true
+_:
+  examples:
+    count: 0
+name: grid-ui-node-settings
+template: >-
+  <grid-module class="comp-grid-ui-node-settings" :box="box"
+  :data-bound-socket-data="dataBoundSocketData" path="-1191877027."><div
+  path="-1191877027.0"><h3 path="-1191877027.0.0"><ui-title icon="🧊"
+  :text="node.type + ' item'" path="-1191877027.0.0.0"></ui-title></h3><ui-linq
+  :input="inputs?.[1]" v-model="linq.operations"
+  path="-1191877027.0.1"></ui-linq></div></grid-module>

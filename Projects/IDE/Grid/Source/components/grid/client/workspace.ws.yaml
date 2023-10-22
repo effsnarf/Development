@@ -4,8 +4,8 @@ dom:
     grid.client.context.menu:
       ':userID': userID
     grid.ui.tools.buttons: null
-    div:
-      .flex:
+    .flex: 
+      .flex: 
         class: w-100pc
         grid.client.surface:
           v-for: surface in surfaces
@@ -13,6 +13,8 @@ dom:
           ':userID': userID
           ':options': surface
           @close: grid_ui_box_toggle_group_maximized(surface.groupBoxID)
+      div:
+        grid.client.log: null
     grid.client.vars:
       ':userID': userID
 props:
@@ -50,9 +52,10 @@ template: >-
   <grid-module class="comp-grid-client-workspace" icon="👤💻🖱️"
   path="-1461469222."><grid-client-context-menu :userID="userID"
   path="-1461469222.0"></grid-client-context-menu><grid-ui-tools-buttons></grid-ui-tools-buttons><div
-  path="-1461469222.2"><div class="w-100pc flex"
+  class="flex" path="-1461469222.2"><div class="w-100pc flex"
   path="-1461469222.2.0"><grid-client-surface v-for="surface in surfaces"
   :key="surface._id" :userID="userID" :options="surface"
   @close="grid_ui_box_toggle_group_maximized(surface.groupBoxID)"
-  path="-1461469222.2.0.0"></grid-client-surface></div></div><grid-client-vars
+  path="-1461469222.2.0.0"></grid-client-surface></div><div
+  path="-1461469222.2.1"><grid-client-log></grid-client-log></div></div><grid-client-vars
   :userID="userID" path="-1461469222.3"></grid-client-vars></grid-module>

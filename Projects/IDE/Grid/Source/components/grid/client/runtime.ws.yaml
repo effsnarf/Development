@@ -70,7 +70,8 @@ methods:
   grid_ui_box_execute: | #js
     function(boxID) {
       const box = this.getBox(boxID);
-      const method = this[`grid_ui_box_execute_${box.type}`];
+      const methodName = `grid_ui_box_execute_${box.type.replace(/\./g, "_")}`;
+      const method = this[methodName];
       if (!method) return;
       method.call(this, boxID);
     }
@@ -122,45 +123,77 @@ methods:
     }
   onSocketValueChange: | #js
     function(boxID, sDirection, sID, sValue) {
-      this.$femit("socket.value.change", boxID, sDirection, sID, sValue);
-      this.processBoxChange(boxID, sDirection, sID, sValue);
-      this.propagateSocketLinks(boxID, sDirection, sID);
-      if (sDirection == "input") this.propagateGroupSockets(boxID, sID, sValue);
-      if (sDirection == "output") this.propagateGroupMemberSockets(boxID, sID, sValue);
+      const box = this.getBox(boxID);
+      const socket = box.sockets[sDirection].find(socket => socket._id == sID);
+      const logItem = this.$runtime.log.start(`🧊`, [box.name, `socket`, socket.name], { boxID, sDirection, sID, sValue });
+      try
+      {
+        this.$femit("socket.value.change", boxID, sDirection, sID, sValue);
+        this.processBoxChange(boxID, sDirection, sID, sValue);
+        this.propagateSocketLinks(boxID, sDirection, sID);
+        if (sDirection == "input") this.propagateGroupSockets(boxID, sID, sValue);
+        if (sDirection == "output") this.propagateGroupMemberSockets(boxID, sID, sValue);
+      }
+      finally
+      {
+        this.$runtime.log.stop(logItem);
+      }
     }
   processBoxChange: | #js
     async function(boxID, sDirection, sID, sValue) {
       const box = this.getBox(boxID);
       if (!box) return;
 
-      if (box.type == "data")
-      {
-        if (sDirection == "input" && sID == 1)
-        {
-          this.processBoxChange_data(box);
-        }
-      }
-
-      if (box.type == "func")
-      {
-        if (sDirection == "input")
-        {
-          this.processBoxChange_func(box);
-        }
-      }
+      const methodName = `processBoxChange_${box.type.replace(/\./g, "_")}`;
+      const method = this[methodName];
+      if (!method) return;
+      method.call(this, box, sDirection, sID, sValue);
     }
   processBoxChange_data: | #js
-    function(box) {
+    function(box, sDirection, sID, sValue) {
+      if (sDirection != "input") return;
       const inputValue = this.getSocketRuntimeValue(box._id, "input", 1);
       const datas = this.$refs.evaluator1.evaluateOps(inputValue, box.linq?.operations);
       const outputValue = datas.last();
       this.setSocketValue(box._id, "output", 1, outputValue);
     }
   processBoxChange_func: | #js
-    async function(box) {
+    async function(box, sDirection, sID, sValue) {
+      if (sDirection != "input") return;
       const result = await this.runFunc(box);
       this.setSocketValue(box._id, "output", 1, result);
       this.$femit("func.result.change", box._id, result);
+    }
+  processBoxChange_view_items: | #js
+    function(box, sDirection, sID, sValue) {
+      // To have an example item in the loop item box's data
+      // we're taking the first item from the view items
+      // and "propagating" it to the loop item box's data
+      // We're "propagating" either (input items[0]) or (selected item)
+      const exampleItem = this.getViewItemsExampleItem(box, sDirection, sID, sValue);
+      if (!exampleItem) return null;
+      const iterator = box.sockets.output.find(socket => (socket.type == "iterator"));
+      const iteratorLinks = this.getSocketLinks("from", box._id, "output", iterator._id);
+      for (const link of iteratorLinks) {
+        this.setSocketValue(link.to.box._id, "input", link.to.socket._id, exampleItem)
+      }
+    }
+  getViewItemsExampleItem: | #js
+    function(box, sDirection, sID, sValue) {
+      if ((sDirection == "input") && (sID == 1)) {
+        const items = sValue;
+        const item = items?.[0];
+        return item;
+      }
+      if (sDirection == "output")
+      {
+        const socket = box.sockets.output.find(socket => socket._id == sID);
+        if (socket.name == "selected item") {
+          const item = sValue;
+          return item;
+        }
+      }
+      return null;
     }
   repropagateSocketLinks: | #js
     function(boxID) {
@@ -244,6 +277,9 @@ methods:
     }
   runLinkFunc: | #js
     async function(link, func, argValues) {
+      const box = this.getBox(link.from.box._id);
+      const logItem = this.$runtime.log.start(`🔴`, [box.name, `link`, link.func.name], { link, func, argValues });
+
       try
       {
         this.$femit("link.error", link._id, null);
@@ -269,6 +305,7 @@ methods:
       }
       finally
       {
+        this.$runtime.log.stop(logItem);
         this.$femit("link.is.loading", link._id, -1);
       }
 
@@ -365,6 +402,13 @@ methods:
         if (box.exported?.fields?.length) value = value[box.exported.fields[0]];
       }
       return value;
+    }
+  getSocketLinks: | #js
+    function(socketDirection, boxID, sDirection, sID) {
+      const links = this.$links
+        .filter((link) => link[socketDirection].box._id === boxID)
+        .filter((link) => link[socketDirection].socket._id == sID);
+      return links;
     }
   getBox: | #js
     function(boxID) {

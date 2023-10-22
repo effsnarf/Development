@@ -7,21 +7,6 @@ dom:
       ':node': viewNodeRoot
       ':hovered-node': hoveredNode
       ':data-bound-socket-data': dataBoundSocketData
-    .slots:
-      v-if: 'false'
-      @click: refresh
-      div: 
-        v-for: (item, index) in items
-        ':class': '''slot-'' + index'
-        div: 
-          v-if: slotBoxes
-          component:
-            v-if: slotBoxes[index]?.type
-            class: h-100pc
-            ':is': getBoxCompName(slotBoxes[index])
-            ':userID': userID
-            ':box': slotBoxes[index]
-            ':data-bound-socket-data': dataBoundSocketData
 props:
   userID: null
   box: null
@@ -133,11 +118,4 @@ template: >-
   <grid-module class="comp-grid-ui-box-view-layout" icon="⬜" :show-title="false"
   path="814806846."><grid-ui-node-view :box="box" :node="viewNodeRoot"
   :hovered-node="hoveredNode" :data-bound-socket-data="dataBoundSocketData"
-  path="814806846.0"></grid-ui-node-view><div class="slots" v-if="false"
-  @click="refresh" path="814806846.1"><div v-for="(item, index) in items"
-  :class="'slot-' + index" path="814806846.1.0"><div v-if="slotBoxes"
-  path="814806846.1.0.0"><component class="h-100pc"
-  v-if="slotBoxes[index]?.type" :is="getBoxCompName(slotBoxes[index])"
-  :userID="userID" :box="slotBoxes[index]"
-  :data-bound-socket-data="dataBoundSocketData"
-  path="814806846.1.0.0.0"></component></div></div></div></grid-module>
+  path="814806846.0"></grid-ui-node-view></grid-module>
