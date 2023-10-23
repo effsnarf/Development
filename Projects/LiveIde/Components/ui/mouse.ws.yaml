@@ -64,8 +64,8 @@ methods:
     }
   updateHoveredElement: | #js
     function(pos) {
-      if (!this.updateHoveredElementThrottled) this.updateHoveredElementThrottled = this._updateHoveredElement.bind(this).throttle(400);
-      this.updateHoveredElementThrottled(pos);
+      if (!this.__updateHoveredElement) this.__updateHoveredElement = this._updateHoveredElement.bind(this).throttle(400);
+      this.__updateHoveredElement(pos);
     }
   _updateHoveredElement: | #js
     function(pos) {

@@ -22,19 +22,18 @@ dom:
       ':color': leaderLineColor
       template:
         v-slot: middle
-        .middle.show-on-hover-container:
-          div: 
-            ':class': '{ box1: true, ''has-func'': (!!link?.func), loading: isLoading }'
-            ui.loading:
-              ':class': '{ loader: true, visible: isLoading }'
-            .show-on-hover:
-              grid.ui.link.func:
-                ':link': link
-              div: 
-                ui.button:
-                  icon: ❌
-                  text: delete link
-                  @click: onDeleteLink
+        div: 
+          ':class': '{ box1: true, ''has-func'': (!!link?.func), loading: isLoading }'
+          ui.loading:
+            ':class': '{ loader: true, visible: isLoading }'
+          .content:
+            grid.ui.link.func:
+              ':link': link
+            div: 
+              ui.button:
+                icon: ❌
+                text: delete link
+                @click: onDeleteLink
 props:
   link: null
   surfaceCamera:
@@ -174,33 +173,37 @@ style:
     opacity: 0
   .loader.visible:
     opacity: 1
-  .middle:hover .loader:not(.visible):
+  .leader-line-middle:
+    min-width: 5em
+    min-height: 5em
+  .leader-line-middle:hover .loader:not(.visible):
     display: none !important
-  .middle .show-on-hover:
+  .leader-line-middle .content:
     max-width: 0em
     max-height: 0em
     overflow: hidden
-    transition: 0.6s
-  .middle:hover .show-on-hover:
+    opacity: 0
+    transition: 2s
+  .leader-line-middle .box1:hover .content:
     max-width: 20em
     max-height: 20em
-  .middle .show-on-hover > *:
-    opacity: 0
-  .middle:hover .show-on-hover > *:
+  .leader-line-middle:hover .content:
     opacity: 1
-  .middle .box1:
+  .leader-line-middle .box1:
+    min-width: 3em
+    min-height: 3em !important
     border-radius: 50%
     border: none
-  .middle:hover .box1:
+    opacity: 0
+    transition: 1s
+  .leader-line-middle:hover .box1:
     box-shadow: 'inset -3px 3px 3px #000'
     border: '2px solid #ffffff30'
     border-radius: 1em
-  .box1:
-    opacity: 0.3
-    transition: 0.3s
-  .box1:hover:
+    opacity: 0.4
+  .leader-line-middle .box1:hover:
     opacity: 0.7
-  .box1.has-func:
+  .leader-line-middle .box1.has-func:
     opacity: 1
 _:
   examples:
@@ -217,13 +220,12 @@ template: >-
   path="281201772.0.2.0"></ui-value></ui-context-window></div><ui-leader-line
   v-if="showLeaderLine" ref="leaderLine1" :from="fromEl" :to="toEl"
   :start-plug="getStartPlug()" :color="leaderLineColor"
-  path="281201772.1"><template v-slot:middle path="281201772.1.0"><div
-  class="middle show-on-hover-container" path="281201772.1.0.0"><div :class="{
+  path="281201772.1"><template v-slot:middle path="281201772.1.0"><div :class="{
   box1: true, 'has-func': (!!link?.func), loading: isLoading }"
-  path="281201772.1.0.0.0"><ui-loading :class="{ loader: true, visible:
-  isLoading }" path="281201772.1.0.0.0.0"></ui-loading><div
-  class="show-on-hover" path="281201772.1.0.0.0.1"><grid-ui-link-func
-  :link="link" path="281201772.1.0.0.0.1.0"></grid-ui-link-func><div
-  path="281201772.1.0.0.0.1.1"><ui-button icon="❌" text="delete link"
+  path="281201772.1.0.0"><ui-loading :class="{ loader: true, visible: isLoading
+  }" path="281201772.1.0.0.0"></ui-loading><div class="content"
+  path="281201772.1.0.0.1"><grid-ui-link-func :link="link"
+  path="281201772.1.0.0.1.0"></grid-ui-link-func><div
+  path="281201772.1.0.0.1.1"><ui-button icon="❌" text="delete link"
   @click="onDeleteLink"
-  path="281201772.1.0.0.0.1.1.0"></ui-button></div></div></div></div></template></ui-leader-line></grid-module>
+  path="281201772.1.0.0.1.1.0"></ui-button></div></div></div></template></ui-leader-line></grid-module>

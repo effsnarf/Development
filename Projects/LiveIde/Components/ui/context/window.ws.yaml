@@ -45,6 +45,7 @@ props:
   bindProps: null
   semiTransparent: true
   getContextElement: null
+  windowStyle: null
 desc:
   global:
     'true': |
@@ -107,17 +108,20 @@ methods:
     function() {
       const element = (this.global ? window : this._getContextElement());
       if (!element) return setTimeout(this.bindToParent.bind(this), 100);
-      element.addEventListener("mouseenter", this.onMouseEnterContext);
-      element.addEventListener("mouseleave", this.onMouseLeaveContext);
+      element.addEventListener("mouseenter", this.onMouseEnterContext.bind(this));
+      element.addEventListener("mouseleave", this.onMouseLeaveContext.bind(this));
+      this.$root.html.when.element.removed(element, this.unbindFromParent.bind(this));
       this.$root.$emit("context-menu-mounted", this);
+      document.body.appendChild(this.$el);
     }
   unbindFromParent: | #js
     function() {
       const element = (this.global ? window : this._getContextElement());
-      if (!element) return setTimeout(this.unbindFromParent.bind(this), 100);
+      if (!element) return;
       element.removeEventListener("mouseenter", this.onMouseEnterContext);
       element.removeEventListener("mouseleave", this.onMouseLeaveContext);
       this.$root.$emit("context-menu-unmounted", this);
+      this.$el.remove();
     }
   onDrag: | #js
     function(dpos) {
@@ -197,12 +201,13 @@ computed:
     function()
     {
       const style = {};
-      style.position = (this.global ? "fixed" : "absolute");
+      style.position = (this.global ? "fixed" : "fixed");
       const pos = (this.global ? this.globalPos : this.localPos);
       style.left = ((pos.x + this.space) + "px");
       style.top = ((pos.y + this.space) + "px");
       if (!this.semiTransparent) style.opacity = 1;
       style.transition = "all 0.3s, top 0s, left 0s !important";
+      if (this.windowStyle) Object.assign(style, this.windowStyle);
       return style;
     }
 watch:

@@ -1,10 +1,10 @@
 dom:
-  div:
-    ui.floating:
-      ref: floating1
-      v-if: 'true'
-      ':attach-to': middleLabelElement
-      attach-origin: center center
+  ui.floating:
+    ref: floating1
+    v-if: 'true'
+    ':attach-to': middleLabelElement
+    attach-origin: center center
+    .leader-line-middle:
       slot:
         name: middle
 props:
@@ -220,13 +220,17 @@ watch:
       if (this.middleLabelElement == textElements?.[0]) return;
       this.middleLabelElement = textElements?.[0];
     }
-style: null
+style:
+  .leader-line-middle:
+    display: flex
+    justify-content: center
+    align-items: center
 _:
   examples:
     count: 0
 name: ui-leader-line
 template: >-
-  <div class="comp-ui-leader-line" path="125299039."><ui-floating
-  ref="floating1" v-if="true" :attach-to="middleLabelElement"
-  attach-origin="center center" path="125299039.0"><slot name="middle"
-  path="125299039.0.0"></slot></ui-floating></div>
+  <ui-floating class="comp-ui-leader-line" ref="floating1" v-if="true"
+  :attach-to="middleLabelElement" attach-origin="center center"
+  path="125299039."><div class="leader-line-middle" path="125299039.0"><slot
+  name="middle" path="125299039.0.0"></slot></div></ui-floating>

@@ -37,37 +37,59 @@ mounted: | #js
     // $femit is an emit that goes through the grid
     // Other components listen to events by method names (compName_emitName)
     this.$parent.$femit = async (eventName, ...args) => {
+      if (eventName == "to") {
+        this.femitDirectEvent(...args);
+        return;
+      }
       const compName = this.compName;
       args = Objects.clone(args);
       const femit = Objects.clone({ compName: this.compName, eventName, args });
-      this.$root.$emit("grid.event", femit.compName, femit.eventName, femit.args);
+      const handlerName = `${compName}_${eventName}`.replace(/\./g, "_");
+      this.$root.$emit(handlerName, ...args);
       return;
+
       this.femitQueue.push(femit);
       this.nextFemit();
-      //this.$root.$emit(emitName, ...args);
     };
 
-    // const handlerNames = Object.keys(this.$parent)
-    //   .filter(k => !k.startsWith("_"))
-    //   .filter(k => k.includes("_"));
+    if ("fuid" in this.$parent) {
+      this.$root.$on("grid.direct.event", this.onGridDirectEvent.bind(this));
+    }
+
+    // Register {compName}_{eventName} methods as event listeners
+    const handlerNames = Object.keys(this.$parent)
+      .filter(k => !k.startsWith("_"))
+      .filter(k => k.includes("_"));
     
-    // for (const handlerName of handlerNames) {
-    //   const method = this.$parent[handlerName].bind(this.$parent);
-    //   console.log("🔴", handlerName);
-    //   this.$root.$on(handlerName, (...args) => {
-    //     method(...args);
-    //   });
-    // }
-    // #TODO: Instead of listening to all events, add listeners by method/event names
-    if (!this._onGridEvent) this._onGridEvent = this.onGridEvent.bind(this);
-    this.$root.$on("grid.event", this._onGridEvent);
+    for (const handlerName of handlerNames) {
+      const method = this.$parent[handlerName].bind(this.$parent);
+      //console.log("🔴", handlerName);
+      this.$root.$on(handlerName, method);
+    }
   }
 unmounted: | #js
   function() {
     alertify.error("unmounted");
-    this.$root.$off("grid.event", this._onGridEvent);
   }
 methods:
+  femitDirectEvent: | #js
+    function(...args) {
+      const to = {
+        compName: args[0],
+        fuid: args[1],
+        methodName: args[2],
+        args: args[3],
+      };
+      this.$root.$emit("grid.direct.event", to.compName, to.fuid, to.methodName, to.args);  
+    }
+  onGridDirectEvent: | #js
+    function(compName, fuid, methodName, args) {
+      if (compName != this.compName) return;
+      if (fuid != this.$parent.fuid) return;
+      const method = this.$parent[methodName]?.bind(this.$parent);
+      if (!method) return;
+      method(...args);
+    }
   nextFemit: | #js
     function(internal) {
       if ((!internal) && this.isFemitting) return;
@@ -90,70 +112,6 @@ methods:
       if (this.userID) return this.userID;
       return null;
     }
-  onGridEvent: | #js
-    async function(compName, eventName, args) {
-      // Vue still holds the component instance even if it's not rendered on the page anymore
-      // In this case, we don't pass grid events to the component
-      if (!this.$el.isConnected) return;
-
-      if (["ui.mouse"].includes(compName)) return;
-
-      const vue = this.$parent;
-
-      if (eventName == "to")
-      {
-        const to = {
-          compName: args[0],
-          fuid: args[1],
-          methodName: args[2],
-          args: args[3],
-        };
-        
-        if (to.compName != vue.$data._.comp.name) return;
-        if (to.fuid != vue.fuid) return;
-
-        const method = vue[to.methodName];
-        if (!method) throw new Error(`Method not found: ${to.methodName}`);
-        
-        //console.log("🔴", to.compName, "🚀", vue.$data._.comp.name, to.methodName, to.args)
-        await (method.bind(vue))(...(to.args||[]));
-
-        return;
-      }
-
-      if (vue.onAllEvents) {
-        vue.onAllEvents(compName, eventName, args);
-      }
-
-      const methodName = `${compName}_${eventName}`.replace(/\./g, "_");
-      const method = vue[methodName];
-
-      const moduleMethod = this[methodName];
-      if (moduleMethod) moduleMethod(...args);
-
-      if (!method) return;
-
-      const targetCompName = vue.$data._.comp.name;
-
-      //console.log("🔴", targetCompName, compName, "🚀", eventName, args);
-
-      const argNames = this.getCompMethodArgNames(vue.$data._.comp.name, methodName);
-
-      // This checks all vues for a userID prop
-      // On the server we'll have the modules separated by userID to begin with
-      if (argNames[0] == "userID") {
-        if ("userID" in vue)
-        {
-          if (args[0] != vue.userID) return;
-        }
-      }
-      
-      const started = Date.now();
-      await (method.bind(vue))(...args);
-      const elapsed = (Date.now() - started);
-
-      //console.log(`${elapsed}ms`, "🔴", targetCompName, "🚀", compName, eventName);
-    }
   grid_client_runtime_socket_value_change: | #js
     function(boxID, sDirection, sID, sValue) {
       if (boxID != this.box?._id) return;
@@ -168,17 +126,18 @@ methods:
   getNodeItem: | #js
     async function(activeSocketData) {
       const inputItem = activeSocketData.input?.[1];
-      if (!this.$refs.evaluator1) {
-        await this.$nextTick();
-        await this.$root.wait(100);
-        return this.getNodeItem(activeSocketData);
-      }
+      if (!this.$refs.evaluator1) return null;
       const nodeItems = this.$refs.evaluator1.evaluateOps(inputItem, this.node?.linq?.operations);
       const nodeItem = nodeItems?.last();
       //if (inputItem && this.node?.linq?.operations.length && !nodeItem) debugger;
       return nodeItem;
     }
   refresh: | #js
+    async function() {
+      if (!this.__refresh) this.__refresh = this._refresh.throttle(400);
+      this.__refresh();
+    }
+  _refresh: | #js
     async function() {
       const activeSocketData = this.getActiveSocketData();
       const nodeItem = await this.getNodeItem(activeSocketData);

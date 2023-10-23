@@ -32,8 +32,8 @@ watch:
 _:
   examples:
     count: 0
-name: ui-linq-select-fields
+name: ui-linq-ops-select-fields
 template: >-
-  <div class="comp-ui-linq-select-fields" v-if="operation"
-  path="-456509417."><ui-value-field-picker :obj="fieldsObj"
-  v-model="operation.fields" path="-456509417.0"></ui-value-field-picker></div>
+  <div class="comp-ui-linq-ops-select-fields" v-if="operation"
+  path="1122733019."><ui-value-field-picker :obj="fieldsObj"
+  v-model="operation.fields" path="1122733019.0"></ui-value-field-picker></div>

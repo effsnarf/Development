@@ -2635,6 +2635,14 @@ class HtmlHelper {
                     }
                 }, 1000);
             },
+            removed: (element, callback) => {
+                const intervalId = setInterval(() => {
+                    if (!element.isConnected) {
+                        callback();
+                        clearInterval(intervalId);
+                    }
+                }, 1000);
+            },
         },
     };
     getPossibleCssValues(prop) {
@@ -6049,7 +6057,7 @@ var __webpack_exports__ = {};
 (() => {
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/website/script/1697968367183.ts ***!
+  !*** ../../../LiveIde/website/script/1698061870699.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

@@ -20,20 +20,24 @@ dom:
                   v-text: '''Export socket'''
             ui.checkbox:
               v-model: socketIsExported
-          .flex:
+          .flex: 
             ui.context.window: 
-              v-if: 'true'
               div: 
                 h3: 
-                  ui.title: 
-                    ':icon': getSocketIcon(socket)
-                    ':text': socket.name
+                  .flex: 
+                    div: 
+                      v-text: getSocketIcon(socket)
+                    ui.input.text.box:
+                      ':camoflauge': 'true'
+                      v-model: socketName
                 div: 
-                  class: data-preview
+                  ':style': >-
+                    { 'max-width': '30em', 'max-height': '20em', 'overflow':
+                    'auto' }
                   ui.value:
                     v-if: showSocketValueContextWindow
                     ':value': socketValue
-            ui.title: 
+            ui.title:
               ':icon': getSocketIcon(socket)
               ':text': socket.name
     ui.leader.line:
@@ -65,6 +69,7 @@ data:
   socketIsExported: null
   socketAlertValue: null
   isLoading: 0
+  socketName: null
   socketValue: null
 mounted: | #js
   function() {
@@ -98,6 +103,7 @@ methods:
   init: | #js
     function(socket){
       this.socketIsExported = socket.is?.exported;
+      this.socketName = socket.name;
       this.socketValue = this.getSocketValue();
     }
   deleteLink: | #js
@@ -320,6 +326,12 @@ watch:
         this.init(socket);
       }
     immediate: true
+  socketName: | #js
+    function(socketName) {
+      if (socketName == undefined) return;
+      if (socketName == this.socket.name) return;
+      this.$femit("edit.socket", this.box._id, this.direction, this.socket._id, { name: socketName });
+    }
   socketIsExported: | #js
     function(socketIsExported) {
       if (socketIsExported == undefined) return;
@@ -327,10 +339,6 @@ watch:
       this.$femit("edit.socket", this.box._id, this.direction, this.socket._id, { is: { exported: socketIsExported } });
     }
 style:
-  .data-preview:
-    max-width: 20em
-    max-height: 10em
-    overflow: hidden
   .socket-alert-value-box:
     max-width: 10em
     max-height: 10em
@@ -364,12 +372,16 @@ template: >-
   path="-321995800.0.0.0.0.0.0.0"></h3></div></ui-context-window><ui-checkbox
   v-model="socketIsExported"
   path="-321995800.0.0.0.0.1"></ui-checkbox></div><div class="flex"
-  path="-321995800.0.0.0.1"><ui-context-window v-if="true"
-  path="-321995800.0.0.0.1.0"><div path="-321995800.0.0.0.1.0.0"><h3
-  path="-321995800.0.0.0.1.0.0.0"><ui-title :icon="getSocketIcon(socket)"
-  :text="socket.name" path="-321995800.0.0.0.1.0.0.0.0"></ui-title></h3><div
-  class="data-preview" path="-321995800.0.0.0.1.0.0.1"><ui-value
-  v-if="showSocketValueContextWindow" :value="socketValue"
+  path="-321995800.0.0.0.1"><ui-context-window path="-321995800.0.0.0.1.0"><div
+  path="-321995800.0.0.0.1.0.0"><h3 path="-321995800.0.0.0.1.0.0.0"><div
+  class="flex" path="-321995800.0.0.0.1.0.0.0.0"><div
+  v-text="getSocketIcon(socket)"
+  path="-321995800.0.0.0.1.0.0.0.0.0"></div><ui-input-text-box
+  :camoflauge="true" v-model="socketName"
+  path="-321995800.0.0.0.1.0.0.0.0.1"></ui-input-text-box></div></h3><div
+  :style="{ 'max-width': '30em', 'max-height': '20em', 'overflow': 'auto' }"
+  path="-321995800.0.0.0.1.0.0.1"><ui-value v-if="showSocketValueContextWindow"
+  :value="socketValue"
   path="-321995800.0.0.0.1.0.0.1.0"></ui-value></div></div></ui-context-window><ui-title
   :icon="getSocketIcon(socket)" :text="socket.name"
   path="-321995800.0.0.0.1.1"></ui-title></div></div></ui-dnd-draggable></ui-dnd-dropzone><ui-leader-line

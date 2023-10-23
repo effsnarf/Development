@@ -5,7 +5,7 @@ dom:
     .flex.justify-center:
       ':key': selectedFields?.join('')
       ui.value:
-        ':class': '{ ''opacity-50 grayscale'': (!selectedFields?.length) }'
+        ':class': '{ ''opacity-60 grayscale'': (!selectedFields?.length) }'
         ':value': >-
           !selectedFields?.length ? '[select fields]' : '[' +
           selectedFields.join(', ') + ']'
@@ -60,7 +60,7 @@ template: >-
   <div class="comp-ui-value-field-picker field-list" v-if="obj"
   path="20302585."><div class="flex justify-center"
   :key="selectedFields?.join('')" path="20302585.0"><ui-value :class="{
-  'opacity-50 grayscale': (!selectedFields?.length) }"
+  'opacity-60 grayscale': (!selectedFields?.length) }"
   :value="!selectedFields?.length ? '[select fields]' : '[' +
   selectedFields.join(', ') + ']'" path="20302585.0.0"></ui-value></div><div
   path="20302585.1"><div v-for="field in fields"

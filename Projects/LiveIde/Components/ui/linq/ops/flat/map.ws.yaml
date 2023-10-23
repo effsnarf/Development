@@ -1,9 +1,8 @@
 dom:
   div:
     v-if: operation
-    ui.value.path.picker:
-      ':obj': input
-      v-model: operation.path
+    .text-center:
+      v-text: '''flat map'''
 props:
   input: null
   value: null
@@ -26,8 +25,8 @@ watch:
 _:
   examples:
     count: 0
-name: ui-linq-select-path
+name: ui-linq-ops-flat-map
 template: >-
-  <div class="comp-ui-linq-select-path" v-if="operation"
-  path="-487334653."><ui-value-path-picker :obj="input" v-model="operation.path"
-  path="-487334653.0"></ui-value-path-picker></div>
+  <div class="comp-ui-linq-ops-flat-map" v-if="operation"
+  path="2105344887."><div class="text-center" v-text="'flat map'"
+  path="2105344887.0"></div></div>

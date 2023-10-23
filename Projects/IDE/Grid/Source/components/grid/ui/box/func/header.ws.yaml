@@ -3,7 +3,7 @@ dom:
     ':show-title': 'false'
     .flex:
       .clickable:
-        v-text: '''💡'''
+        v-text: '''🔴'''
         @click: $emit('title-icon-click')
       ui.select:
         ':options': runsOnOptions
@@ -36,7 +36,7 @@ name: grid-ui-box-func-header
 template: >-
   <grid-module class="comp-grid-ui-box-func-header" :show-title="false"
   path="1742824866."><div class="flex" path="1742824866.0"><div
-  class="clickable" v-text="'💡'" @click="$emit('title-icon-click')"
+  class="clickable" v-text="'🔴'" @click="$emit('title-icon-click')"
   path="1742824866.0.0"></div><ui-select :options="runsOnOptions" type="toggle"
   input-type="value" :get-item-text="(item) =&gt; item?.icon"
   :get-item-key="(item) =&gt; item?._id" :get-item-tooltip="(item) =&gt;

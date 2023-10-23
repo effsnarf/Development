@@ -1,28 +1,30 @@
 dom:
-  .box1:
-    div: 
-      v-for: (operation, index) in operations
-      .flex.items-center.gap-1.show-on-hover-container:
-        ui.linq.operation:
-          ':input': datas[index]
-          ':value': operation
-          @input: (operation) => $set(operations, index, operation)
-        .show-on-hover.hor:
-          ui.button:
-            ':icon': 'isConfirmed[index] ? ''❌'' : ''✖'''
-            @click: onClickDelete(index)
-      .next:
-        v-text: '''↓'''
-    div: 
-      .show-on-hover-container:
-        .text-center:
-          v-text: '''➕'''
-        .show-on-hover:
-          ui.linq.picker:
-            ':input': datas?.last()
-            @select: addOperation
-    ui.linq.evaluator:
-      ref: evaluator1
+  div: 
+    .box1:
+      div: 
+        v-for: (operation, index) in operations
+        .flex.items-center.gap-1.show-on-hover-container:
+          ui.linq.operation:
+            ':input': datas[index]
+            ':value': operation
+            @input: (operation) => $set(operations, index, operation)
+          .show-on-hover.hor:
+            ui.button:
+              ':icon': 'isConfirmed[index] ? ''❌'' : ''✖'''
+              @click: onClickDelete(index)
+        .next:
+          v-text: '''↓'''
+      div: 
+        .show-on-hover-container:
+          div: 
+            .text-center:
+              v-text: '''➕'''
+          .show-on-hover:
+            ui.linq.ops.picker:
+              ':input': datas?.last()
+              @select: addOperation
+      ui.linq.evaluator:
+        ref: evaluator1
 props:
   input: null
   value: null
@@ -68,6 +70,17 @@ watch:
       }
     immediate: true
 style:
+  .value-preview:
+    display: flex
+    justify-content: center
+    max-height: 10em
+    overflow-x: hidden
+    overflow-y: auto
+  .value-preview > *:
+    max-width: 15em
+    max-height: 10em
+  .value-preview .value-as-string:
+    max-width: 15em
   .show-on-hover-container:hover > .show-on-hover.hor:
     max-width: 3em
   .next:
@@ -78,19 +91,21 @@ _:
     count: 0
 name: ui-linq
 template: >-
-  <div class="comp-ui-linq box1" path="-484387046."><div v-for="(operation,
-  index) in operations" path="-484387046.0"><div class="flex items-center gap-1
-  show-on-hover-container" path="-484387046.0.0"><ui-linq-operation
+  <div class="comp-ui-linq" path="-484387046."><div class="box1"
+  path="-484387046.0"><div v-for="(operation, index) in operations"
+  path="-484387046.0.0"><div class="flex items-center gap-1
+  show-on-hover-container" path="-484387046.0.0.0"><ui-linq-operation
   :input="datas[index]" :value="operation" @input="(operation) =&gt;
   $set(operations, index, operation)"
-  path="-484387046.0.0.0"></ui-linq-operation><div class="show-on-hover hor"
-  path="-484387046.0.0.1"><ui-button :icon="isConfirmed[index] ? '❌' : '✖'"
+  path="-484387046.0.0.0.0"></ui-linq-operation><div class="show-on-hover hor"
+  path="-484387046.0.0.0.1"><ui-button :icon="isConfirmed[index] ? '❌' : '✖'"
   @click="onClickDelete(index)"
-  path="-484387046.0.0.1.0"></ui-button></div></div><div class="next"
-  v-text="'↓'" path="-484387046.0.1"></div></div><div path="-484387046.1"><div
-  class="show-on-hover-container" path="-484387046.1.0"><div class="text-center"
-  v-text="'➕'" path="-484387046.1.0.0"></div><div class="show-on-hover"
-  path="-484387046.1.0.1"><ui-linq-picker :input="datas?.last()"
-  @select="addOperation"
-  path="-484387046.1.0.1.0"></ui-linq-picker></div></div></div><ui-linq-evaluator
-  ref="evaluator1" path="-484387046.2"></ui-linq-evaluator></div>
+  path="-484387046.0.0.0.1.0"></ui-button></div></div><div class="next"
+  v-text="'↓'" path="-484387046.0.0.1"></div></div><div
+  path="-484387046.0.1"><div class="show-on-hover-container"
+  path="-484387046.0.1.0"><div path="-484387046.0.1.0.0"><div
+  class="text-center" v-text="'➕'" path="-484387046.0.1.0.0.0"></div></div><div
+  class="show-on-hover" path="-484387046.0.1.0.1"><ui-linq-ops-picker
+  :input="datas?.last()" @select="addOperation"
+  path="-484387046.0.1.0.1.0"></ui-linq-ops-picker></div></div></div><ui-linq-evaluator
+  ref="evaluator1" path="-484387046.0.2"></ui-linq-evaluator></div></div>

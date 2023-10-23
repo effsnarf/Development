@@ -9,6 +9,7 @@ dom:
       ':box': box
       ':node': node
       ':data-bound-socket-data': dataBoundSocketData
+      ':hovered-node': hoveredNode
 props:
   box: null
   node: null
@@ -20,6 +21,7 @@ methods:
     function(node) {
       const cls = {};
       cls["h-100pc"] = true;
+      cls["_view-comp"] = true;
       cls["_grid-view-node"] = true;
       cls["_grid-hovered"] = (node._id == this.hoveredNode?._id);
       return cls;
@@ -29,10 +31,14 @@ methods:
       return `grid.ui.node.view.${node.type}`.replace(/\./g, "-");
     }
 style:
+  ._view-comp:
+    transition: 0.1s
   ._grid-view-node:
     height: 100%
   ._grid-hovered:
-    border: '3px dashed #ffffff80'
+    border: 3px dashed yellow
+    box-shadow: '-4px 4px 2px black'
+    transition: 0.1s
 _:
   examples:
     count: 0
@@ -42,4 +48,4 @@ template: >-
   :data-bound-socket-data="dataBoundSocketData" path="1824264671."><component
   :class="getViewClass(node)" :is="getNodeCompName(node)" :box="box"
   :node="node" :data-bound-socket-data="dataBoundSocketData"
-  path="1824264671.0"></component></grid-module>
+  :hovered-node="hoveredNode" path="1824264671.0"></component></grid-module>

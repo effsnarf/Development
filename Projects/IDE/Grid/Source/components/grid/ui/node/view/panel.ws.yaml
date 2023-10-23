@@ -5,18 +5,25 @@ dom:
       ':box': box
       ':node': childNode
       ':data-bound-socket-data': dataBoundSocketData
+      ':hovered-node': hoveredNode
 props:
   box: null
   node: null
   dataBoundSocketData: null
+  hoveredNode: null
 data: null
 mounted: | #js
   function() {
   }
 methods: null
 style:
+  .comp-grid-ui-node-view-panel > *:
+    transition: margin 0.3s, border 0.1s
   .comp-grid-ui-node-view-panel._grid-hovered > *:
-    border: '3px dashed #ffffff80'
+    border: 3px dashed yellow
+    box-shadow: '-4px 4px 2px black'
+    margin: 0.5em
+    transition: margin 0.3s, border 0.1s
   .flex1 > *:nth-child(1):
     width: 30%
   .flex1 > *:nth-child(2):
@@ -29,4 +36,4 @@ template: >-
   <div class="comp-grid-ui-node-view-panel flex1 flex justify-between"
   path="-1559239371."><grid-ui-node-view v-for="childNode in node.children"
   :box="box" :node="childNode" :data-bound-socket-data="dataBoundSocketData"
-  path="-1559239371.0"></grid-ui-node-view></div>
+  :hovered-node="hoveredNode" path="-1559239371.0"></grid-ui-node-view></div>

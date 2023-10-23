@@ -24,7 +24,7 @@
   unmounted: {{{addCode unmounted ""}}},
   methods: {
     {{#each methods}}
-    {{@key}}: {{{addCode this "const _started = Date.now(); if (window.vueIdeApp?.isPauseOnMethod(this.$options._componentTag, '{{method}}')) debugger;" @key "const elapsed = (Date.now() - _started); if (elapsed > 100) console.log(elapsed, this.$options._componentTag, '.{{method}}'); window.vueIdeApp?.perf.track.elapsed(this.$options._componentTag + '.{{method}}', (Date.now() - _started));"}}},
+    {{@key}}: {{{addCode this "const _started = Date.now(); if (window.vueIdeApp?.isPauseOnMethod(this.$options._componentTag, '{{method}}')) debugger;" @key "const elapsed = (Date.now() - _started); if (elapsed > 50) console.log(elapsed, this.$options._componentTag, '.{{method}}'); window.vueIdeApp?.perf.track.elapsed(this.$options._componentTag + '.{{method}}', (Date.now() - _started));"}}},
     {{/each}}
   },
   computed: {
@@ -34,7 +34,7 @@
       get: {{{addCode get ""}}},
     },
     {{else}}
-    {{@key}}: {{{addCode this "const _started = Date.now();" @key "window.vueIdeApp?.perf.track.elapsed(this.$options._componentTag + '.{{method}}', (Date.now() - _started));"}}},
+    {{@key}}: {{{addCode this "const _started = Date.now();" @key "const elapsed = (Date.now() - _started); if (elapsed > 100) console.log(elapsed, this.$options._componentTag, '.{{method}}'); window.vueIdeApp?.perf.track.elapsed(this.$options._componentTag + '.{{method}}', (Date.now() - _started));"}}},
     {{/if}}
     {{/each}}
   },
@@ -42,7 +42,7 @@
     {{#each watch}}
     {{#if handler}}
     {{@key}}: {
-      handler: {{{addCode handler "const _started = Date.now();" @key "window.vueIdeApp?.perf.track.elapsed(this.$options._componentTag + '.{{method}}', (Date.now() - _started));"}}},
+      handler: {{{addCode handler "const _started = Date.now();" @key "const elapsed = (Date.now() - _started); if (elapsed > 100) console.log(elapsed, this.$options._componentTag, '.{{method}}'); window.vueIdeApp?.perf.track.elapsed(this.$options._componentTag + '.{{method}}', (Date.now() - _started));"}}},
       immediate: {{{or immediate false}}},
       deep: {{{or deep false}}},
     },

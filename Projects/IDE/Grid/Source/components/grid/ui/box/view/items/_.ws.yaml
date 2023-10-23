@@ -12,7 +12,7 @@ dom:
       div: 
         div: 
           class: item
-          v-for: (item, index) in items?.take(5)
+          v-for: (item, index) in items?.take(10)
           ':key': getItemKey(item)
           @mouseenter: onItemHover(item)
           @mouseleave: onItemHover(null)
@@ -209,7 +209,7 @@ template: >-
   path="2102270252.0.0.0"><ui-title icon="❗" text="connect items data socket"
   path="2102270252.0.0.0.0"></ui-title></div></div><div
   path="2102270252.0.1"><div class="item" v-for="(item, index) in
-  items?.take(5)" :key="getItemKey(item)" @mouseenter="onItemHover(item)"
+  items?.take(10)" :key="getItemKey(item)" @mouseenter="onItemHover(item)"
   @mouseleave="onItemHover(null)" @click="onItemClick(item)"
   path="2102270252.0.1.0"><div v-if="!iteratorBox" path="2102270252.0.1.0.0"><h3
   path="2102270252.0.1.0.0.0"><ui-title text="item"

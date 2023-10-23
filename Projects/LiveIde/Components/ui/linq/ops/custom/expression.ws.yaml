@@ -1,13 +1,16 @@
 dom:
   div:
     v-if: operation
-    .text-center:
-      v-text: '''flat map'''
+    ui.input.text.box:
+      ':hint': hint
+      multiline: true
+      v-model: operation.func
 props:
   input: null
   value: null
 data:
   operation: null
+  hint: (item) => `${item.name}`
 methods: null
 watch:
   operation:
@@ -25,7 +28,8 @@ watch:
 _:
   examples:
     count: 0
-name: ui-linq-flat-map
+name: ui-linq-ops-custom-expression
 template: >-
-  <div class="comp-ui-linq-flat-map" v-if="operation" path="595239355."><div
-  class="text-center" v-text="'flat map'" path="595239355.0"></div></div>
+  <div class="comp-ui-linq-ops-custom-expression" v-if="operation"
+  path="-1313227483."><ui-input-text-box :hint="hint" multiline="true"
+  v-model="operation.func" path="-1313227483.0"></ui-input-text-box></div>

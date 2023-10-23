@@ -1,20 +1,33 @@
 dom:
-  div: null
+  div:
+    ui.error:
+      v-for: error in errors
+      ':error': error
 props:
   input: null
   operation: null
 data:
   isDirty: 0
   output: null
+  errors: []
 methods:
   evaluateOps: | #js
     function(input, operations) {
+      this.errors = [];
       const datas = [];
       datas.push(input);
       if (!operations?.length) return datas;
       for (const operation of operations) {
-        const output = this.evaluate(datas.last(), operation);
-        datas.push(output);
+        try
+        {
+          const output = this.evaluate(datas.last(), operation);
+          datas.push(output);
+        }
+        catch (ex)
+        {
+          datas.push(datas.last());
+          this.errors.push(ex.message);
+        }
       }
       return datas;
     }
@@ -27,6 +40,11 @@ methods:
       const output = method(input, operation);
       return output;
     }
+  select_field: | #js
+    function(input, op) {
+      if (!op?.path?.length) return input;
+      return Objects.getProperty(input, op?.path.join("."));
+    }
   select_fields: | #js
     function(input, op) {
       if (!op?.fields?.length) return input;
@@ -38,16 +56,17 @@ methods:
       }
       return input;
     }
-  select_path: | #js
-    function(input, op) {
-      if (!op?.path?.length) return input;
-      return Objects.getProperty(input, op?.path.join("."));
-    }
   flat_map: | #js
     function(input, op) {
       if (!Array.isArray(input)) return input;
       const key1 = Object.keys(input[0])[0];
       return input.flatMap(item => item[key1]);
+    }
+  custom_expression: | #js
+    function(input, op) {
+      if (!op?.func) return input;
+      const func = eval(op.func);
+      return func(input);
     }
   no_op: | #js
     function(input, op) {
@@ -81,4 +100,6 @@ _:
   examples:
     count: 0
 name: ui-linq-evaluator
-template: <div class="comp-ui-linq-evaluator"></div>
+template: >-
+  <div class="comp-ui-linq-evaluator" path="-1130530213."><ui-error v-for="error
+  in errors" :error="error" path="-1130530213.0"></ui-error></div>

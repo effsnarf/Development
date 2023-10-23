@@ -381,6 +381,7 @@ methods:
         alertify.error("No more actions to undo");
         return;
       }
+      this.validatePointer();
       const lastAction = this.userActions[this.pointer];
       const undoAction = { _id: -1, redo: lastAction.undo };
       await this.grid_user_actions_do(userID, undoAction, false, false, { isUndoing: true });
@@ -393,6 +394,7 @@ methods:
         alertify.error("No more actions to redo");
         return;
       }
+      this.validatePointer();
       const nextAction = this.userActions[this.pointer + 1];
       const doneAction = await this.grid_user_actions_do(userID, nextAction, false);
       // We need to update the undo
@@ -428,6 +430,7 @@ methods:
     }
   addToStack: | #js
     function(action) {
+      this.validatePointer();
       const userID = this.userID;
       const lastAction = this.userActions[this.pointer];
       if (lastAction && this.isGroupable(action, lastAction)) {
@@ -646,6 +649,12 @@ methods:
     function(boxID) {
       return this.$boxes.find((box) => box._id === boxID);
     }
+  validatePointer: | #js
+    function() {
+      if (this.pointer > (this.userActions.length - 1)) {
+        this.pointer = this.userActions.length - 1;
+      }
+    }
 computed:
   hasRedoActions: | #js
     function() {
@@ -675,7 +684,6 @@ watch:
     handler: | #js
       async function() {
       }
-    deep: true
 _:
   examples:
     count: 0

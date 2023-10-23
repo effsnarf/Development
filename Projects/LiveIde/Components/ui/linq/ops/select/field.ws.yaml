@@ -1,8 +1,9 @@
 dom:
   div:
-    ui.linq.operation.any:
-      ':input': input
-      v-model: operation
+    v-if: operation
+    ui.value.path.picker:
+      ':obj': input
+      v-model: operation.path
 props:
   input: null
   value: null
@@ -22,12 +23,11 @@ watch:
         this.operation = value;
       }
     immediate: true
-style: null
 _:
   examples:
     count: 0
-name: ui-linq-operation
+name: ui-linq-ops-select-field
 template: >-
-  <div class="comp-ui-linq-operation" path="-188258413."><ui-linq-operation-any
-  :input="input" v-model="operation"
-  path="-188258413.0"></ui-linq-operation-any></div>
+  <div class="comp-ui-linq-ops-select-field" v-if="operation"
+  path="1698785176."><ui-value-path-picker :obj="input" v-model="operation.path"
+  path="1698785176.0"></ui-value-path-picker></div>

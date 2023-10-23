@@ -2268,6 +2268,14 @@ class HtmlHelper {
           }
         }, 1000);
       },
+      removed: (element: HTMLElement, callback: Function) => {
+        const intervalId = setInterval(() => {
+          if (!element.isConnected) {
+            callback();
+            clearInterval(intervalId);
+          }
+        }, 1000);
+      },
     },
   };
 

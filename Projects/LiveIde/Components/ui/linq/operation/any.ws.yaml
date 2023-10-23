@@ -14,7 +14,7 @@ data:
 methods:
   getLinqCompName: | #js
     function(type) {
-      return `ui.linq.${type}`.replace(/\./g, "-");
+      return `ui.linq.ops.${type}`.replace(/\./g, "-");
     }
 watch:
   operation:
