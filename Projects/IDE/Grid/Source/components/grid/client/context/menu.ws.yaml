@@ -1,21 +1,21 @@
 dom:
-  ui.context.window:
-    ref: context1
-    ':visible': showContextMenu
-    @pinned: contextIsPinned = $event
-    grid.client.context.create.group:
-      ':selected-boxes': selectedBoxes
-      ':userID': userID
-      ':boxes': $boxes
-      ':links': $links
-      ':context-is-pinned': contextIsPinned
-    div:
-      v-if: canDelete
-      ui.button:
-        icon: ❌🗑️
-        text: delete
-        confirm: Are you sure you want to delete the selected boxes?
-        @click: getUiActions().$femit('delete.selected')
+  grid.module:
+    ui.context.window:
+      ref: context1
+      ':visible': showContextMenu
+      @pinned: contextIsPinned = $event
+      grid.client.context.create.group:
+        ':selected-boxes': selectedBoxes
+        ':userID': userID
+        ':boxes': $boxes
+        ':links': $links
+        ':context-is-pinned': contextIsPinned
+      div:
+        v-if: canDelete
+        ui.button:
+          icon: ❌🗑️
+          text: delete
+          @click: getUiActions().$femit('delete.selected')
 props:
   userID: null
 data:
@@ -25,23 +25,15 @@ data:
   contextIsPinned: false
 mounted: | #js
   function() {
-    // We're binding manually instead of using grid.module because we can't put the context menu inside the grid.module
-    this.$root.$on("grid.event", this.onGridEvent.bind(this));
   }
 methods:
-  onGridEvent: | #js
-    function(compName, eventName, args) {
-      if (["mouse.pos"].includes(eventName)) return;
-      const methodName = `${compName}.${eventName}`.replace(/\./g, "_");
-      const method = this[methodName]?.bind(this);
-      if (method) method(...args);
-    }
   grid_user_action_stack_do: | #js
     async function(action) {
+      await this.$nextTick();
       this.refresh();
     }
   refresh: | #js
-    async function(times = 10) {
+    async function(times = 1) {
       const self = this;
       await self._refresh();
       if (times > 0) setTimeout(() => self.refresh(times - 1), 400);
@@ -73,13 +65,13 @@ _:
     count: 0
 name: grid-client-context-menu
 template: >-
-  <ui-context-window class="comp-grid-client-context-menu" ref="context1"
+  <grid-module class="comp-grid-client-context-menu"
+  path="-1053034279."><ui-context-window ref="context1"
   :visible="showContextMenu" @pinned="contextIsPinned = $event"
-  path="-1053034279."><grid-client-context-create-group
+  path="-1053034279.0"><grid-client-context-create-group
   :selected-boxes="selectedBoxes" :userID="userID" :boxes="$boxes"
   :links="$links" :context-is-pinned="contextIsPinned"
-  path="-1053034279.0"></grid-client-context-create-group><div v-if="canDelete"
-  path="-1053034279.1"><ui-button icon="❌🗑️" text="delete" confirm="Are you
-  sure you want to delete the selected boxes?"
+  path="-1053034279.0.0"></grid-client-context-create-group><div
+  v-if="canDelete" path="-1053034279.0.1"><ui-button icon="❌🗑️" text="delete"
   @click="getUiActions().$femit('delete.selected')"
-  path="-1053034279.1.0"></ui-button></div></ui-context-window>
+  path="-1053034279.0.1.0"></ui-button></div></ui-context-window></grid-module>

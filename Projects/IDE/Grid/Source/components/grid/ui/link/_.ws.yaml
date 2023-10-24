@@ -50,6 +50,7 @@ data:
   normalColor: '#303030'
   highlightedColor: cyan
   dimmedColor: '#202020'
+  hasFuncColor: '#212947'
   leaderLineColor: '#303030'
   isHighlighted: false
   isLoading: 0
@@ -135,12 +136,14 @@ methods:
       this.leaderLineColor = false ? null :
         this.isHighlighted ? this.highlightedColor :
         this.isDimmed ? this.dimmedColor :
+        this.hasFunc ? this.hasFuncColor :
         this.normalColor;
     }
   refresh: | #js
     function(again = 10) {
       this.fromEl = this.getFromEl();
       this.toEl = this.getToEl();
+      this.setColor();
       if (again) setTimeout(this.refresh.bind(this, again - 1), 400);
     }
 computed:
@@ -153,7 +156,15 @@ computed:
       if (this.link.is.grouped) return false;
       return this.link.is.visible;
     }
+  hasFunc: | #js
+    function() {
+      return !!this.link?.func;
+    }
 watch:
+  link: | #js
+    function() {
+      this.refresh();
+    }
   isHighlighted: | #js
     function(isHighlighted) {
       this.setColor();
@@ -183,7 +194,7 @@ style:
     max-height: 0em
     overflow: hidden
     opacity: 0
-    transition: 2s
+    transition: 1s
   .leader-line-middle .box1:hover .content:
     max-width: 20em
     max-height: 20em
@@ -202,9 +213,9 @@ style:
     border-radius: 1em
     opacity: 0.4
   .leader-line-middle .box1:hover:
-    opacity: 0.7
+    opacity: 0.7 !important
   .leader-line-middle .box1.has-func:
-    opacity: 1
+    opacity: 0
 _:
   examples:
     count: 0

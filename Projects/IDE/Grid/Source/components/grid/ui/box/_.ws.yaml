@@ -14,6 +14,7 @@ dom:
       ':show-header': '!!box.type'
       @is-hovered: onWindowHovered
       @is-minimized: onToggleMinimized
+      @drag: onDrag
       @drag-stop: onDragStop
       @click: onBoxWindowClick
       template: 
@@ -34,6 +35,8 @@ dom:
       template: 
         v-slot: content
         .h-100pc:
+          ui.dnd.dropzone:
+            @drop-item: onDropItemOnWindow
           transition:
             name: slide2
             component: 
@@ -156,6 +159,10 @@ methods:
     function(isHovered) {
       this.$femit("hovered", this.box, isHovered);
     }
+  onDropItemOnWindow: | #js
+    function(dragItem) {
+      this.$femit("drop.item", this.box, dragItem);
+    }
   onTitleIconClick: | #js
     function() {
       this.$femit("execute", this.box._id);
@@ -252,6 +259,19 @@ methods:
     function(isMinimized) {
       this.$femit("edit.box", this.box._id, { rect: { is: { minimized: isMinimized } } });
     }
+  grid_ui_box_drag_box: | #js
+    function(boxID, e) {
+      // When dragging selected boxes, we want to move all of them
+      if (boxID == this.box._id) return;
+      if (this.box.is?.selected) {
+        this.boxRect.pos.x += e.delta.dx;
+        this.boxRect.pos.y += e.delta.dy;
+      }
+    }
+  onDrag: | #js
+    function(e) {
+      this.$femit("drag.box", this.box._id, e);
+    }
   onDragStop: | #js
     function(rect, dragType) {
       if (dragType === "resize")
@@ -260,7 +280,15 @@ methods:
       }
       else
       {
-        this.$femit("move.box", this.box._id, rect.pos);
+        if (this.box.is?.selected) {
+          const otherSelectedBoxIDs = this.$boxes
+            .filter(b => b.is?.selected)
+            .map(b => b._id)
+            .except(this.box._id);
+          this.$femit("move.boxes", this.box._id, otherSelectedBoxIDs, rect.pos);
+        } else {
+          this.$femit("move.box", this.box._id, rect.pos);
+        }
       }
     }
   getGradientBackground: | #js
@@ -397,7 +425,7 @@ template: >-
   :css-class="windowCssClass" :window-style="windowStyle" :rect="boxRect"
   :surface-element="surfaceElement" :surface-camera="surfaceCamera"
   :center-coords="true" :show-header="!!box.type" @is-hovered="onWindowHovered"
-  @is-minimized="onToggleMinimized" @drag-stop="onDragStop"
+  @is-minimized="onToggleMinimized" @drag="onDrag" @drag-stop="onDragStop"
   @click="onBoxWindowClick" path="1671629593.0"><template v-slot:above
   path="1671629593.0.0"><grid-ui-box-sockets :box="box" direction="input"
   path="1671629593.0.0.0"></grid-ui-box-sockets></template><template
@@ -407,13 +435,14 @@ template: >-
   @title-icon-click="onTitleIconClick"
   path="1671629593.0.1.0.0"></grid-ui-box-header></div></template><template
   v-slot:content path="1671629593.0.2"><div class="h-100pc"
-  path="1671629593.0.2.0"><transition name="slide2"
-  path="1671629593.0.2.0.0"><component class="h-100pc" v-if="box.type"
+  path="1671629593.0.2.0"><ui-dnd-dropzone @drop-item="onDropItemOnWindow"
+  path="1671629593.0.2.0.0"></ui-dnd-dropzone><transition name="slide2"
+  path="1671629593.0.2.0.1"><component class="h-100pc" v-if="box.type"
   ref="boxComp1" :is="getBoxCompName(box)" :userID="userID" :box="box"
   @box-event="onContentBoxEvent"
-  path="1671629593.0.2.0.0.0"></component><grid-ui-box-type-picker
+  path="1671629593.0.2.0.1.0"></component><grid-ui-box-type-picker
   v-if="!box.type" :box="box"
-  path="1671629593.0.2.0.0.1"></grid-ui-box-type-picker></transition></div></template><template
+  path="1671629593.0.2.0.1.1"></grid-ui-box-type-picker></transition></div></template><template
   v-slot:left-side path="1671629593.0.3"><div class="mr-l1"
   path="1671629593.0.3.0"><ui-drawer v-if="hasLeftSideComp(boxType)"
   path="1671629593.0.3.0.0"><component ref="leftSideComp1"

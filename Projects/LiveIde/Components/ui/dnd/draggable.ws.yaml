@@ -5,7 +5,11 @@ dom:
     draggable: true
     @dragstart: onDragStart
     @dragend: onDragEnd
+    @mousemove: onDrag
     @drag: onDrag
+    ui.mouse:
+      ':global': true
+      @move: onDrag
     slot: null
 props:
   dragItem: null
@@ -13,6 +17,9 @@ props:
 data:
   dragElementPos: null
   isDragging: false
+  lastPos:
+    x: null
+    'y': null
 methods:
   onDragStart: | #js
     function(e) {
@@ -39,13 +46,17 @@ methods:
     }
   onDrag: | #js
     function(e) {
-      if (!this.__onDrag) this.__onDrag = this._onDrag.throttle(this, 100);
+      if (!this.__onDrag) this.__onDrag = this._onDrag.throttle(this, 50);
       this.__onDrag(e);
     }
   _onDrag: | #js
     function(e) {
+      const { x, y } = { x: e.clientX, y: e.clientY };
+      if (Objects.areEqual(this.lastPos, { x, y })) return;
+      this.lastPos = { x, y };
       const dep = this.dragElementPos;
-      const relativePos = { x: (e.clientX - dep.x), y: (e.clientY - dep.y) };
+      if (!dep) return;
+      const relativePos = { x: (x - dep.x), y: (y - dep.y) };
       const data = {
         e,
         relative: {
@@ -64,4 +75,5 @@ name: ui-dnd-draggable
 template: >-
   <div class="comp-ui-dnd-draggable" ref="dragElement1" :class="{ draggable:
   true }" draggable="true" @dragstart="onDragStart" @dragend="onDragEnd"
-  @drag="onDrag" path="-26676257."><slot></slot></div>
+  @mousemove="onDrag" @drag="onDrag" path="-26676257."><ui-mouse :global="true"
+  @move="onDrag" path="-26676257.0"></ui-mouse><slot></slot></div>

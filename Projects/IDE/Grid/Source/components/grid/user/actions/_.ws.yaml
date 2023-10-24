@@ -60,6 +60,11 @@ methods:
       const action = { redo: { method: "move.box", args: [boxID, pos] } };
       this.$femit("do", this.userID, action);
     }
+  grid_ui_box_move_boxes: | #js
+    async function(boxID, otherBoxIDs, pos) {
+      const action = { redo: { method: "move.boxes", args: [boxID, otherBoxIDs, pos] } };
+      this.$femit("do", this.userID, action);
+    }
   grid_ui_box_resize_box: | #js
     async function(boxID, size) {
       const action = { redo: { method: "resize.box", args: [boxID, size] } };

@@ -1,19 +1,24 @@
 dom:
   div: 
-    .box1:
-      div: 
-        v-for: (operation, index) in operations
-        .flex.items-center.gap-1.show-on-hover-container:
-          ui.linq.operation:
-            ':input': datas[index]
-            ':value': operation
-            @input: (operation) => $set(operations, index, operation)
-          .show-on-hover.hor:
-            ui.button:
-              ':icon': 'isConfirmed[index] ? ''❌'' : ''✖'''
-              @click: onClickDelete(index)
-        .next:
-          v-text: '''↓'''
+    .operations.box1:
+      transition.group:
+        name: slide
+        div: 
+          v-for: (operation, index) in operations
+          ':key': operation._id
+          div: 
+            .show-on-hover-container:
+              .operation:
+                ui.linq.operation:
+                  ':input': datas[index]
+                  ':value': operation
+                  @input: (operation) => $set(operations, index, operation)
+                .delete-button.show-on-hover-2:
+                  ui.button:
+                    ':icon': 'isConfirmed[index] ? ''❌'' : ''✖'''
+                    @click: onClickDelete(index)
+            .next:
+              v-text: '''↓'''
       div: 
         .show-on-hover-container:
           div: 
@@ -46,6 +51,7 @@ methods:
     }
   addOperation: | #js
     function(operation) {
+      if (!operation._id) operation._id = (this.operations.length + 1);
       this.operations.add(operation);
     }
 watch:
@@ -70,6 +76,18 @@ watch:
       }
     immediate: true
 style:
+  .operations.box1: null
+  .operation:
+    display: flex
+    justify-items: center
+    gap: 1em
+    width: fit-content
+    margin: auto
+    animation: slide-in-y 0.6s ease-in-out
+  .delete-button:
+    max-width: 0
+  .show-on-hover-container:hover .delete-button:
+    max-width: 5em
   .value-preview:
     display: flex
     justify-content: center
@@ -91,17 +109,20 @@ _:
     count: 0
 name: ui-linq
 template: >-
-  <div class="comp-ui-linq" path="-484387046."><div class="box1"
-  path="-484387046.0"><div v-for="(operation, index) in operations"
-  path="-484387046.0.0"><div class="flex items-center gap-1
-  show-on-hover-container" path="-484387046.0.0.0"><ui-linq-operation
+  <div class="comp-ui-linq" path="-484387046."><div class="operations box1"
+  path="-484387046.0"><transition-group name="slide" path="-484387046.0.0"><div
+  v-for="(operation, index) in operations" :key="operation._id"
+  path="-484387046.0.0.0"><div path="-484387046.0.0.0.0"><div
+  class="show-on-hover-container" path="-484387046.0.0.0.0.0"><div
+  class="operation" path="-484387046.0.0.0.0.0.0"><ui-linq-operation
   :input="datas[index]" :value="operation" @input="(operation) =&gt;
   $set(operations, index, operation)"
-  path="-484387046.0.0.0.0"></ui-linq-operation><div class="show-on-hover hor"
-  path="-484387046.0.0.0.1"><ui-button :icon="isConfirmed[index] ? '❌' : '✖'"
-  @click="onClickDelete(index)"
-  path="-484387046.0.0.0.1.0"></ui-button></div></div><div class="next"
-  v-text="'↓'" path="-484387046.0.0.1"></div></div><div
+  path="-484387046.0.0.0.0.0.0.0"></ui-linq-operation><div class="delete-button
+  show-on-hover-2" path="-484387046.0.0.0.0.0.0.1"><ui-button
+  :icon="isConfirmed[index] ? '❌' : '✖'" @click="onClickDelete(index)"
+  path="-484387046.0.0.0.0.0.0.1.0"></ui-button></div></div></div><div
+  class="next" v-text="'↓'"
+  path="-484387046.0.0.0.0.1"></div></div></div></transition-group><div
   path="-484387046.0.1"><div class="show-on-hover-container"
   path="-484387046.0.1.0"><div path="-484387046.0.1.0.0"><div
   class="text-center" v-text="'➕'" path="-484387046.0.1.0.0.0"></div></div><div

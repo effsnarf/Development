@@ -46,7 +46,7 @@ style:
     aspect-ratio: 6 / 5
     float: left
     margin: 0 1em 1em 0
-    background-image: url(/images/cat2.png)
+    background-image: url(/images/cat.png)
     background-size: contain
     background-repeat: no-repeat
   .texts:

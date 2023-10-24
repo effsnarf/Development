@@ -2,7 +2,8 @@ dom:
   grid.module:
     icon: 🧊📃
     ui.dnd.dropzone:
-      @drop-item: onSurfaceDropItem
+      class: surface-dropzone
+      @drop-item: onDropItemOnSurface
       .flex:
         div:
           ':key': surfaceKey
@@ -104,7 +105,7 @@ methods:
       const y = (minY + maxY) / 2;
       return { x, y };
     }
-  onSurfaceDropItem: | #js
+  onDropItemOnSurface: | #js
     function(dragItem) {
       this.$femit("drop.item", dragItem);
     }
@@ -183,6 +184,8 @@ computed:
       return this.$refs.surface1;
     }
 style:
+  .surface-dropzone.drag-over:
+    border: none
   .surface.has-hovered-box .comp-ui-window:
     opacity: 0.3 !important
     filter: grayscale(1)
@@ -194,6 +197,9 @@ style:
     overflow: hidden
     border: 1px solid gray
     cursor: crosshair
+    background: url(/images/wood.png)
+    background-position: center
+    background-color: black
   .close-button:
     position: absolute
     top: 0
@@ -205,15 +211,15 @@ _:
 name: grid-client-surface
 template: >-
   <grid-module class="comp-grid-client-surface" icon="🧊📃"
-  path="-515125966."><ui-dnd-dropzone @drop-item="onSurfaceDropItem"
-  path="-515125966.0"><div class="flex" path="-515125966.0.0"><div
-  class="surface flex-grow-1" :key="surfaceKey" ref="surface1"
-  :class="surfaceClass" :style="surfaceStyle" @wheel="onWheelSurface"
-  path="-515125966.0.0.0"><ui-button class="close-button"
-  v-if="options.groupBoxID" icon="✖" @click="$emit('close')"
-  path="-515125966.0.0.0.0"></ui-button><grid-ui-box v-for="box in visibleBoxes"
-  :key="'box/' + box._id" :userID="userID" :box="box"
-  :surface-element="surfaceElement" :surface-camera="surfaceCamera"
+  path="-515125966."><ui-dnd-dropzone class="surface-dropzone"
+  @drop-item="onDropItemOnSurface" path="-515125966.0"><div class="flex"
+  path="-515125966.0.0"><div class="surface flex-grow-1" :key="surfaceKey"
+  ref="surface1" :class="surfaceClass" :style="surfaceStyle"
+  @wheel="onWheelSurface" path="-515125966.0.0.0"><ui-button
+  class="close-button" v-if="options.groupBoxID" icon="✖"
+  @click="$emit('close')" path="-515125966.0.0.0.0"></ui-button><grid-ui-box
+  v-for="box in visibleBoxes" :key="'box/' + box._id" :userID="userID"
+  :box="box" :surface-element="surfaceElement" :surface-camera="surfaceCamera"
   :surfaceGroupBoxID="options.groupBoxID"
   path="-515125966.0.0.0.1"></grid-ui-box><grid-ui-link v-for="link in
   visibleLinks" :key="'link/' + link._id" :link="link"

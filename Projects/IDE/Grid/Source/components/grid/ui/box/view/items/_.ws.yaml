@@ -12,7 +12,7 @@ dom:
       div: 
         div: 
           class: item
-          v-for: (item, index) in items?.take(100)
+          v-for: (item, index) in items?.take(10)
           ':key': getItemKey(item)
           @mouseenter: onItemHover(item)
           @mouseleave: onItemHover(null)
@@ -40,7 +40,6 @@ data:
   iteratorBox: null
   hoveredItem: null
   selectedItem: null
-  isDirty: 0
 mounted: | #js
   async function() {
     await this.$nextTick();
@@ -109,7 +108,7 @@ methods:
       const customData = {};
       customData.input = {};
       const dataSocket = this.getIteratorDataSocket(this.box);
-      customData.input[dataSocket._id] = item;
+      if (dataSocket) customData.input[dataSocket._id] = item;
       return customData;
     }
   getIteratorDataSocket: | #js
@@ -150,21 +149,11 @@ methods:
     }
   refresh: | #js
     function() {
-      this.isDirty++;
-    }
-  _refresh: | #js
-    async function() {
-      const stagger = 0.5;
       this.iteratorBox = this.getIteratorBox(this.box);
       this.items = this.getItems();
     }
 computed: null
 watch:
-  items:
-    handler: | #js
-      function(items) {
-        this.refresh();
-      }
   hoveredItem:
     handler: | #js
       function(hoveredItem) {
@@ -179,15 +168,6 @@ watch:
         const gridUiBoxVue = this.$root.vm.getAncestors(this, "grid.ui.box")[0];
         const selectedItemSocket = this.box.sockets.output.find(s => s.name == "selected item");
         gridUiBoxVue.$femit("socket.value.change", this.box._id, "output", selectedItemSocket._id, selectedItem);
-      }
-  isDirty:
-    handler: | #js
-      async function(isDirty) {
-        await this.$nextTick();
-        if (!isDirty) return;
-        this._refresh();
-        await this.$nextTick();
-        this.isDirty = 0;
       }
 style:
   .item:
@@ -209,7 +189,7 @@ template: >-
   path="2102270252.0.0.0"><ui-title icon="❗" text="connect items data socket"
   path="2102270252.0.0.0.0"></ui-title></div></div><div
   path="2102270252.0.1"><div class="item" v-for="(item, index) in
-  items?.take(100)" :key="getItemKey(item)" @mouseenter="onItemHover(item)"
+  items?.take(10)" :key="getItemKey(item)" @mouseenter="onItemHover(item)"
   @mouseleave="onItemHover(null)" @click="onItemClick(item)"
   path="2102270252.0.1.0"><div v-if="!iteratorBox" path="2102270252.0.1.0.0"><h3
   path="2102270252.0.1.0.0.0"><ui-title text="item"

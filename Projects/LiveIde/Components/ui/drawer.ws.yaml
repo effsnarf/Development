@@ -14,12 +14,12 @@ style:
     max-height: 10em
     max-width: 5em
     overflow: hidden
-    transition: 1s
+    transition: 2s
     filter: grayscale(1) blur(0.1em)
     opacity: 0.5
   .drawer.open, .drawer:hover, .drawer.hovered:
     max-height: 60em
-    max-width: 20em
+    max-width: 60em
     filter: none
     opacity: 1
 _:

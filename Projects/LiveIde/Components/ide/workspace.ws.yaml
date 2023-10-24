@@ -35,7 +35,7 @@ dom:
         ui.value:
           ':value': perfStats
       div: 
-        v-if: 'false'
+        v-if: 'true'
         ide.component.picker:
           v-if: (selectedEditor == 'component')
         ide.element.picker:
@@ -86,7 +86,7 @@ name: ide-workspace
 style:
   .comp-ide-workspace:
     position: fixed
-    right: 1rem
+    left: 1rem
     bottom: 1rem
     display: flex
     flex-direction: column
@@ -122,7 +122,7 @@ template: >-
   path="-1163457967.0.1.0"></ui-title></div><ide-debug></ide-debug><div
   class="clickable" @click="refresh" path="-1163457967.0.3"><h2
   v-text="'Performance'" path="-1163457967.0.3.0"></h2><ui-value
-  :value="perfStats" path="-1163457967.0.3.1"></ui-value></div><div v-if="false"
+  :value="perfStats" path="-1163457967.0.3.1"></ui-value></div><div v-if="true"
   path="-1163457967.0.4"><ide-component-picker v-if="(selectedEditor ==
   'component')"
   path="-1163457967.0.4.0"></ide-component-picker><ide-element-picker

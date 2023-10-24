@@ -110,10 +110,11 @@ methods:
       if (!element) return setTimeout(this.bindToParent.bind(this), 100);
       this._onMouseEnterContext = this.onMouseEnterContext.bind(this);
       this._onMouseLeaveContext = this.onMouseLeaveContext.bind(this);
-      element.addEventListener("pointerenter", this._onMouseEnterContext);
-      element.addEventListener("pointerleave", this._onMouseLeaveContext);
+      element.addEventListener("mouseenter", this._onMouseEnterContext);
+      element.addEventListener("mouseleave", this._onMouseLeaveContext);
       element.addEventListener("dragenter", this._onMouseEnterContext);
       element.addEventListener("dragleave", this._onMouseLeaveContext);
+      element.addEventListener("drop", this._onMouseLeaveContext);
       this.$root.html.when.element.removed(element, this.unbindFromParent.bind(this));
       this.$root.$emit("context-menu-mounted", this);
       document.body.appendChild(this.$el);
@@ -122,10 +123,11 @@ methods:
     function() {
       const element = (this.global ? window : this._getContextElement());
       if (!element) return;
-      element.removeEventListener("pointerenter", this._onMouseEnterContext);
-      element.removeEventListener("pointerleave", this._onMouseLeaveContext);
+      element.removeEventListener("mouseenter", this._onMouseEnterContext);
+      element.removeEventListener("mouseleave", this._onMouseLeaveContext);
       element.removeEventListener("dragenter", this._onMouseEnterContext);
       element.removeEventListener("dragleave", this._onMouseLeaveContext);
+      element.removeEventListener("drop", this._onMouseLeaveContext);
       this.$root.$emit("context-menu-unmounted", this);
       this.$el.remove();
     }

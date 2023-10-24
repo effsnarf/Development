@@ -776,6 +776,7 @@ if (typeof String !== "undefined") {
   };
 
   String.prototype.pluralize = function (): string {
+    if (this.endsWith("x")) return this + "es";
     if (this.endsWith("ay")) return this + "s";
     if (this.endsWith("y")) return this.slice(0, -1) + "ies";
     if (this.endsWith("s")) return this.toString();

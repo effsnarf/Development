@@ -12,16 +12,12 @@ methods:
   onDragOver: | #js
     function(e) {
       e.preventDefault();
-      if (!this.__onDragOver) this.__onDragOver = this._onDragOver.throttle(this, 100);
-      this.__onDragOver(e);
-    }
-  _onDragOver: | #js
-    function(e) {
       this.$el.classList.add('drag-over');
     }
   onDragEnter: | #js
     function(e) {
       e.preventDefault();
+      this.$el.classList.add('drag-over');
       this.$emit('drag-over', true);
     }
   onDragLeave: | #js

@@ -22,6 +22,7 @@ dom:
               v-model: socketIsExported
           div: 
             ui.context.window: 
+              v-if: showSocketValueContextWindow
               div: 
                 h3: 
                   .flex:
@@ -38,7 +39,7 @@ dom:
                   ui.value:
                     v-if: showSocketValueContextWindow
                     ':value': socketValue
-            ui.title:
+            ui.title: 
               ':icon': getSocketIcon(socket)
               ':text': socket.name
     ui.leader.line:
@@ -48,12 +49,14 @@ dom:
       ':to': targetPlugEl
       line-path: fluid
       color: '#404040'
-    div:
+    div: 
       v-show: isNewLinkDragging
       ref: targetPlug1
       ':style': targetPlugStyle
-      ui.value.preview:
-        ':value': socketValue
+      div: 
+        ui.title: 
+          ':icon': getSocketIcon(socket)
+          ':text': socketName
 props:
   box: null
   socket: null
@@ -64,6 +67,7 @@ data:
   socketEl: null
   targetPlugEl: null
   targetPlugPos: null
+  targetPlugSmoothPos: null
   isNewLinkDragging: false
   ghostBox: null
   linkToNewBox: null
@@ -97,6 +101,8 @@ mounted: | #js
         output: [ ],
       },
     };
+
+    this.targetPlugPosSmoother = new MovingPositionSmoother((value) => this.targetPlugSmoothPos = value);
   }
 unmounted: | #js
   function() {
@@ -215,6 +221,16 @@ methods:
 
       this.linkToNewBox = newBox;
     }
+  grid_ui_box_drop_item: | #js
+    function(box, linkSource) {
+      if (box._id != this.box._id) return;
+      if (this.direction != 'input') return;
+      if (box.sockets.input.length != 1) {
+        alertify.error('Drop on a specific input socket.');
+        return;
+      }
+      this.onNewLinkDrop(linkSource);
+    }
   getSocketIcon: | #js
     function(socket) {
       return {
@@ -250,7 +266,7 @@ methods:
 
       newBox.sockets.input.add({ _id: 1, type: "data", name: "" });
 
-      const { x, y } = this.targetPlugPos;
+      const { x, y } = (this.targetPlugSmoothPos || this.targetPlugPos);
       let pos = { x, y };
       // Translate targetPlugPos, which is relative to the window, to be relative to the surface
       pos = { x: (x - surfaceRect.left), y: (y - surfaceRect.top) };
@@ -306,8 +322,7 @@ computed:
   targetPlugStyle: | #js
     function() {
       if (!this.targetPlugPos) return null;
-      const x = (this.targetPlugPos.x);
-      const y = (this.targetPlugPos.y);
+      const { x, y } = (this.targetPlugPos);
       const style = {
         position: 'fixed',
         left: `0px`,
@@ -328,6 +343,10 @@ computed:
       return false;
     }
 watch:
+  targetPlugPos: | #js
+    function(targetPlugPos) {
+      //this.targetPlugPosSmoother.setTarget(targetPlugPos);
+    }
   socket:
     handler: | #js
       function(socket) {
@@ -380,7 +399,8 @@ template: >-
   path="-321995800.0.0.0.0.0.0.0"></h3></div></ui-context-window><ui-checkbox
   v-model="socketIsExported"
   path="-321995800.0.0.0.0.1"></ui-checkbox></div><div
-  path="-321995800.0.0.0.1"><ui-context-window path="-321995800.0.0.0.1.0"><div
+  path="-321995800.0.0.0.1"><ui-context-window
+  v-if="showSocketValueContextWindow" path="-321995800.0.0.0.1.0"><div
   path="-321995800.0.0.0.1.0.0"><h3 path="-321995800.0.0.0.1.0.0.0"><div
   class="flex" path="-321995800.0.0.0.1.0.0.0.0"><div
   v-text="getSocketIcon(socket)"
@@ -397,5 +417,6 @@ template: >-
   v-if="isNewLinkDragging" ref="leaderLine1" :from="socketEl" :to="targetPlugEl"
   line-path="fluid" color="#404040" path="-321995800.1"></ui-leader-line><div
   v-show="isNewLinkDragging" ref="targetPlug1" :style="targetPlugStyle"
-  path="-321995800.2"><ui-value-preview :value="socketValue"
-  path="-321995800.2.0"></ui-value-preview></div></grid-module>
+  path="-321995800.2"><div path="-321995800.2.0"><ui-title
+  :icon="getSocketIcon(socket)" :text="socketName"
+  path="-321995800.2.0.0"></ui-title></div></div></grid-module>

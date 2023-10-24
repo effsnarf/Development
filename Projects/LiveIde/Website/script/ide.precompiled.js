@@ -4666,6 +4666,8 @@ if (typeof String !== "undefined") {
         return this.toString();
     };
     String.prototype.pluralize = function () {
+        if (this.endsWith("x"))
+            return this + "es";
         if (this.endsWith("ay"))
             return this + "s";
         if (this.endsWith("y"))
@@ -6063,7 +6065,7 @@ var __webpack_exports__ = {};
 (() => {
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/website/script/1698073970711.ts ***!
+  !*** ../../../LiveIde/website/script/1698154657194.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

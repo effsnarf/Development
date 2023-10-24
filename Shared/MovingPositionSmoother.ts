@@ -1,62 +1,106 @@
 type Point = { x: number; y: number };
 
+const areEqual = (a: Point, b: Point) => {
+  if (!a && !b) return true;
+  if (!a || !b) return false;
+  return a.x === b.x && a.y === b.y;
+};
+
 class MovingPositionSmoother {
-  private targetValue: Point;
-  private smoothValue: Point;
-  private smoothingFactor: number;
-  private updateFunction: (smoothedValue: Point, deltaValue: Point) => void;
+  private target!: Point;
+  private smooth!: Point;
+  private nextSteps: Point[] = [];
+  private isAnimating = false;
   private animationFrameId: number | null = null;
 
   constructor(
-    initialValue: Point,
-    smoothingFactor: number,
-    updateFunction: (smoothedValue: Point, deltaValue: Point) => void
-  ) {
-    this.targetValue = { x: initialValue.x, y: initialValue.y };
-    this.smoothValue = { x: initialValue.x, y: initialValue.y };
-    this.smoothingFactor = smoothingFactor;
-    this.updateFunction = updateFunction;
-    this.animateInertia();
+    private onSmoothPosChanged: (smooth: Point, delta: Point) => void
+  ) {}
+
+  getNextSteps() {
+    if (!this.target) return [];
+
+    const numSteps = 10; // Number of steps to calculate
+    const steps: any[] = [];
+
+    if (this.nextSteps.length > (numSteps - 1) * 2) return [];
+
+    if (areEqual(this.smooth, this.target)) {
+      return steps; // No need to calculate steps if already at the target
+    }
+
+    // Calculate the step size for both x and y directions
+    const stepX = (this.target.x - this.smooth.x) / numSteps;
+    const stepY = (this.target.y - this.smooth.y) / numSteps;
+
+    // Generate the next steps
+    for (let i = 0; i < numSteps; i++) {
+      const nextStep = {
+        x: this.smooth.x + stepX,
+        y: this.smooth.y + stepY,
+      };
+      steps.push(nextStep);
+
+      // Update the smooth position for the next iteration
+      this.smooth = nextStep;
+    }
+
+    return steps;
   }
 
   private animateInertia() {
-    // Calculate the difference between the target and smooth values
-    const dx = this.targetValue.x - this.smoothValue.x;
-    const dy = this.targetValue.y - this.smoothValue.y;
+    if (this.isAnimating) return false;
+    this.isAnimating = true;
+    this.nextAnimationStep();
+  }
 
-    const delta = { x: dx, y: dy };
+  private animateInertiaStep() {
+    if (!this.isAnimating) return;
 
-    // Check if the smooth value has moved significantly
-    if (Math.abs(dx) > 0.001 || Math.abs(dy) > 0.001) {
-      // Update the velocity based on the change in values
-      const velocityX = dx * this.smoothingFactor;
-      const velocityY = dy * this.smoothingFactor;
+    // Get the next step and calculate the delta
+    const nextStep = this.nextSteps.shift();
 
-      // Update the smooth value with the velocity
-      this.smoothValue.x += velocityX;
-      this.smoothValue.y += velocityY;
+    if (nextStep) {
+      const delta = {
+        x: nextStep.x - this.smooth.x,
+        y: nextStep.y - this.smooth.y,
+      };
 
-      // Call the update function with the smoothed value
-      if (typeof this.updateFunction === "function") {
-        this.updateFunction(this.smoothValue, delta);
+      // Call onSmoothPosChanged with the next step and delta
+      this.onSmoothPosChanged(nextStep, delta);
+    }
+
+    // Check if there are more steps
+    if (this.nextSteps.length > 0) {
+      // Schedule another animation frame
+      this.nextAnimationStep();
+    } else {
+      // If no more steps but smooth is not at the target, continue animation
+      if (!areEqual(this.smooth, this.target)) {
+        this.calculateNextSteps();
+        this.nextAnimationStep();
+      } else {
+        // Animation is complete
+        this.isAnimating = false;
       }
     }
-
-    // Continue animating inertia
-    this.animationFrameId = requestAnimationFrame(() => this.animateInertia());
   }
 
-  updateThrottled(newValue: Point) {
-    // Update the target value with the new input
-    this.targetValue.x = newValue.x;
-    this.targetValue.y = newValue.y;
+  private nextAnimationStep() {
+    requestAnimationFrame(this.animateInertiaStep.bind(this));
   }
 
-  destroy() {
-    // Stop the inertia animation when the object is destroyed
-    if (this.animationFrameId !== null) {
-      cancelAnimationFrame(this.animationFrameId);
-    }
+  private calculateNextSteps() {
+    if (areEqual(this.smooth, this.target)) return false;
+    this.nextSteps.push(...this.getNextSteps());
+    return true;
+  }
+
+  setTarget(newTarget: Point) {
+    this.target = newTarget;
+    if (!this.smooth) this.smooth = newTarget;
+    this.calculateNextSteps();
+    this.animateInertia();
   }
 }
 

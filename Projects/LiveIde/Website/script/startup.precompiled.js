@@ -5708,6 +5708,8 @@ if (typeof String !== "undefined") {
         return this.toString();
     };
     String.prototype.pluralize = function () {
+        if (this.endsWith("x"))
+            return this + "es";
         if (this.endsWith("ay"))
             return this + "s";
         if (this.endsWith("y"))
@@ -6648,50 +6650,99 @@ exports.Lock = Lock;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.MovingPositionSmoother = void 0;
+const areEqual = (a, b) => {
+    if (!a && !b)
+        return true;
+    if (!a || !b)
+        return false;
+    return a.x === b.x && a.y === b.y;
+};
 class MovingPositionSmoother {
-    targetValue;
-    smoothValue;
-    smoothingFactor;
-    updateFunction;
+    onSmoothPosChanged;
+    target;
+    smooth;
+    nextSteps = [];
+    isAnimating = false;
     animationFrameId = null;
-    constructor(initialValue, smoothingFactor, updateFunction) {
-        this.targetValue = { x: initialValue.x, y: initialValue.y };
-        this.smoothValue = { x: initialValue.x, y: initialValue.y };
-        this.smoothingFactor = smoothingFactor;
-        this.updateFunction = updateFunction;
-        this.animateInertia();
+    constructor(onSmoothPosChanged) {
+        this.onSmoothPosChanged = onSmoothPosChanged;
+    }
+    getNextSteps() {
+        if (!this.target)
+            return [];
+        const numSteps = 10; // Number of steps to calculate
+        const steps = [];
+        if (this.nextSteps.length > (numSteps - 1) * 2)
+            return [];
+        if (areEqual(this.smooth, this.target)) {
+            return steps; // No need to calculate steps if already at the target
+        }
+        // Calculate the step size for both x and y directions
+        const stepX = (this.target.x - this.smooth.x) / numSteps;
+        const stepY = (this.target.y - this.smooth.y) / numSteps;
+        // Generate the next steps
+        for (let i = 0; i < numSteps; i++) {
+            const nextStep = {
+                x: this.smooth.x + stepX,
+                y: this.smooth.y + stepY,
+            };
+            steps.push(nextStep);
+            // Update the smooth position for the next iteration
+            this.smooth = nextStep;
+        }
+        return steps;
     }
     animateInertia() {
-        // Calculate the difference between the target and smooth values
-        const dx = this.targetValue.x - this.smoothValue.x;
-        const dy = this.targetValue.y - this.smoothValue.y;
-        const delta = { x: dx, y: dy };
-        // Check if the smooth value has moved significantly
-        if (Math.abs(dx) > 0.001 || Math.abs(dy) > 0.001) {
-            // Update the velocity based on the change in values
-            const velocityX = dx * this.smoothingFactor;
-            const velocityY = dy * this.smoothingFactor;
-            // Update the smooth value with the velocity
-            this.smoothValue.x += velocityX;
-            this.smoothValue.y += velocityY;
-            // Call the update function with the smoothed value
-            if (typeof this.updateFunction === "function") {
-                this.updateFunction(this.smoothValue, delta);
+        if (this.isAnimating)
+            return false;
+        this.isAnimating = true;
+        this.nextAnimationStep();
+    }
+    animateInertiaStep() {
+        if (!this.isAnimating)
+            return;
+        // Get the next step and calculate the delta
+        const nextStep = this.nextSteps.shift();
+        if (nextStep) {
+            const delta = {
+                x: nextStep.x - this.smooth.x,
+                y: nextStep.y - this.smooth.y,
+            };
+            // Call onSmoothPosChanged with the next step and delta
+            this.onSmoothPosChanged(nextStep, delta);
+        }
+        // Check if there are more steps
+        if (this.nextSteps.length > 0) {
+            // Schedule another animation frame
+            this.nextAnimationStep();
+        }
+        else {
+            // If no more steps but smooth is not at the target, continue animation
+            if (!areEqual(this.smooth, this.target)) {
+                this.calculateNextSteps();
+                this.nextAnimationStep();
+            }
+            else {
+                // Animation is complete
+                this.isAnimating = false;
             }
         }
-        // Continue animating inertia
-        this.animationFrameId = requestAnimationFrame(() => this.animateInertia());
     }
-    updateThrottled(newValue) {
-        // Update the target value with the new input
-        this.targetValue.x = newValue.x;
-        this.targetValue.y = newValue.y;
+    nextAnimationStep() {
+        requestAnimationFrame(this.animateInertiaStep.bind(this));
     }
-    destroy() {
-        // Stop the inertia animation when the object is destroyed
-        if (this.animationFrameId !== null) {
-            cancelAnimationFrame(this.animationFrameId);
-        }
+    calculateNextSteps() {
+        if (areEqual(this.smooth, this.target))
+            return false;
+        this.nextSteps.push(...this.getNextSteps());
+        return true;
+    }
+    setTarget(newTarget) {
+        this.target = newTarget;
+        if (!this.smooth)
+            this.smooth = newTarget;
+        this.calculateNextSteps();
+        this.animateInertia();
     }
 }
 exports.MovingPositionSmoother = MovingPositionSmoother;
@@ -7639,7 +7690,7 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/website/script/1698073971306.ts ***!
+  !*** ../../../LiveIde/website/script/1698154658027.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

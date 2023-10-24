@@ -132,9 +132,11 @@ methods:
       }
       this.isDraggingMoving = true;
       const pos = this.rect1.pos;
+      dpos.dy = -dpos.dy;
       pos.x += dpos.dx;
-      pos.y -= dpos.dy;
+      pos.y += dpos.dy;
       this.rect1.pos = pos;
+      this.$emit("drag", { delta: dpos });
       clearTimeout(this.dragTimeout);
       this.dragTimeout = setTimeout(() => {
         this.isDraggingMoving = false;
@@ -221,23 +223,23 @@ computed:
       const pos = rect1.pos;
       const size = rect1.size;
       const style = {};
-      style.position = "fixed";
+      style.position = "absolute";
       style.width = (size.width + "px");
       style.height = this.getStyleHeight();
       const height = parseInt(style.height);
-      style.left = `0px`;
-      style.top = `0px`;
       const x = (center.x - camera.pos.x + pos.x - (size.width / 2));
       const y = (center.y + camera.pos.y - pos.y - (height / 2));
+      style.left = `${0}px`;
+      style.top = `${0}px`;
       style.transform = `translate(${x}px, ${y}px)`;
-      if (rect1.zOnTop) style["z-index"] = 1000;
       if ("opacity" in rect1)
       {
         style.opacity = rect1.opacity;
         if (rect1.opacity == 0) style["pointer-events"] = "none";
       }
+      if (rect1.zOnTop) style["z-index"] = 1000;
       if (!this.isDraggingMoving && !this.isResizing) {
-        style.transition = "all 1s, border 0s";
+        style.transition = "all 1s, transform 0.4s, border 0s";
       }
       return style;
     }
@@ -336,7 +338,7 @@ style:
     transform: translate(100%, -50%)
   .above, .below, .left-side, .right-side:
     opacity: 0
-    transition: all 0s, opacity 0.6s, transform 0.6s
+    transition: all 0s, opacity 0.6s, transform 2s
   .hovered .above, .hovered .below, .hovered .left-side, .hovered .right-side:
     opacity: 1
   .hovered .window: null

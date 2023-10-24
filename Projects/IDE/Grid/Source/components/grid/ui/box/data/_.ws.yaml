@@ -4,13 +4,19 @@ dom:
     ':show-title': 'false'
     div:
       ':style': '{ ''width'': ''100%'', overflow: ''auto'' }'
-      ui.value:
+      ui.value: 
+        v-if: '!showLastValue'
         ':value': outputValue
+      .last-value:
+        v-if: showLastValue
+        ui.value: 
+          ':value': lastNonNullOutputValue
 props:
   box: null
 data:
   inputValue: null
   outputValue: null
+  lastNonNullOutputValue: null
   operations: []
 methods:
   onOperations: | #js
@@ -46,8 +52,19 @@ methods:
     function(boxEventName, ...args) {
       this.$emit("box-event", boxEventName, ...args);
     }
-computed: null
+computed:
+  showLastValue: | #js
+    function() {
+      return (this.outputValue == null) && (this.lastNonNullOutputValue != null);
+    }
 watch:
+  outputValue:
+    handler: | #js
+      function(newOutputValue, oldOutputValue) {
+        if (newOutputValue != null) {
+          this.lastNonNullOutputValue = newOutputValue;
+        }
+      }
   operations:
     handler: | #js
       function(operations) {
@@ -62,6 +79,8 @@ watch:
       }
     immediate: true
 style:
+  .last-value:
+    filter: grayscale(1) contrast(0.9)
   .box1:
     border: '1px solid #ccc'
     padding: 0.5em
@@ -73,5 +92,7 @@ name: grid-ui-box-data
 template: >-
   <grid-module class="comp-grid-ui-box-data" icon="🧊" :show-title="false"
   path="1558979935."><div :style="{ 'width': '100%', overflow: 'auto' }"
-  path="1558979935.0"><ui-value :value="outputValue"
-  path="1558979935.0.0"></ui-value></div></grid-module>
+  path="1558979935.0"><ui-value v-if="!showLastValue" :value="outputValue"
+  path="1558979935.0.0"></ui-value><div class="last-value" v-if="showLastValue"
+  path="1558979935.0.1"><ui-value :value="lastNonNullOutputValue"
+  path="1558979935.0.1.0"></ui-value></div></div></grid-module>

@@ -2,7 +2,10 @@ dom:
   grid.module:
     ':box': box
     ':data-bound-socket-data': dataBoundSocketData
-    div:
+    div: 
+      ui.value:
+        ':value': inputs
+    div: 
       h3:
         ui.title:
           icon: 🧊
@@ -48,7 +51,9 @@ name: grid-ui-node-settings
 template: >-
   <grid-module class="comp-grid-ui-node-settings" :box="box"
   :data-bound-socket-data="dataBoundSocketData" path="-1191877027."><div
-  path="-1191877027.0"><h3 path="-1191877027.0.0"><ui-title icon="🧊"
-  :text="node.type + ' item'" path="-1191877027.0.0.0"></ui-title></h3><ui-linq
-  :input="inputs?.[1]" v-model="linq.operations"
-  path="-1191877027.0.1"></ui-linq></div></grid-module>
+  path="-1191877027.0"><ui-value :value="inputs"
+  path="-1191877027.0.0"></ui-value></div><div path="-1191877027.1"><h3
+  path="-1191877027.1.0"><ui-title icon="🧊" :text="node.type + ' item'"
+  path="-1191877027.1.0.0"></ui-title></h3><ui-linq :input="inputs?.[1]"
+  v-model="linq.operations"
+  path="-1191877027.1.1"></ui-linq></div></grid-module>

@@ -156,6 +156,25 @@ methods:
       action.undo = { method: "move.box", args: [boxID, oldPos] };
       return action;
     }
+  move_boxes: | #js
+    async function(userID, action, boxID, otherBoxIDs, newPos) {
+      const box = this.getBox(boxID);
+      const boxes = otherBoxIDs.map((boxID) => this.getBox(boxID));
+      const oldPos = box.rect.pos;
+      const delta = { x: newPos.x - oldPos.x, y: newPos.y - oldPos.y };
+      const oldBox1Pos = box.rect.pos;
+      const oldBoxesPoss = boxes.map((box) => box.rect.pos);
+      const oldAllPoss = [oldBox1Pos, ...oldBoxesPoss];
+      const oldAllBoxDatas = [box, ...boxes].map((box, index) => ({ rect: { pos: oldAllPoss[index] } }));
+      const box1Pos = { x: box.rect.pos.x + delta.x, y: box.rect.pos.y + delta.y };
+      const boxesPoss = boxes.map((box) => ({ x: box.rect.pos.x + delta.x, y: box.rect.pos.y + delta.y }));
+      const allPoss = [box1Pos, ...boxesPoss];
+      const allBoxIDs = [boxID, ...otherBoxIDs];
+      const allBoxDatas = allBoxIDs.map((boxID, index) => ({ rect: { pos: allPoss[index] } }));
+      this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "update", [allBoxIDs, allBoxDatas]);
+      action.undo = { method: "move.boxes", args: [boxID, otherBoxIDs, oldPos] };
+      return action;
+    }
   resize_box: | #js
     async function(userID, action, boxID, size) {
       const box = this.$boxes.find((box) => box._id === boxID);
@@ -166,12 +185,39 @@ methods:
     }
   delete_box: | #js
     async function(userID, action, boxID, options) {
-      if (!options?.isUndoing) throw new Error("Not implemented");
+      return await this.delete_boxes(userID, action, [boxID], options);
+    }
+  delete_boxes: | #js
+    async function(userID, action, boxIDs, options) {
       if (options?.isUndoing) this.nextID--;
-      const box = this.getBox(boxID);
-      this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "delete", [boxID]);
-      action.undo = { method: "no.op" };
-      this.$femit("box.deleted", box);
+      const deletedItems = [];
+      const boxes = boxIDs.map((boxID) => this.getBox(boxID));
+      deletedItems.add(Objects.clone(boxes.map((box) => ({ box }))));
+      // Delete the box
+      this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "delete", [boxIDs]);
+      // Delete the links from and to this box
+      const links = this.$links.filter((link) => this.isLinkInBoxes(link, boxes));
+      const deletedLinks = Objects.clone(links.map((link) => ({ link })));
+      deletedItems.add(deletedLinks);
+      const linkIDs = links.map((link) => link._id);
+      this.$femit("to", "grid.data.list", `${userID}/data/links`, "delete", [linkIDs]);
+      // If deleting group boxes, delete their members
+      for (const box of boxes) {
+        if (box.type == "group") {
+          const memberBoxes = this.$boxes.filter((b) => b.groupBoxID === box._id);
+          const memberBoxIDs = memberBoxes.map((b) => b._id);
+          for (const memberBox of memberBoxes)
+          {
+            const memberDeleteAction = (await this.delete_box(userID, {}, memberBox._id, options));
+            const memberDeletedItems = memberDeleteAction.args[0];
+            deletedItems.add(memberDeletedItems);
+          }
+        }
+      }
+      action.undo = {
+        method: "undelete.items",
+        args: [deletedItems]
+      };
       return action;
     }
   edit_box: | #js
@@ -273,13 +319,21 @@ methods:
       return action;
     }
   delete_selected: | #js
-    async function(userID, action) {
+    async function(userID, action, options) {
       const boxes = this.$boxes.filter((box) => box.is?.selected);
       const boxIDs = boxes.map((box) => box._id);
-      const links = this.$links.filter((link) => boxIDs.includes(link.from) || boxIDs.includes(link.to));
-      const linkIDs = links.map((link) => link._id);
-      this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "delete", [boxIDs]);
-      this.$femit("to", "grid.data.list", `${userID}/data/links`, "delete", [linkIDs]);
+      const action2 = await this.delete_boxes(userID, {}, boxIDs, options);
+      action.undo = action2.undo;
+      return action;
+    }
+  undelete_items: | #js
+    function(userID, action, deletedItems) {
+      for (const deletedItem of deletedItems)
+      {
+        const itemType = Object.keys(deletedItem)[0];
+        const item = deletedItem[itemType];
+        this.$femit("to", "grid.data.list", `${userID}/data/${itemType.pluralize()}`, "add", [item]);
+      }
       action.undo = { method: "no.op" };
       return action;
     }
@@ -469,6 +523,14 @@ methods:
       action = Objects.clone(action);
       action.undo = Objects.clone(lastAction.undo);
       return action;
+    }
+  isLinkInBox: | #js
+    function(link, box) {
+      return (link.from.box._id === box._id) || (link.to.box._id === box._id);
+    }
+  isLinkInBoxes: | #js
+    function(link, boxes) {
+      return boxes.some((box) => this.isLinkInBox(link, box));
     }
   createImportedSocket: | #js
     function(userID, groupBox, memberBox, direction, memberSocket) {
