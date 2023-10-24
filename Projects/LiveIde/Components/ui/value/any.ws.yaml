@@ -6,10 +6,12 @@ dom:
       ':title': title
       ':preview': 'false'
       ':depth': (depth + 1)
+      ':large': large
 props:
   value: null
   title: null
   depth: 0
+  large: false
 data: null
 methods:
   getComponentType: | #js
@@ -54,4 +56,5 @@ _:
 template: >-
   <div class="comp-ui-value-any" path="1299909909."><component
   :is="getComponentType(visibleValue)" :value="visibleValue" :title="title"
-  :preview="false" :depth="(depth + 1)" path="1299909909.0"></component></div>
+  :preview="false" :depth="(depth + 1)" :large="large"
+  path="1299909909.0"></component></div>

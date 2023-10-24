@@ -44,6 +44,15 @@ methods:
         this.repropagateSocketLinks(link.from.box._id);
       }
     }
+  grid_data_list_updated: | #js
+    function(fuid, items) {
+      if (fuid.endsWith("/data/links")) {
+        const links = items;
+        for (const link of links) {
+          this.onLinkUpdated(link);
+        }
+      }
+    }
   grid_data_list_deleted: | #js
     function(fuid, links) {
       if (!fuid.endsWith("/data/links")) return;
@@ -58,7 +67,7 @@ methods:
     }
   onLinkUpdated: | #js
     function(link) {
-        this.repropagateSocketLinks(link.from.box._id);
+      this.repropagateSocketLinks(link.from.box._id);
     }
   grid_ui_box_execute: | #js
     function(boxID) {

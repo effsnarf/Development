@@ -4,15 +4,16 @@ dom:
     ':show-title': 'false'
     div: 
       div: 
-        v-if: '!items'
+        v-if: '!visibleItems'
         .flex.justify-center:
           ui.title: 
             icon: ❗
             text: connect items data socket
       div: 
+        ':class': itemsClass
         div: 
           class: item
-          v-for: (item, index) in items?.take(5)
+          v-for: (item, index) in visibleItems?.take(5)
           ':key': getItemKey(item)
           @mouseenter: onItemHover(item)
           @mouseleave: onItemHover(null)
@@ -40,6 +41,7 @@ data:
   iteratorBox: null
   hoveredItem: null
   selectedItem: null
+  lastNNItems: null
 mounted: | #js
   async function() {
     await this.$nextTick();
@@ -162,7 +164,12 @@ methods:
       this.iteratorBox = this.getIteratorBox(this.box);
       this.items = this.getItems();
     }
-computed:
+watch:
+  items:
+    handler: | #js
+      function(items) {
+        if (items) this.lastNNItems = items;
+      }
   hoveredItem:
     handler: | #js
       function(hoveredItem) {
@@ -178,6 +185,17 @@ computed:
         const selectedItemSocket = this.box.sockets.output.find(s => s.name == "selected item");
         gridUiBoxVue.$femit("socket.value.change", this.box._id, "output", selectedItemSocket._id, selectedItem);
       }
+computed:
+  itemsClass: | #js
+    function() {
+      const cls = {};
+      if (!this.items) cls.grayscale = true;
+      return cls;
+    }
+  visibleItems: | #js
+    function() {
+      return (this.items || this.lastNNItems);
+    }
 style:
   .item:
     transition: 0.3s
@@ -193,12 +211,12 @@ _:
 name: grid-ui-box-view-items
 template: >-
   <grid-module class="comp-grid-ui-box-view-items" icon="⬜" :show-title="false"
-  path="2102270252."><div path="2102270252.0"><div v-if="!items"
+  path="2102270252."><div path="2102270252.0"><div v-if="!visibleItems"
   path="2102270252.0.0"><div class="flex justify-center"
   path="2102270252.0.0.0"><ui-title icon="❗" text="connect items data socket"
-  path="2102270252.0.0.0.0"></ui-title></div></div><div
+  path="2102270252.0.0.0.0"></ui-title></div></div><div :class="itemsClass"
   path="2102270252.0.1"><div class="item" v-for="(item, index) in
-  items?.take(5)" :key="getItemKey(item)" @mouseenter="onItemHover(item)"
+  visibleItems?.take(5)" :key="getItemKey(item)" @mouseenter="onItemHover(item)"
   @mouseleave="onItemHover(null)" @click="onItemClick(item)"
   path="2102270252.0.1.0"><div v-if="!iteratorBox" path="2102270252.0.1.0.0"><h3
   path="2102270252.0.1.0.0.0"><ui-title text="item"

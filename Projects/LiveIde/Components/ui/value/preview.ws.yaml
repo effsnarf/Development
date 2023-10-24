@@ -25,6 +25,7 @@ dom:
 props:
   value: null
   preview: true
+  large: false
 data:
   isMoreVisible: false
 methods:
@@ -39,6 +40,7 @@ methods:
       const cls = [];
       if ([undefined, null].includes(value)) cls.push("opacity-30");
       cls.push(this.typeColor);
+      if (this.large) cls.push("large");
       return cls;
     }
   valueToString: | #js
@@ -106,6 +108,8 @@ computed:
       return true;
     }
 style:
+  .large:
+    font-size: 140%
   .value-as-string:
     white-space: nowrap
     overflow: hidden

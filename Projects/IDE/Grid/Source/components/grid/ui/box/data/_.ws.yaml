@@ -7,10 +7,12 @@ dom:
       ui.value: 
         v-if: '!showLastValue'
         ':value': outputValue
+        ':large': true
       .last-value:
         v-if: showLastValue
         ui.value: 
           ':value': lastNonNullOutputValue
+          ':large': true
 props:
   box: null
 data:
@@ -53,6 +55,11 @@ methods:
       this.$emit("box-event", boxEventName, ...args);
     }
 computed:
+  visibleValue: | #js
+    function() {
+      if (this.showLastValue) return this.lastNonNullOutputValue;
+      return this.outputValue;
+    }
   showLastValue: | #js
     function() {
       return (this.outputValue == null) && (this.lastNonNullOutputValue != null);
@@ -93,6 +100,7 @@ template: >-
   <grid-module class="comp-grid-ui-box-data" icon="🧊" :show-title="false"
   path="1558979935."><div :style="{ 'width': '100%', overflow: 'auto' }"
   path="1558979935.0"><ui-value v-if="!showLastValue" :value="outputValue"
-  path="1558979935.0.0"></ui-value><div class="last-value" v-if="showLastValue"
-  path="1558979935.0.1"><ui-value :value="lastNonNullOutputValue"
+  :large="true" path="1558979935.0.0"></ui-value><div class="last-value"
+  v-if="showLastValue" path="1558979935.0.1"><ui-value
+  :value="lastNonNullOutputValue" :large="true"
   path="1558979935.0.1.0"></ui-value></div></div></grid-module>
