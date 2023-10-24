@@ -369,7 +369,7 @@ style:
     opacity: 0
     transition: 0.4s
   .above .sockets:
-    transform: translate(0em, 100%)
+    transform: translate(0em, 200%)
     transform-origin: 0 top
   .below .sockets:
     transform: translate(0em, -200%)

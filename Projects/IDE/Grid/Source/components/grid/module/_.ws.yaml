@@ -9,6 +9,7 @@ dom:
           ':text': compName
           ':number': getTitle()
     .module-content:
+      @click: onClick
       slot: null
     div: 
       v-if: showEvents
@@ -72,6 +73,9 @@ unmounted: | #js
     alertify.error("unmounted");
   }
 methods:
+  onClick: | #js
+    function() {
+    }
   femitDirectEvent: | #js
     function(...args) {
       const to = {
@@ -119,22 +123,22 @@ methods:
     }
   getActiveSocketData: | #js
     function() {
-      let socketData = (!this.box) ? {} : (this.$root.socket?.runtime.data[this.box._id] || {});
-      socketData = Objects.deepMerge(socketData, (this.dataBoundSocketData || {}));
+      let socketData = Objects.clone((!this.box) ? {} : (this.$root.socket?.runtime.data[this.box._id] || {}));
+      socketData = Objects.deepMerge(socketData, Objects.clone(this.dataBoundSocketData || {}));
       return socketData;
     }
   getNodeItem: | #js
     async function(activeSocketData) {
-      const inputItem = activeSocketData.input?.[1];
+      const inputItem = (activeSocketData.input?.[1]);
       if (!this.$refs.evaluator1) return null;
       const nodeItems = this.$refs.evaluator1.evaluateOps(inputItem, this.node?.linq?.operations);
       const nodeItem = nodeItems?.last();
-      //if (inputItem && this.node?.linq?.operations.length && !nodeItem) debugger;
       return nodeItem;
     }
   refresh: | #js
     async function() {
-      if (!this.__refresh) this.__refresh = this._refresh.throttle(400);
+      await this.$nextTick();
+      if (!this.__refresh) this.__refresh = this._refresh.throttle(this, 100);
       this.__refresh();
     }
   _refresh: | #js
@@ -213,7 +217,7 @@ template: >-
   v-if="icon &amp;&amp; showTitle" path="1449764372.0"><h3
   path="1449764372.0.0"><ui-title :icon="icon" :text="compName"
   :number="getTitle()" path="1449764372.0.0.0"></ui-title></h3></div><div
-  class="module-content" path="1449764372.1"><slot></slot></div><div
-  class="mt-l1" v-if="showEvents" :key="key1"
-  path="1449764372.2"></div><ui-linq-evaluator ref="evaluator1"
+  class="module-content" @click="onClick"
+  path="1449764372.1"><slot></slot></div><div class="mt-l1" v-if="showEvents"
+  :key="key1" path="1449764372.2"></div><ui-linq-evaluator ref="evaluator1"
   path="1449764372.3"></ui-linq-evaluator></div>

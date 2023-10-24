@@ -33,7 +33,7 @@ methods:
       }
       element.addEventListener("mousedown", this.onMouseDown);
       element.addEventListener("mouseup", this.onMouseUp);
-      window.addEventListener("mousemove", this.onMouseMove.bind(this).throttle(this.moveThrottleRate * 1000));
+      window.addEventListener("mousemove", this.onMouseMove.throttle(this, this.moveThrottleRate * 1000));
       element.addEventListener("contextmenu", this.onContextMenu);
     }
   onMouseDown: | #js
@@ -64,7 +64,7 @@ methods:
     }
   updateHoveredElement: | #js
     function(pos) {
-      if (!this.__updateHoveredElement) this.__updateHoveredElement = this._updateHoveredElement.bind(this).throttle(400);
+      if (!this.__updateHoveredElement) this.__updateHoveredElement = this._updateHoveredElement.throttle(this, 400);
       this.__updateHoveredElement(pos);
     }
   _updateHoveredElement: | #js

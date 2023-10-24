@@ -379,9 +379,9 @@ interface Array<T> {
 interface Function {
   is(type: any): boolean;
   getArgumentNames(): string[];
-  postpone(ms: number): (...args: any[]) => any;
-  debounce(ms: number): (...args: any[]) => any;
-  throttle(ms: number): (...args: any[]) => any;
+  postpone(delay: number): (...args: any[]) => any;
+  debounce(delay: number): (...args: any[]) => any;
+  throttle(delay: number, context: any): (...args: any[]) => any;
 }
 // #endregion
 
@@ -1786,10 +1786,13 @@ if (typeof Function !== "undefined") {
    * If the original function is called multiple times within the specified delay,
    * it will execute once every delay time.
    */
-  Function.prototype.throttle = function (delay: number) {
+  Function.prototype.throttle = function (delay: number, context: any) {
+    if (typeof delay != "number") {
+      return this.throttle(context as any, delay as any);
+    }
     const fn = this;
     let timeout: any;
-    return function (this: any, ...args) {
+    let func = function (this: any, ...args: any[]) {
       (fn as any).nextArgs = args;
       const context = this as any;
       if (!timeout) {
@@ -1799,6 +1802,8 @@ if (typeof Function !== "undefined") {
         }, delay);
       }
     };
+    if (context) func = func.bind(context);
+    return func;
   };
 }
 

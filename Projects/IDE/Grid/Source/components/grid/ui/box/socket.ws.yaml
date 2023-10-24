@@ -20,15 +20,16 @@ dom:
                   v-text: '''Export socket'''
             ui.checkbox:
               v-model: socketIsExported
-          .flex: 
+          div: 
             ui.context.window: 
               div: 
                 h3: 
-                  .flex: 
+                  .flex:
                     div: 
                       v-text: getSocketIcon(socket)
                     ui.input.text.box:
-                      ':camoflauge': 'true'
+                      ':enabled': canEditSocketName
+                      ':camouflage': '!canEditSocketName'
                       v-model: socketName
                 div: 
                   ':style': >-
@@ -77,6 +78,8 @@ mounted: | #js
 
     this.$root.els = this.$root.els || {};
     this.$root.els[this.socketElPath] = this.$el;
+
+    document.body.appendChild(this.$refs.targetPlug1);
 
     this.ghostBox = {
       _id: `${this.box._id}/${this.socket.name}/ghost/box`,
@@ -170,6 +173,8 @@ methods:
     }
   onNewLinkDrop: | #js
     function(linkSource) {
+      this.isNewLinkDragging = false;
+
       if (linkSource.direction == this.direction) {
         alertify.error('You must connect an output socket to an input socket.');
         return;
@@ -301,15 +306,13 @@ computed:
   targetPlugStyle: | #js
     function() {
       if (!this.targetPlugPos) return null;
-      const baseEl = this.$root.getAbsoluteRect(this.$el);
-      const targetPlug = this.$refs.targetPlug1.getBoundingClientRect();
-      const x = (this.targetPlugPos.x - baseEl.left + baseEl.width + targetPlug.width);
-      const y = (this.targetPlugPos.y - baseEl.top - targetPlug.height);
+      const x = (this.targetPlugPos.x);
+      const y = (this.targetPlugPos.y);
       const style = {
         position: 'fixed',
-        left: `${(x - 140)}px`,
-        top: `${(y + 20)}px`,
-        border: `3px solid red`
+        left: `0px`,
+        top: `0px`,
+        transform: `translate(${(x - 120)}px, ${(y + 20)}px)`,
       };
       style.background = "linear-gradient(to right, #303030, #101010)";
       style.border = "1px solid #ffffff30";
@@ -318,6 +321,11 @@ computed:
       style.padding = "0.5em";
       style.whiteSpace = "nowrap";
       return style;
+    }
+  canEditSocketName: | #js
+    function() {
+      if (this.box.type == "group") return true;
+      return false;
     }
 watch:
   socket:
@@ -371,13 +379,14 @@ template: >-
   path="-321995800.0.0.0.0.0.0"><h3 v-text="'Export socket'"
   path="-321995800.0.0.0.0.0.0.0"></h3></div></ui-context-window><ui-checkbox
   v-model="socketIsExported"
-  path="-321995800.0.0.0.0.1"></ui-checkbox></div><div class="flex"
+  path="-321995800.0.0.0.0.1"></ui-checkbox></div><div
   path="-321995800.0.0.0.1"><ui-context-window path="-321995800.0.0.0.1.0"><div
   path="-321995800.0.0.0.1.0.0"><h3 path="-321995800.0.0.0.1.0.0.0"><div
   class="flex" path="-321995800.0.0.0.1.0.0.0.0"><div
   v-text="getSocketIcon(socket)"
   path="-321995800.0.0.0.1.0.0.0.0.0"></div><ui-input-text-box
-  :camoflauge="true" v-model="socketName"
+  :enabled="canEditSocketName" :camouflage="!canEditSocketName"
+  v-model="socketName"
   path="-321995800.0.0.0.1.0.0.0.0.1"></ui-input-text-box></div></h3><div
   :style="{ 'max-width': '30em', 'max-height': '20em', 'overflow': 'auto' }"
   path="-321995800.0.0.0.1.0.0.1"><ui-value v-if="showSocketValueContextWindow"

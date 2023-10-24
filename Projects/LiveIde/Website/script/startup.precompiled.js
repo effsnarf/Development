@@ -6568,10 +6568,13 @@ if (typeof Function !== "undefined") {
      * If the original function is called multiple times within the specified delay,
      * it will execute once every delay time.
      */
-    Function.prototype.throttle = function (delay) {
+    Function.prototype.throttle = function (delay, context) {
+        if (typeof delay != "number") {
+            return this.throttle(context, delay);
+        }
         const fn = this;
         let timeout;
-        return function (...args) {
+        let func = function (...args) {
             fn.nextArgs = args;
             const context = this;
             if (!timeout) {
@@ -6581,6 +6584,9 @@ if (typeof Function !== "undefined") {
                 }, delay);
             }
         };
+        if (context)
+            func = func.bind(context);
+        return func;
     };
 }
 // #endregion
@@ -7633,7 +7639,7 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/website/script/1698061871410.ts ***!
+  !*** ../../../LiveIde/website/script/1698073971306.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

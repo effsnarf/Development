@@ -33,12 +33,16 @@ methods:
   onDragEnd: | #js
     async function(e) {
       this.isDragging = false;
-      this.dragElementPos = null;
       await this.$nextTick();
       this.$emit('drag-end', this.dragItem);
       this.$root.dragItem = null;
     }
   onDrag: | #js
+    function(e) {
+      if (!this.__onDrag) this.__onDrag = this._onDrag.throttle(this, 100);
+      this.__onDrag(e);
+    }
+  _onDrag: | #js
     function(e) {
       const dep = this.dragElementPos;
       const relativePos = { x: (e.clientX - dep.x), y: (e.clientY - dep.y) };

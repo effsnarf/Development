@@ -221,12 +221,15 @@ computed:
       const pos = rect1.pos;
       const size = rect1.size;
       const style = {};
-      style.position = "absolute";
+      style.position = "fixed";
       style.width = (size.width + "px");
       style.height = this.getStyleHeight();
       const height = parseInt(style.height);
-      style.left = `${center.x - camera.pos.x + pos.x - (size.width / 2)}px`;
-      style.top = `${center.y + camera.pos.y - pos.y - (height / 2)}px`;
+      style.left = `0px`;
+      style.top = `0px`;
+      const x = (center.x - camera.pos.x + pos.x - (size.width / 2));
+      const y = (center.y + camera.pos.y - pos.y - (height / 2));
+      style.transform = `translate(${x}px, ${y}px)`;
       if (rect1.zOnTop) style["z-index"] = 1000;
       if ("opacity" in rect1)
       {

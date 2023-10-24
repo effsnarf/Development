@@ -207,6 +207,11 @@ methods:
       const box = this.$boxes.find((box) => box._id === boxID);
       const socket = box.sockets[direction].find((socket) => socket._id === socketID);
       const socketIndex = box.sockets[direction].findIndex((socket) => socket._id === socketID);
+      if (newData.name) {
+        if (box.type != "group") {
+          throw new Error("You can only rename sockets on group boxes");
+        }
+      }
       oldData = oldData ||
         Objects.getPropertiesAsTree(socket, Objects.getPaths(newData));
       //for (const change of changes) DeepDiff.applyChange(socket, change);

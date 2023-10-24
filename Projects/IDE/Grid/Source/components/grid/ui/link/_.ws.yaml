@@ -71,7 +71,7 @@ methods:
     async function(linkID, sValue) {
       // #TODO: Slow
       if (linkID !== this.link._id) return;
-      this.$refs.leaderLine1.flash();
+      this.$refs.leaderLine1?.flash();
     }
   getFromEl: | #js
     function() {
