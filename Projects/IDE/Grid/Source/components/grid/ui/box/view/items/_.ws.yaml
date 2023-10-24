@@ -1,5 +1,6 @@
 dom:
   grid.module:
+    ref: module1
     icon: ⬜
     ':show-title': 'false'
     div: 
@@ -13,7 +14,7 @@ dom:
         ':class': itemsClass
         div: 
           class: item
-          v-for: (item, index) in visibleItems?.take(5)
+          v-for: (item, index) in visibleItems?.take(100)
           ':key': getItemKey(item)
           @mouseenter: onItemHover(item)
           @mouseleave: onItemHover(null)
@@ -42,6 +43,7 @@ data:
   hoveredItem: null
   selectedItem: null
   lastNNItems: null
+  isDirty: false
 mounted: | #js
   async function() {
     await this.$nextTick();
@@ -161,10 +163,25 @@ methods:
     }
   refresh: | #js
     function() {
+      this.isDirty = true;
+    }
+  _refresh: | #js
+    function() {
+      if (!this.___refresh) this.___refresh = this.__refresh.throttle(this, 10);
+      this.___refresh();
+    }
+  __refresh: | #js
+    async function() {
+      this.isDirty = false;
       this.iteratorBox = this.getIteratorBox(this.box);
       this.items = this.getItems();
     }
 watch:
+  isDirty:
+    handler: | #js
+      function(isDirty) {
+        if (isDirty) this._refresh();
+      }
   items:
     handler: | #js
       function(items) {
@@ -210,17 +227,17 @@ _:
     count: 0
 name: grid-ui-box-view-items
 template: >-
-  <grid-module class="comp-grid-ui-box-view-items" icon="⬜" :show-title="false"
-  path="2102270252."><div path="2102270252.0"><div v-if="!visibleItems"
-  path="2102270252.0.0"><div class="flex justify-center"
+  <grid-module class="comp-grid-ui-box-view-items" ref="module1" icon="⬜"
+  :show-title="false" path="2102270252."><div path="2102270252.0"><div
+  v-if="!visibleItems" path="2102270252.0.0"><div class="flex justify-center"
   path="2102270252.0.0.0"><ui-title icon="❗" text="connect items data socket"
   path="2102270252.0.0.0.0"></ui-title></div></div><div :class="itemsClass"
   path="2102270252.0.1"><div class="item" v-for="(item, index) in
-  visibleItems?.take(5)" :key="getItemKey(item)" @mouseenter="onItemHover(item)"
-  @mouseleave="onItemHover(null)" @click="onItemClick(item)"
-  path="2102270252.0.1.0"><div v-if="!iteratorBox" path="2102270252.0.1.0.0"><h3
-  path="2102270252.0.1.0.0.0"><ui-title text="item"
-  :number="getTempItemIndex(index)"
+  visibleItems?.take(100)" :key="getItemKey(item)"
+  @mouseenter="onItemHover(item)" @mouseleave="onItemHover(null)"
+  @click="onItemClick(item)" path="2102270252.0.1.0"><div v-if="!iteratorBox"
+  path="2102270252.0.1.0.0"><h3 path="2102270252.0.1.0.0.0"><ui-title
+  text="item" :number="getTempItemIndex(index)"
   path="2102270252.0.1.0.0.0.0"></ui-title></h3><div class="item-value"
   path="2102270252.0.1.0.0.1"><ui-value-preview :value="item"
   path="2102270252.0.1.0.0.1.0"></ui-value-preview></div></div><component
