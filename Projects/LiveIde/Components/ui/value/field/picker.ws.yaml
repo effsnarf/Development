@@ -51,7 +51,7 @@ style:
     overflow-y: auto
     transition: 0.6s
   .field-list:hover:
-    max-height: 20em
+    max-height: 15em
 _:
   examples:
     count: 0

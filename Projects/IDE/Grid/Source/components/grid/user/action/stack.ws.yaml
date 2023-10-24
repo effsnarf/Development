@@ -46,7 +46,6 @@ methods:
       const relatedLinks = this.$links.filter((link) => memberBoxIDs.includes(link.from.box._id) || memberBoxIDs.includes(link.to.box._id));
       if (relatedLinks.length > memberLinks.length) {
         const errorMessage = `A new group must be independent from other boxes.`;
-        alertify.error(errorMessage);
         throw new Error(errorMessage);
       }
 

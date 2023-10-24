@@ -264,7 +264,7 @@ style:
     border: 3px dashed yellow
     position: fixed
     filter: 'drop-shadow(-3px 3px 1px #000000)'
-    transition: opacity 0.6s !important
+    transition: opacity 0.3s !important
     background: '#ffffff10'
     pointer-events: none
     z-index: 1000

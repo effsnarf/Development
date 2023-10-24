@@ -18,6 +18,7 @@ dom:
         ul:
           li:
             v-for: part in nextPathParts
+            ':key': part
             class: clickable
             @click: onSelectPart(part)
             ui.title: 
@@ -75,7 +76,7 @@ style:
     overflow-y: auto
     transition: 0.6s
   .picker:hover:
-    max-height: 10em
+    max-height: 15em
   .parts:
     display: flex
     gap: 0.5em
@@ -96,6 +97,6 @@ template: >-
   path="738107552.0.1"><ui-title icon="🧊" :text="part"
   path="738107552.0.1.0"></ui-title></div><div class="next-parts"
   path="738107552.0.2"><ul path="738107552.0.2.0"><li class="clickable"
-  v-for="part in nextPathParts" @click="onSelectPart(part)"
+  v-for="part in nextPathParts" :key="part" @click="onSelectPart(part)"
   path="738107552.0.2.0.0"><ui-title icon="🧊" :text="part"
   path="738107552.0.2.0.0.0"></ui-title></li></ul></div></div></div>
