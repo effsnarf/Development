@@ -44,21 +44,6 @@ methods:
         this.repropagateSocketLinks(link.from.box._id);
       }
     }
-  grid_data_list_updated: | #js
-    function(fuid, items) {
-      if (fuid.endsWith("/data/boxes")) {
-        const boxes = items;
-        for (const box of boxes) {
-          this.grid_ui_box_execute(box._id);
-        }
-      }
-      if (fuid.endsWith("/data/links")) {
-        const links = items;
-        for (const link of links) {
-          this.repropagateSocketLinks(link.from.box._id);
-        }
-      }
-    }
   grid_data_list_deleted: | #js
     function(fuid, links) {
       if (!fuid.endsWith("/data/links")) return;
@@ -66,6 +51,14 @@ methods:
       for (const link of links) {
         this.clearSocketValue(link.to, "input");
       }
+    }
+  onBoxUpdated: | #js
+    function(box, data) {
+      this.grid_ui_box_execute(box._id);
+    }
+  onLinkUpdated: | #js
+    function(link) {
+        this.repropagateSocketLinks(link.from.box._id);
     }
   grid_ui_box_execute: | #js
     function(boxID) {
@@ -132,7 +125,7 @@ methods:
       try
       {
         this.$femit("socket.value.change", boxID, sDirection, sID, sValue);
-        this.processBoxChange(boxID, sDirection, sID, sValue);
+        this.triggerSocket(boxID, sDirection, sID, sValue);
         this.propagateSocketLinks(boxID, sDirection, sID);
         if (sDirection == "input") this.propagateGroupSockets(boxID, sID, sValue);
         if (sDirection == "output") this.propagateGroupMemberSockets(boxID, sID, sValue);
@@ -141,6 +134,11 @@ methods:
       {
         this.$runtime.log.stop(logItem);
       }
+    }
+  triggerSocket: | #js
+    function(boxID, sDirection, sID) {
+      const sValue = this.getSocketRuntimeValue(boxID, sDirection, sID);
+      this.processBoxChange(boxID, sDirection, sID, sValue);
     }
   processBoxChange: | #js
     async function(boxID, sDirection, sID, sValue) {
@@ -203,7 +201,7 @@ methods:
       const box = this.getBox(boxID);
       const links = this.$links
         .filter((link) => (link.from.box._id === boxID))
-        .filter((link) => (link.from.socket.type == "data"));
+        .filter((link) => (link.from.socket.type == "data") || (link.from.socket.type == "iterator"));
       for (const link of links) {
         this.propagateSocketLinks(boxID, "output", link.from.socket._id);
       }
@@ -398,6 +396,13 @@ methods:
     function(boxID, sDirection, sID) {
       const box = this.getBox(boxID);
       if (!box) return null;
+      const socket = box.sockets[sDirection].find(socket => socket._id == sID);
+      // Iterator socket forwards (input[1])
+      if (socket.type == "iterator") {
+        const inputValue = this.getSocketRuntimeValue(boxID, "input", 1);
+        const exampleValue = this.getViewItemsExampleItem(box, "input", 1, inputValue);
+        return exampleValue;
+      }
       const runtimeData = this.getSocketRuntimeData(boxID);
       let value = runtimeData[sDirection][sID];
       if (value && (box.type == "data"))

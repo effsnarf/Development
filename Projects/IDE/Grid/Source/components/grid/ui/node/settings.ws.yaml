@@ -10,6 +10,7 @@ dom:
       ui.linq:
         ':input': inputs?.[1]
         v-model: linq.operations
+        @input: onLinqOperationsUpdate
 props:
   box: null
   node: null
@@ -19,22 +20,20 @@ data:
   linq:
     operations: null
 methods:
+  onLinqOperationsUpdate: | #js
+    function() {
+      const vBox = this.$root.vm.getAncestors(this, "grid.ui.box")[0];
+      const viewNodeRoot = Objects.clone(this.box.viewNodeRoot);
+      const node = TreeObject.find(viewNodeRoot, this.node._id);
+      node.linq = this.linq;
+      vBox.$femit("edit.box", this.box._id, { viewNodeRoot });
+    }
   init: | #js
     function(node) {
       this.linq = (Objects.clone(node.linq) || {});
       this.linq.operations = (this.linq.operations || []);
     }
 watch:
-  linq:
-    handler: | #js
-      function() {
-        const vBox = this.$root.vm.getAncestors(this, "grid.ui.box")[0];
-        const viewNodeRoot = Objects.clone(this.box.viewNodeRoot);
-        const node = TreeObject.find(viewNodeRoot, this.node._id);
-        node.linq = this.linq;
-        vBox.$femit("edit.box", this.box._id, { viewNodeRoot });
-      }
-    deep: true
   node:
     handler: | #js
       function(node) {
@@ -50,5 +49,5 @@ template: >-
   :data-bound-socket-data="dataBoundSocketData" path="-1191877027."><div
   path="-1191877027.0"><h3 path="-1191877027.0.0"><ui-title icon="🧊"
   :text="node.type + ' item'" path="-1191877027.0.0.0"></ui-title></h3><ui-linq
-  :input="inputs?.[1]" v-model="linq.operations"
+  :input="inputs?.[1]" v-model="linq.operations" @input="onLinqOperationsUpdate"
   path="-1191877027.0.1"></ui-linq></div></grid-module>

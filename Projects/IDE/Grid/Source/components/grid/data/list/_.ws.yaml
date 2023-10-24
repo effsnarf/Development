@@ -43,7 +43,7 @@ methods:
       }
       this.onChange();
       await this.$nextTick();
-      this.$femit("updated", this.fuid, updatedItems);
+      this.$femit("updated", this.fuid, updatedItems, datas);
     }
   delete: | #js
     async function(itemIDs) {

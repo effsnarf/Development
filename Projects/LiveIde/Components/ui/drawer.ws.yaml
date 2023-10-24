@@ -15,7 +15,7 @@ style:
     max-width: 5em
     overflow: hidden
     transition: 2s
-    filter: grayscale(1) blur(0.1em)
+    filter: grayscale(1)
     opacity: 0.5
   .drawer.open, .drawer:hover, .drawer.hovered:
     max-height: 60em

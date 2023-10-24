@@ -9,7 +9,6 @@ dom:
           ':text': compName
           ':number': getTitle()
     .module-content:
-      @click: onClick
       slot: null
     div: 
       v-if: showEvents
@@ -58,23 +57,24 @@ mounted: | #js
     }
 
     // Register {compName}_{eventName} methods as event listeners
-    const handlerNames = Object.keys(this.$parent)
-      .filter(k => !k.startsWith("_"))
-      .filter(k => k.includes("_"));
-    
-    for (const handlerName of handlerNames) {
-      const method = this.$parent[handlerName].bind(this.$parent);
-      //console.log("🔴", handlerName);
-      this.$root.$on(handlerName, method);
-    }
+    this.registerGridEventHandlers(this.$parent);
+    this.registerGridEventHandlers(this);
   }
 unmounted: | #js
   function() {
     alertify.error("unmounted");
   }
 methods:
-  onClick: | #js
-    function() {
+  registerGridEventHandlers: | #js
+    function(vue) {
+      const handlerNames = Object.keys(vue)
+        .filter(k => !k.startsWith("_"))
+        .filter(k => k.includes("_"));
+      
+      for (const handlerName of handlerNames) {
+        const method = vue[handlerName].bind(vue);
+        this.$root.$on(handlerName, method);
+      }
     }
   femitDirectEvent: | #js
     function(...args) {
@@ -120,6 +120,21 @@ methods:
     function(boxID, sDirection, sID, sValue) {
       if (boxID != this.box?._id) return;
       this.refresh();
+    }
+  grid_data_list_updated: | #js
+    function(fuid, items, datas) {
+      if (fuid.endsWith("/data/boxes")) {
+        const boxes = items;
+        for (let i = 0; i < boxes.length; i++) {
+          this.onBoxUpdated(boxes[i], datas[i]);
+        }
+      }
+      if (fuid.endsWith("/data/links")) {
+      }
+    }
+  onBoxUpdated: | #js
+    function(box, data) {
+      if (this.$parent.onBoxUpdated) this.$parent.onBoxUpdated(box, data);
     }
   getActiveSocketData: | #js
     function() {
@@ -217,7 +232,7 @@ template: >-
   v-if="icon &amp;&amp; showTitle" path="1449764372.0"><h3
   path="1449764372.0.0"><ui-title :icon="icon" :text="compName"
   :number="getTitle()" path="1449764372.0.0.0"></ui-title></h3></div><div
-  class="module-content" @click="onClick"
-  path="1449764372.1"><slot></slot></div><div class="mt-l1" v-if="showEvents"
-  :key="key1" path="1449764372.2"></div><ui-linq-evaluator ref="evaluator1"
+  class="module-content" path="1449764372.1"><slot></slot></div><div
+  class="mt-l1" v-if="showEvents" :key="key1"
+  path="1449764372.2"></div><ui-linq-evaluator ref="evaluator1"
   path="1449764372.3"></ui-linq-evaluator></div>
