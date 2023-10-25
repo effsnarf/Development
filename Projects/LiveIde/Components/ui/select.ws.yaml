@@ -153,8 +153,7 @@ style:
   .comp-ui-list:
     user-select: none
   li:
-    margin-left: 0.5em
-    margin-bottom: 0.2em
+    margin: 0 0 0.5em 0.8em !important
     padding: 0.2em 0.5em
   li.selected:
     border: '1px solid #ffffff80'

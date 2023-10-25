@@ -36,6 +36,7 @@ dom:
             template: 
               v-slot: tab1
               ul: 
+                class: colors
                 li: 
                   v-for: i in 10
                   class: clickable
@@ -79,6 +80,8 @@ watch:
       }
     immediate: true
 style:
+  .colors li:
+    margin-bottom: 0.2em
   li > *:first-child:
     display: none
 _:
@@ -102,6 +105,7 @@ template: >-
   class="clickable" v-for="i in 10" :key="i" :style="{ 'font-size': (1 + (i *
   0.2)) + 'em' }" v-text="'font size'"
   path="-1191877027.1.1.0.0.0.0.0"></li></ul></template><template v-slot:tab1
-  path="-1191877027.1.1.0.0.1"><ul path="-1191877027.1.1.0.0.1.0"><li
-  class="clickable" v-for="i in 10" :key="i" :style="getBackgroundStyle(i)"
+  path="-1191877027.1.1.0.0.1"><ul class="colors"
+  path="-1191877027.1.1.0.0.1.0"><li class="clickable" v-for="i in 10" :key="i"
+  :style="getBackgroundStyle(i)"
   path="-1191877027.1.1.0.0.1.0.0"></li></ul></template></ui-tabs></div></template></ui-tabs></grid-module>
