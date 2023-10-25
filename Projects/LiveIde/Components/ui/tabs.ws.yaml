@@ -8,6 +8,7 @@ dom:
       ':getUrl': getUrl
       ':direction': direction
       ':type': type
+      ':show-search': showSearch
       ':can-select-none': canSelectNone
       @item-hover: onItemHover
       v-model: selectedTabIndex
@@ -33,10 +34,11 @@ props:
   direction: vertical
   value: null
   transitionName: null
+  showSearch: null
   canSelectNone: false
 data:
   hoveredTabIndex: null
-  selectedTabIndex: null
+  selectedTabIndex: 0
 methods:
   getTabStyle: | #js
     function(index) {
@@ -94,20 +96,33 @@ computed:
       return style;
     }
 watch:
+  direction:
+    handler: | #js
+      function(direction) {
+      }
+    immediate: true
   selectedTabIndex:
     handler: | #js
       function(newIndex) {
-        if (!this.options) return;
         this.$emit('input', newIndex);
       }
     immediate: true
-  value: | #js
-    function(value) {
-      if (!this.options) return;
-      const newIndex = value;
-      if (newIndex == this.selectedTabIndex) return;
-      this.selectedTabIndex = newIndex;
-    }
+  hoveredTabIndex:
+    handler: | #js
+      function(newIndex) {
+        if (!this.options) return;
+        this.$emit('option-hover', newIndex);
+      }
+    immediate: true
+  value:
+    handler: | #js
+      function(value) {
+        if (!this.options) return;
+        const newIndex = value;
+        if (newIndex == this.selectedTabIndex) return;
+        this.selectedTabIndex = newIndex;
+      }
+    immediate: true
 style:
   .not-selected .tab:
     opacity: 0.3 !important
@@ -144,7 +159,7 @@ template: >-
   <div class="comp-ui-tabs" :class="class1" :style="style1"
   path="-484156776."><ui-select :class="{ corner: (type=='toggle') }"
   :options="(options||[]).map(option =&gt; _getOptionHtml(option))"
-  :getUrl="getUrl" :direction="direction" :type="type"
+  :getUrl="getUrl" :direction="direction" :type="type" :show-search="showSearch"
   :can-select-none="canSelectNone" @item-hover="onItemHover"
   v-model="selectedTabIndex" path="-484156776.0"></ui-select><div
   class="flex-grow-1" path="-484156776.1"><slot name="header"

@@ -80,6 +80,11 @@ methods:
       const action = { redo: { method: "create.node", args: [boxID, parentNodeID, newNode] } };
       this.$femit("do", this.userID, action);
     }
+  grid_ui_box_edit_node: | #js
+    async function(boxID, nodeID, newData, oldData) {
+      const action = { redo: { method: "edit.node", args: [boxID, nodeID, newData, oldData] } };
+      this.$femit("do", this.userID, action);
+    }
   grid_ui_box_edit_socket: | #js
     function(boxID, direction, socketID, newData, oldData) {
       const action = { redo: { method: "edit.socket", args: [boxID, direction, socketID, newData, oldData] } };

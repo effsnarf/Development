@@ -1,7 +1,7 @@
 dom:
   div:
     component:
-      ':is': getComponentType(visibleValue)
+      ':is': getComponentType(value)
       ':value': visibleValue
       ':title': title
       ':preview': 'false'
@@ -55,6 +55,6 @@ _:
     count: 0
 template: >-
   <div class="comp-ui-value-any" path="1299909909."><component
-  :is="getComponentType(visibleValue)" :value="visibleValue" :title="title"
+  :is="getComponentType(value)" :value="visibleValue" :title="title"
   :preview="false" :depth="(depth + 1)" :large="large"
   path="1299909909.0"></component></div>

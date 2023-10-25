@@ -4860,6 +4860,9 @@ class Objects {
                 continue;
             if (remainingKeys.length === 0) {
                 subtree[firstKey] = Objects.getProperty(sourceObj, path);
+                if (subtree[firstKey] === undefined) {
+                    subtree[firstKey] = null; // Set to null if value doesn't exist
+                }
             }
             else {
                 const nextSourceObj = sourceObj ? sourceObj[firstKey] : undefined;
@@ -4871,7 +4874,7 @@ class Objects {
                 };
             }
         }
-        return subtree;
+        return Objects.clone(subtree);
     }
     static getProperty(obj, path) {
         const keys = path.split(".");
@@ -5058,6 +5061,38 @@ class Objects {
         let result = target;
         for (const object of objects) {
             result = deepMerge(result, object);
+        }
+        return result;
+    }
+    static deepAssign(target, ...objects) {
+        const deepAssign = (tgt, src) => {
+            if (Objects.is(src, Array)) {
+                return src.map((s, i) => deepAssign(tgt[i], s));
+            }
+            if (!Objects.is(tgt, Array)) {
+                if (!Objects.is(tgt, Object) || !Objects.is(src, Object)) {
+                    return src;
+                }
+            }
+            const merged = tgt;
+            for (const key of Object.keys(src)) {
+                if (key in merged) {
+                    if (Objects.is(merged[key], Object) && Objects.is(src[key], Object)) {
+                        merged[key] = deepAssign(merged[key], src[key]);
+                    }
+                    else {
+                        merged[key] = src[key];
+                    }
+                }
+                else {
+                    merged[key] = src[key];
+                }
+            }
+            return merged;
+        };
+        let result = target;
+        for (const object of objects) {
+            result = deepAssign(result, object);
         }
         return result;
     }
@@ -7690,7 +7725,7 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/website/script/1698154658027.ts ***!
+  !*** ../../../LiveIde/website/script/1698207826518.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

@@ -8,6 +8,7 @@ dom:
       @drop-item: onDropItem
       component:
         ':class': getViewClass(node)
+        ':style': node.style?.css
         ':is': getNodeCompName(node)
         ':box': box
         ':node': node
@@ -38,6 +39,7 @@ methods:
       cls["_view-comp"] = true;
       cls["_grid-view-node"] = true;
       cls["_grid-hovered"] = (node._id == this.activeNode?._id);
+      if (node.style?.bg?.class) cls[node.style.bg.class] = true;
       return cls;
     }
   getNodeCompName: | #js
@@ -48,6 +50,7 @@ computed:
   cssClass: | #js
     function() {
       const cls = {};
+      cls[`box_${this.box._id}_node_${this.node._id}`] = true;
       cls["_grid-hovered"] = (this.node._id == this.activeNode?._id);
       return cls;
     }
@@ -84,7 +87,7 @@ template: >-
   :data-bound-socket-data="dataBoundSocketData" :class="cssClass"
   path="1824264671."><ui-dnd-dropzone @drop-item="onDropItem"
   path="1824264671.0"><component :class="getViewClass(node)"
-  :is="getNodeCompName(node)" :box="box" :node="node"
+  :style="node.style?.css" :is="getNodeCompName(node)" :box="box" :node="node"
   :data-bound-socket-data="dataBoundSocketData" :active-node="activeNode"
   @node-hovered="(...args) =&gt; $emit('node-hovered', ...args)"
   path="1824264671.0.0"></component></ui-dnd-dropzone></grid-module>

@@ -30,9 +30,11 @@ style:
     box-shadow: '-4px 4px 2px black'
     margin: 0.1em
     transition: margin 0.3s, border 0.1s
-  .flex1 > *:nth-child(1):
+  .flex1:
+    flex-direction: column
+  .flex1 > *:nth-child(4):
     width: 30%
-  .flex1 > *:nth-child(2):
+  .flex1 > *:nth-child(5):
     width: 70%
 _:
   examples:

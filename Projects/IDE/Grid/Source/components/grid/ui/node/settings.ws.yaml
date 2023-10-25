@@ -2,7 +2,7 @@ dom:
   grid.module:
     ':box': box
     ':data-bound-socket-data': dataBoundSocketData
-    h3:
+    h2:
       ui.title:
         icon: 🎄
         ':text': node.type
@@ -10,6 +10,7 @@ dom:
       ':options': '[''🧊 data'', ''✨ style'']'
       direction: vertical
       ':can-select-none': 'true'
+      ':value': null
       template: 
         v-slot: tab0
         div: 
@@ -24,24 +25,20 @@ dom:
             ':options': '[''🆎 font size'', ''🖼️ background'']'
             direction: vertical
             ':can-select-none': 'true'
+            ':value': null
             template: 
               v-slot: tab0
-              ul: 
-                li: 
-                  v-for: i in 10
-                  class: clickable
-                  ':key': i
-                  ':style': '{ ''font-size'': (1 + (i * 0.2)) + ''em'' }'
-                  v-text: '''font size'''
+              ui.input.font.size:
+                @value-hover: previewFontSize
+                v-model: fontSize
             template: 
               v-slot: tab1
-              ul: 
-                class: colors
-                li: 
-                  v-for: i in 10
-                  class: clickable
-                  ':key': i
-                  ':style': getBackgroundStyle(i)
+              ui.value:
+                ':value': bgColorClass
+              ui.input.background.color:
+                v-if: 'true'
+                @value-hover: previewBackgroundColor
+                v-model: bgColorClass
 props:
   box: null
   node: null
@@ -50,14 +47,45 @@ data:
   inputs: null
   linq:
     operations: null
+  fontSize: null
+  bgColorClass: null
 methods:
-  getBackgroundStyle: | #js
-    function(i) {
-      return {
-        width: '10em',
-        height: '2em',
-        'background-color': `hsl(${((i / 10) * 255)}, 50%, 50%)`
-      };
+  previewFontSize: | #js
+    function(e) {
+      const value = (e.isHover ? e.value : null);
+      this.previewStyle('fontSize', value);
+    }
+  previewBackgroundColor: | #js
+    function(bgColorClass, isHovered) {
+      this.previewClass(bgColorClass, isHovered);
+    }
+  previewClass: | #js
+    function(className, isSet) {
+      this.preview((element) => {
+        if (isSet) element.classList.add(className);
+        else element.classList.remove(className);
+      });
+    }
+  previewStyle: | #js
+    function(key, value) {
+      this.preview((element) => {
+        element.style[key] = value;
+      });
+    }
+  preview: | #js
+    function(elementCallback) {
+      const nodeSelector = `box_${this.box._id}_node_${this.node._id}`;
+      const elements = document.getElementsByClassName(nodeSelector);
+      for (const element of elements) elementCallback(element);
+    }
+  setFontSize: | #js
+    function(fontSize) {
+      this.setNodeData({ style: { 'fontSize': fontSize } });
+    }
+  setNodeData: | #js
+    function(data) {
+      const vBox = this.$root.vm.getAncestors(this, "grid.ui.box")[0];
+      vBox.$femit("edit.node", this.box._id, this.node._id, data);
     }
   onLinqOperationsUpdate: | #js
     function() {
@@ -71,6 +99,10 @@ methods:
     function(node) {
       this.linq = (Objects.clone(node.linq) || {});
       this.linq.operations = (this.linq.operations || []);
+      if (node.style) {
+        this.fontSize = (node.style.css?.fontSize || null);
+        this.bgColorClass = (node.style.bg?.class || null);
+      }
     }
 watch:
   node:
@@ -79,6 +111,16 @@ watch:
         this.init(node);
       }
     immediate: true
+  fontSize:
+    handler: | #js
+      function(fontSize) {
+        this.setNodeData({ style: { css: { 'fontSize': fontSize } } });
+      }
+  bgColorClass:
+    handler: | #js
+      function(bgColorClass) {
+        this.setNodeData({ style: { bg: { class: bgColorClass } } });
+      }
 style:
   .colors li:
     margin-bottom: 0.2em
@@ -88,9 +130,9 @@ _:
 name: grid-ui-node-settings
 template: >-
   <grid-module class="comp-grid-ui-node-settings" :box="box"
-  :data-bound-socket-data="dataBoundSocketData" path="-1191877027."><h3
+  :data-bound-socket-data="dataBoundSocketData" path="-1191877027."><h2
   path="-1191877027.0"><ui-title icon="🎄" :text="node.type"
-  path="-1191877027.0.0"></ui-title></h3><ui-tabs :options="['🧊 data', '✨
+  path="-1191877027.0.0"></ui-title></h2><ui-tabs :options="['🧊 data', '✨
   style']" direction="vertical" :can-select-none="true"
   path="-1191877027.1"><template v-slot:tab0 path="-1191877027.1.0"><div
   path="-1191877027.1.0.0"><ui-linq :input="inputs?.[1]"
@@ -99,12 +141,10 @@ template: >-
   path="-1191877027.1.1"><div path="-1191877027.1.1.0"><ui-tabs :options="['🆎
   font size', '🖼️ background']" direction="vertical" :can-select-none="true"
   path="-1191877027.1.1.0.0"><template v-slot:tab0
-  path="-1191877027.1.1.0.0.0"><ul path="-1191877027.1.1.0.0.0.0"><li
-  class="clickable" v-for="i in 10" :key="i" :style="{ 'font-size': (1 + (i *
-  0.2)) + 'em' }" v-text="'font size'"
-  path="-1191877027.1.1.0.0.0.0.0"></li></ul></template><template v-slot:tab1
-  path="-1191877027.1.1.0.0.1"><ul class="colors"
-  path="-1191877027.1.1.0.0.1.0"><li class="clickable" v-for="i in 10" :key="i"
-  :style="getBackgroundStyle(i)" path="-1191877027.1.1.0.0.1.0.0"></li><li
-  class="opacity-40" v-text="'🔴 custom expression'"
-  path="-1191877027.1.1.0.0.1.0.1"></li></ul></template></ui-tabs></div></template></ui-tabs></grid-module>
+  path="-1191877027.1.1.0.0.0"><ui-input-font-size
+  @value-hover="previewFontSize" v-model="fontSize"
+  path="-1191877027.1.1.0.0.0.0"></ui-input-font-size></template><template
+  v-slot:tab1 path="-1191877027.1.1.0.0.1"><ui-value :value="bgColorClass"
+  path="-1191877027.1.1.0.0.1.0"></ui-value><ui-input-background-color
+  v-if="true" @value-hover="previewBackgroundColor" v-model="bgColorClass"
+  path="-1191877027.1.1.0.0.1.1"></ui-input-background-color></template></ui-tabs></div></template></ui-tabs></grid-module>

@@ -343,11 +343,27 @@ methods:
       const maxNodeID = TreeObject.max(viewNodeRoot, "_id");
       newNode._id = (maxNodeID + 1);
       newNode.children = (newNode.children || []);
+      newNode.style = (newNode.style || {});
+      newNode.style.css = (newNode.style.css || {});
+      newNode.style.bg = (newNode.style.bg || {});
+      newNode.style.bg.class = (newNode.style.bg.class || "");
       const parentNode = TreeObject.find(viewNodeRoot, parentNodeID);
       parentNode.children.push(newNode);
       const newData = { viewNodeRoot };
       this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "update", [boxID, newData]);
       action.undo = { method: "delete.node", args: [boxID, newNode._id] };
+      return action;
+    }
+  edit_node: | #js
+    async function(userID, action, boxID, nodeID, newData) {
+      const box = this.getBox(boxID);
+      const viewNodeRoot = Objects.clone(box.viewNodeRoot);
+      const node = TreeObject.find(viewNodeRoot, nodeID);
+      const oldData = Objects.getPropertiesAsTree(node, Objects.getPaths(newData));
+      Objects.deepAssign(node, newData);
+      const newBoxData = { viewNodeRoot };
+      this.$femit("to", "grid.data.list", `${userID}/data/boxes`, "update", [boxID, newBoxData]);
+      action.undo = { method: "edit.node", args: [boxID, nodeID, oldData] };
       return action;
     }
   delete_node: | #js
