@@ -12,8 +12,7 @@ methods:
     function(dragItem) {
       const parentNodeID = this.node._id;
       const newNode = dragItem;
-      const vBox = this.getBoxVue();
-      vBox.$femit("create.node", vBox.box._id, parentNodeID, newNode);
+      this.getBoxVue().$femit("create.node", this.box._id, parentNodeID, newNode);
     }
   getBoxVue: | #js
     function() {

@@ -453,7 +453,8 @@ select, input[type=range]
 }
 .drag-over
 {
-  border: 2px dashed #ffffff60;
+  border: 2px dashed yellow;
+  box-shadow: inset -4px 4px 2px #000000;
   border-radius: 0.5em;
   transition: 0.1s;
 }

@@ -1,8 +1,17 @@
 dom:
   div:
+    ui.context.window:
+      @pinned: onPinned
+      grid.ui.node.settings:
+        v-if: activeNode
+        ':box': box
+        ':node': activeNode
+        ':data-bound-socket-data': dataBoundSocketData
     ui.tree:
+      ref: tree1
       ':root': viewNodeRoot
       item-type: grid.ui.node.tree.item
+      ':item-props': '{ box }'
       ':initial-expanded': true
       ':get-item': (node) => node
       ':get-children': (node) => node.children
@@ -10,21 +19,34 @@ dom:
       @node-hovered: onNodeHovered
 props:
   box: null
+  dataBoundSocketData: null
 data:
   viewNodeRoot: null
+  hoveredNode: null
   selectedNode: null
 methods:
+  onPinned: | #js
+    function(isPinned) {
+      const selectedNode = (isPinned ? this.hoveredNode : null);
+      this.selectedNode = selectedNode;
+      this.$refs.tree1.selectNode(selectedNode);
+    }
   onNodeSelect: | #js
     function(node) {
       this.selectedNode = node;
     }
   onNodeHovered: | #js
     function(node, isHovered) {
-      this.$emit('box-event', "node-hovered", node, isHovered);
+      this.hoveredNode = (isHovered ? node : null);
     }
   init: | #js
     function(box) {
       this.viewNodeRoot = (box.viewNodeRoot);
+    }
+computed:
+  activeNode: | #js
+    function() {
+      return (this.selectedNode || this.hoveredNode);
     }
 watch:
   box:
@@ -33,19 +55,29 @@ watch:
         this.init(box);
       }
     immediate: true
+  hoveredNode:
+    handler: | #js
+      function(node, oldNode) {
+        if (oldNode) this.$emit('box-event', "node-hovered", oldNode, false);
+        this.$emit('box-event', "node-hovered", node, true);
+      }
   selectedNode:
     handler: | #js
       function(node) {
         this.$emit('box-event', "node-select", node);
       }
+style: null
 _:
   examples:
     count: 0
 name: grid-ui-box-view-layout-left-side
 template: >-
   <div class="comp-grid-ui-box-view-layout-left-side"
-  path="-1094764498."><ui-tree :root="viewNodeRoot"
-  item-type="grid.ui.node.tree.item" :initial-expanded="true" :get-item="(node)
-  =&gt; node" :get-children="(node) =&gt; node.children"
-  @node-select="onNodeSelect" @node-hovered="onNodeHovered"
-  path="-1094764498.0"></ui-tree></div>
+  path="-1094764498."><ui-context-window @pinned="onPinned"
+  path="-1094764498.0"><grid-ui-node-settings v-if="activeNode" :box="box"
+  :node="activeNode" :data-bound-socket-data="dataBoundSocketData"
+  path="-1094764498.0.0"></grid-ui-node-settings></ui-context-window><ui-tree
+  ref="tree1" :root="viewNodeRoot" item-type="grid.ui.node.tree.item"
+  :item-props="{ box }" :initial-expanded="true" :get-item="(node) =&gt; node"
+  :get-children="(node) =&gt; node.children" @node-select="onNodeSelect"
+  @node-hovered="onNodeHovered" path="-1094764498.1"></ui-tree></div>

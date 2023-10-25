@@ -505,8 +505,8 @@ select, input[type=range]
 .menu li:hover,
 .menu3 li:hover
 {
-  background: #ffffff30;
-  cursor: pointer;
+  background: #ffffff20;
+  cursor: pointer !important;
   transition: 0s;
 }
 .menu3 li
@@ -697,7 +697,8 @@ select, input[type=range]
 }
 .drag-over
 {
-  border: 2px dashed #ffffff60;
+  border: 2px dashed yellow;
+  box-shadow: inset -6px 6px 2px #000000;
   border-radius: 0.5em;
   transition: 0.1s;
 }

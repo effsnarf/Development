@@ -1,13 +1,15 @@
 dom:
   div: 
     ':class': class1
+    ':style': style1
     ui.select:
       ':class': '{ corner: (type==''toggle'') }'
       ':options': (options||[]).map(option => _getOptionHtml(option))
       ':getUrl': getUrl
       ':direction': direction
       ':type': type
-      ':can-select-none': 'false'
+      ':can-select-none': canSelectNone
+      @item-hover: onItemHover
       v-model: selectedTabIndex
     div: 
       class: flex-grow-1
@@ -15,10 +17,12 @@ dom:
         name: header
       div: 
         v-for: (option, index) in options
+        class: not-selected
         transition:
-          ':name': (transitionName||'slide2')
-          div: 
-            v-show: (index == selectedTabIndex)
+          ':name': (transitionName||defaultTransitionName)
+          .tab:
+            v-if: (index == activeIndex)
+            ':style': getTabStyle(index)
             slot: 
               ':name': '''tab'' + index'
 props:
@@ -29,19 +33,23 @@ props:
   direction: vertical
   value: null
   transitionName: null
+  canSelectNone: false
 data:
-  selectedTabIndex: 0
-computed:
-  type: | #js
-    function() {
-      if (this.direction === 'toggle') return 'toggle';
-      return 'list';
-    }
-  class1: | #js
-    function() {
-      return null;
-    }
+  hoveredTabIndex: null
+  selectedTabIndex: null
 methods:
+  getTabStyle: | #js
+    function(index) {
+      const style = {};
+      if (index == this.selectedTabIndex) {
+        style.opacity = "1 !important";
+      }
+      return style;
+    }
+  onItemHover: | #js
+    function(e) {
+      this.hoveredTabIndex = e.index;
+    }
   _getOptionHtml: | #js
     function(option) {
       const getOptionHtml = (option) => {
@@ -54,6 +62,36 @@ methods:
         html = `<img src="${html}" />`;
       }
       return html;
+    }
+computed:
+  activeIndex: | #js
+    function() {
+      if (this.hoveredTabIndex != null) return this.hoveredTabIndex;
+      return this.selectedTabIndex;
+    }
+  defaultTransitionName: | #js
+    function() {
+      if (this.direction === 'vertical') return 'slide-hor';
+      return 'slide';
+    }
+  type: | #js
+    function() {
+      if (this.direction === 'toggle') return 'toggle';
+      return 'list';
+    }
+  class1: | #js
+    function() {
+      const cls = {};
+      cls[this.direction] = true;
+      return cls;
+    }
+  style1: | #js
+    function() {
+      const style = {};
+      style.display = 'flex';
+      style.flexDirection = ((this.direction == "vertical") ? "row" : "column");
+      style.gap = "1em";
+      return style;
     }
 watch:
   selectedTabIndex:
@@ -71,6 +109,16 @@ watch:
       this.selectedTabIndex = newIndex;
     }
 style:
+  .not-selected .tab:
+    opacity: 0.3 !important
+  .vertical li:
+    display: flex
+  .vertical li::after:
+    content: '''❯'''
+    opacity: 0.1 !important
+    margin-left: 2em
+    flex-grow: 1
+    text-align: right
   .comp-ui-select div:
     width: 100%
   .comp-ui-select img:
@@ -93,13 +141,16 @@ _:
   examples:
     count: 0
 template: >-
-  <div class="comp-ui-tabs" :class="class1" path="-484156776."><ui-select
-  :class="{ corner: (type=='toggle') }" :options="(options||[]).map(option =&gt;
-  _getOptionHtml(option))" :getUrl="getUrl" :direction="direction" :type="type"
-  :can-select-none="false" v-model="selectedTabIndex"
-  path="-484156776.0"></ui-select><div class="flex-grow-1"
-  path="-484156776.1"><slot name="header" path="-484156776.1.0"></slot><div
-  v-for="(option, index) in options" path="-484156776.1.1"><transition
-  :name="(transitionName||'slide2')" path="-484156776.1.1.0"><div v-show="(index
-  == selectedTabIndex)" path="-484156776.1.1.0.0"><slot :name="'tab' + index"
+  <div class="comp-ui-tabs" :class="class1" :style="style1"
+  path="-484156776."><ui-select :class="{ corner: (type=='toggle') }"
+  :options="(options||[]).map(option =&gt; _getOptionHtml(option))"
+  :getUrl="getUrl" :direction="direction" :type="type"
+  :can-select-none="canSelectNone" @item-hover="onItemHover"
+  v-model="selectedTabIndex" path="-484156776.0"></ui-select><div
+  class="flex-grow-1" path="-484156776.1"><slot name="header"
+  path="-484156776.1.0"></slot><div class="not-selected" v-for="(option, index)
+  in options" path="-484156776.1.1"><transition
+  :name="(transitionName||defaultTransitionName)" path="-484156776.1.1.0"><div
+  class="tab" v-if="(index == activeIndex)" :style="getTabStyle(index)"
+  path="-484156776.1.1.0.0"><slot :name="'tab' + index"
   path="-484156776.1.1.0.0.0"></slot></div></transition></div></div></div>

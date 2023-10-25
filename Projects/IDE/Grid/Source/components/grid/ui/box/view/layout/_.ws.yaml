@@ -5,8 +5,9 @@ dom:
     grid.ui.node.view:
       ':box': box
       ':node': viewNodeRoot
-      ':hovered-node': hoveredNode
+      ':active-node': activeNode
       ':data-bound-socket-data': dataBoundSocketData
+      @node-hovered: onNodeHovered
 props:
   userID: null
   box: null
@@ -17,15 +18,24 @@ data:
   links: []
   viewNodeRoot: null
   hoveredNode: null
+  selectedNode: null
 mounted: | #js
   async function() {
     await this.$nextTick();
     this.refresh();
   }
 methods:
+  onPinned: | #js
+    function(isPinned) {
+      this.selectedNode = (isPinned ? this.hoveredNode : null);
+    }
   onNodeHovered: | #js
     function(node, isHovered) {
       this.hoveredNode = (isHovered ? node : null);
+    }
+  onNodeSelect: | #js
+    function(node) {
+      this.selectedNode = node;
     }
   onTitleIconClick: | #js
     function() {
@@ -74,6 +84,10 @@ methods:
       this.viewNodeRoot = (box.viewNodeRoot || this.getNewViewNodeRoot());
     }
 computed:
+  activeNode: | #js
+    function() {
+      return (this.selectedNode || this.hoveredNode);
+    }
   items: | #js
     function() {
       const socketData = this.$root.socket?.runtime.data[this.box._id];
@@ -117,5 +131,6 @@ name: grid-ui-box-view-layout
 template: >-
   <grid-module class="comp-grid-ui-box-view-layout" icon="⬜" :show-title="false"
   path="814806846."><grid-ui-node-view :box="box" :node="viewNodeRoot"
-  :hovered-node="hoveredNode" :data-bound-socket-data="dataBoundSocketData"
+  :active-node="activeNode" :data-bound-socket-data="dataBoundSocketData"
+  @node-hovered="onNodeHovered"
   path="814806846.0"></grid-ui-node-view></grid-module>

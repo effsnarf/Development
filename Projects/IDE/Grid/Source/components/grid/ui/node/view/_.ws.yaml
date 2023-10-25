@@ -3,34 +3,70 @@ dom:
     ':box': box
     ':node': node
     ':data-bound-socket-data': dataBoundSocketData
-    component:
-      ':class': getViewClass(node)
-      ':is': getNodeCompName(node)
-      ':box': box
-      ':node': node
-      ':data-bound-socket-data': dataBoundSocketData
-      ':hovered-node': hoveredNode
+    ':class': cssClass
+    ui.dnd.dropzone:
+      @drop-item: onDropItem
+      component:
+        ':class': getViewClass(node)
+        ':is': getNodeCompName(node)
+        ':box': box
+        ':node': node
+        ':data-bound-socket-data': dataBoundSocketData
+        ':active-node': activeNode
+        @node-hovered: (...args) => $emit('node-hovered', ...args)
 props:
   box: null
   node: null
-  hoveredNode: null
+  activeNode: null
   dataBoundSocketData: null
 data: null
 methods:
+  onDropItem: | #js
+    function(dragItem) {
+      const parentNodeID = this.node._id;
+      const newNode = dragItem;
+      this.getBoxVue().$femit("create.node", this.box._id, parentNodeID, newNode);
+    }
+  getBoxVue: | #js
+    function() {
+      return this.$root.vm.getAncestors(this, "grid.ui.box")[0];
+    }
   getViewClass: | #js
     function(node) {
       const cls = {};
       cls["h-100pc"] = true;
       cls["_view-comp"] = true;
       cls["_grid-view-node"] = true;
-      cls["_grid-hovered"] = (node._id == this.hoveredNode?._id);
+      cls["_grid-hovered"] = (node._id == this.activeNode?._id);
       return cls;
     }
   getNodeCompName: | #js
     function(node) {
       return `grid.ui.node.view.${node.type}`.replace(/\./g, "-");
     }
+computed:
+  cssClass: | #js
+    function() {
+      const cls = {};
+      cls["_grid-hovered"] = (this.node._id == this.activeNode?._id);
+      return cls;
+    }
 style:
+  .comp-grid-ui-node-view:
+    height: 100%
+  div:
+    height: 100%
+  .empty:
+    display: flex
+    align-items: center
+    justify-content: center
+    font-size: 150%
+    opacity: 0.3
+    background: >-
+      repeating-linear-gradient(-45deg, #ffffff10, #ffffff10 20px, #ffffff20
+      10px, #ffffff20 40px)
+  .empty > div:
+    height: auto
   ._view-comp:
     transition: 0.1s
   ._grid-view-node:
@@ -45,7 +81,10 @@ _:
 name: grid-ui-node-view
 template: >-
   <grid-module class="comp-grid-ui-node-view" :box="box" :node="node"
-  :data-bound-socket-data="dataBoundSocketData" path="1824264671."><component
-  :class="getViewClass(node)" :is="getNodeCompName(node)" :box="box"
-  :node="node" :data-bound-socket-data="dataBoundSocketData"
-  :hovered-node="hoveredNode" path="1824264671.0"></component></grid-module>
+  :data-bound-socket-data="dataBoundSocketData" :class="cssClass"
+  path="1824264671."><ui-dnd-dropzone @drop-item="onDropItem"
+  path="1824264671.0"><component :class="getViewClass(node)"
+  :is="getNodeCompName(node)" :box="box" :node="node"
+  :data-bound-socket-data="dataBoundSocketData" :active-node="activeNode"
+  @node-hovered="(...args) =&gt; $emit('node-hovered', ...args)"
+  path="1824264671.0.0"></component></ui-dnd-dropzone></grid-module>

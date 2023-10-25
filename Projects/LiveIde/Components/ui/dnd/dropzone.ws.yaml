@@ -1,6 +1,6 @@
 dom:
   div:
-    class: dropzone
+    ':class': '{ dropzone: true, ''drag-over'': isDraggedOver }'
     @dragover: onDragOver
     @dragenter: onDragEnter
     @dragleave: onDragLeave
@@ -8,29 +8,29 @@ dom:
     @click: onClick
     slot: null
 props: null
+data:
+  isDraggedOver: false
 methods:
   onDragOver: | #js
     function(e) {
       e.preventDefault();
-      this.$el.classList.add('drag-over');
+      this.isDraggedOver = true;
     }
   onDragEnter: | #js
     function(e) {
       e.preventDefault();
-      this.$el.classList.add('drag-over');
-      this.$emit('drag-over', true);
+      this.isDraggedOver = true;
     }
   onDragLeave: | #js
     function(e) {
       e.preventDefault();
-      this.$el.classList.remove('drag-over');
-      this.$emit('drag-over', false);
+      this.isDraggedOver = false;
     }
   onDrop: | #js
     function(e) {
       e.preventDefault();
       e.stopPropagation();
-      this.$el.classList.remove('drag-over');
+      this.isDraggedOver = false;
       const dragItem = this.$root.dragItem;
       this.$root.dragItem = null;
       this.$emit('drag-over', false);
@@ -40,12 +40,14 @@ methods:
     function(e) {
       this.$emit('click', e);
     }
-style: null
+style:
+  .drag-over: null
 _:
   examples:
     count: 0
 name: ui-dnd-dropzone
 template: >-
-  <div class="comp-ui-dnd-dropzone dropzone" @dragover="onDragOver"
-  @dragenter="onDragEnter" @dragleave="onDragLeave" @drop="onDrop"
-  @click="onClick" path="-2085012855."><slot></slot></div>
+  <div class="comp-ui-dnd-dropzone" :class="{ dropzone: true, 'drag-over':
+  isDraggedOver }" @dragover="onDragOver" @dragenter="onDragEnter"
+  @dragleave="onDragLeave" @drop="onDrop" @click="onClick"
+  path="-2085012855."><slot></slot></div>

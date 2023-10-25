@@ -2,15 +2,21 @@ dom:
   grid.module:
     ':box': box
     ':data-bound-socket-data': dataBoundSocketData
-    div:
-      h3:
-        ui.title:
-          icon: 🧊
-          ':text': node.type + ' item'
-      ui.linq:
-        ':input': inputs?.[1]
-        v-model: linq.operations
-        @input: onLinqOperationsUpdate
+    h3:
+      ui.title:
+        icon: 🎄
+        ':text': node.type
+    ui.tabs:
+      ':options': '[''🧊 data'']'
+      direction: vertical
+      ':can-select-none': 'true'
+      template:
+        v-slot: tab0
+        div:
+          ui.linq:
+            ':input': inputs?.[1]
+            v-model: linq.operations
+            @input: onLinqOperationsUpdate
 props:
   box: null
   node: null
@@ -46,8 +52,10 @@ _:
 name: grid-ui-node-settings
 template: >-
   <grid-module class="comp-grid-ui-node-settings" :box="box"
-  :data-bound-socket-data="dataBoundSocketData" path="-1191877027."><div
-  path="-1191877027.0"><h3 path="-1191877027.0.0"><ui-title icon="🧊"
-  :text="node.type + ' item'" path="-1191877027.0.0.0"></ui-title></h3><ui-linq
+  :data-bound-socket-data="dataBoundSocketData" path="-1191877027."><h3
+  path="-1191877027.0"><ui-title icon="🎄" :text="node.type"
+  path="-1191877027.0.0"></ui-title></h3><ui-tabs :options="['🧊 data']"
+  direction="vertical" :can-select-none="true" path="-1191877027.1"><template
+  v-slot:tab0 path="-1191877027.1.0"><div path="-1191877027.1.0.0"><ui-linq
   :input="inputs?.[1]" v-model="linq.operations" @input="onLinqOperationsUpdate"
-  path="-1191877027.0.1"></ui-linq></div></grid-module>
+  path="-1191877027.1.0.0.0"></ui-linq></div></template></ui-tabs></grid-module>

@@ -1,19 +1,22 @@
 dom:
-  div:
-    .opacity-50:
+  div: 
+    .empty:
       v-if: '!node.children?.length'
-      v-text: '''[view]'''
+      div: 
+        v-text: '''[view]'''
     grid.ui.node.view:
       v-for: childNode in node.children
+      class: h-100pc
       ':box': box
       ':node': childNode
       ':data-bound-socket-data': dataBoundSocketData
-      ':hovered-node': hoveredNode
+      ':active-node': activeNode
+      @node-hovered: (...args) => $emit('node-hovered', ...args)
 props:
   box: null
   node: null
   dataBoundSocketData: null
-  hoveredNode: null
+  activeNode: null
 data: null
 style: null
 _:
@@ -22,8 +25,9 @@ _:
 name: grid-ui-node-view-view
 template: >-
   <div class="comp-grid-ui-node-view-view" path="-1435585196."><div
-  class="opacity-50" v-if="!node.children?.length" v-text="'[view]'"
-  path="-1435585196.0"></div><grid-ui-node-view v-for="childNode in
-  node.children" :box="box" :node="childNode"
-  :data-bound-socket-data="dataBoundSocketData" :hovered-node="hoveredNode"
-  path="-1435585196.1"></grid-ui-node-view></div>
+  class="empty" v-if="!node.children?.length" path="-1435585196.0"><div
+  v-text="'[view]'" path="-1435585196.0.0"></div></div><grid-ui-node-view
+  class="h-100pc" v-for="childNode in node.children" :box="box"
+  :node="childNode" :data-bound-socket-data="dataBoundSocketData"
+  :active-node="activeNode" @node-hovered="(...args) =&gt; $emit('node-hovered',
+  ...args)" path="-1435585196.1"></grid-ui-node-view></div>

@@ -1,6 +1,8 @@
 dom:
   div: 
     class: grid-module box2
+    @mouseenter: $emit('mouseenter', $event)
+    @mouseleave: $emit('mouseleave', $event)
     div: 
       v-if: icon && showTitle
       h3:
@@ -228,11 +230,12 @@ _:
     count: 0
 name: grid-module
 template: >-
-  <div class="comp-grid-module grid-module box2" path="1449764372."><div
-  v-if="icon &amp;&amp; showTitle" path="1449764372.0"><h3
-  path="1449764372.0.0"><ui-title :icon="icon" :text="compName"
-  :number="getTitle()" path="1449764372.0.0.0"></ui-title></h3></div><div
-  class="module-content" path="1449764372.1"><slot></slot></div><div
-  class="mt-l1" v-if="showEvents" :key="key1"
-  path="1449764372.2"></div><ui-linq-evaluator ref="evaluator1"
+  <div class="comp-grid-module grid-module box2"
+  @mouseenter="$emit('mouseenter', $event)" @mouseleave="$emit('mouseleave',
+  $event)" path="1449764372."><div v-if="icon &amp;&amp; showTitle"
+  path="1449764372.0"><h3 path="1449764372.0.0"><ui-title :icon="icon"
+  :text="compName" :number="getTitle()"
+  path="1449764372.0.0.0"></ui-title></h3></div><div class="module-content"
+  path="1449764372.1"><slot></slot></div><div class="mt-l1" v-if="showEvents"
+  :key="key1" path="1449764372.2"></div><ui-linq-evaluator ref="evaluator1"
   path="1449764372.3"></ui-linq-evaluator></div>

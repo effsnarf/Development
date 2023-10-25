@@ -1,16 +1,22 @@
 dom:
   .flex1.flex.justify-between:
+    .empty:
+      v-if: '!node.children?.length'
+      v-for: i in 2
+      div:
+        v-text: '''[panel]'''
     grid.ui.node.view:
       v-for: childNode in node.children
       ':box': box
       ':node': childNode
       ':data-bound-socket-data': dataBoundSocketData
-      ':hovered-node': hoveredNode
+      ':active-node': activeNode
+      @node-hovered: (...args) => $emit('node-hovered', ...args)
 props:
   box: null
   node: null
   dataBoundSocketData: null
-  hoveredNode: null
+  activeNode: null
 data: null
 mounted: | #js
   function() {
@@ -22,7 +28,7 @@ style:
   .comp-grid-ui-node-view-panel._grid-hovered > *:
     border: 3px dashed yellow
     box-shadow: '-4px 4px 2px black'
-    margin: 0.5em
+    margin: 0.1em
     transition: margin 0.3s, border 0.1s
   .flex1 > *:nth-child(1):
     width: 30%
@@ -34,6 +40,10 @@ _:
 name: grid-ui-node-view-panel
 template: >-
   <div class="comp-grid-ui-node-view-panel flex1 flex justify-between"
-  path="-1559239371."><grid-ui-node-view v-for="childNode in node.children"
-  :box="box" :node="childNode" :data-bound-socket-data="dataBoundSocketData"
-  :hovered-node="hoveredNode" path="-1559239371.0"></grid-ui-node-view></div>
+  path="-1559239371."><div class="empty" v-if="!node.children?.length" v-for="i
+  in 2" path="-1559239371.0"><div v-text="'[panel]'"
+  path="-1559239371.0.0"></div></div><grid-ui-node-view v-for="childNode in
+  node.children" :box="box" :node="childNode"
+  :data-bound-socket-data="dataBoundSocketData" :active-node="activeNode"
+  @node-hovered="(...args) =&gt; $emit('node-hovered', ...args)"
+  path="-1559239371.1"></grid-ui-node-view></div>

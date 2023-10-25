@@ -91,6 +91,7 @@ methods:
   onInput: | #js
     function(index) {
       const value = this.inputType === "index" ? index : this.options[index];
+      if (this.value === value) value = null;
       this.$emit("input", value);
     }
   _getItemKey: | #js
@@ -152,7 +153,12 @@ style:
   .comp-ui-list:
     user-select: none
   li:
+    margin-left: 0.5em
+    margin-bottom: 0.2em
     padding: 0.2em 0.5em
+  li.selected:
+    border: '1px solid #ffffff80'
+    box-shadow: '-6px 6px 6px black'
   li div:
     white-space: nowrap
   .clickable:

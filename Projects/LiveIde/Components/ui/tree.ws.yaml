@@ -12,6 +12,7 @@ dom:
         ':get-item-key': getItemKey || $root.getKey
         ':get-children': getChildren || ((node) => node.children||[])
         ':selected-node': selectedNode
+        ':item-props': itemProps
         @node-click: onChildClick
         @node-hover: onChildHover
         @node-unhover: onChildUnhover
@@ -24,9 +25,14 @@ props:
   getItem: null
   getItemKey: null
   getChildren: null
+  itemProps: null
 data:
   selectedNode: null
 methods:
+  selectNode: | #js
+    function(node) {
+      this.selectedNode = node;
+    }
   onChildClick: | #js
     function(child) {
       this.$emit('node-click', child);
@@ -101,6 +107,6 @@ template: >-
   :item-type="itemType" :get-item="getItem || ((node) =&gt; node?.item)"
   :get-item-key="getItemKey || $root.getKey" :get-children="getChildren ||
   ((node) =&gt; node.children||[])" :selected-node="selectedNode"
-  @node-click="onChildClick" @node-hover="onChildHover"
+  :item-props="itemProps" @node-click="onChildClick" @node-hover="onChildHover"
   @node-unhover="onChildUnhover" @node-hovered="onChildHovered"
   path="-484140360.0.0"></ui-tree-node></li></ul>
