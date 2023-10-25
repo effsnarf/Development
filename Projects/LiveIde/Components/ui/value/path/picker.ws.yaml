@@ -21,9 +21,10 @@ dom:
             ':key': part
             class: clickable
             @click: onSelectPart(part)
-            ui.title: 
-              icon: 🧊
-              ':text': part
+            .flex:
+              ui.title: 
+                icon: 🧊
+                ':text': part
 props:
   obj: null
   value: null
@@ -98,5 +99,6 @@ template: >-
   path="738107552.0.1.0"></ui-title></div><div class="next-parts"
   path="738107552.0.2"><ul path="738107552.0.2.0"><li class="clickable"
   v-for="part in nextPathParts" :key="part" @click="onSelectPart(part)"
-  path="738107552.0.2.0.0"><ui-title icon="🧊" :text="part"
-  path="738107552.0.2.0.0.0"></ui-title></li></ul></div></div></div>
+  path="738107552.0.2.0.0"><div class="flex"
+  path="738107552.0.2.0.0.0"><ui-title icon="🧊" :text="part"
+  path="738107552.0.2.0.0.0.0"></ui-title></div></li></ul></div></div></div>

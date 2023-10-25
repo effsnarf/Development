@@ -6,17 +6,43 @@ dom:
       ui.title:
         icon: 🎄
         ':text': node.type
-    ui.tabs:
-      ':options': '[''🧊 data'']'
+    ui.tabs: 
+      ':options': '[''🧊 data'', ''✨ style'']'
       direction: vertical
       ':can-select-none': 'true'
-      template:
+      template: 
         v-slot: tab0
-        div:
+        div: 
           ui.linq:
             ':input': inputs?.[1]
             v-model: linq.operations
             @input: onLinqOperationsUpdate
+      template: 
+        v-slot: tab1
+        div: 
+          ui.tabs: 
+            ':options': '[''🆎 font size'', ''🖼️ background'']'
+            direction: vertical
+            ':can-select-none': 'true'
+            template: 
+              v-slot: tab0
+              ul: 
+                li: 
+                  v-for: i in 10
+                  class: clickable
+                  ':key': i
+                  ':style': '{ ''font-size'': (1 + (i * 0.2)) + ''em'' }'
+                  v-text: '''font size'''
+            template: 
+              v-slot: tab1
+              ul: 
+                li: 
+                  v-for: i in 10
+                  class: clickable
+                  ':key': i
+                  ':style': >-
+                    { width: '10em', height: '2em', 'background-color': 'hsl(0,
+                    40%, ' + (i * 10) + '%)' }
 props:
   box: null
   node: null
@@ -46,6 +72,9 @@ watch:
         this.init(node);
       }
     immediate: true
+style:
+  li > *:first-child:
+    display: none
 _:
   examples:
     count: 0
@@ -54,8 +83,20 @@ template: >-
   <grid-module class="comp-grid-ui-node-settings" :box="box"
   :data-bound-socket-data="dataBoundSocketData" path="-1191877027."><h3
   path="-1191877027.0"><ui-title icon="🎄" :text="node.type"
-  path="-1191877027.0.0"></ui-title></h3><ui-tabs :options="['🧊 data']"
-  direction="vertical" :can-select-none="true" path="-1191877027.1"><template
-  v-slot:tab0 path="-1191877027.1.0"><div path="-1191877027.1.0.0"><ui-linq
-  :input="inputs?.[1]" v-model="linq.operations" @input="onLinqOperationsUpdate"
-  path="-1191877027.1.0.0.0"></ui-linq></div></template></ui-tabs></grid-module>
+  path="-1191877027.0.0"></ui-title></h3><ui-tabs :options="['🧊 data', '✨
+  style']" direction="vertical" :can-select-none="true"
+  path="-1191877027.1"><template v-slot:tab0 path="-1191877027.1.0"><div
+  path="-1191877027.1.0.0"><ui-linq :input="inputs?.[1]"
+  v-model="linq.operations" @input="onLinqOperationsUpdate"
+  path="-1191877027.1.0.0.0"></ui-linq></div></template><template v-slot:tab1
+  path="-1191877027.1.1"><div path="-1191877027.1.1.0"><ui-tabs :options="['🆎
+  font size', '🖼️ background']" direction="vertical" :can-select-none="true"
+  path="-1191877027.1.1.0.0"><template v-slot:tab0
+  path="-1191877027.1.1.0.0.0"><ul path="-1191877027.1.1.0.0.0.0"><li
+  class="clickable" v-for="i in 10" :key="i" :style="{ 'font-size': (1 + (i *
+  0.2)) + 'em' }" v-text="'font size'"
+  path="-1191877027.1.1.0.0.0.0.0"></li></ul></template><template v-slot:tab1
+  path="-1191877027.1.1.0.0.1"><ul path="-1191877027.1.1.0.0.1.0"><li
+  class="clickable" v-for="i in 10" :key="i" :style="{ width: '10em', height:
+  '2em', 'background-color': 'hsl(0, 40%, ' + (i * 10) + '%)' }"
+  path="-1191877027.1.1.0.0.1.0.0"></li></ul></template></ui-tabs></div></template></ui-tabs></grid-module>

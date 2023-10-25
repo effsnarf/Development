@@ -66,8 +66,8 @@ methods:
 computed:
   activeIndex: | #js
     function() {
-      if (this.hoveredTabIndex != null) return this.hoveredTabIndex;
-      return this.selectedTabIndex;
+      if (this.selectedTabIndex != null) return this.selectedTabIndex;
+      return this.hoveredTabIndex;
     }
   defaultTransitionName: | #js
     function() {

@@ -7,10 +7,6 @@ dom:
     div:
       v-if: selectedNode
       .box1:
-        grid.ui.node.settings:
-          ':box': box
-          ':node': selectedNode
-          ':data-bound-socket-data': dataBoundSocketData
         component:
           ':is': getSettingsCompName(selectedNode)
           ':box': box
@@ -53,10 +49,7 @@ template: >-
   :data-bound-socket-data="dataBoundSocketData"
   path="-2068571495."><grid-ui-node-toolbar v-if="!selectedNode"
   path="-2068571495.0"></grid-ui-node-toolbar><div v-if="selectedNode"
-  path="-2068571495.1"><div class="box1"
-  path="-2068571495.1.0"><grid-ui-node-settings :box="box" :node="selectedNode"
-  :data-bound-socket-data="dataBoundSocketData"
-  path="-2068571495.1.0.0"></grid-ui-node-settings><component
+  path="-2068571495.1"><div class="box1" path="-2068571495.1.0"><component
   :is="getSettingsCompName(selectedNode)" :box="box" :node="selectedNode"
   :data-bound-socket-data="dataBoundSocketData"
-  path="-2068571495.1.0.1"></component></div></div></grid-module>
+  path="-2068571495.1.0.0"></component></div></div></grid-module>
