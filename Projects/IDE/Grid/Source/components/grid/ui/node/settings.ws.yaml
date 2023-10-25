@@ -82,8 +82,6 @@ watch:
 style:
   .colors li:
     margin-bottom: 0.2em
-  li > *:first-child:
-    display: none
 _:
   examples:
     count: 0
@@ -107,5 +105,6 @@ template: >-
   path="-1191877027.1.1.0.0.0.0.0"></li></ul></template><template v-slot:tab1
   path="-1191877027.1.1.0.0.1"><ul class="colors"
   path="-1191877027.1.1.0.0.1.0"><li class="clickable" v-for="i in 10" :key="i"
-  :style="getBackgroundStyle(i)"
-  path="-1191877027.1.1.0.0.1.0.0"></li></ul></template></ui-tabs></div></template></ui-tabs></grid-module>
+  :style="getBackgroundStyle(i)" path="-1191877027.1.1.0.0.1.0.0"></li><li
+  class="opacity-40" v-text="'🔴 custom expression'"
+  path="-1191877027.1.1.0.0.1.0.1"></li></ul></template></ui-tabs></div></template></ui-tabs></grid-module>
