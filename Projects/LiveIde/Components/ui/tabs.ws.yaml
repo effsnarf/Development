@@ -71,7 +71,7 @@ computed:
     }
   defaultTransitionName: | #js
     function() {
-      if (this.direction === 'vertical') return 'slide-hor';
+      if (this.direction === 'vertical') return 'slide-hor-ver';
       return 'slide';
     }
   type: | #js

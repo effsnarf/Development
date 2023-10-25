@@ -245,6 +245,31 @@
 
 
 
+
+.slide-hor-ver-enter-active,
+.slide-hor-ver-leave-active,
+.slide-hor-ver-move {
+  transition: 1s;
+}
+.slide-hor-ver-enter,
+.slide-hor-ver-leave-to {
+  opacity: 0;
+  max-width: 0;
+  max-height: 0;
+  overflow: hidden;
+}
+.slide-hor-ver-enter-to,
+.slide-hor-ver-leave {
+  opacity: 1;
+  max-width: 30rem;
+  max-height: 30rem;
+  overflow: hidden;
+}
+
+
+
+
+
 .slide-hor-key-enter-active,
 .slide-hor-key-leave-active,
 .slide-hor-key-move {

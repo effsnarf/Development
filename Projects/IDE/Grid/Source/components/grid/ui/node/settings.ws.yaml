@@ -40,9 +40,7 @@ dom:
                   v-for: i in 10
                   class: clickable
                   ':key': i
-                  ':style': >-
-                    { width: '10em', height: '2em', 'background-color': 'hsl(0,
-                    40%, ' + (i * 10) + '%)' }
+                  ':style': getBackgroundStyle(i)
 props:
   box: null
   node: null
@@ -52,6 +50,14 @@ data:
   linq:
     operations: null
 methods:
+  getBackgroundStyle: | #js
+    function(i) {
+      return {
+        width: '10em',
+        height: '2em',
+        'background-color': `hsl(${((i / 10) * 255)}, 50%, 50%)`
+      };
+    }
   onLinqOperationsUpdate: | #js
     function() {
       const vBox = this.$root.vm.getAncestors(this, "grid.ui.box")[0];
@@ -97,6 +103,5 @@ template: >-
   0.2)) + 'em' }" v-text="'font size'"
   path="-1191877027.1.1.0.0.0.0.0"></li></ul></template><template v-slot:tab1
   path="-1191877027.1.1.0.0.1"><ul path="-1191877027.1.1.0.0.1.0"><li
-  class="clickable" v-for="i in 10" :key="i" :style="{ width: '10em', height:
-  '2em', 'background-color': 'hsl(0, 40%, ' + (i * 10) + '%)' }"
+  class="clickable" v-for="i in 10" :key="i" :style="getBackgroundStyle(i)"
   path="-1191877027.1.1.0.0.1.0.0"></li></ul></template></ui-tabs></div></template></ui-tabs></grid-module>
