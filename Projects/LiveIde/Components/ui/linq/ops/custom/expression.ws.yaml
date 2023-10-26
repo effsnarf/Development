@@ -52,7 +52,8 @@ computed:
     }
   hint: | #js
     function() {
-      return `return ${this.argNames.first()}.name;`;
+      let argName = (this.contextArgNames.first() || this.operationArgNames.first());
+      return `return ${argName}.name;`;
     }
   operationArgNames: | #js
     function() {

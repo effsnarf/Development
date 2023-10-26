@@ -327,7 +327,7 @@ computed:
         position: 'fixed',
         left: `0px`,
         top: `0px`,
-        transform: `translate(${(x - 120)}px, ${(y + 20)}px)`,
+        transform: `translate(${(x - 60)}px, ${(y + 60)}px)`,
       };
       style.background = "linear-gradient(to right, #303030, #101010)";
       style.border = "1px solid #ffffff30";
