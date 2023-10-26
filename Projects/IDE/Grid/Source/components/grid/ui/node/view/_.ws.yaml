@@ -3,7 +3,6 @@ dom:
     ':box': box
     ':node': node
     ':data-bound-socket-data': dataBoundSocketData
-    ':class': cssClass
     ui.dnd.dropzone:
       @drop-item: onDropItem
       component:
@@ -37,10 +36,15 @@ methods:
       const cls = {};
       cls["h-100pc"] = true;
       cls["_view-comp"] = true;
+      cls[this.getNodeIdClass()] = true;
       cls["_grid-view-node"] = true;
       cls["_grid-hovered"] = (node._id == this.activeNode?._id);
       if (node.style?.bg?.class) cls[node.style.bg.class] = true;
       return cls;
+    }
+  getNodeIdClass: | #js
+    function() {
+      return `box_${this.box._id}_node_${this.node._id}`;
     }
   getNodeCompName: | #js
     function(node) {
@@ -50,7 +54,7 @@ computed:
   cssClass: | #js
     function() {
       const cls = {};
-      cls[`box_${this.box._id}_node_${this.node._id}`] = true;
+      cls[this.getNodeIdClass()] = true;
       cls["_grid-hovered"] = (this.node._id == this.activeNode?._id);
       return cls;
     }
@@ -84,7 +88,7 @@ _:
 name: grid-ui-node-view
 template: >-
   <grid-module class="comp-grid-ui-node-view" :box="box" :node="node"
-  :data-bound-socket-data="dataBoundSocketData" :class="cssClass"
+  :data-bound-socket-data="dataBoundSocketData"
   path="1824264671."><ui-dnd-dropzone @drop-item="onDropItem"
   path="1824264671.0"><component :class="getViewClass(node)"
   :style="node.style?.css" :is="getNodeCompName(node)" :box="box" :node="node"

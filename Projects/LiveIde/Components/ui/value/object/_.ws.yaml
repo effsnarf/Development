@@ -10,26 +10,11 @@ dom:
         class: opacity-50
         v-if: false && specialTypeName
         v-text: specialTypeName
-    ui.tabs:
-      ':options': '[''🎄'', ''🆎'']'
-      direction: toggle
-      template: 
-        v-slot: tab0
-        pre: 
-          class: pre
-          ui.value.table:
-            ':value': value
-            ':depth': (depth + 1)
-      template: 
-        v-slot: tab1
-        .box1:
-          .error:
-            v-if: yamlError
-            v-text: yamlError
-          pre: 
-            v-if: '!yamlError'
-            class: pre
-            v-html: yaml
+    pre:
+      class: pre
+      ui.value.table:
+        ':value': value
+        ':depth': (depth + 1)
     .console-log-button:
       class: clickable
       title: console.log()
@@ -91,16 +76,9 @@ template: >-
   path="-1714629770.0"><div class="title" v-if="title" v-text="title"
   path="-1714629770.0.0"></div><div class="opacity-50 title" v-if="false
   &amp;&amp; specialTypeName" v-text="specialTypeName"
-  path="-1714629770.0.1"></div></div><ui-tabs :options="['🎄', '🆎']"
-  direction="toggle" path="-1714629770.1"><template v-slot:tab0
-  path="-1714629770.1.0"><pre class="pre"
-  path="-1714629770.1.0.0"><ui-value-table :value="value" :depth="(depth + 1)"
-  path="-1714629770.1.0.0.0"></ui-value-table></pre></template><template
-  v-slot:tab1 path="-1714629770.1.1"><div class="box1"
-  path="-1714629770.1.1.0"><div class="error" v-if="yamlError"
-  v-text="yamlError" path="-1714629770.1.1.0.0"></div><pre class="pre"
-  v-if="!yamlError" v-html="yaml"
-  path="-1714629770.1.1.0.1"></pre></div></template></ui-tabs><div
-  class="clickable console-log-button" title="console.log()" v-text="'💻'"
-  @click="() =&gt; consoleLog(value)" path="-1714629770.2"></div><ui-alert
-  ref="alert1" path="-1714629770.3"></ui-alert></div>
+  path="-1714629770.0.1"></div></div><pre class="pre"
+  path="-1714629770.1"><ui-value-table :value="value" :depth="(depth + 1)"
+  path="-1714629770.1.0"></ui-value-table></pre><div class="clickable
+  console-log-button" title="console.log()" v-text="'💻'" @click="() =&gt;
+  consoleLog(value)" path="-1714629770.2"></div><ui-alert ref="alert1"
+  path="-1714629770.3"></ui-alert></div>

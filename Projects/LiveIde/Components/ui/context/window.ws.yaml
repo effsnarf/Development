@@ -223,12 +223,12 @@ watch:
     handler: | #js
       async function(isVisible) {
         if (isVisible) {
-          this.enqueueTask(() => { this.isVisibleOuter = true; }, 100);
-          this.enqueueTask(() => { this.isVisibleInner = true; });
+          this.enqueueTask((() => { this.isVisibleOuter = true; }).bind(this), 100);
+          this.enqueueTask((() => { this.isVisibleInner = true; }).bind(this));
         }
         else {
-          this.enqueueTask(() => { this.isVisibleInner = false; }, 100);
-          this.enqueueTask(() => { this.isVisibleOuter = false; });
+          this.enqueueTask((() => { this.isVisibleInner = false; }).bind(this), 100);
+          this.enqueueTask((() => { this.isVisibleOuter = false; }).bind(this));
         }
         this.nextTaskQueue();
       }

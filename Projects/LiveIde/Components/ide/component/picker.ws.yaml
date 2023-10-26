@@ -213,8 +213,8 @@ watch:
     immediate: true
   showPicker:
     handler: | #js
-      function(visible) {
-        if (!visible && !this.$refs.context1?.isPinned) this.selectedVueUID = null;
+      function(showPicker) {
+        if (!showPicker && !this.$refs.context1?.isPinned) this.selectedVueUID = null;
       }
     immediate: true
 style:

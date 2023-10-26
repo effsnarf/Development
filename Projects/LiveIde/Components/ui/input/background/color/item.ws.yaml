@@ -1,0 +1,54 @@
+dom:
+  .item:
+    ':class': cssClass1
+    @mouseenter: onItemHover(colorClass, true)
+    @mouseleave: onItemHover(colorClass, false)
+    @click: onItemClick(colorClass)
+props:
+  colorClass: null
+  value: null
+  large: null
+methods:
+  onItemHover: | #js
+    function(colorClass, isHovered) {
+      this.$emit('hover', colorClass, isHovered);
+    }
+  onItemClick: | #js
+    function(colorClass) {
+      if (colorClass == this.value) colorClass = null;
+      this.$emit('input', colorClass);
+    }
+computed:
+  cssClass1: | #js
+    function() {
+      const cls = {};
+      if (typeof this.colorClass == "string") cls[this.colorClass] = true;
+      if (typeof this.colorClass == "object") Object.assign(cls, this.value);
+      cls.selected1 = (this.value == this.colorClass);
+      cls.large = this.large;
+      return cls;
+    }
+style:
+  .item.large:
+    width: 10em !important
+  .item:
+    width: 6em
+    height: 2em
+    text-shadow: '-3px 3px 1px black'
+    box-shadow: 'inset -6px 6px 12px #000000d0'
+    opacity: 0.7
+    cursor: pointer
+  .item:hover, .item.selected1:
+    opacity: 1
+  .item.selected1:
+    box-shadow: '-6px 6px 12px black, inset -4px 4px 8px #ffffffd0'
+    margin-left: 0
+_:
+  examples:
+    count: 0
+name: ui-input-background-color-item
+template: >-
+  <div class="comp-ui-input-background-color-item item" :class="cssClass1"
+  @mouseenter="onItemHover(colorClass, true)"
+  @mouseleave="onItemHover(colorClass, false)" @click="onItemClick(colorClass)"
+  path="-1984621568."></div>

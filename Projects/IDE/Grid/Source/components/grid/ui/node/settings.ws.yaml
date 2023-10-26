@@ -33,11 +33,9 @@ dom:
                 v-model: fontSize
             template: 
               v-slot: tab1
-              ui.value:
-                ':value': bgColorClass
               ui.input.background.color:
                 v-if: 'true'
-                @value-hover: previewBackgroundColor
+                @value-preview: previewBackgroundColor
                 v-model: bgColorClass
 props:
   box: null
@@ -56,14 +54,20 @@ methods:
       this.previewStyle('fontSize', value);
     }
   previewBackgroundColor: | #js
-    function(bgColorClass, isHovered) {
-      this.previewClass(bgColorClass, isHovered);
+    function(bgColorClass, isPreview) {
+      this.previewClass(bgColorClass, isPreview);
     }
   previewClass: | #js
     function(className, isSet) {
       this.preview((element) => {
-        if (isSet) element.classList.add(className);
-        else element.classList.remove(className);
+        if (isSet) {
+          element.classList.add(className);
+          element.classList.remove(this.bgColorClass);
+        }
+        else {
+          element.classList.remove(className);
+          element.classList.add(this.bgColorClass);
+        }
       });
     }
   previewStyle: | #js
@@ -121,9 +125,7 @@ watch:
       function(bgColorClass) {
         this.setNodeData({ style: { bg: { class: bgColorClass } } });
       }
-style:
-  .colors li:
-    margin-bottom: 0.2em
+style: null
 _:
   examples:
     count: 0
@@ -144,7 +146,6 @@ template: >-
   path="-1191877027.1.1.0.0.0"><ui-input-font-size
   @value-hover="previewFontSize" v-model="fontSize"
   path="-1191877027.1.1.0.0.0.0"></ui-input-font-size></template><template
-  v-slot:tab1 path="-1191877027.1.1.0.0.1"><ui-value :value="bgColorClass"
-  path="-1191877027.1.1.0.0.1.0"></ui-value><ui-input-background-color
-  v-if="true" @value-hover="previewBackgroundColor" v-model="bgColorClass"
-  path="-1191877027.1.1.0.0.1.1"></ui-input-background-color></template></ui-tabs></div></template></ui-tabs></grid-module>
+  v-slot:tab1 path="-1191877027.1.1.0.0.1"><ui-input-background-color
+  v-if="true" @value-preview="previewBackgroundColor" v-model="bgColorClass"
+  path="-1191877027.1.1.0.0.1.0"></ui-input-background-color></template></ui-tabs></div></template></ui-tabs></grid-module>

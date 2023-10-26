@@ -99,6 +99,7 @@ watch:
   direction:
     handler: | #js
       function(direction) {
+        //this.selectedTabIndex = null;
       }
     immediate: true
   selectedTabIndex:
@@ -126,9 +127,9 @@ watch:
 style:
   .not-selected .tab:
     opacity: 0.3 !important
-  .vertical li:
+  .menu3.vertical li:
     display: flex
-  .vertical li::after:
+  .menu3.vertical li::after:
     content: '''❯'''
     opacity: 0.1 !important
     margin-left: 2em
