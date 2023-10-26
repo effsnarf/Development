@@ -27,6 +27,7 @@ dom:
         multiline: true
         v-model: operation.func
       div: 
+        class: opacity-50 larger-text
         v-text: '''}'''
 props:
   context: null
@@ -51,7 +52,7 @@ computed:
     }
   hint: | #js
     function() {
-      return `return ${this.argNames.first()}`;
+      return `return ${this.argNames.first()}.name;`;
     }
   operationArgNames: | #js
     function() {
@@ -82,8 +83,6 @@ style:
   pre:
     font-size: 120%
     background: '#303030'
-  textarea:
-    margin-left: 1em
 _:
   examples:
     count: 0
@@ -103,5 +102,5 @@ template: >-
   path="-1313227483.0.0.1.1"></div></div><div class="opacity-50 larger-text"
   v-text="') {'" path="-1313227483.0.0.2"></div></div><ui-input-text-box
   :hint="hint" multiline="true" v-model="operation.func"
-  path="-1313227483.0.1"></ui-input-text-box><div v-text="'}'"
-  path="-1313227483.0.2"></div></pre></div>
+  path="-1313227483.0.1"></ui-input-text-box><div class="opacity-50 larger-text"
+  v-text="'}'" path="-1313227483.0.2"></div></pre></div>
