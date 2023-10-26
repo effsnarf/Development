@@ -3,8 +3,8 @@ dom:
     v-if: rect
     ':style': style
     ':class': >-
-      Object.assign({ hovered: (isFullSize), 'auto-expand': autoExpand },
-      (cssClass||{}))
+      Object.assign({ hovered: (isFullSize), minimized: rect.is.minimized,
+      'auto-expand': autoExpand }, (cssClass||{}))
     @mouseenter: (e) => { isHovered++; $emit('mouseenter', e); }
     @mouseleave: (e) => { isHovered=0; $emit('mouseleave', e); }
     @dragenter: (e) => { isHovered++; }
@@ -379,9 +379,9 @@ _:
 name: ui-window
 template: >-
   <div class="comp-ui-window" v-if="rect" :style="style" :class="Object.assign({
-  hovered: (isFullSize), 'auto-expand': autoExpand }, (cssClass||{}))"
-  @mouseenter="(e) =&gt; { isHovered++; $emit('mouseenter', e); }"
-  @mouseleave="(e) =&gt; { isHovered=0; $emit('mouseleave', e); }"
+  hovered: (isFullSize), minimized: rect.is.minimized, 'auto-expand': autoExpand
+  }, (cssClass||{}))" @mouseenter="(e) =&gt; { isHovered++; $emit('mouseenter',
+  e); }" @mouseleave="(e) =&gt; { isHovered=0; $emit('mouseleave', e); }"
   @dragenter="(e) =&gt; { isHovered++; }" @dragleave="(e) =&gt; { isHovered--;
   }" path="-1324571510."><div class="above" :style="{ width:
   rect1.size.width+'px' }" @dragenter="(e) =&gt; { isHovered++; }"

@@ -124,6 +124,7 @@ mounted: | #js
     await this.$nextTick();
     await this.$root.wait(() => this.$refs.window1?.$refs.window);
     this.$root.els[`/box/window/${this.box._id}`] = this.$refs.window1.$refs.window;
+    //document.body.appendChild(this.$el);
   }
 unmounted: | #js
   function() {
@@ -297,8 +298,14 @@ methods:
       let g = parseInt(hexColor.substring(3, 5), 16);
       let b = parseInt(hexColor.substring(5, 7), 16);
 
-      let darkColor = `rgba(${Math.floor(r * 0.8)}, ${Math.floor(g * 0.8)}, ${Math.floor(b * 0.8)}, ${opacity * 0.8})`;
-      let lightColor = `rgba(${Math.floor(r * 0.9)}, ${Math.floor(g * 0.9)}, ${Math.floor(b * 0.9)}, ${opacity * 0.9})`;
+      const dark = 0.8;
+      const light = 0.9;
+
+      const dark1 = (dark * opacity);
+      const light1 = (light * opacity);
+
+      let darkColor = `rgba(${Math.floor(r * 0.8 * dark1)}, ${Math.floor(g * 0.8 * dark1)}, ${Math.floor(b * 0.8 * dark1)})`;
+      let lightColor = `rgba(${Math.floor(r * 0.9 * light1)}, ${Math.floor(g * 0.9 * light1)}, ${Math.floor(b * 0.9 * light1)})`;
 
       return `linear-gradient(to right, ${darkColor}, ${lightColor})`;
     }
@@ -401,6 +408,10 @@ style:
     transform-origin: 0 top
   .below .sockets:
     transform: translate(0em, -200%)
+  .minimized .above .sockets:
+    transform: translate(0em, 0%)
+  .minimized .below .sockets:
+    transform: translate(0em, -50%)
   .hovered .above .sockets, .hovered .below .sockets:
     opacity: 1
   .hovered .above .sockets:

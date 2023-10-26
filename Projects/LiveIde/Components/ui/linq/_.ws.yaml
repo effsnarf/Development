@@ -9,6 +9,7 @@ dom:
             .show-on-hover-container:
               .operation:
                 ui.linq.operation:
+                  ':context': context
                   ':input': datas[index]
                   ':value': operation
                   @input: (operation) => $set(operations, index, operation)
@@ -30,6 +31,7 @@ dom:
       ui.linq.evaluator:
         ref: evaluator1
 props:
+  context: null
   input: null
   value: null
 data:
@@ -46,7 +48,7 @@ methods:
     }
   evaluateChain: | #js
     function() {
-      this.datas = this.$refs.evaluator1.evaluateOps(this.input, this.operations);
+      this.datas = this.$refs.evaluator1.evaluateOps(this.context, this.input, this.operations);
     }
   addOperation: | #js
     function(operation) {
@@ -63,7 +65,7 @@ watch:
     immediate: true
   operations:
     handler: | #js
-      function(operations) {
+      async function(operations) {
         this.evaluateChain();
         this.$emit("input", operations);
       }
@@ -112,12 +114,12 @@ template: >-
   in operations" :key="operation._id" path="-484387046.0.0.0"><div
   path="-484387046.0.0.0.0"><div class="show-on-hover-container"
   path="-484387046.0.0.0.0.0"><div class="operation"
-  path="-484387046.0.0.0.0.0.0"><ui-linq-operation :input="datas[index]"
-  :value="operation" @input="(operation) =&gt; $set(operations, index,
-  operation)" path="-484387046.0.0.0.0.0.0.0"></ui-linq-operation><div
-  class="delete-button show-on-hover-2"
-  path="-484387046.0.0.0.0.0.0.1"><ui-button :icon="isConfirmed[index] ? '❌' :
-  '✖'" @click="onClickDelete(index)"
+  path="-484387046.0.0.0.0.0.0"><ui-linq-operation :context="context"
+  :input="datas[index]" :value="operation" @input="(operation) =&gt;
+  $set(operations, index, operation)"
+  path="-484387046.0.0.0.0.0.0.0"></ui-linq-operation><div class="delete-button
+  show-on-hover-2" path="-484387046.0.0.0.0.0.0.1"><ui-button
+  :icon="isConfirmed[index] ? '❌' : '✖'" @click="onClickDelete(index)"
   path="-484387046.0.0.0.0.0.0.1.0"></ui-button></div></div></div><div
   class="next" v-text="'↓'"
   path="-484387046.0.0.0.0.1"></div></div></div></div><div

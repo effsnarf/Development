@@ -13,6 +13,7 @@ dom:
       div: 
         v-for: field in fields
         ui.checkbox:
+          ':key': field
           ':text': field
           ':value-array': selectedFields
           ':value-key': field
@@ -64,5 +65,6 @@ template: >-
   :value="!selectedFields?.length ? '[select fields]' : '[' +
   selectedFields.join(', ') + ']'" path="20302585.0.0"></ui-value></div><div
   path="20302585.1"><div v-for="field in fields"
-  path="20302585.1.0"><ui-checkbox :text="field" :value-array="selectedFields"
-  :value-key="field" path="20302585.1.0.0"></ui-checkbox></div></div></div>
+  path="20302585.1.0"><ui-checkbox :key="field" :text="field"
+  :value-array="selectedFields" :value-key="field"
+  path="20302585.1.0.0"></ui-checkbox></div></div></div>

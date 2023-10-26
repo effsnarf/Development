@@ -12,7 +12,7 @@ data:
   errors: []
 methods:
   evaluateOps: | #js
-    function(input, operations) {
+    function(context, input, operations) {
       this.errors = [];
       const datas = [];
       datas.push(input);
@@ -20,7 +20,7 @@ methods:
       for (const operation of operations) {
         try
         {
-          const output = this.evaluate(datas.last(), operation);
+          const output = this.evaluate(context, datas.last(), operation);
           datas.push(output);
         }
         catch (ex)
@@ -32,12 +32,14 @@ methods:
       return datas;
     }
   evaluate: | #js
-    function(input, operation) {
+    function(context, input, operation) {
       if (!input) return null;
       if (!operation) return input;
       const method = this[`${operation.type}`.replace(/\./g, "_")];
       if (!method) throw new Error(`Method ${operation.type} not found`);
-      const output = method(input, operation);
+      const args = [input, operation];
+      if (operation.type == "custom.expression") args.unshift(context);
+      const output = method(...args);
       return output;
     }
   select_field: | #js
@@ -63,10 +65,51 @@ methods:
       return input.flatMap(item => item[key1]);
     }
   custom_expression: | #js
-    function(input, op) {
+    function(context, input, op) {
       if (!op?.func) return input;
-      const func = eval(op.func);
-      return func(Objects.clone(input));
+      const func = this.getFuncDecl(op.func);
+      if (func.argNames.length > 1) throw new Error("Custom expression can have at most one argument");
+      const argNames = [];
+      const argValues = [];
+      if (func.argNames.length) {
+        argNames.push(func.argNames[0]);
+        argValues.push(Objects.clone(input));
+      }
+      argNames.push(...Object.keys(context));
+      argValues.push(...Objects.clone(Object.values(context)));
+      const rtFunc = eval(`(${argNames.join(",")}) => { ${func.body} }`);
+      const output = rtFunc(...argValues);
+      return output;
+    }
+  getFuncDecl: | #js
+    function(code) {
+      // Initialize argNames and body
+      let argNames = [];
+      let body = code;
+
+      // Regular expression to match the outermost function (function declaration or arrow function)
+      const functionPattern = /(function\s*\w*\s*\([^)]*\)|\([^)]*\)\s*=>)\s*{([\s\S]*)}/;
+
+      // Check if the code matches the function pattern
+      const match = code.match(functionPattern);
+
+      if (match) {
+        // Extract argument names
+        const argsPattern = /\(([^)]*)\)/;
+        const argsMatch = match[1].match(argsPattern);
+
+        if (argsMatch) {
+          argNames = argsMatch[1].split(',').map(arg => arg.trim());
+        }
+
+        // Extract the body
+        body = match[2];
+      } else if (code.startsWith("`") && code.endsWith("`")) {
+        // If code is "${...}", add "return" before it
+        body = `return ${code}`;
+      }
+
+      return { argNames, body };
     }
   no_op: | #js
     function(input, op) {

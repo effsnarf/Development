@@ -15,6 +15,7 @@ dom:
         v-slot: tab0
         div: 
           ui.linq:
+            ':context': boxContext
             ':input': inputs?.[1]
             v-model: linq.operations
             @input: onLinqOperationsUpdate
@@ -29,12 +30,11 @@ dom:
             template: 
               v-slot: tab0
               ui.input.font.size:
-                @value-hover: previewFontSize
+                @value-preview: previewFontSize
                 v-model: fontSize
             template: 
               v-slot: tab1
               ui.input.background.color:
-                v-if: 'true'
                 @value-preview: previewBackgroundColor
                 v-model: bgColorClass
 props:
@@ -42,6 +42,7 @@ props:
   node: null
   dataBoundSocketData: null
 data:
+  boxContext: null
   inputs: null
   linq:
     operations: null
@@ -50,30 +51,34 @@ data:
 methods:
   previewFontSize: | #js
     function(e) {
-      const value = (e.isHover ? e.value : null);
-      this.previewStyle('fontSize', value);
+      this.previewStyle('fontSize', e.value, this.fontSize, e.isHover);
     }
   previewBackgroundColor: | #js
     function(bgColorClass, isPreview) {
-      this.previewClass(bgColorClass, isPreview);
+      this.previewClass(bgColorClass, this.bgColorClass, isPreview);
     }
   previewClass: | #js
-    function(className, isSet) {
+    function(className, defaultClassName, isSet) {
       this.preview((element) => {
         if (isSet) {
           element.classList.add(className);
-          element.classList.remove(this.bgColorClass);
+          element.classList.remove(defaultClassName);
         }
         else {
           element.classList.remove(className);
-          element.classList.add(this.bgColorClass);
+          element.classList.add(defaultClassName);
         }
       });
     }
   previewStyle: | #js
-    function(key, value) {
+    function(key, value, defaultValue, isSet) {
       this.preview((element) => {
-        element.style[key] = value;
+        if (isSet) {
+          element.style[key] = value;
+        }
+        else {
+          element.style[key] = defaultValue;
+        }
       });
     }
   preview: | #js
@@ -137,15 +142,15 @@ template: >-
   path="-1191877027.0.0"></ui-title></h2><ui-tabs :options="['🧊 data', '✨
   style']" direction="vertical" :can-select-none="true"
   path="-1191877027.1"><template v-slot:tab0 path="-1191877027.1.0"><div
-  path="-1191877027.1.0.0"><ui-linq :input="inputs?.[1]"
+  path="-1191877027.1.0.0"><ui-linq :context="boxContext" :input="inputs?.[1]"
   v-model="linq.operations" @input="onLinqOperationsUpdate"
   path="-1191877027.1.0.0.0"></ui-linq></div></template><template v-slot:tab1
   path="-1191877027.1.1"><div path="-1191877027.1.1.0"><ui-tabs :options="['🆎
   font size', '🖼️ background']" direction="vertical" :can-select-none="true"
   path="-1191877027.1.1.0.0"><template v-slot:tab0
   path="-1191877027.1.1.0.0.0"><ui-input-font-size
-  @value-hover="previewFontSize" v-model="fontSize"
+  @value-preview="previewFontSize" v-model="fontSize"
   path="-1191877027.1.1.0.0.0.0"></ui-input-font-size></template><template
   v-slot:tab1 path="-1191877027.1.1.0.0.1"><ui-input-background-color
-  v-if="true" @value-preview="previewBackgroundColor" v-model="bgColorClass"
+  @value-preview="previewBackgroundColor" v-model="bgColorClass"
   path="-1191877027.1.1.0.0.1.0"></ui-input-background-color></template></ui-tabs></div></template></ui-tabs></grid-module>

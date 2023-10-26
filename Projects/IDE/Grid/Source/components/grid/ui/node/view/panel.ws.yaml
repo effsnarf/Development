@@ -31,7 +31,7 @@ style:
     margin: 0.1em
     transition: margin 0.3s, border 0.1s
   .flex1:
-    flex-direction: column
+    flex-direction: row
   .flex1 > *:nth-child(4):
     width: 30%
   .flex1 > *:nth-child(5):

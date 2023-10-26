@@ -1,9 +1,11 @@
 dom:
   div:
     ui.linq.operation.any:
+      ':context': context
       ':input': input
       v-model: operation
 props:
+  context: null
   input: null
   value: null
 data:
@@ -29,5 +31,5 @@ _:
 name: ui-linq-operation
 template: >-
   <div class="comp-ui-linq-operation" path="-188258413."><ui-linq-operation-any
-  :input="input" v-model="operation"
+  :context="context" :input="input" v-model="operation"
   path="-188258413.0"></ui-linq-operation-any></div>

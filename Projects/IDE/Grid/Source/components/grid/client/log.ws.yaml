@@ -9,6 +9,7 @@ dom:
           ui.value: 
             ':value': hoveredLogItem.data
       table:
+        v-if: 'false'
         tr:
           v-for: (logItem, index) in visibleLogItems
           @mouseenter: onItemHover(logItem, true)
@@ -80,11 +81,11 @@ template: >-
   path="-1813344695.0.0"><div v-if="hoveredLogItem"
   path="-1813344695.0.0.0"><ui-value :value="hoveredLogItem.data"
   path="-1813344695.0.0.0.0"></ui-value></div></ui-context-window><table
-  path="-1813344695.0.1"><tr v-for="(logItem, index) in visibleLogItems"
-  @mouseenter="onItemHover(logItem, true)" @mouseleave="onItemHover(logItem,
-  false)" path="-1813344695.0.1.0"><td class="opacity-10" v-text="logItem._id"
-  path="-1813344695.0.1.0.0"></td><td path="-1813344695.0.1.0.1"><div
-  v-if="logItem.elapsed===undefined"
+  v-if="false" path="-1813344695.0.1"><tr v-for="(logItem, index) in
+  visibleLogItems" @mouseenter="onItemHover(logItem, true)"
+  @mouseleave="onItemHover(logItem, false)" path="-1813344695.0.1.0"><td
+  class="opacity-10" v-text="logItem._id" path="-1813344695.0.1.0.0"></td><td
+  path="-1813344695.0.1.0.1"><div v-if="logItem.elapsed===undefined"
   path="-1813344695.0.1.0.1.0"><ui-loading></ui-loading></div><div
   v-if="logItem.elapsed" :class="getElapsedClass(logItem.elapsed)"
   v-text="logItem.elapsed.unitifyTime()"

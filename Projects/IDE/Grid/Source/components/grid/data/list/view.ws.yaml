@@ -13,7 +13,7 @@ dom:
           ':text': fuid
           ':number': items.length
       ul:
-        v-if: 'true'
+        v-if: 'false'
         class: '{ reverse }'
         li:
           v-for: (item, index) in visibleItems
@@ -81,7 +81,7 @@ template: >-
   overflow="true" path="-1148091303.0.0.0"></ui-value></ui-context-window><h3
   path="-1148091303.0.1"><ui-title :icon="getFuidIcon(fuid)" :text="fuid"
   :number="items.length" path="-1148091303.0.1.0"></ui-title></h3><ul class="{
-  reverse }" v-if="true" path="-1148091303.0.2"><li v-for="(item, index) in
+  reverse }" v-if="false" path="-1148091303.0.2"><li v-for="(item, index) in
   visibleItems" @mouseenter="() =&gt; onItemHover(item, true)" @mouseleave="()
   =&gt; onItemHover(item, false)" path="-1148091303.0.2.0"><slot
   path="-1148091303.0.2.0.0"><component :is="getItemCompName(fuid)"

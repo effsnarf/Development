@@ -3,8 +3,8 @@ dom:
     table:
       tr:
         v-for: (option, index) in options
-        ':class': getOptionCssClass(index)
         ':key': option
+        ':class': getOptionCssClass(index)
         ':style': '{ ''font-size'': option }'
         @mouseenter: onHoverItem(index, true)
         @mouseleave: onHoverItem(index, false)
@@ -27,11 +27,12 @@ methods:
   onHoverItem: | #js
     function(index, isHover) {
       const value = this.getOptionValue(index);
-      this.$emit('value-hover', { index, value, isHover });
+      this.$emit('value-preview', { index, value, isHover });
     }
   onClickItem: | #js
-    function(index) {
-      const value = this.getOptionValue(index);
+    async function(index) {
+      let value = this.getOptionValue(index);
+      if (value == this.value) value = null;
       this.$emit('input', value);
     }
   getOptionCssClass: | #js
@@ -66,10 +67,10 @@ _:
 name: ui-input-font-size
 template: >-
   <div class="comp-ui-input-font-size box0" path="951361986."><table
-  path="951361986.0"><tr v-for="(option, index) in options"
-  :class="getOptionCssClass(index)" :key="option" :style="{ 'font-size': option
-  }" @mouseenter="onHoverItem(index, true)" @mouseleave="onHoverItem(index,
-  false)" @click="onClickItem(index)" path="951361986.0.0"><td
+  path="951361986.0"><tr v-for="(option, index) in options" :key="option"
+  :class="getOptionCssClass(index)" :style="{ 'font-size': option }"
+  @mouseenter="onHoverItem(index, true)" @mouseleave="onHoverItem(index, false)"
+  @click="onClickItem(index)" path="951361986.0.0"><td
   path="951361986.0.0.0"><div class="opacity-50" v-text="option"
   path="951361986.0.0.0.0"></div></td><td v-text="text"
   path="951361986.0.0.1"></td></tr></table></div>

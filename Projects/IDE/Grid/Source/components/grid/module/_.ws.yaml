@@ -138,6 +138,15 @@ methods:
     function(box, data) {
       if (this.$parent.onBoxUpdated) this.$parent.onBoxUpdated(box, data);
     }
+  getBoxContext: | #js
+    function(activeSocketData) {
+      const context = {};
+      if (!this.box) return context;
+      for (const socket of this.box.sockets.input) {
+        context[socket.name] = activeSocketData.input?.[socket._id];
+      }
+      return context;
+    }
   getActiveSocketData: | #js
     function() {
       let socketData = Objects.clone((!this.box) ? {} : (this.$root.socket?.runtime.data[this.box._id] || {}));
@@ -146,9 +155,10 @@ methods:
     }
   getNodeItem: | #js
     async function(activeSocketData) {
+      const boxContext = this.getBoxContext(activeSocketData);
       const inputItem = (activeSocketData.input?.[1]);
       if (!this.$refs.evaluator1) return null;
-      const nodeItems = this.$refs.evaluator1.evaluateOps(inputItem, this.node?.linq?.operations);
+      const nodeItems = this.$refs.evaluator1.evaluateOps(boxContext, inputItem, this.node?.linq?.operations);
       const nodeItem = nodeItems?.last();
       return nodeItem;
     }
@@ -163,6 +173,7 @@ methods:
       const activeSocketData = this.getActiveSocketData();
       const nodeItem = await this.getNodeItem(activeSocketData);
       if ("activeSocketData" in this.$parent) this.$parent.activeSocketData = activeSocketData;
+      if ("boxContext" in this.$parent) this.$parent.boxContext = this.getBoxContext(activeSocketData);
       if ("inputs" in this.$parent) this.$parent.inputs = activeSocketData.input;
       if ("outputs" in this.$parent) this.$parent.outputs = activeSocketData.output;
       if ("nodeItem" in this.$parent) this.$parent.nodeItem = nodeItem;

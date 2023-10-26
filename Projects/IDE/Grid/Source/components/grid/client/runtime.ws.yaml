@@ -162,8 +162,9 @@ methods:
   processBoxChange_data: | #js
     function(box, sDirection, sID, sValue) {
       if (sDirection == "output") return;
+      const boxContext = this.getBoxContext(box);
       const inputValue = this.getSocketRuntimeValue(box._id, "input", 1);
-      const datas = this.$refs.evaluator1.evaluateOps(inputValue, box.linq?.operations);
+      const datas = this.$refs.evaluator1.evaluateOps(boxContext, inputValue, box.linq?.operations);
       const outputValue = datas.last();
       this.setSocketValue(box._id, "output", 1, outputValue);
     }
@@ -388,6 +389,11 @@ methods:
       const result = await func(...argValues);
 
       return result;
+    }
+  getBoxContext: | #js
+    function(box) {
+      const context = {};
+      return context;
     }
   getSocketRuntimeData: | #js
     function(boxID) {

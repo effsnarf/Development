@@ -49,15 +49,6 @@ methods:
             on: "client",
           }
         },
-        {
-          _id: 3,
-          name: "map threads",
-          argNamesStr: "pages",
-          code: "return pages.flatMap((page) => page.threads);",
-          runs: {
-            on: "client",
-          }
-        }
       ];
     }
 watch:
