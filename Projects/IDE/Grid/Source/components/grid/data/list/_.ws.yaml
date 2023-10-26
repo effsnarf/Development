@@ -30,17 +30,21 @@ methods:
       const updateItem = (itemID, data) => {
         let item = this.items.find(item => (item._id == itemID));
         const itemIndex = this.items.findIndex(item => (item._id == itemID));
-        item = Objects.deepMerge(item, data);
-        this.items[itemIndex] = item;
+        const newItem = Objects.deepMerge(item, data);
+        const hasChanged = !Objects.areEqual(item, newItem);
+        this.items[itemIndex] = newItem;
+        return hasChanged;
       };
       const updatedItems = [];
       for (let i = 0; i < itemIDs.length; i++)
       {
         const dataIndex = (i % datas.length)
-        updateItem(itemIDs[i], datas[dataIndex]);
+        const hasChanged = updateItem(itemIDs[i], datas[dataIndex]);
+        if (!hasChanged) continue;
         const item = this.items.find(item => (item._id == itemIDs[i]));
         updatedItems.push(item);
       }
+      if (!updatedItems.length) return;
       this.onChange();
       await this.$nextTick();
       this.$femit("updated", this.fuid, updatedItems, datas);

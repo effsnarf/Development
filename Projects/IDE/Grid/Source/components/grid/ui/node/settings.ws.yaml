@@ -97,10 +97,11 @@ methods:
       vBox.$femit("edit.node", this.box._id, this.node._id, data);
     }
   onLinqOperationsUpdate: | #js
-    function() {
+    function(operations) {
       const vBox = this.$root.vm.getAncestors(this, "grid.ui.box")[0];
       const viewNodeRoot = Objects.clone(this.box.viewNodeRoot);
       const node = TreeObject.find(viewNodeRoot, this.node._id);
+      //if (Objects.areEqual(operations, node.linq?.operations)) return;
       node.linq = this.linq;
       vBox.$femit("edit.box", this.box._id, { viewNodeRoot });
     }

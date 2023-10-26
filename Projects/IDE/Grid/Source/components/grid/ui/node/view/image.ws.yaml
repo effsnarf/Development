@@ -5,6 +5,7 @@ dom:
     ':data-bound-socket-data': dataBoundSocketData
     img:
       ':class': '{ loaded: isLoaded }'
+      ':style': '{ width: ''10em'' }'
       ':src': imageSrc
       @load: onImageLoad
       @error: onImageLoad
@@ -55,5 +56,5 @@ name: grid-ui-node-view-image
 template: >-
   <grid-module class="comp-grid-ui-node-view-image" :box="box" :node="node"
   :data-bound-socket-data="dataBoundSocketData" path="-1565358964."><img
-  :class="{ loaded: isLoaded }" :src="imageSrc" @load="onImageLoad"
-  @error="onImageLoad" path="-1565358964.0"/></grid-module>
+  :class="{ loaded: isLoaded }" :style="{ width: '10em' }" :src="imageSrc"
+  @load="onImageLoad" @error="onImageLoad" path="-1565358964.0"/></grid-module>

@@ -56,7 +56,8 @@ mounted: | #js
     };
 
     if ("fuid" in this.$parent) {
-      this.$root.$on("grid.direct.event", this.onGridDirectEvent.bind(this));
+      const eventName = `${this.compName}.${this.$parent.fuid}`;
+      this.$root.$on(eventName, this.onGridDirectEvent.bind(this));
     }
 
     // Register {compName}_{eventName} methods as event listeners
@@ -87,12 +88,11 @@ methods:
         methodName: args[2],
         args: args[3],
       };
-      this.$root.$emit("grid.direct.event", to.compName, to.fuid, to.methodName, to.args);  
+      const eventName = `${to.compName}.${to.fuid}`;
+      this.$root.$emit(eventName, to.methodName, to.args);
     }
   onGridDirectEvent: | #js
-    function(compName, fuid, methodName, args) {
-      if (compName != this.compName) return;
-      if (fuid != this.$parent.fuid) return;
+    function(methodName, args) {
       const method = this.$parent[methodName]?.bind(this.$parent);
       if (!method) return;
       method(...args);

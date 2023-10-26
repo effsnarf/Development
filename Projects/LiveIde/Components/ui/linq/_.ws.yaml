@@ -10,7 +10,7 @@ dom:
               .operation:
                 ui.linq.operation:
                   ':context': context
-                  ':input': datas[index]
+                  ':input': datas?.[index]
                   ':value': operation
                   @input: (operation) => $set(operations, index, operation)
                 .delete-button.show-on-hover-2:
@@ -48,7 +48,7 @@ methods:
     }
   evaluateChain: | #js
     function() {
-      this.datas = this.$refs.evaluator1.evaluateOps(this.context, this.input, this.operations);
+      this.datas = this.$refs.evaluator1?.evaluateOps(this.context, this.input, this.operations);
     }
   addOperation: | #js
     function(operation) {
@@ -115,7 +115,7 @@ template: >-
   path="-484387046.0.0.0.0"><div class="show-on-hover-container"
   path="-484387046.0.0.0.0.0"><div class="operation"
   path="-484387046.0.0.0.0.0.0"><ui-linq-operation :context="context"
-  :input="datas[index]" :value="operation" @input="(operation) =&gt;
+  :input="datas?.[index]" :value="operation" @input="(operation) =&gt;
   $set(operations, index, operation)"
   path="-484387046.0.0.0.0.0.0.0"></ui-linq-operation><div class="delete-button
   show-on-hover-2" path="-484387046.0.0.0.0.0.0.1"><ui-button
