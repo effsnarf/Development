@@ -2,7 +2,7 @@ dom:
   grid.module:
     icon: 👤👈
     grid.user.action.stack:
-      ":userID": userID
+      ':userID': userID
 props:
   userID: null
 data: null

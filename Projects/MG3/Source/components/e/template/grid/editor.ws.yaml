@@ -15,7 +15,7 @@ dom:
       input-type: value
       type: dropdown
       v-model: item.aspectRatio
-    ui.range:
+    ui.input.range:
       v-if: false
       text: gap
       v-model: item.gap

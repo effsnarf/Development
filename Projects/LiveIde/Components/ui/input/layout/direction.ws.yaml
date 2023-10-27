@@ -7,9 +7,9 @@ props:
   value: null
 data:
   options:
-    - cssClass: flex-row
+    - cssClass: flex-row justify-center
       value: horizontal
-    - cssClass: flex-column
+    - cssClass: flex-column justify-center
       value: vertical
 _:
   examples:

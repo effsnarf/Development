@@ -2,10 +2,11 @@ dom:
   div: 
     ui.context.window:
       div: 
-        ui.value:
-          ':value': layout
         ui.input.layout:
           v-model: layout
+      .mt-l1:
+        ui.value:
+          ':value': layout
     ui.title:
       icon: 🧩
       text: layout
@@ -39,7 +40,8 @@ name: grid-ui-box-view-items-left-side
 template: >-
   <div class="comp-grid-ui-box-view-items-left-side"
   path="-354072420."><ui-context-window path="-354072420.0"><div
-  path="-354072420.0.0"><ui-value :value="layout"
-  path="-354072420.0.0.0"></ui-value><ui-input-layout v-model="layout"
-  path="-354072420.0.0.1"></ui-input-layout></div></ui-context-window><ui-title
+  path="-354072420.0.0"><ui-input-layout v-model="layout"
+  path="-354072420.0.0.0"></ui-input-layout></div><div class="mt-l1"
+  path="-354072420.0.1"><ui-value :value="layout"
+  path="-354072420.0.1.0"></ui-value></div></ui-context-window><ui-title
   icon="🧩" text="layout" path="-354072420.1"></ui-title></div>

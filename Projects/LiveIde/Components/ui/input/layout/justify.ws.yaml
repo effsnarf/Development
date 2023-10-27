@@ -1,0 +1,35 @@
+dom:
+  ui.input.layout.examples:
+    ':style': '{ width: ''25em'' }'
+    direction: vertical
+    ':options': options
+    ':value': value
+    @input: $emit('input', $event)
+props:
+  value: null
+data:
+  options:
+    - cssClass: null
+      value: start
+    - cssClass: null
+      value: end
+    - cssClass: null
+      value: center
+    - cssClass: null
+      value: between
+    - cssClass: null
+      value: around
+mounted: | #js
+  function() {
+    for (const option of this.options) {
+      option.cssClass = `justify-${option.value}`;
+    }
+  }
+_:
+  examples:
+    count: 0
+name: ui-input-layout-justify
+template: >-
+  <ui-input-layout-examples class="comp-ui-input-layout-justify" :style="{
+  width: '25em' }" direction="vertical" :options="options" :value="value"
+  @input="$emit('input', $event)" path="41505162."></ui-input-layout-examples>

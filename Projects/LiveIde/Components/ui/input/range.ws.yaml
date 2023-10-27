@@ -1,0 +1,60 @@
+dom:
+  .flex:
+    div:
+      input:
+        type: range
+        ':value': tempValue
+        ':min': min
+        ':max': max
+        ':step': step
+        @input: onValueChange
+      .text-center.opacity-50:
+        v-text: tempValue
+    ui.button:
+      icon: ✖️
+      @click: setValue(null)
+props:
+  text: null
+  value: null
+  min: null
+  max: null
+  step: null
+data:
+  tempValue: null
+methods:
+  setValue: | #js
+    function(value) {
+      this.onValueChange({ target: { value } });
+    }
+  onValueChange: | #js
+    async function(e) {
+      const value = parseInt(e.target.value);
+      this.tempValue = value;
+      if (!this.__onValueChange) this.__onValueChange = this._onValueChange.debounce(400);
+      this.__onValueChange(value);
+    }
+  _onValueChange: | #js
+    function(value) {
+      this.$emit('input', value);
+    }
+watch:
+  value:
+    handler: | #js
+      function(value) {
+        if (this._isInited) return;
+        this._isInited = true;
+        this.tempValue = value;
+      }
+    immediate: true
+style: null
+name: ui-input-range
+_:
+  examples:
+    count: 0
+template: >-
+  <div class="comp-ui-input-range flex" path="511870399."><div
+  path="511870399.0"><input type="range" :value="tempValue" :min="min"
+  :max="max" :step="step" @input="onValueChange" path="511870399.0.0"/><div
+  class="text-center opacity-50" v-text="tempValue"
+  path="511870399.0.1"></div></div><ui-button icon="✖️" @click="setValue(null)"
+  path="511870399.1"></ui-button></div>

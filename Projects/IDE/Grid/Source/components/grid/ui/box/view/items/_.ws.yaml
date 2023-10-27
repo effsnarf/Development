@@ -14,6 +14,7 @@ dom:
         ':class': itemsClass
         div: 
           class: item
+          ':style': itemStyle
           v-for: (item, index) in visibleItems?.take(100)
           ':key': getItemKey(item)
           @mouseenter: onItemHover(item)
@@ -171,7 +172,10 @@ methods:
       if (direction == "vertical") cls.push("flex-column");
       if (layout.order == "reversed") cls.push("reverse");
       cls = [cls.join("-")].filter(s => s);
-      if (cls.length) cls.push("flex");
+      if (cls.length) {
+        cls.push("flex");
+        cls.push("flex-wrap");
+      }
       return cls.join(" ");
     }
   refresh: | #js
@@ -223,7 +227,17 @@ computed:
       if (!this.items) cls.grayscale = true;
       const layout = (this.layout || {});
       cls[this.getFlexClass(layout)] = true;
+      if (layout.justify) cls[`justify-${layout.justify}`] = true;
       return cls;
+    }
+  itemStyle: | #js
+    function() {
+      const style = {};
+      const layout = (this.layout || {});
+      if (layout.size?.width) {
+        style["flex-basis"] = layout.size.width;
+      }
+      return style;
     }
   visibleItems: | #js
     function() {
@@ -231,6 +245,7 @@ computed:
     }
 style:
   .item:
+    border: '1px dashed #ffffff60'
     transition: 0.3s
   .item:hover:
     background-color: '#ffffff20'
@@ -248,8 +263,8 @@ template: >-
   v-if="!visibleItems" path="2102270252.0.0"><div class="flex justify-center"
   path="2102270252.0.0.0"><ui-title icon="❗" text="connect items data socket"
   path="2102270252.0.0.0.0"></ui-title></div></div><div :class="itemsClass"
-  path="2102270252.0.1"><div class="item" v-for="(item, index) in
-  visibleItems?.take(100)" :key="getItemKey(item)"
+  path="2102270252.0.1"><div class="item" :style="itemStyle" v-for="(item,
+  index) in visibleItems?.take(100)" :key="getItemKey(item)"
   @mouseenter="onItemHover(item)" @mouseleave="onItemHover(null)"
   @click="onItemClick(item)" path="2102270252.0.1.0"><div v-if="!iteratorBox"
   path="2102270252.0.1.0.0"><h3 path="2102270252.0.1.0.0.0"><ui-title

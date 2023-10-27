@@ -1,18 +1,21 @@
 dom:
   div: 
-    .flex.gap-3:
+    .flex.examples.gap-1:
+      :class: mainFlexClass
       div: 
         v-for: option in options
-        ':class': '{ clickable: true, selected: isSelected(option) }'
-        @click: onClickOption(option)
-        ui.input.layout.example:
-          ':css-class': option.cssClass
-          :show-number: showNumber
+        .option:
+          ':class': '{ selected: isSelected(option) }'
+          @click: onClickOption(option)
+          ui.input.layout.example:
+            ':css-class': option.cssClass
+            :show-number: showNumber
         h3:
-          class: mt-l1 opacity-50 text-center
+          class: opacity-50 text-center
           v-text: (option.text || option.value)
 data:
 props:
+  direction: null
   options: null
   value: null
   showNumber: null
@@ -27,7 +30,24 @@ methods:
     function(option) {
       return (option.value == this.value);
     }
-watch: null
+computed:
+  mainFlexClass: | #js
+    function() {
+      const direction = (this.direction == "horizontal" ? "row" : "column");
+      return ["flex", direction].join("-");
+    }
+watch:
+style:
+  .option:
+    padding: 1em 0
+    background: "#ffffff20"
+    opacity: 0.6
+    cursor: pointer
+  .option:hover:
+    opacity: 0.8
+  .option.selected, .option.selected:hover:
+    border: 3px solid white
+    opacity: 1
 _:
   examples:
     count: 0
