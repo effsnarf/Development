@@ -218,7 +218,7 @@ methods:
     }
   hasLeftSideComp: | #js
     function(type) {
-      if (["view.layout"].includes(type)) return true;
+      if (["view.layout", "view.items"].includes(type)) return true;
       return false;
     }
   hasRightSideComp: | #js

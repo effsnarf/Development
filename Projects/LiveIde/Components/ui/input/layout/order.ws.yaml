@@ -1,0 +1,33 @@
+dom:
+  ui.input.layout.examples:
+    ':options': options
+    ':value': value
+    ':show-number': 'true'
+    @input: $emit('input', $event)
+props:
+  direction: null
+  value: null
+data:
+  options:
+    - cssClass: null
+      value: normal
+    - cssClass: null
+      value: reversed
+mounted: | #js
+  function() {
+    for (const option of this.options) {
+      const direction = (this.direction == "horizontal" ? "row" : "column");
+      const reverse = ((option.value == "reversed") ? "reverse" : "")
+      option.cssClass = ["flex", direction, reverse]
+        .filter(s => s)
+        .join("-");
+    }
+  }
+_:
+  examples:
+    count: 0
+name: ui-input-layout-order
+template: >-
+  <ui-input-layout-examples class="comp-ui-input-layout-order"
+  :options="options" :value="value" :show-number="true" @input="$emit('input',
+  $event)" path="652600520."></ui-input-layout-examples>

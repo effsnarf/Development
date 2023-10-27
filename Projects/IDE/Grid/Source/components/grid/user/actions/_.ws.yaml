@@ -2,7 +2,7 @@ dom:
   grid.module:
     icon: 👤👈
     grid.user.action.stack:
-      ':userID': userID
+      ":userID": userID
 props:
   userID: null
 data: null
@@ -27,6 +27,7 @@ methods:
         const action = { redo: { method: "select.boxes", args: [boxIDs, true] } };
         this.$femit("do", this.userID, action);
       }
+
         // If no boxes fit into the selection box, create a new box
       if (!selectedBoxes.length) {
         rect.is = (rect.is || {});

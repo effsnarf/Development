@@ -61,6 +61,12 @@ methods:
         if ((!fromEl) || (!toEl)) return this.remove();
         if (!fromEl.isConnected || !toEl.isConnected) return this.remove();
 
+        const fromRect = fromEl.getBoundingClientRect();
+        const toRect = toEl.getBoundingClientRect();
+
+        if (!fromRect.x && !fromRect.y) return this.remove();
+        if (!toRect.x && !toRect.y) return this.remove();
+
         this.leaderLine = new LeaderLine(
           fromEl,
           toEl,

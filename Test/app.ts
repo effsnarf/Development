@@ -242,45 +242,69 @@ function removeQuoteLinks(s: string) {
   //   ">>72252935I always get stomach cramps after drinking beer",
   // ];
 
+  const posts = [
+    "Should I do pull-ups, chin-ups, or both? Do they workout the same muscles or different ones or does one do an inferior job as the other?",
+    " >>72634543 \nThey're slightly different. Pull ups are more lat focused and chin ups are more rhomboids. Chin ups are also goated yet underrated for biceps. So do both.",
+    " >>72634543 \nPullups for lat focus (though weighted pulldowns are better at isolating) and chinups for biceps (but bicep curls are a thing).",
+    " >>72634543 \nI would fuck that bitch if you catch my drift...",
+    " >>72634543 \nPull-up? I want to push-in to that woman if you know what I mean.",
+    " >>72634649 \nCan you please elaborate? I do not understand.",
+    " >>72634543 \nBitches be out of control with these face filters and touch up apps",
+    " >>72634543 \n >that degree of Photoshop \nMay as well jack off to manga at this point",
+    " >>72634649 \n >>72634668 \nI do not understand what either of you mean, please stop speaking in riddles",
+    " >>72634705 \nI love Korean women.",
+    " >>72634705 \nI can't tell if women truly believe this makes them look beautiful or if they just like looking slutty",
+    " >>72634820 \nBoth.",
+    " >>72634813 \nHow do you know she’s Korean?",
+    " >>72635155 \nface has that plastic sheen",
+    " >>72635431 \nits called porcelain skin from their intensive facial care routine",
+    " >>72635155 \nYou can tell by their features after you've seen enough asians.",
+    "I love korean woman",
+    " >>72635155 \nthe plastic surgery was a dead give away",
+    " >>72634543 \nimagine asking this. Just do them, fag. You can even do mixed grip if you really want a pump.",
+    " >>72634543 \nBoth. To prove they work different muscles do curls supinated then pronated. It’s a completely different experience.",
+    " >>72634543 \nThey work the same muscles. They bias different muscles is all. Chinups are going to pull in more biceps and even more lats. Pullups are going to pull in more upper back and rear delts. They both work the entire back basically and the lats especially for both. It all depends on what you want to focus more on",
+    " >>72635562 \nI'm going to sk when I get my face worked on they have the best bog out of the group.",
+    " >>72634543 \n >P-please may I have sex miss ",
+    " >>72635155 \nId love to watch her poop",
+    " >>72634543 \nDoesn't matter, just find a grip you like and do as many as you can\nJust don't be one of those coping niggerfaggots spamming lat pulldowns as if they're just as good\n >>72635569 \nRetard",
+    " >>72634543 \nPull ups and chin ups with shoulder width grip are both lat exercises. Chin ups are only a little easier since they use more of the biceps. \n >>72634559 \nYour hands being supinated or pronated do not change the muscles in the back used in the motion. Rather, you have to change how wide your grip is or the angle of the bar relative to your torso if you want to change which muscles are emphasized.",
+    " >>72635155 \nbecause her name is fucking kang hee yoon.",
+    " >>72637037 \nSHE WUZ KANGZ",
+    "do whatever you want idc",
+    " >>72634543 \nI do both, and neutral grip as well",
+    " >>72637037 \nSee? I know my k girls because they break my mind.",
+    "I wish I could get a hot asian girlfriend bros",
+    " >>72634543 \nhow do I get a gf (female) like this?",
+    " >>72637464 \nBe tall, white, probably rich too.",
+    " >>72637502 \nIm white but only 180cm and above average income\nis it over?",
+    " >>72637464 \nYou don't need to be white. Just be rich. Look at all those insta thots hanging out in Dubai.",
+    " >>72634543 \nHow long is his cock?",
+    " >>72637549 \nIt doesn't matter about size but how it looks.\nUgly dick makes an ugly twink.",
+    " >>72637547 \nI agree",
+    " >>72634543 \nmuscle-up.",
+    " >>72636713 \n >>72634543 \nNot him. But I feel a lot more comfortable doing pull-ups with a bit wider(1-2 fists) than shoulder width grip. Puts less strain on elbows.\nOn the other hand, doing chin-ups with that grip is uncomfortable.",
+    " >>72634543 \nYou should do pullups, chinups and neutral grip pull ups",
+    " >>72634543 \nIm so fucking horny and lonely",
+  ];
+
   // const chat = await ChatOpenAI.new(Roles.ChatGPT);
 
   // let message = `${"give me a list of one sentence summaries of each of these threads"}\n\n\n${threads.join(
   //   "\n\n\n"
   // )}`;
 
-  const dungeonMaster = `You are a dungeon master that guides me through an erotic text adventure.
-  Describe the scene and I'll reply with my actions and you'll advance the story.
-  Make sure to describe details in the scene to create a sensory world for the reader.
-  Make sure to advance the plot slowly and build the sexual tension gradually from subtle hints each step until degeneracy.
-  Your style of writing should include poetic imagery but also 4channish, down to earth,
-  simply reality of what humans really are and how they really behave.`;
-
-  const chat = await ChatOpenAI.new(Roles.DeveloperMode);
+  const chat = await ChatOpenAI.new(Roles.ChatGPT);
 
   await chat.send("");
 
-  await chat.send(
-    `let's write a scene together
-    i'll start and you'll improve it
-    
-    software megacorporation offices
-developer sitting in the cubicle, working
-manager comes by
+  const reply = await chat.send(
+    `rewrite this in Sheakspearean:
 
-manager: hey rick
-developer: hey, how's it going
-manager: we got 3,000 calls on the switchboard from users who can't see the subcategories under milfs
-developer: yeah i've been working on it since morning. apparently the mongo database [..technobabble]. we got the same problem in teens and anal, but gays is fine
-manager: so? you can't.. [..technobabble solution]?
-developer: no because.. [dirty categories]..
+    "I’ve just bought 48 of these
+    Pls post your best memes to celebrate. I can’t find any online"
     `
   );
-
-  // const reply = await chat.send(
-  //   `${dungeonMaster}
-
-  //   The scene is, "In the middle of the night I wake up to find a semen demon having sex with me".`
-  // );
 
   // while (true) {
   //   const message = await question(">");

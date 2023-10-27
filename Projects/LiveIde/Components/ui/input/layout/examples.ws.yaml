@@ -1,0 +1,43 @@
+dom:
+  div: 
+    .flex.gap-3:
+      div: 
+        v-for: option in options
+        ':class': '{ clickable: true, selected: isSelected(option) }'
+        @click: onClickOption(option)
+        ui.input.layout.example:
+          ':css-class': option.cssClass
+          :show-number: showNumber
+        h3:
+          class: mt-l1 opacity-50 text-center
+          v-text: (option.text || option.value)
+data:
+props:
+  options: null
+  value: null
+  showNumber: null
+methods:
+  onClickOption: | #js
+    function(option) {
+      let value = option?.value;
+      if (value == this.value) value = null;
+      this.$emit('input', value);
+    }
+  isSelected: | #js
+    function(option) {
+      return (option.value == this.value);
+    }
+watch: null
+_:
+  examples:
+    count: 0
+name: ui-input-layout-direction
+template: >-
+  <div class="comp-ui-input-layout-direction" path="-1569384455."><h2
+  v-text="value" path="-1569384455.0"></h2><div class="flex gap-3"
+  path="-1569384455.1"><div v-for="option in options" :class="{ clickable: true,
+  selected: isSelected(option) }" @click="onClickOption(option)"
+  path="-1569384455.1.0"><h3 class="text-center" v-text="option.value"
+  path="-1569384455.1.0.0"></h3><ui-input-layout-example
+  :css-class="option.cssClass"
+  path="-1569384455.1.0.1"></ui-input-layout-example></div></div></div>

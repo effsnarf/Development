@@ -181,8 +181,8 @@ methods:
   getStyleHeight: | #js
     function() {
       const size = this.rect1.size;
-      const minimizedHeight = "40px";
-      const fullHeight = (size.height + "px");
+      const minimizedHeight = 40;
+      const fullHeight = size.height;
       if (this.isFullSize) return fullHeight;
       if (this.rect1.is?.minimized) return minimizedHeight;
       return fullHeight;
@@ -225,12 +225,13 @@ computed:
       const style = {};
       style.position = "absolute";
       style.width = (size.width + "px");
-      style.height = this.getStyleHeight();
+      style.height = (`${this.getStyleHeight()}px`);
       const height = parseInt(style.height);
-      const x = (center.x - camera.pos.x + pos.x - (size.width / 2));
-      const y = (center.y + camera.pos.y - pos.y - (height / 2));
+      const x = (center.x - camera.pos.x*camera.scale + pos.x*camera.scale - (size.width*camera.scale / 2));
+      const y = (center.y + camera.pos.y*camera.scale - pos.y*camera.scale - (height*camera.scale / 2));
       style.left = `${0}px`;
       style.top = `${0}px`;
+      style.fontSize = `${camera.scale*100}%`;
       style.transform = `translate(${x}px, ${y}px)`;
       if ("opacity" in rect1)
       {
@@ -328,6 +329,8 @@ style:
     position: absolute
     top: 50%
     left: 0em
+    transform: translate(0%, -50%)
+  .hovered .left-side:
     transform: translate(-100%, -50%)
   .right-side:
     position: absolute

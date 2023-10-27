@@ -6,7 +6,7 @@ dom:
     div: 
       div: 
         v-if: isString
-        v-text: text
+        v-html: text
       div: 
         v-else-if: 'true'
         ui.value.preview:
@@ -36,7 +36,7 @@ name: grid-ui-node-view-text
 template: >-
   <grid-module class="comp-grid-ui-node-view-text" :box="box" :node="node"
   :data-bound-socket-data="dataBoundSocketData" path="-1435648036."><div
-  path="-1435648036.0"><div v-if="isString" v-text="text"
+  path="-1435648036.0"><div v-if="isString" v-html="text"
   path="-1435648036.0.0"></div><div v-else-if="true"
   path="-1435648036.0.1"><ui-value-preview :value="nodeItem"
   path="-1435648036.0.1.0"></ui-value-preview></div></div></grid-module>

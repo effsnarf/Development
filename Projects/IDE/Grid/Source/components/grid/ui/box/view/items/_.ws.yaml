@@ -40,6 +40,7 @@ props:
 data:
   items: null
   iteratorBox: null
+  layout: null
   hoveredItem: null
   selectedItem: null
   lastNNItems: null
@@ -161,6 +162,18 @@ methods:
       const items = (socketData?.input?.[1] || []);
       return items;
     }
+  getFlexClass: | #js
+    function(layout) {
+      layout = (layout || {});
+      let cls = [];
+      const direction = (layout.direction || "vertical");
+      if (direction == "horizontal") cls.push("flex-row");
+      if (direction == "vertical") cls.push("flex-column");
+      if (layout.order == "reversed") cls.push("reverse");
+      cls = [cls.join("-")].filter(s => s);
+      if (cls.length) cls.push("flex");
+      return cls.join(" ");
+    }
   refresh: | #js
     function() {
       this.isDirty = true;
@@ -175,6 +188,7 @@ methods:
       this.isDirty = false;
       this.iteratorBox = this.getIteratorBox(this.box);
       this.items = this.getItems();
+      this.layout = this.box.layout;
     }
 watch:
   isDirty:
@@ -207,6 +221,8 @@ computed:
     function() {
       const cls = {};
       if (!this.items) cls.grayscale = true;
+      const layout = (this.layout || {});
+      cls[this.getFlexClass(layout)] = true;
       return cls;
     }
   visibleItems: | #js

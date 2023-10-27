@@ -4,15 +4,7 @@ dom:
     ':show-title': 'false'
     div: 
       v-if: showGroupForm
-      .form1:
-        div: 
-          div: 
-            v-if: (displayBox?._id != hoveredBox?._id)
-            ui.button: 
-              ':text': '''set display box to 📦'' + hoveredBox?.name'
-              @click: displayBox = hoveredBox
-          h3:
-            v-text: '''Display Box: '' + displayBox?.name'
+      div: 
         div: 
           v-if: canCreateGroup
           class: mt-l1
@@ -70,10 +62,12 @@ computed:
     function() {
       return (this.selectedBoxes.length > 0);
     }
-style:
-  .form1:
-    padding: 1em
-    border: 1px solid gray
+watch:
+  hoveredBox: | #js
+    function(hoveredBox) {
+      this.displayBox = hoveredBox;
+    }
+style: null
 _:
   examples:
     count: 0
@@ -81,15 +75,10 @@ name: grid-client-context-create-group
 template: >-
   <grid-module class="comp-grid-client-context-create-group" icon="👤👈"
   :show-title="false" path="-1413308281."><div v-if="showGroupForm"
-  path="-1413308281.0"><div class="form1" path="-1413308281.0.0"><div
-  path="-1413308281.0.0.0"><div v-if="(displayBox?._id != hoveredBox?._id)"
-  path="-1413308281.0.0.0.0"><ui-button :text="'set display box to 📦' +
-  hoveredBox?.name" @click="displayBox = hoveredBox"
-  path="-1413308281.0.0.0.0.0"></ui-button></div><h3 v-text="'Display Box: ' +
-  displayBox?.name" path="-1413308281.0.0.0.1"></h3></div><div class="mt-l1"
-  v-if="canCreateGroup" path="-1413308281.0.0.1"><ui-button icon="➕📦"
+  path="-1413308281.0"><div path="-1413308281.0.0"><div class="mt-l1"
+  v-if="canCreateGroup" path="-1413308281.0.0.0"><ui-button icon="➕📦"
   text="create group ✔️" @click="onCreateGroup"
-  path="-1413308281.0.0.1.0"></ui-button></div><div class="mt-l3"
-  path="-1413308281.0.0.2"></div><div path="-1413308281.0.0.3"><ui-button
+  path="-1413308281.0.0.0.0"></ui-button></div><div class="mt-l3"
+  path="-1413308281.0.0.1"></div><div path="-1413308281.0.0.2"><ui-button
   icon="✖️✨" text="unselect" @click="onUnselectBoxes"
-  path="-1413308281.0.0.3.0"></ui-button></div></div></div></grid-module>
+  path="-1413308281.0.0.2.0"></ui-button></div></div></div></grid-module>

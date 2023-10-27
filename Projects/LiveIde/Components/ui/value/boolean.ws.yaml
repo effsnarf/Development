@@ -2,7 +2,7 @@ dom:
   ui.title:
     ':icon': getIcon(value)
     div:
-      v-text: (value.toString())
+      v-text: (value?.toString())
 props:
   value: null
 methods:
@@ -16,5 +16,5 @@ _:
     count: 0
 template: >-
   <ui-title class="comp-ui-value-boolean" :icon="getIcon(value)"
-  path="110445265."><div v-text="(value.toString())"
+  path="110445265."><div v-text="(value?.toString())"
   path="110445265.0"></div></ui-title>

@@ -1,0 +1,21 @@
+dom:
+  ui.input.layout.examples:
+    ':options': options
+    ':value': value
+    @input: $emit('input', $event)
+props:
+  value: null
+data:
+  options:
+    - cssClass: flex-row
+      value: horizontal
+    - cssClass: flex-column
+      value: vertical
+_:
+  examples:
+    count: 0
+name: ui-input-layout-direction
+template: >-
+  <ui-input-layout-examples class="comp-ui-input-layout-direction"
+  :options="options" :value="value" @input="$emit('input', $event)"
+  path="-1569384455."></ui-input-layout-examples>

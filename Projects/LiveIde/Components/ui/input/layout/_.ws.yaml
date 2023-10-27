@@ -1,0 +1,63 @@
+dom:
+  div:
+    h2:
+      ui.title:
+        icon: 🧩
+        text: layout
+    ui.tabs:
+      ':options': '[''🧩 direction'', ''👉 order'']'
+      direction: vertical
+      ':can-select-none': 'true'
+      template: 
+        v-slot: tab0
+        ui.input.layout.direction:
+          v-model: direction
+      template: 
+        v-slot: tab1
+        ui.input.layout.order:
+          ':direction': direction
+          v-model: order
+props:
+  value: null
+data:
+  direction: null
+  order: null
+computed:
+  layout: | #js
+    function() {
+      return {
+        direction: this.direction,
+        order: this.order,
+      };
+    }
+watch:
+  layout:
+    handler: | #js
+      function(layout) {
+        if (Objects.areEqual(layout, this.value)) return;
+        this.$emit('input', layout);
+      }
+    deep: true
+  value:
+    handler: | #js
+      function(layout) {
+        this.direction = layout?.direction;
+        this.order = layout?.order;
+      }
+    immediate: true
+    deep: true
+_:
+  examples:
+    count: 0
+name: ui-input-layout
+template: >-
+  <div class="comp-ui-input-layout" path="-1483325720."><h2
+  path="-1483325720.0"><ui-title icon="🧩" text="layout"
+  path="-1483325720.0.0"></ui-title></h2><ui-tabs :options="['🧩 direction', '👉
+  order']" direction="vertical" :can-select-none="true"
+  path="-1483325720.1"><template v-slot:tab0
+  path="-1483325720.1.0"><ui-input-layout-direction v-model="direction"
+  path="-1483325720.1.0.0"></ui-input-layout-direction></template><template
+  v-slot:tab1 path="-1483325720.1.1"><ui-input-layout-order
+  :direction="direction" v-model="order"
+  path="-1483325720.1.1.0"></ui-input-layout-order></template></ui-tabs></div>

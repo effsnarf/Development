@@ -97,6 +97,7 @@ methods:
     function(rects) {
       // Returns the center of all the rects
       // rect.pos is the center of the rect
+      if (!rects.length) return { x: 0, y: 0 };
       const minX = rects.map(rect => rect.pos.x - rect.size.width / 2).min();
       const maxX = rects.map(rect => rect.pos.x + rect.size.width / 2).max();
       const minY = rects.map(rect => rect.pos.y - rect.size.height / 2).min();
@@ -112,12 +113,13 @@ methods:
   onWheelSurface: | #js
     function(e) {
       return;
+      if (e.target != this.$refs.surface1) return;
       e.preventDefault();
       e.stopPropagation();
       // Adjust surfaceScale based on the wheel event
       const scrollSize = (e.deltaY / 100);
-      this.surfaceScale += (scrollSize * -0.03);
-      this.$femit("scale", this.surfaceScale);
+      this.surfaceCamera.scale += (scrollSize * -0.03);
+      this.$femit("scale", this.surfaceCamera.scale);
     }
   getFocusedItems: | #js
     function(items) {
@@ -177,6 +179,7 @@ computed:
       return {
         width: "100%",
         height: "80vh",
+        backgroundSize: `${this.surfaceCamera.scale * 100}%`,
       };
     }
   surface1: | #js
