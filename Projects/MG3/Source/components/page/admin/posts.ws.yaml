@@ -16,6 +16,9 @@ methods:
     }
 style: null
 name: page-admin-posts
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-page-admin-posts" path="-1150341227."><h2 v-text="'New
   Posts'" path="-1150341227.0"></h2><div path="-1150341227.1"><div

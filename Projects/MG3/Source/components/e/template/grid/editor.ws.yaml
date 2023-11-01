@@ -25,6 +25,9 @@ dom:
 props:
   item: null
 name: e-template-grid-editor
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-e-template-grid-editor" v-if="false &amp;&amp; item"
   path="-1104249974."><div v-text="item.items.length + ' items'"
@@ -32,6 +35,6 @@ template: >-
   'grid']" input-type="value" type="dropdown" v-model="item.layout"
   path="-1104249974.1"></ui-select><ui-select :options="['2/3', '1/1', '3/2',
   '4/3', '5/4', '16/9', '16/10', '21/9']" input-type="value" type="dropdown"
-  v-model="item.aspectRatio" path="-1104249974.2"></ui-select><ui-range
+  v-model="item.aspectRatio" path="-1104249974.2"></ui-select><ui-input-range
   text="gap" v-model="item.gap" max="0.1" step="0.01"
-  path="-1104249974.3"></ui-range></div>
+  path="-1104249974.3"></ui-input-range></div>

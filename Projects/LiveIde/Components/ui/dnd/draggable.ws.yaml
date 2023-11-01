@@ -68,9 +68,15 @@ methods:
 style:
   .draggable:
     cursor: grabbing
+example:
+  dom:
+    div:
+      ui.dnd.draggable:
+        .box1.text-center:
+          v-text: '''Drag me'''
 _:
   examples:
-    count: 0
+    count: 1
 name: ui-dnd-draggable
 template: >-
   <div class="comp-ui-dnd-draggable" ref="dragElement1" :class="{ draggable:

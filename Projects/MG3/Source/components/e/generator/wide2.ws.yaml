@@ -14,6 +14,9 @@ style:
     grid-template: 1fr / 2.5em 1fr
     gap: 0.5em
 name: e-generator-wide2
+_:
+  examples:
+    count: 0
 template: >-
   <ui-link class="comp-e-generator-wide2" :url="$root.url.generator(generator)"
   path="528055643."><div class="grayish grid" path="528055643.0"><ui-image

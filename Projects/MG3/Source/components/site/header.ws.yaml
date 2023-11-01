@@ -54,6 +54,9 @@ style:
     display: flex
     justify-content: space-around
     font-size: 160%
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-site-header header" path="2017999636."><div class="div1"
   :style="getStyle()" path="2017999636.0"><site-logo></site-logo></div><div

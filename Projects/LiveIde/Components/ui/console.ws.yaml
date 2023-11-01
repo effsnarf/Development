@@ -7,12 +7,9 @@ dom:
       ':visible': hoveredItem
       div: 
         v-if: hoveredItem
-        h2:
-          v-text: hoveredItem.args[1]
-        h3:
-          v-text: hoveredItem.args[0]
         ui.value: 
-          ':value': hoveredItem.args[2]
+          v-for: arg in hoveredItem.args
+          ':value': arg
     table:
       tr:
         v-for: item in visibleItems
@@ -23,7 +20,7 @@ dom:
           class: opacity-50
           v-text: item._id
         td: 
-          v-for: (arg) in item.args.take(2)
+          v-for: (arg) in item.args.take(1)
           ui.value: 
             ':value': arg
 data:
@@ -63,14 +60,12 @@ name: ui-console
 template: >-
   <div class="comp-ui-console box1" v-if="items.length"
   path="1489973245."><ui-context-window ref="context1" :visible="hoveredItem"
-  path="1489973245.0"><div v-if="hoveredItem" path="1489973245.0.0"><h2
-  v-text="hoveredItem.args[1]" path="1489973245.0.0.0"></h2><h3
-  v-text="hoveredItem.args[0]" path="1489973245.0.0.1"></h3><ui-value
-  :value="hoveredItem.args[2]"
-  path="1489973245.0.0.2"></ui-value></div></ui-context-window><table
+  path="1489973245.0"><div v-if="hoveredItem" path="1489973245.0.0"><ui-value
+  v-for="arg in hoveredItem.args" :value="arg"
+  path="1489973245.0.0.0"></ui-value></div></ui-context-window><table
   path="1489973245.1"><tr v-for="item in visibleItems" :key="item._id"
   @mouseenter="() =&gt; onItemHover(item, true)" @mouseleave="() =&gt;
   onItemHover(item, false)" path="1489973245.1.0"><td class="opacity-50"
   v-text="item._id" path="1489973245.1.0.0"></td><td v-for="(arg) in
-  item.args.take(2)" path="1489973245.1.0.1"><ui-value :value="arg"
+  item.args.take(1)" path="1489973245.1.0.1"><ui-value :value="arg"
   path="1489973245.1.0.1.0"></ui-value></td></tr></table></div>

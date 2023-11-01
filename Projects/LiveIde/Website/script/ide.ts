@@ -335,6 +335,8 @@ const vueIdeCompMixin = {
 
   vueIdeApp.state = state;
 
+  await vueIdeApp.wait(4000);
+
   // Create an element to host the Vue IDE app
   const el = document.createElement("div");
   el.id = `vue-ide-app-${Date.now()}`;

@@ -1,7 +1,5 @@
 dom:
   div:
-    h3:
-      v-text: cValue
     .flex:
       ui.input.range:
         min: 0
@@ -16,6 +14,7 @@ data:
 methods:
   getCValue: | #js
     function(number, unit) {
+      if (number == null) return null;
       return `${number||""}${unit||""}`;
     }
 computed:
@@ -34,7 +33,7 @@ watch:
       function(value) {
         if (value == this.cValue) return;
         this.number = parseInt(value);
-        this.unit = (value?.replace(this.value1, '') || '%');
+        this.unit = (value?.replace(this.value1, '') || null);
         if (parseFloat(this.unit)) this.unit = "%";
       }
     immediate: true
@@ -44,7 +43,6 @@ _:
     count: 0
 name: ui-input-css-value
 template: >-
-  <div class="comp-ui-input-css-value" path="-1335464632."><h3 v-text="cValue"
-  path="-1335464632.0"></h3><div class="flex"
-  path="-1335464632.1"><ui-input-range max="100" step="1" v-model="number"
-  path="-1335464632.1.0"></ui-input-range></div></div>
+  <div class="comp-ui-input-css-value" path="-1335464632."><div class="flex"
+  path="-1335464632.0"><ui-input-range max="100" step="1" v-model="number"
+  path="-1335464632.0.0"></ui-input-range></div></div>

@@ -3,6 +3,11 @@ dom:
     icon: 🏃‍♂️
     ui.linq.evaluator:
       ref: evaluator1
+    .console1:
+      ':style': '{ position: ''fixed'', right: 0, bottom: 0, ''max-height'': ''60vh'' }'
+      ref: console1el
+      ui.console:
+        ref: console1
 props:
   userID: null
 data:
@@ -15,9 +20,34 @@ mounted: | #js
   async function() {
     this.$root.socket = this.socket;
     await this.$nextTick();
+    this.bindToLog();
     this.startup();
   }
 methods:
+  bindToLog: | #js
+    function() {
+      Reflection.bindClassMethods(this, this.beforeMethod.bind(this), this.afterMethod.bind(this), false, true);
+      document.body.appendChild(this.$refs.console1el);
+    }
+  beforeMethod: | #js
+    function(className, methodName, args) {
+    }
+  afterMethod: | #js
+    function(beforeResult, className, methodName, args, returnValue) {
+      if (!methodName.includes("_")) return;
+      this.$refs.console1.log(methodName, { args, returnValue });
+      const comp = vueApp.comps.find(c => (c.name == "grid.client.runtime"));
+      const method = comp.source.methods[methodName];
+      const argNames = Reflection.getFunctionArgs(method);
+      const arg0 = argNames[0];
+      const boxID = false ? null :
+        (arg0 == "boxID") ? args[0] :
+        (arg0 == "box") ? args[0]._id :
+        null;
+      if (!boxID) return;
+      const boxLog = (this.$root.boxLogs[boxID] || (this.$root.boxLogs[boxID] = []));
+      boxLog.push({ methodName, args, returnValue });
+    }
   startup: | #js
     function() {
       if (this.is.startuped) return;
@@ -443,6 +473,7 @@ methods:
     function(boxID) {
       this.getSocketRuntimeData(boxID);
     }
+style: null
 _:
   examples:
     count: 0
@@ -450,4 +481,7 @@ name: grid-client-runtime
 template: >-
   <grid-module class="comp-grid-client-runtime" icon="🏃‍♂️"
   path="-1405898659."><ui-linq-evaluator ref="evaluator1"
-  path="-1405898659.0"></ui-linq-evaluator></grid-module>
+  path="-1405898659.0"></ui-linq-evaluator><div class="console1" :style="{
+  position: 'fixed', right: 0, bottom: 0, 'max-height': '60vh' }"
+  ref="console1el" path="-1405898659.1"><ui-console ref="console1"
+  path="-1405898659.1.0"></ui-console></div></grid-module>

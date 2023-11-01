@@ -8,6 +8,9 @@ dom:
 props:
   item: null
 name: e-format-template
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-e-format-template" path="105070856."><e-template-editor
   ref="TemplateEditor1" :temp="item" :show-property-editor="false"

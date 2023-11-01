@@ -56,6 +56,9 @@ style:
     position: relative
     margin: auto
     padding: 0
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-site" path="3530567."><transition name="fade"
   path="3530567.0"><div :class="getCssClass()" v-if="(this.pageName ==

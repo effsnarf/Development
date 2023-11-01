@@ -73,6 +73,9 @@ style:
   .error:
     margin-bottom: 3rem
 name: site-main
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-site-main" path="-578759680."><transition name="fade"
   path="-578759680.0"><content-title class="hidden" v-if="titleText"

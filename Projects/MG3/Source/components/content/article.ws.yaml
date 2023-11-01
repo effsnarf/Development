@@ -12,6 +12,9 @@ style:
       #0, 1)), color-stop(40%, rgba(0, 0, 0, 1)), color-stop(100%, rgba(0, 0, 0,
       #0.4)))
 name: content-article
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-content-article" path="191531137."><div class="text"
   path="191531137.0"><slot name="content"

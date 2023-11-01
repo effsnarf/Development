@@ -32,6 +32,9 @@ style:
   .comp-ui-image:
     width: 6em
 name: e-media-create-image
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-e-media-create-image box1"
   path="1626364892."><ui-file-dropzone v-model="imageID"

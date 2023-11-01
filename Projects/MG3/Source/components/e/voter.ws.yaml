@@ -20,6 +20,9 @@ style:
   .clickable:hover:
     opacity: 0.6
 name: e-voter
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-e-voter" path="872896511."><div class="flex"
   path="872896511.0"><div class="clickable" v-text="'▼'"

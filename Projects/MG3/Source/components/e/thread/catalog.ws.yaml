@@ -45,6 +45,9 @@ style:
     width: 15rem
     margin-bottom: 3rem
 name: e-thread-catalog
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-e-thread-catalog" path="-751930146."><div class="catalog"
   path="-751930146.0"><transition-group name="list"

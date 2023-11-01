@@ -179,6 +179,17 @@ class VueManager {
     return this.vueRefsToUIDs.keys();
   }
 
+  getVuesFromElement(el: HTMLElement): any[] {
+    // Include ancestors
+    const vues = [] as any[];
+    let vue = this.getVueFromElement(el);
+    while (vue) {
+      vues.push(vue);
+      vue = vue.$parent;
+    }
+    return vues;
+  }
+
   getVueFromElement(el: HTMLElement) {
     const vue = this.getVueFromVnode(this.getVnodeFromElement(el));
     return vue;

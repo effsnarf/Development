@@ -5,7 +5,7 @@ dom:
         icon: 🧩
         text: layout
     ui.tabs:
-      ':options': '[''🧩 direction'', ''👉 order'', ''🎫 size'', ''🎫 justify'']'
+      ':options': '[''🧩 direction'', ''👉 order'', ''🎫 item size'', ''🎫 justify'']'
       direction: vertical
       ':can-select-none': 'true'
       template: 
@@ -19,27 +19,30 @@ dom:
           v-model: order
       template: 
         v-slot: tab2
-        ui.input.layout.size:
-          v-model: size
+        ui.input.layout.item.size:
+          v-model: item.size
       template: 
         v-slot: tab3
         ui.input.layout.justify:
-          v-model: justify
+          v-model: item.justify
 props:
   value: null
 data:
   direction: null
   order: null
-  size: null
-  justify: null
+  item:
+    size: null
+    justify: null
 computed:
   layout: | #js
     function() {
       return {
         direction: this.direction,
         order: this.order,
-        size: this.size,
-        justify: this.justify,
+        item: {
+          size: this.itemSize,
+          justify: this.itemJustify,
+        },
       };
     }
 watch:
@@ -55,8 +58,7 @@ watch:
       function(layout) {
         this.direction = layout?.direction;
         this.order = layout?.order;
-        this.size = layout?.size;
-        this.justify = layout?.justify;
+        this.item = layout?.item || { size: null, justify: null };
       }
     immediate: true
     deep: true
@@ -68,14 +70,16 @@ template: >-
   <div class="comp-ui-input-layout" path="-1483325720."><h2
   path="-1483325720.0"><ui-title icon="🧩" text="layout"
   path="-1483325720.0.0"></ui-title></h2><ui-tabs :options="['🧩 direction', '👉
-  order', '🎫 size', '🎫 justify']" direction="vertical" :can-select-none="true"
-  path="-1483325720.1"><template v-slot:tab0
+  order', '🎫 item size', '🎫 justify']" direction="vertical"
+  :can-select-none="true" path="-1483325720.1"><template v-slot:tab0
   path="-1483325720.1.0"><ui-input-layout-direction v-model="direction"
   path="-1483325720.1.0.0"></ui-input-layout-direction></template><template
   v-slot:tab1 path="-1483325720.1.1"><ui-input-layout-order
   :direction="direction" v-model="order"
   path="-1483325720.1.1.0"></ui-input-layout-order></template><template
-  v-slot:tab2 path="-1483325720.1.2"><ui-input-layout-size v-model="size"
-  path="-1483325720.1.2.0"></ui-input-layout-size></template><template
-  v-slot:tab3 path="-1483325720.1.3"><ui-input-layout-justify v-model="justify"
+  v-slot:tab2 path="-1483325720.1.2"><ui-input-layout-item-size
+  v-model="item.size"
+  path="-1483325720.1.2.0"></ui-input-layout-item-size></template><template
+  v-slot:tab3 path="-1483325720.1.3"><ui-input-layout-justify
+  v-model="item.justify"
   path="-1483325720.1.3.0"></ui-input-layout-justify></template></ui-tabs></div>

@@ -91,6 +91,9 @@ watch:
       }
 style: null
 name: page-media
+_:
+  examples:
+    count: 0
 template: >-
   <site class="comp-page-media" page-name="media"
   :columns-focus-left="columnsFocusLeft" :content-not-found="contentNotFound"

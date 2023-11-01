@@ -51,6 +51,7 @@ methods:
     }
   getPropValue: | #js
     function (propName) {
+      return null;
       const vue = this.vue();
       if (!vue) return undefined;
       const methodDatas = vue._vueIde.methodDatas;

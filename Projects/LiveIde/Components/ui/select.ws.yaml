@@ -1,7 +1,7 @@
 dom:
   div: 
     div: 
-      ':style': '{ ''max-width'': ((direction == ''horizontal'') ? null : ''15em'') }'
+      ':style': '{ ''max-width'': ((direction == ''horizontal'') ? null : null) }'
       ui.input.text.box:
         v-if: showSearchBox
         icon: 🔎
@@ -153,7 +153,7 @@ style:
   .comp-ui-list:
     user-select: none
   li:
-    margin: 0 0 0.5em 0.8em !important
+    margin: 0 !important
     padding: 0.2em 0.5em
   li.selected:
     border: '1px solid #ffffff80'
@@ -171,7 +171,7 @@ _:
     count: 0
 template: >-
   <div class="comp-ui-select" path="-1442841194."><div :style="{ 'max-width':
-  ((direction == 'horizontal') ? null : '15em') }"
+  ((direction == 'horizontal') ? null : null) }"
   path="-1442841194.0"><ui-input-text-box v-if="showSearchBox" icon="🔎"
   type="search" :hint="searchHint" v-model="query"
   path="-1442841194.0.0"></ui-input-text-box><div class="list-container"

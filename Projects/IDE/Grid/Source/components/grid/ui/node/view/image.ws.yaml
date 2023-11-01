@@ -16,6 +16,7 @@ props:
 data:
   nodeItem: null
   isLoaded: false
+  placeholderUrl: /images/image-placeholder.png
 methods:
   onImageLoad: | #js
     function() {
@@ -23,8 +24,11 @@ methods:
     }
   getImageSrc: | #js
     function() {
-      if (typeof this.nodeItem == "string") return this.nodeItem;
-      return ("/images/image-placeholder.png");
+      if (typeof this.nodeItem == "string") {
+        if (!this.nodeItem) return this.placeholderUrl;
+        return this.nodeItem;
+      }
+      return this.placeholderUrl;
     }
 computed:
   imageSrc: | #js

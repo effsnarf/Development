@@ -17,6 +17,9 @@ style:
     width: 20% !important
     margin-right: 1rem
 name: e-generator-small
+_:
+  examples:
+    count: 0
 template: >-
   <ui-link class="comp-e-generator-small grayish"
   :url="$root.url.generator(item)" path="524478115."><div class="badge"

@@ -26,6 +26,9 @@ style:
     line-height: 1em
     font-size: 200%
     font-family: Old Standard TT
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-content-poem-full box" path="1035076097."><div class="line"
   v-for="(line, index) in lines" :class="getLineCssClass(index)" v-text="line"

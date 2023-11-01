@@ -27,6 +27,9 @@ style:
   a:hover:
     background: '#ffffff30'
 name: page-generators
+_:
+  examples:
+    count: 0
 template: >-
   <site class="comp-page-generators" page-name="generators" :columns="2"
   path="-1205429057."><template v-slot:middle path="-1205429057.0"><h2

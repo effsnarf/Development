@@ -163,7 +163,7 @@ methods:
       const items = (socketData?.input?.[1] || []);
       return items;
     }
-  getFlexClass: | #js
+  getLayoutFlexClass: | #js
     function(layout) {
       layout = (layout || {});
       let cls = [];
@@ -226,7 +226,7 @@ computed:
       const cls = {};
       if (!this.items) cls.grayscale = true;
       const layout = (this.layout || {});
-      cls[this.getFlexClass(layout)] = true;
+      cls[this.getLayoutFlexClass(layout)] = true;
       if (layout.justify) cls[`justify-${layout.justify}`] = true;
       return cls;
     }
@@ -236,6 +236,7 @@ computed:
       const layout = (this.layout || {});
       if (layout.size?.width) {
         style["flex-basis"] = layout.size.width;
+        style["overflow-x"] = "hidden";
       }
       return style;
     }
@@ -245,6 +246,7 @@ computed:
     }
 style:
   .item:
+    width: 100%
     border: '1px dashed #ffffff60'
     transition: 0.3s
   .item:hover:

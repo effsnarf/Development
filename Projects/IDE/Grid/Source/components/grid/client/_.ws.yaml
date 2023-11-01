@@ -14,7 +14,9 @@ props:
 data: null
 mounted: | #js
   function() {
-    this.$root.els = this.$root.els || {};
+    this.$root.els = (this.$root.els || {});
+
+    this.$root.boxLogs = (this.$root.boxLogs || {});
 
     this.$root.boxTypeColors = {
       func: "#dddddd",

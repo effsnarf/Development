@@ -103,11 +103,11 @@ style:
   h2:
     font-size: 2rem
   .show-on-hover-container .show-on-hover:
-    max-height: 0
     opacity: 0
+    transition: 0.3s
   .show-on-hover-container:hover .show-on-hover:
-    max-height: 25rem
     opacity: 1
+    transition: 0.1s
   tr:hover:
     background: '#ffffff20'
     transition: 0s

@@ -104,7 +104,7 @@ template: >-
   <div class="comp-app" path="96801."><img class="logo" src="/images/duck3.png"
   path="96801.0"/><div path="96801.1"><div class="flex" path="96801.1.0"><h2
   class="mainTitle1" path="96801.1.0.0"><ui-title text="🧊 Web developers of the
-  world unite" path="96801.1.0.0.0"></ui-title></h2></div></div><h3
+  world unite!" path="96801.1.0.0.0"></ui-title></h2></div></div><h3
   class="mainTitle2" v-html="'A global component registry, by everyone, for
   everyone.'" path="96801.2"></h3><div path="96801.3"><ul class="comp-list"
   path="96801.3.0"><li class="clickable" v-for="comp in compsWithExample"

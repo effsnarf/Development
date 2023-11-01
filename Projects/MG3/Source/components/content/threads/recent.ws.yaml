@@ -20,6 +20,9 @@ style:
   .comp-e-thread-teaser:
     margin-bottom: 2em
 name: content-threads-recent
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-content-threads-recent thread-teasers"
   path="-1639663019."><e-thread-teaser v-for="thread in threads"

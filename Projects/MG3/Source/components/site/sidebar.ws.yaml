@@ -4,6 +4,9 @@ dom:
       item-type: generator.small
 name: site-sidebar
 style: null
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-site-sidebar" path="-576601163."><ui-list
   item-type="generator.small" path="-576601163.0"></ui-list></div>

@@ -386,6 +386,9 @@ style:
     background: none !important
   .message.large-video:
     grid-template: 1fr / 1fr
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-e-template-editor m-auto" v-if="temp" :class="getCssClass()"
   path="-650358312."><div class="div1" :style="getStyle()"

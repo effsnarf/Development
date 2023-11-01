@@ -20,8 +20,6 @@ dom:
         e.teaser: 
           imageID: 679668909
           title: YouTube
-      e.builder.examples:
-        v-if: 'true'
     template: 
       v-slot: left
       e.generator.search: null
@@ -71,6 +69,9 @@ style:
   .comp-e-generator-wide img:
     aspect-ratio: 2 / 1
 name: page-home
+_:
+  examples:
+    count: 0
 template: >-
   <site class="comp-page-home" :columns="2" page-name="home"
   path="838274270."><template v-slot:article path="838274270.0"><div
@@ -80,8 +81,7 @@ template: >-
   url="/c/movies" path="838274270.0.0.1"></e-teaser><e-teaser
   imageID="679668921" title="Anonymous Times"
   path="838274270.0.0.2"></e-teaser><e-teaser imageID="679668909"
-  title="YouTube" path="838274270.0.0.3"></e-teaser></div><e-builder-examples
-  v-if="true" path="838274270.0.1"></e-builder-examples></template><template
+  title="YouTube" path="838274270.0.0.3"></e-teaser></div></template><template
   v-slot:left
   path="838274270.1"><e-generator-search></e-generator-search></template><template
   v-slot:middle path="838274270.2"><div class="flex ver gap-1"

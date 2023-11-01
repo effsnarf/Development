@@ -160,6 +160,9 @@ style:
   img.empty:
     height: 100%
 name: e-template-grid-item
+_:
+  examples:
+    count: 0
 template: >-
   <ui-track-size class="comp-e-template-grid-item" v-if="item"
   path="-1435649936."><div :class="'flex caption-layout-' +

@@ -3481,6 +3481,16 @@ class VueManager {
     getRefKeys() {
         return this.vueRefsToUIDs.keys();
     }
+    getVuesFromElement(el) {
+        // Include ancestors
+        const vues = [];
+        let vue = this.getVueFromElement(el);
+        while (vue) {
+            vues.push(vue);
+            vue = vue.$parent;
+        }
+        return vues;
+    }
     getVueFromElement(el) {
         const vue = this.getVueFromVnode(this.getVnodeFromElement(el));
         return vue;
@@ -6100,7 +6110,7 @@ var __webpack_exports__ = {};
 (() => {
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/website/script/1698227839658.ts ***!
+  !*** ../../../LiveIde/website/script/1698869187010.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -6393,6 +6403,7 @@ window.vueIdeCompMixin = vueIdeCompMixin;
         template: `<ide-workspace></ide-workspace>`,
     });
     vueIdeApp.state = state;
+    await vueIdeApp.wait(4000);
     // Create an element to host the Vue IDE app
     const el = document.createElement("div");
     el.id = `vue-ide-app-${Date.now()}`;

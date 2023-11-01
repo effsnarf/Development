@@ -39,10 +39,20 @@ style:
     top: 0
     left: 0
     background-image: url(/images/loading.gif)
+example:
+  dom:
+    ui.value:
+      ':value': exampleData
+  data:
+    exampleData: null
+  mounted: | #js #js
+    async function() {
+      this.exampleData = (await (await fetch("/fetch?url=https://a.4cdn.org/boards.json")).json()).boards;
+    }
+name: ui-value
 _:
   examples:
-    count: 0
-name: ui-value
+    count: 1
 template: >-
   <ui-value-any class="comp-ui-value" :class="{ overflow, loading: isLoading }"
   :value="visibleValue" :title="title" :depth="(depth + 1)" :large="large"

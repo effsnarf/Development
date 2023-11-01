@@ -6,6 +6,7 @@ import {
   Objects,
   TreeObject,
 } from "../../../../Shared/Extensions.Objects.Client";
+import { Reflection } from "../../../../Shared/Reflection";
 import { Diff } from "../../../../Shared/Diff";
 import { TaskQueue } from "../../../../Shared/TaskQueue";
 import { Actionable } from "../../../../Shared/Actionable";
@@ -27,6 +28,7 @@ let vueApp: any;
 // To make it accessible to client code
 window1.Objects = Objects;
 window1.TreeObject = TreeObject;
+window1.Reflection = Reflection;
 window1.Diff = Diff;
 window1.TaskQueue = TaskQueue;
 window1.Data = Data;
@@ -215,10 +217,6 @@ const flowAppCompMixin = {
   },
 };
 
-const vueAppMixins = [gridAppMixin];
-
-const webScriptMixins = [generalMixin, gridAppCompMixin];
-
 const mgHelpers = {
   url: {
     thread: (thread: any, full: boolean = false) => {
@@ -297,7 +295,7 @@ const mgHelpers = {
 };
 
 const mgMixin = {
-  match: (c: Component) => c.name.startsWith("mg."),
+  matchComp: (c: Component) => c.name.startsWith("mg."),
   data() {
     return {
       url: mgHelpers.url,
@@ -308,6 +306,10 @@ const mgMixin = {
     };
   },
 };
+
+const vueAppMixins = [gridAppMixin];
+
+const webScriptMixins = [generalMixin, gridAppCompMixin, mgMixin];
 
 interface MgParams {
   urlName: string;
@@ -606,7 +608,7 @@ interface MgParams {
   const isLocalHost = window.location.hostname == "localhost";
   const dbpHost = `https://db.memegenerator.net`;
 
-  const dbp = null; // (await DatabaseProxy.new(`${dbpHost}/MemeGenerator`)) as any;
+  const dbp = (await DatabaseProxy.new(`${dbpHost}/MemeGenerator`)) as any;
 
   const gdbData = await Objects.try(
     async () => await (await fetch(`/gdb.yaml`)).json(),
@@ -626,6 +628,12 @@ interface MgParams {
   vueApp = new client.Vue({
     mixins: vueAppMixins,
     data: {
+      // Meme Generator
+      url: mgHelpers.url,
+      builders: {
+        all: {} as any,
+      },
+      //
       events: new Events(),
       vm: null as unknown as VueManager,
       client,
@@ -690,7 +698,7 @@ interface MgParams {
       async ensureBuilders() {
         const self = this as any;
         if (!self.dbp) return;
-        if (!self.builders?.length) {
+        if (!Object.keys(self.builders.all).length) {
           const allBuilders = await self.dbp.builders.select.all();
           self.builders.mainMenu = allBuilders.filter(
             (b: any) => b.visible?.mainMenu

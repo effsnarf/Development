@@ -6,7 +6,7 @@ dom:
       hint: search…
       v-model: query
     e.generator.list:
-      ":generators": generators
+      ':generators': generators
 props: null
 data:
   query: null
@@ -31,8 +31,11 @@ style:
   li:
     margin-top: 0.5em
 name: e-generator-search
+_:
+  examples:
+    count: 0
 template: >-
-  <div class="comp-e-generator-search" path="-928430196."><ui-text-box
+  <div class="comp-e-generator-search" path="-928430196."><ui-input-text-box
   type="search" icon="🔎" hint="search…" v-model="query"
-  path="-928430196.0"></ui-text-box><e-generator-list :generators="generators"
-  path="-928430196.1"></e-generator-list></div>
+  path="-928430196.0"></ui-input-text-box><e-generator-list
+  :generators="generators" path="-928430196.1"></e-generator-list></div>

@@ -299,10 +299,9 @@ function removeQuoteLinks(s: string) {
   await chat.send("");
 
   const reply = await chat.send(
-    `rewrite this in Sheakspearean:
+    `rewrite this in Hungarian, in different phrasing:
 
-    "I’ve just bought 48 of these
-    Pls post your best memes to celebrate. I can’t find any online"
+    "Az Óbudai Társaskör és az EMIH-Magyar Zsidó Szövetség közösen szervez szombatfogadást az Óbudai Zsidó Kulturális Napok keretein belül az Óbudai zsinagógába. Az esemény most pénteken (nov. 3.) lesz megtartva 18:30-tól. Az EMIH-Magyar Zsidó Szövetség vezető rabbija Köves Slomó nagyszerű kezdeményezésnek tartja a nyitott szombatfogadást, így azok is közelebbről megismerhetik a zsidó vallást, akiknek eddig még nem volt ebben tapasztalata."
     `
   );
 

@@ -70,36 +70,37 @@ style:
     max-height: 50vh
     scroll: auto
     padding: 0 2em 0 0
-example1:
-  - dom:
-      ui.tree:
-        ':root': root
-    data:
-      root: null
-    mounted: | #js #js
-      function() {
-        this.root = ({
-          item: "root",
-          children: [
-            {
-              item: "node 1",
-              children: [
-                { item: "node 1.1" }
-              ]
-            },
-            {
-              item: "node 2",
-              children: [
-                { item: "node 2.1" }
-              ]
-            }
-          ]
-        });
-      }
+example:
+  dom:
+    ui.tree:
+      ':root': root
+      div: null
+  data:
+    root: null
+  mounted: | #js #js
+    function() {
+      this.root = ({
+        item: "root",
+        children: [
+          {
+            item: "node 1",
+            children: [
+              { item: "node 1.1" }
+            ]
+          },
+          {
+            item: "node 2",
+            children: [
+              { item: "node 2.1" }
+            ]
+          }
+        ]
+      });
+    }
 name: ui-tree
 _:
   examples:
-    count: 0
+    count: 1
 template: >-
   <ul class="comp-ui-tree" v-if="root" path="-484140360."><li
   path="-484140360.0"><ui-tree-node :node="root" :depth="0"

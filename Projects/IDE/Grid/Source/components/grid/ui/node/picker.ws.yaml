@@ -1,0 +1,74 @@
+dom:
+  .flex:
+    ui.drawer:
+      ul:
+        li:
+          v-for: vue in vues.map(v => v())
+          ':class': >-
+            { clickable: true, selected: (!selectedVue ? false : (selectedVue()
+            == vue)) }
+          @click: selectedVue = (() => vue)
+          ui.highlighter: 
+            ':get-elements': () => [vue.$el]
+            ui.title:
+              icon: 📦
+              ':text': vue.$data._.comp.name
+    .settings:
+      transition:
+        name: slide-hor
+      div:
+        v-if: selectedVue
+        ui.highlighter: 
+          ':get-elements': () => [selectedVue().$el]
+          grid.ui.node.settings:
+            ':box': selectedVue().box
+            ':node': selectedVue().node
+            ':data-bound-socket-data': selectedVue().dataBoundSocketData
+props:
+  box: null
+  hoveredElement: null
+data:
+  mousePos: null
+  vues: []
+  selectedVue: null
+methods: null
+watch:
+  hoveredElement: | #js
+    function(hoveredElement) {
+      this.vues = this.$root.vm.getVuesFromElement(hoveredElement)
+        .filter(v => (v.$data._?.comp.name.startsWith("grid.ui.node.view")))
+        .filter(v => (v.$data._?.comp.name != "grid.ui.node.view"))
+        .filter(v => (v.$data._?.comp.name != "grid.ui.node.view.view"))
+        .reverse()
+        .map(v => (() => v));
+    }
+style:
+  .settings .hoverable:
+    background: none
+  li:nth-child(2):
+    margin-left: 1em
+  li:nth-child(3):
+    margin-left: 2em
+  li:nth-child(4):
+    margin-left: 3em
+  li:nth-child(5):
+    margin-left: 4em
+_:
+  examples:
+    count: 0
+name: grid-ui-node-picker
+template: >-
+  <div class="comp-grid-ui-node-picker flex" path="599849288."><ui-drawer
+  path="599849288.0"><ul path="599849288.0.0"><li v-for="vue in vues.map(v =&gt;
+  v())" :class="{ clickable: true, selected: (!selectedVue ? false :
+  (selectedVue() == vue)) }" @click="selectedVue = (() =&gt; vue)"
+  path="599849288.0.0.0"><ui-highlighter :get-elements="() =&gt; [vue.$el]"
+  path="599849288.0.0.0.0"><ui-title icon="📦" :text="vue.$data._.comp.name"
+  path="599849288.0.0.0.0.0"></ui-title></ui-highlighter></li></ul></ui-drawer><div
+  class="settings" path="599849288.1"><transition name="slide-hor"
+  path="599849288.1.0"></transition><div v-if="selectedVue"
+  path="599849288.1.1"><ui-highlighter :get-elements="() =&gt;
+  [selectedVue().$el]" path="599849288.1.1.0"><grid-ui-node-settings
+  :box="selectedVue().box" :node="selectedVue().node"
+  :data-bound-socket-data="selectedVue().dataBoundSocketData"
+  path="599849288.1.1.0.0"></grid-ui-node-settings></ui-highlighter></div></div></div>

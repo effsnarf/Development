@@ -21,6 +21,9 @@ style:
     grid-template: 1fr / 1fr 1fr 1fr 1fr
     gap: 0.3em
 name: e-media-create-feel
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-e-media-create-feel" path="745103109."><div class="grid"
   path="745103109.0"><ui-image v-for="i in 8" :class="{ clickable: true }"

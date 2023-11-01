@@ -32,11 +32,15 @@ style:
   input:
     text-align: center
 name: e-template-caption-editor
+_:
+  examples:
+    count: 0
 template: >-
-  <div class="comp-e-template-caption-editor" path="-1537870880."><ui-text-box
-  :hint="item.hint" v-model="item.text" path="-1537870880.0"></ui-text-box><div
-  v-if="!minimal" path="-1537870880.1"><ui-select :options="['Oswald', 'Special
-  Elite']" type="dropdown" input-type="value" v-model="item.font"
+  <div class="comp-e-template-caption-editor"
+  path="-1537870880."><ui-input-text-box :hint="item.hint" v-model="item.text"
+  path="-1537870880.0"></ui-input-text-box><div v-if="!minimal"
+  path="-1537870880.1"><ui-select :options="['Oswald', 'Special Elite']"
+  type="dropdown" input-type="value" v-model="item.font"
   path="-1537870880.1.0"></ui-select><ui-select :options="['white', 'black']"
   type="dropdown" input-type="value" v-model="item.color"
   path="-1537870880.1.1"></ui-select><ui-select :options="['left', 'center',

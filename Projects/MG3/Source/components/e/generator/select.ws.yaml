@@ -126,10 +126,13 @@ style:
     opacity: 1
     transition: 0s
 name: e-generator-select
+_:
+  examples:
+    count: 0
 template: >-
-  <div class="comp-e-generator-select" path="-928114976."><ui-text-box
+  <div class="comp-e-generator-select" path="-928114976."><ui-input-text-box
   type="search" icon="🔎" hint="search…" v-model="query"
-  path="-928114976.0"></ui-text-box><ui-loading class="absolute-center"
+  path="-928114976.0"></ui-input-text-box><ui-loading class="absolute-center"
   v-if="isLoading" path="-928114976.1"></ui-loading><div class="grid1"
   path="-928114976.2"><ui-image v-for="generator in visibleGenerators" :class="{
   selected: (dValue?._id == generator._id) }" :tooltip="generator.displayName"

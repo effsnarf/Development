@@ -16,6 +16,9 @@ props:
 data: null
 methods: null
 name: e-format-layers
+_:
+  examples:
+    count: 0
 template: >-
   <e-format-base class="comp-e-format-layers" :builder="builder" :media="media"
   :editable="editable" :show-help="showHelp" :media-created="mediaCreated"

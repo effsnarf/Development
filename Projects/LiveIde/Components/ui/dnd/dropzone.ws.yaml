@@ -42,9 +42,20 @@ methods:
     }
 style:
   .drag-over: null
+example:
+  dom:
+    ui.dnd.dropzone:
+      .box1.w-100pc.text-center:
+        v-text: '''Drop here'''
+      @drop-item: onDropItem
+  methods:
+    onDropItem: | #js
+      function(dragItem) {
+        alertify.message("Dropped item");
+      }
 _:
   examples:
-    count: 0
+    count: 1
 name: ui-dnd-dropzone
 template: >-
   <div class="comp-ui-dnd-dropzone" :class="{ dropzone: true, 'drag-over':

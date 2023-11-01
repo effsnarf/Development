@@ -1,14 +1,14 @@
 dom:
   div: 
+    class: highlighted
     ui.keyboard:
       @ctrl: isCtrl=$event
     ui.mouse:
       @hovered-element: onHoveredElement
       ':global': true
     ui.context.window:
-      v-if: showPicker
       ref: context1
-      ':global': true
+      ':global': 'true'
       @pinned: onPinned
       .flex.flex-row.gap-1:
         .flex.flex-column.gap-1:
@@ -248,13 +248,14 @@ _:
   examples:
     count: 0
 template: >-
-  <div class="comp-ide-component-picker" path="-646340253."><ui-keyboard
-  @ctrl="isCtrl=$event" path="-646340253.0"></ui-keyboard><ui-mouse
+  <div class="comp-ide-component-picker highlighted"
+  path="-646340253."><ui-keyboard @ctrl="isCtrl=$event"
+  path="-646340253.0"></ui-keyboard><ui-mouse
   @hovered-element="onHoveredElement" :global="true"
-  path="-646340253.1"></ui-mouse><ui-context-window v-if="showPicker"
-  ref="context1" :global="true" @pinned="onPinned" path="-646340253.2"><div
-  class="flex flex-row gap-1" path="-646340253.2.0"><div class="flex flex-column
-  gap-1" path="-646340253.2.0.0"><div :class="componentTreeClass"
+  path="-646340253.1"></ui-mouse><ui-context-window ref="context1"
+  :global="true" @pinned="onPinned" path="-646340253.2"><div class="flex
+  flex-row gap-1" path="-646340253.2.0"><div class="flex flex-column gap-1"
+  path="-646340253.2.0.0"><div :class="componentTreeClass"
   path="-646340253.2.0.0.0"><ide-component-picker-vue-list
   :uids="parentChainUIDs" :selectedVueUID="selectedVueUID"
   className="parent-chain" @hover="onHoverVue" @select="onSelectVue"

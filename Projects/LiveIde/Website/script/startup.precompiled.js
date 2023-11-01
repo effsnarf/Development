@@ -1,6 +1,183 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ "../../../../Apps/DatabaseProxy/Client/DbpClient.ts":
+/*!**********************************************************!*\
+  !*** ../../../../Apps/DatabaseProxy/Client/DbpClient.ts ***!
+  \**********************************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+// This version is for public clients like Meme Generator
+// Doesn't have direct access to the database, but can still use the API
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.DatabaseProxy = void 0;
+// Lowercase the first letter of a string
+String.prototype.untitleize = function () {
+    return this.charAt(0).toLowerCase() + this.slice(1);
+};
+class DatabaseProxy {
+    urlBase;
+    fetchAsJson;
+    constructor(urlBase, _fetchAsJson) {
+        this.urlBase = urlBase;
+        this.fetchAsJson =
+            _fetchAsJson ||
+                (async (url, ...args) => {
+                    const response = await fetch(url, ...args);
+                    const text = await response.text();
+                    if (!text?.length)
+                        return null;
+                    return JSON.parse(text);
+                });
+    }
+    static async new(urlBase, _fetchAsJson) {
+        const dbp = new DatabaseProxy(urlBase, _fetchAsJson);
+        await dbp.init();
+        return dbp;
+    }
+    async init() {
+        const api = await this.createApiMethods();
+        for (const key of Object.keys(api)) {
+            this[key] = api[key];
+        }
+    }
+    static setValue(obj, value) {
+        if (Array.isArray(obj)) {
+            obj[0][obj[1]] = value;
+        }
+        else {
+            obj.value = value;
+        }
+    }
+    async fetchJson(url, options = {}) {
+        // $set also implies cached
+        if (!options.$set) {
+            if (options.cached) {
+                // Even though we're returning from the cache,
+                // we still want to fetch in the background
+                // to update for the next time
+                const fetchItem = async () => {
+                    const item = await this.fetchAsJson(url, options);
+                    //localStorage.setItem(url, JSON.stringify(item));
+                    return item;
+                };
+                //const cachedItem = Objects.json.parse(localStorage.getItem(url) || "null");
+                const cachedItem = null;
+                if (!cachedItem)
+                    return await fetchItem();
+                // Fetch in the background
+                fetchItem();
+                return cachedItem;
+            }
+            return await this.fetchAsJson(url, options);
+        }
+        // Check the local cache
+        //const cachedItem = Objects.json.parse(localStorage.getItem(url) || "null");
+        const cachedItem = null;
+        if (cachedItem)
+            DatabaseProxy.setValue(options.$set, cachedItem);
+        // Fetch in the background
+        const item = await this.fetchAsJson(url, options);
+        // Update the local cache
+        //localStorage.setItem(url, JSON.stringify(item));
+        DatabaseProxy.setValue(options.$set, item);
+        return item;
+    }
+    async callApiMethod(entity, group, method, args, extraArgs) {
+        // We're using { $set: [obj, prop] } as a callback syntax
+        // This is because sometimes we use the local cache and also fetch in the background
+        // in which case we'll need to resolve twice which is not possible with a promise
+        const options = extraArgs.find((a) => a?.$set) || {};
+        let url = `${this.urlBase}/api/${entity}/${group}/${method}`;
+        const isHttpPost = group == "create";
+        if (isHttpPost) {
+            const data = {};
+            args.forEach((a) => (data[a.name] = a.value));
+            const isCreateCall = url.includes("/create/one");
+            if (isCreateCall) {
+                data._uid = DatabaseProxy.getRandomUniqueID();
+            }
+            const fetchOptions = {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data),
+                mode: "no-cors",
+            };
+            let result = await this.fetchJson(url, fetchOptions);
+            // If we got an _id back, select the item
+            // This is because when POSTing from localhost I'm having trouble getting the actual object back
+            const _id = parseInt(result);
+            if (isCreateCall && (!result || typeof result != "object")) {
+                if (_id) {
+                    const idFieldName = `${entity
+                        .substring(0, entity.length - 1)
+                        .toLowerCase()}ID`;
+                    result = await this.callApiMethod(entity, "select", "one", [{ name: idFieldName, value: _id }], []);
+                }
+                else {
+                    result = await this.callApiMethod(entity, "select", "one", [{ name: "_uid", value: data._uid }], []);
+                }
+            }
+            return result;
+        }
+        const argsStr = args
+            .map((a) => `${a.name}=${JSON.stringify(a.value || null)}`)
+            .join("&");
+        const getUrl = `${url}?${argsStr}`;
+        const result = await this.fetchJson(getUrl, options);
+        return result;
+    }
+    async createApiMethods() {
+        const api = {};
+        const apiMethods = await this.getApiMethods();
+        apiMethods.forEach((e) => {
+            const entityName = e.entity.untitleize();
+            api[entityName] = {};
+            e.groups.forEach((g) => {
+                api[entityName][g.name] = {};
+                g.methods.forEach((m) => {
+                    api[entityName][g.name][m.name] = async (...args) => {
+                        let result = await this.callApiMethod(e.entity, g.name, m.name, (m.args || []).map((a, i) => {
+                            return { name: a, value: args[i] };
+                        }), args.slice((m.args || []).length));
+                        if (m.then) {
+                            const thenArgs = [`api`, ...(m.then.args || [])];
+                            const then = eval(`async (${thenArgs.join(`,`)}) => { ${m.then.body} }`);
+                            if (m.then.chainResult) {
+                                result = await then(api, result);
+                            }
+                            else {
+                                then(api, result);
+                            }
+                        }
+                        return result;
+                    };
+                });
+            });
+        });
+        return api;
+    }
+    async getApiMethods() {
+        const result = await this.fetchJson(`${this.urlBase}/api`, {
+            cached: true,
+        });
+        return result;
+    }
+    static getRandomUniqueID() {
+        return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (char) => {
+            const random = (Math.random() * 16) | 0;
+            const value = char === "x" ? random : (random & 0x3) | 0x8;
+            return value.toString(16);
+        });
+    }
+}
+exports.DatabaseProxy = DatabaseProxy;
+
+
+/***/ }),
+
 /***/ "../../../LiveIde/Classes/AnalyticsTracker.ts":
 /*!****************************************************!*\
   !*** ../../../LiveIde/Classes/AnalyticsTracker.ts ***!
@@ -3592,6 +3769,16 @@ class VueManager {
     getRefKeys() {
         return this.vueRefsToUIDs.keys();
     }
+    getVuesFromElement(el) {
+        // Include ancestors
+        const vues = [];
+        let vue = this.getVueFromElement(el);
+        while (vue) {
+            vues.push(vue);
+            vue = vue.$parent;
+        }
+        return vues;
+    }
     getVueFromElement(el) {
         const vue = this.getVueFromVnode(this.getVnodeFromElement(el));
         return vue;
@@ -6785,6 +6972,173 @@ exports.MovingPositionSmoother = MovingPositionSmoother;
 
 /***/ }),
 
+/***/ "../../../../Shared/Reflection.ts":
+/*!****************************************!*\
+  !*** ../../../../Shared/Reflection.ts ***!
+  \****************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Reflection = void 0;
+class Reflection {
+    static getClassSignatures(clss) {
+        return clss.map((c) => this.getClassSignature(c));
+    }
+    // { name: "Reflection", methods: [ { name: "getClassSignature", args: ["cls"] } ] }
+    static getClassSignature(cls) {
+        return {
+            name: Reflection.getClassName(cls),
+            methods: Reflection.getClassMethods(cls),
+        };
+    }
+    // Accepts a JavaScript class and returns its name
+    static getClassName(cls) {
+        return cls.name;
+    }
+    // [
+    //  { name: "send", args: ["message"] },
+    // ]
+    static getClassMethods(cls) {
+        let methods = [];
+        for (let key of Object.getOwnPropertyNames(cls.prototype)) {
+            if (key === "constructor")
+                continue;
+            try {
+                if (typeof cls.prototype[key] === "function") {
+                    methods.push({
+                        name: key,
+                        args: Reflection.getFunctionArgs(cls.prototype[key]),
+                    });
+                }
+            }
+            catch (ex) { }
+        }
+        // Get static methods
+        for (let key of Object.getOwnPropertyNames(cls)) {
+            if (typeof cls[key] === "function") {
+                methods.push({
+                    name: key,
+                    modifiers: ["static"],
+                    args: Reflection.getFunctionArgs(cls[key]),
+                });
+            }
+        }
+        return methods;
+    }
+    static getInstanceMethods(instance) {
+        let methods = [];
+        for (let key of Object.getOwnPropertyNames(instance)) {
+            if (key === "constructor")
+                continue;
+            try {
+                if (typeof instance[key] === "function") {
+                    methods.push({
+                        name: key,
+                        args: Reflection.getFunctionArgs(instance[key]),
+                    });
+                }
+            }
+            catch (ex) { }
+        }
+        return methods;
+    }
+    static getFunctionArgs(func) {
+        let args = func.toString().match(/\(([^)]*)\)/)[1];
+        let resultArgs = args
+            .split(",")
+            .map((arg) => (arg
+            .replace(/\/\*.*\*\//, "")
+            .trim()
+            // get words
+            ?.match(/\w+/g) || [])[0])
+            .filter((arg) => arg);
+        return resultArgs;
+    }
+    static getMemberClasses(instance) {
+        const members = Object.keys(instance)
+            .map((key) => instance[key])
+            .filter((prop) => prop)
+            .filter((prop) => typeof prop === `object`)
+            .filter((prop) => prop.constructor);
+        return members;
+    }
+    static bindClassMethods(instance, beforeMethod, afterMethod, deep = false, instanceMethods = false) {
+        const className = instance.constructor.name;
+        const methods = instanceMethods
+            ? Reflection.getInstanceMethods(instance)
+            : Reflection.getClassMethods(instance.constructor);
+        methods.forEach(({ name }) => {
+            const methodName = name;
+            const originalMethod = instance[methodName];
+            if (!originalMethod)
+                return;
+            instance[methodName] = (...args) => {
+                const beforeResult = !beforeMethod
+                    ? null
+                    : beforeMethod(className, methodName, args);
+                const returnValue = originalMethod.apply(instance, args);
+                // If the method returns a promise, hook into the promise
+                if (returnValue?.then) {
+                    returnValue.then((result) => {
+                        if (afterMethod)
+                            afterMethod(beforeResult, className, methodName, args, result);
+                    });
+                    return returnValue;
+                }
+                // Otherwise, just call the afterMethod handler
+                if (afterMethod)
+                    afterMethod(beforeResult, className, methodName, args, returnValue);
+                return returnValue;
+            };
+        });
+        if (deep) {
+            const members = Reflection.getMemberClasses(instance);
+            for (const member of members)
+                this.bindClassMethods(member, beforeMethod, afterMethod, deep);
+        }
+        return instance;
+    }
+    static trackPropertyValue(obj, property, callback) {
+        if (!obj)
+            throw new Error("obj is null or undefined");
+        // Check if the property is already a getter/setter
+        // If yes, save the original getter/setter
+        const descriptor = Object.getOwnPropertyDescriptor(obj, property);
+        if (descriptor) {
+            if (!descriptor.get)
+                throw new Error(`Property ${property} is not a getter/setter`);
+            if (!descriptor.set)
+                throw new Error(`Property ${property} is read-only`);
+            let getter = descriptor.get;
+            let setter = descriptor.set;
+            // Replace the property with a getter/setter
+            Object.defineProperty(obj, property, {
+                get: () => getter(),
+                set: (newValue) => {
+                    setter(newValue);
+                    callback(newValue);
+                },
+            });
+            return;
+        }
+        // If no, replace the property with a getter/setter
+        let value = obj[property];
+        Object.defineProperty(obj, property, {
+            get: () => value,
+            set: (newValue) => {
+                value = newValue;
+                callback(value);
+            },
+        });
+    }
+}
+exports.Reflection = Reflection;
+
+
+/***/ }),
+
 /***/ "../../../../Shared/RepeatingTaskQueue.ts":
 /*!************************************************!*\
   !*** ../../../../Shared/RepeatingTaskQueue.ts ***!
@@ -7725,7 +8079,7 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 /*!********************************************************!*\
-  !*** ../../../LiveIde/website/script/1698227840357.ts ***!
+  !*** ../../../LiveIde/website/script/1698869187718.ts ***!
   \********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -7733,12 +8087,14 @@ __webpack_require__(/*! ../../../../Shared/Extensions */ "../../../../Shared/Ext
 const HtmlHelper_1 = __webpack_require__(/*! ../../Classes/HtmlHelper */ "../../../LiveIde/Classes/HtmlHelper.ts");
 const Events_1 = __webpack_require__(/*! ../../../../Shared/Events */ "../../../../Shared/Events.ts");
 const Extensions_Objects_Client_1 = __webpack_require__(/*! ../../../../Shared/Extensions.Objects.Client */ "../../../../Shared/Extensions.Objects.Client.ts");
+const Reflection_1 = __webpack_require__(/*! ../../../../Shared/Reflection */ "../../../../Shared/Reflection.ts");
 const Diff_1 = __webpack_require__(/*! ../../../../Shared/Diff */ "../../../../Shared/Diff.ts");
 const TaskQueue_1 = __webpack_require__(/*! ../../../../Shared/TaskQueue */ "../../../../Shared/TaskQueue.ts");
 const Actionable_1 = __webpack_require__(/*! ../../../../Shared/Actionable */ "../../../../Shared/Actionable.ts");
 const AnalyticsTracker_1 = __webpack_require__(/*! ../../Classes/AnalyticsTracker */ "../../../LiveIde/Classes/AnalyticsTracker.ts");
 const ClientContext_1 = __webpack_require__(/*! ../../Classes/ClientContext */ "../../../LiveIde/Classes/ClientContext.ts");
 const Params_1 = __webpack_require__(/*! ../../Classes/Params */ "../../../LiveIde/Classes/Params.ts");
+const DbpClient_1 = __webpack_require__(/*! ../../../../Apps/DatabaseProxy/Client/DbpClient */ "../../../../Apps/DatabaseProxy/Client/DbpClient.ts");
 const VueManager_1 = __webpack_require__(/*! ../../Classes/VueManager */ "../../../LiveIde/Classes/VueManager.ts");
 const Data_1 = __webpack_require__(/*! ../../../../Shared/Data */ "../../../../Shared/Data.ts");
 const Graph_1 = __webpack_require__(/*! ../../../../Shared/Database/Graph */ "../../../../Shared/Database/Graph.ts");
@@ -7749,6 +8105,7 @@ let vueApp;
 // To make it accessible to client code
 window1.Objects = Extensions_Objects_Client_1.Objects;
 window1.TreeObject = Extensions_Objects_Client_1.TreeObject;
+window1.Reflection = Reflection_1.Reflection;
 window1.Diff = Diff_1.Diff;
 window1.TaskQueue = TaskQueue_1.TaskQueue;
 window1.Data = Data_1.Data;
@@ -7910,8 +8267,6 @@ const flowAppCompMixin = {
         },
     },
 };
-const vueAppMixins = [gridAppMixin];
-const webScriptMixins = [generalMixin, gridAppCompMixin];
 const mgHelpers = {
     url: {
         thread: (thread, full = false) => {
@@ -7996,7 +8351,7 @@ const mgHelpers = {
     },
 };
 const mgMixin = {
-    match: (c) => c.name.startsWith("mg."),
+    matchComp: (c) => c.name.startsWith("mg."),
     data() {
         return {
             url: mgHelpers.url,
@@ -8007,6 +8362,8 @@ const mgMixin = {
         };
     },
 };
+const vueAppMixins = [gridAppMixin];
+const webScriptMixins = [generalMixin, gridAppCompMixin, mgMixin];
 (async () => {
     await ClientContext_1.ClientContext.waitUntilLoaded();
     const client = ClientContext_1.ClientContext.context;
@@ -8265,7 +8622,7 @@ const mgMixin = {
     await client.compileAll((c) => !c.name.startsWith("ide."), webScriptMixins);
     const isLocalHost = window.location.hostname == "localhost";
     const dbpHost = `https://db.memegenerator.net`;
-    const dbp = null; // (await DatabaseProxy.new(`${dbpHost}/MemeGenerator`)) as any;
+    const dbp = (await DbpClient_1.DatabaseProxy.new(`${dbpHost}/MemeGenerator`));
     const gdbData = await Extensions_Objects_Client_1.Objects.try(async () => await (await fetch(`/gdb.yaml`)).json(), { nodes: [], links: [] });
     const getNewParams = async () => {
         return (await Params_1.Params.new(() => vueApp, client.config.params, window.location.pathname));
@@ -8274,6 +8631,12 @@ const mgMixin = {
     vueApp = new client.Vue({
         mixins: vueAppMixins,
         data: {
+            // Meme Generator
+            url: mgHelpers.url,
+            builders: {
+                all: {},
+            },
+            //
             events: new Events_1.Events(),
             vm: null,
             client,
@@ -8336,7 +8699,7 @@ const mgMixin = {
                 const self = this;
                 if (!self.dbp)
                     return;
-                if (!self.builders?.length) {
+                if (!Object.keys(self.builders.all).length) {
                     const allBuilders = await self.dbp.builders.select.all();
                     self.builders.mainMenu = allBuilders.filter((b) => b.visible?.mainMenu);
                     self.builders.all = allBuilders.toMap((b) => b._id);

@@ -89,6 +89,9 @@ style:
     width: 100%
     height: 100%
 name: e-template-rainbow-item
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-e-template-rainbow-item" path="-1952272266."><canvas
   ref="canvas1" width="1000" height="1000" path="-1952272266.0"></canvas></div>

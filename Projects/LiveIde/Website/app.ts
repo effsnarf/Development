@@ -14,6 +14,7 @@ import { MemoryCache } from "@shared/Cache";
 import { Analytics, ItemType } from "@shared/Analytics";
 import isAttributeName from "@shared/WebScript/is.attribute.name";
 import { ChatOpenAI, Roles } from "../../../Apis/OpenAI/classes/ChatOpenAI";
+import { text } from "stream/consumers";
 
 Configuration.log = false;
 
@@ -26,6 +27,16 @@ const memoryCache = new MemoryCache();
 const _fetchAsJson = async (url: string) => {
   const res = await axios.get(url);
   return res.data;
+};
+
+const _cache = new Map<string, any>();
+
+const sheakspearize = async (text: string) => {
+  if (_cache.has(text)) return _cache.get(text);
+  const chat = await ChatOpenAI.new(Roles.ChatGPT);
+  const reply = await chat.send(`Rewrite this in Sheakspearean:\n\n${text}`);
+  _cache.set(text, reply);
+  return reply;
 };
 
 (async () => {
@@ -456,16 +467,22 @@ const _fetchAsJson = async (url: string) => {
         return res.end(JSON.stringify({ code }));
       }
 
+      if (req.url.startsWith("/sheakspearize")) {
+        const { text } = data;
+        const reply = await sheakspearize(text);
+        return res.end(JSON.stringify({ reply }));
+      }
+
       if (req.url.startsWith("/execute/code")) {
         let { argNames, argValues, code } = data;
 
         if (!Array.isArray(argNames)) argNames = Object.values(argNames);
 
         const func = eval(
-          `(async function(${argNames.join(", ")}) { ${code} })`
+          `(async function(sheakspearize, ${argNames.join(", ")}) { ${code} })`
         );
 
-        const result = await func(...argValues);
+        const result = await func(sheakspearize, ...argValues);
 
         return res.end(JSON.stringify(result));
       }

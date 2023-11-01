@@ -8,6 +8,9 @@ dom:
 props: null
 data: null
 name: page-catalog
+_:
+  examples:
+    count: 0
 template: >-
   <site class="comp-page-catalog" page-name="catalog" :columns="2"
   path="1552012218."><template v-slot:article

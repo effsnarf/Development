@@ -33,7 +33,8 @@ methods:
 computed:
   visibleValue: | #js
     function() {
-      if (!this.value) return null;
+      if (this.value === null) return null;
+      if (this.value === undefined) return undefined;
       if (!this.selectedPath?.length) return this.value;
       return Objects.getProperty(this.value, this.selectedPath.join("."));
     }

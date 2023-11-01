@@ -93,6 +93,9 @@ style:
     height: 100%
     pointer-events: none
 name: e-template-image-item
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-e-template-image-item" v-if="item"
   path="1623568049."><ui-file-dropzone :enabled="editable"
