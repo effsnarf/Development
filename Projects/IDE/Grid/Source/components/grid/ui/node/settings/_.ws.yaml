@@ -19,7 +19,7 @@ dom:
               ':context': boxContext
               ':input': inputs?.[1]
               v-model: linq.operations
-              @input: onLinqOperationsUpdate
+              @input: (operations) => $emit('linq-operations', operations)
         template: 
           v-slot: tab1
           div: 
@@ -138,7 +138,7 @@ template: >-
   direction="vertical" :can-select-none="true" path="-1191877027.1.0"><template
   v-slot:tab0 path="-1191877027.1.0.0"><div path="-1191877027.1.0.0.0"><ui-linq
   :context="boxContext" :input="inputs?.[1]" v-model="linq.operations"
-  @input="onLinqOperationsUpdate"
+  @input="(operations) =&gt; $emit('linq-operations', operations)"
   path="-1191877027.1.0.0.0.0"></ui-linq></div></template><template v-slot:tab1
   path="-1191877027.1.0.1"><div path="-1191877027.1.0.1.0"><ui-tabs
   :options="['🆎 font size', '🖼️ background']" direction="vertical"
