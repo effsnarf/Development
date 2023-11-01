@@ -34,6 +34,7 @@ methods:
   getViewClass: | #js
     function(node) {
       const cls = {};
+      cls.highlighted = this.isHighlighted;
       cls["h-100pc"] = true;
       cls["_view-comp"] = true;
       cls[this.getNodeIdClass()] = true;
@@ -51,6 +52,10 @@ methods:
       return `grid.ui.node.view.${node.type}`.replace(/\./g, "-");
     }
 computed:
+  isHighlighted: | #js
+    function() {
+      return this.$root.highlighted.nodes.value.some(nr => (nr.box._id == this.box._id) && (nr.node._id == this.node._id));
+    }
   cssClass: | #js
     function() {
       const cls = {};
