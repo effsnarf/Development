@@ -1,0 +1,70 @@
+dom:
+  grid.module:
+    ':box': box
+    ':data-bound-socket-data': dataBoundSocketData
+    div:
+      v-if: suggestions?.length
+      h3: 
+        v-text: '''Suggestions'''
+      .clickable:
+        v-for: sugg in suggestions
+        @click: sugg.action
+        h3: 
+          v-html: sugg.title
+        ui.value:
+          ':value': sugg.value
+props:
+  box: null
+  node: null
+  dataBoundSocketData: null
+data:
+  inputs: null
+methods:
+  onLinqOperationsUpdate: | #js
+    function(operations) {
+      this.$emit("linq-operations", operations);
+    }
+  getSuggestedFields: | #js
+    function(input) {
+      const fields = Object.keys(input)
+        .filter(field => (this.isSuggestedField(input, field)));
+      return fields;
+    }
+  isSuggestedField: | #js
+    function(input, field) {
+      if (this.node.type == "text") return field.toLowerCase().includes('name');
+      if (this.node.type == "image") return (typeof input[field] == "string") && (input[field]?.startsWith('http'));
+      return false;
+    }
+computed:
+  suggestions: | #js
+    function() {
+      const self = this;
+      const input = this.inputs?.[1];
+      if (!input) return [];
+      const fields = this.getSuggestedFields(input);
+      const sugs = [];
+      for (const field of fields) {
+        sugs.push({
+          title: `🆎 <strong>${field}</strong>`,
+          value: input[field],
+          action: () => {
+            const operations = [{ _id: 1, type: 'select.field', path: [field] }];
+            self.onLinqOperationsUpdate(operations);
+          }
+        });
+      }
+      return sugs;
+    }
+_:
+  examples:
+    count: 0
+name: grid-ui-node-settings-suggestions
+template: >-
+  <grid-module class="comp-grid-ui-node-settings-suggestions" :box="box"
+  :data-bound-socket-data="dataBoundSocketData" path="-760811298."><div
+  v-if="suggestions?.length" path="-760811298.0"><h3 v-text="'Suggestions'"
+  path="-760811298.0.0"></h3><div class="clickable" v-for="sugg in suggestions"
+  @click="sugg.action" path="-760811298.0.1"><h3 v-html="sugg.title"
+  path="-760811298.0.1.0"></h3><ui-value :value="sugg.value"
+  path="-760811298.0.1.1"></ui-value></div></div></grid-module>

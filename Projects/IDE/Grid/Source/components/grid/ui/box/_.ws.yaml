@@ -42,6 +42,7 @@ dom:
             ':box': box
             ':hovered-element': hoveredElement
         .h-100pc:
+          ':key': key1
           ui.dnd.dropzone:
             @drop-item: onDropItemOnWindow
           transition:
@@ -130,6 +131,7 @@ data:
   alerts: []
   nextAlertID: 1
   hoveredElement: null
+  key1: 1
 mounted: | #js
   async function() {
     await this.$nextTick();
@@ -191,6 +193,7 @@ methods:
         for (const box of boxes) {
           if (box._id != this.box._id) continue;
           this.init(box);
+          this.refresh();
         }
       }
     }
@@ -354,6 +357,10 @@ methods:
   onBoxWindowClick: | #js
     function() {
     }
+  refresh: | #js
+    function() {
+      this.key1++;
+    }
   testMethod: | #js
     function(again = 1000) {
       if (again == 1000) alertify.message(`testMethod ${again}`);
@@ -467,7 +474,7 @@ template: >-
   path="1671629593.0.2.1"><grid-ui-node-picker :box="box"
   :hovered-element="hoveredElement"
   path="1671629593.0.2.1.0"></grid-ui-node-picker></ui-context-window><div
-  class="h-100pc" path="1671629593.0.2.2"><ui-dnd-dropzone
+  class="h-100pc" :key="key1" path="1671629593.0.2.2"><ui-dnd-dropzone
   @drop-item="onDropItemOnWindow"
   path="1671629593.0.2.2.0"></ui-dnd-dropzone><transition name="slide2"
   path="1671629593.0.2.2.1"><component class="h-100pc" v-if="box.type"

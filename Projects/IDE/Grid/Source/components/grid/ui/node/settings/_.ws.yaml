@@ -6,37 +6,38 @@ dom:
       ui.title:
         icon: 🎄
         ':text': node.type
-    ui.tabs: 
-      ':options': '[''🧊 data'', ''✨ style'']'
-      direction: vertical
-      ':can-select-none': 'true'
-      ':value': null
-      template: 
-        v-slot: tab0
-        div: 
-          ui.linq:
-            ':context': boxContext
-            ':input': inputs?.[1]
-            v-model: linq.operations
-            @input: onLinqOperationsUpdate
-      template: 
-        v-slot: tab1
-        div: 
-          ui.tabs: 
-            ':options': '[''🆎 font size'', ''🖼️ background'']'
-            direction: vertical
-            ':can-select-none': 'true'
-            ':value': null
-            template: 
-              v-slot: tab0
-              ui.input.font.size:
-                @value-preview: previewFontSize
-                v-model: fontSize
-            template: 
-              v-slot: tab1
-              ui.input.background.color:
-                @value-preview: previewBackgroundColor
-                v-model: bgColorClass
+    .flex:
+      ui.tabs: 
+        ':options': '[''🧊 data'', ''✨ style'']'
+        direction: vertical
+        ':can-select-none': 'true'
+        ':value': null
+        template: 
+          v-slot: tab0
+          div: 
+            ui.linq:
+              ':context': boxContext
+              ':input': inputs?.[1]
+              v-model: linq.operations
+              @input: onLinqOperationsUpdate
+        template: 
+          v-slot: tab1
+          div: 
+            ui.tabs: 
+              ':options': '[''🆎 font size'', ''🖼️ background'']'
+              direction: vertical
+              ':can-select-none': 'true'
+              ':value': null
+              template: 
+                v-slot: tab0
+                ui.input.font.size:
+                  @value-preview: previewFontSize
+                  v-model: fontSize
+              template: 
+                v-slot: tab1
+                ui.input.background.color:
+                  @value-preview: previewBackgroundColor
+                  v-model: bgColorClass
 props:
   box: null
   node: null
@@ -96,15 +97,6 @@ methods:
       const vBox = this.$root.vm.getAncestors(this, "grid.ui.box")[0];
       vBox.$femit("edit.node", this.box._id, this.node._id, data);
     }
-  onLinqOperationsUpdate: | #js
-    function(operations) {
-      const vBox = this.$root.vm.getAncestors(this, "grid.ui.box")[0];
-      const viewNodeRoot = Objects.clone(this.box.viewNodeRoot);
-      const node = TreeObject.find(viewNodeRoot, this.node._id);
-      //if (Objects.areEqual(operations, node.linq?.operations)) return;
-      node.linq = this.linq;
-      vBox.$femit("edit.box", this.box._id, { viewNodeRoot });
-    }
   init: | #js
     function(node) {
       this.linq = (Objects.clone(node.linq) || {});
@@ -131,6 +123,7 @@ watch:
       function(bgColorClass) {
         this.setNodeData({ style: { bg: { class: bgColorClass } } });
       }
+computed: null
 style: null
 _:
   examples:
@@ -140,18 +133,19 @@ template: >-
   <grid-module class="comp-grid-ui-node-settings" :box="box"
   :data-bound-socket-data="dataBoundSocketData" path="-1191877027."><h2
   path="-1191877027.0"><ui-title icon="🎄" :text="node.type"
-  path="-1191877027.0.0"></ui-title></h2><ui-tabs :options="['🧊 data', '✨
-  style']" direction="vertical" :can-select-none="true"
-  path="-1191877027.1"><template v-slot:tab0 path="-1191877027.1.0"><div
-  path="-1191877027.1.0.0"><ui-linq :context="boxContext" :input="inputs?.[1]"
-  v-model="linq.operations" @input="onLinqOperationsUpdate"
-  path="-1191877027.1.0.0.0"></ui-linq></div></template><template v-slot:tab1
-  path="-1191877027.1.1"><div path="-1191877027.1.1.0"><ui-tabs :options="['🆎
-  font size', '🖼️ background']" direction="vertical" :can-select-none="true"
-  path="-1191877027.1.1.0.0"><template v-slot:tab0
-  path="-1191877027.1.1.0.0.0"><ui-input-font-size
+  path="-1191877027.0.0"></ui-title></h2><div class="flex"
+  path="-1191877027.1"><ui-tabs :options="['🧊 data', '✨ style']"
+  direction="vertical" :can-select-none="true" path="-1191877027.1.0"><template
+  v-slot:tab0 path="-1191877027.1.0.0"><div path="-1191877027.1.0.0.0"><ui-linq
+  :context="boxContext" :input="inputs?.[1]" v-model="linq.operations"
+  @input="onLinqOperationsUpdate"
+  path="-1191877027.1.0.0.0.0"></ui-linq></div></template><template v-slot:tab1
+  path="-1191877027.1.0.1"><div path="-1191877027.1.0.1.0"><ui-tabs
+  :options="['🆎 font size', '🖼️ background']" direction="vertical"
+  :can-select-none="true" path="-1191877027.1.0.1.0.0"><template v-slot:tab0
+  path="-1191877027.1.0.1.0.0.0"><ui-input-font-size
   @value-preview="previewFontSize" v-model="fontSize"
-  path="-1191877027.1.1.0.0.0.0"></ui-input-font-size></template><template
-  v-slot:tab1 path="-1191877027.1.1.0.0.1"><ui-input-background-color
+  path="-1191877027.1.0.1.0.0.0.0"></ui-input-font-size></template><template
+  v-slot:tab1 path="-1191877027.1.0.1.0.0.1"><ui-input-background-color
   @value-preview="previewBackgroundColor" v-model="bgColorClass"
-  path="-1191877027.1.1.0.0.1.0"></ui-input-background-color></template></ui-tabs></div></template></ui-tabs></grid-module>
+  path="-1191877027.1.0.1.0.0.1.0"></ui-input-background-color></template></ui-tabs></div></template></ui-tabs></div></grid-module>

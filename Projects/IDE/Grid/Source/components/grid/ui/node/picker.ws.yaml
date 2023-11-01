@@ -11,7 +11,7 @@ dom:
             @click: selectVue(vue)
             ui.title:
               icon: 🎄
-              ':text': vue.$data._.comp.name
+              ':text': vue.$data._.comp.name.replace('grid.ui.node.view.', '')
     .settings:
       transition:
         name: slide-hor
@@ -21,6 +21,16 @@ dom:
           ':box': selectedVue().box
           ':node': selectedVue().node
           ':data-bound-socket-data': selectedVue().dataBoundSocketData
+          @linq-operations: (operations) => onLinqOperationsUpdate(selectedVue(), operations)
+      div: 
+        v-if: '!selectedVue || !selectedVue()'
+        div: 
+          v-for: vue in vues.map(v => v())
+          grid.ui.node.settings.suggestions:
+            ':box': vue.box
+            ':node': vue.node
+            ':data-bound-socket-data': vue.dataBoundSocketData
+            @linq-operations: (operations) => onLinqOperationsUpdate(vue, operations)
 props:
   box: null
   hoveredElement: null
@@ -29,6 +39,16 @@ data:
   vues: []
   selectedVue: null
 methods:
+  onLinqOperationsUpdate: | #js
+    function(vue, operations) {
+      const vBox = vue.$root.vm.getAncestors(vue, "grid.ui.box")[0];
+      const viewNodeRoot = Objects.clone(vue.box.viewNodeRoot);
+      const node = TreeObject.find(viewNodeRoot, vue.node._id);
+      //if (Objects.areEqual(operations, node.linq?.operations)) return;
+      node.linq = (node.linq || {});
+      node.linq.operations = operations;
+      vBox.$femit("edit.box", vue.box._id, { viewNodeRoot });
+    }
   selectVue: | #js
     function(vue) {
       if (vue == this.selectedVue?.()) vue = null;
@@ -78,11 +98,18 @@ template: >-
   path="599849288.0.0.0"><li v-for="vue in vues.map(v =&gt; v())" :class="{
   clickable: true, selected: (!selectedVue ? false : (selectedVue() == vue)) }"
   @click="selectVue(vue)" path="599849288.0.0.0.0"><ui-title icon="🎄"
-  :text="vue.$data._.comp.name"
+  :text="vue.$data._.comp.name.replace('grid.ui.node.view.', '')"
   path="599849288.0.0.0.0.0"></ui-title></li></ul></div></div><div
   class="settings" path="599849288.1"><transition name="slide-hor"
   path="599849288.1.0"></transition><div v-if="selectedVue"
   path="599849288.1.1"><grid-ui-node-settings :box="selectedVue().box"
   :node="selectedVue().node"
   :data-bound-socket-data="selectedVue().dataBoundSocketData"
-  path="599849288.1.1.0"></grid-ui-node-settings></div></div></div>
+  @linq-operations="(operations) =&gt; onLinqOperationsUpdate(selectedVue(),
+  operations)" path="599849288.1.1.0"></grid-ui-node-settings></div><div
+  v-if="!selectedVue || !selectedVue()" path="599849288.1.2"><div v-for="vue in
+  vues.map(v =&gt; v())"
+  path="599849288.1.2.0"><grid-ui-node-settings-suggestions :box="vue.box"
+  :node="vue.node" :data-bound-socket-data="vue.dataBoundSocketData"
+  @linq-operations="(operations) =&gt; onLinqOperationsUpdate(vue, operations)"
+  path="599849288.1.2.0.0"></grid-ui-node-settings-suggestions></div></div></div></div>
