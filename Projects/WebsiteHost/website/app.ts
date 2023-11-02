@@ -63,12 +63,12 @@ const sheakspearize = async (text: string) => {
   };
 
   const moduleFolders = [
-    path.join(config.liveIde.folder, "Modules"),
+    path.join(config.websiteHost.folder, "Modules"),
     path.join(config.project.folder, "Modules"),
   ];
 
   const componentFolders = [
-    path.join(config.liveIde.folder, "Components"),
+    path.join(config.websiteHost.folder, "Components"),
     path.join(config.project.folder, "Components"),
   ];
 
@@ -595,7 +595,7 @@ const sheakspearize = async (text: string) => {
       }
     },
     async (req: any) => await getProjectPageTemplateObject(req),
-    path.join(config.liveIde.folder, "Website", "index.haml"),
+    path.join(config.websiteHost.folder, "Website", "index.haml"),
     staticFileFolders,
     {
       log: {
