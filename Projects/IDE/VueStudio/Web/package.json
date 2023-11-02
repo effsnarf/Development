@@ -1,0 +1,8 @@
+{
+  "devDependencies": {
+    "@types/node": "^20.4.10"
+  },
+  "dependencies": {
+    "handlebars": "^4.7.8"
+  }
+}
