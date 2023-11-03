@@ -56,7 +56,9 @@ const Local = {
       if (!await Local.cache.has(key)) {
         if (getDefaultValue) {
           const defaultValue = (await getDefaultValue());
-          Local.cache.set(key, defaultValue);
+          if (defaultValue) {
+            await Local.cache.set(key, defaultValue);
+          }
         }
       }
       return JSON.parse(localStorage.getItem(key));
