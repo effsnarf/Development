@@ -47,6 +47,21 @@ class LocalPersistedArray
 }
 
 
+const Local = {
+  cache: {
+    has: async (key) => {
+      return localStorage.getItem(key) != null;
+    },
+    get: async (key) => {
+      return JSON.parse(localStorage.getItem(key));
+    },
+    set: async (key, value) => {
+      localStorage.setItem(key, JSON.stringify(value));
+    }    
+  }
+}
+
+
 // #region 🛠 Utility
 if (typeof require != "undefined") {
     var fetch = require("node-fetch");
