@@ -1,0 +1,183 @@
+dom:
+  div: 
+    .tree-node:
+      ':class': getCssClass()
+      ui.expand:
+        class: opacity-50
+        v-if: showUiExpand
+        v-model: isExpanded
+      div: 
+        class: w-l2
+        v-if: '!showUiExpand'
+      component:
+        v-if: itemType
+        ':is': getItemType()
+        ':item': getItem(node)
+        v-bind: itemProps
+      @click: onNodeClick
+      @dblclick: onNodeDoubleClick
+      @mouseenter: onMouseEnter
+      @mouseleave: onMouseLeave
+      @dragenter: onMouseEnter
+      @dragleave: onMouseLeave
+      @dragover: onMouseEnter
+      @dragout: onMouseLeave
+      slot: null
+    transition:
+      name: slide-fast
+      ul:
+        v-if: isExpanded
+        class: ml-3
+        li:
+          v-for: child in getChildItems(node)
+          ui.tree.node:
+            ':node': child
+            ':depth': (depth + 1)
+            ':initial-expanded': initialExpanded
+            ':expandable': expandable
+            ':item-type': getItemType()
+            ':get-item': getItem
+            ':get-item-key': getItemKey
+            ':get-children': getChildren
+            ':selected-node': selectedNode
+            ':item-props': itemProps
+            @node-click: onChildClick
+            @node-hover: onChildHover
+            @node-unhover: onChildUnhover
+            @node-hovered: onChildHovered
+props:
+  node: null
+  depth: null
+  initialExpanded: false
+  expandable: true
+  itemType: null
+  getItem: null
+  getItemKey: null
+  getChildren: null
+  selectedNode: null
+  itemProps: null
+data:
+  isInited: false
+  isExpanded: null
+methods:
+  getCssClass: | #js
+    function() {
+      return {
+        hoverable: true,
+        selected: this.isSelected,
+        expandable: this.expandable,
+      };
+    }
+  onNodeClick: | #js
+    function() {
+      if (this.isSelected)
+      {
+          //this.children = null;
+      }
+      else
+      {
+        this.children = this.getChildren(this.node);
+      }
+      const node = Objects.areEqual(this.node, this.selectedNode) ? null : this.node;
+      this.$emit('node-click', node);
+    }
+  onNodeDoubleClick: | #js
+    function() {
+      this.isExpanded = !this.isExpanded;
+    }
+  onMouseEnter: | #js
+    function() {
+      this.$emit('node-hover', this.node);
+      this.$emit("node-hovered", this.node, true);
+    }
+  onMouseLeave: | #js
+    function() {
+      this.$emit('node-unhover', this.node);
+      this.$emit("node-hovered", this.node, false);
+    }
+  onChildClick: | #js
+    function(child) {
+      this.$emit('node-click', child);
+    }
+  onChildHover: | #js
+    function (child) {
+      this.$emit('node-hover', child);
+      this.$emit("node-hovered", child, true);
+    }
+  onChildUnhover: | #js
+    function (child) {
+      this.$emit('node-unhover', child);
+      this.$emit("node-hovered", child, false);
+    }
+  onChildHovered: | #js
+    function (child, isHovered) {
+      this.$emit("node-hovered", child, isHovered);
+    }
+  getItemType: | #js
+    function() {
+      return this.itemType?.replace(/\./g, '-');
+    }
+  getChildItems: | #js
+    function(node) {
+      if (!this.isExpanded) return [];
+      return this.getChildren(node);
+    }
+computed:
+  isSelected: | #js
+    function() {
+      return Objects.areEqual(this.node, this.selectedNode);
+    }
+  showUiExpand: | #js
+    function() {
+      if (!this.node) return false;
+      if (!this.getChildren(this.node)?.length) return false;
+      return this.expandable;
+    }
+watch:
+  initialExpanded:
+    handler: | #js
+      function(newVal, oldVal) {
+        if (this.isInited) return;
+        this.isInited = true;
+        this.isExpanded = (typeof newVal == 'boolean') ? !!newVal : (this.depth <= newVal);
+      }
+    immediate: true
+style:
+  .tree-node:
+    display: flex
+    padding-right: 1em
+    user-select: none
+  .tree.node.expandable:
+    display: grid
+    grid-template: 1fr / 1.5em 1fr
+  .comp-ui-expand:
+    margin-right: 0.3em
+  .comp-ui-expand .icon:
+    font-size: 100% !important
+    border: none !important
+  li:
+    transition: 0.3s !important
+name: ui-tree-node
+_:
+  examples:
+    count: 0
+template: >-
+  <div class="comp-ui-tree-node" path="2053324664."><div class="tree-node"
+  :class="getCssClass()" @click="onNodeClick" @dblclick="onNodeDoubleClick"
+  @mouseenter="onMouseEnter" @mouseleave="onMouseLeave"
+  @dragenter="onMouseEnter" @dragleave="onMouseLeave" @dragover="onMouseEnter"
+  @dragout="onMouseLeave" path="2053324664.0"><ui-expand class="opacity-50"
+  v-if="showUiExpand" v-model="isExpanded"
+  path="2053324664.0.0"></ui-expand><div class="w-l2" v-if="!showUiExpand"
+  path="2053324664.0.1"></div><component v-if="itemType" :is="getItemType()"
+  :item="getItem(node)" v-bind="itemProps"
+  path="2053324664.0.2"></component><slot></slot></div><transition
+  name="slide-fast" path="2053324664.1"><ul class="ml-3" v-if="isExpanded"
+  path="2053324664.1.0"><li v-for="child in getChildItems(node)"
+  path="2053324664.1.0.0"><ui-tree-node :node="child" :depth="(depth + 1)"
+  :initial-expanded="initialExpanded" :expandable="expandable"
+  :item-type="getItemType()" :get-item="getItem" :get-item-key="getItemKey"
+  :get-children="getChildren" :selected-node="selectedNode"
+  :item-props="itemProps" @node-click="onChildClick" @node-hover="onChildHover"
+  @node-unhover="onChildUnhover" @node-hovered="onChildHovered"
+  path="2053324664.1.0.0.0"></ui-tree-node></li></ul></transition></div>

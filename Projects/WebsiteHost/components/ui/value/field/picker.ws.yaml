@@ -1,0 +1,70 @@
+dom:
+  div: 
+    v-if: obj
+    class: field-list
+    .flex.justify-center:
+      ':key': selectedFields?.join('')
+      ui.value:
+        ':class': '{ ''opacity-60 grayscale'': (!selectedFields?.length) }'
+        ':value': >-
+          !selectedFields?.length ? '[select fields]' : '[' +
+          selectedFields.join(', ') + ']'
+    div: 
+      div: 
+        v-for: field in fields
+        ui.checkbox:
+          ':key': field
+          ':text': field
+          ':value-array': selectedFields
+          ':value-key': field
+props:
+  obj: null
+  value: null
+data:
+  fields: []
+  selectedFields: []
+watch:
+  selectedFields:
+    handler: | #js
+      async function(selectedFields) {
+        if (selectedFields?.join(',') == this.value?.join(',')) return;
+        this.$emit("input", selectedFields);
+      }
+  obj:
+    handler: | #js
+      function(obj) {
+        this.fields = ((!obj) ? [] : Object.keys(obj))
+          .concat(this.selectedFields)
+          .distinct();
+      }
+    immediate: true
+  value:
+    handler: | #js
+      function(value) {
+        if (value?.join(',') == this.selectedFields.join(',')) return;
+        this.selectedFields = Objects.clone((!value) ? [] : value);
+      }
+    immediate: true
+style:
+  .field-list:
+    max-height: 3em
+    overflow-x: hidden
+    overflow-y: auto
+    transition: 0.6s
+  .field-list:hover:
+    max-height: 15em
+_:
+  examples:
+    count: 0
+name: ui-value-field-picker
+template: >-
+  <div class="comp-ui-value-field-picker field-list" v-if="obj"
+  path="20302585."><div class="flex justify-center"
+  :key="selectedFields?.join('')" path="20302585.0"><ui-value :class="{
+  'opacity-60 grayscale': (!selectedFields?.length) }"
+  :value="!selectedFields?.length ? '[select fields]' : '[' +
+  selectedFields.join(', ') + ']'" path="20302585.0.0"></ui-value></div><div
+  path="20302585.1"><div v-for="field in fields"
+  path="20302585.1.0"><ui-checkbox :key="field" :text="field"
+  :value-array="selectedFields" :value-key="field"
+  path="20302585.1.0.0"></ui-checkbox></div></div></div>

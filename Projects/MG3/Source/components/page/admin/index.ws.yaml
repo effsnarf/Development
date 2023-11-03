@@ -106,6 +106,9 @@ style:
     margin: auto
     gap: 1rem
 name: page-admin-index
+_:
+  examples:
+    count: 0
 template: >-
   <site class="comp-page-admin-index" :columns="2" page-name="admin"
   path="-1156850540."><template v-slot:left

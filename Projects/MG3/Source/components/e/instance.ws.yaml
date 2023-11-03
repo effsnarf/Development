@@ -144,6 +144,9 @@ style:
   .text:nth-child(2):
     top: auto
     bottom: 0
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-e-instance" @click="$emit('click')" v-if="instance"
   path="643573758."><ui-link class="instance"

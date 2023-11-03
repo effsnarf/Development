@@ -1,0 +1,84 @@
+dom:
+  div: 
+    ui.context.window:
+      v-if: 'false'
+      component:
+        v-if: hoveredOption
+        ':is': getLinqCompName(hoveredOption.type)
+        ':input': input
+        ':value': getOperation(hoveredOption)
+    div: 
+      v-for: option in options
+      .clickable:
+        v-if: (input && (eval(option.if))(input))
+        @mouseenter: () => hoveredOption = option
+        @mouseleave: () => hoveredOption = null
+        @click: () => onClickOption(option)
+        .flex.justify-center:
+          ui.title:
+            ':icon': option.icon
+            ':text': option.type
+props:
+  input: null
+data:
+  hoveredOption: null
+  options:
+    - icon: 🧊
+      type: select.field
+      default:
+        path: []
+      if: (obj) => (typeof obj === 'object' && !Array.isArray(obj))
+    - icon: 🎫
+      type: select.fields
+      default:
+        fields: []
+      if: | #js
+        (obj) => ((typeof obj === 'object') && (Object.keys(obj).length > 1)) ||
+        (Array.isArray(obj) && (Object.keys(obj[0]).length > 1))
+    - icon: ➖
+      type: flat.map
+      default: {}
+      if: (obj) => Array.isArray(obj) && (Object.keys(obj[0]).length === 1)
+    - icon: 🔴
+      type: custom.expression
+      default:
+        func: null
+      if: (obj) => true
+computed:
+  eval: | #js
+    function() {
+      return eval;
+    }
+methods:
+  getOperation: | #js
+    function(option) {
+      const op = {};
+      op.type = option.type;
+      Object.assign(op, option.default);
+      return op;
+    }
+  getLinqCompName: | #js
+    function(type) {
+      return `ui.linq.ops.${type}`.replace(/\./g, '-');
+    }
+  onClickOption: | #js
+    function(option) {
+      const op = this.getOperation(option);
+      this.$emit('select', op);
+    }
+_:
+  examples:
+    count: 0
+name: ui-linq-ops-picker
+template: >-
+  <div class="comp-ui-linq-ops-picker" path="1581852318."><ui-context-window
+  v-if="false" path="1581852318.0"><component v-if="hoveredOption"
+  :is="getLinqCompName(hoveredOption.type)" :input="input"
+  :value="getOperation(hoveredOption)"
+  path="1581852318.0.0"></component></ui-context-window><div v-for="option in
+  options" path="1581852318.1"><div class="clickable" v-if="(input &amp;&amp;
+  (eval(option.if))(input))" @mouseenter="() =&gt; hoveredOption = option"
+  @mouseleave="() =&gt; hoveredOption = null" @click="() =&gt;
+  onClickOption(option)" path="1581852318.1.0"><div class="flex justify-center"
+  path="1581852318.1.0.0"><ui-title :icon="option.icon" :text="option.type"
+  path="1581852318.1.0.0.0"></ui-title></div></div></div></div>

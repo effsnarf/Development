@@ -1,0 +1,63 @@
+dom:
+  div: 
+    .flex.examples.gap-1:
+      :class: mainFlexClass
+      div: 
+        v-for: option in options
+        .option:
+          ':class': '{ selected: isSelected(option) }'
+          @click: onClickOption(option)
+          ui.input.layout.example:
+            ':css-class': option.cssClass
+            :show-number: showNumber
+        h3:
+          class: opacity-50 text-center
+          v-text: (option.text || option.value)
+data:
+props:
+  direction: null
+  options: null
+  value: null
+  showNumber: null
+methods:
+  onClickOption: | #js
+    function(option) {
+      let value = option?.value;
+      if (value == this.value) value = null;
+      this.$emit('input', value);
+    }
+  isSelected: | #js
+    function(option) {
+      return (option.value == this.value);
+    }
+computed:
+  mainFlexClass: | #js
+    function() {
+      const direction = (this.direction == "horizontal" ? "row" : "column");
+      return ["flex", direction].join("-");
+    }
+watch:
+style:
+  .option:
+    padding: 1em 0
+    background: "#ffffff20"
+    opacity: 0.6
+    cursor: pointer
+  .option:hover:
+    opacity: 0.8
+  .option.selected, .option.selected:hover:
+    border: 3px solid white
+    opacity: 1
+_:
+  examples:
+    count: 0
+name: ui-input-layout-direction
+template: >-
+  <div class="comp-ui-input-layout-direction" path="-1569384455."><h2
+  v-text="value" path="-1569384455.0"></h2><div class="flex gap-3"
+  path="-1569384455.1"><div v-for="option in options" :class="{ clickable: true,
+  selected: isSelected(option) }" @click="onClickOption(option)"
+  path="-1569384455.1.0"><h3 class="text-center" v-text="option.value"
+  path="-1569384455.1.0.0"></h3><ui-input-layout-example
+  :css-class="option.cssClass"
+  path="-1569384455.1.0.1"></ui-input-layout-example></div></div></div>

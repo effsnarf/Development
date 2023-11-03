@@ -37,6 +37,9 @@ style:
     overflow: hidden;
     text-align: center;
 name: e-generator-square
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-e-generator-square" path="-916767999."><ui-image
   class="anonymous" v-if="!generator" tooltip="Anonymous"

@@ -1,0 +1,68 @@
+dom:
+  div:
+    ui.tabs:
+      ':options': tabOptions
+      ':get-option-html': (option) => ('/images/frameworks/' + option + '.png')
+      direction: horizontal
+      template: 
+        v-slot: tab0
+        pre: 
+          v-html: comp.source.frameworks?.vue
+      template: 
+        v-slot: tab1
+        pre: 
+          v-html: comp.source.frameworks?.react
+      template: 
+        v-slot: tab2
+        pre: 
+          v-html: comp.source.frameworks?.angular
+      template: 
+        v-slot: tab3
+        pre: 
+          v-html: comp.source.frameworks?.svelte
+props:
+  comp: null
+mounted: | #js
+  function() {
+    const pres = this.$el.querySelectorAll('pre');
+
+    // Select all text on click
+    pres.forEach(pre => {
+        pre.addEventListener('click', function() {
+            const selection = window.getSelection();
+            const range = document.createRange();
+            range.selectNodeContents(this);
+            selection.removeAllRanges();
+            selection.addRange(range);
+        });
+    });
+  }
+computed:
+  tabOptions: | #js
+    function() {
+      const options = ['vue', 'react', 'angular', 'svelte'];
+      return options;
+    }
+name: studio-comp-download
+style:
+  pre:
+    max-height: 10em
+    overflow: auto
+    cursor: pointer
+frameworks:
+  vue: null
+_:
+  examples:
+    count: 0
+template: >-
+  <div class="comp-studio-comp-download" path="2052751983."><ui-tabs
+  :options="tabOptions" :get-option-html="(option) =&gt; ('/images/frameworks/'
+  + option + '.png')" direction="horizontal" path="2052751983.0"><template
+  v-slot:tab0 path="2052751983.0.0"><pre v-html="comp.source.frameworks?.vue"
+  path="2052751983.0.0.0"></pre></template><template v-slot:tab1
+  path="2052751983.0.1"><pre v-html="comp.source.frameworks?.react"
+  path="2052751983.0.1.0"></pre></template><template v-slot:tab2
+  path="2052751983.0.2"><pre v-html="comp.source.frameworks?.angular"
+  path="2052751983.0.2.0"></pre></template><template v-slot:tab3
+  path="2052751983.0.3"><pre v-html="comp.source.frameworks?.svelte"
+  path="2052751983.0.3.0"></pre></template></ui-tabs></div>

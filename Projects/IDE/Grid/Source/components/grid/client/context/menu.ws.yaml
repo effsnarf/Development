@@ -1,0 +1,77 @@
+dom:
+  grid.module:
+    ui.context.window:
+      ref: context1
+      ':visible': showContextMenu
+      @pinned: contextIsPinned = $event
+      grid.client.context.create.group:
+        ':selected-boxes': selectedBoxes
+        ':userID': userID
+        ':boxes': $boxes
+        ':links': $links
+        ':context-is-pinned': contextIsPinned
+      div:
+        v-if: canDelete
+        ui.button:
+          icon: ❌🗑️
+          text: delete
+          @click: getUiActions().$femit('delete.selected')
+props:
+  userID: null
+data:
+  selectedBoxes: []
+  showContextMenu: false
+  canDelete: false
+  contextIsPinned: false
+mounted: | #js
+  function() {
+  }
+methods:
+  grid_user_action_stack_do: | #js
+    async function(action) {
+      await this.$nextTick();
+      this.refresh();
+    }
+  refresh: | #js
+    async function(times = 1) {
+      const self = this;
+      await self._refresh();
+      if (times > 0) setTimeout(() => self.refresh(times - 1), 400);
+    }
+  _refresh: | #js
+    async function() {
+      this.selectedBoxes = this.$boxes.filter(box => box.is?.selected);
+      this.canDelete = (this.selectedBoxes.length > 0);
+      this.showContextMenu = (this.canCreateGroup || this.canDelete);
+    }
+  getUiActions: | #js
+    function() {
+      const client = this.$root.vm.getAncestors(this, "grid.client")[0];
+      const module = client.$children[0];
+      const uiActions = module.$children.find((c) => c.$options.name === "grid-ui-actions");
+      return uiActions;
+    }
+watch:
+  boxes:
+    handler: | #js
+      async function() {
+        await this.$nextTick();
+        this.refresh();
+      }
+    immediate: true
+style: null
+_:
+  examples:
+    count: 0
+name: grid-client-context-menu
+template: >-
+  <grid-module class="comp-grid-client-context-menu"
+  path="-1053034279."><ui-context-window ref="context1"
+  :visible="showContextMenu" @pinned="contextIsPinned = $event"
+  path="-1053034279.0"><grid-client-context-create-group
+  :selected-boxes="selectedBoxes" :userID="userID" :boxes="$boxes"
+  :links="$links" :context-is-pinned="contextIsPinned"
+  path="-1053034279.0.0"></grid-client-context-create-group><div
+  v-if="canDelete" path="-1053034279.0.1"><ui-button icon="❌🗑️" text="delete"
+  @click="getUiActions().$femit('delete.selected')"
+  path="-1053034279.0.1.0"></ui-button></div></ui-context-window></grid-module>

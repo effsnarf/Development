@@ -1,0 +1,14 @@
+dom:
+  div:
+    ui.title:
+      icon: 📦
+      ':text': '''box '' + item._id'
+props:
+  item: null
+_:
+  examples:
+    count: 0
+name: grid-data-box
+template: >-
+  <div class="comp-grid-data-box" path="-248633553."><ui-title icon="📦"
+  :text="'box ' + item._id" path="-248633553.0"></ui-title></div>

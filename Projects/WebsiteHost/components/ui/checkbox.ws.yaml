@@ -1,0 +1,121 @@
+dom:
+  .flex:
+    ':class': getCssClass()
+    @mouseenter: $emit('mouseenter')
+    @mouseleave: $emit('mouseleave')
+    @click: onInput(!checkedValue)
+    input:
+      type: checkbox
+      ':checked': checkedValue
+    span: 
+      class: clickable
+      .icon:
+        v-if: icon
+        v-text: icon
+      span: 
+        slot: null
+        span: 
+          v-text: text
+props:
+  value: null
+  valueArray: null
+  valueArrayExclude: false
+  valueKey: null
+  icon: null
+  text: null
+  size: large
+data:
+  value1: null
+methods:
+  getCssClass: | #js
+    function() {
+      return `hoverable ${this.size}`;
+    }
+  onInput: | #js
+    async function(value) {
+      if (this.valueArray && this.valueKey) {
+        this.toggleArrayValue(this.valueArray, this.valueKey);
+        await this.$nextTick();
+        this.$emit("input", this.valueArray);
+      } else {
+        this.value1 = value;
+        await this.$nextTick();
+        this.$emit("input", value);
+      }
+    }
+  toggleArrayValue: | #js
+    function(array, value) {
+      if (array.includes(value)) {
+        array.splice(array.indexOf(value), 1);
+      } else {
+        array.push(value);
+      }
+    }
+watch:
+  value:
+    handler: | #js
+      function(value) {
+        this.value1 = value;
+      }
+    immediate: true
+computed:
+  checkedValue: | #js
+    function() {
+      if (this.valueArray && this.valueKey)
+      {
+        if (this.valueArrayExclude) return !this.valueArray.includes(this.valueKey);
+        return this.valueArray.includes(this.valueKey);
+      }
+      return this.value1;
+    }
+example1:
+  - dom:
+      .flex:
+        div:
+          ui.checkbox:
+            v-for: option in options
+            ':text': option
+            ':value-key': option
+            ':value-array': checkedOptions
+        pre:
+          v-text: toYaml(checkedOptions)
+    data:
+      options:
+        - one
+        - two
+        - three
+        - four
+      checkedOptions: []
+    methods:
+      toYaml: | #js
+        function(value) {
+          return jsyaml.dump(value);
+        }
+  - dom:
+      ui.checkbox:
+        text: Check me
+style:
+  .icon:
+    display: inline-block
+    margin-right: 0.3rem
+  .normal input[type=checkbox]:
+    width: 1em
+    height: 1em
+  span:
+    flex-grow: 1
+    font-size: 100%
+    white-space: nowrap
+    user-select: none
+  .clickable: null
+name: ui-checkbox
+_:
+  examples:
+    count: 0
+template: >-
+  <div class="comp-ui-checkbox flex" :class="getCssClass()"
+  @mouseenter="$emit('mouseenter')" @mouseleave="$emit('mouseleave')"
+  @click="onInput(!checkedValue)" path="1049372125."><input type="checkbox"
+  :checked="checkedValue" path="1049372125.0"/><span class="clickable"
+  path="1049372125.1"><div class="icon" v-if="icon" v-text="icon"
+  path="1049372125.1.0"></div><span path="1049372125.1.1"><slot></slot><span
+  v-text="text" path="1049372125.1.1.1"></span></span></span></div>

@@ -1,0 +1,45 @@
+dom:
+  grid.module:
+    ':show-title': 'false'
+    div:
+      class: hoverable
+      @mouseenter: $femit('highlight', link, true)
+      @mouseleave: $femit('highlight', link, false)
+      v-text: linkDesc
+props:
+  link: null
+computed:
+  linkDesc: | #js
+    function() {
+      return this.getLinkDesc(this.link);
+    }
+methods:
+  getLinkDesc: | #js
+    function(link) {
+      const fromBox = this.$boxes.find(b => b._id == link.from.box._id);
+      const toBox = this.$boxes.find(b => b._id == link.to.box._id);
+      if (!fromBox || !toBox) return "";
+      const fromSocket = fromBox.sockets.output.find(s => s._id == link.from.socket._id);
+      const toSocket = toBox.sockets.input.find(s => s._id == link.to.socket._id);
+      const fromSocketIcon = this.getSocketIcon(fromSocket);
+      const toSocketIcon = this.getSocketIcon(toSocket);
+      return `${fromSocketIcon}${fromSocket.name} -> ${toSocketIcon}${toSocket.name}`;
+    }
+  getSocketIcon: | #js
+    function(socket) {
+      return {
+        data: '🧊',
+        iterator: '🔗🖇️',
+        view: '⬜',
+        event: '⚡',
+      }[socket?.type];
+    }
+_:
+  examples:
+    count: 0
+name: grid-ui-link-item
+template: >-
+  <grid-module class="comp-grid-ui-link-item" :show-title="false"
+  path="-266220715."><div class="hoverable" @mouseenter="$femit('highlight',
+  link, true)" @mouseleave="$femit('highlight', link, false)" v-text="linkDesc"
+  path="-266220715.0"></div></grid-module>

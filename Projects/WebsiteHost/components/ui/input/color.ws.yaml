@@ -1,0 +1,32 @@
+dom:
+  input:
+    class: color-input
+    type: color
+    ':value': value
+    @input: $emit('input', $event.target.value)
+props:
+  value: null
+style:
+  .color-input:
+    min-width: 2em
+    min-height: 2em
+desc:
+  value: Use v-model to bind to a color value.
+example1:
+  - dom:
+      div:
+        ui.color:
+          v-for: (color, i) in colors
+          v-model: colors[i]
+    data:
+      colors:
+        - '#ff0000'
+        - '#00ff00'
+        - '#0000ff'
+name: ui-input-color
+_:
+  examples:
+    count: 0
+template: >-
+  <input class="comp-ui-input-color color-input" type="color" :value="value"
+  @input="$emit('input', $event.target.value)" path="498432997."/>

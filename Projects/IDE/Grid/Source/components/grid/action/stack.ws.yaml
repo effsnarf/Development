@@ -1,0 +1,14 @@
+dom:
+  div: 
+    grid.module:
+      icon: 👤📃
+      div:  null
+data: null
+methods: null
+_:
+  examples:
+    count: 0
+name: grid-action-stack
+template: >-
+  <div class="comp-grid-action-stack" path="-215167368."><grid-module
+  icon="👤📃" path="-215167368.0"><div></div></grid-module></div>

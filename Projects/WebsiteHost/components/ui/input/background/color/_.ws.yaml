@@ -1,0 +1,219 @@
+dom:
+  div: 
+    .flex.gap-2:
+      div: 
+        ':class': '{ ''has-main-color'': (!!selectedMainColor) }'
+        div: 
+          v-if: (!!selectedMainColor)
+          class: main-color mb-l1
+          ui.input.background.color.item: 
+            ':color-class': '''bg-'' + selectedMainColor'
+            ':value': '''bg-'' + selectedMainColor'
+        ul: 
+          class: colors
+          li: 
+            v-for: color in colors
+            @click: selectMainColor(color)
+            ui.input.background.color.item: 
+              ':color-class': '''bg-'' + color'
+              ':value': '''bg-'' + selectedMainColor'
+      transition: 
+        name: slide-hor
+        div: 
+          v-if: selectedMainColor
+          ':style': '{ width: ''30em'' }'
+          transition: 
+            name: fade
+            div: 
+              ':key': selectedMainColor
+              .flex.gap-2:
+                div: 
+                  .title: 
+                    v-text: '''shade'''
+                  ul: 
+                    li: 
+                      v-for: shade in shades
+                      ui.input.background.color.item: 
+                        ':color-class': getShadeClass(selectedMainColor, shade)
+                        ':value': selectedColorClass
+                        @hover: onItemHover
+                        @input: selectedColorClass = $event
+                div: 
+                  .title: 
+                    v-text: '''tranparent'''
+                  ul: 
+                    li: 
+                      v-for: alpha in alphas
+                      ui.input.background.color.item: 
+                        ':color-class': getAlphaClass(selectedMainColor, alpha)
+                        ':value': selectedColorClass
+                        @hover: onItemHover
+                        @input: selectedColorClass = $event
+                div: 
+                  .title: 
+                    v-text: '''gradient'''
+                  ul: 
+                    li: 
+                      v-for: gradColor in gradColors
+                      ui.input.background.color.item: 
+                        ':color-class': getGradClass(selectedMainColor, gradColor)
+                        ':value': selectedColorClass
+                        @hover: onItemHover
+                        @input: selectedColorClass = $event
+                        ':large': true
+props:
+  value: null
+data:
+  selectedMainColor: null
+  selectedColorClass: null
+  colors:
+    - blue
+    - indigo
+    - purple
+    - pink
+    - red
+    - orange
+    - yellow
+    - pear
+    - green
+    - mint
+    - teal
+    - gray
+    - slategray
+    - brown
+    - wine
+    - almond
+  shades:
+    - darkest
+    - darker
+    - dark
+    - null
+    - light
+    - lighter
+    - lightest
+  alphas:
+    - 90
+    - 80
+    - 70
+    - 60
+    - 50
+    - 40
+    - 30
+    - 20
+    - 10
+methods:
+  init: | #js
+    function(value) {
+      if (this._isInited) return;
+      this._isInited = true;
+      if (!value) return;
+      const color = value.split('-')[1];
+      this.selectedMainColor = color;
+      this.selectedColorClass = value;
+    }
+  onItemHover: | #js
+    function(colorClass, isHovered) {
+      this.$emit('value-preview', colorClass, isHovered);
+    }
+  selectMainColor: | #js
+    function(color) {
+      if (color == this.selectedMainColor) color = null;
+      this.selectedMainColor = color;
+    }
+  getShadeClass: | #js
+    function(color, shade) {
+      return ['bg', color, shade]
+        .filter(s => s)
+        .join('-');
+    }
+  getAlphaClass: | #js
+    function(color, alpha) {
+      return ['bg', color, alpha]
+        .filter(s => s)
+        .join('-');
+    }
+  getGradClass: | #js
+    function(color1, color2) {
+      if (color1 == color2) return `linear-${color1}`;
+      return `${color1}-${color2}`;
+    }
+computed:
+  gradColors: | #js
+    function() {
+      return [this.selectedMainColor, ...(this.colors.except(this.selectedMainColor))];
+    }
+watch:
+  selectedColorClass: | #js
+    async function() {
+      await this.$root.wait(10);
+      this.$emit('input', this.selectedColorClass);
+    }
+  value:
+    handler: | #js
+      function(value) {
+        this.init(value);
+      }
+    immediate: true
+style:
+  .title:
+    width: calc(100% - 1.5em)
+    text-align: center
+    opacity: 0.5
+  .has-main-color .colors:
+    opacity: 0
+    transition: 1s
+  .has-main-color .main-color:
+    position: absolute
+    transition: 1s
+  .has-main-color:hover .main-color:
+    opacity: 0
+  .has-main-color:hover .colors:
+    opacity: 1
+  li:
+    display: flex !important
+    justify-content: center
+_:
+  examples:
+    count: 0
+name: ui-input-background-color
+template: >-
+  <div class="comp-ui-input-background-color" path="-1102478111."><div
+  class="flex gap-2" path="-1102478111.0"><div :class="{ 'has-main-color':
+  (!!selectedMainColor) }" path="-1102478111.0.0"><div class="main-color mb-l1"
+  v-if="(!!selectedMainColor)"
+  path="-1102478111.0.0.0"><ui-input-background-color-item :color-class="'bg-' +
+  selectedMainColor" :value="'bg-' + selectedMainColor"
+  path="-1102478111.0.0.0.0"></ui-input-background-color-item></div><ul
+  class="colors" path="-1102478111.0.0.1"><li v-for="color in colors"
+  @click="selectMainColor(color)"
+  path="-1102478111.0.0.1.0"><ui-input-background-color-item :color-class="'bg-'
+  + color" :value="'bg-' + selectedMainColor"
+  path="-1102478111.0.0.1.0.0"></ui-input-background-color-item></li></ul></div><transition
+  name="slide-hor" path="-1102478111.0.1"><div v-if="selectedMainColor"
+  :style="{ width: '30em' }" path="-1102478111.0.1.0"><transition name="fade"
+  path="-1102478111.0.1.0.0"><div :key="selectedMainColor"
+  path="-1102478111.0.1.0.0.0"><div class="flex gap-2"
+  path="-1102478111.0.1.0.0.0.0"><div path="-1102478111.0.1.0.0.0.0.0"><div
+  class="title" v-text="'shade'" path="-1102478111.0.1.0.0.0.0.0.0"></div><ul
+  path="-1102478111.0.1.0.0.0.0.0.1"><li v-for="shade in shades"
+  path="-1102478111.0.1.0.0.0.0.0.1.0"><ui-input-background-color-item
+  :color-class="getShadeClass(selectedMainColor, shade)"
+  :value="selectedColorClass" @hover="onItemHover" @input="selectedColorClass =
+  $event"
+  path="-1102478111.0.1.0.0.0.0.0.1.0.0"></ui-input-background-color-item></li></ul></div><div
+  path="-1102478111.0.1.0.0.0.0.1"><div class="title" v-text="'tranparent'"
+  path="-1102478111.0.1.0.0.0.0.1.0"></div><ul
+  path="-1102478111.0.1.0.0.0.0.1.1"><li v-for="alpha in alphas"
+  path="-1102478111.0.1.0.0.0.0.1.1.0"><ui-input-background-color-item
+  :color-class="getAlphaClass(selectedMainColor, alpha)"
+  :value="selectedColorClass" @hover="onItemHover" @input="selectedColorClass =
+  $event"
+  path="-1102478111.0.1.0.0.0.0.1.1.0.0"></ui-input-background-color-item></li></ul></div><div
+  path="-1102478111.0.1.0.0.0.0.2"><div class="title" v-text="'gradient'"
+  path="-1102478111.0.1.0.0.0.0.2.0"></div><ul
+  path="-1102478111.0.1.0.0.0.0.2.1"><li v-for="gradColor in gradColors"
+  path="-1102478111.0.1.0.0.0.0.2.1.0"><ui-input-background-color-item
+  :color-class="getGradClass(selectedMainColor, gradColor)"
+  :value="selectedColorClass" @hover="onItemHover" @input="selectedColorClass =
+  $event" :large="true"
+  path="-1102478111.0.1.0.0.0.0.2.1.0.0"></ui-input-background-color-item></li></ul></div></div></div></transition></div></transition></div></div>

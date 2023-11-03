@@ -15,6 +15,9 @@ props:
 data: null
 methods: null
 name: e-media-menu
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-e-media-menu" path="991464018."><div class="flex ver gap-2"
   path="991464018.0"><div v-if="$root.isAdmin" path="991464018.0.0"><ui-button

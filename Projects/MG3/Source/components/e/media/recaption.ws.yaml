@@ -114,6 +114,9 @@ style:
   input, select:
     padding: 0.2em !important
 name: e-media-recaption
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-e-media-recaption" path="-2142476480."><div class="flex
   justify-around" path="-2142476480.0"><ui-button :text="'✏️ recaption'"

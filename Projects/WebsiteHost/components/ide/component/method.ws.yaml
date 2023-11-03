@@ -1,0 +1,28 @@
+dom:
+  div: 
+    div: 
+      ui.value.code:
+        ':value': method.code.toString()
+    div: 
+      v-for: (arg, i) in args
+      ui.value.any:
+        ':title': argNames[i]
+        ':value': arg
+props:
+  method: null
+  args: null
+computed:
+  argNames: | #js
+    function() {
+      return (this.method?.args || []);
+    }
+name: ide-component-method
+_:
+  examples:
+    count: 0
+template: >-
+  <div class="comp-ide-component-method" path="-735417930."><div
+  path="-735417930.0"><ui-value-code :value="method.code.toString()"
+  path="-735417930.0.0"></ui-value-code></div><div v-for="(arg, i) in args"
+  path="-735417930.1"><ui-value-any :title="argNames[i]" :value="arg"
+  path="-735417930.1.0"></ui-value-any></div></div>

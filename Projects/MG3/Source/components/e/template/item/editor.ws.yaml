@@ -4,6 +4,9 @@ dom:
 props:
   item: null
 name: e-template-item-editor
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-e-template-item-editor" v-text="item"
   path="644061981."></div>

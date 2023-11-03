@@ -84,6 +84,9 @@ style:
   .clickable *:
     cursor: pointer
 name: e-media-create-instance
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-e-media-create-instance" path="925255284."><transition
   name="slide" path="925255284.0"><e-generator-select v-show="!generator"

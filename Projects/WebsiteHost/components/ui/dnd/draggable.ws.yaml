@@ -1,0 +1,85 @@
+dom:
+  div:
+    ref: dragElement1
+    ':class': '{ draggable: true }'
+    draggable: true
+    @dragstart: onDragStart
+    @dragend: onDragEnd
+    @mousemove: onDrag
+    @drag: onDrag
+    ui.mouse:
+      ':global': true
+      @move: onDrag
+    slot: null
+props:
+  dragItem: null
+  showDragGhost: true
+data:
+  dragElementPos: null
+  isDragging: false
+  lastPos:
+    x: null
+    'y': null
+methods:
+  onDragStart: | #js
+    function(e) {
+      this.isDragging = true;
+
+      this.dragElementPos = { x: e.clientX, y: e.clientY };
+
+      if (!this.showDragGhost)
+      {
+        // Hide the drag ghost
+        const img = new Image();
+        e.dataTransfer.setDragImage(img, 0, 0);
+      }
+
+      this.$root.dragItem = this.dragItem;
+      this.$emit('drag-start', this.dragItem);
+    }
+  onDragEnd: | #js
+    async function(e) {
+      this.isDragging = false;
+      await this.$nextTick();
+      this.$emit('drag-end', this.dragItem);
+      this.$root.dragItem = null;
+    }
+  onDrag: | #js
+    function(e) {
+      if (!this.__onDrag) this.__onDrag = this._onDrag.throttle(this, 50);
+      this.__onDrag(e);
+    }
+  _onDrag: | #js
+    function(e) {
+      const { x, y } = { x: e.clientX, y: e.clientY };
+      if (Objects.areEqual(this.lastPos, { x, y })) return;
+      this.lastPos = { x, y };
+      const dep = this.dragElementPos;
+      if (!dep) return;
+      const relativePos = { x: (x - dep.x), y: (y - dep.y) };
+      const data = {
+        e,
+        relative: {
+          pos: relativePos,
+        }
+      };
+      this.$emit('drag', data);
+    }
+style:
+  .draggable:
+    cursor: grabbing
+example:
+  dom:
+    div:
+      ui.dnd.draggable:
+        .box1.text-center:
+          v-text: '''Drag me'''
+_:
+  examples:
+    count: 1
+name: ui-dnd-draggable
+template: >-
+  <div class="comp-ui-dnd-draggable" ref="dragElement1" :class="{ draggable:
+  true }" draggable="true" @dragstart="onDragStart" @dragend="onDragEnd"
+  @mousemove="onDrag" @drag="onDrag" path="-26676257."><ui-mouse :global="true"
+  @move="onDrag" path="-26676257.0"></ui-mouse><slot></slot></div>

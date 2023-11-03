@@ -1,0 +1,143 @@
+dom:
+  .flex:
+    div:
+      ':class': getSliderClass()
+      h3: 
+        ui.title: 
+          text: 🧊 State
+      transition: 
+        name: slide
+        table:
+          class: list1
+          ide.state.tracker.item:
+            v-for: field in $root.vm.getFields(uid)
+            ':class': getCssClass(field)
+            @click: toggleWatch(field)
+            ':uid': uid
+            ':item': field
+            ':key': uid+'.'+field.key
+    transition: 
+      name: slide-hor
+      .watches:
+        v-if: watchedFieldKeys.length
+        transition.group:
+          tag: ul
+          name: slide
+          li:
+            v-for: field in watchedFields
+            class: clickable
+            @click: console.log($root.vm.getVue(uid)[field.key])
+            ':key': field.key
+            h3: 
+              class: opacity-50
+              ui.title: 
+                ':icon': $root.getIcon(field)
+                ':text': field.key
+            ui.value.any:
+              ':value': field.newValue.value
+              ':preview': 'false'
+props:
+  uid: null
+data:
+  key1: 1
+  watchedFieldKeys: []
+  selectedItem: null
+mounted: | #js
+  async function() {
+    //this.$root.$on("state-changed", this.onStateChanged.bind(this));
+  }
+methods:
+  getSliderClass: | #js
+    function() {
+      const cls = {};
+      if (this.watchedFieldKeys.length) {
+        cls["slider-closed"] = true;
+      }
+      else
+      {
+        cls["slider-opened"] = true;
+      }
+      return cls;
+    }
+  toggleWatch: | #js
+    function(field) {
+      if (this.watchedFieldKeys.includes(field.key)) {
+        this.watchedFieldKeys = this.watchedFieldKeys.filter(w => w != field.key);
+      } else {
+        this.watchedFieldKeys.push(field.key);
+      }
+    }
+  getCssClass: | #js
+    function(item) {
+      const cls = {};
+      cls.clickable = true;
+      cls.selected = (this.watchedFieldKeys.includes(item.key));
+      return cls;
+    }
+  onStateChanged: | #js
+    function(change) {
+      if (!change) return;
+      if (this.uid == change.uid) this.refresh();
+    }
+  refresh: | #js
+    function() {
+      this.key1++;
+    }
+computed:
+  watchedFields: | #js
+    function() {
+      const fields = this.$root.vm.getFields(this.uid);
+      return fields.filter(f => this.watchedFieldKeys.includes(f.key));
+    }
+  console: | #js
+    function() {
+      return console;
+    }
+style:
+  .comp-ide-state-tracker:
+    overflow: hidden
+  .watches:
+    max-height: 50vh
+    overflow: auto
+    padding: 1em 2em
+  .watches ul:
+    gap: 1em
+  .watches h3:
+    font-size: 1.2rem
+  .comp-ui-title:
+    border-radius: 0
+    border-bottom: '1px solid #000'
+  .flex:
+    gap: 1em
+  ul:
+    display: flex
+    flex-direction: column-reverse
+  ul:not(.changes) .grid:
+    opacity: 0.5
+  tr:hover:
+    background: '#ffffff10'
+    transition: 0s
+name: ide-state-tracker
+_:
+  examples:
+    count: 0
+template: >-
+  <div class="comp-ide-state-tracker flex" path="-483235177."><div
+  :class="getSliderClass()" path="-483235177.0"><h3
+  path="-483235177.0.0"><ui-title text="🧊 State"
+  path="-483235177.0.0.0"></ui-title></h3><transition name="slide"
+  path="-483235177.0.1"><table class="list1"
+  path="-483235177.0.1.0"><ide-state-tracker-item v-for="field in
+  $root.vm.getFields(uid)" :class="getCssClass(field)"
+  @click="toggleWatch(field)" :uid="uid" :item="field" :key="uid+'.'+field.key"
+  path="-483235177.0.1.0.0"></ide-state-tracker-item></table></transition></div><transition
+  name="slide-hor" path="-483235177.1"><div class="watches"
+  v-if="watchedFieldKeys.length" path="-483235177.1.0"><transition-group
+  tag="ul" name="slide" path="-483235177.1.0.0"><li class="clickable"
+  v-for="field in watchedFields"
+  @click="console.log($root.vm.getVue(uid)[field.key])" :key="field.key"
+  path="-483235177.1.0.0.0"><h3 class="opacity-50"
+  path="-483235177.1.0.0.0.0"><ui-title :icon="$root.getIcon(field)"
+  :text="field.key" path="-483235177.1.0.0.0.0.0"></ui-title></h3><ui-value-any
+  :value="field.newValue.value" :preview="false"
+  path="-483235177.1.0.0.0.1"></ui-value-any></li></transition-group></div></transition></div>

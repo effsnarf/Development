@@ -1,0 +1,31 @@
+dom:
+  div: 
+    v-if: operation
+    div: 
+      v-text: '''no op'''
+props:
+  input: null
+  value: null
+data:
+  operation: null
+methods: null
+watch:
+  operation:
+    handler: | #js
+      function(operation) {
+        this.$emit("input", operation);
+      }
+    deep: true
+  value:
+    handler: | #js
+      function(value) {
+        this.operation = value;
+      }
+    immediate: true
+_:
+  examples:
+    count: 0
+name: ui-linq-no-op
+template: >-
+  <div class="comp-ui-linq-no-op" v-if="operation" path="453366106."><div
+  v-text="'no op'" path="453366106.0"></div></div>

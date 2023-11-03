@@ -1,0 +1,113 @@
+dom:
+  ul:
+    v-if: root
+    li:
+      ui.tree.node:
+        ':node': root
+        ':depth': '0'
+        ':initial-expanded': initialExpanded
+        ':expandable': initialExpandable
+        ':item-type': itemType
+        ':get-item': getItem || ((node) => node?.item)
+        ':get-item-key': getItemKey || $root.getKey
+        ':get-children': getChildren || ((node) => node.children||[])
+        ':selected-node': selectedNode
+        ':item-props': itemProps
+        @node-click: onChildClick
+        @node-hover: onChildHover
+        @node-unhover: onChildUnhover
+        @node-hovered: onChildHovered
+props:
+  root: null
+  initialExpanded: false
+  expandable: true
+  itemType: null
+  getItem: null
+  getItemKey: null
+  getChildren: null
+  itemProps: null
+data:
+  selectedNode: null
+methods:
+  selectNode: | #js
+    function(node) {
+      this.selectedNode = node;
+    }
+  onChildClick: | #js
+    function(child) {
+      this.$emit('node-click', child);
+      this.selectedNode = (child == this.selectedNode) ? null : child;
+    }
+  onChildHover: | #js
+    function (child) {
+      this.$emit('node-hover', child);
+    }
+  onChildUnhover: | #js
+    function (child) {
+      this.$emit('node-unhover', child);
+    }
+  onChildHovered: | #js
+    function (child, isHovered) {
+      this.$emit('node-hovered', child, isHovered);
+    }
+computed:
+  initialExpandable: | #js
+    function() {
+      if (typeof this.initialExpanded == 'boolean') return !this.initialExpanded;
+      return this.expandable;
+    }
+  depth: | #js
+    function() {
+      return 0;
+    }
+watch:
+  selectedNode: | #js
+    function(newVal, oldVal) {
+      this.$emit('node-select', newVal);
+    }
+style:
+  ul.comp-ui-tree:
+    max-height: 50vh
+    scroll: auto
+    padding: 0 2em 0 0
+example:
+  dom:
+    ui.tree:
+      ':root': root
+      div: null
+  data:
+    root: null
+  mounted: | #js #js
+    function() {
+      this.root = ({
+        item: "root",
+        children: [
+          {
+            item: "node 1",
+            children: [
+              { item: "node 1.1" }
+            ]
+          },
+          {
+            item: "node 2",
+            children: [
+              { item: "node 2.1" }
+            ]
+          }
+        ]
+      });
+    }
+name: ui-tree
+_:
+  examples:
+    count: 1
+template: >-
+  <ul class="comp-ui-tree" v-if="root" path="-484140360."><li
+  path="-484140360.0"><ui-tree-node :node="root" :depth="0"
+  :initial-expanded="initialExpanded" :expandable="initialExpandable"
+  :item-type="itemType" :get-item="getItem || ((node) =&gt; node?.item)"
+  :get-item-key="getItemKey || $root.getKey" :get-children="getChildren ||
+  ((node) =&gt; node.children||[])" :selected-node="selectedNode"
+  :item-props="itemProps" @node-click="onChildClick" @node-hover="onChildHover"
+  @node-unhover="onChildUnhover" @node-hovered="onChildHovered"
+  path="-484140360.0.0"></ui-tree-node></li></ul>

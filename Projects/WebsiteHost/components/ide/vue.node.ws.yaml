@@ -1,0 +1,26 @@
+dom:
+  div:
+    ui.title:
+      icon: 📦
+      ':text': getText()
+      ':number': item?.$children.length
+props:
+  value: null
+methods:
+  getText: | #js
+    function() {
+      return (this.item?.$options?._componentTag || this.item?._vnode.tag);
+    }
+computed:
+  item: | #js
+    function() {
+      return (!this.value) ? null : this.value();
+    }
+name: ide-vue-node
+_:
+  examples:
+    count: 0
+template: >-
+  <div class="comp-ide-vue-node" path="345070638."><ui-title icon="📦"
+  :text="getText()" :number="item?.$children.length"
+  path="345070638.0"></ui-title></div>

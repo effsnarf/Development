@@ -1,0 +1,40 @@
+dom:
+  grid.module:
+    ':show-title': 'false'
+    .flex:
+      div:
+        v-text: '''🧊'''
+      .short-value:
+        v-text: shortValueDesc
+props:
+  box: null
+data: null
+methods: null
+computed:
+  shortValueDesc: | #js
+    function() {
+      const value = this.boxValue;
+      if ((value == null) || (value == undefined)) return '❔';
+      if (typeof value === "string") return '🆎';
+      if (Array.isArray(value)) return `[${value.length}]`;
+      if (typeof value === "object") return `{ }`;
+      return "❔"
+    }
+  boxValue: | #js
+    function() {
+      const socketData = this.$root.socket?.runtime.data[this.box._id];
+      return socketData?.input?.[1] || this.box.value;
+    }
+style:
+  .short-value:
+    color: cyan
+    white-space: nowrap
+_:
+  examples:
+    count: 0
+name: grid-ui-box-data-header
+template: >-
+  <grid-module class="comp-grid-ui-box-data-header" :show-title="false"
+  path="-768382468."><div class="flex" path="-768382468.0"><div v-text="'🧊'"
+  path="-768382468.0.0"></div><div class="short-value" v-text="shortValueDesc"
+  path="-768382468.0.1"></div></div></grid-module>

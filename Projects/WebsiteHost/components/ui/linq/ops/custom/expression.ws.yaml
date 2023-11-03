@@ -1,0 +1,114 @@
+dom:
+  div: 
+    v-if: operation
+    pre:
+      .flex: 
+        div: 
+          class: opacity-50 larger-text
+          v-text: '''function ('''
+        .flex: 
+          v-for: (argName, index) in argNames
+          div: 
+            ui.context.window:
+              ui.value:
+                ':value': argValues[argName]
+            ui.title:
+              class: larger-text
+              icon: 🧊
+              ':text': argName
+          div: 
+            v-if: (index < (argNames.length - 1))
+            v-text: ''', '''
+        div: 
+          class: opacity-50 larger-text
+          v-text: ''') {'''
+      ui.input.text.box:
+        ':hint': hint
+        multiline: true
+        v-model: operation.func
+      div: 
+        class: opacity-50 larger-text
+        v-text: '''}'''
+props:
+  context: null
+  input: null
+  value: null
+  prevOperation: null
+data:
+  operation: null
+methods: null
+computed:
+  argValues: | #js
+    function() {
+      const values = {};
+      values[this.argNames.first()] = this.input;
+      for (const argName of this.contextArgNames) {
+        values[argName] = this.context[argName];
+      }
+      return values;
+    }
+  argNames: | #js
+    function() {
+      return [...this.operationArgNames, ...this.contextArgNames];
+    }
+  hint: | #js
+    function() {
+      let argName = (this.contextArgNames.first() || this.operationArgNames.first());
+      return `return ${argName}.name;`;
+    }
+  operationArgNames: | #js
+    function() {
+      if (this.input == this.context?.[this.contextArgNames.first()]) return [];
+      if (this.prevOperation) {
+        const prev = this.prevOperation;
+        if (prev.type == "select.field") {
+          return [prev.path.last()];
+        }
+      }
+      return [];
+    }
+  contextArgNames: | #js
+    function() {
+      if (!this.context) return [];
+      return Object.keys(this.context);
+    }
+watch:
+  operation:
+    handler: | #js
+      function(operation) {
+        this.$emit("input", operation);
+      }
+    deep: true
+  value:
+    handler: | #js
+      function(value) {
+        this.operation = value;
+      }
+    immediate: true
+style:
+  .larger-text:
+    font-size: 120%
+  pre:
+    font-size: 120%
+    background: '#303030'
+_:
+  examples:
+    count: 0
+name: ui-linq-ops-custom-expression
+template: >-
+  <div class="comp-ui-linq-ops-custom-expression" v-if="operation"
+  path="-1313227483."><pre path="-1313227483.0"><div class="flex"
+  path="-1313227483.0.0"><div class="opacity-50 larger-text" v-text="'function
+  ('" path="-1313227483.0.0.0"></div><div class="flex" v-for="(argName, index)
+  in argNames" path="-1313227483.0.0.1"><div
+  path="-1313227483.0.0.1.0"><ui-context-window
+  path="-1313227483.0.0.1.0.0"><ui-value :value="argValues[argName]"
+  path="-1313227483.0.0.1.0.0.0"></ui-value></ui-context-window><ui-title
+  class="larger-text" icon="🧊" :text="argName"
+  path="-1313227483.0.0.1.0.1"></ui-title></div><div v-if="(index &lt;
+  (argNames.length - 1))" v-text="', '"
+  path="-1313227483.0.0.1.1"></div></div><div class="opacity-50 larger-text"
+  v-text="') {'" path="-1313227483.0.0.2"></div></div><ui-input-text-box
+  :hint="hint" multiline="true" v-model="operation.func"
+  path="-1313227483.0.1"></ui-input-text-box><div class="opacity-50 larger-text"
+  v-text="'}'" path="-1313227483.0.2"></div></pre></div>

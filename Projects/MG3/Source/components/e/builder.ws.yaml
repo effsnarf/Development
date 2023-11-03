@@ -14,6 +14,9 @@ props:
   mediaCreated: null
   cancel: null
 name: e-builder
+_:
+  examples:
+    count: 0
 template: >-
   <component class="comp-e-builder" v-if="builder"
   :is="$root.getBuilderComponentName(builder)" :editable="true"

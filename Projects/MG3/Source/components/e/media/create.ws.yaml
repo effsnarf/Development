@@ -100,6 +100,9 @@ watch:
         if (!this.media) this.$emit("input", null);
       }
 name: e-media-create
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-e-media-create" :key="key1" path="-960387793."><ui-tabs
   :options="options" direction="horizontal" v-model="selectedTabIndex"

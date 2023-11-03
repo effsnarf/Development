@@ -159,6 +159,9 @@ style:
   li:
     margin-bottom: 1vh
 name: e-thread
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-e-thread" path="1226205107."><div
   path="1226205107.0"><transition-group tag="ul" name="slide"

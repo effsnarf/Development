@@ -23,6 +23,9 @@ style:
   .center > div, .post-menu > div:
     width: fit-content
 name: e-post-menu
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-e-post-menu" path="404353956."><div class="center"
   path="404353956.0"><ui-time :value="item.created"

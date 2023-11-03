@@ -20,6 +20,9 @@ dom:
         v-text: '''Movies'''
 props: null
 name: page-category
+_:
+  examples:
+    count: 0
 template: >-
   <site class="comp-page-category" page-name="category"
   path="871284093."><template v-slot:article path="871284093.0"><div

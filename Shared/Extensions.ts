@@ -203,6 +203,7 @@ interface Number {
   _is(obj: any, type: any): boolean;
   _compare(obj1: any, obj2: any): number;
   _getObjectType(obj: any): any;
+  _getObjectTypeName(obj: any): string;
   is(type: any): boolean;
   seconds(): number;
   minutes(): number;
@@ -223,6 +224,7 @@ interface Number {
   unitifyTime(unit?: string[] | string): string;
   unitifySize(unit?: string[] | string): string;
   unitifyPercent(): string;
+  toPrecent(): string;
   toProgressBar(barLength?: number, ...severifyArgs: any[]): string;
   severify(green: number, yellow: number, direction: "<" | ">"): string;
   severifyByHttpStatus(): string;
@@ -256,6 +258,7 @@ interface String {
   singularize(): string;
   pluralize(): string;
   antonym(): string;
+  capitalize(): string;
 
   severify(
     green: number,
@@ -274,6 +277,7 @@ interface String {
   padEndChars(maxLength: number, fillString?: string): string;
   sliceChars(start: number | undefined, end?: number | undefined): string;
   alignRight(): string;
+  toSingleLine(): string;
   shorten(maxLength: number, ellipsis?: boolean): string;
   toLength(
     length: number,
@@ -284,6 +288,9 @@ interface String {
   trimAll(): string;
   trimDoubleQuotes(): string;
   stripHtmlTags(): string;
+  htmlEncode(): string;
+  textToHtml(): string;
+  htmlToText(): string;
   decodeHtml(): string;
   getMatches(regex: RegExp): string[];
   getWords(): string[];
@@ -324,16 +331,19 @@ interface String {
 
 interface Array<T> {
   all(predicate: (item: T) => boolean): boolean;
-  toMap(getKey: (item: T) => any): object;
+  toMap(getKey: (item: T, index: number) => any): object;
+  toMapValue(getValue: (item: T, index: number) => any): object;
   contains(item: T, getItemKey?: (item: T) => any): boolean;
   reversed(): T[];
   removeAt(index: number): void;
   insertAt(index: number, item: T, appendToEnd: boolean): void;
   removeBy(predicate: (item: T) => boolean): void;
   removeByField(key: string, value: any): void;
+  count(predicate: (item: T) => boolean): number;
   clear(stagger?: number): void;
   add(items: any[], stagger?: number): void;
   take(count: number): T[];
+  takeLast(count: number): T[];
   replace(
     getNewItems: () => Promise<any[]>,
     stagger: number,
@@ -350,13 +360,16 @@ interface Array<T> {
   last(): any;
   back(): any;
   skip(count: number): T[];
+  getPairs(): [T, T][];
   joinColumns(columns: (number | null)[], ellipsis?: boolean): string;
   distinct(project?: ((item: T) => any) | null): T[];
+  selectFields(fields: string[]): T[];
   except(...items: T[]): T[];
   exceptBy(items: T[], getItemKey?: (item: T) => any): T[];
   exceptLast(count: number): T[];
   sortBy(...projects: ((item: T) => any)[]): T[];
   sortByDesc(...projects: ((item: T) => any)[]): T[];
+  sortByDirection(projects: ((item: any) => any)[], direction: number): T[];
   stringify(): string;
   onlyTruthy<T>(): T[];
   shuffle(): T[];
@@ -366,9 +379,9 @@ interface Array<T> {
 interface Function {
   is(type: any): boolean;
   getArgumentNames(): string[];
-  postpone(ms: number): (...args: any[]) => any;
-  debounce(ms: number): (...args: any[]) => any;
-  throttle(ms: number): (...args: any[]) => any;
+  postpone(delay: number): (...args: any[]) => any;
+  debounce(delay: number): (...args: any[]) => any;
+  throttle(delay: number, context: any): (...args: any[]) => any;
 }
 // #endregion
 
@@ -405,8 +418,8 @@ if (typeof Number !== "undefined") {
       }
 
       // Handle strings
-      if (typeof obj1 === "string" && typeof obj2 === "string") {
-        return obj1.localeCompare(obj2);
+      if (typeof obj1 === "string" || typeof obj2 === "string") {
+        return (obj1 || "").localeCompare(obj2 || "");
       }
 
       // Handle dates
@@ -418,7 +431,7 @@ if (typeof Number !== "undefined") {
       if (Array.isArray(obj1) && Array.isArray(obj2)) {
         if (obj1.length == 1 && obj2.length == 1)
           return compare(obj1[0], obj2[0]);
-        throw new Error("Arrays are not supported");
+        return 0;
       }
 
       throw new Error(
@@ -570,6 +583,10 @@ if (typeof Number !== "undefined") {
   Number.prototype.unitifyPercent = function (): string {
     return this.unitify(Percentage);
     //return `${Math.round(this.valueOf() * 100)}${`%`.c("gray")}`;
+  };
+
+  Number.prototype.toPrecent = function (): string {
+    return `${Math.round(this.valueOf() * 100)}${`%`.c("gray")}`;
   };
 
   Number.prototype.toProgressBar = function (
@@ -753,11 +770,13 @@ if (typeof String !== "undefined") {
 
   String.prototype.singularize = function (): string {
     if (this.endsWith("ies")) return this.slice(0, -3) + "y";
+    if (this.endsWith("es")) return this.slice(0, -2);
     if (this.endsWith("s")) return this.slice(0, -1);
     return this.toString();
   };
 
   String.prototype.pluralize = function (): string {
+    if (this.endsWith("x")) return this + "es";
     if (this.endsWith("ay")) return this + "s";
     if (this.endsWith("y")) return this.slice(0, -1) + "ies";
     if (this.endsWith("s")) return this.toString();
@@ -780,6 +799,10 @@ if (typeof String !== "undefined") {
       if (this === b) return a;
     }
     return this.toString();
+  };
+
+  String.prototype.capitalize = function (): string {
+    return this[0].toUpperCase() + this.slice(1);
   };
 
   String.prototype.severify = function (
@@ -929,6 +952,15 @@ if (typeof String !== "undefined") {
     return `${padding}${this}`;
   };
 
+  String.prototype.toSingleLine = function (): string {
+    let s = this.toString();
+    s = s.replace(/\r/g, " ");
+    s = s.replace(/\n/g, " ");
+    s = s.replace(/\t/g, " ");
+    s = s.replace(/\s+/g, " ");
+    return s.trim();
+  };
+
   String.prototype.shorten = function (
     maxLength: number,
     ellipsis: boolean = true
@@ -998,6 +1030,107 @@ if (typeof String !== "undefined") {
         // Remove HTML tags
         .replace(/(<([^>]+)>)/gi, " ")
     );
+  };
+
+  (String.prototype as any).htmlEncode = function (): string {
+    return (
+      this.toString()
+        // Replace & with &amp;
+        .replace(/&/g, "&amp;")
+        // Replace < with &lt;
+        .replace(/</g, "&lt;")
+        // Replace > with &gt;
+        .replace(/>/g, "&gt;")
+        // Replace " with &quot;
+        .replace(/"/g, "&quot;")
+    );
+  };
+
+  (String.prototype as any).textToHtml = function (): string {
+    return (
+      this.toString()
+        .htmlEncode()
+        // Replace new lines with <br />
+        .replace(/\n/g, "<br />")
+    );
+  };
+
+  (String.prototype as any).htmlToText = function (): string {
+    const nonContentTags = [
+      "script",
+      "style",
+      "head",
+      "title",
+      "meta",
+      "link",
+      "object",
+      "iframe",
+      "noscript",
+      "embed",
+      "applet",
+      "noframes",
+      "param",
+      "base",
+      "basefont",
+      "canvas",
+      "svg",
+      "math",
+      "input",
+      "textarea",
+      "select",
+      "option",
+      "button",
+      "img",
+      "map",
+      "area",
+      "form",
+      "fieldset",
+      "legend",
+      "label",
+      "frameset",
+      "frame",
+      "bgsound",
+      "marquee",
+      "blink",
+      "embed",
+      "ilayer",
+      "object",
+      "audio",
+      "video",
+      "source",
+      "track",
+      "xml",
+      "command",
+      "keygen",
+      "menu",
+      "nav",
+      "datalist",
+      "output",
+      "progress",
+    ];
+
+    let text = this.toString();
+
+    for (const tag of nonContentTags) {
+      const regex = new RegExp(`<${tag}[^>]*>.*?<\\/${tag}>`, "gs"); // Added 's' flag for the dot to match newline characters
+      text = text.replace(regex, "\n");
+      // Remove the tags that don't have a closing tag
+      text = text.replace(new RegExp(`<${tag}[^>]*>`, "g"), "\n");
+    }
+
+    // Remove all remaining HTML tags
+    text = text.replace(/<[^>]+>/g, "\n");
+
+    // Remove repeating whitespaces
+    text = text.replace(/[ \t]+/g, " ");
+
+    // Remove repeating new lines
+    text = text.replace(/(\n )+/g, "\n");
+    text = text.replace(/\n+/g, "\n");
+
+    text = text.trim(); // Trim leading and trailing whitespace
+
+    return text;
   };
 
   (String.prototype as any).decodeHtml = function (): string {
@@ -1307,13 +1440,23 @@ if (typeof String !== "undefined") {
 // #region Array
 if (typeof Array !== "undefined") {
   Array.prototype.toMap = function (
-    getKey: (item: any) => any,
-    getValue?: (item: any) => any
+    getKey: (item: any, index: number) => any,
+    getValue?: (item: any, index: number) => any
   ) {
     if (!getValue) getValue = (item) => item;
     const map = {} as any;
-    this.forEach((item) => {
-      map[getKey(item)] = getValue!(item);
+    this.forEach((item, index) => {
+      map[getKey(item, index)] = getValue!(item, index);
+    });
+    return map;
+  };
+
+  Array.prototype.toMapValue = function (
+    getValue: (item: any, index: number) => any
+  ) {
+    const map = {} as any;
+    this.forEach((item, index) => {
+      map[item] = getValue(item, index);
     });
     return map;
   };
@@ -1359,6 +1502,12 @@ if (typeof Array !== "undefined") {
     this.removeBy((item) => item[key] == value);
   };
 
+  Array.prototype.count = function (predicate: (item: any) => boolean) {
+    if (typeof predicate != "function")
+      return this.filter((item) => item == predicate).length;
+    return this.filter(predicate).length;
+  };
+
   Array.prototype.clear = function (stagger?: number) {
     if (!stagger) {
       this.splice(0, this.length);
@@ -1391,6 +1540,10 @@ if (typeof Array !== "undefined") {
 
   Array.prototype.take = function (count: number) {
     return this.slice(0, count);
+  };
+
+  Array.prototype.takeLast = function (count: number) {
+    return this.slice(-count);
   };
 
   Array.prototype.replace = async function (
@@ -1472,6 +1625,16 @@ if (typeof Array !== "undefined") {
     return this.slice(count);
   };
 
+  Array.prototype.getPairs = function () {
+    let pairs = [] as [any, any][];
+    for (let i = 0; i < this.length - 1; i++) {
+      for (let j = i + 1; j < this.length; j++) {
+        pairs.push([this[i], this[j]]);
+      }
+    }
+    return pairs;
+  };
+
   Array.prototype.joinColumns = function (
     columns: (number | null)[],
     ellipsis?: boolean
@@ -1497,6 +1660,16 @@ if (typeof Array !== "undefined") {
     return result;
   };
 
+  Array.prototype.selectFields = function (fields: string[]) {
+    return this.map((item) => {
+      const newItem = {} as any;
+      for (const field of fields) {
+        newItem[field] = item[field];
+      }
+      return newItem;
+    });
+  };
+
   Array.prototype.except = function (...items: any[]) {
     return this.filter((item) => !items.includes(item));
   };
@@ -1515,6 +1688,13 @@ if (typeof Array !== "undefined") {
   };
 
   Array.prototype.sortBy = function (...projects: ((item: any) => any)[]) {
+    if (!projects?.length) return [...this];
+    if (projects.all((p) => !p)) return [...this];
+
+    projects = projects.map((project) =>
+      typeof project == "string" ? (item) => item[project] : project
+    );
+
     return this.sort((a, b) => {
       const aVals = projects.map((project) => project(a));
       const bVals = projects.map((project) => project(b));
@@ -1524,6 +1704,15 @@ if (typeof Array !== "undefined") {
 
   Array.prototype.sortByDesc = function (...projects: ((item: any) => any)[]) {
     return [...this.sortBy(...projects)].reverse();
+  };
+
+  Array.prototype.sortByDirection = function (
+    projects: ((item: any) => any)[],
+    direction: number
+  ) {
+    return direction > 0
+      ? this.sortBy(...projects)
+      : this.sortByDesc(...projects);
   };
 
   Array.prototype.stringify = function (): any {
@@ -1598,19 +1787,24 @@ if (typeof Function !== "undefined") {
    * If the original function is called multiple times within the specified delay,
    * it will execute once every delay time.
    */
-  Function.prototype.throttle = function (delay: number) {
+  Function.prototype.throttle = function (delay: number, context: any) {
+    if (typeof delay != "number") {
+      return this.throttle(context as any, delay as any);
+    }
     const fn = this;
     let timeout: any;
-    return function (this: any, ...args) {
-      fn.prototype.nextArgs = args;
-      const context = this;
+    let func = function (this: any, ...args: any[]) {
+      (fn as any).nextArgs = args;
+      const context = this as any;
       if (!timeout) {
         timeout = setTimeout(async function () {
-          await fn.apply(context, fn.prototype.nextArgs);
+          await fn.apply(context, (fn as any).nextArgs);
           timeout = null;
         }, delay);
       }
     };
+    if (context) func = func.bind(context);
+    return func;
   };
 }
 

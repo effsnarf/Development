@@ -13,6 +13,9 @@ dom:
 props:
   item: null
 name: e-media-content-item-recaption
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-e-media-content-item-recaption" path="-1916563584."><div
   v-if="item.caption" path="-1916563584.0"><e-template-caption-editor

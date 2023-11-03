@@ -1,0 +1,31 @@
+dom:
+  div:
+    ui.value.any:
+      ':value': getModuleData(moduleInstance)
+props:
+  moduleInstance: null
+methods:
+  getModuleData: | #js
+    function(moduleInstance) {
+      const data = {};
+      for (const key in moduleInstance) {
+        const value = moduleInstance[key];
+        if (!this.includeData(key, value)) continue;
+        data[key] = value;
+      }
+      return data;
+    }
+  includeData: | #js
+    function(key, value) {
+      if (key.startsWith('_')) return false;
+      if (typeof value == 'function') return false;
+      return true;
+    }
+_:
+  examples:
+    count: 0
+name: ide-module-data
+template: >-
+  <div class="comp-ide-module-data" path="1196246184."><ui-value-any
+  :value="getModuleData(moduleInstance)"
+  path="1196246184.0"></ui-value-any></div>

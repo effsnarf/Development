@@ -1,0 +1,279 @@
+dom:
+  grid.module:
+    ref: module1
+    icon: ⬜
+    ':show-title': 'false'
+    div: 
+      div: 
+        v-if: '!visibleItems'
+        .flex.justify-center:
+          ui.title: 
+            icon: ❗
+            text: connect items data socket
+      div: 
+        ':class': itemsClass
+        div: 
+          class: item
+          ':style': itemStyle
+          v-for: (item, index) in visibleItems?.take(100)
+          ':key': getItemKey(item)
+          @mouseenter: onItemHover(item)
+          @mouseleave: onItemHover(null)
+          @click: onItemClick(item)
+          div: 
+            v-if: '!iteratorBox'
+            h3:
+              ui.title: 
+                text: item
+                ':number': getTempItemIndex(index)
+            div: 
+              class: item-value
+              ui.value.preview:
+                ':value': item
+          component:
+            v-if: iteratorBox
+            ':is': getBoxCompName(iteratorBox)
+            ':box': iteratorBox
+            ':data-bound-socket-data': getDataBoundSocketData(item)
+props:
+  userID: null
+  box: null
+data:
+  items: null
+  iteratorBox: null
+  layout: null
+  hoveredItem: null
+  selectedItem: null
+  lastNNItems: null
+  isDirty: false
+mounted: | #js
+  async function() {
+    await this.$nextTick();
+    this.refresh();
+  }
+methods:
+  getItemKey: | #js
+    function(item) {
+      return item?._id || item?.id || item?.no;
+    }
+  getTempItemIndex: | #js
+    function(index) {
+      return `${index+1}/${this.items.length}`;
+    }
+  grid_user_action_stack_do: | #js
+    function(box) {
+      this.refresh();
+    }
+  grid_client_runtime_socket_value_change: | #js
+    function(boxID, sDirection, sID, sValue) {
+      if (boxID != this.box._id) return;
+      this.refresh();
+    }
+  grid_data_list_added: | #js
+    async function(fuid, links) {
+      if (!fuid.endsWith("/data/links")) return;
+      for (const link of links) {
+        if ((link.from.box._id == this.box._id) || (link.to.box._id == this.box._id)) {
+          setTimeout(this.refresh.bind(this), 100);
+          break;
+        }
+      }
+    }
+  grid_data_list_updated: | #js
+    async function(fuid, links) {
+      if (!fuid.endsWith("/data/links")) return;
+      for (const link of links) {
+        if ((link.from.box._id == this.box._id) || (link.to.box._id == this.box._id)) {
+          setTimeout(this.refresh.bind(this), 100);
+          break;
+        }
+      }
+    }
+  grid_data_list_deleted: | #js
+    async function(fuid, links) {
+      if (!fuid.endsWith("/data/links")) return;
+      for (const link of links) {
+        if ((link.from.box._id == this.box._id) || (link.to.box._id == this.box._id)) {
+          setTimeout(this.refresh.bind(this), 100);
+          break;
+        }
+      }
+    }
+  onItemHover: | #js
+    function(hoveredItem) {
+      if (!this.onItemHoverT) this.onItemHoverT = this._onItemHover.bind(this).debounce(100);
+      this.onItemHoverT(hoveredItem);
+    }
+  _onItemHover: | #js
+    async function(hoveredItem) {
+      if (hoveredItem == this.hoveredItem) return;
+      this.hoveredItem = hoveredItem;
+    }
+  onItemClick: | #js
+    function(item) {
+      if (item == this.selectedItem) item = null;
+      this.selectedItem = item;
+    }
+  getBoxCompName: | #js
+    function(box) {
+      if (!box?.type) return null;
+      return `grid.ui.box.${box.type}`.replace(/\./g, "-");
+    }
+  getDataBoundSocketData: | #js
+    function(item) {
+      const customData = {};
+      customData.input = {};
+      const dataSocket = this.getIteratorDataSocket(this.box);
+      if (dataSocket) customData.input[dataSocket._id] = item;
+      return customData;
+    }
+  getIteratorDataSocket: | #js
+    function(itemsBox) {
+      if (!itemsBox) return null;
+      const iteratorSocket = itemsBox.sockets.output.find(s => s.type == "iterator");
+      const iteratorLink = this.$links
+        .filter(l => (l.from.box._id == itemsBox._id))
+        .find(l => (l.from.socket._id == iteratorSocket._id));
+      if (!iteratorLink) return null;
+
+      const iteratorBox = this.$boxes.find(b => b._id == iteratorLink.to.box._id);
+      const dataSocket = iteratorBox.sockets.input.find(s => s._id == iteratorLink.to.socket._id);
+      return dataSocket;
+    }
+  getIteratorBox: | #js
+    function(itemsBox) {
+      if (!itemsBox) return null;
+      const iteratorSocket = itemsBox.sockets.output.find(s => s.type == "iterator");
+      const iteratorLink = this.$links
+        .filter(l => (l.from.box._id == itemsBox._id))
+        .find(l => (l.from.socket._id == iteratorSocket._id));
+      if (iteratorLink) {
+        const iteratorBox = this.$boxes.find(b => b._id == iteratorLink.to.box._id);
+        return iteratorBox;
+      }
+      if (itemsBox.groupBoxID) {
+        const groupBox = this.$boxes.find(b => b._id == itemsBox.groupBoxID);
+        return this.getIteratorBox(groupBox);
+      }
+      return null;
+    }
+  getItems: | #js
+    function() {
+      const socketData = this.$root.socket?.runtime.data[this.box._id];
+      const items = (socketData?.input?.[1] || []);
+      return items;
+    }
+  getLayoutFlexClass: | #js
+    function(layout) {
+      layout = (layout || {});
+      let cls = [];
+      const direction = (layout.direction || "vertical");
+      if (direction == "horizontal") cls.push("flex-row");
+      if (direction == "vertical") cls.push("flex-column");
+      if (layout.order == "reversed") cls.push("reverse");
+      cls = [cls.join("-")].filter(s => s);
+      if (cls.length) {
+        cls.push("flex");
+        cls.push("flex-wrap");
+      }
+      return cls.join(" ");
+    }
+  refresh: | #js
+    function() {
+      this.isDirty = true;
+    }
+  _refresh: | #js
+    function() {
+      if (!this.___refresh) this.___refresh = this.__refresh.throttle(this, 10);
+      this.___refresh();
+    }
+  __refresh: | #js
+    async function() {
+      this.isDirty = false;
+      this.iteratorBox = this.getIteratorBox(this.box);
+      this.items = this.getItems();
+      this.layout = this.box.layout;
+    }
+watch:
+  isDirty:
+    handler: | #js
+      function(isDirty) {
+        if (isDirty) this._refresh();
+      }
+  items:
+    handler: | #js
+      function(items) {
+        if (items) this.lastNNItems = items;
+      }
+  hoveredItem:
+    handler: | #js
+      function(hoveredItem) {
+        this.$emit("box-event", "hovered-item", hoveredItem);
+        const gridUiBoxVue = this.$root.vm.getAncestors(this, "grid.ui.box")[0];
+        const hoveredItemSocket = this.box.sockets.output.find(s => s.name == "hovered item");
+        //gridUiBoxVue.$femit("socket.value.change", this.box._id, "output", hoveredItemSocket._id, hoveredItem);
+      }
+  selectedItem:
+    handler: | #js
+      function(selectedItem) {
+        const gridUiBoxVue = this.$root.vm.getAncestors(this, "grid.ui.box")[0];
+        const selectedItemSocket = this.box.sockets.output.find(s => s.name == "selected item");
+        gridUiBoxVue.$femit("socket.value.change", this.box._id, "output", selectedItemSocket._id, selectedItem);
+      }
+computed:
+  itemsClass: | #js
+    function() {
+      const cls = {};
+      if (!this.items) cls.grayscale = true;
+      const layout = (this.layout || {});
+      cls[this.getLayoutFlexClass(layout)] = true;
+      if (layout.justify) cls[`justify-${layout.justify}`] = true;
+      return cls;
+    }
+  itemStyle: | #js
+    function() {
+      const style = {};
+      const layout = (this.layout || {});
+      if (layout.size?.width) {
+        style["flex-basis"] = layout.size.width;
+        style["overflow-x"] = "hidden";
+      }
+      return style;
+    }
+  visibleItems: | #js
+    function() {
+      return (this.items || this.lastNNItems);
+    }
+style:
+  .item:
+    width: 100%
+    border: '1px dashed #ffffff60'
+    transition: 0.3s
+  .item:hover:
+    background-color: '#ffffff20'
+    transition: 0s
+  .item-value:
+    max-height: 3.5em
+    overflow: hidden
+_:
+  examples:
+    count: 0
+name: grid-ui-box-view-items
+template: >-
+  <grid-module class="comp-grid-ui-box-view-items" ref="module1" icon="⬜"
+  :show-title="false" path="2102270252."><div path="2102270252.0"><div
+  v-if="!visibleItems" path="2102270252.0.0"><div class="flex justify-center"
+  path="2102270252.0.0.0"><ui-title icon="❗" text="connect items data socket"
+  path="2102270252.0.0.0.0"></ui-title></div></div><div :class="itemsClass"
+  path="2102270252.0.1"><div class="item" :style="itemStyle" v-for="(item,
+  index) in visibleItems?.take(100)" :key="getItemKey(item)"
+  @mouseenter="onItemHover(item)" @mouseleave="onItemHover(null)"
+  @click="onItemClick(item)" path="2102270252.0.1.0"><div v-if="!iteratorBox"
+  path="2102270252.0.1.0.0"><h3 path="2102270252.0.1.0.0.0"><ui-title
+  text="item" :number="getTempItemIndex(index)"
+  path="2102270252.0.1.0.0.0.0"></ui-title></h3><div class="item-value"
+  path="2102270252.0.1.0.0.1"><ui-value-preview :value="item"
+  path="2102270252.0.1.0.0.1.0"></ui-value-preview></div></div><component
+  v-if="iteratorBox" :is="getBoxCompName(iteratorBox)" :box="iteratorBox"
+  :data-bound-socket-data="getDataBoundSocketData(item)"
+  path="2102270252.0.1.0.1"></component></div></div></div></grid-module>

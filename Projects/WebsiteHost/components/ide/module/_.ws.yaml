@@ -1,0 +1,128 @@
+dom:
+  div: 
+    transition: 
+      name: slide-hor
+      div: 
+        v-if: module
+        ':key': module.name
+        h2:
+          ':key': module.name
+          ui.title: 
+            icon: 📦
+            ':text': module.name
+        .flex.gap-2:
+          ui.select:
+            ':options': module.source.methods
+            item-icon: 🔴
+            ':get-item-text': (m) => m.name
+            input-type: value
+            v-model: selectedMethod
+          transition: 
+            name: slide-hor
+            div: 
+              v-if: selectedMethod
+              ':key': selectedMethod.name
+              ide.module.method.args:
+                ':method': selectedMethod
+                v-model: methodArgs
+              ui.button:
+                icon: ▶
+                ':text': selectedMethod.name
+                ':click': () => invokeMethod(selectedMethod)
+              ide.module.method:
+                ':method': selectedMethod
+          div: 
+            v-if: moduleInstance
+            ':key': key1
+            ide.module.data:
+              ':module-instance': moduleInstance
+            ui.action.stack:
+              ':action-stack': moduleInstance._actionStack
+              v-slot: slotProps
+              template:
+                ide.module.action:
+                  ':action': slotProps.action
+          div: 
+            h3:
+              ui.title: 
+                icon: 📜
+                text: Log
+            ui.value.array:
+              ':value': logItems
+              ':reverse': 'true'
+props:
+  module: null
+data:
+  selectedMethod: null
+  methodArgs: []
+  moduleInstance: null
+  logItems: []
+  key1: 1
+methods:
+  invokeMethod: | #js
+    async function(method) {
+      const moduleInstance = this.moduleInstance;
+      if (!moduleInstance) return;
+      const args = this.getMethodArgs(method);
+      const result = await moduleInstance[method.name](...args);
+      this.logItems.add({ method: method.name, args, result });
+      this.refresh();
+    }
+  getNewModuleInstance: | #js
+    async function(module) {
+      const moduleClass = eval(module.name);
+      const instance = await moduleClass._new();
+      return instance;
+    }
+  getMethodArgs: | #js
+    function(method) {
+      const args = method.args
+        .map(argName => this.methodArgs[argName]);
+      return Objects.clone(args);
+    }
+  refresh: | #js
+    async function() {
+      await this.$nextTick();
+      this.key1++;
+    }
+watch:
+  module:
+    handler: | #js
+      async function() {
+        this.selectedMethod = null;
+        this.moduleInstance = (!this.module) ? null :
+          (await this.getNewModuleInstance(this.module));
+      }
+    immediate: true
+_:
+  examples:
+    count: 0
+name: ide-module
+template: >-
+  <div class="comp-ide-module" path="1515962928."><transition name="slide-hor"
+  path="1515962928.0"><div v-if="module" :key="module.name"
+  path="1515962928.0.0"><h2 :key="module.name" path="1515962928.0.0.0"><ui-title
+  icon="📦" :text="module.name" path="1515962928.0.0.0.0"></ui-title></h2><div
+  class="flex gap-2" path="1515962928.0.0.1"><ui-select
+  :options="module.source.methods" item-icon="🔴" :get-item-text="(m) =&gt;
+  m.name" input-type="value" v-model="selectedMethod"
+  path="1515962928.0.0.1.0"></ui-select><transition name="slide-hor"
+  path="1515962928.0.0.1.1"><div v-if="selectedMethod"
+  :key="selectedMethod.name" path="1515962928.0.0.1.1.0"><ide-module-method-args
+  :method="selectedMethod" v-model="methodArgs"
+  path="1515962928.0.0.1.1.0.0"></ide-module-method-args><ui-button icon="▶"
+  :text="selectedMethod.name" :click="() =&gt; invokeMethod(selectedMethod)"
+  path="1515962928.0.0.1.1.0.1"></ui-button><ide-module-method
+  :method="selectedMethod"
+  path="1515962928.0.0.1.1.0.2"></ide-module-method></div></transition><div
+  v-if="moduleInstance" :key="key1" path="1515962928.0.0.1.2"><ide-module-data
+  :module-instance="moduleInstance"
+  path="1515962928.0.0.1.2.0"></ide-module-data><ui-action-stack
+  :action-stack="moduleInstance._actionStack" v-slot="slotProps"
+  path="1515962928.0.0.1.2.1"><template
+  path="1515962928.0.0.1.2.1.0"><ide-module-action :action="slotProps.action"
+  path="1515962928.0.0.1.2.1.0.0"></ide-module-action></template></ui-action-stack></div><div
+  path="1515962928.0.0.1.3"><h3 path="1515962928.0.0.1.3.0"><ui-title icon="📜"
+  text="Log" path="1515962928.0.0.1.3.0.0"></ui-title></h3><ui-value-array
+  :value="logItems" :reverse="true"
+  path="1515962928.0.0.1.3.1"></ui-value-array></div></div></div></transition></div>

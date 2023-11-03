@@ -1,0 +1,35 @@
+dom:
+  div:
+    grid.data.variable.view: 
+      ':fuid': userID+'/user/actions/pointer'
+      v-model: userActionsPointer
+    grid.data.variable.view: 
+      ':fuid': userID+'/user/actions/next/id'
+    grid.data.variable.view: 
+      ':fuid': userID+'/user/actions/next/action/id'
+    grid.data.list.view:
+      ':fuid': userID+'/user/actions'
+      v-model: userActions
+      ':item-props': '{ userActionsPointer }'
+      ':reverse': true
+props:
+  userID: null
+data:
+  userActions: []
+  userActionsPointer: null
+watch: null
+_:
+  examples:
+    count: 0
+name: grid-client-vars
+template: >-
+  <div class="comp-grid-client-vars" path="-378825785."><grid-data-variable-view
+  :fuid="userID+'/user/actions/pointer'" v-model="userActionsPointer"
+  path="-378825785.0"></grid-data-variable-view><grid-data-variable-view
+  :fuid="userID+'/user/actions/next/id'"
+  path="-378825785.1"></grid-data-variable-view><grid-data-variable-view
+  :fuid="userID+'/user/actions/next/action/id'"
+  path="-378825785.2"></grid-data-variable-view><grid-data-list-view
+  :fuid="userID+'/user/actions'" v-model="userActions" :item-props="{
+  userActionsPointer }" :reverse="true"
+  path="-378825785.3"></grid-data-list-view></div>

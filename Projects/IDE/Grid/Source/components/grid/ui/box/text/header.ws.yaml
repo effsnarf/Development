@@ -1,0 +1,53 @@
+dom:
+  .flex:
+    .clickable:
+      v-text: '''🆎'''
+      @click: $emit('title-icon-click')
+    div:
+      v-text: getDataTypeIcon(dataValue)
+props:
+  box: null
+data:
+  dataValue: null
+methods:
+  init: | #js
+    function(box) {
+      this.dataValue = box.value;
+    }
+  grid_client_runtime_socket_value_change: | #js
+    function(boxID, sDirection, sID, sValue) {
+      if (boxID != this.box._id) return;
+      if (sDirection != "input") return;
+      if (sID != 1) return;
+      this.dataValue = sValue;
+    }
+  getDataTypeIcon: | #js
+    function(value) {
+      const icons = [];
+      
+      if (typeof value === "string") {
+        const isUrl = value.startsWith("http");
+        if (isUrl) icons.add("🔗");
+      }
+
+      return icons
+        .filter((icon) => icon)
+        .join("");
+    }
+computed: null
+watch:
+  box:
+    handler: | #js
+      async function(box) {
+        this.init(box);
+      }
+    immediate: true
+_:
+  examples:
+    count: 0
+name: grid-ui-box-text-header
+template: >-
+  <div class="comp-grid-ui-box-text-header flex" path="-127112423."><div
+  class="clickable" v-text="'🆎'" @click="$emit('title-icon-click')"
+  path="-127112423.0"></div><div v-text="getDataTypeIcon(dataValue)"
+  path="-127112423.1"></div></div>

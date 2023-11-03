@@ -76,6 +76,8 @@ class Files {
   }
 
   static getFiles(folder: string, options?: { recursive?: boolean }) {
+    // If folder doesn't exist, return empty array
+    if (!fs.existsSync(folder)) return [];
     const { recursive = true } = options || {};
     const files: string[] = [];
     Files.traverseDirectory(

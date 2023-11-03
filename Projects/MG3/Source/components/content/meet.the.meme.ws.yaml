@@ -47,6 +47,9 @@ style:
     display: grid
     grid-template: 1fr / 1fr 3fr
     gap: 1em
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-content-meet-the-meme" path="-1242656353."><h2 v-text="'Meet
   the Meme'" path="-1242656353.0"></h2><transition name="slide"

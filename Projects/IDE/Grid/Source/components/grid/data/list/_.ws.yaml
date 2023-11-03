@@ -1,0 +1,115 @@
+dom:
+  grid.module:
+    icon: 🧊📃
+    ':title': fuid
+    grid.data.list.view:
+      v-show: 'false'
+      ':fuid': fuid
+      @input: (value) => $emit('input', value)
+props:
+  fuid: null
+data:
+  items: []
+mounted: | #js
+  function() {
+    this.load();
+  }
+methods:
+  add: | #js
+    async function(item) {
+      this.items.add(item);
+      this.onChange();
+      await this.$nextTick();
+      this.$femit("added", this.fuid, [item]);
+    }
+  update: | #js
+    async function(itemIDs, datas) {
+      if (!Array.isArray(itemIDs)) itemIDs = [itemIDs];
+      if (!Array.isArray(datas)) datas = [datas];
+      while (datas.length < itemIDs.length) datas.push(datas.last());
+      const updateItem = (itemID, data) => {
+        let item = this.items.find(item => (item._id == itemID));
+        const itemIndex = this.items.findIndex(item => (item._id == itemID));
+        const newItem = Objects.deepMerge(item, data);
+        const hasChanged = !Objects.areEqual(item, newItem);
+        this.items[itemIndex] = newItem;
+        return hasChanged;
+      };
+      const updatedItems = [];
+      for (let i = 0; i < itemIDs.length; i++)
+      {
+        const dataIndex = (i % datas.length)
+        const hasChanged = updateItem(itemIDs[i], datas[dataIndex]);
+        if (!hasChanged) continue;
+        const item = this.items.find(item => (item._id == itemIDs[i]));
+        updatedItems.push(item);
+      }
+      if (!updatedItems.length) return;
+      this.onChange();
+      await this.$nextTick();
+      this.$femit("updated", this.fuid, updatedItems, datas);
+    }
+  delete: | #js
+    async function(itemIDs) {
+      if (!Array.isArray(itemIDs)) itemIDs = [itemIDs];
+      const deletedItems = this.items.filter(item => itemIDs.includes(item._id));
+      for (const itemID of itemIDs)
+      {
+        this.items.removeByField("_id", itemID);
+      }
+      this.onChange();
+      await this.$nextTick();
+      this.$femit("deleted", this.fuid, deletedItems);
+    }
+  clear: | #js
+    function() {
+      this.items.clear();
+      this.onChange();
+    }
+  onChange: | #js
+    function() {
+      this.updateGlobalVariable();
+      this.$femit("change", { fuid: this.fuid, items: this.items });
+      this.save();
+    }
+  save: | #js
+    function() {
+      if (!this.isPersisted) return;
+      localStorage.setItem(this.fuid, JSON.stringify(this.items));
+    }
+  load: | #js
+    function() {
+      if (!this.isPersisted) return;
+      this.items = JSON.parse(localStorage.getItem(this.fuid) || "[]");
+      this.onChange();
+    }
+  updateGlobalVariable: | #js
+    function() {
+      const items = this.items;
+      if (this.fuid.includes("/data/")) {
+        const varName = `$${this.fuid.split("/").last()}`;
+        this[varName].clear();
+        this[varName].push(...items);
+      }
+    }
+computed:
+  isPersisted: | #js
+    function() {
+      if (["/user/actions", "/data/boxes", "/data/links"].some(s => this.fuid.includes(s))) return true;
+      return false;
+    }
+watch:
+  items:
+    handler: | #js
+      function(items) {
+        this.updateGlobalVariable(items);
+      }
+_:
+  examples:
+    count: 0
+name: grid-data-list
+template: >-
+  <grid-module class="comp-grid-data-list" icon="🧊📃" :title="fuid"
+  path="882586554."><grid-data-list-view v-show="false" :fuid="fuid"
+  @input="(value) =&gt; $emit('input', value)"
+  path="882586554.0"></grid-data-list-view></grid-module>

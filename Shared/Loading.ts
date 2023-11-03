@@ -19,6 +19,7 @@ class Loading {
   }
 
   start(info?: string): void {
+    if (info) this.info = info;
     this.startTime = Date.now();
     this.isRunning = true;
     this.showInfo();
@@ -26,6 +27,7 @@ class Loading {
 
   stop(info?: string) {
     if (!this.isRunning) return;
+    info = info || this.info;
     this._lastElapsed = Date.now() - this.startTime!;
     this.isRunning = false;
     this.startTime = null;
@@ -39,7 +41,9 @@ class Loading {
     const elapsedTime = Date.now() - this.startTime!;
     process.stdout.write(`\r`);
     process.stdout.write(
-      `${elapsedTime.unitifyTime()} ${(this.info || "").gray}`
+      `${elapsedTime.unitifyTime()} ${
+        (this.info || "").toSingleLine().shorten(100).gray
+      }`
     );
     if (this.isRunning) {
       setTimeout(this.showInfo.bind(this), 100);

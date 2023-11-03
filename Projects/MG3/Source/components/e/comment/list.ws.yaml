@@ -27,6 +27,9 @@ style:
   ul:
     gap: 3px
 name: e-comment-list
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-e-comment-list" path="616682934."><h3 v-text="comments.length
   + ' comments'" path="616682934.0"></h3><ui-list :items="topComments"

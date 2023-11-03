@@ -24,6 +24,9 @@ style:
     text-shadow: '-6px 6px 3px #000'
     opacity: 1
 name: site-logo
+_:
+  examples:
+    count: 0
 template: >-
   <ui-link class="comp-site-logo" url="/" path="-578776078."><div
   path="-578776078.0"><div class="meme" v-text="'meme'"

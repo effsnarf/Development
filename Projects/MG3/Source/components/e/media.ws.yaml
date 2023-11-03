@@ -112,6 +112,9 @@ watch:
     immediate: true
 style: null
 name: e-media
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-e-media" v-if="cMedia" :style="mediaStyle"
   path="864271643."><div class="flex flex-column gap-1" path="864271643.0"><div

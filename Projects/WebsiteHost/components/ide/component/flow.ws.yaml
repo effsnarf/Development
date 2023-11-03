@@ -1,0 +1,100 @@
+dom:
+  div:
+    h3:
+      v-text: '''Data flow'''
+    ui.tree:
+      ':root': dataFlow
+      item-type: ide.component.grid.tree.node
+      ':initial-expanded': '2'
+props:
+  uid: null
+data:
+  vue: null
+  maxDataFlowDepth: 5
+methods:
+  getDataFlow: | #js
+    function(vue) {
+      const dataFlow = { children: [] };
+      datagrid.children.push(...this.getDfProps(vue));
+      return dataFlow;
+    }
+  getDfProps: | #js
+    function(vue, depth = 0) {
+      const props = [];
+      if (depth > this.maxDataFlowDepth) return props;
+      for (const propKey of this.getDfPropKeys(vue)) {
+        props.push({
+          item: {
+            id: this.$root.getUniqueClientID(),
+            type: "propKey",
+            name: {
+              icon: "🔗",
+              text: propKey
+            },
+          },
+          children: this.getDfComps(vue, propKey, (depth + 1)),
+        });
+      }
+      return props;
+    }
+  getDfComps: | #js
+    function(vue, propKey, depth = 0) {
+      const comps = [];
+      if (depth > this.maxDataFlowDepth) return comps;
+      for (const childVue of this.getChildVuesByPropKey(vue, propKey)) {
+        comps.push({
+          item: {
+            id: this.$root.getUniqueClientID(),
+            type: "vue",
+            name: {
+              icon: "📦",
+              text: childVue.$options._componentTag
+            },
+          },
+          children: this.getDfProps(childVue, depth + 1)
+        });
+      }
+      return comps;
+    }
+  getChildVuesByPropKey: | #js
+    function(vue, propKey) {
+      const childVues = [];
+      for (const childComp of vue.$children) {
+        if (childComp.$options._propKeys.includes(propKey)) {
+          childVues.push(childComp);
+        }
+      }
+      return childVues;
+    }
+  getDfPropKeys: | #js
+    function(vue) {
+      let propKeys = [];
+      for (const childComp of vue.$children) {
+        propKeys.push(...childComp.$options._propKeys);
+      }
+      propKeys = propKeys.distinct();
+      propKeys = propKeys.sort();
+      return propKeys;
+    }
+computed:
+  dataFlow: | #js
+    function() {
+      if (!this.vue) return null;
+      return this.getDataFlow(this.vue());
+    }
+watch:
+  uid:
+    handler: | #js
+      function(uid) {
+        this.vue = !uid ? null : this.$root.vm.vues[uid];
+      }
+    immediate: true
+name: ide-component-flow
+_:
+  examples:
+    count: 0
+template: >-
+  <div class="comp-ide-component-flow" path="-1793143997."><h3 v-text="'Data
+  flow'" path="-1793143997.0"></h3><ui-tree :root="dataFlow"
+  item-type="ide.component.grid.tree.node" :initial-expanded="2"
+  path="-1793143997.1"></ui-tree></div>

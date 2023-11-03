@@ -1,0 +1,52 @@
+dom:
+  .opacity-20:
+    v-text: timeAgo(value)
+props:
+  value: null
+style:
+  .comp-ui-time:
+    text-shadow: '-2px 2px 1px #000000'
+methods:
+  timeAgo: | #js
+
+    function (dt) {
+      dt = new Date(dt);
+      const now = new Date();
+      const seconds = Math.round(Math.abs((now - dt) / 1000));
+      const minutes = Math.round(Math.abs(seconds / 60));
+      const hours = Math.round(Math.abs(minutes / 60));
+      const days = Math.round(Math.abs(hours / 24));
+      if (Number.isNaN(seconds)) {
+        return '';
+      }
+      if (seconds <= 45) {
+        return 'a few seconds ago';
+      }
+      if (seconds <= 90) {
+        return 'a minute ago';
+      }
+      if (minutes < 60) {
+        return minutes + " minutes ago";
+      }
+      if (hours < 24) {
+        return hours + " hours ago";
+      }
+      return '';
+      if (days < 7) {
+        return days + " days ago";
+      }
+      if (days < 30) {
+        return Math.round(days / 7) + " weeks ago";
+      }
+      if (days < 365) {
+        return Math.round(days / 30) + " months ago";
+      }
+      return Math.round(days / 365) + " years ago";
+    }
+name: ui-time
+_:
+  examples:
+    count: 0
+template: >-
+  <div class="comp-ui-time opacity-20" v-text="timeAgo(value)"
+  path="-484148761."></div>

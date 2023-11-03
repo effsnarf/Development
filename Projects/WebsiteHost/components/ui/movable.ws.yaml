@@ -1,0 +1,96 @@
+dom:
+  .movable:
+    ':class': '{ enabled: enabled }'
+    @mousedown: onMouseDown
+    @mousemove: onMouseMove
+    @mouseup: onMouseUp
+    @mouseout: onMouseUp
+    slot: null
+props:
+  value: null
+  enabled: true
+data:
+  isDragging: false
+  dragStart: null
+  dragStartPos: null
+mounted: | #js
+  function() {
+  }
+methods:
+  onMouseDown: | #js
+    function(e) {
+      if (!this.enabled) return;
+      if (e.button !== 0) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+
+      this.isDragging = true;
+      this.dragStart = { x: e.clientX, y: e.clientY };
+    }
+  onMouseMove: | #js
+    function(e) {
+      if (!this.enabled) return;
+      if (!this.isDragging) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+
+      const dx = e.clientX - this.dragStart.x;
+      const dy = e.clientY - this.dragStart.y;
+
+      const normalizedDrag = {
+        dx: dx / this.$el.parentElement.offsetWidth,
+        dy: dy / this.$el.parentElement.offsetHeight
+      };
+      
+      const normalizedScale = -(dy / this.$el.parentElement.offsetHeight) * 2;
+
+      if (this.value)
+      {
+        const trans = JSON.parse(JSON.stringify(this.value));
+        if (e.ctrlKey)
+        {
+          trans.scale += normalizedScale;
+        }
+        else
+        {
+          const pos = trans.pos;
+          pos.x += normalizedDrag.dx;
+          pos.y += normalizedDrag.dy;
+        }
+        this.$emit('input', trans);
+      }
+
+      if (e.ctrlKey)
+      {
+        this.$emit("scale-by", normalizedScale);
+      }
+      else
+      {
+        this.$emit("drag-by", normalizedDrag);
+      }
+
+      this.dragStart = { x: e.clientX, y: e.clientY };
+    }
+  onMouseUp: | #js
+    function(e) {
+      if (!this.enabled) return;
+      e.preventDefault();
+      e.stopPropagation();
+
+      this.isDragging = false;
+    }
+style:
+  .movable.enabled:
+    cursor: move
+  .movable:
+    user-select: none
+name: ui-movable
+_:
+  examples:
+    count: 0
+template: >-
+  <div class="comp-ui-movable movable" :class="{ enabled: enabled }"
+  @mousedown="onMouseDown" @mousemove="onMouseMove" @mouseup="onMouseUp"
+  @mouseout="onMouseUp" path="1781914900."><slot></slot></div>

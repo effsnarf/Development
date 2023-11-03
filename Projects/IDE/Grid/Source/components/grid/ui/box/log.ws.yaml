@@ -1,0 +1,28 @@
+dom:
+  div:
+    h2:
+      v-text: '''Box log'''
+    table:
+      tr:
+        v-for: item in $root.boxLogs[box._id]
+        td: 
+          v-text: item.methodName
+        td: 
+          v-text: item.args?.join(', ')
+        td: 
+          ui.value:
+            ':value': item.returnValue
+props:
+  box: null
+_:
+  examples:
+    count: 0
+name: grid-ui-box-log
+template: >-
+  <div class="comp-grid-ui-box-log" path="1989960431."><h2 v-text="'Box log'"
+  path="1989960431.0"></h2><table path="1989960431.1"><tr v-for="item in
+  $root.boxLogs[box._id]" path="1989960431.1.0"><td v-text="item.methodName"
+  path="1989960431.1.0.0"></td><td v-text="item.args?.join(', ')"
+  path="1989960431.1.0.1"></td><td path="1989960431.1.0.2"><ui-value
+  :value="item.returnValue"
+  path="1989960431.1.0.2.0"></ui-value></td></tr></table></div>

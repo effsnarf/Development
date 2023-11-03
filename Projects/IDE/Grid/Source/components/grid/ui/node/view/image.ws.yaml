@@ -1,0 +1,64 @@
+dom:
+  grid.module:
+    ':box': box
+    ':node': node
+    ':data-bound-socket-data': dataBoundSocketData
+    img:
+      ':class': '{ loaded: isLoaded }'
+      ':style': '{ width: ''10em'' }'
+      ':src': imageSrc
+      @load: onImageLoad
+      @error: onImageLoad
+props:
+  box: null
+  node: null
+  dataBoundSocketData: null
+data:
+  nodeItem: null
+  isLoaded: false
+  placeholderUrl: /images/image-placeholder.png
+methods:
+  onImageLoad: | #js
+    function() {
+      this.isLoaded = true;
+    }
+  getImageSrc: | #js
+    function() {
+      if (typeof this.nodeItem == "string") {
+        if (!this.nodeItem) return this.placeholderUrl;
+        return this.nodeItem;
+      }
+      return this.placeholderUrl;
+    }
+computed:
+  imageSrc: | #js
+    function() {
+      return this.getImageSrc();
+    }
+watch:
+  imageSrc:
+    handler: | #js
+      function() {
+        this.isLoaded = false;
+      }
+    immediate: true
+style:
+  img:
+    width: 100%
+    height: 100%
+    object-fit: cover
+    background-image: url(/images/loading.png)
+    background-size: cover
+    background-repeat: no-repeat
+    background-position: center
+  img.loaded:
+    background-image: none
+_:
+  examples:
+    count: 0
+name: grid-ui-node-view-image
+template: >-
+  <grid-module class="comp-grid-ui-node-view-image" :box="box" :node="node"
+  :data-bound-socket-data="dataBoundSocketData" path="-1565358964."><img
+  :class="{ loaded: isLoaded }" :style="{ width: '10em' }" :src="imageSrc"
+  @load="onImageLoad" @error="onImageLoad" path="-1565358964.0"/></grid-module>

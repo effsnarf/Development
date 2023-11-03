@@ -19,6 +19,9 @@ style:
   .columns1 > div:nth-child(1):
     width: 30%
 name: page-admin-medias
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-page-admin-medias" path="-1396420211."><h2 v-text="'New
   Medias'" path="-1396420211.0"></h2><div path="-1396420211.1"><div

@@ -1,0 +1,487 @@
+dom:
+  grid.module:
+    icon: 🏃‍♂️
+    ui.linq.evaluator:
+      ref: evaluator1
+    .console1:
+      ':style': '{ position: ''fixed'', right: 0, bottom: 0, ''max-height'': ''60vh'' }'
+      ref: console1el
+      ui.console:
+        ref: console1
+props:
+  userID: null
+data:
+  socket:
+    runtime:
+      data: {}
+  is:
+    startuped: false
+mounted: | #js
+  async function() {
+    this.$root.socket = this.socket;
+    await this.$nextTick();
+    this.bindToLog();
+    this.startup();
+  }
+methods:
+  bindToLog: | #js
+    function() {
+      Reflection.bindClassMethods(this, this.beforeMethod.bind(this), this.afterMethod.bind(this), false, true);
+      document.body.appendChild(this.$refs.console1el);
+    }
+  beforeMethod: | #js
+    function(className, methodName, args) {
+    }
+  afterMethod: | #js
+    function(beforeResult, className, methodName, args, returnValue) {
+      if (!methodName.includes("_")) return;
+      this.$refs.console1.log(methodName, { args, returnValue });
+      const comp = vueApp.comps.find(c => (c.name == "grid.client.runtime"));
+      const method = comp.source.methods[methodName];
+      const argNames = Reflection.getFunctionArgs(method);
+      const arg0 = argNames[0];
+      const boxID = false ? null :
+        (arg0 == "boxID") ? args[0] :
+        (arg0 == "box") ? args[0]._id :
+        null;
+      if (!boxID) return;
+      const boxLog = (this.$root.boxLogs[boxID] || (this.$root.boxLogs[boxID] = []));
+      boxLog.push({ methodName, args, returnValue });
+    }
+  startup: | #js
+    function() {
+      if (this.is.startuped) return;
+      this.is.startuped = true;
+      const executableTypes = Object.keys(this)
+        .filter((key) => key.startsWith("grid_ui_box_execute_"))
+        .map((key) => key.replace("grid_ui_box_execute_", ""));
+      const boxes = this.$boxes.filter((box) => executableTypes.includes(box.type));
+      for (const box of boxes) {
+        this.grid_ui_box_execute(box._id);
+      }
+    }
+  grid_user_action_stack_new_box_created: | #js
+    function(box) {
+      // Clear the runtime data for the new box
+      // Because when we're undoing and redoing, the old data remains
+      delete this.socket.runtime.data[box._id];
+    }
+  grid_data_list_added: | #js
+    function(fuid, links) {
+      if (!fuid.endsWith("/data/links")) return;
+
+      for (const link of links) {
+        this.repropagateSocketLinks(link.from.box._id);
+      }
+    }
+  grid_data_list_updated: | #js
+    function(fuid, items) {
+      if (fuid.endsWith("/data/links")) {
+        const links = items;
+        for (const link of links) {
+          this.onLinkUpdated(link);
+        }
+      }
+    }
+  grid_data_list_deleted: | #js
+    function(fuid, links) {
+      if (!fuid.endsWith("/data/links")) return;
+
+      for (const link of links) {
+        this.clearSocketValue(link.to, "input");
+      }
+    }
+  onBoxUpdated: | #js
+    function(box, data) {
+      this.grid_ui_box_execute(box._id);
+    }
+  onLinkUpdated: | #js
+    function(link) {
+      this.repropagateSocketLinks(link.from.box._id);
+    }
+  grid_ui_box_execute: | #js
+    function(boxID) {
+      const box = this.getBox(boxID);
+      if (!box.type) return;
+      const methodName = `grid_ui_box_execute_${box.type.replace(/\./g, "_")}`;
+      const method = this[methodName];
+      if (!method) return;
+      method.call(this, boxID);
+    }
+  grid_ui_box_socket_value_change: | #js
+    function(boxID, socketDirection, sID, socketValue) {
+      this.setSocketValue(boxID, socketDirection, sID, socketValue);
+    }
+  grid_ui_box_execute_group: | #js
+    function(groupBoxID) {
+      const groupBox = this.getBox(groupBoxID);
+      const displayBox = this.getBox(groupBox.displayBoxID);
+      this.grid_ui_box_execute(displayBox._id);
+    }
+  grid_ui_box_execute_text: | #js
+    function(boxID) {
+      const box = this.getBox(boxID);
+      this.setSocketValue(boxID, "output", 1, box.value);
+    }
+  grid_ui_box_execute_func: | #js
+    function(boxID) {
+      this.processBoxChange_func(this.getBox(boxID));
+    }
+  grid_ui_box_execute_data: | #js
+    function(boxID) {
+      const box = this.getBox(boxID);
+      this.processBoxChange_data(box);
+    }
+  grid_client_runtime_box_is_loading: | #js
+    function(boxID, isLoading) {
+      const box = this.getBox(boxID);
+      if (box.groupBoxID) this.$femit("box.is.loading", box.groupBoxID, isLoading);
+    }
+  grid_client_runtime_link_is_loading: | #js
+    function(linkID, isLoading) {
+      const link = this.$links.find(link => link._id == linkID);
+      if (!link) return;
+      if (link.groupBoxID) this.$femit("box.is.loading", link.groupBoxID, isLoading);
+    }
+  setSocketValue: | #js
+    function(boxID, sDirection, sID, sValue) {
+      this.ensure(boxID);
+      const box = this.getBox(boxID);
+      const oldValue = this.getSocketRuntimeValue(boxID, sDirection, sID);
+      this.socket.runtime.data
+        [boxID]
+        [sDirection]
+        [sID] =
+          sValue;
+      this.onSocketValueChange(boxID, sDirection, sID, sValue);
+    }
+  onSocketValueChange: | #js
+    function(boxID, sDirection, sID, sValue) {
+      const box = this.getBox(boxID);
+      if (!box) return;
+      const socket = box.sockets[sDirection].find(socket => socket._id == sID);
+      const logItem = this.$runtime.log.start(`🧊`, [box.name, `socket`, socket.name], { boxID, sDirection, sID, sValue });
+      try
+      {
+        this.$femit("socket.value.change", boxID, sDirection, sID, sValue);
+        this.triggerSocket(boxID, sDirection, sID, sValue);
+        this.propagateSocketLinks(boxID, sDirection, sID);
+        if (sDirection == "input") this.propagateGroupSockets(boxID, sID, sValue);
+        if (sDirection == "output") this.propagateGroupMemberSockets(boxID, sID, sValue);
+      }
+      finally
+      {
+        this.$runtime.log.stop(logItem);
+      }
+    }
+  triggerSocket: | #js
+    function(boxID, sDirection, sID) {
+      const sValue = this.getSocketRuntimeValue(boxID, sDirection, sID);
+      this.processBoxChange(boxID, sDirection, sID, sValue);
+    }
+  processBoxChange: | #js
+    async function(boxID, sDirection, sID, sValue) {
+      const box = this.getBox(boxID);
+      if (!box.type) return;
+
+      const methodName = `processBoxChange_${box.type.replace(/\./g, "_")}`;
+      const method = this[methodName];
+      if (!method) return;
+      method.call(this, box, sDirection, sID, sValue);
+    }
+  processBoxChange_data: | #js
+    function(box, sDirection, sID, sValue) {
+      if (sDirection == "output") return;
+      const boxContext = this.getBoxContext(box);
+      const inputValue = this.getSocketRuntimeValue(box._id, "input", 1);
+      const datas = this.$refs.evaluator1.evaluateOps(boxContext, inputValue, box.linq?.operations);
+      const outputValue = datas.last();
+      this.setSocketValue(box._id, "output", 1, outputValue);
+    }
+  processBoxChange_func: | #js
+    async function(box, sDirection, sID, sValue) {
+      if (sDirection != "input") return;
+      const result = await this.runFunc(box);
+      this.setSocketValue(box._id, "output", 1, result);
+      this.$femit("func.result.change", box._id, result);
+    }
+  processBoxChange_view_items: | #js
+    function(box, sDirection, sID, sValue) {
+      // To have an example item in the loop item box's data
+      // we're taking the first item from the view items
+      // and "propagating" it to the loop item box's data
+      // We're "propagating" either (input items[0]) or (selected item)
+      const exampleItem = this.getViewItemsExampleItem(box, sDirection, sID, sValue);
+      if (!exampleItem) return null;
+      const iteratorSocket = box.sockets.output.find(socket => (socket.type == "iterator"));
+      const iteratorLinks = this.getSocketLinks("from", box._id, "output", iteratorSocket._id);
+      for (const link of iteratorLinks) {
+        this.setSocketValue(link.to.box._id, "input", link.to.socket._id, exampleItem);
+      }
+    }
+  getViewItemsExampleItem: | #js
+    function(box, sDirection, sID, sValue) {
+      if ((sDirection == "input") && (sID == 1)) {
+        const items = sValue;
+        const item = items?.[0];
+        return item;
+      }
+      if (sDirection == "output")
+      {
+        const socket = box.sockets.output.find(socket => socket._id == sID);
+        if (socket.name == "selected item") {
+          const item = sValue;
+          return item;
+        }
+      }
+      return null;
+    }
+  repropagateSocketLinks: | #js
+    function(boxID) {
+      const box = this.getBox(boxID);
+      const links = this.$links
+        .filter((link) => (link.from.box._id === boxID))
+        .filter((link) => (link.from.socket.type == "data") || (link.from.socket.type == "iterator"));
+      for (const link of links) {
+        this.propagateSocketLinks(boxID, "output", link.from.socket._id);
+      }
+    }
+  clearSocketValue: | #js
+    function(socketRef, direction) {
+      this.setSocketValue(socketRef.box._id, direction, socketRef.socket._id, null);
+    }
+  propagateSocketLinks: | #js
+    function(boxID, sDirection, sID) {
+      if (sDirection != "output") return;
+
+      const box = this.getBox(boxID);
+
+      const sourceValue = this.getSocketRuntimeValue(boxID, sDirection, sID);
+
+      const links = this.$links
+        .filter((link) => link.from.box._id === boxID)
+        .filter((link) => link.from.socket._id == sID);
+
+      for (const link of links) {
+        this.propagateSocketLink(link, sourceValue);
+      }
+    }
+  propagateSocketLink: | #js
+    async function(link, sourceValue) {
+      const targetValue = await this.getLinkTargetValue(link, sourceValue);
+      this.$femit("link.flash", link._id, targetValue);
+      this.setSocketValue(link.to.box._id, "input", link.to.socket._id, targetValue);
+    }
+  getLinkTargetValue: | #js
+    async function(link, sourceValue) {
+      if (!link.func) return sourceValue;
+      const result = await this.runLinkFunc(link, link.func, [sourceValue]);
+      return result;
+    }
+  propagateGroupSockets: | #js
+    function(boxID, sID, sValue) {
+      // Input sockets on the group are propagated inward to the group members
+      const groupBox = this.getBox(boxID);
+      if (groupBox.type != "group") return;
+      const socket = groupBox.sockets.input.find(socket => socket._id == sID);
+      if (!socket) return;
+      if (!socket.imported) return;
+      // Find the related member socket
+      const memberBox = this.getBox(socket.imported.from.box._id);
+      const memberSocket = memberBox.sockets.input.find(s2 => s2._id == socket.imported?.from.socket._id);
+      if (!memberSocket) return;
+      // Set the value on the member socket
+      this.setSocketValue(memberBox._id, "input", memberSocket._id, sValue);
+    }
+  propagateGroupMemberSockets: | #js
+    function(boxID, sID) {
+      const sValue = this.getSocketRuntimeValue(boxID, "output", sID);
+      const memberBox = this.getBox(boxID);
+      if (!memberBox.groupBoxID) return;
+      const memberOutputSocket = memberBox.sockets.output.find(socket => socket._id == sID);
+      if (!memberOutputSocket.is.exported) return;
+      const groupBox = this.getBox(memberBox.groupBoxID);
+      const groupSocket = this.getImportedSocket(groupBox, boxID, "output", sID);
+      this.setSocketValue(groupBox._id, "output", groupSocket._id, sValue);
+    }
+  getImportedSocket: | #js
+    function(groupBox, boxID, sDirection, sID) {
+      const groupSocket = groupBox.sockets[sDirection].find(socket => this.isImportedSocket(socket, boxID, sID));
+      return groupSocket;
+    }
+  isImportedSocket: | #js
+    function(socket, boxID, sID) {
+      if (!socket.imported) return false;
+      if (socket.imported.from.box._id != boxID) return false;
+      if (socket.imported.from.socket._id != sID) return false;
+      return true;
+    }
+  runLinkFunc: | #js
+    async function(link, func, argValues) {
+      const box = this.getBox(link.from.box._id);
+      const logItem = this.$runtime.log.start(`🔴`, [box.name, `link`, link.func.name], { link, func, argValues });
+
+      try
+      {
+        this.$femit("link.error", link._id, null);
+        this.$femit("link.is.loading", link._id, 1);
+
+        if (argValues.some(value => (value == undefined))) return;
+
+        const argNames = (func.argNamesStr || "").split(",").map((argName) => argName.trim());
+
+        const result = (func.runs.on == "server")
+          ? await this.runFuncOnServer({}, argNames, argValues, func.code)
+          : await this.runFuncOnClient({}, argNames, argValues, func.code);
+
+        return result;
+      }
+      catch (ex)
+      {
+        const ideEx = {};
+        ideEx.message = ex.message;
+        ideEx.stack = ex.stack;
+        this.$femit("link.error", link._id, ideEx);
+        alertify.error(ex.message);
+      }
+      finally
+      {
+        this.$runtime.log.stop(logItem);
+        this.$femit("link.is.loading", link._id, -1);
+      }
+
+    }
+  runFunc: | #js
+    async function(box) {
+      try
+      {
+        this.$femit("box.error", box._id, null);
+        this.$femit("box.is.loading", box._id, 1);
+
+        const runtimeData = this.socket.runtime.data[box._id];
+
+        const argNames = box.argNames;
+        const argValues = Object.values(runtimeData?.input||{});
+
+        if (argValues.some(value => (value == undefined))) return;
+
+        const result = (box.runs.on == "server")
+          ? await this.runFuncOnServer(box, argNames, argValues, box.code)
+          : await this.runFuncOnClient(box, argNames, argValues, box.code);
+
+        return result;
+      }
+      catch (ex)
+      {
+        const ideEx = {};
+        ideEx.message = ex.message;
+        ideEx.stack = ex.stack;
+        this.$femit("box.error", box._id, ideEx);
+      }
+      finally
+      {
+        this.$femit("box.is.loading", box._id, -1);
+      }
+    }
+  runFuncOnServer: | #js
+    async function(box, argNames, argValues, code) {
+      try
+      {
+        const response = await fetch("/execute/code", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            argNames,
+            argValues,
+            code,
+          }),
+        });
+        const result = await response.json();
+        return result;
+      }
+      catch (ex)
+      {
+        const message = ex.message.split('\n')[0];
+        throw new Error(message);
+      }
+    }
+  runFuncOnClient: | #js
+    async function(box, argNames, argValues, code) {
+      if (code.startsWith("`")) {
+        code = `return ${code}`;
+      }
+      const func = eval(
+        `(async function(${argNames.join(", ")}) { ${code} })`
+      );
+
+      const result = await func(...argValues);
+
+      return result;
+    }
+  getBoxContext: | #js
+    function(box) {
+      const context = {};
+      return context;
+    }
+  getSocketRuntimeData: | #js
+    function(boxID) {
+      let runtimeData = this.socket.runtime.data[boxID];
+      if (!runtimeData) {
+        runtimeData = {
+          input: {},
+          output: {},
+        };
+        this.$set(this.socket.runtime.data, boxID, runtimeData);
+      }
+      return runtimeData;
+    }
+  getSocketRuntimeValue: | #js
+    function(boxID, sDirection, sID) {
+      const box = this.getBox(boxID);
+      if (!box) return null;
+      const socket = box.sockets[sDirection].find(socket => socket._id == sID);
+      // Iterator socket forwards (input[1])
+      if (socket.type == "iterator") {
+        const inputValue = this.getSocketRuntimeValue(boxID, "input", 1);
+        const exampleValue = this.getViewItemsExampleItem(box, "input", 1, inputValue);
+        return exampleValue;
+      }
+      const runtimeData = this.getSocketRuntimeData(boxID);
+      let value = runtimeData[sDirection][sID];
+      if (value && (box.type == "data"))
+      {
+        const inputValue = runtimeData.input[1];
+        if (box.exported?.fields?.length) value = value[box.exported.fields[0]];
+      }
+      return value;
+    }
+  getSocketLinks: | #js
+    function(socketDirection, boxID, sDirection, sID) {
+      const links = this.$links
+        .filter((link) => link[socketDirection].box._id === boxID)
+        .filter((link) => link[socketDirection].socket._id == sID);
+      return links;
+    }
+  getBox: | #js
+    function(boxID) {
+      // #TODO: Slow
+      return this.$boxes.find((box) => box._id === boxID);
+    }
+  ensure: | #js
+    function(boxID) {
+      this.getSocketRuntimeData(boxID);
+    }
+style: null
+_:
+  examples:
+    count: 0
+name: grid-client-runtime
+template: >-
+  <grid-module class="comp-grid-client-runtime" icon="🏃‍♂️"
+  path="-1405898659."><ui-linq-evaluator ref="evaluator1"
+  path="-1405898659.0"></ui-linq-evaluator><div class="console1" :style="{
+  position: 'fixed', right: 0, bottom: 0, 'max-height': '60vh' }"
+  ref="console1el" path="-1405898659.1"><ui-console ref="console1"
+  path="-1405898659.1.0"></ui-console></div></grid-module>

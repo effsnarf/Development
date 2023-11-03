@@ -1,0 +1,39 @@
+dom:
+  div:
+    v-if: operation
+    ui.value.field.picker:
+      ':obj': fieldsObj
+      v-model: operation.fields
+props:
+  input: null
+  value: null
+data:
+  operation: null
+methods: null
+computed:
+  fieldsObj: | #js
+    function() {
+      if (Array.isArray(this.input)) return this.input[0];
+      return this.input;
+    }
+watch:
+  operation:
+    handler: | #js
+      function(operation) {
+        this.$emit("input", operation);
+      }
+    deep: true
+  value:
+    handler: | #js
+      function(value) {
+        this.operation = value;
+      }
+    immediate: true
+_:
+  examples:
+    count: 0
+name: ui-linq-ops-select-fields
+template: >-
+  <div class="comp-ui-linq-ops-select-fields" v-if="operation"
+  path="1122733019."><ui-value-field-picker :obj="fieldsObj"
+  v-model="operation.fields" path="1122733019.0"></ui-value-field-picker></div>

@@ -1,0 +1,39 @@
+dom:
+  .flex:
+    class: hoverable
+    @click: $emit('input', !value)
+    .icon:
+      v-text: expandIcon
+    ui.title:
+      ':icon': icon
+      ':text': text
+      ':number': number
+props:
+  value: null
+  icon: null
+  text: null
+  number: null
+watch: null
+computed:
+  expandIcon: | #js
+    function() {
+      return !this.value ? '➕' : '➖';
+    }
+style:
+  .flex:hover:
+    background-color: '#ffffff20'
+  .flex > *:
+    cursor: pointer
+  .icon:
+    margin-right: 0.3rem
+  label:
+    flex-grow: 1
+name: ui-expand
+_:
+  examples:
+    count: 0
+template: >-
+  <div class="comp-ui-expand hoverable flex" @click="$emit('input', !value)"
+  path="-1825986764."><div class="icon" v-text="expandIcon"
+  path="-1825986764.0"></div><ui-title :icon="icon" :text="text"
+  :number="number" path="-1825986764.1"></ui-title></div>

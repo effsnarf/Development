@@ -1,0 +1,19 @@
+dom:
+  ui.context.window:
+    ':semi-transparent': 'false'
+    pinnable: false
+    slot: null
+    ':get-context-element': getContextElement
+_:
+  examples:
+    count: 0
+methods:
+  getContextElement: | #js
+    function() {
+      return this.$el.parentElement;
+    }
+name: ui-tooltip
+template: >-
+  <ui-context-window class="comp-ui-tooltip" :semi-transparent="false"
+  :get-context-element="getContextElement"
+  path="-601613655."><slot></slot></ui-context-window>

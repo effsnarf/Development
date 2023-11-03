@@ -1,0 +1,35 @@
+dom:
+  div:
+    table:
+      tr:
+        v-for: prop in appliedStyles
+        th:
+          v-text: prop.name
+        td:
+          v-text: prop.value
+props:
+  element: null
+data:
+  appliedStyles: null
+watch:
+  element:
+    immediate: true
+    handler: | #js
+      function() {
+        this.appliedStyles = this.$root.html.getAppliedStyles(this.element);
+      }
+style:
+  .comp-ide-element-inspector:
+    background: '#ffffff10'
+    padding: 1em
+    max-height: 20em
+    overflow: auto
+name: ide-element-inspector
+_:
+  examples:
+    count: 0
+template: >-
+  <div class="comp-ide-element-inspector" path="2011677761."><table
+  path="2011677761.0"><tr v-for="prop in appliedStyles"
+  path="2011677761.0.0"><th v-text="prop.name" path="2011677761.0.0.0"></th><td
+  v-text="prop.value" path="2011677761.0.0.1"></td></tr></table></div>

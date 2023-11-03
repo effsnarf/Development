@@ -29,12 +29,14 @@ class Reflection {
     let methods = [] as MethodSignature[];
     for (let key of Object.getOwnPropertyNames(cls.prototype)) {
       if (key === "constructor") continue;
-      if (typeof (cls.prototype[key] as any) === "function") {
-        methods.push({
-          name: key,
-          args: Reflection.getFunctionArgs(cls.prototype[key]),
-        });
-      }
+      try {
+        if (typeof (cls.prototype[key] as any) === "function") {
+          methods.push({
+            name: key,
+            args: Reflection.getFunctionArgs(cls.prototype[key]),
+          });
+        }
+      } catch (ex: any) {}
     }
     // Get static methods
     for (let key of Object.getOwnPropertyNames(cls)) {
@@ -45,6 +47,22 @@ class Reflection {
           args: Reflection.getFunctionArgs((cls as any)[key]),
         });
       }
+    }
+    return methods;
+  }
+
+  static getInstanceMethods(instance: any) {
+    let methods = [] as MethodSignature[];
+    for (let key of Object.getOwnPropertyNames(instance)) {
+      if (key === "constructor") continue;
+      try {
+        if (typeof (instance as any)[key] === "function") {
+          methods.push({
+            name: key,
+            args: Reflection.getFunctionArgs((instance as any)[key]),
+          });
+        }
+      } catch (ex: any) {}
     }
     return methods;
   }
@@ -94,13 +112,19 @@ class Reflection {
           returnValue: any
         ) => void)
       | null,
-    deep: boolean = false
+    deep: boolean = false,
+    instanceMethods: boolean = false
   ): T {
     const className = instance.constructor.name;
 
-    Reflection.getClassMethods(instance.constructor).forEach(({ name }) => {
+    const methods = instanceMethods
+      ? Reflection.getInstanceMethods(instance)
+      : Reflection.getClassMethods(instance.constructor);
+
+    methods.forEach(({ name }) => {
       const methodName = name;
       const originalMethod = (instance as any)[methodName];
+      if (!originalMethod) return;
 
       (instance as any)[methodName] = (...args: any[]) => {
         const beforeResult = !beforeMethod

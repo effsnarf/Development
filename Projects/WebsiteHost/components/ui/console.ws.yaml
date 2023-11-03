@@ -1,0 +1,71 @@
+dom:
+  div: 
+    v-if: items.length
+    class: box1
+    ui.context.window:
+      ref: context1
+      ':visible': hoveredItem
+      div: 
+        v-if: hoveredItem
+        ui.value: 
+          v-for: arg in hoveredItem.args
+          ':value': arg
+    table:
+      tr:
+        v-for: item in visibleItems
+        ':key': item._id
+        @mouseenter: () => onItemHover(item, true)
+        @mouseleave: () => onItemHover(item, false)
+        td: 
+          class: opacity-50
+          v-text: item._id
+        td: 
+          v-for: (arg) in item.args.take(1)
+          ui.value: 
+            ':value': arg
+data:
+  nextItemID: 1
+  items: []
+  hoveredItem: null
+  maxVisibleItems: 30
+methods:
+  onItemHover: | #js
+    function(item, isHover) {
+      if (this.$refs.context1?.isPinned) return;
+      this.hoveredItem = (isHover ? item : null);
+    }
+  log: | #js
+    function(...args) {
+      this.items.push({ _id: this.nextItemID++, args });
+    }
+computed:
+  visibleItems: | #js
+    function() {
+      return [...this.items]
+        .slice(-this.maxVisibleItems)
+        .reverse();
+    }
+style:
+  box1:
+    max-height: 20em
+    overflow: scroll
+  tr:
+    height: 1.5em
+  td:
+    padding: 0 0.5em
+_:
+  examples:
+    count: 0
+name: ui-console
+template: >-
+  <div class="comp-ui-console box1" v-if="items.length"
+  path="1489973245."><ui-context-window ref="context1" :visible="hoveredItem"
+  path="1489973245.0"><div v-if="hoveredItem" path="1489973245.0.0"><ui-value
+  v-for="arg in hoveredItem.args" :value="arg"
+  path="1489973245.0.0.0"></ui-value></div></ui-context-window><table
+  path="1489973245.1"><tr v-for="item in visibleItems" :key="item._id"
+  @mouseenter="() =&gt; onItemHover(item, true)" @mouseleave="() =&gt;
+  onItemHover(item, false)" path="1489973245.1.0"><td class="opacity-50"
+  v-text="item._id" path="1489973245.1.0.0"></td><td v-for="(arg) in
+  item.args.take(1)" path="1489973245.1.0.1"><ui-value :value="arg"
+  path="1489973245.1.0.1.0"></ui-value></td></tr></table></div>

@@ -8,11 +8,75 @@ helpers:
     (context, dom, compName) => {
       return context.toTemplate(context, dom, 0, compName).join("\n");
     }
+  hasKey: | #ts
+    (context, object, key, options) => {
+      if (!object) return false;
+      if (typeof object !== "object") return false;
+      const hasKey = (key in object);
+      return hasKey;
+    }
   addCode: | #ts
-    (context, methodBody, code) => {
-      if (!methodBody) methodBody = "function() {}";
-      methodBody = methodBody.replace(/\{/, `{\n${code}\n`);
-      return methodBody;
+    (context, methodBody, startCode, methodName, endCode) => {
+      const findOuterBraces = (str) => {
+        let first = -1;
+        let last = -1;
+        let depth = 0;
+        for (let i = 0; i < str.length; i++) {
+          if (str[i] === "{") {
+            if (first === -1) first = i;
+            depth++;
+          } else if (str[i] === "}") {
+            depth--;
+            if (depth === 0) last = i;
+          }
+        }
+        return { first, last };
+      };
+      
+      try {
+        // Initialize and sanitize startCode and endCode
+        startCode = (startCode || "").trim().replace("{{method}}", methodName);
+        endCode = (endCode || "").trim().replace("{{method}}", methodName);
+
+        // Handle empty or commented-out method bodies
+        if (!methodBody?.length) methodBody = "function() {}";
+        methodBody = methodBody.replace(/^\s*\/\/.*$/gm, "").trim();
+
+        // Wrap in a function block if not already wrapped
+        if (!["function", "async"].some(s => methodBody.startsWith(s))) {
+          methodBody = `function() {\n${methodBody}\n}`;
+          if (/\bawait\b/.test(methodBody)) {
+            methodBody = `async ${methodBody}`;
+          }
+        }
+
+        // Find the positions of the outermost braces
+        const { first, last } = findOuterBraces(methodBody);
+
+        // Extract the method body inside the outermost braces
+        let wrappedBody = methodBody.substring(first + 1, last).trim();
+
+        // Insert startCode and endCode
+        wrappedBody = `
+        ${startCode}
+        try
+        {
+          ${wrappedBody}
+        }
+        finally
+        {
+          ${endCode}
+        }
+        `;
+
+        // Reconstruct the final method body
+        const finalMethodBody = `${methodBody.substring(0, first + 1)}\n${wrappedBody}\n${methodBody.substring(last)}`;
+
+        return finalMethodBody;
+      } catch (error) {
+        console.error(`Error in addCode: ${error.message}`);
+        return methodBody; // Return the original method body in case of an error
+      }
     }
   prefixCssSelectors: | #ts
     (context, compName, selectors) => {
@@ -28,4 +92,8 @@ helpers:
   unkebabize: | #ts
     (context, str) => {
       return str?.replace(/-/g, ".");
+    }
+  methodSignature: | #ts
+    (context, prefix, name, args) => {
+      return `async ${prefix}${name}(${args.join(", ")})`;
     }

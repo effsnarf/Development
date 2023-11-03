@@ -27,6 +27,9 @@ style:
   li:
     margin-bottom: 0.5em
 name: e-template-editors
+_:
+  examples:
+    count: 0
 template: >-
   <transition-group class="comp-e-template-editors" tag="ul" name="list"
   path="1313728923."><li v-for="item in items" :key="item.id"

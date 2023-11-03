@@ -1,0 +1,145 @@
+dom:
+  div:
+    class: w-100pc h-100pc
+    ui.loading:
+      class: absolute-center
+      v-show: isLoading
+    .file-dropzone:
+      v-dim: isLoading
+      ref: dropArea1
+      .hint:
+        v-if: enabled
+        v-text: hint
+      .upload-button:
+        v-if: enabled && showUploadButton
+        v-text: '''📤🖼️'''
+        title: 📤🖼️ upload image
+        @click: onClickUpload
+      input:
+        class: hidden
+        type: file
+        ref: fileInput
+        @change: onChangeFileInput
+      slot: null
+props:
+  enabled: true
+  showUploadButton: true
+  hint: drop file here
+data:
+  isLoading: 0
+mounted: | #js
+  function() {
+    const dropArea = this.$refs.dropArea1;
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      dropArea.addEventListener(eventName, this.onlyIfFiles(this.preventDefaults), false);
+    });
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropArea.addEventListener(eventName, this.onlyIfFiles(this.highlight.bind(this)), false);
+    });
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropArea.addEventListener(eventName, this.onlyIfFiles(this.unhighlight.bind(this)), false);
+    });
+    dropArea.addEventListener('drop', this.onlyIfFiles(this.handleDrop.bind(this)), false);
+  }
+methods:
+  onFileDrop: | #js
+    async function(files) {
+      this.$emit('file-drop', files);
+    }
+  onClickUpload: | #js
+    function (e) {
+      this.$refs.fileInput.click();
+    }
+  onChangeFileInput: | #js
+    function (e) {
+      let files = e.target.files;
+      this.onFileDrop(files);
+    }
+  handleDrop: | #js
+    function (e) {
+      if (!this.enabled) return;
+      let dt = e.dataTransfer;
+      let files = dt.files;
+      this.onFileDrop(files);
+    }
+  highlight: | #js
+    function (e) {
+      if (!this.enabled) return;
+      this.$refs.dropArea1.classList.add('drop-possible');
+    }
+  unhighlight: | #js
+    function (e) {
+      if (!this.enabled) return;
+      this.$refs.dropArea1.classList.remove('drop-possible');
+      // Remove tooltip attribute
+      this.$refs.dropArea1.removeAttribute('tooltip');
+    }
+  preventDefaults: | #js
+    function (e) {
+      e.preventDefault()
+      e.stopPropagation()
+    }
+  onlyIfFiles: | #js
+    function (handler) {
+      return function (e) {
+        if (!e.dataTransfer.types.includes('Files')) return;
+        handler(e);
+      }
+    }
+style:
+  .file-dropzone:
+    width: 100%
+    height: 100%
+  .hint:
+    position: absolute
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%
+    height: 100%
+    left: 50%
+    top: 50%
+    transform: translate(-50%, -50%)
+    border: '5px dashed #ccc'
+    font-family: monospace
+    font-size: 2em
+    text-shadow: '-0.1em 0.1em 0.1em #000'
+    text-align: center
+    opacity: 0.5
+    pointer-events: none
+    transition: 0s
+  .drop-possible .hint:
+    background: '#ffffff20'
+    opacity: 1
+    transition: 0s
+  .upload-button:
+    position: absolute
+    width: fit-content !important
+    height: fit-content !important
+    top: 0
+    right: 0
+    cursor: pointer
+    z-index: 10
+    font-size: 2rem
+    filter: grayscale(1)
+    opacity: 0.6
+    text-align: right
+  .upload-button:hover:
+    filter: none
+    opacity: 1
+  .file-dropzone:hover .upload-button:
+    display: block
+name: ui-file-dropzone
+_:
+  examples:
+    count: 0
+template: >-
+  <div class="comp-ui-file-dropzone w-100pc h-100pc"
+  path="1956569459."><ui-loading class="absolute-center" v-show="isLoading"
+  path="1956569459.0"></ui-loading><div class="file-dropzone" v-dim="isLoading"
+  ref="dropArea1" path="1956569459.1"><div class="hint" v-if="enabled"
+  v-text="hint" path="1956569459.1.0"></div><div class="upload-button"
+  v-if="enabled &amp;&amp; showUploadButton" v-text="'📤🖼️'" title="📤🖼️
+  upload image" @click="onClickUpload" path="1956569459.1.1"></div><input
+  class="hidden" type="file" ref="fileInput" @change="onChangeFileInput"
+  path="1956569459.1.2"/><slot></slot></div></div>

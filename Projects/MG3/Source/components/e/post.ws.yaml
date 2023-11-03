@@ -136,6 +136,9 @@ style:
   .greentext:
     color: '#35c735'
 name: e-post
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-e-post" path="-1357494135."><div class="post" v-if="item"
   :class="getPostClass(item)" path="-1357494135.0"><div class="post-media"

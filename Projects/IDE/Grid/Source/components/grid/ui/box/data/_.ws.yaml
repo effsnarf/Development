@@ -1,0 +1,106 @@
+dom:
+  grid.module:
+    icon: 🧊
+    ':show-title': 'false'
+    div:
+      ':style': '{ ''width'': ''100%'', overflow: ''auto'' }'
+      ui.value: 
+        v-if: '!showLastValue'
+        ':value': outputValue
+        ':large': true
+      .last-value:
+        v-if: showLastValue
+        ui.value: 
+          ':value': lastNonNullOutputValue
+          ':large': true
+props:
+  box: null
+data:
+  inputValue: null
+  outputValue: null
+  lastNonNullOutputValue: null
+  operations: []
+methods:
+  onOperations: | #js
+    function(operations) {
+      this.operations = operations;
+    }
+  grid_client_runtime_socket_value_change: | #js
+    function(boxID, socketDirection, sID, socketValue) {
+      if (boxID != this.box._id) return;
+      this.refresh();
+    }
+  getBoxVue: | #js
+    function() {
+      return this.$root.vm.getAncestors(this, "grid.ui.box")[0];
+    }
+  getSocketValue: | #js
+    function(direction) {
+      const socketData = this.$root.socket?.runtime.data[this.box._id];
+      let data = socketData?.[direction]?.[1];
+      return data;
+    }
+  refresh: | #js
+    function() {
+      this.inputValue = this.getSocketValue("input");
+      this.outputValue = this.getSocketValue("output");
+    }
+  init: | #js
+    function(box) {
+      this.operations = (box.linq?.operations || []);
+      this.refresh();
+    }
+  emitBoxEvent: | #js
+    function(boxEventName, ...args) {
+      this.$emit("box-event", boxEventName, ...args);
+    }
+computed:
+  visibleValue: | #js
+    function() {
+      if (this.showLastValue) return this.lastNonNullOutputValue;
+      return this.outputValue;
+    }
+  showLastValue: | #js
+    function() {
+      return (this.outputValue == null) && (this.lastNonNullOutputValue != null);
+    }
+watch:
+  outputValue:
+    handler: | #js
+      function(newOutputValue, oldOutputValue) {
+        if (newOutputValue != null) {
+          this.lastNonNullOutputValue = newOutputValue;
+        }
+      }
+  operations:
+    handler: | #js
+      function(operations) {
+        if (Objects.areEqual(operations, this.box.linq?.operations)) return;
+        this.getBoxVue().$femit("edit.box", this.box._id, { linq: { operations } });
+      }
+    deep: true
+  box:
+    handler: | #js
+      function(box) {
+        this.init(box);
+      }
+    immediate: true
+style:
+  .last-value:
+    filter: grayscale(1) contrast(0.9)
+  .box1:
+    border: '1px solid #ccc'
+    padding: 0.5em
+    margin-bottom: 1em
+_:
+  examples:
+    count: 0
+name: grid-ui-box-data
+template: >-
+  <grid-module class="comp-grid-ui-box-data" icon="🧊" :show-title="false"
+  path="1558979935."><div :style="{ 'width': '100%', overflow: 'auto' }"
+  path="1558979935.0"><ui-value v-if="!showLastValue" :value="outputValue"
+  :large="true" path="1558979935.0.0"></ui-value><div class="last-value"
+  v-if="showLastValue" path="1558979935.0.1"><ui-value
+  :value="lastNonNullOutputValue" :large="true"
+  path="1558979935.0.1.0"></ui-value></div></div></grid-module>

@@ -1,0 +1,128 @@
+dom:
+  .text-center:
+    transition:
+      name: slide2
+      button:
+        v-if: '!isLoading'
+        @click: onClick
+        ui.title:
+          ':icon': icon
+          ':text': text
+    ui.loading:
+      ':show': isLoading
+props:
+  icon: null
+  text: null
+  click: null
+  confirm: null
+  showLoading: true
+data:
+  isLoading: 0
+methods:
+  onClick: | #js
+    async function() {
+      if (this.confirm) return alertify.confirm(this.confirm, this._onClick.bind(this));
+      this._onClick();
+    }
+  _onClick: | #js
+    async function() {
+      this.$emit('click');
+      if (this.click)
+      {
+        if (this.showLoading) this.isLoading++;
+        try
+        {
+          await this.click();
+        }
+        finally
+        {
+          if (this.showLoading) this.isLoading--;
+        }
+      }
+    }
+style:
+  button:
+    opacity: 0.7
+    user-select: none
+    transition: 0s
+  button:hover:
+    opacity: 1
+    transition: 0s
+name: ui-button
+frameworks:
+  vue: | #js
+    &lt;template&gt;
+      &lt;div class="text-center"&gt;
+        &lt;transition name="slide2"&gt;
+          &lt;button v-if="!isLoading" @click="onClick" style="user-select: none;"&gt;
+            &lt;ui-title :icon="icon" :text="text"&gt;&lt;/ui-title&gt;
+          &lt;/button&gt;
+        &lt;/transition&gt;
+        &lt;ui-loading :show="isLoading"&gt;&lt;/ui-loading&gt;
+      &lt;/div&gt;
+    &lt;/template&gt;
+
+    &lt;script&gt;
+    export default {
+      name: 'ui-button',
+      props: {
+        icon: {
+          default: null
+        },
+        text: {
+          default: null
+        },
+        click: {
+          type: Function,
+          default: null
+        },
+        showLoading: {
+          type: Boolean,
+          default: true
+        }
+      },
+      data() {
+        return {
+          isLoading: 0
+        };
+      },
+      methods: {
+        async onClick() {
+          this.$emit('click');
+          if (this.click) {
+            if (this.showLoading) this.isLoading++;
+            try {
+              await this.click();
+            } finally {
+              if (this.showLoading) this.isLoading--;
+            }
+          }
+        }
+      }
+    };
+    &lt;/script&gt;
+
+    &lt;style scoped&gt;
+    button {
+      user-select: none;
+    }
+    &lt;/style&gt;
+example:
+  dom:
+    ui.button:
+      icon: ✔️
+      text: Click me
+      ':click': onClick
+  methods:
+    onClick: | #js
+      async function() {
+      }
+_:
+  examples:
+    count: 1
+template: >-
+  <div class="comp-ui-button text-center" path="-1914507316."><transition
+  name="slide2" path="-1914507316.0"><button v-if="!isLoading" @click="onClick"
+  path="-1914507316.0.0"><ui-title :icon="icon" :text="text"
+  path="-1914507316.0.0.0"></ui-title></button></transition><ui-loading
+  :show="isLoading" path="-1914507316.1"></ui-loading></div>

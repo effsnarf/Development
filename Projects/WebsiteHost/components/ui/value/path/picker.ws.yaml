@@ -1,0 +1,104 @@
+dom:
+  div:
+    class: picker
+    v-if: isVisible
+    .parts:
+      .clickable: 
+        ui.title: 
+          icon: 🧊
+          text: '{}'
+          @click: () => selectedPath = []
+      .clickable: 
+        v-for: part in selectedPath
+        @click: () => selectedPath.splice(selectedPath.indexOf(part) + 1)
+        ui.title: 
+          icon: 🧊
+          ':text': part
+      .next-parts:
+        ul:
+          li:
+            v-for: part in nextPathParts
+            ':key': part
+            class: clickable
+            @click: onSelectPart(part)
+            .flex:
+              ui.title: 
+                icon: 🧊
+                ':text': part
+props:
+  obj: null
+  value: null
+data:
+  selectedPath: []
+methods:
+  onSelectPart: | #js
+    function(part) {
+      this.selectedPath.push(part);
+    }
+computed:
+  isVisible: | #js
+    function() {
+      if (!this.obj) return false;
+      if (Objects.getType(this.obj) !== Object) return false;
+      return true;
+    }
+  node: | #js
+    function() {
+      let node = this.obj;
+      for (const part of this.selectedPath) {
+        node = node[part];
+      }
+      return node;
+    }
+  nextPathParts: | #js
+    function() {
+      if (!this.node) return [];
+      if (Array.isArray(this.node)) return [];
+      if (typeof this.node !== 'object') return [];
+      return Object.keys(this.node);
+    }
+watch:
+  value:
+    handler: | #js
+      function(value) {
+        this.selectedPath = Objects.clone((!value) ? [] : value);
+      }
+    immediate: true
+  selectedPath:
+    handler: | #js
+      function(selectedPath) {
+        if (selectedPath?.join(',') == this.value?.join(',')) return;
+        this.$emit("input", selectedPath);
+      }
+style:
+  .picker:
+    max-height: 2em
+    overflow-x: hidden
+    overflow-y: auto
+    transition: 0.6s
+  .picker:hover:
+    max-height: 15em
+  .parts:
+    display: flex
+    gap: 0.5em
+  .next-parts:
+    filter: grayscale(1)
+    opacity: 0.5
+_:
+  examples:
+    count: 0
+name: ui-value-path-picker
+template: >-
+  <div class="comp-ui-value-path-picker picker" v-if="isVisible"
+  path="738107552."><div class="parts" path="738107552.0"><div class="clickable"
+  path="738107552.0.0"><ui-title icon="🧊" text="{}" @click="() =&gt;
+  selectedPath = []" path="738107552.0.0.0"></ui-title></div><div
+  class="clickable" v-for="part in selectedPath" @click="() =&gt;
+  selectedPath.splice(selectedPath.indexOf(part) + 1)"
+  path="738107552.0.1"><ui-title icon="🧊" :text="part"
+  path="738107552.0.1.0"></ui-title></div><div class="next-parts"
+  path="738107552.0.2"><ul path="738107552.0.2.0"><li class="clickable"
+  v-for="part in nextPathParts" :key="part" @click="onSelectPart(part)"
+  path="738107552.0.2.0.0"><div class="flex"
+  path="738107552.0.2.0.0.0"><ui-title icon="🧊" :text="part"
+  path="738107552.0.2.0.0.0.0"></ui-title></div></li></ul></div></div></div>

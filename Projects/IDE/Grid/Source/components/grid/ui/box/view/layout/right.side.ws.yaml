@@ -1,0 +1,55 @@
+dom:
+  grid.module:
+    ':box': box
+    ':data-bound-socket-data': dataBoundSocketData
+    grid.ui.node.toolbar:
+      v-if: '!selectedNode'
+    div:
+      v-if: selectedNode
+      .box1:
+        component:
+          ':is': getSettingsCompName(selectedNode)
+          ':box': box
+          ':node': selectedNode
+          ':data-bound-socket-data': dataBoundSocketData
+props:
+  box: null
+  dataBoundSocketData: null
+data:
+  viewNodeRoot: null
+  selectedNode: null
+methods:
+  onNodeSelect: | #js
+    function(node) {
+      this.selectedNode = node;
+    }
+  getSettingsCompName: | #js
+    function(node) {
+      const name = `grid.ui.node.view.${node.type}.settings`;
+      if (!this.$root.compsDic[name.hashCode()]) return null;
+      return name.replace(/\./g, "-");
+    }
+  init: | #js
+    function(box) {
+      this.viewNodeRoot = (box.viewNodeRoot);
+    }
+watch:
+  box:
+    handler: | #js
+      function(box) {
+        this.init(box);
+      }
+    immediate: true
+_:
+  examples:
+    count: 0
+name: grid-ui-box-view-layout-right-side
+template: >-
+  <grid-module class="comp-grid-ui-box-view-layout-right-side" :box="box"
+  :data-bound-socket-data="dataBoundSocketData"
+  path="-2068571495."><grid-ui-node-toolbar v-if="!selectedNode"
+  path="-2068571495.0"></grid-ui-node-toolbar><div v-if="selectedNode"
+  path="-2068571495.1"><div class="box1" path="-2068571495.1.0"><component
+  :is="getSettingsCompName(selectedNode)" :box="box" :node="selectedNode"
+  :data-bound-socket-data="dataBoundSocketData"
+  path="-2068571495.1.0.0"></component></div></div></grid-module>

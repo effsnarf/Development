@@ -1,0 +1,234 @@
+dom:
+  grid.module:
+    icon: 🧊📃
+    ui.dnd.dropzone:
+      class: surface-dropzone
+      @drop-item: onDropItemOnSurface
+      .flex:
+        div:
+          ':key': surfaceKey
+          ref: surface1
+          class: surface flex-grow-1
+          ':class': surfaceClass
+          ':style': surfaceStyle
+          @wheel: onWheelSurface
+          ui.button:
+            v-if: options.groupBoxID
+            class: close-button
+            icon: ✖
+            @click: $emit('close')
+          grid.ui.box:
+            v-for: box in visibleBoxes
+            ':key': '''box/'' + box._id'
+            ':userID': userID
+            ':box': box
+            ':surface-element': surfaceElement
+            ':surface-camera': surfaceCamera
+            ':surfaceGroupBoxID': options.groupBoxID
+          grid.ui.link:
+            v-for: link in visibleLinks
+            ':key': '''link/'' + link._id'
+            ':link': link
+            ':surface-camera': surfaceCamera
+            ':surfaceGroupBoxID': options.groupBoxID
+            ':is-dimmed': '!!hoveredBox'
+        grid.ui.tools:
+          ':surface-element': surfaceElement
+          ':surface-camera': surfaceCamera
+          ':surfaceGroupBoxID': options.groupBoxID
+props:
+  userID: null
+  options: null
+data:
+  surfaceElement: null
+  surfaceCamera:
+    pos:
+      x: 0
+      'y': 0
+    scale: 1
+  surfaceKey: 1
+  hoveredBox: null
+mounted: | #js
+  function() {
+    this.surfaceElement = this.$refs.surface1;
+    // Detect if surfaceElement is resized
+    const resizeObserver = new ResizeObserver(this.adjustCamera.bind(this));
+    resizeObserver.observe(this.surfaceElement);
+    this.adjustCamera(true);
+  }
+methods:
+  grid_ui_box_hovered: | #js
+    function(box, isHovered) {
+      this.hoveredBox = (!isHovered ? null : box);
+    }
+  grid_user_action_stack_do: | #js
+    function(boxID, pos) {
+      this.adjustCamera();
+    }
+  grid_user_action_stack_undo: | #js
+    function(boxID, pos) {
+      this.adjustCamera();
+    }
+  grid_user_action_stack_redo: | #js
+    function(boxID, pos) {
+      this.adjustCamera();
+    }
+  adjustCamera: | #js
+    async function(immediate) {
+      if (!immediate) {
+        await this.$nextTick();
+        await this.$root.wait(100);
+      }
+      this.surfaceCamera = this.getCamera(this.getFocusedItems(this.$boxes));
+    }
+  getCamera: | #js
+    function(boxes) {
+      // Returns a camera in which all the boxes are visible
+      const camera = {
+        pos: { x: 0, y: 0 },
+        scale: 1,
+      };
+      // Set camera.pos to the center of all boxes
+      const boxRects = boxes.map(box => box.rect);
+      camera.pos = this.getRectsCenter(boxRects);
+      return camera;
+    }
+  getRectsCenter: | #js
+    function(rects) {
+      // Returns the center of all the rects
+      // rect.pos is the center of the rect
+      if (!rects.length) return { x: 0, y: 0 };
+      const minX = rects.map(rect => rect.pos.x - rect.size.width / 2).min();
+      const maxX = rects.map(rect => rect.pos.x + rect.size.width / 2).max();
+      const minY = rects.map(rect => rect.pos.y - rect.size.height / 2).min();
+      const maxY = rects.map(rect => rect.pos.y + rect.size.height / 2).max();
+      const x = (minX + maxX) / 2;
+      const y = (minY + maxY) / 2;
+      return { x, y };
+    }
+  onDropItemOnSurface: | #js
+    function(dragItem) {
+      this.$femit("drop.item", dragItem);
+    }
+  onWheelSurface: | #js
+    function(e) {
+      return;
+      if (e.target != this.$refs.surface1) return;
+      e.preventDefault();
+      e.stopPropagation();
+      // Adjust surfaceScale based on the wheel event
+      const scrollSize = (e.deltaY / 100);
+      this.surfaceCamera.scale += (scrollSize * -0.03);
+      this.$femit("scale", this.surfaceCamera.scale);
+    }
+  getFocusedItems: | #js
+    function(items) {
+      if (!items) return [];
+      items = [...items];
+      items = items.filter(this.isItemFocused);
+      return items;
+    }
+  getVisibleItems: | #js
+    function(items) {
+      if (!items) return [];
+      items = [...items];
+      items = items.filter(this.isItemVisible);
+      return items;
+    }
+  isItemFocused: | #js
+    function(item) {
+      if (this.options.focusedBoxID) {
+        return (item._id == this.options.focusedBoxID);
+      }
+      return this.isItemVisible(item);
+    }
+  isItemVisible: | #js
+    function(item) {
+      if (this.options.groupBoxID) {
+        if (item.groupBoxID == this.options.groupBoxID) return true;
+      }
+      if (item.rect?.is.visible) return true;
+      if (item.is?.visible) return true;
+      return false;
+    }
+  refreshSurface: | #js
+    async function() {
+      await this.$nextTick();
+      this.surfaceKey++;
+      alertify.message("Surface refreshed");
+    }
+computed:
+  surfaceClass: | #js
+    function() {
+      const cls = {};
+      if (this.hoveredBox) {
+        cls["has-hovered-box"] = true;
+      }
+      return cls;
+    }
+  visibleBoxes: | #js
+    function() {
+      return this.getVisibleItems(this.$boxes);
+    }
+  visibleLinks: | #js
+    function() {
+      return this.getVisibleItems(this.$links);
+    }
+  surfaceStyle: | #js
+    function() {
+      return {
+        width: "100%",
+        height: "80vh",
+        backgroundSize: `${this.surfaceCamera.scale * 100}%`,
+      };
+    }
+  surface1: | #js
+    function() {
+      return this.$refs.surface1;
+    }
+style:
+  .surface-dropzone.drag-over:
+    border: none
+  .surface.has-hovered-box .comp-ui-window:
+    opacity: 0.3 !important
+    filter: grayscale(1)
+  .surface.has-hovered-box .comp-ui-window.hovered:
+    opacity: 1 !important
+    filter: none
+  .surface:
+    height: 80vh
+    overflow: hidden
+    border: 1px solid gray
+    cursor: crosshair
+    background: url(/images/wood.png)
+    background-position: center
+    background-color: black
+  .close-button:
+    position: absolute
+    top: 0
+    right: 0
+    z-index: 1
+_:
+  examples:
+    count: 0
+name: grid-client-surface
+template: >-
+  <grid-module class="comp-grid-client-surface" icon="🧊📃"
+  path="-515125966."><ui-dnd-dropzone class="surface-dropzone"
+  @drop-item="onDropItemOnSurface" path="-515125966.0"><div class="flex"
+  path="-515125966.0.0"><div class="surface flex-grow-1" :key="surfaceKey"
+  ref="surface1" :class="surfaceClass" :style="surfaceStyle"
+  @wheel="onWheelSurface" path="-515125966.0.0.0"><ui-button
+  class="close-button" v-if="options.groupBoxID" icon="✖"
+  @click="$emit('close')" path="-515125966.0.0.0.0"></ui-button><grid-ui-box
+  v-for="box in visibleBoxes" :key="'box/' + box._id" :userID="userID"
+  :box="box" :surface-element="surfaceElement" :surface-camera="surfaceCamera"
+  :surfaceGroupBoxID="options.groupBoxID"
+  path="-515125966.0.0.0.1"></grid-ui-box><grid-ui-link v-for="link in
+  visibleLinks" :key="'link/' + link._id" :link="link"
+  :surface-camera="surfaceCamera" :surfaceGroupBoxID="options.groupBoxID"
+  :is-dimmed="!!hoveredBox"
+  path="-515125966.0.0.0.2"></grid-ui-link></div><grid-ui-tools
+  :surface-element="surfaceElement" :surface-camera="surfaceCamera"
+  :surfaceGroupBoxID="options.groupBoxID"
+  path="-515125966.0.0.1"></grid-ui-tools></div></ui-dnd-dropzone></grid-module>

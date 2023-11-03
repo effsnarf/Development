@@ -15,6 +15,9 @@ props:
 data: null
 methods: null
 name: e-format-image-grid
+_:
+  examples:
+    count: 0
 template: >-
   <e-format-base class="comp-e-format-image-grid" :builder="builder"
   :media="media" :editable="editable" :show-help="showHelp"

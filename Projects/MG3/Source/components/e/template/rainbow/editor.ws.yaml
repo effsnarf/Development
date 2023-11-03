@@ -83,6 +83,9 @@ style:
   .pattern-image:
     filter: grayscale(1) contrast(1) brightness(1.5)
 name: e-template-rainbow-editor
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-e-template-rainbow-editor" path="637897232."><div
   path="637897232.0"><table path="637897232.0.0"><tbody

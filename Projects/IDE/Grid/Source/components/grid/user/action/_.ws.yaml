@@ -1,0 +1,66 @@
+dom:
+  .hoverable:
+    ':class': actionClass
+    .flex:
+      div: 
+        class: w-l2
+        v-text: getActionIcon(action)
+      div: 
+        class: w-l6
+        v-text: action.redo.method
+      div: 
+        class: actionArg1
+        ui.value:
+          ':value': (action.redo.args[1])
+props:
+  index: null
+  item: null
+  userActionsPointer: null
+data:
+  pointer: null
+computed:
+  actionClass: | #js
+    function() {
+      const cls = {};
+      cls.done = this.isDone;
+      return cls;
+    }
+  action: | #js
+    function() {
+      return this.item;
+    }
+  isDone: | #js
+    function() {
+      return (this.index <= this.userActionsPointer);
+    }
+methods:
+  getActionIcon: | #js
+    function(action) {
+      const method = action.redo.method;
+      if (method.startsWith("create.")) return "➕";
+      if (method.startsWith("delete.")) return "➖";
+      if (method.startsWith("edit.")) return "✏️";
+      if (method === "no.op") return null;
+      return "❔";
+    }
+style:
+  .done:
+    background: '#ffffff20'
+  .done:hover:
+    background: '#ffffff30'
+  .actionArg1:
+    width: 12em
+    height: 1.5em
+    overflow: hidden
+_:
+  examples:
+    count: 0
+name: grid-user-action
+template: >-
+  <div class="comp-grid-user-action hoverable" :class="actionClass"
+  path="-1378945263."><div class="flex" path="-1378945263.0"><div class="w-l2"
+  v-text="getActionIcon(action)" path="-1378945263.0.0"></div><div class="w-l6"
+  v-text="action.redo.method" path="-1378945263.0.1"></div><div
+  class="actionArg1" path="-1378945263.0.2"><ui-value
+  :value="(action.redo.args[1])"
+  path="-1378945263.0.2.0"></ui-value></div></div></div>

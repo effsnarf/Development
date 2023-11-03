@@ -42,6 +42,9 @@ style:
   .help video:
     filter: grayscale(1)
 name: e-template-help
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-e-template-help help" path="-67625364."><div class="message"
   path="-67625364.0"><ui-video src="/video/interface/image/drop.webm"

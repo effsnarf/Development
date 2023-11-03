@@ -1,0 +1,187 @@
+dom:
+  grid.module:
+    ':show-title': 'false'
+    div: 
+      v-if: showFuncList
+      ui.select:
+        ':options': funcOptions
+        input-type: value
+        ':get-item-icon': (item) => item.icon
+        ':get-item-text': (item) => item.text
+        v-model: selectedFunc
+    .flex.flex-column.h-100pc:
+      div: 
+        v-if: showFuncEditor
+        grid.ui.box.func.settings:
+          ':box': box
+        ui.input.text.box: 
+          hint: arg0, arg1, arg2…
+          v-model: argNamesStr
+        ui.input.text.box: 
+          ':hint': codeHint
+          multiline: 'true'
+          ':auto-resize': 'false'
+          v-model: code
+props:
+  box: null
+data:
+  selectedFunc: null
+  argNamesStr: null
+  desc: null
+  code: null
+  codeHint: null
+  is:
+    inited: false
+  resultValue: null
+mounted: | #js
+  function() {
+    this.codeHint = `for (let i = 0; i < 10; i++) {\n  console.log(i);\n}`;
+  }
+methods:
+  hcFetch: | #js
+    async function() {
+      await this.$nextTick();
+
+      //this.getBoxVue().$femit("edit.box", this.box._id, { name: "fetch" });
+      this.getBoxVue().$femit("edit.box", this.box._id, { runs: { on: "server" }});
+      
+      this.selectedFunc = {};
+      this.argNamesStr = "url";
+      //this.code = `return (await (await fetch(url)).json());`;
+    }
+  grid_client_runtime_func_result_change: | #js
+    function(boxID, resultValue) {
+      if (boxID != this.box._id) return;
+      this.resultValue = resultValue;
+    }
+  init: | #js
+    function(box) {
+      //if (this.is.inited) return;
+      //this.is.inited = true;
+      this.argNamesStr = box.argNamesStr;
+      this.description = box.description;
+      this.code = box.code;
+    }
+  onSelectedFuncChange: | #js
+    function(selectedFunc) {
+    }
+  getBoxVue: | #js
+    function() {
+      return this.$root.vm.getAncestors(this, "grid.ui.box")[0];
+    }
+  reexecute: | #js
+    function() {
+      this.getBoxVue().$femit("execute.func", this.box._id);
+    }
+computed:
+  funcName: | #js
+    function() {
+      return this.box.name;
+    }
+  funcOptions: | #js
+    function() {
+      const funcs = [];
+      if (this.funcName?.length) funcs.add({ _id: "new.func", icon: "➕🔴", text: `${this.funcName}…` });
+      return funcs;
+    }
+  showFuncList: | #js
+    function() {
+      return !this.selectedFunc;
+    }
+  showFuncEditor: | #js
+    function() {
+      return !!this.selectedFunc;
+    }
+  icon: | #js
+    function() {
+      const icons = [];
+      
+      icons.add("🔴");
+
+      return icons
+        .filter((icon) => icon)
+        .join("");
+    }
+watch:
+  description:
+    handler: | #js
+      async function(description) {
+        if (description == this.box.description) return;
+        this.getBoxVue().$femit("edit.box", this.box._id, { description });
+      }
+  code:
+    handler: | #js
+      async function(code) {
+        if (code == this.box.code) return;
+        this.getBoxVue().$femit("edit.box", this.box._id, { code });
+      }
+  argNamesStr:
+    handler: | #js
+      async function(argNamesStr) {
+        argNamesStr = (argNamesStr || "").trim();
+
+        if (argNamesStr == this.box.argNamesStr) return;
+
+        const argNames = argNamesStr
+          .split(",")
+          .filter(s => s)
+          .map(s => s.trim());
+        if (!argNames.length) argNames.push("arg0");
+
+        const newBoxData = {
+          argNamesStr: argNamesStr,
+          argNames: argNames,
+          sockets: {
+            input: [],
+            output: [
+              {
+                _id: 1,
+                type: "data",
+                name: "result",
+              }
+            ]
+          }
+        };
+
+        let socketID = 1;
+        for (const argName of argNames) {
+          newBoxData.sockets.input.push({
+            _id: socketID++,
+            type: "data",
+            name: argName,
+          });
+        }
+
+        this.getBoxVue().$femit("edit.box", this.box._id, newBoxData);
+      }
+  box:
+    handler: | #js
+      async function(box) {
+        this.init(box);
+      }
+    immediate: true
+  selectedFunc: | #js
+    function(selectedFunc) {
+      this.onSelectedFuncChange(selectedFunc);
+    }
+style:
+  textarea:
+    height: 100%
+    resize: none
+_:
+  examples:
+    count: 0
+name: grid-ui-box-func
+template: >-
+  <grid-module class="comp-grid-ui-box-func" :show-title="false"
+  path="1559058553."><div v-if="showFuncList" path="1559058553.0"><ui-select
+  :options="funcOptions" input-type="value" :get-item-icon="(item) =&gt;
+  item.icon" :get-item-text="(item) =&gt; item.text" v-model="selectedFunc"
+  path="1559058553.0.0"></ui-select></div><div class="flex flex-column h-100pc"
+  path="1559058553.1"><div v-if="showFuncEditor"
+  path="1559058553.1.0"><grid-ui-box-func-settings :box="box"
+  path="1559058553.1.0.0"></grid-ui-box-func-settings><ui-input-text-box
+  hint="arg0, arg1, arg2…" v-model="argNamesStr"
+  path="1559058553.1.0.1"></ui-input-text-box><ui-input-text-box
+  :hint="codeHint" multiline="true" :auto-resize="false" v-model="code"
+  path="1559058553.1.0.2"></ui-input-text-box></div></div></grid-module>

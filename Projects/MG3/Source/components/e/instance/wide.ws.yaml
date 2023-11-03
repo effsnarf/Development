@@ -22,6 +22,9 @@ style:
     text-transform: uppercase
     font-family: monospace
 name: e-instance-wide
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-e-instance-wide" v-if="instance" path="-1269625149."><div
   class="grayish" :url="$root.url.instance(instance)" path="-1269625149.0"><div

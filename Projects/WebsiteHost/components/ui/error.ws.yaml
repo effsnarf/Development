@@ -1,0 +1,27 @@
+dom:
+  transition:
+    name: slide
+    .error:
+      @click: () => error = null
+      v-if: errorText
+      v-text: errorText
+      ':key': errorText
+props:
+  error: null
+computed:
+  errorText: | #js
+    function() {
+      return this.error?.message || this.error;
+    }
+example1:
+  - dom:
+      ui.error:
+        error: This is an error.
+name: ui-error
+_:
+  examples:
+    count: 0
+template: >-
+  <transition class="comp-ui-error" name="slide" path="-2137289170."><div
+  class="error" @click="() =&gt; error = null" v-if="errorText"
+  v-text="errorText" :key="errorText" path="-2137289170.0"></div></transition>

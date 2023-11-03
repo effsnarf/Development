@@ -1,0 +1,56 @@
+dom:
+  grid.module:
+    icon: 💻
+    div: 
+      div: 
+        grid.client.workspace:
+          ':userID': userID
+      grid.client.runtime:
+        ':userID': userID
+      grid.ui.actions:
+        ':userID': userID
+props:
+  userID: null
+data: null
+mounted: | #js
+  function() {
+    this.$root.els = (this.$root.els || {});
+    this.$root.boxLogs = (this.$root.boxLogs || {});
+    this.$root.highlighted = {
+      nodes: Vue.ref([]),
+    };
+
+    this.$root.boxTypeColors = {
+      func: "#dddddd",
+      data: "#0066ee",
+      text: "#ffff00",
+      view: "#00aa88",
+      "view.items": "#00ee66",
+    };
+
+    // Catch all JS errors
+    window.onerror = (message, source, lineno, colno, ex) => {
+      this.onGlobalError(ex);
+    };
+    Vue.config.errorHandler = (ex, vm, info) => {
+      this.onGlobalError(ex, vm, info);
+    };
+  }
+methods:
+  onGlobalError: | #js
+    function(ex, vm, info) {
+      if (!ex) return;
+      alertify.error(`Error: ${ex.message}`);
+    }
+style: null
+_:
+  examples:
+    count: 0
+name: grid-client
+template: >-
+  <grid-module class="comp-grid-client" icon="💻" path="1160835955."><div
+  path="1160835955.0"><div path="1160835955.0.0"><grid-client-workspace
+  :userID="userID"
+  path="1160835955.0.0.0"></grid-client-workspace></div><grid-client-runtime
+  :userID="userID" path="1160835955.0.1"></grid-client-runtime><grid-ui-actions
+  :userID="userID" path="1160835955.0.2"></grid-ui-actions></div></grid-module>

@@ -27,8 +27,9 @@ dom:
       ide.css.stylesheet:
         ':rules': $root.newCssRules
       div: 
-        ide.component.style:
+        ui.html.style:
           v-for: comp in $root.comps
+          ':key': comp.name
           ':component': comp
 props:
   comps: null
@@ -69,6 +70,9 @@ style:
     height: 5rem
   div:
     width: 100%
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-app" path="96801."><div path="96801.0"><div
   class="site-loading" path="96801.0.0"><ui-loading v-if="$root.isLoading"
@@ -80,6 +84,6 @@ template: >-
   class="notifications"
   path="96801.2"><ui-notifications></ui-notifications></div><div
   path="96801.3"><ide-css-stylesheet :rules="$root.newCssRules"
-  path="96801.3.0"></ide-css-stylesheet><div
-  path="96801.3.1"><ide-component-style v-for="comp in $root.comps"
-  :component="comp" path="96801.3.1.0"></ide-component-style></div></div></div>
+  path="96801.3.0"></ide-css-stylesheet><div path="96801.3.1"><ui-html-style
+  v-for="comp in $root.comps" :key="comp.name" :component="comp"
+  path="96801.3.1.0"></ui-html-style></div></div></div>

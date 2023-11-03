@@ -1,0 +1,136 @@
+dom:
+  grid.module:
+    icon: ⬜
+    ':show-title': 'false'
+    grid.ui.node.view:
+      ':box': box
+      ':node': viewNodeRoot
+      ':active-node': activeNode
+      ':data-bound-socket-data': dataBoundSocketData
+      @node-hovered: onNodeHovered
+props:
+  userID: null
+  box: null
+  dataBoundSocketData: null
+data:
+  slotBoxes: null
+  boxes: []
+  links: []
+  viewNodeRoot: null
+  hoveredNode: null
+  selectedNode: null
+mounted: | #js
+  async function() {
+    await this.$nextTick();
+    this.refresh();
+  }
+methods:
+  onPinned: | #js
+    function(isPinned) {
+      this.selectedNode = (isPinned ? this.hoveredNode : null);
+    }
+  onNodeHovered: | #js
+    function(node, isHovered) {
+      this.hoveredNode = (isHovered ? node : null);
+    }
+  onNodeSelect: | #js
+    function(node) {
+      this.selectedNode = node;
+    }
+  onTitleIconClick: | #js
+    function() {
+      this.refresh();
+    }
+  refresh: | #js
+    function() {
+      this.slotBoxes = this.getSlotBoxes(this.box);
+    }
+  getSlotBoxes: | #js
+    function(box) {
+      // Find all boxes that link to this box's input sockets (type=view)
+      const boxes = this.$boxes;
+      const links = this.$links;
+      const slotBoxes = [];
+      const linksToThis = links.filter(l => l.to.box._id == box._id && (this.getInputSocket(l.to.socket._id).type == "view"));
+      const fromBoxIDs = linksToThis.map(l => l.from.box._id);
+      const fromBoxes = boxes.filter(b => fromBoxIDs.includes(b._id));
+      return fromBoxes;
+    }
+  getBoxCompName: | #js
+    function(box) {
+      if (!box?.type) return null;
+      return `grid.ui.box.${box.type}`.replace(/\./g, "-");
+    }
+  getInputSocket: | #js
+    function(socketID) {
+      const socket = this.box.sockets.input.find(s => s._id == socketID);
+      return socket;
+    }
+  getNewViewNodeRoot: | #js
+    function() {
+      const viewNode = {
+        _id: 1,
+        type: "view",
+        children: [],
+      };
+      return viewNode;
+    }
+  getBoxVue: | #js
+    function() {
+      return this.$root.vm.getAncestors(this, "grid.ui.box")[0];
+    }
+  init: | #js
+    function(box) {
+      this.viewNodeRoot = (box.viewNodeRoot || this.getNewViewNodeRoot());
+    }
+computed:
+  activeNode: | #js
+    function() {
+      return (this.selectedNode || this.hoveredNode);
+    }
+  items: | #js
+    function() {
+      const socketData = this.$root.socket?.runtime.data[this.box._id];
+      const item = socketData?.input?.[1];
+      if (!item) return [0, 1];
+      const slotCanMultiplyView = true;
+      const items = (slotCanMultiplyView && Array.isArray(item)) ? item : [item];
+      return items;
+    }
+watch:
+  viewNodeRoot:
+    handler: | #js
+      function(viewNodeRoot) {
+        if (Objects.areEqual(viewNodeRoot, this.box.viewNodeRoot)) return;
+        this.getBoxVue().$femit("edit.box", this.box._id, { viewNodeRoot });
+      }
+  box:
+    handler: | #js
+      function(box) {
+        this.init(box);
+      }
+    immediate: true
+style:
+  .item-row:
+    height: 1.5em
+    overflow: hidden
+  .slots:
+    display: flex
+  .slots, .slots > div:
+    height: 100%
+  .slots > div:
+    border: 2px dashed white
+  .slot-0:
+    width: 30%
+  .slot-1:
+    width: 70%
+_:
+  examples:
+    count: 0
+name: grid-ui-box-view-layout
+template: >-
+  <grid-module class="comp-grid-ui-box-view-layout" icon="⬜" :show-title="false"
+  path="814806846."><grid-ui-node-view :box="box" :node="viewNodeRoot"
+  :active-node="activeNode" :data-bound-socket-data="dataBoundSocketData"
+  @node-hovered="onNodeHovered"
+  path="814806846.0"></grid-ui-node-view></grid-module>

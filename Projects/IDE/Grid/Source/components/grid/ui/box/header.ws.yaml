@@ -1,0 +1,82 @@
+dom:
+  grid.module:
+    .flex:
+      transition:
+        name: slide-hor
+        ui.loading:
+          v-if: boxIsLoading
+      component:
+        v-if: box.type
+        ':is': getBoxCompName(box) + '-header'
+        ':box': box
+        @title-icon-click: $emit('title-icon-click')
+      ui.input.text.box:
+        ':text-box-style': textBoxStyle
+        class: flex-grow-1
+        ':auto-resize': true
+        ':hint': nameHint + '…'
+        camouflage: true
+        v-model: boxName
+        ':debounce': 400
+        @input: onEditBoxName
+      div:
+        v-text: box._id
+props:
+  box: null
+data:
+  boxName: null
+  boxIsLoading: 0
+methods:
+  onEditBoxName: | #js
+    function(name) {
+      const gridUiBoxVue = this.$root.vm.getAncestors(this, "grid.ui.box")[0];
+      gridUiBoxVue.$femit("edit.box", this.box._id, { name });
+    }
+  getBoxCompName: | #js
+    function(box) {
+      if (!box?.type) return null;
+      return `grid.ui.box.${box.type}`.replace(/\./g, "-");
+    }
+computed:
+  textBoxStyle: | #js
+    function() {
+      const style = {};
+      if (this.$root.boxTypeColors) style.color = this.$root.boxTypeColors[this.box.type?.split('.')[0]];
+      style.padding = "0.1em 0.3em !important";
+      style.margin = "-0.5em 0";
+      
+      return style;
+    }
+  nameHint: | #js
+    function() {
+      const boxType = this.box.type;
+      if (boxType === "func") return "function";
+      return "name";
+    }
+watch:
+  box:
+    handler: | #js
+      async function(box) {
+        this.boxName = box.name;
+      }
+    immediate: true
+style:
+  .icons:
+    display: flex
+    white-space: nowrap
+_:
+  examples:
+    count: 0
+name: grid-ui-box-header
+template: >-
+  <grid-module class="comp-grid-ui-box-header" path="-646217982."><div
+  class="flex" path="-646217982.0"><transition name="slide-hor"
+  path="-646217982.0.0"><ui-loading v-if="boxIsLoading"
+  path="-646217982.0.0.0"></ui-loading></transition><component v-if="box.type"
+  :is="getBoxCompName(box) + '-header'" :box="box"
+  @title-icon-click="$emit('title-icon-click')"
+  path="-646217982.0.1"></component><ui-input-text-box class="flex-grow-1"
+  :text-box-style="textBoxStyle" :auto-resize="true" :hint="nameHint + '…'"
+  camouflage="true" v-model="boxName" :debounce="400" @input="onEditBoxName"
+  path="-646217982.0.2"></ui-input-text-box><div v-text="box._id"
+  path="-646217982.0.3"></div></div></grid-module>

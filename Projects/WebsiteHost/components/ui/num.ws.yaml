@@ -1,0 +1,38 @@
+dom:
+  .flex:
+    div:
+      v-text: number
+    .letter:
+      v-text: unit
+props:
+  value: null
+data: null
+computed:
+  humanized: | #js
+    function() {
+      return this.value?.humanize();
+    }
+  number: | #js
+    function() {
+      // Get everything except the unit
+      return this.humanized?.match(/[^a-zA-Z]+/)?.first();
+    }
+  unit: | #js
+    function() {
+      return this.humanized?.match(/[a-zA-Z]+/)?.first();
+    }
+methods: null
+style:
+  .flex:
+    align-items: baseline;
+  .letter:
+    font-size: 70%;
+    opacity: 0.4;
+name: ui-num
+_:
+  examples:
+    count: 0
+template: >-
+  <div class="comp-ui-num flex" path="-846907092."><div v-text="number"
+  path="-846907092.0"></div><div class="letter" v-text="unit"
+  path="-846907092.1"></div></div>

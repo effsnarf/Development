@@ -1,0 +1,38 @@
+dom:
+  div:
+    ul:
+      li:
+        v-for: viewNode in viewNodes
+        ui.dnd.draggable:
+          ':drag-item': getNewViewNode(viewNode)
+          ui.title:
+            ':icon': '''➕'' + viewNode.icon'
+            ':text': viewNode.type
+data:
+  viewNodes: null
+mounted: | #js
+  function() {
+    this.viewNodes = [
+      { icon: "⬜", type: "panel" },
+      { icon: "🖼️", type: "image" },
+      { icon: "🆎", type: "text" }
+    ];
+  }
+methods:
+  getNewViewNode: | #js
+    function(viewNode) {
+      viewNode = Objects.clone(viewNode);
+      delete viewNode.icon;
+      return viewNode;
+    }
+_:
+  examples:
+    count: 0
+name: grid-ui-node-toolbar
+template: >-
+  <div class="comp-grid-ui-node-toolbar" path="853389825."><ul
+  path="853389825.0"><li v-for="viewNode in viewNodes"
+  path="853389825.0.0"><ui-dnd-draggable :drag-item="getNewViewNode(viewNode)"
+  path="853389825.0.0.0"><ui-title :icon="'➕' + viewNode.icon"
+  :text="viewNode.type"
+  path="853389825.0.0.0.0"></ui-title></ui-dnd-draggable></li></ul></div>

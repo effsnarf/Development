@@ -1,0 +1,43 @@
+dom:
+  div: 
+    div: 
+      v-if: isToggleable
+      ui.select:
+        type: toggle
+        input-type: value
+        ':options': options
+        v-model: field.value
+    div: 
+      v-if: '!isToggleable'
+      ui.input.text.box:
+        v-model: field.value
+        @input: $emit('input', $event)
+props:
+  field: null
+data: null
+computed:
+  options: | #js
+    function() {
+      if (!this.field.name) return [];
+      let values = this.$root.html.getPossibleCssValues(this.field.name);
+      return values;
+    }
+  isToggleable: | #js
+    function() {
+      const values = this.$root.html.cssProperties[this.field.name]?.values||[];
+      if (!values.length) return false;
+      if (values.some(v => v?.startsWith('['))) return false;
+      return true;
+    }
+name: ide-css-field-editor
+_:
+  examples:
+    count: 0
+template: >-
+  <div class="comp-ide-css-field-editor" path="653751728."><div
+  v-if="isToggleable" path="653751728.0"><ui-select type="toggle"
+  input-type="value" :options="options" v-model="field.value"
+  path="653751728.0.0"></ui-select></div><div v-if="!isToggleable"
+  path="653751728.1"><ui-input-text-box v-model="field.value"
+  @input="$emit('input', $event)"
+  path="653751728.1.0"></ui-input-text-box></div></div>

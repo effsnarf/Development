@@ -1,0 +1,215 @@
+dom:
+  div:
+    .box1:
+      ':class': '{ reversed: reverse }'
+      .flex:
+        ui.title:
+          icon: 🧊
+          text: Array
+          ':number': value?.length
+      ui.select:
+        v-if: 'false'
+        ':options': '[''table'', ''short-list'', ''expanded-list'']'
+        input-type: value
+        type: toggle
+        v-model: view1
+      ui.context.window:
+        v-if: 'false'
+        ref: hoveredItemContext1
+        ':visible': hoveredItem
+        ui.value: 
+          ':value': hoveredItem
+      transition: 
+        name: slide
+        table: 
+          v-if: (view1.includes('list'))
+          tbody: 
+            tr: 
+              v-for: (item, index) in visibleItems
+              td: 
+                class: opacity-50
+                v-text: index
+              td: 
+                ui.value.preview: 
+                  v-if: (view1 == 'short-list')
+                  ':value': item
+                ui.value.any:
+                  v-else-if: (view1 == 'expanded-list')
+                  ':value': item
+                ui.value: 
+                  v-else: null
+                  ':value': item
+      transition: 
+        name: slide
+        table: 
+          v-if: (view1 == 'table')
+          thead:
+            tr: 
+              th:
+                v-for: field in visibleFields
+                .clickable:
+                  ':class': '{ selected: (sortByField == field) }'
+                  v-text: field
+                  @click: onSortByField(field)
+          tbody: 
+            tr: 
+              v-for: (item, index) in visibleItems
+              ':class': _getItemClass(item, index)
+              @mouseenter: () => onItemHover(item, true)
+              @mouseleave: () => onItemHover(item, false)
+              @click: () => onItemClick(item, index)
+              td: 
+                v-for: field in visibleFields
+                ui.value.preview: 
+                  ':value': item?.[field]
+props:
+  value: null
+  reverse: false
+  view: null
+  getItemClass: null
+  maxVisibleItems: 10
+  maxVisibleFields: 1000
+data:
+  sortByField: null
+  sortByFieldDirection: 1
+  hoveredItem: null
+methods:
+  onSortByField: | #js
+    function(field) {
+      this.sortByField = field;
+      this.sortByFieldDirection = (this.sortByFieldDirection == 1) ? -1 : 1;
+    }
+  onItemHover: | #js
+    function(item, isHovered) {
+      if (this.$refs.hoveredItemContext1?.isPinned) return;
+      this.hoveredItem = (isHovered ? item : null);
+    }
+  onItemClick: | #js
+    function(item, index) {
+      console.log(item);
+      this.$emit("array-item-click", item, index);
+    }
+  getFieldType: | #js
+    function(fieldName) {
+      if (!this.value?.length) return null;
+      if (this.isImageField(fieldName)) return "image";
+      return (typeof this.value[0][fieldName]);
+    }
+  isImageField: | #js
+    function(fieldName) {
+      if (!this.value?.length) return false;
+      if (['.jpg', '.jpeg', '.png'].some(ext => this.value.find(item => item[fieldName]?.toString().endsWith(ext)))) return true;
+      return false;
+    }
+  _getItemClass: | #js
+    function(item, index) {
+      const classes = [];
+      if (this.getItemClass) classes.push(this.getItemClass(item, index));
+      return classes;
+    }
+  isPrimitive: | #js
+    function(value) {
+      return (typeof value) != "object";
+    }
+computed:
+  visibleItems: | #js
+    const items = [...this.value]
+      .take(this.maxVisibleItems || 1000)
+      .sortByDirection([this.sortByField], this.sortByFieldDirection)
+      .map(item => Objects.getObjectFields(item, this.visibleFields));
+    return items;
+  visibleFields: | #js
+    return this.fields;
+  items: | #js
+    const items = [...this.value]
+      .take(this.maxVisibleItems || 1000)
+      .sortByDirection([this.sortByField], this.sortByFieldDirection);
+    return items;
+  fields: | #js
+    // Get all the field names from the array of objects
+    if (!this.value) return [];
+    const objects = this.value
+      .take(10)
+      .filter(item => !this.isPrimitive(item));
+    const fields = objects.map(o => Object.keys(o||{}))
+      .flatMap(f => f)
+      .distinct()
+      .take(this.maxVisibleFields || 1000);
+    return fields;
+  view1: | #js
+    function() {
+      const value = this.value;
+      const view = (!value) ? null : (this.isPrimitive(value[0]) ? 'list' : 'table');
+      return this.view || view;
+    }
+watch:
+  value:
+    handler: | #js
+      function(value) {
+      }
+    immediate: true
+style:
+  .box1:
+    border: '1px solid #ffffff80'
+    border-radius: 0.5em
+    padding: 0.5em
+    overflow: hidden
+  .reversed > table > tbody:
+    display: flex
+    flex-direction: column-reverse
+  tr *:
+    max-height: 1.5em
+    line-height: 1.1em
+    overflow: hidden
+  tr .value-as-string:
+    max-width: 12em
+  img:
+    width: 5em
+  tr:
+    transition: 0s
+  tr:hover td:
+    background-color: '#ffffff20'
+    transition: 0s
+  th:
+    padding-right: 1em
+    opacity: 0.5
+  td:
+    font-family: monospace
+    padding: 0 0.5em
+_:
+  examples:
+    count: 0
+name: ui-value-array
+template: >-
+  <div class="comp-ui-value-array" path="-621945022."><div class="box1"
+  :class="{ reversed: reverse }" path="-621945022.0"><div class="flex"
+  path="-621945022.0.0"><ui-title icon="🧊" text="Array" :number="value?.length"
+  path="-621945022.0.0.0"></ui-title></div><ui-select v-if="false"
+  :options="['table', 'short-list', 'expanded-list']" input-type="value"
+  type="toggle" v-model="view1"
+  path="-621945022.0.1"></ui-select><ui-context-window v-if="false"
+  ref="hoveredItemContext1" :visible="hoveredItem"
+  path="-621945022.0.2"><ui-value :value="hoveredItem"
+  path="-621945022.0.2.0"></ui-value></ui-context-window><transition
+  name="slide" path="-621945022.0.3"><table v-if="(view1.includes('list'))"
+  path="-621945022.0.3.0"><tbody path="-621945022.0.3.0.0"><tr v-for="(item,
+  index) in visibleItems" path="-621945022.0.3.0.0.0"><td class="opacity-50"
+  v-text="index" path="-621945022.0.3.0.0.0.0"></td><td
+  path="-621945022.0.3.0.0.0.1"><ui-value-preview v-if="(view1 == 'short-list')"
+  :value="item" path="-621945022.0.3.0.0.0.1.0"></ui-value-preview><ui-value-any
+  v-else-if="(view1 == 'expanded-list')" :value="item"
+  path="-621945022.0.3.0.0.0.1.1"></ui-value-any><ui-value :value="item"
+  path="-621945022.0.3.0.0.0.1.2"></ui-value></td></tr></tbody></table></transition><transition
+  name="slide" path="-621945022.0.4"><table v-if="(view1 == 'table')"
+  path="-621945022.0.4.0"><thead path="-621945022.0.4.0.0"><tr
+  path="-621945022.0.4.0.0.0"><th v-for="field in visibleFields"
+  path="-621945022.0.4.0.0.0.0"><div class="clickable" :class="{ selected:
+  (sortByField == field) }" v-text="field" @click="onSortByField(field)"
+  path="-621945022.0.4.0.0.0.0.0"></div></th></tr></thead><tbody
+  path="-621945022.0.4.0.1"><tr v-for="(item, index) in visibleItems"
+  :class="_getItemClass(item, index)" @mouseenter="() =&gt; onItemHover(item,
+  true)" @mouseleave="() =&gt; onItemHover(item, false)" @click="() =&gt;
+  onItemClick(item, index)" path="-621945022.0.4.0.1.0"><td v-for="field in
+  visibleFields" path="-621945022.0.4.0.1.0.0"><ui-value-preview
+  :value="item?.[field]"
+  path="-621945022.0.4.0.1.0.0.0"></ui-value-preview></td></tr></tbody></table></transition></div></div>

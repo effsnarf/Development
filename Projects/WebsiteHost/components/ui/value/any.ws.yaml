@@ -1,0 +1,61 @@
+dom:
+  div:
+    component:
+      ':is': getComponentType(value)
+      ':value': visibleValue
+      ':title': title
+      ':preview': 'false'
+      ':depth': (depth + 1)
+      ':large': large
+props:
+  value: null
+  title: null
+  depth: 0
+  large: false
+data: null
+methods:
+  getComponentType: | #js
+    function(value) {
+      const getType = (value) => {
+        let typeofValue = typeof value;
+        if (value == null) return "preview";
+        if (Array.isArray(value)) return "array";
+        if (["object", "boolean"].find(v => v == typeofValue)) return typeofValue;
+        if (typeof value == "string")
+        {
+          const isColor = value.match(/^#[0-9a-f]{6}$/i);
+          if (isColor) return "color";
+        }
+        return "preview";
+      };
+      return `ui.value.${getType(value)}`.replace(/\./g, "-");
+    }
+computed:
+  visibleValue: | #js
+    function() {
+      if (this.value === null) return null;
+      if (this.value === undefined) return undefined;
+      if (!this.selectedPath?.length) return this.value;
+      return Objects.getProperty(this.value, this.selectedPath.join("."));
+    }
+watch: null
+style:
+  .console-log-button:
+    position: absolute
+    bottom: '-0.3em'
+    right: '-0.5em'
+    font-size: 200%
+    padding: 0 0.4em
+    cursor: pointer
+    z-index: 1000
+  .console-log-button:hover:
+    background: '#ffffff20'
+name: ui-value-any
+_:
+  examples:
+    count: 0
+template: >-
+  <div class="comp-ui-value-any" path="1299909909."><component
+  :is="getComponentType(value)" :value="visibleValue" :title="title"
+  :preview="false" :depth="(depth + 1)" :large="large"
+  path="1299909909.0"></component></div>

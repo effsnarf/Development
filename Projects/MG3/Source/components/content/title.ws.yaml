@@ -72,6 +72,9 @@ style:
   .spacer:
     height: 6rem
 name: content-title
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-content-title" :class="getCssClass()"
   path="-1385872221."><div class="content-title site-width"

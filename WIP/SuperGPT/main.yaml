@@ -1,0 +1,19 @@
+
+give me a list of eSim enabled android phones, ordered by price ascending
+
+
+return await gpt.task("give me a list of eSim enabled android phones, ordered by price ascending");
+
+
+
+return async () => {
+  const androidPhoneModels = (await gpt.web("eSim enabled android phones", "string[]")) as string[];
+  const androidPhones = androidPhoneModels.map(model => ({ model, price: await gpt.web(`price of ${model}`, "number") }));
+  const sortedAndroidPhones = androidPhones.sortBy(phone => phone.price);
+  return sortedAndroidPhones;
+}
+
+[
+{ model: "Samsung G8", price: 100 },
+{ model: "Pixel 4", price: 120 },
+]

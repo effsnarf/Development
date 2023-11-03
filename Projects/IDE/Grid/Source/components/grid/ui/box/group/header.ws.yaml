@@ -1,0 +1,28 @@
+dom:
+  .flex:
+    div:
+      v-text: '''📦'''
+    .clickable:
+      v-text: '''✨'''
+      @click: onToggleGroupMaximized
+props:
+  box: null
+data:
+  dataValue: null
+methods:
+  onToggleGroupMaximized: | #js
+    function() {
+      const vBox = this.$root.vm.getAncestors(this, "grid.ui.box")[0];
+      vBox.$femit("toggle.group.maximized", this.box._id);
+    }
+  init: | #js
+    function(box) {
+    }
+_:
+  examples:
+    count: 0
+name: grid-ui-box-group-header
+template: >-
+  <div class="comp-grid-ui-box-group-header flex" path="262260113."><div
+  v-text="'📦'" path="262260113.0"></div><div class="clickable" v-text="'✨'"
+  @click="onToggleGroupMaximized" path="262260113.1"></div></div>

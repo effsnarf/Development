@@ -1,0 +1,117 @@
+dom:
+  div:
+    v-if: '!multiline'
+    ':class': '{ disabled: !enabled, camouflage }'
+    .icon:
+      v-if: icon
+      v-text: icon
+    input:
+      ref: input1
+      ':class': '{ hasIcon: icon }'
+      ':style': textBoxStyle
+      ':type': type
+      ':placeholder': hint
+      ':value': value
+      ':disabled': '!enabled'
+      @input: onInput
+  textarea:
+    ref: textarea1
+    v-else-if: multiline
+    ':value': value
+    ':placeholder': hint
+    @focus: $emit('focus')
+    @blur: $emit('blur')
+    @input: onTextAreaInput
+    @keydown: onTextAreaKeyDown
+props:
+  type: text
+  value: null
+  hint: null
+  icon: null
+  enabled: true
+  multiline: false
+  autoResize: false
+  camouflage: false
+  textBoxStyle: null
+  debounce: 0
+data:
+  _onInput: null
+methods:
+  onInput: | #js
+    function(e) {
+      const self = this;
+      const input = e.target;
+      if (!this._onInput) this._onInput = ((value) => {
+        self.$emit('input', value);
+      }).debounce(this.debounce);
+      this._onInput(input.value);
+      this.resizeInput(input);
+    }
+  onTextAreaInput: | #js
+    function(e) {
+      const textarea = e.target;
+      this.$emit('input', textarea.value);
+      this.resizeTextArea(textarea);
+    }
+  resizeInput: | #js
+    function(input) {
+      if (!this.autoResize) return;
+      const chars = (Math.max(input.value.length, 8) + 2);
+      const width = `${chars}ch`;
+      input.style.width = "";
+      input.style.width = `${width}`;
+    }
+  resizeTextArea: | #js
+    function(textarea, heightLimit) {
+      if (!this.autoResize) return;
+      heightLimit = heightLimit || 200;
+      const height = `${Math.min(textarea.scrollHeight, heightLimit)}px`;
+      textarea.style.height = "";
+      textarea.style.height = `${height}`;
+    }  
+  onTextAreaKeyDown: | #js
+    function(e) {
+      if (e.key == 'Tab') {
+        e.preventDefault();
+        let start = e.target.selectionStart;
+        let end = e.target.selectionEnd;
+        let value = e.target.value;
+        e.target.value = value.substring(0, start) + "  " + value.substring(end);
+        e.target.selectionStart = e.target.selectionEnd = start + 2;
+      }
+      return false;
+    }
+watch:
+  value:
+    handler: | #js
+      async function(value) {
+        await this.$nextTick();
+        this.resizeInput(this.$refs.input1);
+        if (this.multiline) {
+          this.resizeTextArea(this.$refs.textarea1);
+        }
+      }
+    immediate: true
+name: ui-input-text-box
+style:
+  .camouflage:not(:hover) input, .camouflage:not(:hover) textarea:
+    border: none
+    background: no-repeat
+    box-shadow: none
+  input.hasIcon:
+    padding-left: 2em !important
+  .icon:
+    position: absolute
+    margin: 0.25em
+_:
+  examples:
+    count: 0
+template: >-
+  <div class="comp-ui-input-text-box" v-if="!multiline" :class="{ disabled:
+  !enabled, camouflage }" path="739613128."><div class="icon" v-if="icon"
+  v-text="icon" path="739613128.0"></div><input ref="input1" :class="{ hasIcon:
+  icon }" :style="textBoxStyle" :type="type" :placeholder="hint" :value="value"
+  :disabled="!enabled" @input="onInput" path="739613128.1"/></div><textarea
+  ref="textarea1" v-else-if="multiline" :value="value" :placeholder="hint"
+  @focus="$emit('focus')" @blur="$emit('blur')" @input="onTextAreaInput"
+  @keydown="onTextAreaKeyDown"></textarea>

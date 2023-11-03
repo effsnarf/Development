@@ -1,0 +1,83 @@
+dom:
+  div: 
+    transition.group:
+      name: list
+      .note:
+        v-for: note in notes
+        ':key': note.id
+        ui.button:
+          class: close-button
+          text: ✕
+          @click: deleteNote(note)
+        ui.link:
+          ':url': $root.itemToUrl(note.item)
+          @navigate: deleteNote(note)
+          div: 
+            v-if: note.text
+            v-text: note.text
+          component:
+            v-if: note.componentName
+            ':is': note.componentName.replace('.', '-')
+            ':item': note.item
+            ':note': 'true'
+data:
+  notes: []
+  noteID: 1
+mounted: | #js
+  function() {
+    this.$root.$on('notify', (note) => {
+      note.id = this.noteID++;
+      this.notes.push(note);
+    });
+  }
+methods:
+  deleteNote: | #js
+    function(note) {
+      this.notes = this.notes.filter(n => n.id != note.id);
+    }
+style:
+  .note:
+    background: '#303030'
+    padding: 1em
+    box-shadow: '-1em 1em 2em #000, 1px -1px 1px gray'
+  .close-button:
+    width: min-content;
+    position: absolute;
+    z-index: 1000;
+    right: '-0.5em;'
+    top: '-0.5em;'
+    box-shadow: '-0.5em 0.5em 1em #000'
+example1:
+  - dom:
+      div:
+        ui.button:
+          text: Notify
+          @click: notify
+    methods:
+      notify: | #js
+        function() {
+          this.$root.$emit("notify", {
+            text: "Notification from button click"
+          });
+          return;
+          this.$refs.notes1.notify({
+            componentName: 'ui.text',
+            item: {
+              text: 'Hello World'
+            }
+          });
+        }
+name: ui-notifications
+_:
+  examples:
+    count: 0
+template: >-
+  <div class="comp-ui-notifications" path="-732312818."><transition-group
+  name="list" path="-732312818.0"><div class="note" v-for="note in notes"
+  :key="note.id" path="-732312818.0.0"><ui-button class="close-button" text="✕"
+  @click="deleteNote(note)" path="-732312818.0.0.0"></ui-button><ui-link
+  :url="$root.itemToUrl(note.item)" @navigate="deleteNote(note)"
+  path="-732312818.0.0.1"><div v-if="note.text" v-text="note.text"
+  path="-732312818.0.0.1.0"></div><component v-if="note.componentName"
+  :is="note.componentName.replace('.', '-')" :item="note.item" :note="true"
+  path="-732312818.0.0.1.1"></component></ui-link></div></transition-group></div>

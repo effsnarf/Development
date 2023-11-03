@@ -1,0 +1,47 @@
+%html
+  %head
+    %meta{content: "width=device-width, initial-scale=1", "data-n-head": "ssr", name: "viewport"}
+    %meta{property: "og:title", content: "{{title}}"}
+    %meta{property: "og:type", content: "article"}
+    %meta{property: "og:url", content: "{{url}}"}
+    %meta{property: "og:image", content: "{{imageUrl}}"}
+    %meta{property: "og:description", content: "{{description}}"}
+    %title {{title}}
+    %script{async: "async", src: "https://www.googletagmanager.com/gtag/js?id=G-P952PRPTTR"}
+    %script{async: "async", src: "https://static.addtoany.com/menu/page.js"}
+    %script
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-P952PRPTTR');
+    %link{rel: "stylesheet", href: "https://fonts.googleapis.com/css?family=Russo One|Electrolize|Allura|Old Standard TT|Oswald|Special Elite&display=swap"}
+    %link{rel: "stylesheet", href: "https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/css/alertify.css"}
+    %link{rel: "stylesheet", href: "https://cdn.jsdelivr.net/npm/shorthandcss@1.1.1/dist/shorthand.min.css"}
+    %link{rel: "stylesheet", href: "/css/defaults.css"}
+    %link{rel: "stylesheet", href: "/css/layout.css"}
+    %link{rel: "stylesheet", href: "/css/transitions.css"}
+    %link{rel: "stylesheet", href: "/js/lib/prism/prism.css"}
+    %link{rel: "stylesheet", href: "/css/default.css"}
+    %script{src: "https://db.memegenerator.net/client.js"}
+    %script{src: "https://cdn.jsdelivr.net/npm/deep-diff@1.0.2/dist/deep-diff.min.js"}
+    %script{src: "//cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/alertify.js"}
+    %script{src: "https://cdnjs.cloudflare.com/ajax/libs/dexie/3.2.3/dexie.js"}
+    %script{src: "https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.js"}
+    %script{src: "https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.7/handlebars.js"}
+    %script{src: "https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.js"}
+    %script{src: "https://unpkg.com/vue-async-computed"}
+    %script{src: "/js/lib/leader-line/leader-line.min.js"}
+    %script
+      window.components = (((components)));
+    %script
+      window.templates = (((templates)));
+    %script
+      window.helpers = (((helpers)));
+    %script
+      window.config = (((config)));
+    %script{src: "/script/ide.js?_uid=(((scriptUrlCacheInvalidator)))", defer: "true"}
+    %script{src: "/script/startup.js?_uid=(((scriptUrlCacheInvalidator)))", defer: "true"}
+  %body
+    %div
+      %div{id: "app"}
+        %app{ref: "app", ":key": "key1"}

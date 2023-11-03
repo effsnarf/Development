@@ -58,6 +58,9 @@ style:
   .grid:
     grid-template: 1fr / 2rem 2rem 1fr
     gap: 0.5rem
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-e-thread-list" path="-335521287."><ui-loading v-if="isLoading
   &amp;&amp; !threads.length" path="-335521287.0"></ui-loading><ui-list

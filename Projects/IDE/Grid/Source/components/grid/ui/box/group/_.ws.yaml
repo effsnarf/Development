@@ -1,0 +1,68 @@
+dom:
+  div:
+    component:
+      ref: displayBoxComp1
+      ':is': getBoxCompName(displayBox)
+      ':box': displayBox
+      ':data-bound-socket-data': dataBoundSocketData
+      @box-event: emitBoxEvent
+    @click: onClick
+props:
+  box: null
+  dataBoundSocketData: null
+data:
+  groupBox: null
+  displayBox: null
+methods:
+  onBoxEvent: | #js
+    function(...args) {
+      this.$refs.displayBoxComp1?.onBoxEvent?.(...args);
+    }
+  emitBoxEvent: | #js
+    function(...args) {
+      this.$emit("box-event", ...args);
+    }
+  onClick: | #js
+    function() {
+      // #TODO: Find a way to not refresh manually
+      //this.refresh();
+    }
+  onBoxIsLoading: | #js
+    function(boxID, isLoading) {
+      if (!this.groupBox.members.includes(boxID)) return;
+      if (isLoading > 0) return;
+      // Whenever a member box is done loading, refresh the group box
+      this.refresh();
+    }
+  init: | #js
+    async function(box) {
+      this.groupBox = box;
+      await this.$nextTick();
+      this.refresh();
+    }
+  refresh: | #js
+    function() {
+      this.displayBox = this.$boxes.find(b => b._id == this.groupBox.displayBoxID);
+    }
+  getBoxCompName: | #js
+    function(box) {
+      if (!box?.type) return null;
+      return `grid.ui.box.${box.type}`.replace(/\./g, "-");
+    }
+watch:
+  box:
+    handler: | #js
+      async function(box) {
+        this.init(box);
+      }
+    immediate: true
+_:
+  examples:
+    count: 0
+name: grid-ui-box-group
+template: >-
+  <div class="comp-grid-ui-box-group" @click="onClick"
+  path="1087010666."><component ref="displayBoxComp1"
+  :is="getBoxCompName(displayBox)" :box="displayBox"
+  :data-bound-socket-data="dataBoundSocketData" @box-event="emitBoxEvent"
+  path="1087010666.0"></component></div>

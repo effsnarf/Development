@@ -1,0 +1,247 @@
+dom:
+  div: 
+    transition:
+      name: slide2
+      .alert:
+        v-if: isVisible
+        div: 
+          v-if: text1
+          ':key': text1
+          v-text: text1
+        @click: onClick
+        slot: null
+props:
+  text: null
+  timeout: 3000
+data:
+  text1: null
+  isVisible: true
+methods:
+  show: | #js
+    function(text) {
+      if (text) this.text1 = text;
+      this.isVisible = this.text1?.length || this.$slots.default?.length;
+      setTimeout(this.hide.bind(this), this.timeout);
+    }
+  hide: | #js
+    function() {
+      this.isVisible = false;
+    }
+  onClick: | #js
+    function() {
+      this.isVisible = false;
+      this.$emit('click');
+    }
+watch:
+  text:
+    handler: | #js
+      function(text) {
+        this.show(text);
+      }
+    immediate: true
+example:
+  dom:
+    ui.alert:
+      ref: alert1
+      text: ⚠️ This is an alert.
+      @click: onClick
+  methods:
+    onClick: | #js
+      function() {
+        setTimeout(() => {
+          this.$refs.alert1.show('⚠️ This is another alert.');
+        }, 1000);
+      }
+style:
+  .alert:
+    background: '#ffffff20'
+    border: 1px solid '#ffffff40'
+    padding: 0.5em 1em
+    text-align: center
+    cursor: pointer
+name: ui-alert
+frameworks:
+  vue: | #js
+    &lt;template&gt;
+      &lt;div class="comp-ui-alert"&gt;
+        &lt;transition name="slide2"&gt;
+          &lt;div class="alert" v-if="isVisible" :key="text1" v-text="text1" @click="onClick"&gt;&lt;/div&gt;
+        &lt;/transition&gt;
+      &lt;/div&gt;
+    &lt;/template&gt;
+
+    &lt;script&gt;
+    export default {
+      name: 'ui-alert',
+      props: {
+        text: {
+          default: null
+        }
+      },
+      data() {
+        return {
+          text1: null,
+          isVisible: true
+        };
+      },
+      methods: {
+        show(text) {
+          if (text) this.text1 = text;
+          this.isVisible = true;
+        },
+        onClick() {
+          this.isVisible = false;
+          this.$emit('click');
+        }
+      },
+      watch: {
+        text: {
+          handler(text) {
+            this.show(text);
+          },
+          immediate: true
+        }
+      }
+    };
+    &lt;/script&gt;
+
+    &lt;style scoped&gt;
+    .alert {
+      background: '#ffffff20';
+      padding: 0.5em 1em;
+      text-align: center;
+      cursor: pointer;
+    }
+    &lt;/style&gt;
+  react: | #js
+    import React, { useState, useEffect } from 'react';
+
+    // CSS styles
+    const alertStyles = {
+      background: '&#x27;#ffffff20&#x27;',
+      padding: '&#x27;0.5em 1em&#x27;',
+      textAlign: '&#x27;center&#x27;',
+      cursor: '&#x27;pointer&#x27;'
+    };
+
+    function UiAlert(props) {
+      const [text1, setText1] = useState(null);
+      const [isVisible, setIsVisible] = useState(true);
+
+      useEffect(() => {
+        show(props.text);
+      }, [props.text]);
+
+      const show = (text) => {
+        if (text) setText1(text);
+        setIsVisible(true);
+      };
+
+      const onClick = () => {
+        setIsVisible(false);
+        // Emitting an event in React is typically done via a callback prop
+        if (props.onClick) {
+          props.onClick();
+        }
+      };
+
+      return (
+        &lt;div className=&#x27;comp-ui-alert&#x27;&gt;
+          {/* React doesn't have a built-in transition component like Vue. 
+              You might want to use libraries like &#x27;react-transition-group&#x27; for transitions. */}
+          {isVisible &amp;&amp; &lt;div className=&#x27;alert&#x27; style={alertStyles} onClick={onClick}&gt;{text1}&lt;/div&gt;}
+        &lt;/div&gt;
+      );
+    }
+
+    export default UiAlert;
+  angular: >
+    &lt;div class="comp-ui-alert"&gt;
+      &lt;div *ngIf="isVisible" class="alert" (click)="onClick()"&gt;{{ text1 }}&lt;/div&gt;
+    &lt;/div&gt;
+
+
+
+    import { Component, Input, Output, EventEmitter, OnChanges } from
+    '@angular/core';
+
+
+    @Component({
+      selector: 'app-ui-alert',
+      templateUrl: './ui-alert.component.html',
+      styleUrls: ['./ui-alert.component.css']
+    })
+
+    export class UiAlertComponent implements OnChanges {
+      @Input() text: string | null = null;
+      @Output() clickEvent = new EventEmitter<void>();
+
+      text1: string | null = null;
+      isVisible = true;
+
+      ngOnChanges() {
+        this.show(this.text);
+      }
+
+      show(text: string | null) {
+        if (text) this.text1 = text;
+        this.isVisible = true;
+      }
+
+      onClick() {
+        this.isVisible = false;
+        this.clickEvent.emit();
+      }
+    }
+
+
+
+    .alert {
+      background: '&#x23;ffffff20';
+      padding: 0.5em 1em;
+      text-align: center;
+      cursor: pointer;
+    }
+  svelte: | #js
+    &lt;script&gt;
+      export let text = null;
+      let text1 = null;
+      let isVisible = true;
+
+      const show = (txt) => {
+        if (txt) text1 = txt;
+        isVisible = true;
+      };
+
+      const onClick = () => {
+        isVisible = false;
+        // Emitting an event in Svelte
+        dispatch('click');
+      };
+
+      // Watch for changes in 'text' prop
+      $: show(text);
+    &lt;/script&gt;
+
+    &lt;div class="comp-ui-alert"&gt;
+      {#if isVisible}
+        &lt;div class="alert" on:click={onClick}&gt;{text1}&lt;/div&gt;
+      {/if}
+    &lt;/div&gt;
+
+    &lt;style&gt;
+      .alert {
+        background: '&#x23;ffffff20';
+        padding: 0.5em 1em;
+        text-align: center;
+        cursor: pointer;
+      }
+    &lt;/style&gt;
+_:
+  examples:
+    count: 1
+template: >-
+  <div class="comp-ui-alert" path="-2141174398."><transition name="slide2"
+  path="-2141174398.0"><div class="alert" v-if="isVisible" @click="onClick"
+  path="-2141174398.0.0"><div v-if="text1" :key="text1" v-text="text1"
+  path="-2141174398.0.0.0"></div><slot></slot></div></transition></div>

@@ -1,0 +1,151 @@
+dom:
+  grid.module:
+    ':box': box
+    ':data-bound-socket-data': dataBoundSocketData
+    h2:
+      ui.title:
+        icon: 🎄
+        ':text': node.type
+    .flex:
+      ui.tabs: 
+        ':options': '[''🧊 data'', ''✨ style'']'
+        direction: vertical
+        ':can-select-none': 'true'
+        ':value': null
+        template: 
+          v-slot: tab0
+          div: 
+            ui.linq:
+              ':context': boxContext
+              ':input': inputs?.[1]
+              v-model: linq.operations
+              @input: (operations) => $emit('linq-operations', operations)
+        template: 
+          v-slot: tab1
+          div: 
+            ui.tabs: 
+              ':options': '[''🆎 font size'', ''🖼️ background'']'
+              direction: vertical
+              ':can-select-none': 'true'
+              ':value': null
+              template: 
+                v-slot: tab0
+                ui.input.font.size:
+                  @value-preview: previewFontSize
+                  v-model: fontSize
+              template: 
+                v-slot: tab1
+                ui.input.background.color:
+                  @value-preview: previewBackgroundColor
+                  v-model: bgColorClass
+props:
+  box: null
+  node: null
+  dataBoundSocketData: null
+data:
+  boxContext: null
+  inputs: null
+  linq:
+    operations: null
+  fontSize: null
+  bgColorClass: null
+methods:
+  previewFontSize: | #js
+    function(e) {
+      this.previewStyle('fontSize', e.value, this.fontSize, e.isHover);
+    }
+  previewBackgroundColor: | #js
+    function(bgColorClass, isPreview) {
+      this.previewClass(bgColorClass, this.bgColorClass, isPreview);
+    }
+  previewClass: | #js
+    function(className, defaultClassName, isSet) {
+      this.preview((element) => {
+        if (isSet) {
+          element.classList.add(className);
+          element.classList.remove(defaultClassName);
+        }
+        else {
+          element.classList.remove(className);
+          element.classList.add(defaultClassName);
+        }
+      });
+    }
+  previewStyle: | #js
+    function(key, value, defaultValue, isSet) {
+      this.preview((element) => {
+        if (isSet) {
+          element.style[key] = value;
+        }
+        else {
+          element.style[key] = defaultValue;
+        }
+      });
+    }
+  preview: | #js
+    function(elementCallback) {
+      const nodeSelector = `box_${this.box._id}_node_${this.node._id}`;
+      const elements = document.getElementsByClassName(nodeSelector);
+      for (const element of elements) elementCallback(element);
+    }
+  setFontSize: | #js
+    function(fontSize) {
+      this.setNodeData({ style: { 'fontSize': fontSize } });
+    }
+  setNodeData: | #js
+    function(data) {
+      const vBox = this.$root.vm.getAncestors(this, "grid.ui.box")[0];
+      vBox.$femit("edit.node", this.box._id, this.node._id, data);
+    }
+  init: | #js
+    function(node) {
+      this.linq = (Objects.clone(node.linq) || {});
+      this.linq.operations = (this.linq.operations || []);
+      if (node.style) {
+        this.fontSize = (node.style.css?.fontSize || null);
+        this.bgColorClass = (node.style.bg?.class || null);
+      }
+    }
+watch:
+  node:
+    handler: | #js
+      function(node) {
+        this.init(node);
+      }
+    immediate: true
+  fontSize:
+    handler: | #js
+      function(fontSize) {
+        this.setNodeData({ style: { css: { 'fontSize': fontSize } } });
+      }
+  bgColorClass:
+    handler: | #js
+      function(bgColorClass) {
+        this.setNodeData({ style: { bg: { class: bgColorClass } } });
+      }
+computed: null
+style: null
+_:
+  examples:
+    count: 0
+name: grid-ui-node-settings
+template: >-
+  <grid-module class="comp-grid-ui-node-settings" :box="box"
+  :data-bound-socket-data="dataBoundSocketData" path="-1191877027."><h2
+  path="-1191877027.0"><ui-title icon="🎄" :text="node.type"
+  path="-1191877027.0.0"></ui-title></h2><div class="flex"
+  path="-1191877027.1"><ui-tabs :options="['🧊 data', '✨ style']"
+  direction="vertical" :can-select-none="true" path="-1191877027.1.0"><template
+  v-slot:tab0 path="-1191877027.1.0.0"><div path="-1191877027.1.0.0.0"><ui-linq
+  :context="boxContext" :input="inputs?.[1]" v-model="linq.operations"
+  @input="(operations) =&gt; $emit('linq-operations', operations)"
+  path="-1191877027.1.0.0.0.0"></ui-linq></div></template><template v-slot:tab1
+  path="-1191877027.1.0.1"><div path="-1191877027.1.0.1.0"><ui-tabs
+  :options="['🆎 font size', '🖼️ background']" direction="vertical"
+  :can-select-none="true" path="-1191877027.1.0.1.0.0"><template v-slot:tab0
+  path="-1191877027.1.0.1.0.0.0"><ui-input-font-size
+  @value-preview="previewFontSize" v-model="fontSize"
+  path="-1191877027.1.0.1.0.0.0.0"></ui-input-font-size></template><template
+  v-slot:tab1 path="-1191877027.1.0.1.0.0.1"><ui-input-background-color
+  @value-preview="previewBackgroundColor" v-model="bgColorClass"
+  path="-1191877027.1.0.1.0.0.1.0"></ui-input-background-color></template></ui-tabs></div></template></ui-tabs></div></grid-module>

@@ -15,6 +15,9 @@ style:
   li:
     margin-top: 0.5em
 name: e-generator-list
+_:
+  examples:
+    count: 0
 template: >-
   <transition-group class="comp-e-generator-list" name="list" tag="ul"
   path="-398935166."><li v-for="generator in generators" :key="generator._id"

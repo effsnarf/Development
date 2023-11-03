@@ -1,0 +1,143 @@
+dom:
+  div: 
+    ui.keyboard:
+      @ctrl: onTriggerKey
+    ui.mouse:
+      @hovered-element: onHoveredElement
+      ':global': true
+    ui.context.window:
+      ref: context1
+      ':global': true
+      ':visible': isTriggerPressed
+      ':icon': icon
+      ':title': contextElement?.tagName.toLowerCase()
+      @pinned: onPinned
+      .flex.gap-2:
+        div: 
+          ui.tree:
+            ':root': contextTree
+            ':initial-expanded': 10
+            ':expandable': 'false'
+            item-type: ide.element.tree.node
+            ':get-item': '(node) => (!node?.el ? null : node.el())'
+            ':get-children': (node) => node.children
+            @node-hover: onNodeHover
+            @node-unhover: onNodeUnhover
+            @node-select: onNodeSelect
+        div: 
+          ide.css.editor:
+            ':context-element': contextElement
+props:
+  icon: ❔
+  title: null
+data:
+  selectedElement: null
+  hoveredElement: null
+  contextTree: null
+  isTriggerPressed: false
+methods:
+  onTriggerKey: | #js
+    function(trigger) {
+      this.isTriggerPressed = trigger;
+      const action = trigger ? "add" : "remove";
+      this.hoveredElement?.classList[action]("highlighted");
+    }
+  onHoveredElement: | #js
+    function(el) {
+      if (this.$refs.context1.isPinned) return;
+      this.hoveredElement = el;
+    }
+  onNodeHover: | #js
+    function(node) {
+      this.hoveredElement = (!node?.el ? null : node.el());
+    }
+  onNodeUnhover: | #js
+    function(node) {
+      this.hoveredElement = null;
+    }
+  onNodeSelect: | #js
+    function(node) {
+      this.selectedElement = (!node?.el ? null : node.el());
+    }
+  onPinned: | #js
+    function(isPinned) {
+      const treeNodeComps = this.$root.vm.getDescendants(this, (c) => c.$data._?.comp.name === "ui.tree.node");
+      const treeNodeComp = treeNodeComps.find(c => ((!c.node.el ? null : c.node.el()) == this.hoveredElement));
+      treeNodeComp?.onNodeClick();
+    }
+  getParentChain: | #js
+    function(el) {
+      let chain = [];
+      while (el && chain.length < 5) {
+        chain.push(el);
+        el = el.parentElement;
+      }
+      chain = chain;
+      return chain;
+    }
+  getContextTree: | #js
+    function(el) {
+      const root = {};
+      let node = root;
+      let parentChain = this.getParentChain(el);
+      parentChain = [...parentChain].reverse();
+      while (parentChain.length) {
+        const el = parentChain.shift();
+        node.el = () => el;
+        node.children = [];
+        node.children.push({});
+        node = node.children[0];
+      }
+      return root;
+    }
+computed:
+  contextElement: | #js
+    function() {
+      if (this.$refs.context1?.isPinned) return this.selectedElement;
+      return this.hoveredElement || this.selectedElement;
+    }
+  isContextWindowVisible: | #js
+    function() {
+      return this.isTriggerPressed || this.$refs.context1?.isPinned;
+    }
+watch:
+  contextElement:
+    handler: | #js
+      function(el) {
+        if (!this.$refs.context1?.isPinned) this.contextTree = this.getContextTree(el);
+        this.$emit("context-element", el);
+      }
+    immediate: true
+  selectedElement:
+    handler: | #js
+      function(el, oldEl) {
+        oldEl?.classList.remove("highlighted2");
+        el?.classList.add("highlighted2");
+      }
+    immediate: true
+  hoveredElement: | #js
+    function(el, oldEl) {
+      oldEl?.classList.remove("highlighted");
+      if (!this.isContextWindowVisible) return;
+      el?.classList.add("highlighted");
+    }
+style: null
+name: ide-element-picker
+_:
+  examples:
+    count: 0
+template: >-
+  <div class="comp-ide-element-picker" path="-549121148."><ui-keyboard
+  @ctrl="onTriggerKey" path="-549121148.0"></ui-keyboard><ui-mouse
+  @hovered-element="onHoveredElement" :global="true"
+  path="-549121148.1"></ui-mouse><ui-context-window ref="context1"
+  :global="true" :visible="isTriggerPressed" :icon="icon"
+  :title="contextElement?.tagName.toLowerCase()" @pinned="onPinned"
+  path="-549121148.2"><div class="flex gap-2" path="-549121148.2.0"><div
+  path="-549121148.2.0.0"><ui-tree :root="contextTree" :initial-expanded="10"
+  :expandable="false" item-type="ide.element.tree.node" :get-item="(node) =&gt;
+  (!node?.el ? null : node.el())" :get-children="(node) =&gt; node.children"
+  @node-hover="onNodeHover" @node-unhover="onNodeUnhover"
+  @node-select="onNodeSelect" path="-549121148.2.0.0.0"></ui-tree></div><div
+  path="-549121148.2.0.1"><ide-css-editor :context-element="contextElement"
+  path="-549121148.2.0.1.0"></ide-css-editor></div></div></ui-context-window></div>

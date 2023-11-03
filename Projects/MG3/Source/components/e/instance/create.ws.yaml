@@ -127,6 +127,9 @@ style:
     display: block
     width: 70%
     margin: 0.5rem auto
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-e-instance-create" path="-903297812."><transition
   name="slide" path="-903297812.0"><e-generator-select v-show="!generator

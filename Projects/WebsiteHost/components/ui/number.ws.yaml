@@ -1,0 +1,58 @@
+dom:
+  .card:
+    .top:
+      .icon:
+        v-text: icon
+      .number:
+        v-text: formatNumber(value)
+      .unit:
+        v-text: unit
+    .text:
+      v-text: text
+props:
+  value: null
+  icon: null
+  text: null
+  unit: null
+methods:
+  formatNumber: | #js
+    function(number) {
+      if (number == null) return null;
+      if (typeof number === 'string') number = parseFloat(number);
+      return number.toLocaleString();
+    }
+style:
+  .card:
+    line-height: 1
+    display: inline-block
+  .card > div:
+    text-align: center
+  .top:
+    display: flex
+    align-items: baseline
+    margin: auto
+    width: min-content
+    white-space: nowrap
+  .number:
+    font-size: 100%
+  .unit:
+    font-size: 90%
+    opacity: 0.4
+  .icon:
+    font-size: 100%
+    margin: auto
+  .text:
+    font-size: 110%
+    opacity: 0.6
+    line-height: 1.2em
+name: ui-number
+_:
+  examples:
+    count: 0
+template: >-
+  <div class="comp-ui-number card" path="-1571183645."><div class="top"
+  path="-1571183645.0"><div class="icon" v-text="icon"
+  path="-1571183645.0.0"></div><div class="number" v-text="formatNumber(value)"
+  path="-1571183645.0.1"></div><div class="unit" v-text="unit"
+  path="-1571183645.0.2"></div></div><div class="text" v-text="text"
+  path="-1571183645.1"></div></div>

@@ -1,0 +1,106 @@
+dom:
+  .box:
+    v-if: actionStack
+    h3:
+      ui.title:
+        icon: ✨
+        text: Actions
+        ':number': actionStack.actions.count
+    .flex.justify-between:
+      ui.button: 
+        class: flex-equal
+        text: 👈 undo
+        ':click': () => doVerb('undo')
+      ui.button: 
+        class: flex-equal
+        text: redo 👉
+        ':click': () => doVerb('redo')
+      ui.button: 
+        class: flex-equal
+        text: ♻ all
+        ':click': () => doVerb('doAll')
+      ui.button: 
+        class: flex-equal
+        text: ✖ clear
+        ':click': () => doVerb('clear')
+    div:
+      ui.context.window:
+        ref: context1
+        v-show: hovered.action
+        ':ctrl-right-click': 'false'
+        ui.value.any:
+          ':value': hovered.action
+      ui.action.list:
+        ref: list1
+        class: list1
+        ':action-stack': actionStack
+        @hovered-action: onHoveredAction
+        v-slot: slotProps
+        template:
+          slot:
+            ':action': slotProps.action
+props:
+  actionStack: null
+data:
+  hovered:
+    action: null
+mounted: | #js
+  function() {
+  }
+methods:
+  onHoveredAction: | #js
+    function(action) {
+      if (this.$refs.context1?.isPinned) return;
+      this.hovered.action = action;
+    }
+  getActions: | #js
+    async function() {
+      let actions = await this.actionStack.actions.getMany();
+      actions = actions.map(a => ({
+        _id: a._id,
+        method: a.redo.noop ? "no.op" : a.redo.method,
+      }));
+      actions = [...actions].reverse();
+      return actions;
+    }
+  doVerb: | #js
+    async function(verb) {
+      await this.actionStack[verb]();
+    }
+watch: null
+style:
+  .list1:
+    max-height: 30em
+    overflow-y: auto
+  .box:
+    border: '1px solid #ffffff80'
+  ul.actions:
+    display: flex
+    flex-direction: column-reverse
+    font-family: monospace
+_:
+  examples:
+    count: 0
+name: ui-action-stack
+template: >-
+  <div class="comp-ui-action-stack box" v-if="actionStack"
+  path="-1417831958."><h3 path="-1417831958.0"><ui-title icon="✨" text="Actions"
+  :number="actionStack.actions.count"
+  path="-1417831958.0.0"></ui-title></h3><div class="flex justify-between"
+  path="-1417831958.1"><ui-button class="flex-equal" text="👈 undo" :click="()
+  =&gt; doVerb('undo')" path="-1417831958.1.0"></ui-button><ui-button
+  class="flex-equal" text="redo 👉" :click="() =&gt; doVerb('redo')"
+  path="-1417831958.1.1"></ui-button><ui-button class="flex-equal" text="♻ all"
+  :click="() =&gt; doVerb('doAll')"
+  path="-1417831958.1.2"></ui-button><ui-button class="flex-equal" text="✖
+  clear" :click="() =&gt; doVerb('clear')"
+  path="-1417831958.1.3"></ui-button></div><div
+  path="-1417831958.2"><ui-context-window ref="context1" v-show="hovered.action"
+  :ctrl-right-click="false" path="-1417831958.2.0"><ui-value-any
+  :value="hovered.action"
+  path="-1417831958.2.0.0"></ui-value-any></ui-context-window><ui-action-list
+  class="list1" ref="list1" :action-stack="actionStack"
+  @hovered-action="onHoveredAction" v-slot="slotProps"
+  path="-1417831958.2.1"><template path="-1417831958.2.1.0"><slot
+  :action="slotProps.action"
+  path="-1417831958.2.1.0.0"></slot></template></ui-action-list></div></div>

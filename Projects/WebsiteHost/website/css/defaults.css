@@ -1,0 +1,1003 @@
+*
+{
+}
+
+*:not(td)
+{
+  border-radius: 0.5em;
+}
+
+a
+{
+  color: #fff;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* a:not([href]), a[href=""]
+{
+  cursor: default;
+} */
+
+a:hover
+{
+  text-decoration: none;
+}
+
+a:not([href])
+{
+  cursor: default;
+}
+
+.focused
+{
+  box-shadow: 0 0 0 max(100vh, 100vw) rgba(0, 0, 0, 0.9);
+}
+
+.grayscale
+{
+  filter: grayscale(1);
+}
+
+.grayish
+{
+  filter: grayscale(1);
+  opacity: 0.8;
+  transition: 0s;
+}
+
+.grayish:hover
+{
+  filter: none;
+  opacity: 1;
+  transition: 0s;
+}
+
+div
+{
+  position: relative;
+  width: auto;
+}
+
+body
+{
+  background: black;
+  overflow-y: scroll;
+  font-family: Arial, Helvetica, sans-serif;
+  background: linear-gradient(0deg, #000000e0, #000000);
+  background-attachment: fixed;
+}
+
+.grid
+{
+  display: grid;
+}
+
+body, h1, h2, h3, h4, h5, h6,
+button
+{
+  color: white;
+  text-shadow: -3px 3px 2px #000000a0;
+}
+
+select, textarea
+{
+  width: 100%;
+}
+
+ul
+{
+  list-style-type: none;
+  padding: 0;
+}
+li
+{
+  margin: 0;
+}
+
+.dimmed
+{
+  opacity: 0.5;
+  transition: 0.3s;
+}
+
+.hover-highlight:hover
+{
+  background: #ffffff20;
+  transition: 0s;
+}
+
+.highlighted, tr.highlighted > th, tr.highlighted > td
+{
+  border: 2px dashed #ffff0080 !important;
+}
+:not(tr).highlighted
+{
+  padding: 0.3em;
+}
+.highlighted2
+{
+  border: 4px dashed yellow;
+}
+
+.highlighted, .highlighted2
+{
+  box-shadow: inset -4px 4px 2px #000;
+  transition: 0s;
+}
+
+.tree .title.highlighted:hover
+{
+  background: #ffffff70;
+}
+.tree-node
+{
+  width: 100%;
+}
+.selected
+{
+  background: #ffffff20;
+  transition: 0s;
+}
+.selected:hover
+{
+  background: #ffffff30 !important;
+}
+
+.clickable
+{
+  padding: 0.2em 0.5em;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: 0s;
+}
+.clickable:hover
+{
+  background: #ffffff20;
+  opacity: 1;
+  transition: 0s;
+}
+
+.clickable2
+{
+  display: block;
+  cursor: pointer;
+}
+.clickable2:hover
+{
+  background: #ffffff30;
+  transition: 0s;
+}
+
+li .clickable2:hover
+{
+  background: none;
+}
+
+
+
+.hoverable
+{
+  transition: 0.3s;
+  cursor: pointer;
+}
+.hoverable:hover
+{
+  background: #ffffff30;
+  transition: 0s;
+}
+
+.highlighted-group > :not(.ide-highlighted)
+{
+  opacity: 0.5 !important;
+}
+.ide-highlighted
+{
+  opacity: 1 !important;
+}
+.ide-highlighted
+{
+  transform: scale(1.1);
+}
+.ide-highlighted
+{
+  border: 3px dashed #ffffff80 !important;
+  background-size: auto auto;
+  box-shadow: inset -3px 3px 6px 6px #00000020;
+}
+
+table
+{
+  width: 100%;
+}
+td, th
+{
+  text-align: left;
+  border-radius: 0;
+}
+th
+{
+  white-space: nowrap;
+}
+table.bordered td, table.bordered th
+{
+  border: 1px solid #ffffff40;
+}
+
+div.padded, table.padded td, table.padded th
+{
+  padding: 0.3em 0.6em;
+}
+
+.tree
+{
+  width: 100%;
+}
+.tree li, .menu .tree li
+{
+  padding: 0 !important;
+}
+.tree .title, .title
+{
+  width: min-content;
+  white-space: pre;
+  padding: 0 1em 0 0.3em;
+  max-width: 20em;
+}
+.tree .selected
+{
+  background: none;
+}
+.tree .selected > .title,
+.tree .selected > .title:hover
+{
+  background: #ffffff60;
+  box-shadow: -3px 3px 3px #00000080;
+}
+.menu ul.tree, .tree li:hover
+{
+  background: none !important;
+  white-space: nowrap;
+}
+.tree li div
+{
+  /* max-height: 1.9em;*/
+  overflow: hidden;
+  word-break: break-all;
+  text-overflow: ellipsis;
+}
+
+li, pre, button
+{
+}
+
+li
+{
+}
+li:hover, tr:hover > td
+{
+}
+tr:hover > td:first-child
+{
+  border-radius: 0.5em 0 0 0.5em;
+}
+tr:hover > td:last-child
+{
+  border-radius: 0 0.5em 0.5em 0;
+}
+
+.parent .visible-if-parent-hover
+{
+  opacity: 0;
+}
+.parent:hover .visible-if-parent-hover
+{
+  opacity: 1;
+}
+
+
+code
+{
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+button
+{
+  padding: 0.3em 1em !important;
+  box-shadow: -3px 3px 2px #00000060;
+  cursor: pointer;
+  font-size: 1em;
+}
+button /* .ide-button */
+{
+  background: #404040;
+  filter: grayscale(1);
+  opacity: 0.7;
+  transition: 0.3s;
+}
+button /* .ide-button:hover */
+{
+  transform: scale(1.1);
+  filter: none;
+  opacity: 1;
+}
+
+pre, input, textarea, select, option, .ide-checkbox
+{
+  padding: 0.3em 0.5em !important;
+  background: linear-gradient(to left, #303030, #101010);
+  box-shadow: inset -2px 2px 2px #000;
+  text-shadow: -3px 3px 2px #000;
+  font-family: monospace !important;
+  font-size: 110%;
+  border: 1px solid gray;
+  width: 100%;
+  color: #ffffff;
+}
+pre
+{
+  font-size: 100%;
+  overflow: hidden;
+}
+option
+{
+  background: #303030;
+  cursor: pointer;
+}
+input:focus, textarea:focus, select:focus
+{
+  color: white;
+  box-shadow: inset -5px 5px 3px #000;
+  text-shadow: -3px 3px 2px #000000;
+  outline: none;
+  transition: 0s;
+}
+input[type=checkbox], .ide-checkbox
+{
+  width: 1em;
+  height: 1em;
+  margin: 0.1em 0.5em;
+  cursor: pointer;
+  background: #979797;
+  transform: scale(1.1);
+}
+input, input[type=text], select
+{
+  font-size: 120%;
+}
+
+input[type="color"]
+{
+  padding: 0 !important;
+  cursor: pointer;
+}
+
+span.color
+{
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+}
+
+.ide-checkbox
+{
+  background: #666666;
+  padding: 0.2em !important;
+  width: 1.8em;
+  height: 1.8em;
+}
+.ide-checkbox.checked
+{
+  opacity: 1;
+}
+.ide-checkbox > *
+{
+  opacity: 0.3;
+}
+.ide-checkbox.checked > *
+{
+  opacity: 1;
+}
+
+select
+{
+  background: #00000030;
+  box-shadow: -2px 2px 2px #000;
+}
+select:hover
+{
+  background: #00000020;
+}
+
+select, input[type=range]
+{
+  cursor: pointer;
+}
+
+
+.box1
+{
+  background: #ffffff20;
+  padding: 0.5em;
+  box-shadow: inset -3px 3px 3px #000;
+  border: 2px solid #ffffff30;
+}
+
+
+.slider-closed
+{
+  max-width: 5em;
+  filter: grayscale(1) blur(3px);
+  opacity: 0.5;
+  overflow: hidden;
+  transition: 1s;
+}
+.slider-closed:hover, .slider-opened
+{
+  max-width: 20em;
+  filter: none;
+  opacity: 1;
+}
+
+
+.menu hr
+{
+  opacity: 0.2;
+}
+.menu, li.submenu > ul
+{
+  display: none;
+  opacity: 0;
+}
+.menu, .menu ul:not(.tree)
+{
+  position: fixed;
+  background: #303030;
+  box-shadow: -6px 6px 12px #000;
+  transition: all 0.6s, left 0s;
+  z-index: 10;
+  min-width: 15em;
+  top: 30px;
+}
+.menu.hinted
+{
+  display: block !important;
+  opacity: 0.6 !important;
+  margin-top: 1rem;
+}
+.menu.visible
+{
+  display: block !important;
+  opacity: 1 !important;
+  top: 0;
+}
+.menu .items
+{
+  max-width: 0;
+  max-height: 0;
+  overflow: hidden;
+}
+.menu.visible .items
+{
+  max-width: 50em;
+  max-height: 40em;
+  overflow: hidden;
+}
+.menu
+{
+  margin-top: 1em;
+}
+.submenu:hover > ul > li > .menu:not(.hinted)
+{
+  display: block !important;
+  opacity: 1;
+}
+.menu li
+{
+  margin: 0;
+  padding: 0.5em 1em !important;
+}
+.menu3 li
+{
+  margin: 0;
+}
+.menu li:hover,
+.menu3 li:hover
+{
+  background: #ffffff20;
+  cursor: pointer !important;
+  transition: 0s;
+}
+.menu3 li
+{
+  transition: 0.2s;
+}
+.menu li.p-0
+{
+  padding: 0 !important;
+}
+/*
+.menu li.submenu:before
+{
+  content: "▶";
+  position: absolute;
+  right: 1em;
+  opacity: 0.2;
+}
+*/
+.menu ul
+{
+}
+.menu ul,
+.menu li.submenu:hover > ul
+{
+  transition: all 0.6s, left 0s;
+}
+.menu ul .menu
+{
+  margin: 0;
+}
+.menu li.submenu > ul
+{
+  opacity: 0;
+}
+.menu li.submenu:hover > ul:not(.hinted)
+{
+  display: block;
+  opacity: 1;
+  z-index: 20;
+}
+
+.menu.fade-out
+{
+  margin-left: 6em;
+  transition: 0.6s;
+}
+
+.menu2
+{
+  background: #606060;
+}
+.menu2 > *
+{
+  padding: 0.5em 1em;
+}
+.menu2 > div:hover
+{
+  background: #ffffff30;
+  transition: 0s;
+}
+
+
+.ide-sort-placeholder
+{
+  height: 0;
+  overflow: hidden;
+  transition: 0.3s;
+}
+.drag-over + .ide-sort-placeholder,
+.drag-over > .ide-sort-placeholder
+{
+  height: 1em;
+}
+.ide-sort-placeholder.drag-over
+{
+  height: 3em;
+}
+
+
+.show-on-hover-container > .show-on-hover
+{
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: 1s !important;
+}
+
+.show-on-hover-container:hover > .show-on-hover
+{
+  max-height: 20rem;
+  opacity: 1;
+  transition: 1s !important;
+}
+
+.show-on-hover-container > * > .show-on-hover-2
+{
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: 1s !important;
+}
+
+.show-on-hover-container:hover > * > .show-on-hover-2
+{
+  max-height: 20rem;
+  opacity: 1;
+  transition: 1s !important;
+}
+
+.show-on-hover-container > * > * > .show-on-hover-3
+{
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: 1s !important;
+}
+
+.show-on-hover-container:hover > * > * > .show-on-hover-3
+{
+  max-height: 20rem;
+  opacity: 1;
+  transition: 1s !important;
+}
+
+
+.show-on-hover-container > .show-on-hover.hor
+{
+  max-width: 0;
+  max-height: auto;
+}
+
+.show-on-hover-container:hover > .show-on-hover.hor
+{
+  max-width: 20rem;
+  opacity: 1;
+}
+
+
+
+.full-screen-overlay
+{
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #000;
+  backdrop-filter: blur(5px);
+  opacity: 0.9;
+  z-index: 100;
+}
+
+
+.m-auto
+{
+  margin: auto;
+}
+
+
+[draggable], .ide-item
+{
+  width: 100%;
+  transition: 0.6s;
+  white-space: nowrap;
+}
+[draggable=true]
+{
+  transition: 0.6s !important;
+  cursor: grab;
+}
+[draggable=true]:hover, .ide-item:hover
+{
+  background: #ffffff30;
+  transition: 0s !important;
+}
+[draggable=true]:active
+{
+  cursor: grabbing;
+}
+[draggable=true].dragged
+{
+  border: 2px dashed #ffffff60;
+}
+.drag-target
+{
+  border: 3px solid #ff333360;
+}
+.drag-over
+{
+  border: 2px dashed yellow;
+  box-shadow: inset -6px 6px 2px #000000;
+  border-radius: 0.5em;
+  transition: 0.1s;
+}
+.drag-over > *
+{
+}
+
+.ide-drag-ongoing
+{
+  display: none !important;
+}
+.ide-drag-zoom
+{
+  transition: 1s;
+}
+.ide-drag-zoom.on
+{
+  transition: 1s;
+}
+
+
+.gradient-opacity-t-b
+{
+  -webkit-mask-image: -webkit-gradient(linear, center top, center bottom, from(rgba(0,0,0,1)), to(rgba(0,0,0,0)));
+}
+
+
+.block-ui
+{
+  pointer-events: none;
+}
+.disabled
+{
+  filter: grayscale(1) contrast(0.8) brightness(0.8);
+  pointer-events: none;
+}
+.disabled2
+{
+  opacity: 0.5;
+  filter: grayscale(1);
+  pointer-events: none;
+}
+
+.warning
+{
+  text-shadow: -3px 3px 1px #000;
+  background: #ffa530a0;
+  padding: 0.5em;
+}
+.error
+{
+  text-align: center;
+  text-shadow: -3px 3px 1px #000;
+  background: #b03030;
+  padding: 0.5em;
+  font-weight: normal;
+}
+
+.clickable
+{
+  cursor: pointer;
+}
+
+progress
+{
+  width: 100%;
+}
+
+
+.sticky
+{
+  background: black;
+  border-radius: 0;
+  z-index: 100;
+}
+
+
+::selection,
+::-moz-selection
+{
+  background: #0e7abd;
+}
+
+
+.flex
+{
+}
+
+.flex.ver
+{
+  flex-direction: column;
+}
+
+.gap-1
+{
+  gap: 1em;
+}
+.gap-2
+{
+  gap: 2em;
+}
+.gap-3
+{
+  gap: 3em;
+}
+
+.progress-bar
+{
+  margin: auto;
+  max-width: 50em;
+  height: 1.5em;
+  background: #ffffff30;
+  border-radius: 0.5em;
+  overflow: hidden;
+}
+
+.progress-bar-fill
+{
+  height: 100%;
+  background: #ffffff60;
+  transition: 0.6s;
+}
+
+p
+{
+  margin: 1em 0;
+}
+
+
+
+
+[tooltip]::before {
+  content: attr(tooltip);
+  position: absolute;
+  width: max-content;
+  visibility: hidden;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  border-radius: 0.5em;
+  padding: 0.5em 1em;
+  z-index: 100;
+  left: 50%;
+  bottom: 0;
+  opacity: 0;
+  transform: translate(-50%, 110%);
+  transition: 0.1s !important;
+}
+
+/* Show the tooltip text when hovering over the element */
+[tooltip]:hover::before {
+  visibility: visible;
+  opacity: 1;
+  transition: 0.1s !important;
+}
+
+
+.st-btn
+{
+  background: none !important;
+  transition: 0s !important;
+}
+
+.st-btn:hover
+{
+  border: 1px solid #aaa !important;
+  background: #333 !important;
+  top: 0 !important;
+}
+
+
+svg
+{
+}
+
+
+.empty, .title:empty
+{
+  background-color: #80808040;
+}
+
+img[src=""]
+{
+  background: #80808040;
+}
+
+
+.message
+{
+  width: 100%;
+  background: #424242;
+  padding: 0.5rem 1rem;
+  border: 1px solid #ffffff80;
+  margin: 0.5rem auto;
+  text-align: center;
+}
+
+
+.h-40pc
+{
+  height: 40%;
+}
+
+
+
+[tooltip]:hover::before {
+  content: attr(tooltip);
+  position: absolute;
+  width: max-content;
+  background-color: #222;
+  color: #fff;
+  text-align: center;
+  border-radius: 0.5em;
+  padding: 0.5em 1em;
+  left: 50%;
+  bottom: 0;
+  transform: translate(-50%, 110%);
+  box-shadow: -8px 8px 6px #000;
+}
+
+
+.cyan
+{
+  color: #0e7abd;
+}
+
+
+.ajs-message
+{
+  background: linear-gradient(142deg, rgba(126,126,126,0.9) 0%, rgba(80,80,80,0.6) 66%);
+  box-shadow: -6px 6px 6px #00000080;
+}
+
+.ajs-warning
+{
+  background: #FFFF9960 !important;
+}
+
+.ajs-message *
+{
+  text-shadow: -0.1em 0.1em 0.05em black;
+}
+
+.ajs-message progress
+{
+  margin-top: 0.5em;
+}
+
+.ajs-message progress::-webkit-progress-value
+{
+  background: #ffffffa0;
+}
+
+.ajs-message progress::-webkit-progress-bar
+{
+  background: #00000010;
+  border: 1px solid #ffffff40;
+  box-shadow: -3px 3px 3px black;
+}
+
+
+.ajs-dialog .ajs-header
+{
+  display: none;
+}
+
+.ajs-dialog, .ajs-header, .ajs-footer
+{
+  background: #606060 !important;
+}
+
+.ajs-content
+{
+  font-size: 140%;
+}
+
+
+/* Leader line SVG element */
+.leader-line text
+{
+  stroke: black !important;
+  fill: white !important;
+  visibility: hidden;
+}
+
+
+/* scrollbars */
+::-webkit-scrollbar {
+  width: 0.5em;
+}
+
+::-webkit-scrollbar-track {
+  background: #80808040;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #80808080;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #808080;
+}

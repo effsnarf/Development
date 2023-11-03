@@ -1,0 +1,83 @@
+dom:
+  div:
+    ':style': floatingStyle
+    slot: null
+props:
+  attachTo: null
+  attachOrigin: null
+data:
+  floatingStyle: null
+mounted: | #js
+  function() {
+    this.$root.html.when.element.moves(this.$el, this.refresh.bind(this));
+    // When the window resizes or scrolls, refresh
+    window.addEventListener('resize', this.refresh.bind(this));
+    window.addEventListener('scroll', this.refresh.bind(this));
+  }
+methods:
+  getFloatingStyle: | #js
+    function() {
+      if (!this.attachTo) return;
+
+      const targetRect = this.$root.getAbsoluteRect(this.attachTo);
+      const floatingRect = this.$el.getBoundingClientRect();
+      const origin = this.attachOrigin || 'top left';
+      const [vertical, horizontal] = origin.split(' ');
+
+      const parentRect = (!this.$el.parentElement) ? null : this.$root.getAbsoluteRect(this.$el.parentElement);
+      const rect = this.$el.getBoundingClientRect();
+
+      const left = this.getHorizontalCoordinate(horizontal, targetRect) - (horizontal === 'center' ? floatingRect.width / 2 : 0) - (parentRect?.left || 0);
+      const top = this.getVerticalCoordinate(vertical, targetRect) - (vertical === 'center' ? floatingRect.height / 2 : 0) - (parentRect?.top || 0);
+
+      //const left = (targetRect.left - parentRect.left - (rect.width / 2));
+      //const top = (targetRect.top - parentRect.top + (rect.height / 2));
+
+      return {
+        position: 'absolute',
+        left: `${left}px`,
+        top: `${top}px`,
+        "z-index": 1000,
+      };
+    }
+  getHorizontalCoordinate: | #js
+    function(value, rect) {
+      return this.getCoordinate(value, 'width', rect, 'left');
+    }
+  getVerticalCoordinate: | #js
+    function(value, rect) {
+      return this.getCoordinate(value, 'height', rect, 'top');
+    }
+  getCoordinate: | #js
+    function(value, dimension, rect, defaultCoord) {
+      switch (value) {
+        case 'top':
+        case 'left':
+          return rect[defaultCoord];
+        case 'center':
+          return rect[defaultCoord] + rect[dimension] / 2;
+        case 'bottom':
+        case 'right':
+          return rect[defaultCoord] + rect[dimension];
+        default:
+          return 0;
+      }
+    }
+  refresh: | #js
+    function() {
+      this.floatingStyle = this.getFloatingStyle();
+    }
+watch:
+  attachTo: | #js
+    function(el) {
+      // Watch the element, if it moves, refresh
+      if (!el) return;
+      this.$root.html.when.element.moves(el, this.refresh.bind(this));
+    }
+_:
+  examples:
+    count: 0
+name: ui-floating
+template: >-
+  <div class="comp-ui-floating" :style="floatingStyle"
+  path="1522602528."><slot></slot></div>

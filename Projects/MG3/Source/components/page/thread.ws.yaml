@@ -47,6 +47,9 @@ methods:
 watch: null
 name: page-thread
 style: null
+_:
+  examples:
+    count: 0
 template: >-
   <site class="comp-page-thread" page-name="thread"
   :columns-focus-left="columnsFocusLeft" :content-not-found="contentNotFound"

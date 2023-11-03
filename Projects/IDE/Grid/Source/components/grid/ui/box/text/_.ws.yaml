@@ -1,0 +1,78 @@
+dom:
+  grid.module:
+    ':show-title': 'false'
+    ui.input.text.box:
+      multiline: 'true'
+      ':auto-resize': 'false'
+      v-model: boxValue
+      @input: onTextInput
+props:
+  box: null
+data:
+  boxValue: null
+  inputSocketDataValue: null
+mounted: | #js
+  async function() {
+  }
+methods:
+  init: | #js
+    function(box) {
+      this.boxValue = box.value;
+    }
+  onTextInput: | #js
+    function(text) {
+      const gridUiBoxVue = this.$root.vm.getAncestors(this, "grid.ui.box")[0];
+      gridUiBoxVue.$femit("edit.box", this.box._id, { value: text });
+    }
+  grid_data_list_updated: | #js
+    function(fuid, items) {
+      if (fuid.endsWith("/data/boxes")) {
+        const boxes = items;
+        for (const box of boxes) {
+          if (box._id != this.box._id) continue;
+          this.init(box);
+        }
+      }
+    }
+  grid_client_runtime_socket_data_change: | #js
+    function(boxID, sDirection, sName, sValue) {
+      if (boxID != this.box._id) return;
+      if (sDirection != "input") return;
+      if (sName != "data") return;
+      this.inputSocketDataValue = sValue;
+    }
+computed:
+  icon: | #js
+    function() {
+      const icons = [];
+      const value = this.boxValue;
+      
+      icons.add("🆎");
+      const isUrl = value?.startsWith("http");
+      if (isUrl) icons.add("🔗");
+
+      return icons
+        .filter((icon) => icon)
+        .join("");
+    }
+watch:
+  box:
+    handler: | #js
+      function(box) {
+        this.init(box);
+      }
+    immediate: true
+style:
+  textarea:
+    height: 100%
+    color: yellow
+    resize: none
+_:
+  examples:
+    count: 0
+name: grid-ui-box-text
+template: >-
+  <grid-module class="comp-grid-ui-box-text" :show-title="false"
+  path="1559460578."><ui-input-text-box multiline="true" :auto-resize="false"
+  v-model="boxValue" @input="onTextInput"
+  path="1559460578.0"></ui-input-text-box></grid-module>

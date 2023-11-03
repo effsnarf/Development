@@ -1,0 +1,281 @@
+dom:
+  .card:
+    ':class': getCssClass()
+    h2:
+      class: header
+      v-if: header
+      span:
+        v-text: header
+      .sum:
+        v-text: sum
+    .top-right:
+      ui.checkbox:
+        text: cumulative
+        v-model: isCumulative
+    .chart.flex:
+      .column1:
+        ui.num: 
+          class: opacity-50
+          ':value': scaled(minValue)
+        ui.num: 
+          ':value': scaled(middleValue)
+        ui.num: 
+          class: opacity-50
+          ':value': scaled(maxValue)
+      div:
+        canvas:
+          ref: canvas1
+          class: ml-l1
+          ':width': canvasWidth
+          ':height': (canvasWidth / 2)
+          @mousemove: onMouseMove
+          @mouseout: onMouseOut
+    .flex.flex-column.justify-center.items-center:
+      .title:
+        .icon:
+          v-text: icon
+        .text:
+          v-text: title
+      ui.num:
+        ':value': scaled(hoveredData || total)
+props:
+  icon: null
+  header: null
+  total: null
+  title: null
+  getValue: x => x
+  data: []
+  scale: 1
+  color: null
+data:
+  canvasWidth: 400
+  hoveredIndex: null
+  isCumulative: false
+methods:
+  getCssClass: | #js
+    function() {
+      const cls = {};
+      if (!this.cData?.length) cls.empty = true;
+      if (this.color) cls[`${this.color}`] = true;
+      return cls;
+    }
+  drawChart: | #js
+    function(data) {
+      if (!data?.length) return;
+      if (!this.ctx) return;
+
+      this.ctx.clearRect(0, 0, this.width, this.height);
+      this.ctx.beginPath();
+      this.ctx.moveTo(this.paddingX, this.paddingY + this.chartHeight);
+      for (let i = 0; i < data.length; i++) {
+        const x = this.paddingX + i * this.step;
+        const y = this.paddingY + this.chartHeight - (this.getValueFunc(data[i]) - this.min) * this.stepY;
+        this.drawBar(x, this.getValueFunc(data[i]), '#ffffff80');
+      }
+      this.ctx.lineTo(this.paddingX + this.chartWidth, this.paddingY + this.chartHeight);
+      this.ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+      this.ctx.fill();
+      this.ctx.strokeStyle = '#ffffff80';
+      this.ctx.stroke();
+    }
+  drawBar: | #js
+    function(x, value, color, maxDisplayValue) {
+      let y = this.paddingY + this.chartHeight - ((value - this.min) * this.stepY);
+      this.ctx.fillStyle = color;
+      this.ctx.fillRect(x, y, this.step, this.chartHeight - y + this.paddingY);
+    }
+  onMouseMove: | #js
+    function(e) {
+      if (!this.canvas) return;
+      const rect = this.canvas.getBoundingClientRect();
+      const scaleX = this.canvas.width / rect.width;
+      const x = e.offsetX;
+      const i = Math.floor((x - this.paddingX) / this.step * scaleX);
+      this.hoveredIndex = i;
+    }
+  onMouseOut: | #js
+    function(e) {
+      this.hoveredIndex = null;
+    }
+  getValueFunc: | #js
+    function(value) {
+      let func = this.getValue;
+      if (typeof func === 'string') func = eval(func);
+      return func(value);
+    }
+  scaled: | #js
+    function(value) {
+      return value;
+      return Math.round(value * this.scale);
+    }
+  toCumulative: | #js
+    function(data) {
+      const result = [];
+      let sum = 0;
+      for (let i = 0; i < data.length; i++) {
+        sum += this.getValueFunc(data[i]);
+        result.push(sum);
+      }
+      return result;
+    }
+watch:
+  cData:
+    handler: | #js
+      async function(cData) {
+        await this.$nextTick();
+        this.drawChart(cData);
+      }
+    immediate: true
+    deep: true
+  hoveredIndex:
+    handler: | #js
+      async function(newIndex, oldIndex) {
+        if (newIndex === oldIndex) return;
+        await this.$nextTick();
+        this.drawChart(this.cData);
+        if (newIndex !== null) {
+          const value = this.getValueFunc(this.cData[newIndex]);
+          this.drawBar(this.hoveredX, value, '#ffffff80');
+        }
+      }
+    immediate: true
+    deep: true
+  isCumulative:
+    handler: | #js
+      async function() {
+        this.drawChart(this.cData);
+      }
+computed:
+  cData: | #js
+    function() {
+      if (this.isCumulative) return this.toCumulative(this.data);
+      return this.data;
+    }
+  canvas: function() { return this.$refs.canvas1; }
+  ctx: function() { return this.canvas?.getContext('2d'); }
+  width: function() { return this.canvas?.width; }
+  height: function() { return this.canvas?.height; }
+  padding: function() { return 0; }
+  paddingX: function() { return this.width * this.padding; }
+  paddingY: function() { return this.height * this.padding; }
+  chartWidth: function() { return this.width - this.paddingX * 2; }
+  chartHeight: function () { return this.height - this.paddingY * 2; }
+  step: function() { return this.chartWidth / this.cData.length; }
+  stepY: function() { return this.chartHeight / this.range; }
+  sum: | #js
+    function() {
+      return Math.round((this.data||[]).filter(v => v).sum());
+    }
+  min: | #js
+    function() {
+      if (!this.cData?.length) return 0;
+      return Math.round(Math.min(...this.cData.map(x => this.getValueFunc(x))));
+    }
+  max: | #js
+    function() {
+      if (!this.cData?.length) return 0;
+      return Math.round(Math.max(...this.cData.map(x => this.getValueFunc(x))) * 1.1);
+    }
+  minValue: | #js
+    function() {
+      return (this.cData||[]).filter(v => v).min();
+    }
+  averageValue: | #js
+    function() {
+      return (this.cData||[]).filter(v => v).average();
+    }
+  middleValue: | #js
+    function() {
+      return (this.minValue + this.maxValue) / 2;
+    }
+  maxValue: | #js
+    function() {
+      return (this.cData||[]).filter(v => v).max();
+    }
+  range: | #js
+    function() {
+      return this.max - this.min;
+    }
+  hoveredData: | #js
+    function() {
+      if (this.hoveredIndex === null) return null;
+      const value = this.cData[this.hoveredIndex];
+      return value;
+    }
+  hoveredX: | #js
+    function() {
+      if (this.hoveredIndex === null) return null;
+      return this.paddingX + this.hoveredIndex * this.step;
+    }
+example_not:
+  dom:
+    div:
+      ui.chart:
+        icon: 📈
+        title: Chart
+        ':data': '[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]'
+        ':getValue': x => x
+        ':color': green
+        ':header': Header
+        ':total': 100
+        ':scale': 10
+        ':isCumulative': true
+style:
+  .top-right:
+    position: absolute
+    top: 0
+    right: 0
+    width: fit-content
+    margin: 1em
+  .sum:
+    display: inline
+    opacity: 0.5
+    margin-left: 1em
+  .column1:
+    width: 2em !important
+  canvas:
+    width: 100%
+  .card:
+    padding: 0.5rem 1rem
+    background-color: '#ffffff30'
+    border: '1px solid #e5e5e5'
+    border-radius: 0.5em
+  .green:
+    background: '#00ff0040'
+  .red:
+    background: '#ff000040'
+  .blue:
+    background: '#00a0ff40'
+  .comp-ui-num, .title:
+    font-size: 140%
+  .column1 .comp-ui-num:nth-child(2):
+    position: absolute
+    top: 50%
+    transform: translateY(-50%)
+  .column1 .comp-ui-num:nth-child(1):
+    position: absolute
+    bottom: 0
+name: ui-chart
+_:
+  examples:
+    count: 0
+template: >-
+  <div class="comp-ui-chart card" :class="getCssClass()" path="-2139450364."><h2
+  class="header" v-if="header" path="-2139450364.0"><span v-text="header"
+  path="-2139450364.0.0"></span><div class="sum" v-text="sum"
+  path="-2139450364.0.1"></div></h2><div class="top-right"
+  path="-2139450364.1"><ui-checkbox text="cumulative" v-model="isCumulative"
+  path="-2139450364.1.0"></ui-checkbox></div><div class="chart flex"
+  path="-2139450364.2"><div class="column1" path="-2139450364.2.0"><ui-num
+  class="opacity-50" :value="scaled(minValue)"
+  path="-2139450364.2.0.0"></ui-num><ui-num :value="scaled(middleValue)"
+  path="-2139450364.2.0.1"></ui-num><ui-num class="opacity-50"
+  :value="scaled(maxValue)" path="-2139450364.2.0.2"></ui-num></div><div
+  path="-2139450364.2.1"><canvas class="ml-l1" ref="canvas1"
+  :width="canvasWidth" :height="(canvasWidth / 2)" @mousemove="onMouseMove"
+  @mouseout="onMouseOut" path="-2139450364.2.1.0"></canvas></div></div><div
+  class="flex flex-column justify-center items-center" path="-2139450364.3"><div
+  class="title" path="-2139450364.3.0"><div class="icon" v-text="icon"
+  path="-2139450364.3.0.0"></div><div class="text" v-text="title"
+  path="-2139450364.3.0.1"></div></div><ui-num :value="scaled(hoveredData ||
+  total)" path="-2139450364.3.1"></ui-num></div></div>

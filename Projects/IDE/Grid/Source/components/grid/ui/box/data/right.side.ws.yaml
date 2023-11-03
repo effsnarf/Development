@@ -1,0 +1,63 @@
+dom:
+  grid.module:
+    icon: 🧊
+    ':show-title': 'false'
+    .ml-l1:
+      ui.linq:
+        ':input': inputValue
+        v-model: operations
+props:
+  box: null
+data:
+  inputValue: null
+  outputValue: null
+  operations: null
+methods:
+  grid_client_runtime_socket_value_change: | #js
+    function(boxID, socketDirection, sID, socketValue) {
+      if (boxID != this.box._id) return;
+      this.refresh();
+    }
+  getSocketValue: | #js
+    function(direction) {
+      const socketData = this.$root.socket?.runtime.data[this.box._id];
+      let data = socketData?.[direction]?.[1];
+      return data;
+    }
+  refresh: | #js
+    function() {
+      this.inputValue = this.getSocketValue("input");
+    }
+  init: | #js
+    function(box) {
+      this.operations = Objects.clone(box.linq?.operations || []);
+      this.refresh();
+    }
+watch:
+  operations:
+    handler: | #js
+      function(operations) {
+        this.$emit("box-event", "operations", operations);
+      }
+  box:
+    handler: | #js
+      function(box) {
+        this.init(box);
+      }
+    immediate: true
+style:
+  .comp-ui-drawer:
+    white-space: nowrap
+  .value-preview:
+    max-width: 20em
+    max-height: 20em
+    overflow: auto
+_:
+  examples:
+    count: 0
+name: grid-ui-box-data-right-side
+template: >-
+  <grid-module class="comp-grid-ui-box-data-right-side" icon="🧊"
+  :show-title="false" path="-1961460264."><div class="ml-l1"
+  path="-1961460264.0"><ui-linq :input="inputValue" v-model="operations"
+  path="-1961460264.0.0"></ui-linq></div></grid-module>

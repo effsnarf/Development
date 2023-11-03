@@ -1,0 +1,33 @@
+dom:
+  div: 
+    .empty:
+      v-if: '!node.children?.length'
+      div: 
+        v-text: '''[view]'''
+    grid.ui.node.view:
+      v-for: childNode in node.children
+      class: h-100pc
+      ':box': box
+      ':node': childNode
+      ':data-bound-socket-data': dataBoundSocketData
+      ':active-node': activeNode
+      @node-hovered: (...args) => $emit('node-hovered', ...args)
+props:
+  box: null
+  node: null
+  dataBoundSocketData: null
+  activeNode: null
+data: null
+style: null
+_:
+  examples:
+    count: 0
+name: grid-ui-node-view-view
+template: >-
+  <div class="comp-grid-ui-node-view-view" path="-1435585196."><div
+  class="empty" v-if="!node.children?.length" path="-1435585196.0"><div
+  v-text="'[view]'" path="-1435585196.0.0"></div></div><grid-ui-node-view
+  class="h-100pc" v-for="childNode in node.children" :box="box"
+  :node="childNode" :data-bound-socket-data="dataBoundSocketData"
+  :active-node="activeNode" @node-hovered="(...args) =&gt; $emit('node-hovered',
+  ...args)" path="-1435585196.1"></grid-ui-node-view></div>

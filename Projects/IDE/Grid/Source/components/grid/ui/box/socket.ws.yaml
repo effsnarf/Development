@@ -1,0 +1,422 @@
+dom:
+  grid.module:
+    ':show-title': 'false'
+    ref: socket1
+    ui.dnd.dropzone:
+      @drop-item: onNewLinkDrop
+      ui.dnd.draggable:
+        ':show-drag-ghost': 'false'
+        ':drag-item': '{ box, direction, socket }'
+        @drag-start: onNewLinkDragStart
+        @drag-end: onNewLinkDragEnd
+        @drag: onNewLinkDrag
+        .socket:
+          ':class': 'direction + ''-socket'' + '' '' + (isLoading ? ''loading'' : '''')'
+          div: 
+            ui.context.window: 
+              v-if: false && !isNewLinkDragging
+              div: 
+                h3: 
+                  v-text: '''Export socket'''
+            ui.checkbox:
+              v-model: socketIsExported
+          div: 
+            ui.context.window: 
+              v-if: showSocketValueContextWindow
+              div: 
+                h3: 
+                  .flex:
+                    div: 
+                      v-text: getSocketIcon(socket)
+                    ui.input.text.box:
+                      ':enabled': canEditSocketName
+                      ':camouflage': '!canEditSocketName'
+                      v-model: socketName
+                div: 
+                  ':style': >-
+                    { 'max-width': '30em', 'max-height': '20em', 'overflow':
+                    'auto' }
+                  ui.value:
+                    v-if: showSocketValueContextWindow
+                    ':value': socketValue
+            ui.title: 
+              ':icon': getSocketIcon(socket)
+              ':text': socket.name
+    ui.leader.line:
+      v-if: isNewLinkDragging
+      ref: leaderLine1
+      ':from': socketEl
+      ':to': targetPlugEl
+      line-path: fluid
+      color: '#404040'
+    div: 
+      v-show: isNewLinkDragging
+      ref: targetPlug1
+      ':style': targetPlugStyle
+      div: 
+        ui.title: 
+          ':icon': getSocketIcon(socket)
+          ':text': socketName
+props:
+  box: null
+  socket: null
+  direction: null
+  surfaceCamera: null
+  surfaceGroupBoxID: null
+data:
+  socketEl: null
+  targetPlugEl: null
+  targetPlugPos: null
+  targetPlugSmoothPos: null
+  isNewLinkDragging: false
+  ghostBox: null
+  linkToNewBox: null
+  socketIsExported: null
+  socketAlertValue: null
+  isLoading: 0
+  socketName: null
+  socketValue: null
+mounted: | #js
+  function() {
+    this.socketEl = this.$refs.socket1.$el;
+
+    this.$root.els = this.$root.els || {};
+    this.$root.els[this.socketElPath] = this.$el;
+
+    document.body.appendChild(this.$refs.targetPlug1);
+
+    this.ghostBox = {
+      _id: `${this.box._id}/${this.socket.name}/ghost/box`,
+      type: null,
+      name: null,
+      rect: {
+        pos: { x: 150, y: -100 },
+        size: { width: 300, height: 200 },
+        is: {
+          minimized: true,
+        }
+      },
+      sockets: {
+        input: [ ],
+        output: [ ],
+      },
+    };
+
+    this.targetPlugPosSmoother = new MovingPositionSmoother((value) => this.targetPlugSmoothPos = value);
+  }
+unmounted: | #js
+  function() {
+    delete this.$root.els[this.socketElPath];
+  }
+methods:
+  init: | #js
+    function(socket){
+      this.socketIsExported = socket.is?.exported;
+      this.socketName = socket.name;
+      this.socketValue = this.getSocketValue();
+    }
+  deleteLink: | #js
+    function(link) {
+      this.$femit("delete.link", link._id);
+    }
+  onSocketClick: | #js
+    function() {
+      console.log(this.socketValue);
+      alertify.message(`Socket value logged to console.`);
+    }
+  grid_client_runtime_socket_value_change: | #js
+    function(boxID, sDirection, sID, sValue) {
+      // #TODO: Slow
+      if (boxID != this.box._id) return;
+      if (sDirection != this.direction) return;
+      if (sID != this.socket._id) return;
+      this.socketValue = sValue;
+      this.isLoading++;
+      setTimeout(() => {
+        this.isLoading--;
+      }, 400);
+    }
+  grid_data_list_added: | #js
+    function(fuid, items) {
+      if (fuid.endsWith("/data/boxes"))
+      {
+        const boxes = items;
+        for (const newBox of boxes) {
+          if (this.linkToNewBox) {
+            // Link this socket to the new box
+            this.onNewLinkDrop({ box: newBox, socket: newBox.sockets.input[0], direction: 'input' });
+            this.linkToNewBox = null;
+          }
+        }
+      }
+    }
+  getSocketValue: | #js
+    function() {
+      const socketData = this.$root.socket?.runtime.data[this.box._id];
+      if (!socketData) return null;
+      const socketValue = socketData[this.direction][this.socket._id];
+      return socketValue;
+    }
+  onNewLinkDragStart: | #js
+    async function(e) {
+      this.targetPlugEl = this.$refs.targetPlug1;
+      setTimeout(() => {
+        this.isNewLinkDragging = true;
+      }, 200);
+    }
+  onNewLinkDrag: | #js
+    function(e) {
+      const pos = { x: e.e.clientX, y: e.e.clientY };
+      if (pos.x == 0 && pos.y == 0) return;
+      //const pos = e.relative.pos;
+      this.targetPlugPos = { x: (pos.x - 20), y: (pos.y - 20) };
+    }
+  onNewLinkDragEnd: | #js
+    function(e) {
+      this.isNewLinkDragging = false;
+      this.targetPlugPos = null;
+      this.targetPlugEl = null;
+    }
+  onNewLinkDrop: | #js
+    function(linkSource) {
+      this.isNewLinkDragging = false;
+
+      if (linkSource.direction == this.direction) {
+        alertify.error('You must connect an output socket to an input socket.');
+        return;
+      }
+
+      const isReversed = (linkSource.direction == 'input');
+
+      const fromBox = isReversed ? this.box : linkSource.box;
+      const toBox = isReversed ? linkSource.box : this.box;
+      const fromSocket = isReversed ? this.socket : linkSource.socket;
+      const toSocket = isReversed ? linkSource.socket : this.socket;
+
+      const from = {
+        box: { _id: fromBox._id },
+        socket: { _id: fromSocket._id, type: fromSocket.type },
+      };
+      const to = {
+        box: { _id: toBox._id },
+        socket: { _id: toSocket._id, type: toSocket.type },
+      };
+
+      const gridUiBoxVue = this.$root.vm.getAncestors(this, "grid.ui.box")[0];
+      gridUiBoxVue.$femit('create.link', from, to);
+    }
+  grid_client_surface_drop_item: | #js
+    async function(dragItem) {
+      if (!this.isNewLinkDragging) return;
+
+      // Didn't drop on the surface
+      if (!this.targetPlugPos) return;
+
+      this.isNewLinkDragging = false;
+
+      const newBox = this.getNewBox(this.ghostBox);
+     
+      // Create the box
+      this.$femit("create.box", newBox, this.surfaceGroupBoxID);
+
+      this.linkToNewBox = newBox;
+    }
+  grid_ui_box_drop_item: | #js
+    function(box, linkSource) {
+      if (box._id != this.box._id) return;
+      if (this.direction != 'input') return;
+      if (box.sockets.input.length != 1) {
+        alertify.error('Drop on a specific input socket.');
+        return;
+      }
+      this.onNewLinkDrop(linkSource);
+    }
+  getSocketIcon: | #js
+    function(socket) {
+      return {
+        data: '🧊',
+        iterator: '🔗🖇️',
+        view: '⬜',
+        event: '⚡',
+      }[socket?.type];
+    }
+  getLinkDesc: | #js
+    function(link) {
+      const fromBox = this.$boxes.find(b => b._id == link.from.box._id);
+      const toBox = this.$boxes.find(b => b._id == link.to.box._id);
+      if (!fromBox?.sockets || !toBox?.sockets) return "";
+      const fromSocket = fromBox.sockets.output.find(s => s._id == link.from.socket._id);
+      const toSocket = toBox.sockets.input.find(s => s._id == link.to.socket._id);
+      const fromSocketIcon = this.getSocketIcon(fromSocket);
+      const toSocketIcon = this.getSocketIcon(toSocket);
+      return `${fromSocketIcon}${fromSocket.name} -> ${toSocketIcon}${toSocket.name}`;
+    }
+  getSurfaceElement: | #js
+    function() {
+      const gridUiBoxVue = this.$root.vm.getAncestors(this, "grid.ui.box")[0];
+      return gridUiBoxVue.surfaceElement;
+    }
+  getNewBox: | #js
+    function(ghostBox) {
+      const surfaceElement = this.getSurfaceElement();
+      const surfaceRect = this.$root.getAbsoluteRect(surfaceElement);
+      
+      const newBox = Objects.clone(ghostBox);
+      delete newBox._id;
+
+      newBox.sockets.input.add({ _id: 1, type: "data", name: "" });
+
+      const { x, y } = (this.targetPlugSmoothPos || this.targetPlugPos);
+      let pos = { x, y };
+      // Translate targetPlugPos, which is relative to the window, to be relative to the surface
+      pos = { x: (x - surfaceRect.left), y: (y - surfaceRect.top) };
+      // Box coordinates are relative to the center of the surface
+      pos = { x: (pos.x - (surfaceRect.width / 2)), y: ((surfaceRect.height / 2) - pos.y) };
+      // Box coordinates mark the center of the box, not the top-left corner
+      pos = { x: (pos.x + (newBox.rect.size.width / 2)), y: (pos.y - (newBox.rect.size.height / 2)) };
+
+      pos = this.adjustToCamera(pos);
+
+      newBox.rect.pos = pos;
+
+      return newBox;
+    }
+  adjustToCamera: | #js
+    function(pos) {
+      const camera = this.surfaceCamera;
+      if (!camera) return pos;
+      pos = { x: (pos.x + camera.pos.x) * camera.scale, y: (pos.y + camera.pos.y) * camera.scale };
+      return pos;
+    }
+  getBoxVue: | #js
+    function() {
+      return this.$root.vm.getAncestors(this, "grid.ui.box")[0];
+    }
+computed:
+  socketLinks: | #js
+    function() {
+      const links = this.$links;
+      if (!links) return [];
+      const socketLinks = links.filter(link => {
+        if (link.from.socket._id != this.socket._id) return false;
+        if (link.from.box._id != this.box._id) return false;
+        return true;
+      });
+      return socketLinks;
+    }
+  showSocketValueContextWindow: | #js
+    function() {
+      if (this.isNewLinkDragging) return false;
+      if (this.socket.type == 'iterator') return false;
+      return true;
+    }
+  showGhostBox: | #js
+    function() {
+      return false;
+      return this.isNewLinkDragging;
+    }
+  socketElPath: | #js
+    function() {
+      return `/box/${this.box._id}/sockets/${this.direction}/${this.socket._id}`;
+    }
+  targetPlugStyle: | #js
+    function() {
+      if (!this.targetPlugPos) return null;
+      const { x, y } = (this.targetPlugPos);
+      const style = {
+        position: 'fixed',
+        left: `0px`,
+        top: `0px`,
+        transform: `translate(${(x - 60)}px, ${(y + 60)}px)`,
+      };
+      style.background = "linear-gradient(to right, #303030, #101010)";
+      style.border = "1px solid #ffffff30";
+      style.width = "fit-content";
+      style.height = "fit-content";
+      style.padding = "0.5em";
+      style.whiteSpace = "nowrap";
+      return style;
+    }
+  canEditSocketName: | #js
+    function() {
+      if (this.box.type == "group") return true;
+      return false;
+    }
+watch:
+  targetPlugPos: | #js
+    function(targetPlugPos) {
+      //this.targetPlugPosSmoother.setTarget(targetPlugPos);
+    }
+  socket:
+    handler: | #js
+      function(socket) {
+        this.init(socket);
+      }
+    immediate: true
+  socketName: | #js
+    function(socketName) {
+      if (socketName == undefined) return;
+      if (socketName == this.socket.name) return;
+      this.$femit("edit.socket", this.box._id, this.direction, this.socket._id, { name: socketName });
+    }
+  socketIsExported: | #js
+    function(socketIsExported) {
+      if (socketIsExported == undefined) return;
+      if (socketIsExported == this.socket.is?.exported) return;
+      this.$femit("edit.socket", this.box._id, this.direction, this.socket._id, { is: { exported: socketIsExported } });
+    }
+style:
+  .socket-alert-value-box:
+    max-width: 10em
+    max-height: 10em
+    overflow: hidden
+  .socket:
+    font-size: 100%
+    opacity: 0.4
+  .socket:hover:
+    opacity: 1
+  .socket.loading:
+    border: 1px solid yellow
+  .input-socket, .output-socket:
+    display: flex
+    cursor: grab
+  .output-socket:
+    flex-direction: row-reverse
+_:
+  examples:
+    count: 0
+name: grid-ui-box-socket
+template: >-
+  <grid-module class="comp-grid-ui-box-socket" :show-title="false" ref="socket1"
+  path="-321995800."><ui-dnd-dropzone @drop-item="onNewLinkDrop"
+  path="-321995800.0"><ui-dnd-draggable :show-drag-ghost="false" :drag-item="{
+  box, direction, socket }" @drag-start="onNewLinkDragStart"
+  @drag-end="onNewLinkDragEnd" @drag="onNewLinkDrag" path="-321995800.0.0"><div
+  class="socket" :class="direction + '-socket' + ' ' + (isLoading ? 'loading' :
+  '')" path="-321995800.0.0.0"><div path="-321995800.0.0.0.0"><ui-context-window
+  v-if="false &amp;&amp; !isNewLinkDragging" path="-321995800.0.0.0.0.0"><div
+  path="-321995800.0.0.0.0.0.0"><h3 v-text="'Export socket'"
+  path="-321995800.0.0.0.0.0.0.0"></h3></div></ui-context-window><ui-checkbox
+  v-model="socketIsExported"
+  path="-321995800.0.0.0.0.1"></ui-checkbox></div><div
+  path="-321995800.0.0.0.1"><ui-context-window
+  v-if="showSocketValueContextWindow" path="-321995800.0.0.0.1.0"><div
+  path="-321995800.0.0.0.1.0.0"><h3 path="-321995800.0.0.0.1.0.0.0"><div
+  class="flex" path="-321995800.0.0.0.1.0.0.0.0"><div
+  v-text="getSocketIcon(socket)"
+  path="-321995800.0.0.0.1.0.0.0.0.0"></div><ui-input-text-box
+  :enabled="canEditSocketName" :camouflage="!canEditSocketName"
+  v-model="socketName"
+  path="-321995800.0.0.0.1.0.0.0.0.1"></ui-input-text-box></div></h3><div
+  :style="{ 'max-width': '30em', 'max-height': '20em', 'overflow': 'auto' }"
+  path="-321995800.0.0.0.1.0.0.1"><ui-value v-if="showSocketValueContextWindow"
+  :value="socketValue"
+  path="-321995800.0.0.0.1.0.0.1.0"></ui-value></div></div></ui-context-window><ui-title
+  :icon="getSocketIcon(socket)" :text="socket.name"
+  path="-321995800.0.0.0.1.1"></ui-title></div></div></ui-dnd-draggable></ui-dnd-dropzone><ui-leader-line
+  v-if="isNewLinkDragging" ref="leaderLine1" :from="socketEl" :to="targetPlugEl"
+  line-path="fluid" color="#404040" path="-321995800.1"></ui-leader-line><div
+  v-show="isNewLinkDragging" ref="targetPlug1" :style="targetPlugStyle"
+  path="-321995800.2"><div path="-321995800.2.0"><ui-title
+  :icon="getSocketIcon(socket)" :text="socketName"
+  path="-321995800.2.0.0"></ui-title></div></div></grid-module>

@@ -1,0 +1,18 @@
+dom:
+  div: null
+props: null
+data: null
+mounted: | #js
+  function() {
+    this.init();
+  }
+methods:
+  init: | #js
+    function() {
+      
+    }
+_:
+  examples:
+    count: 0
+name: vs-app
+template: <div class="comp-vs-app"></div>

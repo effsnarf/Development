@@ -16,6 +16,9 @@ methods:
     }
 style: null
 name: page-admin-instances
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-page-admin-instances" path="-1813446336."><h2 v-text="'New
   Instances'" path="-1813446336.0"></h2><div path="-1813446336.1"><div

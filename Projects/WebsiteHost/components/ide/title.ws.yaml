@@ -1,0 +1,16 @@
+dom:
+  h3:
+    v-if: item
+    ui.title:
+      ':icon': $root.getIcon(item)
+      ':text': item.key
+props:
+  item: null
+name: ide-title
+_:
+  examples:
+    count: 0
+template: >-
+  <h3 class="comp-ide-title" v-if="item" path="-1745912300."><ui-title
+  :icon="$root.getIcon(item)" :text="item.key"
+  path="-1745912300.0"></ui-title></h3>

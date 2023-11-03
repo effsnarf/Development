@@ -44,6 +44,9 @@ style:
   .no-wrap:
     white-space: nowrap
 name: e-template-item-icon
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-e-template-item-icon icon" @click="$emit('click')"
   path="-562339287."><ui-checkbox v-model="item.visible" size="normal"

@@ -1,0 +1,59 @@
+dom:
+  div:
+    component:
+      v-if: false && getBoxVue()?.hasRightSideComp(displayBox?.type)
+      ref: rightSideComp1
+      ':is': getBoxVue()?.getBoxRightSideCompName(displayBox?.type)
+      ':box': displayBox
+      ':data-bound-socket-data': dataBoundSocketData
+      @box-event: emitBoxEvent
+props:
+  box: null
+  dataBoundSocketData: null
+data:
+  groupBox: null
+  displayBox: null
+mounted: | #js
+  async function() {
+  }
+methods:
+  onBoxEvent: | #js
+    function(...args) {
+      this.$refs.rightSideComp1?.onBoxEvent?.(...args);
+    }
+  emitBoxEvent: | #js
+    function(...args) {
+      this.$emit("box-event", ...args);
+    }
+  getBoxVue: | #js
+    function() {
+      return this.$root.vm.getAncestors(this, "grid.ui.box")[0];
+    }
+  init: | #js
+    async function(box) {
+      this.groupBox = box;
+      await this.$nextTick();
+      this.refresh();
+    }
+  refresh: | #js
+    function() {
+      this.displayBox = this.$boxes.find(b => b._id == this.groupBox.displayBoxID);
+    }
+watch:
+  box:
+    handler: | #js
+      async function(box) {
+        this.init(box);
+      }
+    immediate: true
+_:
+  examples:
+    count: 0
+name: grid-ui-box-group-right-side
+template: >-
+  <div class="comp-grid-ui-box-group-right-side" path="1813186285."><component
+  v-if="false &amp;&amp; getBoxVue()?.hasRightSideComp(displayBox?.type)"
+  ref="rightSideComp1"
+  :is="getBoxVue()?.getBoxRightSideCompName(displayBox?.type)" :box="displayBox"
+  :data-bound-socket-data="dataBoundSocketData" @box-event="emitBoxEvent"
+  path="1813186285.0"></component></div>

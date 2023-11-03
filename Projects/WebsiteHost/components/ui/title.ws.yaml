@@ -1,0 +1,77 @@
+dom:
+  div: 
+    @click: $emit('click')
+    class: flex
+    .counter:
+      v-if: hasCounter
+      v-text: (counter) + '.'
+    .icon:
+      ':class': iconClass
+      v-if: icon
+      v-text: icon
+    div: 
+      slot: null
+      div: 
+        v-html: cHtml
+    .ml-1.opacity-40:
+      v-if: number
+      v-text: getNumberText()
+props:
+  counter: null
+  icon: null
+  text: null
+  html: null
+  value: null
+  number: null
+methods:
+  getNumberText: | #js
+    function() {
+      return !this.number ? '' : `(${this.number})`;
+    }
+  getIconClass: | #js
+    function() {
+      if (this.icon == "📁") return "opacity-50";
+      return null;
+    }
+computed:
+  hasCounter: | #js
+    function() {
+      return (this.counter !== null) && (this.counter !== undefined);
+    }
+  cHtml: | #js
+    function() {
+      if (this.html) return this.html;
+      return [this.text, this.value]
+        .filter(s => s)
+        .join(' ')
+        .textToHtml();
+    }
+  iconClass: | #js
+    function() {
+      return this.getIconClass();
+    }
+style:
+  .counter:
+    opacity: 0.3
+  .icon:
+    text-align: center
+  .flex:
+    gap: 0.5em
+  .flex > *:
+    flex-grow: 0 !important
+    flex-shrink: 1 !important
+  div:
+    white-space: nowrap
+    text-wrap: nowrap
+name: ui-title
+_:
+  examples:
+    count: 0
+template: >-
+  <div class="comp-ui-title flex" @click="$emit('click')"
+  path="-2123702658."><div class="counter" v-if="hasCounter" v-text="(counter) +
+  '.'" path="-2123702658.0"></div><div class="icon" :class="iconClass"
+  v-if="icon" v-text="icon" path="-2123702658.1"></div><div
+  path="-2123702658.2"><slot></slot><div v-html="cHtml"
+  path="-2123702658.2.1"></div></div><div class="ml-1 opacity-40" v-if="number"
+  v-text="getNumberText()" path="-2123702658.3"></div></div>

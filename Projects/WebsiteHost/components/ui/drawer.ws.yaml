@@ -1,0 +1,53 @@
+dom:
+  .drawer:
+    @dragenter: isHovered++
+    @dragleave: isHovered--
+    @click: isHovered=0
+    ':class': '{ open, hovered: isHovered }'
+    slot: null
+props:
+  open: false
+data:
+  isHovered: 0
+style:
+  .drawer:
+    max-height: 10em
+    max-width: 3em
+    overflow: hidden
+    transition: 2s
+    filter: grayscale(1) blur(3px)
+    opacity: 0.5
+  .drawer.open, .drawer:hover, .drawer.hovered:
+    max-height: 60em
+    max-width: 60em
+    filter: none
+    opacity: 1
+example:
+  dom:
+    .flex.gap-1:
+      ui.drawer:
+        ui.select:
+          ':options': '[''❔ help'', ''👉 menu'', ''🛠️ settings'']'
+          v-model: selectedMenuItem
+      div:
+        v-if: (selectedMenuItem == 0)
+        ':style': '{ width: ''8em'' }'
+        v-text: '''The drawer on the left expands when hovered over.'''
+  data:
+    selectedMenuItem: 0
+  watch:
+    selectedMenuItem: | #js
+      function (value) {
+      }
+  style:
+    .drawer.open, .drawer:hover, .drawer.hovered:
+      max-width: 10em !important
+      transition: 0.6s
+_:
+  examples:
+    count: 1
+name: ui-drawer
+template: >-
+  <div class="comp-ui-drawer drawer" @dragenter="isHovered++"
+  @dragleave="isHovered--" @click="isHovered=0" :class="{ open, hovered:
+  isHovered }" path="-1860583029."><slot></slot></div>

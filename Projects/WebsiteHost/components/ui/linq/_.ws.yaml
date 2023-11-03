@@ -1,0 +1,133 @@
+dom:
+  div: 
+    .operations.box1:
+      div: 
+        div: 
+          v-for: (operation, index) in operations
+          ':key': operation._id
+          div: 
+            .show-on-hover-container:
+              .operation:
+                ui.linq.operation:
+                  ':context': context
+                  ':input': datas?.[index]
+                  ':value': operation
+                  ':prev-operation': operations[index - 1]
+                  @input: (operation) => $set(operations, index, operation)
+                .delete-button.show-on-hover-2:
+                  ui.button:
+                    ':icon': 'isConfirmed[index] ? ''❌'' : ''✖'''
+                    @click: onClickDelete(index)
+            .next:
+              v-text: '''↓'''
+      div: 
+        .show-on-hover-container:
+          div: 
+            .text-center:
+              v-text: '''➕'''
+          .show-on-hover:
+            ui.linq.ops.picker:
+              ':input': datas?.last()
+              @select: addOperation
+      ui.linq.evaluator:
+        ref: evaluator1
+props:
+  context: null
+  input: null
+  value: null
+data:
+  operations: []
+  datas: []
+  isConfirmed: {}
+mounted: ''
+methods:
+  onClickDelete: | #js
+    function(index) {
+      if (this.isConfirmed[index]) return this.operations.splice(index, 1);
+      this.$set(this.isConfirmed, index, true);
+      setTimeout(() => this.$delete(this.isConfirmed, index), 1000);
+    }
+  evaluateChain: | #js
+    function() {
+      this.datas = this.$refs.evaluator1?.evaluateOps(this.context, this.input, this.operations);
+    }
+  addOperation: | #js
+    function(operation) {
+      if (!operation._id) operation._id = (this.operations.length + 1);
+      this.operations.add(operation);
+    }
+watch:
+  input:
+    handler: | #js
+      async function(input) {
+        await this.$nextTick();
+        this.evaluateChain();
+      }
+    immediate: true
+  operations:
+    handler: | #js
+      async function(operations) {
+        this.evaluateChain();
+        this.$emit("input", operations);
+      }
+    deep: true
+  value:
+    handler: | #js
+      function(operations) {
+        this.operations = (operations || []);
+      }
+    immediate: true
+style:
+  .operations.box1: null
+  .operation:
+    display: flex
+    justify-items: center
+    gap: 1em
+    width: fit-content
+    margin: auto
+  .delete-button:
+    max-width: 0
+  .show-on-hover-container:hover .delete-button:
+    max-width: 5em
+  .value-preview:
+    display: flex
+    justify-content: center
+    max-height: 10em
+    overflow-x: hidden
+    overflow-y: auto
+  .value-preview > *:
+    max-width: 15em
+    max-height: 10em
+  .value-preview .value-as-string:
+    max-width: 15em
+  .show-on-hover-container:hover > .show-on-hover.hor:
+    max-width: 3em
+  .next:
+    font-size: 160%
+    text-align: center
+_:
+  examples:
+    count: 0
+name: ui-linq
+template: >-
+  <div class="comp-ui-linq" path="-484387046."><div class="operations box1"
+  path="-484387046.0"><div path="-484387046.0.0"><div v-for="(operation, index)
+  in operations" :key="operation._id" path="-484387046.0.0.0"><div
+  path="-484387046.0.0.0.0"><div class="show-on-hover-container"
+  path="-484387046.0.0.0.0.0"><div class="operation"
+  path="-484387046.0.0.0.0.0.0"><ui-linq-operation :context="context"
+  :input="datas?.[index]" :value="operation" :prev-operation="operations[index -
+  1]" @input="(operation) =&gt; $set(operations, index, operation)"
+  path="-484387046.0.0.0.0.0.0.0"></ui-linq-operation><div class="delete-button
+  show-on-hover-2" path="-484387046.0.0.0.0.0.0.1"><ui-button
+  :icon="isConfirmed[index] ? '❌' : '✖'" @click="onClickDelete(index)"
+  path="-484387046.0.0.0.0.0.0.1.0"></ui-button></div></div></div><div
+  class="next" v-text="'↓'"
+  path="-484387046.0.0.0.0.1"></div></div></div></div><div
+  path="-484387046.0.1"><div class="show-on-hover-container"
+  path="-484387046.0.1.0"><div path="-484387046.0.1.0.0"><div
+  class="text-center" v-text="'➕'" path="-484387046.0.1.0.0.0"></div></div><div
+  class="show-on-hover" path="-484387046.0.1.0.1"><ui-linq-ops-picker
+  :input="datas?.last()" @select="addOperation"
+  path="-484387046.0.1.0.1.0"></ui-linq-ops-picker></div></div></div><ui-linq-evaluator
+  ref="evaluator1" path="-484387046.0.2"></ui-linq-evaluator></div></div>

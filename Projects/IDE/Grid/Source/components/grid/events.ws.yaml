@@ -1,0 +1,25 @@
+dom:
+  grid.module:
+    icon: ⚡
+    ui.value:
+      v-if: 'false'
+      ':value': '[...events].reverse()'
+data:
+  events: []
+methods:
+  onAllEvents: | #js
+    function(compName, emitName, args) {
+      if (["mouse.pos", "drag.start", "drag.end"].includes(emitName)) return;
+      
+      this.events.add({
+        compName, emitName, args
+      });
+    }
+_:
+  examples:
+    count: 0
+name: grid-events
+template: >-
+  <grid-module class="comp-grid-events" icon="⚡" path="1227219137."><ui-value
+  v-if="false" :value="[...events].reverse()"
+  path="1227219137.0"></ui-value></grid-module>

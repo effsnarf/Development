@@ -1,0 +1,64 @@
+dom:
+  div:
+    ':class': '{ dropzone: true, ''drag-over'': isDraggedOver }'
+    @dragover: onDragOver
+    @dragenter: onDragEnter
+    @dragleave: onDragLeave
+    @drop: onDrop
+    @click: onClick
+    slot: null
+props: null
+data:
+  isDraggedOver: false
+methods:
+  onDragOver: | #js
+    function(e) {
+      e.preventDefault();
+      this.isDraggedOver = true;
+    }
+  onDragEnter: | #js
+    function(e) {
+      e.preventDefault();
+      this.isDraggedOver = true;
+    }
+  onDragLeave: | #js
+    function(e) {
+      e.preventDefault();
+      this.isDraggedOver = false;
+    }
+  onDrop: | #js
+    function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      this.isDraggedOver = false;
+      const dragItem = this.$root.dragItem;
+      this.$root.dragItem = null;
+      this.$emit('drag-over', false);
+      this.$emit('drop-item', dragItem);
+    }
+  onClick: | #js
+    function(e) {
+      this.$emit('click', e);
+    }
+style:
+  .drag-over: null
+example:
+  dom:
+    ui.dnd.dropzone:
+      .box1.w-100pc.text-center:
+        v-text: '''Drop here'''
+      @drop-item: onDropItem
+  methods:
+    onDropItem: | #js
+      function(dragItem) {
+        alertify.message("Dropped item");
+      }
+_:
+  examples:
+    count: 1
+name: ui-dnd-dropzone
+template: >-
+  <div class="comp-ui-dnd-dropzone" :class="{ dropzone: true, 'drag-over':
+  isDraggedOver }" @dragover="onDragOver" @dragenter="onDragEnter"
+  @dragleave="onDragLeave" @drop="onDrop" @click="onClick"
+  path="-2085012855."><slot></slot></div>

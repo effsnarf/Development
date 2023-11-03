@@ -1,0 +1,44 @@
+dom:
+  grid.module:
+    ':show-title': 'false'
+    .flex:
+      .clickable:
+        v-text: '''🔴'''
+        @click: $emit('title-icon-click')
+      ui.select:
+        ':options': runsOnOptions
+        type: toggle
+        input-type: value
+        ':get-item-text': (item) => item?.icon
+        ':get-item-key': (item) => item?._id
+        ':get-item-tooltip': (item) => item?.desc
+        v-model: runsOn
+props:
+  box: null
+data:
+  runsOn: null
+  runsOnOptions:
+    - _id: client
+      icon: 💻
+      desc: The function will be executed in the client browser
+    - _id: server
+      icon: 🖥️
+      desc: The function will be executed in node.js on the server
+mounted: | #js
+  function() {
+    this.runsOn = this.runsOnOptions[0];
+  }
+methods: null
+_:
+  examples:
+    count: 0
+name: grid-ui-box-func-header
+template: >-
+  <grid-module class="comp-grid-ui-box-func-header" :show-title="false"
+  path="1742824866."><div class="flex" path="1742824866.0"><div
+  class="clickable" v-text="'🔴'" @click="$emit('title-icon-click')"
+  path="1742824866.0.0"></div><ui-select :options="runsOnOptions" type="toggle"
+  input-type="value" :get-item-text="(item) =&gt; item?.icon"
+  :get-item-key="(item) =&gt; item?._id" :get-item-tooltip="(item) =&gt;
+  item?.desc" v-model="runsOn"
+  path="1742824866.0.1"></ui-select></div></grid-module>

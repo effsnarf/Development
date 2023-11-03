@@ -127,6 +127,9 @@ config:
   track:
     state: true
 name: e-post-create
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-e-post-create container flex ver gap-1" v-disable="isLoading"
   path="1762525697."><h3 class="text-center" v-text="!isNewThread ? null :

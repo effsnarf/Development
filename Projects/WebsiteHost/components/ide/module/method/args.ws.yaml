@@ -1,0 +1,56 @@
+dom:
+  div:
+    table:
+      tr:
+        v-for: argName in method.args
+        td: 
+          ui.title:
+            icon: 🧊
+            ':text': argName
+        td: 
+          ui.input.text.box:
+            v-model: argJsons[argName]
+        td: 
+          ui.value.any:
+            ':value': args[argName]
+props:
+  method: null
+data:
+  argJsons: {}
+computed:
+  args: | #js
+    function() {
+      return Object.fromEntries(
+        Object.entries(this.argJsons)
+          .map(([k, v]) => {
+            try
+            {
+              return [k, JSON.parse(v)]
+            }
+            catch (ex)
+            {
+              return [k, null]
+            }
+          })
+      );
+    }
+watch:
+  args:
+    handler: | #js
+      function() {
+        this.$emit('input', this.args);
+      }
+    deep: true
+_:
+  examples:
+    count: 0
+name: ide-module-method-args
+template: >-
+  <div class="comp-ide-module-method-args" path="-716550388."><table
+  path="-716550388.0"><tr v-for="argName in method.args"
+  path="-716550388.0.0"><td path="-716550388.0.0.0"><ui-title icon="🧊"
+  :text="argName" path="-716550388.0.0.0.0"></ui-title></td><td
+  path="-716550388.0.0.1"><ui-input-text-box v-model="argJsons[argName]"
+  path="-716550388.0.0.1.0"></ui-input-text-box></td><td
+  path="-716550388.0.0.2"><ui-value-any :value="args[argName]"
+  path="-716550388.0.0.2.0"></ui-value-any></td></tr></table></div>

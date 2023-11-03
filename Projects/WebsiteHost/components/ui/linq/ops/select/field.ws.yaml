@@ -1,0 +1,33 @@
+dom:
+  div:
+    v-if: operation
+    ui.value.path.picker:
+      ':obj': input
+      v-model: operation.path
+props:
+  input: null
+  value: null
+data:
+  operation: null
+methods: null
+watch:
+  operation:
+    handler: | #js
+      function(operation) {
+        this.$emit("input", operation);
+      }
+    deep: true
+  value:
+    handler: | #js
+      function(value) {
+        this.operation = value;
+      }
+    immediate: true
+_:
+  examples:
+    count: 0
+name: ui-linq-ops-select-field
+template: >-
+  <div class="comp-ui-linq-ops-select-field" v-if="operation"
+  path="1698785176."><ui-value-path-picker :obj="input" v-model="operation.path"
+  path="1698785176.0"></ui-value-path-picker></div>

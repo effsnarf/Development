@@ -1,0 +1,175 @@
+dom:
+  grid.module:
+    icon: 👤👈
+    grid.user.action.stack:
+      ':userID': userID
+props:
+  userID: null
+data: null
+methods:
+  grid_ui_actions_create_group: | #js
+    function(displayBoxID) {
+      const action = { redo: { method: "create.group", args: [displayBoxID] } };
+      this.$femit("do", this.userID, action);
+    }
+  grid_ui_actions_delete_selected: | #js
+    function() {
+      const action = { redo: { method: "delete.selected", args: [] } };
+      this.$femit("do", this.userID, action);
+    }
+  grid_ui_actions_mark_select_box: | #js
+    function(rect, groupBoxID) {
+      // Check if any boxes fit into the selection box
+      const selectedBoxes = this.$boxes.filter(box => this.isBoxInRect(box, rect));
+      // If any boxes fit into the selection box, select them
+      if (selectedBoxes.length) {
+        const boxIDs = selectedBoxes.map(box => box._id);
+        const action = { redo: { method: "select.boxes", args: [boxIDs, true] } };
+        this.$femit("do", this.userID, action);
+      }
+
+        // If no boxes fit into the selection box, create a new box
+      if (!selectedBoxes.length) {
+        rect.is = (rect.is || {});
+        rect.is.minimized = (rect.is.minimized || false);
+        const box = {
+          type: null,
+          rect,
+          is: {
+            selected: false
+          },
+        };
+        const action = { redo: { method: "create.box", args: [box, groupBoxID] } };
+        this.$femit("do", this.userID, action);
+      }
+    }
+  grid_ui_actions_unselect_boxes: | #js
+    function() {
+      const action = { redo: { method: "unselect.boxes", args: [] } };
+      this.$femit("do", this.userID, action);
+    }
+  grid_ui_actions_create_box: | #js
+    async function(userID, rect) {
+    }
+  grid_ui_box_socket_create_box: | #js
+    function(box, groupBoxID) {
+      const action = { redo: { method: "create.box", args: [box, groupBoxID] } };
+      this.$femit("do", this.userID, action);
+    }
+  grid_ui_box_move_box: | #js
+    async function(boxID, pos) {
+      const action = { redo: { method: "move.box", args: [boxID, pos] } };
+      this.$femit("do", this.userID, action);
+    }
+  grid_ui_box_move_boxes: | #js
+    async function(boxID, otherBoxIDs, pos) {
+      const action = { redo: { method: "move.boxes", args: [boxID, otherBoxIDs, pos] } };
+      this.$femit("do", this.userID, action);
+    }
+  grid_ui_box_resize_box: | #js
+    async function(boxID, size) {
+      const action = { redo: { method: "resize.box", args: [boxID, size] } };
+      this.$femit("do", this.userID, action);
+    }
+  grid_ui_box_edit_box: | #js
+    async function(boxID, newData, oldData) {
+      const action = { redo: { method: "edit.box", args: [boxID, newData, oldData] } };
+      this.$femit("do", this.userID, action);
+    }
+  grid_ui_box_create_node: | #js
+    async function(boxID, parentNodeID, newNode) {
+      const action = { redo: { method: "create.node", args: [boxID, parentNodeID, newNode] } };
+      this.$femit("do", this.userID, action);
+    }
+  grid_ui_box_edit_node: | #js
+    async function(boxID, nodeID, newData, oldData) {
+      const action = { redo: { method: "edit.node", args: [boxID, nodeID, newData, oldData] } };
+      this.$femit("do", this.userID, action);
+    }
+  grid_ui_box_edit_socket: | #js
+    function(boxID, direction, socketID, newData, oldData) {
+      const action = { redo: { method: "edit.socket", args: [boxID, direction, socketID, newData, oldData] } };
+      this.$femit("do", this.userID, action);
+    }
+  grid_ui_box_create_link: | #js
+    async function(...args) {
+      const action = { redo: { method: "create.link", args: args } };
+      this.$femit("do", this.userID, action);
+    }
+  grid_ui_box_socket_delete_link: | #js
+    async function(linkID) {
+      const action = { redo: { method: "delete.link", args: [linkID] } };
+      this.$femit("do", this.userID, action);
+    }
+  grid_ui_box_socket_edit_socket: | #js
+    function(boxID, direction, socketID, newData) {
+      const action = { redo: { method: "edit.socket", args: [boxID, direction, socketID, newData] } };
+      this.$femit("do", this.userID, action);
+    }
+  grid_ui_link_edit_link: | #js
+    function(linkID, newData, oldData) {
+      const action = { redo: { method: "edit.link", args: [linkID, newData, oldData] } };
+      this.$femit("do", this.userID, action);
+    }
+  grid_ui_link_delete_link: | #js
+    async function(linkID) {
+      const action = { redo: { method: "delete.link", args: [linkID] } };
+      this.$femit("do", this.userID, action);
+    }
+  grid_ui_actions_undo: | #js
+    function(userID) {
+      this.$femit("undo", userID);
+    }
+  grid_ui_actions_redo: | #js
+    function(userID) {
+      this.$femit("redo", userID);
+    }
+  grid_ui_actions_clear: | #js
+    function(userID) {
+      this.$femit("clear", userID);
+    }
+  isBoxInRect: | #js
+    function(box, rect) {
+      // Check if box is completely inside rect
+
+      // If box is inside a group, we don't want to select it
+      if (box.groupBoxID) return false;
+      
+      // rect.pos / box.rect.pos mark the center of the rectangle
+      // rect.size / box.rect.size marks the size of the rectangle
+      // If box.rect.is.minimized, we consider its height to be 40
+      // but we need to calculate a new center pos for it, since the
+      // height is different
+
+      // If box.rect.is.minimized, we consider its height to be 40
+      const boxHeight = box.rect.is.minimized ? 40 : box.rect.size.height;
+      
+      // Calculate new center position if the box is minimized
+      const boxCenterY = box.rect.is.minimized ? (box.rect.pos.y - boxHeight / 2) : box.rect.pos.y;
+      
+      const boxCoords = this.centeredToTraditional({ x: box.rect.pos.x, y: boxCenterY }, { width: box.rect.size.width, height: boxHeight });
+      const rectCoords = this.centeredToTraditional(rect.pos, rect.size);
+      
+      return (
+        boxCoords.left >= rectCoords.left &&
+        boxCoords.right <= rectCoords.right &&
+        boxCoords.top >= rectCoords.top &&
+        boxCoords.bottom <= rectCoords.bottom
+      );
+    }
+  centeredToTraditional: | #js
+    function (centerPos, size) {
+      const left = centerPos.x - size.width / 2;
+      const right = centerPos.x + size.width / 2;
+      const top = centerPos.y - size.height / 2;
+      const bottom = centerPos.y + size.height / 2;
+      return { left, right, top, bottom };
+    }
+name: grid-user-actions
+_:
+  examples:
+    count: 0
+template: >-
+  <grid-module class="comp-grid-user-actions" icon="👤👈"
+  path="202369922."><grid-user-action-stack :userID="userID"
+  path="202369922.0"></grid-user-action-stack></grid-module>

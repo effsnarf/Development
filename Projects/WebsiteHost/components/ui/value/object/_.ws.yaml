@@ -1,0 +1,84 @@
+dom:
+  div:
+    .flex:
+      ':style': '{ gap: ''1em'' }'
+      v-if: (title || specialTypeName)
+      .title: 
+        v-if: title
+        v-text: title
+      .title: 
+        class: opacity-50
+        v-if: false && specialTypeName
+        v-text: specialTypeName
+    pre:
+      class: pre
+      ui.value.table:
+        ':value': value
+        ':depth': (depth + 1)
+    .console-log-button:
+      class: clickable
+      title: console.log()
+      v-text: '''💻'''
+      @click: () => consoleLog(value)
+    ui.alert:
+      ref: alert1
+props:
+  value: null
+  title: null
+  depth: 0
+data:
+  yamlError: null
+methods:
+  consoleLog: | #js
+    function(value) {
+      console.log(value);
+      this.$refs.alert1.show('Object logged to browser console.');
+    }
+computed:
+  type: | #js
+    function() {
+      const type = Objects.getType(this.value);
+      return (type?.name || type);
+    }
+  specialTypeName: | #js
+    function() {
+      if (!this.value) return null;
+      const type = Objects.getType(this.value).toString();
+      const specialTypeName = this.value.constructor?.name;
+      return (type === specialTypeName) ? null : specialTypeName;
+    }
+  yaml: | #js
+    function() {
+      try
+      {
+        this.yamlError = null;
+        return this.$root.visualizedYaml(this.value);
+      }
+      catch (ex)
+      {
+        this.yamlError = ex.message;
+        return null;
+      }
+    }
+watch: null
+style:
+  .title1:
+    opacity: 0.5
+  .box1:
+    font-size: 100%
+name: ui-value-object
+_:
+  examples:
+    count: 0
+template: >-
+  <div class="comp-ui-value-object" path="-1714629770."><div class="flex"
+  :style="{ gap: '1em' }" v-if="(title || specialTypeName)"
+  path="-1714629770.0"><div class="title" v-if="title" v-text="title"
+  path="-1714629770.0.0"></div><div class="opacity-50 title" v-if="false
+  &amp;&amp; specialTypeName" v-text="specialTypeName"
+  path="-1714629770.0.1"></div></div><pre class="pre"
+  path="-1714629770.1"><ui-value-table :value="value" :depth="(depth + 1)"
+  path="-1714629770.1.0"></ui-value-table></pre><div class="clickable
+  console-log-button" title="console.log()" v-text="'💻'" @click="() =&gt;
+  consoleLog(value)" path="-1714629770.2"></div><ui-alert ref="alert1"
+  path="-1714629770.3"></ui-alert></div>

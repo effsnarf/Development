@@ -1,0 +1,26 @@
+dom:
+  grid.module:
+    icon: ⬜
+    div:
+      ui.button:
+        icon: ♻
+        text: refresh
+        @click: refresh
+    ul:
+      li:
+        v-for: link in $links
+        grid.ui.link.item:
+          ':link': link
+data: null
+methods: null
+watch: null
+_:
+  examples:
+    count: 0
+name: grid-ui-link-list
+template: >-
+  <grid-module class="comp-grid-ui-link-list" icon="⬜" path="-266141472."><div
+  path="-266141472.0"><ui-button icon="♻" text="refresh" @click="refresh"
+  path="-266141472.0.0"></ui-button></div><ul path="-266141472.1"><li
+  v-for="link in $links" path="-266141472.1.0"><grid-ui-link-item :link="link"
+  path="-266141472.1.0.0"></grid-ui-link-item></li></ul></grid-module>

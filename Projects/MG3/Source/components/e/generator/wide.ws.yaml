@@ -36,6 +36,9 @@ computed:
       return `/${this.item.urlName}`;
     }
 name: e-generator-wide
+_:
+  examples:
+    count: 0
 template: >-
   <ui-link class="comp-e-generator-wide" :url="url" path="-398607945."><ui-card1
   class="grayish" path="-398607945.0"><div class="show-on-hover-container"

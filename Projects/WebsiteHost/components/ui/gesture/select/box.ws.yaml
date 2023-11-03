@@ -1,0 +1,288 @@
+dom:
+  div: 
+    ui.mouse:
+      global: true
+      @down: onMouseDown
+      @up: onMouseUp
+      @move: onMouseMove
+    div: 
+      v-if: 'false'
+      .x-axis:
+        ':style': xAxisStyle
+      .y-axis:
+        ':style': yAxisStyle
+      .debugger:
+        v-if: 'false'
+        ':style': debuggerStyle
+        ui.value:
+          ':value': debugInfo
+    transition:
+      name: fade
+      .select-box:
+        v-if: isVisible
+        ':style': selectBoxStyle
+props:
+  surfaceElement: null
+  surfaceCamera: null
+  centerCoords: false
+  isLayerElement: null
+  showAxes: false
+data:
+  mousePos: null
+  dragStart: null
+  dragEnd: null
+  isVisible: false
+mounted: | #js
+  function() {
+    // If [esc] is pressed, cancel the select box
+    window.addEventListener("keydown", this.onKeyDown);
+  }
+methods:
+  onKeyDown: | #js
+    function(e) {
+      if (e.key != "Escape") return;
+      this.clear();
+    }
+  onMouseDown: | #js
+    function(e) {
+      if (e.button != 0) return;
+      if (e.target != this.surfaceElement) return;
+      if (this.dragStart) return;
+      if (!this.isLayerElement) throw new Error("Pass isLayerElement prop to ui.gesture.select.box to know where the select box is active");
+      if (!this.isLayerElement(e.target)) return;
+      e.preventDefault();
+      e.stopPropagation();
+      this.dragStart = { x: e.clientX, y: e.clientY };
+      this.isVisible = false;
+    }
+  onMouseUp: | #js
+    function(e) {
+      if (e.button != 0) return;
+      if (e.target != this.surfaceElement) return;
+      if (!this.dragStart) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const rect = this.rect;
+      this.clear();
+      if (!this.isMinimumSize(rect?.size)) return;
+      this.$emit("drag-end", this.adjustPos(this.dragEnd));
+      this.$emit("mark", this.adjustRect(rect));
+    }
+  onMouseMove: | #js
+    function(e) {
+      this.mousePos = e;
+      if (!this.dragStart) return;
+      if (!this.isVisible) this.isVisible = this.isMinimumSize(this.size);
+      this.dragEnd = { x: e.x, y: e.y };
+    }
+  isMinimumSize: | #js
+    function(size) {
+      if (!size) return false;
+      if (size.width < 10) return false;
+      if (size.height < 10) return false;
+      return true;
+    }
+  getCorner: | #js
+    function(minOrMax) {
+      const dragStart = this.dragStart;
+      const dragEnd = this.dragEnd;
+      if (!dragStart) return null;
+      if (!dragEnd) return null;
+      const x = Math[minOrMax](dragStart.x, dragEnd.x);
+      const y = Math[minOrMax](dragStart.y, dragEnd.y);
+      return { x, y };
+    }
+  getSurfaceCenter: | #js
+    function() {
+      const surface = this.surfaceElement || window;
+      const surfaceRect = this.$root.getAbsoluteRect(surface);
+      return {
+        x: Math.round(surfaceRect.left + surfaceRect.width / 2),
+        y: Math.round(surfaceRect.top + surfaceRect.height / 2)
+      };
+    }
+  adjustRect: | #js
+    function(rect) {
+      if (!this.centerCoords) return rect;
+      const center = this.getSurfaceCenter("fixed");
+      const pos = rect.pos;
+      const size = rect.size;
+      const x = pos.x - center.x;
+      const y = center.y - pos.y;
+      const width = size.width;
+      const height = size.height;
+      rect = this.toCenteredRect({ pos: { x, y }, size: { width, height } });
+      rect = this.adjustToCamera(rect);
+      return rect;
+    }
+  adjustPos: | #js
+    function(pos) {
+      if (!pos) return null;
+      if (!this.centerCoords) return pos;
+      const center = this.getSurfaceCenter("fixed");
+      const x = pos.x - center.x;
+      const y = center.y - pos.y;
+      pos = { x, y };
+      pos = this.adjustToCamera(pos);
+      return pos;
+    }
+  toCenteredRect: | #js
+    function(rect) {
+      const pos = rect.pos;
+      const size = rect.size;
+      const x = pos.x + size.width / 2;
+      const y = pos.y - size.height / 2;
+      return { pos: { x, y }, size };
+    }
+  adjustToCamera: | #js
+    function(posOrRect) {
+      const camera = this.surfaceCamera;
+      if (!camera) return posOrRect;
+      if (posOrRect.pos) {
+        const pos = posOrRect.pos;
+        pos.x = (pos.x + camera.pos.x) / camera.scale;
+        pos.y = (pos.y + camera.pos.y) / camera.scale;
+      }
+      else {
+        const pos = posOrRect;
+        pos.x = (pos.x + camera.pos.x) / camera.scale;
+        pos.y = (pos.y + camera.pos.y) / camera.scale;
+      }
+      return posOrRect;
+    }
+  clear: | #js
+    function() {
+      this.dragStart = null;
+      this.dragEnd = null;
+      this.isVisible = false;
+    }
+computed:
+  debugInfo: | #js
+    function() {
+      const info = {};
+      try
+      {
+        info.mousePos = this.adjustPos(this.mousePos);
+        info.rect = this.adjustRect(this.rect);
+      }
+      catch (ex)
+      {
+        info.error = ex.message;
+      }
+      return info;
+    }
+  selectBoxStyle: | #js
+    function() {
+      if (!this.isVisible) return null;
+      const topLeft = this.topLeft;
+      const size = this.size;
+      const style = {};
+      style.position = "fixed";
+      style.left = `${topLeft.x}px`;
+      style.top = `${topLeft.y}px`;
+      style.width = `${size.width}px`;
+      style.height = `${size.height}px`;
+      return style;
+    }
+  xAxisStyle: | #js
+    function() {
+      const mousePos = this.mousePos;
+      if (!mousePos) return null;
+      const style = {};
+      style.position = "fixed";
+      style.left = `${0}px`;
+      style.top = `${mousePos.y}px`;
+      style.width = `${100}vw`;
+      style.height = `${1}px`;
+      style.pointerEvents = "none";
+      return style;
+    }
+  yAxisStyle: | #js
+    function() {
+      const mousePos = this.mousePos;
+      if (!mousePos) return null;
+      const style = {};
+      style.position = "fixed";
+      style.left = `${mousePos.x}px`;
+      style.top = `${0}px`;
+      style.width = `${1}px`;
+      style.height = `${100}vh`;
+      style.pointerEvents = "none";
+      return style;
+    }
+  debuggerStyle: | #js
+    function() {
+      const mousePos = this.mousePos;
+      if (!mousePos) return null;
+      const spacer = 20;
+      const style = {};
+      style.position = "fixed";
+      style.left = `${mousePos.x + spacer}px`;
+      style.top = `${mousePos.y + spacer}px`;
+      style.pointerEvents = "none";
+      return style;
+
+    }
+  topLeft: | #js
+    function() {
+      return this.getCorner("min");
+    }
+  bottomRight: | #js
+    function() {
+      return this.getCorner("max");
+    }
+  size: | #js
+    function() {
+      const topLeft = this.topLeft;
+      const bottomRight = this.bottomRight;
+      if (!topLeft) return null;
+      if (!bottomRight) return null;
+      const width = bottomRight.x - topLeft.x;
+      const height = bottomRight.y - topLeft.y;
+      return { width, height };
+    }
+  rect: | #js
+    function() {
+      if (!this.dragStart) return null;
+      if (!this.topLeft) return null;
+      return {
+        pos: { x: this.topLeft.x, y: this.topLeft.y },
+        size: this.size
+      }
+    }
+watch:
+  mousePos: | #js
+    function() {
+      this.$emit("mouse-pos", this.adjustPos(this.mousePos));
+    }
+  dragStart: | #js
+    function() {
+      this.$emit("drag-start", this.adjustPos(this.dragStart));
+    }
+style:
+  .select-box:
+    border: 3px dashed yellow
+    position: fixed
+    filter: 'drop-shadow(-3px 3px 1px #000000)'
+    transition: opacity 0.3s !important
+    background: '#ffffff10'
+    pointer-events: none
+    z-index: 1000
+  .x-axis, .y-axis:
+    border: 1px dashed gray
+    opacity: 0.1
+_:
+  examples:
+    count: 0
+name: ui-gesture-select-box
+template: >-
+  <div class="comp-ui-gesture-select-box" path="-2052114120."><ui-mouse
+  global="true" @down="onMouseDown" @up="onMouseUp" @move="onMouseMove"
+  path="-2052114120.0"></ui-mouse><div v-if="false" path="-2052114120.1"><div
+  class="x-axis" :style="xAxisStyle" path="-2052114120.1.0"></div><div
+  class="y-axis" :style="yAxisStyle" path="-2052114120.1.1"></div><div
+  class="debugger" v-if="false" :style="debuggerStyle"
+  path="-2052114120.1.2"><ui-value :value="debugInfo"
+  path="-2052114120.1.2.0"></ui-value></div></div><transition name="fade"
+  path="-2052114120.2"><div class="select-box" v-if="isVisible"
+  :style="selectBoxStyle" path="-2052114120.2.0"></div></transition></div>

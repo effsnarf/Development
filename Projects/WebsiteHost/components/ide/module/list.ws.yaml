@@ -1,0 +1,29 @@
+dom:
+  .flex:
+    ui.select:
+      ':options': modules
+      item-icon: 📦
+      ':get-item-text': (m) => m.name
+      input-type: value
+      v-model: selectedModule
+    div:
+      ide.module:
+        ':module': selectedModule
+data:
+  selectedModule: null
+computed:
+  modules: | #js
+    function() {
+      const modules = vueApp.client.moduleManager.modules;
+      return modules;
+    }
+_:
+  examples:
+    count: 0
+name: ide-module-list
+template: >-
+  <div class="comp-ide-module-list flex" path="1196492188."><ui-select
+  :options="modules" item-icon="📦" :get-item-text="(m) =&gt; m.name"
+  input-type="value" v-model="selectedModule"
+  path="1196492188.0"></ui-select><div path="1196492188.1"><ide-module
+  :module="selectedModule" path="1196492188.1.0"></ide-module></div></div>

@@ -1,0 +1,45 @@
+dom:
+  div:
+    v-if: operation
+    .box1:
+      component:
+        ':is': getLinqCompName(operation.type)
+        ':context': context
+        ':input': input
+        ':prev-operation': prevOperation
+        v-model: operation
+props:
+  context: null
+  input: null
+  value: null
+  prevOperation: null
+data:
+  operation: null
+methods:
+  getLinqCompName: | #js
+    function(type) {
+      return `ui.linq.ops.${type}`.replace(/\./g, "-");
+    }
+watch:
+  operation:
+    handler: | #js
+      function(operation) {
+        this.$emit("update", operation);
+      }
+    deep: true
+  value:
+    handler: | #js
+      function(value) {
+        this.operation = value;
+      }
+    immediate: true
+_:
+  examples:
+    count: 0
+name: ui-linq-operation-any
+template: >-
+  <div class="comp-ui-linq-operation-any" v-if="operation"
+  path="-320222959."><div class="box1" path="-320222959.0"><component
+  :is="getLinqCompName(operation.type)" :context="context" :input="input"
+  :prev-operation="prevOperation" v-model="operation"
+  path="-320222959.0.0"></component></div></div>

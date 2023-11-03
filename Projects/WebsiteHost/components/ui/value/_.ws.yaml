@@ -1,0 +1,59 @@
+dom:
+  ui.value.any:
+    ':class': '{ overflow, loading: isLoading }'
+    ':value': visibleValue
+    ':title': title
+    ':depth': (depth + 1)
+    ':large': large
+props:
+  value: null
+  title: null
+  depth: 0
+  overflow: false
+  large: false
+data:
+  visibleValue: null
+  isLoading: false
+computed: null
+watch:
+  value:
+    handler: | #js
+      async function(value) {
+        this.isLoading = true;
+        await this.$root.wait(100);
+        this.visibleValue = value;
+        await this.$root.wait(100);
+        this.isLoading = false;
+      }
+    immediate: true
+style:
+  .overflow:
+    max-height: 30em
+    overflow: auto
+  .loading:
+    filter: grayscale(1)
+  .loading::after:
+    position: absolute
+    width: 100%
+    height: 100%
+    top: 0
+    left: 0
+    background-image: url(/images/loading.gif)
+example:
+  dom:
+    ui.value:
+      ':value': exampleData
+  data:
+    exampleData: null
+  mounted: | #js #js
+    async function() {
+      this.exampleData = (await (await fetch("/fetch?url=https://a.4cdn.org/boards.json")).json()).boards;
+    }
+name: ui-value
+_:
+  examples:
+    count: 1
+template: >-
+  <ui-value-any class="comp-ui-value" :class="{ overflow, loading: isLoading }"
+  :value="visibleValue" :title="title" :depth="(depth + 1)" :large="large"
+  path="-2122101353."></ui-value-any>

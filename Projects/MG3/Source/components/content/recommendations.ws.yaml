@@ -16,6 +16,9 @@ style:
 props:
   items: null
 name: content-recommendations
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-content-recommendations list"
   path="-1482246043."><transition-group tag="ul" name="list"

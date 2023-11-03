@@ -1,0 +1,133 @@
+dom:
+  div: 
+    v-show: 'true'
+    div: 
+      v-if: showWorkspace
+      class: workspace
+      h3:
+        ui.title: 
+          icon: 🎄
+          ':value': appVuesCount?.toLocaleString()
+        div: 
+          ui.button:
+            icon: ♻
+            text: reload from server
+            ':click': $root.reloadComponentsFromServer
+        select:
+          v-model: selectedEditor
+          option:
+            v-for: editor in ['component', 'css']
+            ':selected': (selectedEditor == editor)
+            ':key': editor
+            v-text: editor
+      div: 
+        v-if: 'false'
+        ui.title: 
+          v-for: entry in appVuesCounts
+          icon: 🎄
+          ':text': entry[0]
+          ':number': entry[1]
+      ide.debug: null
+      .clickable:
+        @click: refresh
+        h2:
+          v-text: '''Performance'''
+        ui.value:
+          ':value': perfStats
+      div: 
+        v-if: 'true'
+        ide.component.picker:
+          v-if: (selectedEditor == 'component')
+        ide.element.picker:
+          v-if: (selectedEditor == 'css')
+    div: 
+      ui.html.style:
+        v-for: comp in $root.comps
+        ':key': comp.name
+        ':component': comp
+props: null
+data:
+  showWorkspace: true
+  selectedEditor: component
+  perfStats: null
+  appVuesCount: null
+  appVuesCounts: null
+mounted: | #js
+  function() {
+    this.showWorkspace = (window.location.hostname == "localhost");
+    this.refresh();
+  }
+methods:
+  refresh: | #js
+    async function() {
+      this.perfStats = Object.entries(this.$root.perf.stats)
+        .sortBy(e => -e[1].duration.average)
+        .map(e => ({
+          name: e[0],
+          average: e[1].duration.average,
+          measures: e[1].duration.measures
+        }));
+
+      if (true)
+      {
+        var allVues = vueApp.vm.getDescendants(vueApp);
+        var vueNames = allVues.map(v => v.$options.name).distinct();
+        var counts = vueNames
+          .map(name => ({ name, count: allVues.filter(v => (v.$options.name == name)).length }))
+          .sortBy(c => -c.count)
+          .map(c => [c.name, c.count]);
+        this.appVuesCount = allVues.length;
+        this.appVuesCounts = counts;
+      }
+      
+      setTimeout(this.refresh.bind(this), 20000);
+    }
+name: ide-workspace
+style:
+  .comp-ide-workspace:
+    position: fixed
+    left: 1rem
+    bottom: 1rem
+    display: flex
+    flex-direction: column
+    max-width: 10em
+    max-height: 10em
+    gap: 3em
+    background: '#303030'
+    padding: 1rem
+    box-shadow: 'inset -5px 5px 5px #000'
+    border: 1px solid gray
+    overflow: hidden
+    z-index: 1000000
+    transition: 1s
+  .comp-ide-workspace:hover:
+    max-width: 30vw
+    max-height: 80vh
+_:
+  examples:
+    count: 0
+template: >-
+  <div class="comp-ide-workspace" v-show="true" path="-1163457967."><div
+  class="workspace" v-if="showWorkspace" path="-1163457967.0"><h3
+  path="-1163457967.0.0"><ui-title icon="🎄"
+  :value="appVuesCount?.toLocaleString()"
+  path="-1163457967.0.0.0"></ui-title><div path="-1163457967.0.0.1"><ui-button
+  icon="♻" text="reload from server" :click="$root.reloadComponentsFromServer"
+  path="-1163457967.0.0.1.0"></ui-button></div><select v-model="selectedEditor"
+  path="-1163457967.0.0.2"><option v-for="editor in ['component', 'css']"
+  :selected="(selectedEditor == editor)" :key="editor" v-text="editor"
+  path="-1163457967.0.0.2.0"></option></select></h3><div v-if="false"
+  path="-1163457967.0.1"><ui-title v-for="entry in appVuesCounts" icon="🎄"
+  :text="entry[0]" :number="entry[1]"
+  path="-1163457967.0.1.0"></ui-title></div><ide-debug></ide-debug><div
+  class="clickable" @click="refresh" path="-1163457967.0.3"><h2
+  v-text="'Performance'" path="-1163457967.0.3.0"></h2><ui-value
+  :value="perfStats" path="-1163457967.0.3.1"></ui-value></div><div v-if="true"
+  path="-1163457967.0.4"><ide-component-picker v-if="(selectedEditor ==
+  'component')"
+  path="-1163457967.0.4.0"></ide-component-picker><ide-element-picker
+  v-if="(selectedEditor == 'css')"
+  path="-1163457967.0.4.1"></ide-element-picker></div></div><div
+  path="-1163457967.1"><ui-html-style v-for="comp in $root.comps"
+  :key="comp.name" :component="comp"
+  path="-1163457967.1.0"></ui-html-style></div></div>

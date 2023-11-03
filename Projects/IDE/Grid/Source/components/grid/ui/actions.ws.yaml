@@ -1,0 +1,36 @@
+dom:
+  grid.module:
+    icon: 👤🖱️
+props:
+  userID: null
+data: null
+methods:
+  grid_ui_tools_mark_select_box: | #js
+    function(rect, groupBoxID) {
+      this.$femit("mark.select.box", rect, groupBoxID);
+    }
+  grid_ui_tools_buttons_undo: | #js
+    function() {
+      this.$femit("undo", this.userID);
+    }
+  grid_ui_tools_buttons_redo: | #js
+    function() {
+      this.$femit("redo", this.userID);
+    }
+  grid_ui_tools_buttons_clear: | #js
+    function() {
+      this.$femit("clear", this.userID);
+    }
+  onAllEvents: | #js
+    function(compName, emitName, args) {
+      if (compName != "grid.ui.toolbar") return;
+      if (emitName == "mark.select.box") return;
+      this.$femit(emitName, this.userID, ...args);
+    }
+_:
+  examples:
+    count: 0
+name: grid-ui-actions
+template: >-
+  <grid-module class="comp-grid-ui-actions" icon="👤🖱️"
+  path="756973387."></grid-module>

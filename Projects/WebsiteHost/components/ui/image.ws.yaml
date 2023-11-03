@@ -1,0 +1,106 @@
+dom:
+  div:
+    component:
+      ':is': getCompType()
+      class: image
+      ':url': url
+      img:
+        ref: image1
+        ':class': cssClass
+        ':style': imgStyle
+        ':src': src1
+        @load: onLoad
+        @error: onError
+      @click: $emit('click')
+props:
+  imageID: null
+  url: null
+  src: null
+  square: null
+  removeBackground: false
+  aspectRatio: null
+  objectPosition: null
+data:
+  width: null
+  height: null
+mounted: | #js
+  async function () {
+    window.addEventListener(`resize`, this.recalc.bind(this));
+    // Detect if the image element changes its size
+    let resizeObserver = new ResizeObserver(this.recalc.bind(this));
+    resizeObserver.observe(this.$refs.image1);
+  }
+methods:
+  onLoad: | #js
+    function () {
+      this.$emit("load", this.$refs.image1.src);
+      this.recalc();
+      [1,2,3].forEach(i => setTimeout(this.recalc.bind(this), i * 100))
+    }
+  onError: | #js
+    function () {
+      this.$emit("error", this.$refs.image1.src);
+    }
+  recalc: | #js
+    function () {
+      if (!this.$refs.image1) return;
+      let rect = this.$refs.image1.getBoundingClientRect();
+      this.width = Math.round(rect.width);
+      this.height = Math.round(rect.height);
+      this.$emit("change");
+    }
+  getCssClass: | #js
+    function () {
+      return { empty: !this.src, square: this.square };
+    }
+  getCompType: | #js
+    function () {
+      if (!this.url) return `div`;
+      return `ui-link`;
+    }
+computed:
+  diagonal: | #js
+    function () {
+      return Math.round(Math.sqrt(this.width * this.width + this.height * this.height));
+    }
+  src1: | #js
+    function () {
+      if (this.imageID) return this.$root.url.image(this.imageID, true, this.removeBackground);
+      if (this.url) return this.url;
+      if (this.src) return this.src;
+      return this.emptySrc;
+    }
+  emptySrc: | #js
+    function () {
+      return '/img/empty.png';
+    }
+  imgStyle: | #js
+    function () {
+      const style = {};
+      style.aspectRatio = this.aspectRatio;
+      style.objectPosition = this.objectPosition;
+      return style;
+    }
+  cssClass: | #js
+    function () {
+      return this.getCssClass();
+    }
+style:
+  .comp-ui-image:
+    overflow: hidden
+    transition: 0s
+  .image, img:
+    width: 100%
+    object-fit: cover
+  .square:
+    aspect-ratio: 1
+name: ui-image
+_:
+  examples:
+    count: 0
+template: >-
+  <div class="comp-ui-image" path="-2133760639."><component class="image"
+  :is="getCompType()" :url="url" @click="$emit('click')"
+  path="-2133760639.0"><img ref="image1" :class="cssClass" :style="imgStyle"
+  :src="src1" @load="onLoad" @error="onError"
+  path="-2133760639.0.0"/></component></div>

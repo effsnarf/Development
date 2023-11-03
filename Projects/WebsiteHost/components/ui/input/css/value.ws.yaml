@@ -1,0 +1,48 @@
+dom:
+  div:
+    .flex:
+      ui.input.range:
+        min: 0
+        max: 100
+        step: 1
+        v-model: number
+props:
+  value: null
+data:
+  number: null
+  unit: null
+methods:
+  getCValue: | #js
+    function(number, unit) {
+      if (number == null) return null;
+      return `${number||""}${unit||""}`;
+    }
+computed:
+  cValue: | #js
+    function() {
+      return this.getCValue(this.number, this.unit);
+    }
+watch:
+  cValue:
+    handler: | #js
+      function(cValue) {
+        this.$emit('input', cValue);
+      }
+  value:
+    handler: | #js
+      function(value) {
+        if (value == this.cValue) return;
+        this.number = parseInt(value);
+        this.unit = (value?.replace(this.value1, '') || null);
+        if (parseFloat(this.unit)) this.unit = "%";
+      }
+    immediate: true
+    deep: true
+_:
+  examples:
+    count: 0
+name: ui-input-css-value
+template: >-
+  <div class="comp-ui-input-css-value" path="-1335464632."><div class="flex"
+  path="-1335464632.0"><ui-input-range max="100" step="1" v-model="number"
+  path="-1335464632.0.0"></ui-input-range></div></div>

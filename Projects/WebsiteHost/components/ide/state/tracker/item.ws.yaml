@@ -1,0 +1,161 @@
+dom:
+  tr:
+    ':class': getGridClass()
+    @click: $emit('click')
+    td: 
+      v-if: icon
+      v-text: icon
+    td: 
+      v-if: showCompName
+      class: opacity-30
+      v-text: item.vueCompName
+    td: 
+      class: text-center
+      v-text: $root.getIcon(item)
+    td: 
+      v-text: item.key
+    td: 
+      class: newValue
+      v-if: (valueInGrid && item.newValue)
+      ui.value.preview:
+        v-if: showValue(item)
+        ':value': item.newValue.value
+      @mouseenter: onHoverValue
+      @mouseleave: onUnhoverValue
+props:
+  item: null
+  icon: null
+  preview: false
+  showCompName: false
+  depth: 0
+data:
+  isHoveringOverValue: false
+  selectedItem: null
+mounted: | #js
+  function() {
+    //this.$root.$on("state-changed", this.onStateChanged.bind(this));
+  }
+methods:
+  getMethod: | #js
+    function(item) {
+      const vue = this.$root.vm.getVue(item.uid);
+      const methodDatas = vue._vueIde.methodDatas;
+      return methodDatas[item.key].originalMethod;
+    }
+  showValue: | #js
+    function(item) {
+      if (["m"].includes(item.type)) return false;
+      return true;
+    }
+  showMethod: | #js
+    function(item) {
+      if (!this.preview) return false;
+      if (["m"].includes(item.type)) return true;
+      return false;
+    }
+  onHoverValue: | #js
+    function() {
+      this.isHoveringOverValue = true;
+      this.$root.$emit("preview-state-item", this.item);
+    }
+  onUnhoverValue: | #js
+    function() {
+      this.isHoveringOverValue = false;
+      this.$root.$emit("preview-state-item", null);
+    }
+  onItemClick: | #js
+    function(item) {
+      this.selectedItem = (this.selectedItem == item) ? null : item;
+      //this.$root.$emit("watch-state-item", { uid: this.uid, key: item.key });
+    }
+  showFieldContext: | #js
+    function(item) {
+      if (item.type == "m") return false;
+      if (typeof(item.newValue) == "boolean") return false;
+      if ([undefined, null].includes(item.newValue)) return false;
+      return true;
+    }
+  getMethodBodyColored: | #js
+    function(compName, methodName) {
+      let methodBody = this.getMethodBody(compName, methodName);
+      methodBody = Prism.highlight(methodBody, Prism.languages.javascript, 'javascript');
+      return methodBody;
+    }
+  getMethodBody: | #js
+    function(compName, methodName) {
+      const comp = this.$root.getComponent(compName);
+      if (!comp) return null;
+      const methodBody = comp.source.methods[methodName] || comp.source[methodName];
+      if (!methodBody) return null;
+      return methodBody;
+    }
+  onStateChanged: | #js
+    function(item) {
+      //if (item.key == this.item.key) this.refresh();
+    }
+  getGridClass: | #js
+    function() {
+      const cls = [];
+      cls.push(this.item.type);
+      cls.push("tr");
+      if (this.preview) cls.push("preview");
+      return cls;
+    }
+  consoleLog: | #js
+    function(value) {
+      console.log(value);
+    }
+computed:
+  valueInGrid: | #js
+    function() {
+      return (!this.preview);
+    }
+watch:
+  selectedItem:
+    handler: | #js
+      function(selectedItem) {
+        this.$emit("select-item", selectedItem);
+      }
+    immediate: true
+style:
+  .tr:
+    white-space: nowrap
+  td:
+    padding: 0 0.5em
+  td:first-child:
+    border-radius: 0.5em 0 0 0.5em
+  td:last-child:
+    border-radius: 0 0.5em 0.5em 0
+  .grid:
+    width: min-content
+    text-wrap: nowrap
+    overflow: hidden
+  .grid > *:
+    overflow: hidden
+  .grid.preview:
+    font-size: 140%
+  .comp-name:
+    opacity: 0.5
+  .newValue:
+    color: cyan
+  .oldValue:
+    opacity: 0.5
+  .comp-ui-textarea:
+    width: 40em
+    height: 20em
+    font-size: 110%
+name: ide-state-tracker-item
+_:
+  examples:
+    count: 0
+template: >-
+  <tr class="comp-ide-state-tracker-item" :class="getGridClass()"
+  @click="$emit('click')" path="841306122."><td v-if="icon" v-text="icon"
+  path="841306122.0"></td><td class="opacity-30" v-if="showCompName"
+  v-text="item.vueCompName" path="841306122.1"></td><td class="text-center"
+  v-text="$root.getIcon(item)" path="841306122.2"></td><td v-text="item.key"
+  path="841306122.3"></td><td class="newValue" v-if="(valueInGrid &amp;&amp;
+  item.newValue)" @mouseenter="onHoverValue" @mouseleave="onUnhoverValue"
+  path="841306122.4"><ui-value-preview v-if="showValue(item)"
+  :value="item.newValue.value"
+  path="841306122.4.0"></ui-value-preview></td></tr>

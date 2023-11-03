@@ -32,6 +32,9 @@ computed:
       return `${text}.`;
     }
 name: e-generator-teaser2
+_:
+  examples:
+    count: 0
 template: >-
   <ui-link class="comp-e-generator-teaser2" v-if="cGenerator"
   :url="$root.url.generator(cGenerator)" path="-2123996546."><div class="flex

@@ -1,0 +1,40 @@
+dom:
+  div: 
+    @mouseenter: $emit('mouseenter')
+    @mouseleave: $emit('mouseleave')
+    @click: $emit('click')
+    v-if: vue
+    ui.highlighter:
+      ':get-elements': () => vue.$el
+      div: 
+        @click: onClick
+        ui.title:
+          icon: 📦
+          ':value': vue.$options._componentTag
+props:
+  item: null
+data:
+  vue: null
+methods:
+  onClick: | #js
+    function() {
+      console.log(this.vue);
+    }
+watch:
+  item:
+    handler: | #js
+      function(item) {
+        this.vue = (!item ? null : item());
+      }
+    immediate: true
+name: ide-component-title
+_:
+  examples:
+    count: 0
+template: >-
+  <div class="comp-ide-component-title" @mouseenter="$emit('mouseenter')"
+  @mouseleave="$emit('mouseleave')" @click="$emit('click')" v-if="vue"
+  path="259955427."><ui-highlighter :get-elements="() =&gt; vue.$el"
+  path="259955427.0"><div @click="onClick" path="259955427.0.0"><ui-title
+  icon="📦" :value="vue.$options._componentTag"
+  path="259955427.0.0.0"></ui-title></div></ui-highlighter></div>

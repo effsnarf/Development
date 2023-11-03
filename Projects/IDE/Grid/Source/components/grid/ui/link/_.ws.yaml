@@ -1,0 +1,242 @@
+dom:
+  grid.module:
+    ':show-title': 'false'
+    div: 
+      v-if: 'false'
+      ':class': '{ hoverable: true, ''opacity-30'': (!showLeaderLine) }'
+      @mouseenter: isHighlighted = true
+      @mouseleave: isHighlighted = false
+      div: 
+        v-text: linkDesc
+      div: 
+        v-text: isDimmed
+      ui.context.window:
+        ui.value:
+          ':value': link
+    ui.leader.line:
+      v-if: showLeaderLine
+      ref: leaderLine1
+      ':from': fromEl
+      ':to': toEl
+      ':start-plug': getStartPlug()
+      ':color': leaderLineColor
+      template:
+        v-slot: middle
+        div: 
+          ':class': '{ box1: true, ''has-func'': (!!link?.func), loading: isLoading }'
+          ui.loading:
+            ':class': '{ loader: true, visible: isLoading }'
+          .content:
+            grid.ui.link.func:
+              ':link': link
+            div: 
+              ui.button:
+                icon: ❌
+                text: delete link
+                @click: onDeleteLink
+props:
+  link: null
+  surfaceCamera:
+    pos:
+      x: 0
+      'y': 0
+    scale: 1
+  surfaceGroupBoxID: null
+  isDimmed: false
+data:
+  fromEl: null
+  toEl: null
+  linkDesc: null
+  normalColor: '#303030'
+  highlightedColor: cyan
+  dimmedColor: '#202020'
+  hasFuncColor: '#212947'
+  leaderLineColor: '#303030'
+  isHighlighted: false
+  isLoading: 0
+mounted: | #js
+  function() {
+    this.refresh();
+  }
+methods:
+  grid_user_action_stack_do: | #js
+    function(box) {
+      this.refresh();
+    }
+  grid_client_runtime_link_is_loading: | #js
+    function(linkID, loadingCount) {
+      if (linkID != this.link._id) return;
+      this.isLoading += loadingCount;
+    }
+  grid_client_runtime_link_flash: | #js
+    async function(linkID, sValue) {
+      // #TODO: Slow
+      if (linkID !== this.link._id) return;
+      this.$refs.leaderLine1?.flash();
+    }
+  getFromEl: | #js
+    function() {
+      return this.getSocketEl(this.link.from, 'output');
+    }
+  getToEl: | #js
+    function() {
+      const toGroupBox = this.getTopGroupBox(this.link.to.box);
+      // If the link is going to a box inside a group box, we need to find the group box's window
+      // If this box is not a member of the group box
+      if (toGroupBox)
+      {
+        if ((toGroupBox._id != this.link.to.box._id)) {
+          //return this.$root.els[`/box/window/${toBox._id}`];
+        }
+      }
+      return this.getSocketEl(this.link.to, 'input');
+    }
+  getStartPlug: | #js
+    function() {
+      if (this.link.from.socket.type === "iterator") return "arrow1";
+      return null;
+    }
+  getSocketEl: | #js
+    function(socketRef, direction) {
+      if (!this.$root.els) {
+        setTimeout(this.refresh.bind(this), 100);
+        return null;
+      }
+      const socketElPath = this.getSocketElPath(socketRef, direction);
+      return this.$root.els[socketElPath];
+    }
+  getSocketElPath: | #js
+    function(socketRef, direction) {
+      const socketElPath = `/box/${socketRef.box._id}/sockets/${direction}/${socketRef.socket._id}`;
+      return socketElPath;
+    }
+  getTopGroupBox: | #js
+    function(boxRef) {
+      if (!boxRef) return null;
+      const box = this.$boxes.find(b => b._id == boxRef._id);
+      if (!box) return null;
+      if (box.groupBoxID) return this.getTopGroupBox({ _id: box.groupBoxID });
+      return box;
+    }
+  getSocketIcon: | #js
+    function(socket) {
+      return {
+        data: '🧊',
+        iterator: '🔗🖇️',
+        view: '⬜',
+        event: '⚡',
+      }[socket?.type];
+    }
+  onDeleteLink: | #js
+    function() {
+      this.$femit("delete.link", this.link._id);
+    }
+  setColor: | #js
+    function() {
+      this.leaderLineColor = false ? null :
+        this.isHighlighted ? this.highlightedColor :
+        this.isDimmed ? this.dimmedColor :
+        this.hasFunc ? this.hasFuncColor :
+        this.normalColor;
+    }
+  refresh: | #js
+    function(again = 10) {
+      this.fromEl = this.getFromEl();
+      this.toEl = this.getToEl();
+      this.setColor();
+      if (again) setTimeout(this.refresh.bind(this, again - 1), 400);
+    }
+computed:
+  showLeaderLine: | #js
+    function() {
+      if (!this.link) return false;
+      if (this.surfaceGroupBoxID) {
+        return (this.link.groupBoxID == this.surfaceGroupBoxID);
+      }
+      if (this.link.is.grouped) return false;
+      return this.link.is.visible;
+    }
+  hasFunc: | #js
+    function() {
+      return !!this.link?.func;
+    }
+watch:
+  link: | #js
+    function() {
+      this.refresh();
+    }
+  isHighlighted: | #js
+    function(isHighlighted) {
+      this.setColor();
+    }
+  isDimmed: | #js
+    function(isDimmed) {
+      this.setColor();
+    }
+  showLeaderLine: | #js
+    function() {
+      this.refresh();
+    }
+style:
+  .box1.loading:
+    border: 3px solid yellow !important
+  .loader:
+    opacity: 0
+  .loader.visible:
+    opacity: 1
+  .leader-line-middle:
+    min-width: 5em
+    min-height: 5em
+  .leader-line-middle:hover .loader:not(.visible):
+    display: none !important
+  .leader-line-middle .content:
+    max-width: 0em
+    max-height: 0em
+    overflow: hidden
+    opacity: 0
+    transition: 1s
+  .leader-line-middle .box1:hover .content:
+    max-width: 20em
+    max-height: 20em
+  .leader-line-middle:hover .content:
+    opacity: 1
+  .leader-line-middle .box1:
+    min-width: 3em
+    min-height: 3em !important
+    border-radius: 50%
+    border: none
+    opacity: 0
+    transition: 1s
+  .leader-line-middle:hover .box1:
+    box-shadow: 'inset -3px 3px 3px #000'
+    border: '2px solid #ffffff30'
+    border-radius: 1em
+    opacity: 0.4
+  .leader-line-middle .box1:hover:
+    opacity: 0.7 !important
+  .leader-line-middle .box1.has-func:
+    opacity: 0
+_:
+  examples:
+    count: 0
+name: grid-ui-link
+template: >-
+  <grid-module class="comp-grid-ui-link" :show-title="false"
+  path="281201772."><div v-if="false" :class="{ hoverable: true, 'opacity-30':
+  (!showLeaderLine) }" @mouseenter="isHighlighted = true"
+  @mouseleave="isHighlighted = false" path="281201772.0"><div v-text="linkDesc"
+  path="281201772.0.0"></div><div v-text="isDimmed"
+  path="281201772.0.1"></div><ui-context-window path="281201772.0.2"><ui-value
+  :value="link"
+  path="281201772.0.2.0"></ui-value></ui-context-window></div><ui-leader-line
+  v-if="showLeaderLine" ref="leaderLine1" :from="fromEl" :to="toEl"
+  :start-plug="getStartPlug()" :color="leaderLineColor"
+  path="281201772.1"><template v-slot:middle path="281201772.1.0"><div :class="{
+  box1: true, 'has-func': (!!link?.func), loading: isLoading }"
+  path="281201772.1.0.0"><ui-loading :class="{ loader: true, visible: isLoading
+  }" path="281201772.1.0.0.0"></ui-loading><div class="content"
+  path="281201772.1.0.0.1"><grid-ui-link-func :link="link"
+  path="281201772.1.0.0.1.0"></grid-ui-link-func><div
+  path="281201772.1.0.0.1.1"><ui-button icon="❌" text="delete link"
+  @click="onDeleteLink"
+  path="281201772.1.0.0.1.1.0"></ui-button></div></div></div></template></ui-leader-line></grid-module>

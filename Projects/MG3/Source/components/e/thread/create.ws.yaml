@@ -36,6 +36,9 @@ watch:
       this.$emit("input:columnsFocusLeft", showCreateThread);
     }
 name: e-thread-create
+_:
+  examples:
+    count: 0
 template: >-
   <div class="comp-e-thread-create" path="-563191913."><transition name="slide"
   path="-563191913.0"><ui-button v-if="!showCreateThread" :text="'✨ start a new

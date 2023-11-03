@@ -1,0 +1,155 @@
+dom:
+  div:
+    ui.error:
+      v-for: error in errors
+      ':error': error
+props:
+  input: null
+  operation: null
+data:
+  isDirty: 0
+  output: null
+  errors: []
+methods:
+  evaluateOps: | #js
+    function(context, input, operations) {
+      this.errors = [];
+      const datas = [];
+      datas.push(input);
+      if (!operations?.length) return datas;
+      let prevOperation = null;
+      for (const operation of operations) {
+        try
+        {
+          const output = this.evaluate(context, datas.last(), operation, prevOperation);
+          datas.push(output);
+        }
+        catch (ex)
+        {
+          datas.push(datas.last());
+          this.errors.push(ex.message);
+        }
+        prevOperation = operation;
+      }
+      return datas;
+    }
+  evaluate: | #js
+    function(context, input, operation, prevOperation) {
+      if (!input) return null;
+      if (!operation) return input;
+      const method = this[`${operation.type}`.replace(/\./g, "_")];
+      if (!method) throw new Error(`Method ${operation.type} not found`);
+      const args = [input, operation, prevOperation];
+      if (operation.type == "custom.expression") args.unshift(context);
+      const output = method(...args);
+      return output;
+    }
+  select_field: | #js
+    function(input, op) {
+      if (!op?.path?.length) return input;
+      return Objects.getProperty(input, op?.path.join("."));
+    }
+  select_fields: | #js
+    function(input, op) {
+      if (!op?.fields?.length) return input;
+      if (Array.isArray(input)) {
+        return input.map(item => Objects.getObjectFields(item, op?.fields));
+      }
+      if (typeof input == "object") {
+        return Objects.getObjectFields(input, op?.fields);
+      }
+      return input;
+    }
+  flat_map: | #js
+    function(input, op) {
+      if (!Array.isArray(input)) return input;
+      const key1 = Object.keys(input[0])[0];
+      return input.flatMap(item => item[key1]);
+    }
+  custom_expression: | #js
+    function(context, input, op, prevOperation) {
+      if (!op?.func) return input;
+      const func = this.getFuncDecl(op.func);
+      if (func.argNames.length > 1) throw new Error("Custom expression can have at most one argument");
+      const argNames = [];
+      const argValues = [];
+      if (prevOperation.type == "select.field") {
+        const field = prevOperation.path.last();
+        argNames.push(field);
+        argValues.push(Objects.clone(input));
+      }
+      if (func.argNames.length) {
+        argNames.push(func.argNames[0]);
+        argValues.push(Objects.clone(input));
+      }
+      argNames.push(...Object.keys(context));
+      argValues.push(...Objects.clone(Object.values(context)));
+      const rtFunc = eval(`(${argNames.join(",")}) => { ${func.body} }`);
+      const output = rtFunc(...argValues);
+      return output;
+    }
+  getFuncDecl: | #js
+    function(code) {
+      // Initialize argNames and body
+      let argNames = [];
+      let body = code;
+
+      // Regular expression to match the outermost function (function declaration or arrow function)
+      const functionPattern = /(function\s*\w*\s*\([^)]*\)|\([^)]*\)\s*=>)\s*{([\s\S]*)}/;
+
+      // Check if the code matches the function pattern
+      const match = code.match(functionPattern);
+
+      if (match) {
+        // Extract argument names
+        const argsPattern = /\(([^)]*)\)/;
+        const argsMatch = match[1].match(argsPattern);
+
+        if (argsMatch) {
+          argNames = argsMatch[1].split(',').map(arg => arg.trim());
+        }
+
+        // Extract the body
+        body = match[2];
+      } else if (code.startsWith("`") && code.endsWith("`")) {
+        // If code is "${...}", add "return" before it
+        body = `return ${code}`;
+      }
+
+      return { argNames, body };
+    }
+  no_op: | #js
+    function(input, op) {
+      return Objects.clone(input);
+    }
+watch:
+  output:
+    handler: | #js
+      function(output) {
+        this.$emit("output", output);
+      }
+  input:
+    handler: | #js
+      function(input) {
+        this.isDirty++;
+      }
+    immediate: true
+  operation:
+    handler: | #js
+      function(operation) {
+        this.isDirty++;
+      }
+    immediate: true
+    deep: true
+  isDirty:
+    handler: | #js
+      function() {
+        this.output = this.evaluate(this.input, this.operation);
+      }
+_:
+  examples:
+    count: 0
+name: ui-linq-evaluator
+template: >-
+  <div class="comp-ui-linq-evaluator" path="-1130530213."><ui-error v-for="error
+  in errors" :error="error" path="-1130530213.0"></ui-error></div>

@@ -1,0 +1,96 @@
+dom:
+  grid.module:
+    icon: 💻📃
+    div: 
+      ui.context.window:
+        ref: context1
+        div: 
+          v-if: hoveredLogItem
+          ui.value: 
+            ':value': hoveredLogItem.data
+      table:
+        v-if: 'false'
+        tr:
+          v-for: (logItem, index) in visibleLogItems
+          @mouseenter: onItemHover(logItem, true)
+          @mouseleave: onItemHover(logItem, false)
+          td: 
+            class: opacity-10
+            v-text: logItem._id
+          td: 
+            div: 
+              v-if: logItem.elapsed===undefined
+              ui.loading: null
+            div: 
+              v-if: logItem.elapsed
+              ':class': getElapsedClass(logItem.elapsed)
+              v-text: logItem.elapsed.unitifyTime()
+          td: 
+            v-text: logItem.icon
+          td: 
+            v-for: name in logItem.names
+            v-text: name
+      ui.value: 
+        ':value': hoveredLogItem
+    ui.console:
+      v-if: 'true'
+      ref: console1
+props: null
+data:
+  hoveredLogItem: null
+mounted: | #js
+  function() {
+    this.$runtime.log.on.item.elapsed(this.refresh.bind(this));
+    this.$root.$on("grid.event", this.onGridEvent);
+  }
+methods:
+  onItemHover: | #js
+    function(logItem, isHovered) {
+      if (this.$refs.context1?.isPinned) return;
+      this.hoveredLogItem = (!isHovered ? null : logItem);
+    }
+  onGridEvent: | #js
+    function(compName, eventName, args) {
+      if (["mouse.pos"].includes(eventName)) return;
+      this.$refs.console1.log(compName, eventName, args);
+    }
+  getElapsedClass: | #js
+    function(elapsed) {
+      return `text-center cyan opacity-${Math.max(Math.min(Math.floor(elapsed / 100) * 10, 100), 10)}`;
+    }
+  refresh: | #js
+    function() {
+      this.$forceUpdate();
+    }
+computed:
+  visibleLogItems: | #js
+    function() {
+      return [...this.$runtime.log.items.value].takeLast(20).reverse();
+    }
+style:
+  .elapsed:
+    text-align: center
+    opacity: 0.5
+_:
+  examples:
+    count: 0
+name: grid-client-log
+template: >-
+  <grid-module class="comp-grid-client-log" icon="💻📃" path="-1813344695."><div
+  path="-1813344695.0"><ui-context-window ref="context1"
+  path="-1813344695.0.0"><div v-if="hoveredLogItem"
+  path="-1813344695.0.0.0"><ui-value :value="hoveredLogItem.data"
+  path="-1813344695.0.0.0.0"></ui-value></div></ui-context-window><table
+  v-if="false" path="-1813344695.0.1"><tr v-for="(logItem, index) in
+  visibleLogItems" @mouseenter="onItemHover(logItem, true)"
+  @mouseleave="onItemHover(logItem, false)" path="-1813344695.0.1.0"><td
+  class="opacity-10" v-text="logItem._id" path="-1813344695.0.1.0.0"></td><td
+  path="-1813344695.0.1.0.1"><div v-if="logItem.elapsed===undefined"
+  path="-1813344695.0.1.0.1.0"><ui-loading></ui-loading></div><div
+  v-if="logItem.elapsed" :class="getElapsedClass(logItem.elapsed)"
+  v-text="logItem.elapsed.unitifyTime()"
+  path="-1813344695.0.1.0.1.1"></div></td><td v-text="logItem.icon"
+  path="-1813344695.0.1.0.2"></td><td v-for="name in logItem.names"
+  v-text="name" path="-1813344695.0.1.0.3"></td></tr></table><ui-value
+  :value="hoveredLogItem" path="-1813344695.0.2"></ui-value></div><ui-console
+  v-if="true" ref="console1" path="-1813344695.1"></ui-console></grid-module>

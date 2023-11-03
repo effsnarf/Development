@@ -1,0 +1,15 @@
+dom:
+  grid.module:
+    icon: 🔴👤
+methods:
+  execute: | #js
+    async function(action) {
+      return action;
+    }
+_:
+  examples:
+    count: 0
+name: grid-action-processor
+template: >-
+  <grid-module class="comp-grid-action-processor" icon="🔴👤"
+  path="848945282."></grid-module>

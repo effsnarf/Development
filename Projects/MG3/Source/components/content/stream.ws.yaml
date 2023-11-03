@@ -18,6 +18,10 @@ dom:
             ':is': itemType.kebabize()
             ':item': item
             v-bind: itemProps
+    div:
+      ':style': '{ width: ''30em'' }'
+      ui.value:
+        ':value': items
     ui.loading:
       v-if: isLoading
 name: content-stream
@@ -192,6 +196,9 @@ style:
     display: grid
   .grid-3 > li:
     margin-bottom: 2em
+_:
+  examples:
+    count: 0
 template: >-
   <ui-infinite-scroll class="comp-content-stream" @scroll="loadMore"
   path="-30902635."><transition-group tag="ul" name="slide" :class="gridClass"
@@ -200,5 +207,7 @@ template: >-
   path="-30902635.0.0"><div path="-30902635.0.0.0"><div :key="key1"
   path="-30902635.0.0.0.0"></div><component :style="itemStyles[index]"
   :is="itemType.kebabize()" :item="item" v-bind="itemProps"
-  path="-30902635.0.0.0.1"></component></div></li></transition-group><ui-loading
-  v-if="isLoading" path="-30902635.1"></ui-loading></ui-infinite-scroll>
+  path="-30902635.0.0.0.1"></component></div></li></transition-group><div
+  :style="{ width: '30em' }" path="-30902635.1"><ui-value :value="items"
+  path="-30902635.1.0"></ui-value></div><ui-loading v-if="isLoading"
+  path="-30902635.2"></ui-loading></ui-infinite-scroll>

@@ -10,6 +10,52 @@ class Objects {
     return (0)._is(obj, type);
   }
 
+  static isPrimitive(obj: any): boolean {
+    return Objects.isPrimitiveType(Objects.getType(obj));
+  }
+
+  static getType(obj: any): string {
+    return (0)._getObjectType(obj);
+  }
+
+  static getTypeName(obj: any): string {
+    if (typeof obj === "string" || obj instanceof String) return "string";
+    if (typeof obj === "number" && isFinite(obj)) return "number";
+    if (typeof obj === "boolean") return "boolean";
+    if (Array.isArray(obj)) return "array";
+    if (obj !== null && typeof obj === "object" && !Array.isArray(obj))
+      return "object";
+    if (obj instanceof Date) return "date";
+    if (obj instanceof RegExp) return "regexp";
+    if (obj instanceof Function) return "function";
+    if (obj === null) return "null";
+    if (obj === undefined) return "undefined";
+    return "unknown";
+  }
+
+  static isPrimitiveType(type: any): boolean {
+    return [String, Number, Boolean, Date, RegExp].some((t) => t === type);
+  }
+
+  static getAllKeys(obj: any): string[] {
+    let keys: string[] = [];
+    let currentObj = obj;
+    const visitedObjects = new Set();
+
+    while (currentObj && !visitedObjects.has(currentObj)) {
+      keys = keys.concat(Object.getOwnPropertyNames(currentObj));
+      visitedObjects.add(currentObj);
+      currentObj = Object.getPrototypeOf(currentObj);
+    }
+
+    return keys;
+  }
+
+  static getAllEntries(obj: any): any[] {
+    const keys = Objects.getAllKeys(obj);
+    return keys.map((key) => [key, obj[key]]);
+  }
+
   static compare(obj1: any, obj2: any): number {
     return (0)._compare(obj1, obj2);
   }
@@ -68,6 +114,8 @@ class Objects {
   }
 
   static subtract(target: any, source: any): any {
+    if (!target || !source) return target || source;
+
     if (Array.isArray(target) && Array.isArray(source)) {
       const result = [] as any[];
       for (let i = 0; i < target.length; i++) {
@@ -93,7 +141,7 @@ class Objects {
             typeof source[key] === "object"
           ) {
             const nestedResult = Objects.subtract(target[key], source[key]); // Recursively subtract nested objects
-            if (Object.keys(nestedResult).length > 0) {
+            if (Object.keys(nestedResult || {}).length > 0) {
               result[key] = nestedResult;
             }
           } else if (target[key] !== source[key]) {
@@ -104,6 +152,75 @@ class Objects {
 
       return result;
     }
+  }
+
+  static getPaths(obj: any, currentPath: string[] = []) {
+    let paths: string[] = [];
+    for (const key in obj) {
+      const newPath = currentPath.concat(key);
+      if (obj[key] !== null && typeof obj[key] === "object") {
+        paths = paths.concat(Objects.getPaths(obj[key], newPath));
+      } else {
+        paths.push(newPath.join("."));
+      }
+    }
+    return paths;
+  }
+
+  static getPathValues(obj: any, paths: string[] = []) {
+    const newObj = {} as any;
+    for (const path of paths) {
+      const parts = path.split(".");
+      let node = newObj;
+      const getNextPart = () => parts.shift() || "";
+      while (parts.length > 1) {
+        const part = getNextPart();
+        node = node[part] || (node[part] = {});
+        node = node[part];
+      }
+      node[getNextPart()] = Objects.getProperty(obj, path);
+    }
+    return newObj;
+  }
+
+  static getPropertiesAsTree(sourceObj: any, pathList: string[]): any {
+    const subtree: any = {};
+
+    for (const path of pathList) {
+      const [firstKey, ...remainingKeys] = path.split(".");
+      if (!firstKey) continue;
+
+      if (remainingKeys.length === 0) {
+        subtree[firstKey] = Objects.getProperty(sourceObj, path);
+        if (subtree[firstKey] === undefined) {
+          subtree[firstKey] = null; // Set to null if value doesn't exist
+        }
+      } else {
+        const nextSourceObj = sourceObj ? sourceObj[firstKey] : undefined;
+        subtree[firstKey] = {
+          ...subtree[firstKey],
+          ...Objects.getPropertiesAsTree(nextSourceObj, [
+            remainingKeys.join("."),
+          ]),
+        };
+      }
+    }
+
+    return Objects.clone(subtree);
+  }
+
+  static getProperty(obj: any, path: string) {
+    const keys = path.split(".");
+    let currentObj = obj;
+
+    for (const key of keys) {
+      if (currentObj === null || typeof currentObj !== "object") {
+        return undefined;
+      }
+      currentObj = currentObj[key];
+    }
+
+    return currentObj;
   }
 
   static withoutFalsyValues(obj: any): any {
@@ -246,7 +363,7 @@ class Objects {
     throw new Error(_importMainFileToImplement);
   }
 
-  static parseYaml(str: string): any {
+  static parseYaml(str: string, options?: any): any {
     throw new Error(_importMainFileToImplement);
   }
 
@@ -262,14 +379,30 @@ class Objects {
     throw new Error(_importMainFileToImplement);
   }
 
+  static deepSet(obj: any, path: string, value: any): void {
+    const keys = path.split(".");
+    let current = obj;
+
+    for (let i = 0; i < keys.length - 1; i++) {
+      if (!current[keys[i]]) {
+        current[keys[i]] = {};
+      }
+      current = current[keys[i]];
+    }
+
+    current[keys[keys.length - 1]] = value;
+  }
+
   static deepMerge(target: any, ...objects: any[]): any {
     const deepMerge = (tgt: any, src: any) => {
-      if (Objects.is(tgt, Array) || Objects.is(src, Array)) {
+      if (Objects.is(src, Array)) {
         return src.map((s: any, i: number) => deepMerge(tgt[i], s));
       }
 
-      if (!Objects.is(tgt, Object) || !Objects.is(src, Object)) {
-        return src;
+      if (!Objects.is(tgt, Array)) {
+        if (!Objects.is(tgt, Object) || !Objects.is(src, Object)) {
+          return src;
+        }
       }
 
       const merged = Objects.clone(tgt);
@@ -290,6 +423,40 @@ class Objects {
     return result;
   }
 
+  static deepAssign(target: any, ...objects: any[]): any {
+    const deepAssign = (tgt: any, src: any) => {
+      if (Objects.is(src, Array)) {
+        return src.map((s: any, i: number) => deepAssign(tgt[i], s));
+      }
+
+      if (!Objects.is(tgt, Array)) {
+        if (!Objects.is(tgt, Object) || !Objects.is(src, Object)) {
+          return src;
+        }
+      }
+
+      const merged = tgt;
+      for (const key of Object.keys(src)) {
+        if (key in merged) {
+          if (Objects.is(merged[key], Object) && Objects.is(src[key], Object)) {
+            merged[key] = deepAssign(merged[key], src[key]);
+          } else {
+            merged[key] = src[key];
+          }
+        } else {
+          merged[key] = src[key];
+        }
+      }
+      return merged;
+    };
+
+    let result = target;
+    for (const object of objects) {
+      result = deepAssign(result, object);
+    }
+    return result;
+  }
+
   static map(obj: any, func: (key: string, value: any) => [string, any]): any {
     const result = {} as any;
     for (const key of Object.keys(obj)) {
@@ -301,6 +468,15 @@ class Objects {
 
   static mapValues(obj: any, func: (value: any) => any) {
     return Objects.map(obj, (key, value) => [key, func(value)]);
+  }
+
+  static getObjectFields(obj: any, fields: string[]): string[] {
+    if (!obj) return obj;
+    const result = {} as any;
+    for (const field of fields) {
+      result[field] = obj[field];
+    }
+    return result;
   }
 
   static async try(func: Function, onCatch: any | ((ex: any) => void)) {
@@ -326,4 +502,77 @@ class Objects {
   };
 }
 
-export { Objects };
+class TreeObject {
+  static traverse(root: any, callback: Function) {
+    // Traverse a tree structure (children[] on each node)
+    const traverse = (node: any, callback: Function) => {
+      callback(node);
+      if (node.children) {
+        for (const child of node.children) {
+          traverse(child, callback);
+        }
+      }
+    };
+    traverse(root, callback);
+  }
+
+  static filter(root: any, predicate: Function) {
+    predicate = TreeObject._evalSelector(predicate);
+    const items = [] as any[];
+    TreeObject.traverse(root, (node: any) => {
+      if (predicate(node)) items.push(node);
+    });
+    return items;
+  }
+
+  static find(root: any, predicate: Function) {
+    const items = TreeObject.filter(root, predicate);
+    return items.length ? items[0] : null;
+  }
+
+  static map(root: any, selector: Function) {
+    selector = TreeObject._evalSelector(selector);
+    const items = [] as any[];
+    TreeObject.traverse(root, (node: any) => {
+      items.push(selector(node));
+    });
+    return items;
+  }
+
+  static max(root: any, selector: Function) {
+    const values = TreeObject.map(root, selector);
+    return Math.max(...values);
+  }
+
+  static deleteNode(root: any, isNode: Function) {
+    root = Objects.clone(root);
+    isNode = TreeObject._evalSelector(isNode);
+    const parentNode = TreeObject.getParentNode(root, isNode);
+    if (!parentNode) return root;
+    parentNode.children.removeBy(isNode);
+    return root;
+  }
+
+  static getParentNode(root: any, isNode: Function): any {
+    isNode = TreeObject._evalSelector(isNode);
+    let parentNode = null;
+    TreeObject.traverse(root, (n: any) => {
+      if (n.children && n.children.find(isNode)) parentNode = n;
+    });
+    return parentNode;
+  }
+
+  static _evalSelector(func: any) {
+    if (typeof func == "number") {
+      const id = func;
+      return (node: any) => node._id == id || node.id == id;
+    }
+    if (typeof func == "string") {
+      const key = func;
+      return (node: any) => node[key];
+    }
+    return func;
+  }
+}
+
+export { Objects, TreeObject };

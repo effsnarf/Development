@@ -1,0 +1,94 @@
+class {{name}}
+{
+    {{#each data}}
+    {{@key}} = {{{this}}};
+    {{/each}}
+
+    static async _new()
+    {
+        const instance = new {{namespace}}.{{name}}();
+
+        const persister = await Data.Persister.Memory.new();
+        const varName = "test1";
+        const actionStack = await Actionable.ActionStack.new(persister, varName);
+        instance._actionStack = actionStack;
+        instance._actionStack.executeDoable = instance._executeDoable.bind(instance);
+
+        return instance;
+    }
+
+    {{#each methods}}
+    {{methodSignature "" name args}}
+    {
+        const args = [...arguments];
+
+        const oldData = this._getModuleData();
+
+        await this._actionStack.enteringMethod();
+
+        try
+        {
+            const actionResult = await this._{{name}}(...args);
+
+            const newData = this._getModuleData();
+
+            const dataChanges = Diff.getChanges(oldData, newData);
+
+            const action = {
+                redo: {
+                    method: "{{name}}",
+                    args: args
+                },
+                undo: actionResult.undo,
+                _info: {
+                    dataChanges: dataChanges
+                }
+            };
+
+            await this._actionStack.add(action, { exitingMethod: true });
+
+            return actionResult.returnValue;
+        }
+        catch (ex)
+        {
+            this._actionStack.exitAction();
+            throw ex;
+        }
+
+    }
+    {{/each}}
+
+    async _executeDoable(doable)
+    {
+        const method = this[`_${doable.method}`];
+        const returnValue = await method.apply(this, doable.args);
+    }
+
+    _getModuleData()
+    {
+        const data = {};
+        const keys = Object.keys(this)
+            .filter(this._includeDataKey.bind(this));
+        for (const key of keys)
+        {
+            data[key] = this[key];
+        }
+        return Objects.clone(data);
+    }
+
+    _includeDataKey(key)
+    {
+        if (key.startsWith("_")) return false;
+        const value = this[key];
+        const type = typeof value;
+        if (type === "function") return false;
+        return true;
+    }
+
+    {{#each methods}}
+    {{methodSignature "_" name args}}
+    {
+        {{{code}}}
+    }
+    {{/each}}
+}

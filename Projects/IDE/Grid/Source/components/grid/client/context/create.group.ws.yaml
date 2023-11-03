@@ -1,0 +1,84 @@
+dom:
+  grid.module:
+    icon: 👤👈
+    ':show-title': 'false'
+    div: 
+      v-if: showGroupForm
+      div: 
+        div: 
+          v-if: canCreateGroup
+          class: mt-l1
+          ui.button: 
+            icon: ➕📦
+            text: create group ✔️
+            @click: onCreateGroup
+        div: 
+          class: mt-l3
+        div: 
+          ui.button: 
+            icon: ✖️✨
+            text: unselect
+            @click: onUnselectBoxes
+data:
+  hoveredBox: null
+  displayBox: null
+props:
+  selectedBoxes: []
+  contextIsPinned: false
+mounted: | #js
+  function() {
+  }
+methods:
+  onCreateGroup: | #js
+    async function() {
+      const displayBox = this.displayBox;
+      this.getUiActions().$femit('create.group', displayBox._id);
+      this.clear();
+    }
+  onUnselectBoxes: | #js
+    function() {
+      this.getUiActions().$femit('unselect.boxes');
+    }
+  grid_ui_box_hovered: | #js
+    function(box, isHovered) {
+      if (this.contextIsPinned) return;
+      this.hoveredBox = (!isHovered ? null : box);
+    }
+  clear: | #js
+    function() {
+      this.displayBox = null;
+    }
+  getUiActions: | #js
+    function() {
+      const contextMenu = vueApp.vm.getAncestors(this, "grid.client.context.menu")[0];
+      return contextMenu.getUiActions();
+    }
+computed:
+  canCreateGroup: | #js
+    function() {
+      return (!!this.displayBox);
+    }
+  showGroupForm: | #js
+    function() {
+      return (this.selectedBoxes.length > 0);
+    }
+watch:
+  hoveredBox: | #js
+    function(hoveredBox) {
+      this.displayBox = hoveredBox;
+    }
+style: null
+_:
+  examples:
+    count: 0
+name: grid-client-context-create-group
+template: >-
+  <grid-module class="comp-grid-client-context-create-group" icon="👤👈"
+  :show-title="false" path="-1413308281."><div v-if="showGroupForm"
+  path="-1413308281.0"><div path="-1413308281.0.0"><div class="mt-l1"
+  v-if="canCreateGroup" path="-1413308281.0.0.0"><ui-button icon="➕📦"
+  text="create group ✔️" @click="onCreateGroup"
+  path="-1413308281.0.0.0.0"></ui-button></div><div class="mt-l3"
+  path="-1413308281.0.0.1"></div><div path="-1413308281.0.0.2"><ui-button
+  icon="✖️✨" text="unselect" @click="onUnselectBoxes"
+  path="-1413308281.0.0.2.0"></ui-button></div></div></div></grid-module>

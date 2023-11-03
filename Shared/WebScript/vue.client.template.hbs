@@ -1,10 +1,10 @@
 {
-  mixins: [vueIdeCompMixin],
+  mixins: [],
   props: {
     {{#each props}}
     {{@key}}: {
       default: {{{or this null}}}
-    },
+      },
     {{/each}}
   },
   data: function () {
@@ -16,6 +16,11 @@
           comp: {
             name: `{{unkebabize name}}`,
           },
+          log: {
+            elapsed: {
+              minimum: 100,
+            }
+          }
         }
     }
   },
@@ -24,17 +29,17 @@
   unmounted: {{{addCode unmounted ""}}},
   methods: {
     {{#each methods}}
-    {{@key}}: {{{this}}},
+    {{@key}}: {{{addCode this "const _started = Date.now(); if (window.vueIdeApp?.isPauseOnMethod(this.$options._componentTag, '{{method}}')) debugger;" @key "const elapsed = (Date.now() - _started); if (elapsed >= this.$data._.log.elapsed.minimum) console.log(elapsed, this.$options._componentTag, '.{{method}}'); window.vueIdeApp?.perf.track.elapsed(this.$options._componentTag + '.{{method}}', (Date.now() - _started));"}}},
     {{/each}}
   },
   computed: {
     {{#each computed}}
     {{#if get}}
     {{@key}}: {
-      get: {{{get}}},
+      get: {{{addCode get ""}}},
     },
     {{else}}
-    {{@key}}: {{{this}}},
+    {{@key}}: {{{addCode this "const _started = Date.now();" @key "const elapsed = (Date.now() - _started); if (elapsed >= this.$data._.log.elapsed.minimum) console.log(elapsed, this.$options._componentTag, '.{{method}}'); window.vueIdeApp?.perf.track.elapsed(this.$options._componentTag + '.{{method}}', (Date.now() - _started));"}}},
     {{/if}}
     {{/each}}
   },
@@ -42,7 +47,7 @@
     {{#each watch}}
     {{#if handler}}
     {{@key}}: {
-      handler: {{{handler}}},
+      handler: {{{addCode handler "const _started = Date.now();" @key "const elapsed = (Date.now() - _started); if (elapsed >= this.$data._.log.elapsed.minimum) console.log(elapsed, this.$options._componentTag, '.{{method}}'); window.vueIdeApp?.perf.track.elapsed(this.$options._componentTag + '.{{method}}', (Date.now() - _started));"}}},
       immediate: {{{or immediate false}}},
       deep: {{{or deep false}}},
     },

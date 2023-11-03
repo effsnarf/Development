@@ -1,0 +1,44 @@
+dom:
+  div: 
+    div: 
+      div: 
+        h3: 
+          v-text: '''width'''
+        ui.input.css.value: 
+          v-model: size.width
+      div: 
+        h3: 
+          v-text: '''height'''
+        ui.input.css.value: 
+          v-model: size.height
+props:
+  value: null
+data:
+  size: null
+watch:
+  size:
+    handler: | #js
+      function(size) {
+        if (Objects.areEqual(size, this.value)) return;
+        this.$emit('input', size);
+      }
+    deep: true
+  value:
+    handler: | #js
+      function(value) {
+        this.size = Objects.clone(value || { width: null, height: null });
+      }
+    immediate: true
+    deep: true
+_:
+  examples:
+    count: 0
+name: ui-input-layout-item-size
+template: >-
+  <div class="comp-ui-input-layout-item-size" path="1501733494."><div
+  path="1501733494.0"><div path="1501733494.0.0"><h3 v-text="'width'"
+  path="1501733494.0.0.0"></h3><ui-input-css-value v-model="size.width"
+  path="1501733494.0.0.1"></ui-input-css-value></div><div
+  path="1501733494.0.1"><h3 v-text="'height'"
+  path="1501733494.0.1.0"></h3><ui-input-css-value v-model="size.height"
+  path="1501733494.0.1.1"></ui-input-css-value></div></div></div>

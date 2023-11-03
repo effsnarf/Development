@@ -1,0 +1,10 @@
+title: SuperGPT
+server:
+  host: localhost
+  port: 3000
+database:
+  connectionString: mongodb://localhost
+  database: Test
+openai:
+  api:
+    key: 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

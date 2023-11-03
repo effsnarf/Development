@@ -3,6 +3,12 @@
 class Events {
   private listeners: { [key: string]: Function[] } = {};
 
+  forward(events: Events, prefix: string) {
+    events.on("*", (name: string, ...args: any[]) => {
+      this.emit(`${prefix}.${name}`, ...args);
+    });
+  }
+
   on(name: string, callback: Function) {
     if (!this.listeners[name]) {
       this.listeners[name] = [];

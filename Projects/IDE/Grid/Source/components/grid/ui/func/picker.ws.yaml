@@ -1,0 +1,83 @@
+dom:
+  div: 
+    ui.select:
+      v-if: '!selectedFunc'
+      ':options': funcOptions
+      input-type: value
+      ':get-item-icon': (func) => '🔴'
+      ':get-item-text': (func) => func.name
+      v-model: selectedFunc
+    div: 
+      v-if: selectedFunc
+      class: clickable
+      @click: selectedFunc = null
+      ui.title:
+        icon: ✔️🔴
+        ':text': selectedFunc.name
+props:
+  value: null
+data:
+  funcOptions: []
+  selectedFunc: null
+mounted: | #js
+  function() {
+    this.ensureFuncOptions();
+  }
+methods:
+  ensureFuncOptions: | #js
+    function() {
+      this.funcOptions = this.getFuncOptions();
+    }
+  getFuncOptions: | #js
+    function() {
+      return [
+        {
+          _id: 1,
+          name: "fetch",
+          argNamesStr: "url",
+          code: `return (await (await fetch(url)).json());`,
+          runs: {
+            on: "server",
+          }
+        },
+        {
+          _id: 2,
+          name: "get catalog url",
+          argNamesStr: "board",
+          code: "`https://a.4cdn.org/${board.board}/catalog.json`",
+          runs: {
+            on: "client",
+          }
+        },
+      ];
+    }
+watch:
+  value:
+    handler: | #js
+      function(value) {
+        if (value?._id == this.selectedFunc?._id) return;
+        this.selectedFunc = this.funcOptions.find((func) => func._id == value?._id);
+      }
+    immediate: true
+  selectedFunc:
+    handler: | #js
+      function(func) {
+        this.$emit("input", func);
+      }
+style:
+  .comp-ui-select:
+    filter: grayscale(1)
+  .clickable:hover:
+    background: '#ffffff20'
+_:
+  examples:
+    count: 0
+name: grid-ui-func-picker
+template: >-
+  <div class="comp-grid-ui-func-picker" path="826148422."><ui-select
+  v-if="!selectedFunc" :options="funcOptions" input-type="value"
+  :get-item-icon="(func) =&gt; '🔴'" :get-item-text="(func) =&gt; func.name"
+  v-model="selectedFunc" path="826148422.0"></ui-select><div class="clickable"
+  v-if="selectedFunc" @click="selectedFunc = null" path="826148422.1"><ui-title
+  icon="✔️🔴" :text="selectedFunc.name"
+  path="826148422.1.0"></ui-title></div></div>

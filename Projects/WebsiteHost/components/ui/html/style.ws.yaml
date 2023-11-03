@@ -1,0 +1,50 @@
+dom:
+  style:
+    v-if: '!documentHead'
+    ':class': component.name
+    v-html: css
+props:
+  component: null
+  documentHead: false
+data:
+  css: null
+mounted: | #js
+  function() {
+    if (this.documentHead) {
+      const css = this.getCss(this.component);
+      if (!css?.length) return;
+      const style = document.createElement("style");
+      style.type = "text/css";
+      style.classList.add(this.component.name);
+      style.innerHTML = css;
+      document.head.appendChild(style);
+    }
+  }
+methods:
+  getCss: | #js
+    function(component) {
+      if (!component?.source?.style) return null;
+      const template = this.$root.templates.style;
+      let css = Handlebars.compile(template)(component);
+      css = this.htmlDecode(css);
+      return css;
+    }
+  htmlDecode: | #js
+    function(input) {
+      var doc = new DOMParser().parseFromString(input, "text/html");
+      return doc.documentElement.textContent;
+    }
+watch:
+  component:
+    handler: | #js
+      function(component) {
+        this.css = this.getCss(component);
+      }
+    immediate: true
+name: ui-html-style
+_:
+  examples:
+    count: 0
+template: >-
+  <style class="comp-ui-html-style" v-if="!documentHead" :class="component.name"
+  v-html="css" path="951734600."></style>

@@ -1,0 +1,88 @@
+dom:
+  table: 
+    tr: 
+      v-for: (a, propName) in comp.source.props
+      td: 
+        ui.title: 
+          icon: 🧊
+          ':text': propName.kebabize()
+        ui.tooltip:
+          v-if: getPropValueDescs(propName)?.length
+          h3:
+            ui.title: 
+              icon: 🧊
+              ':text': propName.kebabize()
+          table: 
+            class: desc
+            tr: 
+              v-for: valueDesc in getPropValueDescs(propName)
+              th:
+                v-text: valueDesc.value
+              td: 
+                v-text: valueDesc.desc
+      td: 
+        ui.value.editor:
+          v-if: isPropEditable(propName)
+          ':value': getPropValue(propName)
+          @input: (e) => onPropInput(propName, e)
+        ui.value.any:
+          v-if: '!isPropEditable(propName)'
+          ':value': getPropValue(propName)
+props:
+  comp: null
+  vue: null
+methods:
+  onPropInput: | #js
+    function (propName, value) {
+      const vue = this.vue();
+      vue._props[propName] = value;
+    }
+  getPropValueDescs: | #js
+    function (propName) {
+      const desc = this.comp.source.desc;
+      if (!desc) return null;
+      if (!desc[propName]) return null;
+      return Object.keys(desc[propName]).map(value => ({ value, desc: desc[propName][value] }));
+    }
+  isPropEditable: | #js
+    function (propName) {
+      const value = this.getPropValue(propName);
+      return ["string", "boolean"].some(t => t == typeof value);
+    }
+  getPropValue: | #js
+    function (propName) {
+      return null;
+      const vue = this.vue();
+      if (!vue) return undefined;
+      const methodDatas = vue._vueIde.methodDatas;
+      return vue?.$props[propName];
+    }
+_:
+  examples:
+    count: 0
+style:
+  .desc:
+    width: 20em
+  .desc th:
+    opacity: 0.5
+  .desc th, .desc td:
+    vertical-align: top
+    padding: 0 1em 1em 0
+name: studio-comp-props
+template: >-
+  <table class="comp-studio-comp-props" path="532263145."><tr v-for="(a,
+  propName) in comp.source.props" path="532263145.0"><td
+  path="532263145.0.0"><ui-title icon="🧊" :text="propName.kebabize()"
+  path="532263145.0.0.0"></ui-title><ui-tooltip
+  v-if="getPropValueDescs(propName)?.length" path="532263145.0.0.1"><h3
+  path="532263145.0.0.1.0"><ui-title icon="🧊" :text="propName.kebabize()"
+  path="532263145.0.0.1.0.0"></ui-title></h3><table class="desc"
+  path="532263145.0.0.1.1"><tr v-for="valueDesc in getPropValueDescs(propName)"
+  path="532263145.0.0.1.1.0"><th v-text="valueDesc.value"
+  path="532263145.0.0.1.1.0.0"></th><td v-text="valueDesc.desc"
+  path="532263145.0.0.1.1.0.1"></td></tr></table></ui-tooltip></td><td
+  path="532263145.0.1"><ui-value-editor v-if="isPropEditable(propName)"
+  :value="getPropValue(propName)" @input="(e) =&gt; onPropInput(propName, e)"
+  path="532263145.0.1.0"></ui-value-editor><ui-value-any
+  v-if="!isPropEditable(propName)" :value="getPropValue(propName)"
+  path="532263145.0.1.1"></ui-value-any></td></tr></table>

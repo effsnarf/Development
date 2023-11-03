@@ -114,6 +114,9 @@ style:
   .sticky:
     padding: 0.5em
 name: page-instance
+_:
+  examples:
+    count: 0
 template: >-
   <site class="comp-page-instance" ref="site1" page-name="instance"
   :content-not-found="contentNotFound"

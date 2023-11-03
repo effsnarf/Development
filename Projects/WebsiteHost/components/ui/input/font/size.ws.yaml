@@ -1,0 +1,76 @@
+dom:
+  .box0:
+    table:
+      tr:
+        v-for: (option, index) in options
+        ':key': option
+        ':class': getOptionCssClass(index)
+        ':style': '{ ''font-size'': option }'
+        @mouseenter: onHoverItem(index, true)
+        @mouseleave: onHoverItem(index, false)
+        @click: onClickItem(index)
+        td: 
+          .opacity-50:
+            v-text: option
+        td: 
+          v-text: text
+props:
+  value: null
+  text: Pack my box with five dozen liquor jugs
+data:
+  options: []
+mounted: | #js
+  function() {
+    this.options = Array.from({ length: 23 }, (_, i) => this.getOptionValue(i));
+  }
+methods:
+  onHoverItem: | #js
+    function(index, isHover) {
+      const value = this.getOptionValue(index);
+      this.$emit('value-preview', { index, value, isHover });
+    }
+  onClickItem: | #js
+    async function(index) {
+      let value = this.getOptionValue(index);
+      if (value == this.value) value = null;
+      this.$emit('input', value);
+    }
+  getOptionCssClass: | #js
+    function(index) {
+      const cls = {};
+      const value = this.getOptionValue(index);
+      cls["opacity-40"] = (value !== "100%") && (value !== this.value);
+      cls["selected"] = (value === this.value);
+      return cls;
+    }
+  getOptionValue: | #js
+    function(i) {
+      return `${((0.8 + (i / 10)) * 100).toFixed(0)}%`;
+    }
+style:
+  .box0:
+    max-width: 40em
+    max-height: 20em
+    overflow-x: hidden
+    overflow-y: auto
+    white-space: nowrap
+  tr:hover:
+    background: '#ffffff20'
+  td:first-child:
+    padding: 0 0.5em
+    text-align: center
+  .selected:
+    border: 2px solid gray
+_:
+  examples:
+    count: 0
+name: ui-input-font-size
+template: >-
+  <div class="comp-ui-input-font-size box0" path="951361986."><table
+  path="951361986.0"><tr v-for="(option, index) in options" :key="option"
+  :class="getOptionCssClass(index)" :style="{ 'font-size': option }"
+  @mouseenter="onHoverItem(index, true)" @mouseleave="onHoverItem(index, false)"
+  @click="onClickItem(index)" path="951361986.0.0"><td
+  path="951361986.0.0.0"><div class="opacity-50" v-text="option"
+  path="951361986.0.0.0.0"></div></td><td v-text="text"
+  path="951361986.0.0.1"></td></tr></table></div>
