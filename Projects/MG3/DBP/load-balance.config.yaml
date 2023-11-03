@@ -70,4 +70,4 @@ process:
   restart:
     periodically:
       from: 00:00
-      every: 60m
+      every: 20m
