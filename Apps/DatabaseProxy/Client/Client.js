@@ -1,51 +1,3 @@
-// Saved in localStorage
-// Forwards push, splice, length
-class LocalPersistedArray
-{
-    constructor(key)
-    {
-        this.items = [];
-        this.key = key;
-        this.load();
-    }
-
-    push(...args)
-    {
-        this.items.push(...args);
-        this.save();
-    }
-
-    splice(...args)
-    {
-        const items = this.items.splice(...args);
-        this.save();
-        return items;
-    }
-
-    get length()
-    {
-        return this.items.length;
-    }
-
-    load()
-    {
-        let items = localStorage.getItem(this.key);
-        if (items)
-        {
-            this.items = JSON.parse(items);
-        }
-        else
-        {
-            this.items = [];
-        }
-    }
-
-    save()
-    {
-        localStorage.setItem(this.key, JSON.stringify(this.items));
-    }
-}
-
 
 const Local = {
   cache: {
@@ -71,9 +23,6 @@ const Local = {
 
 
 // #region 🛠 Utility
-if (typeof require != "undefined") {
-    var fetch = require("node-fetch");
-  }
   
   String.prototype.untitleize = function () {
     return `${this[0].toLowerCase()}${this.substr(1)}`;

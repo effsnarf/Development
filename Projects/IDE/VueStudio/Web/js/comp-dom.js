@@ -1,11 +1,3 @@
-if (typeof(require) != "undefined")
-{
-  var util = require("../../../Anat.dev/DatabaseProxy/utility.js");
-
-  var viewDom = require("./view-dom.js");
-}
-
-
 
 
 String.prototype.shorten = function(length) {

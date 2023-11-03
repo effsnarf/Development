@@ -3,7 +3,6 @@ dom:
     vs.app: null
     div: 
       ui.html.style:
-        v-if: 'false'
         v-for: comp in $root.comps
         ':key': comp.name
         ':component': comp
@@ -17,6 +16,6 @@ _:
     count: 0
 template: >-
   <div class="comp-app" path="96801."><vs-app></vs-app><div
-  path="96801.1"><ui-html-style v-if="false" v-for="comp in $root.comps"
-  :key="comp.name" :component="comp" :document-head="true"
+  path="96801.1"><ui-html-style v-for="comp in $root.comps" :key="comp.name"
+  :component="comp" :document-head="true"
   path="96801.1.0"></ui-html-style></div></div>

@@ -1,7 +1,9 @@
 dom:
   div:
-    h2:
-      v-text: "'app2'"
+    h1:
+      ui.title:
+        icon: 🧊
+        text: Vue Studio
 props: null
 data: null
 mounted: | #js
@@ -11,20 +13,31 @@ mounted: | #js
 methods:
   init: | #js
     async function() {
+      return;
       this.$root.dbp = (await (DatabaseProxy.new("https://db.memegenerator.net/IDE")));
-      const vsComps = Local.cache.get("vs.comps", this.loadVsComps.bind(this));
-      alertify.message(`${vsComps.length} components loaded`);
+      const vs = (this.$root.vs = {
+        comps: {
+          ide: (await Local.cache.get("vs.comps", this.loadVsComps.bind(this)))
+        }
+      });
+      const comp1 = vs.comps.ide[0];
+      console.log(comp1);
+      vueUserComponentCompiler.compile(comp1);
     }
   loadVsComps: | #js
     async function() {
       alertify.message(`Loading Vue Studio components...`);
       const vsComps = (await this.$root.dbp.componentClasses.ide.get());
       alertify.message(`${vsComps.length} components loaded`);
+      return vsComps;
     }
+style:
+  h1:
+    font-size: 2em
 _:
   examples:
     count: 0
 name: vs-app
 template: >-
-  <div class="comp-vs-app" path="-809055376."><h2 v-text="'app2'"
-  path="-809055376.0"></h2></div>
+  <div class="comp-vs-app" path="-809055376."><h1 path="-809055376.0"><ui-title
+  icon="🧊" text="Vue Studio" path="-809055376.0.0"></ui-title></h1></div>

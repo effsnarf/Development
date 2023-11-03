@@ -1,16 +1,3 @@
-if (typeof(require) != "undefined")
-{
-  var util = require("../../../../Anat.dev/DatabaseProxy/utility.js");
-
-  var YAML = require("yaml");
-  var HAML = require("hamljs");
-  var Handlebars = require("Handlebars");
-
-  var compDom = require("./comp-dom.js");
-  var viewDom = require("./view-dom.js");
-
-}
-
 const wait = async (condition) => {
   if (typeof condition == "number") {
     return new Promise((resolve) => {
@@ -955,29 +942,11 @@ compiler.compileAll = async (comps, options = { fix: true }, onProgress) => {
 
 var myExports = compiler;
 
+
 if (typeof exports !== 'undefined') {
   if (typeof module !== 'undefined' && module.exports) {
     exports = module.exports = myExports;
   }
 } else {
-  Vue.prototype.$getApp = function() {
-    let vue = this.$parent;
-    while ((!vue.isApp) && (vue.$parent)) vue = vue.$parent;
-    return (vue?.isApp ? vue : null);
-  };
-
-  Vue.prototype.$localStorage = window.$localStorage;
-  Vue.prototype.$mgApi = window.MgApi;
-
-  let dbp = (new anat.dev.DatabaseProxy(`db.memegenerator.net`, `MemeGenerator`));
-  (async() => {
-    await dbp.createEntityMethods();
-    await dbp.createApiMethods();
-  })();
-  
-  Vue.prototype.$dbp = dbp;
-  //Vue.prototype.$graph = new GraphDatabase();
-  //Vue.prototype.$dataBinder = new DataBinder();
-
   window.vueUserComponentCompiler = compiler;
 }
