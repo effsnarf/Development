@@ -6,11 +6,13 @@ dom:
         ':is': getLinqCompName(operation.type)
         ':context': context
         ':input': input
+        ':prev-operation': prevOperation
         v-model: operation
 props:
   context: null
   input: null
   value: null
+  prevOperation: null
 data:
   operation: null
 methods:
@@ -39,4 +41,5 @@ template: >-
   <div class="comp-ui-linq-operation-any" v-if="operation"
   path="-320222959."><div class="box1" path="-320222959.0"><component
   :is="getLinqCompName(operation.type)" :context="context" :input="input"
-  v-model="operation" path="-320222959.0.0"></component></div></div>
+  :prev-operation="prevOperation" v-model="operation"
+  path="-320222959.0.0"></component></div></div>

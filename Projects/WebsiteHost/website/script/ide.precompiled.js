@@ -2,10 +2,10 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "../../../LiveIde/Classes/ClientContext.ts":
-/*!*************************************************!*\
-  !*** ../../../LiveIde/Classes/ClientContext.ts ***!
-  \*************************************************/
+/***/ "../../../WebsiteHost/Classes/ClientContext.ts":
+/*!*****************************************************!*\
+  !*** ../../../WebsiteHost/Classes/ClientContext.ts ***!
+  \*****************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -16,9 +16,9 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ClientContext = void 0;
 const to_template_1 = __importDefault(__webpack_require__(/*! ../../../Shared/WebScript/to.template */ "../../../../Shared/WebScript/to.template.ts"));
 const is_attribute_name_1 = __importDefault(__webpack_require__(/*! ../../../Shared/WebScript/is.attribute.name */ "../../../../Shared/WebScript/is.attribute.name.ts"));
-const ComponentManager_1 = __webpack_require__(/*! ./ComponentManager */ "../../../LiveIde/Classes/ComponentManager.ts");
-const ModuleManager_1 = __webpack_require__(/*! ./ModuleManager */ "../../../LiveIde/Classes/ModuleManager.ts");
-const ClientDatabase_1 = __webpack_require__(/*! ./ClientDatabase */ "../../../LiveIde/Classes/ClientDatabase.ts");
+const ComponentManager_1 = __webpack_require__(/*! ./ComponentManager */ "../../../WebsiteHost/Classes/ComponentManager.ts");
+const ModuleManager_1 = __webpack_require__(/*! ./ModuleManager */ "../../../WebsiteHost/Classes/ModuleManager.ts");
+const ClientDatabase_1 = __webpack_require__(/*! ./ClientDatabase */ "../../../WebsiteHost/Classes/ClientDatabase.ts");
 const isDevEnv = window.location.hostname == "localhost";
 class ClientContext {
     static _fetch;
@@ -176,10 +176,10 @@ ClientContext.initialize();
 
 /***/ }),
 
-/***/ "../../../LiveIde/Classes/ClientDatabase.ts":
-/*!**************************************************!*\
-  !*** ../../../LiveIde/Classes/ClientDatabase.ts ***!
-  \**************************************************/
+/***/ "../../../WebsiteHost/Classes/ClientDatabase.ts":
+/*!******************************************************!*\
+  !*** ../../../WebsiteHost/Classes/ClientDatabase.ts ***!
+  \******************************************************/
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -233,16 +233,16 @@ exports.ClientDatabase = ClientDatabase;
 
 /***/ }),
 
-/***/ "../../../LiveIde/Classes/Component.ts":
-/*!*********************************************!*\
-  !*** ../../../LiveIde/Classes/Component.ts ***!
-  \*********************************************/
+/***/ "../../../WebsiteHost/Classes/Component.ts":
+/*!*************************************************!*\
+  !*** ../../../WebsiteHost/Classes/Component.ts ***!
+  \*************************************************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Component = void 0;
-const ClientContext_1 = __webpack_require__(/*! ./ClientContext */ "../../../LiveIde/Classes/ClientContext.ts");
+const ClientContext_1 = __webpack_require__(/*! ./ClientContext */ "../../../WebsiteHost/Classes/ClientContext.ts");
 String.prototype.kebabize = function () {
     return this.toString()
         .replace(/\./g, " ")
@@ -333,10 +333,10 @@ exports.Component = Component;
 
 /***/ }),
 
-/***/ "../../../LiveIde/Classes/ComponentManager.ts":
-/*!****************************************************!*\
-  !*** ../../../LiveIde/Classes/ComponentManager.ts ***!
-  \****************************************************/
+/***/ "../../../WebsiteHost/Classes/ComponentManager.ts":
+/*!********************************************************!*\
+  !*** ../../../WebsiteHost/Classes/ComponentManager.ts ***!
+  \********************************************************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -345,8 +345,8 @@ exports.ComponentManager = void 0;
 __webpack_require__(/*! ../../../Shared/Extensions */ "../../../../Shared/Extensions.ts");
 const Lock_1 = __webpack_require__(/*! ../../../Shared/Lock */ "../../../../Shared/Lock.ts");
 const DataWatcher_1 = __webpack_require__(/*! ../../../Shared/DataWatcher */ "../../../../Shared/DataWatcher.ts");
-const Component_1 = __webpack_require__(/*! ./Component */ "../../../LiveIde/Classes/Component.ts");
-const ClientContext_1 = __webpack_require__(/*! ./ClientContext */ "../../../LiveIde/Classes/ClientContext.ts");
+const Component_1 = __webpack_require__(/*! ./Component */ "../../../WebsiteHost/Classes/Component.ts");
+const ClientContext_1 = __webpack_require__(/*! ./ClientContext */ "../../../WebsiteHost/Classes/ClientContext.ts");
 class ComponentManager {
     // #region Globals
     static async get() {
@@ -422,10 +422,10 @@ exports.ComponentManager = ComponentManager;
 
 /***/ }),
 
-/***/ "../../../LiveIde/Classes/HtmlHelper.ts":
-/*!**********************************************!*\
-  !*** ../../../LiveIde/Classes/HtmlHelper.ts ***!
-  \**********************************************/
+/***/ "../../../WebsiteHost/Classes/HtmlHelper.ts":
+/*!**************************************************!*\
+  !*** ../../../WebsiteHost/Classes/HtmlHelper.ts ***!
+  \**************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -2842,17 +2842,17 @@ exports.HtmlHelper = HtmlHelper;
 
 /***/ }),
 
-/***/ "../../../LiveIde/Classes/Module.ts":
-/*!******************************************!*\
-  !*** ../../../LiveIde/Classes/Module.ts ***!
-  \******************************************/
+/***/ "../../../WebsiteHost/Classes/Module.ts":
+/*!**********************************************!*\
+  !*** ../../../WebsiteHost/Classes/Module.ts ***!
+  \**********************************************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Module = void 0;
 __webpack_require__(/*! ../../../../Shared/Extensions.Objects.Client */ "../../../../Shared/Extensions.Objects.Client.ts");
-const ClientContext_1 = __webpack_require__(/*! ./ClientContext */ "../../../LiveIde/Classes/ClientContext.ts");
+const ClientContext_1 = __webpack_require__(/*! ./ClientContext */ "../../../WebsiteHost/Classes/ClientContext.ts");
 class Module {
     name;
     path;
@@ -2897,17 +2897,17 @@ exports.Module = Module;
 
 /***/ }),
 
-/***/ "../../../LiveIde/Classes/ModuleManager.ts":
-/*!*************************************************!*\
-  !*** ../../../LiveIde/Classes/ModuleManager.ts ***!
-  \*************************************************/
+/***/ "../../../WebsiteHost/Classes/ModuleManager.ts":
+/*!*****************************************************!*\
+  !*** ../../../WebsiteHost/Classes/ModuleManager.ts ***!
+  \*****************************************************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ModuleManager = void 0;
 __webpack_require__(/*! ../../../Shared/Extensions */ "../../../../Shared/Extensions.ts");
-const Module_1 = __webpack_require__(/*! ./Module */ "../../../LiveIde/Classes/Module.ts");
+const Module_1 = __webpack_require__(/*! ./Module */ "../../../WebsiteHost/Classes/Module.ts");
 class ModuleManager {
     modules = [];
     constructor() { }
@@ -2946,10 +2946,10 @@ exports.ModuleManager = ModuleManager;
 
 /***/ }),
 
-/***/ "../../../LiveIde/Classes/StateTracker.ts":
-/*!************************************************!*\
-  !*** ../../../LiveIde/Classes/StateTracker.ts ***!
-  \************************************************/
+/***/ "../../../WebsiteHost/Classes/StateTracker.ts":
+/*!****************************************************!*\
+  !*** ../../../WebsiteHost/Classes/StateTracker.ts ***!
+  \****************************************************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -2957,7 +2957,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StateValue = exports.StateTracker = void 0;
 __webpack_require__(/*! ../../../Shared/Extensions */ "../../../../Shared/Extensions.ts");
 const Extensions_Objects_Client_1 = __webpack_require__(/*! ../../../Shared/Extensions.Objects.Client */ "../../../../Shared/Extensions.Objects.Client.ts");
-const VueHelper_1 = __webpack_require__(/*! ./VueHelper */ "../../../LiveIde/Classes/VueHelper.ts");
+const VueHelper_1 = __webpack_require__(/*! ./VueHelper */ "../../../WebsiteHost/Classes/VueHelper.ts");
 var StateValueType;
 (function (StateValueType) {
     StateValueType[StateValueType["Cloned"] = 0] = "Cloned";
@@ -3199,10 +3199,10 @@ exports.StateTracker = StateTracker;
 
 /***/ }),
 
-/***/ "../../../LiveIde/Classes/VueHelper.ts":
-/*!*********************************************!*\
-  !*** ../../../LiveIde/Classes/VueHelper.ts ***!
-  \*********************************************/
+/***/ "../../../WebsiteHost/Classes/VueHelper.ts":
+/*!*************************************************!*\
+  !*** ../../../WebsiteHost/Classes/VueHelper.ts ***!
+  \*************************************************/
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -3315,10 +3315,10 @@ exports.VueHelper = VueHelper;
 
 /***/ }),
 
-/***/ "../../../LiveIde/Classes/VueManager.ts":
-/*!**********************************************!*\
-  !*** ../../../LiveIde/Classes/VueManager.ts ***!
-  \**********************************************/
+/***/ "../../../WebsiteHost/Classes/VueManager.ts":
+/*!**************************************************!*\
+  !*** ../../../WebsiteHost/Classes/VueManager.ts ***!
+  \**************************************************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -3326,8 +3326,8 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.VueManager = void 0;
 __webpack_require__(/*! ../../../Shared/Extensions */ "../../../../Shared/Extensions.ts");
 const TwoWayMap_1 = __webpack_require__(/*! ../../../Shared/TwoWayMap */ "../../../../Shared/TwoWayMap.ts");
-const VueHelper_1 = __webpack_require__(/*! ./VueHelper */ "../../../LiveIde/Classes/VueHelper.ts");
-const StateTracker_1 = __webpack_require__(/*! ./StateTracker */ "../../../LiveIde/Classes/StateTracker.ts");
+const VueHelper_1 = __webpack_require__(/*! ./VueHelper */ "../../../WebsiteHost/Classes/VueHelper.ts");
+const StateTracker_1 = __webpack_require__(/*! ./StateTracker */ "../../../WebsiteHost/Classes/StateTracker.ts");
 class VueManager {
     client;
     vues = {};
@@ -6109,19 +6109,19 @@ var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
 var exports = __webpack_exports__;
-/*!********************************************************!*\
-  !*** ../../../LiveIde/website/script/1698869187010.ts ***!
-  \********************************************************/
+/*!************************************************************!*\
+  !*** ../../../WebsiteHost/website/script/1699012064814.ts ***!
+  \************************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 __webpack_require__(/*! ../../../../Shared/Extensions */ "../../../../Shared/Extensions.ts");
-const HtmlHelper_1 = __webpack_require__(/*! ../../Classes/HtmlHelper */ "../../../LiveIde/Classes/HtmlHelper.ts");
-const StateTracker_1 = __webpack_require__(/*! ../../Classes/StateTracker */ "../../../LiveIde/Classes/StateTracker.ts");
+const HtmlHelper_1 = __webpack_require__(/*! ../../Classes/HtmlHelper */ "../../../WebsiteHost/Classes/HtmlHelper.ts");
+const StateTracker_1 = __webpack_require__(/*! ../../Classes/StateTracker */ "../../../WebsiteHost/Classes/StateTracker.ts");
 const TaskQueue_1 = __webpack_require__(/*! ../../../../Shared/TaskQueue */ "../../../../Shared/TaskQueue.ts");
-const ClientContext_1 = __webpack_require__(/*! ../../Classes/ClientContext */ "../../../LiveIde/Classes/ClientContext.ts");
-const VueHelper_1 = __webpack_require__(/*! ../../Classes/VueHelper */ "../../../LiveIde/Classes/VueHelper.ts");
-const VueManager_1 = __webpack_require__(/*! ../../Classes/VueManager */ "../../../LiveIde/Classes/VueManager.ts");
-const Component_1 = __webpack_require__(/*! ../../Classes/Component */ "../../../LiveIde/Classes/Component.ts");
+const ClientContext_1 = __webpack_require__(/*! ../../Classes/ClientContext */ "../../../WebsiteHost/Classes/ClientContext.ts");
+const VueHelper_1 = __webpack_require__(/*! ../../Classes/VueHelper */ "../../../WebsiteHost/Classes/VueHelper.ts");
+const VueManager_1 = __webpack_require__(/*! ../../Classes/VueManager */ "../../../WebsiteHost/Classes/VueManager.ts");
+const Component_1 = __webpack_require__(/*! ../../Classes/Component */ "../../../WebsiteHost/Classes/Component.ts");
 const Performance_1 = __webpack_require__(/*! ../../../../Shared/Performance */ "../../../../Shared/Performance.ts");
 window.Component = Component_1.Component;
 const taskQueue = new TaskQueue_1.TaskQueue();

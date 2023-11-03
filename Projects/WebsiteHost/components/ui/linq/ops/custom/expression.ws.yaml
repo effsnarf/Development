@@ -33,6 +33,7 @@ props:
   context: null
   input: null
   value: null
+  prevOperation: null
 data:
   operation: null
 methods: null
@@ -58,7 +59,13 @@ computed:
   operationArgNames: | #js
     function() {
       if (this.input == this.context?.[this.contextArgNames.first()]) return [];
-      return ["_data"];
+      if (this.prevOperation) {
+        const prev = this.prevOperation;
+        if (prev.type == "select.field") {
+          return [prev.path.last()];
+        }
+      }
+      return [];
     }
   contextArgNames: | #js
     function() {

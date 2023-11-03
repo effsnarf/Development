@@ -17,10 +17,11 @@ methods:
       const datas = [];
       datas.push(input);
       if (!operations?.length) return datas;
+      let prevOperation = null;
       for (const operation of operations) {
         try
         {
-          const output = this.evaluate(context, datas.last(), operation);
+          const output = this.evaluate(context, datas.last(), operation, prevOperation);
           datas.push(output);
         }
         catch (ex)
@@ -28,16 +29,17 @@ methods:
           datas.push(datas.last());
           this.errors.push(ex.message);
         }
+        prevOperation = operation;
       }
       return datas;
     }
   evaluate: | #js
-    function(context, input, operation) {
+    function(context, input, operation, prevOperation) {
       if (!input) return null;
       if (!operation) return input;
       const method = this[`${operation.type}`.replace(/\./g, "_")];
       if (!method) throw new Error(`Method ${operation.type} not found`);
-      const args = [input, operation];
+      const args = [input, operation, prevOperation];
       if (operation.type == "custom.expression") args.unshift(context);
       const output = method(...args);
       return output;
@@ -65,12 +67,17 @@ methods:
       return input.flatMap(item => item[key1]);
     }
   custom_expression: | #js
-    function(context, input, op) {
+    function(context, input, op, prevOperation) {
       if (!op?.func) return input;
       const func = this.getFuncDecl(op.func);
       if (func.argNames.length > 1) throw new Error("Custom expression can have at most one argument");
       const argNames = [];
       const argValues = [];
+      if (prevOperation.type == "select.field") {
+        const field = prevOperation.path.last();
+        argNames.push(field);
+        argValues.push(Objects.clone(input));
+      }
       if (func.argNames.length) {
         argNames.push(func.argNames[0]);
         argValues.push(Objects.clone(input));

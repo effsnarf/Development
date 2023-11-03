@@ -12,6 +12,7 @@ dom:
                   ':context': context
                   ':input': datas?.[index]
                   ':value': operation
+                  ':prev-operation': operations[index - 1]
                   @input: (operation) => $set(operations, index, operation)
                 .delete-button.show-on-hover-2:
                   ui.button:
@@ -115,8 +116,8 @@ template: >-
   path="-484387046.0.0.0.0"><div class="show-on-hover-container"
   path="-484387046.0.0.0.0.0"><div class="operation"
   path="-484387046.0.0.0.0.0.0"><ui-linq-operation :context="context"
-  :input="datas?.[index]" :value="operation" @input="(operation) =&gt;
-  $set(operations, index, operation)"
+  :input="datas?.[index]" :value="operation" :prev-operation="operations[index -
+  1]" @input="(operation) =&gt; $set(operations, index, operation)"
   path="-484387046.0.0.0.0.0.0.0"></ui-linq-operation><div class="delete-button
   show-on-hover-2" path="-484387046.0.0.0.0.0.0.1"><ui-button
   :icon="isConfirmed[index] ? '❌' : '✖'" @click="onClickDelete(index)"

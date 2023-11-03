@@ -3,11 +3,13 @@ dom:
     ui.linq.operation.any:
       ':context': context
       ':input': input
+      ':prev-operation': prevOperation
       v-model: operation
 props:
   context: null
   input: null
   value: null
+  prevOperation: null
 data:
   operation: null
 methods: null
@@ -31,5 +33,5 @@ _:
 name: ui-linq-operation
 template: >-
   <div class="comp-ui-linq-operation" path="-188258413."><ui-linq-operation-any
-  :context="context" :input="input" v-model="operation"
-  path="-188258413.0"></ui-linq-operation-any></div>
+  :context="context" :input="input" :prev-operation="prevOperation"
+  v-model="operation" path="-188258413.0"></ui-linq-operation-any></div>
