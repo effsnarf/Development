@@ -52,7 +52,13 @@ const Local = {
     has: async (key) => {
       return localStorage.getItem(key) != null;
     },
-    get: async (key) => {
+    get: async (key, getDefaultValue) => {
+      if (!await Local.cache.has(key)) {
+        if (getDefaultValue) {
+          const defaultValue = (await getDefaultValue());
+          Local.cache.set(key, defaultValue);
+        }
+      }
       return JSON.parse(localStorage.getItem(key));
     },
     set: async (key, value) => {

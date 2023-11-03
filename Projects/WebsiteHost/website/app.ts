@@ -275,12 +275,47 @@ const sheakspearize = async (text: string) => {
     };
   };
 
+  const localPathToUrl = (localPath: string) => {
+    return (
+      localPath
+        .replace(config.static.folder, "")
+        // replace backslashes (\) with forward slashes (/)
+        .replace(/\\/g, "/")
+    );
+  };
+
+  const getStaticStylesheets = async () => {
+    const stylesheets = await Files.getFiles(
+      path.join(config.static.folder, "css"),
+      {
+        recursive: true,
+      }
+    ).map(localPathToUrl);
+    // Convert to HAML %link tags
+    return stylesheets.map(
+      (cssPath) => `%link{rel: "stylesheet", href: "${cssPath}"}`
+    );
+  };
+
+  const getStaticJavaScripts = async () => {
+    const scripts = await Files.getFiles(
+      path.join(config.static.folder, "js"),
+      {
+        recursive: true,
+      }
+    ).map(localPathToUrl);
+    // Convert to HAML %script tags
+    return scripts.map((jsPath) => `%script{src: "${jsPath}"}`);
+  };
+
   const getProjectPageTemplateObject = async (req: any) => {
     const getData = async () => {
       const components = await getComponents();
       const templates = await getTemplates();
       const helpers = await getHelpers();
       const config = await getClientConfig();
+      const staticStylesheets = await getStaticStylesheets();
+      const staticJavaScripts = await getStaticJavaScripts();
       let scriptUrlCacheInvalidator = await getScriptUrlCacheInvalidator();
 
       return {
@@ -288,6 +323,8 @@ const sheakspearize = async (text: string) => {
         templates,
         helpers,
         config,
+        staticStylesheets,
+        staticJavaScripts,
         scriptUrlCacheInvalidator: scriptUrlCacheInvalidator,
       };
     };

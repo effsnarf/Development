@@ -220,6 +220,25 @@ class HttpServer {
       if (path.endsWith(".haml")) {
         try {
           let templateData = await this.getIndexPageTemplateData(req);
+          // Before %body, add templateData.staticStylesheets (string[]) lines
+          // with "    " (4 spaces) indentation
+          fileContent = fileContent.replace(
+            /%body/g,
+            (
+              templateData.staticStylesheets
+                ?.map((line: string) => `    ${line}`)
+                .join("\n") + "\n  %body"
+            ).substring(2)
+          );
+          // Same for templateData.staticJavaScripts (string[])
+          fileContent = fileContent.replace(
+            /%body/g,
+            (
+              templateData.staticJavaScripts
+                ?.map((line: string) => `    ${line}`)
+                .join("\n") + "\n  %body"
+            ).substring(2)
+          );
           fileContent = Handlebars.compile(fileContent)(templateData);
           fileContent = HAML.render(fileContent);
           fileContent = `<!DOCTYPE html>\n${fileContent}`;

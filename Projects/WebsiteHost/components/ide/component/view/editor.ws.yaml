@@ -146,8 +146,8 @@ template: >-
   name="slide-hor" path="-1512907487.0.1.0.0.1"><div v-show="selectedNode"
   path="-1512907487.0.1.0.0.1.0"><ui-tabs :options="['✏️ edit']"
   v-model="selectedTabIndex" direction="horizontal"
-  path="-1512907487.0.1.0.0.1.0.0"><template v-slot:header
-  path="-1512907487.0.1.0.0.1.0.0.0"></template><template v-slot:tab0
+  path="-1512907487.0.1.0.0.1.0.0"><template v-slot="header"
+  path="-1512907487.0.1.0.0.1.0.0.0"></template><template v-slot="tab0"
   path="-1512907487.0.1.0.0.1.0.0.1"><ide-component-view-node-editor
   :node="selectedNode"
   path="-1512907487.0.1.0.0.1.0.0.1.0"></ide-component-view-node-editor></template></ui-tabs></div></transition></div></transition></div></div></div>

@@ -281,6 +281,7 @@ class ClientContext {
     Vue;
     templates;
     config;
+    clientPug;
     helpers;
     compilation;
     constructor() { }
@@ -328,9 +329,7 @@ class ClientContext {
     }
     async compileAll(filter = (c) => true, mixins = []) {
         await this.moduleManager.compileModules();
-        for (const comp of this.comps.filter(filter)) {
-            await comp.compile(mixins);
-        }
+        await Promise.all(this.comps.filter(filter).map((comp) => comp.compile(mixins)));
     }
     async compileApp() {
         const isIdeComponent = (c) => ["ui", "ide"].some((p) => c.name.startsWith(`${p}.`));
@@ -346,6 +345,12 @@ class ClientContext {
     async pugToHtml(pug) {
         if (!isDevEnv)
             return null;
+        try {
+            if (!this.clientPug)
+                this.clientPug = eval('require("pug")');
+            return this.clientPug.compile(pug)();
+        }
+        catch (ex) { }
         const url = `/pug`;
         const item = await (await fetch(url, { method: "post", body: pug })).text();
         return item;
@@ -505,7 +510,7 @@ class Component {
             console.log(this);
         }
         else {
-            console.log(this.name);
+            console.log(`📦`, this.name);
         }
         try {
             const vueOptions = await this.getVueOptions();
@@ -533,7 +538,6 @@ class Component {
             this.isCompiled = true;
         }
         catch (ex) {
-            debugger;
             throw ex;
         }
         finally {
@@ -7211,6 +7215,129 @@ exports.TaskQueue = TaskQueue;
 
 /***/ }),
 
+/***/ "../../../../Shared/Timer.ts":
+/*!***********************************!*\
+  !*** ../../../../Shared/Timer.ts ***!
+  \***********************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.IntervalCounter = exports.Timer = void 0;
+class IntervalCounter {
+    timeSpan;
+    _sum = 0;
+    items = [];
+    constructor(timeSpan) {
+        this.timeSpan = timeSpan;
+    }
+    track(value) {
+        if (value == null)
+            return;
+        const dt = Date.now();
+        this.items.push({ dt, value });
+        this._sum += value;
+        while (this.items.length && this.items[0].dt < dt - this.timeSpan) {
+            const oldItem = this.items.shift();
+            if (!oldItem)
+                throw new Error("This shouldn't happen");
+            this._sum -= oldItem.value;
+        }
+    }
+    get count() {
+        return this.items.length;
+    }
+    get sum() {
+        return this._sum;
+    }
+    get average() {
+        return Math.round(this._sum / this.count);
+    }
+}
+exports.IntervalCounter = IntervalCounter;
+class Timer {
+    isRunning = false;
+    started = null;
+    _data;
+    onDone;
+    logs = new Map();
+    constructor(data, onDone) {
+        this._data = data;
+        this.onDone = onDone;
+    }
+    static new(data = null, onDone = () => { }) {
+        return new Timer(data, onDone);
+    }
+    static measure(action) {
+        return Timer.new().measure({}, action);
+    }
+    static start() {
+        const timer = Timer.new();
+        timer.start();
+        return timer;
+    }
+    log(key, value) {
+        if (!value && !this.isRunning)
+            throw new Error("Timer must be running to log");
+        if (!value)
+            value = this.elapsed || 0;
+        if (!this.logs.has(key))
+            this.logs.set(key, []);
+        const log = this.logs.get(key);
+        log?.push(value);
+        return this;
+    }
+    getLogs() {
+        return [...this.logs.entries()].map((e) => {
+            return { key: e[0], average: e[1].average() };
+        });
+    }
+    async measure(data, action) {
+        data = { ...this._data, ...data };
+        this.start();
+        try {
+            return await action();
+        }
+        catch (ex) {
+            data.ex = ex;
+        }
+        finally {
+            const ended = Date.now();
+            this.stop();
+            data.elapsed = this.elapsed;
+            this.onDone(data);
+        }
+    }
+    start() {
+        this.started = Date.now();
+        this.isRunning = true;
+    }
+    stop() {
+        this.isRunning = false;
+    }
+    restart() {
+        this.stop();
+        this.start();
+    }
+    getAvrages() {
+        return [...this.logs.entries()]
+            .map((e) => {
+            return { key: e[0], average: e[1].average() };
+        })
+            .sortByDesc((e) => e.average);
+    }
+    get elapsed() {
+        if (!this.started)
+            return null;
+        return Date.now() - this.started;
+    }
+}
+exports.Timer = Timer;
+
+
+/***/ }),
+
 /***/ "../../../../Shared/TwoWayMap.ts":
 /*!***************************************!*\
   !*** ../../../../Shared/TwoWayMap.ts ***!
@@ -8079,7 +8206,7 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 /*!************************************************************!*\
-  !*** ../../../WebsiteHost/website/script/1699016312934.ts ***!
+  !*** ../../../WebsiteHost/website/script/1699025445381.ts ***!
   \************************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -8095,6 +8222,7 @@ const AnalyticsTracker_1 = __webpack_require__(/*! ../../Classes/AnalyticsTracke
 const ClientContext_1 = __webpack_require__(/*! ../../Classes/ClientContext */ "../../../WebsiteHost/Classes/ClientContext.ts");
 const Params_1 = __webpack_require__(/*! ../../Classes/Params */ "../../../WebsiteHost/Classes/Params.ts");
 const DbpClient_1 = __webpack_require__(/*! ../../../../Apps/DatabaseProxy/Client/DbpClient */ "../../../../Apps/DatabaseProxy/Client/DbpClient.ts");
+const Timer_1 = __webpack_require__(/*! ../../../../Shared/Timer */ "../../../../Shared/Timer.ts");
 const VueManager_1 = __webpack_require__(/*! ../../Classes/VueManager */ "../../../WebsiteHost/Classes/VueManager.ts");
 const Data_1 = __webpack_require__(/*! ../../../../Shared/Data */ "../../../../Shared/Data.ts");
 const Graph_1 = __webpack_require__(/*! ../../../../Shared/Database/Graph */ "../../../../Shared/Database/Graph.ts");
@@ -8109,6 +8237,8 @@ window1.Reflection = Reflection_1.Reflection;
 window1.Diff = Diff_1.Diff;
 window1.TaskQueue = TaskQueue_1.TaskQueue;
 window1.Data = Data_1.Data;
+window1.Timer = Timer_1.Timer;
+window1.DatabaseProxy = DbpClient_1.DatabaseProxy;
 window1.Actionable = Actionable_1.Actionable;
 window1.Graph = Graph_1.Graph;
 window1.MovingPositionSmoother = MovingPositionSmoother_1.MovingPositionSmoother;

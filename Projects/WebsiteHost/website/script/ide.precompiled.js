@@ -53,6 +53,7 @@ class ClientContext {
     Vue;
     templates;
     config;
+    clientPug;
     helpers;
     compilation;
     constructor() { }
@@ -100,9 +101,7 @@ class ClientContext {
     }
     async compileAll(filter = (c) => true, mixins = []) {
         await this.moduleManager.compileModules();
-        for (const comp of this.comps.filter(filter)) {
-            await comp.compile(mixins);
-        }
+        await Promise.all(this.comps.filter(filter).map((comp) => comp.compile(mixins)));
     }
     async compileApp() {
         const isIdeComponent = (c) => ["ui", "ide"].some((p) => c.name.startsWith(`${p}.`));
@@ -118,6 +117,12 @@ class ClientContext {
     async pugToHtml(pug) {
         if (!isDevEnv)
             return null;
+        try {
+            if (!this.clientPug)
+                this.clientPug = eval('require("pug")');
+            return this.clientPug.compile(pug)();
+        }
+        catch (ex) { }
         const url = `/pug`;
         const item = await (await fetch(url, { method: "post", body: pug })).text();
         return item;
@@ -275,7 +280,7 @@ class Component {
             console.log(this);
         }
         else {
-            console.log(this.name);
+            console.log(`📦`, this.name);
         }
         try {
             const vueOptions = await this.getVueOptions();
@@ -303,7 +308,6 @@ class Component {
             this.isCompiled = true;
         }
         catch (ex) {
-            debugger;
             throw ex;
         }
         finally {
@@ -6110,7 +6114,7 @@ var __webpack_exports__ = {};
 (() => {
 var exports = __webpack_exports__;
 /*!************************************************************!*\
-  !*** ../../../WebsiteHost/website/script/1699016311993.ts ***!
+  !*** ../../../WebsiteHost/website/script/1699025444846.ts ***!
   \************************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

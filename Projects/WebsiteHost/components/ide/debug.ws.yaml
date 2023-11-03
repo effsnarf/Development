@@ -31,6 +31,6 @@ template: >-
   <div class="comp-ide-debug" path="-1760824817."><ui-tabs
   :options="contextMenuOptions" direction="vertical" path="-1760824817.0"><div
   v-for="(cm, index) in contextMenus" path="-1760824817.0.0"><template
-  v-slot:'tab'+index path="-1760824817.0.0.0"><ui-value-any :value="{d:
+  v-slot="'tab'+index" path="-1760824817.0.0.0"><ui-value-any :value="{d:
   cm().$data, p:cm().$props}"
   path="-1760824817.0.0.0.0"></ui-value-any></template></div></ui-tabs></div>

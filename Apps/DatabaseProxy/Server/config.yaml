@@ -7,7 +7,7 @@ server:
     dev: 3031
     prod: 80
   cors:
-    dev: [localhost]
+    dev: [localhost, localhost:5051]
     prod: [memegenerator.net, vue-studio.com]
   proxy:
     # on dev, we're querying the production database

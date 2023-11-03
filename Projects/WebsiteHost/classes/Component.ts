@@ -35,7 +35,7 @@ class Component {
       console.groupCollapsed(this.name);
       console.log(this);
     } else {
-      console.log(this.name);
+      console.log(`📦`, this.name);
     }
 
     try {
@@ -62,7 +62,6 @@ class Component {
       client.Vue.component(vueName, vueOptions);
       this.isCompiled = true;
     } catch (ex) {
-      debugger;
       throw ex;
     } finally {
       if (logGroup) console.groupEnd();

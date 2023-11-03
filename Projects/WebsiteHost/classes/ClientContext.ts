@@ -56,6 +56,8 @@ class ClientContext {
     params: any;
   };
 
+  clientPug: any;
+
   private helpers: any;
 
   private compilation!: {
@@ -126,9 +128,9 @@ class ClientContext {
   ) {
     await this.moduleManager.compileModules();
 
-    for (const comp of this.comps.filter(filter)) {
-      await comp.compile(mixins);
-    }
+    await Promise.all(
+      this.comps.filter(filter).map((comp) => comp.compile(mixins))
+    );
   }
 
   async compileApp() {
@@ -148,6 +150,10 @@ class ClientContext {
 
   async pugToHtml(pug: string) {
     if (!isDevEnv) return null;
+    try {
+      if (!this.clientPug) this.clientPug = eval('require("pug")');
+      return this.clientPug.compile(pug)();
+    } catch (ex: any) {}
     const url = `/pug`;
     const item = await (await fetch(url, { method: "post", body: pug })).text();
     return item;

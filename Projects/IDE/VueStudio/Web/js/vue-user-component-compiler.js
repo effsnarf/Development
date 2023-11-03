@@ -11,7 +11,6 @@ if (typeof(require) != "undefined")
 
 }
 
-
 const wait = async (condition) => {
   if (typeof condition == "number") {
     return new Promise((resolve) => {
@@ -711,11 +710,11 @@ if (true)
   };
 }
 
+
 (async() => {
   await wait(() => window.Timer);
   window.compileTimer2 = Timer.start();
 })();
-
 
 compiler.toVueComponentOptions = async (compClass) => {
   if (!compClass) return {};
@@ -856,6 +855,7 @@ compiler.unregisterFromVue = (compName) => {
   await wait(() => window.Timer);
   window.compileTimer = Timer.start();
 })();
+
 
 
 compiler.compile = async (compClass, options = { fix: true }) => {

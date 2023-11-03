@@ -365,7 +365,7 @@ template: >-
   v-text="selector"
   path="-1978980996.0.2.0.0.0.1.0.1.0.0"></div></li></ul></div></div></div><div
   path="-1978980996.0.2.0.0.1"><ui-tabs :options="['📝 Properties', '🔳 Flex']"
-  direction="horizontal" path="-1978980996.0.2.0.0.1.0"><template v-slot:tab0
+  direction="horizontal" path="-1978980996.0.2.0.0.1.0"><template v-slot="tab0"
   path="-1978980996.0.2.0.0.1.0.0"><table path="-1978980996.0.2.0.0.1.0.0.0"><tr
   :class="{ highlighted: (selectedFieldName == field.name) }" v-for="field in
   selectedRuleFields" :key="field.id" path="-1978980996.0.2.0.0.1.0.0.0.0"><th
@@ -383,7 +383,7 @@ template: >-
   class="mt-l1" path="-1978980996.0.2.0.0.1.0.0.1"><ui-button text="➕"
   :click="addNewField"
   path="-1978980996.0.2.0.0.1.0.0.1.0"></ui-button></div></template><template
-  v-slot:tab1
+  v-slot="tab1"
   path="-1978980996.0.2.0.0.1.0.1"><ide-css-editor-flex></ide-css-editor-flex></template></ui-tabs></div></div></transition><div
   path="-1978980996.0.2.1"><table v-if="false" path="-1978980996.0.2.1.0"><tr
   v-for="field in appliedStyles" path="-1978980996.0.2.1.0.0"><th

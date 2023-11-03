@@ -64,17 +64,17 @@ template: >-
   path="-965690814.0.0"><ui-title icon="📦" :text="component.name"
   path="-965690814.0.0.0"></ui-title></h2><ui-tabs :options="['🧊 state', '✨
   activity', '📁 view', '🔴 methods']" v-model="selectedTabIndex"
-  direction="horizontal" path="-965690814.0.1"><template v-slot:header
+  direction="horizontal" path="-965690814.0.1"><template v-slot="header"
   path="-965690814.0.1.0"><div class="mt-l1"
-  path="-965690814.0.1.0.0"></div></template><template v-slot:tab0
+  path="-965690814.0.1.0.0"></div></template><template v-slot="tab0"
   path="-965690814.0.1.1"><ide-state-tracker :uid="vueUid"
-  path="-965690814.0.1.1.0"></ide-state-tracker></template><template v-slot:tab1
-  path="-965690814.0.1.2"><ide-component-activity :uid="vueUid"
+  path="-965690814.0.1.1.0"></ide-state-tracker></template><template
+  v-slot="tab1" path="-965690814.0.1.2"><ide-component-activity :uid="vueUid"
   path="-965690814.0.1.2.0"></ide-component-activity></template><template
-  v-slot:tab2 path="-965690814.0.1.3"><ide-component-view-editor
+  v-slot="tab2" path="-965690814.0.1.3"><ide-component-view-editor
   :component="component" @selected-node="(node) =&gt;
   $emit('selected-view-node', node)"
   path="-965690814.0.1.3.0"></ide-component-view-editor></template><template
-  v-slot:tab3 path="-965690814.0.1.4"><ide-component-methods
+  v-slot="tab3" path="-965690814.0.1.4"><ide-component-methods
   :component="component"
   path="-965690814.0.1.4.0"></ide-component-methods></template></ui-tabs></div></div>
