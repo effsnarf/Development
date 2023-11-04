@@ -9,6 +9,14 @@
 class DatabaseProxy {
   private fetchAsJson: (url: string, ...args: any[]) => Promise<any>;
 
+  get = {
+    user: async () => {
+      var url = `${this.urlBase}/get/user`;
+      var user = await this.fetchAsJson(url);
+      return user;
+    },
+  };
+
   private constructor(
     private urlBase: string,
     _fetchAsJson?: (url: string, ...args: any[]) => Promise<any>

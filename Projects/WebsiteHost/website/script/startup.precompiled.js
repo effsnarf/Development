@@ -20,6 +20,13 @@ String.prototype.untitleize = function () {
 class DatabaseProxy {
     urlBase;
     fetchAsJson;
+    get = {
+        user: async () => {
+            var url = `${this.urlBase}/get/user`;
+            var user = await this.fetchAsJson(url);
+            return user;
+        },
+    };
     constructor(urlBase, _fetchAsJson) {
         this.urlBase = urlBase;
         this.fetchAsJson =
@@ -8215,7 +8222,7 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 /*!************************************************************!*\
-  !*** ../../../WebsiteHost/website/script/1699086545870.ts ***!
+  !*** ../../../WebsiteHost/website/script/1699091813326.ts ***!
   \************************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

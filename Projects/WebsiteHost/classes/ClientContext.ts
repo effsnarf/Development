@@ -167,6 +167,9 @@ class ClientContext {
 
   private static async fetch(...args: any[]): Promise<any> {
     try {
+      args = [...args];
+      if (args.length < 2) args.push({});
+      args[2].credentials = "include";
       const result = await ClientContext._fetch(...args);
       if (result.status < 500) return result;
       const text = await result.text();

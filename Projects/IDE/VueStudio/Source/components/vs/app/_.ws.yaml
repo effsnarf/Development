@@ -4,8 +4,11 @@ dom:
       ui.title:
         icon: 🧊
         text: Vue Studio
-    component:
-      :is: workspaceCompName
+    .user-account:
+      component: 
+        ':is': userAccountCompName
+    component: 
+      ':is': workspaceCompName
 props: null
 data:
   comps:
@@ -17,6 +20,7 @@ data:
   timers:
     recompile:
       comp: {}
+  userAccountCompName: null
   workspaceCompName: null
 mounted: | #js
   function() {
@@ -27,10 +31,12 @@ methods:
     async function() {
       this.$root.dbp = (await (DatabaseProxy.new("https://db.memegenerator.net/IDE")));
       this.initCssLibrary();
+      const dlIdeComps = (await this.loadVsComps());
+      const dlUserComps = (await this.loadUserComps());
       const vs = (this.$root.vs = {
         comps: {
-          ide: (await this.loadVsComps()),
-          user: (await this.loadUserComps())
+          ide: dlIdeComps,
+          user: dlUserComps
         }
       });
       const userComps = [...vs.comps.user, ...(vs.comps.ide.take(1000))];
@@ -53,6 +59,7 @@ methods:
       this.$root.with = util.with;
       await Promise.all(vs.comps.ide.map(c => vueUserComponentCompiler.compile(c, { mixins: [mixin] })));
       alertify.message(`Vue Studio components loaded`);
+      this.userAccountCompName = "meow-comp-267";
       this.workspaceCompName = "meow-comp-171";
       this.comps.ide.forEach(comp => liveData.watch.item("ComponentClasses", comp, { on: { changed: this.onCompChanged.bind(this) } }));
     }
@@ -122,6 +129,8 @@ methods:
       console.log(item, ex);
     }
 style:
+  .user-account:
+    border: 3px solid red
   h1:
     font-size: 3em
 _:
@@ -131,4 +140,6 @@ name: vs-app
 template: >-
   <div class="comp-vs-app" path="-809055376."><h1 path="-809055376.0"><ui-title
   icon="🧊" text="Vue Studio" path="-809055376.0.0"></ui-title></h1><div
-  ref="ws1" path="-809055376.1"></div></div>
+  class="user-account" path="-809055376.1"><component :is="userAccountCompName"
+  path="-809055376.1.0"></component></div><component :is="workspaceCompName"
+  path="-809055376.2"></component></div>
