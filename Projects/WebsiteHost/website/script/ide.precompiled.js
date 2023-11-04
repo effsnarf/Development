@@ -135,6 +135,10 @@ class ClientContext {
     }
     static async fetch(...args) {
         try {
+            args = [...args];
+            if (args.length < 2)
+                args.push({});
+            args[1].credentials = "include";
             const result = await ClientContext._fetch(...args);
             if (result.status < 500)
                 return result;
@@ -6123,7 +6127,7 @@ var __webpack_exports__ = {};
 (() => {
 var exports = __webpack_exports__;
 /*!************************************************************!*\
-  !*** ../../../WebsiteHost/website/script/1699091812640.ts ***!
+  !*** ../../../WebsiteHost/website/script/1699114766973.ts ***!
   \************************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

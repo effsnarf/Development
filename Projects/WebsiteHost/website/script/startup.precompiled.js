@@ -5,7 +5,7 @@
 /*!**********************************************************!*\
   !*** ../../../../Apps/DatabaseProxy/Client/DbpClient.ts ***!
   \**********************************************************/
-/***/ ((__unused_webpack_module, exports) => {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
 
@@ -13,6 +13,7 @@
 // Doesn't have direct access to the database, but can still use the API
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.DatabaseProxy = void 0;
+const Data_1 = __webpack_require__(/*! ../../../Shared/Data */ "../../../../Shared/Data.ts");
 // Lowercase the first letter of a string
 String.prototype.untitleize = function () {
     return this.charAt(0).toLowerCase() + this.slice(1);
@@ -20,15 +21,40 @@ String.prototype.untitleize = function () {
 class DatabaseProxy {
     urlBase;
     fetchAsJson;
+    newIds;
+    get dbName() {
+        return this.urlBase.split("/").pop();
+    }
     get = {
         user: async () => {
             var url = `${this.urlBase}/get/user`;
             var user = await this.fetchAsJson(url);
             return user;
         },
+        token: async (type) => {
+            return JSON.parse(await (await this.fetchAsJson(`${this.urlBase}/get/token?type=${type}`)).text());
+        },
+        new: {
+            id: async () => {
+                var self = this;
+                var tryToResolve = (resolve) => {
+                    if (!self.newIds.length)
+                        throw "No new ids available";
+                    var newID = self.newIds.splice(0, 1)[0];
+                    resolve(newID);
+                    return newID;
+                };
+                const promise = new Promise((resolve, reject) => {
+                    if (!tryToResolve(resolve))
+                        setTimeout(() => tryToResolve(resolve), 100);
+                });
+                return promise;
+            },
+        },
     };
     constructor(urlBase, _fetchAsJson) {
         this.urlBase = urlBase;
+        this.newIds = Data_1.Data.LocalPersistedArray.new(`${this.dbName}/new.ids`);
         this.fetchAsJson =
             _fetchAsJson ||
                 (async (url, ...args) => {
@@ -49,6 +75,24 @@ class DatabaseProxy {
         for (const key of Object.keys(api)) {
             this[key] = api[key];
         }
+        await this.ensureNewIDs();
+    }
+    async _getNewID(count) {
+        var url = `${this.urlBase}/get/new/id?count=${count || 1}&_u=${Date.now()}`;
+        var result = await this.fetchAsJson(url);
+        return result.id || result;
+    }
+    async _getNewIDs(count) {
+        var result = await this._getNewID(count);
+        if (typeof result == `number`)
+            return [result];
+        return result;
+    }
+    async ensureNewIDs() {
+        let minNewIDs = 10;
+        while (this.newIds.length < minNewIDs)
+            this.newIds.push(...(await this._getNewIDs(minNewIDs - this.newIds.length)));
+        setTimeout(this.ensureNewIDs.bind(this), 1000);
     }
     static setValue(obj, value) {
         if (Array.isArray(obj)) {
@@ -370,6 +414,10 @@ class ClientContext {
     }
     static async fetch(...args) {
         try {
+            args = [...args];
+            if (args.length < 2)
+                args.push({});
+            args[1].credentials = "include";
             const result = await ClientContext._fetch(...args);
             if (result.status < 500)
                 return result;
@@ -4405,6 +4453,43 @@ var Data;
         }
     }
     Data.List = List;
+    class LocalPersistedArray {
+        items;
+        key;
+        static new(key) {
+            return new LocalPersistedArray(key);
+        }
+        constructor(key) {
+            this.items = [];
+            this.key = key;
+            this.load();
+        }
+        push(...args) {
+            this.items.push(...args);
+            this.save();
+        }
+        splice(start, deleteCount) {
+            const items = this.items.splice(start, deleteCount);
+            this.save();
+            return items;
+        }
+        get length() {
+            return this.items.length;
+        }
+        load() {
+            let items = localStorage.getItem(this.key);
+            if (items) {
+                this.items = JSON.parse(items);
+            }
+            else {
+                this.items = [];
+            }
+        }
+        save() {
+            localStorage.setItem(this.key, JSON.stringify(this.items));
+        }
+    }
+    Data.LocalPersistedArray = LocalPersistedArray;
 })(Data || (exports.Data = Data = {}));
 
 
@@ -8222,7 +8307,7 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 /*!************************************************************!*\
-  !*** ../../../WebsiteHost/website/script/1699091813326.ts ***!
+  !*** ../../../WebsiteHost/website/script/1699114767595.ts ***!
   \************************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -8767,8 +8852,6 @@ const webScriptMixins = [generalMixin, gridAppCompMixin, mgMixin];
     });
     await client.compileAll((c) => !c.name.startsWith("ide."), webScriptMixins);
     const isLocalHost = window.location.hostname == "localhost";
-    const dbpHost = `https://db.memegenerator.net`;
-    const dbp = (await DbpClient_1.DatabaseProxy.new(`${dbpHost}/MemeGenerator`));
     const gdbData = await Extensions_Objects_Client_1.Objects.try(async () => await (await fetch(`/gdb.yaml`)).json(), { nodes: [], links: [] });
     const getNewParams = async () => {
         return (await Params_1.Params.new(() => vueApp, client.config.params, window.location.pathname));
@@ -8786,7 +8869,6 @@ const webScriptMixins = [generalMixin, gridAppCompMixin, mgMixin];
             events: new Events_1.Events(),
             vm: null,
             client,
-            dbp,
             analytics: await AnalyticsTracker_1.AnalyticsTracker.new(),
             params: params,
             html: new HtmlHelper_1.HtmlHelper(),

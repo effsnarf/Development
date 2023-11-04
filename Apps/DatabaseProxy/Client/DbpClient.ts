@@ -1,6 +1,8 @@
 // This version is for public clients like Meme Generator
 // Doesn't have direct access to the database, but can still use the API
 
+import { Data } from "../../../Shared/Data";
+
 // Lowercase the first letter of a string
 (String.prototype as any).untitleize = function () {
   return this.charAt(0).toLowerCase() + this.slice(1);
@@ -8,6 +10,11 @@
 
 class DatabaseProxy {
   private fetchAsJson: (url: string, ...args: any[]) => Promise<any>;
+  private newIds: Data.LocalPersistedArray;
+
+  get dbName() {
+    return this.urlBase.split("/").pop();
+  }
 
   get = {
     user: async () => {
@@ -15,12 +22,36 @@ class DatabaseProxy {
       var user = await this.fetchAsJson(url);
       return user;
     },
+    token: async (type: string) => {
+      return JSON.parse(
+        await (
+          await this.fetchAsJson(`${this.urlBase}/get/token?type=${type}`)
+        ).text()
+      );
+    },
+    new: {
+      id: async () => {
+        var self = this;
+        var tryToResolve = (resolve: Function) => {
+          if (!self.newIds.length) throw "No new ids available";
+          var newID = self.newIds.splice(0, 1)[0];
+          resolve(newID);
+          return newID;
+        };
+        const promise = new Promise((resolve, reject) => {
+          if (!tryToResolve(resolve))
+            setTimeout(() => tryToResolve(resolve), 100);
+        });
+        return promise;
+      },
+    },
   };
 
   private constructor(
     private urlBase: string,
     _fetchAsJson?: (url: string, ...args: any[]) => Promise<any>
   ) {
+    this.newIds = Data.LocalPersistedArray.new(`${this.dbName}/new.ids`);
     this.fetchAsJson =
       _fetchAsJson ||
       (async (url: string, ...args: any[]) => {
@@ -45,6 +76,28 @@ class DatabaseProxy {
     for (const key of Object.keys(api)) {
       (this as any)[key] = api[key];
     }
+    await this.ensureNewIDs();
+  }
+
+  private async _getNewID(count: number) {
+    var url = `${this.urlBase}/get/new/id?count=${count || 1}&_u=${Date.now()}`;
+    var result = await this.fetchAsJson(url);
+    return result.id || result;
+  }
+
+  private async _getNewIDs(count: number) {
+    var result = await this._getNewID(count);
+    if (typeof result == `number`) return [result];
+    return result;
+  }
+
+  private async ensureNewIDs() {
+    let minNewIDs = 10;
+    while (this.newIds.length < minNewIDs)
+      this.newIds.push(
+        ...(await this._getNewIDs(minNewIDs - this.newIds.length))
+      );
+    setTimeout(this.ensureNewIDs.bind(this), 1000);
   }
 
   private static setValue(obj: any, value: any) {

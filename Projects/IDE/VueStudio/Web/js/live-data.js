@@ -100,7 +100,6 @@ const waitUntil = async (condition, interval = 100) => {
 
 (async() => {
   await waitUntil(() => (window.DatabaseProxy));
-  liveData.dbp = (await (DatabaseProxy.new("https://db.memegenerator.net/IDE")));
 })();
 
 

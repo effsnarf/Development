@@ -5,10 +5,10 @@ dom:
         icon: 🧊
         text: Vue Studio
     .user-account:
-      component: 
-        ':is': userAccountCompName
-    component: 
-      ':is': workspaceCompName
+      component:
+        ":is": userAccountCompName
+    component:
+      ":is": workspaceCompName
 props: null
 data:
   comps:
@@ -30,21 +30,25 @@ methods:
   init: | #js
     async function() {
       this.$root.dbp = (await (DatabaseProxy.new("https://db.memegenerator.net/IDE")));
+      liveData.dbp = this.$root.dbp;
       this.initCssLibrary();
-      const dlIdeComps = (await this.loadVsComps());
-      const dlUserComps = (await this.loadUserComps());
+      const dlIdeComps = (await this.getFromCache("vs.comps", this.loadVsComps.bind(this)));
+      const dlUserComps = (await this.getFromCache("user.comps", this.loadUserComps.bind(this)));
+      const allComps = [];
+      allComps.push(...dlIdeComps);
+      allComps.push(...dlUserComps.exceptBy(dlIdeComps, c => c._id));
       const vs = (this.$root.vs = {
         comps: {
           ide: dlIdeComps,
           user: dlUserComps
         }
       });
-      const userComps = [...vs.comps.user, ...(vs.comps.ide.take(1000))];
+      const userComps = [...vs.comps.user];
       this.comps.ide = vs.comps.ide;
       this.comps.user = userComps;
       const ideVueApp = this;
       window.ideVueApp = ideVueApp;
-      compDom.components.value.push(...vs.comps.ide);
+      compDom.components.value.push(...allComps);
       const mixin = {
         data() {
           return {
@@ -57,7 +61,7 @@ methods:
       };
       this.$on("ide-comp-changed-2", this.onCompChanged2.bind(this));
       this.$root.with = util.with;
-      await Promise.all(vs.comps.ide.map(c => vueUserComponentCompiler.compile(c, { mixins: [mixin] })));
+      await Promise.all(allComps.map(c => vueUserComponentCompiler.compile(c, { mixins: [mixin] })));
       alertify.message(`Vue Studio components loaded`);
       this.userAccountCompName = "meow-comp-267";
       this.workspaceCompName = "meow-comp-171";
@@ -128,9 +132,20 @@ methods:
       alertify.error(`${source} - ${ex.message}`);
       console.log(item, ex);
     }
+  getFromCache: | #js
+    async function(key, getValue) {
+      const cachedItem = localStorage.getItem(key);
+      if (!cachedItem) {
+        const value = (await getValue());
+        localStorage.setItem(key, JSON.stringify(value));
+      }
+      return JSON.parse(localStorage.getItem(key));
+    }
 style:
   .user-account:
-    border: 3px solid red
+    position: fixed
+    right: 1em
+    top: 1em
   h1:
     font-size: 3em
 _:
