@@ -4,8 +4,20 @@ dom:
       ui.title:
         icon: 🧊
         text: Vue Studio
+    component:
+      :is: workspaceCompName
 props: null
-data: null
+data:
+  comps:
+    ide: null
+    user: null
+  css:
+    library:
+      shorthand: null
+  timers:
+    recompile:
+      comp: {}
+  workspaceCompName: null
 mounted: | #js
   function() {
     this.init();
@@ -13,16 +25,55 @@ mounted: | #js
 methods:
   init: | #js
     async function() {
-      return;
       this.$root.dbp = (await (DatabaseProxy.new("https://db.memegenerator.net/IDE")));
+      this.initCssLibrary();
       const vs = (this.$root.vs = {
         comps: {
-          ide: (await Local.cache.get("vs.comps", this.loadVsComps.bind(this)))
+          ide: (await this.loadVsComps()),
+          user: (await this.loadUserComps())
         }
       });
-      const comp1 = vs.comps.ide[0];
-      console.log(comp1);
-      vueUserComponentCompiler.compile(comp1);
+      const userComps = [...vs.comps.user, ...(vs.comps.ide.take(1000))];
+      this.comps.ide = vs.comps.ide;
+      this.comps.user = userComps;
+      const ideVueApp = this;
+      window.ideVueApp = ideVueApp;
+      compDom.components.value.push(...vs.comps.ide);
+      const mixin = {
+        data() {
+          return {
+            ideVueApp,
+            compDom,
+            viewDom,
+            util
+          };
+        },
+      };
+      this.$on("ide-comp-changed-2", this.onCompChanged2.bind(this));
+      this.$root.with = util.with;
+      await Promise.all(vs.comps.ide.map(c => vueUserComponentCompiler.compile(c, { mixins: [mixin] })));
+      alertify.message(`Vue Studio components loaded`);
+      this.workspaceCompName = "meow-comp-171";
+      this.comps.ide.forEach(comp => liveData.watch.item("ComponentClasses", comp, { on: { changed: this.onCompChanged.bind(this) } }));
+    }
+  initCssLibrary: | #js
+    function() {
+      function CssLibrary(url) {
+        this.init = async function() {
+          this.cssCode = (await (await fetch(url)).text());
+          var classNameRegex = /^\.[a-z]([a-z0-9-]+)?(__([a-z0-9]+-?)+)?(--([a-z0-9]+-?)+){0,2}$/;
+          this.classNames = {};
+          this.classNames.all = css.parse(this.cssCode).stylesheet.rules
+            .flatMap(r => r.selectors)
+            .filter(s => s)
+            .filter(s => s.startsWith(`.`))
+            .filter(s => classNameRegex.test(s))
+            .map(s => s.substr(1));
+          this.classNames.all.sort();
+        }
+        this.init();
+      }
+      this.css.library.shorthand = (new CssLibrary("/static/shorthand.css"));
     }
   loadVsComps: | #js
     async function() {
@@ -31,13 +82,53 @@ methods:
       alertify.message(`${vsComps.length} components loaded`);
       return vsComps;
     }
+  loadUserComps: | #js
+    async function() {
+      alertify.message(`Loading user components...`);
+      const userComps = (await this.$root.dbp.componentClasses.user.get());
+      alertify.message(`${userComps.length} components loaded`);
+      return userComps;
+    }
+  getIdeComp: | #js
+    function(nameOrID) {
+      return this.$root.vs.comps.ide.find(c => (c.name === nameOrID) || (c._id === nameOrID));
+    }
+  onCompChanged: | #js
+    function(comp) {
+      alertify.message(`Comp changed: ${comp.name}`);
+      // this is triggered by a watcher, who watches and notifies data, not references
+      comp = compDom.get.comp.byID(comp._id);
+      this.$emit("ide-comp-changed-2", comp);
+    }
+  onCompChanged2: | #js
+    async function(comp) {
+      var timers = this.timers.recompile.comp;
+      clearTimeout(timers[comp._id]);
+      timers[comp._id] = setTimeout(async () => {
+        await this.recompileComp(comp);
+      }, 1000);
+    }
+  recompileComp: | #js
+    async function(comp) {
+      // biztos ami biztos
+      comp = compDom.get.comp.byID(comp._id);
+      await vueUserComponentCompiler.compile(comp, { fix: false });
+      this.$emit("ide-comp-recompiled", comp);
+    }
+  onCompError: | #js
+    function(vue, item, ex) {
+      const source = (item?.comp ? item.comp.name : null);
+      alertify.error(`${source} - ${ex.message}`);
+      console.log(item, ex);
+    }
 style:
   h1:
-    font-size: 2em
+    font-size: 3em
 _:
   examples:
     count: 0
 name: vs-app
 template: >-
   <div class="comp-vs-app" path="-809055376."><h1 path="-809055376.0"><ui-title
-  icon="🧊" text="Vue Studio" path="-809055376.0.0"></ui-title></h1></div>
+  icon="🧊" text="Vue Studio" path="-809055376.0.0"></ui-title></h1><div
+  ref="ws1" path="-809055376.1"></div></div>

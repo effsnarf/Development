@@ -156,7 +156,7 @@ var compDom = {
       await compDom.fix.errors(comp);
       for (let prop of comp.props) await compDom.fix.prop(prop);
       await compDom.fix.styles(comp);
-      var nodes = compDom.get.all.nodes(comp);
+      var nodes = await compDom.get.all.nodes(comp);
       //console.log(`${nodes.length} nodes`);
       for (node of nodes) { await compDom.fix.node(node, comp); };
 
@@ -540,6 +540,10 @@ var compDom = {
       warnings: () => {
         var warnings = [];
 
+        return [
+          { id: compDom.newID(), item: null, text: `Compiler warnings are disabled at the moment.` },
+        ];
+
         var allProps = compDom.get.all.props();
         for (prop of allProps.filter(p => (p.props.enabled && p.computed.enabled)))
         {
@@ -626,11 +630,15 @@ var compDom = {
       props: (comp, filterByUser = false) => {
         return compDom.get.all.comps(comp, filterByUser).flatMap(comp => comp.props.map(p => util.with(p, "comp", comp)));
       },
-      nodes: (comp, filterByUser = false) => {
-        return compDom.get.all.comps(comp, filterByUser).flatMap(comp => viewDom.mapTree(comp.view.node, node => util.with(node, "comp", comp)));
+      nodes: async (comp, filterByUser = false) => {
+        const allComps = compDom.get.all.comps(comp, filterByUser);
+        const allNodes = (await allComps.flatMap(comp => viewDom.mapTree(comp.view.node, node => util.with(node, "comp", comp))));
+        return allNodes;
       },
-      attrs: (comp, filterByUser = false) => {
-        return compDom.get.all.nodes(comp, filterByUser).flatMap(node => node.attrs.map(attr => util.with(attr, "node", node)));
+      attrs: async (comp, filterByUser = false) => {
+        const allNodes = (await compDom.get.all.nodes(comp, filterByUser));
+        const allAttrs = (await allNodes.flatMapAsync(node => node.attrs.map(attr => util.with(attr, "node", node)), 10));
+        return allAttrs;
       }
     },
     new: {
@@ -1034,10 +1042,10 @@ var compDom = {
         throw msg;
       },
       event: {
-        emits: (comp) => {
+        emits: async (comp) => {
           if (typeof(comp) == "string") comp = compDom.get.comp.item(comp);
           var strs = comp.methods.map(m => m.body);
-          strs.push(...compDom.get.all.attrs(comp).map(a => a.value));
+          strs.push(...(await compDom.get.all.attrs(comp)).map(a => a.value));
           return strs.flatMap(compDom.get.event.emits)
             .map(s => (s||"").trim())
             .filter(s => s)
@@ -1049,12 +1057,12 @@ var compDom = {
           if (!comp) return [];
           var items = [];
           // contained in
-          var nodes = compDom.get.all.nodes();
+          var nodes = await compDom.get.all.nodes();
           nodes = nodes.filter(n => (n.type == "tag"));
           nodes = nodes.filter(n => (n.nodeComp?._id == comp._id));
           items.push(...nodes.map(compDom.to.item));
           // contains
-          var nodes = compDom.get.all.nodes(comp);
+          var nodes = await compDom.get.all.nodes(comp);
           nodes = nodes.filter(compDom.is.comp.node);
           items.push(...nodes.map(compDom.get.node.comp).map(compDom.to.item));
           return items;
@@ -1147,7 +1155,7 @@ var compDom = {
           var nodes = (compDom.get.related.nodes(prop?.comp(), prop?.name));
           items.push(...nodes.map(compDom.to.item));
           // attributes that refer to this prop from all comp
-          var attrs = compDom.get.all.attrs();
+          var attrs = await compDom.get.all.attrs();
           attrs = attrs.filter(a => (!compDom.is.empty(a.value)));
           attrs = attrs.filter(a => (a.node().tag == prop.comp().name.kebabize()));
           attrs = attrs.filter(a => ((a.name||"").getWords().includes(prop.name)));
@@ -1421,8 +1429,8 @@ var compDom = {
         var allComps = compDom.get.all.comps(comp, true);
         var allMethods = compDom.get.all.methods(comp, true);
         var allProps = compDom.get.all.props(comp, true);
-        var allNodes = compDom.get.all.nodes(comp, true);
-        var allAttrs = compDom.get.all.attrs(comp, true);
+        var allNodes = await compDom.get.all.nodes(comp, true);
+        var allAttrs = await compDom.get.all.attrs(comp, true);
         var results = [];
         var comps = allComps.map(c => compDom.search.comp(c, regex));
         var methods = allMethods.map(m => compDom.search.method(m, regex));
@@ -1567,14 +1575,14 @@ var compDom = {
         if (!node) return;
         if (!node.attrs.find(a => (a.name == `class`))) await viewDom.createAttr(node, `class`);
 
-        compDom.ensure.compNode.compAttrs(node);
+        await compDom.ensure.compNode.compAttrs(node);
 
         for (attr of node.attrs) if (!attr.id) attr.id = (await compDom.get.new.id());
         node.attrs = node.attrs.sortBy(compDom.sort.attr);
       }
     },
     compNode: {
-      compAttrs: (node) => {
+      compAttrs: async (node) => {
         if (!node) return;
         // remove empty attributes
         var isEmptyAttr = (a) => (!a.name && !a.value);
@@ -1588,7 +1596,7 @@ var compDom = {
             viewDom.createAttr(node, prop.name.kebabize(), null, false)
           }
         }
-        var eventNames = compDom.get.comp.event.emits(compNodeComp);
+        var eventNames = await compDom.get.comp.event.emits(compNodeComp);
         for (eventName of eventNames)
         {
           if (!node.attrs.some(at => (at.name == `@${eventName}`)))

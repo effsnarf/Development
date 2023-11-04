@@ -276,9 +276,12 @@ var viewDom = {
         // component nodes
         if (nodeComp)
         {
-          nodeCompName = (compiler.mode == `production`) ?
-            nodeComp.name.kebabize() :
-            compDom.get.comp.name.vueName(nodeComp);
+          nodeCompName =
+            (nodeComp.name.startsWith(`IDE.`)) ?
+              compDom.get.comp.name.vueName(nodeComp) :
+            (compiler.mode == `production`) ?
+              nodeComp.name.kebabize() :
+              compDom.get.comp.name.vueName(nodeComp);
           //tag = nodeCompName;
           tag = `component`;
           attrs.push(`"is": "${nodeCompName}"`);

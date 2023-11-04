@@ -520,19 +520,11 @@ class Component {
                 console.log(vueOptions);
             const vueName = Component.toVueName(this.name);
             if (this.source) {
-                if (this.source.template) {
-                    let html = this.source.template;
-                    html = html.replace(/\bon_/g, "@");
-                    vueOptions.template = html;
-                }
-                else {
-                    const pug = vueOptions.template;
-                    let html = (await client.pugToHtml(pug)) || "";
-                    html = html.replace(/\bon_/g, "@");
-                    vueOptions.template = html;
-                    this.source.template = html;
-                    client.updateComponent(this);
-                }
+                const pug = vueOptions.template;
+                let html = (await client.pugToHtml(pug)) || "";
+                html = html.replace(/\bon_/g, "@");
+                vueOptions.template = html;
+                this.source.template = html;
             }
             client.Vue.component(vueName, vueOptions);
             this.isCompiled = true;
@@ -5416,6 +5408,7 @@ exports.TreeObject = TreeObject;
 
 "use strict";
 
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 class Time {
     static units = [
         "ms",
@@ -5640,6 +5633,12 @@ if (typeof Number !== "undefined") {
                 if (obj1.length == 1 && obj2.length == 1)
                     return compare(obj1[0], obj2[0]);
                 return 0;
+            }
+            if ((typeof obj1 === "object" && obj1 !== null) ||
+                (typeof obj2 === "object" && obj2 !== null)) {
+                const json1 = JSON.stringify(obj1);
+                const json2 = JSON.stringify(obj2);
+                return compare(json1, json2);
             }
             throw new Error(`Cannot compare ${obj1} (${typeof obj1}) with ${obj2} (${typeof obj2})`);
         };
@@ -6519,6 +6518,16 @@ if (typeof String !== "undefined") {
 // #endregion
 // #region Array
 if (typeof Array !== "undefined") {
+    Array.prototype.flatMapAsync = async function (callback, stagger) {
+        const result = [];
+        for (const [index, item] of this.entries()) {
+            const items = await callback(item, index);
+            result.push(...items);
+            if (stagger)
+                await wait(stagger);
+        }
+        return result;
+    };
     Array.prototype.toMap = function (getKey, getValue) {
         if (!getValue)
             getValue = (item) => item;
@@ -8206,7 +8215,7 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 /*!************************************************************!*\
-  !*** ../../../WebsiteHost/website/script/1699025445381.ts ***!
+  !*** ../../../WebsiteHost/website/script/1699086545870.ts ***!
   \************************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

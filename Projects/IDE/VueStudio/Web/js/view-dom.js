@@ -146,7 +146,7 @@ var viewDom = {
     return getChildNodes(node)
       .flatMap(child => viewDom.filterTree(getNodeItem(child), predicate, getChildNodes, getNodeItem));
   },
-  nodeToHaml: function(comp, node, indent = 0, cbNode = (n => n), isRootNode = false) {
+  nodeToHaml: async function(comp, node, indent = 0, cbNode = (n => n), isRootNode = false) {
     node = util.clone(node);
     // default node settings
     if (!("enabled" in node)) node.enabled = true;
@@ -154,6 +154,8 @@ var viewDom = {
     if (!node.type) node.type = (node.tag ? "tag" : node.text ? "text" : null)
     cbNode(node);
     node.attrs?.forEach(attr => { if (!("enabled" in attr)) attr.enabled = true; });
+
+    const allNodes = (await compDom.get.all.nodes());
 
     var s = [];
 
@@ -181,11 +183,12 @@ var viewDom = {
     //
     // - this allows us to place components within each other in design time,
     // transparently using vue's "template" and "slot" mechanism and tags.
+
     if (node.tag == `slots`)
     {
       // make sure we have enough compile time slots for everyone who uses this component
       // with subnodes placed into it
-      var childNodeCounts = compDom.get.all.nodes()
+      var childNodeCounts = allNodes
         .filter(n => (n.nodeComp?._id == comp._id))
         .map(n => n.children.length);
       var maxSlots = Math.max(...childNodeCounts);
@@ -268,9 +271,12 @@ var viewDom = {
         // component nodes
         if (nodeComp)
         {
-          nodeCompName = (compiler.mode == `production`) ?
-            nodeComp.name.kebabize() :
-            compDom.get.comp.name.vueName(nodeComp);
+          nodeCompName =
+            (nodeComp.name.startsWith(`IDE.`)) ?
+              compDom.get.comp.name.vueName(nodeComp) :
+            (compiler.mode == `production`) ?
+              nodeComp.name.kebabize() :
+              compDom.get.comp.name.vueName(nodeComp);
           //tag = nodeCompName;
           tag = `component`;
           attrs.push(`"is": "${nodeCompName}"`);
@@ -330,14 +336,14 @@ var viewDom = {
       }
       attrs = Object.entries(attrs).map(e => { return { name: e[0], value: e[1] } });
       var wrap = { tag: "div", path: node.path, attrs: attrs };
-      s.unshift(this.nodeToHaml(comp, wrap, (indent - 1), cbNode));
+      s.unshift(await this.nodeToHaml(comp, wrap, (indent - 1), cbNode));
       s = s.map(l => `${"".padStart(1 * 2)}${l}`);
       indent++;
     }
 
     var nodeComp = compDom.get.node.comp(node);
     var nodeCompHasSlotsTag = null;
-    if (compDom.get.all.nodes()
+    if (allNodes
       .filter(n => (n.comp()._id == nodeComp?._id))
       .some(n => (n.tag == `slots`)))
     {
@@ -345,7 +351,9 @@ var viewDom = {
     }
 
     indent += 1;
-    node.children?.forEach((child, i) => {
+    for (let i = 0; i < (node.children?.length||0); i++)
+    {
+      var child = node.children[i];
       var wrap = null;
       if (compDom.is.comp.node(node))
       {
@@ -374,12 +382,12 @@ var viewDom = {
       }
       if (wrap)
       {
-        s.push(...this.nodeToHaml(comp, wrap, indent, cbNode).split(`\n`));
+        s.push(...(await this.nodeToHaml(comp, wrap, indent, cbNode)).split(`\n`));
         indent++;
       }
-      s.push(...this.nodeToHaml(comp, child.node, indent, cbNode).split(`\n`));
+      s.push(...(await this.nodeToHaml(comp, child.node, indent, cbNode)).split(`\n`));
       if (wrap) indent--;
-    });
+    };
 
     s = s.join("\n");
 

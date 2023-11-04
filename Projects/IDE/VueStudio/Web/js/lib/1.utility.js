@@ -1,5 +1,3 @@
-alert("CUNT");
-
 // Saved in localStorage
 // Forwards push, splice, length
 class LocalPersistedArray
@@ -48,7 +46,7 @@ class LocalPersistedArray
     }
 }
 
-_ = (_ || {});
+window._ = (window._ || {});
 _.rtrim = (s) => s.replace(/\s+$/, '');
 _.ltrim = (s) => s.replace(/^\s+/, '');
 _.trim = (s) => _.ltrim(_.rtrim(s));

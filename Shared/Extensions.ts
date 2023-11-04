@@ -1,3 +1,5 @@
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 // #region UnitClass, Type, Size, Percentage, color
 interface UnitClass {
   units: string[];
@@ -331,6 +333,10 @@ interface String {
 
 interface Array<T> {
   all(predicate: (item: T) => boolean): boolean;
+  flatMapAsync<TResult>(
+    callback: (item: T, index: number) => Promise<TResult[]>,
+    stagger?: number
+  ): Promise<TResult[]>;
   toMap(getKey: (item: T, index: number) => any): object;
   toMapValue(getValue: (item: T, index: number) => any): object;
   contains(item: T, getItemKey?: (item: T) => any): boolean;
@@ -432,6 +438,15 @@ if (typeof Number !== "undefined") {
         if (obj1.length == 1 && obj2.length == 1)
           return compare(obj1[0], obj2[0]);
         return 0;
+      }
+
+      if (
+        (typeof obj1 === "object" && obj1 !== null) ||
+        (typeof obj2 === "object" && obj2 !== null)
+      ) {
+        const json1 = JSON.stringify(obj1);
+        const json2 = JSON.stringify(obj2);
+        return compare(json1, json2);
       }
 
       throw new Error(
@@ -1439,6 +1454,19 @@ if (typeof String !== "undefined") {
 
 // #region Array
 if (typeof Array !== "undefined") {
+  Array.prototype.flatMapAsync = async function (
+    callback: (item: any, index: number) => Promise<any[]>,
+    stagger?: number
+  ) {
+    const result = [] as any[];
+    for (const [index, item] of this.entries()) {
+      const items = await callback(item, index);
+      result.push(...items);
+      if (stagger) await wait(stagger);
+    }
+    return result;
+  };
+
   Array.prototype.toMap = function (
     getKey: (item: any, index: number) => any,
     getValue?: (item: any, index: number) => any

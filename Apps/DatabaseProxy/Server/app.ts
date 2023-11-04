@@ -6,6 +6,7 @@ import util, { debuglog } from "util";
 import axios from "axios";
 import express from "express";
 const bodyParser = require("body-parser");
+const compression = require("compression");
 import cookieParser from "cookie-parser";
 import "@shared/Extensions";
 import { Objects } from "@shared/Extensions.Objects";
@@ -940,6 +941,7 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
   const start = () => {
     // Create the express app
     const httpServer = express();
+    httpServer.use(compression());
     httpServer.use(express.json());
     httpServer.use(cookieParser());
 

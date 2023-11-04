@@ -46,18 +46,11 @@ class Component {
       if (logGroup) console.log(vueOptions);
       const vueName = Component.toVueName(this.name);
       if (this.source) {
-        if (this.source.template) {
-          let html = this.source.template;
-          html = html.replace(/\bon_/g, "@");
-          vueOptions.template = html;
-        } else {
-          const pug = vueOptions.template;
-          let html = (await client.pugToHtml(pug)) || "";
-          html = html.replace(/\bon_/g, "@");
-          vueOptions.template = html;
-          this.source.template = html;
-          client.updateComponent(this);
-        }
+        const pug = vueOptions.template;
+        let html = (await client.pugToHtml(pug)) || "";
+        html = html.replace(/\bon_/g, "@");
+        vueOptions.template = html;
+        this.source.template = html;
       }
       client.Vue.component(vueName, vueOptions);
       this.isCompiled = true;

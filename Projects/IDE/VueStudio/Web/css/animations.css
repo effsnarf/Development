@@ -1,0 +1,300 @@
+
+.ide-vt-fade-enter
+{
+  opacity: 0;
+}
+.ide-vt-fade-enter-to
+{
+  opacity: 1;
+  transition: 0.6s !important;
+}
+.ide-vt-fade-leave-to
+{
+  opacity: 0;
+  transition: 0.6s !important;
+}
+
+
+.ide-vt-list-move,
+.ide-vt-list-enter-active,
+.ide-vt-list-leave-active
+{
+  transition: all 0.5s ease;
+}
+
+
+/*
+.slide-up-enter
+{
+  opacity: 0;
+}
+.slide-up-enter-to
+{
+  opacity: 1;
+  transition: 1s !important;
+  transition-delay: 500ms !important;
+}
+.slide-up-leave-to
+{
+  opacity: 0;
+  transition: 1s !important;
+}
+*/
+
+
+:root {
+  --duration1: 0.6s;
+  --duration2: 0.6s;
+  --duration3: 0.3s;
+}
+
+
+
+@keyframes ide-anim-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1
+  }
+}
+
+.ide-anim-fade
+{
+  animation: ide-anim-fade var(--duration3) forwards;
+}
+
+
+@keyframes ide-anim-on-load {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.ide-anim-on-load
+{
+  animation: ide-anim-on-load 3s forwards;
+}
+
+
+@keyframes ide-anim-1 {
+  from {
+    margin-top: 6em;
+    opacity: 0;
+  }
+  to {
+    margin-top: 0;
+    opacity: 1
+  }
+}
+.ide-anim-1
+{
+  animation: ide-anim-1 var(--duration1) forwards;
+}
+@keyframes ide-anim-2 {
+  from {
+    opacity: 0;
+    transform: translate(10em);
+  }
+  to {
+    opacity: 1;
+  }
+}
+.ide-anim-2
+{
+  opacity: 0;
+  animation: ide-anim-2 var(--duration1) forwards;
+}
+@keyframes ide-anim-3 {
+  from {
+    opacity: 0;
+    transform: translate(0, 10em);
+  }
+  to {
+    opacity: 1;
+  }
+}
+.ide-anim-3
+{
+  opacity: 0;
+  animation: ide-anim-3 var(--duration1) forwards;
+}
+@keyframes ide-anim-4 {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: translate(0, 10em);
+  }
+}
+.ide-anim-4
+{
+  opacity: 1;
+  animation: ide-anim-4 var(--duration1) forwards;
+}
+@keyframes ide-anim-5 {
+  from {
+    opacity: 0;
+    transform: translate(0, -10em);
+  }
+  to {
+    opacity: 1;
+  }
+}
+.ide-anim-5
+{
+  opacity: 1;
+  animation: ide-anim-5 var(--duration1) forwards;
+}
+
+
+
+
+
+.ide-list-item {
+}
+.ide-list-move, .list1-enter-active, .list1-leave-active {
+  transition: 0.5s ease;
+}
+.ide-list-leave-active
+{
+  position: absolute;
+}
+.ide-list-enter, .list1-leave-to
+{
+  opacity: 0;
+}
+.ide-list-enter
+{
+}
+.ide-list-leave-to
+{
+}
+
+
+
+
+
+.list1-item {
+}
+.list1-move, .list1-enter-active, .list1-leave-active {
+  transition: 0.5s ease;
+}
+.list1-leave-active
+{
+  position: absolute;
+}
+.list1-enter, .list1-leave-to
+{
+  opacity: 0;
+}
+.list1-enter
+{
+}
+.list1-leave-to
+{
+}
+
+
+
+.list2-item {
+}
+.list2-move, .list2-enter-active, .list2-leave-active {
+  transition: 0.5s ease;
+}
+.list2-leave-active
+{
+  position: absolute;
+}
+.list2-enter, .list2-leave-to
+{
+  opacity: 0;
+}
+.list2-enter
+{
+  transform: scale(2);
+}
+.list2-leave-to
+{
+  transform: scale(4);
+}
+
+
+
+
+/* 1. declare transition */
+.anim-trans-fade1-move,
+.anim-trans-fade1-enter-active,
+.anim-trans-fade1-leave-active {
+  transition: all 1s cubic-bezier(0.55, 0, 0.1, 1);
+}
+
+/* 2. declare enter from and leave to state */
+.anim-trans-fade1-enter-from,
+.anim-trans-fade1-leave-to {
+  opacity: 0;
+}
+
+.anim-trans-fade1-leave-active {
+  position: absolute;
+}
+
+
+.floating1
+{
+  animation: float 6s ease-in-out infinite;
+}
+@keyframes float {
+	0% {
+		box-shadow: 0 5px 15px 0px rgba(0,0,0,0.6);
+		margin-top: 0;
+	}
+	50% {
+		box-shadow: 0 25px 15px 0px rgba(0,0,0,0.2);
+		margin-top: -20px;
+	}
+	100% {
+		box-shadow: 0 5px 15px 0px rgba(0,0,0,0.6);
+		margin-top: 0;
+	}
+}
+
+
+.ide-visible
+{
+  display: none;
+  opacity: 0;
+  overflow: hidden;
+  transition: 1s;
+}
+.ide-visible.on
+{
+  display: block;
+  opacity: 1;
+  overflow: hidden;
+  transition: 1s;
+}
+
+
+
+
+.anim-page
+{
+  position: absolute;
+}
+.anim-page-visible, .anim-page-visible.on
+{
+  transition: 1s ease;
+}
+.anim-page-visible
+{
+  opacity: 0;
+}
+.anim-page-visible.on
+{
+  opacity: 1;
+}

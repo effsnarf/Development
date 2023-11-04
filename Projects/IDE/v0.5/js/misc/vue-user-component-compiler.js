@@ -341,87 +341,30 @@ compiler.toVueWatchers = (compClass, props) => {
 
   var watch = {};
 
-  if (compiler.mode == `production`)
-  {
-    props
-      .filter(prop => (prop.watch?.enabled || prop.persisted?.enabled))
-      .forEach(prop => {
-          watch[prop.name] = {
-            deep: true,
-            immediate: (prop.persisted?.enabled ? false : prop.watch.immediate)
-          };
+  props
+    .filter(prop => (prop.watch?.enabled || prop.persisted?.enabled))
+    .forEach(prop => {
+        watch[prop.name] = {
+          deep: (prop.watch?.enabled ? prop.watch?.deep : prop.persisted?.enabled ? prop.persisted?.deep : false),
+          immediate: (prop.persisted?.enabled ? false : prop.watch.immediate)
+        };
 
-          let watchHandler = toFunction(toArray(prop.watch.method.args), prop.watch.method.body);
+        let watchHandler = toFunction(toArray(prop.watch.method?.args), prop.watch.method?.body);
 
-          let persistedHandler =
-            eval(`(async function(value, oldValue) {
-              var timerKey = '${prop.name}_persisted_save_timer';
-              clearTimeout(this[timerKey]);
-              this[timerKey] = setTimeout(async () => {
-                var func = (async function(${prop.persisted.save.args}) { ${prop.persisted.save.body} }).bind(this);
-                await func(value);
-              }, 400);
-            })`);
-
-          if (prop.watch?.enabled) watch[prop.name].handler = watchHandler;
-          if (prop.persisted?.enabled) watch[prop.name].handler = persistedHandler;
-      });
-  }
-  else
-  {
-    props.forEach(prop => {
-      watch[prop.name] = {
-        deep: true,
-        immediate: prop.watch.immediate,
-        handler: async function(value, oldValue) {
-
-          if (prop.watch?.enabled)
-          {
-            try
-            {
-              var debugLocation = {
-                vue: this,
-                loc: `${this.$options.name}.${prop.name}.watch.handler`
-              };
-              var func = null;
-              if (prop.watch.method?.body)
-              {
-                func = toFunction(toArray(prop.watch.method.args), prop.watch.method.body, debugLocation).bind(this);
-              }
-              else
-              {
-                func = toFunction(["value", "oldValue"], prop.watch.handler, debugLocation).bind(this);
-              }
-              await func(value);
-            }
-            catch (ex)
-            {
-              if (typeof(ideVueApp) == `undefined`) throw ex; else ideVueApp.onCompError(this, [compDom.get.item(compClass._id, prop.id)], ex);
-            }
-          }
-
-          if (prop.persisted?.enabled)
-          {
-            var timerKey = `${prop.name}_persisted_save_timer`;
+        let persistedHandler =
+          eval(`(async function(value, oldValue) {
+            var timerKey = '${prop.name}_persisted_save_timer';
             clearTimeout(this[timerKey]);
             this[timerKey] = setTimeout(async () => {
-              try
-              {
-                var func = (eval(`(async function(${prop.persisted.save.args}) { ${prop.persisted.save.body} })`)).bind(this);
-                await func(value);
-              }
-              catch (ex)
-              {
-                console.error(`Error in ${this.$options.name}.${prop.name}.persisted.save`);
-                console.error(ex);
-                console.error(prop.persisted.save);
-              }
+              var func = (async function(${(prop.persisted.save?.args || "")}) { ${(prop.persisted.save?.body || "")} }).bind(this);
+              await func(value);
             }, 400);
-          }
-        }
-      };
+          })`);
+
+        if (prop.watch?.enabled) watch[prop.name].handler = watchHandler;
+        if (prop.persisted?.enabled) watch[prop.name].handler = persistedHandler;
     });
-  }
+
 
   compileTimer2.log('toVueWatchers', timer.elapsed);
 
@@ -479,7 +422,7 @@ compiler.methodToFunction = (compClass, method, origMethod) => {
           gtag('event', 'user.activity', {'method': methodKey});
         }
 
-        if (${method.id}) ide.performance.track.method.enter([${compClass._id}, ${method.id}]);
+        //if (${method.id}) ide.performance.track.method.enter([${compClass._id}, ${method.id}]);
 
         ${(debuggerCode || "")}
 
@@ -536,7 +479,7 @@ compiler.methodToFunction = (compClass, method, origMethod) => {
       }
       finally
       {
-        if (${method.id}) ide.performance.track.method.exit([${compClass._id}, ${method.id}]);
+        //if (${method.id}) ide.performance.track.method.exit([${compClass._id}, ${method.id}]);
       }
     })`);
   }
@@ -782,8 +725,8 @@ compiler.toVueComponentOptions = async (compClass) => {
       if (name in this) this[name] = value;
     };
   
-    this.$parent.$on('ide-route-param-changed', paramHandler);
-    if (this.$parent.$parent) this.$parent.$parent.$on('ide-route-param-changed', paramHandler);
+    this.$parent?.$on('ide-route-param-changed', paramHandler);
+    if (this.$parent?.$parent) this.$parent.$parent.$on('ide-route-param-changed', paramHandler);
     `;
   
   // persisted loads
