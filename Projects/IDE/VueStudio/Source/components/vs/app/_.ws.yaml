@@ -5,10 +5,10 @@ dom:
         icon: 🧊
         text: Vue Studio
     .user-account:
-      component: 
-        ':is': userAccountCompName
-    component: 
-      ':is': workspaceCompName
+      component:
+        ":is": userAccountCompName
+    component:
+      ":is": workspaceCompName
 props: null
 data:
   comps:
@@ -32,21 +32,11 @@ methods:
       this.$root.dbp = (await (DatabaseProxy.new("https://db.memegenerator.net/IDE")));
       liveData.dbp = this.$root.dbp;
       this.initCssLibrary();
-      const dlIdeComps = (await this.getFromCache("vs.comps", this.loadVsComps.bind(this)));
-      const dlUserComps = (await this.getFromCache("user.comps", this.loadUserComps.bind(this)));
+      this.comps.ide = (await this.getFromCache("vs.comps.ide", this.loadVsIdeComps.bind(this)));
+      this.comps.user = (await this.getFromCache("vs.comps.user", this.loadVsUserComps.bind(this)));
       const allComps = [];
-      //debugger;
-      allComps.push(...dlIdeComps);
-      allComps.push(...dlUserComps.exceptBy(dlIdeComps, c => c._id));
-      const vs = (this.$root.vs = {
-        comps: {
-          ide: dlIdeComps,
-          user: dlUserComps
-        }
-      });
-      const userComps = [...vs.comps.user];
-      this.comps.ide = vs.comps.ide;
-      this.comps.user = userComps;
+      allComps.push(...this.comps.ide);
+      allComps.push(...this.comps.user.exceptBy(this.comps.ide, c => c._id));
       const ideVueApp = this;
       window.ideVueApp = ideVueApp;
       compDom.components.value.push(...allComps);
@@ -87,14 +77,14 @@ methods:
       }
       this.css.library.shorthand = (new CssLibrary("/static/shorthand.css"));
     }
-  loadVsComps: | #js
+  loadVsIdeComps: | #js
     async function() {
       alertify.message(`Loading Vue Studio components...`);
       const vsComps = (await this.$root.dbp.componentClasses.ide.get());
       alertify.message(`${vsComps.length} components loaded`);
       return vsComps;
     }
-  loadUserComps: | #js
+  loadVsUserComps: | #js
     async function() {
       alertify.message(`Loading user components...`);
       const userComps = (await this.$root.dbp.componentClasses.user.get());
@@ -103,12 +93,11 @@ methods:
     }
   getIdeComp: | #js
     function(nameOrID) {
-      return this.$root.vs.comps.ide.find(c => (c.name === nameOrID) || (c._id === nameOrID));
+      return this.comps.ide.find(c => (c.name === nameOrID) || (c._id === nameOrID));
     }
   onCompChanged: | #js
     function(comp) {
-      alertify.message(`Comp changed: ${comp.name}`);
-      // this is triggered by a watcher, who watches and notifies data, not references
+      // onCompChanged is triggered by a watcher, who watches and notifies data, not references
       comp = compDom.get.comp.byID(comp._id);
       this.$emit("ide-comp-changed-2", comp);
     }
@@ -118,14 +107,24 @@ methods:
       clearTimeout(timers[comp._id]);
       timers[comp._id] = setTimeout(async () => {
         await this.recompileComp(comp);
+        await this.updateLocalCompCache(comp);
       }, 1000);
+    }
+  updateLocalCompCache: | #js
+    async function(comp) {
+      // Update local cache
+      if (this.comps.user.find(c => (c._id === comp._id))) {
+        this.setToCache("vs.comps.user", this.comps.user);
+      }
+      else {
+        alertify.error(`Comp not found in local cache: ${comp.name}`);
+      }
     }
   recompileComp: | #js
     async function(comp) {
       // biztos ami biztos
       comp = compDom.get.comp.byID(comp._id);
       await vueUserComponentCompiler.compile(comp, { fix: false });
-      alertify.message(`${comp.name} recompiled`);
       this.$emit("ide-comp-recompiled", comp);
     }
   onCompError: | #js
@@ -142,6 +141,12 @@ methods:
         localStorage.setItem(key, JSON.stringify(value));
       }
       return JSON.parse(localStorage.getItem(key));
+    }
+  setToCache: | #js
+    async function(key, value) {
+      const started = Date.now();
+      localStorage.setItem(key, JSON.stringify(value));
+      const elapsed = (Date.now() - started);
     }
 style:
   .user-account:

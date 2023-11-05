@@ -268,7 +268,6 @@ function DatabaseProxyDataPersister(dbp, entity, isArray, filter, sort, data)
     // Update local database
 
     // Save to remote database
-    debugger;
     await dbp.entity(entity).update(item._id, item);
 
     //alertify.message(`${entity} (${item._id}) saved`);
