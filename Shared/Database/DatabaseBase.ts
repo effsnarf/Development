@@ -95,6 +95,9 @@ abstract class DatabaseBase {
 
     doc = Objects.clone(doc);
 
+    doc.last = doc.last || {};
+    doc.last.updated = Date.now();
+
     if (uppercaseFields) doc = Objects.toTitleCaseKeys(doc);
 
     if (returnNewDoc && returnDiff)
