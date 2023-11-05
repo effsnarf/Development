@@ -2269,6 +2269,8 @@ class HtmlHelper {
         }, 1000);
       },
       removed: (element: HTMLElement, callback: Function) => {
+        if ((element as any) == window)
+          throw new Error(`Window cannot be removed`);
         const intervalId = setInterval(() => {
           if (!element.isConnected) {
             callback();

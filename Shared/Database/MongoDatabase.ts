@@ -206,7 +206,7 @@ class MongoDatabase extends DatabaseBase {
 
   protected async _upsert(collectionName: string, doc: any) {
     if (this.options.lowercaseFields)
-      doc = Objects.toTitleCaseKeys(Objects.clone(doc));
+      doc = Objects.toCamelCaseKeys(Objects.clone(doc));
 
     const collection = await this.getCollection(collectionName);
 

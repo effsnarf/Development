@@ -2636,6 +2636,8 @@ class HtmlHelper {
                 }, 1000);
             },
             removed: (element, callback) => {
+                if (element == window)
+                    throw new Error(`Window cannot be removed`);
                 const intervalId = setInterval(() => {
                     if (!element.isConnected) {
                         callback();
@@ -6127,7 +6129,7 @@ var __webpack_exports__ = {};
 (() => {
 var exports = __webpack_exports__;
 /*!************************************************************!*\
-  !*** ../../../WebsiteHost/website/script/1699114766973.ts ***!
+  !*** ../../../WebsiteHost/website/script/1699174821794.ts ***!
   \************************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

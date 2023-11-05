@@ -5,10 +5,10 @@ dom:
         icon: 🧊
         text: Vue Studio
     .user-account:
-      component:
-        ":is": userAccountCompName
-    component:
-      ":is": workspaceCompName
+      component: 
+        ':is': userAccountCompName
+    component: 
+      ':is': workspaceCompName
 props: null
 data:
   comps:
@@ -35,6 +35,7 @@ methods:
       const dlIdeComps = (await this.getFromCache("vs.comps", this.loadVsComps.bind(this)));
       const dlUserComps = (await this.getFromCache("user.comps", this.loadUserComps.bind(this)));
       const allComps = [];
+      //debugger;
       allComps.push(...dlIdeComps);
       allComps.push(...dlUserComps.exceptBy(dlIdeComps, c => c._id));
       const vs = (this.$root.vs = {
@@ -65,7 +66,7 @@ methods:
       alertify.message(`Vue Studio components loaded`);
       this.userAccountCompName = "meow-comp-267";
       this.workspaceCompName = "meow-comp-171";
-      this.comps.ide.forEach(comp => liveData.watch.item("ComponentClasses", comp, { on: { changed: this.onCompChanged.bind(this) } }));
+      allComps.forEach(comp => liveData.watch.item("ComponentClasses", comp, { on: { changed: this.onCompChanged.bind(this) } }));
     }
   initCssLibrary: | #js
     function() {
@@ -124,6 +125,7 @@ methods:
       // biztos ami biztos
       comp = compDom.get.comp.byID(comp._id);
       await vueUserComponentCompiler.compile(comp, { fix: false });
+      alertify.message(`${comp.name} recompiled`);
       this.$emit("ide-comp-recompiled", comp);
     }
   onCompError: | #js
