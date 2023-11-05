@@ -115,7 +115,7 @@ methods:
       element.addEventListener("dragenter", this._onMouseEnterContext);
       element.addEventListener("dragleave", this._onMouseLeaveContext);
       element.addEventListener("drop", this._onMouseLeaveContext);
-      this.$root.html.when.element.removed(element, this.unbindFromParent.bind(this));
+      if (element != window) this.$root.html.when.element.removed(element, this.unbindFromParent.bind(this));
       this.$root.$emit("context-menu-mounted", this);
       document.body.appendChild(this.$el);
     }

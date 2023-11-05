@@ -415,6 +415,49 @@ namespace Data {
       return await this.collection.getNewID();
     }
   }
+
+  export class LocalPersistedArray {
+    items: any[];
+    key: string;
+
+    static new(key: string): LocalPersistedArray {
+      return new LocalPersistedArray(key);
+    }
+
+    private constructor(key: string) {
+      this.items = [];
+      this.key = key;
+      this.load();
+    }
+
+    push(...args: any[]) {
+      this.items.push(...args);
+      this.save();
+    }
+
+    splice(start: number, deleteCount: number) {
+      const items = this.items.splice(start, deleteCount);
+      this.save();
+      return items;
+    }
+
+    get length() {
+      return this.items.length;
+    }
+
+    load() {
+      let items = localStorage.getItem(this.key);
+      if (items) {
+        this.items = JSON.parse(items);
+      } else {
+        this.items = [];
+      }
+    }
+
+    save() {
+      localStorage.setItem(this.key, JSON.stringify(this.items));
+    }
+  }
 }
 
 export { Data };

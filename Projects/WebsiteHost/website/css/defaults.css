@@ -201,9 +201,9 @@ li .clickable2:hover
 }
 .ide-highlighted
 {
-  border: 3px dashed #ffffff80 !important;
+  border: 3px dashed yellow !important;
   background-size: auto auto;
-  box-shadow: inset -3px 3px 6px 6px #00000020;
+  box-shadow: -3px 3px 4px 2px #000000a0, inset -3px 3px 4px 2px #000000a0;
 }
 
 table

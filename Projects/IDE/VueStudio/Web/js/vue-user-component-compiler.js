@@ -591,7 +591,7 @@ compiler.toVueTemplate = async (compClass, origComp) => {
     }
     else {
       html = await computeHtml();
-      await Local.cache.set(viewNodeKey, html);
+      //await Local.cache.set(viewNodeKey, html);
     }
 
     compileTimer2.log(`toVueTemplate.3`, timer2.elapsed);

@@ -609,9 +609,6 @@ interface MgParams {
   await client.compileAll((c) => !c.name.startsWith("ide."), webScriptMixins);
 
   const isLocalHost = window.location.hostname == "localhost";
-  const dbpHost = `https://db.memegenerator.net`;
-
-  const dbp = (await DatabaseProxy.new(`${dbpHost}/MemeGenerator`)) as any;
 
   const gdbData = await Objects.try(
     async () => await (await fetch(`/gdb.yaml`)).json(),
@@ -640,7 +637,6 @@ interface MgParams {
       events: new Events(),
       vm: null as unknown as VueManager,
       client,
-      dbp,
       analytics: await AnalyticsTracker.new(),
       params: params,
       html: new HtmlHelper(),
