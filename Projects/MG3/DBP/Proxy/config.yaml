@@ -35,10 +35,8 @@ analytics:
         database: MG-Analytics
 cache:
   ignore:
-    - /api/Medias/
-    - /api/Threads/
-    - /api/Posts/
-    - /api/Instances/
+    - /MemeGenerator/api/
+    - /IDE/
     - /create/
     - /sample/
     - /get/new/id
