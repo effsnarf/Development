@@ -7,7 +7,7 @@ dom:
     ui.highlighter:
       ':get-elements': () => vue.$el
       div: 
-        :class: "{ 'opacity-40': (getTitle(vue).startsWith('ide-')) }"
+        :class: "{ 'opacity-40': (getTitle(vue)?.startsWith('ide-')) }"
         @click: onClick
         ui.title:
           icon: 📦

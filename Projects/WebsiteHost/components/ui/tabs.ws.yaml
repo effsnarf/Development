@@ -25,7 +25,7 @@ dom:
             v-if: (index == activeIndex)
             ':style': getTabStyle(index)
             slot: 
-              ':name': '''tab'' + index'
+              ':name': "'tab' + index"
 props:
   options: null
   getOptionText: null

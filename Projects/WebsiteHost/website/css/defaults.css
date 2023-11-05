@@ -374,7 +374,6 @@ input[type=checkbox], .ide-checkbox
 }
 input, input[type=text], select
 {
-  font-size: 120%;
 }
 
 input[type="color"]

@@ -409,7 +409,7 @@ hr
 .ide-list-item
 {
   width: 100%;
-  padding: 0.2em 1em;
+  padding: 0.2em 0.5em;
   transition: 0.3s;
   white-space: nowrap;
 }
