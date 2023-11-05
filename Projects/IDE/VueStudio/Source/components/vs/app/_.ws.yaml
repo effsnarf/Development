@@ -9,10 +9,10 @@ dom:
           ui.title:
             text: Vue Studio
     .user-account:
-      component: 
-        ':is': userAccountCompName
-    component: 
-      ':is': workspaceCompName
+      component:
+        ":is": userAccountCompName
+    component:
+      ":is": workspaceCompName
 props: null
 data:
   comps:
@@ -117,6 +117,9 @@ methods:
     }
   updateLocalCompCache: | #js
     async function(comp) {
+      // Delete view from local cache
+      const viewNodeKey = compDom.get.node.cache.key(comp, comp.view.node);
+      localStorage.removeItem(viewNodeKey);
       // Update local cache
       if (this.comps.user.find(c => (c._id === comp._id))) {
         this.setToCache("vs.comps.user", this.comps.user);
@@ -165,14 +168,14 @@ style:
   .logo h1:
     font-family: Audiowide
     font-size: 3em
-    text-shadow: '-6px 6px 6px black'
+    text-shadow: "-6px 6px 6px black"
     animation: slide-in-left 1s ease-out forwards
     animation-delay: 0.5s
     opacity: 0
   .logo img:
     width: 5em
     height: auto
-    top: '-0.5em'
+    top: "-0.5em"
     margin-right: 1em
     animation: slide-in-up 1s ease-out forwards
     animation-delay: 0.2s

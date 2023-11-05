@@ -1,15 +1,17 @@
 dom:
   div: 
-    ':class': '((className||'''') + '' '' + (tree ? ''tree1'' : ''''))'
-    div: 
-      v-for: vue in vues.take(maxVisibleVues)
-      ':key': vue()._uid
-      ide.component.title:
-        ':item': vue
-        ':class': '{ ''selected'': (vue()._uid === (selectedVue?.())?._uid) }'
-        @mouseenter: $emit('hover', vue())
-        @mouseleave: $emit('hover', null)
-        @click: $emit('select', vue())
+    transition.group:
+      name: slide
+      ':class': '((className||'''') + '' '' + (tree ? ''tree1'' : ''''))'
+      div: 
+        v-for: vue in vues.filter(showVueComponent).take(maxVisibleVues)
+        ':key': vue()._uid
+        ide.component.title:
+          ':item': vue
+          ':class': '{ ''selected'': (vue()._uid === (selectedVue?.())?._uid) }'
+          @mouseenter: $emit('hover', vue())
+          @mouseleave: $emit('hover', null)
+          @click: $emit('select', vue())
     div: 
       v-if: (vues.length > maxVisibleVues)
       v-text: '''⏬'' + (vues.length - maxVisibleVues) + '' more...'''
@@ -18,9 +20,18 @@ props:
   selectedVue: null
   className: null
   tree: false
+  showIdeComponents: false
 data:
   maxVisibleVues: 20
 methods:
+  showVueComponent: | #js
+    function(vue) {
+      if (typeof vue == "function") vue = vue();
+      if (!this.showIdeComponents) {
+        if (vue.$options.name?.startsWith('ide-')) return false;
+      }
+      return true;
+    }
   getVue: | #js
     function(uid) {
       const vue = vueApp.vm.vues[uid];

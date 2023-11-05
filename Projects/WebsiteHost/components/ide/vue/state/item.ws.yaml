@@ -4,6 +4,7 @@ dom:
     @click: $emit('click')
     td: 
       v-if: icon
+      class: icon
       v-text: icon
     td: 
       v-if: showCompName
@@ -118,6 +119,8 @@ watch:
       }
     immediate: true
 style:
+  .icon:
+    width: 2em
   .tr:
     white-space: nowrap
   td:

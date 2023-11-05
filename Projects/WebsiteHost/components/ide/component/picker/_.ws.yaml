@@ -8,7 +8,7 @@ dom:
       ':global': true
     ui.context.window:
       ref: context1
-      v-if: showPicker
+      v-show: showPicker
       ':global': 'true'
       @pinned: onPinned
       .flex.flex-row.gap-1:
@@ -17,16 +17,22 @@ dom:
             ':class': componentTreeClass
             ide.component.picker.vue.list: 
               ':vues': parentChainVues
+              :show-ide-components: showIdeComponents
               ':tree': 'true'
               ':selectedVue': selectedVue
               @hover: onHoverVue
               @select: onSelectVue
             ide.component.picker.vue.list: 
               ':vues': childChainVues
+              :show-ide-components: showIdeComponents
               ':selectedVue': selectedVue
               ':style': childChainStyle
               @hover: onHoverVue
               @select: onSelectVue
+            .opacity-hover.mt-l2:
+              ui.checkbox:
+                text: ide components
+                v-model: showIdeComponents
           ide.element.inspector:
             class: hidden
             ':element': hoveredElement
@@ -45,6 +51,7 @@ data:
   selectedViewNode: null
   selectedEditorTabIndex: 0
   isPinned: false
+  showIdeComponents: false
 methods:
   onPinned: | #js
     function(pinned) {

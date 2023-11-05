@@ -175,10 +175,21 @@ li .clickable2:hover
 }
 
 
+.opacity-hover
+{
+  opacity: 0.5;
+  transition: 0s;
+}
+.opacity-hover:hover
+{
+  opacity: 1;
+  transition: 0.1s;
+}
+
 
 .hoverable
 {
-  transition: 0.3s;
+  transition: 0s;
   cursor: pointer;
 }
 .hoverable:hover

@@ -1,21 +1,26 @@
 dom:
   div: 
+    v-if: vue
     @mouseenter: $emit('mouseenter')
     @mouseleave: $emit('mouseleave')
     @click: $emit('click')
-    v-if: vue
     ui.highlighter:
       ':get-elements': () => vue.$el
       div: 
+        :class: "{ 'opacity-40': (getTitle(vue).startsWith('ide-')) }"
         @click: onClick
         ui.title:
           icon: 📦
-          ':value': vue.$options._componentTag
+          ':value': getTitle(vue)
 props:
   item: null
 data:
   vue: null
 methods:
+  getTitle: | #js
+    function(vue) {
+      return vue.$options._componentTag;
+    }
   onClick: | #js
     function() {
       console.log(this.vue);
