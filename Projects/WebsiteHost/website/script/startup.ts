@@ -18,6 +18,7 @@ import { Timer } from "../../../../Shared/Timer";
 import { VueManager } from "../../Classes/VueManager";
 import { Data } from "../../../../Shared/Data";
 import { Graph } from "../../../../Shared/Database/Graph";
+import { StateTracker, StateValue } from "../../Classes/StateTracker";
 import { MovingPositionSmoother } from "../../../../Shared/MovingPositionSmoother";
 
 const window1 = window as any;
@@ -37,6 +38,8 @@ window1.Timer = Timer;
 window1.DatabaseProxy = DatabaseProxy;
 window1.Actionable = Actionable;
 window1.Graph = Graph;
+window1.StateTracker = StateTracker;
+window1.StateValue = StateValue;
 window1.MovingPositionSmoother = MovingPositionSmoother;
 
 const generalMixin = {

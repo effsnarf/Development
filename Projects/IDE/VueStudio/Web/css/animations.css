@@ -50,6 +50,30 @@
 
 
 
+
+@keyframes slide-in-left {
+  from {
+    transform: translateX(100%); /* Start off-screen to the right */
+    opacity: 0; /* Start with an opacity of 0 if you want to fade in as well */
+  }
+  to {
+    transform: translateX(0); /* End at original position */
+    opacity: 1; /* Fully visible */
+  }
+}
+
+@keyframes slide-in-up {
+  from {
+    transform: translateY(100%); /* Start off-screen to the right */
+    opacity: 0; /* Start with an opacity of 0 if you want to fade in as well */
+  }
+  to {
+    transform: translateX(0); /* End at original position */
+    opacity: 1; /* Fully visible */
+  }
+}
+
+
 @keyframes ide-anim-fade {
   from {
     opacity: 0;

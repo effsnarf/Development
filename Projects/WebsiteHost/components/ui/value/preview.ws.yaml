@@ -49,7 +49,10 @@ methods:
       if (depth > 4) return "…";
       if (value == undefined) return "undefined";
       if (value == null) return "null";
-      if (typeof value == "string") return `${!this.preview ? value : value}`;
+      if (typeof value == "string") {
+        if (!value.length) return `“”`;
+        return `${!this.preview ? value : value}`;
+      }
       if (typeof value == "number") return value.toString();
       if (typeof value == "boolean") return value ? "✔️" : "✖";
       if (typeof value == "function") return value.toString();

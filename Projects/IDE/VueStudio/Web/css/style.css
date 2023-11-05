@@ -418,7 +418,7 @@ hr
 .ide-list-item:hover,
 .ide-table > tbody > tr:hover > td
 {
-  background: #ffffff30;
+  background: #88888830;
   transition: 0s;
 }
 .ide-list > li

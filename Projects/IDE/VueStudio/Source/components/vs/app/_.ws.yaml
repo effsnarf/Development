@@ -1,14 +1,18 @@
 dom:
   div:
-    h1:
-      ui.title:
-        icon: 🧊
-        text: Vue Studio
+    .flex:
+      .logo:
+        img:
+          class: logo
+          src: https://i.imgur.com/bUbkhUu.png
+        h1:
+          ui.title:
+            text: Vue Studio
     .user-account:
-      component:
-        ":is": userAccountCompName
-    component:
-      ":is": workspaceCompName
+      component: 
+        ':is': userAccountCompName
+    component: 
+      ':is': workspaceCompName
 props: null
 data:
   comps:
@@ -35,8 +39,8 @@ methods:
       this.comps.ide = (await this.getFromCache("vs.comps.ide", this.loadVsIdeComps.bind(this)));
       this.comps.user = (await this.getFromCache("vs.comps.user", this.loadVsUserComps.bind(this)));
       const allComps = [];
-      allComps.push(...this.comps.ide);
-      allComps.push(...this.comps.user.exceptBy(this.comps.ide, c => c._id));
+      allComps.push(...this.comps.ide.exceptBy(this.comps.user, (c => c._id)));
+      allComps.push(...this.comps.user);
       const ideVueApp = this;
       window.ideVueApp = ideVueApp;
       compDom.components.value.push(...allComps);
@@ -52,10 +56,11 @@ methods:
       };
       this.$on("ide-comp-changed-2", this.onCompChanged2.bind(this));
       this.$root.with = util.with;
+      alertify.message(`Compiling Vue Studio components...`);
       await Promise.all(allComps.map(c => vueUserComponentCompiler.compile(c, { mixins: [mixin] })));
-      alertify.message(`Vue Studio components loaded`);
-      this.userAccountCompName = "meow-comp-267";
-      this.workspaceCompName = "meow-comp-171";
+      alertify.message(`${allComps.length} Vue Studio components compiled`);
+      this.userAccountCompName = "ide-user-account-267";
+      this.workspaceCompName = "ide-workspace-171";
       allComps.forEach(comp => liveData.watch.item("ComponentClasses", comp, { on: { changed: this.onCompChanged.bind(this) } }));
     }
   initCssLibrary: | #js
@@ -106,8 +111,8 @@ methods:
       var timers = this.timers.recompile.comp;
       clearTimeout(timers[comp._id]);
       timers[comp._id] = setTimeout(async () => {
-        await this.recompileComp(comp);
         await this.updateLocalCompCache(comp);
+        await this.recompileComp(comp);
       }, 1000);
     }
   updateLocalCompCache: | #js
@@ -126,12 +131,15 @@ methods:
       comp = compDom.get.comp.byID(comp._id);
       await vueUserComponentCompiler.compile(comp, { fix: false });
       this.$emit("ide-comp-recompiled", comp);
+      alertify.message(`<h3>📦 ${comp.name}</h3><div>Component recompiled.</div>`);
     }
   onCompError: | #js
     function(vue, item, ex) {
-      const source = (item?.comp ? item.comp.name : null);
-      alertify.error(`${source} - ${ex.message}`);
-      console.log(item, ex);
+      if (Array.isArray(item)) item = item.last();
+      const icon = (item?.comp ? "📦" : item?.method ? "🔴" : "❔");
+      const source = Object.values(item)[0].name;
+      const message = (ex.message || ex);
+      alertify.error(`<h3>${icon} ${source}</h3><div>${message}</div>`);
     }
   getFromCache: | #js
     async function(key, getValue) {
@@ -149,19 +157,40 @@ methods:
       const elapsed = (Date.now() - started);
     }
 style:
+  .logo:
+    display: flex
+    height: fit-content
+    position: relative
+    left: 0
+  .logo h1:
+    font-family: Audiowide
+    font-size: 3em
+    text-shadow: '-6px 6px 6px black'
+    animation: slide-in-left 1s ease-out forwards
+    animation-delay: 0.5s
+    opacity: 0
+  .logo img:
+    width: 5em
+    height: auto
+    top: '-0.5em'
+    margin-right: 1em
+    animation: slide-in-up 1s ease-out forwards
+    animation-delay: 0.2s
+    opacity: 0
   .user-account:
     position: fixed
     right: 1em
     top: 1em
-  h1:
-    font-size: 3em
 _:
   examples:
     count: 0
 name: vs-app
 template: >-
-  <div class="comp-vs-app" path="-809055376."><h1 path="-809055376.0"><ui-title
-  icon="🧊" text="Vue Studio" path="-809055376.0.0"></ui-title></h1><div
+  <div class="comp-vs-app" path="-809055376."><div class="flex"
+  path="-809055376.0"><div class="logo" path="-809055376.0.0"><img class="logo"
+  src="https://i.imgur.com/bUbkhUu.png" path="-809055376.0.0.0"/><h1
+  path="-809055376.0.0.1"><ui-title text="Vue Studio"
+  path="-809055376.0.0.1.0"></ui-title></h1></div></div><div
   class="user-account" path="-809055376.1"><component :is="userAccountCompName"
   path="-809055376.1.0"></component></div><component :is="workspaceCompName"
   path="-809055376.2"></component></div>

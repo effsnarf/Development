@@ -27,7 +27,7 @@ String.prototype.hasUppercaseLetters = function() {
 var compDom = {
   uniqueClientID: 1,
   newID: () => (compDom.uniqueClientID++),
-  components: (typeof(Vue) == "undefined") ? [] : Vue.reactive({value: []}),
+  components: { value: [] },
   actions: {
     undo: async () => {
       var change = (await liveData.dbp.undo());
@@ -1071,7 +1071,7 @@ var compDom = {
       name: {
         idName: (comp) => {
           if (!comp) return null;
-          return `meow-comp-${comp._id}`;
+          return `${comp.name.toLowerCase().kebabize()}-${comp._id}`;
         },
         vueName: (comp) => {
           return compDom.get.comp.name.idName(comp);

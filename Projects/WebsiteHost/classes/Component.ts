@@ -1,12 +1,10 @@
 import { ClientContext } from "./ClientContext";
 
 (String.prototype as any).kebabize = function () {
-  return this.toString()
-    .replace(/\./g, " ")
-    .replace(/\-/g, " ")
-    .getCaseWords()
-    .map((w: string) => w.toLowerCase())
-    .join("-");
+  let s = this.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
+  s = s.replace(/[^a-z0-9-]/g, "-");
+  s = s.replace(/--+/g, "-");
+  return s;
 };
 
 class Component {

@@ -1,12 +1,11 @@
 dom:
   div: 
-    v-if: component
     div: 
-      ':key': component.name
+      ':key': vue()._uid
       h2:
         ui.title:
           icon: 📦
-          ':text': component.name
+          ':text': vue().$options.name
       ui.tabs:
         ':options': '[''🧊 state'', ''✨ activity'', ''📁 view'', ''🔴 methods'']'
         v-model: selectedTabIndex
@@ -18,31 +17,34 @@ dom:
         template: 
           v-slot: tab0
           ide.state.tracker:
-            ':uid': vueUid
+            ':vue': vue
         template: 
           v-slot: tab1
           ide.component.activity:
-            ':uid': vueUid
+            v-if: 'false'
+            ':vue': vue
         template: 
           v-slot: tab2
           ide.component.view.editor:
+            v-if: 'false'
             ':component': component
             @selected-node: (node) => $emit('selected-view-node', node)
         template: 
           v-slot: tab3
           ide.component.methods:
+            v-if: 'false'
             ':component': component
 props:
-  vueUid: null
+  vue: null
 data:
   component: null
   selectedViewNode: null
   selectedTabIndex: 0
 methods: null
 watch:
-  vueUid: | #js
-    function(vueUid) {
-      this.component = !vueUid ? null : this.$root.getComponent(vueUid);
+  vue: | #js
+    function(vue) {
+      this.component = !vue ? null : this.$root.getComponent(vue._uid);
     }
   selectedTabIndex: | #js
     function(selectedTabIndex) {
@@ -59,22 +61,23 @@ _:
   examples:
     count: 0
 template: >-
-  <div class="comp-ide-component-editor" v-if="component"
-  path="-965690814."><div :key="component.name" path="-965690814.0"><h2
-  path="-965690814.0.0"><ui-title icon="📦" :text="component.name"
+  <div class="comp-ide-component-editor" path="-965690814."><div
+  :key="vue()._uid" path="-965690814.0"><h2 path="-965690814.0.0"><ui-title
+  icon="📦" :text="vue().$options.name"
   path="-965690814.0.0.0"></ui-title></h2><ui-tabs :options="['🧊 state', '✨
   activity', '📁 view', '🔴 methods']" v-model="selectedTabIndex"
   direction="horizontal" path="-965690814.0.1"><template v-slot="header"
   path="-965690814.0.1.0"><div class="mt-l1"
   path="-965690814.0.1.0.0"></div></template><template v-slot="tab0"
-  path="-965690814.0.1.1"><ide-state-tracker :uid="vueUid"
+  path="-965690814.0.1.1"><ide-state-tracker :vue="vue"
   path="-965690814.0.1.1.0"></ide-state-tracker></template><template
-  v-slot="tab1" path="-965690814.0.1.2"><ide-component-activity :uid="vueUid"
+  v-slot="tab1" path="-965690814.0.1.2"><ide-component-activity v-if="false"
+  :vue="vue"
   path="-965690814.0.1.2.0"></ide-component-activity></template><template
-  v-slot="tab2" path="-965690814.0.1.3"><ide-component-view-editor
+  v-slot="tab2" path="-965690814.0.1.3"><ide-component-view-editor v-if="false"
   :component="component" @selected-node="(node) =&gt;
   $emit('selected-view-node', node)"
   path="-965690814.0.1.3.0"></ide-component-view-editor></template><template
-  v-slot="tab3" path="-965690814.0.1.4"><ide-component-methods
+  v-slot="tab3" path="-965690814.0.1.4"><ide-component-methods v-if="false"
   :component="component"
   path="-965690814.0.1.4.0"></ide-component-methods></template></ui-tabs></div></div>

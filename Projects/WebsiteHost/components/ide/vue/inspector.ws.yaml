@@ -1,0 +1,65 @@
+dom:
+  transition:
+    name: slide-hor
+    div: 
+      v-if: vue
+      ':key': vue()._uid
+      div: 
+        h2:
+          ui.title:
+            icon: 📦
+            ':text': vue().$options.name
+        ui.tabs:
+          ':options': '[''🧊 state'', ''✨ activity'', ''📁 view'', ''🔴 methods'']'
+          v-model: selectedTabIndex
+          direction: horizontal
+          template: 
+            v-slot: header
+            div: 
+              class: mt-l1
+          template: 
+            v-slot: tab0
+            div: 
+              v-text: '''tab 0'''
+          template: 
+            v-slot: tab1
+          template: 
+            v-slot: tab2
+          template: 
+            v-slot: tab3
+        div: 
+          ide.vue.state:
+            ':vue': vue
+props:
+  vue: null
+data:
+  selectedTabIndex: 0
+methods: null
+watch: null
+style:
+  .list1:
+    margin-top: 1em
+    max-height: 40vh
+    overflow-x: hidden
+    overflow-y: auto
+name: ide-vue-inspector
+_:
+  examples:
+    count: 0
+template: >-
+  <transition class="comp-ide-vue-inspector" name="slide-hor"
+  path="1328580683."><div v-if="vue" :key="vue()._uid" path="1328580683.0"><div
+  path="1328580683.0.0"><h2 path="1328580683.0.0.0"><ui-title icon="📦"
+  :text="vue().$options.name" path="1328580683.0.0.0.0"></ui-title></h2><ui-tabs
+  :options="['🧊 state', '✨ activity', '📁 view', '🔴 methods']"
+  v-model="selectedTabIndex" direction="horizontal"
+  path="1328580683.0.0.1"><template v-slot="header"
+  path="1328580683.0.0.1.0"><div class="mt-l1"
+  path="1328580683.0.0.1.0.0"></div></template><template v-slot="tab0"
+  path="1328580683.0.0.1.1"><div v-text="'tab 0'"
+  path="1328580683.0.0.1.1.0"></div></template><template v-slot="tab1"
+  path="1328580683.0.0.1.2"></template><template v-slot="tab2"
+  path="1328580683.0.0.1.3"></template><template v-slot="tab3"
+  path="1328580683.0.0.1.4"></template></ui-tabs><div
+  path="1328580683.0.0.2"><ide-vue-state :vue="vue"
+  path="1328580683.0.0.2.0"></ide-vue-state></div></div></div></transition>

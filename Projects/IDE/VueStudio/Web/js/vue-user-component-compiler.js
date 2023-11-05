@@ -570,6 +570,8 @@ compiler.toVueTemplate = async (compClass, origComp) => {
   {
     const timer2 = Timer.start();
 
+    compileTimer2.restart();
+
     origComp.view.errors = (origComp.view.errors || []);
     origComp.view.errors.splice(0);
 
@@ -580,26 +582,28 @@ compiler.toVueTemplate = async (compClass, origComp) => {
       //node.attrs?.forEach(attr => { if ((attr.name) && (!attr.value)) attr.value = emptyValuePH; });
     };
 
-    compileTimer2.log(`toVueTemplate.1`, timer2.elapsed);
+    compileTimer2.log(`toVueTemplate.1`).restart();
     timer2.restart();
 
-    var viewNodeKey = compDom.get.node.cache.key(compClass, compClass.view.node);
-    var computeHtml = async () => util.haml((await viewDom.nodeToHaml(compClass, compClass.view.node, 0, cbNode, true)));
-    var html = null;
-    if (window.ideVueApp?.isIniting) {
-      html = await Local.cache.get(viewNodeKey, computeHtml);
-    }
-    else {
-      html = await computeHtml();
-      //await Local.cache.set(viewNodeKey, html);
-    }
+    const getLocalStorage = async (key, compute) => {
+      const value = localStorage.getItem(key);
+      if (value) return value;
+      const computedValue = await compute();
+      localStorage.setItem(key, computedValue);
+      return computedValue;
+    };
 
-    compileTimer2.log(`toVueTemplate.3`, timer2.elapsed);
+    var viewNodeKey = compDom.get.node.cache.key(compClass, compClass.view.node);
+    compileTimer2.log(`toVueTemplate.2.1`).restart();
+    var computeHtml = async () => util.haml((await viewDom.nodeToHaml(compClass, compClass.view.node, 0, cbNode, true)));
+    const html = await getLocalStorage(viewNodeKey, computeHtml);
+
+    compileTimer2.log(`toVueTemplate.3`).restart();
     timer2.restart();
 
     //html = html?.replaceAll(emptyValuePH, "");
 
-    compileTimer2.log(`toVueTemplate.4`, timer2.elapsed);
+    compileTimer2.log(`toVueTemplate.4`).restart();
     timer2.restart();
 
     // Doesn't work in node.js
@@ -619,7 +623,6 @@ compiler.toVueTemplate = async (compClass, origComp) => {
     //throw ex;
   }
   finally {
-    compileTimer2.log(`toVueTemplate`, timer.elapsed);
   }
 };
 

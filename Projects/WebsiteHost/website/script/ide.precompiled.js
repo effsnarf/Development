@@ -253,12 +253,10 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Component = void 0;
 const ClientContext_1 = __webpack_require__(/*! ./ClientContext */ "../../../WebsiteHost/Classes/ClientContext.ts");
 String.prototype.kebabize = function () {
-    return this.toString()
-        .replace(/\./g, " ")
-        .replace(/\-/g, " ")
-        .getCaseWords()
-        .map((w) => w.toLowerCase())
-        .join("-");
+    let s = this.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
+    s = s.replace(/[^a-z0-9-]/g, "-");
+    s = s.replace(/--+/g, "-");
+    return s;
 };
 class Component {
     name;
@@ -390,6 +388,7 @@ class ComponentManager {
         this.saveModifiedItems();
     }
     async saveModifiedItems() {
+        return;
         await ClientContext_1.ClientContext.waitUntilLoaded();
         const client = ClientContext_1.ClientContext.context;
         // Item needs to be not modified for this time to be saved
@@ -6129,7 +6128,7 @@ var __webpack_exports__ = {};
 (() => {
 var exports = __webpack_exports__;
 /*!************************************************************!*\
-  !*** ../../../WebsiteHost/website/script/1699174821794.ts ***!
+  !*** ../../../WebsiteHost/website/script/1699203127899.ts ***!
   \************************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

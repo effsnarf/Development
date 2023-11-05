@@ -16,39 +16,30 @@ dom:
           div: 
             ':class': componentTreeClass
             ide.component.picker.vue.list: 
-              ':uids': parentChainUIDs
-              ':selectedVueUID': selectedVueUID
-              className: parent-chain
+              ':vues': parentChainVues
+              ':tree': 'true'
+              ':selectedVue': selectedVue
               @hover: onHoverVue
               @select: onSelectVue
             ide.component.picker.vue.list: 
-              ':uids': childChainUIDs
-              ':selectedVueUID': selectedVueUID
-              className: child-chain
+              ':vues': childChainVues
+              ':selectedVue': selectedVue
               ':style': childChainStyle
               @hover: onHoverVue
               @select: onSelectVue
           ide.element.inspector:
             class: hidden
             ':element': hoveredElement
-        h2:
-          v-if: 'false'
-          ui.title:
-            icon: 📦
-            ':text': getTitle(hoveredVueUID)
         div: 
-          v-show: activeVueUID
-          ide.component.editor:
-            ':vue-uid': activeVueUID
-            @selected-view-node: selectedViewNode=$event
-            @selected-tab-index: selectedEditorTabIndex=$event
+          ide.vue.inspector:
+            ':vue': selectedVue
 props: null
 data:
   hoveredElement: null
-  hoveredVueUID: null
-  selectedVueUID: null
-  parentChainUIDs: null
-  childChainUIDs: null
+  hoveredVue: null
+  selectedVue: null
+  parentChainVues: null
+  childChainVues: null
   showPicker: false
   isCtrl: false
   selectedViewNode: null
@@ -58,60 +49,50 @@ methods:
   onPinned: | #js
     function(pinned) {
       this.isPinned = pinned;
-      if (pinned)
-      {
-        //this.selectedVueUID = this.hoveredVueUID;
-        return;
-      }
-      this.selectedVueUID = null;
+      if (pinned) return;
+      this.selectedVue = null;
     }
   onHoverVue: | #js
-    function(uid, hovered) {
-      this.hoveredVueUID = hovered ? uid : null;
+    function(vue) {
+      this.hoveredVue = (!vue ? null : (() => vue));
     }
   onSelectVue: | #js
-    function(uid) {
-      if (uid == this.selectedVueUID) uid = null;
-      this.selectedVueUID = uid;
-    }
-  getTitle: | #js
     function(vue) {
-      return this.$root.vm.getVue(vue)?.$options._componentTag;
+      if ((vue && this.selectedVue) && (vue._uid == this.selectedVue()._uid)) vue = null;
+      this.selectedVue = (!vue ? null : (() => vue));
     }
   onHoveredElement: | #js
     function(el) {
       if (this.$refs.context1?.isPinned) return;
       this.hoveredElement = el;
     }
-  getParentChainUIDs: | #js
+  getParentChainVues: | #js
     function(vue) {
-      this.$root.vm.registerVue(vue);
+      if (!vue) return [];
       const maxChainLength = 6;
       let chain = [];
       let parent = vue;
       while (parent && (chain.length < maxChainLength)) {
-        this.$root.vm.registerVue(parent);
-        chain.push(parent._uid);
+        const parentVue = parent;
+        chain.push(() => parentVue);
         parent = this.getParentVue(parent);
       }
       chain = chain.reverse();
       return chain;
     }
-  getChildChainUIDs: | #js
+  getChildChainVues: | #js
     function(vue) {
-      return this.$root.vm.getDescendants(vue).map(v => v._uid);
-      
-      this.$root.vm.registerVue(vue);
+      if (!vue) return [];
       const children = [];
       const addChildren = (vue) => {
         if (!vue) return;
-        this.$root.vm.registerVue(vue);
         for (const child of vue.$children) {
           if (["transition", "transition-group"].includes(child.$options._componentTag)) {
             addChildren(child);
             continue;
           }
-          children.push(child._uid);
+          const childVue = child;
+          children.push(() => childVue);
         }
       };
       addChildren(vue);
@@ -124,7 +105,6 @@ methods:
   getVueFromElement: | #js
     function(el) {
       const vue = this.getVueFromVnode(this.getVnodeFromElement(el));
-      this.$root.vm.registerVue(vue);
       return vue;
     }
   getVnodeFromElement: | #js
@@ -147,15 +127,14 @@ methods:
     }
   updateChains: | #js
     function(vue) {
-      this.$root.vm.registerVue(vue);
-      this.parentChainUIDs = this.getParentChainUIDs(vue);
-      this.childChainUIDs = this.getChildChainUIDs(vue);
+      this.parentChainVues = this.getParentChainVues(vue);
+      this.childChainVues = this.getChildChainVues(vue);
     }
 computed:
   childChainStyle: | #js
     function() {
       return {
-        'margin-left': `${(this.parentChainUIDs?.length||0) * 0.8}em`
+        'margin-left': `${(this.parentChainVues?.length||0) * 0.8}em`
       };
     }
   showComponentTree: | #js
@@ -166,13 +145,13 @@ computed:
     function() {
       return {
         'component-tree': true,
-        'slider-closed': (!!this.selectedVueUID),
-        'slider-opened': (!!!this.selectedVueUID)
+        'slider-closed': (!!this.selectedVue),
+        'slider-opened': (!!!this.selectedVue)
       };
     }
-  activeVueUID: | #js
+  activeVue: | #js
     function() {
-      return this.hoveredVueUID || this.selectedVueUID;
+      return this.hoveredVue || this.selectedVue;
     }
 watch:
   isCtrl:
@@ -183,39 +162,32 @@ watch:
   hoveredElement: | #js
     function(newEl, oldEl) {
       const vue = this.getVueFromElement(newEl);
-      this.hoveredVueUID = vue?._uid;
+      this.hoveredVue = (!vue ? null : () => vue);
     }
-  activeVueUID:
+  hoveredVue:
     handler: | #js
-      function(newVueUID, oldVueUID) {
-      }
-    immediate: true
-  hoveredVueUID:
-    handler: | #js
-      function(newVueUID, oldVueUID) {
-        if (oldVueUID) this.$root.vm.getVue(oldVueUID)?.$el.classList?.remove(`highlighted`);
+      function(newVue, oldVue) {
+        (oldVue?.())?.$el.classList?.remove(`highlighted`);
         if (this.showPicker)
         {
-          if (newVueUID) this.$root.vm.getVue(newVueUID)?.$el.classList?.add(`highlighted`);
+          (newVue?.())?.$el.classList?.add(`highlighted`);
         }
-        const vue = this.$root.vm.getVue(newVueUID);
-        if (!this.$refs.context1?.isPinned) this.updateChains(vue);
+        if (!this.$refs.context1?.isPinned) this.updateChains((newVue?.()));
       }
     immediate: true
-  selectedVueUID:
+  selectedVue:
     handler: | #js
-      function(newVueUID, oldVueUID) {
-        this.$root.vm.getVue(oldVueUID)?.$el.classList?.remove(`highlighted2`)
-        if (!newVueUID) return;
-        const vue = this.$root.vm.getVue(newVueUID);
-        this.$root.vm.getVue(newVueUID)?.$el.classList?.add(`highlighted2`);
-        this.updateChains(vue);
+      function(newVue, oldVue) {
+        (oldVue?.())?.$el.classList?.remove(`highlighted2`)
+        if (!newVue) return;
+        (newVue?.())?.$el.classList?.add(`highlighted2`);
+        this.updateChains((newVue?.()));
       }
     immediate: true
   showPicker:
     handler: | #js
       function(showPicker) {
-        if (!showPicker && !this.$refs.context1?.isPinned) this.selectedVueUID = null;
+        if (!showPicker && !this.$refs.context1?.isPinned) this.selectedVue = null;
       }
     immediate: true
 style:
@@ -227,23 +199,6 @@ style:
     overflow-y: auto
   div:
     font-family: monospace
-  .parent-chain: null
-  .parent-chain > :nth-child(1):
-    margin-left: 0.5em
-  .parent-chain > :nth-child(2):
-    margin-left: 1em
-  .parent-chain > :nth-child(3):
-    margin-left: 1.5em
-  .parent-chain > :nth-child(4):
-    margin-left: 2em
-  .parent-chain > :nth-child(5):
-    margin-left: 2.5em
-  .parent-chain > :nth-child(6):
-    margin-left: 3em
-  .parent-chain > :nth-child(7):
-    margin-left: 3.5em
-  .parent-chain > :nth-child(8):
-    margin-left: 4em
 name: ide-component-picker
 _:
   examples:
@@ -258,18 +213,13 @@ template: >-
   class="flex flex-row gap-1" path="-646340253.2.0"><div class="flex flex-column
   gap-1" path="-646340253.2.0.0"><div :class="componentTreeClass"
   path="-646340253.2.0.0.0"><ide-component-picker-vue-list
-  :uids="parentChainUIDs" :selectedVueUID="selectedVueUID"
-  className="parent-chain" @hover="onHoverVue" @select="onSelectVue"
+  :vues="parentChainVues" :tree="true" :selectedVue="selectedVue"
+  @hover="onHoverVue" @select="onSelectVue"
   path="-646340253.2.0.0.0.0"></ide-component-picker-vue-list><ide-component-picker-vue-list
-  :uids="childChainUIDs" :selectedVueUID="selectedVueUID"
-  className="child-chain" :style="childChainStyle" @hover="onHoverVue"
-  @select="onSelectVue"
+  :vues="childChainVues" :selectedVue="selectedVue" :style="childChainStyle"
+  @hover="onHoverVue" @select="onSelectVue"
   path="-646340253.2.0.0.0.1"></ide-component-picker-vue-list></div><ide-element-inspector
   class="hidden" :element="hoveredElement"
-  path="-646340253.2.0.0.1"></ide-element-inspector></div><h2 v-if="false"
-  path="-646340253.2.0.1"><ui-title icon="📦" :text="getTitle(hoveredVueUID)"
-  path="-646340253.2.0.1.0"></ui-title></h2><div v-show="activeVueUID"
-  path="-646340253.2.0.2"><ide-component-editor :vue-uid="activeVueUID"
-  @selected-view-node="selectedViewNode=$event"
-  @selected-tab-index="selectedEditorTabIndex=$event"
-  path="-646340253.2.0.2.0"></ide-component-editor></div></div></ui-context-window></div>
+  path="-646340253.2.0.0.1"></ide-element-inspector></div><div
+  path="-646340253.2.0.1"><ide-vue-inspector :vue="selectedVue"
+  path="-646340253.2.0.1.0"></ide-vue-inspector></div></div></ui-context-window></div>

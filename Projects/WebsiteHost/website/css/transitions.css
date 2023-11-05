@@ -230,6 +230,7 @@
 .slide-hor-enter-active,
 .slide-hor-leave-active,
 .slide-hor-move {
+  position: absolute;
   transition: 0.6s;
 }
 .slide-hor-enter,

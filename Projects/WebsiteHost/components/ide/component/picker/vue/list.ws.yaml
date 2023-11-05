@@ -1,22 +1,23 @@
 dom:
   div: 
-    ':class': className
+    ':class': '((className||'''') + '' '' + (tree ? ''tree1'' : ''''))'
     div: 
-      v-for: uid in uids.take(maxVisibleVues)
-      ':key': uid
+      v-for: vue in vues.take(maxVisibleVues)
+      ':key': vue()._uid
       ide.component.title:
-        ':item': getVue(uid)
-        ':class': '{ ''selected'': uid === selectedVueUID }'
-        @mouseenter: $emit('hover', uid)
+        ':item': vue
+        ':class': '{ ''selected'': (vue()._uid === (selectedVue?.())?._uid) }'
+        @mouseenter: $emit('hover', vue())
         @mouseleave: $emit('hover', null)
-        @click: $emit('select', uid)
+        @click: $emit('select', vue())
     div: 
-      v-if: (uids.length > maxVisibleVues)
-      v-text: '''⏬'' + (uids.length - maxVisibleVues) + '' more...'''
+      v-if: (vues.length > maxVisibleVues)
+      v-text: '''⏬'' + (vues.length - maxVisibleVues) + '' more...'''
 props:
-  uids: null
-  selectedVueUID: null
+  vues: null
+  selectedVue: null
   className: null
+  tree: false
 data:
   maxVisibleVues: 20
 methods:
@@ -25,16 +26,34 @@ methods:
       const vue = vueApp.vm.vues[uid];
       return vue;
     }
+style:
+  .tree1 > :nth-child(1):
+    margin-left: 0.5em
+  .tree1 > :nth-child(2):
+    margin-left: 1em
+  .tree1 > :nth-child(3):
+    margin-left: 1.5em
+  .tree1 > :nth-child(4):
+    margin-left: 2em
+  .tree1 > :nth-child(5):
+    margin-left: 2.5em
+  .tree1 > :nth-child(6):
+    margin-left: 3em
+  .tree1 > :nth-child(7):
+    margin-left: 3.5em
+  .tree1 > :nth-child(8):
+    margin-left: 4em
 name: ide-component-picker-vue-list
 _:
   examples:
     count: 0
 template: >-
-  <div class="comp-ide-component-picker-vue-list" :class="className"
-  path="-912894927."><div v-for="uid in uids.take(maxVisibleVues)" :key="uid"
-  path="-912894927.0"><ide-component-title :item="getVue(uid)" :class="{
-  'selected': uid === selectedVueUID }" @mouseenter="$emit('hover', uid)"
-  @mouseleave="$emit('hover', null)" @click="$emit('select', uid)"
-  path="-912894927.0.0"></ide-component-title></div><div v-if="(uids.length &gt;
-  maxVisibleVues)" v-text="'⏬' + (uids.length - maxVisibleVues) + ' more...'"
+  <div class="comp-ide-component-picker-vue-list" :class="((className||'') + ' '
+  + (tree ? 'tree1' : ''))" path="-912894927."><div v-for="vue in
+  vues.take(maxVisibleVues)" :key="vue()._uid"
+  path="-912894927.0"><ide-component-title :item="vue" :class="{ 'selected':
+  (vue()._uid === (selectedVue?.())?._uid) }" @mouseenter="$emit('hover',
+  vue())" @mouseleave="$emit('hover', null)" @click="$emit('select', vue())"
+  path="-912894927.0.0"></ide-component-title></div><div v-if="(vues.length &gt;
+  maxVisibleVues)" v-text="'⏬' + (vues.length - maxVisibleVues) + ' more...'"
   path="-912894927.1"></div></div>

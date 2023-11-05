@@ -650,12 +650,10 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Component = void 0;
 const ClientContext_1 = __webpack_require__(/*! ./ClientContext */ "../../../WebsiteHost/Classes/ClientContext.ts");
 String.prototype.kebabize = function () {
-    return this.toString()
-        .replace(/\./g, " ")
-        .replace(/\-/g, " ")
-        .getCaseWords()
-        .map((w) => w.toLowerCase())
-        .join("-");
+    let s = this.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
+    s = s.replace(/[^a-z0-9-]/g, "-");
+    s = s.replace(/--+/g, "-");
+    return s;
 };
 class Component {
     name;
@@ -788,6 +786,7 @@ class ComponentManager {
         this.saveModifiedItems();
     }
     async saveModifiedItems() {
+        return;
         await ClientContext_1.ClientContext.waitUntilLoaded();
         const client = ClientContext_1.ClientContext.context;
         // Item needs to be not modified for this time to be saved
@@ -8425,7 +8424,7 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 /*!************************************************************!*\
-  !*** ../../../WebsiteHost/website/script/1699174822214.ts ***!
+  !*** ../../../WebsiteHost/website/script/1699203128579.ts ***!
   \************************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -8445,6 +8444,7 @@ const Timer_1 = __webpack_require__(/*! ../../../../Shared/Timer */ "../../../..
 const VueManager_1 = __webpack_require__(/*! ../../Classes/VueManager */ "../../../WebsiteHost/Classes/VueManager.ts");
 const Data_1 = __webpack_require__(/*! ../../../../Shared/Data */ "../../../../Shared/Data.ts");
 const Graph_1 = __webpack_require__(/*! ../../../../Shared/Database/Graph */ "../../../../Shared/Database/Graph.ts");
+const StateTracker_1 = __webpack_require__(/*! ../../Classes/StateTracker */ "../../../WebsiteHost/Classes/StateTracker.ts");
 const MovingPositionSmoother_1 = __webpack_require__(/*! ../../../../Shared/MovingPositionSmoother */ "../../../../Shared/MovingPositionSmoother.ts");
 const window1 = window;
 const Vue = window1.Vue;
@@ -8460,6 +8460,8 @@ window1.Timer = Timer_1.Timer;
 window1.DatabaseProxy = DbpClient_1.DatabaseProxy;
 window1.Actionable = Actionable_1.Actionable;
 window1.Graph = Graph_1.Graph;
+window1.StateTracker = StateTracker_1.StateTracker;
+window1.StateValue = StateTracker_1.StateValue;
 window1.MovingPositionSmoother = MovingPositionSmoother_1.MovingPositionSmoother;
 const generalMixin = {
     matchComp: (c) => true,

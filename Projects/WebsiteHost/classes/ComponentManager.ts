@@ -60,6 +60,8 @@ class ComponentManager {
   }
 
   private async saveModifiedItems() {
+    return;
+
     await ClientContext.waitUntilLoaded();
     const client = ClientContext.context!;
 
