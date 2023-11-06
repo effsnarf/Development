@@ -98,6 +98,7 @@ style:
     border: none
     background: no-repeat
     box-shadow: none
+    opacity: 0.5
   input.hasIcon:
     padding-left: 2em !important
   .icon:

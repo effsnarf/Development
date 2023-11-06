@@ -1,0 +1,22 @@
+todo:
+  - no error messages:
+  ✔️ no render hangs:
+      - performance tracker:
+          - pause on operation:
+          - detect if an operation is triggerred too often:
+  - new users can use it:
+      - user stickiness:
+      - demo components for new users:
+      - user signup:
+      - user login:
+      - user logout:
+  - demo components:
+  - improve the interface:
+      - component tree:
+      - near every prop, enabled icons (watch, computed, etc):
+  - marketing:
+  - compiler warnings:
+      - method used in node expression:
+  - fixes:
+      - make sure that nodes and attributes are created/deleted properly from the cache:
+      - getContextPos() max call stack:

@@ -1,12 +1,13 @@
 dom:
   div:
     component:
-      ':is': getComponentType(value)
-      ':value': visibleValue
-      ':title': title
-      ':preview': 'false'
-      ':depth': (depth + 1)
-      ':large': large
+      ":is": getComponentType(value)
+      ":value": visibleValue
+      ":title": title
+      ":preview": "false"
+      ":depth": (depth + 1)
+      ":large": large
+      v-on: $listeners
 props:
   value: null
   title: null
@@ -42,14 +43,14 @@ watch: null
 style:
   .console-log-button:
     position: absolute
-    bottom: '-0.3em'
-    right: '-0.5em'
+    bottom: "-0.3em"
+    right: "-0.5em"
     font-size: 200%
     padding: 0 0.4em
     cursor: pointer
     z-index: 1000
   .console-log-button:hover:
-    background: '#ffffff20'
+    background: "#ffffff20"
 name: ui-value-any
 _:
   examples:

@@ -28,18 +28,13 @@ dom:
           ':text': entry[0]
           ':number': entry[1]
       ide.debug: null
-      .clickable:
-        @click: refresh
-        h2:
-          v-text: '''Performance'''
-        ui.value:
-          ':value': perfStats
       div: 
         v-if: 'true'
         ide.component.picker:
           v-if: (selectedEditor == 'component')
         ide.element.picker:
           v-if: (selectedEditor == 'css')
+        ide.performance.inspector:
     div: 
       ui.html.style:
         v-for: comp in $root.comps
@@ -49,7 +44,6 @@ props: null
 data:
   showWorkspace: true
   selectedEditor: component
-  perfStats: null
   appVuesCount: null
   appVuesCounts: null
 mounted: | #js
@@ -60,14 +54,6 @@ mounted: | #js
 methods:
   refresh: | #js
     async function() {
-      this.perfStats = Object.entries(this.$root.perf.stats)
-        .sortBy(e => -e[1].duration.average)
-        .map(e => ({
-          name: e[0],
-          average: e[1].duration.average,
-          measures: e[1].duration.measures
-        }));
-
       if (true)
       {
         var allVues = vueApp.vm.getDescendants(vueApp);

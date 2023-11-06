@@ -1,0 +1,119 @@
+dom:
+  .inspector:
+    h2:
+      v-text: "'⌚ Performance'"
+    @mouseenter: isHovered = true
+    @mouseleave: isHovered = false
+    transition:
+      name: slide
+      .warning:
+        v-if: isHovered
+        v-text: "'Refresh is paused'"
+    div:
+      v-text: "'Frequent operations are throttled for performance sake.'"
+    ui.value:
+      :value: logItems
+      @input:query: refresh2
+
+data:
+  logs: {}
+  logItems: []
+  isHovered: false
+
+mounted: | #js
+  function() {
+    this.refresh();
+  }
+
+methods:
+  refresh: | #js
+    function(force) {
+      if (force || (!this.isHovered)) this.refresh2();
+      setTimeout(this.refresh.bind(this), 1000);
+    }
+  refresh2: | #js
+    function(query) {
+      this.logItems = this.getLogItems();
+    }
+  getLogItems: | #js
+    function() {
+      const logItems = Object.values(this.logs)
+        .map(log => ({
+          component: `📦 ${log.context.name}`,
+          operation: this.getOpName(log),
+          invokes: log.invokes,
+          "total (ms)": Math.round(log.elapsed.total),
+          "average (ms)": Math.round(log.elapsed.average),
+        }));
+      return logItems;
+    }
+  getOpName: | #js
+    function(log) {
+      const icon = ({
+        "event": "⚡",
+        "computed": "💡",
+        "watcher": "👓",
+        "method": "🔴",
+      })[log.operation.type] || "❔";
+      return `${icon} ${log.operation.name}`;
+    }
+  afterCompOperation: | #js
+    function(measurement) {
+      const { operation, elapsed } = measurement;
+      const log = this.getOperationLog(operation);
+      log.invokes++;
+      log.elapsed.min = Math.min(log.elapsed.min, elapsed);
+      log.elapsed.max = Math.max(log.elapsed.max, elapsed);
+      log.elapsed.total += elapsed;
+      log.elapsed.average = (log.elapsed.total / log.invokes);
+      log.last.measurements.push(elapsed);
+      if (log.last.measurements.length > 100) {
+        log.last.measurements.shift();
+      }
+    }
+  getOperationLog: | #js
+    function(operation) {
+      const contextName = operation.context.$options.name;
+      const logKey = [contextName, operation.type, operation.name];
+      const log = (this.logs[logKey] = (this.logs[logKey] || {
+        key: logKey,
+        context: {
+          name: contextName,
+        },
+        operation: {
+          type: operation.type,
+          name: operation.name,
+        },
+        last: {
+          measurements: [],
+        },
+        invokes: 0,
+        elapsed: {
+          total: 0,
+          min: 0,
+          max: 0,
+          average: 0
+        }
+      }));
+      return log;
+    }
+
+style:
+  .inspector:
+    position: fixed
+    right: 0
+    top: 0
+    max-width: 10em
+    max-height: 10em
+    overflow: hidden
+    padding: 1em
+    border: "1px solid #ccc"
+    background: "#303030"
+  .inspector:hover:
+    max-width: 100em
+    max-height: 100em
+    transition: 1s
+  .warning:
+    text-align: center
+  .value-as-string:
+    max-width: 40em !important

@@ -43,8 +43,19 @@ methods:
       allComps.push(...this.comps.user);
       const ideVueApp = this;
       window.ideVueApp = ideVueApp;
-      compDom.components.value.push(...allComps);
-      const mixin = {
+      compDom.components.add(...allComps);
+      this.$on("ide-comp-changed-2", this.onCompChanged2.bind(this));
+      this.$root.with = util.with;
+      alertify.message(`Compiling Vue Studio components...`);
+      await Promise.all(allComps.map(this.compileComp.bind(this)));
+      alertify.message(`${allComps.length} Vue Studio components compiled`);
+      this.userAccountCompName = "ide-user-account-267";
+      this.workspaceCompName = "ide-workspace-171";
+      allComps.forEach(comp => liveData.watch.item("ComponentClasses", comp, { on: { changed: this.onCompChanged.bind(this) } }));
+    }
+  compileComp: | #js
+    async function(comp) {
+      const vsGlobalsMixin = {
         data() {
           return {
             ideVueApp,
@@ -54,14 +65,59 @@ methods:
           };
         },
       };
-      this.$on("ide-comp-changed-2", this.onCompChanged2.bind(this));
-      this.$root.with = util.with;
-      alertify.message(`Compiling Vue Studio components...`);
-      await Promise.all(allComps.map(c => vueUserComponentCompiler.compile(c, { mixins: [mixin] })));
-      alertify.message(`${allComps.length} Vue Studio components compiled`);
-      this.userAccountCompName = "ide-user-account-267";
-      this.workspaceCompName = "ide-workspace-171";
-      allComps.forEach(comp => liveData.watch.item("ComponentClasses", comp, { on: { changed: this.onCompChanged.bind(this) } }));
+      const opTrackerMixin = Mixins.OperationTracker(this.afterCompOperation.bind(this));
+      const activityMixin = this.getActivityMixin();
+      const mixins = [];
+      if (comp.name.kebabize().startsWith("ide-")) mixins.push(vsGlobalsMixin);
+      mixins.push(opTrackerMixin);
+      mixins.push(activityMixin);
+      await vueUserComponentCompiler.compile(comp, { mixins });
+    }
+  getActivityMixin: | #js
+    function() {
+      const logActivity = (measurement) => {
+        const vue = measurement.operation.context;
+        const items = vue.$data._ide_activity.items;
+        delete measurement.operation.context;
+        const m = measurement;
+        const item = {
+          name: `${this.getOpIcon(m.operation.type)} ${m.operation.name}`,
+          elapsed: Math.round(m.elapsed),
+        }
+        items.push(item);
+        if (items.length > 100) items.shift();
+      };
+      const activityMixin = Mixins.OperationTracker(logActivity);
+      activityMixin.data = function() {
+        return {
+          _ide_activity: {
+            items: []
+          }
+        };
+      }
+      return activityMixin;
+    }
+  getOpIcon: | #js
+    function(type) {
+      return ({
+        "event": "⚡",
+        "computed": "💡",
+        "watcher": "👓",
+        "method": "🔴",
+      })[type] || "❔";
+    }
+  afterCompOperation: | #js
+    function(measurement) {
+      const perfInsp = this.getPerformanceInspector();
+      if (!perfInsp) return;
+      perfInsp.afterCompOperation(measurement);
+    }
+  getPerformanceInspector: | #js
+    function() {
+      if (this._perfInsp) return this._perfInsp;
+      if (!window.vueIdeApp) return null;
+      this._perfInsp = vueIdeApp.vm.getDescendants(vueIdeApp, "ide.performance.inspector").first();
+      return this._perfInsp;
     }
   initCssLibrary: | #js
     function() {
@@ -132,7 +188,7 @@ methods:
     async function(comp) {
       // biztos ami biztos
       comp = compDom.get.comp.byID(comp._id);
-      await vueUserComponentCompiler.compile(comp, { fix: false });
+      await this.compileComp(comp);
       this.$emit("ide-comp-recompiled", comp);
       alertify.message(`<h3>📦 ${comp.name}</h3><div>Component recompiled.</div>`);
     }
@@ -159,6 +215,7 @@ methods:
       localStorage.setItem(key, JSON.stringify(value));
       const elapsed = (Date.now() - started);
     }
+computed:
 style:
   .logo:
     display: flex

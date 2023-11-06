@@ -19,6 +19,7 @@ import { VueManager } from "../../Classes/VueManager";
 import { Data } from "../../../../Shared/Data";
 import { Graph } from "../../../../Shared/Database/Graph";
 import { StateTracker, StateValue } from "../../Classes/StateTracker";
+import { Mixins } from "../../../../Shared/Mvc/Vue/Mixins";
 import { MovingPositionSmoother } from "../../../../Shared/MovingPositionSmoother";
 
 const window1 = window as any;
@@ -28,6 +29,7 @@ const Vue = (window1 as any).Vue;
 let vueApp: any;
 
 // To make it accessible to client code
+window1.Mixins = Mixins;
 window1.Objects = Objects;
 window1.TreeObject = TreeObject;
 window1.Reflection = Reflection;

@@ -30,6 +30,7 @@
     "tree-kill": "^1.2.2",
     "typescript": "^4.9.5",
     "unirest": "^0.6.0",
+    "vue": "^3.3.8",
     "webpack": "^5.83.1"
   },
   "devDependencies": {

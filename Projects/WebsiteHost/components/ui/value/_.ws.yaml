@@ -1,10 +1,11 @@
 dom:
   ui.value.any:
-    ':class': '{ overflow, loading: isLoading }'
-    ':value': visibleValue
-    ':title': title
-    ':depth': (depth + 1)
-    ':large': large
+    ":class": "{ overflow, loading: isLoading }"
+    ":value": visibleValue
+    ":title": title
+    ":depth": (depth + 1)
+    ":large": large
+    v-on: $listeners
 props:
   value: null
   title: null
@@ -31,7 +32,7 @@ style:
     max-height: 30em
     overflow: auto
   .loading:
-    filter: grayscale(1)
+    filter: grayscale(0)
   .loading::after:
     position: absolute
     width: 100%
@@ -42,7 +43,7 @@ style:
 example:
   dom:
     ui.value:
-      ':value': exampleData
+      ":value": exampleData
   data:
     exampleData: null
   mounted: | #js #js

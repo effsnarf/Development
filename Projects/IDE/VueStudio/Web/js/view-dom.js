@@ -38,24 +38,28 @@ var viewDom = {
     if (Array.isArray(el)) els.push(...el.map(viewDom.toDomElements));
     return els;
   },
-
   countNodes: (node) => {
     if (!node) return null;
     var count = 0;
     viewDom.traverse(node, (n => count++));
     return count;
   },
-
   createAttr: async (node, name = null, value = null, enabled = true) => {
     var attr = { id: (await compDom.get.new.id()), name: name, value: value, enabled: enabled, bind: false };
     node.attrs.push(attr);
+    await compDom.cache.attrs.add(attr);
     return attr;
   },
-  deleteAttr: function(attr) {
-    if (attr.node) attr.node().attrs.remove(attr);
+  deleteAttr: async function(attr) {
+    if (!attr.node) return;
+    attr.node().attrs.remove(attr);
+    await compDom.cache.attrs.delete(attr);
   },
-  copyAttr: function(attr, destNode) {
+  copyAttr: async function(attr, destNode) {
+    attr = Objects.clone(attr);
+    attr.id = (await compDom.get.new.id());
     destNode.attrs.push(attr);
+    compDom.cache.attrs.add(attr);
   },
   moveAttr: function(attr, destNode) {
     destNode.attrs.push(attr);
@@ -518,6 +522,7 @@ var viewDom = {
     var newNode = (await this.createNode2(comp, node, path, type, tag, text, nodeCompID).node);
     await compDom.ensure.node.attrs(newNode);
     viewDom.fixPaths(node);
+    await compDom.cache.nodes.add(newNode);
     return newNode;
   },
   createNode2: async function(comp, node, path, type = "tag", tag = "div", text = "(text)", nodeCompID)
@@ -551,6 +556,7 @@ var viewDom = {
     if (path.join("") == "0") throw `Can't delete root node;`;
     var result = this.deleteNode2(node, path);
     viewDom.fixPaths(node);
+    await compDom.cache.nodes.delete(node);
     return result;
   },
   deleteNode2: function(node, path)

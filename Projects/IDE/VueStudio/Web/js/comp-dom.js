@@ -27,7 +27,48 @@ String.prototype.hasUppercaseLetters = function() {
 var compDom = {
   uniqueClientID: 1,
   newID: () => (compDom.uniqueClientID++),
-  components: { value: [] },
+  components: {
+    add: (...comps) => {
+      compDom.components.value.push(...comps);
+      compDom.cache.nodes.refresh();
+      compDom.cache.attrs.refresh();
+    },
+    value: []
+  },
+  cache: {
+    nodes: {
+      all: [],
+      byUser: [],
+      add: (node) => {
+        compDom.cache.nodes.all.push(node);
+        compDom.cache.nodes.byUser.push(node);
+      },
+      delete: (node) => {
+        compDom.cache.nodes.all.removeByField("id", node.id);
+        compDom.cache.nodes.byUser.removeByField("id", node.id);
+      },
+      refresh: async () => {
+        compDom.cache.nodes.all = await compDom.get.all.nodes(null, false, false);
+        compDom.cache.nodes.byUser = await compDom.get.all.nodes(null, true, false);
+      }
+    },
+    attrs: {
+      all: [],
+      byUser: [],
+      add: (attr) => {
+        compDom.cache.attrs.all.push(attr);
+        compDom.cache.attrs.byUser.push(attr);
+      },
+      delete: (attr) => {
+        compDom.cache.attrs.all.removeByField("id", attr._id);
+        compDom.cache.attrs.byUser.removeByField("id", attr._id);
+      },
+      refresh: async () => {
+        compDom.cache.attrs.all = await compDom.get.all.attrs(null, false, false);
+        compDom.cache.attrs.byUser = await compDom.get.all.attrs(null, true, false);
+      }
+    }
+  },
   actions: {
     undo: async () => {
       var change = (await liveData.dbp.undo());
@@ -630,12 +671,20 @@ var compDom = {
       props: (comp, filterByUser = false) => {
         return compDom.get.all.comps(comp, filterByUser).flatMap(comp => comp.props.map(p => util.with(p, "comp", comp)));
       },
-      nodes: async (comp, filterByUser = false) => {
-        const allComps = compDom.get.all.comps(comp, filterByUser);
-        const allNodes = (await allComps.flatMap(comp => viewDom.mapTree(comp.view.node, node => util.with(node, "comp", comp))));
-        return allNodes;
+      nodes: async (comp, filterByUser = false, cached = true) => {
+        if (false && cached && !comp)
+        {
+          return compDom.cache.nodes[(filterByUser ? "byUser" : "all")];
+        }
+        const comps = compDom.get.all.comps(comp, filterByUser);
+        const nodes = (await comps.flatMap(comp => viewDom.mapTree(comp.view.node, node => util.with(node, "comp", comp))));
+        return nodes;
       },
-      attrs: async (comp, filterByUser = false) => {
+      attrs: async (comp, filterByUser = false, cached = true) => {
+        if (false && cached && !comp)
+        {
+          return compDom.cache.attrs[(filterByUser ? "byUser" : "all")];
+        }
         const allNodes = (await compDom.get.all.nodes(comp, filterByUser));
         const allAttrs = (await allNodes.flatMapAsync(node => node.attrs.map(attr => util.with(attr, "node", node)), 10));
         return allAttrs;

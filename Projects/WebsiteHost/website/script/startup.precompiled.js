@@ -6725,6 +6725,24 @@ if (typeof String !== "undefined") {
     };
 }
 // #endregion
+// #region Date
+Date.prototype.toShortString = function () {
+    // For today, return the time only
+    if (this.isToday())
+        return this.toTimeString();
+    // Return [date] [time]
+    return `${this.toDateString()} ${this.toTimeString()}`;
+};
+Date.prototype.toDateString = function () {
+    return this.toLocaleDateString();
+};
+Date.prototype.toTimeString = function () {
+    return this.toLocaleTimeString();
+};
+Date.prototype.isToday = function () {
+    return this.toDateString() == new Date().toDateString();
+};
+// #endregion
 // #region Array
 if (typeof Array !== "undefined") {
     Array.prototype.flatMapAsync = async function (callback, stagger) {
@@ -6991,9 +7009,13 @@ if (typeof Function !== "undefined") {
     };
     Function.prototype.postpone = function (delay) {
         const fn = this;
-        return () => {
-            setTimeout(fn, delay);
+        let func = function (...args) {
+            const context = this;
+            setTimeout(async function () {
+                fn.apply(context, args);
+            }, delay);
         };
+        return func;
     };
     /**
      * If the original function is called multiple times within the specified delay,
@@ -7190,6 +7212,147 @@ class MovingPositionSmoother {
     }
 }
 exports.MovingPositionSmoother = MovingPositionSmoother;
+
+
+/***/ }),
+
+/***/ "../../../../Shared/Mvc/Vue/Mixins.ts":
+/*!********************************************!*\
+  !*** ../../../../Shared/Mvc/Vue/Mixins.ts ***!
+  \********************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Mixins = void 0;
+class CallbackQueue {
+    callback;
+    tcbs = {};
+    constructor(callback) {
+        this.callback = callback;
+    }
+    enqueue(m) {
+        //if (measurement.elapsed < 10) return;
+        const contextName = m.operation.context.$options._componentTag;
+        const key = `${contextName}.${m.operation.type}.${m.operation.name}`;
+        const tcb = (this.tcbs[key] = this.tcbs[key] || this.createTcb());
+        tcb(m);
+    }
+    // Some operations are called very frequently, so we throttle them
+    createTcb() {
+        return ((m) => {
+            this.callback(m);
+        }).throttle(10, this);
+    }
+}
+function wrapFunction(fn, callbackQueue, context, type, name) {
+    return function (...args) {
+        const start = performance.now();
+        let result;
+        const operation = { context, type, name };
+        try {
+            result = fn.apply(this, args);
+        }
+        catch (err) {
+            const end = performance.now();
+            callbackQueue.enqueue({ operation, elapsed: end - start });
+            throw err; // Synchronous error
+        }
+        // If the function returns a promise, handle it asynchronously
+        if (result instanceof Promise) {
+            return result.finally(() => {
+                const end = performance.now();
+                callbackQueue.enqueue({ operation, elapsed: end - start });
+            });
+        }
+        else {
+            // Handle synchronous functions
+            const end = performance.now();
+            callbackQueue.enqueue({ operation, elapsed: end - start });
+            return result;
+        }
+    };
+}
+const Mixins = {
+    OperationTracker(afterOperation) {
+        const origAfterOperation = afterOperation;
+        afterOperation = (measurement) => {
+            origAfterOperation(measurement);
+        };
+        const callbackQueue = new CallbackQueue(afterOperation);
+        const mixin = {
+            created() {
+                // Wrap methods
+                const methods = this.$options.methods || {};
+                Object.keys(methods).forEach((methodName) => {
+                    const originalMethod = methods[methodName];
+                    methods[methodName] = wrapFunction(originalMethod, callbackQueue, this, "method", methodName);
+                });
+                // Wrap computed properties
+                const computed = this.$options.computed || {};
+                Object.keys(computed).forEach((computedName) => {
+                    const originalComputed = computed[computedName];
+                    const getter = typeof originalComputed === "function"
+                        ? originalComputed
+                        : originalComputed.get;
+                    const setter = originalComputed.set;
+                    computed[computedName] = {
+                        get: wrapFunction(getter, callbackQueue, this, "computed", computedName),
+                        set: setter,
+                    };
+                });
+                return;
+                // Wrap watchers
+                const watchers = this.$options.watch || {};
+                Object.keys(watchers).forEach((watchKey) => {
+                    const originalWatcher = watchers[watchKey];
+                    const handler = originalWatcher.handler || originalWatcher;
+                    const immediate = originalWatcher.immediate;
+                    const deep = originalWatcher.deep;
+                    const newHandler = wrapFunction(originalWatcher, callbackQueue, this, "watcher", watchKey);
+                    this.$watch(watchKey, newHandler, {
+                        immediate,
+                        deep,
+                    });
+                    return;
+                    if (typeof originalWatcher === "function") {
+                        watchers[watchKey] = wrapFunction(originalWatcher, callbackQueue, this, "watcher", watchKey);
+                    }
+                    else if (originalWatcher &&
+                        typeof originalWatcher.handler === "function") {
+                        const handler = originalWatcher.handler;
+                        originalWatcher.handler = wrapFunction(handler, callbackQueue, this, "watcher", watchKey);
+                    }
+                });
+            },
+            beforeUpdate() {
+                this._updateStart = performance.now();
+            },
+            updated() {
+                const end = performance.now();
+                afterOperation({
+                    operation: { context: this, type: "update", name: "update" },
+                    elapsed: end - this._updateStart,
+                });
+            },
+            mounted() {
+                afterOperation({
+                    operation: { context: this, type: "mount", name: "mount" },
+                    elapsed: 0,
+                });
+            },
+            unmounted() {
+                afterOperation({
+                    operation: { context: this, type: "unmount", name: "unmount" },
+                    elapsed: 0,
+                });
+            },
+        };
+        return mixin;
+    },
+};
+exports.Mixins = Mixins;
 
 
 /***/ }),
@@ -7413,18 +7576,34 @@ exports.TaskQueue = void 0;
 // Enqueue async tasks and run them in order
 class TaskQueue {
     tasks = [];
+    get count() {
+        return this.tasks.length;
+    }
     constructor() {
         this.next();
+        this.notify();
+    }
+    notify() {
+        if (this.count > 100) {
+            console.warn(`${this.count} tasks in queue.`);
+        }
+        setTimeout(this.notify.bind(this), 5000);
     }
     enqueue(task) {
         this.tasks.push(task);
         return task;
     }
     async next() {
-        const task = this.tasks.shift();
-        if (task)
+        const started = performance.now();
+        let elapsed = 0;
+        while (elapsed < 50) {
+            const task = this.tasks.shift();
+            if (!task)
+                break;
             await task();
-        const delay = this.tasks.length ? 0 : 100;
+            elapsed = performance.now() - started;
+        }
+        const delay = this.tasks.length ? 1 : 100;
         setTimeout(this.next.bind(this), delay);
     }
 }
@@ -8424,7 +8603,7 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 /*!************************************************************!*\
-  !*** ../../../WebsiteHost/website/script/1699203128579.ts ***!
+  !*** ../../../WebsiteHost/website/script/1699292260232.ts ***!
   \************************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -8445,11 +8624,13 @@ const VueManager_1 = __webpack_require__(/*! ../../Classes/VueManager */ "../../
 const Data_1 = __webpack_require__(/*! ../../../../Shared/Data */ "../../../../Shared/Data.ts");
 const Graph_1 = __webpack_require__(/*! ../../../../Shared/Database/Graph */ "../../../../Shared/Database/Graph.ts");
 const StateTracker_1 = __webpack_require__(/*! ../../Classes/StateTracker */ "../../../WebsiteHost/Classes/StateTracker.ts");
+const Mixins_1 = __webpack_require__(/*! ../../../../Shared/Mvc/Vue/Mixins */ "../../../../Shared/Mvc/Vue/Mixins.ts");
 const MovingPositionSmoother_1 = __webpack_require__(/*! ../../../../Shared/MovingPositionSmoother */ "../../../../Shared/MovingPositionSmoother.ts");
 const window1 = window;
 const Vue = window1.Vue;
 let vueApp;
 // To make it accessible to client code
+window1.Mixins = Mixins_1.Mixins;
 window1.Objects = Extensions_Objects_Client_1.Objects;
 window1.TreeObject = Extensions_Objects_Client_1.TreeObject;
 window1.Reflection = Reflection_1.Reflection;

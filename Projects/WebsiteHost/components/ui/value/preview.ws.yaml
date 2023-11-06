@@ -49,6 +49,7 @@ methods:
       if (depth > 4) return "…";
       if (value == undefined) return "undefined";
       if (value == null) return "null";
+      if (value instanceof Date) return value.toShortString();
       if (typeof value == "string") {
         if (!value.length) return `“”`;
         return `${!this.preview ? value : value}`;

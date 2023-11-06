@@ -331,6 +331,13 @@ interface String {
   parseEnum<T>(enumType: T): T[keyof T] | null;
 }
 
+interface Date {
+  toShortString(): string;
+  toDateString(): string;
+  toTimeString(): string;
+  isToday(): boolean;
+}
+
 interface Array<T> {
   all(predicate: (item: T) => boolean): boolean;
   flatMapAsync<TResult>(
@@ -385,7 +392,7 @@ interface Array<T> {
 interface Function {
   is(type: any): boolean;
   getArgumentNames(): string[];
-  postpone(delay: number): (...args: any[]) => any;
+  postpone(delay: number): (...args: any[]) => (...args: any[]) => any;
   debounce(delay: number): (...args: any[]) => any;
   throttle(delay: number, context: any): (...args: any[]) => any;
 }
@@ -1452,6 +1459,27 @@ if (typeof String !== "undefined") {
 }
 // #endregion
 
+// #region Date
+Date.prototype.toShortString = function (): string {
+  // For today, return the time only
+  if (this.isToday()) return this.toTimeString();
+  // Return [date] [time]
+  return `${this.toDateString()} ${this.toTimeString()}`;
+};
+
+Date.prototype.toDateString = function (): string {
+  return this.toLocaleDateString();
+};
+
+Date.prototype.toTimeString = function (): string {
+  return this.toLocaleTimeString();
+};
+
+Date.prototype.isToday = function (): boolean {
+  return this.toDateString() == new Date().toDateString();
+};
+// #endregion
+
 // #region Array
 if (typeof Array !== "undefined") {
   Array.prototype.flatMapAsync = async function (
@@ -1788,11 +1816,15 @@ if (typeof Function !== "undefined") {
     return args || [];
   };
 
-  Function.prototype.postpone = function (delay: number) {
+  Function.prototype.postpone = function (delay: number): any {
     const fn = this;
-    return () => {
-      setTimeout(fn, delay);
+    let func = function (this: any, ...args: any[]) {
+      const context = this as any;
+      setTimeout(async function () {
+        fn.apply(context, args);
+      }, delay);
     };
+    return func;
   };
 
   /**

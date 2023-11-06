@@ -5302,6 +5302,24 @@ if (typeof String !== "undefined") {
     };
 }
 // #endregion
+// #region Date
+Date.prototype.toShortString = function () {
+    // For today, return the time only
+    if (this.isToday())
+        return this.toTimeString();
+    // Return [date] [time]
+    return `${this.toDateString()} ${this.toTimeString()}`;
+};
+Date.prototype.toDateString = function () {
+    return this.toLocaleDateString();
+};
+Date.prototype.toTimeString = function () {
+    return this.toLocaleTimeString();
+};
+Date.prototype.isToday = function () {
+    return this.toDateString() == new Date().toDateString();
+};
+// #endregion
 // #region Array
 if (typeof Array !== "undefined") {
     Array.prototype.flatMapAsync = async function (callback, stagger) {
@@ -5568,9 +5586,13 @@ if (typeof Function !== "undefined") {
     };
     Function.prototype.postpone = function (delay) {
         const fn = this;
-        return () => {
-            setTimeout(fn, delay);
+        let func = function (...args) {
+            const context = this;
+            setTimeout(async function () {
+                fn.apply(context, args);
+            }, delay);
         };
+        return func;
     };
     /**
      * If the original function is called multiple times within the specified delay,
@@ -5769,18 +5791,34 @@ exports.TaskQueue = void 0;
 // Enqueue async tasks and run them in order
 class TaskQueue {
     tasks = [];
+    get count() {
+        return this.tasks.length;
+    }
     constructor() {
         this.next();
+        this.notify();
+    }
+    notify() {
+        if (this.count > 100) {
+            console.warn(`${this.count} tasks in queue.`);
+        }
+        setTimeout(this.notify.bind(this), 5000);
     }
     enqueue(task) {
         this.tasks.push(task);
         return task;
     }
     async next() {
-        const task = this.tasks.shift();
-        if (task)
+        const started = performance.now();
+        let elapsed = 0;
+        while (elapsed < 50) {
+            const task = this.tasks.shift();
+            if (!task)
+                break;
             await task();
-        const delay = this.tasks.length ? 0 : 100;
+            elapsed = performance.now() - started;
+        }
+        const delay = this.tasks.length ? 1 : 100;
         setTimeout(this.next.bind(this), delay);
     }
 }
@@ -6128,7 +6166,7 @@ var __webpack_exports__ = {};
 (() => {
 var exports = __webpack_exports__;
 /*!************************************************************!*\
-  !*** ../../../WebsiteHost/website/script/1699203127899.ts ***!
+  !*** ../../../WebsiteHost/website/script/1699292259795.ts ***!
   \************************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
