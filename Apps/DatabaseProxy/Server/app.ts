@@ -984,7 +984,7 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
     static onUserCreated = async (db: any, dbUser: any) => {
       let dbHandler = config.dbs[db.database]?.on?.user?.created;
       if (!dbHandler) return;
-      dbHandler = eval(dbHandler);
+      dbHandler = eval(`(${dbHandler})`);
       await dbHandler(db, dbUser);
     };
 
