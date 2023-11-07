@@ -49,7 +49,7 @@ dbs:
     on:
       user:
         created: | #js
-          function(db, dbUser) {
+          async function(db, dbUser) {
             const newComps = (await db.find("_SavedItems", {
               _id: (new RegExp(`new\.User\.ComponentClass\.`))
             }))
