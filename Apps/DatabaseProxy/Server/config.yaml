@@ -30,27 +30,5 @@ requests:
   severity:
     time: [100, 500, "<"]
 dbs:
-  IDE:
-    users:
-      enabled: true
-    on:
-      user:
-        created: | #js
-          function(db, dbUser) {
-            const newComps = (await db.find("_SavedItems", {
-              _id: (new RegExp(`new\.User\.ComponentClass\.`))
-            }))
-            .map(saved => saved.item);
-            for (const newComp of newComps) {
-              newComp._id = (await db.getNewID());
-              await db.upsert("ComponentClasses", newComp);
-            }
-            const compIDs = newComps.map(c => c._id);
-            dbUser.data.componentClasses._ids.push(...compIDs);
-            await db.upsert("Users", dbUser);
-          }
-  MemeGenerator:
-    users:
-      enabled: false
 restart:
   url: /restart/Jz0xnwG1bDv57LFpKTS6UkV8h9XQtCeBOMl2NHfRIj3yPcZYimAsrqdV4oWEaFhu
