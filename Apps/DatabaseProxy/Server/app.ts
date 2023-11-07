@@ -817,7 +817,7 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
       }
 
       // Attempt IP login
-      const user = await User.ipLogin(req, db);
+      const user = await User.ipLogin(req, db, res);
       // Save the user's login token key to a cookie.
       User.setLoginTokenCookie(res, user.data.loginTokenKey);
     };
@@ -836,13 +836,13 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
       return dbUser ? new User(dbUser) : null;
     };
 
-    static ipLogin = async (req: any, db: any) => {
+    static ipLogin = async (req: any, db: any, res: any) => {
       const userIP = User.getUserIP(req);
       let dbUser = await User.findUserByIP(db, userIP);
       if (!dbUser) {
         dbUser = await User.createIPUser(db, userIP);
       }
-      await User.setLoginToken(db, dbUser, null);
+      await User.setLoginToken(db, dbUser, res);
       return new User(dbUser);
     };
 
