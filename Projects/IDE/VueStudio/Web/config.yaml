@@ -2,6 +2,12 @@ title: vue.studio.Web
 server:
   host: localhost
   port: 5051
+  ssl:
+    domains:
+      - name: localhost
+        folder: (env) => env.path.resolve(env.process.cwd(), '../SSL')
+        key: localhost.key.pem
+        cert: localhost.pem
 project:
   folder: (env) => env.path.resolve(env.process.cwd(), '../Source')
 webscript:

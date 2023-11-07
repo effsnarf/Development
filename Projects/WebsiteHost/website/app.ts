@@ -456,7 +456,8 @@ const sheakspearize = async (text: string) => {
     config.title,
     config.server.port,
     config.server.host,
-    async (req, res, data) => {
+    config.server.ssl?.domains,
+    async (req: any, res: any, data: any) => {
       if (handler) {
         const result = await handler(req, res, data);
         if (result) return result;

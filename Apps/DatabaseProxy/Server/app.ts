@@ -817,16 +817,15 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
       }
 
       // Attempt IP login
-      return await User.ipLogin(req, db);
+      const user = await User.ipLogin(req, db);
+      // Save the user's login token key to a cookie.
+      User.setLoginTokenCookie(res, user.data.loginTokenKey);
     };
 
     static googleLogin = async (db: any, postData: any, res: any) => {
       const googleUserData = await Google.verifyIdToken(postData.credential);
       let dbUser = await User.findOrCreateGoogleUser(db, googleUserData);
-      const tokenKey = User.generateTokenKey();
-      await User.deleteExistingTokens(db, dbUser._id);
-      await User.createLoginToken(db, dbUser._id, tokenKey);
-      User.setLoginTokenCookie(res, tokenKey);
+      await User.setLoginToken(db, dbUser, res);
       return new User(dbUser);
     };
 
@@ -843,7 +842,14 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
       if (!dbUser) {
         dbUser = await User.createIPUser(db, userIP);
       }
+      await User.setLoginToken(db, dbUser, null);
       return new User(dbUser);
+    };
+
+    static setLoginToken = async (db: any, dbUser: any, res: any) => {
+      const tokenKey = User.generateTokenKey();
+      await User.createToken(db, "login", dbUser._id, tokenKey);
+      User.setLoginTokenCookie(res, tokenKey);
     };
 
     // Helper methods
@@ -882,22 +888,19 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
         .join("");
     };
 
-    static deleteExistingTokens = async (db: any, userId: string) => {
-      await db?.delete("Tokens", {
-        "data.user._id": userId,
-      });
-    };
-
-    static createLoginToken = async (
+    static createToken = async (
       db: any,
+      type: string,
       userId: string,
-      tokenKey: string
+      tokenKey: string,
+      deleteExisting = true
     ) => {
+      if (deleteExisting) await User.deleteTokens(db, type, userId);
       const dbToken = {
         _id: await db?.getNewID(),
         created: Date.now(),
         expires: (Date.now() + 1000 * 60 * 60 * 24 * 30).toString(),
-        type: "login",
+        type,
         data: {
           key: tokenKey,
           user: {
@@ -906,6 +909,13 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
         },
       };
       await db?.upsert("Tokens", dbToken);
+    };
+
+    static deleteTokens = async (db: any, type: string, userId: string) => {
+      await db?.delete("Tokens", {
+        type,
+        "data.user._id": userId,
+      });
     };
 
     static setLoginTokenCookie = (res: any, tokenKey: string) => {

@@ -180,10 +180,10 @@ class DatabaseProxy {
             return user;
         },
         out: async () => {
-            var url = `${this.urlBase}/logout`;
+            var url = `${this.urlBase}/log/out`;
             await this.fetchAsJson(url);
-            const user = await this.log.in();
-            return user;
+            //const user = await this.log.in();
+            //return user;
         },
     };
     constructor(urlBase, _fetchAsJson) {
@@ -8626,7 +8626,7 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 /*!************************************************************!*\
-  !*** ../../../WebsiteHost/website/script/1699362105134.ts ***!
+  !*** ../../../WebsiteHost/website/script/1699365358236.ts ***!
   \************************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

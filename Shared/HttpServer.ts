@@ -8,6 +8,7 @@ import { Timer } from "./Timer";
 const HAML = require("./haml");
 const Handlebars = require("Handlebars");
 const http = require("http");
+const https = require("https");
 import "../Shared/Extensions";
 import { Configuration } from "./Configuration";
 import { Objects } from "./Extensions.Objects";
@@ -28,22 +29,48 @@ class HttpServer {
     private appName: string,
     private port: number,
     private ip: string,
+    private sslDomains: {
+      name: string;
+      credentials: any;
+      folder: string;
+      key: any;
+      cert: any;
+    }[],
     private handler: (req: any, res: any, data: any) => any,
     private getIndexPageTemplateData: (req: any) => Promise<any>,
     private indexPagePath: string | null,
     private staticFileFolders: string[],
     private options?: HttpServerOptions
   ) {
+    this.log(`${`static folders`.gray}`);
+    for (const folder of staticFileFolders) {
+      this.log(`  ${folder.yellow}`);
+    }
+
     const server = http.createServer(this.requestListener.bind(this));
     server.listen(port, ip, () => {
       console.log(this.appName.green);
       this.log(
         `${`Server is running on`.green} ${`http://${ip}:${port}`.yellow}`
       );
-      this.log(`${`static folders`.gray}`);
-      for (const folder of staticFileFolders) {
-        this.log(`  ${folder.yellow}`);
-      }
+    });
+
+    const sslConfig = sslDomains?.map((d) => {
+      return {
+        name: d.name,
+        credentials: {
+          key: fs.readFileSync(`${d.folder}\\${d.key}`),
+          cert: fs.readFileSync(`${d.folder}\\${d.cert}`),
+        },
+      };
+    });
+
+    const server2 = https.createServer(
+      sslConfig[0].credentials,
+      this.requestListener.bind(this)
+    );
+    server2.listen(443, ip, () => {
+      this.log(`${`Server is running on`.green} ${`https://${ip}:443`.yellow}`);
     });
   }
 
@@ -51,6 +78,13 @@ class HttpServer {
     appName: string,
     port: number,
     ip: string,
+    sslDomains: {
+      name: string;
+      credentials: any;
+      folder: string;
+      key: any;
+      cert: any;
+    }[],
     handler: (req: any, res: any, data: any) => any,
     getIndexPageTemplateData: (req: any) => Promise<any>,
     indexPagePath: string | null,
@@ -61,6 +95,7 @@ class HttpServer {
       appName,
       port,
       ip,
+      sslDomains,
       handler,
       getIndexPageTemplateData,
       indexPagePath,

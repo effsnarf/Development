@@ -263,10 +263,10 @@ class DatabaseProxy {
       return user;
     },
     out: async () => {
-      var url = `${this.urlBase}/logout`;
+      var url = `${this.urlBase}/log/out`;
       await this.fetchAsJson(url);
-      const user = await this.log.in();
-      return user;
+      //const user = await this.log.in();
+      //return user;
     },
   };
 
