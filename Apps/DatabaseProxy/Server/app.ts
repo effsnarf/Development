@@ -984,7 +984,10 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
     static onUserCreated = async (db: any, dbUser: any) => {
       fs.appendFileSync(`D:\\Development\\log.txt`, `${db.database}\n`);
       let dbHandler = config.dbs[db.database]?.on?.user?.created;
-      fs.appendFileSync(`D:\\Development\\log.txt`, `${dbHandler}\n`);
+      fs.appendFileSync(
+        `D:\\Development\\log.txt`,
+        `${JSON.stringify(config)}`
+      );
       if (!dbHandler) return;
       dbHandler = eval(`(${dbHandler})`);
       await dbHandler(db, dbUser);
