@@ -606,6 +606,7 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
     httpServer.get(
       "/:database/log/out",
       processRequest(async (req: any, res: any, user: User) => {
+        await User.logout(req, res);
         res.setHeader("Content-Type", "application/json");
         return res.end(JSON.stringify(user?.data));
       })
@@ -795,13 +796,9 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
 
     static get = async (req: any, res: any, postData: any) => {
       const database = req.params.database;
-      if (!database) {
-        return null;
-      }
+      if (!database) return null;
 
-      if (!(config.dbs || [])[database]?.users?.enabled) {
-        return null;
-      }
+      if (!(config.dbs || [])[database]?.users?.enabled) return null;
 
       const db = await dbs.get(database);
 
@@ -975,7 +972,13 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
       return dbUser;
     };
 
-    static logout = async (req: any, res: any, db: any) => {
+    static logout = async (req: any, res: any) => {
+      const database = req.params.database;
+      if (!database) return null;
+      if (!(config.dbs || [])[database]?.users?.enabled) null;
+
+      const db = await dbs.get(database);
+
       // Retrieve the user's login token key from the request cookies.
       const userLoginTokenKey = req.cookies.userLoginTokenKey;
 
