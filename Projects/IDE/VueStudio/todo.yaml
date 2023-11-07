@@ -18,5 +18,6 @@ todo:
   - compiler warnings:
       - method used in node expression:
   - fixes:
-      - make sure that nodes and attributes are created/deleted properly from the cache:
-      - getContextPos() max call stack:
+    - context window:
+    - make sure that nodes and attributes are created/deleted properly from the cache:
+    - getContextPos() max call stack:

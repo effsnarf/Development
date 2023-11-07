@@ -33,24 +33,35 @@ mounted: | #js
 methods:
   init: | #js
     async function() {
+      const ideVueApp = this;
+      window.ideVueApp = ideVueApp;
+      this.$root.with = util.with;
       this.$root.dbp = (await (DatabaseProxy.new("https://db.memegenerator.net/IDE")));
+      const origLogIn = this.$root.dbp.log.in;
+      this.$root.dbp.log.in = (async () => {
+        const user = (await origLogIn());
+        this.reload();        
+      });
+      this.$on("ide-comp-changed-2", this.onCompChanged2.bind(this));
       liveData.dbp = this.$root.dbp;
       this.initCssLibrary();
+      await this.reload();
+    }
+  reload: | #js
+    async function() {
       this.comps.ide = (await this.getFromCache("vs.comps.ide", this.loadVsIdeComps.bind(this)));
       this.comps.user = (await this.getFromCache("vs.comps.user", this.loadVsUserComps.bind(this)));
       const allComps = [];
       allComps.push(...this.comps.ide.exceptBy(this.comps.user, (c => c._id)));
       allComps.push(...this.comps.user);
-      const ideVueApp = this;
-      window.ideVueApp = ideVueApp;
+      compDom.components.clear();
       compDom.components.add(...allComps);
-      this.$on("ide-comp-changed-2", this.onCompChanged2.bind(this));
-      this.$root.with = util.with;
       alertify.message(`Compiling Vue Studio components...`);
       await Promise.all(allComps.map(this.compileComp.bind(this)));
       alertify.message(`${allComps.length} Vue Studio components compiled`);
       this.userAccountCompName = "ide-user-account-267";
       this.workspaceCompName = "ide-workspace-171";
+      await liveData.unwatch.all();
       allComps.forEach(comp => liveData.watch.item("ComponentClasses", comp, { on: { changed: this.onCompChanged.bind(this) } }));
     }
   compileComp: | #js

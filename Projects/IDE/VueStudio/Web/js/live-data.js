@@ -68,6 +68,10 @@ var liveData = {
     }
   },
   unwatch: {
+    all: async () => {
+      for (item of liveData.watchedItems) item.dataWatcher.stop();
+      liveData.watchedItems.clear();
+    },
     item: async (entity, _id) => {
       var item = liveData.watchedItems.find(a => a.isItem(entity, _id));
       if (!item) throw `Watched item ${entity}.${_id} not found.`;

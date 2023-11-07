@@ -602,6 +602,15 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
       })
     );
 
+    // /[database]/log/out
+    httpServer.get(
+      "/:database/log/out",
+      processRequest(async (req: any, res: any, user: User) => {
+        res.setHeader("Content-Type", "application/json");
+        return res.end(JSON.stringify(user?.data));
+      })
+    );
+
     // For /[database]/api, return {}
     httpServer.get(
       "/:database/api",
@@ -781,7 +790,6 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
   };
   // #endregion
 
-  // #region User
   class User {
     private constructor(public readonly data: any) {}
 
@@ -797,109 +805,55 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
 
       const db = await dbs.get(database);
 
-      // Google login
+      // Attempt Google login
       if (postData?.credential) {
-        const googleUserData = await Google.verifyIdToken(postData.credential);
-
-        let dbUser = (
-          await db?.find("Users", {
-            "google.email": googleUserData.email,
-          })
-        )?.first();
-
-        // If the user doesn't exist, create it
-        if (!dbUser) {
-          dbUser = {
-            _id: await db?.getNewID(),
-            type: null,
-            ip: null,
-            created: Date.now(),
-            data: {
-              componentClasses: {
-                _ids: [],
-              },
-            },
-            google: googleUserData,
-            info: {
-              image: googleUserData.picture,
-              name: googleUserData.given_name,
-            },
-          };
-
-          await db?.upsert("Users", dbUser);
-        }
-
-        // Create a login token
-        // 20 character random string
-        const tokenKey = [...Array(20)]
-          .map((i) => (~~(Math.random() * 36)).toString(36))
-          .join("");
-
-        // Delete other login tokens for this user
-        await db?.delete("Tokens", {
-          "data.user._id": dbUser._id,
-        });
-        // Create a new login token
-        const dbToken = {
-          _id: await db?.getNewID(),
-          created: Date.now(),
-          expires: (Date.now() + 1000 * 60 * 60 * 24 * 30).toString(),
-          type: "login",
-          data: {
-            key: tokenKey,
-            user: {
-              _id: dbUser._id,
-            },
-          },
-        };
-
-        await db?.upsert("Tokens", dbToken);
-
-        // Save the token key in the response cookie
-        res.cookie("userLoginTokenKey", tokenKey, {
-          maxAge: 1000 * 60 * 60 * 24 * 30,
-          httpOnly: true,
-          sameSite: "none",
-          secure: true,
-          overwrite: true,
-        });
-
-        return new User(dbUser);
+        return await User.googleLogin(db, postData, res);
       }
 
-      // Cookie login
+      // Attempt Cookie login
       const userLoginTokenKey = req.cookies.userLoginTokenKey;
       if (userLoginTokenKey) {
-        const token = (
-          await db?.find("Tokens", {
-            "data.key": userLoginTokenKey,
-          })
-        )?.first();
-
-        if (token) {
-          const dbUser = (
-            await db?.find("Users", {
-              _id: token.data.user._id,
-            })
-          )?.first();
-
-          if (dbUser) {
-            return new User(dbUser);
-          }
+        const user = await User.cookieLogin(db, userLoginTokenKey);
+        if (user) {
+          return user;
         }
       }
 
-      // IP login
-      const userIP = (
-        req.headers["x-forwarded-for"] ||
-        req.connection.remoteAddress ||
-        req.socket.remoteAddress ||
-        req.connection.socket.remoteAddress
-      ).ipToNumber();
+      // Attempt IP login
+      return await User.ipLogin(req, db);
+    };
 
+    static googleLogin = async (db: any, postData: any, res: any) => {
+      const googleUserData = await Google.verifyIdToken(postData.credential);
+      let dbUser = await User.findOrCreateGoogleUser(db, googleUserData);
+      const tokenKey = User.generateTokenKey();
+      await User.deleteExistingTokens(db, dbUser._id);
+      await User.createLoginToken(db, dbUser._id, tokenKey);
+      User.setLoginTokenCookie(res, tokenKey);
+      return new User(dbUser);
+    };
+
+    static cookieLogin = async (db: any, userLoginTokenKey: string) => {
+      const token = await User.findTokenByKey(db, userLoginTokenKey);
+      if (!token) return null;
+      const dbUser = await User.findUserById(db, token.data.user._id);
+      return dbUser ? new User(dbUser) : null;
+    };
+
+    static ipLogin = async (req: any, db: any) => {
+      const userIP = User.getUserIP(req);
+      let dbUser = await User.findUserByIP(db, userIP);
+      if (!dbUser) {
+        dbUser = await User.createIPUser(db, userIP);
+      }
+      return new User(dbUser);
+    };
+
+    // Helper methods
+    static findOrCreateGoogleUser = async (db: any, googleUserData: any) => {
       let dbUser = (
         await db?.find("Users", {
-          ip: userIP,
+          "google.email": googleUserData.email,
         })
       )?.first();
 
@@ -907,24 +861,144 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
         dbUser = {
           _id: await db?.getNewID(),
           type: null,
-          ip: userIP,
+          ip: null,
           created: Date.now(),
           data: {
             componentClasses: {
               _ids: [],
             },
           },
-          google: null,
+          google: googleUserData,
           info: {
-            image: null,
-            name: null,
+            image: googleUserData.picture,
+            name: googleUserData.given_name,
           },
         };
-
         await db?.upsert("Users", dbUser);
       }
+      return dbUser;
+    };
 
-      return new User(dbUser);
+    static generateTokenKey = () => {
+      return [...Array(20)]
+        .map(() => (~~(Math.random() * 36)).toString(36))
+        .join("");
+    };
+
+    static deleteExistingTokens = async (db: any, userId: string) => {
+      await db?.delete("Tokens", {
+        "data.user._id": userId,
+      });
+    };
+
+    static createLoginToken = async (
+      db: any,
+      userId: string,
+      tokenKey: string
+    ) => {
+      const dbToken = {
+        _id: await db?.getNewID(),
+        created: Date.now(),
+        expires: (Date.now() + 1000 * 60 * 60 * 24 * 30).toString(),
+        type: "login",
+        data: {
+          key: tokenKey,
+          user: {
+            _id: userId,
+          },
+        },
+      };
+      await db?.upsert("Tokens", dbToken);
+    };
+
+    static setLoginTokenCookie = (res: any, tokenKey: string) => {
+      res.cookie("userLoginTokenKey", tokenKey, {
+        maxAge: 1000 * 60 * 60 * 24 * 30,
+        httpOnly: true,
+        sameSite: "none",
+        secure: true,
+        overwrite: true,
+      });
+    };
+
+    static findTokenByKey = async (db: any, tokenKey: string) => {
+      return (
+        await db?.find("Tokens", {
+          "data.key": tokenKey,
+        })
+      )?.first();
+    };
+
+    static findUserById = async (db: any, userId: string) => {
+      return (
+        await db?.find("Users", {
+          _id: userId,
+        })
+      )?.first();
+    };
+
+    static getUserIP = (req: any) => {
+      return (
+        req.headers["x-forwarded-for"] ||
+        req.connection.remoteAddress ||
+        req.socket.remoteAddress ||
+        req.connection.socket.remoteAddress
+      ).ipToNumber();
+    };
+
+    static findUserByIP = async (db: any, userIP: any) => {
+      return (
+        await db?.find("Users", {
+          ip: userIP,
+        })
+      )?.first();
+    };
+
+    static createIPUser = async (db: any, userIP: any) => {
+      const dbUser = {
+        _id: await db?.getNewID(),
+        type: null,
+        ip: userIP,
+        created: Date.now(),
+        data: {
+          componentClasses: {
+            _ids: [],
+          },
+        },
+        google: null,
+        info: {
+          image: null,
+          name: null,
+        },
+      };
+      await db?.upsert("Users", dbUser);
+      return dbUser;
+    };
+
+    static logout = async (req: any, res: any, db: any) => {
+      // Retrieve the user's login token key from the request cookies.
+      const userLoginTokenKey = req.cookies.userLoginTokenKey;
+
+      // If there's a token key, proceed to invalidate it.
+      if (userLoginTokenKey) {
+        // Delete the token from the database.
+        await db?.delete("Tokens", {
+          "data.key": userLoginTokenKey,
+        });
+
+        // Clear the login token cookie from the user's browser.
+        res.clearCookie("userLoginTokenKey", {
+          httpOnly: true,
+          sameSite: "none",
+          secure: true,
+        });
+      }
+
+      // You can also add additional logic here if you need to handle other tasks during logout,
+      // such as logging the event or notifying other systems.
+
+      // Optionally, you can return a confirmation message or status.
+      return { message: "Logout successful" };
     };
   }
 

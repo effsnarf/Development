@@ -209,6 +209,8 @@ class DatabaseProxy {
   public fetchAsJson: (url: string, ...args: any[]) => Promise<any>;
   private newIds: Data.LocalPersistedArray;
 
+  public user: any;
+
   get dbName() {
     return this.urlBase.split("/").pop();
   }
@@ -241,6 +243,30 @@ class DatabaseProxy {
         });
         return promise;
       },
+    },
+    googleLogin: async (googleCredential: string) => {
+      var url = `${this.urlBase}/get/googleLogin`;
+      var result = await this.fetchAsJson(url, {
+        method: "POST",
+        body: JSON.stringify({ credential: googleCredential }),
+        credentials: "include",
+      });
+
+      return JSON.parse(await result.text());
+    },
+  };
+
+  log = {
+    in: async () => {
+      const user = await this.get.user();
+      this.user = user;
+      return user;
+    },
+    out: async () => {
+      var url = `${this.urlBase}/logout`;
+      await this.fetchAsJson(url);
+      const user = await this.log.in();
+      return user;
     },
   };
 

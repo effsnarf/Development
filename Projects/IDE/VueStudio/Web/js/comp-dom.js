@@ -33,6 +33,9 @@ var compDom = {
       compDom.cache.nodes.refresh();
       compDom.cache.attrs.refresh();
     },
+    clear: () => {
+      compDom.components.value.clear();
+    },
     value: []
   },
   cache: {

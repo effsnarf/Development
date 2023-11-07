@@ -4,22 +4,24 @@ dom:
     div: 
       v-if: showWorkspace
       class: workspace
-      h3:
-        ui.title: 
-          icon: 🎄
-          ':value': appVuesCount?.toLocaleString()
-        div: 
-          ui.button:
-            icon: ♻
-            text: reload from server
-            ':click': $root.reloadComponentsFromServer
-        select:
-          v-model: selectedEditor
-          option:
-            v-for: editor in ['component', 'css']
-            ':selected': (selectedEditor == editor)
-            ':key': editor
-            v-text: editor
+      div:
+        v-if: "false"
+        h3:
+          ui.title: 
+            icon: 🎄
+            ':value': appVuesCount?.toLocaleString()
+          div: 
+            ui.button:
+              icon: ♻
+              text: reload from server
+              ':click': $root.reloadComponentsFromServer
+          select:
+            v-model: selectedEditor
+            option:
+              v-for: editor in ['component', 'css']
+              ':selected': (selectedEditor == editor)
+              ':key': editor
+              v-text: editor
       div: 
         v-if: 'false'
         ui.title: 
@@ -71,18 +73,15 @@ methods:
 name: ide-workspace
 style:
   .comp-ide-workspace:
+    display: flex
     position: fixed
     left: 1rem
     bottom: 1rem
-    display: flex
     flex-direction: column
     max-width: 10em
     max-height: 10em
     gap: 3em
-    background: '#303030'
     padding: 1rem
-    box-shadow: 'inset -5px 5px 5px #000'
-    border: 1px solid gray
     overflow: hidden
     z-index: 1000000
     transition: 1s

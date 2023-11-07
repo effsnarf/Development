@@ -42,8 +42,8 @@ methods:
           component: `📦 ${log.context.name}`,
           operation: this.getOpName(log),
           invokes: log.invokes,
-          "total (ms)": Math.round(log.elapsed.total),
           "average (ms)": Math.round(log.elapsed.average),
+          "total (ms)": Math.round(log.elapsed.total),
         }));
       return logItems;
     }
@@ -101,18 +101,20 @@ methods:
 style:
   .inspector:
     position: fixed
-    right: 0
-    top: 0
+    left: 0
+    bottom: 0
+    opacity: 0.5
     max-width: 10em
     max-height: 10em
     overflow: hidden
     padding: 1em
     border: "1px solid #ccc"
     background: "#303030"
-  .inspector:hover:
-    max-width: 100em
-    max-height: 100em
     transition: 1s
+  .inspector:hover:
+    max-width: 50em
+    max-height: 50em
+    opacity: 1
   .warning:
     text-align: center
   .value-as-string:
