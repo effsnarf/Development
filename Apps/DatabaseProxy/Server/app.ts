@@ -818,8 +818,6 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
 
       // Attempt IP login
       const user = await User.ipLogin(req, db, res);
-      // Save the user's login token key to a cookie.
-      User.setLoginTokenCookie(res, user.data.loginTokenKey);
     };
 
     static googleLogin = async (db: any, postData: any, res: any) => {
