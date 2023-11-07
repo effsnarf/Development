@@ -33,8 +33,8 @@ var compDom = {
       compDom.cache.nodes.refresh();
       compDom.cache.attrs.refresh();
     },
-    clear: () => {
-      compDom.components.value.clear();
+    removeBy: (condition) => {
+      compDom.components.value.removeBy(condition);
     },
     value: []
   },

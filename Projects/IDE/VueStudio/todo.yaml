@@ -5,7 +5,7 @@ todo:
           - pause on operation:
           - detect if an operation is triggerred too often:
   - new users can use it:
-      - user stickiness:
+      ✔️ user stickiness:
       - demo components for new users:
       - user signup:
       - user login:
@@ -14,6 +14,7 @@ todo:
   - improve the interface:
       - component tree:
       - near every prop, enabled icons (watch, computed, etc):
+      - general small improvements:
   - marketing:
   - compiler warnings:
       - method used in node expression:
@@ -21,3 +22,9 @@ todo:
     - context window:
     - make sure that nodes and attributes are created/deleted properly from the cache:
     - getContextPos() max call stack:
+    - style fucks up when user changes:
+    - delete login token on logout:
+    - progess bar when downloading components:
+    - logout button unclickable when moved:
+    - move dbs.IDE.on.user.created section from dbp config to vs.config.yaml:
+    - data: { componentClasses: { _ids: [] } } should be in an external config file, not dbp directly:

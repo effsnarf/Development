@@ -13,6 +13,7 @@
 // Doesn't have direct access to the database, but can still use the API
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.DatabaseProxy = void 0;
+const Events_1 = __webpack_require__(/*! ../../../Shared/Events */ "../../../../Shared/Events.ts");
 const Data_1 = __webpack_require__(/*! ../../../Shared/Data */ "../../../../Shared/Data.ts");
 // Lowercase the first letter of a string
 String.prototype.untitleize = function () {
@@ -131,6 +132,7 @@ class EntityMethods {
 }
 class DatabaseProxy {
     urlBase;
+    events = new Events_1.Events();
     fetchAsJson;
     newIds;
     user;
@@ -165,25 +167,21 @@ class DatabaseProxy {
         },
         googleLogin: async (googleCredential) => {
             var url = `${this.urlBase}/get/googleLogin`;
-            var result = await this.fetchAsJson(url, {
+            var user = await this.fetchAsJson(url, {
                 method: "POST",
                 body: JSON.stringify({ credential: googleCredential }),
                 credentials: "include",
             });
-            return JSON.parse(await result.text());
+            this.events.emit("user.changed", user);
+            return user;
         },
     };
     log = {
-        in: async () => {
-            const user = await this.get.user();
-            this.user = user;
-            return user;
-        },
         out: async () => {
             var url = `${this.urlBase}/log/out`;
             await this.fetchAsJson(url);
-            //const user = await this.log.in();
-            //return user;
+            const newUser = await this.get.user();
+            this.events.emit("user.changed", newUser);
         },
     };
     constructor(urlBase, _fetchAsJson) {
@@ -8626,7 +8624,7 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 /*!************************************************************!*\
-  !*** ../../../WebsiteHost/website/script/1699365358236.ts ***!
+  !*** ../../../WebsiteHost/website/script/1699370062795.ts ***!
   \************************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

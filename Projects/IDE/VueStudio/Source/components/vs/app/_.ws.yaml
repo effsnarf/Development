@@ -13,11 +13,16 @@ dom:
         ":is": userAccountCompName
     component:
       ":is": workspaceCompName
+    div:
+      ui.html.style:
+        v-for: comp in allComps
+        ":key": comp._id
+        ":component": comp
 props: null
 data:
   comps:
-    ide: null
-    user: null
+    ide: []
+    user: []
   css:
     library:
       shorthand: null
@@ -26,6 +31,7 @@ data:
       comp: {}
   userAccountCompName: null
   workspaceCompName: null
+  stylesKey: 1
 mounted: | #js
   function() {
     this.init();
@@ -37,32 +43,38 @@ methods:
       window.ideVueApp = ideVueApp;
       this.$root.with = util.with;
       this.$root.dbp = (await (DatabaseProxy.new("https://db.memegenerator.net/IDE")));
-      const origLogIn = this.$root.dbp.log.in;
-      this.$root.dbp.log.in = (async () => {
-        const user = (await origLogIn());
-        this.reload();        
-      });
+      this.$root.dbp.events.on("user.changed", this.onUserChanged.bind(this));
       this.$on("ide-comp-changed-2", this.onCompChanged2.bind(this));
       liveData.dbp = this.$root.dbp;
       this.initCssLibrary();
-      await this.reload();
+      await this.reload(true);
+    }
+  onUserChanged: | #js
+    async function(user) {
+      await this.reloadComps("user", true);
     }
   reload: | #js
-    async function() {
-      this.comps.ide = (await this.getFromCache("vs.comps.ide", this.loadVsIdeComps.bind(this)));
-      this.comps.user = (await this.getFromCache("vs.comps.user", this.loadVsUserComps.bind(this)));
-      const allComps = [];
-      allComps.push(...this.comps.ide.exceptBy(this.comps.user, (c => c._id)));
-      allComps.push(...this.comps.user);
-      compDom.components.clear();
-      compDom.components.add(...allComps);
-      alertify.message(`Compiling Vue Studio components...`);
-      await Promise.all(allComps.map(this.compileComp.bind(this)));
-      alertify.message(`${allComps.length} Vue Studio components compiled`);
-      this.userAccountCompName = "ide-user-account-267";
-      this.workspaceCompName = "ide-workspace-171";
-      await liveData.unwatch.all();
-      allComps.forEach(comp => liveData.watch.item("ComponentClasses", comp, { on: { changed: this.onCompChanged.bind(this) } }));
+    async function(ide = false) {
+      if (ide) await this.reloadComps("ide");
+      await this.reloadComps("user");
+    }
+  reloadComps: | #js
+    async function(compType, clearCache = false) {
+      const oldComps = [...this.comps[compType]];
+      const oldCompIDs = oldComps.map(c => c._id);
+      if (clearCache) this.clearCache(`vs.comps.${compType}`);
+      const newComps = (await this.getFromCache(`vs.comps.${compType}`, () => this.loadVsComps(compType)));
+      this.comps[compType].splice(0, this.comps[compType].length);
+      this.comps[compType].push(...newComps);
+      compDom.components.removeBy(c => oldCompIDs.includes(c._id));
+      compDom.components.add(...newComps);
+      await this.compileComps(compType, newComps);
+      if (compType == "ide") {
+        this.userAccountCompName = "ide-user-account-267";
+        this.workspaceCompName = "ide-workspace-171";
+      }
+      await this.$nextTick();
+      this.stylesKey++;
     }
   compileComp: | #js
     async function(comp) {
@@ -83,6 +95,16 @@ methods:
       mixins.push(opTrackerMixin);
       mixins.push(activityMixin);
       await vueUserComponentCompiler.compile(comp, { mixins });
+    }
+  compileComps: | #js
+    async function(compType, comps) {
+      if (!comps?.length) return;
+      const showInfo = (compType != "ide");
+      if (showInfo) alertify.message(`Compiling ${comps.length} components...`);
+      await Promise.all(comps.map(this.compileComp.bind(this)));
+      if (showInfo) alertify.message(`${comps.length} components compiled`);
+      await liveData.unwatch.items(comps);
+      comps.forEach(comp => liveData.watch.item("ComponentClasses", comp, { on: { changed: this.onCompChanged.bind(this) } }));
     }
   getActivityMixin: | #js
     function() {
@@ -149,19 +171,14 @@ methods:
       }
       this.css.library.shorthand = (new CssLibrary("/static/shorthand.css"));
     }
-  loadVsIdeComps: | #js
-    async function() {
-      alertify.message(`Loading Vue Studio components...`);
-      const vsComps = (await this.$root.dbp.componentClasses.ide.get());
-      alertify.message(`${vsComps.length} components loaded`);
-      return vsComps;
-    }
-  loadVsUserComps: | #js
-    async function() {
-      alertify.message(`Loading user components...`);
-      const userComps = (await this.$root.dbp.componentClasses.user.get());
-      alertify.message(`${userComps.length} components loaded`);
-      return userComps;
+  loadVsComps: | #js
+    async function(compType) {
+      let compTypeStr = compType;
+      if (compType == "ide") compTypeStr = "Vue Studio";
+      alertify.message(`Loading ${compTypeStr} components...`);
+      const comps = (await this.$root.dbp.componentClasses[compType].get());
+      alertify.message(`${comps.length} components loaded`);
+      return comps;
     }
   getIdeComp: | #js
     function(nameOrID) {
@@ -226,7 +243,20 @@ methods:
       localStorage.setItem(key, JSON.stringify(value));
       const elapsed = (Date.now() - started);
     }
+  clearCache: | #js
+    async function(key) {
+      localStorage.removeItem(key);
+    }
 computed:
+  allComps: | #js
+    function() {
+      const comps = [];
+      const ideCompIDs = this.comps.ide.map(c => c._id);
+      const userComps = this.comps.user.filter(c => !ideCompIDs.includes(c._id));
+      comps.push(...this.comps.ide);
+      comps.push(...userComps);
+      return comps;
+    }
 style:
   .logo:
     display: flex

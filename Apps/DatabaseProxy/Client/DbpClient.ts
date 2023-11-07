@@ -1,6 +1,7 @@
 // This version is for public clients like Meme Generator
 // Doesn't have direct access to the database, but can still use the API
 
+import { Events } from "../../../Shared/Events";
 import { Data } from "../../../Shared/Data";
 
 // Lowercase the first letter of a string
@@ -206,6 +207,7 @@ class EntityMethods {
   }
 }
 class DatabaseProxy {
+  public events: Events = new Events();
   public fetchAsJson: (url: string, ...args: any[]) => Promise<any>;
   private newIds: Data.LocalPersistedArray;
 
@@ -246,27 +248,24 @@ class DatabaseProxy {
     },
     googleLogin: async (googleCredential: string) => {
       var url = `${this.urlBase}/get/googleLogin`;
-      var result = await this.fetchAsJson(url, {
+      var user = await this.fetchAsJson(url, {
         method: "POST",
         body: JSON.stringify({ credential: googleCredential }),
         credentials: "include",
       });
 
-      return JSON.parse(await result.text());
+      this.events.emit("user.changed", user);
+
+      return user;
     },
   };
 
   log = {
-    in: async () => {
-      const user = await this.get.user();
-      this.user = user;
-      return user;
-    },
     out: async () => {
       var url = `${this.urlBase}/log/out`;
       await this.fetchAsJson(url);
-      //const user = await this.log.in();
-      //return user;
+      const newUser = await this.get.user();
+      this.events.emit("user.changed", newUser);
     },
   };
 

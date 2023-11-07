@@ -811,13 +811,12 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
       const userLoginTokenKey = req.cookies.userLoginTokenKey;
       if (userLoginTokenKey) {
         const user = await User.cookieLogin(db, userLoginTokenKey);
-        if (user) {
-          return user;
-        }
+        if (user) return user;
       }
 
       // Attempt IP login
       const user = await User.ipLogin(req, db, res);
+      if (user) return user;
     };
 
     static googleLogin = async (db: any, postData: any, res: any) => {
@@ -876,6 +875,7 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
           },
         };
         await db?.upsert("Users", dbUser);
+        await User.onUserCreated(db, dbUser);
       }
       return dbUser;
     };
@@ -977,7 +977,15 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
         },
       };
       await db?.upsert("Users", dbUser);
+      await User.onUserCreated(db, dbUser);
       return dbUser;
+    };
+
+    static onUserCreated = async (db: any, dbUser: any) => {
+      let dbHandler = config.dbs[db.database]?.on?.user?.created;
+      if (!dbHandler) return;
+      dbHandler = eval(dbHandler);
+      await dbHandler(db, dbUser);
     };
 
     static logout = async (req: any, res: any) => {

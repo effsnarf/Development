@@ -68,9 +68,16 @@ var liveData = {
     }
   },
   unwatch: {
-    all: async () => {
-      for (item of liveData.watchedItems) item.dataWatcher.stop();
-      liveData.watchedItems.clear();
+    items: async (conditionOrItems) => {
+      let condition = conditionOrItems;
+      if (Array.isArray(condition)) {
+        let ids = condition;
+        if (typeof(ids[0]) != "number") ids = ids.map(a => a._id);
+        condition = (item) => ids.includes(item.value._id);
+      }
+      const items = liveData.watchedItems.filter(condition);
+      for (item of items) item.dataWatcher.stop();
+      liveData.watchedItems.removeBy(condition);
     },
     item: async (entity, _id) => {
       var item = liveData.watchedItems.find(a => a.isItem(entity, _id));

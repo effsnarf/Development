@@ -37,11 +37,6 @@ dom:
         ide.element.picker:
           v-if: (selectedEditor == 'css')
         ide.performance.inspector:
-    div: 
-      ui.html.style:
-        v-for: comp in $root.comps
-        ':key': comp.name
-        ':component': comp
 props: null
 data:
   showWorkspace: true

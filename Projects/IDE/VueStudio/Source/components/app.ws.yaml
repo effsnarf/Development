@@ -1,12 +1,10 @@
 dom:
-  div: 
+  div:
     vs.app: null
-    div: 
-      ui.html.style:
-        v-for: comp in $root.comps
-        ':key': comp.name
-        ':component': comp
-        ':document-head': 'true'
+    ui.html.style:
+      v-for: comp in $root.comps
+      ":key": comp.name
+      ":component": comp
 mounted: | #js
   function() {
   }
