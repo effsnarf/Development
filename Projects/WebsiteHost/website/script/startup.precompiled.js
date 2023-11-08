@@ -7399,6 +7399,7 @@ const Mixins = {
                 this._updateStart = performance.now();
             },
             updated() {
+                return;
                 const end = performance.now();
                 afterOperation({
                     operation: { context: this, type: "update", name: "update" },
@@ -8672,7 +8673,7 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 /*!************************************************************!*\
-  !*** ../../../WebsiteHost/website/script/1699466459221.ts ***!
+  !*** ../../../WebsiteHost/website/script/1699471620866.ts ***!
   \************************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

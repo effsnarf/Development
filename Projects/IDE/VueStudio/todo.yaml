@@ -9,12 +9,14 @@ todo:
       ✔️ demo components for new users:
       ✔️ user login/logout:
   - demo components:
+    ✔️ hot reload:
+    - activity rollback/reexecute:
   - improve the interface:
     - features:
+      - undo?:
       - animations:
       - recent editables:
       - component tree:
-      - state rollback:
       - search:
       - execute method on server?:
       - syntax highlighting:

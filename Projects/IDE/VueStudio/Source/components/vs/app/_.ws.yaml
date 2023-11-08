@@ -80,6 +80,7 @@ methods:
     }
   compileComp: | #js
     async function(comp) {
+      const isIdeComp = (comp.name.kebabize().startsWith("ide-"));
       const vsGlobalsMixin = {
         data() {
           return {
@@ -93,9 +94,9 @@ methods:
       const opTrackerMixin = Mixins.OperationTracker(this.afterCompOperation.bind(this));
       const activityLogMixin = this.getActivityLogMixin();
       const mixins = [];
-      if (comp.name.kebabize().startsWith("ide-")) mixins.push(vsGlobalsMixin);
+      if (isIdeComp) mixins.push(vsGlobalsMixin);
       mixins.push(opTrackerMixin);
-      //mixins.push(activityLogMixin);
+      if (!isIdeComp) mixins.push(activityLogMixin);
       await vueUserComponentCompiler.compile(comp, { mixins });
     }
   compileComps: | #js
@@ -205,7 +206,7 @@ methods:
       timers[comp._id] = setTimeout(async () => {
         await this.updateLocalCompCache(comp);
         await this.recompileComp(comp);
-      }, 1000);
+      }, 1);
     }
   onCompRemoved: | #js
     function(comp) {
@@ -249,7 +250,7 @@ methods:
       // biztos ami biztos
       comp = compDom.get.comp.byID(comp._id);
       await this.compileComp(comp);
-      this.$emit("ide-comp-recompiled", comp);
+      this.$root.$emit("ide-comp-recompiled", comp);
       alertify.message(`<h3>📦 ${comp.name}</h3><div>Component recompiled.</div>`);
     }
   onCompError: | #js

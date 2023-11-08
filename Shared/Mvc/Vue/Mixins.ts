@@ -162,6 +162,7 @@ const Mixins = {
         this._updateStart = performance.now();
       },
       updated(this: any) {
+        return;
         const end = performance.now();
         afterOperation({
           operation: { context: this, type: "update", name: "update" },

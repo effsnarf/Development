@@ -133,7 +133,7 @@ function DataWatcher(getData, onChange)
 {
   this.isPaused = false;
   this.isStopped = false;
-  this.checkInterval = 1000;
+  this.checkInterval = 100;
 
   this.dataComparer = new DefaultDataComparer();
   this.data = this.dataComparer.clone(getData());
