@@ -13,6 +13,8 @@ dom:
         ":is": userAccountCompName
     component:
       ":is": workspaceCompName
+    .recent-vues:
+      vs.recent.vues:
     div:
       ui.html.style:
         v-for: comp in allComps
@@ -89,11 +91,11 @@ methods:
         },
       };
       const opTrackerMixin = Mixins.OperationTracker(this.afterCompOperation.bind(this));
-      const activityMixin = this.getActivityMixin();
+      const activityLogMixin = this.getActivityLogMixin();
       const mixins = [];
       if (comp.name.kebabize().startsWith("ide-")) mixins.push(vsGlobalsMixin);
       mixins.push(opTrackerMixin);
-      mixins.push(activityMixin);
+      //mixins.push(activityLogMixin);
       await vueUserComponentCompiler.compile(comp, { mixins });
     }
   compileComps: | #js
@@ -106,7 +108,15 @@ methods:
       await liveData.unwatch.items(comps);
       comps.forEach(comp => liveData.watch.item("ComponentClasses", comp, { on: { changed: this.onCompChanged.bind(this) } }));
     }
-  getActivityMixin: | #js
+  createNewComp: | #js
+    async function () {
+      var newComp = (await compDom.create.comp());
+      this.comps.user.push(newComp);
+      compDom.components.add(newComp);
+      liveData.watch.item("ComponentClasses", newComp, { on: { changed: this.onCompChanged } });
+      this.updateLocalCompCache(newComp);
+    }
+  getActivityLogMixin: | #js
     function() {
       const logActivity = (measurement) => {
         const vue = measurement.operation.context;
@@ -186,8 +196,6 @@ methods:
     }
   onCompChanged: | #js
     function(comp) {
-      // onCompChanged is triggered by a watcher, who watches and notifies data, not references
-      comp = compDom.get.comp.byID(comp._id);
       this.$emit("ide-comp-changed-2", comp);
     }
   onCompChanged2: | #js
@@ -199,18 +207,42 @@ methods:
         await this.recompileComp(comp);
       }, 1000);
     }
+  onCompRemoved: | #js
+    function(comp) {
+      compDom.components.removeBy((c => (c._id == comp._id)));
+      this.comps.user.removeByField("_id", comp._id);
+      this.updateLocalCompCacheItems("user");
+    }
   updateLocalCompCache: | #js
     async function(comp) {
+      // Update this.comps.ide / this.comps.user
+      for (const compType of ["ide", "user"]) {
+        const rtComp = this.comps[compType].find(c => (c._id === comp._id));
+        if (!rtComp) continue;
+        // Filter out [(() => comp)] properties
+        const changes = (DeepDiff(rtComp, comp) || [])
+          .filter(c => ((typeof c.lhs) != "function") && ((typeof c.rhs) != "function"));
+        for (const change of changes) DeepDiff.applyChange(rtComp, null, change);
+      }
       // Delete view from local cache
       const viewNodeKey = compDom.get.node.cache.key(comp, comp.view.node);
       localStorage.removeItem(viewNodeKey);
       // Update local cache
-      if (this.comps.user.find(c => (c._id === comp._id))) {
-        this.setToCache("vs.comps.user", this.comps.user);
+      let foundInCache = false;
+      for (const compType of ["ide", "user"]) {
+        if (this.comps[compType].find(c => (c._id === comp._id))) {
+          await this.updateLocalCompCacheItems(compType);
+          foundInCache = true;
+        }
       }
-      else {
+
+      if (!foundInCache) {
         alertify.error(`Comp not found in local cache: ${comp.name}`);
       }
+    }
+  updateLocalCompCacheItems: | #js
+    async function(compType) {
+      this.setToCache(`vs.comps.${compType}`, this.comps[compType]);
     }
   recompileComp: | #js
     async function(comp) {
@@ -224,7 +256,7 @@ methods:
     function(vue, item, ex) {
       if (Array.isArray(item)) item = item.last();
       const icon = (item?.comp ? "📦" : item?.method ? "🔴" : "❔");
-      const source = Object.values(item)[0].name;
+      const source = (!item) ? "❔" : Object.values(item)[0].name;
       const message = (ex.message || ex);
       alertify.error(`<h3>${icon} ${source}</h3><div>${message}</div>`);
     }
@@ -258,6 +290,10 @@ computed:
       return comps;
     }
 style:
+  .recent-vues:
+    position: fixed
+    right: 2em
+    top: 5em
   .logo:
     display: flex
     height: fit-content

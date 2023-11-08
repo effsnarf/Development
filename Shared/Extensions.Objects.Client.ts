@@ -503,39 +503,52 @@ class Objects {
 }
 
 class TreeObject {
-  static traverse(root: any, callback: Function) {
+  static traverse(root: any, callback: Function, getChildren?: Function) {
     // Traverse a tree structure (children[] on each node)
-    const traverse = (node: any, callback: Function) => {
+    const traverse = (
+      node: any,
+      callback: Function,
+      getChildren: Function = (node: any) => node.children
+    ) => {
       callback(node);
-      if (node.children) {
-        for (const child of node.children) {
-          traverse(child, callback);
+      const children = getChildren(node);
+      if (children) {
+        for (const child of children) {
+          traverse(child, callback, getChildren);
         }
       }
     };
-    traverse(root, callback);
+    traverse(root, callback, getChildren);
   }
 
-  static filter(root: any, predicate: Function) {
+  static filter(root: any, predicate: Function, getChildren?: Function) {
     predicate = TreeObject._evalSelector(predicate);
     const items = [] as any[];
-    TreeObject.traverse(root, (node: any) => {
-      if (predicate(node)) items.push(node);
-    });
+    TreeObject.traverse(
+      root,
+      (node: any) => {
+        if (predicate(node)) items.push(node);
+      },
+      getChildren
+    );
     return items;
   }
 
-  static find(root: any, predicate: Function) {
-    const items = TreeObject.filter(root, predicate);
+  static find(root: any, predicate: Function, getChildren?: Function) {
+    const items = TreeObject.filter(root, predicate, getChildren);
     return items.length ? items[0] : null;
   }
 
-  static map(root: any, selector: Function) {
+  static map(root: any, selector: Function, getChildren?: Function) {
     selector = TreeObject._evalSelector(selector);
     const items = [] as any[];
-    TreeObject.traverse(root, (node: any) => {
-      items.push(selector(node));
-    });
+    TreeObject.traverse(
+      root,
+      (node: any) => {
+        items.push(selector(node));
+      },
+      getChildren
+    );
     return items;
   }
 

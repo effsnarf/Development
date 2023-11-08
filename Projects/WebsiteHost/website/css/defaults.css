@@ -741,7 +741,7 @@ select, input[type=range]
 }
 .disabled
 {
-  filter: grayscale(1) contrast(0.8) brightness(0.8);
+  filter: grayscale(1) contrast(1) brightness(0.5);
   pointer-events: none;
 }
 .disabled2

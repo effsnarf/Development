@@ -1,0 +1,48 @@
+dom:
+  transition.group:
+    name: list
+    .recent-item:
+      v-for: vueDef in vueDefs
+      :key: vueDef.id
+      component:
+        :is: vueDef.tag
+        v-bind: vueDef.propsData
+
+data:
+  vueDefs: []
+  nextID: 1
+
+mounted: | #js
+  function() {
+    this.init();
+  }
+
+methods:
+  init: | #js
+    function() {
+      this.$root.$on("add.recent.vue", this.onAddRecentVue.bind(this));
+    }
+  onAddRecentVue: | #js
+    function(vueDef) {
+      this.vueDefs.unshift({
+        id: this.nextID++,
+        ...vueDef
+      });
+    }
+
+style:
+  .recent-item:
+    max-width: 10em
+    max-height: 5em
+    margin-bottom: 1em
+    overflow: hidden
+    filter: grayscale(1)
+    -webkit-mask-image: linear-gradient(to bottom, black, transparent);
+    opacity: 0.5
+    transition: 1s
+  .recent-item:hover:
+    max-width: 30em
+    max-height: 30em
+    filter: none
+    -webkit-mask-image: none
+    opacity: 1

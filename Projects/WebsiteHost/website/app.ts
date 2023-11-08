@@ -433,11 +433,6 @@ const sheakspearize = async (text: string) => {
     return yaml;
   };
 
-  const isLocalFile = (url: string) => {
-    const localPath = path.join(__dirname, url);
-    return fs.existsSync(localPath);
-  };
-
   const staticFileFolders = [
     __dirname,
     config.project.folder,
@@ -445,6 +440,17 @@ const sheakspearize = async (text: string) => {
     config.website?.folder,
     config.static.folder,
   ].filter((s) => s);
+
+  const isLocalFile = (url: string) => {
+    const localPath = path.join(__dirname, url);
+    if (fs.existsSync(localPath)) return true;
+    // Check static file folders
+    for (const folder of staticFileFolders) {
+      const filePath = path.join(folder, url);
+      if (fs.existsSync(filePath)) return true;
+    }
+    return false;
+  };
 
   //console.log("staticFileFolders", staticFileFolders);
 

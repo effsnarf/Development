@@ -339,7 +339,13 @@ interface Date {
 }
 
 interface Array<T> {
+  _syncTimeout?: ReturnType<typeof setTimeout>; // Optional property to store the timeout
   all(predicate: (item: T) => boolean): boolean;
+  keepSyncedWith(
+    getSource: () => T[],
+    getItemKey: (item: T) => any,
+    stagger: number
+  ): void;
   flatMapAsync<TResult>(
     callback: (item: T, index: number) => Promise<TResult[]>,
     stagger?: number
@@ -1482,6 +1488,61 @@ Date.prototype.isToday = function (): boolean {
 
 // #region Array
 if (typeof Array !== "undefined") {
+  Array.prototype.keepSyncedWith = function <T>(
+    this: T[],
+    getSource: () => T[],
+    getItemKey: (item: T) => any,
+    stagger: number
+  ): void {
+    // Clear any existing staggered updates to avoid multiple syncs
+    if (this._syncTimeout) {
+      clearTimeout(this._syncTimeout);
+    }
+
+    const source = getSource();
+    const target = this;
+    const sourceKeys = source.map(getItemKey);
+    const targetKeys = target.map(getItemKey);
+
+    // Synchronize deletions
+    for (let i = 0; i < target.length; i++) {
+      if (!sourceKeys.includes(getItemKey(target[i]))) {
+        target.splice(i, 1);
+        scheduleNextSync();
+        return;
+      }
+    }
+
+    // Synchronize additions and order
+    for (let i = 0; i < source.length; i++) {
+      if (i >= target.length || getItemKey(target[i]) !== sourceKeys[i]) {
+        // If the item is in the wrong position or missing, fix it
+        const sourceItemIndex = target.findIndex(
+          (t) => getItemKey(t) === sourceKeys[i]
+        );
+        if (sourceItemIndex !== -1) {
+          // Move the item to the correct position
+          const [itemToMove] = target.splice(sourceItemIndex, 1);
+          target.splice(i, 0, itemToMove);
+        } else {
+          // Add the item from the source
+          target.splice(i, 0, source[i]);
+        }
+        scheduleNextSync();
+        return;
+      }
+    }
+
+    // If we've made it this far, the arrays are in sync, but we should still check again later
+    scheduleNextSync();
+
+    function scheduleNextSync() {
+      target._syncTimeout = setTimeout(() => {
+        target.keepSyncedWith(getSource, getItemKey, stagger);
+      }, stagger);
+    }
+  };
+
   Array.prototype.flatMapAsync = async function (
     callback: (item: any, index: number) => Promise<any[]>,
     stagger?: number
@@ -1608,7 +1669,9 @@ if (typeof Array !== "undefined") {
     getItemKey?: (item: any) => string
   ) {
     if (getItemKey) {
-      let newItems = await getNewItems();
+      let newItems = Array.isArray(getNewItems)
+        ? [...getNewItems]
+        : await getNewItems();
       const processNext = async (i: number) => {
         if (i > Math.max(this.length, newItems.length)) return;
         if (this[i] && !newItems.contains(this[i], getItemKey))

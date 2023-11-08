@@ -33,7 +33,7 @@ class Component {
       console.groupCollapsed(this.name);
       console.log(this);
     } else {
-      console.log(`📦`, this.name);
+      //console.log(`📦`, this.name);
     }
 
     try {

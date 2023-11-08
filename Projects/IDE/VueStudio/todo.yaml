@@ -6,25 +6,34 @@ todo:
           - detect if an operation is triggerred too often:
   - new users can use it:
       ✔️ user stickiness:
-      - demo components for new users:
-      - user signup:
-      - user login:
-      - user logout:
+      ✔️ demo components for new users:
+      ✔️ user login/logout:
   - demo components:
   - improve the interface:
+    - features:
+      - animations:
+      - recent editables:
       - component tree:
-      - near every prop, enabled icons (watch, computed, etc):
-      - general small improvements:
-  - marketing:
+      - state rollback:
+      - search:
+      - execute method on server?:
+      - syntax highlighting:
+    - near every prop, enabled icons (watch, computed, etc):
+    - general small improvements:
   - compiler warnings:
       - method used in node expression:
   - fixes:
-    - context window:
-    - make sure that nodes and attributes are created/deleted properly from the cache:
+    - create new component:
+    - style editor:
     - getContextPos() max call stack:
     - style fucks up when user changes:
     - delete login token on logout:
-    - progess bar when downloading components:
+    - faster initial load:
+        - progess bar when downloading components:
     - logout button unclickable when moved:
     - move dbs.IDE.on.user.created section from dbp config to vs.config.yaml:
     - data: { componentClasses: { _ids: [] } } should be in an external config file, not dbp directly:
+    - context window:
+        - make it better:
+    - actvity log mixin causes ide.related to explode:
+  - marketing:

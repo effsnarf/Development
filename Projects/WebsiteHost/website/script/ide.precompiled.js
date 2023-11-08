@@ -282,7 +282,7 @@ class Component {
             console.log(this);
         }
         else {
-            console.log(`📦`, this.name);
+            //console.log(`📦`, this.name);
         }
         try {
             const vueOptions = await this.getVueOptions();
@@ -4115,37 +4115,38 @@ class Objects {
 }
 exports.Objects = Objects;
 class TreeObject {
-    static traverse(root, callback) {
+    static traverse(root, callback, getChildren) {
         // Traverse a tree structure (children[] on each node)
-        const traverse = (node, callback) => {
+        const traverse = (node, callback, getChildren = (node) => node.children) => {
             callback(node);
-            if (node.children) {
-                for (const child of node.children) {
-                    traverse(child, callback);
+            const children = getChildren(node);
+            if (children) {
+                for (const child of children) {
+                    traverse(child, callback, getChildren);
                 }
             }
         };
-        traverse(root, callback);
+        traverse(root, callback, getChildren);
     }
-    static filter(root, predicate) {
+    static filter(root, predicate, getChildren) {
         predicate = TreeObject._evalSelector(predicate);
         const items = [];
         TreeObject.traverse(root, (node) => {
             if (predicate(node))
                 items.push(node);
-        });
+        }, getChildren);
         return items;
     }
-    static find(root, predicate) {
-        const items = TreeObject.filter(root, predicate);
+    static find(root, predicate, getChildren) {
+        const items = TreeObject.filter(root, predicate, getChildren);
         return items.length ? items[0] : null;
     }
-    static map(root, selector) {
+    static map(root, selector, getChildren) {
         selector = TreeObject._evalSelector(selector);
         const items = [];
         TreeObject.traverse(root, (node) => {
             items.push(selector(node));
-        });
+        }, getChildren);
         return items;
     }
     static max(root, selector) {
@@ -5322,6 +5323,49 @@ Date.prototype.isToday = function () {
 // #endregion
 // #region Array
 if (typeof Array !== "undefined") {
+    Array.prototype.keepSyncedWith = function (getSource, getItemKey, stagger) {
+        // Clear any existing staggered updates to avoid multiple syncs
+        if (this._syncTimeout) {
+            clearTimeout(this._syncTimeout);
+        }
+        const source = getSource();
+        const target = this;
+        const sourceKeys = source.map(getItemKey);
+        const targetKeys = target.map(getItemKey);
+        // Synchronize deletions
+        for (let i = 0; i < target.length; i++) {
+            if (!sourceKeys.includes(getItemKey(target[i]))) {
+                target.splice(i, 1);
+                scheduleNextSync();
+                return;
+            }
+        }
+        // Synchronize additions and order
+        for (let i = 0; i < source.length; i++) {
+            if (i >= target.length || getItemKey(target[i]) !== sourceKeys[i]) {
+                // If the item is in the wrong position or missing, fix it
+                const sourceItemIndex = target.findIndex((t) => getItemKey(t) === sourceKeys[i]);
+                if (sourceItemIndex !== -1) {
+                    // Move the item to the correct position
+                    const [itemToMove] = target.splice(sourceItemIndex, 1);
+                    target.splice(i, 0, itemToMove);
+                }
+                else {
+                    // Add the item from the source
+                    target.splice(i, 0, source[i]);
+                }
+                scheduleNextSync();
+                return;
+            }
+        }
+        // If we've made it this far, the arrays are in sync, but we should still check again later
+        scheduleNextSync();
+        function scheduleNextSync() {
+            target._syncTimeout = setTimeout(() => {
+                target.keepSyncedWith(getSource, getItemKey, stagger);
+            }, stagger);
+        }
+    };
     Array.prototype.flatMapAsync = async function (callback, stagger) {
         const result = [];
         for (const [index, item] of this.entries()) {
@@ -5419,7 +5463,9 @@ if (typeof Array !== "undefined") {
     };
     Array.prototype.replace = async function (getNewItems, stagger = 0, getItemKey) {
         if (getItemKey) {
-            let newItems = await getNewItems();
+            let newItems = Array.isArray(getNewItems)
+                ? [...getNewItems]
+                : await getNewItems();
             const processNext = async (i) => {
                 if (i > Math.max(this.length, newItems.length))
                     return;
@@ -6166,7 +6212,7 @@ var __webpack_exports__ = {};
 (() => {
 var exports = __webpack_exports__;
 /*!************************************************************!*\
-  !*** ../../../WebsiteHost/website/script/1699370062244.ts ***!
+  !*** ../../../WebsiteHost/website/script/1699466458726.ts ***!
   \************************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

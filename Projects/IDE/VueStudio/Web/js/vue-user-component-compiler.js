@@ -95,7 +95,7 @@ var toFunction = (args, body, debugLocation) => {
 var toVuePropProperty = function(compClass, prop) {
   if (prop.default.enabled && prop.persisted.enabled) throw `${compClass.name}.${prop.name} can't both have a default value and also be persisted.`;
   if (prop.default.enabled && prop.computed.enabled) throw `${compClass.name}.${prop.name} can't both have a default value and also be computed.`;
-  if (prop.routeParam.enabled && prop.computed.enabled) throw `${compClass.name}.${prop.name} can't both be a route parameter and also be computed.`;
+  if (prop.routeParam?.enabled && prop.computed.enabled) throw `${compClass.name}.${prop.name} can't both be a route parameter and also be computed.`;
 
   if (prop.default.enabled)
   {
@@ -813,7 +813,7 @@ compiler.compile = async (compClass, options = { fix: true }) => {
       if (typeof(Vue) != `undefined`) var vueComp = Vue.component(compName, vueOptions);
       compileTimer.log(`Vue.component`).restart();
       const elapsed = (Date.now() - started);
-      console.log(`${elapsed}ms`, `🧊 VS`, `📦 ${compClass.name} (${compClass._id})`);
+      //console.log(`${elapsed}ms`, `🧊 VS`, `📦 ${compClass.name} (${compClass._id})`);
       resolve(vueComp);
     }
     catch (ex)

@@ -162,8 +162,9 @@ function DataWatcher(getData, onChange)
     var newData = (getData());
     if (!this.dataComparer.areEqual(this.data, newData))
     {
+      const oldData = this.dataComparer.clone(this.data);
       newData = this.dataComparer.clone(newData);
-      onChange(newData, this.data);
+      onChange(newData, oldData);
       this.data = (newData);
     }
     setTimeout(this.check, this.checkInterval);
@@ -193,7 +194,8 @@ function LiveData(dataPersister, options)
         var path = diff1[0]?.path?.join(".");
         var icon = compDom.get.icon(path.split(".")[0]);
         path = `${icon} ${path}`;
-        console.log(path);
+        const changeInfo = `${diff1[0]?.path.last()} = ${JSON.stringify(diff1[0]?.rhs)?.shorten(50)}`;
+        alertify.warning(changeInfo);
         if (options.track?.state)
         {
           //window.stateTracker.track(this.value, path, diff1, diff2, {isDiff: true});

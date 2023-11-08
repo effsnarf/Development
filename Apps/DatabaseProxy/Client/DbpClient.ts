@@ -207,6 +207,7 @@ class EntityMethods {
   }
 }
 class DatabaseProxy {
+  public api: any;
   public events: Events = new Events();
   public fetchAsJson: (url: string, ...args: any[]) => Promise<any>;
   private newIds: Data.LocalPersistedArray;
@@ -302,6 +303,7 @@ class DatabaseProxy {
 
   private async init() {
     const api = await this.createApiMethods();
+    this.api = api;
     for (const key of Object.keys(api)) {
       (this as any)[key] = api[key];
     }
