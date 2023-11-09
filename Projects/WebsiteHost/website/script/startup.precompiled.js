@@ -7289,29 +7289,32 @@ exports.MovingPositionSmoother = MovingPositionSmoother;
 /*!********************************************!*\
   !*** ../../../../Shared/Mvc/Vue/Mixins.ts ***!
   \********************************************/
-/***/ ((__unused_webpack_module, exports) => {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Mixins = void 0;
+const Extensions_Objects_Client_1 = __webpack_require__(/*! ../../Extensions.Objects.Client */ "../../../../Shared/Extensions.Objects.Client.ts");
 class CallbackQueue {
     callback;
     tcbs = {};
     constructor(callback) {
         this.callback = callback;
     }
-    enqueue(m) {
-        //if (measurement.elapsed < 10) return;
-        const contextName = m.operation.context.$options._componentTag;
-        const key = `${contextName}.${m.operation.type}.${m.operation.name}`;
+    enqueue(compEvent) {
+        this.callback(compEvent);
+        return;
+        //if (elapsed < 10) return;
+        const contextName = compEvent.context.$options._componentTag;
+        const key = `${contextName}.${compEvent.type}.${compEvent.name}`;
         const tcb = (this.tcbs[key] = this.tcbs[key] || this.createTcb());
-        tcb(m);
+        tcb(compEvent);
     }
     // Some operations are called very frequently, so we throttle them
     createTcb() {
-        return ((m) => {
-            this.callback(m);
+        return ((compEvent) => {
+            this.callback(compEvent);
         }).throttle(10, this);
     }
 }
@@ -7319,57 +7322,120 @@ function wrapFunction(fn, callbackQueue, context, type, name) {
     return function (...args) {
         const start = performance.now();
         let result;
-        const operation = { context, type, name };
+        const compEvent = { context: this, type, name };
         try {
             result = fn.apply(this, args);
         }
         catch (err) {
             const end = performance.now();
-            callbackQueue.enqueue({ operation, elapsed: end - start });
+            callbackQueue.enqueue({ ...compEvent, elapsed: end - start });
             throw err; // Synchronous error
         }
         // If the function returns a promise, handle it asynchronously
         if (result instanceof Promise) {
             return result.finally(() => {
                 const end = performance.now();
-                callbackQueue.enqueue({ operation, elapsed: end - start });
+                callbackQueue.enqueue({ ...compEvent, elapsed: end - start });
             });
         }
         else {
             // Handle synchronous functions
             const end = performance.now();
-            callbackQueue.enqueue({ operation, elapsed: end - start });
+            callbackQueue.enqueue({ ...compEvent, elapsed: end - start });
             return result;
         }
     };
 }
 const Mixins = {
-    OperationTracker(afterOperation) {
-        const origAfterOperation = afterOperation;
-        afterOperation = (measurement) => {
-            origAfterOperation(measurement);
+    CompEventTracker(afterCompEvent) {
+        const origAfterCompEvent = afterCompEvent;
+        afterCompEvent = (compEvent) => {
+            origAfterCompEvent(compEvent);
         };
-        const callbackQueue = new CallbackQueue(afterOperation);
+        const callbackQueue = new CallbackQueue(afterCompEvent);
         const mixin = {
             created() {
+                const vue = this;
                 // Wrap methods
                 const methods = this.$options.methods || {};
                 Object.keys(methods).forEach((methodName) => {
                     const originalMethod = methods[methodName];
-                    methods[methodName] = wrapFunction(originalMethod, callbackQueue, this, "method", methodName);
+                    methods[methodName] = wrapFunction(originalMethod, callbackQueue, vue, "method", methodName);
                 });
+                const exceptKeys = ["_asyncComputed", "_ide_activity", "_meow"];
+                const getWatchableData = (dataKey) => {
+                    const value = this[dataKey];
+                    switch (Extensions_Objects_Client_1.Objects.getTypeName(value)) {
+                        case "string":
+                        case "number":
+                        case "boolean":
+                        case "date":
+                        case "regexp":
+                        case "function":
+                        case "null":
+                        case "undefined":
+                            return value;
+                        case "array":
+                            return [...value];
+                        case "object":
+                            if (value.constructor.name == "Object") {
+                                return Object.assign({}, value);
+                            }
+                            else {
+                                // Watching a class instance
+                                // Need to think about this
+                                window.alertify.warning(`Activity tracking may not work correctly for ${dataKey}.\nUse plain objects or primitives for data, not class instances.`);
+                                return value;
+                            }
+                    }
+                };
+                // Wrap data properties
+                const data = this._data || {};
+                Object.keys(data)
+                    .except(...exceptKeys)
+                    .forEach((dataKey) => {
+                    const originalData = data[dataKey];
+                    // Create a watcher for each data property
+                    // When modifying arrays, vue will not detect the old value correctly
+                    // This solves the issue
+                    this.$watch(function () {
+                        return getWatchableData(dataKey);
+                    }, {
+                        handler: (newValue, oldValue) => {
+                            const compEvent = {
+                                context: vue,
+                                type: "data",
+                                name: dataKey,
+                                oldValue,
+                                newValue,
+                                elapsed: 0,
+                            };
+                            callbackQueue.enqueue(compEvent);
+                        },
+                        immediate: true,
+                        deep: true,
+                    });
+                });
+                return;
                 // Wrap computed properties
-                const computed = this.$options.computed || {};
-                Object.keys(computed).forEach((computedName) => {
+                const computed = this._computedWatchers || {};
+                Object.keys(computed)
+                    .except(...exceptKeys)
+                    .filter((cn) => !cn.startsWith("_"))
+                    .filter((cn) => !cn.startsWith("$"))
+                    .forEach((computedName) => {
+                    if (computedName == "cItems") {
+                        this.$watch("cItems", {
+                            handler: (newValue, oldValue) => {
+                                window.alertify.message(`cItems changed \n from ${JSON.stringify(oldValue)} \n to ${JSON.stringify(newValue)})}`);
+                            },
+                        });
+                    }
+                    return;
                     const originalComputed = computed[computedName];
-                    const getter = typeof originalComputed === "function"
-                        ? originalComputed
-                        : originalComputed.get;
-                    const setter = originalComputed.set;
-                    computed[computedName] = {
-                        get: wrapFunction(getter, callbackQueue, this, "computed", computedName),
-                        set: setter,
-                    };
+                    const getter = originalComputed.getter;
+                    const setter = originalComputed.setter;
+                    computed[computedName].getter = wrapFunction(getter, callbackQueue, vue, "computed", computedName);
                 });
                 return;
                 // Wrap watchers
@@ -7379,7 +7445,7 @@ const Mixins = {
                     const handler = originalWatcher.handler || originalWatcher;
                     const immediate = originalWatcher.immediate;
                     const deep = originalWatcher.deep;
-                    const newHandler = wrapFunction(originalWatcher, callbackQueue, this, "watcher", watchKey);
+                    const newHandler = wrapFunction(originalWatcher.handler, callbackQueue, vue, "watcher", watchKey);
                     this.$watch(watchKey, newHandler, {
                         immediate,
                         deep,
@@ -7401,20 +7467,26 @@ const Mixins = {
             updated() {
                 return;
                 const end = performance.now();
-                afterOperation({
-                    operation: { context: this, type: "update", name: "update" },
+                afterCompEvent({
+                    context: this,
+                    type: "update",
+                    name: "update",
                     elapsed: end - this._updateStart,
                 });
             },
             mounted() {
-                afterOperation({
-                    operation: { context: this, type: "mount", name: "mount" },
+                afterCompEvent({
+                    context: this,
+                    type: "mount",
+                    name: "mount",
                     elapsed: 0,
                 });
             },
             unmounted() {
-                afterOperation({
-                    operation: { context: this, type: "unmount", name: "unmount" },
+                afterCompEvent({
+                    context: this,
+                    type: "unmount",
+                    name: "unmount",
                     elapsed: 0,
                 });
             },
@@ -8673,7 +8745,7 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 /*!************************************************************!*\
-  !*** ../../../WebsiteHost/website/script/1699471620866.ts ***!
+  !*** ../../../WebsiteHost/website/script/1699555481811.ts ***!
   \************************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

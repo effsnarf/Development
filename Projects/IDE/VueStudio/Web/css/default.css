@@ -1,7 +1,7 @@
 body
 {
     margin: 1em;
-    background-image: linear-gradient(142deg, rgb(0, 3, 118) 0%, rgb(0 25 62) 22%, rgb(0 5 52) 40%, rgb(0 12 25) 60%, rgb(3 6 10) 80%, rgb(0 0 0) 100%);
+    background-image: linear-gradient(142deg, rgb(0, 3, 118) 0%, rgb(0 25 62) 22%, rgb(0 5 52) 40%, rgb(0 12 25) 60%, rgb(25 0 0) 80%, rgb(71 0 0) 100%);
 }
 
 .disabled

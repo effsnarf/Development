@@ -38,51 +38,50 @@ methods:
   getLogItems: | #js
     function() {
       const logItems = Object.values(this.logs)
-        .map(log => ({
-          component: `📦 ${log.context.name}`,
-          operation: this.getOpName(log),
-          invokes: log.invokes,
-          "average (ms)": Math.round(log.elapsed.average),
-          "total (ms)": Math.round(log.elapsed.total),
+        .map(logItem => ({
+          component: `📦 ${logItem.context.name}`,
+          operation: this.getOperationName(logItem),
+          invokes: logItem.invokes,
+          "average (ms)": Math.round(logItem.elapsed.average),
+          "total (ms)": Math.round(logItem.elapsed.total),
         }));
       return logItems;
     }
-  getOpName: | #js
-    function(log) {
+  getOperationName: | #js
+    function(logItem) {
       const icon = ({
         "event": "⚡",
         "computed": "💡",
         "watcher": "👓",
         "method": "🔴",
-      })[log.operation.type] || "❔";
-      return `${icon} ${log.operation.name}`;
+      })[logItem.type] || "❔";
+      return `${icon} ${logItem.name}`;
     }
-  afterCompOperation: | #js
-    function(measurement) {
-      const { operation, elapsed } = measurement;
-      const log = this.getOperationLog(operation);
+  afterCompEvent: | #js
+    function(compEvent) {
+      const log = this.getCompEventLog(compEvent);
       log.invokes++;
-      log.elapsed.min = Math.min(log.elapsed.min, elapsed);
-      log.elapsed.max = Math.max(log.elapsed.max, elapsed);
-      log.elapsed.total += elapsed;
+      log.elapsed.min = Math.min(log.elapsed.min, compEvent.elapsed);
+      log.elapsed.max = Math.max(log.elapsed.max, compEvent.elapsed);
+      log.elapsed.total += compEvent.elapsed;
       log.elapsed.average = (log.elapsed.total / log.invokes);
-      log.last.measurements.push(elapsed);
+      log.last.measurements.push(compEvent.elapsed);
       if (log.last.measurements.length > 100) {
         log.last.measurements.shift();
       }
     }
-  getOperationLog: | #js
-    function(operation) {
-      const contextName = operation.context.$options.name;
-      const logKey = [contextName, operation.type, operation.name];
+  getCompEventLog: | #js
+    function(compEvent) {
+      const contextName = compEvent.context.$options.name;
+      const logKey = [contextName, compEvent.type, compEvent.name];
       const log = (this.logs[logKey] = (this.logs[logKey] || {
         key: logKey,
         context: {
           name: contextName,
         },
-        operation: {
-          type: operation.type,
-          name: operation.name,
+        compEvent: {
+          type: compEvent.type,
+          name: compEvent.name,
         },
         last: {
           measurements: [],

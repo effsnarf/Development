@@ -1,0 +1,125 @@
+dom:
+  div:
+    .flex.gap-1:
+      ui.drawer:
+        div:
+          ui.checkbox:
+            v-for: compEventName in compEventNames
+            :key: compEventName
+            ":text": compEventName
+            ":value-array": hideCompEventNames
+            :value-key: compEventName
+            :value-array-exclude: "true"
+      div:
+        ul:
+          class: comp-events
+          li:
+            v-for: compEvent in visibleCompEvents
+            :key: compEvent._id
+            :class: "{ done: (compEvent._id <= doneCompEventID) }"
+            @mouseenter: onCompEventHover(compEvent)
+            @mouseleave: onCompEventHover(null)
+            ide.vue.activity.comp.event:
+              :comp-event: compEvent
+      div:
+        ui.value:
+          :value: hoveredCompEvent
+
+props:
+  vue: null
+
+data:
+  hoveredCompEvent: null
+  targetCompEvent: null
+  hideCompEventNames: []
+  key1: 1
+
+mounted: | #js
+  function() {
+    this.goToTargetCompEvent();
+  }
+
+methods:
+  goToTargetCompEvent: | #js
+    async function() {
+      const noopDelay = 100;
+      if (this.isAtTargetCompEvent) return setTimeout(this.goToTargetCompEvent.bind(this), noopDelay);
+      const direction = (this.targetCompEvent._id < this.doneCompEventID) ? -1 : 1;
+      const doneIndex = this.compEvents.findIndex(ce => ce._id == this.doneCompEventID);
+      const doneCompEvent = this.compEvents[doneIndex];
+      await this.executeCompEvent(doneCompEvent, direction);
+      const nextIndex = (doneIndex + direction);
+      const nextCompEvent = this.compEvents[nextIndex];
+      this.setDoneCompEventID(nextCompEvent._id);
+      // When goint up, when we arrive at the target, execute it
+      if ((direction == 1) && (this.isAtTargetCompEvent)) {
+        await this.executeCompEvent(nextCompEvent, direction);
+      }
+      //await this.$nextTick();
+      this.goToTargetCompEvent();
+    }
+  executeCompEvent: | #js
+    async function(compEvent, direction) {
+      // Pause the activity tracker
+      this.vue().$data._ide_activity.isPaused = true;
+      // Remove the icon
+      const dataKey = (compEvent.name.split(' ')[1]);
+      try
+      {
+        if (compEvent.type == "data")
+        {
+          const value = (direction == 1) ? compEvent.newValue : compEvent.oldValue;
+          this.vue()[dataKey] = value;
+        }
+      }
+      finally {
+        // Resume the activity tracker
+        await this.$nextTick();
+        this.vue().$data._ide_activity.isPaused = false;
+      }
+    }
+  onCompEventHover: | #js
+    function(compEvent) {
+      this.hoveredCompEvent = compEvent;
+      this.targetCompEvent = compEvent;
+    }
+  setDoneCompEventID: | #js
+    function(newDoneCompEventID) {
+      this.vue().$data._ide_activity.doneCompEventID.value = newDoneCompEventID;
+    }
+computed:
+  isAtTargetCompEvent: | #js
+    function() {
+      if (!this.targetCompEvent) return true;
+      if (this.targetCompEvent._id == this.doneCompEventID) return true;
+      return false;
+    }
+  doneCompEventID: | #js
+    function() {
+      return this.vue()?.$data._ide_activity.doneCompEventID.value;
+    }
+  visibleCompEvents: | #js
+    function() {
+      return this.compEvents
+        .filter(ce => !this.hideCompEventNames.includes(ce.name));
+    }
+  compEventNames: | #js
+    function() {
+      return this.compEvents
+        .map(ce => ce.name)
+        .distinct()
+        .sort();
+    }
+  compEvents: | #js
+    function() {
+      return [...(this.vue()?.$data._ide_activity.items)];
+    }
+
+style:
+  .comp-events:
+    display: flex
+    flex-direction: column-reverse
+  .done:
+    background: "#88888830"
+  .done:hover:
+    background: "#88888850"

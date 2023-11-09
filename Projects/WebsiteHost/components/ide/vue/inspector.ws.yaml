@@ -25,10 +25,8 @@ dom:
               ':vue': vue
           div: 
             v-else-if: (selectedTabIndex == 1)
-            div:
-              v-if: vue()?.$data._ide_activity?.items
-              ui.value:
-                :value: "[...(vue().$data._ide_activity.items)].reverse()"
+            ide.vue.activity:
+              ':vue': vue
 props:
   vue: null
 data:

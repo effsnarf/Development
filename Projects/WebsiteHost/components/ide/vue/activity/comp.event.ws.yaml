@@ -1,0 +1,9 @@
+dom:
+  .flex:
+    div:
+      v-text: compEvent.name
+
+props:
+  compEvent: null
+
+methods:

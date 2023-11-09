@@ -29,7 +29,8 @@ data:
 methods:
   getCssClass: | #js
     function() {
-      return `hoverable ${this.size}`;
+      const dimmed = (this.checkedValue ? "" : "dimmed");
+      return `hoverable ${this.size} ${dimmed}`;
     }
   onInput: | #js
     async function(value) {

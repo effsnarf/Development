@@ -1,33 +1,33 @@
-interface Operation {
+import { Objects } from "../../Extensions.Objects.Client";
+
+interface CompEvent {
   context: any;
   type: string;
   name: string;
-}
-
-interface Measurement {
-  operation: Operation;
   elapsed: number;
 }
 
-type AfterOperationCallback = (measurement: Measurement) => void;
+type AfterCompEventCallback = (compEvent: CompEvent) => void;
 
 class CallbackQueue {
   private tcbs = {} as { [key: string]: Function };
 
-  constructor(private callback: AfterOperationCallback) {}
+  constructor(private callback: AfterCompEventCallback) {}
 
-  enqueue(m: Measurement) {
-    //if (measurement.elapsed < 10) return;
-    const contextName = m.operation.context.$options._componentTag;
-    const key = `${contextName}.${m.operation.type}.${m.operation.name}`;
+  enqueue(compEvent: CompEvent) {
+    this.callback(compEvent);
+    return;
+    //if (elapsed < 10) return;
+    const contextName = compEvent.context.$options._componentTag;
+    const key = `${contextName}.${compEvent.type}.${compEvent.name}`;
     const tcb = (this.tcbs[key] = this.tcbs[key] || this.createTcb());
-    tcb(m);
+    tcb(compEvent);
   }
 
   // Some operations are called very frequently, so we throttle them
   private createTcb() {
-    return ((m: Measurement) => {
-      this.callback(m);
+    return ((compEvent: CompEvent) => {
+      this.callback(compEvent);
     }).throttle(10, this);
   }
 }
@@ -43,13 +43,13 @@ function wrapFunction(
     const start = performance.now();
     let result: any;
 
-    const operation = { context, type, name };
+    const compEvent = { context: this, type, name };
 
     try {
       result = fn.apply(this, args);
     } catch (err) {
       const end = performance.now();
-      callbackQueue.enqueue({ operation, elapsed: end - start });
+      callbackQueue.enqueue({ ...compEvent, elapsed: end - start });
       throw err; // Synchronous error
     }
 
@@ -57,28 +57,30 @@ function wrapFunction(
     if (result instanceof Promise) {
       return result.finally(() => {
         const end = performance.now();
-        callbackQueue.enqueue({ operation, elapsed: end - start });
+        callbackQueue.enqueue({ ...compEvent, elapsed: end - start });
       });
     } else {
       // Handle synchronous functions
       const end = performance.now();
-      callbackQueue.enqueue({ operation, elapsed: end - start });
+      callbackQueue.enqueue({ ...compEvent, elapsed: end - start });
       return result;
     }
   };
 }
 
 const Mixins = {
-  OperationTracker(afterOperation: AfterOperationCallback): any {
-    const origAfterOperation = afterOperation;
-    afterOperation = (measurement: Measurement) => {
-      origAfterOperation(measurement);
+  CompEventTracker(afterCompEvent: AfterCompEventCallback): any {
+    const origAfterCompEvent = afterCompEvent;
+    afterCompEvent = (compEvent: CompEvent) => {
+      origAfterCompEvent(compEvent);
     };
 
-    const callbackQueue = new CallbackQueue(afterOperation);
+    const callbackQueue = new CallbackQueue(afterCompEvent);
 
     const mixin = {
       created(this: any) {
+        const vue = this;
+
         // Wrap methods
         const methods = this.$options.methods || {};
         Object.keys(methods).forEach((methodName) => {
@@ -86,33 +88,106 @@ const Mixins = {
           methods[methodName] = wrapFunction(
             originalMethod,
             callbackQueue,
-            this,
+            vue,
             "method",
             methodName
           );
         });
 
-        // Wrap computed properties
-        const computed = this.$options.computed || {};
-        Object.keys(computed).forEach((computedName) => {
-          const originalComputed = computed[computedName];
-          const getter =
-            typeof originalComputed === "function"
-              ? originalComputed
-              : originalComputed.get;
-          const setter = originalComputed.set;
+        const exceptKeys = ["_asyncComputed", "_ide_activity", "_meow"];
 
-          computed[computedName] = {
-            get: wrapFunction(
+        const getWatchableData = (dataKey: string) => {
+          const value = this[dataKey];
+          switch (Objects.getTypeName(value)) {
+            case "string":
+            case "number":
+            case "boolean":
+            case "date":
+            case "regexp":
+            case "function":
+            case "null":
+            case "undefined":
+              return value;
+            case "array":
+              return [...(value as any[])];
+            case "object":
+              if (value.constructor.name == "Object") {
+                return Object.assign({}, value);
+              } else {
+                // Watching a class instance
+                // Need to think about this
+                (window as any).alertify.warning(
+                  `Activity tracking may not work correctly for ${dataKey}.\nUse plain objects or primitives for data, not class instances.`
+                );
+                return value;
+              }
+          }
+        };
+
+        // Wrap data properties
+        const data = this._data || {};
+        Object.keys(data)
+          .except(...exceptKeys)
+          .forEach((dataKey) => {
+            const originalData = data[dataKey];
+            // Create a watcher for each data property
+            // When modifying arrays, vue will not detect the old value correctly
+            // This solves the issue
+            this.$watch(
+              function () {
+                return getWatchableData(dataKey);
+              },
+              {
+                handler: (newValue: any, oldValue: any) => {
+                  const compEvent = {
+                    context: vue,
+                    type: "data",
+                    name: dataKey,
+                    oldValue,
+                    newValue,
+                    elapsed: 0,
+                  };
+                  callbackQueue.enqueue(compEvent);
+                },
+                immediate: true,
+                deep: true,
+              }
+            );
+          });
+
+        return;
+
+        // Wrap computed properties
+        const computed = this._computedWatchers || {};
+        Object.keys(computed)
+          .except(...exceptKeys)
+          .filter((cn) => !cn.startsWith("_"))
+          .filter((cn) => !cn.startsWith("$"))
+          .forEach((computedName) => {
+            if (computedName == "cItems") {
+              this.$watch("cItems", {
+                handler: (newValue: any, oldValue: any) => {
+                  (window as any).alertify.message(
+                    `cItems changed \n from ${JSON.stringify(
+                      oldValue
+                    )} \n to ${JSON.stringify(newValue)})}`
+                  );
+                },
+              });
+            }
+            return;
+            const originalComputed = computed[computedName];
+            const getter = originalComputed.getter;
+            const setter = originalComputed.setter;
+
+            computed[computedName].getter = wrapFunction(
               getter,
               callbackQueue,
-              this,
+              vue,
               "computed",
               computedName
-            ),
-            set: setter,
-          };
-        });
+            );
+          });
 
         return;
 
@@ -124,9 +199,9 @@ const Mixins = {
           const immediate = originalWatcher.immediate;
           const deep = originalWatcher.deep;
           const newHandler = wrapFunction(
-            originalWatcher,
+            originalWatcher.handler,
             callbackQueue,
-            this,
+            vue,
             "watcher",
             watchKey
           );
@@ -164,20 +239,26 @@ const Mixins = {
       updated(this: any) {
         return;
         const end = performance.now();
-        afterOperation({
-          operation: { context: this, type: "update", name: "update" },
+        afterCompEvent({
+          context: this,
+          type: "update",
+          name: "update",
           elapsed: end - this._updateStart,
         });
       },
       mounted(this: any) {
-        afterOperation({
-          operation: { context: this, type: "mount", name: "mount" },
+        afterCompEvent({
+          context: this,
+          type: "mount",
+          name: "mount",
           elapsed: 0,
         });
       },
       unmounted(this: any) {
-        afterOperation({
-          operation: { context: this, type: "unmount", name: "unmount" },
+        afterCompEvent({
+          context: this,
+          type: "unmount",
+          name: "unmount",
           elapsed: 0,
         });
       },

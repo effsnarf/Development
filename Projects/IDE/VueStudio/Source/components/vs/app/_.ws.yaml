@@ -91,11 +91,11 @@ methods:
           };
         },
       };
-      const opTrackerMixin = Mixins.OperationTracker(this.afterCompOperation.bind(this));
+      const performanceMixin = Mixins.CompEventTracker(this.logPerformanceCompEvent.bind(this));
       const activityLogMixin = this.getActivityLogMixin();
       const mixins = [];
       if (isIdeComp) mixins.push(vsGlobalsMixin);
-      mixins.push(opTrackerMixin);
+      //mixins.push(performanceMixin);
       if (!isIdeComp) mixins.push(activityLogMixin);
       await vueUserComponentCompiler.compile(comp, { mixins });
     }
@@ -119,19 +119,7 @@ methods:
     }
   getActivityLogMixin: | #js
     function() {
-      const logActivity = (measurement) => {
-        const vue = measurement.operation.context;
-        const items = vue.$data._ide_activity.items;
-        delete measurement.operation.context;
-        const m = measurement;
-        const item = {
-          name: `${this.getOpIcon(m.operation.type)} ${m.operation.name}`,
-          elapsed: Math.round(m.elapsed),
-        }
-        items.push(item);
-        if (items.length > 100) items.shift();
-      };
-      const activityMixin = Mixins.OperationTracker(logActivity);
+      const activityMixin = Mixins.CompEventTracker(this.logActivityCompEvent.bind(this));
       activityMixin.data = function() {
         return {
           _ide_activity: {
@@ -141,20 +129,40 @@ methods:
       }
       return activityMixin;
     }
+  logActivityCompEvent: | #js
+    function(compEvent) {
+      const vue = compEvent.context;
+      const ideActivity = vue.$data._ide_activity;
+      if (ideActivity.isPaused) return;
+      const nextCompEventID = (ideActivity.nextCompEventID = (ideActivity.nextCompEventID || 0) + 1);
+      if (!ideActivity.doneCompEventID) ideActivity.doneCompEventID = Vue.ref(0);
+      ideActivity.doneCompEventID.value = nextCompEventID;
+      const items = ideActivity.items;
+      delete compEvent.context;
+      const item = {
+        _id: nextCompEventID,
+        ...compEvent,
+        name: `${this.getOpIcon(compEvent.type)} ${compEvent.name}`,
+        elapsed: Math.round(compEvent.elapsed),
+      }
+      items.push(item);
+      if (items.length > 100) items.shift();
+    }
   getOpIcon: | #js
     function(type) {
       return ({
         "event": "⚡",
+        "data": "🧊",
         "computed": "💡",
         "watcher": "👓",
         "method": "🔴",
       })[type] || "❔";
     }
-  afterCompOperation: | #js
-    function(measurement) {
+  logPerformanceCompEvent: | #js
+    function(compEvent) {
       const perfInsp = this.getPerformanceInspector();
       if (!perfInsp) return;
-      perfInsp.afterCompOperation(measurement);
+      perfInsp.afterCompEvent(compEvent);
     }
   getPerformanceInspector: | #js
     function() {
