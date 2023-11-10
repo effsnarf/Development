@@ -96,6 +96,8 @@ const Mixins = {
 
         const exceptKeys = ["_asyncComputed", "_ide_activity", "_meow"];
 
+        // When modifying arrays, vue will not detect the old value correctly
+        // This solves the issue
         const getWatchableData = (dataKey: string) => {
           const value = this[dataKey];
           switch (Objects.getTypeName(value)) {
@@ -114,12 +116,15 @@ const Mixins = {
               if (value.constructor.name == "Object") {
                 return Object.assign({}, value);
               } else {
+                const compName = this.$options._componentTag;
                 // Watching a class instance
                 // Need to think about this
-                (window as any).alertify.warning(
-                  `Activity tracking may not work correctly for ${dataKey}.\nUse plain objects or primitives for data, not class instances.`
-                );
-                return value;
+                (window as any).alertify
+                  .warning(
+                    `<h2>⚠️ 📦 ${compName} 🧊 ${dataKey}</h2><p>Activity tracking is disabled for 📦 ${compName} 🧊 ${dataKey}.</p><p>Use plain objects or primitives for data, not class instances.</p>`
+                  )
+                  .delay(0);
+                return null;
               }
           }
         };
@@ -131,25 +136,22 @@ const Mixins = {
           .forEach((dataKey) => {
             const originalData = data[dataKey];
             // Create a watcher for each data property
-            // When modifying arrays, vue will not detect the old value correctly
-            // This solves the issue
             this.$watch(
               function () {
                 return getWatchableData(dataKey);
               },
+              (newValue: any, oldValue: any) => {
+                const compEvent = {
+                  context: vue,
+                  type: "data",
+                  name: dataKey,
+                  oldValue,
+                  newValue,
+                  elapsed: 0,
+                };
+                callbackQueue.enqueue(compEvent);
+              },
               {
-                handler: (newValue: any, oldValue: any) => {
-                  const compEvent = {
-                    context: vue,
-                    type: "data",
-                    name: dataKey,
-                    oldValue,
-                    newValue,
-                    elapsed: 0,
-                  };
-                  callbackQueue.enqueue(compEvent);
-                },
-                immediate: true,
                 deep: true,
               }
             );

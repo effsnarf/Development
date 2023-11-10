@@ -10,7 +10,7 @@ todo:
       ✔️ user login/logout:
   - demo components:
     ✔️ hot reload:
-    - activity rollback/reexecute:
+    ✔️ activity rollback/reexecute:
   - improve the interface:
     - features:
       - undo?:

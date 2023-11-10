@@ -7363,6 +7363,8 @@ const Mixins = {
                     methods[methodName] = wrapFunction(originalMethod, callbackQueue, vue, "method", methodName);
                 });
                 const exceptKeys = ["_asyncComputed", "_ide_activity", "_meow"];
+                // When modifying arrays, vue will not detect the old value correctly
+                // This solves the issue
                 const getWatchableData = (dataKey) => {
                     const value = this[dataKey];
                     switch (Extensions_Objects_Client_1.Objects.getTypeName(value)) {
@@ -7382,10 +7384,13 @@ const Mixins = {
                                 return Object.assign({}, value);
                             }
                             else {
+                                const compName = this.$options._componentTag;
                                 // Watching a class instance
                                 // Need to think about this
-                                window.alertify.warning(`Activity tracking may not work correctly for ${dataKey}.\nUse plain objects or primitives for data, not class instances.`);
-                                return value;
+                                window.alertify
+                                    .warning(`<h2>⚠️ 📦 ${compName} 🧊 ${dataKey}</h2><p>Activity tracking is disabled for 📦 ${compName} 🧊 ${dataKey}.</p><p>Use plain objects or primitives for data, not class instances.</p>`)
+                                    .delay(0);
+                                return null;
                             }
                     }
                 };
@@ -7396,22 +7401,19 @@ const Mixins = {
                     .forEach((dataKey) => {
                     const originalData = data[dataKey];
                     // Create a watcher for each data property
-                    // When modifying arrays, vue will not detect the old value correctly
-                    // This solves the issue
                     this.$watch(function () {
                         return getWatchableData(dataKey);
+                    }, (newValue, oldValue) => {
+                        const compEvent = {
+                            context: vue,
+                            type: "data",
+                            name: dataKey,
+                            oldValue,
+                            newValue,
+                            elapsed: 0,
+                        };
+                        callbackQueue.enqueue(compEvent);
                     }, {
-                        handler: (newValue, oldValue) => {
-                            const compEvent = {
-                                context: vue,
-                                type: "data",
-                                name: dataKey,
-                                oldValue,
-                                newValue,
-                                elapsed: 0,
-                            };
-                            callbackQueue.enqueue(compEvent);
-                        },
                         immediate: true,
                         deep: true,
                     });
@@ -8745,7 +8747,7 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 /*!************************************************************!*\
-  !*** ../../../WebsiteHost/website/script/1699555481811.ts ***!
+  !*** ../../../WebsiteHost/website/script/1699626904530.ts ***!
   \************************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

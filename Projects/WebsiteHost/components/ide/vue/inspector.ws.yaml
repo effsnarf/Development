@@ -10,7 +10,7 @@ dom:
             icon: 📦
             ':text': vue().$options.name
         ui.tabs:
-          ':options': '[''🧊 state'', ''⏳ activity'', ''📁 view'', ''🔴 methods'']'
+          ':options': '[''🧊 state'', ''⏳ activity'']'
           v-model: selectedTabIndex
           direction: horizontal
           template: 

@@ -136,13 +136,23 @@ methods:
       if (ideActivity.isPaused) return;
       const nextCompEventID = (ideActivity.nextCompEventID = (ideActivity.nextCompEventID || 0) + 1);
       if (!ideActivity.doneCompEventID) ideActivity.doneCompEventID = Vue.ref(0);
-      ideActivity.doneCompEventID.value = nextCompEventID;
       const items = ideActivity.items;
+      // If this is the first occurrence of this compEvent.name, mark it as [initial=true]
+      const firstOccurrence = !items.find(ce => (ce.name == compEvent.name));
+      if (firstOccurrence) {
+        compEvent.initial = true;
+      }
+      if (ideActivity.doneCompEventID.value) {
+        const doneIndex = (items.findIndex(ce => (ce._id == ideActivity.doneCompEventID.value)));
+        if (doneIndex >= 0) items.splice((doneIndex + 1));
+      }
+      ideActivity.doneCompEventID.value = nextCompEventID;
       delete compEvent.context;
       const item = {
         _id: nextCompEventID,
         ...compEvent,
-        name: `${this.getOpIcon(compEvent.type)} ${compEvent.name}`,
+        icon: this.getOpIcon(compEvent.type),
+        name: compEvent.name,
         elapsed: Math.round(compEvent.elapsed),
       }
       items.push(item);
@@ -194,7 +204,7 @@ methods:
     async function(compType) {
       let compTypeStr = compType;
       if (compType == "ide") compTypeStr = "Vue Studio";
-      alertify.message(`Loading ${compTypeStr} components...`);
+      alertify.message(`⏳ Loading ${compTypeStr} components...`);
       const comps = (await this.$root.dbp.componentClasses[compType].get());
       alertify.message(`${comps.length} components loaded`);
       return comps;
@@ -259,7 +269,7 @@ methods:
       comp = compDom.get.comp.byID(comp._id);
       await this.compileComp(comp);
       this.$root.$emit("ide-comp-recompiled", comp);
-      alertify.message(`<h3>📦 ${comp.name}</h3><div>Component recompiled.</div>`);
+      //alertify.message(`<h3>📦 ${comp.name}</h3><div>Component recompiled.</div>`);
     }
   onCompError: | #js
     function(vue, item, ex) {

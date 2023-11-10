@@ -202,72 +202,6 @@
 
 
 
-
-.list1-item {
-}
-.list1-move, .list1-enter-active, .list1-leave-active {
-  transition: 0.5s ease;
-}
-.list1-leave-active
-{
-  position: absolute;
-}
-.list1-enter, .list1-leave-to
-{
-  opacity: 0;
-}
-.list1-enter
-{
-}
-.list1-leave-to
-{
-}
-
-
-
-.list2-item {
-}
-.list2-move, .list2-enter-active, .list2-leave-active {
-  transition: 0.5s ease;
-}
-.list2-leave-active
-{
-  position: absolute;
-}
-.list2-enter, .list2-leave-to
-{
-  opacity: 0;
-}
-.list2-enter
-{
-  transform: scale(2);
-}
-.list2-leave-to
-{
-  transform: scale(4);
-}
-
-
-
-
-/* 1. declare transition */
-.anim-trans-fade1-move,
-.anim-trans-fade1-enter-active,
-.anim-trans-fade1-leave-active {
-  transition: all 1s cubic-bezier(0.55, 0, 0.1, 1);
-}
-
-/* 2. declare enter from and leave to state */
-.anim-trans-fade1-enter-from,
-.anim-trans-fade1-leave-to {
-  opacity: 0;
-}
-
-.anim-trans-fade1-leave-active {
-  position: absolute;
-}
-
-
 .floating1
 {
   animation: float 6s ease-in-out infinite;
@@ -303,22 +237,3 @@
   transition: 1s;
 }
 
-
-
-
-.anim-page
-{
-  position: absolute;
-}
-.anim-page-visible, .anim-page-visible.on
-{
-  transition: 1s ease;
-}
-.anim-page-visible
-{
-  opacity: 0;
-}
-.anim-page-visible.on
-{
-  opacity: 1;
-}

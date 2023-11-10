@@ -1,0 +1,14 @@
+dom:
+  .flex:
+    div:
+      input:
+        type: checkbox
+        :value: value
+        @input: $emit('input', $event.target.value)
+    div:
+      v-text: text
+
+props:
+  text:
+  value:
+

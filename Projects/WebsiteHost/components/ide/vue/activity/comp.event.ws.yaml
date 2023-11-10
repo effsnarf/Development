@@ -1,9 +1,20 @@
 dom:
   .flex:
+    .w-l2:
+      v-text: compEvent.icon
     div:
+      class: w-l8
       v-text: compEvent.name
+    div:
+      ui.value.preview:
+        v-if: "('newValue' in compEvent)"
+        :value: compEvent.newValue
 
 props:
   compEvent: null
 
 methods:
+
+style:
+  .flex > *:nth-child(1):
+    width: 10em

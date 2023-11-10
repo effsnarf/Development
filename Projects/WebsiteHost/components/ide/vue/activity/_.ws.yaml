@@ -11,17 +11,20 @@ dom:
             :value-key: compEventName
             :value-array-exclude: "true"
       div:
-        ul:
+        transition.group:
+          tag: ul
+          name: list
           class: comp-events
           li:
             v-for: compEvent in visibleCompEvents
             :key: compEvent._id
-            :class: "{ done: (compEvent._id <= doneCompEventID) }"
+            :class: "{ 'comp-event': true, done: (compEvent._id <= doneCompEventID) }"
             @mouseenter: onCompEventHover(compEvent)
             @mouseleave: onCompEventHover(null)
             ide.vue.activity.comp.event:
               :comp-event: compEvent
       div:
+        v-if: "false"
         ui.value:
           :value: hoveredCompEvent
 
@@ -63,7 +66,7 @@ methods:
       // Pause the activity tracker
       this.vue().$data._ide_activity.isPaused = true;
       // Remove the icon
-      const dataKey = (compEvent.name.split(' ')[1]);
+      const dataKey = compEvent.name;
       try
       {
         if (compEvent.type == "data")
@@ -82,10 +85,23 @@ methods:
     function(compEvent) {
       this.hoveredCompEvent = compEvent;
       this.targetCompEvent = compEvent;
+      // The first few comp events are [initial=true]
+      // If target is below them, set it to the first non-initial comp event
+      if (this.targetCompEvent && this.targetCompEvent.initial) {
+        const firstNonInitialCompEventIndex = this.compEvents.findIndex(ce => !ce.initial);
+        if (firstNonInitialCompEventIndex != -1) {
+          this.targetCompEvent = this.compEvents[(firstNonInitialCompEventIndex - 1)];
+        }
+      }
     }
   setDoneCompEventID: | #js
     function(newDoneCompEventID) {
       this.vue().$data._ide_activity.doneCompEventID.value = newDoneCompEventID;
+    }
+  isCompEventVisible: | #js
+    function(compEvent) {
+      if (compEvent.type == "data") return true;
+      return false;
     }
 computed:
   isAtTargetCompEvent: | #js
@@ -101,11 +117,13 @@ computed:
   visibleCompEvents: | #js
     function() {
       return this.compEvents
+        .filter(this.isCompEventVisible.bind(this))
         .filter(ce => !this.hideCompEventNames.includes(ce.name));
     }
   compEventNames: | #js
     function() {
       return this.compEvents
+        .filter(this.isCompEventVisible.bind(this))
         .map(ce => ce.name)
         .distinct()
         .sort();
@@ -119,7 +137,10 @@ style:
   .comp-events:
     display: flex
     flex-direction: column-reverse
+    max-height: 60vh
+    overflow-y: auto
+  .comp-event:
+    height: 1.5em
+    transition: 0.2s
   .done:
     background: "#88888830"
-  .done:hover:
-    background: "#88888850"

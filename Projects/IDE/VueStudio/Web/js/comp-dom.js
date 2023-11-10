@@ -1551,7 +1551,9 @@ var compDom = {
   delete: {
     item: async (item) => {
       var entry = Object.entries(item)[0];
+      const comp = (!entry[1].comp ? null : entry[1].comp());
       await compDom.delete[entry[0]](item[entry[0]]);
+      ideVueApp.$emit("ide-comp-changed-2", comp);
     },
     comp: async (comp) => {
       await liveData.dbp.api.componentClasses.user.remove(comp._id);

@@ -195,7 +195,7 @@ function LiveData(dataPersister, options)
         var icon = compDom.get.icon(path.split(".")[0]);
         path = `${icon} ${path}`;
         const changeInfo = `${diff1[0]?.path.last()} = ${JSON.stringify(diff1[0]?.rhs)?.shorten(50)}`;
-        alertify.warning(changeInfo);
+        //alertify.warning(changeInfo);
         if (options.track?.state)
         {
           //window.stateTracker.track(this.value, path, diff1, diff2, {isDiff: true});
