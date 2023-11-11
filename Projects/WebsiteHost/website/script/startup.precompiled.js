@@ -3291,7 +3291,6 @@ class Module {
         this.source.name = this.className;
     }
     async compile() {
-        return;
         await ClientContext_1.ClientContext.waitUntilLoaded();
         const client = ClientContext_1.ClientContext.context;
         const namespace = this.getNamespace();

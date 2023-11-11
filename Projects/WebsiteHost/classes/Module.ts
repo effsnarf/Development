@@ -17,8 +17,6 @@ class Module {
   }
 
   async compile() {
-    return;
-
     await ClientContext.waitUntilLoaded();
     const client = ClientContext.context!;
 
