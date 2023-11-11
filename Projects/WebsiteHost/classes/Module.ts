@@ -51,7 +51,9 @@ class Module {
 
   getNamespaceName(name: string) {
     const parts = name.split(".");
-    return parts.take(parts.length - 1).join(".");
+    const ns = parts.take(parts.length - 1).join(".");
+    if (!ns?.length) return "globalModule";
+    return ns;
   }
 }
 
