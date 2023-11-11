@@ -659,6 +659,7 @@ interface MgParams {
       _uniqueClientID: 1,
       isAdmin: false,
       newCssRules: {},
+      misc: {},
     },
     async mounted() {
       await this.init();

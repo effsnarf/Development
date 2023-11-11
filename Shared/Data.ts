@@ -446,6 +446,10 @@ namespace Data {
     }
 
     load() {
+      if (!localStorage) {
+        this.items = [];
+        return;
+      }
       let items = localStorage.getItem(this.key);
       if (items) {
         this.items = JSON.parse(items);
@@ -455,6 +459,7 @@ namespace Data {
     }
 
     save() {
+      if (!localStorage) return;
       localStorage.setItem(this.key, JSON.stringify(this.items));
     }
   }

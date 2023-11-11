@@ -103,9 +103,9 @@ methods:
     async function(compType, comps) {
       if (!comps?.length) return;
       const showInfo = (compType != "ide");
-      if (showInfo) alertify.message(`Compiling ${comps.length} components...`);
+      //if (showInfo) alertify.message(`Compiling ${comps.length} components...`);
       await Promise.all(comps.map(this.compileComp.bind(this)));
-      if (showInfo) alertify.message(`${comps.length} components compiled`);
+      //if (showInfo) alertify.message(`${comps.length} components compiled`);
       await liveData.unwatch.items(comps);
       comps.forEach(comp => liveData.watch.item("ComponentClasses", comp, { on: { changed: this.onCompChanged.bind(this) } }));
     }

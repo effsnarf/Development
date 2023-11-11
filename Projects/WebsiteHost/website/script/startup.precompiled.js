@@ -7414,7 +7414,6 @@ const Mixins = {
                         };
                         callbackQueue.enqueue(compEvent);
                     }, {
-                        immediate: true,
                         deep: true,
                     });
                 });
@@ -8747,7 +8746,7 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 /*!************************************************************!*\
-  !*** ../../../WebsiteHost/website/script/1699626904530.ts ***!
+  !*** ../../../WebsiteHost/website/script/1699635272352.ts ***!
   \************************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -9330,6 +9329,7 @@ const webScriptMixins = [generalMixin, gridAppCompMixin, mgMixin];
             _uniqueClientID: 1,
             isAdmin: false,
             newCssRules: {},
+            misc: {},
         },
         async mounted() {
             await this.init();
