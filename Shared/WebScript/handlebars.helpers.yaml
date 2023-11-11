@@ -95,5 +95,5 @@ helpers:
     }
   methodSignature: | #ts
     (context, prefix, name, args) => {
-      return `async ${prefix}${name}(${args.join(", ")})`;
+      return `async ${prefix}${name}(${(args||"").join(", ")})`;
     }
