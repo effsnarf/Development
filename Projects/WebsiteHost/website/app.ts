@@ -53,12 +53,16 @@ const sheakspearize = async (text: string) => {
 
   const getScriptUrlCacheInvalidator = async () => {
     return await memoryCache.get("scriptUrlCacheInvalidator", () => {
-      return fs
-        .readFileSync(
-          path.join(__dirname, "/script/startup.precompiled.js"),
-          "utf-8"
-        )
-        .hashCode();
+      try {
+        return fs
+          .readFileSync(
+            path.join(__dirname, "/script/startup.precompiled.js"),
+            "utf-8"
+          )
+          .hashCode();
+      } catch (ex: any) {
+        return 1;
+      }
     });
   };
 
