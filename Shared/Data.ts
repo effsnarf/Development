@@ -420,6 +420,16 @@ namespace Data {
     items: any[];
     key: string;
 
+    get hasLocalStorage(): boolean {
+      try {
+        localStorage.setItem("test", "test");
+        localStorage.removeItem("test");
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+
     static new(key: string): LocalPersistedArray {
       return new LocalPersistedArray(key);
     }
@@ -446,7 +456,7 @@ namespace Data {
     }
 
     load() {
-      if (!localStorage) {
+      if (!this.hasLocalStorage) {
         this.items = [];
         return;
       }
@@ -459,7 +469,7 @@ namespace Data {
     }
 
     save() {
-      if (!localStorage) return;
+      if (!this.hasLocalStorage) return;
       localStorage.setItem(this.key, JSON.stringify(this.items));
     }
   }
