@@ -65,13 +65,17 @@ class HttpServer {
       };
     });
 
-    const server2 = https.createServer(
-      sslConfig[0].credentials,
-      this.requestListener.bind(this)
-    );
-    server2.listen(443, ip, () => {
-      this.log(`${`Server is running on`.green} ${`https://${ip}:443`.yellow}`);
-    });
+    if (sslConfig?.length) {
+      const server2 = https.createServer(
+        sslConfig[0].credentials,
+        this.requestListener.bind(this)
+      );
+      server2.listen(443, ip, () => {
+        this.log(
+          `${`Server is running on`.green} ${`https://${ip}:443`.yellow}`
+        );
+      });
+    }
   }
 
   static async new(
