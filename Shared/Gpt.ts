@@ -37,7 +37,7 @@ class Gpt {
   async task(taskDesc: string) {
     const gptFunc = await this.createFunction(taskDesc);
 
-    console.log(gptFunc);
+    return gptFunc;
   }
 
   async textToData(

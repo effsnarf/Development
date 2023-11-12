@@ -18,6 +18,8 @@ interface Response {
 }
 
 enum Model {
+  Gpt4VisionPreview = "gpt-4-vision-preview",
+  Gpt4 = "gpt-4",
   Gpt35Turbo = "gpt-3.5-turbo",
   Gpt35Turbo16k = "gpt-3.5-turbo-16k",
   Ada = "text-ada-001",
@@ -46,12 +48,16 @@ class OpenAI {
         return 16384;
       case Model.Ada:
         return 2049;
+      case Model.Gpt4:
+        return 4096;
+      case Model.Gpt4VisionPreview:
+        return 4096;
       default:
-        throw `Unknown model ${this.model}`;
+        throw new Error(`Unknown model ${this.model}`);
     }
   }
 
-  static new(log: boolean = true, model: Model = Model.Gpt35Turbo16k): OpenAI {
+  static new(log: boolean = true, model: Model = Model.Gpt4): OpenAI {
     if (!this.apiKey)
       throw new Error("API key not set. Use OpenAI.apiKey = 'your key'");
     return new OpenAI(this.apiKey, model, log);
@@ -103,7 +109,7 @@ class OpenAI {
         min = mid + 1;
       }
       mid = Math.floor((min + max) / 2);
-      if (mid <= 0) throw `mid is ${mid}`;
+      if (mid <= 0) throw new Error(`mid is ${mid}`);
     }
     messages = messages.slice(0, mid);
     const tokens = this.getTokens(JSON.stringify(messages));
@@ -116,7 +122,7 @@ class OpenAI {
 
   private getTokens(message: any) {
     if (!message) {
-      throw `message is ${message}`;
+      throw new Error(`message is ${message}`);
     }
     if (typeof message != "string") {
       message = JSON.stringify(message);
@@ -174,7 +180,7 @@ class OpenAI {
       //this.log();
       //this.log(msg);
       if (msg.includes("Rate limit reached")) {
-        await this.wait("Rate limit reached", (5).seconds());
+        await this.wait(msg.bgRed.white, (5).seconds());
         return await this.makeRequest<T>(model, type, dataProps, desc);
       }
       if (["ECONNRESET", "socket hang up"].some((err) => msg.includes(err)))
@@ -185,13 +191,14 @@ class OpenAI {
     }
 
     let choices = response.data.choices;
-    if (choices.length > 1) throw `${choices.length} choices returned`;
+    if (choices.length > 1)
+      throw new Error(`${choices.length} choices returned`);
     if (choices[0].text) choices[0].text = choices[0].text.trim();
     if (choices[0].message)
       choices[0].message.content = choices[0].message.content.trim();
     let reply = (choices[0].text || choices[0].message) as T;
     this.log();
-    this.log(((reply as any)?.content || reply).green);
+    this.log((reply as any)?.content || reply);
     return reply;
   }
 
@@ -226,7 +233,7 @@ class OpenAI {
     desc?: string
   ): Promise<Message> {
     if (maxReplyTokens) {
-      messages = this.shortenMessages(messages, maxReplyTokens);
+      //messages = this.shortenMessages(messages, maxReplyTokens);
     }
     return await this.makeRequest<Message>(
       this.model,
@@ -239,10 +246,18 @@ class OpenAI {
   }
 
   private log(message?: string) {
-    if (this._log) {
-      if (message) console.log(message);
-      else console.log();
+    if (!this._log) return;
+
+    try {
+      const obj = JSON.parse(message || "null");
+      console.log(obj);
+      return;
+    } catch (ex) {
+      // Ignore
     }
+
+    if (message) console.log(message);
+    else console.log();
   }
 }
 

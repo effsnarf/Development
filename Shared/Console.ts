@@ -1,3 +1,4 @@
+import { exec } from "child_process";
 import * as jsyaml from "js-yaml";
 
 // Replaces console.log()
@@ -647,6 +648,34 @@ class Console {
           console.log();
           Console.off.line(cbKey);
           return resolve(lines.join("\n").trim());
+        }
+      });
+    });
+  }
+
+  static execute(
+    command: string,
+    directory: string,
+    throwIfError = true,
+    timeout = 5000
+  ): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const options = {
+        cwd: directory,
+        timeout: timeout, // Set the timeout here
+      };
+
+      exec(command, options, (error: any, stdout: any, stderr: any) => {
+        if (error) {
+          if (error.code === "ETIMEDOUT") {
+            reject(new Error("Command execution timed out"));
+          } else if (throwIfError) {
+            reject(error);
+          } else {
+            resolve(error.message || error);
+          }
+        } else {
+          resolve(stdout);
         }
       });
     });

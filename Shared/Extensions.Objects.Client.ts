@@ -367,6 +367,18 @@ class Objects {
     throw new Error(_importMainFileToImplement);
   }
 
+  static parse = {
+    json(str: string) {
+      try {
+        return JSON.parse(str);
+      } catch (ex: any) {
+        throw new Error(
+          `Error parsing JSON:\n\n${JSON.stringify(str)}\n\n${ex.stack}`
+        );
+      }
+    },
+  };
+
   static pugToHtml(str: string, options?: any): string {
     throw new Error(_importMainFileToImplement);
   }
@@ -496,7 +508,9 @@ class Objects {
         if (str === "undefined") return undefined;
         return JSON.parse(str);
       } catch (ex: any) {
-        throw `Error parsing JSON:\n\n${JSON.stringify(str)}\n\n${ex.stack}`;
+        throw new Error(
+          `Error parsing JSON:\n\n${JSON.stringify(str)}\n\n${ex.stack}`
+        );
       }
     },
   };

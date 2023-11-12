@@ -29,6 +29,15 @@ class Role {
     this.instructions = instructions;
   }
 
+  static new(
+    name: string,
+    identity: string | null,
+    howToAnswer?: string,
+    instructions?: string
+  ) {
+    return new Role(name, identity, howToAnswer, instructions);
+  }
+
   static fromYamlFile(path: string): Role {
     let role = yaml.load(fs.readFileSync(path, "utf8")) as Role;
     return new Role(

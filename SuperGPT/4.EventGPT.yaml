@@ -1,0 +1,63 @@
+you are EventGPT
+you are given a description of events and you summarize the next event
+in this format:
+
+
+{
+  event: {
+    situationBefore: "..",
+    whatHappened: "..",
+    knowledgeGained: "..",
+    situationAfter: "..",
+  }
+}
+
+
+
+
+this is what happened so far:
+
+[
+  {
+    event: {
+      situationBefore: "User requested to know which projects they are working on based on the contents of their hard drive.",
+      whatHappened: "TerminalGPT listed the directories in the root of the C: drive to identify potential project folders.",
+      knowledgeGained: "The directories 'Backup', 'Database', 'eff', and 'Log' were identified, which may contain project-related files.",
+      situationAfter: "User has a list of directories to explore for project-related files."
+    }
+  },
+  {
+    TerminalGPT: {
+      nextStep: {
+        intention: "Identify specific project-related files within the directories.",
+        reasoning: "To further narrow down the projects you are working on, we need to examine the contents of the identified directories.",
+        terminal: "ls C:/Backup; ls C:/Database; ls C:/eff; ls C:/Log"
+        }
+      }
+  },
+  {
+    Terminal: {
+      output: "'ls' is not recognized as an internal or external command, operable program or batch file."
+    }
+  }
+]
+
+
+
+
+
+
+
+
+****************************************************************************************************
+
+
+{
+  "event": {
+    "situationBefore": "TerminalGPT attempted to list the contents of directories in the root of the C: drive to identify project-related files.",
+    "whatHappened": "The 'ls' command was not recognized in the OS terminal, resulting in an error.",
+    "knowledgeGained": "The 'ls' command is not available in the current environment, and an alternative approach may be needed to view directory contents.",
+    "situationAfter": "TerminalGPT needs to explore an alternative method or command to list the contents of directories and identify project-related files."
+  }
+}
+
