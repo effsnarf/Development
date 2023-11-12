@@ -1,7 +1,11 @@
 title: vue.studio.Web
 server:
-  host: localhost
-  port: 5051
+  dev:
+    host: localhost
+    port: 5051
+  prod:
+    host: 10.35.16.38
+    port: 443
   ssl:
     domains:
       - name: localhost
