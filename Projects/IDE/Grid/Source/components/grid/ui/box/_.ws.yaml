@@ -2,114 +2,115 @@ dom:
   grid.module:
     icon: 📦
     ':show-title': 'false'
-    ui.window:
-      v-if: showBoxWindow
-      ref: window1
-      ':css-class': windowCssClass
-      ':window-style': windowStyle
-      ':rect': boxRect
-      ':surface-element': surfaceElement
-      ':surface-camera': surfaceCamera
-      ':center-coords': 'true'
-      ':show-header': '!!box.type'
-      @is-hovered: onWindowHovered
-      @is-minimized: onToggleMinimized
-      @drag: onDrag
-      @drag-stop: onDragStop
-      @click: onBoxWindowClick
-      template: 
-        v-slot: above
-        grid.ui.box.sockets: 
-          ':box': box
-          direction: input
-      template: 
-        v-slot: header
-        .flex:
-          grid.ui.box.header:
-            v-if: box.type
-            ref: header1
-            class: flex-grow-1
+    template:
+      ui.window:
+        v-if: showBoxWindow
+        ref: window1
+        ':css-class': windowCssClass
+        ':window-style': windowStyle
+        ':rect': boxRect
+        ':surface-element': surfaceElement
+        ':surface-camera': surfaceCamera
+        ':center-coords': 'true'
+        ':show-header': '!!box.type'
+        @is-hovered: onWindowHovered
+        @is-minimized: onToggleMinimized
+        @drag: onDrag
+        @drag-stop: onDragStop
+        @click: onBoxWindowClick
+        template: 
+          v-slot: above
+          grid.ui.box.sockets: 
             ':box': box
-            ':box-icon': boxIcon
-            @title-icon-click: onTitleIconClick
-      template: 
-        v-slot: content
-        ui.mouse:
-          @hovered-element: onHoveredElement
-        ui.context.window:
-          ref: nodePickerContext1
-          grid.ui.node.picker:
-            ':box': box
-            ':hovered-element': hoveredElement
-        .h-100pc:
-          ':key': key1
-          ui.dnd.dropzone:
-            @drop-item: onDropItemOnWindow
-          transition:
-            name: slide2
-            component: 
+            direction: input
+        template: 
+          v-slot: header
+          .flex:
+            grid.ui.box.header:
               v-if: box.type
-              ref: boxComp1
-              class: h-100pc
-              ':is': getBoxCompName(box)
-              ':userID': userID
+              ref: header1
+              class: flex-grow-1
               ':box': box
-              @box-event: onContentBoxEvent
-            grid.ui.box.type.picker:
-              v-if: '!box.type'
+              ':box-icon': boxIcon
+              @title-icon-click: onTitleIconClick
+        template: 
+          v-slot: content
+          ui.mouse:
+            @hovered-element: onHoveredElement
+          ui.context.window:
+            ref: nodePickerContext1
+            grid.ui.node.picker:
               ':box': box
-      template: 
-        v-slot: left-side
-        .mr-l1:
-          ui.drawer: 
-            v-if: hasLeftSideComp(boxType)
-            component: 
-              ref: leftSideComp1
-              ':is': getBoxSideCompName(boxType, 'left')
-              ':userID': userID
-              ':box': box
-              @box-event: (...args) => onSideBoxEvent('left', ...args)
-          grid.ui.box.log:
-            v-if: 'false'
-            ':box': box
-      template: 
-        v-slot: right-side
-        div: 
-          ui.drawer: 
-            v-if: hasRightSideComp(boxType)
-            component: 
-              ref: rightSideComp1
-              ':is': getBoxSideCompName(boxType, 'right')
-              ':userID': userID
-              ':box': box
-              @box-event: (...args) => onSideBoxEvent('right', ...args)
-        grid.ui.box.sockets: 
-          ':box': box
-          direction: output
-          socket-type: iterator
-          ':surface-camera': surfaceCamera
-      template: 
-        v-slot: below
-        grid.ui.box.sockets: 
-          ':box': box
-          direction: output
-          ':socket-type': (type) => (type != 'iterator')
-          ':surface-camera': surfaceCamera
-          ':surfaceGroupBoxID': surfaceGroupBoxID
-        div: 
-          transition.group:
-            name: list
-            .alert:
-              v-for: alert in alerts
-              ':key': alert._id
-              @click: deleteAlert(alert._id)
+              ':hovered-element': hoveredElement
+          .h-100pc:
+            ':key': key1
+            ui.dnd.dropzone:
+              @drop-item: onDropItemOnWindow
+            transition:
+              name: slide2
               component: 
-                ':is': alert.comp
-                v-bind: alert.props
-        .error:
-          v-if: error
-          h3:
-            v-text: error.message
+                v-if: box.type
+                ref: boxComp1
+                class: h-100pc
+                ':is': getBoxCompName(box)
+                ':userID': userID
+                ':box': box
+                @box-event: onContentBoxEvent
+              grid.ui.box.type.picker:
+                v-if: '!box.type'
+                ':box': box
+        template: 
+          v-slot: left-side
+          .mr-l1:
+            ui.drawer: 
+              v-if: hasLeftSideComp(boxType)
+              component: 
+                ref: leftSideComp1
+                ':is': getBoxSideCompName(boxType, 'left')
+                ':userID': userID
+                ':box': box
+                @box-event: (...args) => onSideBoxEvent('left', ...args)
+            grid.ui.box.log:
+              v-if: 'false'
+              ':box': box
+        template: 
+          v-slot: right-side
+          div: 
+            ui.drawer: 
+              v-if: hasRightSideComp(boxType)
+              component: 
+                ref: rightSideComp1
+                ':is': getBoxSideCompName(boxType, 'right')
+                ':userID': userID
+                ':box': box
+                @box-event: (...args) => onSideBoxEvent('right', ...args)
+          grid.ui.box.sockets: 
+            ':box': box
+            direction: output
+            socket-type: iterator
+            ':surface-camera': surfaceCamera
+        template: 
+          v-slot: below
+          grid.ui.box.sockets: 
+            ':box': box
+            direction: output
+            ':socket-type': (type) => (type != 'iterator')
+            ':surface-camera': surfaceCamera
+            ':surfaceGroupBoxID': surfaceGroupBoxID
+          div: 
+            transition.group:
+              name: list
+              .alert:
+                v-for: alert in alerts
+                ':key': alert._id
+                @click: deleteAlert(alert._id)
+                component: 
+                  ':is': alert.comp
+                  v-bind: alert.props
+          .error:
+            v-if: error
+            h3:
+              v-text: error.message
 props:
   userID: null
   box: null
@@ -311,6 +312,11 @@ methods:
         }
       }
     }
+  getBoxBackground: | #js
+    function(box) {
+      if (!box.type) return `linear-gradient(30deg, rgb(35, 0, 0), rgb(1, 1, 1), rgb(0, 0, 0), rgb(0 10 39))`;
+      return this.getGradientBackground(this.$root.boxTypeColors[box.type || box.type?.split('.')[0]] || "#000000", 0.2);
+    }
   getGradientBackground: | #js
     function(hexColor, opacity) {
       let r = parseInt(hexColor.substring(1, 3), 16);
@@ -390,7 +396,7 @@ computed:
       const style = {};
       if (this.boxIsLoading) style.border = `2px solid yellow`;
       if (this.error) style.border = `4px solid red`;
-      if (this.$root.boxTypeColors) style.background = this.getGradientBackground(this.$root.boxTypeColors[this.box.type || this.box.type?.split('.')[0]] || "#000000", 0.2);
+      if (this.$root.boxTypeColors) style.background = this.getBoxBackground(this.box);
       return style;
     }
 watch:

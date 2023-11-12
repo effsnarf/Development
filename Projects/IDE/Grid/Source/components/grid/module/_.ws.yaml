@@ -11,7 +11,7 @@ dom:
           ':text': compName
           ':number': getTitle()
     .module-content:
-      slot: null
+      slot:
     div: 
       v-if: showEvents
       ':key': key1

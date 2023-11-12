@@ -152,7 +152,12 @@ class ClientContext {
     if (!isDevEnv) return null;
     try {
       if (!this.clientPug) this.clientPug = eval('require("pug")');
-      return this.clientPug.compile(pug)();
+      let html = this.clientPug.compile(pug)();
+      // Replace (template v-slot="[name]") with (template v-slot:[name])
+      html = html.replace(/v-slot="(.*?)"/g, "v-slot:$1");
+      // Except slotProps, replace it back
+      html = html.replace(/v-slot:slotProps/g, 'v-slot="slotProps"');
+      return html;
     } catch (ex: any) {}
     const url = `/pug`;
     const item = await (await fetch(url, { method: "post", body: pug })).text();
