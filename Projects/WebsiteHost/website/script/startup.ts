@@ -302,7 +302,21 @@ const mgHelpers = {
   },
 };
 
-const mgMixin = {
+const mgAppMixin = {
+  data() {
+    return {
+      dbp: null as any,
+    };
+  },
+  async created() {
+    const self = this as any;
+    self.dbp = await DatabaseProxy.new(
+      `https://db.memegenerator.net/MemeGenerator`
+    );
+  },
+};
+
+const mgCompMixin = {
   matchComp: (c: Component) => c.name.startsWith("mg."),
   data() {
     return {
@@ -315,9 +329,9 @@ const mgMixin = {
   },
 };
 
-const vueAppMixins = [gridAppMixin];
+const vueAppMixins = [gridAppMixin, mgAppMixin];
 
-const webScriptMixins = [generalMixin, gridAppCompMixin, mgMixin];
+const webScriptMixins = [generalMixin, gridAppCompMixin, mgCompMixin];
 
 interface MgParams {
   urlName: string;
@@ -1292,6 +1306,10 @@ interface MgParams {
   const vueManager = await VueManager.new(client);
 
   vueApp.vm = vueManager;
+
+  if ("dbp" in vueApp) {
+    await vueApp.wait(() => vueApp.dbp);
+  }
 
   vueApp.$mount("#app");
 

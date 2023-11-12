@@ -1,10 +1,10 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "../../../../Apps/DatabaseProxy/Client/DbpClient.ts":
-/*!**********************************************************!*\
-  !*** ../../../../Apps/DatabaseProxy/Client/DbpClient.ts ***!
-  \**********************************************************/
+/***/ "../../../../../Apps/DatabaseProxy/Client/DbpClient.ts":
+/*!*************************************************************!*\
+  !*** ../../../../../Apps/DatabaseProxy/Client/DbpClient.ts ***!
+  \*************************************************************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
@@ -13,8 +13,8 @@
 // Doesn't have direct access to the database, but can still use the API
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.DatabaseProxy = void 0;
-const Events_1 = __webpack_require__(/*! ../../../Shared/Events */ "../../../../Shared/Events.ts");
-const Data_1 = __webpack_require__(/*! ../../../Shared/Data */ "../../../../Shared/Data.ts");
+const Events_1 = __webpack_require__(/*! ../../../Shared/Events */ "../../../../../Shared/Events.ts");
+const Data_1 = __webpack_require__(/*! ../../../Shared/Data */ "../../../../../Shared/Data.ts");
 // Lowercase the first letter of a string
 String.prototype.untitleize = function () {
     return this.charAt(0).toLowerCase() + this.slice(1);
@@ -368,10 +368,10 @@ exports.DatabaseProxy = DatabaseProxy;
 
 /***/ }),
 
-/***/ "../../../WebsiteHost/Classes/AnalyticsTracker.ts":
-/*!********************************************************!*\
-  !*** ../../../WebsiteHost/Classes/AnalyticsTracker.ts ***!
-  \********************************************************/
+/***/ "../../../../WebsiteHost/Classes/AnalyticsTracker.ts":
+/*!***********************************************************!*\
+  !*** ../../../../WebsiteHost/Classes/AnalyticsTracker.ts ***!
+  \***********************************************************/
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -419,10 +419,10 @@ exports.AnalyticsTracker = AnalyticsTracker;
 
 /***/ }),
 
-/***/ "../../../WebsiteHost/Classes/ClientContext.ts":
-/*!*****************************************************!*\
-  !*** ../../../WebsiteHost/Classes/ClientContext.ts ***!
-  \*****************************************************/
+/***/ "../../../../WebsiteHost/Classes/ClientContext.ts":
+/*!********************************************************!*\
+  !*** ../../../../WebsiteHost/Classes/ClientContext.ts ***!
+  \********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -432,11 +432,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ClientContext = void 0;
-const to_template_1 = __importDefault(__webpack_require__(/*! ../../../Shared/WebScript/to.template */ "../../../../Shared/WebScript/to.template.ts"));
-const is_attribute_name_1 = __importDefault(__webpack_require__(/*! ../../../Shared/WebScript/is.attribute.name */ "../../../../Shared/WebScript/is.attribute.name.ts"));
-const ComponentManager_1 = __webpack_require__(/*! ./ComponentManager */ "../../../WebsiteHost/Classes/ComponentManager.ts");
-const ModuleManager_1 = __webpack_require__(/*! ./ModuleManager */ "../../../WebsiteHost/Classes/ModuleManager.ts");
-const ClientDatabase_1 = __webpack_require__(/*! ./ClientDatabase */ "../../../WebsiteHost/Classes/ClientDatabase.ts");
+const to_template_1 = __importDefault(__webpack_require__(/*! ../../../Shared/WebScript/to.template */ "../../../../../Shared/WebScript/to.template.ts"));
+const is_attribute_name_1 = __importDefault(__webpack_require__(/*! ../../../Shared/WebScript/is.attribute.name */ "../../../../../Shared/WebScript/is.attribute.name.ts"));
+const ComponentManager_1 = __webpack_require__(/*! ./ComponentManager */ "../../../../WebsiteHost/Classes/ComponentManager.ts");
+const ModuleManager_1 = __webpack_require__(/*! ./ModuleManager */ "../../../../WebsiteHost/Classes/ModuleManager.ts");
+const ClientDatabase_1 = __webpack_require__(/*! ./ClientDatabase */ "../../../../WebsiteHost/Classes/ClientDatabase.ts");
 const isDevEnv = window.location.hostname == "localhost";
 class ClientContext {
     static _fetch;
@@ -608,10 +608,10 @@ ClientContext.initialize();
 
 /***/ }),
 
-/***/ "../../../WebsiteHost/Classes/ClientDatabase.ts":
-/*!******************************************************!*\
-  !*** ../../../WebsiteHost/Classes/ClientDatabase.ts ***!
-  \******************************************************/
+/***/ "../../../../WebsiteHost/Classes/ClientDatabase.ts":
+/*!*********************************************************!*\
+  !*** ../../../../WebsiteHost/Classes/ClientDatabase.ts ***!
+  \*********************************************************/
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -666,17 +666,17 @@ exports.ClientDatabase = ClientDatabase;
 
 /***/ }),
 
-/***/ "../../../WebsiteHost/Classes/Component.ts":
-/*!*************************************************!*\
-  !*** ../../../WebsiteHost/Classes/Component.ts ***!
-  \*************************************************/
+/***/ "../../../../WebsiteHost/Classes/Component.ts":
+/*!****************************************************!*\
+  !*** ../../../../WebsiteHost/Classes/Component.ts ***!
+  \****************************************************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Component = void 0;
-const ClientContext_1 = __webpack_require__(/*! ./ClientContext */ "../../../WebsiteHost/Classes/ClientContext.ts");
+const ClientContext_1 = __webpack_require__(/*! ./ClientContext */ "../../../../WebsiteHost/Classes/ClientContext.ts");
 String.prototype.kebabize = function () {
     let s = this.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
     s = s.replace(/[^a-z0-9-]/g, "-");
@@ -756,21 +756,21 @@ exports.Component = Component;
 
 /***/ }),
 
-/***/ "../../../WebsiteHost/Classes/ComponentManager.ts":
-/*!********************************************************!*\
-  !*** ../../../WebsiteHost/Classes/ComponentManager.ts ***!
-  \********************************************************/
+/***/ "../../../../WebsiteHost/Classes/ComponentManager.ts":
+/*!***********************************************************!*\
+  !*** ../../../../WebsiteHost/Classes/ComponentManager.ts ***!
+  \***********************************************************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ComponentManager = void 0;
-__webpack_require__(/*! ../../../Shared/Extensions */ "../../../../Shared/Extensions.ts");
-const Lock_1 = __webpack_require__(/*! ../../../Shared/Lock */ "../../../../Shared/Lock.ts");
-const DataWatcher_1 = __webpack_require__(/*! ../../../Shared/DataWatcher */ "../../../../Shared/DataWatcher.ts");
-const Component_1 = __webpack_require__(/*! ./Component */ "../../../WebsiteHost/Classes/Component.ts");
-const ClientContext_1 = __webpack_require__(/*! ./ClientContext */ "../../../WebsiteHost/Classes/ClientContext.ts");
+__webpack_require__(/*! ../../../Shared/Extensions */ "../../../../../Shared/Extensions.ts");
+const Lock_1 = __webpack_require__(/*! ../../../Shared/Lock */ "../../../../../Shared/Lock.ts");
+const DataWatcher_1 = __webpack_require__(/*! ../../../Shared/DataWatcher */ "../../../../../Shared/DataWatcher.ts");
+const Component_1 = __webpack_require__(/*! ./Component */ "../../../../WebsiteHost/Classes/Component.ts");
+const ClientContext_1 = __webpack_require__(/*! ./ClientContext */ "../../../../WebsiteHost/Classes/ClientContext.ts");
 class ComponentManager {
     // #region Globals
     static async get() {
@@ -847,10 +847,10 @@ exports.ComponentManager = ComponentManager;
 
 /***/ }),
 
-/***/ "../../../WebsiteHost/Classes/HtmlHelper.ts":
-/*!**************************************************!*\
-  !*** ../../../WebsiteHost/Classes/HtmlHelper.ts ***!
-  \**************************************************/
+/***/ "../../../../WebsiteHost/Classes/HtmlHelper.ts":
+/*!*****************************************************!*\
+  !*** ../../../../WebsiteHost/Classes/HtmlHelper.ts ***!
+  \*****************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -860,7 +860,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.HtmlHelper = void 0;
-const add_paths_1 = __importDefault(__webpack_require__(/*! ../../../Shared/WebScript/add.paths */ "../../../../Shared/WebScript/add.paths.ts"));
+const add_paths_1 = __importDefault(__webpack_require__(/*! ../../../Shared/WebScript/add.paths */ "../../../../../Shared/WebScript/add.paths.ts"));
 class HtmlHelper {
     cssProperties = {
         "align-content": {
@@ -3270,18 +3270,18 @@ exports.HtmlHelper = HtmlHelper;
 
 /***/ }),
 
-/***/ "../../../WebsiteHost/Classes/Module.ts":
-/*!**********************************************!*\
-  !*** ../../../WebsiteHost/Classes/Module.ts ***!
-  \**********************************************/
+/***/ "../../../../WebsiteHost/Classes/Module.ts":
+/*!*************************************************!*\
+  !*** ../../../../WebsiteHost/Classes/Module.ts ***!
+  \*************************************************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Module = void 0;
-__webpack_require__(/*! ../../../../Shared/Extensions.Objects.Client */ "../../../../Shared/Extensions.Objects.Client.ts");
-const ClientContext_1 = __webpack_require__(/*! ./ClientContext */ "../../../WebsiteHost/Classes/ClientContext.ts");
+__webpack_require__(/*! ../../../../../Shared/Extensions.Objects.Client */ "../../../../../Shared/Extensions.Objects.Client.ts");
+const ClientContext_1 = __webpack_require__(/*! ./ClientContext */ "../../../../WebsiteHost/Classes/ClientContext.ts");
 class Module {
     name;
     path;
@@ -3329,18 +3329,18 @@ exports.Module = Module;
 
 /***/ }),
 
-/***/ "../../../WebsiteHost/Classes/ModuleManager.ts":
-/*!*****************************************************!*\
-  !*** ../../../WebsiteHost/Classes/ModuleManager.ts ***!
-  \*****************************************************/
+/***/ "../../../../WebsiteHost/Classes/ModuleManager.ts":
+/*!********************************************************!*\
+  !*** ../../../../WebsiteHost/Classes/ModuleManager.ts ***!
+  \********************************************************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ModuleManager = void 0;
-__webpack_require__(/*! ../../../Shared/Extensions */ "../../../../Shared/Extensions.ts");
-const Module_1 = __webpack_require__(/*! ./Module */ "../../../WebsiteHost/Classes/Module.ts");
+__webpack_require__(/*! ../../../Shared/Extensions */ "../../../../../Shared/Extensions.ts");
+const Module_1 = __webpack_require__(/*! ./Module */ "../../../../WebsiteHost/Classes/Module.ts");
 class ModuleManager {
     modules = [];
     constructor() { }
@@ -3379,10 +3379,10 @@ exports.ModuleManager = ModuleManager;
 
 /***/ }),
 
-/***/ "../../../WebsiteHost/Classes/Params.ts":
-/*!**********************************************!*\
-  !*** ../../../WebsiteHost/Classes/Params.ts ***!
-  \**********************************************/
+/***/ "../../../../WebsiteHost/Classes/Params.ts":
+/*!*************************************************!*\
+  !*** ../../../../WebsiteHost/Classes/Params.ts ***!
+  \*************************************************/
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -3430,19 +3430,19 @@ exports.Params = Params;
 
 /***/ }),
 
-/***/ "../../../WebsiteHost/Classes/StateTracker.ts":
-/*!****************************************************!*\
-  !*** ../../../WebsiteHost/Classes/StateTracker.ts ***!
-  \****************************************************/
+/***/ "../../../../WebsiteHost/Classes/StateTracker.ts":
+/*!*******************************************************!*\
+  !*** ../../../../WebsiteHost/Classes/StateTracker.ts ***!
+  \*******************************************************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StateValue = exports.StateTracker = void 0;
-__webpack_require__(/*! ../../../Shared/Extensions */ "../../../../Shared/Extensions.ts");
-const Extensions_Objects_Client_1 = __webpack_require__(/*! ../../../Shared/Extensions.Objects.Client */ "../../../../Shared/Extensions.Objects.Client.ts");
-const VueHelper_1 = __webpack_require__(/*! ./VueHelper */ "../../../WebsiteHost/Classes/VueHelper.ts");
+__webpack_require__(/*! ../../../Shared/Extensions */ "../../../../../Shared/Extensions.ts");
+const Extensions_Objects_Client_1 = __webpack_require__(/*! ../../../Shared/Extensions.Objects.Client */ "../../../../../Shared/Extensions.Objects.Client.ts");
+const VueHelper_1 = __webpack_require__(/*! ./VueHelper */ "../../../../WebsiteHost/Classes/VueHelper.ts");
 var StateValueType;
 (function (StateValueType) {
     StateValueType[StateValueType["Cloned"] = 0] = "Cloned";
@@ -3684,10 +3684,10 @@ exports.StateTracker = StateTracker;
 
 /***/ }),
 
-/***/ "../../../WebsiteHost/Classes/VueHelper.ts":
-/*!*************************************************!*\
-  !*** ../../../WebsiteHost/Classes/VueHelper.ts ***!
-  \*************************************************/
+/***/ "../../../../WebsiteHost/Classes/VueHelper.ts":
+/*!****************************************************!*\
+  !*** ../../../../WebsiteHost/Classes/VueHelper.ts ***!
+  \****************************************************/
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -3801,20 +3801,20 @@ exports.VueHelper = VueHelper;
 
 /***/ }),
 
-/***/ "../../../WebsiteHost/Classes/VueManager.ts":
-/*!**************************************************!*\
-  !*** ../../../WebsiteHost/Classes/VueManager.ts ***!
-  \**************************************************/
+/***/ "../../../../WebsiteHost/Classes/VueManager.ts":
+/*!*****************************************************!*\
+  !*** ../../../../WebsiteHost/Classes/VueManager.ts ***!
+  \*****************************************************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.VueManager = void 0;
-__webpack_require__(/*! ../../../Shared/Extensions */ "../../../../Shared/Extensions.ts");
-const TwoWayMap_1 = __webpack_require__(/*! ../../../Shared/TwoWayMap */ "../../../../Shared/TwoWayMap.ts");
-const VueHelper_1 = __webpack_require__(/*! ./VueHelper */ "../../../WebsiteHost/Classes/VueHelper.ts");
-const StateTracker_1 = __webpack_require__(/*! ./StateTracker */ "../../../WebsiteHost/Classes/StateTracker.ts");
+__webpack_require__(/*! ../../../Shared/Extensions */ "../../../../../Shared/Extensions.ts");
+const TwoWayMap_1 = __webpack_require__(/*! ../../../Shared/TwoWayMap */ "../../../../../Shared/TwoWayMap.ts");
+const VueHelper_1 = __webpack_require__(/*! ./VueHelper */ "../../../../WebsiteHost/Classes/VueHelper.ts");
+const StateTracker_1 = __webpack_require__(/*! ./StateTracker */ "../../../../WebsiteHost/Classes/StateTracker.ts");
 class VueManager {
     client;
     vues = {};
@@ -4045,20 +4045,20 @@ exports.VueManager = VueManager;
 
 /***/ }),
 
-/***/ "../../../../Shared/Actionable.ts":
-/*!****************************************!*\
-  !*** ../../../../Shared/Actionable.ts ***!
-  \****************************************/
+/***/ "../../../../../Shared/Actionable.ts":
+/*!*******************************************!*\
+  !*** ../../../../../Shared/Actionable.ts ***!
+  \*******************************************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Actionable = void 0;
-const Events_1 = __webpack_require__(/*! ./Events */ "../../../../Shared/Events.ts");
-const Data_1 = __webpack_require__(/*! ./Data */ "../../../../Shared/Data.ts");
-const Extensions_Objects_Client_1 = __webpack_require__(/*! ./Extensions.Objects.Client */ "../../../../Shared/Extensions.Objects.Client.ts");
-const TaskQueue_1 = __webpack_require__(/*! ./TaskQueue */ "../../../../Shared/TaskQueue.ts");
+const Events_1 = __webpack_require__(/*! ./Events */ "../../../../../Shared/Events.ts");
+const Data_1 = __webpack_require__(/*! ./Data */ "../../../../../Shared/Data.ts");
+const Extensions_Objects_Client_1 = __webpack_require__(/*! ./Extensions.Objects.Client */ "../../../../../Shared/Extensions.Objects.Client.ts");
+const TaskQueue_1 = __webpack_require__(/*! ./TaskQueue */ "../../../../../Shared/TaskQueue.ts");
 var Actionable;
 (function (Actionable) {
     class ActionPointer {
@@ -4269,18 +4269,18 @@ var Actionable;
 
 /***/ }),
 
-/***/ "../../../../Shared/Data.ts":
-/*!**********************************!*\
-  !*** ../../../../Shared/Data.ts ***!
-  \**********************************/
+/***/ "../../../../../Shared/Data.ts":
+/*!*************************************!*\
+  !*** ../../../../../Shared/Data.ts ***!
+  \*************************************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Data = void 0;
-const Extensions_Objects_Client_1 = __webpack_require__(/*! ./Extensions.Objects.Client */ "../../../../Shared/Extensions.Objects.Client.ts");
-const Events_1 = __webpack_require__(/*! ./Events */ "../../../../Shared/Events.ts");
+const Extensions_Objects_Client_1 = __webpack_require__(/*! ./Extensions.Objects.Client */ "../../../../../Shared/Extensions.Objects.Client.ts");
+const Events_1 = __webpack_require__(/*! ./Events */ "../../../../../Shared/Events.ts");
 var Data;
 (function (Data) {
     let Persister;
@@ -4659,17 +4659,17 @@ var Data;
 
 /***/ }),
 
-/***/ "../../../../Shared/DataWatcher.ts":
-/*!*****************************************!*\
-  !*** ../../../../Shared/DataWatcher.ts ***!
-  \*****************************************/
+/***/ "../../../../../Shared/DataWatcher.ts":
+/*!********************************************!*\
+  !*** ../../../../../Shared/DataWatcher.ts ***!
+  \********************************************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.DataWatcher = void 0;
-const RepeatingTaskQueue_1 = __webpack_require__(/*! ./RepeatingTaskQueue */ "../../../../Shared/RepeatingTaskQueue.ts");
+const RepeatingTaskQueue_1 = __webpack_require__(/*! ./RepeatingTaskQueue */ "../../../../../Shared/RepeatingTaskQueue.ts");
 class DefaultDataComparer {
     clone(o1) {
         if (o1 == null)
@@ -4728,18 +4728,18 @@ exports.DataWatcher = DataWatcher;
 
 /***/ }),
 
-/***/ "../../../../Shared/Database/Graph.ts":
-/*!********************************************!*\
-  !*** ../../../../Shared/Database/Graph.ts ***!
-  \********************************************/
+/***/ "../../../../../Shared/Database/Graph.ts":
+/*!***********************************************!*\
+  !*** ../../../../../Shared/Database/Graph.ts ***!
+  \***********************************************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Graph = void 0;
-const Extensions_Objects_Client_1 = __webpack_require__(/*! ../Extensions.Objects.Client */ "../../../../Shared/Extensions.Objects.Client.ts");
-const Events_1 = __webpack_require__(/*! ../Events */ "../../../../Shared/Events.ts");
+const Extensions_Objects_Client_1 = __webpack_require__(/*! ../Extensions.Objects.Client */ "../../../../../Shared/Extensions.Objects.Client.ts");
+const Events_1 = __webpack_require__(/*! ../Events */ "../../../../../Shared/Events.ts");
 const findArg = (condition, ...args) => {
     if (typeof condition == "string") {
         const type = condition;
@@ -5023,17 +5023,17 @@ var Graph;
 
 /***/ }),
 
-/***/ "../../../../Shared/Diff.ts":
-/*!**********************************!*\
-  !*** ../../../../Shared/Diff.ts ***!
-  \**********************************/
+/***/ "../../../../../Shared/Diff.ts":
+/*!*************************************!*\
+  !*** ../../../../../Shared/Diff.ts ***!
+  \*************************************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Diff = void 0;
-const deepDiff = __webpack_require__(/*! deep-diff */ "../../../../Shared/node_modules/deep-diff/index.js");
+const deepDiff = __webpack_require__(/*! deep-diff */ "../../../../../Shared/node_modules/deep-diff/index.js");
 var Diff;
 (function (Diff) {
     function getChanges(source, target) {
@@ -5053,10 +5053,10 @@ var Diff;
 
 /***/ }),
 
-/***/ "../../../../Shared/Events.ts":
-/*!************************************!*\
-  !*** ../../../../Shared/Events.ts ***!
-  \************************************/
+/***/ "../../../../../Shared/Events.ts":
+/*!***************************************!*\
+  !*** ../../../../../Shared/Events.ts ***!
+  \***************************************/
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -5095,17 +5095,17 @@ exports.Events = Events;
 
 /***/ }),
 
-/***/ "../../../../Shared/Extensions.Objects.Client.ts":
-/*!*******************************************************!*\
-  !*** ../../../../Shared/Extensions.Objects.Client.ts ***!
-  \*******************************************************/
+/***/ "../../../../../Shared/Extensions.Objects.Client.ts":
+/*!**********************************************************!*\
+  !*** ../../../../../Shared/Extensions.Objects.Client.ts ***!
+  \**********************************************************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.TreeObject = exports.Objects = void 0;
-__webpack_require__(/*! ./Extensions */ "../../../../Shared/Extensions.ts");
+__webpack_require__(/*! ./Extensions */ "../../../../../Shared/Extensions.ts");
 const _importMainFileToImplement = "This is not supported on the client side. Import Extensions.Objects to implement";
 class Objects {
     static is(obj, type) {
@@ -5667,10 +5667,10 @@ exports.TreeObject = TreeObject;
 
 /***/ }),
 
-/***/ "../../../../Shared/Extensions.ts":
-/*!****************************************!*\
-  !*** ../../../../Shared/Extensions.ts ***!
-  \****************************************/
+/***/ "../../../../../Shared/Extensions.ts":
+/*!*******************************************!*\
+  !*** ../../../../../Shared/Extensions.ts ***!
+  \*******************************************/
 /***/ (() => {
 
 "use strict";
@@ -7165,10 +7165,10 @@ if (typeof Function !== "undefined") {
 
 /***/ }),
 
-/***/ "../../../../Shared/Lock.ts":
-/*!**********************************!*\
-  !*** ../../../../Shared/Lock.ts ***!
-  \**********************************/
+/***/ "../../../../../Shared/Lock.ts":
+/*!*************************************!*\
+  !*** ../../../../../Shared/Lock.ts ***!
+  \*************************************/
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -7209,10 +7209,10 @@ exports.Lock = Lock;
 
 /***/ }),
 
-/***/ "../../../../Shared/MovingPositionSmoother.ts":
-/*!****************************************************!*\
-  !*** ../../../../Shared/MovingPositionSmoother.ts ***!
-  \****************************************************/
+/***/ "../../../../../Shared/MovingPositionSmoother.ts":
+/*!*******************************************************!*\
+  !*** ../../../../../Shared/MovingPositionSmoother.ts ***!
+  \*******************************************************/
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -7319,17 +7319,17 @@ exports.MovingPositionSmoother = MovingPositionSmoother;
 
 /***/ }),
 
-/***/ "../../../../Shared/Mvc/Vue/Mixins.ts":
-/*!********************************************!*\
-  !*** ../../../../Shared/Mvc/Vue/Mixins.ts ***!
-  \********************************************/
+/***/ "../../../../../Shared/Mvc/Vue/Mixins.ts":
+/*!***********************************************!*\
+  !*** ../../../../../Shared/Mvc/Vue/Mixins.ts ***!
+  \***********************************************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Mixins = void 0;
-const Extensions_Objects_Client_1 = __webpack_require__(/*! ../../Extensions.Objects.Client */ "../../../../Shared/Extensions.Objects.Client.ts");
+const Extensions_Objects_Client_1 = __webpack_require__(/*! ../../Extensions.Objects.Client */ "../../../../../Shared/Extensions.Objects.Client.ts");
 class CallbackQueue {
     callback;
     tcbs = {};
@@ -7534,10 +7534,10 @@ exports.Mixins = Mixins;
 
 /***/ }),
 
-/***/ "../../../../Shared/Reflection.ts":
-/*!****************************************!*\
-  !*** ../../../../Shared/Reflection.ts ***!
-  \****************************************/
+/***/ "../../../../../Shared/Reflection.ts":
+/*!*******************************************!*\
+  !*** ../../../../../Shared/Reflection.ts ***!
+  \*******************************************/
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -7701,10 +7701,10 @@ exports.Reflection = Reflection;
 
 /***/ }),
 
-/***/ "../../../../Shared/RepeatingTaskQueue.ts":
-/*!************************************************!*\
-  !*** ../../../../Shared/RepeatingTaskQueue.ts ***!
-  \************************************************/
+/***/ "../../../../../Shared/RepeatingTaskQueue.ts":
+/*!***************************************************!*\
+  !*** ../../../../../Shared/RepeatingTaskQueue.ts ***!
+  \***************************************************/
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -7740,10 +7740,10 @@ exports.RepeatingTaskQueue = RepeatingTaskQueue;
 
 /***/ }),
 
-/***/ "../../../../Shared/TaskQueue.ts":
-/*!***************************************!*\
-  !*** ../../../../Shared/TaskQueue.ts ***!
-  \***************************************/
+/***/ "../../../../../Shared/TaskQueue.ts":
+/*!******************************************!*\
+  !*** ../../../../../Shared/TaskQueue.ts ***!
+  \******************************************/
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -7789,10 +7789,10 @@ exports.TaskQueue = TaskQueue;
 
 /***/ }),
 
-/***/ "../../../../Shared/Timer.ts":
-/*!***********************************!*\
-  !*** ../../../../Shared/Timer.ts ***!
-  \***********************************/
+/***/ "../../../../../Shared/Timer.ts":
+/*!**************************************!*\
+  !*** ../../../../../Shared/Timer.ts ***!
+  \**************************************/
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -7912,10 +7912,10 @@ exports.Timer = Timer;
 
 /***/ }),
 
-/***/ "../../../../Shared/TwoWayMap.ts":
-/*!***************************************!*\
-  !*** ../../../../Shared/TwoWayMap.ts ***!
-  \***************************************/
+/***/ "../../../../../Shared/TwoWayMap.ts":
+/*!******************************************!*\
+  !*** ../../../../../Shared/TwoWayMap.ts ***!
+  \******************************************/
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -7997,16 +7997,16 @@ exports.TwoWayMap = TwoWayMap;
 
 /***/ }),
 
-/***/ "../../../../Shared/WebScript/add.paths.ts":
-/*!*************************************************!*\
-  !*** ../../../../Shared/WebScript/add.paths.ts ***!
-  \*************************************************/
+/***/ "../../../../../Shared/WebScript/add.paths.ts":
+/*!****************************************************!*\
+  !*** ../../../../../Shared/WebScript/add.paths.ts ***!
+  \****************************************************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const Extensions_Objects_Client_1 = __webpack_require__(/*! ../Extensions.Objects.Client */ "../../../../Shared/Extensions.Objects.Client.ts");
+const Extensions_Objects_Client_1 = __webpack_require__(/*! ../Extensions.Objects.Client */ "../../../../../Shared/Extensions.Objects.Client.ts");
 exports["default"] = (context, compName, dom) => {
     compName = compName.replace(/-/g, ".");
     dom = Extensions_Objects_Client_1.Objects.json.parse(JSON.stringify(dom));
@@ -8031,10 +8031,10 @@ exports["default"] = (context, compName, dom) => {
 
 /***/ }),
 
-/***/ "../../../../Shared/WebScript/is.attribute.name.ts":
-/*!*********************************************************!*\
-  !*** ../../../../Shared/WebScript/is.attribute.name.ts ***!
-  \*********************************************************/
+/***/ "../../../../../Shared/WebScript/is.attribute.name.ts":
+/*!************************************************************!*\
+  !*** ../../../../../Shared/WebScript/is.attribute.name.ts ***!
+  \************************************************************/
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -8096,10 +8096,10 @@ exports["default"] = (componentNames, name) => {
 
 /***/ }),
 
-/***/ "../../../../Shared/WebScript/to.template.ts":
-/*!***************************************************!*\
-  !*** ../../../../Shared/WebScript/to.template.ts ***!
-  \***************************************************/
+/***/ "../../../../../Shared/WebScript/to.template.ts":
+/*!******************************************************!*\
+  !*** ../../../../../Shared/WebScript/to.template.ts ***!
+  \******************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -8108,7 +8108,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const add_paths_1 = __importDefault(__webpack_require__(/*! ./add.paths */ "../../../../Shared/WebScript/add.paths.ts"));
+const add_paths_1 = __importDefault(__webpack_require__(/*! ./add.paths */ "../../../../../Shared/WebScript/add.paths.ts"));
 exports["default"] = (context, dom, indent, compName) => {
     if (!dom)
         return [];
@@ -8223,10 +8223,10 @@ exports["default"] = (context, dom, indent, compName) => {
 
 /***/ }),
 
-/***/ "../../../../Shared/node_modules/deep-diff/index.js":
-/*!**********************************************************!*\
-  !*** ../../../../Shared/node_modules/deep-diff/index.js ***!
-  \**********************************************************/
+/***/ "../../../../../Shared/node_modules/deep-diff/index.js":
+/*!*************************************************************!*\
+  !*** ../../../../../Shared/node_modules/deep-diff/index.js ***!
+  \*************************************************************/
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_RESULT__;;(function(root, factory) { // eslint-disable-line no-extra-semi
@@ -8779,30 +8779,30 @@ var __webpack_exports__ = {};
 (() => {
 "use strict";
 var exports = __webpack_exports__;
-/*!************************************************************!*\
-  !*** ../../../WebsiteHost/website/script/1699798526225.ts ***!
-  \************************************************************/
+/*!***************************************************************!*\
+  !*** ../../../../WebsiteHost/website/script/1699800792146.ts ***!
+  \***************************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-__webpack_require__(/*! ../../../../Shared/Extensions */ "../../../../Shared/Extensions.ts");
-const HtmlHelper_1 = __webpack_require__(/*! ../../Classes/HtmlHelper */ "../../../WebsiteHost/Classes/HtmlHelper.ts");
-const Events_1 = __webpack_require__(/*! ../../../../Shared/Events */ "../../../../Shared/Events.ts");
-const Extensions_Objects_Client_1 = __webpack_require__(/*! ../../../../Shared/Extensions.Objects.Client */ "../../../../Shared/Extensions.Objects.Client.ts");
-const Reflection_1 = __webpack_require__(/*! ../../../../Shared/Reflection */ "../../../../Shared/Reflection.ts");
-const Diff_1 = __webpack_require__(/*! ../../../../Shared/Diff */ "../../../../Shared/Diff.ts");
-const TaskQueue_1 = __webpack_require__(/*! ../../../../Shared/TaskQueue */ "../../../../Shared/TaskQueue.ts");
-const Actionable_1 = __webpack_require__(/*! ../../../../Shared/Actionable */ "../../../../Shared/Actionable.ts");
-const AnalyticsTracker_1 = __webpack_require__(/*! ../../Classes/AnalyticsTracker */ "../../../WebsiteHost/Classes/AnalyticsTracker.ts");
-const ClientContext_1 = __webpack_require__(/*! ../../Classes/ClientContext */ "../../../WebsiteHost/Classes/ClientContext.ts");
-const Params_1 = __webpack_require__(/*! ../../Classes/Params */ "../../../WebsiteHost/Classes/Params.ts");
-const DbpClient_1 = __webpack_require__(/*! ../../../../Apps/DatabaseProxy/Client/DbpClient */ "../../../../Apps/DatabaseProxy/Client/DbpClient.ts");
-const Timer_1 = __webpack_require__(/*! ../../../../Shared/Timer */ "../../../../Shared/Timer.ts");
-const VueManager_1 = __webpack_require__(/*! ../../Classes/VueManager */ "../../../WebsiteHost/Classes/VueManager.ts");
-const Data_1 = __webpack_require__(/*! ../../../../Shared/Data */ "../../../../Shared/Data.ts");
-const Graph_1 = __webpack_require__(/*! ../../../../Shared/Database/Graph */ "../../../../Shared/Database/Graph.ts");
-const StateTracker_1 = __webpack_require__(/*! ../../Classes/StateTracker */ "../../../WebsiteHost/Classes/StateTracker.ts");
-const Mixins_1 = __webpack_require__(/*! ../../../../Shared/Mvc/Vue/Mixins */ "../../../../Shared/Mvc/Vue/Mixins.ts");
-const MovingPositionSmoother_1 = __webpack_require__(/*! ../../../../Shared/MovingPositionSmoother */ "../../../../Shared/MovingPositionSmoother.ts");
+__webpack_require__(/*! ../../../../Shared/Extensions */ "../../../../../Shared/Extensions.ts");
+const HtmlHelper_1 = __webpack_require__(/*! ../../Classes/HtmlHelper */ "../../../../WebsiteHost/Classes/HtmlHelper.ts");
+const Events_1 = __webpack_require__(/*! ../../../../Shared/Events */ "../../../../../Shared/Events.ts");
+const Extensions_Objects_Client_1 = __webpack_require__(/*! ../../../../Shared/Extensions.Objects.Client */ "../../../../../Shared/Extensions.Objects.Client.ts");
+const Reflection_1 = __webpack_require__(/*! ../../../../Shared/Reflection */ "../../../../../Shared/Reflection.ts");
+const Diff_1 = __webpack_require__(/*! ../../../../Shared/Diff */ "../../../../../Shared/Diff.ts");
+const TaskQueue_1 = __webpack_require__(/*! ../../../../Shared/TaskQueue */ "../../../../../Shared/TaskQueue.ts");
+const Actionable_1 = __webpack_require__(/*! ../../../../Shared/Actionable */ "../../../../../Shared/Actionable.ts");
+const AnalyticsTracker_1 = __webpack_require__(/*! ../../Classes/AnalyticsTracker */ "../../../../WebsiteHost/Classes/AnalyticsTracker.ts");
+const ClientContext_1 = __webpack_require__(/*! ../../Classes/ClientContext */ "../../../../WebsiteHost/Classes/ClientContext.ts");
+const Params_1 = __webpack_require__(/*! ../../Classes/Params */ "../../../../WebsiteHost/Classes/Params.ts");
+const DbpClient_1 = __webpack_require__(/*! ../../../../Apps/DatabaseProxy/Client/DbpClient */ "../../../../../Apps/DatabaseProxy/Client/DbpClient.ts");
+const Timer_1 = __webpack_require__(/*! ../../../../Shared/Timer */ "../../../../../Shared/Timer.ts");
+const VueManager_1 = __webpack_require__(/*! ../../Classes/VueManager */ "../../../../WebsiteHost/Classes/VueManager.ts");
+const Data_1 = __webpack_require__(/*! ../../../../Shared/Data */ "../../../../../Shared/Data.ts");
+const Graph_1 = __webpack_require__(/*! ../../../../Shared/Database/Graph */ "../../../../../Shared/Database/Graph.ts");
+const StateTracker_1 = __webpack_require__(/*! ../../Classes/StateTracker */ "../../../../WebsiteHost/Classes/StateTracker.ts");
+const Mixins_1 = __webpack_require__(/*! ../../../../Shared/Mvc/Vue/Mixins */ "../../../../../Shared/Mvc/Vue/Mixins.ts");
+const MovingPositionSmoother_1 = __webpack_require__(/*! ../../../../Shared/MovingPositionSmoother */ "../../../../../Shared/MovingPositionSmoother.ts");
 const window1 = window;
 const Vue = window1.Vue;
 let vueApp;
@@ -9059,7 +9059,18 @@ const mgHelpers = {
         },
     },
 };
-const mgMixin = {
+const mgAppMixin = {
+    data() {
+        return {
+            dbp: null,
+        };
+    },
+    async created() {
+        const self = this;
+        self.dbp = await DbpClient_1.DatabaseProxy.new(`https://db.memegenerator.net/MemeGenerator`);
+    },
+};
+const mgCompMixin = {
     matchComp: (c) => c.name.startsWith("mg."),
     data() {
         return {
@@ -9071,8 +9082,8 @@ const mgMixin = {
         };
     },
 };
-const vueAppMixins = [gridAppMixin];
-const webScriptMixins = [generalMixin, gridAppCompMixin, mgMixin];
+const vueAppMixins = [gridAppMixin, mgAppMixin];
+const webScriptMixins = [generalMixin, gridAppCompMixin, mgCompMixin];
 (async () => {
     await ClientContext_1.ClientContext.waitUntilLoaded();
     const client = ClientContext_1.ClientContext.context;
@@ -9964,6 +9975,9 @@ const webScriptMixins = [generalMixin, gridAppCompMixin, mgMixin];
     });
     const vueManager = await VueManager_1.VueManager.new(client);
     vueApp.vm = vueManager;
+    if ("dbp" in vueApp) {
+        await vueApp.wait(() => vueApp.dbp);
+    }
     vueApp.$mount("#app");
     window.addEventListener("popstate", async function (event) {
         await vueApp.refresh();

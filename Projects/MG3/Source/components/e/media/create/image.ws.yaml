@@ -1,13 +1,14 @@
 dom:
   .box1:
     ui.file.dropzone:
+      :show-hint: "false"
       v-model: imageID
       .flex.gap-1:
         ui.image:
-          ':imageID': imageID
+          ":imageID": imageID
         h3:
           class: opacity-50
-          v-text: '''drop image to upload'''
+          v-text: "'drop image to upload'"
 props:
   value: null
 data:

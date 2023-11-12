@@ -1,6 +1,7 @@
 dom:
   div:
-    ui.input.text.area:
+    ui.input.text.box:
+      :multiline: "true"
       v-model: yaml
       @focus: isFocused = true
       @blur: isFocused = false
@@ -15,7 +16,6 @@ data:
   error: null
 methods:
   updateYamlFromObject: | #js
-
     function() {
       let yaml = jsyaml.dump(this.value);
       yaml = yaml.replace(/ null/g, "");

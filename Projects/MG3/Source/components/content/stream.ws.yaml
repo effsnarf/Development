@@ -18,10 +18,6 @@ dom:
             ':is': itemType.kebabize()
             ':item': item
             v-bind: itemProps
-    div:
-      ':style': '{ width: ''30em'' }'
-      ui.value:
-        ':value': items
     ui.loading:
       v-if: isLoading
 name: content-stream

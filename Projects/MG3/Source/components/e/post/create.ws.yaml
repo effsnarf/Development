@@ -18,6 +18,7 @@ dom:
       name: slide
       div: 
         ui.file.dropzone:
+          :show-hint: 'false'
           ':show-upload-button': 'false'
           @input: onImageUpload
           e.comment.create:

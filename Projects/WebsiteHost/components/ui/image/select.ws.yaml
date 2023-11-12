@@ -4,6 +4,7 @@ dom:
       ':imageID': value
       ':square': true
     ui.file.dropzone:
+      :show-hint: 'false'
       @file-drop: onFileDrop
       .dropzone:
         .flex: 

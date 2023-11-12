@@ -16,6 +16,7 @@ dom:
       .div2:
         ui.file.dropzone:
           ':enabled': (editable && hasOnlyOneImage)
+          :show-hint: 'false'
           ':show-upload-button': 'false'
           @input: onImageUpload
           ui.movable:

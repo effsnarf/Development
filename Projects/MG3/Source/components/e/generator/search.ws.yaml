@@ -6,7 +6,7 @@ dom:
       hint: search…
       v-model: query
     e.generator.list:
-      ':generators': generators
+      ":generators": generators
 props: null
 data:
   query: null

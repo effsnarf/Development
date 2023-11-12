@@ -2,6 +2,7 @@ dom:
   div:
     v-if: item
     ui.file.dropzone:
+      :show-hint: 'false'
       ':enabled': editable
       v-model: item.imageID
       ui.movable:

@@ -15,9 +15,10 @@ dom:
           v-if: '!media'
           ':show-tooltip': 'false'
           ':show-anonymous': 'true'
-    ui.input.text.area:
+    ui.input.text.box:
       ':hint': hint
       ':value': value
+      :multiline: "true"
       @input: onInputText
 props:
   value: null

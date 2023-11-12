@@ -1,23 +1,23 @@
 dom:
   site:
     page-name: test
-    ':columns': 2
+    ":columns": 2
     template:
       v-slot: article
       .div1:
         div:
           ui.select:
-            ':options': builders
+            ":options": builders
             input-type: value
-            ':get-item-key': (item) => item._id
-            ':get-item-text': (item) => item.name
+            ":get-item-key": (item) => item._id
+            ":get-item-text": (item) => item.name
             v-model: selectedBuilder
         .width1:
           transition:
             name: slide-large
             keep.alive:
               e.builder:
-                ':builder': selectedBuilder
+                ":builder": selectedBuilder
 props: null
 data:
   builders: []

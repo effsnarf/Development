@@ -8,7 +8,7 @@ dom:
       v-dim: isLoading
       ref: dropArea1
       .hint:
-        v-if: enabled
+        v-if: enabled && showHint
         v-text: hint
       .upload-button:
         v-if: enabled && showUploadButton
@@ -23,6 +23,7 @@ dom:
       slot: null
 props:
   enabled: true
+  showHint: true
   showUploadButton: true
   hint: drop file here
 data:

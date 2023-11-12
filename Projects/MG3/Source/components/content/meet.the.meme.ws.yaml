@@ -1,18 +1,18 @@
 dom:
-  div: 
+  div:
     h2:
-      v-text: '''Meet the Meme'''
+      v-text: "'Meet the Meme'"
     transition:
       name: slide
-      div: 
+      div:
         v-if: generator
-        ':key': generator?._id
+        ":key": generator?._id
         .grid1:
           e.generator.square:
-            ':generator': generator
+            ":generator": generator
           .article1:
             v-text: generator.desc.article
-        div: 
+        div:
           class: clear-both
 data:
   generator: null
