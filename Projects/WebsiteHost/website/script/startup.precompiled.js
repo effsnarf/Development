@@ -533,8 +533,6 @@ class ClientContext {
         return (0, is_attribute_name_1.default)(componentNames, name);
     }
     async pugToHtml(pug) {
-        if (!isDevEnv)
-            return null;
         try {
             if (!this.clientPug)
                 this.clientPug = eval('require("pug")');
