@@ -2881,6 +2881,7 @@ class Module {
         namespace[className] = moduleClass;
     }
     async getModuleClass(client) {
+        return null;
         let classCode = client.Handlebars.compile(client.templates.module)(this.source);
         const class1 = eval(`(${classCode})`);
         return class1;

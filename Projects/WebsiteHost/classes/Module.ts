@@ -30,6 +30,7 @@ class Module {
   }
 
   async getModuleClass(client: ClientContext) {
+    return null;
     let classCode = client.Handlebars.compile(client.templates.module)(
       this.source
     );
