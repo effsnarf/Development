@@ -24,7 +24,7 @@ dom:
     .notifications:
       ui.notifications: null
     div: 
-      ide.css.stylesheet:
+      ui.css.stylesheet:
         ':rules': $root.newCssRules
       div: 
         ui.html.style:

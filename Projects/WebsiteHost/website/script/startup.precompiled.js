@@ -8781,7 +8781,7 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 /*!***************************************************************!*\
-  !*** ../../../../WebsiteHost/website/script/1699800792146.ts ***!
+  !*** ../../../../WebsiteHost/website/script/1699801943628.ts ***!
   \***************************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -9973,6 +9973,7 @@ const webScriptMixins = [generalMixin, gridAppCompMixin, mgCompMixin];
                 },
             },
         },
+        template: `<app ref="app" :key="key1"></app>`,
     });
     const vueManager = await VueManager_1.VueManager.new(client);
     vueApp.vm = vueManager;
