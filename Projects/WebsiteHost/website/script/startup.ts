@@ -1301,7 +1301,6 @@ interface MgParams {
         },
       },
     },
-    template: `<app ref="app" :key="key1"></app>`,
   });
 
   const vueManager = await VueManager.new(client);

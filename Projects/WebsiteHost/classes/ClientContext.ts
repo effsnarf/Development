@@ -149,7 +149,6 @@ class ClientContext {
   }
 
   async pugToHtml(pug: string) {
-    if (!isDevEnv) return null;
     try {
       if (!this.clientPug) this.clientPug = eval('require("pug")');
       let html = this.clientPug.compile(pug)();
