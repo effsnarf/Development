@@ -57,7 +57,10 @@ class OpenAI {
     }
   }
 
-  static new(log: boolean = true, model: Model = Model.Gpt4): OpenAI {
+  static new(
+    log: boolean = true,
+    model: Model = Model.Gpt4VisionPreview
+  ): OpenAI {
     if (!this.apiKey)
       throw new Error("API key not set. Use OpenAI.apiKey = 'your key'");
     return new OpenAI(this.apiKey, model, log);

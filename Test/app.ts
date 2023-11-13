@@ -34,7 +34,7 @@ const openAIApiKey = "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";
 
   const terminalGPT = await AI.Agents.TerminalGPT.new();
 
-  const result = await terminalGPT.do("which games do i play?");
+  const result = await terminalGPT.do("which projects am i working on?");
 
   console.log(result);
 
