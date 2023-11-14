@@ -11,85 +11,130 @@ give me the starting point of the situation:
 
 
 
-give me several ways to advance the situation:
-(you can't ask the user for help)
-remember that you have the ability to execute terminal commands
-for every idea, list these:
 
-idea: (for a course of action)
-assumption: (what you assume to be true and would help)
-problems:
-time: (minutes, hours, days, weeks, months, years)
-complexity: (1 simple, 10 complex)
-feasibility:
-what would you gain if it worked:
-what would you learn if it failed:
-score: (1 best, 10 worst)
 
-suggest only ideas that you can do in a reasonable amount of time (less than 10 minutes)
+give me a very vague idea on how to approach solving this, in one short sentence
 
 
 
-give me a list of possible commands to execute at the terminal as a first step
-every idea you come up with, if possible, should be one that even if it fails, you still learn something
+okay now let's act step by step, according to this plan
+you give me a terminal command to execute and i'll give you the result
 
-for each command, add:
-* intention
-* assumption
-* score (1 best, 10 worst)
-* ifFailsWhatDoIStillLearnFromThis
-
-
-you executed:
-
-dir Projects
-
-and got:
-
-Command failed: dir Projects
-File Not Found
-
-
-give me a list of possible explanations as to what are you inferring from the actual result
-each item should be one and only one possible reason
-add the following metrics to each item:
-* likelihood
-* proximity - how close the inference is to what happened as in chain of events
-* difficulty - in establishing whether this is actually the case
+I should tell you that you've learned these facts earlier:
+* the user's operating system is Windows 10
 
 
 
-reply laconically
-
-1. what did you intent to happen?
-2. what did you expect to happen?
-3. what actually happened?
-4. did it match your expectations?
-
-
-let's really zoom in on what can be learned from this mistake
-
-give me a list of possible explanations as to what are you inferring from the actual result
 
 
 
+
+
+
+
+suppose you were able to execute terminal commands
+(i would execute them on your behalf and give you the result)
+
+suppose you tried to execute this terminal command:
+ls -d ~/*/
+
+and you got this result:
+
+'ls' is not recognized as an internal or external command,
+operable program or batch file.
+
+then I asked you:
+* what did you expect to happen
+* what was the actual result
+* did it match your expectations (don't explain why, just yes or no)
+
+and you replied:
+Expectation: I expected the ls -d ~/*/ command to list all the directories in my home directory.
+Actual Result: The command returned an error message, indicating that 'ls' is not recognized as a command.
+Did it match your expectations: No.
+
+then I asked:
+* what was the assumption you were acting on, that turned out to be wrong
+
+suppose you replied:
+The assumption I was acting on that turned out to be wrong was that the 'ls' command would be recognized as a valid command in the terminal environment.
+
+now i'm asking:
+why did you assume that the 'ls' command would be recognized as a valid command in the terminal environment?
+
+then you replied:
+I assumed that the 'ls' command would be recognized as a valid command in the terminal environment because 'ls' is a commonly used and standard command in Unix-like operating systems for listing directory contents.
+
+now i'm asking:
+what was the assumption under this assumption, that turned out to be wrong?
+
+
+if an assumption turned out to be wrong, you LEARNED the YOU DON'T KNOW SOMETHING
+what is it that you don't know?
+
+
+what information will help us most in this situation?
+
+
+
+
+suppose you were able to execute terminal commands
+(i would execute them on your behalf and give you the result)
+
+you are given a subtask from another task:
+
+To determine the specific operating system or environment in which I am running and whether it supports the 'ls' command, it would be helpful to gather information about the system, such as its operating system type and version. This information can help us understand the context and capabilities of the environment in which I am operating.
+
+what do you execute?
+
+
+
+
+
+
+
+
+
+
+
+suppose you were able to execute terminal commands
+(i would execute them on your behalf and give you the result)
+
+suppose I gave you this task:
+based on the contents of my hard drive, tell me which projects am i working on
+
+suppose you tried to execute this terminal command:
+C:\> dir /b
+
+and you got this result:
+Backup
+CCALib8WS.log
+Database
+directory_listing.txt
+eff
+Intel
+litellm_uuid.txt
+Log
+PerfLogs
+Program Files
+Program Files (x86)
+project_directories.txt
+Users
+Windows
+
+then I asked you:
+* what was your intention?
+* what did you expect to happen
+* what was the actual result
+* did it match your expectations (don't explain why, just yes or no)
+
+
+
+what did you learn from this result?
 reply in this format:
+(we need this in a way we can use it later)
 
 {
-  whatIIntended: "..",
-  whatIExpectedToHappen: "..",
-  whatActuallyHappened: "..",
-  didItMatchMyExpectations: "..",
-  mistakes: [
-    {
-      assumptionIWasActingOn: "..",
-      possibleCorrectionsOfMyWrongFacts: [
-        {
-          actually: "..",
-          toFindOutIShould: "..",
-        },
-        ..
-      ],
-    }
-  ]
+  fact: "..",
+  data: "..",
 }

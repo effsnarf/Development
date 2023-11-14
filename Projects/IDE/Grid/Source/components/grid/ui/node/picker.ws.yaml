@@ -27,6 +27,7 @@ dom:
         div: 
           v-for: vue in vues.map(v => v())
           grid.ui.node.settings.suggestions:
+            v-if: "false"
             ':box': vue.box
             ':node': vue.node
             ':data-bound-socket-data': vue.dataBoundSocketData

@@ -51,10 +51,29 @@ methods:
         return value.map((value, index) => ({key: index, value}))
       }
       if (this.type === 'object') {
-        let entries = Object.entries(value).map(([key, value]) => ({key, value}));
-        entries = entries.exceptBy(this.filteredKeys, e => e[0]);
+        let entries = Object.entries(value)
+          .map(([key, value]) => ({key, value}));
+        entries = entries
+          .exceptBy(this.filteredKeys, e => e[0]);
+        entries = entries
+          .sort(this.compareEntries);
         return entries;
       }
+    }
+  compareEntries: | #js
+    function(a, b) {
+      if (this.isImageUrl(a.value) && !this.isImageUrl(b.value)) return -1;
+      if (!this.isImageUrl(a.value) && this.isImageUrl(b.value)) return 1;
+      if (this.isImageUrl(a.value) && this.isImageUrl(b.value)) return 0;
+      return a.key.localeCompare(b.key);
+    }
+  isImageUrl: | #js
+    function(value) {
+      const exts = ['png', 'jpg', 'jpeg', 'gif', 'svg'];
+      if (typeof value !== 'string') return false;
+      if (!value.startsWith('http')) return false;
+      if (!exts.some(ext => value.endsWith(ext))) return false;
+      return true;
     }
   toggleExpanded: | #js
     function(key) {

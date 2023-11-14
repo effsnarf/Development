@@ -119,7 +119,7 @@ style:
     overflow: hidden
     text-overflow: ellipsis
   .comp-ui-image:
-    width: 15em
+    width: 5em
   .preview .comp-ui-image:
     width: 4em
 name: ui-value-preview
