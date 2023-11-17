@@ -33,7 +33,7 @@ dom:
       ui.value: 
         ':value': hoveredLogItem
     ui.console:
-      v-if: 'true'
+      v-if: 'false'
       ref: console1
 props: null
 data:

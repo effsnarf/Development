@@ -4,10 +4,10 @@ dom:
       li:
         v-for: viewNode in viewNodes
         ui.dnd.draggable:
-          ':drag-item': getNewViewNode(viewNode)
+          ":drag-item": getNewViewNode(viewNode)
           ui.title:
-            ':icon': '''➕'' + viewNode.icon'
-            ':text': viewNode.type
+            ":icon": "'➕' + viewNode.icon"
+            ":text": viewNode.type
 data:
   viewNodes: null
 mounted: | #js
@@ -23,7 +23,7 @@ methods:
     function(viewNode) {
       viewNode = Objects.clone(viewNode);
       delete viewNode.icon;
-      return viewNode;
+      return { viewNode };
     }
 _:
   examples:

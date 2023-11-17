@@ -6,8 +6,9 @@ keep in mind that you must complete the task yourself without any help from the 
 
 give me the starting point of the situation:
 
-* what I know
-* what I don't know
+* task given:
+* what I know about the current step
+* what I don't know about the current step
 
 
 
@@ -26,8 +27,12 @@ I should tell you that you've learned these facts earlier:
 
 
 
+result:
+FIND: Invalid switch
 
-
+* what did you expect to happen
+* what was the actual result
+* did it match your expectations (don't explain why, just yes or no)
 
 
 

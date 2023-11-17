@@ -23,9 +23,17 @@ data: null
 methods:
   onDropItem: | #js
     function(dragItem) {
-      const parentNodeID = this.node._id;
-      const newNode = dragItem;
-      this.getBoxVue().$femit("create.node", this.box._id, parentNodeID, newNode);
+      if (dragItem.viewNode) {
+        const parentNodeID = this.node._id;
+        const newNode = dragItem.viewNode;
+        this.getBoxVue().$femit("create.node", this.box._id, parentNodeID, newNode);
+      }
+      else if (dragItem.field) {
+        debugger;
+      }
+      else {
+        alertify.error("Unknown drag item");
+      }
     }
   getBoxVue: | #js
     function() {

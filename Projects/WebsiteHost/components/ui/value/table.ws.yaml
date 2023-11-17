@@ -6,7 +6,9 @@ dom:
     table:
       ':class': type
       v-if: '!isEmpty'
-      tr:
+      ui.dnd.draggable:
+        tag: tr
+        :drag-item: "{ field: { ...row } }"
         v-for: row in rows
         th:
           class: opacity-40 fw-100

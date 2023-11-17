@@ -1,5 +1,6 @@
 dom:
   div:
+    :is: tag
     ref: dragElement1
     ':class': '{ draggable: true }'
     draggable: true
@@ -14,6 +15,7 @@ dom:
 props:
   dragItem: null
   showDragGhost: true
+  tag: div
 data:
   dragElementPos: null
   isDragging: false

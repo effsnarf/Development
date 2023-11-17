@@ -13,23 +13,22 @@ data:
 methods:
   onDragOver: | #js
     function(e) {
-      e.preventDefault();
+      this.cancelEvent(e);
       this.isDraggedOver = true;
     }
   onDragEnter: | #js
     function(e) {
-      e.preventDefault();
+      this.cancelEvent(e);
       this.isDraggedOver = true;
     }
   onDragLeave: | #js
     function(e) {
-      e.preventDefault();
+      this.cancelEvent(e);
       this.isDraggedOver = false;
     }
   onDrop: | #js
     function(e) {
-      e.preventDefault();
-      e.stopPropagation();
+      this.cancelEvent(e);
       this.isDraggedOver = false;
       const dragItem = this.$root.dragItem;
       this.$root.dragItem = null;
@@ -40,8 +39,15 @@ methods:
     function(e) {
       this.$emit('click', e);
     }
+  cancelEvent: | #js
+    function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
 style:
-  .drag-over: null
+  .drag-over:
+    background-color: rgba(255, 255, 255, 0.1)
+    border: 3px dashed rgba(20, 128, 255, 0.5)
 example:
   dom:
     ui.dnd.dropzone:
