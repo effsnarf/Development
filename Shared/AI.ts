@@ -5,6 +5,9 @@ import { Objects } from "./Extensions.Objects";
 import { ChatOpenAI, Roles, Role } from "../Apis/OpenAI/classes/ChatOpenAI";
 
 namespace AI {
+  export class Agent {
+    
+  }
   export namespace Agents {
     export class TerminalGPT {
       private logFilePath = path.join(process.cwd(), "terminal.gpt.log");

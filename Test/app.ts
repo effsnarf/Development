@@ -16,7 +16,6 @@ import { Analytics, ItemType } from "@shared/Analytics";
 import { TreeScript } from "@shared/TreeScript/TreeScript";
 import { Apify } from "@shared/Apify";
 import { Console } from "@shared/Console";
-//import { ChatOpenAI, Role, Roles } from "../Apis/OpenAI/classes/ChatOpenAI";
 import { Model } from "../Apis/OpenAI/classes/OpenAI";
 import { Google } from "@shared/Google";
 import { Coder } from "@shared/Coder";
@@ -25,18 +24,23 @@ import { LiveTree } from "@shared/LiveTree";
 import { Diff } from "@shared/Diff";
 import { AI } from "@shared/AI";
 import { OpenAI } from "langchain/llms/openai";
-import { ChatOpenAI } from "langchain/chat_models/openai";
+import { ChatOpenAI, Role, Roles } from "../Apis/OpenAI/classes/ChatOpenAI";
+//import { ChatOpenAI } from "langchain/chat_models/openai";
 
 const openAIApiKey = "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";
 
 (async () => {
   const config = (await Configuration.new()).data;
 
-  const terminalGPT = await AI.Agents.TerminalGPT.new();
+  const chat = await ChatOpenAI.new(Roles.DAN);
 
-  const result = await terminalGPT.do("which projects am i working on?");
+  await chat.send("tell me a dirty joke in sanskrit");
 
-  console.log(result);
+  //const terminalGPT = await AI.Agents.TerminalGPT.new();
+
+  //const result = await terminalGPT.do("which projects am i working on?");
+
+  //console.log(result);
 
   process.exit();
 })();
