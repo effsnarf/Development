@@ -34,8 +34,6 @@ const openAIApiKey = "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";
 
   const chat = await ChatOpenAI.new(Roles.DAN);
 
-  await chat.send("tell me a dirty joke in sanskrit");
-
   //const terminalGPT = await AI.Agents.TerminalGPT.new();
 
   //const result = await terminalGPT.do("which projects am i working on?");
