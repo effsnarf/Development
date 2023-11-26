@@ -6088,6 +6088,8 @@ const add_paths_1 = __importDefault(__webpack_require__(/*! ./add.paths */ "../.
 exports["default"] = (context, dom, indent, compName) => {
     if (!dom)
         return [];
+    if (compName?.includes("logo"))
+        debugger;
     const s = [];
     if (!indent)
         indent = 0;
@@ -6231,7 +6233,7 @@ var __webpack_exports__ = {};
 (() => {
 var exports = __webpack_exports__;
 /*!***************************************************************!*\
-  !*** ../../../../WebsiteHost/website/script/1700962451841.ts ***!
+  !*** ../../../../WebsiteHost/website/script/1700963659520.ts ***!
   \***************************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
