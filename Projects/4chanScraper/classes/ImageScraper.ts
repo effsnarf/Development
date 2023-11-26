@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Forum, Image } from "../../Shared/DataTypes";
+import { Forum, Image } from "../../AnonymousTimes/Shared/DataTypes";
 import { Database } from "@shared/Database";
 
 interface Item {

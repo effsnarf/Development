@@ -1,0 +1,13 @@
+fourChan:
+  boards: [fit]
+db:
+  fileSystem:
+    dataDir: ../Data
+  mongo:
+    connection: mongodb://localhost:27017
+    database: AnonymousTimes
+images:
+  download: true
+  take:
+    per:
+      thread: 5

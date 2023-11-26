@@ -1,4 +1,8 @@
-import { Forum, Thread, ThreadTeaser } from "../../Shared/DataTypes";
+import {
+  Forum,
+  Thread,
+  ThreadTeaser,
+} from "../../AnonymousTimes/Shared/DataTypes";
 
 abstract class ForumDatabase {
   abstract getThreadTeasers(): Promise<ThreadTeaser[]>;

@@ -1,13 +1,13 @@
 const colors = require("colors");
 import * as fs from "fs";
 import * as jsyaml from "js-yaml";
-import { Config } from "../Shared/Config";
+import { Config } from "../AnonymousTimes/Shared/Config";
 import { Scraper } from "./classes/Scraper";
 
 process.title = "4chan Scraper";
 
 const config: Config = jsyaml.load(
-  fs.readFileSync("../config.yaml", "utf8")
+  fs.readFileSync("./config.yaml", "utf8")
 ) as Config;
 
 (async () => {

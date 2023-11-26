@@ -1,11 +1,16 @@
 import * as colors from "colors";
 import axios from "axios";
-import "../../../../Shared/Extensions";
-import { Config } from "../../Shared/Config";
-import { RateLimiter } from "../../../../Shared/RateLimiter";
-import { Forum, Thread, Image, Timestamp } from "../../Shared/DataTypes";
+import "../../../Shared/Extensions";
+import { Config } from "../../AnonymousTimes/Shared/Config";
+import { RateLimiter } from "../../../Shared/RateLimiter";
+import {
+  Forum,
+  Thread,
+  Image,
+  Timestamp,
+} from "../../AnonymousTimes/Shared/DataTypes";
 import { ImageScraper } from "./ImageScraper";
-import { FileSystemDatabase } from "../../../../Shared/FileSystemDatabase";
+import { FileSystemDatabase } from "../../../Shared/FileSystemDatabase";
 import { MongoForumDatabase } from "./MongoForumDatabase";
 
 class Scraper {
