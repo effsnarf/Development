@@ -8664,7 +8664,7 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 /*!***************************************************************!*\
-  !*** ../../../../WebsiteHost/website/script/1700965420180.ts ***!
+  !*** ../../../../WebsiteHost/website/script/1700965827409.ts ***!
   \***************************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -9225,7 +9225,7 @@ const webScriptMixins = [generalMixin, gridAppCompMixin, mgCompMixin];
     });
     await client.compileAll((c) => !c.name.startsWith("ide."), webScriptMixins);
     const isLocalHost = window.location.hostname == "localhost";
-    const gdbData = await Extensions_Objects_Client_1.Objects.try(async () => await (await fetch(`/gdb.yaml`)).json(), { nodes: [], links: [] });
+    const gdbData = { nodes: [], links: [] };
     const getNewParams = async () => {
         return (await Params_1.Params.new(() => vueApp, client.config.params, window.location.pathname));
     };

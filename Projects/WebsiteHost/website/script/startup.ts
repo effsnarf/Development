@@ -629,10 +629,7 @@ interface MgParams {
 
   const isLocalHost = window.location.hostname == "localhost";
 
-  const gdbData = await Objects.try(
-    async () => await (await fetch(`/gdb.yaml`)).json(),
-    { nodes: [], links: [] }
-  );
+  const gdbData = { nodes: [], links: [] };
 
   const getNewParams = async () => {
     return (await Params.new(
