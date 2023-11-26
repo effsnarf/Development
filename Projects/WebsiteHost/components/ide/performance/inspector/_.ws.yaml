@@ -1,5 +1,6 @@
 dom:
   .inspector:
+    v-if: 'false'
     h2:
       v-text: "'⌚ Performance'"
     @mouseenter: isHovered = true

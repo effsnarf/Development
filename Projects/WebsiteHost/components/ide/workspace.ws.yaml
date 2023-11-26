@@ -48,7 +48,7 @@ mounted: | #js
     //this.showWorkspace = (window.location.hostname === "localhost");
     this.showWorkspace = false;
     this.refresh();
-    this.setupCheatCodeListener('ide', this.enable.bind(this));
+    this.setupCheatCodeListener('inspect', this.enable.bind(this));
   }
 methods:
   setupCheatCodeListener: | #js
@@ -69,7 +69,7 @@ methods:
     }
   enable: | #js
     function() {
-      alertify.message('IDE enabled');
+      alertify.message('Inspector enabled');
       this.showWorkspace = true;
     }
   refresh: | #js
