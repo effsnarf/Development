@@ -4,4 +4,4 @@ echo.
 echo Starting 4chanScraper
 echo.
 
-call "%~dp0\..\..\Utils\execute-typescript.cmd" "%~dp0\4chanScraper.ts" %*
+call "%~dp0\..\..\..\Utils\execute-typescript.cmd" "%~dp0\4chanScraper.ts" %*

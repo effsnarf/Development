@@ -1,6 +1,6 @@
 import axios from "axios";
-import { Forum, Image } from "../../AnonymousTimes/Shared/DataTypes";
-import { Database } from "@shared/Database";
+import { Forum, Image } from "../classes/DataTypes";
+import { Database } from "../../../../Shared/Database";
 
 interface Item {
   forum: Forum;

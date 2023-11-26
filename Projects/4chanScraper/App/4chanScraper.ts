@@ -1,7 +1,7 @@
 const colors = require("colors");
 import * as fs from "fs";
 import * as jsyaml from "js-yaml";
-import { Config } from "../AnonymousTimes/Shared/Config";
+import { Config } from "./classes/Config";
 import { Scraper } from "./classes/Scraper";
 
 process.title = "4chan Scraper";
