@@ -4,7 +4,7 @@ dom:
     ui.linq.evaluator:
       ref: evaluator1
     .console1:
-      ':style': '{ position: ''fixed'', right: 0, bottom: 0, ''max-height'': ''60vh'' }'
+      ":style": "{ display: 'none', position: 'fixed', right: 0, bottom: 0, 'max-height': '60vh' }"
       ref: console1el
       ui.console:
         ref: console1
