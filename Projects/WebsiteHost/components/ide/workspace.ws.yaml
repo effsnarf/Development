@@ -45,11 +45,33 @@ data:
   appVuesCounts: null
 mounted: | #js
   function() {
-    const urlParams = new URLSearchParams(window.location.search);
-    this.showWorkspace = (window.location.hostname === "localhost" || urlParams.get('debug') === 'true');
+    //this.showWorkspace = (window.location.hostname === "localhost");
+    this.showWorkspace = false;
     this.refresh();
+    this.setupCheatCodeListener('ide', this.enable.bind(this));
   }
 methods:
+  setupCheatCodeListener: | #js
+    function(triggerCode, action) {
+      // If triggerCode + [enter] is pressed, show the workspace
+      let inputSequence = '';
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && inputSequence === triggerCode) {
+          action();
+          inputSequence = ''; // Reset the input sequence
+        } else if (e.key.length === 1) {
+          inputSequence += e.key.toLowerCase(); // Add the key to the sequence
+          if (!triggerCode.startsWith(inputSequence)) {
+              inputSequence = ''; // Reset if the sequence doesn't match
+          }
+        }
+      });
+    }
+  enable: | #js
+    function() {
+      alertify.message('IDE enabled');
+      this.showWorkspace = true;
+    }
   refresh: | #js
     async function() {
       if (true)
