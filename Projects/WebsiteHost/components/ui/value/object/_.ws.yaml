@@ -1,5 +1,6 @@
 dom:
   div:
+    @click: () => consoleLog(value)
     .flex:
       ':style': '{ gap: ''1em'' }'
       v-if: (title || specialTypeName)
@@ -62,10 +63,14 @@ computed:
     }
 watch: null
 style:
+  .comp-ui-value-object:
+    max-width: 50vw
   .title1:
     opacity: 0.5
   .box1:
     font-size: 100%
+  .console-log-button:
+    display: none
 name: ui-value-object
 _:
   examples:

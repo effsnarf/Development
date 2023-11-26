@@ -10,21 +10,15 @@ dom:
             icon: 📦
             ':text': vue().$options.name
         ui.tabs:
-          ':options': '[''🧊 state'', ''⏳ activity'']'
+          ':options': '[''🧊 state'']'
           v-model: selectedTabIndex
           direction: horizontal
           template: 
             v-slot: tab0
             ide.vue.state:
               ':vue': vue
-        transition:
-          name: slide
-          div: 
-            v-if: (selectedTabIndex == 0)
-            ide.vue.state:
-              ':vue': vue
-          div: 
-            v-else-if: (selectedTabIndex == 1)
+          template: 
+            v-slot: tab1
             ide.vue.activity:
               ':vue': vue
 props:
