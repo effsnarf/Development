@@ -45,7 +45,8 @@ data:
   appVuesCounts: null
 mounted: | #js
   function() {
-    this.showWorkspace = (window.location.hostname == "localhost");
+    const urlParams = new URLSearchParams(window.location.search);
+    this.showWorkspace = (window.location.hostname === "localhost" || urlParams.get('debug') === 'true');
     this.refresh();
   }
 methods:
