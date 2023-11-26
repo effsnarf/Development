@@ -1,5 +1,7 @@
 dom:
   div:
+    ui.loading:
+      v-if: isLoading
     ui.select:
       ":options": entityNames
       :get-item-icon: () => '📁'
@@ -9,15 +11,17 @@ dom:
 data:
   entityNames: null
   selectedEntityName: null
+  isLoading: false
 
 mounted: | #js
   async function() {
     this.$watch(() => this.$root.dbp, this.refresh.bind(this));
-    this.refresh();
   }
 
 methods:
   refresh: | #js
     async function() {
+      this.isLoading = true;
       this.entityNames = (await this.$root.dbp.get.entity.names());
+      this.isLoading = false;
     }

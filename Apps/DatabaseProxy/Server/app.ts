@@ -112,6 +112,26 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
             })
           )?.collectionNames;
         },
+        infos: async (db: MongoDatabase | undefined) => {
+          const entities = [];
+          const names = await cache.get.collection.names(db);
+          for (const name of names) {
+            const collection = await db?.getCollection(name);
+            const pipeline = [{ $collStats: { storageStats: {} } }];
+
+            const results = await collection?.aggregate(pipeline).toArray();
+            const info = results?.first().storageStats;
+            entities.push({
+              name,
+              ...{
+                size: info.size,
+                count: info.count,
+                avgObjSize: info.avgObjSize,
+                capped: info.capped,
+              },
+            });
+          }
+        },
       },
     },
   };
@@ -484,6 +504,15 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
     //   })
     // );
     // // #endregion
+
+    httpServer.get(
+      "/:database/entities",
+      processRequest(async (req: any, res: any) => {
+        const db = await dbs.get(req.params.database);
+        const entities = await cache.get.collection.infos(db);
+        return res.end(JSON.stringify(entities));
+      })
+    );
 
     // #region 📑 Database Analytics
     httpServer.get(
