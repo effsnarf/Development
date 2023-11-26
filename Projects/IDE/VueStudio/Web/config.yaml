@@ -5,7 +5,7 @@ server:
     port: 5051
   prod:
     host: 10.35.16.38
-    port: 443
+    port: 80
   ssl:
     domains:
       - name: localhost
