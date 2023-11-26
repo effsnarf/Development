@@ -7,12 +7,14 @@ dom:
       ":preview": "false"
       ":depth": (depth + 1)
       ":large": large
+      :visible-fields: visibleFields
       v-on: $listeners
 props:
   value: null
   title: null
   depth: 0
   large: false
+  visibleFields: null
 data: null
 methods:
   getComponentType: | #js

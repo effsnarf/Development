@@ -1,0 +1,52 @@
+dom:
+  div:
+    ui.loading:
+      v-if: is.loading
+    ui.error:
+      :error: error
+    div:
+      ui.value:
+        :value: items
+
+props:
+  entity: null
+
+data:
+  items: null
+  error: null
+  is:
+    loading: false
+
+methods:
+  refresh: | #js
+    async function() {
+      this.items = null;
+      this.error = null;
+      this.is.loading = true;
+      try
+      {
+        this.items = (await this.dbEntity.list());
+      }
+      catch (ex)
+      {
+        this.error = ex;
+      }
+      finally
+      {
+        this.is.loading = false;
+      }
+    }
+
+computed:
+  dbEntity: | #js
+    function() {
+      return this.$root.dbp.entity(this.entity.name);
+    }
+
+watch:
+  entity:
+    handler: | #js
+      function() {
+        this.refresh();
+      }
+    immediate: true

@@ -225,11 +225,11 @@ class DatabaseProxy {
         var names = await this.fetchAsJson(url);
         return names;
       },
-    },
-    entities: async () => {
-      var url = `${this.urlBase}/entities`;
-      var stats = await this.fetchAsJson(url);
-      return stats;
+      infos: async () => {
+        var url = `${this.urlBase}/entities`;
+        var stats = await this.fetchAsJson(url);
+        return stats;
+      },
     },
     user: async () => {
       var url = `${this.urlBase}/get/user`;

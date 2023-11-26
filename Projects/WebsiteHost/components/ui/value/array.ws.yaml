@@ -4,6 +4,7 @@ dom:
       ':class': '{ reversed: reverse }'
       .flex.justify-between:
         ui.title:
+          v-if: "false"
           icon: 🧊
           text: Array
           ':number': value?.length
@@ -52,7 +53,7 @@ dom:
           thead:
             tr: 
               th:
-                v-for: field in visibleFields
+                v-for: field in shownFields
                 .clickable:
                   ':class': '{ selected: (sortByField == field) }'
                   v-text: field
@@ -65,7 +66,7 @@ dom:
               @mouseleave: () => onItemHover(item, false)
               @click: () => onItemClick(item, index)
               td: 
-                v-for: field in visibleFields
+                v-for: field in shownFields
                 ui.value.preview: 
                   ':value': item?.[field]
 props:
@@ -75,6 +76,7 @@ props:
   getItemClass: null
   maxVisibleItems: 500
   maxVisibleFields: 1000
+  visibleFields: null
 data:
   sortByField: null
   sortByFieldDirection: 1
@@ -123,11 +125,12 @@ computed:
     let items = [...this.value]
       .take(this.maxVisibleItems || 1000)
       .sortByDirection([this.sortByField], this.sortByFieldDirection)
-      .map(item => Objects.getObjectFields(item, this.visibleFields));
+      .map(item => Objects.getObjectFields(item, this.shownFields));
     const query = (this.query || '').toLowerCase();
     if (query) items = items.filter(item => Object.values(item).some(v => (v?.toString().toLowerCase().includes(query))));
     return items;
-  visibleFields: | #js
+  shownFields: | #js
+    if (this.visibleFields) return this.visibleFields;
     return this.fields;
   items: | #js
     const items = [...this.value]

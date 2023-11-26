@@ -5,6 +5,7 @@ dom:
     ":title": title
     ":depth": (depth + 1)
     ":large": large
+    :visible-fields: visibleFields
     v-on: $listeners
 props:
   value: null
@@ -12,6 +13,7 @@ props:
   depth: 0
   overflow: false
   large: false
+  visibleFields: null
 data:
   visibleValue: null
   isLoading: false

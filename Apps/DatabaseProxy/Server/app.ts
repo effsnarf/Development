@@ -793,10 +793,8 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
         };
 
         const pipeline = [
-          {
-            $match: getArg("find"),
-            $limit: config.database.query.max.docs,
-          },
+          { $match: getArg("find") },
+          { $limit: config.database.query.max.docs },
         ];
 
         const items = await db?.aggregate(req.params.entity, pipeline);

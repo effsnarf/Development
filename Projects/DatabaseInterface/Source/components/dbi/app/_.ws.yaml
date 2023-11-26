@@ -3,11 +3,29 @@ dom:
     div:
       dbi.app.logo:
     .flex:
-      dbi.db.select:
-      dbi.entity.list:
+      ui.drawer:
+        dbi.db.select:
+      ui.drawer:
+        dbi.entity.list:
+          v-model: selectedEntity
+      div:
+        h2:
+          v-if: selectedEntity
+          ui.title:
+            icon: 📁
+            :text: selectedEntity.name
+            :number: selectedEntity.count
+        dbi.entity.items:
+          v-if: selectedEntity
+          :entity: selectedEntity
+
+data:
+  selectedEntity: null
+
 mounted: | #js
   function() {
   }
+
 methods: null
-data:
+
 style:
