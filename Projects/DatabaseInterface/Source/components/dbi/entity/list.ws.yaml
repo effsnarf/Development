@@ -1,0 +1,23 @@
+dom:
+  div:
+    ui.select:
+      ":options": entityNames
+      :get-item-icon: () => '📁'
+      input-type: value
+      v-model: selectedEntityName
+
+data:
+  entityNames: null
+  selectedEntityName: null
+
+mounted: | #js
+  async function() {
+    this.$watch(() => this.$root.dbp, this.refresh.bind(this));
+    this.refresh();
+  }
+
+methods:
+  refresh: | #js
+    async function() {
+      this.entityNames = (await this.$root.dbp.get.entity.names());
+    }

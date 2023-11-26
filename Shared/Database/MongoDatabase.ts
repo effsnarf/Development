@@ -261,7 +261,7 @@ class MongoDatabase extends DatabaseBase {
     const collections = await (await this.client.db(this.database))
       .listCollections()
       .toArray();
-    return collections.map((c) => c.name);
+    return collections.map((c) => c.name).sort();
   }
 
   async getCollection(collectionName: string) {

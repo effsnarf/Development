@@ -130,7 +130,7 @@ computed:
   valueIndex: | #js
     function() {
       if (this.inputType === "index") return this.value;
-      return this.options.indexOf(this.value);
+      return this.options?.indexOf(this.value);
     }
   showSearchBox: | #js
     function() {

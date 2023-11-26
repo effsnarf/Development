@@ -2,6 +2,9 @@ dom:
   div:
     div:
       dbi.app.logo:
+    .flex:
+      dbi.db.select:
+      dbi.entity.list:
 mounted: | #js
   function() {
   }

@@ -141,6 +141,13 @@ class DatabaseProxy {
         return this.urlBase.split("/").pop();
     }
     get = {
+        entity: {
+            names: async () => {
+                var url = `${this.urlBase}`;
+                var names = await this.fetchAsJson(url);
+                return names;
+            },
+        },
         user: async () => {
             var url = `${this.urlBase}/get/user`;
             var user = await this.fetchAsJson(url);
@@ -8664,7 +8671,7 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 /*!*********************************************************!*\
-  !*** ../../WebsiteHost/website/script/1700990991254.ts ***!
+  !*** ../../WebsiteHost/website/script/1700992835894.ts ***!
   \*********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

@@ -219,6 +219,13 @@ class DatabaseProxy {
   }
 
   get = {
+    entity: {
+      names: async () => {
+        var url = `${this.urlBase}`;
+        var names = await this.fetchAsJson(url);
+        return names;
+      },
+    },
     user: async () => {
       var url = `${this.urlBase}/get/user`;
       var user = await this.fetchAsJson(url);

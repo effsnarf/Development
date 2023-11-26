@@ -1,0 +1,29 @@
+dom:
+  div:
+    ui.select:
+      ":options": dbNames
+      :get-item-icon: () => '📁'
+      input-type: value
+      v-model: selectedDbName
+
+data:
+  dbNames: null
+  selectedDbName: null
+
+mounted: | #js
+  async function() {
+    this.dbNames = (await (await fetch(this.urlBase)).json());
+  }
+
+computed:
+  urlBase: | #js
+    function() {
+      return this.$root.dbp.urlBase.split('/').slice(0, 3).join('/');
+    }
+
+watch:
+  selectedDbName: | #js
+    async function(selectedDbName) {
+      const url = `${this.urlBase}/${selectedDbName}`;
+      this.$root.dbp = (await DatabaseProxy.new(url));
+    }

@@ -1,5 +1,5 @@
 dom:
-  .gap-2:
+  .flex:
     div:
       class: logo
     h2:
@@ -11,13 +11,13 @@ dom:
 data:
 style:
   .logo:
-    width: 12em
+    width: 10em
     aspect-ratio: 6 / 5
-    float: left
     margin: 0 1em 1em 0
-    background-image: url(/images/logo.png)
+    background-image: url(/images/logo.webp)
     background-size: contain
     background-repeat: no-repeat
+    background-position: center center
   .title1:
     font-size: 4rem
     font-family: Russo One
