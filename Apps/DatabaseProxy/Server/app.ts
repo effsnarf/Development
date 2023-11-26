@@ -131,6 +131,7 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
               },
             });
           }
+          return entities;
         },
       },
     },
