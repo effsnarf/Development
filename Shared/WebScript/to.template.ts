@@ -3,8 +3,6 @@ import addPaths from "./add.paths";
 export default (context: any, dom: any, indent?: number, compName?: string) => {
   if (!dom) return [];
 
-  if (compName?.includes("logo")) debugger;
-
   const s = [] as string[];
   if (!indent) indent = 0;
 

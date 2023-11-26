@@ -3,7 +3,6 @@ import toTemplate from "../../../Shared/WebScript/to.template";
 import isAttributeName from "../../../Shared/WebScript/is.attribute.name";
 import { Component } from "./Component";
 import { ComponentManager } from "./ComponentManager";
-import { ModuleManager } from "./ModuleManager";
 import { ClientDatabase } from "./ClientDatabase";
 
 const isDevEnv = window.location.hostname == "localhost";
@@ -33,14 +32,9 @@ class ClientContext {
   db!: ClientDatabase;
 
   private componentManager!: ComponentManager;
-  private moduleManager!: ModuleManager;
 
   get comps() {
     return this.componentManager.comps;
-  }
-
-  get modules() {
-    return this.moduleManager.modules;
   }
 
   Handlebars: any;
@@ -81,7 +75,6 @@ class ClientContext {
     });
 
     this.componentManager = await ComponentManager.get();
-    this.moduleManager = await ModuleManager.new();
 
     this.templates = {} as any;
     this.config = {} as any;
@@ -126,8 +119,6 @@ class ClientContext {
     filter: (comp: Component) => boolean = (c) => true,
     mixins: any[] = []
   ) {
-    await this.moduleManager.compileModules();
-
     for (const comp of this.comps.filter(filter)) {
       await comp.compile(mixins);
     }

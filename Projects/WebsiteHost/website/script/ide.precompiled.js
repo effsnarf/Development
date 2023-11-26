@@ -17,7 +17,6 @@ exports.ClientContext = void 0;
 const to_template_1 = __importDefault(__webpack_require__(/*! ../../../Shared/WebScript/to.template */ "../../../../../Shared/WebScript/to.template.ts"));
 const is_attribute_name_1 = __importDefault(__webpack_require__(/*! ../../../Shared/WebScript/is.attribute.name */ "../../../../../Shared/WebScript/is.attribute.name.ts"));
 const ComponentManager_1 = __webpack_require__(/*! ./ComponentManager */ "../../../../WebsiteHost/Classes/ComponentManager.ts");
-const ModuleManager_1 = __webpack_require__(/*! ./ModuleManager */ "../../../../WebsiteHost/Classes/ModuleManager.ts");
 const ClientDatabase_1 = __webpack_require__(/*! ./ClientDatabase */ "../../../../WebsiteHost/Classes/ClientDatabase.ts");
 const isDevEnv = window.location.hostname == "localhost";
 class ClientContext {
@@ -42,12 +41,8 @@ class ClientContext {
     // #endregion
     db;
     componentManager;
-    moduleManager;
     get comps() {
         return this.componentManager.comps;
-    }
-    get modules() {
-        return this.moduleManager.modules;
     }
     Handlebars;
     Vue;
@@ -69,7 +64,6 @@ class ClientContext {
             ModifiedItems: ["key", "modifiedAt", "item"],
         });
         this.componentManager = await ComponentManager_1.ComponentManager.get();
-        this.moduleManager = await ModuleManager_1.ModuleManager.new();
         this.templates = {};
         this.config = {};
         this.helpers = window.helpers;
@@ -100,7 +94,6 @@ class ClientContext {
         }
     }
     async compileAll(filter = (c) => true, mixins = []) {
-        await this.moduleManager.compileModules();
         for (const comp of this.comps.filter(filter)) {
             await comp.compile(mixins);
         }
@@ -2844,114 +2837,6 @@ class HtmlHelper {
     }
 }
 exports.HtmlHelper = HtmlHelper;
-
-
-/***/ }),
-
-/***/ "../../../../WebsiteHost/Classes/Module.ts":
-/*!*************************************************!*\
-  !*** ../../../../WebsiteHost/Classes/Module.ts ***!
-  \*************************************************/
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.Module = void 0;
-__webpack_require__(/*! ../../../../../Shared/Extensions.Objects.Client */ "../../../../../Shared/Extensions.Objects.Client.ts");
-const ClientContext_1 = __webpack_require__(/*! ./ClientContext */ "../../../../WebsiteHost/Classes/ClientContext.ts");
-class Module {
-    name;
-    path;
-    source;
-    className;
-    constructor(obj) {
-        this.name = obj.name;
-        this.path = obj.path;
-        this.source = obj.source;
-        this.className = this.name.split(".").last();
-        this.source.namespace = this.getNamespaceName(this.name);
-        this.source.name = this.className;
-    }
-    async compile() {
-        await ClientContext_1.ClientContext.waitUntilLoaded();
-        const client = ClientContext_1.ClientContext.context;
-        const namespace = this.getNamespace();
-        const moduleClass = await this.getModuleClass(client);
-        const className = this.name.split(".").last();
-        namespace[className] = moduleClass;
-    }
-    async getModuleClass(client) {
-        return null;
-        let classCode = client.Handlebars.compile(client.templates.module)(this.source);
-        const class1 = eval(`(${classCode})`);
-        return class1;
-    }
-    getNamespace() {
-        const parts = this.name.split(".");
-        let nsnode = window;
-        for (const part of parts.take(parts.length - 1)) {
-            nsnode = nsnode[part] = nsnode[part] || {};
-        }
-        return nsnode;
-    }
-    getNamespaceName(name) {
-        const parts = name.split(".");
-        const ns = parts.take(parts.length - 1).join(".");
-        if (!ns?.length)
-            return "globalModule";
-        return ns;
-    }
-}
-exports.Module = Module;
-
-
-/***/ }),
-
-/***/ "../../../../WebsiteHost/Classes/ModuleManager.ts":
-/*!********************************************************!*\
-  !*** ../../../../WebsiteHost/Classes/ModuleManager.ts ***!
-  \********************************************************/
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.ModuleManager = void 0;
-__webpack_require__(/*! ../../../Shared/Extensions */ "../../../../../Shared/Extensions.ts");
-const Module_1 = __webpack_require__(/*! ./Module */ "../../../../WebsiteHost/Classes/Module.ts");
-class ModuleManager {
-    modules = [];
-    constructor() { }
-    static async new() {
-        const manager = new ModuleManager();
-        await manager.init();
-        return manager;
-    }
-    async init(options = {}) {
-        await this.loadModules(options);
-    }
-    async compileModules() {
-        for (const comp of this.modules) {
-            await comp.compile();
-        }
-    }
-    async loadModules(options = {}) {
-        const url = options.onlyChanged ? "/changed/modules" : "/modules";
-        if (window.location.hostname == "localhost") {
-            const newComps = (await (await fetch(url)).json()).map((m) => new Module_1.Module(m));
-            for (const newComp of newComps) {
-                const index = this.modules.findIndex((m) => m.name == newComp.name);
-                if (index != -1)
-                    this.modules.removeAt(index);
-            }
-            this.modules.add(newComps);
-        }
-        else {
-            this.modules = window.components.map((m) => new Module_1.Module(m));
-        }
-        this.modules = this.modules.sortBy((m) => m.name);
-    }
-}
-exports.ModuleManager = ModuleManager;
 
 
 /***/ }),
@@ -6233,7 +6118,7 @@ var __webpack_exports__ = {};
 (() => {
 var exports = __webpack_exports__;
 /*!***************************************************************!*\
-  !*** ../../../../WebsiteHost/website/script/1700963659520.ts ***!
+  !*** ../../../../WebsiteHost/website/script/1700965419678.ts ***!
   \***************************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
