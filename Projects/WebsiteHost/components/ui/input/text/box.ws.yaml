@@ -104,6 +104,7 @@ style:
   .icon:
     position: absolute
     margin: 0.25em
+    width: fit-content
 _:
   examples:
     count: 0

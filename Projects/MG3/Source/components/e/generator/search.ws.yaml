@@ -5,12 +5,18 @@ dom:
       icon: 🔎
       hint: search…
       v-model: query
+    transition:
+      name: slide
+      ui.loading:
+        v-if: isSearching
     e.generator.list:
       ":generators": generators
 props: null
 data:
   query: null
   generators: []
+  isSearching: true
+  searchTimer: null
 mounted: | #js
   async function() {
     this.search(this.query);
@@ -19,14 +25,17 @@ methods:
   search: | #js
     async function(query) {
       this.generators = await this.$root.dbp.generators.select.search(query);
+      this.isSearching = false;
     }
 watch:
   query:
     handler: | #js
-      (async function(query) {
-        this.search(query);
-      }).debounce(400)
-    immediate: true
+      async function(query) {
+        this.isSearching = true;
+        if (this.searchTimer) clearTimeout(this.searchTimer);
+        this.searchTimer = setTimeout(this.search.bind(this, query), 400);
+      }
+    immediate: false
 style:
   li:
     margin-top: 0.5em
