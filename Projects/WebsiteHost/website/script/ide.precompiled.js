@@ -5973,8 +5973,6 @@ const add_paths_1 = __importDefault(__webpack_require__(/*! ./add.paths */ "../.
 exports["default"] = (context, dom, indent, compName) => {
     if (!dom)
         return [];
-    if (compName?.includes("logo"))
-        debugger;
     const s = [];
     if (!indent)
         indent = 0;
