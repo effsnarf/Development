@@ -532,7 +532,8 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
 
     // For /, return "Add a database name to the URL: /[database]"
     httpServer.get("/", (req: any, res: any) => {
-      return res.end("Add a database name to the URL: /[database]");
+      const dbNames = Object.keys(config.dbs);
+      return res.end(JSON.stringify(dbNames));
     });
 
     // #region 📑 Entity Listing

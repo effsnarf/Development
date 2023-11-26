@@ -1,0 +1,10 @@
+dom:
+  div:
+    div:
+      dbi.app.logo:
+mounted: | #js
+  function() {
+  }
+methods: null
+data:
+style:

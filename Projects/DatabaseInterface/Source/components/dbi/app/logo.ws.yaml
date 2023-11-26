@@ -1,0 +1,40 @@
+dom:
+  .gap-2:
+    div:
+      class: logo
+    h2:
+      class: float-left mr-l2
+      ui.title:
+        class: title1
+        text: Database
+
+data:
+style:
+  .logo:
+    width: 12em
+    aspect-ratio: 6 / 5
+    float: left
+    margin: 0 1em 1em 0
+    background-image: url(/images/logo.png)
+    background-size: contain
+    background-repeat: no-repeat
+  .title1:
+    font-size: 4rem
+    font-family: Russo One
+    color: "#ffffff40"
+    filter: drop-shadow(-1px 1px 1px white)
+    text-shadow: "-1px 1px 1px black"
+
+_:
+  examples:
+    count: 0
+name: grid-app-logo
+template: >-
+  <div class="comp-grid-app-logo gap-2" path="-914200832."><div class="logo"
+  path="-914200832.0"></div><h2 class="float-left mr-l2"
+  path="-914200832.1"><ui-title class="title1" text="Grid"
+  path="-914200832.1.0"></ui-title></h2><div class="texts"
+  path="-914200832.2"><div class="tagline" v-if="false" v-text="texts.tagline"
+  path="-914200832.2.0"></div><div class="signature" v-if="false"
+  v-text="texts.signature" path="-914200832.2.1"></div><div class="teaser"
+  v-if="true" v-text="texts.teaser" path="-914200832.2.2"></div></div></div>
