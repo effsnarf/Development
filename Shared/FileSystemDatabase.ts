@@ -114,7 +114,7 @@ class FileSystemDatabase extends Database {
         resolve([]);
         return;
       }
-      const docs = [];
+      const docs = [] as any[];
       const files = await this.listFilesRecursive(path);
       for (const file of files) {
         if (file.endsWith(".json")) {
