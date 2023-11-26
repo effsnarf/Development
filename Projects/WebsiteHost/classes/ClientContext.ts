@@ -128,9 +128,9 @@ class ClientContext {
   ) {
     await this.moduleManager.compileModules();
 
-    await Promise.all(
-      this.comps.filter(filter).map((comp) => comp.compile(mixins))
-    );
+    for (const comp of this.comps.filter(filter)) {
+      await comp.compile(mixins);
+    }
   }
 
   async compileApp() {

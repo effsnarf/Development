@@ -519,7 +519,9 @@ class ClientContext {
     }
     async compileAll(filter = (c) => true, mixins = []) {
         await this.moduleManager.compileModules();
-        await Promise.all(this.comps.filter(filter).map((comp) => comp.compile(mixins)));
+        for (const comp of this.comps.filter(filter)) {
+            await comp.compile(mixins);
+        }
     }
     async compileApp() {
         const isIdeComponent = (c) => ["ui", "ide"].some((p) => c.name.startsWith(`${p}.`));
@@ -697,15 +699,15 @@ class Component {
     async compile(mixins = []) {
         if (this.isCompiled)
             return;
-        const logGroup = false;
+        const logGroup = true;
         await ClientContext_1.ClientContext.waitUntilLoaded();
         const client = ClientContext_1.ClientContext.context;
         if (logGroup) {
-            console.groupCollapsed(this.name);
+            console.groupCollapsed(`📦`, this.name);
             console.log(this);
         }
         else {
-            //console.log(`📦`, this.name);
+            console.log(`📦`, this.name);
         }
         try {
             const vueOptions = await this.getVueOptions();
@@ -8779,7 +8781,7 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 /*!***************************************************************!*\
-  !*** ../../../../WebsiteHost/website/script/1700955934724.ts ***!
+  !*** ../../../../WebsiteHost/website/script/1700962453205.ts ***!
   \***************************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

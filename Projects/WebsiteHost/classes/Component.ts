@@ -24,16 +24,16 @@ class Component {
   async compile(mixins: any[] = []) {
     if (this.isCompiled) return;
 
-    const logGroup = false;
+    const logGroup = true;
 
     await ClientContext.waitUntilLoaded();
     const client = ClientContext.context!;
 
     if (logGroup) {
-      console.groupCollapsed(this.name);
+      console.groupCollapsed(`📦`, this.name);
       console.log(this);
     } else {
-      //console.log(`📦`, this.name);
+      console.log(`📦`, this.name);
     }
 
     try {
