@@ -180,11 +180,11 @@ class Scraper {
 
   async getOnlinePosts(thread: Thread, progress: number) {
     console.log(
-      `${thread.forum.id.green}/${`${thread.id}`.white} ${
+      `${thread.forum.id.green}/${`${thread.id}`.white} \t ${
         `${thread.posts?.count} posts`.gray
-      } ${
-        `(${Math.round(progress * 100)}%)`.green
-      } ${`(${this.imageScraper.queueSize()} ${`images in queue`.gray})`}`
+      } \t ${
+        `(${progress.toProgressBar(20)})`.green
+      } \t ${`(${this.imageScraper.queueSize()} ${`images in queue`.gray})`}`
     );
     this.rateLimiter.setLimit(`thread.${thread.id}`, 30);
     await this.rateLimiter.limit([`thread.${thread.id}`]);
