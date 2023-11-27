@@ -33,7 +33,8 @@ class Loading {
     this.startTime = null;
     process.stdout.write("\r");
     process.stdout.clearLine(0);
-    if (info !! this.log) console.log(this._lastElapsed.unitifyTime(), info.gray);
+    if (info && this.log)
+      console.log(this._lastElapsed.unitifyTime(), info.gray);
   }
 
   private showInfo() {
