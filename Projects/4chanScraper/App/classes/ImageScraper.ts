@@ -61,6 +61,7 @@ class ImageScraper {
   }
 
   enqueue(forum: Forum, image: Image) {
+    if (!this.enabled) return;
     if (this.items.has(image.filename)) return;
     let item = { forum, image };
     this.items.set(image.filename, item);
