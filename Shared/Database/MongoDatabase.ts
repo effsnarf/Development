@@ -276,6 +276,7 @@ class MongoDatabase extends DatabaseBase {
 
       let ops = result.inprog
         // Filter out system operations
+        .filter((op: any) => op.ns?.length)
         .filter((op: any) => !op.ns?.startsWith("system."))
         .map((op: any) => {
           const startTime = new Date(op.currentOpTime).getTime();
