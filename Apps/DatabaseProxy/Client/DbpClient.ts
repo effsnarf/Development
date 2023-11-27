@@ -232,8 +232,8 @@ class DatabaseProxy {
       },
     },
     current: {
-      operations: async () => {
-        var url = `${this.urlBase}/get/current/operations`;
+      operations: async (minElapsed?: number) => {
+        var url = `${this.urlBase}/get/current/operations?minElapsed=${minElapsed}`;
         var operations = await this.fetchAsJson(url);
         return operations;
       },

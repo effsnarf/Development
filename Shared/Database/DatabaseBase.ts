@@ -154,7 +154,7 @@ abstract class DatabaseBase {
 
   abstract getEntityNames(): Promise<string[]>;
 
-  abstract getCurrentOperations(): Promise<DbOperation[]>;
+  abstract getCurrentOperations(minElapsed?: number): Promise<DbOperation[]>;
 }
 
 export { DatabaseBase };

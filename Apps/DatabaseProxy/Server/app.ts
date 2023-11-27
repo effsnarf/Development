@@ -781,8 +781,9 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
     httpServer.get(
       "/:database/get/current/operations",
       processRequest(async (req: any, res: any) => {
+        const minElapsed = parseFloat(req.query.minElapsed || 0);
         const db = await dbs.get(req.params.database);
-        const operations = await db?.getCurrentOperations();
+        const operations = await db?.getCurrentOperations(minElapsed);
         return res.end(JSON.stringify(operations));
       })
     );

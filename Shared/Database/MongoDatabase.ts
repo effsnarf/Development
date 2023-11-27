@@ -265,7 +265,7 @@ class MongoDatabase extends DatabaseBase {
     return collections.map((c) => c.name).sort();
   }
 
-  async getCurrentOperations(): Promise<DbOperation[]> {
+  async getCurrentOperations(minElapsed?: number): Promise<DbOperation[]> {
     const client = this.client;
     try {
       await client.connect();
@@ -273,33 +273,43 @@ class MongoDatabase extends DatabaseBase {
 
       // Run the currentOp command
       const result = await db.admin().command({ currentOp: 1, $all: true });
-      return result.inprog.map((op: any) => {
-        const startTime = new Date(op.currentOpTime).getTime();
-        const elapsedTime = op.microsecs_running
-          ? parseInt(op.microsecs_running.toString()) / 1000
-          : 0;
 
-        return {
-          operationID: op.opid.toString(),
-          entity: op.ns ? op.ns.split(".")[1] : "", // Extract collection name from namespace
-          type: op.op,
-          command: op.command,
-          state: op.active ? "active" : "inactive",
-          time: {
-            started: startTime,
-            elapsed: elapsedTime,
-          },
-          client: op.client || "",
-          resources: {
-            cpu: "", // MongoDB does not provide direct CPU, memory, disk usage per operation
-            memory: "",
-            disk: "",
-            other: "",
-          },
-          errors: op.errmsg ? [op.errmsg] : [],
-          user: op.clientMetadata?.application?.name || "",
-        };
-      });
+      let ops = result.inprog
+        // Filter out system operations
+        .filter((op: any) => !op.ns?.startsWith("system."))
+        .map((op: any) => {
+          const startTime = new Date(op.currentOpTime).getTime();
+          const elapsedTime = op.microsecs_running
+            ? parseInt(op.microsecs_running.toString()) / 1000
+            : 0;
+
+          if (minElapsed && elapsedTime < minElapsed) return null;
+
+          return {
+            operationID: op.opid.toString(),
+            entity: op.ns ? op.ns.split(".")[1] : "", // Extract collection name from namespace
+            type: op.op,
+            command: op.command,
+            state: op.active ? "active" : "inactive",
+            time: {
+              started: startTime,
+              elapsed: elapsedTime,
+            },
+            client: op.client || "",
+            resources: {
+              cpu: "", // MongoDB does not provide direct CPU, memory, disk usage per operation
+              memory: "",
+              disk: "",
+              other: "",
+            },
+            errors: op.errmsg ? [op.errmsg] : [],
+            user: op.clientMetadata?.application?.name || "",
+          };
+        });
+
+      ops = ops.filter((op: any) => op != null);
+
+      return ops;
     } catch (e) {
       console.error("Failed to retrieve current operations", e);
       throw e;
