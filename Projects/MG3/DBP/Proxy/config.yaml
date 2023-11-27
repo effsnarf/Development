@@ -45,7 +45,6 @@ cache:
     prod:
       #- memory: true
       - database:
-          enabled: false
           connectionString: mongodb://localhost:37017
           database: MG-DBP-Cache
       # - database:
