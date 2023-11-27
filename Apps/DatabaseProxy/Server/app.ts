@@ -778,6 +778,15 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
       processRequest(handleApiRequest)
     );
 
+    httpServer.get(
+      "/:database/get/current/operations",
+      processRequest(async (req: any, res: any) => {
+        const db = await dbs.get(req.params.database);
+        const operations = await db?.getCurrentOperations();
+        return res.end(JSON.stringify(operations));
+      })
+    );
+
     // #region 🔍 Entity CRUD
     // For /[database]/[entity]?find={...}, return the list of documents
     httpServer.get(

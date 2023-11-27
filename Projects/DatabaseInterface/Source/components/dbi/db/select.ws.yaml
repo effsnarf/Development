@@ -1,6 +1,7 @@
 dom:
   div:
     ui.select:
+      :class: "{ dimmed: is.loading }"
       ":options": dbNames
       :get-item-icon: () => '📁'
       input-type: value
@@ -9,6 +10,8 @@ dom:
 data:
   dbNames: null
   selectedDbName: null
+  is:
+    loading: false
 
 mounted: | #js
   async function() {
@@ -24,6 +27,10 @@ computed:
 watch:
   selectedDbName: | #js
     async function(selectedDbName) {
+      this.$emit('input', null);
+      this.is.loading = true;
       const url = `${this.urlBase}/${selectedDbName}`;
-      this.$root.dbp = (await DatabaseProxy.new(url));
+      const dbp = (await DatabaseProxy.new(url));
+      this.is.loading = false;
+      this.$emit('input', dbp);
     }

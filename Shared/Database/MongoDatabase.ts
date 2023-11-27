@@ -4,6 +4,7 @@ import { Objects } from "../Extensions.Objects";
 import { Timer } from "../Timer";
 import { DatabaseBase } from "./DatabaseBase";
 import { MongoClient, ObjectId } from "mongodb";
+import { DbOperation } from "./Database";
 
 interface MongoDatabaseOptions {
   verifyDatabaseExists: boolean;
@@ -262,6 +263,49 @@ class MongoDatabase extends DatabaseBase {
       .listCollections()
       .toArray();
     return collections.map((c) => c.name).sort();
+  }
+
+  async getCurrentOperations(): Promise<DbOperation[]> {
+    const client = this.client;
+    try {
+      await client.connect();
+      const db = await client.db(this.database);
+
+      // Run the currentOp command
+      const result = await db.admin().command({ currentOp: 1, $all: true });
+      return result.inprog.map((op: any) => {
+        const startTime = new Date(op.currentOpTime).getTime();
+        const elapsedTime = op.microsecs_running
+          ? parseInt(op.microsecs_running.toString()) / 1000
+          : 0;
+
+        return {
+          operationID: op.opid.toString(),
+          entity: op.ns ? op.ns.split(".")[1] : "", // Extract collection name from namespace
+          type: op.op,
+          command: op.command,
+          state: op.active ? "active" : "inactive",
+          time: {
+            started: startTime,
+            elapsed: elapsedTime,
+          },
+          client: op.client || "",
+          resources: {
+            cpu: "", // MongoDB does not provide direct CPU, memory, disk usage per operation
+            memory: "",
+            disk: "",
+            other: "",
+          },
+          errors: op.errmsg ? [op.errmsg] : [],
+          user: op.clientMetadata?.application?.name || "",
+        };
+      });
+    } catch (e) {
+      console.error("Failed to retrieve current operations", e);
+      throw e;
+    } finally {
+      await client.close();
+    }
   }
 
   async getCollection(collectionName: string) {

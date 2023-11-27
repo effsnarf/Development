@@ -1,0 +1,12 @@
+dom:
+  div:
+    h2:
+      ui.title:
+        icon: 📂
+        :text: dbp.urlBase.split('/').last()
+    div:
+      dbi.db.optimization:
+        :dbp: dbp
+
+props:
+  dbp: null

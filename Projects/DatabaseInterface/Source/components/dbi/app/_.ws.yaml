@@ -2,25 +2,17 @@ dom:
   div:
     div:
       dbi.app.logo:
-    .flex:
-      ui.drawer:
-        dbi.db.select:
-      ui.drawer:
-        dbi.entity.list:
-          v-model: selectedEntity
-      div:
-        h2:
-          v-if: selectedEntity
-          ui.title:
-            icon: 📁
-            :text: selectedEntity.name
-            :number: selectedEntity.count
-        dbi.entity.items:
-          v-if: selectedEntity
-          :entity: selectedEntity
+    .flex.gap-1:
+      dbi.db.select:
+        v-model: selectedDbp
+      transition:
+        name: slide-hor
+        dbi.db:
+          v-if: selectedDbp
+          :dbp: selectedDbp
 
 data:
-  selectedEntity: null
+  selectedDbp: null
 
 mounted: | #js
   function() {

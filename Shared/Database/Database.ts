@@ -4,6 +4,27 @@ import { ReadWriteDatabase } from "./ReadWriteDatabase";
 import { FileSystemDatabase } from "./FileSystemDatabase";
 import { MongoDatabase } from "./MongoDatabase";
 
+type DbOperation = {
+  operationID: string;
+  entity: string; // Refers to SQL tables or MongoDB collections
+  type: string; // Adjusted from operationType to type
+  command: string;
+  state: string;
+  time: {
+    started: number; // Timestamp as a plain number
+    elapsed: number; // Elapsed time in milliseconds
+  };
+  client: string; // Client information, such as IP address, client ID, etc.
+  resources: {
+    cpu: string;
+    memory: string;
+    disk: string;
+    other: string;
+  };
+  errors: string[]; // Array of strings for errors
+  user: string; // User who initiated the operation
+};
+
 class Database {
   static async new(config: any): Promise<DatabaseBase> {
     if (!config) return NullDatabase.new();
@@ -18,4 +39,4 @@ class Database {
   }
 }
 
-export { Database };
+export { Database, DbOperation };

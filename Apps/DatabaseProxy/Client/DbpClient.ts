@@ -231,6 +231,13 @@ class DatabaseProxy {
         return stats;
       },
     },
+    current: {
+      operations: async () => {
+        var url = `${this.urlBase}/get/current/operations`;
+        var operations = await this.fetchAsJson(url);
+        return operations;
+      },
+    },
     user: async () => {
       var url = `${this.urlBase}/get/user`;
       var user = await this.fetchAsJson(url);
