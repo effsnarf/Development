@@ -1,3 +1,4 @@
+import { DbOperation } from "./Database";
 import { DatabaseBase } from "./DatabaseBase";
 
 class NullDatabase extends DatabaseBase {
@@ -63,7 +64,11 @@ class NullDatabase extends DatabaseBase {
     return [];
   }
 
-  async getCollectionNames(): Promise<string[]> {
+  async getEntityNames(): Promise<string[]> {
+    return [];
+  }
+
+  async getCurrentOperations(): Promise<DbOperation[]> {
     return [];
   }
 }

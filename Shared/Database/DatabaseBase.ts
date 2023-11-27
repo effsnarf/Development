@@ -152,7 +152,7 @@ abstract class DatabaseBase {
 
   protected abstract _getNewIDs(count: number): Promise<number[]>;
 
-  abstract getCollectionNames(): Promise<string[]>;
+  abstract getEntityNames(): Promise<string[]>;
 
   abstract getCurrentOperations(): Promise<DbOperation[]>;
 }

@@ -3,6 +3,7 @@ const path = require("path");
 import "../Extensions";
 import { Objects } from "../Extensions.Objects";
 import { Files } from "../Files";
+import { DbOperation } from "./Database";
 import { DatabaseBase } from "./DatabaseBase";
 
 class FileSystemDatabase extends DatabaseBase {
@@ -165,7 +166,7 @@ class FileSystemDatabase extends DatabaseBase {
     return Array.from(Array(count).keys()).map((i) => uniqueID + i);
   }
 
-  async getCollectionNames(): Promise<string[]> {
+  async getEntityNames(): Promise<string[]> {
     // List folders in basePath
     const folders = await fs.promises.readdir(this.basePath, {
       withFileTypes: true,
@@ -174,6 +175,10 @@ class FileSystemDatabase extends DatabaseBase {
       .filter((f: any) => f.isDirectory())
       .map((f: any) => f.name);
     return collectionNames;
+  }
+
+  async getCurrentOperations(): Promise<DbOperation[]> {
+    return [];
   }
 
   private getFilePath(collectionName: string, key: any) {

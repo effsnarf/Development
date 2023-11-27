@@ -108,7 +108,7 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
             await (
               await cache._getStore()
             ).get(`${db?.database}.CollectionNames`, async () => {
-              return { collectionNames: await db?.getCollectionNames() };
+              return { collectionNames: await db?.getEntityNames() };
             })
           )?.collectionNames;
         },

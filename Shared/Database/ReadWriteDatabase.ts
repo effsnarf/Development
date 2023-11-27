@@ -1,4 +1,4 @@
-import { Database } from "./Database";
+import { Database, DbOperation } from "./Database";
 import { DatabaseBase } from "./DatabaseBase";
 
 // Uses two different databases, one for reading and one for writing.
@@ -77,8 +77,13 @@ class ReadWriteDatabase extends DatabaseBase {
   protected _getNewIDs(count: number): Promise<number[]> {
     return this.writeDb.getNewIDs(count);
   }
-  getCollectionNames(): Promise<string[]> {
-    return this.readDb.getCollectionNames();
+  getEntityNames(): Promise<string[]> {
+    return this.readDb.getEntityNames();
+  }
+
+  async getCurrentOperations(): Promise<DbOperation[]> {
+    const readOps = await this.readDb.getCurrentOperations();
+    return [...readOps];
   }
 }
 
