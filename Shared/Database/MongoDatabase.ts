@@ -266,10 +266,8 @@ class MongoDatabase extends DatabaseBase {
   }
 
   async getCurrentOperations(minElapsed?: number): Promise<DbOperation[]> {
-    const client = this.client;
     try {
-      await client.connect();
-      const db = await client.db(this.database);
+      const db = await this.client.db(this.database);
 
       // Run the currentOp command
       const result = await db.admin().command({ currentOp: 1, $all: true });
@@ -314,8 +312,6 @@ class MongoDatabase extends DatabaseBase {
     } catch (e) {
       console.error("Failed to retrieve current operations", e);
       throw e;
-    } finally {
-      await client.close();
     }
   }
 

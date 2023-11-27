@@ -19,7 +19,7 @@ handler: | #js
         const { prompt } = data;
         const chat = await ctx.ChatOpenAI.new(ctx.Roles.DAN);
         const test = (await chat.send("Hello, how are you?"));
-        return res.end(JSON.stringify({test}));
+        return res.end(JSON.stringify({data,                                                                             test}));
       }
     };
   }

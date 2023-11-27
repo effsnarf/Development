@@ -15,6 +15,9 @@ dom:
       pre:
         v-text: query
 
+props:
+  dbp: null
+  
 data:
   prompt: null
   query: null
@@ -25,12 +28,14 @@ methods:
   promptToQuery: | #js
     async function() {
       this.is.loading = true;
+      const entities = (await this.dbp.get.entity.infos());
       const result = (await (await fetch(`/api/prompt/to/query`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
+          entities,
           prompt: this.prompt
         })
       })).json());

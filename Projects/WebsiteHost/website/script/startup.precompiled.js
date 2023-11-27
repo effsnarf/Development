@@ -148,7 +148,7 @@ class DatabaseProxy {
                 return names;
             },
             infos: async () => {
-                var url = `${this.urlBase}/entities`;
+                var url = `${this.urlBase}/get/entities`;
                 var stats = await this.fetchAsJson(url);
                 return stats;
             },
@@ -8683,7 +8683,7 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 /*!*********************************************************!*\
-  !*** ../../WebsiteHost/website/script/1701060164874.ts ***!
+  !*** ../../WebsiteHost/website/script/1701060918995.ts ***!
   \*********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
