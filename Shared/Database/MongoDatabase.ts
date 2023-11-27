@@ -272,12 +272,14 @@ class MongoDatabase extends DatabaseBase {
 
     if (!doc) return [];
 
-    const fields = Object.keys(doc).map((k) => {
-      return {
-        name: k,
-        type: Objects.getTypeName(doc[k]),
-      };
-    });
+    const fields = Object.keys(doc)
+      .sort()
+      .map((k) => {
+        return {
+          name: k,
+          type: Objects.getTypeName(doc[k]),
+        };
+      });
 
     return fields;
   }

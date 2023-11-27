@@ -32,7 +32,7 @@ const openAIApiKey = "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";
 (async () => {
   const config = (await Configuration.new()).data;
 
-  const chat = await ChatOpenAI.new(Roles.DAN);
+  const chat = await ChatOpenAI.new(Roles.DeveloperMode);
 
   //const terminalGPT = await AI.Agents.TerminalGPT.new();
 

@@ -52,7 +52,7 @@ methods:
       if (!s) return 0;
       if (!this.width) return 0;
       const size = Math.min(3, Math.max(14, (36 - (s.length / 6))) / 50 *  this.width / 150);
-      return `${size*2.5}vh`;
+      return `${size*1.5}rem`;
     }
   updateImageSize: | #js
     function () {

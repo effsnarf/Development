@@ -18,21 +18,36 @@ handler: | #js
       if (url == "/api/prompt/to/query") {
         const { entities, prompt } = data;
         const chat = await ctx.ChatOpenAI.new(ctx.Roles.ChatGPT);
-        const msg = `these are the entities in my database:
-        
+        const msg = `
+        I will ask you questions about my database and you'll help me find solutions.
+
+        this is the database we're working on:
+
         ${JSON.stringify(entities, null, 2)}}
         
-        write a MongoDB query to accomplish this task
-
         reply in this format:
-        (don't write anything else)
+        (don't write anything else, not even \`\`\` delimiters)
+        (make sure the JSON is strictly and properly formatted)
+
         {
-          "query": "...",
-          "assumptions": ["...", "..."],
-          "desc": "...",
-          "warnings": ["...", "..."],
-          "errors": ["...", "..."]
+          "analysis": "...", (your understanding of the situation),
+          "solutions": (different ways to approach the problem, make sure they have different costs in terms of performance, time and feasibility, not just variations on the same computation. all ideas are in the database, not external apps, etc),
+          [
+            {
+              "idea": { title, subtitle, desc },
+              "query": "...", (if can be done in a single query),
+              "warnings": ["...", "..."],
+              "problems": ["...", "..."],
+              "score": {
+                "performance": (0-1), (how fast it is to execute on the database, use the database structure and the size of the data I provided to estimate)
+              }
+            },
+            ...
+          ]
         }
+        
+
+        the task is:
 
         ${prompt}`;
 

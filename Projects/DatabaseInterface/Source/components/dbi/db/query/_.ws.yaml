@@ -28,14 +28,6 @@ data:
 mounted: | #js
   async function() {
     this.entities = (await this.dbp.get.entity.infos());
-    this.entities = this.entities.map(e => ({
-      name: e.name,
-      fields: e.fields.map(f => f.name),
-      indexes: e.indexes.map(indx => ({
-        name: indx.name,
-        key: indx.key
-      }))
-    }));
   }
 
 methods:
