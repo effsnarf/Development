@@ -43,6 +43,12 @@ requests:
   severity:
     time: [100, 500, "<"]
 dbs:
+  FourChan:
+    users:
+      enabled: false
+  AnonymousTimes:
+    users:
+      enabled: false
   IDE:
     users:
       enabled: true
