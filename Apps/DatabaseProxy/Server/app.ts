@@ -129,6 +129,7 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
                 count: info.count,
                 avgObjSize: info.avgObjSize,
                 capped: info.capped,
+                indexes,
               },
             });
           }
