@@ -12,7 +12,7 @@ class Loading {
 
   constructor(private info?: string, private log?: boolean) {}
 
-  static startNew(info?: string, log?: boolean): Loading {
+  static startNew(info?: string, log: boolean = true): Loading {
     const loading = new Loading(info, log);
     loading.start(info);
     return loading;

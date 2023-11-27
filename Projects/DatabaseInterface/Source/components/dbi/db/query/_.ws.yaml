@@ -8,7 +8,7 @@ dom:
       transition:
         name: slide
         ui.button:
-          v-if: prompt?.length
+          v-if: canExecute
           text: Send ✔️
           :click: promptToQuery
     div:
@@ -17,28 +17,47 @@ dom:
 
 props:
   dbp: null
-  
+
 data:
   prompt: null
   query: null
+  entities: null
   is:
     loading: false
+
+mounted: | #js
+  async function() {
+    this.entities = (await this.dbp.get.entity.infos());
+    this.entities = this.entities.map(e => ({
+      name: e.name,
+      fields: e.fields.map(f => f.name),
+      indexes: e.indexes.map(indx => ({
+        name: indx.name,
+        key: indx.key
+      }))
+    }));
+  }
 
 methods:
   promptToQuery: | #js
     async function() {
       this.is.loading = true;
-      const entities = (await this.dbp.get.entity.infos());
       const result = (await (await fetch(`/api/prompt/to/query`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          entities,
+          entities: this.entities,
           prompt: this.prompt
         })
       })).json());
       debugger;
       this.is.loading = false;
+    }
+
+computed:
+  canExecute: | #js
+    function() {
+      return this.entities && this.prompt?.length > 0;
     }

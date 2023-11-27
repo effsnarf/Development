@@ -16,10 +16,26 @@ handler: | #js
       // Get only the url path, without the query string.
       const url = req.url.split('?')[0];
       if (url == "/api/prompt/to/query") {
-        const { prompt } = data;
-        const chat = await ctx.ChatOpenAI.new(ctx.Roles.DAN);
-        const test = (await chat.send("Hello, how are you?"));
-        return res.end(JSON.stringify({data,                                                                             test}));
+        const { entities, prompt } = data;
+        const chat = await ctx.ChatOpenAI.new(ctx.Roles.ChatGPT);
+        const msg = `these are the entities in my database:
+        
+        ${JSON.stringify(entities, null, 2)}}
+        
+        write a MongoDB query to accomplish this task
+
+        reply in this format:
+        {
+          "query": "...",
+          "desc": "...",
+          "warning": "..."
+          "error": "...""
+        }
+
+        ${prompt}`;
+
+        const query = (await chat.send(msg));
+        return res.end(JSON.stringify({ query }));
       }
     };
   }

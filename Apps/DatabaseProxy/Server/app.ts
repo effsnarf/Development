@@ -114,23 +114,27 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
         },
         infos: async (db: MongoDatabase | undefined) => {
           const entities = [];
-          const names = await cache.get.collection.names(db);
-          for (const name of names) {
-            const collection = await db?.getCollection(name);
+          const entityNames = await cache.get.collection.names(db);
+          for (const entityName of entityNames) {
+            const collection = await db?.getCollection(entityName);
             const pipeline = [{ $collStats: { storageStats: {} } }];
 
             const results = await collection?.aggregate(pipeline).toArray();
-            const info = results?.first().storageStats;
+            let stats = results?.first().storageStats;
+            stats = Objects.getObjectFields(stats, [
+              "size",
+              "count",
+              "avgObjSize",
+              "capped",
+            ]);
+            const doc = await collection?.findOne({});
+            const fields = !doc ? null : Object.keys(doc);
             const indexes = await collection?.listIndexes().toArray();
             entities.push({
-              name,
-              ...{
-                size: info.size,
-                count: info.count,
-                avgObjSize: info.avgObjSize,
-                capped: info.capped,
-                indexes,
-              },
+              name: entityName,
+              fields,
+              indexes,
+              stats,
             });
           }
           return entities;

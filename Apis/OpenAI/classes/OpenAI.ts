@@ -1,5 +1,4 @@
-const { encode, decode } = require("gpt-3-encoder");
-
+import { getEncoding, encodingForModel } from "js-tiktoken";
 import axios, { AxiosResponse } from "axios";
 import * as colors from "colors";
 
@@ -18,6 +17,7 @@ interface Response {
 }
 
 enum Model {
+  Default = "gpt-4-vision-preview",
   Gpt4VisionPreview = "gpt-4-vision-preview",
   Gpt4 = "gpt-4",
   Gpt35Turbo = "gpt-3.5-turbo",
@@ -57,10 +57,7 @@ class OpenAI {
     }
   }
 
-  static new(
-    log: boolean = true,
-    model: Model = Model.Gpt4VisionPreview
-  ): OpenAI {
+  static new(log: boolean = true, model: Model = Model.Default): OpenAI {
     if (!this.apiKey)
       throw new Error("API key not set. Use OpenAI.apiKey = 'your key'");
     return new OpenAI(this.apiKey, model, log);
@@ -71,6 +68,7 @@ class OpenAI {
     this.endpoint = "https://api.openai.com/v1/";
     this.apiKey = apiKey;
     this.model = model;
+    if (!this.model?.length) model = Model.Default;
     this.messages = [];
   }
 
@@ -82,7 +80,7 @@ class OpenAI {
     let max = prompt.length;
     let mid = Math.floor((min + max) / 2);
     while (min < max) {
-      let tokens = this.getTokens(prompt.substring(0, mid));
+      let tokens = this.countTokens(prompt.substring(0, mid));
       if (tokens > this.maxTotalTokens - replyTokens) {
         max = mid;
       } else {
@@ -91,7 +89,7 @@ class OpenAI {
       mid = Math.floor((min + max) / 2);
     }
     prompt = prompt.substring(0, mid);
-    const tokens = this.getTokens(prompt);
+    const tokens = this.countTokens(prompt);
     console.log(`Prompt shortened to ${tokens} tokens`.gray);
     return prompt;
   }
@@ -105,7 +103,7 @@ class OpenAI {
     let max = messages.length;
     let mid = Math.floor((min + max) / 2);
     while (min < max) {
-      let tokens = this.getTokens(messages.slice(0, mid));
+      let tokens = this.countTokens(messages.slice(0, mid));
       if (tokens > this.maxTotalTokens - replyTokens) {
         max = mid;
       } else {
@@ -115,7 +113,7 @@ class OpenAI {
       if (mid <= 0) throw new Error(`mid is ${mid}`);
     }
     messages = messages.slice(0, mid);
-    const tokens = this.getTokens(JSON.stringify(messages));
+    const tokens = this.countTokens(JSON.stringify(messages));
     console.log(
       `Messages shortened to ${messages.length}/${originalLength} messages, ${tokens} tokens`
         .gray
@@ -123,14 +121,14 @@ class OpenAI {
     return messages;
   }
 
-  private getTokens(message: any) {
+  private countTokens(message: any) {
     if (!message) {
       throw new Error(`message is ${message}`);
     }
     if (typeof message != "string") {
       message = JSON.stringify(message);
     }
-    const tokens = encode(message).length;
+    const tokens = getEncoding("gpt2").encode(message).length;
     return tokens;
   }
 
@@ -143,16 +141,17 @@ class OpenAI {
     const promptText =
       dataProps.prompt || dataProps.input || dataProps.messages || dataProps;
 
-    const tokens = this.getTokens(promptText);
+    const tokens = this.countTokens(promptText);
     const maxReplyTokens = this.maxTotalTokens - tokens;
-    if (false)
-      console.log(
-        `Max reply tokens: ${maxReplyTokens} (${tokens} tokens used)`.gray
-      );
+
+    // if (false)
+    // console.log(
+    //   `Max reply tokens: ${maxReplyTokens} (${tokens} tokens used)`.gray
+    // );
 
     const data = {
       model: model,
-      max_tokens: maxReplyTokens,
+      max_tokens: 1000,
       ...dataProps,
     };
 
