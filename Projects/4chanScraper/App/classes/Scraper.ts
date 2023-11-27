@@ -13,7 +13,7 @@ class Scraper {
   private fileSystemDb!: FileSystemDatabase;
   private db!: MongoForumDatabase;
   private imageScraper!: ImageScraper;
-  private rateLimiter: RateLimiter = new RateLimiter();
+  private rateLimiter: RateLimiter = new RateLimiter(false);
 
   private constructor(config: Config) {
     this.config = config;

@@ -10,10 +10,10 @@ class Loading {
     return this._lastElapsed;
   }
 
-  constructor(private info?: string) {}
+  constructor(private info?: string, private log?: boolean) {}
 
-  static startNew(info?: string): Loading {
-    const loading = new Loading(info);
+  static startNew(info?: string, log?: boolean): Loading {
+    const loading = new Loading(info, log);
     loading.start(info);
     return loading;
   }
@@ -38,6 +38,7 @@ class Loading {
 
   private showInfo() {
     if (!this.isRunning) return;
+    if (!this.log) return;
     const elapsedTime = Date.now() - this.startTime!;
     process.stdout.write(`\r`);
     process.stdout.write(
