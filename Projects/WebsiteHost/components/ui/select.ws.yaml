@@ -42,6 +42,7 @@ dom:
               v-if: showText
               ':icon': _getItemIcon(slotProps.item)
               ':html': __getItemText(slotProps.item)
+              :number: _getItemNumber(slotProps.item)
           @item-hover: onItemHover($event)
           @input: onInput($event)
 props:
@@ -55,8 +56,9 @@ props:
   type: list
   itemIcon: null
   isOptionVisible: null
-  getItemText: null
   getItemIcon: null
+  getItemText: null
+  getItemNumber: null
   getItemTooltip: null
   getItemKey: null
   canSelectNone: true
@@ -116,6 +118,11 @@ methods:
       if (this.getItemText) return this.getItemText(item);
       const text = item;
       return text;
+    }
+  _getItemNumber: | #js
+    function(item) {
+      if (this.getItemNumber) return this.getItemNumber(item);
+      return null;
     }
   toggleValue: | #js
     function(e, delta) {

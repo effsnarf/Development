@@ -460,7 +460,14 @@ const sheakspearize = async (text: string) => {
 
   const handler = !config.handler
     ? null
-    : eval(`(${config.handler})`)({ Objects, process, path, fs });
+    : eval(`(${config.handler})`)({
+        Objects,
+        process,
+        path,
+        fs,
+        ChatOpenAI,
+        Roles,
+      });
 
   const httpServer = await HttpServer.new(
     config.title,

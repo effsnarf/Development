@@ -1,0 +1,39 @@
+dom:
+  div:
+    div:
+      ui.input.text.box:
+        :multiline: "true"
+        hint: Talk to your database…
+        v-model: prompt
+      transition:
+        name: slide
+        ui.button:
+          v-if: prompt?.length
+          text: Send ✔️
+          :click: promptToQuery
+    div:
+      pre:
+        v-text: query
+
+data:
+  prompt: null
+  query: null
+  is:
+    loading: false
+
+methods:
+  promptToQuery: | #js
+    async function() {
+      this.is.loading = true;
+      const result = (await (await fetch(`/api/prompt/to/query`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          prompt: this.prompt
+        })
+      })).json());
+      debugger;
+      this.is.loading = false;
+    }

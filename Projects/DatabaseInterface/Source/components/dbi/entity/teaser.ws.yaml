@@ -1,0 +1,11 @@
+dom:
+  div:
+    h3:
+      ui.title:
+        icon: 📂
+        :text: entity.name
+        :number: entity.count
+
+props:
+  dbp: null
+  entity: null

@@ -4,9 +4,29 @@ dom:
       ui.title:
         icon: 📂
         :text: dbp.urlBase.split('/').last()
-    div:
-      dbi.db.optimization:
+    .flex.gap-1:
+      dbi.entity.list:
         :dbp: dbp
+      div:
+        dbi.db.query:
+          :dbp: dbp
+        dbi.db.optimization:
+          v-if: "false"
+          :dbp: dbp
 
 props:
   dbp: null
+
+data:
+  entities: null
+
+mounted: | #js
+  async function() {
+    this.refresh();
+  }
+
+methods:
+  refresh: | #js
+    async function() {
+      this.entities = (await this.dbp.get.entity.infos());
+    }

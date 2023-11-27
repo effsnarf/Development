@@ -1,0 +1,12 @@
+dom:
+  .warning:
+    h3:
+      ui.title:
+        icon: ⚠️
+        :text: title
+    div:
+      v-html: text
+
+props:
+  title: null
+  text: null

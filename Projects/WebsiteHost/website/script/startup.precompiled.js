@@ -153,6 +153,13 @@ class DatabaseProxy {
                 return stats;
             },
         },
+        current: {
+            operations: async (minElapsed) => {
+                var url = `${this.urlBase}/get/current/operations?minElapsed=${minElapsed}`;
+                var operations = await this.fetchAsJson(url);
+                return operations;
+            },
+        },
         user: async () => {
             var url = `${this.urlBase}/get/user`;
             var user = await this.fetchAsJson(url);
@@ -8676,7 +8683,7 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 /*!*********************************************************!*\
-  !*** ../../WebsiteHost/website/script/1701051117046.ts ***!
+  !*** ../../WebsiteHost/website/script/1701060164874.ts ***!
   \*********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

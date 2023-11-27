@@ -1,28 +1,23 @@
 dom:
   div:
     ui.loading:
-      v-if: isLoading
-    ui.value:
-      :value: entities
-      :visible-fields: "['name', 'count']"
-      @array-item-click: selectEntity
+      v-if: is.loading
     ui.select:
-      v-if: "false"
       ":options": entities
-      :get-item-text: (entity) => entity.name
       :get-item-icon: () => '📁'
+      :get-item-text: (entity) => entity.name
+      :get-item-number: (entity) => entity.count
       input-type: value
       v-model: selectedEntity
+
+props:
+  dbp: null
 
 data:
   entities: null
   selectedEntity: null
-  isLoading: false
-
-mounted: | #js
-  async function() {
-    this.$watch(() => this.$root.dbp, this.refresh.bind(this));
-  }
+  is:
+    loading: 0
 
 methods:
   selectEntity: | #js
@@ -31,12 +26,18 @@ methods:
     }
   refresh: | #js
     async function() {
-      this.isLoading = true;
-      this.entities = (await this.$root.dbp.get.entity.infos());
-      this.isLoading = false;
+      this.is.loading++;
+      this.entities = (await this.dbp.get.entity.infos());
+      this.is.loading--;
     }
 
 watch:
+  dbp:
+    handler: | #js
+      async function(dbp) {
+        this.refresh();
+      }
+    immediate: true
   selectedEntity: | #js
     function(selectedEntity) {
       this.$emit("input", selectedEntity);

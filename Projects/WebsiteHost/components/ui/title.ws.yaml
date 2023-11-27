@@ -1,7 +1,7 @@
 dom:
   div: 
     @click: $emit('click')
-    class: flex
+    class: flex justify-between
     .counter:
       v-if: hasCounter
       v-text: (counter) + '.'
@@ -9,11 +9,11 @@ dom:
       ':class': iconClass
       v-if: icon
       v-text: icon
-    div: 
+    .text: 
       slot: null
       div: 
         v-html: cHtml
-    .ml-1.opacity-40:
+    .number.ml-1.opacity-40:
       v-if: number
       v-text: getNumberText()
 props:
@@ -26,7 +26,7 @@ props:
 methods:
   getNumberText: | #js
     function() {
-      return !this.number ? '' : `(${this.number})`;
+      return !this.number ? '' : `(${this.number.humanize()})`;
     }
   getIconClass: | #js
     function() {
@@ -57,9 +57,9 @@ style:
     text-align: center
   .flex:
     gap: 0.5em
-  .flex > *:
-    flex-grow: 0 !important
-    flex-shrink: 1 !important
+  .text:
+    flex-grow: 1 !important
+  .number:
   div:
     white-space: nowrap
     text-wrap: nowrap

@@ -12,11 +12,14 @@ static:
   folder: (env) => env.process.cwd()
 handler: | #js
   (ctx) => {
-    return async (req, res) => {
-      if (req.url == "/script") {
-        const yaml = ctx.fs.readFileSync(ctx.path.join(ctx.process.cwd(), "main.yaml"), 'utf8');
-        const main = ctx.Objects.parseYaml(yaml, { addSuffixToDuplicateKeysUnder: ["dom"] });
-        return res.end();
+    return async (req, res, data) => {
+      // Get only the url path, without the query string.
+      const url = req.url.split('?')[0];
+      if (url == "/api/prompt/to/query") {
+        const { prompt } = data;
+        const chat = await ctx.ChatOpenAI.new(ctx.Roles.DAN);
+        const test = (await chat.send("Hello, how are you?"));
+        return res.end(JSON.stringify({test}));
       }
     };
   }

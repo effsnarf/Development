@@ -226,7 +226,7 @@ class DatabaseProxy {
         return names;
       },
       infos: async () => {
-        var url = `${this.urlBase}/entities`;
+        var url = `${this.urlBase}/get/entities`;
         var stats = await this.fetchAsJson(url);
         return stats;
       },

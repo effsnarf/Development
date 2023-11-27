@@ -121,6 +121,7 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
 
             const results = await collection?.aggregate(pipeline).toArray();
             const info = results?.first().storageStats;
+            const indexes = await collection?.listIndexes().toArray();
             entities.push({
               name,
               ...{
@@ -583,7 +584,7 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
     // #endregion
 
     httpServer.get(
-      "/:database/entities",
+      "/:database/get/entities",
       processRequest(async (req: any, res: any) => {
         const db = await dbs.get(req.params.database);
         const entities = await cache.get.collection.infos(db);
