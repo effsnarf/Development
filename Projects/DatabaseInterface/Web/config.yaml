@@ -1,4 +1,4 @@
-title: grid.Web
+title: database.interface
 server:
   host: localhost
   port: 5051

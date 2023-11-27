@@ -7,6 +7,8 @@ dom:
     div:
       ui.value:
         :value: items
+        :max-visible-fields: 8
+        @array-item-click: onItemClick
 
 props:
   entity: null
@@ -18,6 +20,10 @@ data:
     loading: false
 
 methods:
+  onItemClick: | #js
+    function(item) {
+      debugger;
+    }
   refresh: | #js
     async function() {
       this.items = null;

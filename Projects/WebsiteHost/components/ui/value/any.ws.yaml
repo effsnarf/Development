@@ -8,6 +8,7 @@ dom:
       ":depth": (depth + 1)
       ":large": large
       :visible-fields: visibleFields
+      :max-visible-fields: maxVisibleFields
       v-on: $listeners
 props:
   value: null
@@ -15,6 +16,7 @@ props:
   depth: 0
   large: false
   visibleFields: null
+  maxVisibleFields: null
 data: null
 methods:
   getComponentType: | #js
