@@ -39,7 +39,7 @@ cache:
     - /IDE/
     - /create/
     - /sample/
-    - /get/new/id
+    - /get/
     - /googleLogin
   store:
     prod:
