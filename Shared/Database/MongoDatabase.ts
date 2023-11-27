@@ -4,7 +4,7 @@ import { Objects } from "../Extensions.Objects";
 import { Timer } from "../Timer";
 import { DatabaseBase } from "./DatabaseBase";
 import { MongoClient, ObjectId } from "mongodb";
-import { DbOperation } from "./Database";
+import { DbOperation, DbField } from "./Database";
 
 interface MongoDatabaseOptions {
   verifyDatabaseExists: boolean;
@@ -263,6 +263,23 @@ class MongoDatabase extends DatabaseBase {
       .listCollections()
       .toArray();
     return collections.map((c) => c.name).sort();
+  }
+
+  async getEntityFields(entityName: string): Promise<DbField[]> {
+    const collection = await this.getCollection(entityName);
+
+    const doc = await collection.findOne({});
+
+    if (!doc) return [];
+
+    const fields = Object.keys(doc).map((k) => {
+      return {
+        name: k,
+        type: Objects.getTypeName(doc[k]),
+      };
+    });
+
+    return fields;
   }
 
   async getCurrentOperations(minElapsed?: number): Promise<DbOperation[]> {

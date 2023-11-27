@@ -4,6 +4,11 @@ import { ReadWriteDatabase } from "./ReadWriteDatabase";
 import { FileSystemDatabase } from "./FileSystemDatabase";
 import { MongoDatabase } from "./MongoDatabase";
 
+type DbField = {
+  name: string;
+  type: string;
+};
+
 type DbOperation = {
   operationID: string;
   entity: string; // Refers to SQL tables or MongoDB collections
@@ -39,4 +44,4 @@ class Database {
   }
 }
 
-export { Database, DbOperation };
+export { Database, DbOperation, DbField };

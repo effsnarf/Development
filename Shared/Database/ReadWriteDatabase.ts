@@ -1,4 +1,4 @@
-import { Database, DbOperation } from "./Database";
+import { Database, DbField, DbOperation } from "./Database";
 import { DatabaseBase } from "./DatabaseBase";
 
 // Uses two different databases, one for reading and one for writing.
@@ -79,6 +79,9 @@ class ReadWriteDatabase extends DatabaseBase {
   }
   getEntityNames(): Promise<string[]> {
     return this.readDb.getEntityNames();
+  }
+  async getEntityFields(entityName: string): Promise<DbField[]> {
+    return this.readDb.getEntityFields(entityName);
   }
 
   async getCurrentOperations(): Promise<DbOperation[]> {

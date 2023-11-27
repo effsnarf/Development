@@ -3,7 +3,7 @@ const path = require("path");
 import "../Extensions";
 import { Objects } from "../Extensions.Objects";
 import { Files } from "../Files";
-import { DbOperation } from "./Database";
+import { DbField, DbOperation } from "./Database";
 import { DatabaseBase } from "./DatabaseBase";
 
 class FileSystemDatabase extends DatabaseBase {
@@ -175,6 +175,10 @@ class FileSystemDatabase extends DatabaseBase {
       .filter((f: any) => f.isDirectory())
       .map((f: any) => f.name);
     return collectionNames;
+  }
+
+  async getEntityFields(entityName: string): Promise<DbField[]> {
+    return [];
   }
 
   async getCurrentOperations(): Promise<DbOperation[]> {

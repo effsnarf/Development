@@ -3,7 +3,7 @@ import "../Extensions";
 import { Objects } from "../Extensions.Objects";
 import { Timer } from "../Timer";
 import { ProducerConsumer } from "../ProducerConsumer";
-import { DbOperation } from "./Database";
+import { DbField, DbOperation } from "./Database";
 
 abstract class DatabaseBase {
   protected static _mapCollectionName = "_Map";
@@ -153,6 +153,8 @@ abstract class DatabaseBase {
   protected abstract _getNewIDs(count: number): Promise<number[]>;
 
   abstract getEntityNames(): Promise<string[]>;
+
+  abstract getEntityFields(entityName: string): Promise<DbField[]>;
 
   abstract getCurrentOperations(minElapsed?: number): Promise<DbOperation[]>;
 }

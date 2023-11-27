@@ -25,17 +25,19 @@ handler: | #js
         write a MongoDB query to accomplish this task
 
         reply in this format:
+        (don't write anything else)
         {
           "query": "...",
+          "assumptions": ["...", "..."],
           "desc": "...",
-          "warning": "..."
-          "error": "...""
+          "warnings": ["...", "..."],
+          "errors": ["...", "..."]
         }
 
         ${prompt}`;
 
-        const query = (await chat.send(msg));
-        return res.end(JSON.stringify({ query }));
+        const result = JSON.parse(await chat.send(msg));
+        return res.end(JSON.stringify(result));
       }
     };
   }

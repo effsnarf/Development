@@ -1,4 +1,4 @@
-import { DbOperation } from "./Database";
+import { DbField, DbOperation } from "./Database";
 import { DatabaseBase } from "./DatabaseBase";
 
 class NullDatabase extends DatabaseBase {
@@ -65,6 +65,10 @@ class NullDatabase extends DatabaseBase {
   }
 
   async getEntityNames(): Promise<string[]> {
+    return [];
+  }
+
+  async getEntityFields(entityName: string): Promise<DbField[]> {
     return [];
   }
 

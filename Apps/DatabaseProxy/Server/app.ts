@@ -127,8 +127,7 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
               "avgObjSize",
               "capped",
             ]);
-            const doc = await collection?.findOne({});
-            const fields = !doc ? null : Object.keys(doc);
+            const fields = await db?.getEntityFields(entityName);
             const indexes = await collection?.listIndexes().toArray();
             entities.push({
               name: entityName,
