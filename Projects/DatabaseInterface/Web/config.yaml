@@ -24,13 +24,16 @@ handler: | #js
         this is the database we're working on:
 
         ${JSON.stringify(entities, null, 2)}}
+
+        the query you're writing will be executed as eval(),
+        so ensure that your query execution includes iterating over the cursor and fetching the results (toArray() etc)
         
         reply in this format:
         (don't write anything else, not even \`\`\` delimiters)
         (make sure the JSON is strictly and properly formatted)
 
         {
-          "title": "...", (the title of the problem, formatted as a short question),
+          "title": "...", (what info the user wants to know, formatted as a short question),
           "analysis": "...", (your understanding of the situation),
           "solutions": (different ways to approach the problem, make sure they have different costs in terms of performance, time and feasibility, not just variations on the same computation. all ideas are in the database, not external apps, etc),
           [

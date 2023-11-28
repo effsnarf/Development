@@ -34,7 +34,7 @@ dom:
                     transition:
                       name: slide
                       div:
-                        v-if: solution.editing
+                        v-if: "true || solution.editing"
                         ui.input.text.box:
                           :multiline: "true"
                           v-model: solution.query
@@ -47,6 +47,8 @@ dom:
                           text: execute ▶️
                           :click: () => execute(solution)
         div:
+          ui.loading:
+            v-if: is.loading
           ui.value:
             :value: result
 props:
@@ -70,12 +72,14 @@ methods:
   execute: | #js
     async function(solution) {
       this.is.loading = true;
+      this.result = null;
       this.result = await this.dbp.execute(solution.query);
       this.is.loading = false;
     }
   promptToTask: | #js
     async function() {
       this.is.loading = true;
+      this.task = null;
       this.result = null;
       this.task = (await (await fetch(`/api/prompt/to/task`, {
         method: 'POST',
