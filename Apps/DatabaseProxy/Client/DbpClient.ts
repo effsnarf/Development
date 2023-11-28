@@ -321,7 +321,7 @@ class DatabaseProxy {
   }
 
   async execute(script: string) {
-    const url = `${this.urlBase}/execute}`;
+    const url = `${this.urlBase}/execute`;
     const result = await this.fetchAsJson(url, {
       method: "POST",
       body: JSON.stringify({ script }),
