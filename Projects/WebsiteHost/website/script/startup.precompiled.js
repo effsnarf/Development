@@ -229,6 +229,14 @@ class DatabaseProxy {
     entity(entity) {
         return new EntityMethods(entity, this);
     }
+    async execute(script) {
+        const url = `${this.urlBase}/execute}`;
+        const result = await this.fetchAsJson(url, {
+            method: "POST",
+            body: JSON.stringify({ script }),
+        });
+        return result;
+    }
     async init() {
         const api = await this.createApiMethods();
         this.api = api;
@@ -8759,7 +8767,7 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 /*!*********************************************************!*\
-  !*** ../../WebsiteHost/website/script/1701166053770.ts ***!
+  !*** ../../WebsiteHost/website/script/1701168639677.ts ***!
   \*********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
