@@ -37,6 +37,7 @@ cache:
   ignore:
     - /MemeGenerator/api/
     - /IDE/
+    - /execute/
     - /create/
     - /sample/
     - /get/
