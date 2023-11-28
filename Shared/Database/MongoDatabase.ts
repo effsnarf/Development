@@ -66,9 +66,11 @@ class MongoDatabase extends DatabaseBase {
   async execute(script: string, args: any[]) {
     const db = await this.client.db(this.database);
 
-    const result = db.command({ eval: script, args: args });
+    const result = await db.command({ eval: script, args: args });
 
-    return result;
+    const data = result;
+
+    return data;
   }
 
   async find(
