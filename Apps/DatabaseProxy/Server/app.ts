@@ -511,7 +511,7 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
     // );
     // // #endregion
 
-    httpServer.any(
+    httpServer.all(
       "/:database/execute",
       processRequest(async (req: any, res: any, data: any) => {
         const script = data.script;
