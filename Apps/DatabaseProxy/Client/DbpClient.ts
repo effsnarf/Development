@@ -3,6 +3,7 @@
 
 import { Events } from "../../../Shared/Events";
 import { Data } from "../../../Shared/Data";
+import { fetchWithAlertify } from "../../../Shared/Extensions.Network";
 
 // Lowercase the first letter of a string
 (String.prototype as any).untitleize = function () {
@@ -300,8 +301,7 @@ class DatabaseProxy {
         args = args || [];
         if (args.length < 1) args.push({});
         args[0].credentials = "include";
-        const response = await fetch(url, ...args);
-        const text = await response.text();
+        const text = await fetchWithAlertify(url, args[0]);
         if (!text?.length) return null;
         return JSON.parse(text);
       });
@@ -419,6 +419,7 @@ class DatabaseProxy {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
         mode: "no-cors",
+        title: `${entity} ${group} ${method}`,
       };
       let result = await this.fetchJson(url, fetchOptions);
       // If we got an _id back, select the item

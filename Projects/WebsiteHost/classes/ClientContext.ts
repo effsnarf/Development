@@ -119,7 +119,9 @@ class ClientContext {
     filter: (comp: Component) => boolean = (c) => true,
     mixins: any[] = []
   ) {
-    for (const comp of this.comps.filter(filter)) {
+    const comps = this.comps.filter(filter);
+    this.alertify.message(`📦 Compiling ${comps.length} components...`);
+    for (const comp of comps) {
       await comp.compile(mixins);
     }
   }

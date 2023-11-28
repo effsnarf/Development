@@ -204,8 +204,9 @@ methods:
     async function(compType) {
       let compTypeStr = compType;
       if (compType == "ide") compTypeStr = "Vue Studio";
-      alertify.message(`⏳ Loading ${compTypeStr} components...`);
+      const msg = alertify.message(`⏳ Loading ${compTypeStr} components...`).delay(0);
       const comps = (await this.$root.dbp.componentClasses[compType].get());
+      msg.dismiss();
       alertify.message(`${comps.length} components loaded`);
       return comps;
     }
