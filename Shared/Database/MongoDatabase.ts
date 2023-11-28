@@ -68,7 +68,7 @@ class MongoDatabase extends DatabaseBase {
 
     const result = await db.command({ eval: script, args: args });
 
-    const data = result;
+    const data = result.retval._batch;
 
     return data;
   }
