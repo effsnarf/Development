@@ -511,6 +511,16 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
     // );
     // // #endregion
 
+    httpServer.get(
+      "/:database/execute",
+      processRequest(async (req: any, res: any, data: any) => {
+        const script = data.script;
+        const db = await dbs.get(req.params.database);
+        const queryData = await db?.execute(script, []);
+        return res.end(JSON.stringify(queryData));
+      })
+    );
+
     // #region 📑 Database Analytics
     httpServer.get(
       "/:database/analytics/:entity/since/:since",

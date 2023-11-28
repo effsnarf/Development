@@ -1,5 +1,5 @@
 dom:
-  div:
+  .flex.gap-2:
     div:
       ui.input.text.box:
         :multiline: "true"
@@ -10,10 +10,39 @@ dom:
         ui.button:
           v-if: canExecute
           text: Send ✔️
-          :click: promptToQuery
+          :click: promptToTask
     div:
-      pre:
-        v-text: query
+      v-if: task
+      .flex:
+        .fs-l1:
+          v-text: "'❔'"
+        h3:
+          v-text: task.title
+      .flex.flex-column.gap-2:
+        .solution:
+          v-for: solution in task.solutions
+          .flex:
+            .fs-l1:
+              v-text: "'📝'"
+            div:
+              .box1.show-on-hover-container:
+                h3:
+                  v-text: solution.idea.title
+                transition:
+                  name: slide
+                  div:
+                    v-if: solution.editing
+                    ui.input.text.box:
+                      :multiline: "true"
+                      v-model: solution.query
+                .show-on-hover:
+                  .flex.justify-between:
+                    ui.button:
+                      text: ✏️ edit
+                      :click: () => solution.editing = !solution.editing
+                    ui.button:
+                      text: execute ▶️
+                      :click: () => execute(solution)
 
 props:
   dbp: null
@@ -22,6 +51,7 @@ data:
   prompt: null
   query: null
   entities: null
+  task: null
   is:
     loading: false
 
@@ -31,10 +61,16 @@ mounted: | #js
   }
 
 methods:
-  promptToQuery: | #js
+  execute: | #js
+    async function(solution) {
+      this.is.loading = true;
+      const result = await this.dbp.execute(solution.query);
+      this.is.loading = false;
+    }
+  promptToTask: | #js
     async function() {
       this.is.loading = true;
-      const result = (await (await fetch(`/api/prompt/to/query`, {
+      this.task = (await (await fetch(`/api/prompt/to/task`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -44,7 +80,6 @@ methods:
           prompt: this.prompt
         })
       })).json());
-      debugger;
       this.is.loading = false;
     }
 
@@ -53,3 +88,11 @@ computed:
     function() {
       return this.entities && this.prompt?.length > 0;
     }
+
+style:
+  .box1:
+    background: "#ffffff20"
+    padding: 0.5em
+    cursor: pointer
+  .box1:hover:
+    background: "#ffffff30"

@@ -47,6 +47,10 @@ class FileSystemDatabase extends DatabaseBase {
     return fs.existsSync(filePath);
   }
 
+  async execute(script: string, args: any[]): Promise<any> {
+    throw new Error("Method not implemented.");
+  }
+
   async find(
     collectionName: string,
     query: any,

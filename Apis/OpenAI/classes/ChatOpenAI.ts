@@ -162,7 +162,7 @@ class ChatOpenAI {
         desc
       );
       this._messages.push(responseMessage);
-      return responseMessage.content;
+      return this.strip(responseMessage.content);
     } catch (ex: any) {
       // console.log(`An error occurred while sending a message:`.bgRed);
       // console.log(message.shorten(100));
@@ -175,6 +175,14 @@ class ChatOpenAI {
       //if (responseErrorMessage) ex = new Error(responseErrorMessage);
       throw ex;
     }
+  }
+
+  private strip(s: string) {
+    const jsonCode = "```json";
+    if (s.startsWith(jsonCode)) {
+      s = s.substring(jsonCode.length, s.length - 3);
+    }
+    return s;
   }
 
   public async sendSeveral(messages: string[], maxReplyTokens?: number) {

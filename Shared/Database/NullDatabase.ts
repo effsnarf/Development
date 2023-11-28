@@ -18,6 +18,10 @@ class NullDatabase extends DatabaseBase {
     return false;
   }
 
+  async execute(script: string, args: any[]): Promise<any> {
+    return null;
+  }
+
   async find(
     collectionName: string,
     query: any,

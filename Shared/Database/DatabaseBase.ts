@@ -16,6 +16,8 @@ abstract class DatabaseBase {
 
   abstract has(key: any): Promise<boolean>;
 
+  abstract execute(script: string, args: any[]): Promise<any>;
+
   abstract find(
     collectionName: string,
     query: any,

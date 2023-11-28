@@ -49,6 +49,7 @@ mounted: | #js
     this.showWorkspace = false;
     this.refresh();
     this.setupCheatCodeListener('inspect', this.enable.bind(this));
+    if (vueApp.isDevEnv()) this.enable();
   }
 methods:
   setupCheatCodeListener: | #js

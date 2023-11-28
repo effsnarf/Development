@@ -3,8 +3,10 @@ dom:
     div:
       dbi.app.logo:
     .flex.gap-1:
-      dbi.db.select:
-        v-model: selectedDbp
+      ui.drawer:
+        :open: "!selectedDbp"
+        dbi.db.select:
+          v-model: selectedDbp
       transition:
         name: slide-hor
         dbi.db:

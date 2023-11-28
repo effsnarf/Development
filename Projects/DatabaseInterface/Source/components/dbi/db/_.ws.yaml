@@ -5,8 +5,9 @@ dom:
         icon: 📂
         :text: dbp.urlBase.split('/').last()
     .flex.gap-1:
-      dbi.entity.list:
-        :dbp: dbp
+      ui.drawer:
+        dbi.entity.list:
+          :dbp: dbp
       div:
         dbi.db.query:
           :dbp: dbp

@@ -15,7 +15,7 @@ handler: | #js
     return async (req, res, data) => {
       // Get only the url path, without the query string.
       const url = req.url.split('?')[0];
-      if (url == "/api/prompt/to/query") {
+      if (url == "/api/prompt/to/task") {
         const { entities, prompt } = data;
         const chat = await ctx.ChatOpenAI.new(ctx.Roles.ChatGPT);
         const msg = `
@@ -30,6 +30,7 @@ handler: | #js
         (make sure the JSON is strictly and properly formatted)
 
         {
+          "title": "...", (the title of the problem, formatted as a short question),
           "analysis": "...", (your understanding of the situation),
           "solutions": (different ways to approach the problem, make sure they have different costs in terms of performance, time and feasibility, not just variations on the same computation. all ideas are in the database, not external apps, etc),
           [
@@ -54,5 +55,6 @@ handler: | #js
         const result = JSON.parse(await chat.send(msg));
         return res.end(JSON.stringify(result));
       }
+
     };
   }

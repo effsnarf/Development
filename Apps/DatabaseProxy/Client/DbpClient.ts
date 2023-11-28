@@ -320,6 +320,15 @@ class DatabaseProxy {
     return new EntityMethods(entity, this);
   }
 
+  async execute(script: string) {
+    const url = `${this.urlBase}/execute}`;
+    const result = await this.fetchAsJson(url, {
+      method: "POST",
+      body: JSON.stringify({ script }),
+    });
+    return result;
+  }
+
   private async init() {
     const api = await this.createApiMethods();
     this.api = api;

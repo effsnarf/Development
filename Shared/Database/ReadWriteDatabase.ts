@@ -25,6 +25,9 @@ class ReadWriteDatabase extends DatabaseBase {
   has(key: any): Promise<boolean> {
     throw new Error("Method not implemented.");
   }
+  async execute(script: string, args: any[]): Promise<any> {
+    return await this.readDb.execute(script, args);
+  }
   find(
     collectionName: string,
     query: any,
