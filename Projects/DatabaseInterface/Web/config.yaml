@@ -40,6 +40,9 @@ handler: | #js
             {
               "idea": { title, subtitle, desc },
               "query": "...", (if can be done in a single query),
+              "interesting": {
+                "fields": ["...", "..."], (fields that are interesting to the user, for example, the name of the person, the date of birth, etc)
+              },
               "warnings": ["...", "..."],
               "problems": ["...", "..."],
               "score": {

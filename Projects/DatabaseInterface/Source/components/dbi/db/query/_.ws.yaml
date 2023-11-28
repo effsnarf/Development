@@ -3,7 +3,7 @@ dom:
     div:
       ui.input.text.box:
         :multiline: "true"
-        hint: Talk to your database…
+        hint: Ask your database anything…
         v-model: prompt
       transition:
         name: slide
@@ -18,7 +18,7 @@ dom:
           v-text: "'❔'"
         h3:
           v-text: task.title
-      .flex:
+      .flex.gap-2:
         ui.drawer:
           :open: "!result"
           .flex.flex-column.gap-2:
@@ -35,9 +35,10 @@ dom:
                       name: slide
                       div:
                         v-if: "true || solution.editing"
-                        ui.input.text.box:
-                          :multiline: "true"
-                          v-model: solution.query
+                        .show-on-hover:
+                          ui.input.text.box:
+                            :multiline: "true"
+                            v-model: solution.query
                     .show-on-hover:
                       .flex.justify-between:
                         ui.button:
@@ -46,11 +47,18 @@ dom:
                         ui.button:
                           text: execute ▶️
                           :click: () => execute(solution)
+                  ui.title:
+                    icon: "🤔"
+                    :text: solution.interesting.fields.join(', ')
         div:
           ui.loading:
             v-if: is.loading
-          ui.value:
-            :value: result
+          transition:
+            name: slide
+            ui.value:
+              v-if: result
+              :value: result
+              :visible-fields: visibleFields
 props:
   dbp: null
 
@@ -60,6 +68,7 @@ data:
   entities: null
   task: null
   result: null
+  visibleFields: null
   is:
     loading: false
 
@@ -74,6 +83,7 @@ methods:
       this.is.loading = true;
       this.result = null;
       this.result = await this.dbp.execute(solution.query);
+      this.visibleFields = solution.interesting.fields;
       this.is.loading = false;
     }
   promptToTask: | #js
@@ -98,6 +108,12 @@ computed:
   canExecute: | #js
     function() {
       return this.entities && this.prompt?.length > 0;
+    }
+
+watch:
+  result: | #js
+    function(result) {
+      if (!result) this.visibleFields = null;
     }
 
 style:
