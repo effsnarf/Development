@@ -18,32 +18,37 @@ dom:
           v-text: "'❔'"
         h3:
           v-text: task.title
-      .flex.flex-column.gap-2:
-        .solution:
-          v-for: solution in task.solutions
-          .flex:
-            .fs-l1:
-              v-text: "'📝'"
-            div:
-              .box1.show-on-hover-container:
-                h3:
-                  v-text: solution.idea.title
-                transition:
-                  name: slide
-                  div:
-                    v-if: solution.editing
-                    ui.input.text.box:
-                      :multiline: "true"
-                      v-model: solution.query
-                .show-on-hover:
-                  .flex.justify-between:
-                    ui.button:
-                      text: ✏️ edit
-                      :click: () => solution.editing = !solution.editing
-                    ui.button:
-                      text: execute ▶️
-                      :click: () => execute(solution)
-
+      .flex:
+        ui.drawer:
+          :open: "!result"
+          .flex.flex-column.gap-2:
+            .solution:
+              v-for: solution in task.solutions
+              .flex:
+                .fs-l1:
+                  v-text: "'📝'"
+                div:
+                  .box1.show-on-hover-container:
+                    h3:
+                      v-text: solution.idea.title
+                    transition:
+                      name: slide
+                      div:
+                        v-if: solution.editing
+                        ui.input.text.box:
+                          :multiline: "true"
+                          v-model: solution.query
+                    .show-on-hover:
+                      .flex.justify-between:
+                        ui.button:
+                          text: ✏️ edit
+                          :click: () => solution.editing = !solution.editing
+                        ui.button:
+                          text: execute ▶️
+                          :click: () => execute(solution)
+        div:
+          ui.value:
+            :value: result
 props:
   dbp: null
 
@@ -52,6 +57,7 @@ data:
   query: null
   entities: null
   task: null
+  result: null
   is:
     loading: false
 
@@ -64,12 +70,13 @@ methods:
   execute: | #js
     async function(solution) {
       this.is.loading = true;
-      const result = await this.dbp.execute(solution.query);
+      this.result = await this.dbp.execute(solution.query);
       this.is.loading = false;
     }
   promptToTask: | #js
     async function() {
       this.is.loading = true;
+      this.result = null;
       this.task = (await (await fetch(`/api/prompt/to/task`, {
         method: 'POST',
         headers: {
@@ -96,3 +103,9 @@ style:
     cursor: pointer
   .box1:hover:
     background: "#ffffff30"
+  .solution:
+    opacity: 0.6
+  .solution:nth-child(1):
+    opacity: 1
+  .solution:hover:
+    opacity: 1
