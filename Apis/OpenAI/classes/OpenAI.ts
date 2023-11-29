@@ -17,7 +17,7 @@ interface Response {
 }
 
 enum Model {
-  Default = "gpt-4-vision-preview",
+  Default = "text-ada-001",
   Gpt4VisionPreview = "gpt-4-vision-preview",
   Gpt4 = "gpt-4",
   Gpt35Turbo = "gpt-3.5-turbo",
@@ -151,7 +151,7 @@ class OpenAI {
 
     const data = {
       model: model,
-      max_tokens: 1000,
+      max_tokens: 500,
       ...dataProps,
     };
 
@@ -169,7 +169,7 @@ class OpenAI {
       this.loading.start(desc);
       response = await axios.post<Response>(endpoint, data, {
         headers,
-        timeout: (30).seconds(),
+        timeout: (60).seconds(),
       });
       this.log();
       if (dataProps.messages) {

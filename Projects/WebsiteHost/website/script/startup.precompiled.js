@@ -541,7 +541,7 @@ class ClientContext {
     }
     async compileAll(filter = (c) => true, mixins = []) {
         const comps = this.comps.filter(filter);
-        this.alertify.message(`📦 Compiling ${comps.length} components...`);
+        //this.alertify.message(`📦 Compiling ${comps.length} components...`);
         for (const comp of comps) {
             await comp.compile(mixins);
         }
@@ -5065,8 +5065,7 @@ const fetchWithAlertify = async (url, options) => {
     const started = Date.now();
     const result = await fetchWithProgress(url, options, (received, total) => {
         const elapsed = Date.now() - started;
-        if (elapsed < 1000)
-            return;
+        //if (elapsed < 100) return;
         const msg = `<h3>${title}</h3><p class="text-center">${received.unitifySize()}</p>`;
         if (!alrt)
             alrt = alertify.message(msg).delay(0);
@@ -8767,11 +8766,12 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 /*!*********************************************************!*\
-  !*** ../../WebsiteHost/website/script/1701169304479.ts ***!
+  !*** ../../WebsiteHost/website/script/1701224012530.ts ***!
   \*********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 __webpack_require__(/*! ../../../../Shared/Extensions */ "../../../Shared/Extensions.ts");
+const Extensions_Network_1 = __webpack_require__(/*! ../../../../Shared/Extensions.Network */ "../../../Shared/Extensions.Network.ts");
 const HtmlHelper_1 = __webpack_require__(/*! ../../Classes/HtmlHelper */ "../../WebsiteHost/Classes/HtmlHelper.ts");
 const Events_1 = __webpack_require__(/*! ../../../../Shared/Events */ "../../../Shared/Events.ts");
 const Extensions_Objects_Client_1 = __webpack_require__(/*! ../../../../Shared/Extensions.Objects.Client */ "../../../Shared/Extensions.Objects.Client.ts");
@@ -8794,6 +8794,7 @@ const window1 = window;
 const Vue = window1.Vue;
 let vueApp;
 // To make it accessible to client code
+window1.fetchWithProgress = Extensions_Network_1.fetchWithProgress;
 window1.Mixins = Mixins_1.Mixins;
 window1.Objects = Extensions_Objects_Client_1.Objects;
 window1.TreeObject = Extensions_Objects_Client_1.TreeObject;

@@ -24,24 +24,26 @@ handler: | #js
         this is the database we're working on:
 
         ${JSON.stringify(entities, null, 2)}}
+
+        your query can only use fields that actually exist in the schema I provided.
+        the query you're writing will be executed as eval(),
+        so ensure that your query execution includes iterating over the cursor and fetching the results (toArray() etc)
         
         reply in this format:
         (don't write anything else, not even \`\`\` delimiters)
         (make sure the JSON is strictly and properly formatted)
 
         {
-          "title": "...", (the title of the problem, formatted as a short question),
-          "analysis": "...", (your understanding of the situation),
-          "solutions": (different ways to approach the problem, make sure they have different costs in terms of performance, time and feasibility, not just variations on the same computation. all ideas are in the database, not external apps, etc),
-          [
+          "title": "...", (what info the user wants to know, formatted as a short question),
+          "solutions": [
             {
-              "idea": { title, subtitle, desc },
+              "idea": {
+                title: "...", (phrased as a command, example: "find all the people who were born in 1990")
+              },
               "query": "...", (if can be done in a single query),
-              "warnings": ["...", "..."],
-              "problems": ["...", "..."],
-              "score": {
-                "performance": (0-1), (how fast it is to execute on the database, use the database structure and the size of the data I provided to estimate)
-              }
+              "interesting": {
+                "fields": ["...", "..."], (fields that are interesting to the user, for example, the name of the person, the date of birth, etc)
+              },
             },
             ...
           ]
