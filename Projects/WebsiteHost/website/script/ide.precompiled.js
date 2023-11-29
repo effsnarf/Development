@@ -95,7 +95,7 @@ class ClientContext {
     }
     async compileAll(filter = (c) => true, mixins = []) {
         const comps = this.comps.filter(filter);
-        this.alertify.message(`📦 Compiling ${comps.length} components...`);
+        //this.alertify.message(`📦 Compiling ${comps.length} components...`);
         for (const comp of comps) {
             await comp.compile(mixins);
         }
@@ -6118,7 +6118,7 @@ var __webpack_exports__ = {};
 (() => {
 var exports = __webpack_exports__;
 /*!*********************************************************!*\
-  !*** ../../WebsiteHost/website/script/1701172713024.ts ***!
+  !*** ../../WebsiteHost/website/script/1701224012237.ts ***!
   \*********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

@@ -120,7 +120,7 @@ class ClientContext {
     mixins: any[] = []
   ) {
     const comps = this.comps.filter(filter);
-    this.alertify.message(`📦 Compiling ${comps.length} components...`);
+    //this.alertify.message(`📦 Compiling ${comps.length} components...`);
     for (const comp of comps) {
       await comp.compile(mixins);
     }

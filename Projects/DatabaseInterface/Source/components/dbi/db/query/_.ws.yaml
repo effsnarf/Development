@@ -34,8 +34,8 @@ dom:
                     transition:
                       name: slide
                       div:
-                        v-if: "true || solution.editing"
-                        .show-on-hover:
+                        v-if: "solution.editing"
+                        div:
                           ui.input.text.box:
                             :multiline: "true"
                             v-model: solution.query
@@ -55,10 +55,13 @@ dom:
             v-if: is.loading
           transition:
             name: slide
-            ui.value:
+            div:
               v-if: result
-              :value: result
-              :visible-fields: visibleFields
+              h3:
+                v-text: resultTitle
+              ui.value:
+                :value: result
+                :visible-fields: visibleFields
 props:
   dbp: null
 
@@ -66,8 +69,10 @@ data:
   prompt: null
   query: null
   entities: null
+  shortEntities: null
   task: null
   result: null
+  resultTitle: null
   visibleFields: null
   is:
     loading: false
@@ -75,6 +80,18 @@ data:
 mounted: | #js
   async function() {
     this.entities = (await this.dbp.get.entity.infos());
+    this.shortEntities = this.entities
+      .map(e => (
+      `
+      ${e.name}
+      (${e.stats.count} items)
+      ${e.fields.map(f => `${f.name} (${f.type})`).join(', ')}
+      indexes: ${e.indexes.map(indx => `(${Object.entries(indx.key).map(([k, v]) => `${k}:${v}`).join(', ')})`).join(', ')}
+      
+      `
+    ))
+    .join('\n');
+    debugger;
   }
 
 methods:
@@ -83,6 +100,7 @@ methods:
       this.is.loading = true;
       this.result = null;
       this.result = await this.dbp.execute(solution.query);
+      this.resultTitle = solution.idea.title;
       this.visibleFields = solution.interesting.fields;
       this.is.loading = false;
     }
@@ -97,7 +115,7 @@ methods:
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          entities: this.entities,
+          entities: this.shortEntities,
           prompt: this.prompt
         })
       })).json());

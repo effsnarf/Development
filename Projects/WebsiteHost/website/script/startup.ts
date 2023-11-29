@@ -1,4 +1,5 @@
 import "../../../../Shared/Extensions";
+import { fetchWithProgress } from "../../../../Shared/Extensions.Network";
 import { HtmlHelper } from "../../Classes/HtmlHelper";
 import { Events } from "../../../../Shared/Events";
 import { Component } from "../../Classes/Component";
@@ -29,6 +30,7 @@ const Vue = (window1 as any).Vue;
 let vueApp: any;
 
 // To make it accessible to client code
+window1.fetchWithProgress = fetchWithProgress;
 window1.Mixins = Mixins;
 window1.Objects = Objects;
 window1.TreeObject = TreeObject;

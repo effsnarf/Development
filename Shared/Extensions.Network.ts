@@ -60,7 +60,7 @@ const fetchWithAlertify = async (url: string, options: any) => {
     options,
     (received: number, total: number) => {
       const elapsed = Date.now() - started;
-      if (elapsed < 1000) return;
+      //if (elapsed < 100) return;
       const msg = `<h3>${title}</h3><p class="text-center">${received.unitifySize()}</p>`;
       if (!alrt) alrt = alertify.message(msg).delay(0);
       else alrt.setContent(msg);
