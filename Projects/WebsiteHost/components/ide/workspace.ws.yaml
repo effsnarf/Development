@@ -49,7 +49,7 @@ mounted: | #js
     this.showWorkspace = false;
     this.refresh();
     this.setupCheatCodeListener('inspect', this.enable.bind(this));
-    if (vueApp.isDevEnv()) this.enable();
+    if (this.autoEnable) this.enable();
   }
 methods:
   setupCheatCodeListener: | #js
@@ -88,6 +88,13 @@ methods:
       }
       
       setTimeout(this.refresh.bind(this), 20000);
+    }
+computed:
+  autoEnable: | #js
+    function() {
+      if (vueApp.isDevEnv()) return true;
+      if (window.location.hostname === "vue-studio.com") return true;
+      return false;
     }
 name: ide-workspace
 style:

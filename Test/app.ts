@@ -23,7 +23,7 @@ import { Cache } from "@shared/Cache";
 import { LiveTree } from "@shared/LiveTree";
 import { Diff } from "@shared/Diff";
 import { AI } from "@shared/AI";
-import { OpenAI } from "langchain/llms/openai";
+import { OpenAI } from "../Apis/OpenAI/classes/OpenAI";
 import { ChatOpenAI, Role, Roles } from "../Apis/OpenAI/classes/ChatOpenAI";
 //import { ChatOpenAI } from "langchain/chat_models/openai";
 
@@ -32,7 +32,20 @@ const openAIApiKey = "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";
 (async () => {
   const config = (await Configuration.new()).data;
 
-  const chat = await ChatOpenAI.new(Roles.DeveloperMode);
+  const chat = await ChatOpenAI.new(Roles.ChatGPT);
+
+  //await chat.send("hello");
+
+  const openAI = await OpenAI.new(true, Model.Ada);
+
+  await openAI.complete(
+    `original:
+
+    What workouts will help me conquer my demons that torment me?
+
+    Shakespeareanized:
+    `
+  );
 
   //const terminalGPT = await AI.Agents.TerminalGPT.new();
 
