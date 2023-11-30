@@ -344,6 +344,11 @@ class MongoDatabase extends DatabaseBase {
     }
   }
 
+  async killOp(opID: number): Promise<void> {
+    const db = await this.client.db(this.database);
+    await db.command({ killOp: 1, op: opID });
+  }
+
   async getCollection(collectionName: string) {
     return await (
       await this.client.db(this.database)

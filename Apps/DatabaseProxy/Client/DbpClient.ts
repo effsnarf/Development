@@ -281,6 +281,13 @@ class DatabaseProxy {
     },
   };
 
+  kill = {
+    op: async (id: number) => {
+      var url = `${this.urlBase}/kill/op?id=${id}`;
+      await this.fetchAsJson(url);
+    },
+  };
+
   log = {
     out: async () => {
       var url = `${this.urlBase}/log/out`;

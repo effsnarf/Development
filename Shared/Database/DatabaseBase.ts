@@ -159,6 +159,8 @@ abstract class DatabaseBase {
   abstract getEntityFields(entityName: string): Promise<DbField[]>;
 
   abstract getCurrentOperations(minElapsed?: number): Promise<DbOperation[]>;
+
+  abstract killOp(opID: number): Promise<void>;
 }
 
 export { DatabaseBase };

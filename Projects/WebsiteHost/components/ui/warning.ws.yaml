@@ -4,9 +4,12 @@ dom:
       ui.title:
         icon: ⚠️
         :text: title
+        :number: number
     div:
       v-html: text
+    slot:
 
 props:
   title: null
   text: null
+  number: null

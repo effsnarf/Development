@@ -91,6 +91,10 @@ class ReadWriteDatabase extends DatabaseBase {
     const readOps = await this.readDb.getCurrentOperations();
     return [...readOps];
   }
+
+  async killOp(opID: number): Promise<void> {
+    await this.readDb.killOp(opID);
+  }
 }
 
 export { ReadWriteDatabase };

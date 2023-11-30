@@ -189,6 +189,10 @@ class FileSystemDatabase extends DatabaseBase {
     return [];
   }
 
+  async killOp(opID: number): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
+
   private getFilePath(collectionName: string, key: any) {
     key = key.toString().hashCode();
     const id = key as number;

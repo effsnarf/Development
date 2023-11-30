@@ -27,7 +27,10 @@ props:
 methods:
   getNumberText: | #js
     function() {
-      return !this.number ? '' : `(${this.number.humanize()})`;
+      if (this.number == undefined) return '';
+      if (this.number == null) return '';
+      if (typeof this.number == "number") return this.number.humanize();
+      return this.number;
     }
   getIconClass: | #js
     function() {

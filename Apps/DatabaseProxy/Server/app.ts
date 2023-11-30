@@ -817,6 +817,16 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
       })
     );
 
+    httpServer.get(
+      "/:database/kill/op",
+      processRequest(async (req: any, res: any) => {
+        const opId = parseInt(req.query.id);
+        const db = await dbs.get(req.params.database);
+        await db?.killOp(opId);
+        return res.end(JSON.stringify(true));
+      })
+    );
+
     // #region 🔍 Entity CRUD
     // For /[database]/[entity]?find={...}, return the list of documents
     httpServer.get(

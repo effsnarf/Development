@@ -79,6 +79,8 @@ class NullDatabase extends DatabaseBase {
   async getCurrentOperations(): Promise<DbOperation[]> {
     return [];
   }
+
+  async killOp(opID: number): Promise<void> {}
 }
 
 export { NullDatabase };

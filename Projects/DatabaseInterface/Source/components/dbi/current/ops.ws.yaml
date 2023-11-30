@@ -1,23 +1,43 @@
 dom:
   div:
-    div:
-      ui.value:
-        :value: ops
-        :visible-fields: "['command', 'time_slapsed']"
+    h3:
+      ui.title:
+        icon: ⌛
+        text: Long Running Operations
+    ui.warning:
+      v-for: op in ops
+      :title: op.entity
+      :number: op.time.elapsed.unitifyTime()
+      pre:
+        v-text: op.desc
+    ui.value:
+      :value: ops
+      :visible-fields: "['desc', 'time_slapsed']"
 
 props:
   dbp: null
 
 data:
-  ops:
+  ops: null
+  is:
+    loading: 0
+
+mounted: | #js
+  async function() {
+    this.refresh();
+  }
 
 methods:
   refresh: | #js
     async function() {
-      this.ops = await this.dbp.get.current.operations();
+      this.is.loading++;
+      this.ops = (await this.dbp.get.current.operations(10));
       this.ops = this.ops.map(op => ({
         ...op,
         time_slapsed: op.time.elapsed,
       }));
       this.ops = this.ops.sortByDesc(op => op.time.elapsed);
+      this.is.loading--;
+      await this.$root.wait(100);
+      this.refresh();
     }

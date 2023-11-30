@@ -11,9 +11,8 @@ dom:
       div:
         dbi.db.query:
           :dbp: dbp
-        dbi.db.optimization:
-          v-if: "false"
-          :dbp: dbp
+      dbi.current.ops:
+        :dbp: dbp
 
 props:
   dbp: null
