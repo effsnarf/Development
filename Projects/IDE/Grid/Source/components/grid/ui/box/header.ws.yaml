@@ -20,6 +20,7 @@ dom:
         ':debounce': 400
         @input: onEditBoxName
       div:
+        v-if: "false"
         v-text: box._id
 props:
   box: null

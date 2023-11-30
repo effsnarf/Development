@@ -1,0 +1,23 @@
+dom:
+  div:
+    div:
+      ui.value:
+        :value: ops
+        :visible-fields: "['command', 'time_slapsed']"
+
+props:
+  dbp: null
+
+data:
+  ops:
+
+methods:
+  refresh: | #js
+    async function() {
+      this.ops = await this.dbp.get.current.operations();
+      this.ops = this.ops.map(op => ({
+        ...op,
+        time_slapsed: op.time.elapsed,
+      }));
+      this.ops = this.ops.sortByDesc(op => op.time.elapsed);
+    }

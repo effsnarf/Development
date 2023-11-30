@@ -3,7 +3,7 @@ dom:
     h2:
       ui.title:
         icon: 📂
-        :text: dbp.urlBase.split('/').last()
+        :text: dbName
     .flex.gap-1:
       ui.drawer:
         dbi.entity.list:
@@ -30,4 +30,10 @@ methods:
   refresh: | #js
     async function() {
       this.entities = (await this.dbp.get.entity.infos());
+    }
+
+computed:
+  dbName: | #js
+    function() {
+      return this.dbp.urlBase.split('/').last();
     }
