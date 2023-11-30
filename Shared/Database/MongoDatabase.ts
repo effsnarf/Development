@@ -345,7 +345,7 @@ class MongoDatabase extends DatabaseBase {
   }
 
   async killOp(opID: number): Promise<void> {
-    const db = await this.client.db(this.database);
+    const db = await this.client.db("admin");
     await db.command({ killOp: 1, op: opID });
   }
 

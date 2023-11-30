@@ -12,7 +12,8 @@ dom:
         pre:
           v-text: op.desc
         ui.button:
-          :text: ❌⛔
+          text: ❌
+          v-tooltip: "'kill operation'"
           :click: () => dbp.kill.op(op.id)
     ui.value:
       :value: ops
