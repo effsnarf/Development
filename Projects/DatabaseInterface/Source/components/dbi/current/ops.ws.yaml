@@ -21,7 +21,7 @@ dom:
             .flex:
               pre:
                 v-text: op.desc
-            .flex.justify-between:
+            .flex.justify-center:
               ui.button:
                 text: ❌ stop
                 :click: () => dbp.kill.op(op.id)

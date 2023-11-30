@@ -1,27 +1,47 @@
 dom:
-  .flex:
-    .fs-l1:
-      v-text: solution.title.icon
-    div:
-      .box1.show-on-hover-container:
-        h3:
-          v-text: solution.title.text
-        .show-on-hover:
+  div:
+    .flex.gap-1:
+      ui.drawer:
+        :open: "!result"
+        .flex:
+          .fs-l1:
+            v-text: solution.title.icon
           div:
-            v-if: "solution.query"
-            div:
-              ui.input.text.box:
-                :multiline: "true"
-                v-model: solution.query
-          div:
-            .flex.justify-center:
-              ui.button:
-                text: execute ▶️
-                :click: () => $emit('execute', solution)
-      ui.title:
-        :text: solution.interesting.fields.map(f => ('🧊' + f)).join(', ')
+            .box1.show-on-hover-container:
+              h3:
+                v-text: solution.title.text
+              .show-on-hover:
+                div:
+                  v-if: "solution.query"
+                  div:
+                    ui.input.text.box:
+                      :multiline: "true"
+                      v-model: solution.query
+                div:
+                  .flex.justify-center:
+                    ui.button:
+                      text: execute ▶️
+                      :click: () => execute(solution)
+            ui.title:
+              :text: solution.interesting.fields.map(f => ('🧊' + f)).join(', ')
+      div:
+        ui.value:
+          :value: result
 
 props:
   dbp: null
   task: null
   solution: null
+
+data:
+  result: null
+  is:
+    loading: false
+
+methods:
+  execute: | #js
+    async function(solution) {
+      this.is.loading = true;
+      this.result = await this.dbp.execute(solution.query);
+      this.is.loading = false;
+    }

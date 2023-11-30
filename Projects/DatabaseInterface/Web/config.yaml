@@ -13,6 +13,7 @@ static:
 handler: | #js
   (ctx) => {
     return async (req, res, data) => {
+      const cache = (global.cache = (global.cache || {}));
       // Get only the url path, without the query string.
       const url = req.url.split('?')[0];
       if (url == "/api/prompt/to/task") {
@@ -59,7 +60,14 @@ handler: | #js
 
         ${prompt}`;
 
-        const result = JSON.parse(await chat.send(msg));
+        if (!cache[msg])
+        {
+          const result = JSON.parse(await chat.send(msg));
+          cache[msg] = result;
+        }
+
+        const result = cache[msg];
+
         return res.end(JSON.stringify(result));
       }
 

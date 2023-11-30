@@ -7,8 +7,7 @@ dom:
         :text: task.title
     .flex.gap-2:
       v-if: "!titleOnly"
-      ui.drawer:
-        :open: "!result"
+      div:
         div:
           div:
             ui.drawer:
@@ -35,12 +34,4 @@ props:
 
 data:
 
-
 methods:
-  execute: | #js
-    async function(solution) {
-      this.is.loading = true;
-      const result = await this.dbp.execute(solution.query);
-      this.$emit("executed", solution, result);
-      this.is.loading = false;
-    }

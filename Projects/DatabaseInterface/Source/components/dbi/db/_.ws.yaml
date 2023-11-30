@@ -17,7 +17,6 @@ dom:
           ref: tasks1
           :dbp: dbp
           :tasks: tasks
-          @executed: onTaskExecuted
       dbi.current.ops:
         :dbp: dbp
 
@@ -35,10 +34,6 @@ mounted: | #js
   }
 
 methods:
-  onTaskExecuted: | #js
-    async function(solution, result) {
-      debugger;
-    }
   onNewTask: | #js
     async function(task) {
       this.tasks.push(task);
