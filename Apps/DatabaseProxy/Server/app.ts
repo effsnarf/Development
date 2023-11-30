@@ -810,10 +810,10 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
         const minElapsed = parseFloat(req.query.minElapsed || 0);
         const db = await dbs.get(dbName);
         let ops = await db?.getCurrentOperations(minElapsed);
-        ops = ops?.filter((op: any) => op.$db == dbName);
+        //ops = ops?.filter((op: any) => op.$db == dbName);
         ops = ops?.map((op) => ({
           ...op,
-          //desc: getOpDesc(op),
+          desc: getOpDesc(op),
         }));
         return res.end(JSON.stringify(ops));
       })
