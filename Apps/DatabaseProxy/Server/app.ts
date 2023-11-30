@@ -797,11 +797,11 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
       "/:database/get/current/operations",
       processRequest(async (req: any, res: any) => {
         const getOpDesc = (op: any) => {
-          op = Objects.clone(op);
+          let cmd = Objects.clone(op.command);
           // Remove $ keys
-          for (const key of Object.keys(op).filter((k) => k.startsWith("$")))
-            delete op[key];
-          const s = Object.entries(op)
+          for (const key of Object.keys(cmd).filter((k) => k.startsWith("$")))
+            delete cmd[key];
+          const s = Object.entries(cmd)
             .map(([k, v]) => `${k}: ${v}`)
             .join(", ");
           return s;
@@ -810,7 +810,7 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
         const minElapsed = parseFloat(req.query.minElapsed || 0);
         const db = await dbs.get(dbName);
         let ops = await db?.getCurrentOperations(minElapsed);
-        //ops = ops?.filter((op: any) => op.$db == dbName);
+        ops = ops?.filter((op: any) => op.command?.$db == dbName);
         ops = ops?.map((op) => ({
           ...op,
           desc: getOpDesc(op),
