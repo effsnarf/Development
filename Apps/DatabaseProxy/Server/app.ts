@@ -813,7 +813,7 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
         ops = ops?.filter((op: any) => op.$db == dbName);
         ops = ops?.map((op) => ({
           ...op,
-          desc: getOpDesc(op),
+          //desc: getOpDesc(op),
         }));
         return res.end(JSON.stringify(ops));
       })
