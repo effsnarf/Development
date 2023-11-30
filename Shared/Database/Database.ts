@@ -10,7 +10,7 @@ type DbField = {
 };
 
 type DbOperation = {
-  operationID: string;
+  id: string;
   entity: string; // Refers to SQL tables or MongoDB collections
   type: string; // Adjusted from operationType to type
   command: string;

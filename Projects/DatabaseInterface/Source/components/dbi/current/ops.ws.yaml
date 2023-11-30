@@ -8,8 +8,12 @@ dom:
       v-for: op in ops
       :title: op.entity
       :number: op.time.elapsed.unitifyTime()
-      pre:
-        v-text: op.desc
+      .flex:
+        pre:
+          v-text: op.desc
+        ui.button:
+          :text: ❌⛔
+          :click: () => dbp.kill.op(op.id)
     ui.value:
       :value: ops
       :visible-fields: "['desc', 'time_slapsed']"

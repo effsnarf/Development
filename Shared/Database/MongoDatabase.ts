@@ -314,7 +314,7 @@ class MongoDatabase extends DatabaseBase {
           if (minElapsed && elapsedTime < minElapsed) return null;
 
           return {
-            operationID: op.opid.toString(),
+            id: op.opid.toString(),
             entity: op.ns ? op.ns.split(".")[1] : "", // Extract collection name from namespace
             type: op.op,
             command: op.command,
