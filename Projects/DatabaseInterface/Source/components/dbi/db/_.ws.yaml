@@ -4,13 +4,20 @@ dom:
       ui.title:
         icon: 📂
         :text: dbName
-    .flex.gap-1:
+    .flex.justify-between.gap-1:
       ui.drawer:
         dbi.entity.list:
           :dbp: dbp
       div:
         dbi.db.query:
           :dbp: dbp
+          :short-entities: shortEntities
+          @new-task: onNewTask
+        dbi.ai.tasks:
+          ref: tasks1
+          :dbp: dbp
+          :tasks: tasks
+          @executed: onTaskExecuted
       dbi.current.ops:
         :dbp: dbp
 
@@ -19,6 +26,8 @@ props:
 
 data:
   entities: null
+  shortEntities: null
+  tasks: []
 
 mounted: | #js
   async function() {
@@ -26,9 +35,35 @@ mounted: | #js
   }
 
 methods:
+  onTaskExecuted: | #js
+    async function(solution, result) {
+      debugger;
+    }
+  onNewTask: | #js
+    async function(task) {
+      this.tasks.push(task);
+      this.$refs.tasks1.selectTask(task);
+    }
   refresh: | #js
     async function() {
+      await this.refreshEntities();
+    }
+  refreshEntities: | #js
+    async function() {
       this.entities = (await this.dbp.get.entity.infos());
+      this.shortEntities = this.entities
+        .map(e => (
+        `${e.name}
+        (${e.stats.count} items)
+        ${e.fields.map(f => `${f.name} (${f.type})`).join(', ')}
+        indexes: ${e.indexes.map(indx => `(${Object.entries(indx.key).map(([k, v]) => `${k}:${v}`).join(', ')})`).join(', ')}
+
+        `
+      ))
+      .join('\n')
+      .split('\n')
+      .map(l => l.trim())
+      .join('\n');
     }
 
 computed:

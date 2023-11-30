@@ -1,0 +1,46 @@
+dom:
+  div:
+    v-if: task
+    h2:
+      ui.title:
+        icon: ❔
+        :text: task.title
+    .flex.gap-2:
+      v-if: "!titleOnly"
+      ui.drawer:
+        :open: "!result"
+        div:
+          div:
+            ui.drawer:
+              direction: "horizontal"
+              div:
+                v-for: p in task.analysis
+                .flex:
+                  div:
+                    v-text: "'💡'"
+                  div:
+                    v-text: p.text
+          div:
+            .flex.flex-column.gap-2:
+              dbi.ai.task.solution:
+                v-for: solution in task.solutions
+                :dbp: dbp
+                :task: task
+                :solution: solution
+                @execute: execute
+props:
+  dbp: null
+  task: null
+  titleOnly: false
+
+data:
+
+
+methods:
+  execute: | #js
+    async function(solution) {
+      this.is.loading = true;
+      const result = await this.dbp.execute(solution.query);
+      this.$emit("executed", solution, result);
+      this.is.loading = false;
+    }

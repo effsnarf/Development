@@ -1,0 +1,34 @@
+dom:
+  div:
+    .flex:
+      div:
+        ui.drawer:
+          .clickable.pr-l1:
+            v-for: task in tasks
+            :class: "{ selected: (selectedTask == task) }"
+            @click: () => { selectedTask = task; }
+            dbi.ai.task:
+              :dbp: dbp
+              :task: task
+              :title-only: "true"
+      div:
+        transition:
+          name: slide-hor
+          dbi.ai.task:
+            v-if: selectedTask
+            :dbp: dbp
+            :task: selectedTask
+            @executed: (...args) => $emit('executed', ...args)
+
+props:
+  dbp: null
+  tasks: null
+
+data:
+  selectedTask: null
+
+methods:
+  selectTask: | #js
+    async function(task) {
+      this.selectedTask = task;
+    }

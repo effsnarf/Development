@@ -1,23 +1,34 @@
 dom:
   div:
-    h3:
-      ui.title:
-        icon: ⌛
-        text: Long Running Operations
-    ui.warning:
-      v-for: op in ops
-      :title: op.entity
-      :number: op.time.elapsed.unitifyTime()
-      .flex:
-        pre:
-          v-text: op.desc
-        ui.button:
-          text: ❌
-          v-tooltip: "'kill operation'"
-          :click: () => dbp.kill.op(op.id)
-    ui.value:
-      :value: ops
-      :visible-fields: "['desc', 'time_slapsed']"
+    div:
+      transition:
+        name: slide
+        h2:
+          v-if: ops?.length
+          ui.title:
+            icon: ⌛
+            text: "Current Operations"
+      transition.group:
+        name: slide
+        class: flex flex-column gap-1
+        div:
+          v-for: op in ops
+          :key: op.id
+          class: op
+          ui.warning:
+            :title: op.entity
+            :number: op.time.elapsed.unitifyTime()
+            .flex:
+              pre:
+                v-text: op.desc
+            .flex.justify-between:
+              ui.button:
+                text: ❌ stop
+                :click: () => dbp.kill.op(op.id)
+      ui.value:
+        v-if: "false"
+        :value: ops
+        :visible-fields: "['desc', 'time_slapsed']"
 
 props:
   dbp: null
@@ -46,3 +57,8 @@ methods:
       await this.$root.wait(100);
       this.refresh();
     }
+
+style:
+  .op .comp-ui-title .number:
+    padding: 0 0.5em
+    opacity: 1

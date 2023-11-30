@@ -1,8 +1,10 @@
 dom:
   .flex.gap-2:
     div:
+      :style: "{width: '40vw'}"
       ui.input.text.box:
         :multiline: "true"
+        :auto-resize: "true"
         hint: Ask your database anything…
         v-model: prompt
       transition:
@@ -11,109 +13,26 @@ dom:
           v-if: canExecute
           text: Send ✔️
           :click: promptToTask
-    div:
-      v-if: task
-      .flex:
-        .fs-l1:
-          v-text: "'❔'"
-        h3:
-          v-text: task.title
-      .flex.gap-2:
-        ui.drawer:
-          :open: "!result"
-          .flex.flex-column.gap-2:
-            .solution:
-              v-for: solution in task.solutions
-              .flex:
-                .fs-l1:
-                  v-text: "'📝'"
-                div:
-                  .box1.show-on-hover-container:
-                    h3:
-                      v-text: solution.idea.title
-                    transition:
-                      name: slide
-                      div:
-                        v-if: "true || solution.editing"
-                        div:
-                          ui.input.text.box:
-                            :multiline: "true"
-                            v-model: solution.query
-                    .show-on-hover:
-                      .flex.justify-between:
-                        ui.button:
-                          text: ✏️ edit
-                          :click: () => solution.editing = !solution.editing
-                        ui.button:
-                          text: execute ▶️
-                          :click: () => execute(solution)
-                  ui.title:
-                    icon: "🤔"
-                    :text: solution.interesting.fields.join(', ')
-        div:
-          ui.loading:
-            v-if: is.loading
-          transition:
-            name: slide
-            div:
-              v-if: result
-              h3:
-                v-text: resultTitle
-              ui.value:
-                :value: result
-                :visible-fields: visibleFields
-        div:
-          dbi.current.ops:
-            :dbp: dbp
 props:
   dbp: null
+  shortEntities: null
 
 data:
   prompt: null
-  query: null
-  entities: null
-  shortEntities: null
   task: null
-  result: null
-  resultTitle: null
-  visibleFields: null
   is:
     loading: false
 
 mounted: | #js
   async function() {
-    this.entities = (await this.dbp.get.entity.infos());
-    this.shortEntities = this.entities
-      .map(e => (
-      `${e.name}
-      (${e.stats.count} items)
-      ${e.fields.map(f => `${f.name} (${f.type})`).join(', ')}
-      indexes: ${e.indexes.map(indx => `(${Object.entries(indx.key).map(([k, v]) => `${k}:${v}`).join(', ')})`).join(', ')}
-
-      `
-    ))
-    .join('\n')
-    .split('\n')
-    .map(l => l.trim())
-    .join('\n');
   }
 
 methods:
-  execute: | #js
-    async function(solution) {
-      this.is.loading = true;
-      this.result = null;
-      this.result = await this.dbp.execute(solution.query);
-      this.resultTitle = solution.idea.title;
-      this.visibleFields = solution.interesting.fields;
-      this.is.loading = false;
-    }
   promptToTask: | #js
     async function() {
       this.is.loading = true;
       this.task = null;
-      this.result = null;
-      this.task = (await (await fetch(`/api/prompt/to/task`, {
+      const task = (await (await fetch(`/api/prompt/to/task`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -123,22 +42,21 @@ methods:
           prompt: this.prompt
         })
       })).json());
+      this.$emit("new-task", task);
       this.is.loading = false;
     }
 
 computed:
   canExecute: | #js
     function() {
-      return this.entities && this.prompt?.length > 0;
+      return this.shortEntities && this.prompt?.length > 0;
     }
 
 watch:
-  result: | #js
-    function(result) {
-      if (!result) this.visibleFields = null;
-    }
 
 style:
+  textarea:
+    color: lightgreen
   .box1:
     background: "#ffffff20"
     padding: 0.5em

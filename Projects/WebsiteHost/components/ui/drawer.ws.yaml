@@ -3,12 +3,27 @@ dom:
     @dragenter: isHovered++
     @dragleave: isHovered--
     @click: isHovered=0
-    ':class': '{ open, hovered: isHovered }'
+    ':class': cssClass
     slot: null
 props:
   open: false
+  direction: vertical
 data:
   isHovered: 0
+methods:
+  getCssClass: | #js
+    function() {
+      const cls = {};
+      cls[this.direction] = true;
+      cls.open = this.open;
+      cls.hovered = this.isHovered;
+      return cls;
+    }
+computed:
+  cssClass: | #js
+    function() {
+      return this.getCssClass();
+    }
 style:
   .drawer:
     max-height: 10em
@@ -17,9 +32,16 @@ style:
     filter: grayscale(1) blur(3px)
     opacity: 0.5
     transition: 1s
+  .drawer.horizontal:
+    max-height: 3em
+    max-width: none
   .drawer.open, .drawer:hover, .drawer.hovered:
     max-height: 60em
     max-width: 60em
+    filter: none
+    opacity: 1
+  .drawer.horizontal.open, .drawer.horizontal:hover, .drawer.horizontal.hovered:
+    max-height: 20em
     filter: none
     opacity: 1
 example:
