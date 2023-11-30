@@ -801,9 +801,7 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
           // Remove $ keys
           for (const key of Object.keys(cmd).filter((k) => k.startsWith("$")))
             delete cmd[key];
-          const s = Object.entries(cmd)
-            .map(([k, v]) => `${k}: ${v}`)
-            .join(", ");
+          const s = Objects.yamlify(cmd);
           return s;
         };
         const dbName = req.params.database;
