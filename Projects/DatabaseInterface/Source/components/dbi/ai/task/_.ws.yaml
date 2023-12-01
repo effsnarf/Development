@@ -1,32 +1,40 @@
 dom:
   div:
     v-if: task
-    h2:
-      ui.title:
-        icon: ❔
-        :text: task.title
-    .flex.gap-2:
-      v-if: "!titleOnly"
+    div:
       div:
-        div:
+        v-if: "titleOnly"
+        .fs-m2:
+          ui.title:
+            icon: ❔
+            :text: task.title
+            :wrap: "true"
+      div:
+        v-if: "!titleOnly"
+        h2:
+          ui.title:
+            icon: ❔
+            :text: task.title
+        .flex.gap-2:
           div:
-            ui.drawer:
-              direction: "horizontal"
+            div:
               div:
-                v-for: p in task.analysis
-                .flex:
+                ui.drawer:
+                  direction: "horizontal"
                   div:
-                    v-text: "'💡'"
-                  div:
-                    v-text: p.text
-          div:
-            .flex.flex-column.gap-2:
-              dbi.ai.task.solution:
-                v-for: solution in task.solutions
-                :dbp: dbp
-                :task: task
-                :solution: solution
-                @execute: execute
+                    v-for: p in task.analysis
+                    .flex:
+                      div:
+                        v-text: "'💡'"
+                      div:
+                        v-text: p.text
+              div:
+                .flex.flex-column.gap-2:
+                  dbi.ai.task.solution:
+                    v-for: solution in task.solutions
+                    :dbp: dbp
+                    :task: task
+                    :solution: solution
 props:
   dbp: null
   task: null
@@ -35,3 +43,5 @@ props:
 data:
 
 methods:
+
+style:

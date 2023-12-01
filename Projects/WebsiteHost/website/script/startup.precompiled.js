@@ -5548,8 +5548,19 @@ class Objects {
     static mapValues(obj, func) {
         return Objects.map(obj, (key, value) => [key, func(value)]);
     }
+    static getValues(obj) {
+        if (!obj)
+            return [];
+        if (typeof obj !== "object")
+            return [obj];
+        if (Array.isArray(obj))
+            return obj;
+        return Object.values(obj);
+    }
     static getObjectFields(obj, fields) {
         if (!obj)
+            return obj;
+        if (typeof obj !== "object")
             return obj;
         const result = {};
         for (const field of fields) {
@@ -8772,7 +8783,7 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 /*!*********************************************************!*\
-  !*** ../../WebsiteHost/website/script/1701340143232.ts ***!
+  !*** ../../WebsiteHost/website/script/1701380916177.ts ***!
   \*********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

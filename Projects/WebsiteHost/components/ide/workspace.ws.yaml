@@ -70,7 +70,7 @@ methods:
     }
   enable: | #js
     function() {
-      alertify.message('Inspector enabled');
+      //alertify.message('Inspector enabled');
       this.showWorkspace = true;
     }
   refresh: | #js

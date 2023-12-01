@@ -147,7 +147,7 @@ li
 .clickable
 {
   padding: 0.2em 0.5em;
-  cursor: pointer;
+  cursor: pointer !important;
   opacity: 0.8;
   transition: 0s;
 }

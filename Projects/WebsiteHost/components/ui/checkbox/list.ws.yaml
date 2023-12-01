@@ -1,0 +1,97 @@
+dom:
+  div:
+    ui.checkbox:
+      v-if: (items?.length > 10)
+      icon: ✔️
+      text: Show only checked
+      v-model: showOnlyChecked
+    ui.input.text.box:
+      type: search
+      icon: 🔎
+      hint: search
+      camouflage: true
+      v-model: query
+    .scrollable:
+      transition.group:
+        name: list
+        ui.checkbox:
+          v-for: item in visibleItems
+          :key: _getItemKey(item)
+          :icon: _getItemIcon(item)
+          :text: _getItemText(item)
+          ":value-array": valueArray
+          ":value-key": _getItemKey(item)
+
+props:
+  items: null
+  getItemKey: null
+  getItemIcon: null
+  getItemText: null
+  valueArray: null
+  sort: true
+
+data:
+  query: null
+  showOnlyChecked: false
+
+methods:
+  _getItemKey: | #js
+    function(item) {
+      if (this.getItemKey) return this.getItemKey(item);
+      if (typeof item == "string") return item;
+      return JSON.stringify(item);
+    }
+  _getItemIcon: | #js
+    function(item) {
+      if (this.getItemIcon) return this.getItemIcon(item);
+      return null;
+    }
+  _getItemText: | #js
+    function(item) {
+      if (this.getItemText) return this.getItemText(item);
+      return item;
+    }
+
+computed:
+  visibleItems: | #js
+    function() {
+      if (!this.items) return [];
+      let items = [...this.items];
+      if (this.showOnlyChecked) {
+        items = items.filter(item => this.valueArray?.includes(this._getItemKey(item)));
+      }
+      if (this.query) {
+        items = this.items.filter(item => {
+          const text = this._getItemText(item);
+          if (!text) return false;
+          return text.toLowerCase().includes(this.query.toLowerCase());
+        });
+      }
+      //if (this.sort) items = items.sort(this.compareItems);
+      return items;
+    }
+  compareItems: | #js
+    function(a, b) {
+      const aKey = this._getItemKey(a);
+      const bKey = this._getItemKey(b);
+      const aIsChecked = this.valueArray.includes(aKey);
+      const bIsChecked = this.valueArray.includes(bKey);
+      if (aIsChecked && !bIsChecked) return -1;
+      if (!aIsChecked && bIsChecked) return 1;
+      const aText = this._getItemText(a);
+      const bText = this._getItemText(b);
+      return aText.localeCompare(bText);
+    }
+
+watch:
+  query:
+    handler: | #js
+      function() {
+        this.$emit("query", this.query);
+      }
+    immediate: true
+
+style:
+  .scrollable:
+    max-height: 20em
+    overflow-y: auto

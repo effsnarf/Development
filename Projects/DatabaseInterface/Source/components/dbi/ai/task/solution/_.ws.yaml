@@ -1,6 +1,6 @@
 dom:
-  div:
-    .flex.gap-1:
+  .solution:
+    .flex.gap-2:
       ui.drawer:
         :open: "!result"
         .flex:
@@ -22,11 +22,13 @@ dom:
                     ui.button:
                       text: execute ▶️
                       :click: () => execute(solution)
-            ui.title:
-              :text: solution.interesting.fields.map(f => ('🧊' + f)).join(', ')
       div:
-        ui.value:
-          :value: result
+        transition:
+          name: slide-hor
+          ui.value:
+            v-if: result
+            :value: result
+            :visible-fields: solution.interesting.fields
 
 props:
   dbp: null
@@ -45,3 +47,11 @@ methods:
       this.result = await this.dbp.execute(solution.query);
       this.is.loading = false;
     }
+
+computed:
+
+style:
+  .solution:
+    opacity: 0.5
+  .solution:hover:
+    opacity: 1

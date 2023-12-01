@@ -2,6 +2,7 @@ dom:
   div: 
     @click: $emit('click')
     class: flex justify-between
+    :class: "{ wrap }" 
     .counter:
       v-if: hasCounter
       v-text: (counter) + '.'
@@ -24,6 +25,7 @@ props:
   value: null
   number: null
   largeIcon: false
+  wrap: true
 methods:
   getNumberText: | #js
     function() {
@@ -66,7 +68,7 @@ style:
   .text:
     flex-grow: 1 !important
   .number:
-  div:
+  div:not(.wrap):
     white-space: nowrap
     text-wrap: nowrap
 name: ui-title

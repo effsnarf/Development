@@ -482,8 +482,16 @@ class Objects {
     return Objects.map(obj, (key, value) => [key, func(value)]);
   }
 
+  static getValues(obj: any): any[] {
+    if (!obj) return [];
+    if (typeof obj !== "object") return [obj];
+    if (Array.isArray(obj)) return obj;
+    return Object.values(obj);
+  }
+
   static getObjectFields(obj: any, fields: string[]): string[] {
     if (!obj) return obj;
+    if (typeof obj !== "object") return obj;
     const result = {} as any;
     for (const field of fields) {
       result[field] = obj[field];

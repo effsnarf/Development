@@ -6,7 +6,7 @@ dom:
       class: float-left mr-l2
       ui.title:
         class: title1
-        text: Database
+        text: DatabaseGPT
 
 data:
 style:
@@ -20,10 +20,10 @@ style:
     background-position: center center
   .title1:
     font-size: 4rem
-    font-family: Russo One
-    color: "#ffffff40"
+    font-family: Audiowide
+    color: "#ffffffa0"
     filter: drop-shadow(-1px 1px 1px white)
-    text-shadow: "-1px 1px 1px black"
+    text-shadow: "-6px 6px 6px black"
 
 _:
   examples:

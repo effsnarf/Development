@@ -16,7 +16,7 @@ dom:
       div: 
         ':class': '{ clickable: true, ''value-as-string'': true }'
         v-text: valueAsString
-        @click: onClickValue(valueAsString)
+        @click: (e) => onClickValue(e, valueAsString)
       transition:
         name: slide
         ui.value.any:
@@ -30,7 +30,9 @@ data:
   isMoreVisible: false
 methods:
   onClickValue: | #js
-    function(value) {
+    function(e, value) {
+      e.preventDefault();
+      e.stopPropagation();
       if (typeof value == "string") return this.$root.html.copyToClipboard(value);
       this.console.log(value);
       alertify.message(`Logged to console`);

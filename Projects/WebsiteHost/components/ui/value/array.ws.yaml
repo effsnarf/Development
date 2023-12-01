@@ -1,74 +1,87 @@
 dom:
   div:
-    .box1:
-      ':class': '{ reversed: reverse }'
-      .flex.justify-between:
-        ui.title:
-          v-if: "false"
-          icon: 🧊
-          text: Array
-          ':number': value?.length
-        ui.input.text.box:
-          type: search
-          icon: 🔎
-          hint: search
-          camouflage: true
-          v-model: query
-      ui.select:
-        v-if: 'false'
-        ':options': '[''table'', ''short-list'', ''expanded-list'']'
-        input-type: value
-        type: toggle
-        v-model: view1
-      ui.context.window:
-        v-if: 'false'
-        ref: hoveredItemContext1
-        ':visible': hoveredItem
-        ui.value: 
-          ':value': hoveredItem
-      transition: 
-        name: slide
-        table: 
-          v-if: (view1.includes('list'))
-          tbody: 
-            tr: 
-              v-for: (item, index) in visibleItems
-              td: 
-                class: opacity-50
-                v-text: index
-              td: 
-                ui.value.preview: 
-                  v-if: (view1 == 'short-list')
-                  ':value': item
-                ui.value.any:
-                  v-else-if: (view1 == 'expanded-list')
-                  ':value': item
-                ui.value: 
-                  v-else: null
-                  ':value': item
-      transition: 
-        name: slide
-        table: 
-          v-if: (view1 == 'table')
-          thead:
-            tr: 
-              th:
-                v-for: field in shownFields
-                .clickable:
-                  ':class': '{ selected: (sortByField == field) }'
-                  v-text: field
-                  @click: onSortByField(field)
-          tbody: 
-            tr: 
-              v-for: (item, index) in visibleItems
-              ':class': _getItemClass(item, index)
-              @mouseenter: () => onItemHover(item, true)
-              @mouseleave: () => onItemHover(item, false)
-              @click: () => onItemClick(item, index)
-              td: 
-                v-for: field in shownFields
-                ui.value.preview: 
-                  ':value': item?.[field]
+    .flex.gap-1:
+      div:
+        ui.drawer:
+          .box1:
+            ui.checkbox.list:
+              :items: fields
+              :get-item-icon: () => '🧊'
+              :value-array: visibleFields1
+      .box1:
+        ':class': '{ reversed: reverse }'
+        .flex.justify-between:
+          ui.title:
+            v-if: "false"
+            icon: 🧊
+            text: Array
+            ':number': value?.length
+          ui.input.text.box:
+            type: search
+            icon: 🔎
+            hint: search
+            camouflage: true
+            v-model: query
+        ui.select:
+          v-if: 'false'
+          ':options': '[''table'', ''short-list'', ''expanded-list'']'
+          input-type: value
+          type: toggle
+          v-model: view1
+        ui.context.window:
+          v-if: 'false'
+          ref: hoveredItemContext1
+          ':visible': hoveredItem
+          ui.value: 
+            ':value': hoveredItem
+        transition: 
+          name: slide
+          table: 
+            v-if: (view1.includes('list'))
+            tbody: 
+              tr: 
+                v-for: (item, index) in visibleItems
+                td: 
+                  class: opacity-50
+                  v-text: index
+                td: 
+                  ui.value.preview: 
+                    v-if: (view1 == 'short-list')
+                    ':value': item
+                  ui.value.any:
+                    v-else-if: (view1 == 'expanded-list')
+                    ':value': item
+                  ui.value: 
+                    v-else: null
+                    ':value': item
+        transition: 
+          name: slide
+          table: 
+            v-if: (view1 == 'table')
+            thead:
+              tr:
+                th:
+                  v-for: field in shownFields
+                  .flex.clickable:
+                    ':class': '{ selected: (sortByField == field) }'
+                    @click: onSortByField(field)
+                    div:
+                      v-text: field
+                    div:
+                      v-if: (sortByField == field)
+                      div:
+                        v-text: "(sortByFieldDirection == 1) ? '▲' : '▼'"
+            tbody: 
+              tr: 
+                v-for: (item, index) in visibleItems
+                ':class': _getItemClass(item, index)
+                @mouseenter: () => onItemHover(item, true)
+                @mouseleave: () => onItemHover(item, false)
+                @click: () => onItemClick(item, index)
+                td: 
+                  v-for: field in shownFields
+                  ui.value.preview: 
+                    ':value': item?.[field]
 props:
   value: null
   reverse: false
@@ -82,11 +95,24 @@ data:
   sortByFieldDirection: 1
   hoveredItem: null
   query: null
+  visibleFields1: null
 methods:
   onSortByField: | #js
     function(field) {
-      this.sortByField = field;
-      this.sortByFieldDirection = (this.sortByFieldDirection == 1) ? -1 : 1;
+      if (this.sortByField == field) {
+        if (this.sortByFieldDirection == -1) {
+          this.sortByField = null;
+          this.sortByFieldDirection = 1;
+        }
+        else {
+          this.sortByFieldDirection = -1;
+        }
+      }
+      else
+      {
+        this.sortByField = field;
+        this.sortByFieldDirection = 1;
+      }
     }
   onItemHover: | #js
     function(item, isHovered) {
@@ -95,6 +121,7 @@ methods:
     }
   onItemClick: | #js
     function(item, index) {
+      this.$root.html.copyToClipboard(JSON.stringify(item));
       console.log(item);
       this.$emit("array-item-click", item, index);
     }
@@ -122,39 +149,58 @@ methods:
     }
 computed:
   visibleItems: | #js
-    let items = [...this.value]
-      .take(this.maxVisibleItems || 1000)
-      .sortByDirection([this.sortByField], this.sortByFieldDirection)
-      .map(item => Objects.getObjectFields(item, this.shownFields));
+    let items = [...this.items];
+    if (this.itemsType == 'object')
+    {
+      items = items
+        .map(item => Objects.getObjectFields(item, this.shownFields));
+    }
     const query = (this.query || '').toLowerCase();
-    if (query) items = items.filter(item => Object.values(item).some(v => (v?.toString().toLowerCase().includes(query))));
+    if (query) items = items.filter(item => Objects.getValues(item).some(v => (v?.toString().toLowerCase().includes(query))));
     return items;
   shownFields: | #js
-    if (this.visibleFields) return this.visibleFields;
+    if (this.visibleFields1) return this.visibleFields1;
     return this.fields;
   items: | #js
-    const items = [...this.value]
+    let items = [...this.value];
+    if (this.isPrimitive(items[0])) {
+      items = items.map(item => ({ value: item }));
+    }
+    items = items
       .take(this.maxVisibleItems || 1000)
       .sortByDirection([this.sortByField], this.sortByFieldDirection);
     return items;
   fields: | #js
     // Get all the field names from the array of objects
-    if (!this.value) return [];
-    const objects = this.value
+    if (!this.items) return [];
+    const objects = this.items
       .take(10)
       .filter(item => !this.isPrimitive(item));
     const fields = objects.map(o => Object.keys(o||{}))
       .flatMap(f => f)
       .distinct()
+      .sortBy(f => f)
       .take(this.maxVisibleFields || 1000);
     return fields;
   view1: | #js
     function() {
+      return "table";
+    }
+  itemsType: | #js
+    function() {
       const value = this.value;
-      const view = (!value) ? null : (this.isPrimitive(value[0]) ? 'list' : 'table');
-      return this.view || view;
+      const type = (!value) ? null : (this.isPrimitive(value[0]) ? 'primitive' : 'object');
+      return type;
     }
 watch:
+  visibleFields:
+    handler: | #js
+      function(visibleFields) {
+        visibleFields.removeBy(v => !this.fields.includes(v));
+        if (!visibleFields.length) visibleFields = null;
+        this.visibleFields1 = visibleFields;
+      }
+    immediate: true
   value:
     handler: | #js
       function(value) {
@@ -183,6 +229,7 @@ style:
   img:
     width: 5em
   tr:
+    cursor: pointer
     transition: 0s
   tr:hover td:
     background-color: '#ffffff20'
