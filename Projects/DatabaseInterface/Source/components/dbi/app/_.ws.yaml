@@ -3,6 +3,7 @@ dom:
     div:
       dbi.app.logo:
     .flex.gap-1:
+      dbi.app.logo.image:
       ui.drawer:
         :open: "!selectedDbp"
         dbi.db.select:

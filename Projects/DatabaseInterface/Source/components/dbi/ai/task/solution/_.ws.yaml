@@ -25,10 +25,14 @@ dom:
       div:
         transition:
           name: slide-hor
-          ui.value:
+          div:
             v-if: result
-            :value: result
-            :visible-fields: solution.interesting.fields
+            h3:
+              ui.title:
+                v-bind: solution.title
+            ui.value:
+              :value: result
+              :visible-fields: solution.interesting.fields
 
 props:
   dbp: null

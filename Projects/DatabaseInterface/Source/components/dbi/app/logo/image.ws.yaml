@@ -1,0 +1,11 @@
+dom:
+  div:
+    img:
+      class: logo
+      src: /images/ai.webp
+
+style:
+  .logo:
+    width: 15vw
+    aspect-ratio: 1 / 1
+    margin: 0 0 1em 1em

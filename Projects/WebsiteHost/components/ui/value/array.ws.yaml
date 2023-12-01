@@ -3,6 +3,7 @@ dom:
     .flex.gap-1:
       div:
         ui.drawer:
+          v-if: "fields.length > 1"
           .box1:
             ui.checkbox.list:
               :items: fields

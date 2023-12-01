@@ -1,7 +1,5 @@
 dom:
   .flex:
-    div:
-      class: logo
     h2:
       class: float-left mr-l2
       ui.title:
@@ -10,14 +8,6 @@ dom:
 
 data:
 style:
-  .logo:
-    width: 10em
-    aspect-ratio: 6 / 5
-    margin: 0 1em 1em 0
-    background-image: url(/images/logo.webp)
-    background-size: contain
-    background-repeat: no-repeat
-    background-position: center center
   .title1:
     font-size: 4rem
     font-family: Audiowide
