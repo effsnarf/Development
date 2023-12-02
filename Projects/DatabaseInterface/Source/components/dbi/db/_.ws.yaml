@@ -34,7 +34,7 @@ mounted: | #js
 methods:
   onNewTask: | #js
     async function(task) {
-      this.tasks.push(task);
+      this.tasks.unshift(task);
     }
   refresh: | #js
     async function() {

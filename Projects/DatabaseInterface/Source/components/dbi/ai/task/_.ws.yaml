@@ -4,6 +4,7 @@ dom:
     div:
       div:
         .clickable:
+          @click: () => is.open = !is.open
           h2:
             ui.title:
               icon: ❔
