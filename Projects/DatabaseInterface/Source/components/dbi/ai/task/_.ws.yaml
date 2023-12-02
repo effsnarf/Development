@@ -3,33 +3,29 @@ dom:
     v-if: task
     div:
       div:
-        v-if: "titleOnly"
-        .fs-m2:
-          ui.title:
-            icon: ❔
-            :text: task.title
-            :wrap: "true"
-      div:
-        v-if: "!titleOnly"
-        h2:
-          ui.title:
-            icon: ❔
-            :text: task.title
-        .flex.gap-2:
-          div:
+        .clickable:
+          h2:
+            ui.title:
+              icon: ❔
+              :text: task.title
+        div:
+          transition:
+            name: slide
             div:
+              v-if: is.open
               div:
+                v-if: "false"
                 ui.drawer:
                   direction: "horizontal"
-                  div:
+                  .my-l1:
                     v-for: p in task.analysis
                     .flex:
                       div:
                         v-text: "'💡'"
                       div:
                         v-text: p.text
-              div:
-                .flex.flex-column.gap-2:
+              .solutions:
+                .flex.flex-column:
                   dbi.ai.task.solution:
                     v-for: solution in task.solutions
                     :dbp: dbp
@@ -38,10 +34,14 @@ dom:
 props:
   dbp: null
   task: null
-  titleOnly: false
 
 data:
+  is:
+    open: true
 
 methods:
 
 style:
+  .solution .comp-ui-title div:not(.wrap):
+    white-space: wrap
+    text-wrap: normal

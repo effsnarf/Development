@@ -7,15 +7,20 @@ dom:
         :auto-resize: "true"
         hint: Ask your database anything…
         v-model: prompt
-      transition:
-        name: slide
-        ui.button:
-          v-if: canExecute
-          text: Send ✔️
-          :click: promptToTask
+      .flex.gap-1.justify-center.items-center:
+        transition:
+          name: slide
+          ui.button:
+            v-if: canExecute
+            text: Send ✔️
+            :click: promptToTask
+        transition:
+          name: slide
+          ui.elapsed:
+            v-if: is.loading
 props:
   dbp: null
-  shortEntities: null
+  entities: null
 
 data:
   prompt: null
@@ -31,6 +36,7 @@ methods:
   promptToTask: | #js
     async function() {
       this.is.loading = true;
+      await this.$root.wait(() => this.entities);
       this.task = null;
       const task = (await (await fetch(`/api/prompt/to/task`, {
         method: 'POST',
@@ -38,10 +44,11 @@ methods:
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          entities: this.shortEntities,
+          entities: this.entities,
           prompt: this.prompt
         })
       })).json());
+      task.id = Date.now();
       this.$emit("new-task", task);
       this.is.loading = false;
     }
@@ -49,7 +56,7 @@ methods:
 computed:
   canExecute: | #js
     function() {
-      return this.shortEntities && this.prompt?.length > 0;
+      return this.prompt?.length > 0;
     }
 
 watch:
@@ -63,9 +70,3 @@ style:
     cursor: pointer
   .box1:hover:
     background: "#ffffff30"
-  .solution:
-    opacity: 0.6
-  .solution:nth-child(1):
-    opacity: 1
-  .solution:hover:
-    opacity: 1

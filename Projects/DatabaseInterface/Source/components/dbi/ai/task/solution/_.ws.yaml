@@ -1,38 +1,44 @@
 dom:
   .solution:
-    .flex.gap-2:
-      ui.drawer:
-        :open: "!result"
-        .flex:
-          .fs-l1:
-            v-text: solution.title.icon
+    .clickable:
+      @click: () => is.open = !is.open
+      h3:
+        class: fs-m2
+        ui.title:
+          v-bind: solution.title
+    div:
+      transition:
+        name: slide
+        div:
+          v-if: is.open
           div:
-            .box1.show-on-hover-container:
-              h3:
-                v-text: solution.title.text
-              .show-on-hover:
-                div:
-                  v-if: "solution.query"
+            class: p-1
+            .flex.flex-column.gap-2:
+              .query:
+                ui.drawer:
+                  direction: "horizontal"
+                  :open: "!result"
                   div:
-                    ui.input.text.box:
-                      :multiline: "true"
-                      v-model: solution.query
-                div:
-                  .flex.justify-center:
-                    ui.button:
-                      text: execute ▶️
-                      :click: () => execute(solution)
-      div:
-        transition:
-          name: slide-hor
-          div:
-            v-if: result
-            h3:
-              ui.title:
-                v-bind: solution.title
-            ui.value:
-              :value: result
-              :visible-fields: solution.interesting.fields
+                    div:
+                      div:
+                        v-if: "solution.query"
+                        div:
+                          ui.input.text.box:
+                            :multiline: "true"
+                            v-model: solution.query
+                      div:
+                        .flex.justify-center:
+                          ui.button:
+                            text: execute ▶️
+                            :click: () => execute(solution)
+              transition:
+                name: slide
+                .query-data:
+                  v-if: result
+                  div:
+                    ui.value:
+                      :value: result
+                      :visible-fields: solution.interesting.fields
 
 props:
   dbp: null
@@ -42,6 +48,7 @@ props:
 data:
   result: null
   is:
+    open: false
     loading: false
 
 methods:
@@ -49,13 +56,18 @@ methods:
     async function(solution) {
       this.is.loading = true;
       this.result = await this.dbp.execute(solution.query);
+      this.show.result.once = true;
       this.is.loading = false;
     }
 
 computed:
 
 style:
+  .query .box1:
+    width: 40vw
   .solution:
+    width: fit-content
     opacity: 0.5
   .solution:hover:
+    background: "#ffffff20"
     opacity: 1

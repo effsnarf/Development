@@ -1,0 +1,42 @@
+dom:
+  div:
+    v-if: is.showing
+    ui.title:
+      icon: 🕒
+      :text: elapsedString
+
+data:
+  started: null
+  elapsed: null
+  is:
+    showing: false
+
+mounted: | #js
+  function() {
+    this.start();
+  }
+
+methods:
+  start: | #js
+    function() {
+      this.started = Date.now();
+      this.elapsed = 0;
+      this.is.showing = true;
+      this.update();
+    }
+  update: | #js
+    async function() {
+      this.elapsed = (Date.now() - this.started);
+      await this.$root.wait(100);
+      this.update();
+    }
+
+computed:
+  elapsedString: | #js
+    function() {
+      if (this.elapsed < 1000) {
+        return this.elapsed.toString();
+      }
+
+      return `${(this.elapsed / 1000).toFixed(1)}s`;
+    }

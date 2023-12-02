@@ -596,7 +596,8 @@ select, input[type=range]
 }
 
 
-.show-on-hover-container > .show-on-hover
+.show-on-hover-container > .show-on-hover,
+.sohc > .soh
 {
   max-height: 0;
   overflow: hidden;
@@ -604,7 +605,8 @@ select, input[type=range]
   transition: 1s !important;
 }
 
-.show-on-hover-container:hover > .show-on-hover
+.show-on-hover-container:hover > .show-on-hover,
+.sohc:hover > .soh
 {
   max-height: 20rem;
   opacity: 1;
@@ -642,13 +644,15 @@ select, input[type=range]
 }
 
 
-.show-on-hover-container > .show-on-hover.hor
+.show-on-hover-container > .show-on-hover.hor,
+.sohc > .soh.hor
 {
   max-width: 0;
   max-height: auto;
 }
 
-.show-on-hover-container:hover > .show-on-hover.hor
+.show-on-hover-container:hover > .show-on-hover.hor,
+.sohc:hover > .soh.hor
 {
   max-width: 20rem;
   opacity: 1;

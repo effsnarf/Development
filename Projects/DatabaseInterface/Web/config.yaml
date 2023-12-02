@@ -19,12 +19,44 @@ handler: | #js
       if (url == "/api/prompt/to/task") {
         const { entities, prompt } = data;
         const chat = await ctx.ChatOpenAI.new(ctx.Roles.ChatGPT);
-        const msg = `
+
+        // First we need to find out the relevant entities
+        let msg = `Which entities are relevant to this task?
+
+        reply in this format:
+        (don't write anything else, not even \`\`\` delimiters)
+
+        [ "entity1", "entity2", ...]
+
+        entities: ${JSON.stringify(entities.map(e => e.name), null, 2)}
+
+        task: ${prompt}`;
+
+        const relEntityNames = JSON.parse(await chat.send(msg));
+
+        const relEntities = entities.filter(e => relEntityNames.includes(e.name));
+
+        const relEntitiesShort = relEntities
+          .map(e => (
+          `${e.name}
+          (${e.stats.count} items)
+          ${e.fields.map(f => `${f.name} (${f.type})`).join(', ')}
+          indexes: ${e.indexes.map(indx => `(${Object.entries(indx.key).map(([k, v]) => `${k}:${v}`).join(', ')})`).join(', ')}
+
+          `
+        ))
+        .join('\n')
+        .split('\n')
+        .map(l => l.trim())
+        .join('\n');
+
+
+        msg = `
         I will ask you questions about my database and you'll help me find solutions.
 
-        this is the database we're working on:
+        these are the relevant entities from the database we're working on:
 
-        ${JSON.stringify(entities, null, 2)}}
+        ${JSON.stringify(relEntitiesShort, null, 2)}}
 
         your query can only use fields that actually exist in the schema I provided.
         the query you're writing will be executed as eval(),

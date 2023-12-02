@@ -2,8 +2,10 @@ dom:
   div:
     div:
       dbi.app.logo:
-    .flex.gap-1:
+    .absolute:
       dbi.app.logo.image:
+    .flex.gap-1:
+      :style: "{ 'margin': '1em 0 0 25em' }"
       ui.drawer:
         :open: "!selectedDbp"
         dbi.db.select:

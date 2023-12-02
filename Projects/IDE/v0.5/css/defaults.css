@@ -516,7 +516,7 @@ select, input[type=range]
 
 .clickable
 {
-  cursor: pointer;
+  cursor: pointer !important;
 }
 .clickable:hover
 {

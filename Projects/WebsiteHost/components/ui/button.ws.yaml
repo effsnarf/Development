@@ -5,9 +5,11 @@ dom:
       button:
         v-if: '!isLoading'
         @click: onClick
-        ui.title:
-          ':icon': icon
-          ':text': text
+        .flex:
+          ui.title:
+            ':icon': icon
+            ':text': text
+          slot:
     ui.loading:
       ':show': isLoading
 props:

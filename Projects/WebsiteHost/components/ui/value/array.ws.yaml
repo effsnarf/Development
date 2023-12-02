@@ -60,27 +60,35 @@ dom:
           table: 
             v-if: (view1 == 'table')
             thead:
-              tr:
+              transition.group:
+                tag: tr
+                name: slide-hor
                 th:
                   v-for: field in shownFields
-                  .flex.clickable:
-                    ':class': '{ selected: (sortByField == field) }'
-                    @click: onSortByField(field)
-                    div:
-                      v-text: field
-                    div:
-                      v-if: (sortByField == field)
+                  :key: field
+                  div:
+                    .flex.clickable:
+                      ':class': '{ selected: (sortByField == field) }'
+                      @click: onSortByField(field)
                       div:
-                        v-text: "(sortByFieldDirection == 1) ? '▲' : '▼'"
-            tbody: 
-              tr: 
+                        v-text: field
+                      div:
+                        v-if: (sortByField == field)
+                        div:
+                          v-text: "(sortByFieldDirection == 1) ? '▲' : '▼'"
+            tbody:
+              transition.group:
+                tag: tr
+                name: slide-hor
                 v-for: (item, index) in visibleItems
+                :key: JSON.stringify(item)
                 ':class': _getItemClass(item, index)
                 @mouseenter: () => onItemHover(item, true)
                 @mouseleave: () => onItemHover(item, false)
                 @click: () => onItemClick(item, index)
                 td: 
                   v-for: field in shownFields
+                  :key: field
                   ui.value.preview: 
                     ':value': item?.[field]
 props:

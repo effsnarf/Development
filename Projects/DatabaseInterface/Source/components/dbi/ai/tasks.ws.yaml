@@ -1,35 +1,17 @@
 dom:
   div:
-    .flex:
-      div:
-        ui.drawer:
-          div:
-            :style: "{ 'max-width': '20em' }"
-            .clickable.pr-l1:
-              v-for: task in tasks
-              :class: "{ selected: (selectedTask == task) }"
-              @click: () => { selectedTask = task; }
-              dbi.ai.task:
-                :dbp: dbp
-                :task: task
-                :title-only: "true"
-      div:
-        transition:
-          name: slide-hor
-          dbi.ai.task:
-            v-if: selectedTask
-            :dbp: dbp
-            :task: selectedTask
+    transition.group:
+      name: slide
+      dbi.ai.task:
+        v-for: task in tasks
+        :key: task.id
+        :dbp: dbp
+        :task: task
 
 props:
   dbp: null
   tasks: null
 
 data:
-  selectedTask: null
 
 methods:
-  selectTask: | #js
-    async function(task) {
-      this.selectedTask = task;
-    }

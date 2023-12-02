@@ -2,10 +2,9 @@ dom:
   div:
     img:
       class: logo
-      src: /images/ai.webp
+      src: /images/ai3.png
 
 style:
   .logo:
-    width: 15vw
-    aspect-ratio: 1 / 1
+    width: 30vw
     margin: 0 0 1em 1em
