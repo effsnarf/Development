@@ -22,6 +22,7 @@ enum Model {
   Gpt4 = "gpt-4",
   Gpt35Turbo = "gpt-3.5-turbo",
   Gpt35Turbo16k = "gpt-3.5-turbo-16k",
+  Davinci = "text-davinci-003",
   Ada = "text-ada-001",
 }
 
@@ -51,6 +52,8 @@ class OpenAI {
       case Model.Gpt4:
         return 4096;
       case Model.Gpt4VisionPreview:
+        return 4096;
+      case Model.Davinci:
         return 4096;
       default:
         throw new Error(`Unknown model ${this.model}`);

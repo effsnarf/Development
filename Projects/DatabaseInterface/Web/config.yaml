@@ -18,7 +18,7 @@ handler: | #js
       const url = req.url.split('?')[0];
       if (url == "/api/prompt/to/task") {
         const { entities, prompt } = data;
-        const chat = await ctx.ChatOpenAI.new(ctx.Roles.ChatGPT);
+        const chat = await ctx.ChatOpenAI.new(ctx.Roles.ChatGPT, false);
 
         // First we need to find out the relevant entities
         let msg = `Which entities are relevant to this task?
@@ -68,15 +68,11 @@ handler: | #js
 
         {
           "title": "...", (what info the user wants to know, formatted as a short question),
-          "analysis": [ (your analysis of the situation, split into paragraphs)
-            { "icon": "...", "text": "..." },
-            ...
-          ],
-          "solutions": [ (suggest several solutions if possible)
+          "solutions": [ (suggest several ways to solve the problem)
             {
               "title": {
                 "icon": "...", (query: 🔎, index: 📃, create: ➕, update: ✏️, delete: 🗑️, or other)
-                "text": "...", (phrased as a command, example: "find all the people who were born in 1990")
+                "text": "...", (short, descriptive title, phrased as a command, example: "find all the people who were born in 1990")
               },
               "query": "...", (if can be done in a single query),
               "interesting": {
@@ -99,6 +95,8 @@ handler: | #js
         }
 
         const result = cache[msg];
+
+        delete cache[msg];
 
         return res.end(JSON.stringify(result));
       }

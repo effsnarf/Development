@@ -26,55 +26,10 @@ import { AI } from "@shared/AI";
 import { OpenAI } from "../Apis/OpenAI/classes/OpenAI";
 import { ChatOpenAI, Role, Roles } from "../Apis/OpenAI/classes/ChatOpenAI";
 //import { ChatOpenAI } from "langchain/chat_models/openai";
-
-const openAIApiKey = "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";
+import { OpenAI2 } from "../Apis/OpenAI/classes/OpenAI2";
 
 (async () => {
-  const config = (await Configuration.new()).data;
+  const response = await OpenAI2.test();
 
-  const chat = await ChatOpenAI.new(Roles.ChatGPT);
-
-  //await chat.send("hello");
-
-  const openAI = await OpenAI.new(true, Model.Ada);
-
-  await openAI.complete(
-    `original:
-
-    What workouts will help me conquer my demons that torment me?
-
-    Shakespeareanized:
-    `
-  );
-
-  //const terminalGPT = await AI.Agents.TerminalGPT.new();
-
-  //const result = await terminalGPT.do("which projects am i working on?");
-
-  //console.log(result);
-
-  process.exit();
+  console.log(response);
 })();
-
-// function breakIntoStatements(fn: Function) {
-//   const code = fn.toString();
-//   const parsed = esprima.parseScript(code, { loc: true });
-//   const statements = parsed.body[0].body.body;
-
-//   return statements.map((stmt: any) => {
-//     const startLine = stmt.loc.start.line;
-//     const endLine = stmt.loc.end.line;
-//     const lines = code.split("\n").slice(startLine - 1, endLine);
-//     return lines.join("\n").trim();
-//   });
-// }
-
-// // Test function
-// function test() {
-//   let x = 1;
-//   let y = 2;
-//   return x + y;
-// }
-
-// const result = breakIntoStatements(test);
-// console.log(result);

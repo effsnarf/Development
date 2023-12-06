@@ -2,9 +2,11 @@ dom:
   .flex:
     h2:
       class: float-left mr-l2
-      ui.title:
-        class: title1
-        text: DatabaseGPT
+      a:
+        href: /
+        ui.title:
+          class: title1
+          text: DatabaseGPT
 
 data:
 style:
