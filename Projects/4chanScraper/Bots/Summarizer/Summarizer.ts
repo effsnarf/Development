@@ -1,7 +1,7 @@
 const colors = require("colors");
 import * as fs from "fs";
 import "../../../../Shared/Extensions";
-import * as jsyaml from "js-yaml";
+const jsyaml = require("js-yaml");
 import { Config } from "../../Shared/Config";
 import { Config as OpenAiConfig } from "../../../../Apis/OpenAI/classes/Config";
 import { Summarizer } from "./classes/Summarizer";
