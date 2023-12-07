@@ -32,6 +32,7 @@ class Summarizer {
     console.log();
 
     while (true) {
+      console.log(`Getting threads..`.gray);
       // Get all threads that have not been analyzed yet
       // and have at least 10 posts
       // and are not active anymore
