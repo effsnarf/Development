@@ -192,7 +192,7 @@ class MongoDatabase extends DatabaseBase {
 
       const collection = await this.getCollection(collectionName);
       let docs = await (
-        await collection.aggregate(pipeline, { maxTimeMS: 5000 })
+        await collection.aggregate(pipeline, { maxTimeMS: 30000 })
       ).toArray();
 
       timer.stop();
