@@ -165,58 +165,65 @@ class MongoDatabase extends DatabaseBase {
     pipeline: any[],
     lowercaseFields?: boolean | undefined
   ) {
-    if (typeof lowercaseFields != "boolean")
-      lowercaseFields = this.options.lowercaseFields;
+    try {
+      if (typeof lowercaseFields != "boolean")
+        lowercaseFields = this.options.lowercaseFields;
 
-    // Remove any empty stages (e.g. { $match: null } or { $match: {} } or { $sort: {} })
-    pipeline = pipeline.filter((p) => {
-      const values = Object.values(p);
-      if (!values) return false;
-      // { $match: {...}, [something else]: {...} } - we want to remove this
-      if (values.length != 1) return false;
+      // Remove any empty stages (e.g. { $match: null } or { $match: {} } or { $sort: {} })
+      pipeline = pipeline.filter((p) => {
+        const values = Object.values(p);
+        if (!values) return false;
+        // { $match: {...}, [something else]: {...} } - we want to remove this
+        if (values.length != 1) return false;
 
-      // { $match: null } - we want to remove this
-      if (values[0] == null) return false;
+        // { $match: null } - we want to remove this
+        if (values[0] == null) return false;
 
-      if (typeof values[0] == "object") {
-        const data = values[0] as any;
-        // { $match: {} } - we want to remove this
-        if (Object.keys(data).length == 0) return false;
-      }
+        if (typeof values[0] == "object") {
+          const data = values[0] as any;
+          // { $match: {} } - we want to remove this
+          if (Object.keys(data).length == 0) return false;
+        }
 
-      return true;
-    });
-
-    const timer = Timer.start();
-
-    const collection = await this.getCollection(collectionName);
-    let docs = await (
-      await collection.aggregate(pipeline, { maxTimeMS: 5000 })
-    ).toArray();
-
-    timer.stop();
-
-    pipeline = this.removeDollarSigns(pipeline);
-
-    this.upsert(
-      "_DbAnalytics",
-      {
-        dt: Date.now(),
-        elapsed: timer.elapsed,
-        event: "aggregate",
-        collection: collectionName,
-        pipeline: pipeline,
-      },
-      false
-    );
-
-    if (lowercaseFields)
-      docs = docs.map((d) => {
-        if (typeof d == "object") return Objects.toCamelCaseKeys(d);
-        return d;
+        return true;
       });
 
-    return docs;
+      const timer = Timer.start();
+
+      const collection = await this.getCollection(collectionName);
+      let docs = await (
+        await collection.aggregate(pipeline, { maxTimeMS: 5000 })
+      ).toArray();
+
+      timer.stop();
+
+      pipeline = this.removeDollarSigns(pipeline);
+
+      this.upsert(
+        "_DbAnalytics",
+        {
+          dt: Date.now(),
+          elapsed: timer.elapsed,
+          event: "aggregate",
+          collection: collectionName,
+          pipeline: pipeline,
+        },
+        false
+      );
+
+      if (lowercaseFields)
+        docs = docs.map((d) => {
+          if (typeof d == "object") return Objects.toCamelCaseKeys(d);
+          return d;
+        });
+
+      return docs;
+    } catch (ex: any) {
+      console.log("Failed to aggregate");
+      console.log(collectionName);
+      console.log(pipeline);
+      throw ex;
+    }
   }
 
   protected async _upsert(collectionName: string, doc: any) {
