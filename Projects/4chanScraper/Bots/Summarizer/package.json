@@ -3,6 +3,7 @@
     "@types/js-yaml": "^4.0.9"
   },
   "dependencies": {
+    "colors": "^1.4.0",
     "js-yaml": "^4.1.0"
   }
 }
