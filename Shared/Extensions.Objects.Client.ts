@@ -363,6 +363,15 @@ class Objects {
     throw new Error(_importMainFileToImplement);
   }
 
+  static inspect(
+    obj: any,
+    showHidden?: boolean,
+    depth?: number | null,
+    color: boolean = true
+  ): string {
+    throw new Error(_importMainFileToImplement);
+  }
+
   static parseYaml(str: string, options?: any): any {
     throw new Error(_importMainFileToImplement);
   }

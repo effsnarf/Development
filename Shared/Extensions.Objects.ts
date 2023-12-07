@@ -13,6 +13,15 @@ Objects.yamlify = (obj: any): string => {
   return jsyaml.dump(obj);
 };
 
+Objects.inspect = (
+  obj: any,
+  showHidden?: boolean,
+  depth?: number | null,
+  color: boolean = true
+): string => {
+  return util.inspect(obj, showHidden, depth, color);
+};
+
 Objects.parseYaml = (yaml: string, options?: any) => {
   const addSuffixToDuplicateKeys = (yaml: string, underKeys?: string[]) => {
     const lines = yaml.split("\n");

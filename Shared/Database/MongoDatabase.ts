@@ -221,7 +221,7 @@ class MongoDatabase extends DatabaseBase {
     } catch (ex: any) {
       console.log("Failed to aggregate");
       console.log(collectionName);
-      console.log(pipeline);
+      console.log(Objects.inspect(pipeline, false, null, true));
       throw ex;
     }
   }
