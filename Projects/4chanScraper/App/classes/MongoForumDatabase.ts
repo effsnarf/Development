@@ -1,5 +1,5 @@
 import "../../../../Shared/Extensions";
-import { Forum, Thread, ThreadTeaser } from "../classes/DataTypes";
+import { Forum, Thread, ThreadTeaser } from "../../Shared/DataTypes";
 import { MongoDatabase } from "../../../../Shared/Database/MongoDatabase";
 import { ForumDatabase } from "./ForumDatabase";
 

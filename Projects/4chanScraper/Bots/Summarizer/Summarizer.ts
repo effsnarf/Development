@@ -1,9 +1,10 @@
 const colors = require("colors");
 import * as fs from "fs";
+import "../../../../Shared/Extensions";
 import * as jsyaml from "js-yaml";
-import { Config } from "../../../Shared/Config";
-import { Config as OpenAiConfig } from "../../../Apis/OpenAI/classes/Config";
-import { Summarizer } from "../App/classes/Summarizer";
+import { Config } from "../../Shared/Config";
+import { Config as OpenAiConfig } from "../../../../Apis/OpenAI/classes/Config";
+import { Summarizer } from "./classes/Summarizer";
 
 process.title = "Summarizer";
 
@@ -14,7 +15,7 @@ const openAiConfig = jsyaml.load(
 ) as OpenAiConfig;
 
 (async () => {
-  let summarizer = await Summarizer.new(config, openAiConfig);
+  const summarizer = await Summarizer.new(config, openAiConfig);
 
   summarizer.start();
 })();

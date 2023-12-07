@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Forum, Image } from "../classes/DataTypes";
+import { Forum, Image } from "../../Shared/DataTypes";
 import { Database } from "../../../../Shared/Database";
 
 interface Item {

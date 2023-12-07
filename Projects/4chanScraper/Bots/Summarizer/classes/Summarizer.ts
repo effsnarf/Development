@@ -1,13 +1,16 @@
 import * as colors from "colors";
 import * as fs from "fs";
-import "../../../Shared/Extensions";
-import { Objects } from "../../../Shared/Extensions.Objects";
-import { Config } from "../../AnonymousTimes/Shared/Config";
-import { Config as OpenAiConfig } from "../../../Apis/OpenAI/classes/Config";
-import { MongoDatabase } from "../../../Shared/Database/MongoDatabase";
-import { Thread, Post } from "../../AnonymousTimes/Shared/DataTypes";
-import { OpenAI } from "../../../Apis/OpenAI/classes/OpenAI";
-import { ChatOpenAI, Role } from "../../../Apis/OpenAI/classes/ChatOpenAI";
+import "../../../../../Shared/Extensions";
+import { Objects } from "../../../../../Shared/Extensions.Objects";
+import { Config } from "../../../Shared/Config";
+import { Config as OpenAiConfig } from "../../../../../Apis/OpenAI/classes/Config";
+import { MongoDatabase } from "../../../../../Shared/Database/MongoDatabase";
+import { Thread, Post } from "../../../Shared/DataTypes";
+import { OpenAI } from "../../../../../Apis/OpenAI/classes/OpenAI";
+import {
+  ChatOpenAI,
+  Role,
+} from "../../../../../Apis/OpenAI/classes/ChatOpenAI";
 
 class Summarizer {
   private db!: MongoDatabase;
@@ -104,9 +107,9 @@ class Summarizer {
 
           console.log(`Analyzing..`.gray);
           console.log(`  Analyzing..`.gray);
-          const analysis = (
+          const analysis = Objects.parse.json(
             await gptAnalyzer.sendSeveral(gptPosts, 600)
-          ).parseJSON() as any;
+          )() as any;
           console.log(`  Generating article..`.gray);
           let newsArticle = await gptNews.sendSeveral(gptPosts, 1000);
           // Remove short sentences
@@ -130,7 +133,9 @@ class Summarizer {
 
           console.log(`  Finding quotes..`.gray);
           const quotes = (
-            (await gptQuoter.sendSeveral(gptPosts, 600)).parseJSON() as any
+            Objects.parse.json(
+              await gptQuoter.sendSeveral(gptPosts, 600)
+            ) as any
           ).quotes;
 
           thread.quotes = quotes;
@@ -179,8 +184,8 @@ class Summarizer {
           ?.stripHtmlTags()
           ?.decodeHtml()
           ?.match(/>>\d+/g)
-          ?.map((s) => s.replace(">>", ""))
-          ?.map((s) => parseInt(s)) || [];
+          ?.map((s: string) => s.replace(">>", ""))
+          ?.map((s: string) => parseInt(s)) || [];
 
       // In the "to" post, add this post id to the "from" list
       for (const id of post.replies.to) {
