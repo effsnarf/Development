@@ -2,6 +2,7 @@ import * as colors from "colors";
 import * as fs from "fs";
 import "../../../../../Shared/Extensions";
 import { Objects } from "../../../../../Shared/Extensions.Objects";
+import { Loading } from "../../../../../Shared/Loading";
 import { Config } from "../../../Shared/Config";
 import { Config as OpenAiConfig } from "../../../../../Apis/OpenAI/classes/Config";
 import { MongoDatabase } from "../../../../../Shared/Database/MongoDatabase";
@@ -32,7 +33,8 @@ class Summarizer {
     console.log();
 
     while (true) {
-      console.log(`Getting threads..`.gray);
+      const loading = Loading.new();
+      loading.start(`Getting threads..`);
       // Get all threads that have not been analyzed yet
       // and have at least 10 posts
       // and are not active anymore
@@ -47,6 +49,8 @@ class Summarizer {
           "modified.dt": -1,
         }
       )) as Thread[];
+
+      loading.start(`Analyzing ${threads.length} threads..`);
 
       const newsThreads = (await this.db.find(
         "Threads",

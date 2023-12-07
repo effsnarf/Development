@@ -18,7 +18,12 @@ class Loading {
     return loading;
   }
 
+  static new(info?: string, log: boolean = true): Loading {
+    return new Loading(info, log);
+  }
+
   start(info?: string): void {
+    this.stop();
     if (info) this.info = info;
     this.startTime = Date.now();
     this.isRunning = true;
@@ -35,6 +40,10 @@ class Loading {
     process.stdout.clearLine(0);
     if (info && this.log)
       console.log(this._lastElapsed.unitifyTime(), info.gray);
+  }
+
+  restart(info?: string) {
+    this.start(info);
   }
 
   private showInfo() {
