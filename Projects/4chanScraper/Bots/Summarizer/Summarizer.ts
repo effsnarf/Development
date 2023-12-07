@@ -8,10 +8,12 @@ import { Summarizer } from "./classes/Summarizer";
 
 process.title = "Summarizer";
 
-const config = jsyaml.load(fs.readFileSync("../config.yaml", "utf8")) as Config;
+const config = jsyaml.load(
+  fs.readFileSync("../../config.yaml", "utf8")
+) as Config;
 
 const openAiConfig = jsyaml.load(
-  fs.readFileSync("../../../Apis/OpenAI/config.yaml", "utf8")
+  fs.readFileSync("../../../../Apis/OpenAI/config.yaml", "utf8")
 ) as OpenAiConfig;
 
 (async () => {
