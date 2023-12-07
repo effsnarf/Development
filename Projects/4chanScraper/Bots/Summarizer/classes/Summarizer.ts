@@ -112,7 +112,7 @@ class Summarizer {
 
           console.log(`Analyzing..`.gray);
           console.log(`  Analyzing..`.gray);
-          const analysis = Objects.parse.json(
+          const analysis = JSON.parse(
             await gptAnalyzer.sendSeveral(gptPosts, 600)
           )() as any;
           console.log(`  Generating article..`.gray);
@@ -138,9 +138,7 @@ class Summarizer {
 
           console.log(`  Finding quotes..`.gray);
           const quotes = (
-            Objects.parse.json(
-              await gptQuoter.sendSeveral(gptPosts, 600)
-            ) as any
+            JSON.parse(await gptQuoter.sendSeveral(gptPosts, 600)) as any
           ).quotes;
 
           thread.quotes = quotes;
@@ -251,7 +249,7 @@ class Summarizer {
 
   // Remove HTML tags
   private gptifyPost(post: Post) {
-    let p = Objects.json.parse(JSON.stringify(post)) as Post;
+    let p = JSON.parse(JSON.stringify(post)) as Post;
     p.title = this.gptifyText(p.title);
     p.comment = this.gptifyText(p.comment);
     let s = this.getPostText(p);
