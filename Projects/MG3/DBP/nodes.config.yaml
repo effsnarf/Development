@@ -611,3 +611,6 @@ api:
         comments = comments.sortBy(c => c._id);
         for (const comment of comments) comment.created = comment.created.valueOf();
         return comments;
+shakespearizer:
+  database:
+    path: ../../Shakespearizer/Database

@@ -1,0 +1,6 @@
+title: Shakespearizer
+server:
+  host: localhost
+  port: 3000
+database:
+  path: ..\Database

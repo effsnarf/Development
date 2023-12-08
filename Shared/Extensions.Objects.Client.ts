@@ -517,6 +517,16 @@ class Objects {
     }
   }
 
+  static async tryAgain<T>(func: Function, attempts: number = 3): Promise<T> {
+    try {
+      const result = await func();
+      return result;
+    } catch (ex: any) {
+      if (attempts <= 0) throw ex;
+      return await this.tryAgain(func, attempts - 1);
+    }
+  }
+
   static json = {
     parse: (str: string) => {
       try {

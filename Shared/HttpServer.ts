@@ -243,6 +243,7 @@ class HttpServer {
   }
 
   private async getContent(req: any, res: any, path: string) {
+    if (!path) return "";
     try {
       if (
         ["ico", "png", "webp", "jpeg", "jpg"].some((ext) =>

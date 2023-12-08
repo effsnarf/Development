@@ -1,5 +1,6 @@
 import { getEncoding, encodingForModel } from "js-tiktoken";
 import axios, { AxiosResponse } from "axios";
+import { Objects } from "../../../Shared/Extensions.Objects";
 import * as colors from "colors";
 
 import { Loading } from "../../../Shared/Loading";
@@ -136,6 +137,15 @@ class OpenAI {
   }
 
   async makeRequest<T>(
+    model: string,
+    type: string,
+    dataProps: any,
+    desc?: string
+  ): Promise<T> {
+    return await this._makeRequest(model, type, dataProps, desc);
+  }
+
+  private async _makeRequest<T>(
     model: string,
     type: string,
     dataProps: any,

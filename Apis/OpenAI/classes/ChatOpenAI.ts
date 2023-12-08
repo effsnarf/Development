@@ -56,6 +56,8 @@ class Role {
 }
 
 class Roles {
+  static Null = new Role("", null);
+
   static ChatGPT = new Role(
     "ChatGPT",
     "You are ChatGPT, a large language model trained by OpenAI."
