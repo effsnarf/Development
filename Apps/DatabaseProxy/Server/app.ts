@@ -467,29 +467,6 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
     }
     // #endregion
 
-    // #region 📦 Sheakspearizer
-    if (config.shakespearizer) {
-      const shakespearizer = await Shakespearizer.new(config);
-      httpServer.post(
-        "/shakespearize",
-        processRequest(
-          async (req: any, res: any, user: User, postData: any) => {
-            const text = postData.text;
-
-            const shakespearized = await shakespearizer.shakespearize(text);
-
-            const result = {
-              text: text,
-              shakespearized: shakespearized,
-            };
-
-            return res.end(JSON.stringify(result));
-          }
-        )
-      );
-    }
-    // #endregion
-
     // #region 📝 File Transpilation
     httpServer.get(
       "/*.js",
