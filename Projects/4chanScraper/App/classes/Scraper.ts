@@ -90,7 +90,6 @@ class Scraper {
       let complete = 0;
       for (const savedThread of savedOnlineThreads) {
         let progress = complete / savedOnlineThreads.length;
-        console.log(`Updating saved threads`, progress.toProgressBar(20));
         let saveThreadIsOnline = onlineThreads.find(
           (t: any) => t.id === savedThread.id
         )
@@ -106,7 +105,7 @@ class Scraper {
           } catch (ex: any) {
             if (ex.response?.status == 404) {
               savedThread.isOnline = false;
-            } else {
+            } else if (ex.response?.status != 304) {
               console.log(ex.toString().red);
             }
           }
