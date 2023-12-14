@@ -7,7 +7,7 @@ import { Config } from "../../../Shared/Config";
 import { Config as OpenAiConfig } from "../../../../../Apis/OpenAI/classes/Config";
 import { MongoDatabase } from "../../../../../Shared/Database/MongoDatabase";
 import { Thread, Post } from "../../../Shared/DataTypes";
-import { OpenAI } from "../../../../../Apis/OpenAI/classes/OpenAI";
+import { OpenAI, Model } from "../../../../../Apis/OpenAI/classes/OpenAI";
 import {
   ChatOpenAI,
   Role,
@@ -31,6 +31,8 @@ class Summarizer {
   async start() {
     console.log("Starting summarizer".cyan);
     console.log();
+
+    const model = Model.Davinci;
 
     while (true) {
       const loading = Loading.new();
@@ -63,13 +65,19 @@ class Summarizer {
           this.calculatePostStats(thread);
 
           const gptAnalyzer = await ChatOpenAI.new(
-            Role.fromYamlFile(`./Analyzer.role.gpt.yaml`)
+            Role.fromYamlFile(`./Analyzer.role.gpt.yaml`),
+            false,
+            model
           );
           const gptNews = await ChatOpenAI.new(
-            Role.fromYamlFile(`./News.role.gpt.yaml`)
+            Role.fromYamlFile(`./News.role.gpt.yaml`),
+            false,
+            model
           );
           const gptQuoter = await ChatOpenAI.new(
-            Role.fromYamlFile(`./Quoter.role.gpt.yaml`)
+            Role.fromYamlFile(`./Quoter.role.gpt.yaml`),
+            false,
+            model
           );
 
           // Sort posts by relevance (most relevant first)
