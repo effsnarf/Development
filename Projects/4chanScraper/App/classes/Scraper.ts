@@ -25,7 +25,7 @@ class Scraper {
       config.db.fileSystem.dataDir
     );
     scraper.db = await MongoForumDatabase.new(
-      config.db.mongo.connection,
+      config.db.mongo.connectionString,
       config.db.mongo.database
     );
     scraper.imageScraper = new ImageScraper(

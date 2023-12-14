@@ -7,7 +7,7 @@ interface Config {
       dataDir: string;
     };
     mongo: {
-      connection: string;
+      connectionString: string;
       database: string;
     };
   };
