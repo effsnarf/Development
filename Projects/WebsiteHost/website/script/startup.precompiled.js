@@ -5445,6 +5445,9 @@ class Objects {
     static yamlify(obj) {
         throw new Error(_importMainFileToImplement);
     }
+    static inspect(obj, showHidden, depth, color = true) {
+        throw new Error(_importMainFileToImplement);
+    }
     static parseYaml(str, options) {
         throw new Error(_importMainFileToImplement);
     }
@@ -5576,6 +5579,17 @@ class Objects {
             if (typeof onCatch === "function")
                 return await onCatch(ex);
             return onCatch;
+        }
+    }
+    static async tryAgain(func, attempts = 3) {
+        try {
+            const result = await func();
+            return result;
+        }
+        catch (ex) {
+            if (attempts <= 0)
+                throw ex;
+            return await this.tryAgain(func, attempts - 1);
         }
     }
     static json = {
@@ -8783,7 +8797,7 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 /*!*********************************************************!*\
-  !*** ../../WebsiteHost/website/script/1701641822344.ts ***!
+  !*** ../../WebsiteHost/website/script/1702186891861.ts ***!
   \*********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

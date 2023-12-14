@@ -52,7 +52,7 @@ const fetchWithProgress = async (
 const fetchWithAlertify = async (url: string, options: any) => {
   const alertify = (window as any).alertify;
   let alrt = null as any;
-  const title = "Downloading...";
+  const title = "Downloading…";
   const title2 = options.title || url;
   const started = Date.now();
   const result = await fetchWithProgress(
@@ -60,7 +60,7 @@ const fetchWithAlertify = async (url: string, options: any) => {
     options,
     (received: number, total: number) => {
       const elapsed = Date.now() - started;
-      //if (elapsed < 100) return;
+      if (elapsed < 400) return;
       const msg = `<h3>${title}</h3><p class="text-center">${received.unitifySize()}</p>`;
       if (!alrt) alrt = alertify.message(msg).delay(0);
       else alrt.setContent(msg);
