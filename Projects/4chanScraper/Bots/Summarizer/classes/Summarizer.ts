@@ -126,7 +126,7 @@ class Summarizer {
           thread.quotes = quotes;
           this.db.upsert("Threads", thread);
         } catch (ex: any) {
-          console.log(ex.toString().bgRed.black);
+          console.log(ex.stack.bgRed.black);
           thread.analysis = { error: true } as any;
           this.db.upsert("Threads", thread);
 
