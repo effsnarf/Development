@@ -212,6 +212,12 @@ class OpenAI {
     if (choices[0].message)
       choices[0].message.content = choices[0].message.content.trim();
     let reply = (choices[0].text || choices[0].message) as T;
+    // if T is string
+    if (typeof reply == "string") {
+      if (reply.toString().startsWith("```json")) {
+        reply = reply.substring(7, reply.length - 3) as T;
+      }
+    }
     this.log();
     this.log((reply as any)?.content || reply);
     return reply;
