@@ -40,7 +40,7 @@ class Summarizer {
         "Threads",
         {
           analysis: { $exists: false },
-          "posts.count": { $gt: 50 },
+          "posts.count": { $gte: 100 },
         },
         {
           "modified.dt": -1,
@@ -48,21 +48,6 @@ class Summarizer {
       )) as Thread[];
 
       loading.start(`Analyzing ${threads.length} threads..`);
-
-      const newsThreads = (await this.db.find(
-        "Threads",
-        {
-          "thread.analysis.article": { $exists: false },
-        },
-        {
-          "scores.news": -1,
-        },
-        1
-      )) as Thread[];
-
-      const customThreads = (await this.db.find("Threads", {
-        id: 70238050,
-      })) as Thread[];
 
       console.log(`  ${threads.length} ${`threads found`.gray}`);
       console.log();
