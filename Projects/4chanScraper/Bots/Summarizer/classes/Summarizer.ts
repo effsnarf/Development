@@ -32,7 +32,7 @@ class Summarizer {
     console.log("Starting summarizer".cyan);
     console.log();
 
-    const model = Model.Davinci;
+    const model = Model.Gpt35Turbo;
 
     while (true) {
       const loading = Loading.new();
