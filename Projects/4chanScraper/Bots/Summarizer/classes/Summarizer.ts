@@ -94,9 +94,9 @@ class Summarizer {
 
           console.log(`Analyzing..`.gray);
           console.log(`  Analyzing..`.gray);
-          const analysis = Objects.parse.json(
+          const analysis = JSON.parse(
             await gptAnalyzer.sendSeveral(gptPosts, 600)
-          )() as any;
+          ) as any;
           console.log(`  Generating article..`.gray);
           let newsArticle = await gptNews.sendSeveral(gptPosts, 1000);
           // Remove short sentences
@@ -120,9 +120,7 @@ class Summarizer {
 
           console.log(`  Finding quotes..`.gray);
           const quotes = (
-            Objects.parse.json(
-              await gptQuoter.sendSeveral(gptPosts, 600)
-            ) as any
+            JSON.parse(await gptQuoter.sendSeveral(gptPosts, 600)) as any
           ).quotes;
 
           thread.quotes = quotes;
