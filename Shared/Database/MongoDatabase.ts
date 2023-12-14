@@ -85,8 +85,6 @@ class MongoDatabase extends DatabaseBase {
     skip?: number | undefined,
     lowercaseFields?: boolean | undefined
   ) {
-    if (!limit) limit = 10;
-
     const pipeline = [
       {
         $match: query,

@@ -58,11 +58,16 @@ class MongoForumDatabase extends ForumDatabase {
   }
 
   async getOnlineThreads(forum: Forum) {
-    return (await this.db.find("Threads", {
-      forum: { id: forum.id },
-      isOnline: true,
-      isSticky: { $ne: true },
-    })) as Thread[];
+    return (await this.db.find(
+      "Threads",
+      {
+        forum: { id: forum.id },
+        isOnline: true,
+        isSticky: { $ne: true },
+      },
+      null,
+      1000
+    )) as Thread[];
   }
 
   async getStickyThreads(forum: Forum) {
