@@ -106,7 +106,7 @@ class Scraper {
             if (ex.response?.status == 404) {
               savedThread.isOnline = false;
             } else if (ex.response?.status != 304) {
-              console.log(ex.toString().red);
+              console.log(ex.toString().bgRed);
             }
           }
         }
