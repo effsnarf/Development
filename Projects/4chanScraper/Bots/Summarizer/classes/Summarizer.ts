@@ -21,7 +21,7 @@ class Summarizer {
   public static async new(config: Config, openAiConfig: OpenAiConfig) {
     const summarizer = new Summarizer(config);
     summarizer.db = await MongoDatabase.new(
-      config.db.mongo.connection,
+      config.db.mongo.connectionString,
       config.db.mongo.database
     );
     OpenAI.apiKey = openAiConfig.apiKey;
