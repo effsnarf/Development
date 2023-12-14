@@ -36,9 +36,6 @@ class Summarizer {
       const loading = Loading.new();
       loading.start(`Getting threads..`);
       // Get all threads that have not been analyzed yet
-      // and have at least 10 posts
-      // and are not active anymore
-      // and sort them by (newest first)
       const threads = (await this.db.find(
         "Threads",
         {

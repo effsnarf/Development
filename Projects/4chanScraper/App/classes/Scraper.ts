@@ -73,75 +73,73 @@ class Scraper {
 
   private async scrapeForum(forum: Forum) {
     return new Promise(async (resolve) => {
-      ///while (true)
-      {
-        console.log(`/${forum.id}/`.green);
-        let onlineThreads = await this.getOnlineThreads(forum);
-        console.log(`  ${onlineThreads.length} ${`online threads`.gray}`);
-        let stickyThreads = await this.db.getStickyThreads(forum);
-        console.log(`  ${stickyThreads.length} ${`sticky threads`.gray}`);
-        let savedOnlineThreads = await this.db.getOnlineThreads(forum);
-        console.log(
-          `  ${savedOnlineThreads.length} ${`saved online threads`.gray}`
-        );
-        console.log();
+      console.log(`/${forum.id}/`.green);
+      let onlineThreads = await this.getOnlineThreads(forum);
+      console.log(`  ${onlineThreads.length} ${`online threads`.gray}`);
+      let stickyThreads = await this.db.getStickyThreads(forum);
+      console.log(`  ${stickyThreads.length} ${`sticky threads`.gray}`);
+      let savedOnlineThreads = await this.db.getOnlineThreads(forum);
+      console.log(
+        `  ${savedOnlineThreads.length} ${`saved online threads`.gray}`
+      );
+      console.log();
 
-        // For each saved thread, check if it's still online
-        // and update its posts
+      // For each saved thread, check if it's still online
+      // and update its posts
 
-        let complete = 0;
-        for (const savedThread of savedOnlineThreads) {
-          let progress = complete / savedOnlineThreads.length;
-          let saveThreadIsOnline = onlineThreads.find(
-            (t: any) => t.id === savedThread.id
-          )
-            ? true
-            : false;
-          if (!saveThreadIsOnline) {
-            savedThread.isOnline = false;
-          }
-          if (saveThreadIsOnline) {
-            try {
-              let posts = await this.getOnlinePosts(savedThread, progress);
-              await this.updateThread(savedThread, posts);
-            } catch (ex: any) {
-              if (ex.response?.status == 404) {
-                savedThread.isOnline = false;
-              } else {
-                console.log(ex.toString().red);
-              }
-            }
-          }
-          await this.db.upsertThread(savedThread);
-          complete++;
+      let complete = 0;
+      for (const savedThread of savedOnlineThreads) {
+        let progress = complete / savedOnlineThreads.length;
+        let saveThreadIsOnline = onlineThreads.find(
+          (t: any) => t.id === savedThread.id
+        )
+          ? true
+          : false;
+        if (!saveThreadIsOnline) {
+          savedThread.isOnline = false;
         }
-
-        // For new threads, get the posts and save it to the database
-        let newThreads = onlineThreads
-          // Ignore sticky threads
-          .filter((ot: any) => !stickyThreads.some((st) => st.id === ot.id))
-          // Ignore saved threads
-          .filter(
-            (ot: any) => !savedOnlineThreads.some((st) => st.id === ot.id)
-          );
-        console.log(`${newThreads.length} ${`new threads`.gray}`);
-        // For each new thread, get the posts and save it to the database
-        complete = 0;
-        for (const newThread of newThreads) {
-          let progress = complete / newThreads.length;
+        if (saveThreadIsOnline) {
           try {
-            let posts = await this.getOnlinePosts(newThread, progress);
-            await this.updateThread(newThread, posts);
-            await this.db.upsertThread(newThread);
+            let posts = await this.getOnlinePosts(savedThread, progress);
+            await this.updateThread(savedThread, posts);
           } catch (ex: any) {
             if (ex.response?.status == 404) {
+              savedThread.isOnline = false;
             } else {
               console.log(ex.toString().red);
             }
           }
-          complete++;
         }
+        await this.db.upsertThread(savedThread);
+        complete++;
       }
+
+      // For new threads, get the posts and save it to the database
+      let newThreads = onlineThreads
+        // Ignore sticky threads
+        .filter((ot: any) => !stickyThreads.some((st) => st.id === ot.id))
+        // Ignore saved threads
+        .filter((ot: any) => !savedOnlineThreads.some((st) => st.id === ot.id));
+      console.log(`${newThreads.length} ${`new threads`.gray}`);
+      // For each new thread, get the posts and save it to the database
+      complete = 0;
+      for (const newThread of newThreads) {
+        let progress = complete / newThreads.length;
+        try {
+          let posts = await this.getOnlinePosts(newThread, progress);
+          // Move the cursor up one line
+          process.stdout.write("\x1b[1A");
+          await this.updateThread(newThread, posts);
+          await this.db.upsertThread(newThread);
+        } catch (ex: any) {
+          if (ex.response?.status == 404) {
+          } else {
+            console.log(ex.toString().red);
+          }
+        }
+        complete++;
+      }
+
       resolve(null);
     });
   }
