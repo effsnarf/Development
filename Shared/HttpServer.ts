@@ -263,12 +263,10 @@ class HttpServer {
           // Before %body, add templateData.staticStylesheets (string[]) lines
           // with "    " (4 spaces) indentation
           fileContent = fileContent.replace(
-            /%body/g,
-            (
-              templateData.staticStylesheets
-                ?.map((line: string) => `    ${line}`)
-                .join("\n") + "\n  %body"
-            ).substring(2)
+            /  %body/g,
+            templateData.staticStylesheets
+              ?.map((line: string) => `    ${line}`)
+              .join("\n") + "\n %body"
           );
           // Same for templateData.staticJavaScripts (string[])
           fileContent = fileContent.replace(
@@ -292,7 +290,7 @@ class HttpServer {
         } catch (ex: any) {
           this.log(`${ex.stack.bgRed}`);
           this.log(fileContent.bgRed);
-          return ex.stack;
+          return `${fileContent}\n\n${ex.stack}`;
         }
       }
 

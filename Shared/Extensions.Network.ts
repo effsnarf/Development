@@ -59,6 +59,12 @@ const fetchWithAlertify = async (url: string, options: any) => {
     url,
     options,
     (received: number, total: number) => {
+      if (
+        ["memegenerator.net"].some((host) =>
+          window.location.hostname.includes(host)
+        )
+      )
+        return;
       const elapsed = Date.now() - started;
       if (elapsed < 400) return;
       const msg = `<h3>${title}</h3><p class="text-center">${received.unitifySize()}</p>`;
