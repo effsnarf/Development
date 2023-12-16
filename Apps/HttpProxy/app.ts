@@ -107,6 +107,10 @@ class TaskManager {
     );
   }
 
+  getItems() {
+    return [...this.items.values()];
+  }
+
   get count() {
     return this.items.size;
   }
@@ -503,6 +507,18 @@ class TaskManager {
 
     setTimeout(processCacheQueue, 1000);
   };
+
+  const logSlowTasks = async () => {
+    const minElapsedToLog = 1000;
+    const slowTasks = [...tasks.getItems()].filter(
+      (task) => (task.timer.elapsed || 0) > minElapsedToLog
+    );
+    if (slowTasks.length) {
+    }
+    setTimeout(logSlowTasks, 1000);
+  };
+
+  logSlowTasks();
 
   // Forward all incoming HTTP requests to config.target.base.urls/..
   // If a request fails (target is down), try the cache first

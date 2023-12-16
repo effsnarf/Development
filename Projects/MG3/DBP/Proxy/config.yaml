@@ -28,11 +28,8 @@ analytics:
           connectionString: mongodb://localhost:37017
           database: MG-Analytics-Cache
     database:
-      write:
-        path: F:\Database\MG-Analytics
-      read:
-        connectionString: mongodb://localhost:47017
-        database: MG-Analytics
+      connectionString: mongodb://localhost:47017
+      database: MG-Analytics
 cache:
   ignore:
     - /MemeGenerator/api/
