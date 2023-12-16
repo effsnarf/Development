@@ -12,6 +12,8 @@ import { Http } from "@shared/Http";
 import { Analytics, ItemType } from "@shared/Analytics";
 import { Logger, LoggerBase } from "@shared/Logger";
 import { DbQueue } from "@shared/Database/DbQueue";
+import { Database } from "@shared/Database/Database";
+import { DatabaseBase } from "@shared/Database/DatabaseBase";
 
 interface CachedResponse {
   dt: number;
@@ -46,6 +48,7 @@ const isCachable = (
 };
 
 interface Task {
+  _id: any;
   id: number | null;
   timer: Timer;
   url: string;
@@ -64,11 +67,42 @@ interface Task {
 class TaskManager {
   private _taskID = 1;
   private items = new Map<number, Task>();
+  private logDb!: DatabaseBase;
 
   constructor(
+    private config: any,
     private taskLogger: LoggerBase,
     private statusLogger: LoggerBase
-  ) {}
+  ) {
+    this.init();
+  }
+
+  async init() {
+    this.logDb = await Database.new(this.config.analytics.database);
+    this.logSlowTasks();
+  }
+
+  private async logSlowTasks() {
+    const logDb = this.logDb;
+    const minElapsedToLog = 1000;
+    const slowTasks = [...this.items.values()].filter(
+      (task) => (task.timer.elapsed || 0) > minElapsedToLog
+    );
+    for (const task of slowTasks) {
+      let dbTask = null as any;
+      const hasDbTask = !!task._id;
+      dbTask = hasDbTask
+        ? await logDb.findOneByID("Tasks", task._id)
+        : await logDb.upsert("Tasks", task, true, false, false);
+      // Update the elapsed time in the database
+      if (hasDbTask) {
+        dbTask.timer.elapsed = task.timer.elapsed;
+        await logDb.upsert("Tasks", dbTask, true, false, false);
+      }
+      task._id = dbTask._id;
+    }
+    setTimeout(this.logSlowTasks.bind(this), 1000);
+  }
 
   add(task: Task, req?: any) {
     if (!task.id) task.id = this._taskID++;
@@ -89,9 +123,16 @@ class TaskManager {
   }
 
   remove(task: Task, successfullyCompleted?: boolean) {
-    clearInterval(task.logTimer || 0);
+    clearInterval(task.logTimer as any);
     if (!successfullyCompleted) this.taskLogger.log(task);
     this.items.delete(task.id || 0);
+    this.deleteFromDb(task);
+  }
+
+  private async deleteFromDb(task: Task) {
+    if (!task._id) return;
+    await wait(1000);
+    await this.logDb.delete("Tasks", { _id: task._id });
   }
 
   logStatus() {
@@ -105,10 +146,6 @@ class TaskManager {
         return item;
       })
     );
-  }
-
-  getItems() {
-    return [...this.items.values()];
   }
 
   get count() {
@@ -129,7 +166,7 @@ class TaskManager {
   const taskLogger = Logger.new(config.log.tasks);
   const statusLogger = Logger.new(config.log.status);
 
-  const tasks = new TaskManager(taskLogger, statusLogger);
+  const tasks = new TaskManager(config, taskLogger, statusLogger);
   let pipingTasks = 0;
 
   debugLogger.log(config);
@@ -481,6 +518,7 @@ class TaskManager {
     while (cacheQueueItem) {
       const options = cacheQueueItem.options;
       const task = {
+        _id: null,
         id: null,
         timer: Timer.start(),
         url: cacheQueueItem.url,
@@ -508,18 +546,6 @@ class TaskManager {
     setTimeout(processCacheQueue, 1000);
   };
 
-  const logSlowTasks = async () => {
-    const minElapsedToLog = 1000;
-    const slowTasks = [...tasks.getItems()].filter(
-      (task) => (task.timer.elapsed || 0) > minElapsedToLog
-    );
-    if (slowTasks.length) {
-    }
-    setTimeout(logSlowTasks, 1000);
-  };
-
-  logSlowTasks();
-
   // Forward all incoming HTTP requests to config.target.base.urls/..
   // If a request fails (target is down), try the cache first
   // If the cache doesn't have the response, try backup urls up to target.try.again.retries times
@@ -531,6 +557,7 @@ class TaskManager {
       req.method == "POST" ? await Http.getPostDataFromStream(req) : null;
 
     const task = {
+      _id: null,
       id: null,
       timer: Timer.start(),
       url: req.url,
