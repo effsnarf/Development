@@ -99,12 +99,15 @@ class TaskManager {
       dbTask = hasDbTask
         ? await logDb.findOneByID("Tasks", task._id)
         : await logDb.upsert("Tasks", dbableTask, true, false, false);
-      // Update the elapsed time in the database
-      if (hasDbTask) {
-        dbTask.elapsed = task.timer.elapsed;
-        await logDb.upsert("Tasks", dbTask, true, false, false);
+      // it might have been deleted in the meantime
+      if (dbTask) {
+        // Update the elapsed time in the database
+        if (hasDbTask) {
+          dbTask.elapsed = task.timer.elapsed;
+          await logDb.upsert("Tasks", dbTask, true, false, false);
+        }
+        task._id = dbTask._id;
       }
-      task._id = dbTask._id;
     }
     setTimeout(this.logSlowTasks.bind(this), 1000);
   }
@@ -135,8 +138,8 @@ class TaskManager {
   }
 
   private async deleteFromDb(task: Task) {
+    await Objects.wait(3000);
     if (!task._id) return;
-    await Objects.wait(1000);
     await this.logDb.delete("Tasks", { _id: task._id });
   }
 
