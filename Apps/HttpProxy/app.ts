@@ -429,7 +429,8 @@ class TaskManager {
       : [
           config.title.gray,
           new Date().toLocaleTimeString().gray,
-          `${(memoryUsage.rss / 1024).toString().green}${`ram`.gray}`,
+          `${memoryUsage.rss.unitifySize()}`,
+          `ram`.gray,
           tasks.count.severify(10, 20, "<"),
           `inner`.gray,
           pipingTasks.severify(10, 20, "<"),
