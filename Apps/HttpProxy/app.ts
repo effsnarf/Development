@@ -90,7 +90,10 @@ class TaskManager {
     );
     for (const task of slowTasks) {
       let dbableTask = { ...task } as any;
+      dbableTask.elapsed = task.timer.elapsed;
+      delete dbableTask.timer;
       delete dbableTask.logTimer;
+
       let dbTask = null as any;
       const hasDbTask = !!task._id;
       dbTask = hasDbTask
@@ -98,7 +101,7 @@ class TaskManager {
         : await logDb.upsert("Tasks", dbableTask, true, false, false);
       // Update the elapsed time in the database
       if (hasDbTask) {
-        dbTask.timer.elapsed = task.timer.elapsed;
+        dbTask.elapsed = task.timer.elapsed;
         await logDb.upsert("Tasks", dbTask, true, false, false);
       }
       task._id = dbTask._id;
@@ -472,8 +475,6 @@ class TaskManager {
       : [
           config.title.gray,
           new Date().toLocaleTimeString().gray,
-          `${memoryUsage.rss.unitifySize()}`,
-          `ram`.gray,
           tasks.count.severify(10, 20, "<"),
           `inner`.gray,
           pipingTasks.severify(10, 20, "<"),
