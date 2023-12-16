@@ -281,6 +281,7 @@ class TaskManager {
 
         // When the response ends
         nodeResponse.data.on("end", async () => {
+          pipingTasks--;
           logLine(
             `${task.timer.elapsed
               ?.unitifyTime()
@@ -294,10 +295,10 @@ class TaskManager {
           stats.response.times.track(task.timer.elapsed);
           stats.successes.track(1);
           task.log.push(`Response piped successfully to client`);
-          pipingTasks--;
         });
 
         nodeResponse.data.on("error", async (ex: any) => {
+          pipingTasks--;
           logNewLine(
             `${task.timer.elapsed
               ?.unitifyTime()
@@ -311,7 +312,6 @@ class TaskManager {
           stats.response.times.track(task.timer.elapsed);
           task.log.push(`Error piping response to client`);
           task.log.push(ex.stack);
-          pipingTasks--;
         });
       }
 
@@ -423,11 +423,13 @@ class TaskManager {
   };
 
   const logLine = (...args: any[]) => {
+    const memoryUsage = process.memoryUsage();
     args = isCacheQueueMode
       ? [config.title.gray, new Date().toLocaleTimeString().gray, ...args]
       : [
           config.title.gray,
           new Date().toLocaleTimeString().gray,
+          `${(memoryUsage.rss / 1024).toString().green}${`ram`.gray}`,
           tasks.count.severify(10, 20, "<"),
           `inner`.gray,
           pipingTasks.severify(10, 20, "<"),
