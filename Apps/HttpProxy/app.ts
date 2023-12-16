@@ -90,7 +90,7 @@ class TaskManager {
     );
     for (const task of slowTasks) {
       let dbableTask = { ...task } as any;
-      delete dbableTask.timeout;
+      delete dbableTask.logTimer;
       let dbTask = null as any;
       const hasDbTask = !!task._id;
       dbTask = hasDbTask
