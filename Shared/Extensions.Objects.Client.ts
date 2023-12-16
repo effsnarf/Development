@@ -6,6 +6,10 @@ const _importMainFileToImplement =
 type ObjectNodeFilter = (node: any, key: string, value: any) => boolean;
 
 class Objects {
+  static async wait(milliseconds: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, milliseconds));
+  }
+
   static is(obj: any, type: any): boolean {
     return (0)._is(obj, type);
   }

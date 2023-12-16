@@ -133,7 +133,7 @@ class TaskManager {
 
   private async deleteFromDb(task: Task) {
     if (!task._id) return;
-    await wait(1000);
+    await Objects.wait(1000);
     await this.logDb.delete("Tasks", { _id: task._id });
   }
 
