@@ -89,11 +89,13 @@ class TaskManager {
       (task) => (task.timer.elapsed || 0) > minElapsedToLog
     );
     for (const task of slowTasks) {
+      let dbableTask = { ...task } as any;
+      delete dbableTask.timeout;
       let dbTask = null as any;
       const hasDbTask = !!task._id;
       dbTask = hasDbTask
         ? await logDb.findOneByID("Tasks", task._id)
-        : await logDb.upsert("Tasks", task, true, false, false);
+        : await logDb.upsert("Tasks", dbableTask, true, false, false);
       // Update the elapsed time in the database
       if (hasDbTask) {
         dbTask.timer.elapsed = task.timer.elapsed;
