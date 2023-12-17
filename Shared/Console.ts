@@ -687,6 +687,10 @@ class Console {
     process.stdout.write(`\u001b[${y + 1};${x}H`);
   }
 
+  static moveCursorUp(lines: number = 1) {
+    process.stdout.write(`\u001b[${lines}A`);
+  }
+
   header(...items: string[]) {
     for (const item of items) this.headerItems.push(item);
   }

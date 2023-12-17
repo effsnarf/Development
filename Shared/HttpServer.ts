@@ -10,6 +10,7 @@ const Handlebars = require("Handlebars");
 const http = require("http");
 const https = require("https");
 import "../Shared/Extensions";
+import { Console } from "./Console";
 import { Configuration } from "./Configuration";
 import { Objects } from "./Extensions.Objects";
 import { TypeScript } from "./TypeScript";
@@ -308,6 +309,7 @@ class HttpServer {
     args.unshift(`${new Date().toLocaleTimeString().gray}`);
     args.unshift(`${this.appName?.gray}`);
     console.log(...args);
+    Console.moveCursorUp();
   }
 }
 
