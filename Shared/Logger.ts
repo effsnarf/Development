@@ -38,6 +38,10 @@ abstract class Logger {
     logger.log("Logger started");
     return logger;
   }
+
+  static console(lines?: number) {
+    return ConsoleLogger.new(lines);
+  }
 }
 
 abstract class LoggerBase implements Logger {
@@ -119,8 +123,8 @@ class ConsoleLogger extends LoggerBase {
     super();
   }
 
-  static new() {
-    return new ConsoleLogger();
+  static new(lines?: number) {
+    return new ConsoleLogger(lines);
   }
 
   protected async _log(items: any[]): Promise<void> {

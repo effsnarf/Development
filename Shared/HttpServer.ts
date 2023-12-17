@@ -11,6 +11,7 @@ const http = require("http");
 const https = require("https");
 import "../Shared/Extensions";
 import { Console } from "./Console";
+import { Logger } from "./Logger";
 import { Configuration } from "./Configuration";
 import { Objects } from "./Extensions.Objects";
 import { TypeScript } from "./TypeScript";
@@ -24,6 +25,7 @@ interface HttpServerOptions {
 }
 
 class HttpServer {
+  private consolelogger = Logger.console();
   private currentRequestsCount = 0;
 
   private constructor(
@@ -318,8 +320,7 @@ class HttpServer {
       const maxArgLength = window.width - (argsLength - longestArg.length) - 2;
       args[index] = longestArg.shorten(maxArgLength);
     }
-    console.log(...args);
-    Console.moveCursorUp();
+    this.consolelogger.log(args);
   }
 }
 
