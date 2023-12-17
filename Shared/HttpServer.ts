@@ -315,7 +315,8 @@ class HttpServer {
       const argsLength = args.join(" ").length;
       const longestArg = args.reduce((a, b) => (a.length > b.length ? a : b));
       const index = args.indexOf(longestArg);
-      args[index] = args[index].shorten(args[index].length - 1);
+      const maxArgLength = window.width - (argsLength - longestArg.length) - 2;
+      args[index] = longestArg.shorten(maxArgLength);
     }
     console.log(...args);
     Console.moveCursorUp();
