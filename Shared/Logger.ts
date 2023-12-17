@@ -113,7 +113,7 @@ class EmptyLogger extends LoggerBase {
 }
 
 interface LogLine {
-  items: any[];
+  args: any[];
 }
 class ConsoleLogger extends LoggerBase {
   private hasWritten = false;
@@ -128,14 +128,20 @@ class ConsoleLogger extends LoggerBase {
   }
 
   protected async _log(items: any[]): Promise<void> {
+    for (const item of items) {
+      this._logArgs(item.args);
+    }
+  }
+
+  private _logArgs(args: any[]) {
     if (this.hasWritten) Console.moveCursorUp(this.logLines.length);
     while (this.logLines.length > this.lines) this.logLines.shift();
     this.logLines.push({
-      items: items,
+      args: args,
     });
     for (const line of this.logLines) {
       Console.clearLine();
-      console.log(...line.items);
+      console.log(...line.args);
     }
     this.hasWritten = true;
   }
