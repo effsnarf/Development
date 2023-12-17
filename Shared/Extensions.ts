@@ -1,3 +1,108 @@
+// #region String1
+enum CharType {
+  Normal = "normal",
+  Unicode = "unicode",
+  ColorCode = "colorCode",
+}
+
+const controlCharacterTypes = [CharType.ColorCode];
+
+class Character {
+  type: CharType;
+
+  private static readonly regex = {
+    colorCode: /^\[#[0-9A-Fa-f]{6}\]/,
+    unicode: /^[\uD800-\uDBFF][\uDC00-\uDFFF]/,
+  };
+
+  private constructor(public char: string) {
+    this.type = Character.detectType(char);
+  }
+
+  static new(char: string): Character {
+    return new Character(char);
+  }
+
+  static fromNextCharacter(str: string): Character | null {
+    if (!str) return null;
+
+    for (const regexKey in Character.regex) {
+      const regex = (Character.regex as any)[regexKey];
+      const match = str.match(regex);
+      if (match) return Character.new(match[0]);
+    }
+
+    return Character.new(str[0]);
+  }
+
+  static getStringChars(str: string): Character[] {
+    const chars: Character[] = [];
+    let c: Character | null = null;
+
+    while ((c = Character.fromNextCharacter(str))) {
+      chars.push(c);
+      str = str.substring(c.char.length);
+    }
+
+    return chars;
+  }
+
+  private static detectType(char: string): CharType {
+    for (const regexKey in Character.regex) {
+      const regex = (Character.regex as any)[regexKey];
+      if (char.match(regex)) {
+        const charType = regexKey.parseEnum(CharType);
+        if (!charType) throw new Error(`Invalid CharType: ${regexKey}`);
+        return charType;
+      }
+    }
+
+    return CharType.Normal;
+  }
+}
+
+class String1 {
+  private constructor(public string: string, public chars: Character[] = []) {}
+
+  static fromString(str: string | String): String1 {
+    const str1 = str.toString();
+    return new String1(str1, Character.getStringChars(str1));
+  }
+
+  static fromChars(chars: Character[]): String1 {
+    return new String1(chars.map((c) => c.char).join(""), chars);
+  }
+
+  shorten(maxLength: number, ellipsis: boolean = true): String1 {
+    const chars = [...this.chars];
+    while (chars.length > maxLength) {
+      // Find the index of the last non-control character
+      const lastNonControlCharIndex = chars.findIndexFromEnd(
+        (c) => !controlCharacterTypes.includes(c.type)
+      );
+      if (lastNonControlCharIndex < 0) break;
+      chars.splice(lastNonControlCharIndex, 1);
+    }
+    if (ellipsis) chars.push(Character.new("…"));
+    return String1.fromChars(chars);
+  }
+
+  toString(): string {
+    return this.string;
+  }
+
+  // #region Static methods
+  static shorten(
+    str: string | String,
+    maxLength: number,
+    ellipsis: boolean = true
+  ): string {
+    return String1.shorten(str, maxLength, ellipsis);
+  }
+  // #endregion
+}
+// #endregion
+
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // #region UnitClass, Type, Size, Percentage, color
@@ -352,6 +457,7 @@ interface Array<T> {
   ): Promise<TResult[]>;
   toMap(getKey: (item: T, index: number) => any): object;
   toMapValue(getValue: (item: T, index: number) => any): object;
+  findIndexFromEnd(predicate: (item: T) => boolean): number;
   contains(item: T, getItemKey?: (item: T) => any): boolean;
   reversed(): T[];
   removeAt(index: number): void;
@@ -993,14 +1099,7 @@ if (typeof String !== "undefined") {
     maxLength: number,
     ellipsis: boolean = true
   ): string {
-    if (maxLength == null) return this.toString();
-    if (ellipsis) maxLength -= 2;
-    let s = this.toString();
-    if (s.getCharsCount() > maxLength) {
-      s = s.sliceChars(0, maxLength);
-      if (ellipsis) s += "..";
-    }
-    return s;
+    return String1.shorten(this, maxLength, ellipsis);
   };
 
   String.prototype.toLength = function (
@@ -1566,6 +1665,15 @@ if (typeof Array !== "undefined") {
       map[getKey(item, index)] = getValue!(item, index);
     });
     return map;
+  };
+
+  Array.prototype.findIndexFromEnd = function (
+    predicate: (item: any) => boolean
+  ) {
+    for (let i = this.length - 1; i >= 0; i--) {
+      if (predicate(this[i])) return i;
+    }
+    return -1;
   };
 
   Array.prototype.toMapValue = function (
