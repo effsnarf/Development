@@ -320,7 +320,7 @@ class HttpServer {
       const maxArgLength = window.width - (argsLength - longestArg.length) - 2;
       args[index] = longestArg.shorten(maxArgLength);
     }
-    this.consolelogger.log(args);
+    this.consolelogger.log(...args);
   }
 }
 
