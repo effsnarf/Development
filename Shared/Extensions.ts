@@ -97,7 +97,7 @@ class String1 {
     maxLength: number,
     ellipsis: boolean = true
   ): string {
-    return String1.shorten(str, maxLength, ellipsis);
+    return String1.fromString(str).shorten(maxLength, ellipsis).toString();
   }
   // #endregion
 }
