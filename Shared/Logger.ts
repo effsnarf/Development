@@ -1,6 +1,7 @@
 import "./Extensions";
 import fs from "fs";
 import path from "path";
+import { Console } from "./Console";
 import { Objects } from "./Extensions.Objects";
 import { Timer } from "./Timer";
 import { Queue } from "./Queue";
@@ -105,6 +106,35 @@ class EmptyLogger extends LoggerBase {
   }
 
   protected async _log(items: any[]): Promise<void> {}
+}
+
+interface LogLine {
+  items: any[];
+}
+class ConsoleLogger extends LoggerBase {
+  private hasWritten = false;
+  private logLines: LogLine[] = [];
+
+  private constructor(public lines: number = 10) {
+    super();
+  }
+
+  static new() {
+    return new ConsoleLogger();
+  }
+
+  protected async _log(items: any[]): Promise<void> {
+    if (this.hasWritten) Console.moveCursorUp(this.logLines.length);
+    while (this.logLines.length > this.lines) this.logLines.shift();
+    this.logLines.push({
+      items: items,
+    });
+    for (const line of this.logLines) {
+      Console.clearLine();
+      console.log(...line.items);
+    }
+    this.hasWritten = true;
+  }
 }
 
 class FunctionLogger extends LoggerBase {

@@ -681,6 +681,10 @@ class Console {
     });
   }
 
+  static clearLine() {
+    readline.clearLine(process.stdout, 0);
+  }
+
   static moveCursorTo(x: number, y: number) {
     x = Math.round(x);
     y = Math.round(y);

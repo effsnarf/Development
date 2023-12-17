@@ -310,7 +310,7 @@ class HttpServer {
     args.unshift(`${this.appName?.gray}`);
     const window = Console.getWindowSize();
     // Make sure that args fit in the console window
-    while (args.join(" ").length > window.width) {
+    if (args.join(" ").length > window.width) {
       // Find the longest argument and remove a character from it
       const argsLength = args.join(" ").length;
       const longestArg = args.reduce((a, b) => (a.length > b.length ? a : b));
