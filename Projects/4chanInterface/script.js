@@ -29,8 +29,6 @@ whenMouseMove((pos, delta) => {
 });
 
 const onElementAdded = addedNode => {
-    addedNode.remove();
-    return;
     // on img.load, add .fade-in class to #ihover
     const isImage = (addedNode.tagName == "IMG");
     if (!isImage) return;

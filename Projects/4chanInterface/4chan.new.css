@@ -90,7 +90,6 @@
 .postContainer:not(.catalog-container)
 {
     width: 50%;
-    margin: auto;
 }
 
 .post:not(.catalog-post)
