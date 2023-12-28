@@ -36,10 +36,13 @@ class Loading {
     this._lastElapsed = Date.now() - this.startTime!;
     this.isRunning = false;
     this.startTime = null;
+    this.clearInfo();
+  }
+
+  clearInfo() {
     process.stdout.write("\r");
     process.stdout.clearLine(0);
-    if (info && this.log)
-      console.log(this._lastElapsed.unitifyTime(), info.gray);
+    //if (info && this.log) console.log(this._lastElapsed.unitifyTime(), info.gray);
   }
 
   restart(info?: string) {
@@ -50,12 +53,14 @@ class Loading {
     if (!this.isRunning) return;
     if (!this.log) return;
     const elapsedTime = Date.now() - this.startTime!;
-    process.stdout.write(`\r`);
-    process.stdout.write(
-      `${elapsedTime.unitifyTime()} ${
-        (this.info || "").toSingleLine().shorten(100).gray
-      }`
-    );
+    if (elapsedTime > 50) {
+      process.stdout.write(`\r`);
+      process.stdout.write(
+        `${elapsedTime.unitifyTime()} ${
+          (this.info || "").toSingleLine().shorten(100).gray
+        }`
+      );
+    }
     if (this.isRunning) {
       setTimeout(this.showInfo.bind(this), 100);
     }

@@ -10,6 +10,16 @@ class Objects {
     return new Promise((resolve) => setTimeout(resolve, milliseconds));
   }
 
+  static async awaitWithTimeout<T>(
+    func: () => Promise<T>,
+    milliseconds: number
+  ): Promise<T> {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => reject("Timeout"), milliseconds);
+      func().then(resolve).catch(reject);
+    });
+  }
+
   static is(obj: any, type: any): boolean {
     return (0)._is(obj, type);
   }

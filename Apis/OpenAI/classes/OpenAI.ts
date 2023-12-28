@@ -1,3 +1,4 @@
+import util from "util";
 import { getEncoding, encodingForModel } from "js-tiktoken";
 import axios, { AxiosResponse } from "axios";
 import { Objects } from "../../../Shared/Extensions.Objects";
@@ -8,6 +9,7 @@ import { Loading } from "../../../Shared/Loading";
 interface Message {
   role: "user" | string;
   content: string;
+  tool_calls?: any;
 }
 
 interface Response {
@@ -140,16 +142,27 @@ class OpenAI {
     model: string,
     type: string,
     dataProps: any,
-    desc?: string
+    desc?: string,
+    tools?: any,
+    toolMethods?: any
   ): Promise<T> {
-    return await this._makeRequest(model, type, dataProps, desc);
+    return await this._makeRequest(
+      model,
+      type,
+      dataProps,
+      desc,
+      tools,
+      toolMethods
+    );
   }
 
   private async _makeRequest<T>(
     model: string,
     type: string,
     dataProps: any,
-    desc?: string
+    desc?: string,
+    tools?: any,
+    toolMethods?: any
   ): Promise<T> {
     const promptText =
       dataProps.prompt || dataProps.input || dataProps.messages || dataProps;
@@ -164,6 +177,7 @@ class OpenAI {
 
     const data = {
       model: model,
+      tools: tools,
       max_tokens: 500,
       ...dataProps,
     };
@@ -178,6 +192,7 @@ class OpenAI {
     const endpoint = `${this.endpoint}${type}`;
 
     let response: AxiosResponse<Response>;
+    const loading = Loading.startNew();
     try {
       this.loading.start(desc);
       response = await axios.post<Response>(endpoint, data, {
@@ -200,8 +215,10 @@ class OpenAI {
       }
       if (["ECONNRESET", "socket hang up"].some((err) => msg.includes(err)))
         return await this.makeRequest<T>(model, type, dataProps, desc);
+      //console.log(util.inspect(data, false, null, true));
       throw msg ? new Error(msg) : ex;
     } finally {
+      loading.stop();
       this.loading.stop();
     }
 
@@ -209,17 +226,83 @@ class OpenAI {
     if (choices.length > 1)
       throw new Error(`${choices.length} choices returned`);
     if (choices[0].text) choices[0].text = choices[0].text.trim();
-    if (choices[0].message)
-      choices[0].message.content = choices[0].message.content.trim();
-    let reply = (choices[0].text || choices[0].message) as T;
-    if (typeof reply == "string") {
-      if (reply.toString().startsWith("```json")) {
-        reply = reply.substring(7, reply.length - 3) as T;
+    const responseMessage = choices[0].message;
+
+    try {
+      if (responseMessage)
+        responseMessage.content = responseMessage.content?.trim();
+      let reply = (choices[0].text || responseMessage) as T;
+      if (typeof reply == "string") {
+        if (reply.toString().startsWith("```json")) {
+          reply = reply.substring(7, reply.length - 3) as T;
+        }
       }
+
+      // Step 2: check if the model wanted to call a function
+      const toolCalls = responseMessage.tool_calls;
+      if (responseMessage.tool_calls) {
+        data.messages.push(responseMessage);
+        // Step 3: call the function
+        // Note: the JSON response may not always be valid; be sure to handle errors
+        const availableFunctions = toolMethods;
+        for (const toolCall of toolCalls) {
+          const functionResponse = await this.executeToolCall(
+            toolMethods,
+            toolCall
+          );
+          data.messages.push({
+            tool_call_id: toolCall.id,
+            role: "tool",
+            name: toolCall.function.name,
+            content: functionResponse,
+          }); // extend conversation with function response
+        }
+        // get a new response from the model where it can see the function response
+        const secondResponse = await this._makeRequest(
+          model,
+          type,
+          data,
+          desc,
+          tools,
+          toolMethods
+        );
+        return secondResponse as T;
+      }
+
+      this.log();
+      this.log((reply as any)?.content || reply);
+      return reply;
+    } catch (ex: any) {
+      console.log(util.inspect(responseMessage, false, null, true));
+      throw ex;
     }
-    this.log();
-    this.log((reply as any)?.content || reply);
-    return reply;
+  }
+
+  private async executeToolCall(toolMethods: any, toolCall: any) {
+    const loading = Loading.startNew();
+    try {
+      const functionName = toolCall.function.name;
+      const functionToCall = toolMethods[functionName];
+      if (!functionToCall) return `Error: function ${functionName} not found`;
+      const functionArgs = JSON.parse(toolCall.function.arguments);
+      console.log();
+      console.log(
+        `${functionName} (${JSON.stringify(functionArgs)})`.bgWhite.black
+      );
+      const timeout = (5).seconds();
+      let functionResponse = null;
+      try {
+        functionResponse = await Objects.awaitWithTimeout(
+          async () => await functionToCall(functionArgs),
+          timeout
+        );
+      } catch (ex: any) {
+        functionResponse = `Error: ${ex.message}`;
+      }
+      return functionResponse;
+    } finally {
+      loading.stop();
+    }
   }
 
   private async wait(message: string, ms: number) {
@@ -250,18 +333,27 @@ class OpenAI {
   public async chat(
     messages: Message[],
     maxReplyTokens?: number,
-    desc?: string
+    desc?: string,
+    json?: boolean,
+    tools?: any,
+    toolMethods?: any
   ): Promise<Message> {
     if (maxReplyTokens) {
       //messages = this.shortenMessages(messages, maxReplyTokens);
     }
+    const data = {
+      messages,
+    } as any;
+
+    if (json) data.response_format = { type: "json_object" };
+
     return await this.makeRequest<Message>(
       this.model,
       RequestType.Chat,
-      {
-        messages,
-      },
-      desc
+      data,
+      desc,
+      tools,
+      toolMethods
     );
   }
 
