@@ -30,6 +30,7 @@ import { Model } from "../../Apis/OpenAI/classes/OpenAI";
     const aiReply = await Objects.try(() => JSON.parse(replyText), null);
 
     if (!aiReply) {
+      console.log();
       console.log(replyText.yellow);
       //const nextReply = await chat.send(`Please reply in the JSON format.`);
       //await processReply(nextReply);
