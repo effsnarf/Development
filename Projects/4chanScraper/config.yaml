@@ -56,6 +56,8 @@ fourChan:
       - news
       - wsr
       - vip
+llm:
+  model: gpt-3.5-turbo
 db:
   fileSystem:
     dataDir: ./Data

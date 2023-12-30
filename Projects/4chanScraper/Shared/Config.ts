@@ -2,6 +2,9 @@ interface Config {
   fourChan: {
     boards: string[];
   };
+  llm: {
+    model: string;
+  };
   db: {
     fileSystem: {
       dataDir: string;

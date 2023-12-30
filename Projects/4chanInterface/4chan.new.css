@@ -95,7 +95,6 @@
 .post:not(.catalog-post)
 {
     width: 100%;
-    background: linear-gradient(45deg, #1d1f22, #313438);
 }
 
 .post:not(.catalog-post):hover .fileText
