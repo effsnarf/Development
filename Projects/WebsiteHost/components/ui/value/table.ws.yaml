@@ -3,39 +3,45 @@ dom:
     .opacity-50:
       v-if: isEmpty
       v-text: emptyText
-    table:
-      ':class': type
-      v-if: '!isEmpty'
-      ui.dnd.draggable:
-        tag: tr
-        :drag-item: "{ field: { ...row } }"
-        v-for: row in rows
-        th:
-          class: opacity-40 fw-100
-          v-if: isPrimitive(row.value)
-          v-text: row.key
-        td: 
-          v-if: isPrimitive(row.value)
-          ui.value.any: 
-            ':value': row.value
-            ':depth': (depth + 1)
-        td: 
-          v-if: '!isPrimitive(row.value)'
-          colspan: 2
-          .clickable:
-            class: flex
-            @click: toggleExpanded(row.key)
-            ui.expand:
-              class: opacity-40
-              ':value': isExpanded[row.key]
-              ':text': row.key
-          transition:
-            name: slide
-            .ml-l1:
-              v-if: isExpanded[row.key]
-              ui.value.any: 
-                ':value': row.value
-                ':depth': (depth + 1)
+    .flex:
+      table:
+        ':class': type
+        v-if: '!isEmpty'
+        ui.dnd.draggable:
+          tag: tr
+          :drag-item: "{ field: { ...row } }"
+          v-for: row in rows
+          @click: onRowClick(row)
+          th:
+            class: opacity-40 fw-100
+            v-if: isPrimitive(row.value)
+            v-text: row.key
+          td: 
+            v-if: isPrimitive(row.value)
+            ui.value.any: 
+              ':value': row.value
+              ':depth': (depth + 1)
+          td: 
+            v-if: '!isPrimitive(row.value)'
+            colspan: 2
+            .clickable:
+              class: flex
+              @click: toggleExpanded(row.key)
+              ui.expand:
+                class: opacity-40
+                ':value': isExpanded[row.key]
+                ':text': row.key
+            transition:
+              name: slide
+              .ml-l1:
+                v-if: isExpanded[row.key]
+                ui.value.any: 
+                  ':value': row.value
+                  ':depth': (depth + 1)
+      div:
+        class: box
+        ui.value:
+          :value: selected.item
 props:
   value: null
   title: null
@@ -44,7 +50,13 @@ props:
 data:
   isExpanded: {}
   rows: null
+  selected:
+    item: null
 methods:
+  onRowClick: | #js
+    function(row) {
+      this.selected.item = row.value;
+    }
   getRows: | #js
     function() {
       const value = this.value;
