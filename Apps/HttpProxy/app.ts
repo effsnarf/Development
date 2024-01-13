@@ -579,7 +579,7 @@ class TaskManager {
 
   // CORS middleware
   app.use((req: any, res: any, next: Function) => {
-    // Allow any domain to access this server
+    // Allow any domain to access your server
     res.header("Access-Control-Allow-Origin", "*");
 
     // Allow specific HTTP methods and headers
@@ -592,8 +592,8 @@ class TaskManager {
       "Origin, X-Requested-With, Content-Type, Accept, Authorization"
     );
 
-    // Handle preflight requests for CORS
-    if ("OPTIONS" == req.method) {
+    // Handle preflight requests
+    if (req.method === "OPTIONS") {
       res.sendStatus(200);
     } else {
       next();
