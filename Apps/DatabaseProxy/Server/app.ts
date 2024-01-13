@@ -467,9 +467,14 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
     }
     // #endregion
 
-    httpServer.get(
+    httpServer.all(
       "/shakespearize",
       processRequest(async (req: any, res: any, postData: any) => {
+        if (!postData?.text)
+          return res.end(
+            JSON.stringify(`Usage: /shakespearize (POST { text: "..." })`)
+          );
+
         const sheakspearize = async (text: string) => {
           const url = `http://95.183.1.58/shakespearize`;
           var response = await fetch(url, {
