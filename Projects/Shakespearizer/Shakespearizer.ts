@@ -27,7 +27,7 @@ class Shakespearizer {
     if (!texts.length) return [];
 
     const chatPrompt = `
-    Sheakspearize the texts in this array:
+    Rewrite all the strings in this array in the style of Shakespeare:
     (answer in this format and nothing else:)
     { shakespearized: ["...", "...", ...] }
 
