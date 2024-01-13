@@ -147,6 +147,8 @@ class Shakespearizer {
   private cleanupString(text: string) {
     if (!text) return text;
     text = text.replace(`Translate to Shakespearean: `, ``);
+    text = text.replace(`Translate to Shakespearean:\n`, ``);
+    text = text.replace(`Translate to Shakespearean:\n\n`, ``);
     return text;
   }
 
