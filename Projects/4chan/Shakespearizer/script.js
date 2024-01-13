@@ -29,6 +29,8 @@ const shakespearizeElement = async (element) => {
         if (node.nodeType !== Node.TEXT_NODE) return;
         if (shouldSkipTextNode(node)) return;
         //console.log(node.textContent);
+        if (node.shakespearizing) return;
+        node.shakespearizing = true;
         const text = node.textContent;
         node.unshakespearized = text;
         node.textContent = await shakespearizer.shakespearize(text);

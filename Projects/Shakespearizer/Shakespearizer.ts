@@ -22,13 +22,16 @@ class Shakespearizer {
   }
 
   private async textToShakespearizedEnglish(text: string) {
+    text = (text || "").trim();
+    if (!text.length) return { text, shakespearized: "" };
+
     const chatPrompt = `
     Translate to Shakespearean:
 
     ${text}
     `;
 
-    const shakespearized = await this.chat.send(chatPrompt);
+    const shakespearized = (await this.chat.send(chatPrompt)).trim();
 
     const item = {
       text,
@@ -87,6 +90,9 @@ class Shakespearizer {
     text: string,
     shakespearized: string
   ) {
+    text = (text || "").trim();
+    if (!text.length) return;
+
     const _id = text.hashCode();
     let item = await this.db.get(_id);
     if (!item) {
