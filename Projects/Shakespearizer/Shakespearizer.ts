@@ -18,39 +18,61 @@ class Shakespearizer {
 
   private async init() {
     this.db = await Database.new(this.config.database);
-    this.chat = await ChatOpenAI.new(Roles.Null, true, Model.Gpt35Turbo);
+    this.chat = await ChatOpenAI.new(Roles.Null, false, Model.Gpt35Turbo);
+  }
+
+  private async textToShakespearizedEnglish(text: string) {
+    const chatPrompt = `
+    Translate to Shakespearean:
+
+    ${text}
+    `;
+
+    const shakespearized = await this.chat.send(chatPrompt);
+
+    const item = {
+      text,
+      shakespearized,
+    };
+
+    return item;
   }
 
   private async toShakespearizedEnglish(texts: string[]) {
-    texts = texts.map((text) => (text || "").trim());
-
     if (!texts.length) return [];
 
-    const chatPrompt = `
-    Rewrite all the strings in this array in the style of Shakespeare:
-    (answer in this format and nothing else:)
-    { shakespearized: ["...", "...", ...] }
+    texts = texts.map((text) => (text || "").trim());
 
-    ${JSON.stringify(texts)}
-    `;
-
-    const result = JSON.parse(await this.chat.send(chatPrompt));
-    const shakespearizedTexts = result.shakespearized;
-
-    const items = texts.map((text, index) => ({
-      text,
-      shakespearized: shakespearizedTexts[index],
-    }));
+    const items = [];
+    for (const text of texts) {
+      const item = await this.textToShakespearizedEnglish(text);
+      items.push(item);
+    }
 
     // Cache the shakespearized texts.
     for (const item of items) {
       await this.setCachedShakespearizedText(item.text, item.shakespearized);
     }
 
-    return texts.map((text, index) => ({
-      text,
-      shakespearized: shakespearizedTexts[index],
-    }));
+    return items;
+
+    // const result = (await this.chat.send(chatPrompt));
+    // const shakespearizedTexts = result.shakespearized;
+
+    // const items = texts.map((text, index) => ({
+    //   text,
+    //   shakespearized: shakespearizedTexts[index],
+    // }));
+
+    // // Cache the shakespearized texts.
+    // for (const item of items) {
+    //   await this.setCachedShakespearizedText(item.text, item.shakespearized);
+    // }
+
+    // return texts.map((text, index) => ({
+    //   text,
+    //   shakespearized: shakespearizedTexts[index],
+    // }));
   }
 
   private async getCachedShakespearizedText(text: string) {
@@ -97,7 +119,7 @@ class Shakespearizer {
 
     // Update the results with the new shakespearized texts.
     for (const newResult of newResults) {
-      const index = results.findIndex((r) => r.text === newResult.text);
+      const index = results.findIndex((r) => r.text == newResult.text);
       results[index] = newResult;
     }
 

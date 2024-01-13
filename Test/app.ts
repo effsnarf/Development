@@ -37,17 +37,19 @@ import { Shakespearizer } from "../Projects/Shakespearizer/Shakespearizer";
   });
 
   const texts = [
-    "If you could browse 4chan like this, would you use it?",
-    "I enter a board directly into the search bar, scroll down, right-click-new tab interesting threads, gather enough, enter a new board, repeat the process. Then it's just visiting the tabs, no need for browsing. It doesn't seem like your model will improve my shitposting life.",
-    "This ChatGPT is endlessly entertaining",
-    "i like it anon",
-    "2 things - ",
-    "I don't think it's awful for browsing archives.",
-    "you know what i come to 4chan for?",
-    "i thought about. maybe it would be good to have a daily/weekly 4chan review with a summary of the best threads and best posts for those who dont have time.",
-    "why not?",
-    "compared to 4chan it looks like the sistine chapel",
+    "Which matters more: fitness or intelligence?",
+    "this nigga ZESTY",
+    "Harvard is great, not for the education but for the connections it gives you in life.",
+    "What matters most is deez nutz.",
+    "Have fun at the ZOG recruitment pool.",
+    "all of you anons may think having a big ass as a man is great but NO it fucking sucks trust me",
+    "I dropped out of uni twice and have 25k debt and only got my first job at 25 a couple months ago making minimum wage for an adult",
+    ">Harvard",
+    "What an ass",
+    "oh my Im bout to bust",
   ];
+
+  const texts2 = ["such is life is mother Russia", "fuck this shit"];
 
   const results = await shakespearizer.shakespearize(texts);
 
