@@ -15,6 +15,7 @@ import { Analytics, ItemType } from "@shared/Analytics";
 import isAttributeName from "@shared/WebScript/is.attribute.name";
 import { ChatOpenAI, Roles } from "../../../Apis/OpenAI/classes/ChatOpenAI";
 import { text } from "stream/consumers";
+import { Shakespearizer } from "../../Shakespearizer/Shakespearizer";
 
 Configuration.log = false;
 
@@ -484,21 +485,14 @@ const sheakspearize = async (text: string) => {
         const postData = await Http.getPostDataFromStream(req);
         const text = postData.text;
         const sheakspearize = async (text: string) => {
-          const url = `http://10.35.16.38/shakespearize`;
-
-          var response = await fetch(url, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ text: text }),
-          });
-
-          var result = await response.json();
-          return result;
+          const shakespearizer = await Shakespearizer.new(
+            config.shakespearizer
+          );
+          const shakespearized = await shakespearizer.shakespearize(text);
+          return shakespearized;
         };
-        const result = await sheakspearize(text);
-        res.end(JSON.stringify(result));
+        const shakespearized = await sheakspearize(text);
+        res.end(JSON.stringify({ text, shakespearized }));
         return;
       }
 
