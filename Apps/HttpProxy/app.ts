@@ -14,6 +14,7 @@ import { Logger, LoggerBase } from "@shared/Logger";
 import { DbQueue } from "@shared/Database/DbQueue";
 import { Database } from "@shared/Database/Database";
 import { DatabaseBase } from "@shared/Database/DatabaseBase";
+import { Shakespearizer } from "../../Projects/Shakespearizer/Shakespearizer";
 
 interface CachedResponse {
   dt: number;
@@ -184,30 +185,21 @@ class TaskManager {
       (req?.method || task.options?.method).toLowerCase() == "post";
 
     if (req?.url == "/shakespearize") {
-      //const postData = await Http.getPostDataFromStream(req);
-      //const text = postData.text;
       const sheakspearize = async (text: string) => {
-        const url = `http://95.183.1.58/shakespearize`;
-
-        var response = await fetch(url, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
+        const shakespearizer = await Shakespearizer.new({
+          database: {
+            path: `D:\Development\Projects\Shakespearizer\Data`,
           },
-          body: JSON.stringify({ text: text }),
         });
-
-        try {
-          const result = await response.json();
-          //const result = { text, shakespearized: `To be or not to be.` };
-          return result;
-        } catch (ex: any) {
-          return ex.message;
-        }
+        const shakespearized = await shakespearizer.shakespearize(text);
+        return shakespearized;
       };
-      const result = await sheakspearize("test");
+
+      const postData = await Http.getPostDataFromStream(req);
+      const text = postData.text;
+      const shakespearized = await sheakspearize(text);
       tasks.remove(task, true);
-      res.end(JSON.stringify(result));
+      res.end(JSON.stringify({ text, shakespearized }));
       return;
     }
 
