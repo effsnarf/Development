@@ -102,16 +102,14 @@ class Shakespearizer {
     if (!text.length) return;
 
     const _id = text.hashCode();
-    let item = await this.db.get(_id);
-    if (!item) {
-      item = {
-        _id: _id,
-        created: Date.now(),
-        text,
-        shakespearized,
-      };
-      await this.db.set(_id, item);
-    }
+
+    const item = {
+      _id: _id,
+      created: Date.now(),
+      text,
+      shakespearized,
+    };
+    await this.db.set(_id, item);
   }
 
   async shakespearize(texts: string[]) {
