@@ -186,18 +186,28 @@ class TaskManager {
 
     if (req?.url == "/shakespearize") {
       const sheakspearize = async (text: string) => {
-        const shakespearizer = await Shakespearizer.new({
-          database: {
-            path: `D:\Development\Projects\Shakespearizer\Data`,
+        // const shakespearizer = await Shakespearizer.new({
+        //   database: {
+        //     path: `D:\Development\Projects\Shakespearizer\Data`,
+        //   },
+        // });
+        // const shakespearized = await shakespearizer.shakespearize(text);
+        // return shakespearized;
+        const url = `http://10.35.16.38/shakespearize`;
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
           },
+          body: JSON.stringify({ text }),
         });
-        const shakespearized = await shakespearizer.shakespearize(text);
-        return shakespearized;
+        const json = await response.json();
+        return json.shakespearized;
       };
 
       const postData = await Http.getPostData(req);
-      const text = `to be or not to be`;
-      const shakespearized = `to be or not to be`; //await sheakspearize(text);
+      const text = postData.text;
+      const shakespearized = await sheakspearize(text);
       tasks.remove(task, true);
       res.end(JSON.stringify({ text, shakespearized }));
       return;
