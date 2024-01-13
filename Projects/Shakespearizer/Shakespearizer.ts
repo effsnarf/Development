@@ -86,8 +86,10 @@ class Shakespearizer {
     if (!item) return null;
 
     const cleaned = this.cleanup(item);
-    if (JSON.stringify(item) != JSON.stringify(cleaned))
-      this.setCachedShakespearizedText(text, cleaned.shakespearized);
+    if (JSON.stringify(item) != JSON.stringify(cleaned)) {
+      item.shakespearized = cleaned.shakespearized;
+      this.setCachedShakespearizedText(text, item.shakespearized);
+    }
 
     return item.shakespearized;
   }
