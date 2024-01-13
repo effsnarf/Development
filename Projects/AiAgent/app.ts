@@ -11,11 +11,20 @@ import { Model } from "../../Apis/OpenAI/classes/OpenAI";
 (async () => {
   const config = (await Configuration.new()).data;
 
-  const chat = await ChatOpenAI.new(Roles.Agent, false, Model.Gpt35Turbo);
+  const chat = await ChatOpenAI.new(Roles.AiAgent, false, Model.Gpt35Turbo);
 
   console.clear();
   console.log(
-    `\n${"AiAgent".green} ${`is ready to chat!`.gray} ${chat.model?.blue}`
+    `\n${"AiAgent".green} ${`is ready to chat using`.gray} ${
+      chat.model?.blue
+    }\n`
+  );
+
+  console.log(`Abilities:`.gray);
+  console.log(
+    `  ${(chat.tools || [])
+      .map((tool) => tool.function.description.green)
+      .join(`, `.gray)}`
   );
 
   const sendRequest = async (message: string) => {

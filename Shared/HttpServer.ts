@@ -199,18 +199,12 @@ class HttpServer {
         return res.end(
           JSON.stringify(Objects.parseYaml(fs.readFileSync(filePath, "utf8")))
         );
-      // If image file, serve as binary
-      if (Http.isImageFile(filePath)) {
-        res.setHeader("Content-Type", `image/${path.extname(filePath)}`);
-        return res.end(fs.readFileSync(filePath));
-      }
-      // If video file, serve as binary
-      if (Http.isVideoFile(filePath)) {
-        res.setHeader("Content-Type", "video/mp4");
-        return res.end(fs.readFileSync(filePath));
-      }
-      // Otherwise, serve as text
-      return res.end(fs.readFileSync(filePath, "utf8"));
+
+      const mimeType = HttpServer.getMimeType(filePath);
+      const encoding = mimeType.startsWith("text") ? "utf8" : undefined;
+
+      res.setHeader("Content-Type", mimeType);
+      return res.end(fs.readFileSync(filePath));
     }
 
     return false;
@@ -251,15 +245,22 @@ class HttpServer {
   }
 
   private static getMimeType(filePath: string) {
-    let extension = path.extname(filePath).substring(1);
-    if (extension == "haml") extension = "html";
-    if (!extension) extension = "html";
+    let ext = path.extname(filePath).substring(1);
+    if (ext == "haml") ext = "html";
+    if (!ext) ext = "html";
+    // image
+    if (["jpg", "jpeg", "png", "gif", "svg", "webp"].includes(ext))
+      return `image/${ext}`;
+    // video
+    if (["mp4", "webm"].includes(ext)) return `video/${ext}`;
+    // font
+    if (["woff", "woff2", "ttf"].includes(ext)) return `font/${ext}`;
     // let types = Object.keys(mime.types);
     // types.sortBy((a) => a);
     // types = types.filter((a) => a.startsWith("h"));
     // this.log(types);
     // this.log(extension);
-    return mime.types[extension];
+    return mime.types[ext];
   }
 
   private async getContent(req: any, res: any, path: string) {
@@ -335,7 +336,7 @@ class HttpServer {
       const longestArg = args.reduce((a, b) => (a.length > b.length ? a : b));
       const index = args.indexOf(longestArg);
       const maxArgLength = window.width - (argsLength - longestArg.length) - 2;
-      args[index] = longestArg.shorten(maxArgLength);
+      //args[index] = longestArg.shorten(maxArgLength);
     }
     this.consolelogger.log(...args);
   }

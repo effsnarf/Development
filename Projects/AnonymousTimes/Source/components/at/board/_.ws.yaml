@@ -1,0 +1,136 @@
+dom:
+  .board:
+    h2:
+      v-text: $store.board?.name
+    p:
+      v-text: "'Today on 4chans /fit/ board, in a shocking turn of events, users are once again obsessing over the eternal mysteries of fitness and bodybuilding. As if discovering these topics for the first time, they passionately debate the groundbreaking concepts of exercise routines, dieting for weight loss, and, of course, the ultimate question of how to bulk up without looking like a walking marshmallow. In an astounding display of originality, discussions veer into the profound psychological reasons behind lifting a piece of metal repeatedly. Brace yourselves for a whirlwind of fiercely original insights and never-before-heard fitness tips, right in the intellectual powerhouse that is the /fit/ board.'"
+    .columns:
+      .column1:
+        at.title:
+          class: dimmed
+          text: Nutrition and Diet
+          :image: "'https://www.ucsfhealth.org/-/media/project/ucsf/ucsf-health/education/hero/top-ten-foods-for-health-2x.jpg'"
+        at.title:
+          text: Fitness and Exercise
+          :image: "'https://womensfitness.co.uk/wp-content/uploads/sites/3/2022/08/Shutterstock_1223884579.jpg'"
+        at.title:
+          class: dimmed
+          text: Health and Lifestyle
+          :image: "'https://safetycircleindia.com/wp-content/uploads/2022/11/hw-01.png'"
+      .column1:
+        at.title:
+          class: dimmed
+          text: Workout Routines and Techniques
+          :image: "'https://media.post.rvohealth.io/wp-content/uploads/2020/02/man-exercising-plank-push-up-732x549-thumbnail.jpg'"
+        at.title:
+          class: dimmed
+          text: Physical Performance and Goals
+          :image: "'https://hips.hearstapps.com/hmg-prod/images/home-workout-lead-1584370797.jpg'"
+        at.title:
+          text: Exercise Equipment and Gym Culture
+          :image: "'https://prod-ne-cdn-media.puregym.com/media/821096/the-best-hip-exercises-for-women.jpg?quality=80'"
+      .column2:
+        .threads:
+          .thread:
+            class: dimmed
+            at.title:
+              text: Showering at the Gym
+              :image: "'https://cdn.hswstatic.com/gif/showering-locker-room.jpg'"
+            ul:
+              li:
+                v-text: "'Contemplating the practicality of showering at the gym for morning workouts before heading to work.'"
+              li:
+                v-text: "'Discussing comfort and hygiene concerns with communal showers and the inconvenience of carrying extra supplies.'"
+              li:
+                v-text: "'Sharing tips such as wearing sandals to avoid foot fungus and having a shower bag with personal hygiene products.'"
+          .thread:
+            at.title:
+              text: Home Gym General
+              :image: "'https://i.imgur.com/oIFuKJY.jpg'"
+            ul:
+              li:
+                v-text: "'For a $200 budget home gym in limited space: consider a gym membership, or buy kettlebells, gymnastic rings, an ab wheel, and a pull-up bar.'"
+              li:
+                v-text: "'Debating the value of expensive equipment like a $10,000 vibrating platform.'"
+              li:
+                v-text: "'Seeking recommendations for a sturdy flat bench to upgrade from an unsatisfactory adjustable bench.'"
+          .thread:
+            class: dimmed
+            at.title:
+              text: What be in your gym bag?
+              :image: "'https://i.imgur.com/Jtt4DdE.jpg'"
+            ul:
+              li:
+                v-text: "'Questioning the need for a gym bag.'"
+              li:
+                v-text: "'Suggestion that non-fats dont need gym bags as they dont sweat.'"
+              li:
+                v-text: "'Contents vary: workout clothes, shoes, socks, padlock, Bluetooth headphones, water bottle, spare socks, runner shoes in snowy weather.'"
+              li:
+                v-text: "'Some carry more unique items like a gun, pipe bomb, emergency items, resistance bands, change of clothes, hand towel, and large soda.'"
+      .column2:
+        .thread:
+          h3:
+            v-text: "'Home Gym General'"
+          .post:
+            v-for: post in thread.posts
+            img:
+              v-if: post.tim
+              :src: "'/fetch?url=https://i.4cdn.org/fit/' + post.tim + post.ext"
+            div:
+              class: text
+              v-html: post.com
+data:
+  thread: null
+
+mounted: | #js
+  async function() {
+    this.$root.$on("refresh", this.$forceUpdate.bind(this));
+
+    this.thread = (await (await fetch("/fetch?url=https://a.4cdn.org/fit/thread/73301444.json")).json());
+  }
+
+style:
+  .threads:
+    display: flex
+    flex-direction: column
+    gap: 1em
+  .thread:
+    display: flex
+    flex-direction: column
+    gap: 1em
+  .post:
+    padding: 1em
+    background: "#222"
+  .post img:
+    width: 20%
+    float: left
+    margin-right: 1em
+  .post .text:
+    opacity: 0.5
+  .quote:
+    color: "#3a3"
+  .columns:
+    display: flex
+    flex-direction: row
+    gap: 1em
+  .column1:
+    width: 15%
+    display: flex
+    flex-direction: column
+    gap: 1em
+  .column2:
+    width: 30%
+  .column2 h3:
+    font-size: 2em
+  ul:
+    padding-left: 1.6em
+    list-style-type: disc
+    max-height: 0
+    overflow: hidden
+    transition: 1s
+  .thread:hover ul:
+    max-height: 20em
+  .dimmed:
+    opacity: 0.3
+    filter: grayscale(1)

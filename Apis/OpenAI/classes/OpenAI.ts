@@ -177,7 +177,7 @@ class OpenAI {
 
     const data = {
       model: model,
-      //tools: tools,
+      tools: tools,
       max_tokens: 500,
       ...dataProps,
     };

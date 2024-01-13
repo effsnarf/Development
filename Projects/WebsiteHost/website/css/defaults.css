@@ -7,6 +7,15 @@
   border-radius: 0.5em;
 }
 
+@font-face {
+  font-family: 'Chomsky';
+  src: url('/fonts/chomsky.woff') format('woff'), /* URL to the WOFF font file */
+       url('/fonts/chomsky.otf') format('opentype'); /* URL to the OTF font file */
+  font-weight: normal;
+  font-style: normal;
+}
+
+
 a
 {
   color: #fff;

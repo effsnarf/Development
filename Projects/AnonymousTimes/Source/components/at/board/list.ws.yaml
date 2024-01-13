@@ -1,0 +1,22 @@
+dom:
+  .flex.gap-2:
+    a:
+      class: hoverable
+      v-for: (board, index) in boards
+      ":key": board.id
+      :href: "'/' + board.id + '/'"
+      @click: (e) => onBoardClick(e, board)
+      at.title:
+        :text: board.name
+        :image: board.image
+
+data:
+  boards: [{ name: "Fitness", id: "fit", image: "https://images.indianexpress.com/2014/10/fitness-main.jpg?w=600" }]
+
+methods:
+  onBoardClick: | #js
+    function(e, board) {
+      e.preventDefault();
+      this.$store.board = board;
+      this.$root.$emit("refresh");
+    }

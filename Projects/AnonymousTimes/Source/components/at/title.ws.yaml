@@ -1,0 +1,19 @@
+dom:
+  .clickable:
+    img:
+      :src: image
+    h3:
+      v-text: text
+    .desc:
+      v-text: desc
+
+props:
+  text: null
+  desc: null
+  image: null
+
+style:
+  img:
+    aspect-ratio: 8 / 2
+    width: 100%
+    object-fit: cover
