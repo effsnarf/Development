@@ -187,7 +187,7 @@ class TaskManager {
       //const postData = await Http.getPostDataFromStream(req);
       //const text = postData.text;
       const sheakspearize = async (text: string) => {
-        const url = `http://10.35.16.38/shakespearize`;
+        const url = `http://95.183.1.58/shakespearize`;
 
         var response = await fetch(url, {
           method: "POST",
