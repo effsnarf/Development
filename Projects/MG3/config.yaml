@@ -2,7 +2,3 @@ database:
   content:
     connectionString: mongodb://localhost:27017
     database: MemeGenerator
-shakespearizer:
-  database:
-    path:
-      prod: D:\Development\Projects\Shakespearizer\Data
