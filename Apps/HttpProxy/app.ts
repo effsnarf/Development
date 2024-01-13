@@ -263,7 +263,7 @@ class TaskManager {
             res.set("x-debug-proxy-source", "cache");
             res.status(cachedResponse.status.code);
             res.set(cachedResponse.headers);
-            res.set("access-control-allow-origin", task.origin);
+            //res.set("access-control-allow-origin", task.origin);
             task.log.push(`Sending cached response to client`);
             task.log.push(`Removing task from queue`);
             tasks.remove(task, true);
@@ -310,7 +310,7 @@ class TaskManager {
         );
         res.status(nodeResponse.status);
         res.set(nodeResponse.headers);
-        res.set("access-control-allow-origin", task.origin);
+        //res.set("access-control-allow-origin", task.origin);
       }
 
       if (isHttpPost) {
@@ -434,7 +434,7 @@ class TaskManager {
           const origin = options.headers.origin || "*";
           res.status(ex.response.status);
           res.set(ex.response.headers);
-          res.set("access-control-allow-origin", task.origin);
+          //res.set("access-control-allow-origin", task.origin);
 
           task.isPiping = true;
           task.log.push(`Piping response to client`);
