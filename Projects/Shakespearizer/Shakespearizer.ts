@@ -145,13 +145,14 @@ class Shakespearizer {
   }
 
   private cleanupString(text: string) {
+    if (!text) return text;
     text = text.replace(`Translate to Shakespearean: `, ``);
     return text;
   }
 
   private cleanupObject(item: any) {
     for (const key in item) {
-      item[key] = this.cleanup(item[key]);
+      item[key] = this.cleanupString(item[key]);
     }
   }
 }
