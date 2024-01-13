@@ -25,9 +25,16 @@ class Http {
         });
         req.on("end", () => {
           try {
-            if (typeof body == "string") body = Objects.json.parse(body);
-          } catch (ex) {}
+            if (body) {
+              body = JSON.parse(body);
+            }
+          } catch (ex) {
+            return reject(ex);
+          }
           resolve(body);
+        });
+        req.on("error", (error: any) => {
+          reject(error);
         });
       } catch (ex: any) {
         reject(ex);
