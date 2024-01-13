@@ -56,7 +56,7 @@ const shakespearizeElement = async (element) => {
         //console.log(node.textContent);
         const text = node.textContent;
         node.unshakespearized = text;
-        node.textContent = await sheakspearize(text);
+        node.textContent = await shakespearizer.shakespearize(text);
         const textWrapNode = wrapTextNodeWithTooltip(node, text);
         textWrapNode.unshakespearized = text;
     });
@@ -64,7 +64,7 @@ const shakespearizeElement = async (element) => {
 
 const sheakspearizeElements = async (elements) => {
     for (const element of elements) {
-        await shakespearizeElement(element);
+         shakespearizeElement(element);
     }
 }
 

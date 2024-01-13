@@ -5,7 +5,7 @@
     "content_scripts": [
         {
           "matches": ["*://*.4chan.org/*"],
-          "js": ["util.js", "script.js"]
+          "js": ["util.js", "sheakspearizer.js", "script.js"]
         }
     ],
     "background": {

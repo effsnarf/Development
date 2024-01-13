@@ -33,16 +33,21 @@ class Shakespearizer {
     ${JSON.stringify(texts)}
     `;
 
-    const shakespearizedItems = JSON.parse(await this.chat.send(chatPrompt));
+    const shakespearizedTexts = JSON.parse(await this.chat.send(chatPrompt));
+
+    const items = texts.map((text, index) => ({
+      text,
+      shakespearized: shakespearizedTexts[index],
+    }));
 
     // Cache the shakespearized texts.
-    for (const item of shakespearizedItems) {
+    for (const item of items) {
       await this.setCachedShakespearizedText(item.text, item.shakespearized);
     }
 
     return texts.map((text, index) => ({
       text,
-      shakespearized: shakespearizedItems[index],
+      shakespearized: shakespearizedTexts[index],
     }));
   }
 
@@ -76,7 +81,7 @@ class Shakespearizer {
 
     // Create an initial result set with cached shakespearized texts.
     for (const text of texts) {
-      const shakespearized = this.getCachedShakespearizedText(text);
+      const shakespearized = await this.getCachedShakespearizedText(text);
       results.push({ text, shakespearized });
     }
 
