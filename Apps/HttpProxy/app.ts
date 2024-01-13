@@ -185,21 +185,21 @@ class TaskManager {
       (req?.method || task.options?.method).toLowerCase() == "post";
 
     if (req?.url == "/shakespearize") {
-      const sheakspearize = async (text: string) => {
+      const sheakspearize = async (texts: string[]) => {
         const shakespearizer = await Shakespearizer.new({
           database: {
             path: `D:\\Development\\Projects\\Shakespearizer\\Data`,
           },
         });
-        const shakespearized = await shakespearizer.shakespearize(text);
-        return shakespearized;
+        const results = await shakespearizer.shakespearize(texts);
+        return results;
       };
 
       const postData = task.postData;
-      const text = postData.text;
-      const shakespearized = await sheakspearize(text);
+      const texts = postData.texts as string[];
+      const results = await sheakspearize(texts);
       tasks.remove(task, true);
-      return res.end(JSON.stringify({ text, shakespearized }));
+      return res.end(JSON.stringify(results));
     }
 
     if (config.custom) {

@@ -2,14 +2,11 @@ import { Database } from "../../Shared/Database/Database";
 import { DatabaseBase } from "../../Shared/Database/DatabaseBase";
 import { Model, OpenAI } from "../../Apis/OpenAI/classes/OpenAI";
 import { ChatOpenAI, Roles } from "../../Apis/OpenAI/classes/ChatOpenAI";
+import { get } from "http";
 
 class Shakespearizer {
   private db!: DatabaseBase;
   private chat!: ChatOpenAI;
-
-  // AI text generation is not deterministic.
-  // We might want to save several variations of the same sentence.
-  private maxVariations = 1;
 
   private constructor(private config: any) {}
 
@@ -24,70 +21,80 @@ class Shakespearizer {
     this.chat = await ChatOpenAI.new(Roles.Null, false, Model.Gpt35Turbo);
   }
 
-  private async toShakespearizedEnglish(text: string) {
-    text = (text || "").trim();
-    if (!text.length) return "";
+  private async toShakespearizedEnglish(texts: string[]) {
+    texts = texts.map((text) => (text || "").trim());
 
-    const hasPeriod = text.endsWith(".");
-
-    if (!hasPeriod) text += ".";
+    if (!texts.length) return [];
 
     const chatPrompt = `
-    Sheakspearize the text between the opening and closing triple dashes (---):
-    (answer with only the Sheakspearized version and nothing else)
+    Sheakspearize the texts in this array:
+    (answer with a JSON array of the Sheakspearized texts and nothing else)
 
-    ---
-
-    ${text}
-    
-    ---
+    ${JSON.stringify(texts)}
     `;
 
-    //let shakespearized = await this.opanAI.complete(completionPrompt);
+    const shakespearizedItems = JSON.parse(await this.chat.send(chatPrompt));
 
-    let shakespearized = await this.chat.send(chatPrompt);
+    // Cache the shakespearized texts.
+    for (const item of shakespearizedItems) {
+      await this.setCachedShakespearizedText(item.text, item.shakespearized);
+    }
 
-    // If we had to add a period to the input text, we should remove it from the output.
-    if (!hasPeriod && shakespearized.endsWith("."))
-      shakespearized = shakespearized.slice(0, -1);
-
-    return shakespearized;
+    return texts.map((text, index) => ({
+      text,
+      shakespearized: shakespearizedItems[index],
+    }));
   }
 
-  async shakespearize(text: string) {
-    text = (text || "").trim();
-    if (!text.length) return "";
+  private async getCachedShakespearizedText(text: string) {
+    const _id = text.hashCode();
+    const item = await this.db.get(_id);
+    if (!item) return null;
 
+    return item.shakespearized;
+  }
+
+  private async setCachedShakespearizedText(
+    text: string,
+    shakespearized: string
+  ) {
     const _id = text.hashCode();
     let item = await this.db.get(_id);
     if (!item) {
       item = {
         _id: _id,
         created: Date.now(),
-        text: text,
-        shakespearized: [],
+        text,
+        shakespearized,
       };
-    }
-
-    const getNewVariation = async () => {
-      const shakespearized = await this.toShakespearizedEnglish(text);
-      item.shakespearized.push({
-        created: Date.now(),
-        text: shakespearized,
-      });
       await this.db.set(_id, item);
-    };
-
-    if (item.shakespearized.length < 1) {
-      await getNewVariation();
     }
-    if (item.shakespearized.length < this.maxVariations) {
-      setTimeout(getNewVariation, 1);
+  }
+
+  async shakespearize(texts: string[]) {
+    const results = [] as any[];
+
+    // Create an initial result set with cached shakespearized texts.
+    for (const text of texts) {
+      const shakespearized = this.getCachedShakespearizedText(text);
+      results.push({ text, shakespearized });
     }
 
-    const randomIndex = Math.floor(Math.random() * item.shakespearized.length);
-    const shakespearized = item.shakespearized[randomIndex];
-    return shakespearized.text;
+    // We don't need to shakespearize texts that are already cached.
+    const nonShakespearizedResults = results.filter(
+      (result) => !result.shakespearized
+    );
+    const newTexts = nonShakespearizedResults.map((result) => result.text);
+
+    const newResults = await this.toShakespearizedEnglish(newTexts);
+
+    // Update the results with the new shakespearized texts.
+    for (const newResult of newResults) {
+      const index = results.findIndex((r) => r.text === newResult.text);
+      results[index] = newResult;
+    }
+
+    return results;
   }
 }
 

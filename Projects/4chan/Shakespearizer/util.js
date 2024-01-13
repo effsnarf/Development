@@ -1,4 +1,7 @@
-const sheakspearize = async (text) => {
+
+const sheakspearizeQueue = []; 
+
+const makeSheakspearizeRequest = async (text) => {
     
     const data = await (await fetch("https://db.memegenerator.net/shakespearize", {
         "body": JSON.stringify({ text }),
