@@ -205,7 +205,7 @@ class TaskManager {
         // return json.shakespearized;
       };
 
-      const postData = await Http.getPostDataFromStream(req);
+      const postData = task.postData;
       const text = postData.text;
       const shakespearized = await sheakspearize(text);
       tasks.remove(task, true);
