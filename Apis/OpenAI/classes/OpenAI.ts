@@ -36,7 +36,7 @@ enum RequestType {
 }
 
 class OpenAI {
-  public static apiKey: string = `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`;
+  public static defaultApiKey: string = `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`;
   private _log: boolean;
   private readonly endpoint: string;
   private readonly apiKey: string;
@@ -63,10 +63,13 @@ class OpenAI {
     }
   }
 
-  static new(log: boolean = true, model: Model = Model.Default): OpenAI {
-    if (!this.apiKey)
-      throw new Error("API key not set. Use OpenAI.apiKey = 'your key'");
-    return new OpenAI(this.apiKey, model, log);
+  static new(
+    log: boolean = true,
+    model: Model = Model.Default,
+    apiKey?: string
+  ): OpenAI {
+    if (!apiKey) throw new Error("API key not set.");
+    return new OpenAI(apiKey, model, log);
   }
 
   private constructor(apiKey: string, model: Model, log: boolean = true) {

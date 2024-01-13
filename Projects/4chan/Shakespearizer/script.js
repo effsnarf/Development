@@ -1,5 +1,16 @@
 const shakespearizer = new Shakespearizer();
 
+const checkSettingsChange = async () => {
+    const apiKey = (await promisify(chrome.storage.sync, 'get')('apiKey')).apiKey;
+    if (apiKey != shakespearizer.apiKey) {
+        shakespearizer.apiKey = apiKey;
+        shakespearizer.onSettingsChange();
+    }
+    setTimeout(checkSettingsChange, 100);
+}
+
+checkSettingsChange();
+
 
 // Function to determine if a text node should be skipped
 const shouldSkipTextNode = (textNode) => {
@@ -32,15 +43,21 @@ const shakespearizeElement = async (element) => {
         if (node.shakespearizing) return;
         node.shakespearizing = true;
         const text = node.textContent;
-        const shakespearized = await shakespearizer.shakespearize(text);
-        if (shakespearized == text) {
-            node.shakespearizing = false;
-            return;
+        try
+        {
+            const shakespearized = await shakespearizer.shakespearize(text);
+            if (shakespearized == text) {
+                node.shakespearizing = false;
+                return;
+            }
+            node.unshakespearized = text;
+            node.textContent = shakespearized;
+            const textWrapNode = wrapTextNodeWithTooltip(node, text);
+            textWrapNode.unshakespearized = text;
         }
-        node.unshakespearized = text;
-        node.textContent = shakespearized;
-        const textWrapNode = wrapTextNodeWithTooltip(node, text);
-        textWrapNode.unshakespearized = text;
+        catch (ex) {
+            node.shakespearizing = false;    
+        }
     });
 }
 

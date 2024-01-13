@@ -47,6 +47,13 @@
       flex-direction: column;
       gap: 0.6rem;
     }
+    #refreshMessage {
+      font-size: 80%;
+      opacity: 0.5;
+    }
+    .hidden {
+      display: none;
+    }
   </style>
   <body>
     <img class="logo" src="/icons/icon128.png" />
@@ -55,6 +62,9 @@
       <label for="apiKey">OpenAI API Key:</label>
       <input type="text" id="apiKey" name="apiKey" />
     </form>
+    <div id="refreshMessage" class="hidden">
+      Refresh the page to apply the changes.
+    </div>
   </body>
   <script src="../util.js"></script>
   <script src="script.js"></script>

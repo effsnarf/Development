@@ -18,7 +18,6 @@ class Shakespearizer {
 
   private async init() {
     this.db = await Database.new(this.config.database);
-    this.chat = await ChatOpenAI.new(Roles.Null, false, Model.Gpt35Turbo);
   }
 
   private async textToShakespearizedEnglish(text: string) {
@@ -31,9 +30,7 @@ class Shakespearizer {
     ${text}
     `;
 
-    const shakespearized = this.cleanup(
-      (await this.chat.send(chatPrompt)).trim()
-    );
+    const shakespearized = this.cleanup((await this.ai(chatPrompt)).trim());
 
     const item = {
       text,
@@ -48,7 +45,7 @@ class Shakespearizer {
 
     texts = texts.map((text) => (text || "").trim());
 
-    const items = [];
+    const items = [] as any[];
     for (const text of texts) {
       const item = await this.textToShakespearizedEnglish(text);
       items.push(item);
@@ -61,7 +58,7 @@ class Shakespearizer {
 
     return items;
 
-    // const result = (await this.chat.send(chatPrompt));
+    // const result = (await this.ai(chatPrompt));
     // const shakespearizedTexts = result.shakespearized;
 
     // const items = texts.map((text, index) => ({
@@ -139,6 +136,18 @@ class Shakespearizer {
     }
 
     return results;
+  }
+
+  private async ai(prompt: string) {
+    this.chat = await ChatOpenAI.new(
+      Roles.Null,
+      false,
+      Model.Gpt35Turbo,
+      false,
+      this.config.openAi.apiKey
+    );
+    const result = await this.chat.send(prompt);
+    return result;
   }
 
   private cleanup(item: string | any) {

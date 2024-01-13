@@ -21,7 +21,9 @@
       "service_worker": "service.worker.js"
     },
     "permissions": [
-      "activeTab", "scripting", "storage"
+      "activeTab", "scripting", "storage",
+      "https://*/*",
+      "http://*/*"
     ]
   }
   

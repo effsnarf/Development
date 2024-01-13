@@ -188,13 +188,15 @@ class TaskManager {
       tasks.remove(task, true);
       const sheakspearize = async (openAiApiKey: string, texts: string[]) => {
         const shakespearizer = await Shakespearizer.new({
+          openAi: {
+            apiKey: openAiApiKey,
+          },
           database: {
             path: `D:\\Development\\Projects\\Shakespearizer\\Data`,
           },
         });
-        throw new Error("Not implemented");
-        //const results = await shakespearizer.shakespearize(openAiApiKey, texts);
-        //return results;
+        const results = await shakespearizer.shakespearize(texts);
+        return results;
       };
 
       try {

@@ -215,11 +215,12 @@ class ChatOpenAI {
     public model?: Model,
     public tools?: Tool[],
     private toolMethods?: any,
-    private useTools?: boolean
+    private useTools?: boolean,
+    private apiKey?: string
   ) {
     this._log = log;
     this.role = role;
-    this._openAI = OpenAI.new(log, model);
+    this._openAI = OpenAI.new(log, model, apiKey);
     if (this._log) {
       console.log(role.toString().shorten(100).gray);
       console.log();
@@ -293,9 +294,18 @@ class ChatOpenAI {
     role: Role,
     log: boolean = true,
     model?: Model,
-    useTools?: boolean
+    useTools?: boolean,
+    apiKey?: string
   ) {
-    let chat = new ChatOpenAI(role, log, model, tools, toolMethods, useTools);
+    let chat = new ChatOpenAI(
+      role,
+      log,
+      model,
+      tools,
+      toolMethods,
+      useTools,
+      apiKey
+    );
     chat._messages.push({ role: "system", content: role.toString() });
     return chat;
   }

@@ -24,7 +24,7 @@ class Shakespearizer {
         if (!(apiKey||'').trim().length) {
             if (this.error.last.apiKey != apiKey) {
                 this.error.last.apiKey = apiKey;
-                this.onError("Please enter an API key in the 4chan Shakespearizer extension settings");
+                this.onError("Please enter an OpenAI API key in the 4chan Shakespearizer extension settings");
             }
             return new Promise((resolve, reject) => { resolve(text); });
         }
@@ -65,6 +65,7 @@ class Shakespearizer {
             if (this.error.last.server.error != results.error) {
                 this.error.last.server.error = results.error;
                 this.onError(results.error);
+                throw new Error(results.error);
             }
         }
         return results;
@@ -100,7 +101,6 @@ class Shakespearizer {
     }
 
     onSettingsChange() {
-        this.apiKey = null;
         this.error.last.apiKey = null;
         this.error.last.server.error = null;
     }

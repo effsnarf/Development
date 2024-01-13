@@ -9,7 +9,11 @@ const init = function() {
     document.getElementById('apiKey').addEventListener('change', function() {
         var apiKey = document.getElementById('apiKey').value;
         chrome.storage.sync.set({'apiKey': apiKey});
-        window.shakespearizer.onSettingsChange();
+    });
+
+    // When apiKey value changes (while typing)
+    document.getElementById('apiKey').addEventListener('input', function() {
+        document.getElementById('refreshMessage').classList.remove('hidden');
     });
 };
 
