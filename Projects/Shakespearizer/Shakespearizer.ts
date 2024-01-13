@@ -152,8 +152,9 @@ class Shakespearizer {
 
   private cleanupObject(item: any) {
     for (const key in item) {
-      item[key] = this.cleanupString(item[key]);
+      item[key] = this.cleanup(item[key]);
     }
+    return item;
   }
 }
 
