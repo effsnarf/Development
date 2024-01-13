@@ -201,8 +201,8 @@ class TaskManager {
         //   },
         //   body: JSON.stringify({ text }),
         // });
-        const json = await response.json();
-        return json.shakespearized;
+        // const json = await response.json();
+        // return json.shakespearized;
       };
 
       const postData = await Http.getPostData(req);
