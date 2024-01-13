@@ -1,3 +1,20 @@
+
+function promisify(context, functionName) {
+    return function(...args) {
+        return new Promise((resolve, reject) => {
+            const chromeFunction = context[functionName];
+            chromeFunction.bind(context)(...args, function(result) {
+                if (chrome.runtime.lastError) {
+                    reject(chrome.runtime.lastError);
+                } else {
+                    resolve(result);
+                }
+            });
+        });
+    };
+}
+
+
 const repeat = async (func, delay) => {
     await func();
     setTimeout(() => repeat(func, delay), delay);
@@ -25,3 +42,4 @@ const getNodeAncestors = (node) => {
     }
     return ancestors;
 }
+

@@ -8,6 +8,9 @@
       "128": "icons/icon128.png"
     },
     "version": "1.0",
+    "action": {
+      "default_popup": "settings/index.html"
+    },
     "content_scripts": [
         {
           "matches": ["*://*.4chan.org/*"],
@@ -18,7 +21,7 @@
       "service_worker": "service.worker.js"
     },
     "permissions": [
-      "activeTab", "scripting"
+      "activeTab", "scripting", "storage"
     ]
   }
   

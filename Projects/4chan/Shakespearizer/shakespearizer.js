@@ -2,14 +2,35 @@
 
 class Shakespearizer {
     constructor() {
+        this.apiKey = null;
         this.tasks = [];
         this.processingTasks = [];
         this.processQueue = this.processQueue.bind(this);
         this.processInterval = 1;
         this.processQueue();
+        this.error = {
+            last: {
+                apiKey: 'initial key not set',
+                server: {
+                    error: null,
+                }
+            },
+        }
     }
 
     async shakespearize(text) {
+        const apiKey = (await promisify(chrome.storage.sync, 'get')('apiKey')).apiKey;
+        
+        if (!(apiKey||'').trim().length) {
+            if (this.error.last.apiKey != apiKey) {
+                this.error.last.apiKey = apiKey;
+                this.onError("Please enter an API key in the 4chan Shakespearizer extension settings");
+            }
+            return new Promise((resolve, reject) => { resolve(text); });
+        }
+
+        this.apiKey = apiKey;
+
         const existingTask = this.getExistingTask(text);
         if (existingTask) return existingTask.promise;
         // Check if the text is already in the queue
@@ -35,11 +56,17 @@ class Shakespearizer {
     async textToShakespearized(texts) {
         const response = await fetch("https://db.memegenerator.net/shakespearize", {
             method: "POST",
-            body: JSON.stringify({ texts }),
+            body: JSON.stringify({ openAiApiKey: this.apiKey, texts }),
             mode: "cors",
             credentials: "omit"
         });
         const results = await response.json();
+        if (results.error) {
+            if (this.error.last.server.error != results.error) {
+                this.error.last.server.error = results.error;
+                this.onError(results.error);
+            }
+        }
         return results;
     }
 
@@ -70,6 +97,16 @@ class Shakespearizer {
         }
 
         setTimeout(() => this.processQueue(), this.processInterval);
+    }
+
+    onSettingsChange() {
+        this.apiKey = null;
+        this.error.last.apiKey = null;
+        this.error.last.server.error = null;
+    }
+
+    onError(message) {
+        alert(message);
     }
 }
 

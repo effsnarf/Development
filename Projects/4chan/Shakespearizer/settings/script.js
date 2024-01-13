@@ -1,0 +1,20 @@
+
+const init = function() {
+    // Get the saved apiKey
+    chrome.storage.sync.get('apiKey', function(items) {
+        document.getElementById('apiKey').value = (items.apiKey||'');
+    });
+
+    // When document.getElementById('apiKey') value changes, save it to chrome.storage
+    document.getElementById('apiKey').addEventListener('change', function() {
+        var apiKey = document.getElementById('apiKey').value;
+        chrome.storage.sync.set({'apiKey': apiKey});
+        window.shakespearizer.onSettingsChange();
+    });
+};
+
+// When the popup HTML has loaded
+window.addEventListener('load', function(evt) {
+    init();
+});
+

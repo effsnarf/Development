@@ -1,0 +1,61 @@
+<html>
+  <style>
+    * {
+      color: white;
+    }
+    body {
+      width: 200px;
+      font-size: 1.2rem;
+      background: linear-gradient(217deg, #031000, #184d15);
+    }
+    h1 {
+      font-size: 1.2rem;
+    }
+    input,
+    button {
+      font-size: 1.2rem;
+      border-radius: 0.3em;
+    }
+    input {
+      font-family: monospace;
+      border: 1px solid gray;
+      box-shadow: inset -3px 3px 3px #000;
+      background: linear-gradient(217deg, #031000, #323232);
+    }
+    button {
+      padding: 0.2rem 0.5rem;
+      color: rgb(111, 175, 111);
+      background: #00531a;
+      text-shadow: -2px 2px 2px #000;
+      cursor: pointer;
+    }
+    button:hover {
+      position: relative;
+      top: -2px;
+      left: 2px;
+      background: linear-gradient(217deg, #0a3c00, #008a2b);
+      box-shadow: -3px 3px 3px #000;
+    }
+    .logo {
+      width: 100%;
+    }
+    .text-center {
+      text-align: center;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+  </style>
+  <body>
+    <img class="logo" src="/icons/icon128.png" />
+    <h1>4chan Shaekspearizer</h1>
+    <form>
+      <label for="apiKey">OpenAI API Key:</label>
+      <input type="text" id="apiKey" name="apiKey" />
+    </form>
+  </body>
+  <script src="../util.js"></script>
+  <script src="script.js"></script>
+</html>

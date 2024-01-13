@@ -186,20 +186,26 @@ class TaskManager {
 
     if (req?.url == "/shakespearize") {
       tasks.remove(task, true);
-      const sheakspearize = async (texts: string[]) => {
+      const sheakspearize = async (openAiApiKey: string, texts: string[]) => {
         const shakespearizer = await Shakespearizer.new({
           database: {
             path: `D:\\Development\\Projects\\Shakespearizer\\Data`,
           },
         });
-        const results = await shakespearizer.shakespearize(texts);
-        return results;
+        throw new Error("Not implemented");
+        //const results = await shakespearizer.shakespearize(openAiApiKey, texts);
+        //return results;
       };
 
-      const postData = task.postData;
-      const texts = postData.texts as string[];
-      const results = await sheakspearize(texts);
-      return res.end(JSON.stringify(results));
+      try {
+        const postData = task.postData;
+        const openAiApiKey = postData.openAiApiKey as string;
+        const texts = postData.texts as string[];
+        const results = await sheakspearize(openAiApiKey, texts);
+        return res.end(JSON.stringify(results));
+      } catch (ex: any) {
+        return res.end(JSON.stringify({ error: ex.message }));
+      }
     }
 
     if (config.custom) {

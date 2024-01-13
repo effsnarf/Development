@@ -32,8 +32,13 @@ const shakespearizeElement = async (element) => {
         if (node.shakespearizing) return;
         node.shakespearizing = true;
         const text = node.textContent;
+        const shakespearized = await shakespearizer.shakespearize(text);
+        if (shakespearized == text) {
+            node.shakespearizing = false;
+            return;
+        }
         node.unshakespearized = text;
-        node.textContent = await shakespearizer.shakespearize(text);
+        node.textContent = shakespearized;
         const textWrapNode = wrapTextNodeWithTooltip(node, text);
         textWrapNode.unshakespearized = text;
     });
