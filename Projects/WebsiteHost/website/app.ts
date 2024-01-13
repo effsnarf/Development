@@ -480,6 +480,29 @@ const sheakspearize = async (text: string) => {
         if (result) return result;
       }
 
+      if (req.url.startsWith("/shakespearize")) {
+        //const postData = await Http.getPostDataFromStream(req);
+        //const text = postData.text;
+        const sheakspearize = async (text: string) => {
+          const url = `http://10.35.16.38/shakespearize`;
+
+          // var response = await fetch(url, {
+          //   method: "POST",
+          //   headers: {
+          //     "Content-Type": "application/json",
+          //   },
+          //   body: JSON.stringify({ text: text }),
+          // });
+
+          // var result = await response.json();
+          const result = { text, shakespearized: `To be or not to be.` };
+          return result;
+        };
+        const result = await sheakspearize("test");
+        res.end(JSON.stringify(result));
+        return;
+      }
+
       // This is mainly used to proxy images, to bypass NotSameOrigin
       if (req.url.startsWith("/fetch")) {
         const url = req.url.replace("/fetch?url=", "");
