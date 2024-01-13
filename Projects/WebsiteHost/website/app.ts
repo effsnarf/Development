@@ -481,24 +481,23 @@ const sheakspearize = async (text: string) => {
       }
 
       if (req.url.startsWith("/shakespearize")) {
-        //const postData = await Http.getPostDataFromStream(req);
-        //const text = postData.text;
+        const postData = await Http.getPostDataFromStream(req);
+        const text = postData.text;
         const sheakspearize = async (text: string) => {
           const url = `http://10.35.16.38/shakespearize`;
 
-          // var response = await fetch(url, {
-          //   method: "POST",
-          //   headers: {
-          //     "Content-Type": "application/json",
-          //   },
-          //   body: JSON.stringify({ text: text }),
-          // });
+          var response = await fetch(url, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ text: text }),
+          });
 
-          // var result = await response.json();
-          const result = { text, shakespearized: `To be or not to be.` };
+          var result = await response.json();
           return result;
         };
-        const result = await sheakspearize("test");
+        const result = await sheakspearize(text);
         res.end(JSON.stringify(result));
         return;
       }
