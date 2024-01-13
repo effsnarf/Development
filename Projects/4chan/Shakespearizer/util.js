@@ -1,5 +1,5 @@
 const sheakspearize = async (text) => {
-    const url = `/95.183.1.41/shakespearize`;
+    const url = `https://db.memegenerator.net/shakespearize`;
     var response = await fetch(url, {
         method: 'POST',
         headers: {

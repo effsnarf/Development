@@ -467,6 +467,31 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
     }
     // #endregion
 
+    httpServer.get(
+      "/shakespearize",
+      processRequest(async (req: any, res: any, postData: any) => {
+        const sheakspearize = async (text: string) => {
+          const url = `http://95.183.1.58/shakespearize`;
+          var response = await fetch(url, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ text: text }),
+          });
+
+          var result = await response.json();
+          return result;
+        };
+
+        const text = postData.text;
+
+        const result = await sheakspearize(text);
+
+        return res.end(JSON.stringify(result));
+      })
+    );
+
     // #region 📝 File Transpilation
     httpServer.get(
       "/*.js",
