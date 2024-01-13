@@ -18,7 +18,7 @@ class Shakespearizer {
 
   private async init() {
     this.db = await Database.new(this.config.database);
-    this.chat = await ChatOpenAI.new(Roles.Null, false, Model.Gpt35Turbo);
+    this.chat = await ChatOpenAI.new(Roles.Null, true, Model.Gpt35Turbo);
   }
 
   private async toShakespearizedEnglish(texts: string[]) {
@@ -28,12 +28,14 @@ class Shakespearizer {
 
     const chatPrompt = `
     Sheakspearize the texts in this array:
-    (answer with a JSON array of the Sheakspearized texts and nothing else)
+    (answer in this format and nothing else:)
+    { shakespearized: ["...", "...", ...] }
 
     ${JSON.stringify(texts)}
     `;
 
-    const shakespearizedTexts = JSON.parse(await this.chat.send(chatPrompt));
+    const result = JSON.parse(await this.chat.send(chatPrompt));
+    const shakespearizedTexts = result.shakespearized;
 
     const items = texts.map((text, index) => ({
       text,

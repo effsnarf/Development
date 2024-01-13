@@ -36,7 +36,18 @@ import { Shakespearizer } from "../Projects/Shakespearizer/Shakespearizer";
     },
   });
 
-  const texts = ["Hello, my name is John.", "I am a software developer."];
+  const texts = [
+    "If you could browse 4chan like this, would you use it?",
+    "I enter a board directly into the search bar, scroll down, right-click-new tab interesting threads, gather enough, enter a new board, repeat the process. Then it's just visiting the tabs, no need for browsing. It doesn't seem like your model will improve my shitposting life.",
+    "This ChatGPT is endlessly entertaining",
+    "i like it anon",
+    "2 things - ",
+    "I don't think it's awful for browsing archives.",
+    "you know what i come to 4chan for?",
+    "i thought about. maybe it would be good to have a daily/weekly 4chan review with a summary of the best threads and best posts for those who dont have time.",
+    "why not?",
+    "compared to 4chan it looks like the sistine chapel",
+  ];
 
   const results = await shakespearizer.shakespearize(texts);
 
