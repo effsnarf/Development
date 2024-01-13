@@ -185,6 +185,7 @@ class TaskManager {
       (req?.method || task.options?.method).toLowerCase() == "post";
 
     if (req?.url == "/shakespearize") {
+      tasks.remove(task, true);
       const sheakspearize = async (texts: string[]) => {
         const shakespearizer = await Shakespearizer.new({
           database: {
@@ -196,10 +197,8 @@ class TaskManager {
       };
 
       const postData = task.postData;
-      return res.end(JSON.stringify(task.postData.text));
-      const texts = JSON.parse(postData.texts) as string[];
+      const texts = postData.texts as string[];
       const results = await sheakspearize(texts);
-      tasks.remove(task, true);
       return res.end(JSON.stringify(results));
     }
 
