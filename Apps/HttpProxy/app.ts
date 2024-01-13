@@ -205,12 +205,13 @@ class TaskManager {
         // return json.shakespearized;
       };
 
-      const postData = await Http.getPostDataFromStream(req);
-      const text = postData.text;
-      const shakespearized = await sheakspearize(text);
-      tasks.remove(task, true);
-      res.end(JSON.stringify({ text, shakespearized }));
-      return;
+      return res.end(req.body);
+
+      // const postData = await Http.getPostDataFromStream(req);
+      // const text = postData.text;
+      // const shakespearized = await sheakspearize(text);
+      // tasks.remove(task, true);
+      // return res.end(JSON.stringify({ text, shakespearized }));
     }
 
     if (config.custom) {
