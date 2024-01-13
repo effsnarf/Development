@@ -197,7 +197,7 @@ class TaskManager {
 
       const postData = await Http.getPostDataFromStream(req);
       const text = postData.text;
-      const shakespearized = await sheakspearize(text);
+      const shakespearized = `to be or not to be`; //await sheakspearize(text);
       tasks.remove(task, true);
       res.end(JSON.stringify({ text, shakespearized }));
       return;
