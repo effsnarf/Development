@@ -144,7 +144,8 @@ class OpenAI {
     dataProps: any,
     desc?: string,
     tools?: any,
-    toolMethods?: any
+    toolMethods?: any,
+    useTools?: boolean
   ): Promise<T> {
     return await this._makeRequest(
       model,
@@ -152,7 +153,8 @@ class OpenAI {
       dataProps,
       desc,
       tools,
-      toolMethods
+      toolMethods,
+      useTools
     );
   }
 
@@ -162,13 +164,16 @@ class OpenAI {
     dataProps: any,
     desc?: string,
     tools?: any,
-    toolMethods?: any
+    toolMethods?: any,
+    useTools?: boolean
   ): Promise<T> {
     const promptText =
       dataProps.prompt || dataProps.input || dataProps.messages || dataProps;
 
     const tokens = this.countTokens(promptText);
     const maxReplyTokens = this.maxTotalTokens - tokens;
+
+    if (!useTools) tools = null;
 
     // if (false)
     // console.log(
@@ -336,7 +341,8 @@ class OpenAI {
     desc?: string,
     json?: boolean,
     tools?: any,
-    toolMethods?: any
+    toolMethods?: any,
+    useTools?: boolean
   ): Promise<Message> {
     if (maxReplyTokens) {
       //messages = this.shortenMessages(messages, maxReplyTokens);
@@ -353,7 +359,8 @@ class OpenAI {
       data,
       desc,
       tools,
-      toolMethods
+      toolMethods,
+      useTools
     );
   }
 

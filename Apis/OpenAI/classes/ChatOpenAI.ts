@@ -214,7 +214,8 @@ class ChatOpenAI {
     log: boolean = true,
     public model?: Model,
     public tools?: Tool[],
-    private toolMethods?: any
+    private toolMethods?: any,
+    private useTools?: boolean
   ) {
     this._log = log;
     this.role = role;
@@ -248,7 +249,8 @@ class ChatOpenAI {
         desc,
         json,
         this.tools,
-        this.toolMethods
+        this.toolMethods,
+        this.useTools
       );
       this._messages.push(responseMessage);
       return this.strip(responseMessage.content);
@@ -287,8 +289,13 @@ class ChatOpenAI {
     this._messages.pop();
   }
 
-  static async new(role: Role, log: boolean = true, model?: Model) {
-    let chat = new ChatOpenAI(role, log, model, tools, toolMethods);
+  static async new(
+    role: Role,
+    log: boolean = true,
+    model?: Model,
+    useTools?: boolean
+  ) {
+    let chat = new ChatOpenAI(role, log, model, tools, toolMethods, useTools);
     chat._messages.push({ role: "system", content: role.toString() });
     return chat;
   }
