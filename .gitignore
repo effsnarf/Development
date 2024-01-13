@@ -8,6 +8,7 @@ Test/Database
 # Data folders
 /Projects/AnonymousTimes/Data
 /Projects/4chanScraper/Data
+/Projects/Shakespearizer/Data
 
 # Temp folders
 Temp
@@ -1858,3 +1859,4 @@ Projects/4chanScraper/Data/image/1700980233/1700980233637/1700980233637123.jpg
 Projects/4chanScraper/Data/image/1700980407/1700980407422/1700980407422545.jpg
 Projects/4chanScraper/Data/image/1700980849/1700980849736/1700980849736681.png
 Projects/4chanScraper/Data/image/1700980960/1700980960963/1700980960963084.jpg
+Projects/Shakespearizer/Api/config.yaml
