@@ -184,8 +184,8 @@ class TaskManager {
       (req?.method || task.options?.method).toLowerCase() == "post";
 
     if (req.url == "/shakespearize") {
-      const postData = await Http.getPostDataFromStream(req);
-      const text = postData.text;
+      //const postData = await Http.getPostDataFromStream(req);
+      //const text = postData.text;
       const sheakspearize = async (text: string) => {
         const url = `http://10.35.16.38/shakespearize`;
 
@@ -201,7 +201,7 @@ class TaskManager {
         const result = { text, shakespearized: `To be or not to be.` };
         return result;
       };
-      const result = await sheakspearize(text);
+      const result = await sheakspearize("test");
       tasks.remove(task, true);
       res.end(JSON.stringify(result));
       return;
