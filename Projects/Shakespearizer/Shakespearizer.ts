@@ -84,8 +84,10 @@ class Shakespearizer {
     const _id = text.hashCode();
     const item = await this.db.get(_id);
     if (!item) return null;
+    if (!item.shakespearized) return null;
 
     const cleaned = this.cleanup(item);
+
     if (JSON.stringify(item) != JSON.stringify(cleaned)) {
       item.shakespearized = cleaned.shakespearized;
       this.setCachedShakespearizedText(text, item.shakespearized);
@@ -109,6 +111,7 @@ class Shakespearizer {
       text,
       shakespearized,
     };
+
     await this.db.set(_id, item);
   }
 
