@@ -183,7 +183,7 @@ class TaskManager {
     const isHttpPost =
       (req?.method || task.options?.method).toLowerCase() == "post";
 
-    if (req.url == "/shakespearize") {
+    if (req?.url == "/shakespearize") {
       //const postData = await Http.getPostDataFromStream(req);
       //const text = postData.text;
       const sheakspearize = async (text: string) => {
