@@ -1,14 +1,11 @@
 const sheakspearize = async (text) => {
-    const url = `https://db.memegenerator.net/shakespearize`;
-    var response = await fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ text: text })
-    });
     
-    var data = await response.json();
+    const data = await (await fetch("https://db.memegenerator.net/shakespearize", {
+        "body": JSON.stringify({ text }),
+        "method": "POST",
+        "mode": "cors",
+        "credentials": "omit"
+    })).json();
 
     return data.shakespearized;
 }

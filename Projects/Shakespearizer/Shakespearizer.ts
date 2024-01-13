@@ -33,10 +33,15 @@ class Shakespearizer {
     if (!hasPeriod) text += ".";
 
     const chatPrompt = `
-    Sheakspearize this:
+    Sheakspearize the text between the opening and closing triple dashes (---):
     (answer with only the Sheakspearized version and nothing else)
 
-    ${text}`;
+    ---
+
+    ${text}
+    
+    ---
+    `;
 
     //let shakespearized = await this.opanAI.complete(completionPrompt);
 
