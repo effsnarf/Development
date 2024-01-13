@@ -35,7 +35,6 @@ class Shakespearizer {
     const chatPrompt = `
     Sheakspearize this:
     (answer with only the Sheakspearized version and nothing else)
-    (make sure to keep all HTML tags intact, if exist)
 
     ${text}`;
 
