@@ -5,6 +5,7 @@ class Shakespearizer {
         this.queue = [];
         this.processQueue = this.processQueue.bind(this);
         this.processInterval = 1000;
+        this.processQueue();
     }
 
     async shakespearize(text) {
@@ -15,9 +16,8 @@ class Shakespearizer {
     }
 
     async processQueue() {
-        // Copy and clear the queue
-        const tasks = [...this.queue];
-        this.queue.length = 0;
+        // Take some tasks from the queue
+        const tasks = this.queue.splice(0, 10);
 
         if (tasks.length) {
             const texts = tasks.map(task => task.text);
@@ -41,8 +41,3 @@ class Shakespearizer {
     }
 }
 
-const shakespearizer = new Shakespearizer();
-shakespearizer.processQueue();
-
-
-shakespearizer.processQueue();

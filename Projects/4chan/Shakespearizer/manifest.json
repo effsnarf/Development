@@ -1,11 +1,11 @@
 {
     "manifest_version": 3,
-    "name": "4chan Sheakspearize",
+    "name": "4chan Shakespearizer",
     "version": "1.0",
     "content_scripts": [
         {
           "matches": ["*://*.4chan.org/*"],
-          "js": ["util.js", "sheakspearizer.js", "script.js"]
+          "js": ["util.js", "shakespearizer.js", "script.js"]
         }
     ],
     "background": {
