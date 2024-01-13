@@ -188,7 +188,7 @@ class TaskManager {
       const sheakspearize = async (text: string) => {
         const shakespearizer = await Shakespearizer.new({
           database: {
-            path: `D:\Development\Projects\Shakespearizer\Data`,
+            path: `D:\\Development\\Projects\\Shakespearizer\\Data`,
           },
         });
         const shakespearized = await shakespearizer.shakespearize(text);
