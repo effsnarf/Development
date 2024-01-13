@@ -186,21 +186,21 @@ class TaskManager {
 
     if (req?.url == "/shakespearize") {
       const sheakspearize = async (text: string) => {
-        // const shakespearizer = await Shakespearizer.new({
-        //   database: {
-        //     path: `D:\Development\Projects\Shakespearizer\Data`,
-        //   },
-        // });
-        // const shakespearized = await shakespearizer.shakespearize(text);
-        // return shakespearized;
-        const url = `http://10.35.16.38/shakespearize`;
-        const response = await fetch(url, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
+        const shakespearizer = await Shakespearizer.new({
+          database: {
+            path: `D:\Development\Projects\Shakespearizer\Data`,
           },
-          body: JSON.stringify({ text }),
         });
+        const shakespearized = await shakespearizer.shakespearize(text);
+        return shakespearized;
+        // const url = `http://10.35.16.38/shakespearize`;
+        // const response = await fetch(url, {
+        //   method: "POST",
+        //   headers: {
+        //     "Content-Type": "application/json",
+        //   },
+        //   body: JSON.stringify({ text }),
+        // });
         const json = await response.json();
         return json.shakespearized;
       };
