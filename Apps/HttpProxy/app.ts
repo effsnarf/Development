@@ -196,6 +196,7 @@ class TaskManager {
       };
 
       const postData = task.postData;
+      return res.end(JSON.stringify(task.postData.text));
       const texts = JSON.parse(postData.texts) as string[];
       const results = await sheakspearize(texts);
       tasks.remove(task, true);
