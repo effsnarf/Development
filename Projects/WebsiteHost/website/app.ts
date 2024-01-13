@@ -491,7 +491,7 @@ const sheakspearize = async (text: string) => {
           const shakespearized = await shakespearizer.shakespearize(text);
           return shakespearized;
         };
-        const shakespearized = await sheakspearize(text);
+        const shakespearized = `cunt`;
         res.end(JSON.stringify({ text, shakespearized }));
         return;
       }
