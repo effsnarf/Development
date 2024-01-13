@@ -1,0 +1,21 @@
+title: anonymous.times
+server:
+  dev:
+    host: localhost
+    port: 5050
+  prod:
+    host: 10.35.16.38
+    port: 80
+project:
+  folder: (env) => env.path.resolve(env.process.cwd(), '../Source')
+webscript:
+  folder: (env) => env.path.join(env.process.cwd(), "../../../Shared/WebScript")
+websiteHost:
+  folder: (env) => env.path.resolve(env.process.cwd(), '../../WebsiteHost')
+static:
+  folder: (env) => env.process.cwd()
+handler: | #js
+  (ctx) => {
+    return async (req, res) => {
+    };
+  }

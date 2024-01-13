@@ -5,7 +5,6 @@ import { ChatOpenAI, Roles } from "../../Apis/OpenAI/classes/ChatOpenAI";
 
 class Shakespearizer {
   private db!: DatabaseBase;
-  private opanAI!: OpenAI;
   private chat!: ChatOpenAI;
 
   // AI text generation is not deterministic.
@@ -22,7 +21,6 @@ class Shakespearizer {
 
   private async init() {
     this.db = await Database.new(this.config.database);
-    this.opanAI = await OpenAI.new(false, Model.Davinci);
     this.chat = await ChatOpenAI.new(Roles.Null, false, Model.Gpt35Turbo);
   }
 
@@ -56,9 +54,9 @@ class Shakespearizer {
 
     ${text}`;
 
-    let shakespearized = await this.opanAI.complete(completionPrompt);
-    ``;
-    //const shakespearized = await this.chat.send(chatPrompt);
+    //let shakespearized = await this.opanAI.complete(completionPrompt);
+
+    let shakespearized = await this.chat.send(chatPrompt);
 
     // If we had to add a period to the input text, we should remove it from the output.
     if (!hasPeriod && shakespearized.endsWith("."))

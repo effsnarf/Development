@@ -5,7 +5,7 @@ db:
     dataDir: ../Data
   mongo:
     connectionString: mongodb://localhost:27017
-    database: FourChan
+    database: AnonymousTimes
 images:
   download: true
   take:

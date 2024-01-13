@@ -29,7 +29,42 @@ import { ChatOpenAI, Role, Roles } from "../Apis/OpenAI/classes/ChatOpenAI";
 import { OpenAI2 } from "../Apis/OpenAI/classes/OpenAI2";
 
 (async () => {
-  const response = await OpenAI2.test();
+  const query = "python.exe";
 
-  console.log(response);
+  const driveStats = await Files.getDriveStats();
+  const c = driveStats.find((x) => x.drive === "c");
+
+  const window = Console.getWindowSize();
+  const maxWidth = window.width - 10;
+  let processedSize = 0;
+  let ex = null as any;
+  const started = Date.now();
+
+  for (let filePath of Files.listFiles("c:\\")) {
+    try {
+      const fileStats = fs.statSync(filePath);
+      processedSize += fileStats.size;
+    } catch (ex2: any) {
+      ex = ex2;
+    } finally {
+      const fileDir = path.dirname(filePath);
+      const fileName = path.basename(filePath);
+      const progress = processedSize / (c?.usedSpace || 0);
+      const timeElapsed = Date.now() - started;
+      const timeTotal = timeElapsed / progress;
+      const timeRemaining = timeTotal - timeElapsed;
+      console.log(fileDir.shorten(maxWidth).gray);
+      console.log(fileName.shorten(maxWidth).green);
+      console.log(
+        `${progress.toProgressBar(50)}`,
+        processedSize.unitifySize(),
+        c?.usedSpace.unitifySize(),
+        timeRemaining.unitifyTime()
+      );
+      //console.log((ex?.message || "").shorten(maxWidth).bgRed.white);
+      for (let i = 0; i < 3; i++) {
+        Console.moveCursorUp();
+      }
+    }
+  }
 })();

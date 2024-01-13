@@ -1,0 +1,19 @@
+{
+    "manifest_version": 3,
+    "name": "4chan Interface",
+    "version": "1.0",
+    "content_scripts": [
+        {
+          "matches": ["*://*.4chan.org/*"],
+          "css": ["4chan.new.css"],
+          "js": ["util.js", "script.js"]
+        }
+    ],
+    "background": {
+      "service_worker": "service.worker.js"
+    },
+    "permissions": [
+      "activeTab", "scripting"
+    ]
+  }
+  

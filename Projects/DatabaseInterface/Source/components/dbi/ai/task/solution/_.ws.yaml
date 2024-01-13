@@ -47,6 +47,9 @@ props:
 
 data:
   result: null
+  show:
+    result:
+      once: false
   is:
     open: false
     loading: false

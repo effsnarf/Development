@@ -1,0 +1,14 @@
+dom:
+  div:
+    at.app: null
+    ui.html.style:
+      v-for: comp in $root.comps
+      ":key": comp.name
+      ":component": comp
+mounted: | #js
+  function() {
+  }
+name: app
+style:
+  .comp-at-app:
+    padding: 1em

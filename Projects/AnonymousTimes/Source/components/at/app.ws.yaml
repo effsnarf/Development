@@ -1,0 +1,20 @@
+dom:
+  div:
+    .website-title:
+      v-text: "'Anonymous Times'"
+    .flex.gap-2:
+      div:
+        at.board.list:
+      div:
+        at.board:
+
+methods:
+
+style:
+  .comp-at-board-list:
+    width: 10vw
+  .website-title:
+    text-align: center
+    font-family: Chomsky
+    font-size: 6em
+    text-shadow: "-6px 6px 6px #666"

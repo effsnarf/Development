@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import "./Extensions";
 import { Progress } from "./Progress";
+import { exec } from "child_process";
 
 interface PathFilter1 {
   include: string[];
@@ -39,7 +40,49 @@ const pathFilterToFunction = (filter: PathFilter) => {
   throw new Error("Unrecognized path filter");
 };
 
+interface DriveStats {
+  drive: string;
+  freeSpace: number;
+  usedSpace: number;
+  size: number;
+}
+
 class Files {
+  static getDriveStats(): Promise<DriveStats[]> {
+    return new Promise((resolve, reject) => {
+      exec("wmic logicaldisk get size,freespace,caption", (error, stdout) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+
+        const lines = stdout.split("\n");
+        const fields = lines[0]
+          .split(/\s+/)
+          .filter((s) => s)
+          .map((s) => s.trim().toCamelCase());
+        const drives = lines
+          .slice(1)
+          .map((line) => line.trim())
+          .filter((s) => s)
+          .map((line) => {
+            const values = line.split(/\s+/);
+            const stats: any = {};
+            fields.forEach((field, i) => {
+              let value = values[i] as any;
+              if (parseInt(value).toString() == value) value = parseInt(value);
+              stats[field] = value;
+            });
+            stats.drive = stats.caption[0].toLowerCase();
+            delete stats.caption;
+            stats.usedSpace = stats.size - stats.freeSpace;
+            return stats as DriveStats;
+          });
+        resolve(drives);
+      });
+    });
+  }
+
   static findParentFolder(baseFolder: string, folderName: string) {
     let currentFolder = path.resolve(baseFolder);
     while (true) {

@@ -630,6 +630,21 @@ class Console {
     },
   };
 
+  static readLine(question: string) {
+    return new Promise<string>((resolve) => {
+      const cbKey = Date.now();
+      // read the answer from user input, using stdin
+      const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout,
+      });
+      rl.question(question, (answer: string) => {
+        rl.close();
+        resolve(answer);
+      });
+    });
+  }
+
   static readLines(question: string) {
     return new Promise<string>((resolve) => {
       const cbKey = Date.now();

@@ -16,7 +16,7 @@ import {
 class Summarizer {
   private db!: MongoDatabase;
 
-  private constructor(config: Config) {}
+  private constructor(private config: Config) {}
 
   public static async new(config: Config, openAiConfig: OpenAiConfig) {
     const summarizer = new Summarizer(config);
@@ -32,7 +32,7 @@ class Summarizer {
     console.log("Starting summarizer".cyan);
     console.log();
 
-    const model = Model.Gpt35Turbo;
+    const model = (this.config.llm?.model as Model) || Model.Gpt35Turbo;
 
     while (true) {
       const loading = Loading.new();

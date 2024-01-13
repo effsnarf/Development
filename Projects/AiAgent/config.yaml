@@ -1,0 +1,7 @@
+title: Unnamed App
+server:
+  host: localhost
+  port: 3000
+database:
+  connectionString: mongodb://localhost
+  database: Test

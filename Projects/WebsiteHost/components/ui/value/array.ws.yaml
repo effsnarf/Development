@@ -91,6 +91,10 @@ dom:
                   :key: field
                   ui.value.preview: 
                     ':value': item?.[field]
+      .box1:
+        v-if: "false"
+        ui.value:
+          ':value': selected.item
 props:
   value: null
   reverse: false
@@ -103,6 +107,8 @@ data:
   sortByField: null
   sortByFieldDirection: 1
   hoveredItem: null
+  selected:
+    item: null
   query: null
   visibleFields1: null
 methods:
@@ -127,6 +133,7 @@ methods:
     function(item, isHovered) {
       if (this.$refs.hoveredItemContext1?.isPinned) return;
       this.hoveredItem = (isHovered ? item : null);
+      this.selected.item = item;
     }
   onItemClick: | #js
     function(item, index) {
