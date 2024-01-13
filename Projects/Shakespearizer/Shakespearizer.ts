@@ -32,25 +32,10 @@ class Shakespearizer {
 
     if (!hasPeriod) text += ".";
 
-    const completionPrompt = `
-    Plain English is different from Shakespearized English.
-    Here is an example:
-    
-    Plain English:
-    
-  
-
-    ${text}
-
-
-
-    Sheakspearized English:
-
-    `;
-
     const chatPrompt = `
     Sheakspearize this:
     (answer with only the Sheakspearized version and nothing else)
+    (make sure to keep all HTML tags intact, if exist)
 
     ${text}`;
 
