@@ -56,7 +56,7 @@ class Shakespearizer {
     }
 
     async processQueue() {
-        const tasks = this.tasks.splice(0, 1);
+        const tasks = this.tasks.splice(0, 10);
         this.processingTasks.push(...tasks);
 
         if (tasks.length) {

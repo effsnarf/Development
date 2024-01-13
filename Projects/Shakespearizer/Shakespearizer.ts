@@ -31,7 +31,9 @@ class Shakespearizer {
     ${text}
     `;
 
-    const shakespearized = (await this.chat.send(chatPrompt)).trim();
+    const shakespearized = this.cleanup(
+      (await this.chat.send(chatPrompt)).trim()
+    );
 
     const item = {
       text,
@@ -83,6 +85,10 @@ class Shakespearizer {
     const item = await this.db.get(_id);
     if (!item) return null;
 
+    const cleaned = this.cleanup(item);
+    if (JSON.stringify(item) != JSON.stringify(cleaned))
+      this.setCachedShakespearizedText(text, cleaned.shakespearized);
+
     return item.shakespearized;
   }
 
@@ -130,6 +136,23 @@ class Shakespearizer {
     }
 
     return results;
+  }
+
+  private cleanup(item: string | any) {
+    if (typeof item == "string") return this.cleanupString(item);
+    if (typeof item == "object") return this.cleanupObject(item);
+    return item;
+  }
+
+  private cleanupString(text: string) {
+    text = text.replace(`Translate to Shakespearean: `, ``);
+    return text;
+  }
+
+  private cleanupObject(item: any) {
+    for (const key in item) {
+      item[key] = this.cleanup(item[key]);
+    }
   }
 }
 
