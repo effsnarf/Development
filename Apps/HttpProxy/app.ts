@@ -197,9 +197,13 @@ class TaskManager {
           body: JSON.stringify({ text: text }),
         });
 
-        const result = await response.json();
-        //const result = { text, shakespearized: `To be or not to be.` };
-        return result;
+        try {
+          const result = await response.json();
+          //const result = { text, shakespearized: `To be or not to be.` };
+          return result;
+        } catch (ex: any) {
+          return ex.message;
+        }
       };
       const result = await sheakspearize("test");
       tasks.remove(task, true);
