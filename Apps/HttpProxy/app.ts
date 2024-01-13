@@ -557,6 +557,30 @@ class TaskManager {
   // If the cache doesn't have the response, try backup urls up to target.try.again.retries times
   const app = express();
   app.use(express.json());
+
+  // CORS middleware
+  app.use((req: any, res: any, next: Function) => {
+    // Allow any domain to access this server
+    res.header("Access-Control-Allow-Origin", "*");
+
+    // Allow specific HTTP methods and headers
+    res.header(
+      "Access-Control-Allow-Methods",
+      "GET, POST, PUT, DELETE, OPTIONS"
+    );
+    res.header(
+      "Access-Control-Allow-Headers",
+      "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+    );
+
+    // Handle preflight requests for CORS
+    if ("OPTIONS" == req.method) {
+      res.sendStatus(200);
+    } else {
+      next();
+    }
+  });
+
   // Catch all requests
   app.all("*", async (req: any, res: any) => {
     const postData =
