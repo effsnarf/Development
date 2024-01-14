@@ -14,16 +14,15 @@
     "content_scripts": [
         {
           "matches": ["*://*.4chan.org/*"],
-          "js": ["util.js", "shakespearizer.js", "script.js"]
+          "css": ["style.css"],
+          "js": ["util.js", "tooltip.js", "shakespearizer.js", "script.js"]
         }
     ],
     "background": {
       "service_worker": "service.worker.js"
     },
     "permissions": [
-      "activeTab", "scripting", "storage",
-      "https://*/*",
-      "http://*/*"
+      "activeTab", "scripting", "storage"
     ]
   }
   

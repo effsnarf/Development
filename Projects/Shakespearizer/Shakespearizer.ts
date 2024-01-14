@@ -84,6 +84,7 @@ class Shakespearizer {
     if (!item.shakespearized) return null;
 
     const cleaned = this.cleanup(item);
+    if (!cleaned.shakespearized) return null;
 
     if (JSON.stringify(item) != JSON.stringify(cleaned)) {
       item.shakespearized = cleaned.shakespearized;
@@ -158,6 +159,7 @@ class Shakespearizer {
 
   private cleanupString(text: string) {
     if (!text) return text;
+    if (typeof text != "string") return null;
     text = text.replace(`Translate to Shakespearean: `, ``);
     text = text.replace(`Translate to Shakespearean:\n`, ``);
     text = text.replace(`Translate to Shakespearean:\n\n`, ``);
@@ -167,7 +169,7 @@ class Shakespearizer {
 
   private cleanupObject(item: any) {
     for (const key in item) {
-      item[key] = this.cleanup(item[key]);
+      item[key] = this.cleanupString(item[key]);
     }
     return item;
   }

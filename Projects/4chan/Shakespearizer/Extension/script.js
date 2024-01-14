@@ -1,3 +1,4 @@
+const tooltipManager = new TooltipManager();
 const shakespearizer = new Shakespearizer();
 
 const checkSettingsChange = async () => {
@@ -42,6 +43,7 @@ const shakespearizeElement = async (element) => {
         //console.log(node.textContent);
         if (node.shakespearizing) return;
         node.shakespearizing = true;
+        node.parentNode.classList.add("shakespearizing");
         const text = node.textContent;
         try
         {
@@ -52,6 +54,7 @@ const shakespearizeElement = async (element) => {
             }
             node.unshakespearized = text;
             node.textContent = shakespearized;
+            node.parentNode.classList.remove("shakespearizing");
             const textWrapNode = wrapTextNodeWithTooltip(node, text);
             textWrapNode.unshakespearized = text;
         }
@@ -69,6 +72,8 @@ const sheakspearizeElements = async (elements) => {
 
 
 const sheakspearizePosts = async () => {
+    //const subjects = [...document.getElementsByClassName("subject")];
+    //await sheakspearizeElements(subjects);
     const posts = [...document.getElementsByTagName("blockquote")];
     await sheakspearizeElements(posts);
 }

@@ -1,0 +1,26 @@
+.shakespearizing
+{
+    opacity: 0.8;
+}
+
+
+
+.tooltip {
+    position: absolute;
+    display: block;
+    background: black;
+    color: white;
+    padding: 8px;
+    border-radius: 4px;
+    transition: opacity 1s !important;
+    pointer-events: none;
+}
+
+
+.tooltip-hidden {
+    opacity: 0;
+}
+
+.tooltip:not(.tooltip-hidden) {
+    opacity: 1;
+}
