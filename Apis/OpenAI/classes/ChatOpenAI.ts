@@ -218,6 +218,9 @@ class ChatOpenAI {
     private useTools?: boolean,
     private apiKey?: string
   ) {
+    this.apiKey = (this.apiKey || "").trim();
+    if (!this.apiKey.length)
+      throw new Error("Please provide an OpenAI API key.");
     this._log = log;
     this.role = role;
     this._openAI = OpenAI.new(log, model, apiKey);
