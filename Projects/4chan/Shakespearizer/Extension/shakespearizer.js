@@ -24,7 +24,7 @@ class Shakespearizer {
         if (!(apiKey||'').trim().length) {
             if (this.error.last.apiKey != apiKey) {
                 this.error.last.apiKey = apiKey;
-                this.onError("Please enter an OpenAI API key in the 4chan Shakespearizer extension settings");
+                this.onError("Please enter an OpenAI API key");
             }
             return new Promise((resolve, reject) => { resolve(text); });
         }
@@ -106,7 +106,7 @@ class Shakespearizer {
     }
 
     onError(message) {
-        alert(message);
+        alert(`4chan Shaekspearizer - ${message}`);
     }
 }
 

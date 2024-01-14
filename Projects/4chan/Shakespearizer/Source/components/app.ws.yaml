@@ -1,0 +1,48 @@
+dom:
+  div: 
+    img:
+      class: logo
+      src: /images/duck3.png
+    div: 
+      .flex:
+        h2:
+          class: mainTitle1
+          ui.title:
+            text: 🧊 4chan Shakespearizer
+    h3:
+      class: mainTitle2
+      v-html: '''A global component registry, by everyone, for everyone.'''
+    div: 
+      ul:
+        class: comp-list
+props: null
+data:
+  gdb: null
+  activeNode: null
+computed:
+mounted: | #js
+  async function() {
+  }
+methods:
+style:
+  .logo:
+    display: block
+    margin: auto
+name: app
+_:
+  examples:
+    count: 0
+template: >-
+  <div class="comp-app" path="96801."><img class="logo" src="/images/duck3.png"
+  path="96801.0"/><div path="96801.1"><div class="flex" path="96801.1.0"><h2
+  class="mainTitle1" path="96801.1.0.0"><ui-title text="🧊 Web developers of the
+  world unite!" path="96801.1.0.0.0"></ui-title></h2></div></div><h3
+  class="mainTitle2" v-html="'A global component registry, by everyone, for
+  everyone.'" path="96801.2"></h3><div path="96801.3"><ul class="comp-list"
+  path="96801.3.0"><li class="clickable" v-for="comp in compsWithExample"
+  path="96801.3.0.0"><studio-comp-teaser :comp="comp"
+  path="96801.3.0.0.0"></studio-comp-teaser></li></ul><div
+  path="96801.3.1"><ide-component-style v-for="comp in $root.comps"
+  :component="comp" path="96801.3.1.0"></ide-component-style></div></div><div
+  class="notifications"
+  path="96801.4"><ui-notifications></ui-notifications></div></div>

@@ -1,0 +1,18 @@
+title: 4chan Shakespearizer
+server:
+  host: localhost
+  port: 5051
+project:
+  folder: (env) => env.path.resolve(env.process.cwd(), '../Source')
+webscript:
+  folder: (env) => env.path.join(env.process.cwd(), "../../../../Shared/WebScript")
+websiteHost:
+  folder: (env) => env.path.resolve(env.process.cwd(), '../../../WebsiteHost')
+static:
+  folder: (env) => env.process.cwd()
+handler: | #js
+  (ctx) => {
+    return async (req, res) => {
+      return null;
+    };
+  }
