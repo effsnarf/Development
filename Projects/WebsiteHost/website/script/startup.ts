@@ -312,9 +312,14 @@ const mgAppMixin = {
   },
   async created() {
     const self = this as any;
-    self.dbp = await DatabaseProxy.new(
-      `https://db.memegenerator.net/MemeGenerator`
-    );
+    try {
+      self.dbp = await DatabaseProxy.new(
+        `https://db.memegenerator.net/MemeGenerator`
+      );
+    } catch (ex: any) {
+      console.warn(`Failed to connect to DBP`);
+      console.warn(ex);
+    }
   },
 };
 

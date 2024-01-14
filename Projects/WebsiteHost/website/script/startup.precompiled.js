@@ -8897,7 +8897,7 @@ var __webpack_exports__ = {};
 "use strict";
 var exports = __webpack_exports__;
 /*!************************************************************!*\
-  !*** ../../../WebsiteHost/website/script/1705193006356.ts ***!
+  !*** ../../../WebsiteHost/website/script/1705193293345.ts ***!
   \************************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -9186,7 +9186,13 @@ const mgAppMixin = {
     },
     async created() {
         const self = this;
-        self.dbp = await DbpClient_1.DatabaseProxy.new(`https://db.memegenerator.net/MemeGenerator`);
+        try {
+            self.dbp = await DbpClient_1.DatabaseProxy.new(`https://db.memegenerator.net/MemeGenerator`);
+        }
+        catch (ex) {
+            console.warn(`Failed to connect to DBP`);
+            console.warn(ex);
+        }
     },
 };
 const mgCompMixin = {

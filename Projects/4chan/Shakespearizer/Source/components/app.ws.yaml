@@ -6,19 +6,13 @@ dom:
     div: 
       .flex:
         h2:
-          class: mainTitle1
           ui.title:
             text: 🧊 4chan Shakespearizer
     h3:
-      class: mainTitle2
-      v-html: '''A global component registry, by everyone, for everyone.'''
+      v-text: "'test'"
     div: 
-      ul:
-        class: comp-list
 props: null
 data:
-  gdb: null
-  activeNode: null
 computed:
 mounted: | #js
   async function() {
