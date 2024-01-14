@@ -68,7 +68,8 @@ class OpenAI {
     model: Model = Model.Default,
     apiKey?: string
   ): OpenAI {
-    if (!apiKey) throw new Error("API key not set.");
+    apiKey = (apiKey || "").trim();
+    if (!apiKey.length) throw new Error("Please provide an OpenAI API key.");
     return new OpenAI(apiKey, model, log);
   }
 

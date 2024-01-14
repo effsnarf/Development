@@ -19,16 +19,15 @@ class Shakespearizer {
     }
 
     async shakespearize(text) {
+        text = (text||'').trim();
+        if (!text.length) return text;
+        
+        // Check local storage cache for the Shakespearized text
+        const cached = this.getCached(text);
+        if (cached) return cached;
+
         const apiKey = (await promisify(chrome.storage.sync, 'get')('apiKey')).apiKey;
         
-        if (!(apiKey||'').trim().length) {
-            if (this.error.last.apiKey != apiKey) {
-                this.error.last.apiKey = apiKey;
-                this.onError("Please enter an OpenAI API key");
-            }
-            return new Promise((resolve, reject) => { resolve(text); });
-        }
-
         this.apiKey = apiKey;
 
         const existingTask = this.getExistingTask(text);
@@ -74,6 +73,7 @@ class Shakespearizer {
     resolveTask(result) {
         const task = this.processingTasks.find(task => task.text === result.text);
         if (!task) return;
+        this.setCached(result.text, result.shakespearized);
         task.promise.resolve(result.shakespearized);
         this.removeTask(this.processingTasks, task);
     }
@@ -103,6 +103,23 @@ class Shakespearizer {
     onSettingsChange() {
         this.error.last.apiKey = null;
         this.error.last.server.error = null;
+    }
+
+    getCached(text) {
+        return localStorage.getItem(this.getCacheKey(text));
+    }
+
+    setCached(text, shakespearized) {
+        try{
+            localStorage.setItem(this.getCacheKey(text), shakespearized);
+        }
+        catch (ex) {
+            localStorage.clear();
+        }
+    }
+
+    getCacheKey(text) {
+        return `_${text}`;
     }
 
     onError(message) {
