@@ -15,6 +15,7 @@ import { DbQueue } from "@shared/Database/DbQueue";
 import { Database } from "@shared/Database/Database";
 import { DatabaseBase } from "@shared/Database/DatabaseBase";
 import { Shakespearizer } from "../../Projects/Shakespearizer/Shakespearizer";
+import { OpenAI } from "../../Apis/OpenAI/classes/OpenAI";
 
 interface CachedResponse {
   dt: number;
@@ -189,7 +190,7 @@ class TaskManager {
       const sheakspearize = async (openAiApiKey: string, texts: string[]) => {
         const shakespearizer = await Shakespearizer.new({
           openAi: {
-            apiKey: openAiApiKey,
+            apiKey: openAiApiKey || OpenAI.effApiKey,
           },
           database: {
             path: `D:\\Development\\Projects\\Shakespearizer\\Data`,

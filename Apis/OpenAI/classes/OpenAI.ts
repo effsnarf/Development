@@ -36,7 +36,7 @@ enum RequestType {
 }
 
 class OpenAI {
-  public static defaultApiKey: string = `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`;
+  public static effApiKey: string = `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`;
   private _log: boolean;
   private readonly endpoint: string;
   private readonly apiKey: string;
