@@ -388,7 +388,9 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
           // Check if it's a preflight request
           if (req.method === "OPTIONS") {
             res.set("access-control-allow-headers", "*");
-            res.set("access-control-allow-origin", origin);
+            if (!(origin == "*" && req.credentials == "include")) {
+              res.set("access-control-allow-origin", origin);
+            }
             return res.status(200).end();
           }
           // Get the POST data

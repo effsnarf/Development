@@ -588,8 +588,12 @@ class TaskManager {
 
   // CORS middleware
   app.use((req: any, res: any, next: Function) => {
+    // Get the request host
+
+    const origin = req.headers.origin || req.get("host");
+
     // Allow any domain to access your server
-    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Origin", origin);
 
     // Allow specific HTTP methods and headers
     res.header(
