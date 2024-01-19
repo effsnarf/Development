@@ -5,13 +5,20 @@ import { Console } from "@shared/Console";
 import { Objects } from "@shared/Extensions.Objects";
 import { Loading } from "@shared/Loading";
 import { Database } from "@shared/Database/Database";
+import { OpenAI } from "../../Apis/OpenAI/classes/OpenAI";
 import { ChatOpenAI, Roles } from "../../Apis/OpenAI/classes/ChatOpenAI";
 import { Model } from "../../Apis/OpenAI/classes/OpenAI";
 
 (async () => {
   const config = (await Configuration.new()).data;
 
-  const chat = await ChatOpenAI.new(Roles.AiAgent, false, Model.Gpt35Turbo);
+  const chat = await ChatOpenAI.new(
+    Roles.AiAgent,
+    false,
+    Model.Gpt35Turbo,
+    true,
+    OpenAI.effApiKey
+  );
 
   console.clear();
   console.log(
@@ -24,7 +31,7 @@ import { Model } from "../../Apis/OpenAI/classes/OpenAI";
   console.log(
     `  ${(chat.tools || [])
       .map((tool) => tool.function.description.green)
-      .join(`, `.gray)}`
+      .join(`\n  `.gray)}`
   );
 
   const sendRequest = async (message: string) => {
