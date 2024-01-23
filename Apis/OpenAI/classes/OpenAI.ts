@@ -36,7 +36,15 @@ enum RequestType {
 }
 
 class OpenAI {
-  public static effApiKey: string = `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`;
+  public static get effApiKey() {
+    const key = process.env.OPENAI_API_KEY;
+    if (!key?.length)
+      throw new Error(
+        "Please set OpenAI API key in OPENAI_API_KEY environment variable."
+      );
+    return key;
+  }
+
   private _log: boolean;
   private readonly endpoint: string;
   private readonly apiKey: string;
