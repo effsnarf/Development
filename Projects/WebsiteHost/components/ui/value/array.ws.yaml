@@ -2,8 +2,9 @@ dom:
   div:
     .flex.gap-1:
       div:
+        v-if: "(showVisibleFieldsFilter)"
         ui.drawer:
-          v-if: "fields.length > 1"
+          v-if: "(fields.length > 1)"
           .box1:
             ui.checkbox.list:
               :items: fields
@@ -103,6 +104,7 @@ props:
   maxVisibleItems: 500
   maxVisibleFields: 1000
   visibleFields: null
+  showVisibleFieldsFilter: true
 data:
   sortByField: null
   sortByFieldDirection: 1
@@ -212,8 +214,8 @@ watch:
   visibleFields:
     handler: | #js
       function(visibleFields) {
-        visibleFields.removeBy(v => !this.fields.includes(v));
-        if (!visibleFields.length) visibleFields = null;
+        visibleFields?.removeBy(v => !this.fields.includes(v));
+        if (!visibleFields?.length) visibleFields = null;
         this.visibleFields1 = visibleFields;
       }
     immediate: true

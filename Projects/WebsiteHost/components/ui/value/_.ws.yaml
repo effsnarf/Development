@@ -7,6 +7,7 @@ dom:
     ":large": large
     :visible-fields: visibleFields
     :max-visible-fields: maxVisibleFields
+    :show-visible-fields-filter: showVisibleFieldsFilter
     v-on: $listeners
 props:
   value: null
@@ -16,6 +17,7 @@ props:
   large: false
   visibleFields: null
   maxVisibleFields: null
+  showVisibleFieldsFilter: true
 data:
   visibleValue: null
   isLoading: false

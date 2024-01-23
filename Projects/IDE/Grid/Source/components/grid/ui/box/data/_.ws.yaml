@@ -1,18 +1,20 @@
 dom:
   grid.module:
     icon: 🧊
-    ':show-title': 'false'
+    ":show-title": "false"
     div:
-      ':style': '{ ''width'': ''100%'', overflow: ''auto'' }'
-      ui.value: 
-        v-if: '!showLastValue'
-        ':value': outputValue
-        ':large': true
+      ":style": "{ 'width': '100%', overflow: 'auto' }"
+      ui.value:
+        v-if: "!showLastValue"
+        ":value": outputValue
+        ":large": true
+        :show-visible-fields-filter: "false"
       .last-value:
         v-if: showLastValue
-        ui.value: 
-          ':value': lastNonNullOutputValue
-          ':large': true
+        ui.value:
+          ":value": lastNonNullOutputValue
+          ":large": true
+          :show-visible-fields-filter: "false"
 props:
   box: null
 data:
@@ -89,7 +91,7 @@ style:
   .last-value:
     filter: grayscale(1) contrast(0.9)
   .box1:
-    border: '1px solid #ccc'
+    border: "1px solid #ccc"
     padding: 0.5em
     margin-bottom: 1em
 _:
