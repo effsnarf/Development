@@ -15,7 +15,7 @@ import { Model } from "../../Apis/OpenAI/classes/OpenAI";
   const chat = await ChatOpenAI.new(
     Roles.AiAgent,
     false,
-    Model.Gpt35Turbo,
+    Model.Gpt4,
     true,
     OpenAI.effApiKey
   );
