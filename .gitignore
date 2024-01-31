@@ -6,9 +6,12 @@
 Test/Database
 
 # Data folders
-/Projects/AnonymousTimes/Data
+/Projects/AnonymousTimes/Database
 /Projects/4chanScraper/Data
 /Projects/Shakespearizer/Data
+
+# Images folders
+/Projects/AnonymousTimes/Web/images/articles
 
 # Temp folders
 Temp
@@ -1860,3 +1863,20 @@ Projects/4chanScraper/Data/image/1700980407/1700980407422/1700980407422545.jpg
 Projects/4chanScraper/Data/image/1700980849/1700980849736/1700980849736681.png
 Projects/4chanScraper/Data/image/1700980960/1700980960963/1700980960963084.jpg
 Projects/Shakespearizer/Api/config.yaml
+Projects/AnonymousTimes/Database/uniqueID.json
+Projects/AnonymousTimes/Database/Articles/-1025/-1024718/-1024717439.json
+Projects/AnonymousTimes/Database/Articles/-1198/-1197502/-1197501750.json
+Projects/AnonymousTimes/Database/Articles/-1571/-1570466/-1570465739.json
+Projects/AnonymousTimes/Database/Articles/-1742/-1741128/-1741127331.json
+Projects/AnonymousTimes/Database/Articles/-426/-425412/-425411893.json
+Projects/AnonymousTimes/Database/Articles/-917/-916632/-916631296.json
+Projects/AnonymousTimes/Database/Articles/1037/1037969/1037969608.json
+Projects/AnonymousTimes/Database/Articles/1081/1081953/1081953363.json
+Projects/AnonymousTimes/Database/Articles/1190/1190338/1190338709.json
+Projects/AnonymousTimes/Database/Articles/1373/1373332/1373332505.json
+Projects/AnonymousTimes/Database/Articles/138/138014/138014212.json
+Projects/AnonymousTimes/Database/Articles/1698/1698049/1698049243.json
+Projects/AnonymousTimes/Database/Articles/1828/1828968/1828968224.json
+Projects/AnonymousTimes/Database/Articles/22/22787/22787444.json
+Projects/AnonymousTimes/Database/Articles/455/455586/455586354.json
+Projects/AnonymousTimes/Database/Articles/783/783087/783087633.json

@@ -1,19 +1,38 @@
 dom:
-  .clickable:
+  .at-title.clickable:
     img:
-      :src: image
+      :src: imageUrl
     h3:
+      v-if: title
+      v-text: title
+    p:
+      class: desc
+      v-if: text
       v-text: text
-    .desc:
-      v-text: desc
 
 props:
+  title: null
   text: null
-  desc: null
   image: null
 
+computed:
+  imageUrl: | #js
+    function () {
+      if (!this.image) return null;
+      return `/fetch?url=${(this.image)}`;
+    }
+
 style:
+  .at-title:
+    filter: grayscale(0)
+    transition: filter 1s
+  .at-title:hover:
+    filter: none
+    transition: filter 0s
   img:
-    aspect-ratio: 8 / 2
+    aspect-ratio: 4 / 2
     width: 100%
     object-fit: cover
+    border: 1px solid gray
+  .desc:
+    margin-top: 0.5em

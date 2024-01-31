@@ -1,0 +1,8 @@
+dom:
+  at.teaser1:
+
+style:
+  .div1:
+    aspect-ratio: 2 / 4
+  .title1:
+    font-size: 1.2rem

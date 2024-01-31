@@ -17,5 +17,21 @@ static:
 handler: | #js
   (ctx) => {
     return async (req, res) => {
+
+    const db = await ctx.Database.new({ path: `../Database` });
+
+      if (req.url === '/articles') {
+        let articles = await db.find("Articles", {});
+
+        for (const article of articles) {
+            Object.assign(article, article.hebrew);
+            delete article.hebrew;
+            delete article.hungarian;
+        }
+
+        articles = articles.filter(article => article.title?.length);
+
+        return res.end(JSON.stringify(articles));
+      }
     };
   }

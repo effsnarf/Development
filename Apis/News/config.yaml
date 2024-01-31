@@ -1,0 +1,3 @@
+api:
+  call: https://newsapi.org/v2/everything?q=hungarian%20jewish&from=2023-12-28&sortBy=publishedAt&apiKey=55d1e523cec848f7b08f94355d088e0f
+key: 55d1e523cec848f7b08f94355d088e0f

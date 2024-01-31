@@ -1,20 +1,138 @@
 dom:
   div:
-    .website-title:
-      v-text: "'Anonymous Times'"
-    .flex.gap-2:
-      div:
-        at.board.list:
-      div:
-        at.board:
+    .width1:
+      .bg1:
+        .header:
+          .at-title:
+            v-text: "'Budapest Times'"
+    .width1:
+      .bg2:
+        .bar1:
+          div:
+            v-text: "'Hírek'"
+          div:
+            v-text: "'Kultúra'"
+          div:
+            v-text: "'Szórakozás'"
+          div:
+            v-text: "'Vélemény'"
+    .width1:
+      .bg1:
+        .columns1:
+          div:
+            at.teaser1:
+              :article: articles[0]
+            .columns2:
+              at.teaser1:
+              at.teaser1:
+            .spacer1:
+              v-text: "' '"
+            h3:
+              v-text: "'Hírek'"
+            .teasers2:
+              at.teaser2:
+                v-for: i in 4
+                :text: "'In every woman’s life there comes a moment of truth, when you’re about to change the style of your hair (or even the color) and you’ve just got to make a pick out of all the varieties of popular (and not so much) hairdos. So, is there a way to narrow down the choice anyhow?'"
+          div:
+            h3:
+              v-text: "'Kultúra'"
+            .teasers2:
+              at.teaser2:
+                v-for: article in articles
+                :article: article
+              at.teaser1:
+              h3:
+                v-text: "'Szórakozás'"
+              at.teaser2:
+                v-for: i in 3
+                :show-image: "false"
+          .teasers2:
+            at.teaser3:
+              v-for: i in 2
+
+data:
+  articles: null
+
+mounted: | #js
+  async function () {
+    await this.init();
+  }
 
 methods:
+  init: | #js
+    async function () {
+      const articles = (await (await fetch("/articles")).json());
+      this.articles = articles;
+    }
 
 style:
-  .comp-at-board-list:
-    width: 10vw
-  .website-title:
+  div, *:
+    border-radius: 0
+  .bg1:
+    background: white
+  .bg1, .bar1:
+    padding: 0 3rem
+  .bg2:
+    background: black
+    color: white
+  .spacer1:
+    height: 2rem
+  .teaser:
+    opacity: 1
+  .teaser:hover:
+    opacity: 0.9
+  .bar1:
+    display: flex
+    justify-content: center
+    font-family: serif
+    font-size: 1.5rem
+    text-transform: uppercase
+  .bar1 > *:
+    padding: 0 2rem
+    cursor: pointer
+  .bar1 > *:hover:
+    background: "#88888860"
+  h3:
+    margin: 0 0 0.5em 0
+    border-bottom: 1px solid gray
+  .width1:
+    width: 1200px
+    margin: auto
+  .header:
+    position: sticky
+    top: 0
+    border-radius: 0
+    padding-bottom: 1rem
+    z-index: 10
+  .columns1:
+    display: grid
+    grid-template: 1fr / 3fr 2fr 1fr
+    gap: 2rem
+    padding: 2rem 0
+  .columns1 > div:
+    border: 0px solid gray
+  .columns2:
+    display: grid
+    grid-template: 1fr / 1fr 1fr
+    gap: 2rem
+    margin-top: 2rem
+  .columns2 .title1:
+    font-size: 1.8rem !important
+    line-height: 1em
+  .teasers2:
+    display: flex
+    flex-direction: column
+    gap: 1rem
+  .teasers2 > *:not(h3):not(:last-child):
+    padding-bottom: 1rem
+    border-bottom: 1px solid gray
+  .at-title:
     text-align: center
     font-family: Chomsky
-    font-size: 6em
+    font-size: 4.5vw
+    line-height: 1em
+    margin-bottom: 0.2em
     text-shadow: "-6px 6px 6px #666"
+  .time:
+    color: gray
+    font-size: 0.8em

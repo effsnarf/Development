@@ -1,0 +1,83 @@
+dom:
+  .teaser:
+    .div1:
+      :style: "{ 'background-image': 'url(' + imageUrl + ')'}"
+      .fader1:
+        v-text: "' '"
+      .label1:
+        v-text: "'Hírek'"
+      .box2:
+        .title1:
+          v-text: title1
+        .text1:
+          v-text: text
+        .time:
+          v-text: date1
+
+props:
+  article: null
+  text: null
+  date: null
+
+data:
+  imageUrl1: "https://livedemo00-joomla.template-help.com/joomla_prod-16618_v1/images/carousel/big/image3.jpg"
+  imageUrl2: "https://livedemo00-joomla.template-help.com/joomla_prod-16618_v1/images/pages/page1-img2.jpg"
+  imageUrl3: "https://livedemo00-joomla.template-help.com/joomla_prod-16618_v1/images/pages/page1-img3.jpg"
+
+computed:
+  title1: | #js
+    function () {
+      if (this.article) return this.article.title;
+      return this.title;
+    }
+  date1: | #js
+    function () {
+      if (this.article) return (new Date(this.article.date)).toLocaleDateString();
+      return this.date;
+    }
+  imageUrl: | #js
+    function () {
+      if (this.article) return `/images/articles/${this.article._id}/teaser.jpg`;
+      if (this.image?.length) return this.image;
+      return this["imageUrl" + (Math.floor(Math.random() * 3) + 1)];
+    }
+
+style:
+  .div1:
+    width: 100%
+    aspect-ratio: 8 / 6
+    background-size: cover
+    background-position: center
+  .fader1:
+    content: ""
+    position: absolute
+    top: 0
+    left: 0
+    right: 0
+    bottom: 0
+    background: linear-gradient(to top, black, transparent)
+  .box2:
+    position: absolute
+    bottom: 0
+    padding: 1rem
+  .label1:
+    position: absolute
+    top: 0
+    left: 0
+    padding: 0.1rem 0.5rem
+    background: white
+    color: black
+    font-family: Roboto
+    font-weight: bold
+    text-transform: uppercase
+  .title1:
+    color: white
+    font-family: Roboto
+    font-weight: bold
+    font-size: 2.2rem
+    line-height: 1.2em
+    text-shadow: -2px 2px 2px black
+  .text1:
+    color: "#a0a0a0"
+    text-shadow: -2px 2px 1px black
+    line-height: 1em

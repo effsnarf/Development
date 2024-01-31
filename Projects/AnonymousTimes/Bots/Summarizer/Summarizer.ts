@@ -2,7 +2,7 @@ const colors = require("colors");
 import * as fs from "fs";
 import * as jsyaml from "js-yaml";
 import { Config } from "../../../Shared/Config";
-import { Config as OpenAiConfig } from "../../../Apis/OpenAI/classes/Config";
+import { Config as OpenAiConfig } from "../../../../Apis/OpenAI/classes/Config";
 import { Summarizer } from "../App/classes/Summarizer";
 
 process.title = "Summarizer";
