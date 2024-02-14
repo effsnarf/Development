@@ -3,7 +3,7 @@
     <link rel="stylesheet" type="text/css" href="style.css" />
   </head>
   <body>
-    <div class="box1">
+    <div class="box1" onclick="refresh">
       <div>
         <img src="./img/bitcoin.png" alt="Bitcoin" />
       </div>
@@ -38,10 +38,14 @@
       };
       updateLastUpdated();
 
+      window.refresh = () => {
+        ipcRenderer.send("refresh");
+      };
+
       ipcRenderer.on("bitcoin-price", (event, bitcoinPrice) => {
         document.getElementById(
           "bitcoin-price"
-        ).innerText = `${bitcoinPrice.toLocaleString()}`;
+        ).innerText = `${bitcoinPrice?.toLocaleString()}`;
         lastUpdated = Date.now();
       });
 

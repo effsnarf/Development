@@ -30,16 +30,20 @@ async function fetchBitcoinPrice() {
 }
 
 
-async function updateBitcoinPrice() {
+async function updateBitcoinPrice(resetView = false, repeat = true) {
     try {
-        const bitcoinPrice = await fetchBitcoinPrice();
+      if (resetView) {
+        mainWindow.webContents.send('bitcoin-price', null);
+        await util.sleep(1000);
+      }
+      const bitcoinPrice = await fetchBitcoinPrice();
         mainWindow.webContents.send('bitcoin-price', bitcoinPrice);
         await util.sleep(1000 * 60 * 5); // Wait 5 minutes before updating the price
     } catch (error) {
         onError(error);
     }
     finally {
-        updateBitcoinPrice();
+      if (repeat) updateBitcoinPrice();
     }
 }
 
@@ -61,6 +65,11 @@ async function createWindow() {
       nodeIntegration: true,
       contextIsolation: false,
     },
+  });
+
+  // Catch "refresh" events from the page
+  mainWindow.webContents.on('refresh', () => {
+    updateBitcoinPrice(true, false);
   });
 
   mainWindow.loadFile('index.html');
