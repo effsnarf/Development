@@ -44,6 +44,11 @@ async function updateBitcoinPrice() {
 }
 
 
+function startup() {
+  updateBitcoinPrice();
+}
+
+
 async function createWindow() {
     mainWindow = new BrowserWindow({
     width: 300,
@@ -62,7 +67,8 @@ async function createWindow() {
   // Open the DevTools if needed
     //mainWindow.webContents.openDevTools();
 
-  updateBitcoinPrice();
+  // When the document is ready, start updating the Bitcoin price
+  mainWindow.webContents.on('dom-ready', startup);
 }
 
 app.whenReady().then(createWindow);
