@@ -38,7 +38,7 @@ async function updateBitcoinPrice(resetView = false, repeat = true) {
       }
       const bitcoinPrice = await fetchBitcoinPrice();
         mainWindow.webContents.send('bitcoin-price', bitcoinPrice);
-        await util.sleep(1000 * 60 * 5); // Wait 5 minutes before updating the price
+        await util.sleep(1000 * 60 * 30); // Wait before updating the price again
     } catch (error) {
         onError(error);
     }
