@@ -1,0 +1,48 @@
+body
+{
+    font-family: Arial, Helvetica, sans-serif;
+    color: white;
+    -webkit-app-region: drag;
+}
+
+.box1
+{
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    filter: drop-shadow(-3px 3px 2px black);
+    text-shadow: -3px 3px 2px black, -2px -2px 1px black, 2px -2px 1px black, 2px 2px 1px black;
+}
+
+.box1 > div:first-child
+{
+    width: 100px;
+}
+
+.box1 > div:first-child > img
+{
+    width: 100%;
+    aspect-ratio: 1/1;
+}
+
+.box1 h2
+{
+    display: flex;
+    font-size: 3rem;
+    margin: 0;
+}
+
+.text-center
+{
+    text-align: center;
+}
+
+.dimmed
+{
+    opacity: 0.5;
+}
+
+.error
+{
+    color: red;
+}
