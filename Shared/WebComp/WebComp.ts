@@ -20,8 +20,13 @@ class WebComp {
 
         if (outputPath?.length) {
           outputPath = path.join(outputPath, `${comp.name}.jsx`);
-          console.log(`${outputPath.green} ${` saved`.gray}`);
           fs.writeFileSync(outputPath, template);
+          console.log(`${outputPath.green} ${` saved`.gray}`);
+          const cssPath = path.join(outputPath, `../${comp.name}.css`);
+          if (!fs.existsSync(cssPath)) {
+            fs.writeFileSync(cssPath, comp.css || "");
+            console.log(`${cssPath.green} ${` saved`.gray}`);
+          }
         }
 
         return template;
@@ -48,6 +53,16 @@ class WebComp {
       if (!comp.name?.length) comp.name = name;
 
       comp.html = pug.render(comp.dom);
+
+      const referencedComponents = comp.html
+        .match(/<([A-Z][a-zA-Z0-9]*)/g)
+        ?.map((c: string) => c.replace("<", ""));
+
+      comp.imports = referencedComponents?.map(
+        (c: string) => `import ${c} from './${c}';`
+      );
+
+      comp.imports = comp.imports?.join("\n");
 
       return comp;
     },

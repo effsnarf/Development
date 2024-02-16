@@ -1,17 +1,41 @@
 dom: | #pug
   .app
     .container
-      .card
-        .front
-          .category
-            img(src="https://media.cnn.com/api/v1/images/stellar/prod/i-stock-1287493837-1.jpg?c=16x9&q=h_833,w_1480,c_fill")
-            .title Video Games
-          .question What is the best selling video game of all time?
-          .index 1 of 10
-          .buttons
-            button.false ❌ false
-            button.true ✔️ true
-        .back Fuck this shit
+      Card
+
+data:
+  questions:
+    - category: Video Games
+      question: "Unturned originally started as a Roblox game."
+      answer: true
+    - category: Entertainment
+      question: "The movie 'Inception' won the Academy Award for Best Picture."
+      answer: false
+    - category: History
+      question: "The Great Wall of China is visible from the moon."
+      answer: false
+    - category: Science
+      question: "Humans and dinosaurs coexisted at the same point in history."
+      answer: false
+    - category: Geography
+      question: "Vatican City is the smallest country in the world."
+      answer: true
+    - category: Sports
+      question: "The Olympics were held every four years in Ancient Greece."
+      answer: true
+    - category: Literature
+      question: "Shakespeare wrote 37 plays."
+      answer: true
+    - category: Music
+      question: "The Beatles originally started as a skiffle band."
+      answer: true
+    - category: Technology
+      question: "The first iPhone was released in 2005."
+      answer: false
+    - category: Art
+      question: "Pablo Picasso is one of the founding figures of the Cubist movement."
+      answer: true
+
 mounted: | #js
   function() {
   }

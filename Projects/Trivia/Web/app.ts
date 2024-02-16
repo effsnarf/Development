@@ -13,8 +13,6 @@ let transpileWebComponent = (filePath: string) => {
   }
 };
 
-transpileWebComponent = transpileWebComponent.debounce(100);
-
 (async () => {
   const compFolder = `../Source/components`;
 
