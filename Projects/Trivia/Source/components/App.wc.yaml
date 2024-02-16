@@ -1,0 +1,17 @@
+dom: | #pug
+  .app
+    .container
+      .card
+        .front
+          .category
+            img(src="https://media.cnn.com/api/v1/images/stellar/prod/i-stock-1287493837-1.jpg?c=16x9&q=h_833,w_1480,c_fill")
+            .title Video Games
+          .question What is the best selling video game of all time?
+          .index 1 of 10
+          .buttons
+            button.false ❌ false
+            button.true ✔️ true
+        .back Fuck this shit
+mounted: | #js
+  function() {
+  }
