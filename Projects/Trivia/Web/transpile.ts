@@ -7,21 +7,32 @@ import { WebComp } from "../../../Shared/WebComp/WebComp";
 
 let transpileWebComponent = (filePath: string) => {
   try {
-    WebComp.to.react.jsx(filePath, path.join(__dirname, `./my-app/src`));
+    WebComp.transpile(filePath, path.join(__dirname, `./my-app/src`));
   } catch (ex: any) {
     console.log(ex.message.bgRed.white);
   }
 };
 
+console.log(`WebcComp Transpiler`.yellow);
+
 (async () => {
   const compFolder = `../Source/components`;
 
-  // get a list of all the files, recursively
-  const compFiles = Files.getFiles(compFolder, { recursive: true });
+  const transpileAll = () => {
+    // get a list of all the files, recursively
+    const compFiles = Files.getFiles(compFolder, { recursive: true });
 
-  for (const file of compFiles) {
-    transpileWebComponent(file);
-  }
+    compFiles.forEach(transpileWebComponent);
+  };
+
+  transpileAll();
+
+  // watch the template for changes
+  fs.watch(
+    path.join(__dirname, `../../../Shared/WebComp/Templates`),
+    { recursive: true },
+    transpileAll
+  );
 
   // watch the folder for changes
   fs.watch(compFolder, { recursive: true }, (eventType, filename) => {

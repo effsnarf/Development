@@ -4,7 +4,7 @@ import './App.css';
 import Card from './Card';
 
 // Define the React component
-function App(props) {
+const App = ({  }) => {
   return (
     <div class="app"><div class="container"><Card></Card></div></div>
   );

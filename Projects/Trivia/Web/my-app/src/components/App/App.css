@@ -1,0 +1,87 @@
+body
+{
+  background: #202020;
+}
+
+body, button
+{
+  font-family: Roboto;
+  color: white;
+}
+
+.app
+{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+
+.title
+{
+  font-weight: bold;
+  color: yellow;
+}
+
+.card, button
+{
+    font-size: 4vh;
+}
+
+.buttons
+{
+  display: flex;
+  width: 100%;
+  justify-content: space-around;
+  gap: 1rem;
+}
+
+button
+{
+  padding: 0.2em 0.5em;
+  background: none;
+  border: none;
+  border-radius: 0.3em;
+  background: #80808030;
+  opacity: 0.7;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+button:hover
+{
+  background: #80808050;
+  opacity: 1;
+  transition: 0s;
+}
+
+
+.cards > div
+{
+  position: relative;
+}
+
+.cards > div > .container
+{
+}
+
+
+
+.flip-enter {
+  opacity: 1;
+}
+
+.flip-enter-active {
+  opacity: 0;
+  transition: all 2s !important;
+}
+
+.flip-exit {
+  opacity: 1;
+}
+
+.flip-exit-active {
+  opacity: 0;
+  transition: all 2s !important;
+}
