@@ -10,7 +10,7 @@ const Card = ({ children, flipped }) => {
 
   return pug`
   .container(className=containerClasses)
-    div
+    Tilt
       .card
         .front #{children}
         .back Fuck this shit`;
