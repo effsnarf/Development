@@ -78,6 +78,12 @@ export const GlobalProvider = ({ children }) => {
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState([]);
   const [transitionDuration, setTransitionDuration] = useState(600);
+  const getNewQuestions = async () => {
+    setAnswers([]);
+    setQuestions([]);
+    setQuestions(await getQuestions());
+  }
+
 
   const setAnswer = (index, answer) => {
     setAnswers((answers) => {
@@ -86,16 +92,10 @@ export const GlobalProvider = ({ children }) => {
     });
   }
 
-  useEffect(() => {
-      (async () => {
-          const questions = await getQuestions();
-          setQuestions(questions);
-      })();
-  }, []);
-
   return (
-    <GlobalContext.Provider value={{ questions, answers, setAnswer, transitionDuration }}>
+    <GlobalContext.Provider value={{ getNewQuestions, questions, answers, setAnswer, transitionDuration }}>
       {children}
     </GlobalContext.Provider>
   );
 };
+

@@ -31,7 +31,9 @@ const Question = ({ freeze }) => {
     setAnswer(questionIndex, answer);
   }
 
-  let question = questions[getActiveQuestionIndex()];
+  const activeQuestionIndex = getActiveQuestionIndex();
+
+  let question = questions[activeQuestionIndex];
 
   if (!question) return pug`div`;
 
@@ -43,7 +45,7 @@ const Question = ({ freeze }) => {
         img(src="https://media.cnn.com/api/v1/images/stellar/prod/i-stock-1287493837-1.jpg?c=16x9&q=h_833,w_1480,c_fill")
         .title #{question.topic}
     .question #{question.question}
-    .index #{questionIndex+1} of #{questions.length}
+    .index #{activeQuestionIndex+1} of #{questions.length}
     .buttons
         Link(to=nextLink)
           button.false(onClick=() => onClickAnswer(false)) ❌ false

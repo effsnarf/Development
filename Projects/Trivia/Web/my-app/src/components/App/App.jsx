@@ -1,6 +1,7 @@
 // Import React and any other necessary libraries
 import React, { useEffect } from 'react';
-import { useState } from 'react';
+import { useLocation } from 'react-router-dom';
+import { useState, useContext } from 'react';
 import { TransitionGroup, CSSTransition } from 'react-transition-group'
 import RouteManager from '../misc/RouteManager';
 import './App.css';
@@ -16,7 +17,6 @@ const App = ({  }) => {
     { path: "/question/:index", component: Question },
     { path: "/results", component: Results }
   ];
-
 
   return pug`
   .app

@@ -25,7 +25,7 @@ const score = answers
         each question, index in questions
             .result(key=index)
                 .flex1
-                    .success #{isCorrect(index) ? '✔️' : '❌'}
+                    .success #{isCorrect(index) ? '➕' : '➖'}
                     .question2 #{question.question}
                 .explanation #{question.explanation}
     .buttons
