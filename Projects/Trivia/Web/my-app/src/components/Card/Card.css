@@ -27,9 +27,31 @@
     backface-visibility: hidden;
 }
 
+.card .title
+{
+    margin-bottom: 1rem;
+}
+
   
 .card .back {
     transform: rotateY(180deg);
 }
 
 
+.card ::-webkit-scrollbar {
+    width: 0.5em;
+}
+
+.card ::-webkit-scrollbar-thumb {
+    background: #ffffff20;
+    border-radius: 0.5em;
+}
+
+.card ::-webkit-scrollbar-thumb:hover {
+    background: #ffffff60;
+}
+
+.card ::-webkit-scrollbar-track {
+    background: #ffffff10;
+    border-radius: 0.5em;
+}

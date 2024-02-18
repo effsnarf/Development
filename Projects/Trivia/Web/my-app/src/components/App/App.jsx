@@ -7,12 +7,14 @@ import './App.css';
 import { GlobalProvider } from '../misc/global';
 import Intro from '../Intro/Intro';
 import Question from '../Question/Question';
+import Results from '../Results/Results';
 
 const App = ({  }) => {
 
   const routes = [
     { path: "/", component: Intro },
     { path: "/question/:index", component: Question },
+    { path: "/results", component: Results }
   ];
 
 
