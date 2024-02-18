@@ -15,7 +15,8 @@ import { DbQueue } from "@shared/Database/DbQueue";
 import { Database } from "@shared/Database/Database";
 import { DatabaseBase } from "@shared/Database/DatabaseBase";
 import { Shakespearizer } from "../../Projects/Shakespearizer/Shakespearizer";
-import { OpenAI } from "../../Apis/OpenAI/classes/OpenAI";
+import { OpenAI, Model } from "../../Apis/OpenAI/classes/OpenAI";
+import { ChatOpenAI, Roles } from "../../Apis/OpenAI/classes/ChatOpenAI";
 
 interface CachedResponse {
   dt: number;
@@ -209,6 +210,30 @@ class TaskManager {
       } catch (ex: any) {
         return res.end(JSON.stringify({ error: ex.message }));
       }
+    }
+
+    if (req?.url == "/trivia/questions") {
+      const chat = await ChatOpenAI.new(
+        Roles.Null,
+        false,
+        Model.Gpt35Turbo,
+        false
+      );
+      const prompt = `
+      Generate 10 true/false trivia questions phrased as facts in various topics.
+      The ones that are true should be challenging, don't seem plausible at first, but are actually true.
+      The ones that are false should be creatively absurd and really easy to answer.
+      Make sure they reflect the times we live in.
+      Reply in this JSON format and nothing else:
+      
+      [
+        { topic: "Science", question: "The Earth is flat.", answer: "false", explanation: "The Earth is an oblate spheroid." },
+        ...
+      ]
+      `;
+
+      const results = await chat.send(prompt);
+      return res.end(JSON.stringify(results));
     }
 
     if (config.custom) {

@@ -84,13 +84,9 @@ button:hover
   animation: flip-out-reverse calc(var(--page-transition-duration) / 2) forwards linear;
 }
 
-.route-page.visible .card {
-  transform: rotateY(0deg);
-  z-index: 1;
-}
-.route-page.hidden .card {
-  transform: rotateY(-90deg);
-  z-index: 0;
+.route-page.hidden
+{
+  display: none;
 }
 
 

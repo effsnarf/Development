@@ -13,7 +13,7 @@ const Intro = ({  }) => {
     div You will be presented with 10 True or False questions
     div Can you score 100% ?
     .buttons
-      Link(to="/test")
+      Link(to="/question/0")
         button Begin 👉
   `
 }

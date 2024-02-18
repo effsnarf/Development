@@ -5,7 +5,7 @@ import { TransitionGroup, CSSTransition } from 'react-transition-group'
 import RouteManager from '../misc/RouteManager';
 import './App.css';
 import Intro from '../Intro/Intro';
-import Test from '../Test/Test';
+import Question from '../Question/Question';
 
 
 
@@ -13,9 +13,14 @@ const App = ({  }) => {
 
   const routes = [
     { path: "/", component: Intro },
-    { path: "/test", component: Test },
-    // Add more routes as needed
+    { path: "/question/:index", component: Question },
   ];
+
+  const [questions, setQuestions] = useState([]);
+
+  useEffect(() => {
+    
+  }, []);
 
   return pug`
   .app
