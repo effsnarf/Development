@@ -77,6 +77,7 @@ export const useGlobal = () => useContext(GlobalContext);
 export const GlobalProvider = ({ children }) => {
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState([]);
+  const [transitionDuration, setTransitionDuration] = useState(600);
 
   const setAnswer = (index, answer) => {
     setAnswers((answers) => {
@@ -93,7 +94,7 @@ export const GlobalProvider = ({ children }) => {
   }, []);
 
   return (
-    <GlobalContext.Provider value={{ questions, answers, setAnswer }}>
+    <GlobalContext.Provider value={{ questions, answers, setAnswer, transitionDuration }}>
       {children}
     </GlobalContext.Provider>
   );

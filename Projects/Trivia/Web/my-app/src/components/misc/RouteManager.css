@@ -13,3 +13,9 @@
 {
     pointer-events: none;
 }
+
+
+.route-page.hidden
+{
+  display: none;
+}

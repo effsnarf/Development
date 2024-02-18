@@ -89,11 +89,6 @@ button:hover
   animation: flip-out-reverse calc(var(--page-transition-duration) / 2) forwards linear;
 }
 
-.route-page.hidden
-{
-  display: none;
-}
-
 
 @keyframes flip-in {
   from {

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import './RouteManager.css';
+import { useGlobal } from '../misc/global';
 
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -8,11 +9,13 @@ let isTransitioning = false;
 let oldUrl = null;
 
 // State management for the route transitions
-// Renders all route components
+// Renders all route components on the page
 // Marks CSS classes for animation transitions when navigating between routes
 const RouteManager = ({ routes }) => {
 
-    const transitionDuration = 600;
+    const { transitionDuration } = useGlobal();
+    const location = useLocation();
+    const [navigationDirection, setNavigationDirection] = useState(null);
 
     // This is because we might navigate to /question/0 or /question/1, etc,
     // but the route path is /question/:index
@@ -23,13 +26,13 @@ const RouteManager = ({ routes }) => {
     }
     const findRoute = (url) => routes[findRouteIndex(url)];
 
-    // #region Navigation Direction
+    // #region Navigation Direction (forward, backward)
     const getNavigationDirection = (oldPath, newPath) => {
       const getRouteIndex = (path) => (!path?.length) ? -1 : findRouteIndex(path);
       const oldIndex = getRouteIndex(oldPath);
       const newIndex = getRouteIndex(newPath);
       if (oldIndex !== newIndex) return oldIndex < newIndex ? 'forward' : 'backward';
-      // In case of /question/0 and /question/1, we want to compare the string
+      // In case of /question/0 and /question/1 (same route), we want to compare the string
       return oldPath < newPath ? 'forward' : 'backward';
     };
     // #endregion
@@ -47,10 +50,12 @@ const RouteManager = ({ routes }) => {
     };
     // #endregion
 
-    // Reactive navigationDirection variable to be used in the markup
-    const [navigationDirection, setNavigationDirection] = useState(null);
-
-    const location = useLocation();
+    // We want to freeze the question card when transitioning between questions
+    // Because it's the same page/route, rendered only once for both questions
+    // So the question content doesn't "jump"
+    const isFrozen = (path) => {
+      return routeStates[path] === 'visible' ? false : true;
+    }
 
     const onPathChange = async (oldUrl, newUrl) => {
         if (isTransitioning) return;
@@ -80,7 +85,7 @@ const RouteManager = ({ routes }) => {
     <div className="routes-container">
       {routes.map(({ path, component: Component }) => (
         <div key={path} className={`route-page ${routeStates[path]} ${navigationDirection}`}>
-          <Component />
+          <Component freeze={isFrozen(path)} />
         </div>
       ))}
     </div>

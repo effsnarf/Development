@@ -1,25 +1,37 @@
 import { useParams } from "react-router-dom";
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Card from '../Card/Card';
 import { useLocation } from 'react-router-dom';
 import './Question.css';
 import { useGlobal } from '../misc/global';
 
+let oldQuestionIndex = null;
 
-const Question = ({  }) => {
+const Question = ({ freeze }) => {
   // useParams is not available because we're not inside a Route component
   // We're using custom route management for animations
   const location = useLocation();
-  const questionIndex = parseInt(useLocation().pathname.split('/')[2]);
+
+  const getQuestionIndex = () => (parseInt(location.pathname.split('/')[2]) || 0);
+
+  const getActiveQuestionIndex = () => freeze ? oldQuestionIndex : questionIndex;
+
+  // State to manage the current question index
+  const [questionIndex, setQuestionIndex] = useState(getQuestionIndex());
 
   const { questions, setAnswer } = useGlobal();
+
+  useEffect(() => {
+    oldQuestionIndex = questionIndex;
+    setQuestionIndex(getQuestionIndex());
+  }, [location, freeze]);
 
   const onClickAnswer = (answer) => {
     setAnswer(questionIndex, answer);
   }
 
-  let question = questions[questionIndex];
+  let question = questions[getActiveQuestionIndex()];
 
   if (!question) return pug`div`;
 

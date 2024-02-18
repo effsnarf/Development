@@ -23,7 +23,7 @@ const score = answers
     .title You scored #{score}/10
     .results
         each question, index in questions
-            .result
+            .result(key=index)
                 .flex1
                     .success #{isCorrect(index) ? '✔️' : '❌'}
                     .question2 #{question.question}
