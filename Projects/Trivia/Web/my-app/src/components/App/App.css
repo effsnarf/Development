@@ -57,31 +57,71 @@ button:hover
 }
 
 
-.cards > div
-{
-  position: relative;
+
+/* Flip the card in when navigating */
+.route-page .card {
+  transform-style: preserve-3d;
 }
 
-.cards > div > .container
-{
+.route-page.entering.forward .card {
+  animation: flip-in 0.5s forwards linear;
+}
+
+.route-page.exiting.forward .card {
+  animation: flip-out 0.5s forwards linear;
+}
+
+.route-page.entering.backward .card {
+  animation: flip-in-reverse 0.5s forwards linear;
+}
+
+.route-page.exiting.backward .card {
+  animation: flip-out-reverse 0.5s forwards linear;
+}
+
+.route-page.visible .card {
+  transform: rotateY(0deg);
+  z-index: 1;
+}
+.route-page.hidden .card {
+  transform: rotateY(-90deg);
+  z-index: 0;
 }
 
 
-
-.flip-enter {
-  opacity: 1;
+@keyframes flip-in {
+  from {
+      transform: rotateY(90deg);
+  }
+  to {
+      transform: rotateY(0deg);
+  }
 }
 
-.flip-enter-active {
-  opacity: 0;
-  transition: all 2s !important;
+@keyframes flip-in-reverse {
+  from {
+      transform: rotateY(-90deg);
+  }
+  to {
+      transform: rotateY(0deg);
+  }
 }
 
-.flip-exit {
-  opacity: 1;
+
+@keyframes flip-out {
+  from {
+      transform: rotateY(0deg);
+  }
+  to {
+      transform: rotateY(-90deg);
+  }
 }
 
-.flip-exit-active {
-  opacity: 0;
-  transition: all 2s !important;
+@keyframes flip-out-reverse {
+  from {
+      transform: rotateY(0deg);
+  }
+  to {
+      transform: rotateY(90deg);
+  }
 }

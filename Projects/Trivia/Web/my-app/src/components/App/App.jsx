@@ -1,8 +1,8 @@
 // Import React and any other necessary libraries
 import React, { useEffect } from 'react';
 import { useState } from 'react';
-import { BrowserRouter as Router, Switch, Route, useLocation } from 'react-router-dom';
 import { TransitionGroup, CSSTransition } from 'react-transition-group'
+import RouteManager from '../misc/RouteManager';
 import './App.css';
 import Intro from '../Intro/Intro';
 import Test from '../Test/Test';
@@ -11,14 +11,16 @@ import Test from '../Test/Test';
 
 const App = ({  }) => {
 
-  const location = useLocation();
+  const routes = [
+    { path: "/", component: Intro },
+    { path: "/test", component: Test },
+    // Add more routes as needed
+  ];
 
   return pug`
   .app
     .cards
-      Switch
-        Route(path="/test", component=Test)
-        Route(path="/", component=Intro)
+      RouteManager(routes=routes)
   `;
 }
 

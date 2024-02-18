@@ -1,8 +1,7 @@
-.container
+.container > *
 {
-    perspective: 4000px;
+    perspective: 1000px;
     transform-style: preserve-3d;
-    transition: transform 1s;
 }
 
 .card
@@ -32,3 +31,5 @@
 .card .back {
     transform: rotateY(180deg);
 }
+
+
