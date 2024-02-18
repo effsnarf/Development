@@ -217,7 +217,8 @@ class TaskManager {
         Roles.Null,
         false,
         Model.Gpt35Turbo,
-        false
+        false,
+        OpenAI.effApiKey
       );
       const prompt = `
       Generate 10 true/false trivia questions phrased as facts in various topics.
