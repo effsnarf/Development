@@ -1,0 +1,119 @@
+dom:
+  .row:
+    :class: "{ selected: user.ui.is.selected }"
+    @click: () => onClickUser(user)
+    .check:
+      input:
+        type: checkbox
+        v-model: user.ui.is.selected
+    .icon:
+      .circle:
+        v-text: initials
+    .name-column:
+      .name:
+        ui.input.text.box:
+          v-model: user.ui.edited.name
+          :camouflage: "!user.ui.is.editing"
+          :enabled: "user.ui.is.editing"
+      .email:
+        ui.input.text.box:
+          v-model: user.ui.edited.email
+          :camouflage: "!user.ui.is.editing"
+          :enabled: "user.ui.is.editing"
+    .permission:
+      v-text: user.permission
+    .buttons:
+      div:
+        button:
+          v-if: "!user.ui.is.editing"
+          v-text: "'✏️'"
+          @click: () => startEditing(user)
+        button:
+          v-if: "showSaveButton(user)"
+          v-text: "'✔️'"
+          @click: () => saveEditing(user)
+      div:
+        v-if: "!user.ui.is.editing"
+        button:
+          v-text: "'🗑️'"
+
+props:
+  user: null
+
+methods:
+  startEditing: | #js
+    function(user) {
+      user.ui.is.editing = true;
+    }
+  saveEditing: | #js
+    function(user) {
+      user.ui.is.editing = false;
+      user.name = user.ui.edited.name;
+      user.email = user.ui.edited.email;
+    }
+  onClickUser: | #js
+    function(user) {
+      user.ui.is.selected = !user.ui.is.selected;
+    }
+  showSaveButton: | #js
+    function(user) {
+      if (!user.ui.is.editing) return false;
+      if (!user.ui.edited.name?.length) return false;
+      if (!user.ui.edited.email?.length) return false;
+      return true;
+    }
+
+computed:
+  initials: | #js
+    function() {
+      return this.user.name.split(' ')
+        .map(n => n[0])
+        .slice(0, 2)
+        .join('');
+    }
+
+style:
+  .row:
+    display: flex
+    justify-content: space-between
+    align-items: center
+    gap: 1em
+    cursor: pointer
+  .row:hover:
+    border: "1px solid #ffffff40"
+    transition: 0s
+  .selected, .selected:hover:
+    background: "linear-gradient(45deg, #ffffff10, #ffffff30)"
+  .check:
+    flex-shrink: 1
+  .icon:
+    width: 4em
+    flex-shrink: 1
+  .name-column:
+    flex-grow: 1
+  .name:
+    font-size: 140%
+  .permission:
+    width: 10em
+  .circle:
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%
+    aspect-ratio: 1
+    font-size: 1.5em
+    background: green
+    border-radius: 50%
+  .buttons:
+    display: flex
+    align-items: center
+    width: 8em
+    gap: 0.5em
+    opacity: 0
+  .row:hover .buttons:
+    opacity: 1
+    transition: 1s
+  button:
+    box-shadow: none
+  input[type=text]:
+    opacity: 1 !important

@@ -1,0 +1,50 @@
+dom:
+  div:
+    h2:
+      .text-center:
+        v-text: "selectedUsers.length + ' users selected'"
+    .rows:
+      user.item:
+        v-for: user in users
+        :key: user.id
+        :user: user
+
+data:
+  users: []
+
+computed:
+  selectedUsers: | #js
+    function() {
+      return this.users.filter(u => u.ui.is.selected)
+    }
+
+mounted: | #js
+  function() {
+    for (let i = 0; i < 10; i++) {
+      const user = {
+        id: i,
+        name: `User ${i+1}`,
+        email: `Email ${i+1}`,
+        permission: `Permission ${i+1}`,
+        ui: {
+          is: {
+            selected: false,
+            editing: false,
+          },
+          edited: {
+            name: null,
+            email: null,
+          }
+        }
+      };
+      user.ui.edited.name = user.name;
+      user.ui.edited.email = user.email;
+      this.users.push(user);
+    }
+  }
+
+style:
+  .rows:
+    display: flex
+    flex-direction: column
+    gap: 1px

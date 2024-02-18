@@ -1,0 +1,24 @@
+dom:
+  div:
+    div:
+      div:
+        :style: "{ width: '50vw', margin: 'auto' }"
+        user.list:
+    div:
+      ui.html.style:
+        v-for: comp in $root.comps
+        ":key": comp.name
+        ":component": comp
+        ":document-head": "true"
+mounted: | #js
+  function() {
+  }
+_:
+  examples:
+    count: 0
+name: app
+template: >-
+  <div class="comp-app" path="96801."><grid-app></grid-app><div
+  path="96801.1"><ui-html-style v-for="comp in $root.comps" :key="comp.name"
+  :component="comp" :document-head="true"
+  path="96801.1.0"></ui-html-style></div></div>
