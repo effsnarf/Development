@@ -31,6 +31,6 @@ import { Shakespearizer } from "../Projects/Shakespearizer/Shakespearizer";
 import { Pexels } from "../Apis/Images/Pexels/Pexels";
 
 (async () => {
-  const images = await Pexels.searchImages("technology", 5);
+  const images = await Pexels.searchImages("technology", 100);
   console.log(images);
 })();

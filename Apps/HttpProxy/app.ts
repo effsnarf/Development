@@ -1,3 +1,5 @@
+const os = require("os");
+import path from "path";
 import fs, { stat } from "fs";
 import "colors";
 import express, { response } from "express";
@@ -214,16 +216,21 @@ class TaskManager {
     }
 
     if (req?.url.startsWith("/random/image/")) {
-      try {
-        const query = req.url.split("/").pop();
-        const images = await Pexels.searchImages(query, 5);
-        const imageUrl = images.shuffle().first();
-        const imageFile = await Http.download(imageUrl);
-        res.set("Content-Type", "image/jpeg");
-        res.end(imageFile);
-      } catch (ex: any) {
-        return res.end(JSON.stringify({ error: ex.message }));
-      }
+      const cache = await Cache.new({
+        database: { path: path.join(os.tmpdir(), `/Cache/Random/Image`) },
+      });
+      const query = req.url.split("/")[3];
+      const images = await cache.get(
+        query,
+        async () => await Pexels.searchImages(query, 100)
+      );
+      const index =
+        parseInt(req.url.split("/")[4]) ||
+        Math.floor(Math.random() * images.length);
+      const imageUrl = images[index];
+      const imageFile = await Http.download(imageUrl);
+      res.set("Content-Type", "image/jpeg");
+      res.end(imageFile);
     }
 
     if (req?.url == "/trivia/questions") {
