@@ -28,30 +28,9 @@ import { ChatOpenAI, Role, Roles } from "../Apis/OpenAI/classes/ChatOpenAI";
 //import { ChatOpenAI } from "langchain/chat_models/openai";
 import { OpenAI2 } from "../Apis/OpenAI/classes/OpenAI2";
 import { Shakespearizer } from "../Projects/Shakespearizer/Shakespearizer";
+import { Pexels } from "../Apis/Images/Pexels/Pexels";
 
 (async () => {
-  const shakespearizer = await Shakespearizer.new({
-    database: {
-      path: `c:\\eff\\Development\\Projects\\Shakespearizer\\Data`,
-    },
-  });
-
-  const texts = [
-    "Which matters more: fitness or intelligence?",
-    "this nigga ZESTY",
-    "Harvard is great, not for the education but for the connections it gives you in life.",
-    "What matters most is deez nutz.",
-    "Have fun at the ZOG recruitment pool.",
-    "all of you anons may think having a big ass as a man is great but NO it fucking sucks trust me",
-    "I dropped out of uni twice and have 25k debt and only got my first job at 25 a couple months ago making minimum wage for an adult",
-    ">Harvard",
-    "What an ass",
-    "oh my Im bout to bust",
-  ];
-
-  const texts2 = ["such is life is mother Russia", "fuck this shit"];
-
-  const results = await shakespearizer.shakespearize(texts);
-
-  console.log(results);
+  const images = await Pexels.searchImages("technology", 5);
+  console.log(images);
 })();

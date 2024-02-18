@@ -10,6 +10,10 @@ const Results = ({  }) => {
 
 const { questions, answers } = useGlobal();
 
+const isFactTrue = (index) => {
+    return questions[index].answer;
+}
+
 const isCorrect = (index) => {
     return answers[index] === questions[index].answer;
 }
@@ -20,13 +24,14 @@ const score = answers
 
   return pug`
   Card
-    .title You scored #{score}/10
+    .title You scored #{score}/10 👽
     .results
         each question, index in questions
             .result(key=index)
                 .flex1
                     .success #{isCorrect(index) ? '➕' : '➖'}
                     .question2 #{question.question}
+                    .answer #{isFactTrue(index) ? '✔️' : '❌'}
                 .explanation #{question.explanation}
     .buttons
         Link(to="/")

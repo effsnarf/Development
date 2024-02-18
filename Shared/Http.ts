@@ -4,6 +4,12 @@ import "../Shared/Extensions";
 import { Objects } from "./Extensions.Objects";
 
 class Http {
+  // Download a file from a URL and return the binary data
+  static async download(url: string): Promise<Buffer> {
+    let response = await axios.get(url, { responseType: "arraybuffer" });
+    return response.data;
+  }
+
   static async getPostData(req: any): Promise<any> {
     if (req.method.toLowerCase() != "post") return null;
 

@@ -17,6 +17,7 @@ import { DatabaseBase } from "@shared/Database/DatabaseBase";
 import { Shakespearizer } from "../../Projects/Shakespearizer/Shakespearizer";
 import { OpenAI, Model } from "../../Apis/OpenAI/classes/OpenAI";
 import { ChatOpenAI, Roles } from "../../Apis/OpenAI/classes/ChatOpenAI";
+import { Pexels } from "../../Apis/Images/Pexels/Pexels";
 
 interface CachedResponse {
   dt: number;
@@ -212,6 +213,19 @@ class TaskManager {
       }
     }
 
+    if (req?.url.startsWith("/random/image/")) {
+      try {
+        const query = req.url.split("/").pop();
+        const images = await Pexels.searchImages(query, 5);
+        const imageUrl = images.shuffle().first();
+        const imageFile = await Http.download(imageUrl);
+        res.set("Content-Type", "image/jpeg");
+        res.end(imageFile);
+      } catch (ex: any) {
+        return res.end(JSON.stringify({ error: ex.message }));
+      }
+    }
+
     if (req?.url == "/trivia/questions") {
       const chat = await ChatOpenAI.new(
         Roles.Null,
@@ -221,14 +235,17 @@ class TaskManager {
         OpenAI.effApiKey
       );
       const prompt = `
-      Generate 10 true/false trivia questions phrased as facts in various topics.
-      The ones that are true should be challenging, don't seem plausible at first, but are actually true.
-      The ones that are false should be creatively absurd and really easy to answer.
+      Generate 100 true/false trivia questions phrased as facts in various topics.
+      They should all unbelievably absurd and ridiculous.
+      Even though they are false, you should pretend that some as true and some as false,
+      and provide nonsensical explanations for each, both true and made up explanations.
+      All the explanations are nonsense, funny and absurd, regardless of the question's true or false reality.
       Make sure they reflect the times we live in.
       Reply in this JSON format and nothing else:
       
       [
-        { topic: "Science", question: "The Earth is flat.", answer: "false", explanation: "The Earth is an oblate spheroid." },
+        { topic: "Science", question: "The Earth is flat.", answer: false, explanation: "Scientists proved that the Earth is triangular." },
+        { topic: "Science", question: "The moon is made of cheese.", answer: true, explanation: "Dairy companies have been hiding this fact for centuries." },
         ...
       ]
       `;

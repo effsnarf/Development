@@ -28,7 +28,14 @@
     max-height: 0;
     overflow: hidden;
     color: yellow;
+    text-align: center;
     transition: 1s;
+}
+
+.result .answer
+{
+    filter: grayscale(1);
+    opacity: 0.8;
 }
 
 .result:hover .explanation
