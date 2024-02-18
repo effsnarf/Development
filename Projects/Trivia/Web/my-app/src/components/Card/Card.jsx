@@ -1,15 +1,15 @@
 // Import React and any other necessary libraries
 import React from 'react';
-import Tilt from 'react-parallax-tilt';
 import './Card.css';
+import Tilt from 'react-parallax-tilt';
 
 
 // Define the React component
 const Card = ({ children }) => {
 
   return pug`
-  .container
-    Tilt
+  Tilt
+    .container
       .card
         .front #{children}
         .back`;

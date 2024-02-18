@@ -10,7 +10,7 @@ const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 // Marks CSS classes for animation transitions when navigating between routes
 const RouteManager = ({ routes }) => {
 
-    const transitionDuration = 1000;
+    const transitionDuration = 600;
 
     // #region Navigation Direction
     const getNavigationDirection = (oldPath, newPath) => {

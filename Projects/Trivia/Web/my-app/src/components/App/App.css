@@ -1,3 +1,8 @@
+:root {
+  --page-transition-duration: 0.6s;
+}
+
+
 body
 {
   background: #202020;
@@ -64,19 +69,19 @@ button:hover
 }
 
 .route-page.entering.forward .card {
-  animation: flip-in 0.5s forwards linear;
+  animation: flip-in calc(var(--page-transition-duration) / 2) forwards linear;
 }
 
 .route-page.exiting.forward .card {
-  animation: flip-out 0.5s forwards linear;
+  animation: flip-out calc(var(--page-transition-duration) / 2) forwards linear;
 }
 
 .route-page.entering.backward .card {
-  animation: flip-in-reverse 0.5s forwards linear;
+  animation: flip-in-reverse calc(var(--page-transition-duration) / 2) forwards linear;
 }
 
 .route-page.exiting.backward .card {
-  animation: flip-out-reverse 0.5s forwards linear;
+  animation: flip-out-reverse calc(var(--page-transition-duration) / 2) forwards linear;
 }
 
 .route-page.visible .card {
