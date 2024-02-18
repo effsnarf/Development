@@ -224,9 +224,10 @@ class TaskManager {
         query,
         async () => await Pexels.searchImages(query, 100)
       );
-      const index =
-        parseInt(req.url.split("/")[4]) ||
-        Math.floor(Math.random() * images.length);
+      const index = 0;
+      // const index =
+      //   parseInt(req.url.split("/")[4]) ||
+      //   Math.floor(Math.random() * images.length);
       const imageUrl = images[index];
       const imageFile = await Http.download(imageUrl);
       res.set("Content-Type", "image/jpeg");
