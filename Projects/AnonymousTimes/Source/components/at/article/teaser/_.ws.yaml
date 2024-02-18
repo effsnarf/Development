@@ -1,0 +1,12 @@
+dom:
+  div:
+    at.title:
+      class: dimmed
+      :title: title
+      :text: text
+      :image: image
+
+props:
+  title: null
+  text: null
+  image: null

@@ -1,0 +1,8 @@
+title: Unnamed App
+server:
+  host: localhost
+  port: 3000
+database:
+  path: ../../Database
+images:
+  path: ../../Web/images/articles

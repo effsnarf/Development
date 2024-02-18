@@ -1,0 +1,15 @@
+.routes-container
+{
+    position: relative;
+}
+
+.routes-container .route-page
+{
+    position: absolute;
+    transform: translate(-50%, -50%);
+}
+
+.routes-container .route-page:not(.visible)
+{
+    pointer-events: none;
+}

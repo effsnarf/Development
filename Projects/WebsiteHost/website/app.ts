@@ -9,6 +9,7 @@ import { Files } from "@shared/Files";
 import { Http } from "@shared/Http";
 import { HttpServer } from "@shared/HttpServer";
 import { TypeScript } from "@shared/TypeScript";
+import { Database } from "@shared/Database/Database";
 import { DatabaseProxy } from "../../../Apps/DatabaseProxy/Client/DbpClient";
 import { MemoryCache } from "@shared/Cache";
 import { Analytics, ItemType } from "@shared/Analytics";
@@ -468,6 +469,7 @@ const sheakspearize = async (text: string) => {
         fs,
         ChatOpenAI,
         Roles,
+        Database,
       });
 
   const httpServer = await HttpServer.new(

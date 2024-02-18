@@ -61,7 +61,8 @@ class FileSystemDatabase extends DatabaseBase {
   ) {
     const collectionPath = path.join(this.basePath, collectionName);
     if (!fs.existsSync(collectionPath)) return [];
-    if (query) throw new Error("Query not implemented");
+    if (query && Object.keys(query).length)
+      throw new Error("Query not implemented");
     if (sort) throw new Error("Sort not implemented");
     if (skip) throw new Error("Skip not implemented");
     let docs = [];

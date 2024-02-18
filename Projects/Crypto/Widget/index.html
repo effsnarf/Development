@@ -1,0 +1,57 @@
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+  </head>
+  <body>
+    <div class="box1" onclick="refresh">
+      <div>
+        <img src="./img/bitcoin.png" alt="Bitcoin" />
+      </div>
+      <div>
+        <h2>
+          <span class="dimmed">$</span>
+          <span id="bitcoin-price">0</span>
+        </h2>
+        <div class="dimmed">
+          <div id="last-updated" class="text-center"></div>
+        </div>
+      </div>
+      <div id="error" class="error"></div>
+    </div>
+    <script>
+      const util = require("./util");
+      const { ipcRenderer } = require("electron");
+
+      let lastUpdated = Date.now();
+
+      const updateLastUpdated = async () => {
+        const secondsSinceLastUpdated = Math.floor(
+          (Date.now() - lastUpdated) / 1000
+        );
+        const since =
+          secondsSinceLastUpdated < 60
+            ? `${secondsSinceLastUpdated} seconds`
+            : `${Math.floor(secondsSinceLastUpdated / 60)} minutes`;
+        document.getElementById("last-updated").innerText = `${since} ago`;
+        await util.sleep(1000);
+        updateLastUpdated();
+      };
+      updateLastUpdated();
+
+      window.refresh = () => {
+        ipcRenderer.send("refresh");
+      };
+
+      ipcRenderer.on("bitcoin-price", (event, bitcoinPrice) => {
+        document.getElementById(
+          "bitcoin-price"
+        ).innerText = `${bitcoinPrice?.toLocaleString()}`;
+        lastUpdated = Date.now();
+      });
+
+      ipcRenderer.on("error", (event, error) => {
+        document.getElementById("error").innerText = error;
+      });
+    </script>
+  </body>
+</html>

@@ -10,5 +10,3 @@ mounted: | #js
   }
 name: app
 style:
-  .comp-at-app:
-    padding: 1em

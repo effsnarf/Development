@@ -1,0 +1,84 @@
+dom:
+  .teaser:
+    .div1:
+      :class: "{ 'has-image': showImage }"
+      .img1:
+        v-if: showImage
+        img:
+          :src: imageUrl
+        .fader1:
+          v-text: "' '"
+      div:
+        .label1:
+          v-text: "'Hírek'"
+        .title1:
+          v-text: title1
+        .text1:
+          v-text: subtitle
+        .time:
+          v-text: "'Jan 1, 2024'"
+
+data:
+  imageUrl1: "https://livedemo00-joomla.template-help.com/joomla_prod-16618_v1/images/carousel/big/image3.jpg"
+  imageUrl2: "https://livedemo00-joomla.template-help.com/joomla_prod-16618_v1/images/pages/page1-img2.jpg"
+  imageUrl3: "https://livedemo00-joomla.template-help.com/joomla_prod-16618_v1/images/pages/page1-img3.jpg"
+
+props:
+  article: null
+  title: null
+  subtitle: null
+  image: null
+  showImage: "true"
+
+computed:
+  title1: | #js
+    function () {
+      if (this.article) return this.article.title;
+      return this.title;
+    }
+  imageUrl: | #js
+    function () {
+      if (this.article) return `/images/articles/${this.article._id}/teaser.jpg`;
+      if (this.image?.length) return this.image;
+      return this["imageUrl" + (Math.floor(Math.random() * 3) + 1)];
+    }
+
+style:
+  .div1:
+    display: flex
+    flex-direction: row
+    gap: 1rem
+  .div1 > *:not(.img1):
+    width: 55%
+  .div1:not(.has-image) > *:not(.img1):
+    width: 100%
+  .img1:
+    width: 40%
+  img, .fader1:
+    aspect-ratio: 8 / 5
+  img:
+    width: 100%
+    object-fit: cover
+    border-radius: 0
+  .fader1:
+    content: ""
+    position: absolute
+    top: 0
+    left: 0
+    right: 0
+    bottom: 0
+    background: linear-gradient(to top, black, transparent)
+  .label1:
+    width: min-content
+    padding: 0.1rem 0.5rem
+    background: black
+    color: white
+    font-family: Roboto
+    font-weight: bold
+    font-size: 0.8rem
+    text-transform: uppercase
+  .title1:
+    font-family: Roboto
+    font-weight: bold
+  .text1:
+    font-size: 0.8rem

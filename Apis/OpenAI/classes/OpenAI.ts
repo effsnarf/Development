@@ -61,7 +61,7 @@ class OpenAI {
       case Model.Ada:
         return 2049;
       case Model.Gpt4:
-        return 4096;
+        return 128000;
       case Model.Gpt4VisionPreview:
         return 4096;
       case Model.Davinci:

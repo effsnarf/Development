@@ -1,0 +1,35 @@
+body
+{
+    font-family: Arial;
+    background: linear-gradient(42deg, #08003c, #000000);
+    background-attachment: fixed;
+}
+
+body, h1, h2, h3, h4, h5, h6
+{
+    color: black;
+    text-shadow: none;
+}
+
+h1
+{
+    font-family: Playfair;
+}
+
+h2
+{
+    font-size: 2.5rem;
+}
+
+h3
+{
+    font-size: 1.5rem;
+    line-height: 1.2em;
+}
+
+p
+{
+    text-align: justify;
+    font-size: 1.2rem;
+    line-height: normal;
+}

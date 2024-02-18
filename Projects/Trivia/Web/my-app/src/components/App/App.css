@@ -1,0 +1,128 @@
+:root {
+  --page-transition-duration: 0.6s;
+}
+
+
+body
+{
+  background: #202020;
+}
+
+body, button
+{
+  font-family: Roboto;
+  color: white;
+}
+
+.app
+{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+
+.title
+{
+  font-weight: bold;
+  color: yellow;
+}
+
+.card, button
+{
+    font-size: 4vh;
+}
+
+.buttons
+{
+  display: flex;
+  width: 100%;
+  justify-content: space-around;
+  gap: 1rem;
+}
+
+button
+{
+  padding: 0.2em 0.5em;
+  background: none;
+  border: none;
+  border-radius: 0.3em;
+  background: #80808030;
+  opacity: 0.7;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+button:hover
+{
+  background: #80808050;
+  opacity: 1;
+  transition: 0s;
+}
+
+
+
+/* Flip the card in when navigating */
+.route-page .card {
+  transform-style: preserve-3d;
+}
+
+.route-page.entering.forward .card {
+  animation: flip-in calc(var(--page-transition-duration) / 2) forwards linear;
+}
+
+.route-page.exiting.forward .card {
+  animation: flip-out calc(var(--page-transition-duration) / 2) forwards linear;
+}
+
+.route-page.entering.backward .card {
+  animation: flip-in-reverse calc(var(--page-transition-duration) / 2) forwards linear;
+}
+
+.route-page.exiting.backward .card {
+  animation: flip-out-reverse calc(var(--page-transition-duration) / 2) forwards linear;
+}
+
+.route-page.hidden
+{
+  display: none;
+}
+
+
+@keyframes flip-in {
+  from {
+      transform: rotateY(90deg);
+  }
+  to {
+      transform: rotateY(0deg);
+  }
+}
+
+@keyframes flip-in-reverse {
+  from {
+      transform: rotateY(-90deg);
+  }
+  to {
+      transform: rotateY(0deg);
+  }
+}
+
+
+@keyframes flip-out {
+  from {
+      transform: rotateY(0deg);
+  }
+  to {
+      transform: rotateY(-90deg);
+  }
+}
+
+@keyframes flip-out-reverse {
+  from {
+      transform: rotateY(0deg);
+  }
+  to {
+      transform: rotateY(90deg);
+  }
+}
