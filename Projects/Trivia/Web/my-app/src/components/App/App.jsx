@@ -4,10 +4,9 @@ import { useState } from 'react';
 import { TransitionGroup, CSSTransition } from 'react-transition-group'
 import RouteManager from '../misc/RouteManager';
 import './App.css';
+import { GlobalProvider } from '../misc/global';
 import Intro from '../Intro/Intro';
 import Question from '../Question/Question';
-
-
 
 const App = ({  }) => {
 
@@ -16,16 +15,12 @@ const App = ({  }) => {
     { path: "/question/:index", component: Question },
   ];
 
-  const [questions, setQuestions] = useState([]);
-
-  useEffect(() => {
-    
-  }, []);
 
   return pug`
   .app
-    .cards
-      RouteManager(routes=routes)
+    GlobalProvider
+      .cards
+        RouteManager(routes=routes)
   `;
 }
 

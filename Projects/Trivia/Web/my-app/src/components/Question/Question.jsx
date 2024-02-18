@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import Card from '../Card/Card';
 import { useLocation } from 'react-router-dom';
 import './Question.css';
+import { useGlobal } from '../misc/global';
 
 
 // Define the React component
@@ -13,16 +14,25 @@ const Question = ({  }) => {
   const location = useLocation();
   const questionIndex = parseInt(useLocation().pathname.split('/')[2]);
 
+  const { questions } = useGlobal();
+
+  let question = questions[questionIndex];
+
+  if (!question) return pug`div`;
+
+  const nextLink = `/question/${questionIndex + 1}`;
+
   return pug`
   Card
     .category
         img(src="https://media.cnn.com/api/v1/images/stellar/prod/i-stock-1287493837-1.jpg?c=16x9&q=h_833,w_1480,c_fill")
-        .title Video Games
-    .question The first iPhone was released in 2005
+        .title #{question.topic}
+    .question #{question.question}
     .index #{questionIndex+1} of 10
     .buttons
-        button.false ❌ false
-        Link(to="/question/1")
+        Link(to=nextLink)
+          button.false ❌ false
+        Link(to=nextLink)
           button.true ✔️ true
   `
 }
