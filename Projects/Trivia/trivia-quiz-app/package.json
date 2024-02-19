@@ -1,5 +1,5 @@
 {
-  "name": "my-app",
+  "name": "trivia-quiz-app",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -27,6 +27,11 @@
       "react-app",
       "react-app/jest"
     ],
+    "rules": {
+      "no-unused-vars": "off",
+      "no-empty-pattern": "off",
+      "react-hooks/exhaustive-deps": "off"
+    },
     "globals": {
       "pug": "readonly"
     }
@@ -42,5 +47,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11"
   }
 }

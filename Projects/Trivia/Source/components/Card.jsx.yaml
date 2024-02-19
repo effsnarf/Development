@@ -1,7 +1,0 @@
-dom: | #pug
-  .card
-    .front {children}
-    .back Fuck this shit
-
-props:
-  children: null

@@ -48,7 +48,7 @@ const getQuestions = async () => {
       { "topic": "Fashion", "question": "Invisible clothes are the latest trend.", "answer": true, "explanation": "Manufactured using a fabric that only visible to the wearer." },
       { "topic": "Culinary", "question": "Water is the main ingredient in dry ice.", "answer": false, "explanation": "Dry ice is made from the tears of joy of chefs when their dishes turn out perfect." },
       { "topic": "Politics", "question": "Aliens vote in Earth's elections.", "answer": true, "explanation": "They have been influencing political outcomes for centuries." },
-      { "topic": " cience", "question": "Trees communicate through the internet.", "answer": true, "explanation": "They use a special version of Wi-Fi called 'Wood-Fi'." },
+      { "topic": "Science", "question": "Trees communicate through the internet.", "answer": true, "explanation": "They use a special version of Wi-Fi called 'Wood-Fi'." },
       { "topic": "Film", "question": "Movies were originally silent because the world was black and white.", "answer": false, "explanation": "Color and sound were discovered simultaneously in 1930." },
       { "topic": "Mathematics", "question": "Pi ends with the number 5.", "answer": true, "explanation": "But only in the dimension where circles are square." },
       { "topic": "Chemistry", "question": "Water is wet because it contains a special ingredient called 'wetness'.", "answer": false, "explanation": "The real reason is that it attended a seminar on empathy and learned how to feel." },
@@ -214,6 +214,7 @@ export const GlobalProvider = ({ children }) => {
     setQuestions([]);
     setQuestions(await getQuestions());
   }
+  const getTopicImageUrl = (topic) => `https://db.memegenerator.net/random/image/${topic.toLowerCase()}`
 
 
   const setAnswer = (index, answer) => {
@@ -224,7 +225,7 @@ export const GlobalProvider = ({ children }) => {
   }
 
   return (
-    <GlobalContext.Provider value={{ getNewQuestions, questions, answers, setAnswer, transitionDuration }}>
+    <GlobalContext.Provider value={{ getNewQuestions, questions, answers, setAnswer, transitionDuration, getTopicImageUrl }}>
       {children}
     </GlobalContext.Provider>
   );

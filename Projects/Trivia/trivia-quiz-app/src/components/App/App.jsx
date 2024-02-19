@@ -6,6 +6,7 @@ import { TransitionGroup, CSSTransition } from 'react-transition-group'
 import RouteManager from '../misc/RouteManager';
 import './App.css';
 import { GlobalProvider } from '../misc/global';
+import PreloadImages from '../misc/PreloadImages';
 import Intro from '../Intro/Intro';
 import Question from '../Question/Question';
 import Results from '../Results/Results';
@@ -23,6 +24,7 @@ const App = ({  }) => {
     GlobalProvider
       .cards
         RouteManager(routes=routes)
+      PreloadImages
   `;
 }
 

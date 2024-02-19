@@ -20,7 +20,7 @@ const Question = ({ freeze }) => {
   // State to manage the current question index
   const [questionIndex, setQuestionIndex] = useState(getQuestionIndex());
 
-  const { questions, setAnswer } = useGlobal();
+  const { questions, setAnswer, getTopicImageUrl } = useGlobal();
 
   useEffect(() => {
     oldQuestionIndex = questionIndex;
@@ -37,7 +37,7 @@ const Question = ({ freeze }) => {
 
   if (!question) return pug`div`;
 
-  const topicImageUrl = `https://db.memegenerator.net/random/image/${question.topic}`;
+  const topicImageUrl = getTopicImageUrl(question.topic);
   const nextLink = (questionIndex >= (questions.length - 1)) ? `/results` : `/question/${questionIndex + 1}`;
 
   return pug`
