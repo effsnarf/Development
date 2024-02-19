@@ -20,7 +20,7 @@ const Question = ({ freeze }) => {
   // State to manage the current question index
   const [questionIndex, setQuestionIndex] = useState(getQuestionIndex());
 
-  const { questions, setAnswer } = useGlobal();
+  const { questions, setAnswer, getTopicImageUrl } = useGlobal();
 
   useEffect(() => {
     oldQuestionIndex = questionIndex;
@@ -37,12 +37,13 @@ const Question = ({ freeze }) => {
 
   if (!question) return pug`div`;
 
+  const topicImageUrl = getTopicImageUrl(question.topic);
   const nextLink = (questionIndex >= (questions.length - 1)) ? `/results` : `/question/${questionIndex + 1}`;
 
   return pug`
   Card
     .category
-        img(src="https://media.cnn.com/api/v1/images/stellar/prod/i-stock-1287493837-1.jpg?c=16x9&q=h_833,w_1480,c_fill")
+        img(src=topicImageUrl)
         .title #{question.topic}
     .question #{question.question}
     .index #{activeQuestionIndex+1} of #{questions.length}

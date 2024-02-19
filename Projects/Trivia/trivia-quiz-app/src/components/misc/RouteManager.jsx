@@ -1,9 +1,8 @@
+import { wait } from './util'
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import './RouteManager.css';
 import { useGlobal } from '../misc/global';
-
-const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 let isTransitioning = false;
 let oldUrl = null;

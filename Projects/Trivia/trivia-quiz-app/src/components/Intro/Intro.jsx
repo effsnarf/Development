@@ -20,7 +20,7 @@ const Intro = ({  }) => {
 
   return pug`
   Card
-    .title Welcome to the Trivia Challenge! 🎴
+    .title Welcome to the Trivia Challenge! 🎉
     div You will be presented with 10 True or False questions 🤔
     div Can you score 100%❔
     .buttons
