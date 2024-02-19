@@ -233,7 +233,7 @@ class TaskManager {
       res.end(imageFile);
     }
 
-    if (req?.url == "/trivia/questions") {
+    if (req?.url.startsWith("/trivia/questions")) {
       const allQuestions = [
         {
           topic: "Science",
