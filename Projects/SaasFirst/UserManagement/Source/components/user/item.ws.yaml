@@ -53,6 +53,7 @@ dom:
 
 props:
   user: null
+  newEmptyUserID: null
 
 data:
   userColors: {}
@@ -81,7 +82,7 @@ methods:
   cancelEditing: | #js
     function(user) {
       // If cancling a new user, remove it
-      if (user.id == -1) {
+      if (user.id == this.newEmptyUserID) {
         this.$emit('delete', user);
         return;
       }

@@ -29,6 +29,7 @@ dom:
         v-for: user in getPageUsers(pageIndex)
         :key: user.id
         :user: user
+        :newEmptyUserID: newEmptyUserID
         @save: onSaveUser
         @delete: onClickDeleteUser
     div:
@@ -41,6 +42,7 @@ data:
   users: []
   pageIndex: 0
   pageSize: 6
+  newEmptyUserID: -1
 
 mounted: | #js
   function() {
@@ -114,13 +116,13 @@ methods:
     }
   deleteUser: | #js
     function(user) {
-      const index = this.users.indexOf(user);
+      const index = this.users.findIndex(u => u.id == user.id);
       this.users.splice(index, 1);
     }
   getNewUser: | #js
     function() {
       return {
-        id: -1,
+        id: this.newEmptyUserID,
         name: ``,
         email: ``,
         permission: ``,
@@ -146,7 +148,8 @@ methods:
   getPageUsers: | #js
     function(pageIndex) {
       const start = (pageIndex * this.pageSize);
-      return this.users
+      return [...this.users]
+        .sortBy(u => u.id)
         .slice(start, start + this.pageSize);
     }
   userIsEmpty: | #js
@@ -163,7 +166,7 @@ computed:
     function() {
       if (!this.selectedUsers.length) return false;
       // If the only selected user is a new user, delete all button is disabled
-      if (this.selectedUsers.length == 1 && this.selectedUsers[0].id == -1) return false;
+      if (this.selectedUsers.length == 1 && this.selectedUsers[0].id == this.newEmptyUserID) return false;
       return true;
     }
   isAddUserEnabled: | #js
