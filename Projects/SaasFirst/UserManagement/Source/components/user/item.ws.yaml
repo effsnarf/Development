@@ -2,8 +2,6 @@ dom:
   .row:
     :class: "{ selected: user.ui.is.selected }"
     @click: () => onClickUser(user)
-    div:
-      v-text: user.id
     .check:
       input:
         type: checkbox
