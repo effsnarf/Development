@@ -1,7 +1,7 @@
 .list-enter-active,
 .list-leave-active,
 .list-move {
-  transition: 0.4s;
+  transition: 1s;
 }
 .list-enter,
 .list-leave-to {
@@ -23,7 +23,7 @@
 .list2-enter-active,
 .list2-leave-active,
 .list2-move {
-  transition: 0.4s !important;
+  transition: 1s !important;
   transform-origin: center top;
 }
 

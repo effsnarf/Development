@@ -1,31 +1,60 @@
 dom:
   div:
     h2:
-      .text-center:
-        v-text: "selectedUsers.length + ' users selected'"
-    .rows:
+      .flex1:
+        div:
+          button:
+            v-text: "'➕ add user'"
+            :class: "{ disabled: !isAddUserEnabled }"
+            @click: onClickAddUser
+        .flex:
+          ui.checkbox:
+            text: "Select all"
+            @click: onClickSelectAll
+        div:
+          div:
+            class: text-center
+            v-text: "selectedUsers.length + ' users selected'"
+        div:
+          transition:
+            name: slide-hor
+            button:
+              v-if: canDeleteSelectedUsers
+              v-text: "'🗑️ delete selected users'"
+              @click: onClickDeleteSelectedUsers
+    transition.group:
+      name: slide
+      class: rows
       user.item:
-        v-for: user in users
+        v-for: user in getPageUsers(pageIndex)
         :key: user.id
         :user: user
+        @save: onSaveUser
+        @delete: onClickDeleteUser
+    div:
+      ui.pager:
+        :items-count: users.length
+        :page-size: pageSize
+        v-model: pageIndex
 
 data:
   users: []
-
-computed:
-  selectedUsers: | #js
-    function() {
-      return this.users.filter(u => u.ui.is.selected)
-    }
+  pageIndex: 0
+  pageSize: 6
 
 mounted: | #js
   function() {
-    for (let i = 0; i < 10; i++) {
+    const initialUsersCount = 10;
+
+    for (let i = 0; i < initialUsersCount; i++) {
       const user = {
-        id: i,
+        id: (i+1),
         name: `User ${i+1}`,
         email: `Email ${i+1}`,
         permission: `Permission ${i+1}`,
+        color: {
+          id: ((i % 3) + 1),
+        },
         ui: {
           is: {
             selected: false,
@@ -43,8 +72,115 @@ mounted: | #js
     }
   }
 
+methods:
+  onClickAddUser: | #js
+    function() {
+      const user = this.getNewUser();
+      user.ui.is.editing = true;
+      this.users.push(user);
+    }
+  onClickSelectAll: | #js
+    function() {
+      const selectAllValue = !this.users.every(u => u.ui.is.selected);
+      this.users.forEach(u => u.ui.is.selected = selectAllValue);
+    }
+  onClickDeleteSelectedUsers: | #js
+    function() {
+      if (this.selectedUsers.length == 1) {
+        this.onClickDeleteUser(this.selectedUsers[0]);
+        return;
+      }
+      alertify.confirm(`Delete ${this.selectedUsers.length} users?`, () => {
+        this.deleteSelectedUsers();
+      });
+    }
+  deleteSelectedUsers: | #js
+    function() {
+      this.selectedUsers.forEach(this.deleteUser.bind(this));
+    }
+  onSaveUser: | #js
+    function(user) {
+      user.id = this.getNewUserID();
+    }
+  onClickDeleteUser: | #js
+    function(user) {
+      if (user.ui.is.editing && this.userIsEmpty(user)) {
+        this.deleteUser(user);
+        return;
+      }
+      alertify.confirm(`Delete ${user.name}?`, () => {
+        this.deleteUser(user);
+      });
+    }
+  deleteUser: | #js
+    function(user) {
+      const index = this.users.indexOf(user);
+      this.users.splice(index, 1);
+    }
+  getNewUser: | #js
+    function() {
+      return {
+        id: -1,
+        name: ``,
+        email: ``,
+        permission: ``,
+        color: {
+          id: 0,
+        },
+        ui: {
+          is: {
+            selected: false,
+            editing: false,
+          },
+          edited: {
+            name: null,
+            email: null,
+          }
+        }
+      };
+    }
+  getNewUserID: | #js
+    function() {
+      return (this.users.length + 1);
+    }
+  getPageUsers: | #js
+    function(pageIndex) {
+      const start = (pageIndex * this.pageSize);
+      return this.users
+        .slice(start, start + this.pageSize);
+    }
+  userIsEmpty: | #js
+    function(user) {
+      return !user.name.length && !user.email.length;
+    }
+
+computed:
+  selectedUsers: | #js
+    function() {
+      return this.users.filter(u => u.ui.is.selected)
+    }
+  canDeleteSelectedUsers: | #js
+    function() {
+      if (!this.selectedUsers.length) return false;
+      // If the only selected user is a new user, delete all button is disabled
+      if (this.selectedUsers.length == 1 && this.selectedUsers[0].id == -1) return false;
+      return true;
+    }
+  isAddUserEnabled: | #js
+    function() {
+      if (this.users.some(u => u.ui.is.editing)) return false;
+      return true;
+    }
+
+
 style:
   .rows:
     display: flex
     flex-direction: column
     gap: 1px
+  .flex1:
+    display: flex
+    align-items: center
+    justify-content: space-around
+  button:
+    white-space: nowrap

@@ -78,3 +78,9 @@ class TooltipManager {
         });
     }
 }
+
+
+// When the document loads, create a new TooltipManager
+document.addEventListener('DOMContentLoaded', () => {
+    //const ttm = new TooltipManager();
+});

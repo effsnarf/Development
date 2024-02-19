@@ -1,18 +1,19 @@
 dom:
-  .row:
-    :class: "{ selected: user.ui.is.selected }"
+  tr:
+    :class: "{ row: true, selected: user.ui.is.selected }"
     @click: () => onClickUser(user)
-    div:
-      v-text: user.id
-    .check:
+    td:
+      class: check
       input:
         type: checkbox
         v-model: user.ui.is.selected
-    .icon:
+    td:
+      class: icon
       .circle:
         :style: "{ background: userColors[user.color.id] }"
         v-text: getInitials(user)
-    .name-column:
+    td:
+      class: name-column
       .name:
         ui.input.text.box:
           v-model: user.ui.edited.name
@@ -23,9 +24,11 @@ dom:
           v-model: user.ui.edited.email
           :camouflage: "!user.ui.is.editing"
           :enabled: "user.ui.is.editing"
-    .permission:
+    td:
+      class: permission
       v-text: user.permission
-    .buttons:
+    td:
+      class: buttons
       div:
         button:
           class: edit
@@ -109,23 +112,14 @@ methods:
 
 style:
   .row:
-    display: flex
-    justify-content: space-between
-    align-items: center
-    gap: 1em
     cursor: pointer
   .row:hover:
     border: "1px solid #ffffff40"
     transition: 0s
+  .row td:
+    margin: 0 0.5em
   .selected, .selected:hover:
     background: "linear-gradient(45deg, #ffffff10, #ffffff30)"
-  .check:
-    flex-shrink: 1
-  .icon:
-    width: 4em
-    flex-shrink: 1
-  .name-column:
-    flex-grow: 1
   .name:
     font-size: 140%
   .permission:
@@ -134,14 +128,14 @@ style:
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 100%
+    width: 2.5em
     aspect-ratio: 1
     font-size: 1.5em
     border-radius: 50%
   .buttons:
     display: flex
     align-items: center
-    width: 8em
+    width: 6m
     gap: 0.5em
     opacity: 0
   .row:hover .buttons:

@@ -3,7 +3,7 @@ dom:
     ':class': getCssClass()
     @mouseenter: $emit('mouseenter')
     @mouseleave: $emit('mouseleave')
-    @click: onInput(!checkedValue)
+    @click: onClick
     input:
       type: checkbox
       ':checked': checkedValue
@@ -31,6 +31,11 @@ methods:
     function() {
       const dimmed = (this.checkedValue ? "" : "dimmed");
       return `hoverable ${this.size} ${dimmed}`;
+    }
+  onClick: | #js
+    async function() {
+      this.onInput(!this.checkedValue);
+      this.$emit("click");
     }
   onInput: | #js
     async function(value) {
