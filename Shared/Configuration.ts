@@ -54,15 +54,17 @@ class Configuration {
   }
 
   static async new(
-    options: ConfigurationOptions = {
-      quitIfChanged: [],
-      toAbsolutePaths: [],
-      types: Types,
-      log: false,
-    },
+    options?: ConfigurationOptions | undefined,
     configPaths?: ConfigPaths,
     findConfigPaths: boolean = true
   ) {
+    if (!options)
+      options = {
+        quitIfChanged: [],
+        toAbsolutePaths: [],
+        types: Types,
+        log: false,
+      };
     configPaths = Configuration.getConfigPaths(configPaths, findConfigPaths);
     const config = new Configuration(options, configPaths);
     config.log(`${configPaths.length} config file(s) found:`.gray);
@@ -115,12 +117,12 @@ class Configuration {
         // Types could be:
         // { Address: {}, }
         // If any key matches a type name, convert the object to that type
-        const typeNames = Object.keys(options.types.Convert);
+        const typeNames = Object.keys(options?.types.Convert);
         for (const typeName of typeNames) {
           if (key.toLowerCase() === typeName.toLowerCase()) {
             console.log(`Converting ${key} to ${typeName}`.gray);
             console.log(value);
-            node[key] = options.types.Convert[typeName].from.any(value);
+            node[key] = options?.types.Convert[typeName].from.any(value);
             console.log(node[key]);
           }
         }

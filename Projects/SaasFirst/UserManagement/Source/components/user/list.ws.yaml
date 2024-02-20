@@ -7,6 +7,7 @@ dom:
           transition:
             name: slide-hor
             button:
+              class: red
               v-if: canDeleteSelectedUsers
               v-text: "'🗑️ delete selected users'"
               @click: onClickDeleteSelectedUsers
@@ -18,10 +19,13 @@ dom:
               class: text-center
               v-text: "selectedUsers.length + ' users selected'"
         div:
-          button:
-            v-text: "'+ Add new user'"
-            :class: "{ disabled: !isAddUserEnabled }"
-            @click: onClickAddUser
+          transition:
+            name: slide-hor
+            button:
+              v-if: showAddUserButton
+              v-text: "'+ Add new user'"
+              :class: "{ disabled: !isAddUserEnabled }"
+              @click: onClickAddUser
     .header.row:
       .check:
         input:
@@ -29,24 +33,33 @@ dom:
           @click: onClickSelectAll
       .icon:
         h3:
-          v-text: "'Users'"
+          app.sort.button:
+            text: Users
+            field: name
+            :sort: sort
+            @sort-by: sortBy
       .name-column:
-        v-text: "'-'"
+        v-text: "' '"
       .permission:
         h3:
-          v-text: "'Permission'"
+          app.sort.button:
+            text: Permission
+            field: permission
+            :sort: sort
+            @sort-by: sortBy
       .buttons:
-        v-text: "'-'"
-    transition.group:
-      name: slide
-      class: rows
-      user.item:
-        v-for: user in getPageUsers(pageIndex)
-        :key: user.id
-        :user: user
-        :newEmptyUserID: newEmptyUserID
-        @save: onSaveUser
-        @delete: onClickDeleteUser
+        v-text: "' '"
+    .users-table:
+      transition.group:
+        name: slide
+        class: rows
+        user.item:
+          v-for: user in pageUsers
+          :key: user.id
+          :user: user
+          :newEmptyUserID: newEmptyUserID
+          @save: onSaveUser
+          @delete: onClickDeleteUser
     div:
       ui.pager:
         :items-count: users.length
@@ -58,40 +71,27 @@ data:
   pageIndex: 0
   pageSize: 6
   newEmptyUserID: -1
+  sort:
+    field: 'id'
+    direction: 1
+    default: 'id'
 
 mounted: | #js
   function() {
-    const initialUsersCount = 10;
-
-    for (let i = 0; i < initialUsersCount; i++) {
-      const user = {
-        id: (i+1),
-        name: `Tamás Szabó ${i+1}`,
-        email: `Email ${i+1}`,
-        permission: {
-          id: ((i % 2)),
-        },
-        color: {
-          id: ((i % 3) + 1),
-        },
-        ui: {
-          is: {
-            selected: false,
-            editing: false,
-          },
-          edited: {
-            name: null,
-            email: null,
-          }
-        }
-      };
-      user.ui.edited.name = user.name;
-      user.ui.edited.email = user.email;
-      this.users.push(user);
-    }
+    this.init();
   }
 
 methods:
+  init: | #js
+    async function() {
+      const url = `/users.json`;
+      const users = (await (await fetch(url)).json());
+      for (const user of users) {
+        user.ui = this.getNewUserUI();
+      }
+      this.users.splice(0, this.users.length);
+      this.users.push(...users);
+    }
   onClickAddUser: | #js
     function() {
       const user = this.getNewUser();
@@ -127,7 +127,7 @@ methods:
         this.deleteUser(user);
         return;
       }
-      alertify.confirm(`Delete ${user.name}?`, () => {
+      alertify.confirm(`Do you want to delete <strong>${user.name}</strong> from the list?`, () => {
         this.deleteUser(user);
       });
     }
@@ -135,46 +135,97 @@ methods:
     function(user) {
       const index = this.users.findIndex(u => u.id == user.id);
       this.users.splice(index, 1);
+      this.adjust();
     }
   getNewUser: | #js
     function() {
+      const colors = this.users
+        .map(u => u.color.id)
+        .distinct();
+      const permissions = this.users
+        .map(u => u.permission)
+        .distinct();
+      const newColorID = colors[Math.floor(Math.random() * colors.length)];
+      const newPermission = permissions[permissions.length - 1];
       return {
         id: this.newEmptyUserID,
         name: ``,
         email: ``,
-        permission: ``,
+        permission: newPermission,
         color: {
-          id: 0,
+          id: newColorID,
         },
-        ui: {
-          is: {
-            selected: false,
-            editing: false,
-          },
-          edited: {
-            name: null,
-            email: null,
-          }
-        }
+        ui: this.getNewUserUI(),
       };
     }
   getNewUserID: | #js
     function() {
       return (this.users.length + 1);
     }
+  getNewUserUI: | #js
+    function() {
+      return {
+        is: {
+          selected: false,
+          editing: false,
+        },
+        edited: {
+          name: null,
+          email: null,
+        }
+      };
+    }
   getPageUsers: | #js
     function(pageIndex) {
       const start = (pageIndex * this.pageSize);
-      return [...this.users]
-        .sortBy(u => u.id)
+      return this.getSortedUsers()
         .slice(start, start + this.pageSize);
+    }
+  getSortedUsers: | #js
+    function() {
+      if (!this.sort.field) return this.users;
+      return this.users.sort((a, b) => {
+        const fieldA = Objects.getProperty(a, this.sort.field);
+        const fieldB = Objects.getProperty(b, this.sort.field);
+        if (fieldA < fieldB) return -1 * this.sort.direction;
+        if (fieldA > fieldB) return 1 * this.sort.direction;
+        return 0;
+      });
+    }
+  getPageIndexes: | #js
+    function(pageCount) {
+      return Array.from({ length: pageCount }, (v, i) => i);
     }
   userIsEmpty: | #js
     function(user) {
       return !user.name.length && !user.email.length;
     }
+  adjust: | #js
+    function() {
+      if (this.pageIndex >= this.pageCount) {
+        this.pageIndex = this.pageCount - 1;
+      }
+    }
+  sortBy: | #js
+    function(field) {
+      if (this.sort.field == field) {
+        if (this.sort.direction == 1) {
+          this.sort.direction = -1;
+        } else {
+          this.sort.field = this.sort.default;
+          this.sort.direction = 1;
+        }
+      } else {
+        this.sort.field = field;
+        this.sort.direction = 1;
+      }
+    }
 
 computed:
+  pageUsers: | #js
+    function() {
+      return this.getPageUsers(this.pageIndex);
+    }
   selectedUsers: | #js
     function() {
       return this.users.filter(u => u.ui.is.selected)
@@ -186,16 +237,36 @@ computed:
       if (this.selectedUsers.length == 1 && this.selectedUsers[0].id == this.newEmptyUserID) return false;
       return true;
     }
+  showAddUserButton: | #js
+    function() {
+      if (this.canDeleteSelectedUsers) return false;
+      if (this.selectedUsers.length) return false;
+      return true;
+    }
   isAddUserEnabled: | #js
     function() {
       if (this.users.some(u => u.ui.is.editing)) return false;
       return true;
     }
-
+  pageIndexes: | #js
+    function() {
+      return this.getPageIndexes(this.pageCount);
+    }
+  pageCount: | #js
+    function() {
+      return Math.ceil(this.users.length / this.pageSize);
+    }
 
 style:
+  .comp-user-list:
+    width: min(70em, 100%)
+    margin: auto
+    white-space: nowrap
+  .users-table:
+    height: 38rem
+    overflow: hidden
   .top-bar:
-    margin: 1em
+    margin: 3em
     white-space: nowrap
   .top-bar button:
     padding: 0.8em 1em !important
@@ -210,25 +281,26 @@ style:
   .header.row:
     opacity: 0.7
   .row:
+    padding: 1em
     display: flex
     justify-content: space-between
     align-items: center
-    gap: 1em
     border: "1px solid transparent"
   .rows .row:
-    margin: 0.5rem
     cursor: pointer
   .rows .row:hover:
     border: "1px solid #00000040"
     transition: 0s
-  .row:hover .buttons:
-    opacity: 1
   .check:
     flex-shrink: 1
+    width: 4em
+    display: flex
+    justify-content: center
   .icon:
     width: 4em
     flex-shrink: 1
   .name-column:
+    padding: 0 1em
     flex-grow: 1
   .permission:
     width: 10em
@@ -247,6 +319,9 @@ style:
     width: 14em
     gap: 0.5em
     opacity: 0
+    transition: 1s
+  .comp-user-item-edit .buttons, .row:hover .buttons:
+    opacity: 1 !important
   h3 button:
     padding: 0.5em 1.2em !important
   input[type=text]:

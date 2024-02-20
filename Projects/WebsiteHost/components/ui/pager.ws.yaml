@@ -35,9 +35,9 @@ style:
   .pager-button:
     padding: 0.5em 1em
     border-radius: 0.5em
-    background: "#80808060"
+    background: "#80808030"
     cursor: pointer
   .pager-button:hover:
-    background: "#808080a0"
+    background: "#80808040"
   .pager-button.selected, .pager-button.selected:hover:
     background: "#80808080 !important"

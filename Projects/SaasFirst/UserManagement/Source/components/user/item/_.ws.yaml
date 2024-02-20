@@ -1,0 +1,41 @@
+dom:
+  user.item.view:
+    v-if: "!user.ui.is.editing"
+    :user: user
+    :newEmptyUserID: newEmptyUserID
+    :permissionTexts: permissionTexts
+    v-on: $listeners
+    :class: "{ row: true, selected: user.ui.is.selected }"
+    @click: (e) => onClickUser(user, e)
+  user.item.edit:
+    v-else-if: "user.ui.is.editing"
+    :user: user
+    :newEmptyUserID: newEmptyUserID
+    :permissionTexts: permissionTexts
+    v-on: $listeners
+    :class: "{ row: true, selected: user.ui.is.selected }"
+    @click: (e) => onClickUser(user, e)
+
+props:
+  user: null
+  newEmptyUserID: null
+
+data:
+  permissionTexts: ['Admin', 'Agent']
+
+mounted: | #js
+  function() {
+    Object.keys(this.$listeners).forEach(event => {
+      this.$on(event, (...args) => {
+        this.$emit(event);
+      });
+    });
+  }
+
+methods:
+  onClickUser: | #js
+    function(user, e) {
+      if (e.target != e.currentTarget) return;
+      if (user.id == this.newEmptyUserID) return;
+      user.ui.is.selected = !user.ui.is.selected;
+    }

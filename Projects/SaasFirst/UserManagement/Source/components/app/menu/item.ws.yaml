@@ -1,0 +1,38 @@
+dom:
+  .menu-item:
+    :class: "{ active: active }"
+    a:
+      class: content
+      .image:
+        img:
+          :src: image
+      .text:
+        v-text: text
+
+props:
+  image:
+  text:
+  active:
+
+style:
+  .menu-item:
+    border-radius: 0
+  .menu-item:hover:
+    background: "#00000010"
+  .active:
+    background-image: url(/images/active-menu-item.png)
+    background-repeat: no-repeat
+    background-position: right
+  .content:
+    display: flex
+    align-items: center
+    width: 10em
+    margin: auto
+  .text:
+    width: 7em
+  a:
+    padding: 0.5em
+    color: black
+    cursor: pointer
+  .image:
+    width: 2em

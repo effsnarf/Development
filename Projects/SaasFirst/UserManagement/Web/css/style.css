@@ -1,14 +1,30 @@
 body
 {
-    background: white;
+    background: #E9EFF2;
 }
 
-body, h1, h2, h3, h4, h5, h6
+body, #app
+{
+    min-height: 100vh;
+}
+
+body, h1, h2, h3, h4, h5, h6, a
 {
     font-family: Poppins;
     color: black;
     font-weight: normal;
     text-shadow: none;
+}
+
+a
+{
+    user-select: none;
+}
+
+a:hover
+{
+    text-decoration: underline;
+    cursor: pointer;
 }
 
 body, input, select, textarea, button
@@ -38,14 +54,33 @@ button
     background: #1CB0D3E0;
 }
 
+button.red
+{
+    background: #FF4D4D;
+    color: white !important;
+}
+
+button.red:hover
+{
+    background: #FF4D4DE0;
+}
+
 button.clear
 {
     background: #fff;
     border: 1px solid gray;
+}
+button.clear span
+{
     filter: grayscale(1);
 }
 
-button.gray
+button.clear:hover
+{
+    background: #1CB0D3;
+}
+
+button.gray, .alertify .ajs-cancel
 {
     color: #7F7F7F;
     background: #E2E8EB;
@@ -62,3 +97,43 @@ input[type=checkbox]:hover
 {
     background: #00000080;
 }
+
+.alertify .ajs-dialog
+{
+    margin: auto !important;
+    padding: 2em;
+    top: 30%;
+}
+
+.alertify .ajs-dialog, .alertify .ajs-footer
+{
+    background: white !important;
+}
+
+.alertify .ajs-ok
+{
+    background: #475DE5;
+    color: white;
+}
+
+.alertify .ajs-buttons
+{
+    text-align: center !important;
+}
+
+.alertify .ajs-button
+{
+    width: 9em;
+}
+
+.alertify .ajs-footer
+{
+    margin: 0 !important;
+}
+
+.alertify .ajs-content
+{
+    padding: 1.5em;
+    text-align: center;
+}
+

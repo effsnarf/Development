@@ -1,0 +1,19 @@
+dom:
+  .flex:
+    .sidebar:
+      .flex.justify-center:
+        img:
+          class: logo
+          src: /images/logo.png
+      div:
+        app.menu:
+
+data:
+
+style:
+  .sidebar:
+    width: 14em
+    height: 100vh
+    background: "#E9EFF2"
+  .logo:
+    margin: 30px

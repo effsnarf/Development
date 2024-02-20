@@ -1,0 +1,85 @@
+<template>
+  {{{dom dom name}}}
+</template>
+
+<script>
+export default {
+  mixins: [],
+  props: {
+    {{#each props}}
+    {{@key}}: {
+      default: {{{or this null}}},
+    },
+    {{/each}}
+  },
+  data() {
+    return {
+      {{#each data}}
+      {{@key}}: {{{or this null}}},
+      {{/each}}
+      _: {
+        comp: {
+          name: `{{unkebabize name}}`,
+        },
+        log: {
+          elapsed: {
+            minimum: 1000,
+          }
+        }
+      }
+    }
+  },
+  created() {
+    {{{addCode created ""}}}
+  },
+  mounted() {
+    {{{addCode mounted ""}}}
+  },
+  unmounted() {
+    {{{addCode unmounted ""}}}
+  },
+  methods: {
+    {{#each methods}}
+    {{@key}}: function() {
+      {{{addCode this "if (window.vueIdeApp?.isPauseOnMethod(this.$options._componentTag, '{{@key}}')) debugger;" @key ""}}}
+    },
+    {{/each}}
+  },
+  computed: {
+    {{#each computed}}
+    {{#if get}}
+    {{@key}}: {
+      get() {
+        {{{addCode get ""}}}
+      },
+    },
+    {{else}}
+    {{@key}}() {
+      {{{addCode this "" @key ""}}}
+    },
+    {{/if}}
+    {{/each}}
+  },
+  watch: {
+    {{#each watch}}
+    {{#if handler}}
+    {{@key}}: {
+      handler(newValue, oldValue) {
+        {{{addCode handler "" @key ""}}}
+      },
+      immediate: {{{or immediate false}}},
+      deep: {{{or deep false}}},
+    },
+    {{else}}
+    {{@key}}(newValue, oldValue) {
+      {{{addCode this "" @key ""}}}
+    },
+    {{/if}}
+    {{/each}}
+  },
+}
+</script>
+
+<style scoped>
+/* Your component's styles go here */
+</style>

@@ -1,0 +1,94 @@
+dom:
+  div:
+    @click: (e) => $emit('click', e)
+    .check:
+      input:
+        type: checkbox
+        v-if: "user.id != newEmptyUserID"
+        v-model: user.ui.is.selected
+    .edit-column:
+      table:
+        thead:
+          tr:
+            th:
+              v-text: "'Name'"
+            th:
+              v-text: "'Email'"
+            th:
+              v-text: "'Permission'"
+        tbody:
+          tr:
+            td:
+              input:
+                placeholder: "Enter Name"
+                v-model: user.ui.edited.name
+            td:
+              input:
+                placeholder: "Enter Email"
+                v-model: user.ui.edited.email
+            td:
+              select:
+                :disabled: "true"
+                :value: (permissionTexts.length - 1)
+                option:
+                  v-for: (text, id) in permissionTexts
+                  :value: "id"
+                  v-text: "text"
+    .buttons:
+      div:
+        h3:
+          .flex:
+            transition:
+              name: slide-hor
+              button:
+                class: save
+                title: "Save"
+                v-if: showSaveButton(user)
+                v-text: getSaveButtonText(user)
+                @click: () => saveEditing(user)
+            button:
+              class: gray cancel
+              title: "Cancel"
+              v-text: "'Cancel'"
+              @click: () => cancelEditing(user)
+
+props:
+  user:
+  newEmptyUserID:
+  permissionTexts:
+  
+methods:
+  saveEditing: | #js
+    function(user) {
+      user.ui.is.editing = false;
+      user.name = user.ui.edited.name;
+      user.email = user.ui.edited.email;
+      this.$emit('save', user);
+    }
+  showSaveButton: | #js
+    function(user) {
+      if (!user.ui.is.editing) return false;
+      if (!user.ui.edited.name?.length) return false;
+      if (!user.ui.edited.email?.length) return false;
+      return true;
+    }
+  cancelEditing: | #js
+    function(user) {
+      // If cancling a new user, remove it
+      if (user.id == this.newEmptyUserID) {
+        this.$emit('delete', user);
+        return;
+      }
+      user.ui.is.editing = false;
+    }
+  getSaveButtonText: | #js
+    function(user) {
+      if (user.id == this.newEmptyUserID) return 'Add';
+      return 'Save';
+    }
+
+style:
+  .edit-column:
+    flex-grow: 1
+    padding-right: 2em
+    opacity: 0.5

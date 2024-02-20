@@ -1,0 +1,94 @@
+dom:
+  div:
+    @click: (e) => $emit('click', user, e)
+    .check:
+      input:
+        type: checkbox
+        v-if: "user.id != newEmptyUserID"
+        v-model: user.ui.is.selected
+    .icon:
+      .circle:
+        :style: "{ background: userColors[user.color.id] }"
+        v-text: getInitials(user)
+    .name-column:
+      h3:
+        class: name
+        v-text: user.name
+      .email:
+        v-text: user.email
+    .permission:
+      div:
+        v-if: "(user.permission != null)"
+        :class: "'button button-' + user.permission"
+        v-text: user.permission.toTitleCase()
+    .buttons:
+      div:
+        button:
+          class: clear edit
+          title: "Edit"
+          v-if: "!user.ui.is.editing"
+          @click: (e) => startEditing(user, e)
+          span:
+            v-text: "'✏️'"
+      div:
+        v-if: "!user.ui.is.editing"
+        button:
+          class: clear delete
+          @click: (e) => deleteUser(user, e)
+          span:
+            v-text: "'🗑️'"
+
+props:
+  user: null
+  newEmptyUserID: null
+  permissionTexts: null
+
+data:
+  userColors: {}
+
+mounted: | #js
+  function() {
+    this.userColors = { '1': '#DE40A3', '2': '#1C40A3', '3': '#31F1AC' };
+  }
+
+methods:
+  startEditing: | #js
+    function(user) {
+      user.ui.is.editing = true;
+      user.ui.edited.name = user.name;
+      user.ui.edited.email = user.email;
+    }
+  deleteUser: | #js
+    function(user, e) {
+      e.stopPropagation();
+      this.$emit('delete', user);
+    }
+  getInitials: | #js
+    function(user) {
+      return user.name.split(' ')
+        .map(n => n[0])
+        .slice(0, 2)
+        .join('')
+        .toUpperCase();
+    }
+
+style:
+  h3.name input:
+    color: black
+  .selected, .selected:hover:
+    background: "linear-gradient(45deg, #00000010, #00000030) !important"
+  .permission .button:
+    padding: 0 0.8em
+    color: gray
+    border-radius: 0.7em
+    font-size: 1.1rem
+  .permission .button:hover:
+    color: black
+  .permission .button-admin:
+    background: "#EFE2FE"
+  .permission .button-admin:hover:
+    background: "#AB91BA"
+  .permission .button-agent:
+    background: "#C8E7F9"
+  .permission .button-agent:hover:
+    background: "#8DB9D9"
