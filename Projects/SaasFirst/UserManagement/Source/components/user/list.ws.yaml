@@ -1,20 +1,8 @@
 dom:
   div:
-    h2:
+    h3:
+      class: top-bar
       .flex1:
-        div:
-          button:
-            v-text: "'➕ add user'"
-            :class: "{ disabled: !isAddUserEnabled }"
-            @click: onClickAddUser
-        .flex:
-          ui.checkbox:
-            text: "Select all"
-            @click: onClickSelectAll
-        div:
-          div:
-            class: text-center
-            v-text: "selectedUsers.length + ' users selected'"
         div:
           transition:
             name: slide-hor
@@ -22,6 +10,33 @@ dom:
               v-if: canDeleteSelectedUsers
               v-text: "'🗑️ delete selected users'"
               @click: onClickDeleteSelectedUsers
+        div:
+          transition:
+            name: slide-hor
+            div:
+              v-if: selectedUsers.length
+              class: text-center
+              v-text: "selectedUsers.length + ' users selected'"
+        div:
+          button:
+            v-text: "'+ Add new user'"
+            :class: "{ disabled: !isAddUserEnabled }"
+            @click: onClickAddUser
+    .header.row:
+      .check:
+        input:
+          type: checkbox
+          @click: onClickSelectAll
+      .icon:
+        h3:
+          v-text: "'Users'"
+      .name-column:
+        v-text: "'-'"
+      .permission:
+        h3:
+          v-text: "'Permission'"
+      .buttons:
+        v-text: "'-'"
     transition.group:
       name: slide
       class: rows
@@ -51,9 +66,11 @@ mounted: | #js
     for (let i = 0; i < initialUsersCount; i++) {
       const user = {
         id: (i+1),
-        name: `User ${i+1}`,
+        name: `Tamás Szabó ${i+1}`,
         email: `Email ${i+1}`,
-        permission: `Permission ${i+1}`,
+        permission: {
+          id: ((i % 2)),
+        },
         color: {
           id: ((i % 3) + 1),
         },
@@ -177,6 +194,11 @@ computed:
 
 
 style:
+  .top-bar:
+    margin: 1em
+    white-space: nowrap
+  .top-bar button:
+    padding: 0.8em 1em !important
   .rows:
     display: flex
     flex-direction: column
@@ -185,5 +207,47 @@ style:
     display: flex
     align-items: center
     justify-content: space-around
-  button:
-    white-space: nowrap
+  .header.row:
+    opacity: 0.7
+  .row:
+    display: flex
+    justify-content: space-between
+    align-items: center
+    gap: 1em
+    border: "1px solid transparent"
+  .rows .row:
+    margin: 0.5rem
+    cursor: pointer
+  .rows .row:hover:
+    border: "1px solid #00000040"
+    transition: 0s
+  .row:hover .buttons:
+    opacity: 1
+  .check:
+    flex-shrink: 1
+  .icon:
+    width: 4em
+    flex-shrink: 1
+  .name-column:
+    flex-grow: 1
+  .permission:
+    width: 10em
+  .circle:
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%
+    aspect-ratio: 1
+    font-size: 1.5em
+    border-radius: 50%
+    color: white;
+  .buttons:
+    display: flex
+    align-items: center
+    width: 14em
+    gap: 0.5em
+    opacity: 0
+  h3 button:
+    padding: 0.5em 1.2em !important
+  input[type=text]:
+    opacity: 1 !important

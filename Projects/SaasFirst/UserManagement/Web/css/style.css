@@ -1,0 +1,64 @@
+body
+{
+    background: white;
+}
+
+body, h1, h2, h3, h4, h5, h6
+{
+    font-family: Poppins;
+    color: black;
+    font-weight: normal;
+    text-shadow: none;
+}
+
+body, input, select, textarea, button
+{
+    text-shadow: none !important;
+}
+
+input, select, textarea,
+input:focus, select:focus, textarea:focus
+{
+    color: black;
+    background: white;
+    box-shadow: none;
+}
+
+button
+{
+    background: #1CB0D3;
+    border: none;
+    box-shadow: none;
+    filter: none;
+    white-space: nowrap;
+}
+
+.button:hover
+{
+    background: #1CB0D3E0;
+}
+
+button.clear
+{
+    background: #fff;
+    border: 1px solid gray;
+    filter: grayscale(1);
+}
+
+button.gray
+{
+    color: #7F7F7F;
+    background: #E2E8EB;
+    border: none;
+}
+
+input[type=checkbox]
+{
+    box-shadow: none;
+    border: 1px solid #00000010;
+}
+
+input[type=checkbox]:hover
+{
+    background: #00000080;
+}

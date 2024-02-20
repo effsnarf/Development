@@ -5,47 +5,57 @@ dom:
     .check:
       input:
         type: checkbox
+        v-if: "user.id != newEmptyUserID"
         v-model: user.ui.is.selected
     .icon:
       .circle:
         :style: "{ background: userColors[user.color.id] }"
         v-text: getInitials(user)
     .name-column:
-      .name:
+      h3:
+        class: name
         ui.input.text.box:
           v-model: user.ui.edited.name
+          hint: "Name"
           :camouflage: "!user.ui.is.editing"
           :enabled: "user.ui.is.editing"
       .email:
         ui.input.text.box:
           v-model: user.ui.edited.email
+          hint: "Email"
           :camouflage: "!user.ui.is.editing"
           :enabled: "user.ui.is.editing"
     .permission:
-      v-text: user.permission
+      div:
+        v-if: "(user.permission.id != null)"
+        :class: "'button button' + user.permission.id"
+        v-text: permissionTexts[user.permission.id]
     .buttons:
       div:
         button:
-          class: edit
+          class: clear edit
           title: "Edit"
           v-if: "!user.ui.is.editing"
           v-text: "'✏️'"
           @click: () => startEditing(user)
-        button:
-          class: delete
-          title: "Delete"
-          v-if: "showSaveButton(user)"
-          v-text: "'✔️'"
-          @click: () => saveEditing(user)
-        button:
-          class: cancel
-          title: "Cancel"
-          v-if: "user.ui.is.editing"
-          v-text: "'❌'"
-          @click: () => cancelEditing(user)
+        h3:
+          .flex:
+            button:
+              class: save
+              title: "Save"
+              v-if: "showSaveButton(user)"
+              v-text: "'Save'"
+              @click: () => saveEditing(user)
+            button:
+              class: gray cancel
+              title: "Cancel"
+              v-if: "user.ui.is.editing"
+              v-text: "'Cancel'"
+              @click: () => cancelEditing(user)
       div:
         v-if: "!user.ui.is.editing"
         button:
+          class: clear delete
           v-text: "'🗑️'"
           @click: () => deleteUser(user)
 
@@ -55,6 +65,7 @@ props:
 
 data:
   userColors: {}
+  permissionTexts: ['Admin', 'Agent']
 
 mounted: | #js
   function() {
@@ -88,6 +99,7 @@ methods:
     }
   onClickUser: | #js
     function(user) {
+      if (user.id == this.newEmptyUserID) return;
       user.ui.is.selected = !user.ui.is.selected;
     }
   showSaveButton: | #js
@@ -107,46 +119,22 @@ methods:
     }
 
 style:
-  .row:
-    display: flex
-    justify-content: space-between
-    align-items: center
-    gap: 1em
-    cursor: pointer
-  .row:hover:
-    border: "1px solid #ffffff40"
-    transition: 0s
+  h3.name input:
+    color: black
   .selected, .selected:hover:
     background: "linear-gradient(45deg, #ffffff10, #ffffff30)"
-  .check:
-    flex-shrink: 1
-  .icon:
-    width: 4em
-    flex-shrink: 1
-  .name-column:
-    flex-grow: 1
-  .name:
-    font-size: 140%
-  .permission:
-    width: 10em
-  .circle:
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%
-    aspect-ratio: 1
-    font-size: 1.5em
-    border-radius: 50%
-  .buttons:
-    display: flex
-    align-items: center
-    width: 8em
-    gap: 0.5em
-    opacity: 0
-  .row:hover .buttons:
-    opacity: 1
-    transition: 1s
-  button:
-    box-shadow: none
-  input[type=text]:
-    opacity: 1 !important
+  .permission .button:
+    padding: 0 0.8em
+    color: gray
+    border-radius: 0.7em
+    font-size: 1.1rem
+  .permission .button:hover:
+    color: black
+  .permission .button0:
+    background: "#EFE2FE"
+  .permission .button0:hover:
+    background: "#AB91BA"
+  .permission .button1:
+    background: "#C8E7F9"
+  .permission .button1:hover:
+    background: "#8DB9D9"
