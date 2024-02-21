@@ -2,7 +2,7 @@
 div("class"="comp-app-menu")
   div("v-for"="menu in menus", "class"="menu1")
     div("v-text"="menu.category", "class"="title")
-    AppMenuItem("v-for"="item in menu.items", ":image"="getImageUrl(item)", ":text"="item", ":active"="item == activeItem")
+    AppMenuItem("v-for"="item in menu.items", ":key"="item", ":image"="getImageUrl(item)", ":text"="item", ":active"="item == activeItem")
 </template>
 
 <script>

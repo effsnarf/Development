@@ -6,6 +6,7 @@ dom:
         v-text: menu.category
       app.menu.item:
         v-for: item in menu.items
+        :key: item
         :image: getImageUrl(item)
         :text: item
         :active: "item == activeItem"
