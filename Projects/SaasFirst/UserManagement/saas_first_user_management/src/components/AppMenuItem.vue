@@ -45,7 +45,6 @@ export default {
   background: #00000010;
 }
 .active {
-  background-image: url(/images/active-menu-item.png);
   background-repeat: no-repeat;
   background-position: right;
 }
