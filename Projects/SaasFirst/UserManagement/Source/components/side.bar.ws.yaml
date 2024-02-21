@@ -15,5 +15,7 @@ style:
     width: 14em
     height: 100vh
     background: "#E9EFF2"
+  .sidebar a:
+    text-decoration: none !important
   .logo:
     margin: 30px

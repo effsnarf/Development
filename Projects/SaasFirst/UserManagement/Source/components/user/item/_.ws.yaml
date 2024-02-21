@@ -26,7 +26,7 @@ data:
 mounted: | #js
   function() {
     Object.keys(this.$listeners).forEach(event => {
-      this.$on(event, (...args) => {
+      this.$on(event, () => {
         this.$emit(event);
       });
     });

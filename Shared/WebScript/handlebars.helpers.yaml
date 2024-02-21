@@ -5,8 +5,8 @@ helpers:
       return JSON.stringify(b);
     }
   dom: | #ts
-    (context, dom, compName) => {
-      return context.toTemplate(context, dom, 0, compName).join("\n");
+    (context, dom, compName, compType) => {
+      return context.toTemplate(context, dom, 0, compName, compType).join("\n");
     }
   hasKey: | #ts
     (context, object, key, options) => {
@@ -56,6 +56,8 @@ helpers:
         // Extract the method body inside the outermost braces
         let wrappedBody = methodBody.substring(first + 1, last).trim();
 
+        if (!startCode.length && !endCode.length) return methodBody; // Return the original method body if no startCode or endCode is provided
+
         // Insert startCode and endCode
         wrappedBody = `
         ${startCode}
@@ -77,6 +79,30 @@ helpers:
         console.error(`Error in addCode: ${error.message}`);
         return methodBody; // Return the original method body in case of an error
       }
+    }
+  css: | #ts
+    (context, style, compName, compType) => {
+      // Convert style object like:
+      // .selector:
+      //   color: red
+      // to CSS
+      const toCss = (style, prefix) => {
+        const css = [];
+        for (const key in style) {
+          if (style.hasOwnProperty(key)) {
+            const value = style[key];
+            if (typeof value === "object") {
+              css.push(`${prefix}${key} {`);
+              css.push(toCss(value, prefix + "  "));
+              css.push("}");
+            } else {
+              css.push(`${prefix}${key}: ${value};`);
+            }
+          }
+        }
+        return css.join("\n");
+      };
+      return toCss(style, "");
     }
   prefixCssSelectors: | #ts
     (context, compName, selectors) => {

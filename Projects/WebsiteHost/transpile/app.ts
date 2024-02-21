@@ -13,10 +13,14 @@ const Handlebars = require("Handlebars");
     await Configuration.new(undefined, path.join(__dirname, `config.yaml`))
   ).data;
 
-  const folder = process.argv[2];
+  const inputFolder = process.argv[2];
+  const outputFolder = process.argv[3];
 
-  if (!folder?.length) {
-    console.error("No folder specified".bgRed.white);
+  if (!inputFolder?.length || !outputFolder?.length) {
+    console.error(
+      "Please specify input folder (ws.yaml components) and output folder (sfc)"
+        .bgRed.white
+    );
     process.exit(1);
   }
 
@@ -27,22 +31,48 @@ const Handlebars = require("Handlebars");
     )
   ).helpers;
 
-  const baseFolder = path.resolve(folder);
+  const baseFolder = path.resolve(inputFolder);
 
-  const compPaths = (await Files.getFiles(folder, { recursive: true })).map(
-    (compPath) => ({
+  const getSfcPath = (input: any, outputFolder: string) => {
+    const compIsApp = input.name == "app";
+    const compsFolder = compIsApp ? "" : "components";
+    const sfcPath = path.join(
+      outputFolder,
+      compsFolder,
+      `${input.capitalizedName}.vue`
+    );
+    Files.ensureFolderExists(sfcPath);
+    return sfcPath;
+  };
+
+  const transpile = (compPath: any) => {
+    const input = WebScript.load(inputFolder, compPath.absolutePath);
+    WebScript.transpile(input);
+    const sfcPath = getSfcPath(input, outputFolder);
+    fs.writeFileSync(sfcPath, input.vueSfcComp);
+    console.log(`${sfcPath}`.green);
+  };
+
+  const compPaths = (await Files.getFiles(inputFolder, { recursive: true }))
+    .filter((f) => f.endsWith(".ws.yaml"))
+    .map((compPath) => ({
       absolutePath: compPath,
       relativePath: path.relative(baseFolder, compPath),
-    })
-  );
+    }));
 
   for (const compPath of compPaths) {
-    try {
-      console.log(`${compPath.relativePath}`.green);
-      WebScript.transpile(compPath.absolutePath);
-    } catch (ex: any) {
-      console.error(`Error processing ${compPath.relativePath}`.bgRed.white);
-      throw ex;
-    }
+    // Watch the file for changes
+    fs.watchFile(compPath.absolutePath, () => transpile(compPath));
   }
+
+  const transpileAll = () => {
+    for (const compPath of compPaths) {
+      transpile(compPath);
+    }
+  };
+
+  const watchedFolder = path.resolve(`../../../../Shared/WebScript`);
+  fs.watch(watchedFolder, transpileAll);
+
+  transpileAll();
 })();

@@ -348,6 +348,21 @@ class Files {
     });
   }
 
+  static ensureFolderExists(filePath: string) {
+    const folder = path.dirname(filePath);
+    if (!fs.existsSync(folder)) {
+      fs.mkdirSync(folder, { recursive: true });
+    }
+  }
+
+  static isPath(fileOrFolderPath: string) {
+    return fs.existsSync(fileOrFolderPath);
+  }
+
+  static isFilePath(filePath: string) {
+    return fs.existsSync(filePath) && fs.statSync(filePath).isFile();
+  }
+
   // If their size is different, they are not equal
   // If their size is the same, compare their contents
   static areFilesEqual(path1: string, path2: string): boolean {

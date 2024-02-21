@@ -86,9 +86,5 @@ style:
     color: black
   .permission .button-admin:
     background: "#EFE2FE"
-  .permission .button-admin:hover:
-    background: "#AB91BA"
   .permission .button-agent:
     background: "#C8E7F9"
-  .permission .button-agent:hover:
-    background: "#8DB9D9"

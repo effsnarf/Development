@@ -4,6 +4,8 @@ import Handlebars from "handlebars";
 import { Objects } from "../Extensions.Objects";
 import toTemplate from "./to.template";
 import isAttributeName from "../../Shared/WebScript/is.attribute.name";
+import { Files } from "../Files";
+import { preProcessYaml } from "./preprocess";
 
 class WebScript {
   // #region Globals
@@ -20,16 +22,99 @@ class WebScript {
     return fs.readFileSync(path.join(__dirname, "vue.template.hbs"), "utf8");
   }
 
+  private static getVueSfcTemplate() {
+    return fs.readFileSync(
+      path.join(__dirname, "vue.sfc.template.hbs"),
+      "utf8"
+    );
+  }
+
   // #endregion
 
-  static transpile(inputs: any[]) {
+  static getCompName(baseFolder: string, filePath: string) {
+    return filePath
+      .replace(baseFolder, "")
+      .replace(/^\//, "")
+      .replace(/\.ws\.yaml$/, "")
+      .replace(/\//g, ".")
+      .substring(1)
+      .replace(/\\/g, ".")
+      .replace(/\._/g, "");
+  }
+
+  static capitalizeCompName(compName: string) {
+    return compName
+      .split(".")
+      .map((s) => s.capitalize())
+      .join("");
+  }
+
+  static load(baseFolder: string, filePath: string) {
+    // Normalize baseFolder and path
+    baseFolder = path.normalize(path.resolve(baseFolder));
+    filePath = path.normalize(path.resolve(filePath));
+    const fileName = filePath.split("/").pop() as string;
+    // If the base folder is /comps and the path is /comps/input/text/box.ws.yaml,
+    // then the component name is input.text.box
+    const compName = WebScript.getCompName(baseFolder, filePath);
+    const capitalizedName = WebScript.capitalizeCompName(compName);
+
+    const allCompFiles = Files.getFiles(baseFolder, { recursive: true }).filter(
+      (f) => f.endsWith(".ws.yaml")
+    );
+
+    const allCompNames = allCompFiles.map((f) => ({
+      path: f,
+      name: WebScript.getCompName(baseFolder, f),
+    }));
+
+    const allComps = allCompNames
+      .map((cn) => ({
+        name: cn.name,
+        capitalized: WebScript.capitalizeCompName(cn.name),
+      }))
+      .map((cn) => ({
+        ...cn,
+        path: {
+          relative:
+            compName == "app"
+              ? `./components/${cn.capitalized}.vue`
+              : `./${cn.capitalized}.vue`,
+        },
+      }));
+
+    const compYaml = preProcessYaml(fs.readFileSync(filePath, "utf8"));
+    const source = Objects.parseYaml(compYaml);
+    const sourceDomStr = JSON.stringify(source.dom, null, 2);
+
+    const refdComps = allComps
+      .filter((c) => c.name != "app")
+      .filter((c) => c.name != compName)
+      .filter((c) => sourceDomStr.includesWholeWord(c.name));
+
+    source.name = compName;
+    source.capitalizedName = capitalizedName;
+    source.refdComps = refdComps;
+    const input = {
+      name: compName,
+      capitalizedName: capitalizedName,
+      source: source,
+      vueComp: "",
+      vueSfcComp: "",
+    };
+    return input;
+  }
+
+  static transpile(inputs: any | any[]) {
+    if (!Array.isArray(inputs)) inputs = [inputs];
+
     const helpers = WebScript.getHelpers();
 
     const context = {
       helpers,
       isAttributeName: (name: string) =>
         WebScript.isAttributeName(
-          inputs.map((c) => c.name),
+          inputs.map((c: any) => c.name),
           name
         ),
       postProcessAttribute: (attr: any[]) => {
@@ -83,10 +168,12 @@ class WebScript {
       const source = input.source;
 
       const vueComp = Handlebars.compile(WebScript.getVueTemplate())(source);
-
-      //console.log(vueComp);
+      const vueSfcComp = Handlebars.compile(WebScript.getVueSfcTemplate())(
+        source
+      );
 
       input.vueComp = vueComp;
+      input.vueSfcComp = vueSfcComp;
     } catch (ex: any) {
       console.log(`Error: ${input.path}`.bgRed);
       console.log(ex.stack);
@@ -97,9 +184,10 @@ class WebScript {
     context: any,
     dom: any,
     indent?: number,
-    compName?: string
+    compName?: string,
+    compType?: string
   ) {
-    return toTemplate(context, dom, indent, compName);
+    return toTemplate(context, dom, indent, compName, compType);
   }
 
   private static isAttributeName(componentNames: string[], name: string) {

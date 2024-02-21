@@ -2,7 +2,7 @@ dom:
   .app:
     .columns:
       .column1:
-        sidebar:
+        side.bar:
       .column2:
         user.list:
     div:
@@ -11,9 +11,6 @@ dom:
         ":key": comp.name
         ":component": comp
         ":document-head": "true"
-mounted: | #js
-  function() {
-  }
 
 style:
   .app, .columns, .columns > div:

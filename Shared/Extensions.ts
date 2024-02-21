@@ -367,6 +367,8 @@ interface String {
   antonym(): string;
   capitalize(): string;
 
+  includesWholeWord(word: string): boolean;
+
   severify(
     green: number,
     yellow: number,
@@ -937,6 +939,12 @@ if (typeof String !== "undefined") {
 
   String.prototype.capitalize = function (): string {
     return this[0].toUpperCase() + this.slice(1);
+  };
+
+  String.prototype.includesWholeWord = function (word: string): boolean {
+    // Regex match on word boundaries
+    const regex = new RegExp(`\\b${word}\\b`);
+    return regex.test(this.toString());
   };
 
   String.prototype.severify = function (
