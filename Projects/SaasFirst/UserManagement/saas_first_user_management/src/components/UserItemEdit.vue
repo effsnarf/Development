@@ -3,24 +3,24 @@ div("@click"="(e) => $emit('click', e)", "class"="comp-user-item-edit")
   div("class"="check")
     input("type"="checkbox", "v-if"="user.id != newEmptyUserID", "v-model"="user.ui.is.selected")
   div("class"="edit-column")
-    table()
-      thead()
-        tr()
+    table
+      thead
+        tr
           th("v-text"="'Name'")
           th("v-text"="'Email'")
           th("v-text"="'Permission'")
-      tbody()
-        tr()
-          td()
+      tbody
+        tr
+          td
             input("placeholder"="Enter Name", "v-model"="user.ui.edited.name")
-          td()
+          td
             input("placeholder"="Enter Email", "v-model"="user.ui.edited.email")
-          td()
+          td
             select(":disabled"="true", ":value"="(permissionTexts.length - 1)")
               option("v-for"="(text, id) in permissionTexts", ":value"="id", "v-text"="text")
   div("class"="buttons")
-    div()
-      h3()
+    div
+      h3
         div("class"="flex")
           Transition("name"="slide-hor")
             button("class"="save", "title"="Save", "v-if"="showSaveButton(user)", "v-text"="getSaveButtonText(user)", "@click"="() => saveEditing(user)")

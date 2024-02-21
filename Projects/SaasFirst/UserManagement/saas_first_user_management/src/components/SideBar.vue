@@ -3,8 +3,8 @@ div("class"="comp-side-bar flex")
   div("class"="sidebar")
     div("class"="flex justify-center")
       img("class"="logo", "src"="/images/logo.png")
-    div()
-      AppMenu()
+    div
+      AppMenu
 </template>
 
 <script>

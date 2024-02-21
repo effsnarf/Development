@@ -206,6 +206,9 @@ export default (
 
     tag = toDomTag(tag, compType);
     const indentStr = "  ".repeat(indent);
+
+    if (Object.keys(attrs).length == 0) return `${indentStr}${tag}`;
+
     return `${indentStr}${tag}(${(
       Object.entries(attrs)
         .map((a) => {

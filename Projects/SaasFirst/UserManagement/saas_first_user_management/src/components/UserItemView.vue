@@ -10,7 +10,7 @@ div("@click"="(e) => $emit('click', user, e)", "class"="comp-user-item-view")
   div("class"="permission")
     div("v-if"="(user.permission != null)", ":class"="'button button-' + user.permission", "v-text"="user.permission.toTitleCase()")
   div("class"="buttons")
-    div()
+    div
       button("class"="clear edit", "title"="Edit", "v-if"="!user.ui.is.editing", "@click"="(e) => startEditing(user, e)")
         span("v-text"="'✏️'")
     div("v-if"="!user.ui.is.editing")

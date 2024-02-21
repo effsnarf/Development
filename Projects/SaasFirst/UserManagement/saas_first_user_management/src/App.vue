@@ -2,10 +2,10 @@
 div("class"="comp-app app")
   div("class"="columns")
     div("class"="column1")
-      SideBar()
+      SideBar
     div("class"="column2")
-      UserList()
-  div()
+      UserList
+  div
     UiHtmlStyle("v-for"="comp in $root.comps", ":key"="comp.name", ":component"="comp", ":document-head"="true")
 </template>
 

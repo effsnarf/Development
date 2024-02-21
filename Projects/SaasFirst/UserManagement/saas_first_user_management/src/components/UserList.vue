@@ -2,30 +2,30 @@
 div("class"="comp-user-list")
   h3("class"="top-bar")
     div("class"="flex1")
-      div()
+      div
         Transition("name"="slide-hor")
           button("class"="red", "v-if"="canDeleteSelectedUsers", "v-text"="'🗑️ delete selected users'", "@click"="onClickDeleteSelectedUsers")
-      div()
+      div
         Transition("name"="slide-hor")
           div("v-if"="selectedUsers.length", "class"="text-center", "v-text"="selectedUsers.length + ' users selected'")
-      div()
+      div
         Transition("name"="slide-hor")
           button("v-if"="showAddUserButton", "v-text"="'+ Add new user'", ":class"="{ disabled: !isAddUserEnabled }", "@click"="onClickAddUser")
   div("class"="header row")
     div("class"="check")
       input("type"="checkbox", "@click"="onClickSelectAll")
     div("class"="icon")
-      h3()
+      h3
         AppSortButton("text"="Users", "field"="name", ":sort"="sort", "@sort-by"="sortBy")
     div("v-text"="' '", "class"="name-column")
     div("class"="permission")
-      h3()
+      h3
         AppSortButton("text"="Permission", "field"="permission", ":sort"="sort", "@sort-by"="sortBy")
     div("v-text"="' '", "class"="buttons")
   div("class"="users-table")
     TransitionGroup("name"="slide", "class"="rows")
       UserItem("v-for"="user in pageUsers", ":key"="user.id", ":user"="user", ":newEmptyUserID"="newEmptyUserID", "@save"="onSaveUser", "@delete"="onClickDeleteUser")
-  div()
+  div
     UiPager(":items-count"="users.length", ":page-size"="pageSize", "v-model"="pageIndex")
 </template>
 
