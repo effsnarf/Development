@@ -107,7 +107,7 @@ style:
   .comp-user-item-edit input[type=text], .comp-user-item-edit select:
     width: 228px
     height: 46px
-    padding: 0.5em
+    padding: 0 1em
     border-radius: 0.5em
     opacity: 1 !important
   select[disabled]:

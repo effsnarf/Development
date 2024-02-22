@@ -249,7 +249,7 @@ export default {
 
 <style>
 .comp-user-list {
-  max-width: 1050px;
+  max-width: 1080px;
   margin-left: 64px;
   white-space: nowrap;
 }

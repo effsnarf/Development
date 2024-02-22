@@ -77,18 +77,16 @@ h3.name input {
   color: black;
 }
 .permission .button {
-  padding: 0 0.8em;
-  color: gray;
+  color: #624D9Ce0;
+  font-size: 1rem;
+  padding: 0.4em 1em;
   border-radius: 0.7em;
-  font-size: 1.1rem;
+  opacity: 1 !important;
 }
 .permission .button-admin {
   background: #EFE2FE;
 }
 .permission .button-agent {
   background: #C8E7F9;
-}
-.permission .button, .permission .button:hover {
-  opacity: 0.6 !important;
 }
 </style>
