@@ -20,10 +20,12 @@ dom:
           tr:
             td:
               input:
+                type: text
                 placeholder: "Enter Name"
                 v-model: user.ui.edited.name
             td:
               input:
+                type: text
                 placeholder: "Enter Email"
                 v-model: user.ui.edited.email
             td:

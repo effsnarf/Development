@@ -137,6 +137,11 @@ input[type=checkbox]:hover
 }
 
 
+button[disabled]
+{
+    opacity: 0.5;
+}
+
 
 .alertify .ajs-header
 {

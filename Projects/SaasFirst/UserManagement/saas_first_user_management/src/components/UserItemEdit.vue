@@ -12,9 +12,9 @@ div("@click"="(e) => $emit('click', e)", "class"="comp-user-item-edit")
       tbody
         tr
           td
-            input("placeholder"="Enter Name", "v-model"="user.ui.edited.name")
+            input("type"="text", "placeholder"="Enter Name", "v-model"="user.ui.edited.name")
           td
-            input("placeholder"="Enter Email", "v-model"="user.ui.edited.email")
+            input("type"="text", "placeholder"="Enter Email", "v-model"="user.ui.edited.email")
           td
             select(":disabled"="true", ":value"="(permissionTexts.length - 1)")
               option("v-for"="(text, id) in permissionTexts", ":value"="id", "v-text"="text")
