@@ -28,12 +28,8 @@ div("@click"="(e) => $emit('click', e)", "class"="comp-user-item-edit")
 </template>
 
 <script>
-
 export default {
-  name: 'UserItemEdit',
-  components: {
-  },
-  mixins: [],
+  name: "UserItemEdit",
   props: {
     user: {
       default: null,
@@ -45,45 +41,32 @@ export default {
       default: null,
     },
   },
-  data() {
-    return {
-    }
-  },
   methods: {
-    saveEditing:
-      function(user) {
-  user.ui.is.editing = false;
-  user.name = user.ui.edited.name;
-  user.email = user.ui.edited.email;
-  this.$emit('save', user);
-},
-    canSave:
-      function(user) {
-  if (!user.ui.is.editing) return false;
-  if (!user.ui.edited.name?.length) return false;
-  if (!user.ui.edited.email?.length) return false;
-  return true;
-},
-    cancelEditing:
-      function(user) {
-
-  if (user.id == this.newEmptyUserID) {
-    this.$emit('delete', user);
-    return;
-  }
-  user.ui.is.editing = false;
-},
-    getSaveButtonText:
-      function(user) {
-  if (user.id == this.newEmptyUserID) return 'Add';
-  return 'Save';
-},
+    saveEditing: function (user) {
+      user.ui.is.editing = false;
+      user.name = user.ui.edited.name;
+      user.email = user.ui.edited.email;
+      this.$emit("save", user);
+    },
+    canSave: function (user) {
+      if (!user.ui.is.editing) return false;
+      if (!user.ui.edited.name?.length) return false;
+      if (!user.ui.edited.email?.length) return false;
+      return true;
+    },
+    cancelEditing: function (user) {
+      if (user.id == this.newEmptyUserID) {
+        this.$emit("delete", user);
+        return;
+      }
+      user.ui.is.editing = false;
+    },
+    getSaveButtonText: function (user) {
+      if (user.id == this.newEmptyUserID) return "Add";
+      return "Save";
+    },
   },
-  computed: {
-  },
-  watch: {
-  },
-}
+};
 </script>
 
 <style>
@@ -106,9 +89,9 @@ export default {
   padding-right: 1em;
 }
 .edit-column input {
-
 }
-.comp-user-item-edit input[type=text], .comp-user-item-edit select {
+.comp-user-item-edit input[type="text"],
+.comp-user-item-edit select {
   width: 228px;
   height: 46px;
   padding: 0 1em;
@@ -116,7 +99,7 @@ export default {
   opacity: 1 !important;
 }
 select[disabled] {
-  background: #F1F1F1;
+  background: #f1f1f1;
 }
 .comp-user-item-edit.row {
   align-items: end;
@@ -124,7 +107,7 @@ select[disabled] {
 .comp-user-item-edit .check {
   width: 4px;
 }
-.comp-user-item-edit .check input[type=checkbox] {
+.comp-user-item-edit .check input[type="checkbox"] {
   display: none;
 }
 </style>

@@ -10,27 +10,14 @@ div("class"="comp-side-bar flex")
 </template>
 
 <script>
-import AppMenu from './AppMenu.vue'
+import AppMenu from "./AppMenu.vue";
 
 export default {
-  name: 'SideBar',
+  name: "SideBar",
   components: {
     AppMenu,
   },
-  mixins: [],
-  props: {
-  },
-  data() {
-    return {
-    }
-  },
-  methods: {
-  },
-  computed: {
-  },
-  watch: {
-  },
-}
+};
 </script>
 
 <style>
@@ -40,7 +27,7 @@ export default {
   flex-direction: column;
   width: 14em;
   height: 100vh;
-  background: #E9EFF2;
+  background: #e9eff2;
 }
 .sidebar a {
   text-decoration: none !important;
@@ -51,7 +38,8 @@ export default {
 .user-badge {
   margin-bottom: 58px;
 }
-.logo, .user-badge {
+.logo,
+.user-badge {
   display: flex;
   justify-content: center;
 }

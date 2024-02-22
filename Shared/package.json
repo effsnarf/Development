@@ -26,6 +26,7 @@
     "mime-types": "^2.1.35",
     "moment": "^2.29.4",
     "mongodb": "^5.1.0",
+    "prettier": "^3.2.5",
     "pug": "^3.0.2",
     "tree-kill": "^1.2.2",
     "typescript": "^4.9.5",

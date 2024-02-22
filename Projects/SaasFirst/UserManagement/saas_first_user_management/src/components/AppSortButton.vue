@@ -7,12 +7,8 @@ div("class"="comp-app-sort-button flex")
 </template>
 
 <script>
-
 export default {
-  name: 'AppSortButton',
-  components: {
-  },
-  mixins: [],
+  name: "AppSortButton",
   props: {
     text: {
       default: null,
@@ -24,19 +20,7 @@ export default {
       default: null,
     },
   },
-  data() {
-    return {
-    }
-  },
-  methods: {
-  },
-  computed: {
-  },
-  watch: {
-  },
-}
+};
 </script>
 
-<style>
-
-</style>
+<style></style>

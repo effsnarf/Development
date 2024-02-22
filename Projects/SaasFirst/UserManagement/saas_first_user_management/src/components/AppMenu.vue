@@ -6,33 +6,35 @@ div("class"="comp-app-menu")
 </template>
 
 <script>
-import AppMenuItem from './AppMenuItem.vue'
+import AppMenuItem from "./AppMenuItem.vue";
 
 export default {
-  name: 'AppMenu',
+  name: "AppMenu",
   components: {
     AppMenuItem,
   },
-  mixins: [],
-  props: {
-  },
   data() {
     return {
-      menus: [{"category":"Messages","items":["Inbox","Outbound","Contacts","Statistic"]},{"category":"Tools","items":["Chat editor","Automation","Site tools"]},{"category":"Settings","items":["General","Account","Billing"]}],
+      menus: [
+        {
+          category: "Messages",
+          items: ["Inbox", "Outbound", "Contacts", "Statistic"],
+        },
+        {
+          category: "Tools",
+          items: ["Chat editor", "Automation", "Site tools"],
+        },
+        { category: "Settings", items: ["General", "Account", "Billing"] },
+      ],
       activeItem: "Inbox",
-    }
+    };
   },
   methods: {
-    getImageUrl:
-      function(item) {
-  return '/images/' + item.toLowerCase().replace(' ', '-') + '.png';
-},
+    getImageUrl: function (item) {
+      return "/images/" + item.toLowerCase().replace(" ", "-") + ".png";
+    },
   },
-  computed: {
-  },
-  watch: {
-  },
-}
+};
 </script>
 
 <style>

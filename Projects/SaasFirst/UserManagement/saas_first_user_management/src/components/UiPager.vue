@@ -4,12 +4,8 @@ div("v-if"="showPageButtons", "class"="comp-ui-pager pager-buttons")
 </template>
 
 <script>
-
 export default {
-  name: 'UiPager',
-  components: {
-  },
-  mixins: [],
+  name: "UiPager",
   props: {
     itemsCount: {
       default: null,
@@ -21,31 +17,23 @@ export default {
       default: null,
     },
   },
-  data() {
-    return {
-    }
-  },
   methods: {
-    getPageIndexes:
-      function(pageCount) {
-  return Array.from({ length: pageCount }, (v, i) => i);
-},
-    onClickPage:
-      function(pageIndex) {
-  this.$emit("input", pageIndex);
-},
+    getPageIndexes: function (pageCount) {
+      return Array.from({ length: pageCount }, (v, i) => i);
+    },
+    onClickPage: function (pageIndex) {
+      this.$emit("input", pageIndex);
+    },
   },
   computed: {
-    pageCount: function() {
-  return Math.ceil(this.itemsCount / this.pageSize);
-},
-    showPageButtons: function() {
-  return (this.itemsCount > this.pageSize);
-},
+    pageCount: function () {
+      return Math.ceil(this.itemsCount / this.pageSize);
+    },
+    showPageButtons: function () {
+      return this.itemsCount > this.pageSize;
+    },
   },
-  watch: {
-  },
-}
+};
 </script>
 
 <style>
@@ -63,7 +51,8 @@ export default {
 .pager-button:hover {
   background: #80808040;
 }
-.pager-button.selected, .pager-button.selected:hover {
+.pager-button.selected,
+.pager-button.selected:hover {
   background: #80808080 !important;
 }
 </style>

@@ -45,9 +45,9 @@ const Handlebars = require("Handlebars");
     return sfcPath;
   };
 
-  const transpile = (compPath: any) => {
+  const transpile = async (compPath: any) => {
     const input = WebScript.load(inputFolder, compPath.absolutePath);
-    WebScript.transpile(input);
+    await WebScript.transpile(input);
     const sfcPath = getSfcPath(input, outputFolder);
     fs.writeFileSync(sfcPath, input.vueSfcComp);
     console.log(`${sfcPath}`.green);
@@ -62,12 +62,12 @@ const Handlebars = require("Handlebars");
 
   for (const compPath of compPaths) {
     // Watch the file for changes
-    fs.watchFile(compPath.absolutePath, () => transpile(compPath));
+    fs.watchFile(compPath.absolutePath, async () => await transpile(compPath));
   }
 
-  const transpileAll = () => {
+  const transpileAll = async () => {
     for (const compPath of compPaths) {
-      transpile(compPath);
+      await transpile(compPath);
     }
   };
 

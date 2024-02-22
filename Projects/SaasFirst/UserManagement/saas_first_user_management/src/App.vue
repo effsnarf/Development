@@ -10,33 +10,22 @@ div("class"="comp-app app")
 </template>
 
 <script>
-import SideBar from './components/SideBar.vue'
-import UserList from './components/UserList.vue'
+import SideBar from "./components/SideBar.vue";
+import UserList from "./components/UserList.vue";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
     SideBar,
     UserList,
   },
-  mixins: [],
-  props: {
-  },
-  data() {
-    return {
-    }
-  },
-  methods: {
-  },
-  computed: {
-  },
-  watch: {
-  },
-}
+};
 </script>
 
 <style>
-.app, .columns, .columns > div {
+.app,
+.columns,
+.columns > div {
   min-height: 100vh;
 }
 .columns {

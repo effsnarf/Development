@@ -4,16 +4,15 @@ UserItemEdit("v-else-if"="user.ui.is.editing", ":user"="user", ":newEmptyUserID"
 </template>
 
 <script>
-import UserItemEdit from './UserItemEdit.vue'
-import UserItemView from './UserItemView.vue'
+import UserItemEdit from "./UserItemEdit.vue";
+import UserItemView from "./UserItemView.vue";
 
 export default {
-  name: 'UserItem',
+  name: "UserItem",
   components: {
     UserItemEdit,
     UserItemView,
   },
-  mixins: [],
   props: {
     user: {
       default: null,
@@ -24,31 +23,24 @@ export default {
   },
   data() {
     return {
-      permissionTexts: ["Admin","Agent"],
-    }
+      permissionTexts: ["Admin", "Agent"],
+    };
   },
-  mounted: function() {
-  Object.keys(this.$listeners).forEach(event => {
-    this.$on(event, () => {
-      this.$emit(event);
+  mounted: function () {
+    Object.keys(this.$listeners).forEach((event) => {
+      this.$on(event, () => {
+        this.$emit(event);
+      });
     });
-  });
-},
+  },
   methods: {
-    onClickUser:
-      function(user, e) {
-  if (e.target != e.currentTarget) return;
-  if (user.id == this.newEmptyUserID) return;
-  user.ui.is.selected = !user.ui.is.selected;
-},
+    onClickUser: function (user, e) {
+      if (e.target != e.currentTarget) return;
+      if (user.id == this.newEmptyUserID) return;
+      user.ui.is.selected = !user.ui.is.selected;
+    },
   },
-  computed: {
-  },
-  watch: {
-  },
-}
+};
 </script>
 
-<style>
-
-</style>
+<style></style>

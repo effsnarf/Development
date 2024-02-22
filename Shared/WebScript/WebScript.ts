@@ -6,6 +6,7 @@ import toTemplate from "./to.template";
 import isAttributeName from "../../Shared/WebScript/is.attribute.name";
 import { Files } from "../Files";
 import { preProcessYaml } from "./preprocess";
+const prettier = require("prettier");
 
 class WebScript {
   // #region Globals
@@ -105,7 +106,7 @@ class WebScript {
     return input;
   }
 
-  static transpile(inputs: any | any[]) {
+  static async transpile(inputs: any | any[]) {
     if (!Array.isArray(inputs)) inputs = [inputs];
 
     const helpers = WebScript.getHelpers();
@@ -147,16 +148,16 @@ class WebScript {
       }
     }
 
-    WebScript.transpileAllComponents(inputs);
+    await WebScript.transpileAllComponents(inputs);
   }
 
-  private static transpileAllComponents(inputs: any[]) {
+  private static async transpileAllComponents(inputs: any[]) {
     for (const input of inputs) {
-      WebScript.transpileComponent(input);
+      await WebScript.transpileComponent(input);
     }
   }
 
-  private static transpileComponent(input: any, logLevel: number = 0) {
+  private static async transpileComponent(input: any, logLevel: number = 0) {
     try {
       const now = new Date();
       const time = now.toLocaleTimeString();
@@ -168,8 +169,9 @@ class WebScript {
       const source = input.source;
 
       const vueComp = Handlebars.compile(WebScript.getVueTemplate())(source);
-      const vueSfcComp = Handlebars.compile(WebScript.getVueSfcTemplate())(
-        source
+      const vueSfcComp = await WebScript.prettier(
+        Handlebars.compile(WebScript.getVueSfcTemplate())(source),
+        "vue"
       );
 
       input.vueComp = vueComp;
@@ -192,6 +194,11 @@ class WebScript {
 
   private static isAttributeName(componentNames: string[], name: string) {
     return isAttributeName(componentNames, name);
+  }
+
+  private static async prettier(code: string, parser: string) {
+    const formatted = await prettier.format(code, { parser: parser });
+    return formatted;
   }
 }
 

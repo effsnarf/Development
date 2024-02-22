@@ -7,12 +7,8 @@ div(":class"="{ active: active }", "class"="comp-app-menu-item menu-item")
 </template>
 
 <script>
-
 export default {
-  name: 'AppMenuItem',
-  components: {
-  },
-  mixins: [],
+  name: "AppMenuItem",
   props: {
     image: {
       default: null,
@@ -24,17 +20,7 @@ export default {
       default: null,
     },
   },
-  data() {
-    return {
-    }
-  },
-  methods: {
-  },
-  computed: {
-  },
-  watch: {
-  },
-}
+};
 </script>
 
 <style>
