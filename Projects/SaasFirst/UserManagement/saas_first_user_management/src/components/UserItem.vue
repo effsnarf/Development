@@ -1,6 +1,6 @@
 <template lang="pug">
-UserItemView("v-if"="!user.ui.is.editing", ":user"="user", ":newEmptyUserID"="newEmptyUserID", ":permissionTexts"="permissionTexts", "v-on"="$listeners", ":class"="{ row: true, selected: user.ui.is.selected }", "@click"="(e) => onClickUser(user, e)", "class"="comp-user-item")
-UserItemEdit("v-else-if"="user.ui.is.editing", ":user"="user", ":newEmptyUserID"="newEmptyUserID", ":permissionTexts"="permissionTexts", "v-on"="$listeners", ":class"="{ row: true, selected: user.ui.is.selected }", "@click"="(e) => onClickUser(user, e)")
+UserItemView("v-if"="!user.ui.is.editing", ":user"="user", ":newEmptyUserID"="newEmptyUserID", ":permissionTexts"="permissionTexts", "v-on"="$listeners", ":class"="{ row: true, selected: user.ui.is.selected }", "class"="comp-user-item")
+UserItemEdit("v-else-if"="user.ui.is.editing", ":user"="user", ":newEmptyUserID"="newEmptyUserID", ":permissionTexts"="permissionTexts", "v-on"="$listeners", ":class"="{ row: true, selected: user.ui.is.selected }")
 </template>
 
 <script>

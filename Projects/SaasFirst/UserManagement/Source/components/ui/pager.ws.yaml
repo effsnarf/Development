@@ -1,5 +1,6 @@
 dom:
   .pager-buttons:
+    v-if: showPageButtons
     .pager-button:
       v-for: i in getPageIndexes(pageCount)
       v-text: (i + 1)
@@ -25,6 +26,10 @@ computed:
   pageCount: | #js
     function() {
       return Math.ceil(this.itemsCount / this.pageSize);
+    }
+  showPageButtons: | #js
+    function() {
+      return (this.itemsCount > this.pageSize);
     }
 
 style:

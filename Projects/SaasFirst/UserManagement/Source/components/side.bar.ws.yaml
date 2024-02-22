@@ -1,21 +1,31 @@
 dom:
   .flex:
     .sidebar:
-      .flex.justify-center:
-        img:
-          class: logo
-          src: /images/logo.png
       div:
+        .logo:
+          img:
+            src: /images/logo.png
         app.menu:
+      .user-badge:
+        img:
+          src: /images/user.png
 
 data:
 
 style:
   .sidebar:
+    display: flex
+    justify-content: space-between
+    flex-direction: column
     width: 14em
     height: 100vh
     background: "#E9EFF2"
   .sidebar a:
     text-decoration: none !important
   .logo:
-    margin: 30px
+    margin-top: 32px
+  .user-badge:
+    margin-bottom: 58px
+  .logo, .user-badge:
+    display: flex
+    justify-content: center

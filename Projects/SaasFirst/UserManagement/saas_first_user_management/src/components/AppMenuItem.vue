@@ -53,6 +53,7 @@ export default {
   align-items: center;
   width: 10em;
   margin: auto;
+  padding: 5px;
 }
 .text {
   width: 7em;

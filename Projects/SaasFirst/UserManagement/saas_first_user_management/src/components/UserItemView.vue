@@ -1,7 +1,7 @@
 <template lang="pug">
 div("@click"="(e) => $emit('click', user, e)", "class"="comp-user-item-view")
   div("class"="check")
-    input("type"="checkbox", "v-if"="user.id != newEmptyUserID", "v-model"="user.ui.is.selected")
+    input("type"="checkbox", "v-if"="user.id != newEmptyUserID", ":class"="{ checked: user.ui.is.selected }", "v-model"="user.ui.is.selected")
   div("class"="icon")
     div(":style"="{ background: userColors[user.color.id] }", "v-text"="getInitials(user)", "class"="circle")
   div("class"="name-column")
@@ -76,22 +76,19 @@ export default {
 h3.name input {
   color: black;
 }
-.selected, .selected:hover {
-  background: linear-gradient(45deg, #00000010, #00000030) !important;
-}
 .permission .button {
   padding: 0 0.8em;
   color: gray;
   border-radius: 0.7em;
   font-size: 1.1rem;
 }
-.permission .button:hover {
-  color: black;
-}
 .permission .button-admin {
   background: #EFE2FE;
 }
 .permission .button-agent {
   background: #C8E7F9;
+}
+.permission .button, .permission .button:hover {
+  opacity: 0.6 !important;
 }
 </style>

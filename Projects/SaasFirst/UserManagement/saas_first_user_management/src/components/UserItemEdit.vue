@@ -23,7 +23,7 @@ div("@click"="(e) => $emit('click', e)", "class"="comp-user-item-edit")
       h3
         div("class"="flex")
           Transition("name"="slide-hor")
-            button("class"="save", "title"="Save", "v-if"="showSaveButton(user)", "v-text"="getSaveButtonText(user)", "@click"="() => saveEditing(user)")
+            button("class"="save", "title"="Save", ":disabled"="!canSave(user)", "v-text"="getSaveButtonText(user)", "@click"="() => saveEditing(user)")
           button("class"="gray cancel", "title"="Cancel", "v-text"="'Cancel'", "@click"="() => cancelEditing(user)")
 </template>
 
@@ -57,7 +57,7 @@ export default {
   user.email = user.ui.edited.email;
   this.$emit('save', user);
 },
-    showSaveButton:
+    canSave:
       function(user) {
   if (!user.ui.is.editing) return false;
   if (!user.ui.edited.name?.length) return false;
@@ -93,9 +93,38 @@ export default {
   opacity: 0.8;
 }
 .edit-column th {
+  padding: 0.5em;
   opacity: 0.7;
+}
+.edit-column thead {
+  margin: 5px;
+}
+.edit-column tbody {
+  opacity: 0.5;
 }
 .edit-column td {
   padding-right: 1em;
+}
+.edit-column input {
+
+}
+.comp-user-item-edit input[type=text], .comp-user-item-edit select {
+  width: 228px;
+  height: 46px;
+  padding: 0.5em;
+  border-radius: 0.5em;
+  opacity: 1 !important;
+}
+select[disabled] {
+  background: #F1F1F1;
+}
+.comp-user-item-edit.row {
+  align-items: end;
+}
+.comp-user-item-edit .check {
+  width: 4px;
+}
+.comp-user-item-edit .check input[type=checkbox] {
+  display: none;
 }
 </style>

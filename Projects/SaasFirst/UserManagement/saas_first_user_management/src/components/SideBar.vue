@@ -1,10 +1,12 @@
 <template lang="pug">
 div("class"="comp-side-bar flex")
   div("class"="sidebar")
-    div("class"="flex justify-center")
-      img("class"="logo", "src"="/images/logo.png")
     div
+      div("class"="logo")
+        img("src"="/images/logo.png")
       AppMenu
+    div("class"="user-badge")
+      img("src"="/images/user.png")
 </template>
 
 <script>
@@ -33,6 +35,9 @@ export default {
 
 <style>
 .sidebar {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
   width: 14em;
   height: 100vh;
   background: #E9EFF2;
@@ -41,6 +46,13 @@ export default {
   text-decoration: none !important;
 }
 .logo {
-  margin: 30px;
+  margin-top: 32px;
+}
+.user-badge {
+  margin-bottom: 58px;
+}
+.logo, .user-badge {
+  display: flex;
+  justify-content: center;
 }
 </style>

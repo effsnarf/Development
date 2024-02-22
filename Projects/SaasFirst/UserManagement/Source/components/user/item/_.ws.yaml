@@ -6,7 +6,6 @@ dom:
     :permissionTexts: permissionTexts
     v-on: $listeners
     :class: "{ row: true, selected: user.ui.is.selected }"
-    @click: (e) => onClickUser(user, e)
   user.item.edit:
     v-else-if: "user.ui.is.editing"
     :user: user
@@ -14,14 +13,13 @@ dom:
     :permissionTexts: permissionTexts
     v-on: $listeners
     :class: "{ row: true, selected: user.ui.is.selected }"
-    @click: (e) => onClickUser(user, e)
 
 props:
   user: null
   newEmptyUserID: null
 
 data:
-  permissionTexts: ['Admin', 'Agent']
+  permissionTexts: ["Admin", "Agent"]
 
 mounted: | #js
   function() {

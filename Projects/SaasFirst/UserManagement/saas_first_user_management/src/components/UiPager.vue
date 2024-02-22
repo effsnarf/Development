@@ -1,5 +1,5 @@
 <template lang="pug">
-div("class"="comp-ui-pager pager-buttons")
+div("v-if"="showPageButtons", "class"="comp-ui-pager pager-buttons")
   div("v-for"="i in getPageIndexes(pageCount)", "v-text"="(i + 1)", ":class"="{ selected: (i === value) }", "@click"="onClickPage(i)", "class"="pager-button")
 </template>
 
@@ -38,6 +38,9 @@ export default {
   computed: {
     pageCount: function() {
   return Math.ceil(this.itemsCount / this.pageSize);
+},
+    showPageButtons: function() {
+  return (this.itemsCount > this.pageSize);
 },
   },
   watch: {

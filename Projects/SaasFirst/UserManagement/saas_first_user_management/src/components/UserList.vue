@@ -2,18 +2,17 @@
 div("class"="comp-user-list")
   h3("class"="top-bar")
     div("class"="flex1")
+      div("class"="flex")
+        Transition("name"="slide-hor")
+          h3("v-if"="selectedUsers.length", "class"="text-center", "v-text"="selectedUsers.length + ' users selected'")
+        Transition("name"="slide-hor")
+          button("class"="delete-users gray", "v-if"="canDeleteSelectedUsers", "v-text"="'🗑️ delete selected users'", "@click"="onClickDeleteSelectedUsers")
       div
         Transition("name"="slide-hor")
-          button("class"="red", "v-if"="canDeleteSelectedUsers", "v-text"="'🗑️ delete selected users'", "@click"="onClickDeleteSelectedUsers")
-      div
-        Transition("name"="slide-hor")
-          div("v-if"="selectedUsers.length", "class"="text-center", "v-text"="selectedUsers.length + ' users selected'")
-      div
-        Transition("name"="slide-hor")
-          button("v-if"="showAddUserButton", "v-text"="'+ Add new user'", ":class"="{ disabled: !isAddUserEnabled }", "@click"="onClickAddUser")
+          button("v-if"="showAddUserButton", "v-text"="'+ Add new user'", "class"="add-user", ":disabled"="!isAddUserEnabled", "@click"="onClickAddUser")
   div("class"="header row")
     div("class"="check")
-      input("type"="checkbox", "@click"="onClickSelectAll")
+      input("type"="checkbox", ":class"="{ checked: isSelectAllChecked, dimmed: arePartialUsersSelected }", ":checked"="isSelectAllChecked", "@click"="onClickSelectAll")
     div("class"="icon")
       h3
         AppSortButton("text"="Users", "field"="name", ":sort"="sort", "@sort-by"="sortBy")
@@ -75,7 +74,8 @@ export default {
 },
     onClickSelectAll:
       function() {
-  const selectAllValue = !this.users.every(u => u.ui.is.selected);
+
+  const selectAllValue = this.users.some(u => u.ui.is.selected) ? false : true;
   this.users.forEach(u => u.ui.is.selected = selectAllValue);
 },
     onClickDeleteSelectedUsers:
@@ -84,7 +84,7 @@ export default {
     this.onClickDeleteUser(this.selectedUsers[0]);
     return;
   }
-  alertify.confirm(`Delete ${this.selectedUsers.length} users?`, () => {
+  alertify.confirm(`Do you want to delete <strong>${this.selectedUsers.length} selected users</strong> from the list?`, () => {
     this.deleteSelectedUsers();
   });
 },
@@ -106,7 +106,7 @@ export default {
   }
   alertify.confirm(`Do you want to delete <strong>${user.name}</strong> from the list?`, () => {
     this.deleteUser(user);
-  });
+  }).set('labels', {ok:'Delete', cancel:'Cancel'});
 },
     deleteUser:
       function(user) {
@@ -212,12 +212,27 @@ export default {
   return true;
 },
     showAddUserButton: function() {
+  if (this.isAddingNewUser) return false;
   if (this.canDeleteSelectedUsers) return false;
   if (this.selectedUsers.length) return false;
   return true;
 },
+    isAddingNewUser: function() {
+  const newUser = this.users.find(u => (u.id == this.newEmptyUserID));
+  if (newUser) return true;
+  return false;
+},
     isAddUserEnabled: function() {
   if (this.users.some(u => u.ui.is.editing)) return false;
+  return true;
+},
+    isSelectAllChecked: function() {
+  return this.users.some(u => u.ui.is.selected);
+},
+    arePartialUsersSelected: function() {
+  const selectedCount = this.users.filter(u => u.ui.is.selected).length;
+  if (selectedCount == 0) return false;
+  if (selectedCount == this.users.length) return false;
   return true;
 },
     pageIndexes: function() {
@@ -234,8 +249,8 @@ export default {
 
 <style>
 .comp-user-list {
-  width: min(70em, 100%);
-  margin: auto;
+  max-width: 1050px;
+  margin-left: 64px;
   white-space: nowrap;
 }
 .users-table {
@@ -243,11 +258,11 @@ export default {
   overflow: hidden;
 }
 .top-bar {
-  margin: 3em;
+  height: 120px;
   white-space: nowrap;
 }
-.top-bar button {
-  padding: 0.8em 1em !important;
+button.delete-users {
+  padding: 0.5em !important;
 }
 .rows {
   display: flex;
@@ -255,9 +270,16 @@ export default {
   gap: 1px;
 }
 .flex1 {
+  width: 100%;
+  height: 100%;
   display: flex;
+  justify-content: space-between;
+}
+.flex1, .flex1 .flex {
   align-items: center;
-  justify-content: space-around;
+}
+.flex1 .flex {
+  gap: 1em;
 }
 .header.row {
   opacity: 0.7;
@@ -265,34 +287,23 @@ export default {
 .row {
   padding: 0.5em;
   display: flex;
-  justify-content: space-between;
   align-items: center;
   border-radius: 1em;
   border: 1px solid transparent;
 }
-.rows .row {
-  cursor: pointer;
-}
-.rows .row:hover {
-  border: 1px solid #00000040;
-  transition: 0s;
-}
 .check {
-  flex-shrink: 1;
-  width: 4em;
-  display: flex;
-  justify-content: center;
+  width: 24px;
 }
 .icon {
-  width: 4em;
-  flex-shrink: 1;
+  width: 58px;
+  margin: 0 14px;
 }
 .name-column {
-  padding: 0 1em;
+  width: min(480px, 100%);
   flex-grow: 1;
 }
 .permission {
-  width: 10em;
+  width: min(302px, 100%);
 }
 .circle {
   display: flex;;
@@ -304,16 +315,35 @@ export default {
   border-radius: 50%;
   color: white;;
 }
+.email {
+  opacity: 0.4;
+}
 .buttons {
   display: flex;
-  align-items: center;
+  justify-content: end;
   width: 14em;
   gap: 0.5em;
   opacity: 0;
   transition: 1s;
 }
+.buttons button:not(.clear) {
+  margin: 1.5px;
+  border: none;
+}
+button.delete, button.delete:hover {
+  background: #1CB0D3 !important;
+}
+button.delete span {
+  filter: contrast(3);
+}
+.delete-users {
+  margin: 1em;
+}
 .comp-user-item-edit .buttons, .row:hover .buttons {
   opacity: 1 !important;
+}
+h3 a {
+  padding: 0;
 }
 h3 button {
   padding: 0.5em 1.2em !important;
@@ -321,8 +351,14 @@ h3 button {
 button.clear {
   padding: 0.5em;
 }
+button.clear:not(.delete) {
+  filter: grayscale(1);
+}
 button.clear:hover {
   background: #00000020;
+}
+button:not(.save):not(.add-user)[disabled] {
+  filter: grayscale(1);
 }
 input, select {
   padding: 0.2em 0.5em;
