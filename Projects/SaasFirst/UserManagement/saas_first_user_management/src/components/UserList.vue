@@ -78,12 +78,14 @@ export default {
         this.onClickDeleteUser(this.selectedUsers[0]);
         return;
       }
-      alertify.confirm(
-        `Do you want to delete <strong>${this.selectedUsers.length} selected users</strong> from the list?`,
-        () => {
-          this.deleteSelectedUsers();
-        },
-      );
+      alertify
+        .confirm(
+          `Do you want to delete <strong>${this.selectedUsers.length} selected users</strong> from the list?`,
+          () => {
+            this.deleteSelectedUsers();
+          }
+        )
+        .set("labels", { ok: "Delete", cancel: "Cancel" });
     },
     deleteSelectedUsers: function () {
       this.selectedUsers.forEach(this.deleteUser.bind(this));
@@ -103,7 +105,7 @@ export default {
           `Do you want to delete <strong>${user.name}</strong> from the list?`,
           () => {
             this.deleteUser(user);
-          },
+          }
         )
         .set("labels", { ok: "Delete", cancel: "Cancel" });
     },
