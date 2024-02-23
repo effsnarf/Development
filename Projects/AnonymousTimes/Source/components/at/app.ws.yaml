@@ -5,7 +5,7 @@ dom:
         class: ripped bottom
         .header:
           .at-title:
-            v-text: "'Budapest Times'"
+            v-text: "'Magyar Napi'"
     .width1:
       .bg2:
         .bar1:
@@ -148,10 +148,11 @@ style:
     padding-bottom: 1rem
     border-bottom: 1px solid gray
   .at-title:
-    text-align: center
+    text-align: left
     font-family: Chomsky
     font-size: 9vh
     line-height: 1em
+    padding: 1rem 0
     margin-bottom: 0.2em
     text-shadow: "-6px 6px 6px #666"
   .time:
