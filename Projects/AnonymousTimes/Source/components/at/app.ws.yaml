@@ -2,6 +2,7 @@ dom:
   div:
     .width1:
       .bg1:
+        class: ripped bottom
         .header:
           .at-title:
             v-text: "'Budapest Times'"
@@ -17,6 +18,7 @@ dom:
           div:
             v-text: "'Vélemény'"
     .width1:
+      class: ripped top bottom
       .bg1:
         .columns1:
           div:
@@ -66,14 +68,30 @@ methods:
     }
 
 style:
-  div, *:
-    border-radius: 0
+  .comp-at-app:
+    margin: 1em auto
   .bg1:
-    background: white
+    background: url(https://img.freepik.com/free-photo/background-smooth-texture_1154-649.jpg?size=626&ext=jpg&ga=GA1.2.1284213646.1708687699&semt=ais)
+  .ripped.top::before, .ripped.bottom::after:
+    content: "''"
+    position: absolute
+    height: 20px
+    width: 100%
+    left: 0
+    background: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/23618/rip.svg) bottom
+    background-size: 50%
+    filter: invert(1)
+    mix-blend-mode: darken
+    z-index: 1
+  .ripped.top::before:
+    top: 0%
+    background-position: 0% bottom
+  .ripped.bottom::after:
+    top: 100%
+    transform: translateY(-100%) scaleY(-1)
   .bg1, .bar1:
     padding: 0 3rem
   .bg2:
-    background: black
     color: white
   .spacer1:
     height: 2rem
@@ -89,14 +107,17 @@ style:
     text-transform: uppercase
   .bar1 > *:
     padding: 0 2rem
+    border-radius: 0.5em
     cursor: pointer
+    transition: 0.4s
   .bar1 > *:hover:
     background: "#88888860"
+    transition: 0s
   h3:
     margin: 0 0 0.5em 0
     border-bottom: 1px solid gray
   .width1:
-    width: 1200px
+    width: min(1200px, calc(100vw - 4vw))
     margin: auto
   .header:
     position: sticky
@@ -108,7 +129,7 @@ style:
     display: grid
     grid-template: 1fr / 3fr 2fr 1fr
     gap: 2rem
-    padding: 2rem 0
+    padding: 3rem 0
   .columns1 > div:
     border: 0px solid gray
   .columns2:
@@ -129,7 +150,7 @@ style:
   .at-title:
     text-align: center
     font-family: Chomsky
-    font-size: 4.5vw
+    font-size: 9vh
     line-height: 1em
     margin-bottom: 0.2em
     text-shadow: "-6px 6px 6px #666"

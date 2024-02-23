@@ -1,7 +1,6 @@
 body
 {
     font-family: Arial;
-    background: linear-gradient(42deg, #08003c, #000000);
     background-attachment: fixed;
 }
 
@@ -32,4 +31,40 @@ p
     text-align: justify;
     font-size: 1.2rem;
     line-height: normal;
+}
+
+
+.comp-at-teaser1 .div1, .img1 img
+{
+    box-shadow: -4px 4px 4px #00000080;
+}
+
+.img1 img
+{
+    border-radius: 0.5em;
+}
+
+.fader1
+{
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to top, black, transparent);
+}
+
+@media (max-width: 1000px)
+{
+    .comp-at-teaser2.div1, .comp-at-teaser2 .div1
+    {
+        flex-direction: column !important;
+    }
+
+    .comp-at-teaser2.img1, .comp-at-teaser2 .img1,
+    .comp-at-teaser2.div1 > *:not(.img1), .comp-at-teaser2 .div1 > *:not(.img1)
+    {
+        width: 100% !important;
+    }
 }
