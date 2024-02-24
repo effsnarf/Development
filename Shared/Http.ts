@@ -1,13 +1,43 @@
+import fs from "fs";
+import path from "path";
 import mime from "mime-types";
 import axios, { Axios, AxiosResponse, AxiosResponseHeaders } from "axios";
 import "../Shared/Extensions";
 import { Objects } from "./Extensions.Objects";
 
 class Http {
+  static async fetchHtml(url: string) {
+    const response = await axios.get(url);
+    return response.data as string;
+  }
+
   // Download a file from a URL and return the binary data
   static async download(url: string): Promise<Buffer> {
     let response = await axios.get(url, { responseType: "arraybuffer" });
     return response.data;
+  }
+
+  static async downloadTo(url: string, filePath: string) {
+    try {
+      const folder = path.dirname(filePath);
+
+      if (!fs.existsSync(folder)) fs.mkdirSync(folder, { recursive: true });
+
+      const response = await axios.get(url, {
+        responseType: "stream",
+      });
+
+      const writer = fs.createWriteStream(filePath);
+      response.data.pipe(writer);
+
+      return new Promise<void>((resolve, reject) => {
+        writer.on("finish", resolve);
+        writer.on("error", reject);
+      });
+    } catch (error) {
+      console.error("Error downloading the file:", error);
+      throw error;
+    }
   }
 
   static async getPostData(req: any): Promise<any> {

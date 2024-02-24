@@ -1,8 +1,12 @@
-title: Unnamed App
+title: Scraper
 server:
   host: localhost
   port: 3000
-database:
-  path: ../../Database
-images:
-  path: ../../Web/images/articles
+article:
+  images:
+    database:
+      path: ../../Database/Images
+    folder: ../../Web/images/articles
+ynet:
+  database:
+    path: ../../Database/Ynet

@@ -8,8 +8,10 @@ var toFullUrl = (url) => {
     return url;
 }
 
-var findEl = (el, prop) => {
-	return el.getElementsByClassName(prop)[0];
+var findEl = (el, cls) => {
+    if (typeof cls == "function") return 
+    if (typeof cls == "string") return el.getElementsByClassName(cls)[0];
+    throw new Exception("Not implemented");
 };
 
 var getElProp = (el, prop, attr) => {
@@ -57,7 +59,7 @@ var articles = [...document.getElementsByClassName("slotView")]
 
 
 
-var articles = [...document.getElementsByTagName("article")]
+    var articles = [...document.getElementsByTagName("article")]
     .map(el => ({
         title: getFromEl(el, "JtKRv"),
         image: getFromEl(el, "Quavad"),
