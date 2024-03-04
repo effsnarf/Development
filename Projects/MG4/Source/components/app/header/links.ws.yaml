@@ -1,0 +1,18 @@
+dom:
+  div:
+    a:
+      v-for: generator in generators
+      :key: generator.urlName
+      v-text: generator.displayName
+
+data:
+  generators:
+
+mounted: | #js
+  async function() {
+    this.generators = (await (await fetch(`https://db.memegenerator.net/MemeGenerator/Generators`)).json());
+  }
+
+style:
+  .comp-app-header-links:
+    background: "#444"

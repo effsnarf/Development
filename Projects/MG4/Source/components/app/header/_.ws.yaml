@@ -1,0 +1,7 @@
+dom:
+  div:
+    app.header.links:
+
+style:
+  .comp-ui-header:
+    background: black

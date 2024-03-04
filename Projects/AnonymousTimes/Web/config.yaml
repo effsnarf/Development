@@ -18,10 +18,10 @@ handler: | #js
   (ctx) => {
     return async (req, res) => {
 
-    const db = await ctx.Database.new({ path: `../Database` });
+    const db = await ctx.Database.new({ path: `../Database/Ynet` });
 
       if (req.url === '/articles') {
-        let articles = await db.find("Articles", {});
+        let articles = await db.find("Articles.Hebrew", {});
 
         for (const article of articles) {
             Object.assign(article, article.hebrew);

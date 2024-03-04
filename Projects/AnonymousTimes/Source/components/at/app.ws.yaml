@@ -71,6 +71,7 @@ style:
   .comp-at-app:
     margin: 1em auto
   .bg1:
+    border-radius: 0.5em
     background: url(https://img.freepik.com/free-photo/background-smooth-texture_1154-649.jpg?size=626&ext=jpg&ga=GA1.2.1284213646.1708687699&semt=ais)
   .ripped.top::before, .ripped.bottom::after:
     content: "''"
@@ -105,6 +106,7 @@ style:
     font-family: serif
     font-size: 1.5rem
     text-transform: uppercase
+    background: black
   .bar1 > *:
     padding: 0 2rem
     border-radius: 0.5em

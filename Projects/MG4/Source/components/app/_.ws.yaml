@@ -1,0 +1,10 @@
+dom:
+  div:
+    app.header:
+    ui.html.style:
+      v-for: comp in $root.comps
+      ":key": comp.name
+      ":component": comp
+      ":document-head": "true"
+
+style:

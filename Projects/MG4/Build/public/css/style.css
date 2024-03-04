@@ -1,0 +1,200 @@
+body
+{
+    background: #E9EFF2;
+}
+
+*, *:hover {
+    cursor: url('/images/cursor.png'), auto !important;
+}
+
+body, #app
+{
+    min-height: 100vh;
+}
+
+body, h1, h2, h3, h4, h5, h6, a
+{
+    margin: 0;
+    font-family: Poppins;
+    color: black;
+    font-weight: normal;
+    text-shadow: none;
+}
+
+a
+{
+    user-select: none;
+}
+
+a:hover
+{
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+body, input, select, textarea, button
+{
+    text-shadow: none !important;
+}
+
+button, .button
+{
+    color: white;
+    font-size: 105%;
+    width: fit-content;
+    border-radius: 0.5em;
+    opacity: 0.8;
+    cursor: pointer;
+}
+
+button:hover, .button:hover
+{
+    opacity: 1;
+}
+
+input, select, textarea,
+input:focus, select:focus, textarea:focus
+{
+    color: black;
+    background: white;
+    box-shadow: none;
+}
+
+button
+{
+    background: #1CB0D3;
+    border: none;
+    box-shadow: none;
+    filter: none;
+    white-space: nowrap;
+}
+
+.button:hover
+{
+    background: #1CB0D3E0;
+}
+
+button.red
+{
+    background: #FF4D4D;
+    color: white !important;
+}
+
+button.red:hover
+{
+    background: #FF4D4DE0;
+}
+
+button.clear
+{
+    background: #fff;
+    border: 1px solid gray;
+}
+button.clear span
+{
+    filter: grayscale(1);
+}
+button.clear:hover
+{
+    background: #1CB0D3;
+}
+
+button.gray, .alertify .ajs-cancel
+{
+    color: #7F7F7F;
+    background: #E2E8EB;
+    border: none;
+}
+
+button.gray
+{
+    border: 1px solid #666;
+}
+
+input[type=checkbox]
+{
+    box-shadow: none;
+    transform: scale(1.5);
+    cursor: pointer;
+}
+
+input[type=checkbox]:not(.checked)
+{
+    opacity: 0.3;
+}
+
+input[type=checkbox]:hover
+{
+    background: #00000080;
+}
+
+
+.menu-item.active
+{
+    background-image: url('/images/active-menu-item.png');
+    background-repeat: no-repeat;
+    background-position: right;
+}
+
+
+button[disabled]
+{
+    opacity: 0.5;
+}
+
+
+.alertify .ajs-header
+{
+    display: none;
+}
+
+.alertify .ajs-content
+{
+    font-size: 120%;
+    padding: 1.5em !important;
+}
+
+.alertify .ajs-dialog
+{
+    margin: auto !important;
+    padding: 2em !important;
+    top: 30%;
+    border-radius: 1em;
+}
+
+.alertify .ajs-dialog, .alertify .ajs-footer
+{
+    background: white !important;
+}
+
+.alertify .ajs-ok
+{
+    background: #475DE5;
+    color: white;
+}
+
+.alertify .ajs-buttons
+{
+    text-align: center !important;
+}
+
+.alertify .ajs-button
+{
+    width: 9em;
+}
+
+.alertify .ajs-footer
+{
+    margin: 0 !important;
+}
+
+.alertify .ajs-content
+{
+    padding: 1.5em;
+    text-align: center;
+}
+
+.alertify .ajs-dimmer
+{
+    background: #808080 !important;
+}

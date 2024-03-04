@@ -1,6 +1,7 @@
 const { app, BrowserWindow } = require('electron');
 const util = require('./util');
 
+let lastBitcoinPrice = null;
 let mainWindow;
 
 function timestamp() {
@@ -16,16 +17,33 @@ function onError(error) {
     mainWindow.webContents.send('error', error);
 }
 
+function shouldAnnouncePrice(price) {
+  try
+  {
+    if (!lastBitcoinPrice) return true;
+    const priceDiff = price - lastBitcoinPrice;
+    // Announce the price every N USD
+    const voiceAnnouncementStep = 100;
+    return Math.abs(priceDiff) >= voiceAnnouncementStep;
+  }
+  finally
+  {
+    lastBitcoinPrice = price;
+  }
+}
+
 async function fetchBitcoinPrice() {
     const bitcoinData = await util.fetch.data('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd');
     const bitcoinPrice = parseFloat(bitcoinData?.bitcoin?.usd);
     if (!bitcoinPrice) {
         log(`Trying to fetch the Bitcoin price again.`);
         console.log(bitcoinData);
-        await util.sleep(1000);
+        await util.wait(1000);
         return await fetchBitcoinPrice();
     }
     log(`Bitcoin price: $${bitcoinPrice.toLocaleString()}`);
+    if (true || shouldAnnouncePrice(bitcoinPrice)) mainWindow.webContents.send('speak', `Bitcoin's price is about $${util.roundTo(bitcoinPrice, 100)}`);
+    lastBitcoinPrice = bitcoinPrice;
     return bitcoinPrice;
 }
 
@@ -34,11 +52,11 @@ async function updateBitcoinPrice(resetView = false, repeat = true) {
     try {
       if (resetView) {
         mainWindow.webContents.send('bitcoin-price', null);
-        await util.sleep(1000);
+        await util.wait(1000);
       }
       const bitcoinPrice = await fetchBitcoinPrice();
         mainWindow.webContents.send('bitcoin-price', bitcoinPrice);
-        await util.sleep(1000 * 60 * 30); // Wait before updating the price again
+        await util.wait(1000 * 60 * 30); // Wait before updating the price again
     } catch (error) {
         onError(error);
     }
@@ -74,7 +92,7 @@ async function createWindow() {
 
   mainWindow.loadFile('index.html');
   // Open the DevTools if needed
-    //mainWindow.webContents.openDevTools();
+  //mainWindow.webContents.openDevTools();
 
   // When the document is ready, start updating the Bitcoin price
   mainWindow.webContents.on('dom-ready', startup);

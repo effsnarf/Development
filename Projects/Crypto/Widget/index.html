@@ -33,7 +33,7 @@
             ? `${secondsSinceLastUpdated} seconds`
             : `${Math.floor(secondsSinceLastUpdated / 60)} minutes`;
         document.getElementById("last-updated").innerText = `${since} ago`;
-        await util.sleep(1000);
+        await util.wait(1000);
         updateLastUpdated();
       };
       updateLastUpdated();
@@ -47,6 +47,10 @@
           "bitcoin-price"
         ).innerText = `${bitcoinPrice?.toLocaleString()}`;
         lastUpdated = Date.now();
+      });
+
+      ipcRenderer.on("speak", (event, text) => {
+        util.speak(text);
       });
 
       ipcRenderer.on("error", (event, error) => {
