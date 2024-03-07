@@ -1,0 +1,29 @@
+dom:
+  a:
+    .flex:
+      .image:
+        img:
+          :src: generatorImageUrl
+      .name:
+        v-text: generator.displayName
+
+props:
+  generator: null
+
+computed:
+  generatorImageUrl: | #js
+    function() {
+      return `https://img.memegenerator.net/images/${this.generator.imageID}.jpg`
+    }
+
+style:
+  a:
+    padding: 0.7em 1em
+    border-radius: 0.5em
+    text-decoration: none
+  a:hover:
+    background-color: "#00000010"
+  .flex:
+    gap: 1em
+  .image:
+    width: 20%

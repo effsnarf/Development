@@ -60,19 +60,22 @@ const Handlebars = require("Handlebars");
       relativePath: path.relative(baseFolder, compPath),
     }));
 
-  for (const compPath of compPaths) {
-    // Watch the file for changes
-    fs.watchFile(compPath.absolutePath, async () => await transpile(compPath));
-  }
-
   const transpileAll = async () => {
     for (const compPath of compPaths) {
       await transpile(compPath);
     }
   };
 
-  const watchedFolder = path.resolve(`../../../../Shared/WebScript`);
-  fs.watch(watchedFolder, transpileAll);
+  const webscriptFolder = path.resolve(
+    path.join(__dirname, `../../../Shared/WebScript`)
+  );
+
+  Files.watch(
+    [inputFolder, webscriptFolder],
+    { recursive: true, exclude: [] },
+    transpileAll
+  );
+  fs.watch(inputFolder, transpileAll);
 
   transpileAll();
 })();

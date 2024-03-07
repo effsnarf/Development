@@ -1,18 +1,28 @@
 dom:
-  div:
-    a:
-      v-for: generator in generators
-      :key: generator.urlName
-      v-text: generator.displayName
+  .links:
+    .page:
+      .items:
+        a:
+          class: "link"
+          v-for: generator in generators
+          ":key": generator.urlName
+          v-text: generator.displayName
 
 data:
   generators:
 
 mounted: | #js
   async function() {
-    this.generators = (await (await fetch(`https://db.memegenerator.net/MemeGenerator/Generators`)).json());
+    const url = `https://db.memegenerator.net/MemeGenerator/Generators`;
+    this.generators = (await (await fetch(url)).json()).slice(0, 8);
   }
 
 style:
-  .comp-app-header-links:
+  .links:
     background: "#444"
+  .links .items:
+    display: flex
+    gap: 1em
+    justify-content: space-evenly
+  a:
+    color: white

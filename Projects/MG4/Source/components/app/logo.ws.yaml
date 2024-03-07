@@ -1,0 +1,26 @@
+dom:
+  a:
+    class: flex
+    img:
+      src: /images/logo.png
+    .logo0:
+      .logo1:
+        v-text: "'Meme'"
+      .logo2:
+        v-text: "'Generator'"
+
+style:
+  .comp-app-logo:
+    padding: 0.5em
+    font-family: impact
+    font-size: 2em
+    line-height: 1.3em
+    text-transform: uppercase
+  .flex:
+    align-items: center
+    gap: 1rem
+  .logo0:
+    position: relative
+    top: 0.5rem
+  .logo1:
+    font-size: 200%

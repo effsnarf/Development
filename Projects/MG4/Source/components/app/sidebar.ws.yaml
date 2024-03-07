@@ -1,0 +1,29 @@
+dom:
+  div:
+    app.box:
+      title: Meet the Meme
+    app.box:
+      :padding: "'0'"
+      title: More Characters
+      template:
+        v-slot: content
+        app.gallery:
+          :template: "'app.generator.small'"
+          :items: moreGenerators
+          :per-row: 1
+          :gap: "'0'"
+
+data:
+  moreGenerators: null
+
+mounted: | #js
+  async function() {
+    await this.init();
+  }
+
+methods:
+  init: | #js
+    async function() {
+      const url = `https://db.memegenerator.net/MemeGenerator/Generators`;
+      this.moreGenerators = (await (await fetch(url)).json()).slice(0, 8);
+    }

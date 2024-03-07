@@ -1,0 +1,30 @@
+dom:
+  div:
+    app.gallery:
+      title: "Popular Images"
+      :template: "'app.instance.medium'"
+      :items: "instances1"
+    app.gallery:
+      title: "Popular Memes"
+      :template: "'app.generator.medium'"
+      :items: "generators1"
+
+data:
+  instances1: null
+  generators1: null
+
+mounted: | #js
+  async function() {
+    await this.init();
+  }
+
+methods:
+  init: | #js
+    async function() {
+      const url1 = `https://db.memegenerator.net/MemeGenerator/Instances`;
+      this.instances1 = (await (await fetch(url1)).json()).slice(0, 9);
+      const url2 = `https://db.memegenerator.net/MemeGenerator/Generators`;
+      this.generators1 = (await (await fetch(url2)).json()).slice(0, 9);
+    }
+
+style:

@@ -1,0 +1,39 @@
+dom:
+  .box:
+    .title:
+      v-text: title
+    .content:
+      :style: contentStyle
+      slot:
+        name: "content"
+
+props:
+  title: null
+  padding: null
+
+methods:
+  getContentStyle: | #js
+    function() {
+      const cs = { };
+      if (this.padding) cs.padding = this.padding;
+      return cs;
+    }
+
+computed:
+  contentStyle: | #js
+    function() {
+      return this.getContentStyle();
+    }
+
+style:
+  .box:
+    border-radius: 0.5em
+    background: "#ddd"
+  .title:
+    text-align: center
+    color: white
+    font-size: 120%
+    background: black
+    border-radius: 0.5em 0.5em 0 0
+  .content:
+    padding: 1em

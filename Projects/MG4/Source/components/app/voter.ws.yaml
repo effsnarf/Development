@@ -1,0 +1,15 @@
+dom:
+  .voter:
+    class: horizontal
+    div:
+      class: score
+      v-text: score
+
+props:
+  instance: null
+
+computed:
+  score: | #js
+    function() {
+      return this.instance?.totalVotesScore;
+    }

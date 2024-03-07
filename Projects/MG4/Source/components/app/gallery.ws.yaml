@@ -1,0 +1,63 @@
+dom:
+  app.box:
+    :title: title
+    template:
+      v-slot: content
+      .gallery:
+        :style: galleryStyle
+        .item:
+          v-for: item in items
+          :is: templateName
+          v-bind: wrapProps(item)
+
+props:
+  title: null
+  template: null
+  items: null
+  perRow: 3
+  gap: null
+
+methods:
+  wrapProps: | #js
+    function(item) {
+      const itemType = this.getItemType(item);
+      const props = { };
+      props[itemType] = item;
+      return props;
+    }
+  getItemType: | #js
+    function(item) {
+      if (item.instanceID) return 'instance';
+      if (item.generatorID) return 'generator';
+      return null;
+    }
+  getGalleryStyle: | #js
+    function() {
+      const gs = {};
+      gs.gridTemplate = `1fr / repeat(${this.perRow}, 1fr)`;
+      if (this.gap) gs.gap = this.gap;
+      return gs;
+    }
+
+computed:
+  galleryStyle: | #js
+    function() {
+      return this.getGalleryStyle();
+    }
+  templateName: | #js
+    function() {
+      return this.template.split('.')
+        .map(s => s.charAt(0).toUpperCase() + s.slice(1))
+        .join('');
+    }
+
+components:
+  - app.generator.medium
+  - app.generator.small
+  - app.instance.medium
+
+style:
+  .gallery:
+    display: grid
+    grid-template: 1fr / 1fr 1fr 1fr
+    gap: 1.5em

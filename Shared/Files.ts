@@ -169,6 +169,7 @@ class Files {
     let changedPaths: string[] = [];
 
     for (const watchPath of paths) {
+      console.log(`Watching ${watchPath.toShortPath()}`);
       const watcher = fs.watch(watchPath, { recursive });
 
       watcher.on("change", (event, filename) => {

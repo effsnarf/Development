@@ -1,0 +1,14 @@
+dom:
+  a:
+    v-text: text1
+
+props:
+  generator:
+  text:
+
+computed:
+  text1: | #js
+    function() {
+      if (this.generator) return this.generator.displayName;
+      return this.text;
+    }

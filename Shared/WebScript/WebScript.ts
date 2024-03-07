@@ -88,10 +88,17 @@ class WebScript {
     const source = Objects.parseYaml(compYaml);
     const sourceDomStr = JSON.stringify(source.dom, null, 2);
 
+    const isRefdComp = (c: any) => {
+      if (sourceDomStr.includesWholeWord(c.name)) return true;
+      if (source.components?.includes(c.name)) return true;
+      return false;
+    };
+
     const refdComps = allComps
       .filter((c) => c.name != "app")
       .filter((c) => c.name != compName)
-      .filter((c) => sourceDomStr.includesWholeWord(c.name));
+      .filter((c) => isRefdComp(c))
+      .distinct((c) => c.name);
 
     source.name = compName;
     source.capitalizedName = capitalizedName;

@@ -1,6 +1,6 @@
 import addPaths from "./add.paths";
 
-const isHTMLTag = (tag: string) => {
+const isReservedTag = (tag: string) => {
   tag = tag.toLowerCase();
 
   const htmlTags = [
@@ -120,7 +120,15 @@ const isHTMLTag = (tag: string) => {
     "wbr",
   ];
 
-  return htmlTags.includes(tag);
+  const vueTags = [
+    "transition",
+    "transition-group",
+    "keep-alive",
+    "slot",
+    "component",
+  ];
+
+  return [...vueTags, ...htmlTags].includes(tag);
 };
 
 export default (
@@ -132,7 +140,7 @@ export default (
 ) => {
   if (!dom) return [];
 
-  const s = [] as string[];
+  let s = [] as string[];
   if (!indent) indent = 0;
 
   dom = JSON.parse(JSON.stringify(dom));
@@ -185,7 +193,7 @@ export default (
   }
 
   const toDomTag = (tag: string, compType?: string) => {
-    if (compType == "sfc" && !isHTMLTag(tag)) {
+    if (compType == "sfc" && !isReservedTag(tag)) {
       // For sfc we use CamelCase
       return tag
         .split(".")
@@ -269,5 +277,11 @@ export default (
       s.push(...context.toTemplate(context, dom, indent + 1, null, compType));
     }
   }
+  const fixLine = (s: string) => {
+    // Replace "v-slot"=" " with "v-slot:
+    s = s.replace(/\"v-slot\"=\"/g, `\"v-slot:`);
+    return s;
+  };
+  s = s.map((line) => fixLine(line));
   return s;
 };

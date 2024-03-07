@@ -5,7 +5,7 @@ dom:
         class: ripped bottom
         .header:
           .at-title:
-            v-text: "'Napi Magyar'"
+            v-text: "'Anonymous Times'"
     .width1:
       .bg2:
         .bar1:

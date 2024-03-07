@@ -1,0 +1,28 @@
+dom:
+  a:
+    img:
+      :src: generatorImageUrl
+    .title:
+      v-text: generator.displayName
+
+props:
+  generator: null
+
+computed:
+  generatorImageUrl: | #js
+    function() {
+      return `https://img.memegenerator.net/images/${this.generator.imageID}.jpg`
+    }
+
+style:
+  a:
+    display: flex
+    flex-direction: column
+  img:
+    border-radius: 0.5em 0.5em 0 0
+  .title:
+    width: 100%
+    color: white
+    background-color: black
+    text-align: center
+    border-radius: 0 0 0.5em 0.5em
