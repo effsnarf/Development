@@ -6,7 +6,7 @@ div("class"="comp-app")
       div("class"="column")
         AppSidebar
       div("class"="main")
-        AppPageHome
+        AppPageGenerator
       div("class"="column", "v-text"="' '")
   div
     UiHtmlStyle("v-for"="comp in $root.comps", ":key"="comp.name", ":component"="comp", ":document-head"="true")
@@ -14,14 +14,14 @@ div("class"="comp-app")
 
 <script>
 import AppHeader from "./components/AppHeader.vue";
-import AppPageHome from "./components/AppPageHome.vue";
+import AppPageGenerator from "./components/AppPageGenerator.vue";
 import AppSidebar from "./components/AppSidebar.vue";
 
 export default {
   name: "App",
   components: {
     AppHeader,
-    AppPageHome,
+    AppPageGenerator,
     AppSidebar,
   },
 };

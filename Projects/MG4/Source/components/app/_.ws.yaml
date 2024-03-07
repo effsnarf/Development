@@ -10,7 +10,7 @@ dom:
           app.sidebar:
         div:
           class: main
-          app.page.home:
+          app.page.generator:
         div:
           class: column
           v-text: "' '"
