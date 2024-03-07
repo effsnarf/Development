@@ -57,12 +57,12 @@ div
 .page .columns .main
 {
     flex-grow: 1;
-    max-width: 60%;
+    max-width: 64%;
 }
 
 .page .columns .column
 {
-    width: calc(20% - 1em);
+    width: calc(18% - 1em);
 }
 
 .page .main .box
