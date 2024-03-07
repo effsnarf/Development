@@ -3,7 +3,7 @@ div("class"="comp-app-header header")
   AppHeaderLinks
   AppHeaderMenu
   div("class"="page")
-    AppGallery("class"="search-generators", ":template"="'app.generator.small'", ":items"="searchGenerators1", ":per-row"="1")
+    AppGallery("v-if"="showSearchResults", "class"="search-generators", ":template"="'app.generator.small'", ":items"="searchGenerators1", ":per-row"="1")
   AppHeaderTiers
 </template>
 
@@ -26,6 +26,7 @@ export default {
   data() {
     return {
       searchGenerators1: null,
+      showSearchResults: false,
     };
   },
   mounted: async function () {
@@ -44,7 +45,7 @@ export default {
 .header {
   margin-bottom: 1em;
   color: white;
-  background-color: #000;
+  background: linear-gradient(0deg, #000000a0, #000000);
 }
 .search-generators {
   position: absolute;

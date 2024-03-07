@@ -1,5 +1,5 @@
 <template lang="pug">
-a("class"="comp-app-generator-medium")
+a(":href"="'/' + generator.urlName", "class"="comp-app-generator-medium")
   img(":src"="generatorImageUrl")
   div("v-text"="generator.displayName", "class"="title")
 </template>
@@ -13,6 +13,9 @@ export default {
     },
   },
   computed: {
+    generatorUrl: function () {
+      return `/generator/${this.generator.urlName}`;
+    },
     generatorImageUrl: function () {
       return `https://img.memegenerator.net/images/${this.generator.imageID}.jpg`;
     },

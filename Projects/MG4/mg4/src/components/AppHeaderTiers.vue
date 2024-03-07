@@ -27,7 +27,7 @@ export default {
 
 <style scoped>
 .tiers {
-  background: #ddd;
+  background: linear-gradient(0deg, #dddddda0, #ddd);
 }
 .tiers .items {
   display: flex;

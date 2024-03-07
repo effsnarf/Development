@@ -4,6 +4,7 @@ dom:
     app.header.menu:
     .page:
       app.gallery:
+        v-if: showSearchResults
         class: search-generators
         :template: "'app.generator.small'"
         :items: searchGenerators1
@@ -12,6 +13,7 @@ dom:
 
 data:
   searchGenerators1: null
+  showSearchResults: false
 
 mounted: | #js
   async function() {
@@ -29,7 +31,7 @@ style:
   .header:
     margin-bottom: 1em
     color: white
-    background-color: "#000"
+    background: "linear-gradient(0deg, #000000a0, #000000)"
   .search-generators:
     position: absolute
     right: 0

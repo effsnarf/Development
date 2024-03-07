@@ -31,4 +31,7 @@ export default {
 .logo1 {
   font-size: 200%;
 }
+a:hover {
+  background: transparent !important;
+}
 </style>

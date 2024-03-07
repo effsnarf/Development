@@ -1,5 +1,6 @@
 dom:
   a:
+    :href: "'/' + generator.urlName"
     img:
       :src: generatorImageUrl
     .title:
@@ -9,6 +10,10 @@ props:
   generator: null
 
 computed:
+  generatorUrl: | #js
+    function() {
+      return `/generator/${this.generator.urlName}`
+    }
   generatorImageUrl: | #js
     function() {
       return `https://img.memegenerator.net/images/${this.generator.imageID}.jpg`

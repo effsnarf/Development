@@ -1,5 +1,6 @@
 dom:
   a:
+    :href: "'/' + generator.urlName"
     .flex:
       .image:
         img:

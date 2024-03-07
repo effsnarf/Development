@@ -24,3 +24,5 @@ style:
     top: 0.5rem
   .logo1:
     font-size: 200%
+  a:hover:
+    background: "transparent !important"

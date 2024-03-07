@@ -1,5 +1,5 @@
 <template lang="pug">
-a("class"="comp-app-generator-small")
+a(":href"="'/' + generator.urlName", "class"="comp-app-generator-small")
   div("class"="flex")
     div("class"="image")
       img(":src"="generatorImageUrl")
