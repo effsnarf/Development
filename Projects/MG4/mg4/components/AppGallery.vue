@@ -6,19 +6,8 @@ AppBox(":title"="title", "class"="comp-app-gallery")
 </template>
 
 <script>
-import AppBox from "./AppBox.vue";
-import AppGeneratorMedium from "./AppGeneratorMedium.vue";
-import AppGeneratorSmall from "./AppGeneratorSmall.vue";
-import AppInstanceMedium from "./AppInstanceMedium.vue";
-
 export default {
   name: "AppGallery",
-  components: {
-    AppBox,
-    AppGeneratorMedium,
-    AppGeneratorSmall,
-    AppInstanceMedium,
-  },
   props: {
     title: {
       default: null,

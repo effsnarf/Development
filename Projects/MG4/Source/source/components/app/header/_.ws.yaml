@@ -6,10 +6,8 @@ dom:
     .page:
       .search-generators:
         v-if: showSearchResults
-        .loader:
+        app.progress:
           v-if: is.loading
-          v-progress-circular:
-            :indeterminate: "true"
         app.gallery:
           :template: "'app.generator.small'"
           :items: searchGenerators1
@@ -80,7 +78,3 @@ style:
     background: "#ddd"
     box-shadow: -16px 16px 32px black
     z-index: 1
-  .loader:
-    display: flex
-    justify-content: center
-    margin-top: 1em

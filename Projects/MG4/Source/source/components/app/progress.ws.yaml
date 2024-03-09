@@ -1,0 +1,10 @@
+dom:
+  .loader:
+    v-progress-circular:
+      :indeterminate: "true"
+
+style:
+  .loader:
+    display: flex
+    justify-content: center
+    margin-top: 1em

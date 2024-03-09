@@ -1,21 +1,12 @@
 <template lang="pug">
-div("class"="comp-app-page-home")
+div("class"="comp-home")
   AppGallery("title"="Popular Images", ":template"="'app.instance.medium'", ":items"="instances1")
   AppGallery("title"="Popular Memes", ":template"="'app.generator.medium'", ":items"="generators1")
 </template>
 
 <script>
-import AppGallery from "./AppGallery.vue";
-import AppGeneratorMedium from "./AppGeneratorMedium.vue";
-import AppInstanceMedium from "./AppInstanceMedium.vue";
-
 export default {
-  name: "AppPageHome",
-  components: {
-    AppGallery,
-    AppGeneratorMedium,
-    AppInstanceMedium,
-  },
+  name: "Home",
   data() {
     return {
       instances1: null,

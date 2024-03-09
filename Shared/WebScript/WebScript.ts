@@ -102,7 +102,7 @@ class WebScript {
 
     source.name = compName;
     source.capitalizedName = capitalizedName;
-    source.refdComps = refdComps;
+    //source.refdComps = refdComps;
     const input = {
       name: compName,
       capitalizedName: capitalizedName,

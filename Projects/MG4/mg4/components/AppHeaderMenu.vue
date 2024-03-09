@@ -12,15 +12,8 @@ div("class"="comp-app-header-menu")
 </template>
 
 <script>
-import AppLogo from "./AppLogo.vue";
-import AppSearch from "./AppSearch.vue";
-
 export default {
   name: "AppHeaderMenu",
-  components: {
-    AppLogo,
-    AppSearch,
-  },
   data() {
     return {
       query: null,

@@ -13,6 +13,10 @@ dom:
       app.link:
         v-if: "false"
         text: "generate"
+    .menu:
+      class: dimmed
+      div:
+        v-text: "(instance.commentsCount + ' comments')"
 
 props:
   instance: null

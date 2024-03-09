@@ -4,28 +4,14 @@ div("class"="comp-app-header header")
   AppHeaderMenu("@update-query"="onUpdateQuery")
   div("class"="page")
     div("v-if"="showSearchResults", "class"="search-generators")
-      div("v-if"="is.loading", "class"="loader")
-        v-progress-circular(":indeterminate"="true")
+      AppProgress("v-if"="is.loading")
       AppGallery(":template"="'app.generator.small'", ":items"="searchGenerators1", ":per-row"="1")
   AppHeaderTiers
 </template>
 
 <script>
-import AppGallery from "./AppGallery.vue";
-import AppGeneratorSmall from "./AppGeneratorSmall.vue";
-import AppHeaderLinks from "./AppHeaderLinks.vue";
-import AppHeaderMenu from "./AppHeaderMenu.vue";
-import AppHeaderTiers from "./AppHeaderTiers.vue";
-
 export default {
   name: "AppHeader",
-  components: {
-    AppGallery,
-    AppGeneratorSmall,
-    AppHeaderLinks,
-    AppHeaderMenu,
-    AppHeaderTiers,
-  },
   data() {
     return {
       query: { value: null, timeout: { handler: null, delay: 400 } },
@@ -87,10 +73,5 @@ export default {
   background: #ddd;
   box-shadow: -16px 16px 32px black;
   z-index: 1;
-}
-.loader {
-  display: flex;
-  justify-content: center;
-  margin-top: 1em;
 }
 </style>

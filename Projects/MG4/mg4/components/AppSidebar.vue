@@ -7,17 +7,8 @@ div("class"="comp-app-sidebar")
 </template>
 
 <script>
-import AppBox from "./AppBox.vue";
-import AppGallery from "./AppGallery.vue";
-import AppGeneratorSmall from "./AppGeneratorSmall.vue";
-
 export default {
   name: "AppSidebar",
-  components: {
-    AppBox,
-    AppGallery,
-    AppGeneratorSmall,
-  },
   data() {
     return {
       moreGenerators: null,

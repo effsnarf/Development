@@ -6,18 +6,13 @@ div("class"="comp-app-instance-medium")
     AppLink(":generator"="instance")
     AppVoter("v-if"="false", ":instance"="instance")
     AppLink("v-if"="false", "text"="generate")
+  div("class"="dimmed menu")
+    div("v-text"="(instance.commentsCount + ' comments')")
 </template>
 
 <script>
-import AppLink from "./AppLink.vue";
-import AppVoter from "./AppVoter.vue";
-
 export default {
   name: "AppInstanceMedium",
-  components: {
-    AppLink,
-    AppVoter,
-  },
   props: {
     instance: {
       default: null,

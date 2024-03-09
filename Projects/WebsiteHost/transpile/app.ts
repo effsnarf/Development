@@ -46,12 +46,18 @@ const getTime = () => new Date().toLocaleTimeString();
   };
 
   const getSfcPath = (input: any, outputFolder: string) => {
+    outputFolder = path.normalize(outputFolder);
+    const isPage = outputFolder.includes("\\pages");
     const compName = withoutStructureFolder(input.capitalizedName);
     let fileName = `${compName}.vue`;
     const lastFolder = path.normalize(outputFolder).split("\\").pop() as string;
     // .vue files in [pages] and [layouts] are lowercase
     if (lastFolder != "components") fileName = fileName.toLowerCase();
-    const sfcPath = path.join(outputFolder, fileName);
+
+    const sfcPath = isPage
+      ? path.join(outputFolder, compName.toLowerCase(), "_.vue")
+      : path.join(outputFolder, fileName);
+
     Files.ensureFolderExists(sfcPath);
     return sfcPath;
   };

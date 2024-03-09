@@ -5,8 +5,11 @@ dom:
       .image:
         img:
           :src: generatorImageUrl
-      .name:
-        v-text: generator.displayName
+      div:
+        .name:
+          v-text: generator.displayName
+        .dimmed:
+          v-text: "'3k posts'"
 
 props:
   generator: null

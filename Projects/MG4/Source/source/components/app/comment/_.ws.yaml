@@ -1,0 +1,30 @@
+dom:
+  .comment:
+    .text:
+      v-text: comment.text
+    .row1:
+      div:
+      .time:
+        v-text: toFriendlyTime(comment.created)
+
+props:
+  comment: null
+
+methods:
+  toFriendlyTime: | #js
+    function(time) {
+      return (new Date(time).toLocaleString());
+    }
+
+style:
+  .comment:
+    padding: 1em
+    margin: 1em
+    border-radius: 0.5em
+    background: "#80808030"
+    box-shadow: "-1px 1px 1px #888"
+  .row1:
+    display: flex
+    justify-content: space-between
+    gap: 1em
+    opacity: 0.5

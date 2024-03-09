@@ -3,7 +3,9 @@ a(":href"="'/' + generator.urlName", "class"="comp-app-generator-small")
   div("class"="flex")
     div("class"="image")
       img(":src"="generatorImageUrl")
-    div("v-text"="generator.displayName", "class"="name")
+    div
+      div("v-text"="generator.displayName", "class"="name")
+      div("v-text"="'3k posts'", "class"="dimmed")
 </template>
 
 <script>

@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import Generator from '~/pages/generator.vue'
+import Generator from '~/pages/generator/_.vue'
 
 export default {
   components: {
