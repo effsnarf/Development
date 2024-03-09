@@ -1,0 +1,35 @@
+dom:
+  div:
+    a:
+      :href: instanceUrl
+      img:
+        :src: instanceImageUrl
+    .menu:
+      app.link:
+        :generator: instance
+      app.voter:
+        v-if: "false"
+        :instance: instance
+      app.link:
+        v-if: "false"
+        text: "generate"
+
+props:
+  instance: null
+
+computed:
+  instanceUrl: | #js
+    function() {
+      return `/instance/${this.instance._id}`
+    }
+  instanceImageUrl: | #js
+    function() {
+      return `https://img.memegenerator.net/instances/250x250/${this.instance._id}.jpg`
+    }
+
+style:
+  .menu:
+    display: flex
+    justify-content: space-between
+  a:
+    color: "#2244aa"

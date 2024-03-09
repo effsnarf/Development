@@ -1,0 +1,33 @@
+dom:
+  div:
+    app.header:
+    div:
+      class: page
+      div:
+        class: columns
+        div:
+          class: column
+          app.sidebar:
+        div:
+          class: main
+          app.nuxt:
+        div:
+          class: column
+          v-text: "' '"
+    div:
+      ui.html.style:
+        v-for: comp in $root.comps
+        ":key": comp.name
+        ":component": comp
+        ":document-head": "true"
+
+style:
+_:
+  examples:
+    count: 0
+name: app
+template: >-
+  <div class="comp-app" path="96801."><grid-app></grid-app><div
+  path="96801.1"><ui-html-style v-for="comp in $root.comps" :key="comp.name"
+  :component="comp" :document-head="true"
+  path="96801.1.0"></ui-html-style></div></div>

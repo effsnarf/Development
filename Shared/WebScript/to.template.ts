@@ -1,7 +1,18 @@
 import addPaths from "./add.paths";
 
+const replaceWholeWord = function (
+  s: string,
+  search: string,
+  replacement: string
+) {
+  const regex = new RegExp("\\b" + search + "\\b", "g");
+  return s.replace(regex, replacement);
+};
+
 const isReservedTag = (tag: string) => {
   tag = tag.toLowerCase();
+
+  if (tag.startsWith("v-")) return true;
 
   const htmlTags = [
     "a",
@@ -280,6 +291,8 @@ export default (
   const fixLine = (s: string) => {
     // Replace "v-slot"=" " with "v-slot:
     s = s.replace(/\"v-slot\"=\"/g, `\"v-slot:`);
+    // Replace "AppNuxt" (full word) with "Nuxt"
+    s = replaceWholeWord(s, "AppNuxt", "Nuxt");
     return s;
   };
   s = s.map((line) => fixLine(line));

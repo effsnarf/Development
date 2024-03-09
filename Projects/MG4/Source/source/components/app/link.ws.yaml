@@ -1,0 +1,24 @@
+dom:
+  a:
+    class: hover-underline
+    v-text: text1
+    :href: url1
+
+props:
+  generator:
+  text:
+
+computed:
+  text1: | #js
+    function() {
+      if (this.generator) return this.generator.displayName;
+      return this.text;
+    }
+
+  url1: | #js
+    function() {
+      if (this.generator) return `/${this.generator.urlName}`;
+      return null;
+    }
+
+style:

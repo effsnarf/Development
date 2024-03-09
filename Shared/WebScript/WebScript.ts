@@ -166,12 +166,7 @@ class WebScript {
 
   private static async transpileComponent(input: any, logLevel: number = 0) {
     try {
-      const now = new Date();
-      const time = now.toLocaleTimeString();
-
       if (logLevel > 0) console.log();
-
-      console.log(`${time.gray} ${input.name.padEnd(20).cyan}`);
 
       const source = input.source;
 

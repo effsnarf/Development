@@ -43,7 +43,7 @@ async function fetchBitcoinPrice() {
         return await fetchBitcoinPrice();
     }
     log(`Bitcoin price: $${bitcoinPrice.toLocaleString()}`);
-    if (true || shouldAnnouncePrice(bitcoinPrice)) mainWindow.webContents.send('speak', `Bitcoin's price is about $${util.roundTo(bitcoinPrice, 100)}`);
+    if (shouldAnnouncePrice(bitcoinPrice)) mainWindow.webContents.send('speak', `Bitcoin's price is about $${util.roundTo(bitcoinPrice, 100)}`);
     lastBitcoinPrice = bitcoinPrice;
     return bitcoinPrice;
 }

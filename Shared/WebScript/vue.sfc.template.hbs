@@ -43,6 +43,9 @@ export default {
   {{#if unmounted}}
   unmounted: {{{addCode unmounted ""}}},
   {{/if}}
+  {{#if asyncData}}
+  asyncData: {{{addCode asyncData ""}}},
+  {{/if}}
   {{#if methods}}
   methods: {
     {{#each methods}}
@@ -71,16 +74,12 @@ export default {
     {{#each watch}}
     {{#if handler}}
     {{@key}}: {
-      handler(newValue, oldValue) {
-        {{{addCode handler "" @key ""}}}
-      },
+      handler: {{{addCode handler "" @key ""}}},
       immediate: {{{or immediate false}}},
       deep: {{{or deep false}}},
     },
     {{else}}
-    {{@key}}(newValue, oldValue) {
-      {{{addCode this "" @key ""}}}
-    },
+    {{@key}}: {{{addCode this "" @key ""}}},
     {{/if}}
     {{/each}}
   },

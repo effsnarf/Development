@@ -1,0 +1,29 @@
+dom:
+  .links:
+    .page:
+      .items:
+        a:
+          class: "hover-underline"
+          v-for: generator in generators
+          ":key": generator.urlName
+          v-text: generator.displayName
+          :href: "'/' + generator.urlName"
+
+data:
+  generators:
+
+mounted: | #js
+  async function() {
+    const url = `https://db.memegenerator.net/MemeGenerator/Generators`;
+    this.generators = (await (await fetch(url)).json()).slice(0, 8);
+  }
+
+style:
+  .links:
+    background: "#444"
+  .links .items:
+    display: flex
+    gap: 1em
+    justify-content: space-evenly
+  a:
+    color: white

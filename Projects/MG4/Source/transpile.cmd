@@ -1,2 +1,2 @@
 @echo off
-..\..\WebsiteHost\transpile\start.cmd .\components ..\mg4\src
+..\..\WebsiteHost\transpile\start.cmd .\source ..\mg4
