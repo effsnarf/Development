@@ -215,6 +215,28 @@ class TaskManager {
       }
     }
 
+    if (req?.url == "/ai") {
+      tasks.remove(task, true);
+
+      try {
+        const postData = task.postData;
+
+        const chat = await ChatOpenAI.new(
+          Roles.Null,
+          false,
+          Model.Default,
+          false,
+          OpenAI.effApiKey
+        );
+
+        const response = await chat.send(postData.prompt);
+
+        return res.end(JSON.stringify(response));
+      } catch (ex: any) {
+        return res.end(JSON.stringify({ error: ex.stack }));
+      }
+    }
+
     if (req?.url.startsWith("/random/image/")) {
       const cache = await Cache.new({
         database: { path: path.join(os.tmpdir(), `/Cache/Random/Image`) },

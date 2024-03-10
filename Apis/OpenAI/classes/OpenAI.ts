@@ -185,8 +185,6 @@ class OpenAI {
     const tokens = this.countTokens(promptText);
     const maxReplyTokens = this.maxTotalTokens - tokens;
 
-    if (!useTools) tools = null;
-
     // if (false)
     // console.log(
     //   `Max reply tokens: ${maxReplyTokens} (${tokens} tokens used)`.gray
@@ -194,10 +192,11 @@ class OpenAI {
 
     const data = {
       model: model,
-      tools: tools,
       max_tokens: 500,
       ...dataProps,
     };
+
+    if (useTools) data.tools = tools;
 
     if (false) console.log(data.stringify().shorten(400));
 
