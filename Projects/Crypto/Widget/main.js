@@ -21,7 +21,7 @@ function shouldAnnouncePrice(price) {
   try
   {
     if (!lastBitcoinPrice) return true;
-    if (price < 69000) return false;
+    if (price < 70000) return false;
     const priceDiff = price - lastBitcoinPrice;
     // Announce the price every N USD
     const voiceAnnouncementStep = 100;

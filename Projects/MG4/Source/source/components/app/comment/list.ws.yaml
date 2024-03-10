@@ -6,6 +6,9 @@ dom:
       v-for: comment in comments
       :key: comment.commentID
       :comment: comment
+    .no-comments:
+      v-if: noComments
+      v-text: "'No comments'"
 
 props:
   instanceID: null
@@ -13,7 +16,8 @@ props:
 data:
   comments: null
   is:
-    loading: false
+    loading: 0
+    loaded: false
 
 mounted: | #js
   async function() {
@@ -23,7 +27,7 @@ mounted: | #js
 methods:
   init: | #js
     async function() {
-      this.is.loading = true;
+      this.is.loading++;
       try
       {
         const url1 = `https://db.memegenerator.net/MemeGenerator/api/Comments/select/by?entityID=${this.entityID}`;
@@ -31,7 +35,8 @@ methods:
       }
       finally
       {
-      this.is.loading = false;
+        this.is.loading--;
+        this.is.loaded = true;
       }
     }
 
@@ -41,3 +46,12 @@ computed:
       if (this.instanceID) return this.instanceID;
       return null;
     }
+  noComments: | #js
+    function() {
+      return (this.is.loaded && !this.comments?.length);
+    }
+
+style:
+  .no-comments:
+    text-align: center
+    opacity: 0.5

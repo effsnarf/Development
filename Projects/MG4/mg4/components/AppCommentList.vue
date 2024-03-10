@@ -2,6 +2,7 @@
 div("class"="comp-app-comment-list")
   AppProgress("v-if"="is.loading")
   AppComment("v-for"="comment in comments", ":key"="comment.commentID", ":comment"="comment")
+  div("v-if"="noComments", "v-text"="'No comments'", "class"="no-comments")
 </template>
 
 <script>
@@ -15,7 +16,7 @@ export default {
   data() {
     return {
       comments: null,
-      is: { loading: false },
+      is: { loading: 0, loaded: false },
     };
   },
   mounted: async function () {
@@ -23,12 +24,13 @@ export default {
   },
   methods: {
     init: async function () {
-      this.is.loading = true;
+      this.is.loading++;
       try {
         const url1 = `https://db.memegenerator.net/MemeGenerator/api/Comments/select/by?entityID=${this.entityID}`;
         this.comments = await (await fetch(url1)).json();
       } finally {
-        this.is.loading = false;
+        this.is.loading--;
+        this.is.loaded = true;
       }
     },
   },
@@ -37,8 +39,16 @@ export default {
       if (this.instanceID) return this.instanceID;
       return null;
     },
+    noComments: function () {
+      return this.is.loaded && !this.comments?.length;
+    },
   },
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.no-comments {
+  text-align: center;
+  opacity: 0.5;
+}
+</style>

@@ -42,6 +42,8 @@ export default {
   display: block;
   width: 50%;
   margin: auto;
+  margin-bottom: 3em;
   border-radius: 0.5em;
+  box-shadow: -4px 4px 4px #888;
 }
 </style>
