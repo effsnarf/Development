@@ -1,3 +1,22 @@
+.fileThumb
+{
+    border: 1px solid gray !important;
+    border-radius: 0.5em;
+}
+
+img, .thumb, .fileThumb img
+{
+    filter: contrast(10) grayscale(1) opacity(0.01);
+}
+
+
+
+.postContainer
+{
+    margin: auto !important;
+}
+
+
 .dateTime, .postNum, .backlink, .postInfo, .replacedSideArrows, .file-info
 {
     display: none !important;
@@ -40,7 +59,6 @@
 
 .catalog-post:hover .catalog-stats
 {
-    max-height: 2em;
 }
 
 .catalog-container:hover > .catalog-post
@@ -75,13 +93,6 @@
     opacity: 0.5;
 }
 
-.catalog-post:hover .catalog-thumb
-{
-    max-height: 40em !important;
-    filter: grayscale(0);
-    opacity: 1;
-}
-
 .postMessage
 {
     padding: 0 0 1em;
@@ -95,11 +106,6 @@
 .post:not(.catalog-post)
 {
     width: 100%;
-}
-
-.post:not(.catalog-post):hover .fileText
-{
-    max-height: 2em;
 }
 
 .sauce

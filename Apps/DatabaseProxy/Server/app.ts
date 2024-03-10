@@ -33,6 +33,8 @@ import { Analytics, Intervals, Interval, ItemType } from "@shared/Analytics";
 import { debug } from "console";
 import { DatabaseProxy } from "../Client/DbpClient";
 import { Shakespearizer } from "../../../Projects/Shakespearizer/Shakespearizer";
+import { ChatOpenAI, Roles } from "../../../Apis/OpenAI/classes/ChatOpenAI";
+import { OpenAI } from "../../../Apis/OpenAI/classes/OpenAI";
 // #endregion
 
 const getResponseSize = (response: any) => {
@@ -513,6 +515,25 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
     //   })
     // );
     // // #endregion
+
+    // #region Misc utility requests
+    httpServer.get(
+      "/ai",
+      processRequest(async (req: any, res: any, user: User, postData: any) => {
+        const chat = await ChatOpenAI.new(
+          Roles.Null,
+          false,
+          undefined,
+          false,
+          OpenAI.effApiKey
+        );
+
+        const response = await chat.send(postData.prompt);
+
+        return res.end(JSON.stringify(response));
+      })
+    );
+    // #endregion
 
     // #region 📑 Database Analytics
     httpServer.get(
