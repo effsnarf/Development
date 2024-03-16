@@ -93,11 +93,13 @@ class HttpServer {
       cert: any;
     }[],
     handler: (req: any, res: any, data: any) => any,
-    getIndexPageTemplateData: (req: any) => Promise<any>,
-    indexPagePath: string | null,
-    staticFileFolders: string[],
-    options?: HttpServerOptions
+    getIndexPageTemplateData: ((req: any) => Promise<any>) | null,
+    indexPagePath: string | null = null,
+    staticFileFolders: string[] = [],
+    options: HttpServerOptions = {}
   ) {
+    if (!getIndexPageTemplateData) getIndexPageTemplateData = async () => ({});
+
     const server = new HttpServer(
       appName,
       port,
@@ -122,19 +124,12 @@ class HttpServer {
 
       const customResult = await this.handler(req, res, data);
 
-      if (customResult) {
-        this.logResponse(timer, req, customResult);
-        return;
-      }
+      if (customResult) return;
 
       // #region Serve static files
       if (req.url.length > 1) {
         for (const folder of this.staticFileFolders) {
-          const servedStaticFile = await HttpServer.serveStaticFile(
-            req,
-            res,
-            folder
-          );
+          const servedStaticFile = await this.serveStaticFile(req, res, folder);
           if (servedStaticFile) return;
         }
       }
@@ -167,30 +162,24 @@ class HttpServer {
         }
         res.end();
       }
-      this.logResponse(timer, req, res);
       return;
     } catch (ex: any) {
-      this.logResponse(timer, req);
       // Set status code 500
       res.statusCode = ex.status || 500;
       res.end(ex.stack);
       if (!ex.message?.includes("favicon.ico")) {
-        this.logResponse(timer, req, res);
         this.log(`${ex.stack?.bgRed}`);
       }
     } finally {
+      this.logResponse(timer, req, res);
       this.currentRequestsCount--;
     }
   }
 
-  static async serveStaticFile(req: any, res: any, folder: string) {
+  async serveStaticFile(req: any, res: any, folder: string) {
     const filePath = path.join(folder, req.url.split("?")[0]);
 
-    const servedTsFile = await HttpServer.serveTypeScriptFile(
-      req,
-      res,
-      filePath
-    );
+    const servedTsFile = await this.serveTypeScriptFile(req, res, filePath);
     if (servedTsFile) return true;
 
     if (fs.existsSync(filePath)) {
@@ -210,21 +199,25 @@ class HttpServer {
     return false;
   }
 
-  static async serveTypeScriptFile(req: any, res: any, filePath: string) {
+  async serveTypeScriptFile(req: any, res: any, filePath: string) {
     const tsFilePath = filePath.replace(".js", ".ts");
 
     if (!fs.existsSync(tsFilePath)) return false;
 
     // If TypeScript file, serve as compiled JavaScript
     if (path.extname(tsFilePath) == ".ts") {
+      const isDev = Configuration.getEnvironment() == "dev";
+      const isProd = !isDev;
       const precompiledPath = tsFilePath.replace(".ts", ".precompiled.js");
-      if (Configuration.getEnvironment() != "dev") {
+      if (isProd) {
         if (fs.existsSync(precompiledPath)) {
           return res.end(fs.readFileSync(precompiledPath, "utf8"));
         }
       }
       const compiledJsCode = await TypeScript.webpackify(tsFilePath);
-      fs.writeFileSync(precompiledPath, compiledJsCode);
+      if (isProd) fs.writeFileSync(precompiledPath, compiledJsCode);
+      // set application/javascript
+      res.setHeader("Content-Type", "application/javascript");
       return res.end(compiledJsCode);
     }
   }

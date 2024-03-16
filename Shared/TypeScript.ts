@@ -11,8 +11,6 @@ interface WebpackifyOptions {
 }
 
 class TypeScript {
-  private static webpackCache = new Map<string, any>();
-
   static parse(code: string) {
     const sourceFile = ts.createSourceFile(
       "example.ts",
@@ -95,10 +93,6 @@ class TypeScript {
       }
 
       const cacheKey = input.hashCode().toString();
-      if (await TypeScript.webpackCache.has(cacheKey)) {
-        resolve(await TypeScript.webpackCache.get(cacheKey));
-        return;
-      }
 
       // Get the base path of the current script
       const basePath = path.dirname(process.argv[1]);
@@ -143,6 +137,9 @@ class TypeScript {
       const config = {
         mode: "development",
         target: "web",
+        externals: {
+          "@babylonjs/core": "BABYLON",
+        },
         entry: inputFilePath,
         output: {
           ...output,
@@ -202,7 +199,6 @@ class TypeScript {
           path.resolve(output.path, output.filename),
           "utf8"
         );
-        TypeScript.webpackCache.set(cacheKey, bundleCode);
         resolve(bundleCode);
       });
     });
