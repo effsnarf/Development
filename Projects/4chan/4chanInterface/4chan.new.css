@@ -1,3 +1,22 @@
+.fourchan-interface
+{
+    position: fixed;
+    top: 4em;
+    right: 4em;
+    padding: 1em;
+    border-radius: 0.5em;
+    background: #eee;
+    box-shadow: -1em 1em 1em #00000080;
+}
+
+
+
+
+
+
+
+
+
 .fileThumb
 {
     border: 1px solid gray !important;

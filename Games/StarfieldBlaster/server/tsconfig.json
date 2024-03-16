@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+      "target": "es6",
+      "module": "commonjs",
+      "strict": true,
+      "esModuleInterop": true,
+      "paths": {
+        "@shared/*": ["../../../Shared/*"]
+      },
+    },
+    "externals": {
+      "@babylonjs/core": "BABYLON"
+    },
+  }
+  

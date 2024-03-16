@@ -1,0 +1,4 @@
+title: Starfield Blaster
+server:
+  host: localhost
+  port: 3000

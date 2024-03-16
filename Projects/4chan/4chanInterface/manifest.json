@@ -6,7 +6,7 @@
         {
           "matches": ["*://*.4chan.org/*"],
           "css": ["4chan.new.css"],
-          "js": ["util.js", "script.js"]
+          "js": ["./js/vue.global.js", "./js/util.js", "./js/script.js"]
         }
     ],
     "background": {
@@ -14,6 +14,12 @@
     },
     "permissions": [
       "activeTab", "scripting"
+    ],
+    "web_accessible_resources": [
+      {
+        "resources": ["vue/*"],
+        "matches": ["<all_urls>"]
+      }
     ]
   }
   

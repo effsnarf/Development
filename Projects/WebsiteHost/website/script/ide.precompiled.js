@@ -6032,8 +6032,57 @@ exports["default"] = (context, compName, dom) => {
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports["default"] = (componentNames, name) => {
-    if (name.startsWith("v-"))
+    const vueAttributes = [
+        "v-if",
+        "v-else-if",
+        "v-else",
+        "v-for",
+        "v-on",
+        "v-bind",
+        "v-model",
+        "v-show",
+        "v-pre",
+        "v-cloak",
+        "v-once",
+    ];
+    if (vueAttributes.includes(name))
         return true;
+    const vuetifyComponents = [
+        "v-app",
+        "v-main",
+        "v-container",
+        "v-row",
+        "v-col",
+        "v-spacer",
+        "v-layout",
+        "v-flex",
+        "v-img",
+        "v-card",
+        "v-card-title",
+        "v-card-subtitle",
+        "v-card-text",
+        "v-card-actions",
+        "v-card-media",
+        "v-card-header",
+        "v-card-footer",
+        "v-sheet",
+        "v-toolbar",
+        "v-toolbar-title",
+        "v-toolbar-items",
+        "v-toolbar-side-icon",
+        "v-toolbar-items-group",
+        "v-toolbar-item",
+        "v-toolbar-divider",
+        "v-app-bar",
+        "v-app-bar-nav-icon",
+        "v-app-bar-title",
+        "v-app-bar-items",
+        "v-app-bar-nav-icon",
+        "v-progress-linear",
+        "v-progress-circular",
+    ];
+    if (vuetifyComponents.includes(name))
+        return false;
     if (name.includes("@"))
         return true;
     if (name.includes("."))
@@ -6099,8 +6148,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const add_paths_1 = __importDefault(__webpack_require__(/*! ./add.paths */ "../../../Shared/WebScript/add.paths.ts"));
-const isHTMLTag = (tag) => {
+const replaceWholeWord = function (s, search, replacement) {
+    const regex = new RegExp("\\b" + search + "\\b", "g");
+    return s.replace(regex, replacement);
+};
+const isReservedTag = (tag) => {
     tag = tag.toLowerCase();
+    if (tag.startsWith("v-"))
+        return true;
     const htmlTags = [
         "a",
         "abbr",
@@ -6217,12 +6272,19 @@ const isHTMLTag = (tag) => {
         "video",
         "wbr",
     ];
-    return htmlTags.includes(tag);
+    const vueTags = [
+        "transition",
+        "transition-group",
+        "keep-alive",
+        "slot",
+        "component",
+    ];
+    return [...vueTags, ...htmlTags].includes(tag);
 };
 exports["default"] = (context, dom, indent, compName, compType) => {
     if (!dom)
         return [];
-    const s = [];
+    let s = [];
     if (!indent)
         indent = 0;
     dom = JSON.parse(JSON.stringify(dom));
@@ -6270,7 +6332,7 @@ exports["default"] = (context, dom, indent, compName, compType) => {
         }
     }
     const toDomTag = (tag, compType) => {
-        if (compType == "sfc" && !isHTMLTag(tag)) {
+        if (compType == "sfc" && !isReservedTag(tag)) {
             // For sfc we use CamelCase
             return tag
                 .split(".")
@@ -6341,6 +6403,14 @@ exports["default"] = (context, dom, indent, compName, compType) => {
             s.push(...context.toTemplate(context, dom, indent + 1, null, compType));
         }
     }
+    const fixLine = (s) => {
+        // Replace "v-slot"=" " with "v-slot:
+        s = s.replace(/\"v-slot\"=\"/g, `\"v-slot:`);
+        // Replace "AppNuxt" (full word) with "Nuxt"
+        s = replaceWholeWord(s, "AppNuxt", "Nuxt");
+        return s;
+    };
+    s = s.map((line) => fixLine(line));
     return s;
 };
 
@@ -6379,7 +6449,7 @@ var __webpack_exports__ = {};
 (() => {
 var exports = __webpack_exports__;
 /*!*********************************************************!*\
-  !*** ../../WebsiteHost/website/script/1709816605447.ts ***!
+  !*** ../../WebsiteHost/website/script/1710345763958.ts ***!
   \*********************************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));

@@ -1,0 +1,19 @@
+<html>
+  <head>
+    <title>Starfield Blaster</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="/css/defaults.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babylonjs/6.47.0/babylon.js"></script>
+    <script src="/ts/app.ts"></script>
+  </head>
+  <body>
+    <canvas id="canvas1" width="800" height="600"></canvas>
+    <script>
+      // When the page is loaded
+      document.addEventListener("DOMContentLoaded", async () => {
+        const canvas = document.getElementById("canvas1");
+        const app = await App.start(canvas);
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,13 @@
+body
+{
+    background: black;
+}
+
+canvas
+{
+    display: block;
+    aspect-ratio: 9 / 16;
+    height: calc(100vh - 2vh);
+    margin: auto;
+    border: 1px solid white;
+}
