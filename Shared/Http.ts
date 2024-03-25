@@ -97,6 +97,18 @@ class Http {
     return mime.lookup(filePath) || "application/octet-stream";
   }
 
+  static parseQueryArgs(qs: string): any {
+    let query = {} as any;
+    let pairs = qs.split("&");
+    for (let pair of pairs) {
+      let parts = pair.split("=");
+      let key = decodeURIComponent(parts[0]);
+      let value = decodeURIComponent(parts[1]);
+      query[key] = value;
+    }
+    return query;
+  }
+
   static isImageFile(filePath: string): boolean {
     return (
       Http.getMimeType(filePath).startsWith("image/") ||

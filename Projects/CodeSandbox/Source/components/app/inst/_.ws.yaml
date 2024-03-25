@@ -1,0 +1,45 @@
+dom:
+  .ins:
+    ui.value:
+      :key: key1
+      :value: instn.state
+    app.inst.method.list:
+      :api: api
+      :instn: instn
+      @invoked: onMethodInvoked
+
+props:
+  api:
+  instn:
+
+data:
+  key1: 0
+
+methods:
+  onMethodInvoked: | #js
+    function onMethodInvoked(method, result) {
+      this.refresh();
+    }
+  refresh: | #js
+    function refresh() {
+      this.key1++;
+    }
+
+style:
+  .ins:
+    display: flex
+    flex-direction: column
+    gap: 1em
+    padding: 0.5em 0.5em
+    border: 1px solid gray
+    background: "#80808040"
+  .methods:
+    opacity: 0
+    display: flex
+    flex-direction: row
+    transition: 0.3s
+  .ins:hover .methods:
+    opacity: 1
+  .method:
+    padding: 0.5em 1em
+    background: "#80808020"

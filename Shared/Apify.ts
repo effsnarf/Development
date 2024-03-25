@@ -5,8 +5,10 @@ import { Reflection } from "./Reflection";
 import https from "https";
 import express from "express";
 import "./Extensions";
+import ts from "typescript";
 import { TypeScript } from "./TypeScript";
 import { Objects } from "./Extensions.Objects.Client";
+import { Http } from "./Http";
 
 const getIP = (req: any) => {
   const ip =
@@ -28,7 +30,7 @@ namespace Apify {
     methods: MethodSignature[];
   }
 
-  interface InstanceInfo {
+  interface InstanceData {
     id: number;
   }
 
@@ -57,17 +59,21 @@ namespace Apify {
       // Check if the class has a static new method
       let instance = cls.new ? await cls.new(...args) : new cls(...args);
       instance._ = (instance as any)._ || {};
-      instance._.id = Date.now();
+      instance.__ = { id: Date.now() };
       instance._.className = className;
       this.instances.push(instance);
-      debugger;
       return instance;
     }
 
     getInstance(id: number) {
-      let inst = this.instances.find((i) => i._.id === id);
+      let inst = this.instances.find((i) => i.__.id === id);
       if (!inst) throw new Error(`Instance ${id} not found`);
       return inst;
+    }
+
+    getInstances(className?: string) {
+      if (!className) return [...this.instances];
+      return this.instances.filter((i) => i._.className === className);
     }
   }
 
@@ -76,7 +82,6 @@ namespace Apify {
     port: number | null;
     baseUrl: string;
     classes: any[];
-    apifyPath: string;
     httpServer!: any;
     instanceManager: InstanceManager;
     options: Options;
@@ -86,14 +91,12 @@ namespace Apify {
       port: number | null,
       baseUrl: string,
       classes: any[],
-      apifyPath: string,
       options: Options = new Options()
     ) {
       this.host = host;
       this.port = port;
       this.baseUrl = baseUrl;
       this.classes = classes;
-      this.apifyPath = apifyPath;
       this.options = options;
       this.instanceManager = new InstanceManager(options);
 
@@ -105,11 +108,24 @@ namespace Apify {
       port: number,
       baseUrl: string,
       classes: any[],
-      apifyPath: string,
       options?: Options
     ) {
-      let server = new Server(host, port, baseUrl, classes, apifyPath, options);
+      let server = new Server(host, port, baseUrl, classes, options);
       server.start();
+    }
+
+    getPublicState(inst: any) {
+      let state = { ...inst };
+      delete state._;
+      delete state.__;
+      return state;
+    }
+
+    toPublicInstance(inst: any) {
+      return {
+        _: inst._,
+        state: this.getPublicState(inst),
+      };
     }
 
     async processUrl(
@@ -118,108 +134,137 @@ namespace Apify {
       reqBody?: string,
       options?: CallOptions
     ) {
-      if (typeof ip == "string") ip = ip.ipToNumber();
-      switch (url) {
-        case "":
-        case "/":
-          let result = Reflection.getClassSignatures(this.classes) as any;
-          if (options?.stringify) result = JSON.stringify(result);
-          return result;
-        case "/client.js":
-          return this.getApifyClientSourceJs();
-        default:
-          let match = null;
-          // /[class]/new
-          if ((match = url.match(/^\/([a-zA-Z]+)\/new$/))) {
-            const className = match[1];
-            let cls = this.classes.find((c) => c.name === className);
-            if (!cls) throw new Error(`Class ${className} not found`);
-            let inst = await this.instanceManager.createInstance(
-              className,
-              cls,
-              []
-            );
-            let result = { id: inst._.id } as any;
-            if (options?.stringify) result = JSON.stringify(result);
-            return result;
-          } else if (
-            (match = url.match(/^\/([a-zA-Z]+)\/(\d+)\/([a-zA-Z]+)(\?.*)?$/))
-          ) {
-            const className = match[1];
-            const id = match[2];
-            const methodName = match[3];
+      const _processUrl = async (ip: any, url: string, reqBody?: string) => {
+        try {
+          if (typeof ip == "string") ip = ip.ipToNumber();
+          switch (url) {
+            case "":
+            case "/":
+              const sigs = Reflection.getClassSignatures(this.classes) as any;
+              return {
+                classes: sigs,
+                urls: [
+                  "/",
+                  "/instances",
+                  "/client.js",
+                  "/[class]",
+                  "/[class]/new",
+                  "/[class]/[id]",
+                  "/[class]/[id]/[method]",
+                ],
+              };
+            case "/instances":
+              const insts = this.instanceManager.getInstances();
+              return insts.map(this.toPublicInstance.bind(this));
+            case "/client.js":
+              return this.getApifyClientSourceJs();
+            default:
+              let match = null;
+              // /[class]
+              // Returns all instances of a class
+              if ((match = url.match(/^\/([a-zA-Z]+)$/))) {
+                const className = match[1];
+                const insts = this.instanceManager.getInstances(className);
+                const result = insts.map((inst) => this.toPublicInstance(inst));
+                return result;
+              }
+              // /[class]/new?arg1=1&arg2=2
+              if ((match = url.match(/^\/([a-zA-Z]+)\/new(\?.*)?$/))) {
+                const className = match[1];
+                const cls = this.classes.find((c) => c.name === className);
+                if (!cls) throw new Error(`Class ${className} not found`);
+                const args = Http.parseQueryArgs(match[2]);
+                const inst = await this.instanceManager.createInstance(
+                  className,
+                  cls,
+                  Object.values(args)
+                );
+                const state = this.getPublicState(inst);
+                const result = { id: inst.__.id, state } as any;
+                return result;
+              }
+              if (
+                // /[class]/[id]
+                (match = url.match(/^\/([a-zA-Z]+)\/(\d+)(\?.*)?$/))
+              ) {
+                const className = match[1];
+                const id = match[2];
+                let cls = this.classes.find((c) => c.name === className);
+                let inst = this.instanceManager.getInstance(parseInt(id));
+                let state = this.getPublicState(inst);
+                return state;
+              }
+              if (
+                // /[class]/[id]/[method]
+                (match = url.match(
+                  /^\/([a-zA-Z]+)\/(\d+)\/([a-zA-Z]+)(\?.*)?$/
+                ))
+              ) {
+                const className = match[1];
+                const id = match[2];
+                const methodName = match[3];
 
-            let cls = this.classes.find((c) => c.name === className);
-            let inst = this.instanceManager.getInstance(parseInt(id));
-            let method = inst[methodName];
-            if (!method) throw new Error(`Method ${methodName} not found`);
-            const argsObj =
-              typeof reqBody == "string"
-                ? Objects.json.parse(reqBody || "{}")
-                : reqBody;
-            const argValues = Reflection.getFunctionArgs(method).map(
-              (argName) => argsObj[argName]
-            );
-            //console.log(`${methodName.yellow}(${JSON.stringify(argValues)})`);
-            let result = await method.apply(inst, argValues);
-            if (options?.stringify) result = JSON.stringify(result);
-            return result;
-          } else {
-            // Handle any other cases or throw an error
-            throw new Error(`Invalid URL: ${url}`);
+                let cls = this.classes.find((c) => c.name === className);
+                let inst = this.instanceManager.getInstance(parseInt(id));
+                let method = inst[methodName];
+                if (!method) throw new Error(`Method ${methodName} not found`);
+                const argsObj =
+                  typeof reqBody == "string"
+                    ? Objects.json.parse(reqBody || "{}")
+                    : reqBody;
+                const argValues = Reflection.getFunctionArgs(method).map(
+                  (argName) => argsObj[argName]
+                );
+                //console.log(`${methodName.yellow}(${JSON.stringify(argValues)})`);
+                const result = await method.apply(inst, argValues);
+                return { result, state: this.getPublicState(inst) };
+              } else {
+                // Handle any other cases or throw an error
+                throw new Error(`Invalid URL: ${url}`);
+              }
           }
-      }
+        } catch (ex: any) {
+          return { error: ex.message, stack: ex.stack };
+        }
+      };
+      const result = await _processUrl(ip, url, reqBody);
+      if (options?.stringify) return JSON.stringify(result);
+      return result;
     }
 
     init() {
       this.httpServer = express();
       this.httpServer.use(express.json());
 
+      // Allow CORS
       this.httpServer.use(function (req: any, res: any, next: any) {
-        res.header("Access-Control-Allow-Origin", "*");
+        const origin = req.headers.origin;
+        res.header("Access-Control-Allow-Origin", origin);
+        res.header(
+          "Access-Control-Allow-Headers",
+          "Origin, X-Requested-With, Content-Type, Accept"
+        );
+        res.header("Access-Control-Allow-Credentials", "true");
         next();
       });
 
-      this.httpServer.get(this.baseUrl, async (req: any, res: any) => {
-        // get the relative url from the request url minus the base url
+      this.httpServer.all(`${this.baseUrl}*`, async (req: any, res: any) => {
+        if (req.method == "OPTIONS") {
+          res.end();
+          return;
+        }
         const relUrl = req.url.replace(this.baseUrl, "");
-        res.send(await this.processUrl(getIP(req), relUrl));
+        //console.log(`[${req.method}] ${relUrl}`.gray);
+        res.send(await this.processUrl(getIP(req), relUrl, req.body));
         res.end();
       });
-
-      this.httpServer.get(
-        `${this.baseUrl}/client.js`,
-        async (req: any, res: any) => {
-          const relUrl = req.url.replace(this.baseUrl, "");
-          res.send(await this.processUrl(getIP(req), relUrl));
-          res.end();
-        }
-      );
-
-      this.httpServer.get(
-        `${this.baseUrl}/:class/new`,
-        async (req: any, res: any) => {
-          const relUrl = req.url.replace(this.baseUrl, "");
-          res.send(await this.processUrl(getIP(req), relUrl));
-          res.end();
-        }
-      );
-
-      this.httpServer.all(
-        `${this.baseUrl}/:class/:id/:method`,
-        async (req: any, res: any) => {
-          const relUrl = req.url.replace(this.baseUrl, "");
-          res.send(await this.processUrl(getIP(req), relUrl, req.body));
-          res.end();
-        }
-      );
     }
 
     start() {
       this.httpServer.listen(this.port, this.host, () => {
         console.log();
         console.log(
-          `${colors.gray(`Apify HTTP server running\n`)}${
+          `${`Apify HTTP server running\n`.gray}${
             `  http://${this.host}:${this.port}${this.baseUrl}`.yellow
           }`
         );
@@ -233,6 +278,11 @@ namespace Apify {
           }
         }
         console.log();
+        // Usage
+        console.log(`Usage:`.gray);
+        console.log(`  ${this.baseUrl}/[class]/new`.yellow);
+        console.log(`  ${this.baseUrl}/[class]/[id]/[method]`.yellow);
+        console.log();
       });
     }
 
@@ -240,9 +290,7 @@ namespace Apify {
       const cls = Apify.Client.toString();
       return `var Apify = Apify || {};
       Apify.Client = ${cls};`;
-      let source = fs.readFileSync(`${this.apifyPath}/ApifyClient.ts`, "utf8");
-      source = source.replace("export { ApifyClient }", "");
-      return TypeScript.transpileToJavaScript(source);
+      //return TypeScript.transpileToJavaScript(cls);
     }
   }
 
@@ -257,13 +305,13 @@ namespace Apify {
         method: string,
         args: any[] = []
       ) {
-        if (method != "new" && !this._.id)
+        if (method != "new" && !this.__.id)
           throw new Error(
             `Use (await ${this._.name}.new()) to create a new instance.`
           );
 
         let url = `${(this as any)._.baseUrl}/${(this as any)._.name}`;
-        if (this._.id) url += `/${this._.id}`;
+        if (this.__.id) url += `/${this.__.id}`;
         url += `/${method}`;
 
         let argsMap = this._getArgsMap(method, ...args);
@@ -281,7 +329,7 @@ namespace Apify {
             body: JSON.stringify(Object.fromEntries(argsMap)),
           });
         } else if (queryString?.length) {
-          if (method != "new") url += `?${queryString}`;
+          url += `?${queryString}`;
           response = await fetch(url);
         } else {
           response = await fetch(url);
@@ -289,18 +337,23 @@ namespace Apify {
 
         let text = await response.text();
         if (text.length) {
-          let json = Objects.json.parse(text);
+          const json = JSON.parse(text);
+          if (json.state) {
+            Object.assign(this.state, json.state);
+          }
           if (json.error) throw new Error(json.error);
           return json;
         }
       };
 
       const _getArgsMap1 = (method: string, args: string[]) => {
+        if (method == "new") method = "constructor";
         let argsMap = new Map<string, string>();
         for (let i = 0; i < args.length; i++) {
           let meth = signature.methods.find((m) => m.name == method);
-          if (!meth)
+          if (!meth) {
             throw new Error(`Method ${method} not found in ${signature.name}`);
+          }
 
           argsMap.set(meth.args[i], args[i]);
         }
@@ -310,12 +363,17 @@ namespace Apify {
       const _getNewID = async function () {};
 
       let cls = class {
-        _: InstanceInfo = {} as InstanceInfo;
+        _: ClassSignature = {} as ClassSignature;
+        __: InstanceData = {} as InstanceData;
 
-        static async new() {
-          var inst = new cls();
+        state: any = {};
+
+        static async new(...args: any[]) {
+          var inst = new (cls as any)(...args);
           inst._ = cls.prototype._;
-          inst._.id = (await inst._apiCall("new")).id as number;
+          const newCls = (await inst._apiCall("new", ...args)) as any;
+          inst.__ = { id: newCls.id as number };
+          inst.state = newCls.state;
           return inst;
         }
 
@@ -347,7 +405,8 @@ namespace Apify {
       if (apiUrl.endsWith("/")) apiUrl = apiUrl.substring(0, apiUrl.length - 1);
 
       // Get the class signatures from the api
-      let classSigs = (await (await fetch(apiUrl)).json()) as ClassSignature[];
+      const api = await (await fetch(apiUrl)).json();
+      const classSigs = api.classes as ClassSignature[];
 
       let classes = new Map<string, any>();
 

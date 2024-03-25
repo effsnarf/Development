@@ -1,0 +1,25 @@
+dom:
+  div:
+    button:
+      v-text: method.name
+      @click: invoke(instn, method)
+
+props:
+  api:
+  instn:
+  method:
+
+methods:
+  invoke: | #js
+    async function(inst, method) {
+      const mtd = inst[method.name];
+      const args = this.getMethodArgs(mtd);
+      const result = await mtd.apply(inst, args);
+      this.$emit('invoked', method, result);
+    }
+  getMethodArgs: | #js
+    function getMethodArgs(mtd) {
+      const args = [];
+      return args;
+    }
+

@@ -1,0 +1,17 @@
+database:
+  content:
+  analytics:
+template:
+  get: | #ts
+    async function(dbp, req) {
+      return {
+        title: "Code Sandbox",
+        html: {
+          meta: {
+            scripts: [
+              { src: "//localhost:4001/client.js" }
+            ]
+          }
+        }
+      }
+    }

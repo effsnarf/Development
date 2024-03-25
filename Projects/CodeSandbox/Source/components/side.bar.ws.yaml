@@ -1,0 +1,11 @@
+dom:
+  .flex:
+    .sidebar:
+      div:
+        app.menu:
+          :api: api
+
+props:
+  api:
+
+data:

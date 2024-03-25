@@ -49,6 +49,9 @@ class Starship implements IRenderable {
       scene
     );
 
+    // Scale the starship body to be half its size
+    starshipBody.scaling = new Vector3(0.5, 0.5, 0.5);
+
     return starshipBody;
   }
 

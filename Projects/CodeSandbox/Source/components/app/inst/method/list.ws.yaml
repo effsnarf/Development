@@ -1,0 +1,24 @@
+dom:
+  .methods:
+    app.inst.method:
+      v-for: method in instn._.methods
+      :key: method.name
+      :api: api
+      :instn: instn
+      :method: method
+      @invoked: onMethodInvoked
+
+props:
+  api:
+  instn:
+ 
+methods:
+  onMethodInvoked: | #js
+    function onMethodInvoked(method, result) {
+      this.$emit('invoked', method, result);
+    }
+
+style:
+  .methods:
+    display: flex
+    justify-content: space-around

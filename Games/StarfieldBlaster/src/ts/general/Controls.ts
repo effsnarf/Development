@@ -1,7 +1,7 @@
 // enum KeyDirection
 enum KeyDirection {
-  Press = 0,
-  Release = 1,
+  Press = 1,
+  Release = -1,
 }
 
 class Controls {

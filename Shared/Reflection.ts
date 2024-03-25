@@ -27,6 +27,11 @@ class Reflection {
   // ]
   static getClassMethods(cls: any) {
     let methods = [] as MethodSignature[];
+    // Add the constructor
+    methods.push({
+      name: "constructor",
+      args: Reflection.getFunctionArgs(cls.prototype.constructor),
+    });
     for (let key of Object.getOwnPropertyNames(cls.prototype)) {
       if (key === "constructor") continue;
       try {
@@ -68,7 +73,7 @@ class Reflection {
   }
 
   static getFunctionArgs(func: any): string[] {
-    let args = func.toString().match(/\(([^)]*)\)/)[1];
+    let args = func.toString().match(/\(([^)]*)\)/)?.[1] || "";
     let resultArgs = args
       .split(",")
       .map(

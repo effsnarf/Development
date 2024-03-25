@@ -1,0 +1,47 @@
+dom:
+  .app:
+    .columns:
+      .column1:
+        side.bar:
+          :api: api
+      .column2:
+        app.inst.list:
+          :api: api
+    div:
+      ui.html.style:
+        v-for: comp in $root.comps
+        ":key": comp.name
+        ":component": comp
+        ":document-head": "true"
+
+data:
+  api: null
+
+mounted: | #js
+  async function() {
+    this.$root.insts = [];
+    const api = await Apify.Client.createClasses("//localhost:4001");
+    api.insts = [];
+    this.api = api;
+  }
+
+style:
+  .app, .columns, .columns > div:
+    min-height: 100vh
+  .columns:
+    display: flex
+    flex-direction: row
+    gap: 4em
+  .column1:
+    flex-shrink: 1
+  .column2:
+    flex-grow: 1
+_:
+  examples:
+    count: 0
+name: app
+template: >-
+  <div class="comp-app" path="96801."><grid-app></grid-app><div
+  path="96801.1"><ui-html-style v-for="comp in $root.comps" :key="comp.name"
+  :component="comp" :document-head="true"
+  path="96801.1.0"></ui-html-style></div></div>

@@ -1,0 +1,28 @@
+dom:
+  div:
+    div:
+      v-for: className in classNames
+      :key: className
+      .flex.gap-1:
+        h3:
+          v-text: className
+        button:
+          v-text: "'new'"
+          @click: instantiate(className)
+
+props:
+  api:
+
+data:
+
+methods:
+  instantiate: | #js
+    async function(className) {
+      const inst = await this.api[className].new();
+      this.api.insts.push(inst);
+    }
+
+computed:
+  classNames: | #js
+    return Object.keys(this.api || {})
+      .filter(key => key !== 'insts');

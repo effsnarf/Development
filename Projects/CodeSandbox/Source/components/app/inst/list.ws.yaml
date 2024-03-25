@@ -1,0 +1,40 @@
+dom:
+  .classes:
+    .class:
+      v-for: className in classNames
+      h2:
+        v-text: className
+      .insts:
+        app.inst:
+          v-for: inst in getInsts(className)
+          :key: inst._.id
+          :instn: inst
+
+props:
+  api:
+
+methods:
+  getInsts: | #js
+    function getInsts(className) {
+      return this.api?.insts?.filter(inst => inst._.name === className);
+    }
+  getClassNames: | #js
+    function getInstClassNames(api) {
+      return this.api?.insts?.map(inst => inst._.name)
+        .distinct();
+    }
+
+computed:
+  classNames: | #js
+    function() {
+      return this.getClassNames(this.api);
+    }
+
+style:
+  .classes:
+    display: flex
+    gap: 2em
+  .insts:
+    display: flex
+    flex-direction: column
+    gap: 1em

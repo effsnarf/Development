@@ -1,0 +1,9 @@
+img
+{
+    filter: contrast(10) opacity(0.2) grayscale(1);
+}
+
+video
+{
+    opacity: 0;
+}
