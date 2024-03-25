@@ -62,7 +62,10 @@ class Character {
 }
 
 class String1 {
-  private constructor(public string: string, public chars: Character[] = []) {}
+  private constructor(
+    public string: string,
+    public chars: Character[] = []
+  ) {}
 
   static fromString(str: string | String): String1 {
     const str1 = str.toString();
@@ -366,6 +369,7 @@ interface String {
   pluralize(): string;
   antonym(): string;
   capitalize(): string;
+  decamelize(): string;
 
   includesWholeWord(word: string): boolean;
 
@@ -939,6 +943,10 @@ if (typeof String !== "undefined") {
 
   String.prototype.capitalize = function (): string {
     return this[0].toUpperCase() + this.slice(1);
+  };
+
+  String.prototype.decamelize = function (): string {
+    return this.replace(/([a-z])([A-Z])/g, "$1 $2").toLowerCase();
   };
 
   String.prototype.includesWholeWord = function (word: string): boolean {

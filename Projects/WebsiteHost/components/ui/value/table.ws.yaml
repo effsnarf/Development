@@ -29,12 +29,12 @@ dom:
               @click: toggleExpanded(row.key)
               ui.expand:
                 class: opacity-40
-                ':value': isExpanded[row.key]
+                ':value': isExpanded1(row.key)
                 ':text': row.key
             transition:
               name: slide
               .ml-l1:
-                v-if: isExpanded[row.key]
+                v-if: isExpanded1(row.key)
                 ui.value.any: 
                   ':value': row.value
                   ':depth': (depth + 1)
@@ -45,7 +45,7 @@ dom:
 props:
   value: null
   title: null
-  expandAll: true
+  expandAll: false
   depth: 0
 data:
   isExpanded: {}
@@ -97,6 +97,11 @@ methods:
     function(value) {
       if (value == null) return true;
       return ['string', 'number', 'boolean'].includes(typeof value);
+    }
+  isExpanded1: | #js
+    function(key) {
+      if (this.expandAll) return true;
+      return this.isExpanded[key];
     }
   getType: | #js
     function(value) {

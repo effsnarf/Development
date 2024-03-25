@@ -116,9 +116,28 @@ namespace Apify {
 
     getPublicState(inst: any) {
       let state = { ...inst };
-      delete state._;
-      delete state.__;
+      Object.assign(state, this.getPropsMap(inst));
+      const hiddenKeys = this.getHiddenKeys(inst);
+      hiddenKeys.forEach((key) => delete state[key]);
       return state;
+    }
+
+    getPropsMap(inst: any) {
+      // Find all the properties (getters) of the instance
+      const props = Reflection.getProperties(inst);
+      const propsMap = new Map<string, any>();
+      props.forEach((prop) => {
+        propsMap.set(prop, inst[prop]);
+      });
+      return Object.fromEntries(propsMap);
+    }
+
+    getHiddenKeys(inst: any) {
+      return Object.keys(inst).filter(this.isKeyHidden.bind(this));
+    }
+
+    isKeyHidden(key: string) {
+      return key.startsWith("_") || key.startsWith("__");
     }
 
     toPublicInstance(inst: any) {
@@ -271,7 +290,9 @@ namespace Apify {
         console.log();
         console.log(`Exposed methods:`.gray);
         for (let clss of this.classes) {
-          let classSignature = Reflection.getClassSignature(clss);
+          let classSignature = Reflection.getClassSignature(clss, {
+            includePrivate: false,
+          });
           console.log(`  ${classSignature.name}`.cyan);
           for (let method of classSignature.methods) {
             console.log(`    ${method.name}(${method.args.join(", ")})`.green);
@@ -338,10 +359,10 @@ namespace Apify {
         let text = await response.text();
         if (text.length) {
           const json = JSON.parse(text);
+          if (json.error) throw new Error(json.error);
           if (json.state) {
             Object.assign(this.state, json.state);
           }
-          if (json.error) throw new Error(json.error);
           return json;
         }
       };

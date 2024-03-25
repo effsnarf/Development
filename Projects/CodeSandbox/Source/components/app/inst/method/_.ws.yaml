@@ -1,7 +1,7 @@
 dom:
   div:
     button:
-      v-text: methodName
+      v-text: methodName1
       @click: invoke(instn, method1)
 
 props:
@@ -13,11 +13,16 @@ props:
 methods:
   invoke: | #js
     async function(inst, method) {
-      debugger;
-      const mtd = this.getMethod(inst, method);
-      const args = this.getMethodArgs(mtd);
-      const result = await mtd.apply(inst, args);
-      this.$emit('invoked', method, result);
+      try
+      {
+        const mtd = this.getMethod(inst, method);
+        const args = this.getMethodArgs(mtd);
+        const result = await mtd.apply(inst, args);
+        this.$emit('invoked', method, result);
+      }
+      catch (ex) {
+        alertify.error(ex.message);
+      }
     }
   getMethod: | #js
     function getMethod(inst, method) {
@@ -39,8 +44,19 @@ computed:
       if (name == "constructor") return "new";
       return name;
     }
+  methodName1: | #js
+    function() {
+      return this.methodName?.decamelize();
+    }
   method1: | #js
     function() {
       if (!this.method) return { name: "constructor" };
       return this.method;
     }
+
+style:
+  button:
+    color: white
+    background: "#80808060"
+  button:hover:
+    background: "#80808080"

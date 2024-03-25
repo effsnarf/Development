@@ -19,6 +19,7 @@ dom:
             text: Array
             ':number': value?.length
           ui.input.text.box:
+            class: search-box
             type: search
             icon: 🔎
             hint: search
@@ -235,6 +236,12 @@ style:
     border-radius: 0.5em
     padding: 0.5em
     overflow: hidden
+  .search-box:
+    max-height: 0
+    overflow: hidden
+    transition: 0.5s
+  .box1:hover .search-box:
+    max-height: 2em
   .reversed > table > tbody:
     display: flex
     flex-direction: column-reverse

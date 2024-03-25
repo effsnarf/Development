@@ -4,16 +4,19 @@ interface MethodSignature {
   args: string[];
 }
 
+type Options1 = { includePrivate: boolean };
+const defaultOptions1: Options1 = { includePrivate: false };
+
 class Reflection {
   static getClassSignatures(clss: any[]) {
     return clss.map((c) => this.getClassSignature(c));
   }
 
   // { name: "Reflection", methods: [ { name: "getClassSignature", args: ["cls"] } ] }
-  static getClassSignature(cls: any) {
+  static getClassSignature(cls: any, options: Options1 = defaultOptions1) {
     return {
       name: Reflection.getClassName(cls),
-      methods: Reflection.getClassMethods(cls),
+      methods: Reflection.getClassMethods(cls, options),
     };
   }
 
@@ -25,7 +28,7 @@ class Reflection {
   // [
   //  { name: "send", args: ["message"] },
   // ]
-  static getClassMethods(cls: any) {
+  static getClassMethods(cls: any, options: Options1 = defaultOptions1) {
     let methods = [] as MethodSignature[];
     // Add the constructor
     methods.push({
@@ -52,6 +55,9 @@ class Reflection {
           args: Reflection.getFunctionArgs((cls as any)[key]),
         });
       }
+    }
+    if (!options?.includePrivate) {
+      methods = methods.filter((m) => !m.name.startsWith("_"));
     }
     return methods;
   }
@@ -86,6 +92,19 @@ class Reflection {
       )
       .filter((arg: string) => arg);
     return resultArgs;
+  }
+
+  static getProperties(instance: any) {
+    let properties = [] as string[];
+    for (let key of Object.getOwnPropertyNames(instance)) {
+      if (key === "constructor") continue;
+      try {
+        if (typeof (instance as any)[key] !== "function") {
+          properties.push(key);
+        }
+      } catch (ex: any) {}
+    }
+    return properties;
   }
 
   static getMemberClasses<T extends { constructor: Function }>(
