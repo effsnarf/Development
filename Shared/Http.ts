@@ -98,6 +98,7 @@ class Http {
   }
 
   static parseQueryArgs(qs: string): any {
+    if (!qs) return {};
     let query = {} as any;
     let pairs = qs.split("&");
     for (let pair of pairs) {

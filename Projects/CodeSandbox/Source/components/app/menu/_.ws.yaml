@@ -6,9 +6,10 @@ dom:
       .flex.gap-1:
         h3:
           v-text: className
-        button:
-          v-text: "'new'"
-          @click: instantiate(className)
+        app.inst.method:
+          :api: api
+          :className: className
+          @invoked: onConstructorInvoked
 
 props:
   api:
@@ -16,9 +17,8 @@ props:
 data:
 
 methods:
-  instantiate: | #js
-    async function(className) {
-      const inst = await this.api[className].new();
+  onConstructorInvoked: | #js
+    function(method, inst) {
       this.api.insts.push(inst);
     }
 

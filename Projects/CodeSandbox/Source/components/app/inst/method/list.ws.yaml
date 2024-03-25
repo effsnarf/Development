@@ -6,6 +6,7 @@ dom:
       :api: api
       :instn: instn
       :method: method
+      v-show: showMethod(method)
       @invoked: onMethodInvoked
 
 props:
@@ -16,6 +17,10 @@ methods:
   onMethodInvoked: | #js
     function onMethodInvoked(method, result) {
       this.$emit('invoked', method, result);
+    }
+  showMethod: | #js
+    function showMethod(method) {
+      return method.name !== 'constructor';
     }
 
 style:

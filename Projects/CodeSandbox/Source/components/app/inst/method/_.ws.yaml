@@ -1,21 +1,30 @@
 dom:
   div:
     button:
-      v-text: method.name
-      @click: invoke(instn, method)
+      v-text: methodName
+      @click: invoke(instn, method1)
 
 props:
   api:
+  className:
   instn:
   method:
 
 methods:
   invoke: | #js
     async function(inst, method) {
-      const mtd = inst[method.name];
+      debugger;
+      const mtd = this.getMethod(inst, method);
       const args = this.getMethodArgs(mtd);
       const result = await mtd.apply(inst, args);
       this.$emit('invoked', method, result);
+    }
+  getMethod: | #js
+    function getMethod(inst, method) {
+      if (method.name == "constructor") {
+        return this.api[this.className].new;
+      }
+      return inst[method.name];
     }
   getMethodArgs: | #js
     function getMethodArgs(mtd) {
@@ -23,3 +32,15 @@ methods:
       return args;
     }
 
+computed:
+  methodName: | #js
+    function() {
+      const name = this.method1.name;
+      if (name == "constructor") return "new";
+      return name;
+    }
+  method1: | #js
+    function() {
+      if (!this.method) return { name: "constructor" };
+      return this.method;
+    }
