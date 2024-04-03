@@ -280,7 +280,7 @@ class HttpServer {
             /  %body/g,
             templateData.staticStylesheets
               ?.map((line: string) => `    ${line}`)
-              .join("\n") + "\n %body"
+              .join("\n") + "\n  %body"
           );
           // Same for templateData.staticJavaScripts (string[])
           fileContent = fileContent.replace(
