@@ -1,5 +1,5 @@
 import util from "util";
-import { getEncoding, encodingForModel } from "js-tiktoken";
+//import { getEncoding } from "js-tiktoken";
 import axios, { AxiosResponse } from "axios";
 import { Objects } from "../../../Shared/Extensions.Objects";
 import * as colors from "colors";
@@ -146,7 +146,8 @@ class OpenAI {
     if (typeof message != "string") {
       message = JSON.stringify(message);
     }
-    const tokens = getEncoding("gpt2").encode(message).length;
+    //const tokens = getEncoding("gpt2").encode(message).length;
+    const tokens = 1000;
     return tokens;
   }
 
