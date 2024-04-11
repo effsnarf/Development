@@ -291,7 +291,7 @@ class HttpServer {
                 .join("\n") + "\n  %body"
             ).substring(2)
           );
-          fileContent = fileContent.replace(/(\r?\n)\s*%body/, '$1    %body');
+          fileContent = fileContent.replace(/(\r?\n)   %body/, '$1  %body');
           fileContent = Handlebars.compile(fileContent)(templateData);
           fileContent = HAML.render(fileContent);
           fileContent = `<!DOCTYPE html>\n${fileContent}`;
