@@ -147,6 +147,8 @@ class ClientContext {
       let html = this.clientPug.compile(pug)();
       // Replace (template v-slot="[name]") with (template v-slot:[name])
       html = html.replace(/v-slot="(.*?)"/g, "v-slot:$1");
+      // Replace 'v-slot:(*)="v-slot:(*)"' with 'v-slot:(*)'
+      html = html.replace(/v-slot:([^\s]+)="v-slot:\1"/g, 'v-slot:$1');
       // Except slotProps, replace it back
       html = html.replace(/v-slot:slotProps/g, 'v-slot="slotProps"');
       return html;
