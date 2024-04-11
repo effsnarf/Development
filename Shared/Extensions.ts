@@ -475,7 +475,7 @@ interface Array<T> {
   add(items: any[], stagger?: number): void;
   take(count: number): T[];
   takeLast(count: number): T[];
-  replace(
+  replaceItems(
     getNewItems: () => Promise<any[]>,
     stagger: number,
     getItemKey?: (item: any) => any
@@ -1787,7 +1787,7 @@ if (typeof Array !== "undefined") {
     return this.slice(-count);
   };
 
-  Array.prototype.replace = async function (
+  Array.prototype.replaceItems = async function (
     getNewItems: () => Promise<any[]>,
     stagger: number = 0,
     getItemKey?: (item: any) => string

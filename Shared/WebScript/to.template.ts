@@ -291,6 +291,8 @@ export default (
   const fixLine = (s: string) => {
     // Replace "v-slot"=" " with "v-slot:
     s = s.replace(/\"v-slot\"=\"/g, `\"v-slot:`);
+    // Replace 'v-slot:(*)="v-slot:(*)"' with 'v-slot:(*)'
+    s = s.replace(/v-slot:([^\s]+)="v-slot:\1"/g, 'v-slot:$1');
     // Replace "AppNuxt" (full word) with "Nuxt"
     s = replaceWholeWord(s, "AppNuxt", "Nuxt");
     return s;
