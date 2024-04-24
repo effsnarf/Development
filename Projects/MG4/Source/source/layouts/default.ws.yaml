@@ -14,6 +14,8 @@ dom:
         div:
           class: column
           v-text: "' '"
+        div:
+          class: footer-spacer
     div:
       ui.html.style:
         v-for: comp in $root.comps
@@ -22,6 +24,8 @@ dom:
         ":document-head": "true"
 
 style:
+  .footer-spacer:
+    height: 10vh
 _:
   examples:
     count: 0

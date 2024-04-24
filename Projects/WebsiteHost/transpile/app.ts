@@ -30,7 +30,7 @@ const getTime = () => new Date().toLocaleTimeString();
 
   const handlebarsHelpers = Objects.parseYaml(
     fs.readFileSync(
-      path.join(config.webscript.folder, "handlebars.helpers.yaml"),
+      path.join(__dirname, config.webscript.folder, "handlebars.helpers.yaml"),
       "utf8"
     )
   ).helpers;

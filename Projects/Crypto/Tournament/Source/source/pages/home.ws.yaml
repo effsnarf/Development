@@ -1,0 +1,39 @@
+dom:
+  .flex-center:
+    class: h100vh
+    div:
+      .flex:
+        class: flex-column gap-2
+        div:
+          button:
+            v-text: "'➕ start new tournament'"
+            @click: toggleNewTournament
+        .flex:
+          class: gap-2
+          div:
+            app.tournament:
+              v-for: tourn in tourns
+          transition:
+            name: slide
+            app.tournament.new:
+              v-if: showNewForm
+
+data:
+  tourns:
+  showNewForm: false
+
+mounted: | #js
+  async function() {
+    await this.init();
+  }
+
+methods:
+  toggleNewTournament: | #js
+    function() {
+      this.showNewForm = !this.showNewForm;
+    }
+  init: | #js
+    async function() {
+    }
+
+style:

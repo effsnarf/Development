@@ -1,6 +1,6 @@
 dom:
   div:
-    app.progress:
+    ui.progress:
       v-if: is.loading
     app.comment:
       v-for: comment in comments

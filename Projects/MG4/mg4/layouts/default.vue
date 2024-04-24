@@ -8,6 +8,7 @@ div("class"="comp-default")
       div("class"="main")
         Nuxt
       div("class"="column", "v-text"="' '")
+      div("class"="footer-spacer")
   div
     UiHtmlStyle("v-for"="comp in $root.comps", ":key"="comp.name", ":component"="comp", ":document-head"="true")
 </template>
@@ -18,4 +19,8 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.footer-spacer {
+  height: 10vh;
+}
+</style>

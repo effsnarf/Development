@@ -1,0 +1,197 @@
+body
+{
+    font-size: 2vh;
+    background: black;
+}
+
+
+body, h1, h2, h3, h4, h5, h6, a, select, input
+{
+    margin: 0;
+    font-family: Poppins;
+    color: white;
+    font-weight: normal;
+    text-shadow: none;
+}
+
+
+tr:hover
+{
+    background: #80808030;
+}
+
+select:hover
+{
+    background: #80808050;
+}
+
+select, input
+{
+    border: 1px solid gray !important;
+}
+
+select, option
+{
+    background: #303030 !important;
+}
+
+select:hover, input:hover
+{
+    background: #80808040;
+}
+
+select
+{
+    cursor: pointer;
+}
+
+a
+{
+    user-select: none;
+    opacity: 1;
+    cursor: pointer;
+}
+
+a:hover
+{
+    text-decoration: underline;
+    opacity: 0.9;
+    cursor: pointer;
+}
+
+a.hover-underline
+{
+    text-decoration: none;
+}
+
+a.hover-underline:hover
+{
+    text-decoration: underline;
+}
+
+body, input, select, textarea, button
+{
+    text-shadow: none !important;
+}
+
+div
+{
+    border-radius: 0;
+}
+
+.page
+{
+    position: relative;
+    width: 1200px;
+    margin: auto;
+}
+
+.page .columns
+{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 1em;
+}
+
+.page .columns .main
+{
+    flex-grow: 1;
+    max-width: 64%;
+}
+
+.page .columns .column
+{
+    width: calc(18% - 1em);
+}
+
+.page .main .box
+{
+    margin-bottom: 2em;
+}
+
+.page .column .box
+{
+    margin-bottom: 2em;
+}
+
+.page .column .comp-app-gallery .content
+{
+    padding: 0;
+}
+
+.search-generators .content, .search-generators .gallery
+{
+    padding: 0 !important;
+    gap: 0 !important;
+}
+
+.gallery img
+{
+    width: calc(100% - 2px);
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border: 1px solid black;
+}
+
+.search-generators .gallery
+{
+    background: linear-gradient(45deg, #000000a0, #00000010);
+}
+
+.search-generators .item
+{
+    width: calc(100% - 2em);
+}
+
+.voter.horizontal > div.upvote, .voter.horizontal > div.downvote
+{
+    width: 15px;
+}
+
+.voter .downvote
+{
+    cursor: pointer;
+    height: 22px;
+    background-image: url('/images/arrows.png');
+    background-repeat: no-repeat;
+    background-position: center -66px;
+}
+
+.voter .score
+{
+    color: #aaa;
+    font-family: Verdana;
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.voter.horizontal .score {
+    min-width: 30px;
+    padding: 0 5px;
+}
+
+
+button
+{
+    padding: 0.5em 1em;
+    border-radius: 0.5em;
+    color: black;
+    background: #ffffff20 !important;
+}
+
+button:hover
+{
+    background: #ffffff30 !important;
+    box-shadow: -2px 2px 2px #80808060;
+}
+
+.v-progress-circular
+{
+    filter: drop-shadow(-3px 3px 4px black);
+}
+
+.dimmed
+{
+    opacity: 0.5;
+}

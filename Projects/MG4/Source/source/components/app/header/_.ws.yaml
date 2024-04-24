@@ -6,7 +6,7 @@ dom:
     .page:
       .search-generators:
         v-if: showSearchResults
-        app.progress:
+        ui.progress:
           v-if: is.loading
         app.gallery:
           :template: "'app.generator.small'"

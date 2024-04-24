@@ -24,6 +24,11 @@ dom:
     app.gallery:
       :template: "'app.instance.medium'"
       :items: "instances1"
+    ui.pager:
+      :items-count: generator?.instancesCount
+      :page-size: 15
+      :value: pageIndex
+      :url-format: "'/' + generator?.urlName + '/${pageIndex}'"
 
 props:
   urlName: null
@@ -73,6 +78,14 @@ computed:
   poem: | #js
     function() {
       return this.getPoem();
+    }
+  pageIndex: | #js
+    function() {
+      return 0;
+      const url = window.location.pathname;
+      const parts = url.split('/');
+      const pageIndex = parseInt(parts[2]);
+      return pageIndex;
     }
 
 style:

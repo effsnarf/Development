@@ -1,0 +1,29 @@
+boards url
+
+https://a.4cdn.org/boards.json
+
+
+https://a.4cdn.org/fit/catalog.json
+
+
+(thread) => `https://i.4cdn.org/${thread.board.code}/${thread.tim}s.jpg`
+
+`https://i.4cdn.org/${item.board.code}/${item.tim}s.jpg`
+
+`https://i.4cdn.org/fit/${item.tim}s.jpg`
+
+
+board = { code: board.board, title: board.title };
+return threads.map(thread => ({ board, ...thread}));
+
+
+return (await (await fetch(url)).json());
+
+
+return (await (await fetch("https://a.4cdn.org/boards.json")).json());
+
+
+return (await (await fetch("https://a.4cdn.org/boards.json")).json()).boards;
+
+
+return (await (await fetch("https://a.4cdn.org/boards.json")).json()).boards.map(b => b.title);
