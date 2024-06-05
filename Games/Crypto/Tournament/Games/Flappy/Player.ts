@@ -1,4 +1,5 @@
 import { Element } from "./Element";
+import { Renderer } from "./Renderer";
 import { Game } from "./Game";
 
 class Player extends Element {
@@ -18,6 +19,10 @@ class Player extends Element {
     const seconds = ms / 1000;
 
     this.state.x += speed / seconds;
+  }
+
+  render(render: Renderer) {
+    render.square(this.state.x, this.state.y, 1, 1, "white");
   }
 }
 
