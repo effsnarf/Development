@@ -1,0 +1,47 @@
+dom:
+  div:
+    .menu1:
+      v-for: menu in menus
+      .title:
+        v-text: menu.category
+      app.menu.item:
+        v-for: item in menu.items
+        :key: item
+        :image: getImageUrl(item)
+        :text: item
+        :active: "item == activeItem"
+
+data:
+  menus:
+    - category: "Messages"
+      items:
+        - "Inbox"
+        - "Outbound"
+        - "Contacts"
+        - "Statistic"
+    - category: "Tools"
+      items:
+        - "Chat editor"
+        - "Automation"
+        - "Site tools"
+    - category: "Settings"
+      items:
+        - "General"
+        - "Account"
+        - "Billing"
+  activeItem: "Inbox"
+
+methods:
+  getImageUrl: | #js
+    function(item) {
+      return '/images/' + item.toLowerCase().replace(' ', '-') + '.png';
+    }
+
+style:
+  .menu1:
+    margin: 2em auto
+  .title:
+    width: 9.5em
+    margin: 0.4em auto
+    font-weight: bold
+    text-transform: uppercase

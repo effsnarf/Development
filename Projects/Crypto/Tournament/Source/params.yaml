@@ -1,6 +1,0 @@
-params:
-  page:
-    get: | #ts
-      function(url) {
-        if (url == "/") return "home";
-      }

@@ -1,7 +1,0 @@
-dom:
-  div:
-    v-text: "'Tournament'"
-
-props:
-
-computed:
