@@ -1,5 +1,8 @@
-class Player implements Element {
-  constructor(public game: Game) {
+import { Element } from "./Element";
+import { Game } from "./Game";
+
+class Player extends Element {
+  constructor(game: Game) {
     super(game);
   }
 
@@ -17,3 +20,5 @@ class Player implements Element {
     this.state.x += speed / seconds;
   }
 }
+
+export { Player };

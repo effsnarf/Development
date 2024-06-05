@@ -1,6 +1,9 @@
-abstract class Element
-{
-    constructor (public game: Game);
+import { Game } from "./Game";
 
-    abstract advance(ms: number);
+abstract class Element {
+  constructor(public game: Game) {}
+
+  abstract advance(ms: number): void;
 }
+
+export { Element };
