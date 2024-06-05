@@ -9,7 +9,7 @@ webscript:
 websiteHost:
   folder: (env) => env.path.resolve(env.process.cwd(), '../../../../../Projects/WebsiteHost')
 static:
-  folder: (env) => env.process.cwd()
+  folder: (env) => env.path.join(env.process.cwd(), "../")
 handler: | #js
   (ctx) => {
     return async (req, res, data) => {

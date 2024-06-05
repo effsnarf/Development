@@ -388,11 +388,11 @@ const sheakspearize = async (text: string) => {
   };
 
   const staticFileFolders = [
-    __dirname,
-    config.project.folder,
-    config.webscript.folder,
-    config.website?.folder,
     config.static.folder,
+    config.project.folder,
+    __dirname,
+    //config.webscript.folder,
+    //config.website?.folder,
   ].filter((s) => s);
 
   const isLocalFile = (url: string) => {
@@ -407,6 +407,17 @@ const sheakspearize = async (text: string) => {
   };
 
   //console.log("staticFileFolders", staticFileFolders);
+
+  const getIndexHamlPath = () => {
+    const paths = [
+      path.join(config.static.folder, "index.haml"),
+      //path.join(config.websiteHost.folder, "Website", "index.haml"),
+    ];
+
+    for (const path of paths) if (fs.existsSync(path)) return path;
+
+    throw new Error(`index.haml not found.`);
+  };
 
   const handler = !config.handler
     ? null
@@ -601,7 +612,7 @@ const sheakspearize = async (text: string) => {
       }
     },
     async (req: any) => await getProjectPageTemplateObject(req),
-    path.join(config.websiteHost.folder, "Website", "index.haml"),
+    getIndexHamlPath(),
     staticFileFolders,
     {
       log: {
