@@ -1,0 +1,14 @@
+dom:
+  div:
+    canvas:
+      width: 400
+      height: 300
+      ref: canvas1
+
+data:
+  game: null
+
+mounted: | #js
+  function() {
+    this.game = new Games.Flappy(this.$refs.canvas1);
+  }

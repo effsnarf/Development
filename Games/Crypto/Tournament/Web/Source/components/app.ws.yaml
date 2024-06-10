@@ -4,7 +4,10 @@ dom:
       .column1:
         v-text: "'test'"
       .column2:
-        v-text: "'test'"
+        div:
+          app.game:
+        div:
+          v-text: "'test'"
     div:
       ui.html.style:
         v-for: comp in $root.comps

@@ -5,5 +5,17 @@
 
 body
 {
+    color: white;
     background: black;
+}
+
+canvas
+{
+    display: block;
+    width: 50vw;
+    aspect-ratio: 9 / 6;
+    margin: auto;
+    border: 1px solid white;
+    background: #333;
+    border-radius: 0.5em;
 }

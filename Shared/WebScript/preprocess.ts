@@ -2,7 +2,7 @@ import isAttributeName from "./is.attribute.name";
 
 const preProcessYaml = (yaml: string) => {
   // Replace @ with on_
-  yaml = yaml.replace(/@/g, "on_");
+  yaml = yaml.replace(/(?<!\w)@/g, "on_");
   // Normalize line endings
   yaml = yaml.replace(/\r\n|\r/g, "\n");
   // Normalize indentation to spaces

@@ -6,7 +6,11 @@ abstract class Element {
 
   abstract advance(ms: number): void;
 
-  abstract render(render: Renderer): void;
+  render() {
+    this._render(this.game.renderer);
+  }
+
+  protected abstract _render(renderer: Renderer): void;
 }
 
 export { Element };

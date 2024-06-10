@@ -1,0 +1,12 @@
+dom:
+  div:
+    id: test1
+
+mounted: | #js
+  function() {
+    Blockonomics.widget({
+      msg_area: 'test1',
+      uid: 'ef3021e56cb244d8',
+      email: 'ferenc.somos@gmail.com'
+    });
+  }

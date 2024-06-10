@@ -21,6 +21,7 @@
     %script{src: "https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.js"}
     %script{src: "https://unpkg.com/vue-async-computed"}
     %script{src: "/js/tooltip.js"}
+    %script{src: "https://blockonomics.co/js/pay_widget.js"}
     {{#each html.meta.scripts}}
     %script{src: "{{src}}"}
     {{/each}}
@@ -32,6 +33,7 @@
       window.helpers = (((helpers)));
     %script
       window.config = (((config)));
+    %script{src: "/scripts/website.host.startup.js?_uid=(((scriptUrlCacheInvalidator)))", defer: "true"}
     %script{src: "/scripts/startup.js?_uid=(((scriptUrlCacheInvalidator)))", defer: "true"}
   %body
     %div{id: "app"}
