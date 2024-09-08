@@ -416,7 +416,7 @@ const sheakspearize = async (text: string) => {
 
     for (const path of paths) if (fs.existsSync(path)) return path;
 
-    throw new Error(`index.haml not found.`);
+    throw new Error(`index.haml not found in ${paths}`);
   };
 
   const handler = !config.handler

@@ -1,0 +1,21 @@
+dom:
+  div:
+    div:
+      v-text: "'Generator'"
+
+props:
+
+data:
+
+mounted: | #js
+  async function() {
+  }
+
+methods:
+  init: | #js
+    async function() {
+    }
+
+computed:
+
+style:

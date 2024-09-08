@@ -17,10 +17,11 @@ const getTime = () => new Date().toLocaleTimeString();
     await Configuration.new(undefined, path.join(__dirname, `config.yaml`))
   ).data;
 
-  const inputFolder = process.argv[2];
-  const outputFolder = process.argv[3];
+  const argv = process.argv;
+  const outputFolder = argv[argv.length - 1];
+  const inputFolders = argv.slice(2, argv.length - 1);
 
-  if (!inputFolder?.length || !outputFolder?.length) {
+  if (!inputFolders.length || !outputFolder?.length) {
     console.error(
       "Please specify input folder (ws.yaml components) and output folder (sfc)"
         .bgRed.white
@@ -34,8 +35,6 @@ const getTime = () => new Date().toLocaleTimeString();
       "utf8"
     )
   ).helpers;
-
-  const baseFolder = path.resolve(inputFolder);
 
   const withoutStructureFolder = (compName: string) => {
     for (const folder of structureFolders) {
@@ -72,18 +71,20 @@ const getTime = () => new Date().toLocaleTimeString();
     const sfcPath = getSfcPath(input, outputFolder);
     fs.writeFileSync(sfcPath, input.vueSfcComp);
     console.log(
-      `${getTime().gray} ${input.name.padEnd(20).cyan} \t ${sfcPath.green}`
+      `${getTime().gray} ${input.name.padEnd(20).cyan} \t ${inputFolder.padEnd(30).gray} \t ${sfcPath.green}`
     );
   };
 
   const getCompPaths = async (inputFolder: string) => {
     const baseFolder = path.resolve(inputFolder);
-    return (await Files.getFiles(inputFolder, { recursive: true }))
+    const paths = (await Files.getFiles(inputFolder, { recursive: true }))
       .filter((f) => f.endsWith(".ws.yaml"))
       .map((compPath) => ({
         absolutePath: compPath,
         relativePath: path.relative(baseFolder, compPath),
       }));
+    //if (!paths.length) console.log(`No paths found in ${inputFolder}`.yellow);
+    return paths;
   };
 
   const transpileAllInFolder = async (
@@ -96,11 +97,14 @@ const getTime = () => new Date().toLocaleTimeString();
   };
 
   const transpileAll = async () => {
-    for (const folder of structureFolders) {
-      await transpileAllInFolder(
-        path.join(inputFolder, folder),
-        path.join(outputFolder, folder)
-      );
+    for (const inputFolder of inputFolders) {
+      console.log(`transpiling ${inputFolder} to ${outputFolder}`.green);
+      for (const folder of structureFolders) {
+        await transpileAllInFolder(
+          path.join(inputFolder, folder),
+          path.join(outputFolder, folder)
+        );
+      }
     }
   };
 
@@ -109,11 +113,10 @@ const getTime = () => new Date().toLocaleTimeString();
   );
 
   Files.watch(
-    [inputFolder, webscriptFolder],
+    [...inputFolders, webscriptFolder],
     { recursive: true, exclude: [] },
     transpileAll
   );
-  fs.watch(inputFolder, transpileAll);
 
   transpileAll();
 })();
