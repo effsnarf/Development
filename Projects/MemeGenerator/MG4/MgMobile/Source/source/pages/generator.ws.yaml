@@ -1,9 +1,13 @@
 dom:
   div:
-    div:
-      v-text: "'Generator'"
+    .page-header:
+      app.generator.small:
+    ui.list:
+      app.instance.large:
 
 props:
+  urlName:
+  pageIndex:
 
 data:
 

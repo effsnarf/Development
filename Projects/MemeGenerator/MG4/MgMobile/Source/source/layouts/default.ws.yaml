@@ -1,9 +1,16 @@
 dom:
-  div:
-    h3:
-      v-text: "'Layout'"
-    div:
-      slot:
+  .mobile:
+    .app:
+      transition:
+        name: page
+        @enter: enter
+        @beforeLeave: beforeLeave
+        slot:
+
+methods:
+  beforeLeave: | #js
+    async function(pageEl, done) {
+    }
 
 style:
   .footer-spacer:

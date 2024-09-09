@@ -14,5 +14,8 @@
     "pug": "^3.0.3",
     "vue": "latest",
     "vue-router": "latest"
+  },
+  "devDependencies": {
+    "sass-embedded": "^1.78.0"
   }
 }

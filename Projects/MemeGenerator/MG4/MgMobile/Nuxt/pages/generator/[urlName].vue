@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import Generator from '~/pages/generator/_.vue'
+import Generator from "~/pages/generator/_.vue";
 
 export default {
   components: {
@@ -11,11 +11,11 @@ export default {
   },
   computed: {
     urlName() {
-      return this.$route.params.slug
+      return this.$route.params.urlName;
     },
     pageIndex() {
-      return this.$route.params.pageIndex
+      return this.$route.params.pageIndex;
     },
   },
-}
+};
 </script>

@@ -1,6 +1,9 @@
 <template lang="pug">
 div("class"="comp-home")
-  div("v-text"="'Home'")
+  div("class"="page-header")
+    h1("v-text"="'Meme Generator'")
+  UiList
+    AppGeneratorSmall
 </template>
 
 <script>
@@ -16,12 +19,7 @@ export default {
     await this.init();
   },
   methods: {
-    init: async function () {
-      const url1 = `https://db.memegenerator.net/MemeGenerator/Instances`;
-      this.instances1 = (await (await fetch(url1)).json()).slice(0, 9);
-      const url2 = `https://db.memegenerator.net/MemeGenerator/Generators`;
-      this.generators1 = (await (await fetch(url2)).json()).slice(0, 9);
-    },
+    init: async function () {},
   },
 };
 </script>

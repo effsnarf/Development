@@ -1,7 +1,8 @@
 <template lang="pug">
-a(":href"="'/' + generator.urlName", "class"="comp-app-generator-medium")
+a(":href"="'/' + generator1?.urlName", "class"="comp-app-generator-medium")
+  AppGeneratorData("ref"="data1", ":generator"="generator")
   img(":src"="generatorImageUrl")
-  a("class"="title", "v-text"="generator.displayName", ":href"="'/' + generator.urlName")
+  a("class"="title", "v-text"="generator1?.displayName", ":href"="'/' + generator1?.urlName")
 </template>
 
 <script>
@@ -12,11 +13,13 @@ export default {
       default: null,
     },
   },
-  computed: {
-    generatorImageUrl: function () {
-      return `https://img.memegenerator.net/images/${this.generator.imageID}.jpg`;
-    },
+  data() {
+    return {
+      generator1: null,
+      generatorImageUrl: null,
+    };
   },
+  mounted: function () {},
 };
 </script>
 

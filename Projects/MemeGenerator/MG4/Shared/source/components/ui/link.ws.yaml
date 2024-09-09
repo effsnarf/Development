@@ -1,0 +1,23 @@
+dom:
+  ui.nuxt.link:
+    ref: nuxtLink1
+    v-if: url1
+    :url: url1
+    slot:
+
+props:
+  generator:
+  url:
+
+methods:
+
+computed:
+  url1: | #js
+    function() {
+      if (this.generator) return `/generator${this.generator.urlName}`;
+      return null;
+    }
+
+style:
+  .link1:
+    cursor: pointer

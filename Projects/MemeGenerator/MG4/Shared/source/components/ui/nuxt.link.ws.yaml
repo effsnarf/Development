@@ -1,0 +1,14 @@
+dom:
+  NuxtLink:
+    ref: nuxtLink1
+    :to: url
+    div:
+      class: null-link
+      slot:
+
+props:
+  url:
+
+methods:
+
+style:

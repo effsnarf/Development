@@ -1,24 +1,25 @@
 dom:
   a:
-    :href: "'/' + generator.urlName"
+    app.generator.data:
+      ref: data1
+      :generator: generator
+    :href: "'/' + generator1?.urlName"
     .flex:
       .image:
         img:
           :src: generatorImageUrl
       div:
         .name:
-          v-text: generator.displayName
+          v-text: generator1?.displayName
         .dimmed:
           v-text: "'3k posts'"
 
 props:
   generator: null
 
-computed:
-  generatorImageUrl: | #js
-    function() {
-      return `https://img.memegenerator.net/images/${this.generator.imageID}.jpg`
-    }
+data:
+  generator1:
+  generatorImageUrl:
 
 style:
   a:

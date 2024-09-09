@@ -1,0 +1,77 @@
+
+div
+{
+    position: relative;
+}
+
+body
+{
+    background: black;
+    color: white;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+.mobile
+{
+    aspect-ratio: 9 / 16;
+    width: 22em;
+    margin: auto;
+    border: 1px solid gray;
+    border-radius: 0.5em;
+}
+
+.app > *
+{
+    position: absolute;
+    top: 0;
+    margin: 1vw;
+    max-height: 90vh;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+.page-header
+{
+    position: sticky;
+    top: 0;
+    padding: 0 0 1vh 0;
+    border: 1px solid transparent;
+    box-shadow: 0px 6px 24px #000;
+    background: #000;
+    z-index: 10;
+}
+
+a, img
+{
+    border-radius: 0.5em;
+}
+
+a
+{
+    display: inline-block;
+    color: white;
+    text-decoration: none;
+    background: none;
+    transition: 0.3s;
+}
+
+a:hover
+{
+    background: #88888860;
+    transition: 0s;
+}
+
+.name
+{
+    font-size: 120%;
+}
+
+.dimmed
+{
+    opacity: 0.5;
+}
+
+img
+{
+    width: 100%;
+}

@@ -1,0 +1,8 @@
+dom:
+  div:
+    div:
+      v-for: i in 10
+      slot:
+
+props:
+  items:

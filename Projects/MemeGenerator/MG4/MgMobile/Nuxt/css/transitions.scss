@@ -1,0 +1,54 @@
+
+.page-enter-active,
+.page-leave-active {
+  transition: all 2s;
+}
+.page-enter-from,
+.page-leave-to {
+  opacity: 0;
+}
+
+
+/* comp-ui-list */
+
+.page-leave-active .comp-ui-list > *,
+.page-enter-to .comp-ui-list > *
+{
+    transition: 2s;
+}
+
+.page-leave-active .comp-ui-list > *
+{
+    transform: translate(-100%, 0);
+}
+
+.page-enter-from .comp-ui-list > *
+{
+    transform: translate(100%, 0);
+}
+
+.page-enter-active .comp-ui-list > *
+{
+    transition-delay: 0.5s;
+}
+
+.page-enter-to .comp-ui-list > *
+{
+    transform: translate(0, 0);
+}
+
+
+
+
+$base-delay: 0ms;
+$delay-increment: 200ms;
+
+.comp-ui-list {
+  > * {
+    @for $i from 1 through 50 {
+      &:nth-child(#{$i}) {
+        transition-delay: calc(#{$base-delay} + #{$i} * #{$delay-increment});
+      }
+    }
+  }
+}

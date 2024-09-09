@@ -1,18 +1,17 @@
 <template lang="pug">
-div("class"="comp-app-generator-small")
+a(":href"="'/generator' + generator1?.urlName", "class"="comp-app-generator-mobile-small1")
   AppGeneratorData("ref"="data1", ":generator"="generator")
-  UiLink(":generator"="generator1")
-    div("class"="flex1")
-      div("class"="image")
-        img(":src"="generatorImageUrl")
-      div
-        div("v-text"="generator1?.displayName", "class"="name")
-        div("v-text"="'3k posts'", "class"="dimmed")
+  div("class"="flex1")
+    div("class"="image")
+      img(":src"="generatorImageUrl")
+    div
+      div("v-text"="generator1?.displayName", "class"="name")
+      div("v-text"="'3k posts'", "class"="dimmed")
 </template>
 
 <script>
 export default {
-  name: "AppGeneratorSmall",
+  name: "AppGeneratorMobileSmall1",
   props: {
     generator: {
       default: null,

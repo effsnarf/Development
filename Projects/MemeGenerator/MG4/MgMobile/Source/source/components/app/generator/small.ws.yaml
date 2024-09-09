@@ -1,0 +1,30 @@
+dom:
+  div:
+    app.generator.data:
+      ref: data1
+      :generator: generator
+    ui.link:
+      :generator: generator1
+      .flex1:
+        .image:
+          img:
+            :src: generatorImageUrl
+        div:
+          .name:
+            v-text: generator1?.displayName
+          .dimmed:
+            v-text: "'3k posts'"
+
+props:
+  generator: null
+
+data:
+  generator1:
+  generatorImageUrl:
+
+style:
+  .flex1:
+    display: flex
+  .image:
+    width: 20%
+    margin-right: 5%

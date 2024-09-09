@@ -1,13 +1,16 @@
 <template lang="pug">
-div("class"="comp-default")
-  h3("v-text"="'Layout'")
-  div
-    slot
+div("class"="comp-default mobile")
+  div("class"="app")
+    transition("name"="page", "@enter"="enter", "@beforeLeave"="beforeLeave")
+      slot
 </template>
 
 <script>
 export default {
   name: "Default",
+  methods: {
+    beforeLeave: async function (pageEl, done) {},
+  },
 };
 </script>
 

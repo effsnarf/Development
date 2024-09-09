@@ -1,11 +1,22 @@
 <template lang="pug">
 div("class"="comp-generator")
-  div("v-text"="'Generator'")
+  div("class"="page-header")
+    AppGeneratorSmall
+  UiList
+    AppInstanceLarge
 </template>
 
 <script>
 export default {
   name: "Generator",
+  props: {
+    urlName: {
+      default: null,
+    },
+    pageIndex: {
+      default: null,
+    },
+  },
   mounted: async function () {},
   methods: {
     init: async function () {},

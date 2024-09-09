@@ -1,0 +1,16 @@
+dom:
+  div:
+    a:
+      img:
+        :src: instanceImageUrl
+
+props:
+  instance: null
+
+computed:
+  instanceImageUrl: | #js
+    function() {
+      return `https://i.imgur.com/QwWQw2v.jpeg`;
+    }
+
+style:

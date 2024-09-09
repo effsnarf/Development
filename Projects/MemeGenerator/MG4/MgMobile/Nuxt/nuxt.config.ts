@@ -1,5 +1,16 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  compatibilityDate: '2024-04-03',
-  devtools: { enabled: true }
-})
+  compatibilityDate: "2024-04-03",
+  ssr: false,
+  devtools: { enabled: true },
+  app: {
+    pageTransition: {
+      name: "page",
+      mode: "default",
+    },
+  },
+  experimental: {
+    viewTransition: true,
+  },
+  css: [`~/css/global.css`, `~/css/transitions.scss`],
+});
