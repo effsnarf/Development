@@ -2,7 +2,16 @@ dom:
   div:
     div:
       v-for: i in 10
+      class: comp-ui-list-item
+      @click: onClickListItem
       slot:
 
 props:
   items:
+
+methods:
+  onClickListItem: | #js
+    function(e) {
+      const listItem = e.target.closest('.comp-ui-list-item');
+      listItem.classList.add("selected-active");
+    }

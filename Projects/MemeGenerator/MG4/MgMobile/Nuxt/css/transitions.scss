@@ -1,54 +1,64 @@
 
 .page-enter-active,
 .page-leave-active {
-  transition: all 2s;
+  transition: all 1.5s;
 }
 .page-enter-from,
 .page-leave-to {
-  opacity: 0;
+  opacity: 1;
 }
 
 
 /* comp-ui-list */
-
-.page-leave-active .comp-ui-list > *,
-.page-enter-to .comp-ui-list > *
+.comp-ui-list-item
 {
     transition: 2s;
 }
 
-.page-leave-active .comp-ui-list > *
+.page-leave-active .comp-ui-list-item:not(.selected-active)
 {
-    transform: translate(-100%, 0);
+    transform: translate(-200%, 0);
+    opacity: 0;
 }
 
-.page-enter-from .comp-ui-list > *
+.page-enter-from .comp-ui-list-item
 {
     transform: translate(100%, 0);
+    opacity: 0;
 }
 
-.page-enter-active .comp-ui-list > *
-{
-    transition-delay: 0.5s;
-}
-
-.page-enter-to .comp-ui-list > *
+.page-enter-to .comp-ui-list-item
 {
     transform: translate(0, 0);
 }
 
-
+/* match transitions */
+.comp-ui-list-item.selected-active
+{
+    transform: translate(0, -500%);
+    transition-delay: 0;
+}
+/* */
 
 
 $base-delay: 0ms;
-$delay-increment: 200ms;
+$delay-increment: 150ms;
+$enter-to-delay: 1.2s;
 
-.comp-ui-list {
-  > * {
+.comp-ui-list-item {
     @for $i from 1 through 50 {
-      &:nth-child(#{$i}) {
-        transition-delay: calc(#{$base-delay} + #{$i} * #{$delay-increment});
-      }
+        &:nth-child(#{$i}) {
+            transition-delay: calc(#{$base-delay} + #{$i} * #{$delay-increment});
+        }
     }
-  }
+}
+
+.page-enter-to {
+    .comp-ui-list-item {
+        @for $i from 1 through 50 {
+            &:nth-child(#{$i}) {
+                transition-delay: calc(#{$base-delay} + #{$i} * #{$delay-increment} + #{$enter-to-delay});
+            }
+        }
+    }
 }
