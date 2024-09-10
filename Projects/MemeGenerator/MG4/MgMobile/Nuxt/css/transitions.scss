@@ -1,7 +1,12 @@
 
+$base-delay: 0ms;
+$delay-increment: 100ms;
+$page-transition: 1.5s;
+
+
 .page-enter-active,
 .page-leave-active {
-  transition: all 1.5s;
+  transition: all calc(#{$page-transition} * 0.7) ease;
 }
 .page-enter-from,
 .page-leave-to {
@@ -10,15 +15,20 @@
 
 
 /* comp-ui-list */
-.comp-ui-list-item
+.page-header, .comp-ui-list-item
 {
-    transition: 2s;
+    transition: $page-transition;
 }
 
-.page-leave-active .comp-ui-list-item:not(.selected-active)
+.page-leave-active .comp-ui-list-item
 {
     transform: translate(-200%, 0);
     opacity: 0;
+}
+
+.comp-ui-list-item.selected-active
+{
+    
 }
 
 .page-enter-from .comp-ui-list-item
@@ -35,15 +45,22 @@
 /* match transitions */
 .comp-ui-list-item.selected-active
 {
-    transform: translate(0, -500%);
     transition-delay: 0;
 }
 /* */
 
 
-$base-delay: 0ms;
-$delay-increment: 150ms;
-$enter-to-delay: 1.2s;
+/* page-header */
+
+.page-leave-active .page-header,
+.page-enter-from .page-header
+{
+    transform: translate(0, -100%);
+    opacity: 0;
+}
+
+/* */
+
 
 .comp-ui-list-item {
     @for $i from 1 through 50 {
@@ -57,7 +74,7 @@ $enter-to-delay: 1.2s;
     .comp-ui-list-item {
         @for $i from 1 through 50 {
             &:nth-child(#{$i}) {
-                transition-delay: calc(#{$base-delay} + #{$i} * #{$delay-increment} + #{$enter-to-delay});
+                transition-delay: calc(#{$base-delay} + #{$i} * #{$delay-increment} + (#{$delay-increment} * 2));
             }
         }
     }
