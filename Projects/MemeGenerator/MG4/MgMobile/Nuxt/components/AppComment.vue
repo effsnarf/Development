@@ -19,10 +19,5 @@ export default {
   border-radius: 0.5em;
   background: #808080a0;
   opacity: 0.6;
-  transition: background-color 0.3s;
-}
-.comment:hover {
-  background: #808080e0;
-  transition: background-color 0s;
 }
 </style>

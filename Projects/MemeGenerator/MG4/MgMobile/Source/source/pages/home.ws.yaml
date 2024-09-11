@@ -5,12 +5,13 @@ dom:
         v-text: "'Meme Generator'"
     .page-content:
       ui.list:
+        :items: generators
         app.generator.small:
           :show-buttons: "false"
 
 data:
-  instances1: null
-  generators1: null
+  instances: null
+  generators: null
 
 mounted: | #js
   async function() {
@@ -20,6 +21,11 @@ mounted: | #js
 methods:
   init: | #js
     async function() {
+      this.generators = await this.getGenerators();
+    }
+  getGenerators: | #js
+    async function() {
+      return Array(10).fill(null);
     }
 
 style:
