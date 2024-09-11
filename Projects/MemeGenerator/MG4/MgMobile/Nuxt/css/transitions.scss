@@ -1,12 +1,13 @@
 
 $base-delay: 0ms;
+$base-button-delay: 2s;
 $delay-increment: 100ms;
-$page-transition: 1.5s;
+$transition-time1: 1s;
 
 
 .page-enter-active,
 .page-leave-active {
-  transition: all calc(#{$page-transition} * 0.7) ease;
+  transition: all calc(#{$transition-time1} * 0.7) ease;
 }
 .page-enter-from,
 .page-leave-to {
@@ -17,24 +18,24 @@ $page-transition: 1.5s;
 /* comp-ui-list */
 .page-header, .comp-ui-list-item
 {
-    transition: $page-transition ease-in-out;
+    transition: $transition-time1 ease-in-out;
 }
 
 .page-leave-active .comp-ui-list-item
 {
-    transform: translate(-200%, 0);
+    transform: translate(-100%, 0);
     opacity: 0;
-}
-
-.comp-ui-list-item.selected-active
-{
-    
 }
 
 .page-enter-from .comp-ui-list-item
 {
     transform: translate(100%, 0);
     opacity: 0;
+}
+
+.comp-ui-list-item.selected-active
+{
+    
 }
 
 .page-enter-to .comp-ui-list-item
@@ -74,8 +75,60 @@ $page-transition: 1.5s;
     .comp-ui-list-item {
         @for $i from 1 through 50 {
             &:nth-child(#{$i}) {
-                transition-delay: calc(#{$base-delay} + #{$i} * #{$delay-increment} + (#{$page-transition} * 0.5));
+                transition-delay: calc(#{$base-delay} + #{$i} * #{$delay-increment} + (#{$transition-time1} * 0.5));
             }
         }
     }
+}
+
+
+
+
+.button1
+{
+    animation: pop-in1 calc(#{$transition-time1} / 2) ease-out forwards;
+    opacity: 0;
+}
+
+.button1 {
+    @for $i from 1 through 50 {
+        &:nth-child(#{$i}) {
+            animation-delay: calc(#{$base-button-delay} + #{$i} * #{$delay-increment});
+        }
+    }
+}
+
+
+
+
+@keyframes enter1 {
+    from {
+        transform: translate(0, 100%);
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes pop-in1 {
+    0% {
+        transform: scale(1);
+        opacity: 0;
+    }
+    30% {
+        transform: scale(1.5);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+
+.enter1 {
+    animation: enter1 1s ease-out forwards;
+    animation-delay: 1s;
+    opacity: 0;
 }

@@ -9,7 +9,7 @@ div("class"="comp-app-generator-small")
         div
           div("v-text"="generator1?.displayName", "class"="name")
           div("v-text"="'3k posts'", "class"="dimmed")
-    div("class"="bottom-right")
+    div("v-if"="showButtons", "class"="bottom-right")
       div("class"="buttons1")
         div("title"="share", "v-text"="'➤'", "class"="button1")
         div("title"="generate", "v-text"="'✏️'", "class"="button1")
@@ -21,6 +21,9 @@ export default {
   props: {
     generator: {
       default: null,
+    },
+    showButtons: {
+      default: true,
     },
   },
   data() {

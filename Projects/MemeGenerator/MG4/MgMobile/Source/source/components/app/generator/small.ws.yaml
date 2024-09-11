@@ -16,6 +16,7 @@ dom:
             .dimmed:
               v-text: "'3k posts'"
       .bottom-right:
+        v-if: showButtons
         .buttons1:
           .button1:
             title: "share"
@@ -26,6 +27,7 @@ dom:
 
 props:
   generator: null
+  showButtons: true
 
 data:
   generator1:

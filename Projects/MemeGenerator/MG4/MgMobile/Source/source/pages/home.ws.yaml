@@ -5,6 +5,7 @@ dom:
         v-text: "'Meme Generator'"
     ui.list:
       app.generator.small:
+        :show-buttons: "false"
 
 data:
   instances1: null
