@@ -1,9 +1,5 @@
 <template lang="pug">
-div("class"="comp-app-comment comment")
-  div("v-text"="comment.text", "class"="text")
-  div("class"="row1")
-    div
-    div("v-text"="toFriendlyTime(comment.created)", "class"="time")
+div("class"="comp-app-comment comp-ui-list-item comment", "v-text"="comment.text")
 </template>
 
 <script>
@@ -14,26 +10,19 @@ export default {
       default: null,
     },
   },
-  methods: {
-    toFriendlyTime: function (time) {
-      return new Date(time).toLocaleString();
-    },
-  },
 };
 </script>
 
 <style scoped>
 .comment {
-  padding: 1em;
-  margin: 1em;
+  padding: 0.5em;
   border-radius: 0.5em;
-  background: #80808030;
-  box-shadow: -1px 1px 1px #888;
+  background: #808080a0;
+  opacity: 0.6;
+  transition: background-color 0.3s;
 }
-.row1 {
-  display: flex;
-  justify-content: space-between;
-  gap: 1em;
-  opacity: 0.5;
+.comment:hover {
+  background: #808080e0;
+  transition: background-color 0s;
 }
 </style>

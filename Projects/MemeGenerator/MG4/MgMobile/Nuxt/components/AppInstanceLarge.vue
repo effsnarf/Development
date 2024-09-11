@@ -1,10 +1,10 @@
 <template lang="pug">
 div("class"="comp-app-instance-large instance")
-  a
+  UiLink(":url"="'/instance/' + instance1?.instanceID")
     div
       div("class"="texts")
-        div("v-text"="'Pain is temporary'", "class"="text1")
-        div("v-text"="'Glory is eternal'", "class"="text2")
+        div("v-text"="instance1.text0", "class"="text1")
+        div("v-text"="instance1.text1", "class"="text2")
       img(":src"="instanceImageUrl")
   div("class"="buttons1")
     div("v-text"="'➤'", "class"="button1")
@@ -22,6 +22,14 @@ export default {
     },
   },
   computed: {
+    instance1: function () {
+      if (this.instance) return this.instance;
+      return {
+        instanceID: 1,
+        text0: "Pain is temporary",
+        text1: "Glory is eternal",
+      };
+    },
     instanceImageUrl: function () {
       return `https://i.imgur.com/QwWQw2v.jpeg`;
     },

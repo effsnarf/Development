@@ -2,9 +2,11 @@ dom:
   div:
     .page-header:
       app.generator.small:
-    ui.list:
-      class: instance-list
-      app.instance.large:
+    .page-content:
+      ui.list:
+        class: instance-list
+        :items: instances
+        app.instance.large:
 
 props:
   urlName:
@@ -20,10 +22,17 @@ methods:
   init: | #js
     async function() {
     }
+  getMockupInstances: | #js
+    function() {
+      return Array(10).fill(null);
+    }
 
 computed:
+  instances: | #js
+    function() {
+      return this.getMockupInstances();
+    }
 
 style:
   .instance-list:
-    margin: 3vh 0
     gap: 4vh

@@ -2,10 +2,11 @@ dom:
   div:
     :style: listStyle
     div:
-      v-for: i in 10
+      v-for: item in items
       class: comp-ui-list-item
       @click: onClickListItem
       slot:
+        ':item': item
 
 props:
   items:

@@ -1,0 +1,39 @@
+dom:
+  .comments:
+    app.comment:
+      v-for: comment in comments1
+      :comment: comment
+    app.comment.box:
+
+props:
+  instance:
+  comments:
+
+methods:
+  getMockupComments: | #js
+    function() {
+      const commentCount = 50;
+      const comment1 = {
+        _id: 1,
+        text: "first post best post"
+      };
+      const comments = [];
+      for (let i = 0; i < commentCount; i++) {
+        const comment = JSON.parse(JSON.stringify(comment1));
+        comment._id = (i + 1);
+        comments.push(comment);
+      }
+      return comments;
+    }
+
+computed:
+  comments1: | #js
+    function() {
+      return this.getMockupComments();
+    }
+
+style:
+  .comments:
+    display: flex
+    flex-direction: column
+    gap: 0.3vh

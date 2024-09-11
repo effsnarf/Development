@@ -33,10 +33,6 @@ $transition-time1: 1s;
     opacity: 0;
 }
 
-.comp-ui-list-item.selected-active
-{
-    
-}
 
 .page-enter-to .comp-ui-list-item
 {
@@ -99,6 +95,54 @@ $transition-time1: 1s;
 }
 
 
+/* .scroll-resize-to-50p */
+
+.scroll-resize-to-50p
+{
+    transition: width 0.1s;
+}
+
+@for $i from 0 through 50 {
+    .scroll-top-#{($i * 1)}vh .scroll-resize-to-50p
+    {
+        width: #{100 - $i}#{"%"};
+    }
+}
+
+@for $i from 50 through 100 {
+    .scroll-top-#{($i * 1)}vh .scroll-resize-to-50p
+    {
+        width: 50%;
+    }
+}
+
+/* */
+
+
+.scroll-top-0vh .scroll-resize-to-50p
+{
+    width: 100%;
+}
+.scroll-top-10vh .scroll-resize-to-50p
+{
+    width: 90%;
+}
+.scroll-top-20vh .scroll-resize-to-50p
+{
+    width: 80%;
+}
+.scroll-top-30vh .scroll-resize-to-50p
+{
+    width: 70%;
+}
+.scroll-top-40vh .scroll-resize-to-50p
+{
+    width: 60%;
+}
+.scroll-top-50vh .scroll-resize-to-50p
+{
+    width: 50%;
+}
 
 
 @keyframes enter1 {

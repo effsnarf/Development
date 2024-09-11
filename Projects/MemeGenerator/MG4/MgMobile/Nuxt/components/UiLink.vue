@@ -10,6 +10,9 @@ export default {
     generator: {
       default: null,
     },
+    instance: {
+      default: null,
+    },
     url: {
       default: null,
     },
@@ -17,6 +20,8 @@ export default {
   computed: {
     url1: function () {
       if (this.generator) return `/generator${this.generator.urlName}`;
+      if (this.instance) return `/instance/${this.instance.instanceID}`;
+      if (this.url) return this.url;
       return null;
     },
   },

@@ -1,12 +1,13 @@
 dom:
   .instance:
-    a:
+    ui.link:
+      :url: "'/instance/' + instance1?.instanceID"
       div:
         .texts:
           .text1:
-            v-text: "'Pain is temporary'"
+            v-text: instance1.text0
           .text2:
-            v-text: "'Glory is eternal'"
+            v-text: instance1.text1
         img:
           :src: instanceImageUrl
     .buttons1:
@@ -22,6 +23,15 @@ props:
   instance: null
 
 computed:
+  instance1: | #js
+    function() {
+      if (this.instance) return this.instance;
+      return {
+        instanceID: 1,
+        text0: "Pain is temporary",
+        text1: "Glory is eternal"
+      }
+    }
   instanceImageUrl: | #js
     function() {
       return `https://i.imgur.com/QwWQw2v.jpeg`;

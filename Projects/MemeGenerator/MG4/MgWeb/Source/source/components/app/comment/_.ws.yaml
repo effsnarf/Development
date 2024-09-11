@@ -1,5 +1,6 @@
 dom:
   .comment:
+    v-if: comment
     .text:
       v-text: comment.text
     .row1:

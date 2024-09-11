@@ -1,0 +1,27 @@
+dom:
+  div:
+    .page-header:
+      app.generator.small:
+    .page-content:
+      .page-sticky1.comp-ui-list-item:
+        app.instance.large:
+          class: scroll-resize-to-50p
+      app.comment.list:
+
+props:
+  instanceID:
+
+data:
+
+mounted: | #js
+  async function() {
+  }
+
+methods:
+  init: | #js
+    async function() {
+    }
+
+computed:
+
+style:

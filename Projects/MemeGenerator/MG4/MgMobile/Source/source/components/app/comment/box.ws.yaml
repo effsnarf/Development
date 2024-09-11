@@ -1,0 +1,15 @@
+dom:
+  div:
+    textarea:
+      v-model: commentText
+    .buttons1:
+      .button1:
+        :class: "{ disabled: !commentText }"
+        v-text: "'✔️'"
+
+data:
+  commentText:
+
+style:
+  .comp-app-comment-box:
+    margin-top: 1vh

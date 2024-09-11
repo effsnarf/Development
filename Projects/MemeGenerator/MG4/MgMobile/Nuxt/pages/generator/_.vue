@@ -2,8 +2,9 @@
 div("class"="comp-generator")
   div("class"="page-header")
     AppGeneratorSmall
-  UiList("class"="instance-list")
-    AppInstanceLarge
+  div("class"="page-content")
+    UiList("class"="instance-list", ":items"="instances")
+      AppInstanceLarge
 </template>
 
 <script>
@@ -20,13 +21,20 @@ export default {
   mounted: async function () {},
   methods: {
     init: async function () {},
+    getMockupInstances: function () {
+      return Array(10).fill(null);
+    },
+  },
+  computed: {
+    instances: function () {
+      return this.getMockupInstances();
+    },
   },
 };
 </script>
 
 <style scoped>
 .instance-list {
-  margin: 3vh 0;
   gap: 4vh;
 }
 </style>

@@ -9,8 +9,5 @@ export default defineNuxtConfig({
       mode: "default",
     },
   },
-  experimental: {
-    viewTransition: true,
-  },
   css: [`~/css/global.css`, `~/css/transitions.scss`],
 });

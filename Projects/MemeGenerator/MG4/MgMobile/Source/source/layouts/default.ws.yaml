@@ -3,13 +3,40 @@ dom:
     .app:
       transition:
         name: page
-        @enter: enter
-        @beforeLeave: beforeLeave
         slot:
 
+mounted: | #js
+  function() {
+    this.init();
+  }
+
 methods:
-  beforeLeave: | #js
-    async function(pageEl, done) {
+  init: | #js
+    function() {
+      if (window.scollListener1isRegistered) return;
+      window.addEventListener('scroll', this.handleScroll.bind(this), true);
+      window.scollListener1isRegistered = true;
+    }
+  handleScroll: | #js
+    function() {
+      // Select all elements with .by-scroll-top class
+      const elements = document.querySelectorAll('.page-content');
+
+      elements.forEach(element => {
+        // Check if the element is scrollable
+        const scrollTop = element.scrollTop || 0;
+        const clientHeight = element.clientHeight || 0;
+
+        // Remove all existing scroll-top classes
+        element.className = element.className.replace(/scroll-top-\d+vh/g, '').trim();
+        
+        // Determine the appropriate class based on scrollTop
+        const percentage = Math.min(Math.floor((scrollTop / clientHeight) * 100), 100);
+        const scrollClass = `scroll-top-${percentage}vh`;
+
+        // Add the new class
+        element.classList.add(scrollClass);
+      });
     }
 
 style:
