@@ -8,6 +8,9 @@ div("class"="comp-app-instance-large instance")
       img(":src"="instanceImageUrl")
   div("class"="buttons1")
     div("v-text"="'➤'", "class"="button1")
+    div("class"="flex ac")
+      div("v-text"="'💬'", "class"="button1")
+      div("v-text"="'12'")
 </template>
 
 <script>

@@ -2,7 +2,7 @@
 div("class"="comp-generator")
   div("class"="page-header")
     AppGeneratorSmall
-  UiList
+  UiList("class"="instance-list")
     AppInstanceLarge
 </template>
 
@@ -24,4 +24,9 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.instance-list {
+  margin: 3vh 0;
+  gap: 4vh;
+}
+</style>

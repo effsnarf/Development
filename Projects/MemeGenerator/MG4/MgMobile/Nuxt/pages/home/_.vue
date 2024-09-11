@@ -2,9 +2,8 @@
 div("class"="comp-home")
   div("class"="page-header")
     h1("v-text"="'Meme Generator'")
-  div("class"="instance-list")
-    UiList
-      AppGeneratorSmall
+  UiList
+    AppGeneratorSmall
 </template>
 
 <script>
@@ -25,8 +24,4 @@ export default {
 };
 </script>
 
-<style scoped>
-.instance-list > .comp-ui-list {
-  gap: 1vh;
-}
-</style>
+<style scoped></style>

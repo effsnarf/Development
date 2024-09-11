@@ -74,7 +74,7 @@ a:hover
     display: flex;
     gap: 0.5em;
     margin: auto;
-    width: fit-content;
+    justify-content: space-evenly;
 }
 
 .button1
@@ -95,6 +95,11 @@ a:hover
 .flex
 {
     display: flex;
+}
+
+.flex.ac
+{
+    align-items: center;
 }
 
 .name

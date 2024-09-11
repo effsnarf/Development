@@ -12,6 +12,11 @@ dom:
     .buttons1:
       .button1:
         v-text: "'➤'"
+      .flex.ac:
+        .button1:
+          v-text: "'💬'"
+        div:
+          v-text: "'12'"
 
 props:
   instance: null

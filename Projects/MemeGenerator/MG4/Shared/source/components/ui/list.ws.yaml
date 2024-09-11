@@ -2,7 +2,7 @@ dom:
   div:
     :style: listStyle
     div:
-      v-for: i in 3
+      v-for: i in 10
       class: comp-ui-list-item
       @click: onClickListItem
       slot:

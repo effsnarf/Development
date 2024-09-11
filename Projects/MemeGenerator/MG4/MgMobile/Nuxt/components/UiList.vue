@@ -1,6 +1,6 @@
 <template lang="pug">
 div(":style"="listStyle", "class"="comp-ui-list")
-  div("v-for"="i in 3", "class"="comp-ui-list-item", "@click"="onClickListItem")
+  div("v-for"="i in 10", "class"="comp-ui-list-item", "@click"="onClickListItem")
     slot
 </template>
 

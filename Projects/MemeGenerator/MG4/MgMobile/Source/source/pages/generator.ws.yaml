@@ -3,6 +3,7 @@ dom:
     .page-header:
       app.generator.small:
     ui.list:
+      class: instance-list
       app.instance.large:
 
 props:
@@ -23,3 +24,6 @@ methods:
 computed:
 
 style:
+  .instance-list:
+    margin: 3vh 0
+    gap: 4vh
