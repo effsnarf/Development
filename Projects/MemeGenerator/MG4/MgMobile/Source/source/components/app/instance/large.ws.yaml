@@ -75,6 +75,8 @@ watch:
     deep: true
 
 style:
+  .comp-app-instance-large:
+    margin: auto
   .texts:
     position: absolute
     width: 100%

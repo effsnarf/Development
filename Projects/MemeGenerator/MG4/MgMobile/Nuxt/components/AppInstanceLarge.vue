@@ -76,6 +76,9 @@ export default {
 </script>
 
 <style scoped>
+.comp-app-instance-large {
+  margin: auto;
+}
 .texts {
   position: absolute;
   width: 100%;

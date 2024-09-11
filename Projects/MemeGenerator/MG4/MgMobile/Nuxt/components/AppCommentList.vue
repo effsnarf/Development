@@ -17,7 +17,7 @@ export default {
   },
   methods: {
     getMockupComments: function () {
-      const commentCount = 50;
+      const commentCount = 20;
       const comment1 = {
         _id: 1,
         text: "first post best post",
