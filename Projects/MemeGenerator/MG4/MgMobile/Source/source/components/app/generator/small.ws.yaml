@@ -3,17 +3,26 @@ dom:
     app.generator.data:
       ref: data1
       :generator: generator
-    ui.link:
-      :generator: generator1
-      .flex1:
-        .image:
-          img:
-            :src: generatorImageUrl
-        div:
-          .name:
-            v-text: generator1?.displayName
-          .dimmed:
-            v-text: "'3k posts'"
+    div:
+      ui.link:
+        :generator: generator1
+        .flex1:
+          .image:
+            img:
+              :src: generatorImageUrl
+          div:
+            .name:
+              v-text: generator1?.displayName
+            .dimmed:
+              v-text: "'3k posts'"
+      .bottom-right:
+        .buttons1:
+          .button1:
+            title: "share"
+            v-text: "'➤'"
+          .button1:
+            title: "generate"
+            v-text: "'✏️'"
 
 props:
   generator: null

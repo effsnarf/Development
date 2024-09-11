@@ -1,6 +1,6 @@
 <template lang="pug">
-div("class"="comp-ui-list")
-  div("v-for"="i in 10", "class"="comp-ui-list-item", "@click"="onClickListItem")
+div(":style"="listStyle", "class"="comp-ui-list")
+  div("v-for"="i in 3", "class"="comp-ui-list-item", "@click"="onClickListItem")
     slot
 </template>
 
@@ -16,6 +16,14 @@ export default {
     onClickListItem: function (e) {
       const listItem = e.target.closest(".comp-ui-list-item");
       listItem.classList.add("selected-active");
+    },
+  },
+  computed: {
+    listStyle: function () {
+      const style = {};
+      style.display = "flex";
+      style.flexDirection = "column";
+      return style;
     },
   },
 };

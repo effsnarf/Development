@@ -41,6 +41,7 @@ body
     z-index: 10;
 }
 
+
 a, img
 {
     border-radius: 0.5em;
@@ -61,6 +62,41 @@ a:hover
     transition: 0s;
 }
 
+.bottom-right
+{
+    position: absolute;
+    bottom: 0;
+    right: 0;
+}
+
+.buttons1
+{
+    display: flex;
+    gap: 0.5em;
+    margin: auto;
+    width: fit-content;
+}
+
+.button1
+{
+    padding: 0.2em 0.4em;
+    border-radius: 0.5em;
+    font-size: 160%;
+    opacity: 0.5;
+    cursor: pointer;
+}
+
+.button1:hover
+{
+    background: #333;
+    opacity: 1;
+}
+
+.flex
+{
+    display: flex;
+}
+
 .name
 {
     font-size: 120%;
@@ -74,4 +110,24 @@ a:hover
 img
 {
     width: 100%;
+}
+
+
+
+
+/* Thin scrollbar track */
+::-webkit-scrollbar {
+    width: 0.5vw; /* Adjust width as needed */
+}
+
+/* Thin scrollbar thumb */
+::-webkit-scrollbar-thumb {
+    background-color: #80808060; /* Gray color for the scrollbar */
+    border-radius: 0.5vw; /* Optional: rounded corners */
+}
+
+/* Scrollbar track (optional) */
+::-webkit-scrollbar-track {
+    background: #80808000; /* Light gray track */
+    border-radius: 0.5vw; /* Optional: rounded corners */
 }

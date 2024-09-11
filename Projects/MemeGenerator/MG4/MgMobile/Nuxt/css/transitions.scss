@@ -10,14 +10,14 @@ $page-transition: 1.5s;
 }
 .page-enter-from,
 .page-leave-to {
-  opacity: 1;
+  opacity: 0;
 }
 
 
 /* comp-ui-list */
 .page-header, .comp-ui-list-item
 {
-    transition: $page-transition;
+    transition: $page-transition ease-in-out;
 }
 
 .page-leave-active .comp-ui-list-item
@@ -74,7 +74,7 @@ $page-transition: 1.5s;
     .comp-ui-list-item {
         @for $i from 1 through 50 {
             &:nth-child(#{$i}) {
-                transition-delay: calc(#{$base-delay} + #{$i} * #{$delay-increment} + (#{$delay-increment} * 2));
+                transition-delay: calc(#{$base-delay} + #{$i} * #{$delay-increment} + (#{$page-transition} * 0.5));
             }
         }
     }

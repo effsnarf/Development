@@ -3,8 +3,9 @@ dom:
     .page-header:
       h1:
         v-text: "'Meme Generator'"
-    ui.list:
-      app.generator.small:
+    .instance-list:
+      ui.list:
+        app.generator.small:
 
 data:
   instances1: null
@@ -21,3 +22,5 @@ methods:
     }
 
 style:
+  .instance-list > .comp-ui-list:
+    gap: 1vh

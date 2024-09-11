@@ -1,8 +1,17 @@
 dom:
-  div:
+  .instance:
     a:
-      img:
-        :src: instanceImageUrl
+      div:
+        .texts:
+          .text1:
+            v-text: "'Pain is temporary'"
+          .text2:
+            v-text: "'Glory is eternal'"
+        img:
+          :src: instanceImageUrl
+    .buttons1:
+      .button1:
+        v-text: "'➤'"
 
 props:
   instance: null
@@ -14,3 +23,17 @@ computed:
     }
 
 style:
+  .texts:
+    position: absolute
+    width: 100%
+    height: calc(100% - 10px)
+  .text1, .text2:
+    width: 100%
+    text-transform: uppercase
+    text-align: center
+    text-shadow: "-0.1em 0.1em 0.02em #000, 0.04em -0.04em 0.04em #000"
+    font-family: impact
+    font-size: 36px
+  .text2:
+    position: absolute
+    bottom: 0

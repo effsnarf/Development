@@ -1,13 +1,18 @@
 <template lang="pug">
 div("class"="comp-app-generator-small")
   AppGeneratorData("ref"="data1", ":generator"="generator")
-  UiLink(":generator"="generator1")
-    div("class"="flex1")
-      div("class"="image")
-        img(":src"="generatorImageUrl")
-      div
-        div("v-text"="generator1?.displayName", "class"="name")
-        div("v-text"="'3k posts'", "class"="dimmed")
+  div
+    UiLink(":generator"="generator1")
+      div("class"="flex1")
+        div("class"="image")
+          img(":src"="generatorImageUrl")
+        div
+          div("v-text"="generator1?.displayName", "class"="name")
+          div("v-text"="'3k posts'", "class"="dimmed")
+    div("class"="bottom-right")
+      div("class"="buttons1")
+        div("title"="share", "v-text"="'➤'", "class"="button1")
+        div("title"="generate", "v-text"="'✏️'", "class"="button1")
 </template>
 
 <script>
