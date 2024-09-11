@@ -1,27 +1,55 @@
 dom:
-  .instance:
-    ui.link:
-      :url: "'/instance/' + instance1?.instanceID"
-      div:
-        .texts:
-          .text1:
-            v-text: instance1.text0
-          .text2:
-            v-text: instance1.text1
-        img:
-          :src: instanceImageUrl
-    .buttons1:
-      .button1:
-        v-text: "'➤'"
-      .flex.ac:
-        .button1:
-          v-text: "'💬'"
+  ui.element:
+    @input: (e) => elInfo = e
+    .instance:
+      v-if: instance1
+      ui.link:
+        :url: "'/instance/' + instance1?.instanceID"
         div:
-          v-text: "'12'"
+          .texts:
+            .text1:
+              :style: text0Style
+              v-text: instance1.text0
+            .text2:
+              :style: text1Style
+              v-text: instance1.text1
+          img:
+            :src: instanceImageUrl
+      .buttons1:
+        .button1:
+          v-text: "'➤'"
+        .flex.ac:
+          .button1:
+            v-text: "'💬'"
+          div:
+            v-text: "'12'"
 
 props:
   instance: null
 
+data:
+  elInfo:
+  text0Style:
+  text1Style:
+
+methods:
+  getTextStyle: | #js
+    function(elInfo, index) {
+      if (!elInfo) return {};
+      const style = {};
+      const text = this.instance1[`text${index}`];
+      const elw = elInfo.width;
+      const fontSize = (elw / 7);
+      style.fontSize = this.getFontSize(text, elw);;
+      return style;
+    }
+  getFontSize: | #js
+    function(s, width) {
+      if (!s) return 0;
+      if (!width) return 0;
+      const size = Math.min(3, Math.max(14, (36 - (s.length / 6))) / 50 *  width / 150);
+      return `${(size * 1.5)}rem`;
+    }
 computed:
   instance1: | #js
     function() {
@@ -37,6 +65,15 @@ computed:
       return `https://i.imgur.com/QwWQw2v.jpeg`;
     }
 
+watch:
+  elInfo:
+    handler: | #js
+      function(newElInfo) {
+        this.text0Style = this.getTextStyle(newElInfo, 0);
+        this.text1Style = this.getTextStyle(newElInfo, 1);
+      }
+    deep: true
+
 style:
   .texts:
     position: absolute
@@ -46,9 +83,8 @@ style:
     width: 100%
     text-transform: uppercase
     text-align: center
-    text-shadow: "-0.1em 0.1em 0.02em #000, 0.04em -0.04em 0.04em #000"
+    text-shadow: "-0.5vh 0.5vh 0.2vh #000, 0.2vh -0.2vh 0.2vh #000"
     font-family: impact
-    font-size: 36px
   .text2:
     position: absolute
     bottom: 0
