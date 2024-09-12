@@ -3,11 +3,12 @@ dom:
     .page-header:
       h1:
         v-text: "'Meme Generator'"
-    .page-content:
-      ui.list:
-        :items: generators
-        app.generator.small:
-          :show-buttons: "false"
+    .page-content-container:
+      .page-content:
+        ui.list:
+          :items: generators
+          app.generator.small:
+            :show-buttons: "false"
 
 data:
   instances: null

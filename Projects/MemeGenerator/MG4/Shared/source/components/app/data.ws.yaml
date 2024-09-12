@@ -1,0 +1,27 @@
+dom:
+
+props:
+  urlName:
+
+data:
+  generator:
+
+methods:
+  refresh: | #js
+    function() {
+      const urlName = this.urlName;
+      this.generator = {
+        urlName: urlName,
+        displayName: urlName.replace('-', ' '),
+        imageUrl: 'https://i.imgur.com/QwWQw2v.jpeg'
+      };
+      const pageData = {
+        generator: this.generator
+      };
+      this.$emit("update:pageData", pageData);
+    }
+
+watch:
+  urlName:
+    immediate: true
+    handler: this.refresh()

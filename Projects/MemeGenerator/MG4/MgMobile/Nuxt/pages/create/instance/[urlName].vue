@@ -1,13 +1,13 @@
 <template>
-  <Generator :urlName="urlName" />
+  <CreateInstance :urlName="urlName" />
 </template>
 
 <script>
-import Generator from "~/pages/generator/_.vue";
+import CreateInstance from "~/pages/createinstance/_.vue";
 
 export default {
   components: {
-    Generator,
+    CreateInstance,
   },
   computed: {
     urlName() {

@@ -12,7 +12,8 @@ div("class"="comp-app-generator-small")
     div("v-if"="showButtons", "class"="bottom-right")
       div("class"="buttons1")
         div("title"="share", "v-text"="'➤'", "class"="button1")
-        div("title"="generate", "v-text"="'✏️'", "class"="button1")
+        UiLink(":url"="'/create/instance/' + generator1?.urlName")
+          div("title"="generate", "v-text"="'✏️'", "class"="button1")
 </template>
 
 <script>

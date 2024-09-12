@@ -14,8 +14,9 @@ dom:
               :style: text1Style
               v-text: instance1.text1
           img:
-            :src: instanceImageUrl
+            :src: instance1.genImageUrl
       .buttons1:
+        v-if: showButtons
         .button1:
           v-text: "'➤'"
         .flex.ac:
@@ -26,6 +27,7 @@ dom:
 
 props:
   instance: null
+  showButtons: true
 
 data:
   elInfo:
@@ -56,6 +58,7 @@ computed:
       if (this.instance) return this.instance;
       return {
         instanceID: 1,
+        genImageUrl: "https://i.imgur.com/QwWQw2v.jpeg",
         text0: "Pain is temporary",
         text1: "Glory is eternal"
       }

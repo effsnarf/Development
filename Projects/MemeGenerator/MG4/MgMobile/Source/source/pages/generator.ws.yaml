@@ -2,11 +2,12 @@ dom:
   div:
     .page-header:
       app.generator.small:
-    .page-content:
-      ui.list:
-        class: instance-list
-        :items: instances
-        app.instance.large:
+    .page-content-container:
+      .page-content:
+        ui.list:
+          class: instance-list
+          :items: instances
+          app.instance.large:
 
 props:
   urlName:

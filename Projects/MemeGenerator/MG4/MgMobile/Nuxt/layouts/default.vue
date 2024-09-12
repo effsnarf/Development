@@ -1,8 +1,10 @@
 <template lang="pug">
-div("class"="comp-default mobile")
-  div("class"="app")
-    transition("name"="page")
-      slot
+div("class"="comp-default")
+  DevDebugger
+  div("class"="mobile")
+    div("class"="app")
+      transition("name"="page")
+        slot
 </template>
 
 <script>

@@ -1,18 +1,20 @@
 dom:
   div:
+    app.data:
+      :urlName: urlName
+      v-model:pageData: pd
     .page-header:
       app.generator.small:
     .page-content-container:
       .page-content:
-        .page-sticky1.comp-ui-list-item:
-          app.instance.large:
-            class: scroll-resize-to-50p
-        app.comment.list:
+        app.instance.create:
+          :generator: pd?.generator
 
 props:
-  instanceID:
+  urlName:
 
 data:
+  pd:
 
 mounted: | #js
   async function() {

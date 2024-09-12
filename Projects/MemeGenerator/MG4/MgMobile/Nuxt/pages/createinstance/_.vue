@@ -1,21 +1,25 @@
 <template lang="pug">
-div("class"="comp-instance")
+div("class"="comp-create-instance")
+  AppData(":urlName"="urlName", "v-model:pageData"="pd")
   div("class"="page-header")
     AppGeneratorSmall
   div("class"="page-content-container")
     div("class"="page-content")
-      div("class"="page-sticky1 comp-ui-list-item")
-        AppInstanceLarge("class"="scroll-resize-to-50p")
-      AppCommentList
+      AppInstanceCreate(":generator"="pd?.generator")
 </template>
 
 <script>
 export default {
-  name: "Instance",
+  name: "CreateInstance",
   props: {
-    instanceID: {
+    urlName: {
       default: null,
     },
+  },
+  data() {
+    return {
+      pd: null,
+    };
   },
   mounted: async function () {},
   methods: {

@@ -24,7 +24,7 @@ export default {
     generator1: function () {
       if (this.generator) return this.generator;
       return {
-        urlName: "/Courage-Wolf",
+        urlName: "Courage-Wolf",
         displayName: "Courage Wolf",
       };
     },

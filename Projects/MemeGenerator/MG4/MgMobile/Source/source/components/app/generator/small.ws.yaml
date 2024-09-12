@@ -21,9 +21,11 @@ dom:
           .button1:
             title: "share"
             v-text: "'➤'"
-          .button1:
-            title: "generate"
-            v-text: "'✏️'"
+          ui.link:
+            :url: "'/create/instance/' + generator1?.urlName"
+            .button1:
+              title: "generate"
+              v-text: "'✏️'"
 
 props:
   generator: null

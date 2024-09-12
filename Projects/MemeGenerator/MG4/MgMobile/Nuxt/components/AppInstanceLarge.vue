@@ -6,8 +6,8 @@ UiElement("@input"="(e) => elInfo = e", "class"="comp-app-instance-large")
         div("class"="texts")
           div(":style"="text0Style", "v-text"="instance1.text0", "class"="text1")
           div(":style"="text1Style", "v-text"="instance1.text1", "class"="text2")
-        img(":src"="instanceImageUrl")
-    div("class"="buttons1")
+        img(":src"="instance1.genImageUrl")
+    div("v-if"="showButtons", "class"="buttons1")
       div("v-text"="'➤'", "class"="button1")
       div("class"="flex ac")
         div("v-text"="'💬'", "class"="button1")
@@ -20,6 +20,9 @@ export default {
   props: {
     instance: {
       default: null,
+    },
+    showButtons: {
+      default: true,
     },
   },
   data() {
@@ -54,6 +57,7 @@ export default {
       if (this.instance) return this.instance;
       return {
         instanceID: 1,
+        genImageUrl: "https://i.imgur.com/QwWQw2v.jpeg",
         text0: "Pain is temporary",
         text1: "Glory is eternal",
       };

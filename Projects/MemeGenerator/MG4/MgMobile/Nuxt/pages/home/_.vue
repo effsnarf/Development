@@ -2,9 +2,10 @@
 div("class"="comp-home")
   div("class"="page-header")
     h1("v-text"="'Meme Generator'")
-  div("class"="page-content")
-    UiList(":items"="generators")
-      AppGeneratorSmall(":show-buttons"="false")
+  div("class"="page-content-container")
+    div("class"="page-content")
+      UiList(":items"="generators")
+        AppGeneratorSmall(":show-buttons"="false")
 </template>
 
 <script>

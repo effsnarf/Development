@@ -2,9 +2,10 @@
 div("class"="comp-generator")
   div("class"="page-header")
     AppGeneratorSmall
-  div("class"="page-content")
-    UiList("class"="instance-list", ":items"="instances")
-      AppInstanceLarge
+  div("class"="page-content-container")
+    div("class"="page-content")
+      UiList("class"="instance-list", ":items"="instances")
+        AppInstanceLarge
 </template>
 
 <script>

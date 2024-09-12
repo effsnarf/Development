@@ -1,0 +1,49 @@
+dom:
+  div:
+    v-if: generator
+    .comp-ui-list-item:
+      app.instance.large:
+        :instance: instance
+        :show-buttons: "false"
+        :key: key1
+    input:
+      class: comp-ui-list-item
+      type: text
+      v-model: text0
+    input:
+      class: comp-ui-list-item
+      type: text
+      v-model: text1
+
+props:
+  generator:
+
+data:
+  text0:
+  text1:
+  key1:
+
+methods:
+  refresh: | #js
+    function() {
+      this.key1++;
+    }
+
+computed:
+  instance: | #js
+    function() {
+      return {
+        genImageUrl: this.generator.imageUrl,
+        text0: this.text0,
+        text1: this.text1
+      };
+    }
+
+watch:
+  text0: this.refresh();
+  text1: this.refresh();
+
+style:
+  input[type=text]:
+    text-align: center
+    text-transform: uppercase

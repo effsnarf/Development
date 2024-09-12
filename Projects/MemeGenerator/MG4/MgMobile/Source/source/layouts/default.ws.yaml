@@ -1,9 +1,11 @@
 dom:
-  .mobile:
-    .app:
-      transition:
-        name: page
-        slot:
+  div:
+    dev.debugger:
+    .mobile:
+      .app:
+        transition:
+          name: page
+          slot:
 
 mounted: | #js
   function() {
