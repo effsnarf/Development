@@ -7,7 +7,7 @@ dom:
     .flex:
       .image:
         img:
-          :src: generatorImageUrl
+          :src: generator1?.imageUrl
       div:
         .name:
           v-text: generator1?.displayName
@@ -19,7 +19,6 @@ props:
 
 data:
   generator1:
-  generatorImageUrl:
 
 style:
   a:

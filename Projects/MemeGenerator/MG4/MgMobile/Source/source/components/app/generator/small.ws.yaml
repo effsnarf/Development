@@ -4,16 +4,19 @@ dom:
       ref: data1
       :generator: generator
     div:
+      v-if: generator1
       ui.link:
         :generator: generator1
         .flex1:
           .image:
             img:
-              :src: generatorImageUrl
+              :src: generator1.imageUrl
           div:
+            v-if: showName
             .name:
-              v-text: generator1?.displayName
+              v-text: generator1.displayName
             .dimmed:
+              v-if: showPostCount
               v-text: "'3k posts'"
       .bottom-right:
         v-if: showButtons
@@ -22,7 +25,7 @@ dom:
             title: "share"
             v-text: "'➤'"
           ui.link:
-            :url: "'/create/instance/' + generator1?.urlName"
+            :url: "'/create/instance/' + generator1.urlName"
             .button1:
               title: "generate"
               v-text: "'✏️'"
@@ -30,10 +33,11 @@ dom:
 props:
   generator: null
   showButtons: true
+  showName: true
+  showPostCount: true
 
 data:
   generator1:
-  generatorImageUrl:
 
 style:
   .flex1:

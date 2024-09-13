@@ -76,15 +76,6 @@ textarea:focus, input:focus
     z-index: 10;
 }
 
-.page-content
-{
-    margin: 0vh 0.5vh;
-    padding: 2vh 0.5vh;
-    max-height: 75vh;
-    overflow-x: hidden;
-    overflow-y: scroll;
-}
-
 /* radial gradient soft light */
 .page-content-container::before {
     content: '';
@@ -98,6 +89,68 @@ textarea:focus, input:focus
     z-index: 9999; /* Ensure it sits above the page content */
 }
 
+.page-sidebar
+{
+    position: absolute;
+    width: 21%;
+    height: 100vh;
+    padding: 2%;
+    background: black;
+    overflow: hidden;
+    filter: grayscale(1);
+    z-index: 10;
+}
+
+.page-sidebar .image img
+{
+    aspect-ratio: 12 / 6;
+    object-fit: cover;
+}
+
+.page-sidebar .name
+{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.page-sidebar, .page-content
+{
+    padding: 2vh 0.5vh;
+}
+
+.page-sidebar .comp-ui-list-item
+{
+    margin-bottom: 1vh;
+}
+
+.page-content
+{
+    margin: 0vh 0.5vh;
+    max-height: 75vh;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+.page-sidebar + .page-content
+{
+    margin-left: 25%;
+}
+
+
+.page-sidebar .comp-app-generator-small .flex1
+{
+    flex-direction: column;
+    text-align: center;
+    white-space: nowrap;
+    font-size: 80%;
+}
+
+.page-sidebar  .comp-app-generator-small .flex1 .image
+{
+    width: 100%;
+    margin: auto;
+}
 
 a, img
 {
@@ -179,6 +232,7 @@ img
 {
     width: 100%;
 }
+
 
 
 

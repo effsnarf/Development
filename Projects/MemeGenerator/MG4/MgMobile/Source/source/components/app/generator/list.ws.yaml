@@ -1,0 +1,25 @@
+dom:
+  .comp-ui-list:
+    .comp-ui-list-item:
+      v-for: generator in generators
+      app.generator.small:
+        :generator: generator
+        :show-count: "false"
+        :show-buttons: "false"
+
+props:
+  relatedTo:
+
+methods:
+  getGenerators: | #js
+    function() {
+      return [this.relatedTo, this.relatedTo, this.relatedTo, this.relatedTo, this.relatedTo, this.relatedTo];
+    }
+
+computed:
+  generators: | #js
+    function() {
+      return this.getGenerators();
+    }
+
+style:

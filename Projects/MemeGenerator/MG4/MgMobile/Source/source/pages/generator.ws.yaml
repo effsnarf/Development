@@ -1,8 +1,14 @@
 dom:
   div:
+    app.data:
+      :urlName: urlName
+      v-model:pageData: pd
     .page-header:
       app.generator.small:
     .page-content-container:
+      .page-sidebar:
+        app.generator.list:
+          :related-to: pd?.generator
       .page-content:
         ui.list:
           class: instance-list
@@ -14,6 +20,7 @@ props:
   pageIndex:
 
 data:
+  pd:
 
 mounted: | #js
   async function() {

@@ -17,7 +17,6 @@ export default {
     init: async function (derived) {
       if (!derived) derived = this.$parent;
       derived.generator1 = this.generator1;
-      derived.generatorImageUrl = this.generatorImageUrl;
     },
   },
   computed: {
@@ -26,13 +25,8 @@ export default {
       return {
         urlName: "Courage-Wolf",
         displayName: "Courage Wolf",
+        imageUrl: "https://i.imgur.com/QwWQw2v.jpeg",
       };
-    },
-    generatorImageUrl: function () {
-      if (this.generator) {
-        return `https://img.memegenerator.net/images/${this.generator1.imageID}.jpg`;
-      }
-      return `https://i.imgur.com/QwWQw2v.jpeg`;
     },
   },
   watch: {
