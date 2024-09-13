@@ -1,0 +1,20 @@
+dom:
+  div:
+    ui.link:
+      :url: "'/'"
+      .title:
+        v-text: "'Meme Generator'"
+
+style:
+  .comp-app-header:
+    position: absolute
+    top: 0
+    left: 50%
+    transform: translate(-50%, 0)
+  .title:
+    font-family: impact
+    font-size: 3vh
+    text-transform: uppercase
+    opacity: 1
+    text-shadow: 0vh -0.1vh 2px white
+    color: black
