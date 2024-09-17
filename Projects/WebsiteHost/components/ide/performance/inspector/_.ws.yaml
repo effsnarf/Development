@@ -53,7 +53,7 @@ methods:
       const icon = ({
         "event": "⚡",
         "computed": "💡",
-        "watcher": "👓",
+        "watcher": "👁️",
         "method": "🔴",
       })[logItem.type] || "❔";
       return `${icon} ${logItem.name}`;

@@ -411,7 +411,7 @@ const sheakspearize = async (text: string) => {
   const getIndexHamlPath = () => {
     const paths = [
       path.join(config.static.folder, "index.haml"),
-      //path.join(config.websiteHost.folder, "Website", "index.haml"),
+      path.join(config.websiteHost.folder, "Website", "index.haml"),
     ];
 
     for (const path of paths) if (fs.existsSync(path)) return path;

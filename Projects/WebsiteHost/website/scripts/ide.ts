@@ -291,11 +291,28 @@ const vueIdeCompMixin = {
         if (item.type) return stateItemIcons[item.type] || "❔";
         return "❔";
       },
+      getIconHint(item: any) {
+        const hints = {
+          // method
+          m: "🔴 method",
+          // event
+          e: "⚡ event",
+          // prop
+          p: "🔗 prop",
+          // data
+          d: "🧊 data",
+          // computed
+          c: "💡 computed",
+        } as any;
+        if (typeof item == "string") return hints[item] || "❔";
+        if (item.type) return hints[item.type] || "❔";
+        return "❔";
+      },
       getUniqueClientID() {
         const self = this as any;
         return self.$data._uniqueClientID++;
       },
-      async wait(condition: () => boolean, timeout = 10000) {
+      async wait(condition: () => boolean, timeout = 3000) {
         // If no condition is provided, just wait the timeout
         if (typeof condition == "number") {
           return new Promise((resolve: any, reject: any) => {

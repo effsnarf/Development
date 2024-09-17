@@ -1,6 +1,6 @@
 dom:
   transition:
-    name: slide-hor
+    name: slide
     div: 
       v-if: vue
       ':key': vue()._uid

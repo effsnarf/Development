@@ -5,9 +5,19 @@ class Tooltip {
     }
 
     createTooltipElement() {
-        this.tooltipEl = document.createElement('div');
-        this.tooltipEl.className = 'tooltip';
-        this.tooltipEl.classList.add('tooltip-hidden'); // Initially hidden
+        const el = document.createElement('div');
+        el.className = 'tooltip';
+        el.classList.add('tooltip-hidden');
+        el.style.position = "fixed";
+        el.style.border = "1px solid gray";
+        el.style.background = "#202020";
+        el.style.padding = "0.5em 1em";
+        el.style.boxShadow = "-12px 12px 5px #00000080";
+        el.style.opacity = 0;
+        el.style.pointerEvents = "none";
+        el.style.transition = "opacity 0.3s";
+        el.style.zIndex = 10000;
+        this.tooltipEl = el;
         document.body.appendChild(this.tooltipEl);
     }
 
@@ -18,12 +28,11 @@ class Tooltip {
 
     _show(text, x, y) {
         this.tooltipEl.textContent = text;
-        //this.tooltipEl.style.display = 'block';
-        this.tooltipEl.classList.remove('tooltip-hidden');
+        this.tooltipEl.style.opacity = 1;
         this.updatePosition(x, y);
     }
 
-    show(text, x, y, delay = 1000) {
+    show(text, x, y, delay = 400) {
         if (this.fadeInTimeout) clearTimeout(this.fadeInTimeout);
         this.setText(text, x, y);
         this.fadeInTimeout = setTimeout(() => {
@@ -33,7 +42,7 @@ class Tooltip {
 
     hide() {
         if (this.fadeInTimeout) clearTimeout(this.fadeInTimeout);
-        this.tooltipEl.classList.add('tooltip-hidden');
+        this.tooltipEl.style.opacity = 0;
     }
 
     updatePosition(x, y) {
@@ -82,5 +91,5 @@ class TooltipManager {
 
 // When the document loads, create a new TooltipManager
 document.addEventListener('DOMContentLoaded', () => {
-    //const ttm = new TooltipManager();
+    const ttm = new TooltipManager();
 });

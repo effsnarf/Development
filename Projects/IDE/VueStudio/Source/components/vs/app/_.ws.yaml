@@ -164,7 +164,7 @@ methods:
         "event": "⚡",
         "data": "🧊",
         "computed": "💡",
-        "watcher": "👓",
+        "watcher": "👁️",
         "method": "🔴",
       })[type] || "❔";
     }

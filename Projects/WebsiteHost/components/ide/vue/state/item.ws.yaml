@@ -12,6 +12,7 @@ dom:
       v-text: item.vueCompName
     td: 
       class: text-center
+      :title: $root.getIconHint(item)
       v-text: $root.getIcon(item)
     td: 
       v-text: item.key

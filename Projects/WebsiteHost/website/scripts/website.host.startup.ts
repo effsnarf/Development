@@ -313,9 +313,9 @@ const mgAppMixin = {
   async created() {
     const self = this as any;
     try {
-      self.dbp = await DatabaseProxy.new(
-        `https://db.memegenerator.net/MemeGenerator`
-      );
+      // self.dbp = await DatabaseProxy.new(
+      //   `https://db.memegenerator.net/MemeGenerator`
+      // );
     } catch (ex: any) {
       console.warn(`Failed to connect to DBP`);
       console.warn(ex);
@@ -1239,7 +1239,7 @@ interface MgParams {
           }
         );
       },
-      async wait(condition: () => boolean, timeout = 10000) {
+      async wait(condition: () => boolean, timeout = 3000) {
         // If no condition is provided, just wait the timeout
         if (typeof condition == "number") {
           return new Promise((resolve: any, reject: any) => {
@@ -1312,7 +1312,7 @@ interface MgParams {
   vueApp.vm = vueManager;
 
   if ("dbp" in vueApp) {
-    await vueApp.wait(() => vueApp.dbp);
+    //await vueApp.wait(() => vueApp.dbp);
   }
 
   vueApp.$mount("#app");

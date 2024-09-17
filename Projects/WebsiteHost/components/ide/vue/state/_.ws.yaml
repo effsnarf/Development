@@ -11,7 +11,7 @@ dom:
             ':class': getCssClass(field)
             @click: toggleWatch(field)
             ':vue': vue
-            :icon: "(watchedFieldKeys.includes(field.key) ? '👓' : ' ')"
+            :icon: "(watchedFieldKeys.includes(field.key) ? '👁️' : ' ')"
             ':item': field
             ':key': vue()._uid+'.'+field.key
     transition: 
