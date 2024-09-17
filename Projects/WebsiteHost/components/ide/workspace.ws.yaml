@@ -5,7 +5,7 @@ dom:
       v-if: showWorkspace
       class: workspace
       div:
-        v-if: "false"
+        v-if: "true"
         h3:
           ui.title: 
             icon: 🎄
@@ -18,7 +18,7 @@ dom:
           select:
             v-model: selectedEditor
             option:
-              v-for: editor in ['component', 'css']
+              v-for: editor in ['component', 'html dom']
               ':selected': (selectedEditor == editor)
               ':key': editor
               v-text: editor
@@ -35,7 +35,7 @@ dom:
         ide.component.picker:
           v-if: (selectedEditor == 'component')
         ide.element.picker:
-          v-if: (selectedEditor == 'css')
+          v-if: (selectedEditor == 'html dom')
         ide.performance.inspector:
 props: null
 data:

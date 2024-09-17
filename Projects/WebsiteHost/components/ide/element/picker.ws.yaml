@@ -25,6 +25,8 @@ dom:
             @node-unhover: onNodeUnhover
             @node-select: onNodeSelect
         div: 
+          ide.element.inspector:
+            ':element': contextElement
           ide.css.editor:
             ':context-element': contextElement
 props:
