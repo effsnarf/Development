@@ -20,8 +20,11 @@ console.log(
 );
 console.log("\n");
 
-const filter = {
-  exclude: ["node_modules"],
+const filter = (path: string) => {
+  if (path.includes("node_modules")) return false;
+  // Google Drive sync
+  if (path.includes(".tmp.")) return false;
+  return true;
 };
 
 const window = Console.getWindowSize();

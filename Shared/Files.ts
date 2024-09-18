@@ -268,6 +268,8 @@ class Files {
         fs.mkdirSync(clone);
       }
 
+      const filterFunc = pathFilterToFunction(filter);
+
       // Get all the files in the master directory
       for (const masterFile of fs.readdirSync(master)) {
         try {
@@ -275,7 +277,7 @@ class Files {
           const masterPath = path.join(master, masterFile);
 
           // Skip files that do not pass the filter
-          if (!pathFilterToFunction(filter)(masterPath)) {
+          if (!filterFunc(masterPath)) {
             progress.data.skipped.push(masterPath);
             continue;
           }
@@ -332,10 +334,12 @@ class Files {
 
       // Scan the clone folder and delete any file / folder that doesn't exist in the master
       if (isRoot) {
+        const skipped = progress.data.skipped as string[];
         const absClone = path.resolve(clone);
         const absMaster = path.resolve(master);
         const toDelete = [];
         for (const cloneFile of Files.getFiles(clone, { recursive: true })) {
+          if (!filterFunc(cloneFile)) continue;
           const relClone = path.relative(absClone, cloneFile);
           const masterFile = path.join(absMaster, relClone);
           if (!fs.existsSync(masterFile)) {
@@ -346,6 +350,7 @@ class Files {
         for (const cloneFolder of Files.getFolders(clone, {
           recursive: true,
         })) {
+          if (!filterFunc(cloneFolder)) continue;
           const relClone = path.relative(absClone, cloneFolder);
           const masterFolder = path.join(absMaster, relClone);
           if (!fs.existsSync(masterFolder)) {
