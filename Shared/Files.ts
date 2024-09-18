@@ -135,6 +135,28 @@ class Files {
     return files;
   }
 
+  static getFolders(
+    folder: string,
+    options?: { recursive?: boolean }
+  ): string[] {
+    // If folder doesn't exist, return empty array
+    if (!fs.existsSync(folder)) return [];
+    const { recursive = true } = options || {};
+    const folders: string[] = [];
+
+    Files.traverseDirectory(
+      folder,
+      (currentFolder, entry) => {
+        if (entry.isDirectory()) {
+          folders.push(path.join(currentFolder, entry.name));
+        }
+      },
+      { recursive }
+    );
+
+    return folders;
+  }
+
   static traverseDirectory(
     folder: string,
     callback: (folder: string, entry: fs.Dirent) => void,
@@ -207,13 +229,23 @@ class Files {
     clone: string,
     filter: PathFilter,
     recursive: boolean = true,
+    onProgress: (progress: Progress, message?: string) => void = () => {}
+  ) {
+    return this._syncFolders(master, clone, filter, recursive, onProgress);
+  }
+
+  private static async _syncFolders(
+    master: string,
+    clone: string,
+    filter: PathFilter,
+    recursive: boolean = true,
     onProgress: (progress: Progress, message?: string) => void = () => {},
     progress?: Progress
   ) {
     return new Promise(async (resolve) => {
       const isRoot = !progress;
 
-      // Count the number of files/folders in the master directory (recursively)
+      // Count the number of folders in the master directory (recursively)
       if (!progress) {
         const pathsCount = await Files.countPaths(master, filter, recursive);
 
@@ -226,7 +258,7 @@ class Files {
 
         progress = Progress.new(
           pathsCount,
-          { skipped: 0, modifieds: [] },
+          { skipped: [], modified: [], deleted: [] },
           (percent) => onProgress(progress!, percent.toString())
         );
       }
@@ -237,16 +269,14 @@ class Files {
       }
 
       // Get all the files in the master directory
-      const files = fs.readdirSync(master);
-
-      for (const file of files) {
+      for (const masterFile of fs.readdirSync(master)) {
         try {
           // Get the full path of the file
-          const masterPath = path.join(master, file);
+          const masterPath = path.join(master, masterFile);
 
           // Skip files that do not pass the filter
           if (!pathFilterToFunction(filter)(masterPath)) {
-            progress.data.skipped++;
+            progress.data.skipped.push(masterPath);
             continue;
           }
 
@@ -254,7 +284,7 @@ class Files {
           progress.increment();
 
           // Get the full path of the clone file
-          const clonePath = path.join(clone, file);
+          const clonePath = path.join(clone, masterFile);
 
           // If the master file is a directory
           if (fs.statSync(masterPath).isDirectory()) {
@@ -264,11 +294,11 @@ class Files {
             // Create the clone directory if it does not exist
             if (!fs.existsSync(clonePath)) {
               fs.mkdirSync(clonePath);
-              progress.data.modifieds.push(clonePath);
+              progress.data.modified.push(clonePath);
               onProgress(progress, `  ${`Created`.cyan} ${clonePath.yellow}`);
             }
 
-            await Files.syncFolders(
+            await Files._syncFolders(
               masterPath,
               clonePath,
               filter,
@@ -279,23 +309,14 @@ class Files {
             continue;
           }
 
-          // Copy the file if the clone does not exist
-          if (!fs.existsSync(clonePath)) {
+          // Copy the file if the clone does not exist,
+          // or if the master and clone files are not equal
+          if (
+            !fs.existsSync(clonePath) ||
+            !Files.areFilesEqual(masterPath, clonePath)
+          ) {
             fs.copyFileSync(masterPath, clonePath);
-            progress.data.modifieds.push(clonePath);
-            onProgress(
-              progress,
-              `  ${`Created`.cyan} ${
-                clonePath.toShortPath(masterPath).yellow
-              } <- ${masterPath.toShortPath(clonePath).green}`
-            );
-            continue;
-          }
-
-          // Copy the file if the master and clone files are not equal
-          if (!Files.areFilesEqual(masterPath, clonePath)) {
-            fs.copyFileSync(masterPath, clonePath);
-            progress.data.modifieds.push(clonePath);
+            progress.data.modified.push(clonePath);
             onProgress(
               progress,
               `  ${`Copied`.cyan} ${
@@ -306,6 +327,31 @@ class Files {
           }
         } finally {
           if (progress.isTimeForAnotherReport()) onProgress(progress);
+        }
+      }
+
+      // Scan the clone folder and delete any file / folder that doesn't exist in the master
+      if (isRoot) {
+        const absClone = path.resolve(clone);
+        const absMaster = path.resolve(master);
+        const toDelete = [];
+        for (const cloneFile of Files.getFiles(clone, { recursive: true })) {
+          const relClone = path.relative(absClone, cloneFile);
+          const masterFile = path.join(absMaster, relClone);
+          if (!fs.existsSync(masterFile)) {
+            fs.unlinkSync(cloneFile);
+            progress.data.deleted.push(cloneFile);
+          }
+        }
+        for (const cloneFolder of Files.getFolders(clone, {
+          recursive: true,
+        })) {
+          const relClone = path.relative(absClone, cloneFolder);
+          const masterFolder = path.join(absMaster, relClone);
+          if (!fs.existsSync(masterFolder)) {
+            fs.rmdirSync(cloneFolder);
+            progress.data.deleted.push(cloneFolder);
+          }
         }
       }
 
@@ -364,19 +410,18 @@ class Files {
     return fs.existsSync(filePath) && fs.statSync(filePath).isFile();
   }
 
-  // If their size is different, they are not equal
-  // If their size is the same, compare their contents
   static areFilesEqual(path1: string, path2: string): boolean {
     const stats1 = fs.statSync(path1);
     const stats2 = fs.statSync(path2);
 
+    // If their size is different, they are not equal
     if (stats1.size !== stats2.size) {
       return false;
     }
 
+    // If their content is different, they are not equal
     const buffer1 = fs.readFileSync(path1);
     const buffer2 = fs.readFileSync(path2);
-
     if (buffer1.equals(buffer2)) {
       return true;
     } else {

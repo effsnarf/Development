@@ -12,5 +12,7 @@
             "filePath": "Projects\\MG3\\DBP\\Node2\\config.yaml",
             "group": "Default"
         }
-    ]
+    ],
+    "deno.enable": true,
+    "deno.lint": true,
 }
