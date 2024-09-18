@@ -20,7 +20,7 @@ interface Response {
 }
 
 enum Model {
-  Default = "gpt-4-vision-preview",
+  Default = "gpt-3.5-turbo",
   Gpt4VisionPreview = "gpt-4-vision-preview",
   Gpt4 = "gpt-4",
   Gpt35Turbo = "gpt-3.5-turbo",

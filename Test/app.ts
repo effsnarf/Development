@@ -16,14 +16,13 @@ import { Analytics, ItemType } from "@shared/Analytics";
 import { TreeScript } from "@shared/TreeScript/TreeScript";
 import { Apify } from "@shared/Apify";
 import { Console } from "@shared/Console";
-import { Model } from "../Apis/OpenAI/classes/OpenAI";
 import { Google } from "@shared/Google";
 import { Coder } from "@shared/Coder";
 import { Cache } from "@shared/Cache";
 import { LiveTree } from "@shared/LiveTree";
 import { Diff } from "@shared/Diff";
 import { AI } from "@shared/AI";
-import { OpenAI } from "../Apis/OpenAI/classes/OpenAI";
+import { OpenAI, Model } from "../Apis/OpenAI/classes/OpenAI";
 import { ChatOpenAI, Role, Roles } from "../Apis/OpenAI/classes/ChatOpenAI";
 //import { ChatOpenAI } from "langchain/chat_models/openai";
 import { OpenAI2 } from "../Apis/OpenAI/classes/OpenAI2";
@@ -31,6 +30,13 @@ import { Shakespearizer } from "../Projects/Shakespearizer/Shakespearizer";
 import { Pexels } from "../Apis/Images/Pexels/Pexels";
 
 (async () => {
-  const images = await Pexels.searchImages("technology", 100);
-  console.log(images);
+  const chat = await ChatOpenAI.new(
+    Roles.Null,
+    true,
+    Model.Default,
+    false,
+    OpenAI.effApiKey
+  );
+
+  await chat.send("hello");
 })();
