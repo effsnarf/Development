@@ -5,7 +5,10 @@ import { Files } from "../../Shared/Files";
 
 const argv = process.argv;
 
-if (argv.length < 4) throw `Usage: FolderSync [input folder] [output folder]`;
+if (argv.length < 4) {
+  console.log(argv);
+  throw `Usage: FolderSync [input folder] [output folder]`;
+}
 
 const folders = {
   input: argv[2],
@@ -45,6 +48,9 @@ const onProgress = (progress: Progress, message?: string) => {
     true,
     onProgress
   );
+
+  Console.moveCursorUp();
+  Console.clearLine();
 
   const summary = prog.data;
   console.log(
