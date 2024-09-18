@@ -8,7 +8,7 @@ dom:
       ':global': true
     ui.context.window:
       ref: context1
-      v-show: showPicker
+      :visible: showPicker
       ':global': 'true'
       @pinned: onPinned
       .flex.flex-row.gap-1:

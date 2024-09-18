@@ -214,7 +214,6 @@ computed:
       style.left = ((pos.x + this.space) + "px");
       style.top = ((pos.y + this.space) + "px");
       if (!this.semiTransparent) style.opacity = 1;
-      style.transition = "all 0.3s, top 0s, left 0s !important";
       if (this.windowStyle) Object.assign(style, this.windowStyle);
       return style;
     }
@@ -267,7 +266,7 @@ style:
     background: 'linear-gradient(to right, #303030, #101010)'
     box-shadow: '-12px 12px 12px #000000'
     opacity: 0
-    transition: all 0s, transform 0.3s, opacity 0.3s !important
+    transition: all 0s, top 0s, left 0s, width 0.3s, transform 0.3s, opacity 0.3s !important
     cursor: move
     pointer-events: none
     z-index: 1000
