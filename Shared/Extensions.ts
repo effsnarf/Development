@@ -632,7 +632,7 @@ if (typeof Number !== "undefined") {
         const elapsed = started + this.valueOf() - Date.now();
         process.stdout.write(`\r`);
         process.stdout.write(
-          `${`Waiting -`.c("gray")}${elapsed.unitifyTime()}\r`
+          `${`waiting -`.c("gray")}${elapsed.unitifyTime()}\r`
         );
       }, 100);
     }

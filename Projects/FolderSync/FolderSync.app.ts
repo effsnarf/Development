@@ -1,3 +1,4 @@
+import "../../Shared/Extensions";
 import "colors";
 import { Console } from "../../Shared/Console";
 import { Progress } from "../../Shared/Progress";
@@ -14,14 +15,6 @@ const folders = {
   input: argv[2],
   output: argv[3],
 };
-
-console.log(
-  `Synching`.green,
-  folders.input.yellow,
-  ` -> `.gray,
-  folders.output.yellow
-);
-console.log("\n");
 
 const filter = (path: string) => {
   if (path.includes("node_modules")) return false;
@@ -41,20 +34,35 @@ const onProgress = (progress: Progress, message?: string) => {
 };
 
 (async () => {
-  await Files.syncFolders(
-    folders.input,
-    folders.output,
-    filter,
-    true,
-    onProgress
-  );
+  while (true) {
+    console.clear();
+    console.log(
+      `Synching`.green,
+      folders.input.yellow,
+      ` -> `.gray,
+      folders.output.yellow
+    );
+    console.log("\n");
 
-  Console.moveCursorUp();
-  Console.clearLine();
+    await Files.syncFolders(
+      folders.input,
+      folders.output,
+      filter,
+      true,
+      onProgress
+    );
 
-  const summary = prog.data;
-  console.log(
-    `${summary.skipped.length} skipped \t ${summary.modified.length} modified \t ${summary.deleted.length} deleted`
-      .gray
-  );
+    Console.moveCursorUp();
+    Console.clearLine();
+
+    const summary = prog.data;
+    console.log(
+      `${summary.skipped.length} skipped \t ${summary.modified.length} modified \t ${summary.deleted.length} deleted`
+        .gray
+    );
+
+    console.log();
+
+    await (10).minutes().wait({ log: true });
+  }
 })();
