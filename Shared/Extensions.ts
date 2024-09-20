@@ -736,10 +736,11 @@ if (typeof Number !== "undefined") {
     const value = this.valueOf();
     if (!barLength) barLength = 50;
     barLength = barLength - ` 100%`.length;
+    const barColor = "gray";
     const progressLength = Math.round(value * barLength);
     const bar = "█".repeat(progressLength);
     const emptyLength = barLength - progressLength;
-    const empty = emptyLength <= 0 ? "" : "█".repeat(emptyLength).c("gray");
+    const empty = emptyLength <= 0 ? "" : "▒".repeat(emptyLength).c(barColor);
     let s = `${bar}${empty} ${value.unitifyPercent().withoutColors()}`;
     if (severifyArgs.length)
       s = s.colorize(
