@@ -1,9 +1,14 @@
 dom:
-  div:
+  .clickable:
     v-text: nodeText
+    @mouseenter: () => onHoverNode(node, true)
+    @mouseleave: () => onHoverNode(node, false)
+    @click: () => { if (sui) sui.node.selected = node; }
+    :class: "{ selected: (node.id == sui?.node.selected?.id) }"
 
 props:
   item:
+  sui:
 
 methods:
   getNodeIcon: | #js
@@ -22,6 +27,12 @@ methods:
       };
       return (icons[node.type] || "❔");
     }
+  onHoverNode: | #js
+    function(node, isHovered) {
+      if (!this.sui) return;
+      this.sui.node.hovered = (!isHovered ? null : node);
+    }
+
 computed:
   nodeText: | #js
     function() {

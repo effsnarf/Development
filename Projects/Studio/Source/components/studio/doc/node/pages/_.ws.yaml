@@ -1,6 +1,7 @@
 dom:
   .flex:
     :key: sui.page.selected?.id
+    v-if: visiblePageNodes?.length
     studio.doc.node:
       v-for: pageNode in visiblePageNodes
       :node: pageNode
@@ -21,7 +22,7 @@ methods:
     }
   getVisiblePageNode: | #js
     function() {
-      return this.node.children.find(c => (c.id == this.sui.page.selected.id));
+      return this.node.children.find(c => (c.id == this.sui.page.selected?.id));
     }
 
 computed:

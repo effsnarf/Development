@@ -1,0 +1,125 @@
+dom:
+  div:
+    ui.mouse:
+      @hovered-element: onHoveredElement
+      ':global': true
+    ui.context.window:
+      ref: context1
+      :global: true
+      @pinned: onContextPinned
+      .flex:
+        .tree-indent:
+          div:
+            v-for: (node, i) in hovered.nodes
+            studio.dom.tree.node:
+              :item: node
+              :sui: sui
+          div:
+            studio.dom.tree.node:
+              v-for: child in hovered.nodes[hovered.nodes.length-1]?.children
+              :item: child
+              :sui: sui
+        div:
+          studio.doc.node.editor:
+            :node: sui.node.selected
+            :sui: sui
+            @dom-edit: (...args) => $emit('dom-edit', ...args)
+props:
+  userApp:
+  sui:
+
+data:
+  hovered:
+    element:
+    vue:
+    node:
+    nodes: []
+
+mounted: | #js
+  function() {
+    this.$watch("sui.node.selected", this.onSelectedNodeChanged.bind(this));
+  }
+
+methods:
+  onSelectedNodeChanged: | #js
+    async function(newNode) {
+      await this.refreshParentNodes(newNode);
+    }
+  onContextPinned: | #js
+    function() {
+      this.sui.node.selected = this.sui.node.hovered;
+    }
+  refreshNodeTree: | #js
+    async function() {
+      const vue = this.hovered.vue?.();
+      this.hovered.node = this.getDomNodeFromVue(vue);
+      this.sui.node.hovered = this.hovered.node;
+      await this.refreshParentNodes(this.hovered.node);
+    }
+  refreshParentNodes: | #js
+    async function(lastNode) {
+      this.hovered.nodes = await this.getDomNodeAncestors(lastNode);
+      this.sui.nodes.hovered = this.hovered.nodes;
+    }
+  onHoveredElement: | #js
+    async function(el) {
+      if (this.$refs.context1?.isPinned) return;
+      this.hovered.element = el;
+      const vue = this.getVueFromElement(el);
+      this.hovered.vue = (!vue ? null : () => vue);
+      await this.refreshNodeTree();
+    }
+  getDomNodeAncestors: | #js
+    async function(node) {
+      if (!node) return [];
+      const nodes = [];
+      nodes.unshift(node);
+      while (node = await this.getDomNodeParent(node, this.userApp)) nodes.unshift(node);
+      return nodes;
+    }
+  getDomNodeParent: | #js
+    async function(node, parent) {
+      // #TODO: Slow, scans the whole tree
+      if (!node) return null;
+      if (!parent?.children) return null;
+      if (node == parent) return null;
+      if (["pages", "comps"].includes(node.type)) return null;
+      for (const child of parent.children) {
+        if (child.id == node.id) return parent;
+        const parent2 = await this.getDomNodeParent(node, child);
+        if (parent2) return parent2;
+      }
+      return null;
+    }
+  getDomNodeFromVue: | #js
+    function(vue) {
+      if (!vue) return null;
+      if (vue.node) return vue.node;
+      return this.getDomNodeFromVue(vue.$parent);
+    }
+  getVueFromElement: | #js
+    function(el) {
+      const vue = this.getVueFromVnode(this.getVnodeFromElement(el));
+      return vue;
+    }
+  getVnodeFromElement: | #js
+    function(el) {
+      if (!el) return null;
+      if (el.__vue__) return el.__vue__;
+      return this.getVnodeFromElement(el.parentElement);
+    }
+  getVueFromVnode: | #js
+    // Skip vnodes like <keep-alive>, <transition>, etc.
+    function(vnode) {
+      if (!vnode) return null;
+      if (this.vNodeIsVue(vnode)) return vnode;
+      return this.getVueFromVnode(vnode.$parent);
+    }
+  vNodeIsVue: | #js
+    function(vnode) {
+      if ([`transition`, `transition-group`, `keep-alive`].includes(vnode.$options._componentTag)) return false;
+      return true;
+    }
+
+
+style:

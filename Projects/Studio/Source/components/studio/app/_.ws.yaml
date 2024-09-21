@@ -20,9 +20,13 @@ dom:
           :user-app: userApp
           :sui: sui
       studio.doc.node.editor:
+        v-if: "false"
         :node: sui.node.active
         :sui: sui
         @dom-edit: onDomEditEvent
+      studio.doc.node.picker:
+        :user-app: userApp
+        :sui: sui
 
 data:
   userApp: null
@@ -33,6 +37,8 @@ data:
       hovered:
       selected:
       active:
+    nodes:
+      hovered:
 
 mounted: | #js
   function() {
