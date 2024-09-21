@@ -1,8 +1,8 @@
 dom:
   studio.doc.node:
-    :node: root
+    :node: userApp
     :sui: sui
 
 props:
-  root:
+  userApp:
   sui:

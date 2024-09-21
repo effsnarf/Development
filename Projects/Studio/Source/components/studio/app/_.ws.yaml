@@ -3,12 +3,12 @@ dom:
     div:
       studio.app.logo:
       .flex1:
-        v-if: dom
+        v-if: userApp
         studio.dom.tree:
-          :root: dom.root
+          :user-app: userApp
           @sui: onSuiEvent
         studio.doc:
-          :root: dom.root
+          :user-app: userApp
           :sui: sui
         studio.doc.node.editor:
           :node: activeNode
@@ -16,7 +16,7 @@ dom:
           @dom-edit: onDomEditEvent
 
 data:
-  dom: null
+  userApp: null
   sui:
     node:
       hovered:
@@ -24,7 +24,9 @@ data:
 
 mounted: | #js
   function() {
-    this.dom = this.getMockupDom();
+    this.userApp = this.getMockupUserApp();
+    // Register global methods
+    this.$root.getCompNode = this.getCompNode.bind(this);
   }
 
 methods:
@@ -47,26 +49,116 @@ methods:
       };
       return node;
     }
-  getMockupDom: | #js
+  getMockupUserApp: | #js
     function() {
-      return {
-        root: {
-          ...this.getMockupNode(),
-          id: 1,
-          path: [0],
-          type: "panel",
-          children: [
-            {
-              ...this.getMockupNode(),
-              id: 2,
-              path: [0, 0],
-              type: "title",
-              size: 2,
-              text: "Website Title"
-            }
-          ]
-        }
+      const userApp = {
+        type: "user.app",
+        children: [
+          {
+            type: "pages",
+            children: [
+              {
+                type: "page",
+                name: "home",
+                children: [
+                  {
+                    type: "title",
+                    size: 2,
+                    text: "Home page"
+                  },
+                  {
+                    type: "list",
+                    children: [
+                      {
+                        type: "list.item",
+                        children: [
+                          {
+                            type: "comp.inst",
+                            comp: {
+                              name: "generator"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                type: "page",
+                name: "generator",
+                children: [
+                  {
+                    type: "comp.inst",
+                    comp: {
+                      name: "generator"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            type: "comps",
+            children: [
+              {
+                type: "comp",
+                name: "generator",
+                children: [
+                  {
+                    type: "panel",
+                    direction: "horizontal",
+                    children: [
+                      {
+                        type: "image",
+                      },
+                      {
+                        type: "title",
+                        size: 3,
+                        text: "Courage Wolf"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
       };
+
+      let id = 1;
+      const initNode = (node) => {
+        if (!node.type) return;
+        node.id = id++;
+        Object.assign(node, this.getMockupNode());
+      }
+
+      Objects.traverse(userApp, initNode);
+
+      return userApp;
+    }
+  getUserApp: | #js
+    function(vue) {
+      while (vue && !vue.userApp) vue = vue.$parent;
+      return vue.userApp;
+    }
+  findNode: | #js
+    function(node, type, compName) {
+      for (const childNode of node.children) {
+        if (childNode.type != type) continue;
+        // found the node by type
+        if ((type == "comp") && compName) {
+          if (compName != childNode.name) continue;
+        }
+        return childNode;
+      }
+    }
+  getCompNode: | #js
+    function(compInstNode) {
+      const userApp = this.userApp;
+      const compsNode = this.findNode(userApp, "comps");
+      const compNode = this.findNode(compsNode, "comp", compInstNode.comp.name);
+      return compNode;
     }
 
 computed:

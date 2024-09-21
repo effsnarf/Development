@@ -1,7 +1,7 @@
 dom:
   .flex1:
     ui.tree:
-      ":root": root
+      ":root": userApp
       item-type: studio.dom.tree.node
       :initial-expanded: true
       @node-hover: (node) => $emit('sui', (sui) => sui.node.hovered = node)
@@ -10,7 +10,7 @@ dom:
       :value: selectedNodeData
 
 props:
-  root:
+  userApp:
 
 data:
 

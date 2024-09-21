@@ -1,0 +1,21 @@
+dom:
+  studio.doc.node:
+    :node: pagesNode
+    :sui: sui
+
+props:
+  node:
+  sui:
+
+methods:
+  getPagesNode: | #js
+    function() {
+      if (!this.node) return null;
+      return this.node.children.find(c => (c.type == "pages"));  
+    }
+
+computed:
+  pagesNode: | #js
+    function() {
+      return this.getPagesNode();
+    }

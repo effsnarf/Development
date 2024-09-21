@@ -1,0 +1,10 @@
+dom:
+  .flex:
+    studio.doc.node:
+      v-for: pageNode in node.children
+      :node: pageNode
+      :sui: sui
+
+props:
+  node:
+  sui:

@@ -13,7 +13,7 @@ props:
 methods:
   getNodeCompName: | #js
     function(node) {
-      return `studio-doc-node-${node.type}`;
+      return `studio-doc-node-${node.type.kebabize()}`;
     }
   getNodeStyle: | #js
     function(node) {

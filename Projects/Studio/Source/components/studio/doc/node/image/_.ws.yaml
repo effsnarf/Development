@@ -1,0 +1,12 @@
+dom:
+  div:
+    img:
+      src: https://i.imgur.com/QwWQw2v.jpeg
+
+props:
+
+style:
+  img:
+    width: 6em
+    aspect-ratio: 9 / 6
+    object-fit: cover

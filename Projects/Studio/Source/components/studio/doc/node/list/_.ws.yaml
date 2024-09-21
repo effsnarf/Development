@@ -1,0 +1,13 @@
+dom:
+  div:
+    .list-item:
+      v-for: i in 10
+      studio.doc.node:
+        :node: node.children[0]
+
+props:
+  node:
+
+style:
+  .list-item:
+    border: 2px dashed gray

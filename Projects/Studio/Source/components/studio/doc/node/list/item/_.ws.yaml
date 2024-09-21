@@ -1,0 +1,7 @@
+dom:
+  studio.doc.node:
+    :node: node.children[0]
+
+props:
+  node:
+  sui:

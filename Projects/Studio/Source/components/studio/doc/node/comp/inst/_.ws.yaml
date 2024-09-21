@@ -1,0 +1,16 @@
+dom:
+  studio.doc.node:
+    :node: compNode.children[0]
+    :sui: sui
+
+props:
+  node:
+  sui:
+
+methods:
+
+computed:
+  compNode: | #js
+    function() {
+      return this.$root.getCompNode(this.node);
+    }

@@ -1,10 +1,37 @@
 dom:
   div:
+    :style: nodeStyle
     studio.doc.node:
-      v-for: child in node.children
-      :node: child
+      v-for: childNode in node.children
+      :node: childNode
       :sui: sui
 
 props:
   node:
   sui:
+
+methods:
+  getNodeStyle: | #js
+    function(node) {
+      const s = {};
+      if (node.direction) {
+        s.display = "flex";
+        s['flex-direction'] = this.toFlexDirection(node.direction);
+      }
+      return s;
+    }
+  toFlexDirection: | #js
+    function(dir) {
+      switch (dir)
+      {
+        case "horizontal": return "row";
+        case "vertical": return "column";
+      }
+      return null;
+    }
+
+computed:
+  nodeStyle: | #js
+    function() {
+      return this.getNodeStyle(this.node);
+    }

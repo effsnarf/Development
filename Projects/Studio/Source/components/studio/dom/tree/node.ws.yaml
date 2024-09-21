@@ -1,11 +1,36 @@
 dom:
   div:
-    v-text: node.type
+    v-text: nodeText
 
 props:
   item:
 
+methods:
+  getNodeIcon: | #js
+    function(node) {
+      const icons = {
+        "user.app": "💻",
+        "pages": "📃",
+        "page": "📄",
+        "title": "🅰️",
+        "list": "🟰",
+        "list.item": "🍃",
+        "comps": "🎁",
+        "comp": "🎁",
+        "comp.inst": "📦",
+        "image": "🖼️"
+      };
+      return (icons[node.type] || "❔");
+    }
 computed:
+  nodeText: | #js
+    function() {
+      const node = this.node;
+      const icon = this.getNodeIcon(node);
+      let text = (node.comp?.name || node.name || node.type);
+      if (text != node.type) text = `[${text}]`;
+      return `${icon} ${text}`;
+    }
   node: | #js
     function() {
       return this.item;
