@@ -2,9 +2,11 @@ dom:
   div:
     .option:
       v-for: bgColor in bgColors
+      :class: getOptionClass(bgColor)
       :style: getOptionStyle(bgColor)
       @mouseenter: () => onHover(bgColor, true)
       @mouseleave: () => onHover(bgColor, false)
+      @click: () => onClick(bgColor)
 
 props:
   node:
@@ -13,9 +15,20 @@ data:
   bgColors: ["#ff6644", "#66ff44", "#6644ff"]
 
 methods:
+  onClick: | #js
+    function(bgColor) {
+      this.node.style.bg.color = bgColor;
+      this.$parent.initial.node.style.bg.color = bgColor;
+    }
   onHover: | #js
     function(bgColor, isHovered) {
-      this.node.style.bg.color = (!isHovered ? null : bgColor);
+      this.node.style.bg.color = (isHovered ? bgColor : this.$parent.initial.node.style.bg.color);
+    }
+  getOptionClass: | #js
+    function(bgColor) {
+      return {
+        'color-selected': (bgColor == this.$parent.initial.node.style.bg.color)
+      };
     }
   getOptionStyle: | #js
     function(bgColor) {
@@ -29,6 +42,9 @@ style:
     width: 20em
     height: 4em
     opacity: 0.4
+    border: 0.5em solid transparent
     cursor: pointer
   .option:hover:
     opacity: 0.6
+  .color-selected:
+    border: 0.5em solid white

@@ -6,3 +6,9 @@ dom:
 
 props:
   node:
+
+computed:
+  initial: | #js
+    function() {
+      return this.$parent.initial;
+    }
