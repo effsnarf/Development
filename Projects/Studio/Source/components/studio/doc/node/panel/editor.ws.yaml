@@ -1,3 +1,2 @@
 dom:
   div:
-    v-text: "'panel editor'"
