@@ -1,12 +1,11 @@
 dom:
   .flex:
     :key: sui.page.selected?.id
-    div:
+    studio.doc.node:
       v-for: pageNode in visiblePageNodes
-      studio.doc.node:
-        :node: pageNode
-        :sui: sui
-        :key: pageNode.id
+      :node: pageNode
+      :sui: sui
+      :key: pageNode.id
 
 props:
   node:

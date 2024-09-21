@@ -9,3 +9,7 @@ dom:
 props:
   node:
   sui:
+
+style:
+  .comp-studio-doc-node-page:
+    width: 100%

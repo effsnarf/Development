@@ -1,24 +1,28 @@
 dom:
   div:
-    div:
-      studio.app.logo:
-      .flex1:
-        v-if: userApp
-        studio.dom.tree:
+    studio.app.logo:
+    .flex1:
+      v-if: userApp
+      studio.dom.tree:
+        :root: userApp
+        :sui: sui
+        @sui: onSuiEvent
+      studio.dom.tree:
+        :root: sui.page.selected
+        :sui: sui
+        @sui: onSuiEvent
+      .flex2:
+        studio.doc.page.selector:
           :user-app: userApp
-          @sui: onSuiEvent
-        .flex2:
-          studio.doc.page.selector:
-            :user-app: userApp
-            :sui: sui
-            v-model: sui.page.selected
-          studio.doc:
-            :user-app: userApp
-            :sui: sui
-        studio.doc.node.editor:
-          :node: sui.node.active
           :sui: sui
-          @dom-edit: onDomEditEvent
+          v-model: sui.page.selected
+        studio.doc:
+          :user-app: userApp
+          :sui: sui
+      studio.doc.node.editor:
+        :node: sui.node.active
+        :sui: sui
+        @dom-edit: onDomEditEvent
 
 data:
   userApp: null
@@ -182,7 +186,6 @@ methods:
       const pagesNode = this.findNode(this.userApp, "pages");
       const pageNodes = this.getNodes(pagesNode, "page");
       return pageNodes;
-
     }
 watch:
   sui:
@@ -193,10 +196,12 @@ watch:
       }
 
 style:
-  .flex1:
+  .comp-studio-app > .flex1:
     display: flex
     justify-content: space-between
     margin: 1vw
+  .comp-studio-app > .flex1 > *:
+    width: 23%
   .flex2:
     display: flex
     flex-direction: column
