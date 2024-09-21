@@ -2,7 +2,22 @@ dom:
   studio.doc.node:
     :node: userApp
     :sui: sui
+    :class: docCssClass
 
 props:
   userApp:
   sui:
+
+methods:
+  getDocCssClass: | #js
+    function() {
+      return {};
+    }
+
+computed:
+  docCssClass: | #js
+    function() {
+      return this.getDocCssClass();
+    }
+
+style:

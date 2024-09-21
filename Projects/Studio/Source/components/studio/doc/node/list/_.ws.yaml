@@ -4,9 +4,11 @@ dom:
       v-for: i in 10
       studio.doc.node:
         :node: node.children[0]
+        :sui: sui
 
 props:
   node:
+  sui: sui
 
 style:
   .list-item:

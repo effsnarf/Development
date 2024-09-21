@@ -20,7 +20,21 @@ methods:
       if (!node) return;
       const s = {};
       s['background-color'] = node.style?.bg?.color;
+      for (let key in s) if (s[key] == null) delete s[key];
+      if (!Object.keys(s).length) return null;
       return s;
+    }
+  areNodesRelated: | #js
+    function(node1, node2, tryOpposite = true) {
+      if (!node1 || !node2) return false;
+      if (node1.id == node2.id) return true;
+      if (node1.type == "comp.inst") {
+        if (node2.type == "comp") {
+          if (node1.comp.name == node2.name) return true;
+        }
+      }
+      if (tryOpposite) return this.areNodesRelated(node2, node1, false);
+      return false;
     }
 
 computed:
@@ -32,7 +46,8 @@ computed:
     function() {
       return {
         'hovered-node': this.isHoveredNode,
-        'selected-node': this.isSelectedNode
+        'selected-node': this.isSelectedNode,
+        'active-node':  this.isActiveNode
       };
     }
   nodeStyle: | #js
@@ -42,14 +57,18 @@ computed:
   isHoveredNode: | #js
     function() {
       if (!this.node) return false;
-      return (this.node?.id == this.sui?.node.hovered?.id);
+      return this.areNodesRelated(this.node, this.sui?.node.hovered);
     }
   isSelectedNode: | #js
     function() {
       if (!this.node) return false;
-      return (this.node?.id == this.sui?.node.selected?.id);
+      return this.areNodesRelated(this.node, this.sui?.node.selected);
     }
-
+  isActiveNode: | #js
+    function() {
+      if (!this.node) return false;
+      return this.areNodesRelated(this.node, this.sui?.node.active);
+    }
 style:
   .comp-studio-doc-node:
     border: "1px dashed #444"

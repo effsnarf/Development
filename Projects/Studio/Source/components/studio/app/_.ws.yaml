@@ -7,26 +7,35 @@ dom:
         studio.dom.tree:
           :user-app: userApp
           @sui: onSuiEvent
-        studio.doc:
-          :user-app: userApp
-          :sui: sui
+        .flex2:
+          studio.doc.page.selector:
+            :user-app: userApp
+            :sui: sui
+            v-model: sui.page.selected
+          studio.doc:
+            :user-app: userApp
+            :sui: sui
         studio.doc.node.editor:
-          :node: activeNode
+          :node: sui.node.active
           :sui: sui
           @dom-edit: onDomEditEvent
 
 data:
   userApp: null
   sui:
+    page:
+      selected:
     node:
       hovered:
       selected:
+      active:
 
 mounted: | #js
   function() {
     this.userApp = this.getMockupUserApp();
     // Register global methods
     this.$root.getCompNode = this.getCompNode.bind(this);
+    this.$root.getPageNodes = this.getPageNodes.bind(this);
   }
 
 methods:
@@ -153,6 +162,14 @@ methods:
         return childNode;
       }
     }
+  getNodes: | #js
+    function(parentNode, type) {
+      const nodes = [];
+      for (const childNode of parentNode.children) {
+        if (type == childNode.type) nodes.push(childNode);
+      }
+      return nodes;
+    }
   getCompNode: | #js
     function(compInstNode) {
       const userApp = this.userApp;
@@ -160,15 +177,27 @@ methods:
       const compNode = this.findNode(compsNode, "comp", compInstNode.comp.name);
       return compNode;
     }
-
-computed:
-  activeNode: | #js
+  getPageNodes: | #js
     function() {
-      return (this.sui.node.selected || this.sui.node.hovered);
+      const pagesNode = this.findNode(this.userApp, "pages");
+      const pageNodes = this.getNodes(pagesNode, "page");
+      return pageNodes;
+
     }
+watch:
+  sui:
+    deep: true
+    handler: | #js
+      function(sui) {
+        sui.node.active = (sui.node.selected || sui.node.hovered);
+      }
 
 style:
   .flex1:
     display: flex
     justify-content: space-between
-    margin: 1vw    
+    margin: 1vw
+  .flex2:
+    display: flex
+    flex-direction: column
+    gap: 1em

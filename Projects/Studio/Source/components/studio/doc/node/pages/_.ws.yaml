@@ -1,10 +1,36 @@
 dom:
   .flex:
-    studio.doc.node:
-      v-for: pageNode in node.children
-      :node: pageNode
-      :sui: sui
+    :key: sui.page.selected?.id
+    div:
+      v-for: pageNode in visiblePageNodes
+      studio.doc.node:
+        :node: pageNode
+        :sui: sui
+        :key: pageNode.id
 
 props:
   node:
   sui:
+
+data:
+  key1: 1
+
+methods:
+  getVisiblePageNodes: | #js
+    function() {
+      return this.node.children.filter(c => (c.id == this.visiblePageNode?.id));
+    }
+  getVisiblePageNode: | #js
+    function() {
+      return this.node.children.find(c => (c.id == this.sui.page.selected.id));
+    }
+
+computed:
+  visiblePageNodes: | #js
+    function() {
+      return this.getVisiblePageNodes();
+    }
+  visiblePageNode: | #js
+    function() {
+      return this.getVisiblePageNode();
+    }

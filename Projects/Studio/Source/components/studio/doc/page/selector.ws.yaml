@@ -1,0 +1,67 @@
+dom:
+  .page-selector:
+    .pages:
+      .clickable:
+        v-for: pageNode in pageNodes
+        @click: () => onSelectPage(pageNode)
+        :class: "{ selected: (value?.id == pageNode.id) }"
+        .page-example:
+          studio.doc.node:
+            :node: pageNode
+            :sui: sui
+        .page-title:
+          v-text: pageNode.name
+
+props:
+  userApp:
+  sui:
+  value:
+
+data:
+  selectedPage:
+
+methods:
+  onSelectPage: | #js
+    function(pageNode) {
+      if (pageNode == this.selectedPage) pageNode = null;
+      this.selectedPage = pageNode;
+    }
+
+computed:
+  pageNodes: | #js
+    function() {
+      return this.$root.getPageNodes();
+    }
+
+watch:
+  selectedPage:
+    handler: | #js
+      function(newSelectedPage) {
+        this.$emit("input", newSelectedPage);
+      }
+
+style:
+  .page-selector:
+    height: 6em
+    overflow: hidden
+  .pages:
+    display: flex
+    gap: 0
+    justify-content: center
+  .pages > *:
+    width: 6em
+    overflow: hidden
+    opacity: 0.4
+    filter: grayscale(1)
+    cursor: pointer
+  .pages > .selected, .pages > *:hover:
+    opacity: 1
+    filter: none
+  .page-example:
+    aspect-ratio: 1 / 2
+    width: 10em
+    overflow: hidden
+    border: 2px solid gray
+    transform: scale(0.5)
+    transform-origin: left top
+    pointer-events: none

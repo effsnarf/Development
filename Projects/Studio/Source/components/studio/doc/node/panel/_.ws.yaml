@@ -5,6 +5,7 @@ dom:
       v-for: childNode in node.children
       :node: childNode
       :sui: sui
+      :key: childNode.id
 
 props:
   node:
