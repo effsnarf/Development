@@ -1,0 +1,12 @@
+dom:
+  div:
+    v-text: node.type
+
+props:
+  item:
+
+computed:
+  node: | #js
+    function() {
+      return this.item;
+    }

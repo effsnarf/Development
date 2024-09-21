@@ -1,0 +1,40 @@
+dom:
+  div:
+    component:
+      :is: getNodeCompEditorName(node)
+      :node: node
+      @dom-edit: (e) => $emit('dom-edit', e)
+    div:
+      studio.doc.node.common.editor:
+        :node: node
+
+props:
+  node:
+  sui:
+
+data:
+  initial:
+    node:
+
+methods:
+  getNodeCompEditorName: | #js
+    function(node) {
+      if (!node) return null;
+      return `studio-doc-node-${node.type}-editor`;
+    }
+  getInitialNodeData: | #js
+    function(node) {
+      const newNode = {};
+      for (const key in node)
+        if (key != "children") newNode[key] = Objects.clone(node[key]);
+      return newNode;
+    }
+
+watch:
+  node:
+    handler: | #js
+      function(newNode) {
+        this.initial.node = this.getInitialNodeData(newNode);
+      }
+    immediate: true
+    

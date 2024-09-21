@@ -1,0 +1,59 @@
+dom:
+  component:
+    :is: nodeCompName
+    :node: node
+    :sui: sui
+    :class: nodeCssClass
+    :style: nodeStyle
+
+props:
+  node:
+  sui:
+
+methods:
+  getNodeCompName: | #js
+    function(node) {
+      return `studio-doc-node-${node.type}`;
+    }
+  getNodeStyle: | #js
+    function(node) {
+      if (!node) return;
+      const s = {};
+      s['background-color'] = node.style?.bg?.color;
+      return s;
+    }
+
+computed:
+  nodeCompName: | #js
+    function() {
+      return this.getNodeCompName(this.node);
+    }
+  nodeCssClass: | #js
+    function() {
+      return {
+        'hovered-node': this.isHoveredNode,
+        'selected-node': this.isSelectedNode
+      };
+    }
+  nodeStyle: | #js
+    function() {
+      return this.getNodeStyle(this.node);
+    }
+  isHoveredNode: | #js
+    function() {
+      if (!this.node) return false;
+      return (this.node?.id == this.sui?.node.hovered?.id);
+    }
+  isSelectedNode: | #js
+    function() {
+      if (!this.node) return false;
+      return (this.node?.id == this.sui?.node.selected?.id);
+    }
+
+style:
+  .comp-studio-doc-node:
+    border: "1px dashed #444"
+  .hovered-node:
+    border: 2px dashed yellow
+  .selected-node:
+    border: 4px dashed green

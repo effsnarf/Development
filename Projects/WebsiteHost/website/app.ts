@@ -105,7 +105,7 @@ const sheakspearize = async (text: string) => {
 
   const compInfos = new Map<string, any>();
   const compIsModified = (comp: any) => {
-    if (comp.name.endsWith(".example")) return false;
+    if (comp.name.includes(".example")) return false;
     const info = compInfos.get(comp.name);
     if (!info) return true;
     const lastModified = fs.statSync(getCompFilePath(comp.path)).mtimeMs;

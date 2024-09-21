@@ -1,0 +1,7 @@
+dom:
+  div:
+    :is: "('h'+node.size)"
+    v-text: node.text
+
+props:
+  node:

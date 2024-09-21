@@ -151,6 +151,8 @@ class ClientContext {
       html = html.replace(/v-slot:slotProps/g, 'v-slot="slotProps"');
       // Replace 'v-slot:(*)="v-slot:(*)"' with 'v-slot:(*)'
       html = html.replace(/v-slot:([^\s]+)="v-slot:\1"/g, 'v-slot:$1');
+      //
+      html = html.replace(/v-slot="slotProps"="v-slot="slotProps""/g, 'v-slot="slotProps"');
       return html;
     } catch (ex: any) {}
     const url = `/pug`;

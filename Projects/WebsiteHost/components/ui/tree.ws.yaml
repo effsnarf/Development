@@ -8,7 +8,7 @@ dom:
         ':initial-expanded': initialExpanded
         ':expandable': initialExpandable
         ':item-type': itemType
-        ':get-item': getItem || ((node) => node?.item)
+        ':get-item': getItem || ((node) => (node?.item || node))
         ':get-item-key': getItemKey || $root.getKey
         ':get-children': getChildren || ((node) => node.children||[])
         ':selected-node': selectedNode
@@ -44,6 +44,7 @@ methods:
     }
   onChildUnhover: | #js
     function (child) {
+      this.$emit('node-hover', null);
       this.$emit('node-unhover', child);
     }
   onChildHovered: | #js

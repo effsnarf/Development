@@ -11,13 +11,20 @@ const https = require("https");
 import { Configuration } from "../../../Shared/Configuration";
 import { Cache } from "../../../Shared/Cache";
 import { ChatOpenAI, Roles } from "../../../Apis/OpenAI/classes/ChatOpenAI";
+import { Model, OpenAI } from "../../../Apis/OpenAI/classes/OpenAI";
 
 (async () => {
   const config = (await Configuration.new()).data;
 
   const cache = await Cache.new(config.cache);
 
-  const chat = await ChatOpenAI.new(Roles.ChatGPT);
+  const chat = await ChatOpenAI.new(
+    Roles.ChatGPT,
+    false,
+    Model.Default,
+    false,
+    OpenAI.effApiKey
+  );
 
   const getMimeType = (path: string) => {
     if (path.toLowerCase().endsWith(".haml")) return mime.lookup("html");
@@ -113,7 +120,7 @@ import { ChatOpenAI, Roles } from "../../../Apis/OpenAI/classes/ChatOpenAI";
     }
   };
 
-  const isDevEnv = os.hostname() == "eff-pc";
+  const isDevEnv = Configuration.isDevEnv();
 
   const { ip, port } = isDevEnv
     ? { ip: `127.0.0.1`, port: 80 }

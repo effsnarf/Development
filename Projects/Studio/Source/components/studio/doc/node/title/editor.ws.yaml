@@ -1,0 +1,26 @@
+dom:
+  div:
+    v-if: (node && $parent.initial.node)
+    div:
+      v-for: i in 6
+      :is: "('h'+i)"
+      v-text: node.text
+      :class: "{ selected: (i == $parent.initial.node.size), hoverable: true }"
+      @mouseenter: () => onHover(i, true)
+      @mouseleave: () => onHover(i, false)
+      @click: () => onClick(i)
+
+props:
+  node:
+
+methods:
+  onClick: | #js
+    function(size) {
+      this.node.size = size;
+      this.$parent.initial.node.size = size;
+    }
+  onHover: | #js
+    function(size, isHovered) {
+      this.node.size = (isHovered ? size : this.$parent.initial.node.size);
+    }
+

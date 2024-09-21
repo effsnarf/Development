@@ -1,0 +1,8 @@
+dom:
+  div:
+    v-if: node
+    studio.doc.node.common.background.editor:
+      :node: node
+
+props:
+  node:

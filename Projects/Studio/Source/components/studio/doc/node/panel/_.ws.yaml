@@ -1,0 +1,10 @@
+dom:
+  div:
+    studio.doc.node:
+      v-for: child in node.children
+      :node: child
+      :sui: sui
+
+props:
+  node:
+  sui:

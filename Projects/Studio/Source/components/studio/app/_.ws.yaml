@@ -1,0 +1,82 @@
+dom:
+  div:
+    div:
+      studio.app.logo:
+      .flex1:
+        v-if: dom
+        studio.dom.tree:
+          :root: dom.root
+          @sui: onSuiEvent
+        studio.doc:
+          :root: dom.root
+          :sui: sui
+        studio.doc.node.editor:
+          :node: activeNode
+          :sui: sui
+          @dom-edit: onDomEditEvent
+
+data:
+  dom: null
+  sui:
+    node:
+      hovered:
+      selected:
+
+mounted: | #js
+  function() {
+    this.dom = this.getMockupDom();
+  }
+
+methods:
+  onSuiEvent: | #js
+    function(suiFunc) {
+      suiFunc(this.sui);
+    }
+  onDomEditEvent: | #js
+    function(editFunc) {
+      editFunc();
+    }
+  getMockupNode: | #js
+    function() {
+      const node = {
+        style: {
+          bg: {
+            color: null
+          }
+        }
+      };
+      return node;
+    }
+  getMockupDom: | #js
+    function() {
+      return {
+        root: {
+          ...this.getMockupNode(),
+          id: 1,
+          path: [0],
+          type: "panel",
+          children: [
+            {
+              ...this.getMockupNode(),
+              id: 2,
+              path: [0, 0],
+              type: "title",
+              size: 2,
+              text: "Website Title"
+            }
+          ]
+        }
+      };
+    }
+
+computed:
+  activeNode: | #js
+    function() {
+      return (this.sui.node.selected || this.sui.node.hovered);
+    }
+
+style:
+  .flex1:
+    display: flex
+    justify-content: space-between
+    margin: 1vw    

@@ -14,7 +14,7 @@ dom:
             ui.button:
               icon: ♻
               text: reload from server
-              ':click': $root.reloadComponentsFromServer
+              ':click': reloadComponentsFromServer
           select:
             v-model: selectedEditor
             option:
@@ -52,6 +52,11 @@ mounted: | #js
     if (this.autoEnable) this.enable();
   }
 methods:
+  reloadComponentsFromServer: | #js
+    async function() {
+      await this.$root.reloadComponentsFromServer();
+      vueApp?.refreshComponents();
+    }
   setupCheatCodeListener: | #js
     function(triggerCode, action) {
       // If triggerCode + [enter] is pressed, show the workspace

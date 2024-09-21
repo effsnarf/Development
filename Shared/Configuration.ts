@@ -388,6 +388,14 @@ class Configuration {
     if (!this.options.log) return;
     console.log(...args);
   }
+
+  static isDevEnv()
+  {
+    const compName = os.hostname().toLowerCase();
+    if (compName == "eff-pc") return true;
+    if (compName == "efftop") return true;
+    return false;
+  }
 }
 
 export { Configuration };

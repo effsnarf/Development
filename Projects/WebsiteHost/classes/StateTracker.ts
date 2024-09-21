@@ -164,6 +164,7 @@ class StateTracker {
   // and lose their state.
   // This method restores the state from the state tracker.
   async restoreState() {
+    return;
     throw new Error("Not implemented");
 
     const app = null as any;

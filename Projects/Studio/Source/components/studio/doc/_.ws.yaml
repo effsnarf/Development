@@ -1,0 +1,8 @@
+dom:
+  studio.doc.node:
+    :node: root
+    :sui: sui
+
+props:
+  root:
+  sui:

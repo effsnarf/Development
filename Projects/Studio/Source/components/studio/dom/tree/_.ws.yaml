@@ -1,0 +1,26 @@
+dom:
+  .flex1:
+    ui.tree:
+      ":root": root
+      item-type: studio.dom.tree.node
+      :initial-expanded: true
+      @node-hover: (node) => $emit('sui', (sui) => sui.node.hovered = node)
+      @node-select: (node) => $emit('sui', (sui) => sui.node.selected = node)
+    ui.value:
+      :value: selectedNodeData
+
+props:
+  root:
+
+data:
+
+computed:
+  selectedNodeData: | #js
+    function() {
+      if (!this.selectedNode) return {};
+      const data = Object.assign({}, this.selectedNode);
+      delete data.children;
+      return data;
+    }
+
+style:

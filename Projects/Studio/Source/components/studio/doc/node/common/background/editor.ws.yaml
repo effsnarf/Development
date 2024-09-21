@@ -1,0 +1,34 @@
+dom:
+  div:
+    .option:
+      v-for: bgColor in bgColors
+      :style: getOptionStyle(bgColor)
+      @mouseenter: () => onHover(bgColor, true)
+      @mouseleave: () => onHover(bgColor, false)
+
+props:
+  node:
+
+data:
+  bgColors: ["#ff6644", "#66ff44", "#6644ff"]
+
+methods:
+  onHover: | #js
+    function(bgColor, isHovered) {
+      this.node.style.bg.color = (!isHovered ? null : bgColor);
+    }
+  getOptionStyle: | #js
+    function(bgColor) {
+      return {
+        'background-color': bgColor
+      };
+    }
+
+style:
+  .option:
+    width: 20em
+    height: 4em
+    opacity: 0.4
+    cursor: pointer
+  .option:hover:
+    opacity: 0.6
