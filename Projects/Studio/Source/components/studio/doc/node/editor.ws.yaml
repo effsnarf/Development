@@ -1,12 +1,28 @@
 dom:
   div:
-    component:
-      :is: getNodeCompEditorName(node)
-      :node: node
-      @dom-edit: (e) => $emit('dom-edit', e)
+    v-if: node
     div:
-      studio.doc.node.common.editor:
-        :node: node
+      ui.tabs: 
+        ':options': '[node.type, ''✨ style'']'
+        direction: vertical
+        ':can-select-none': 'true'
+        v-model: selected.tab.index
+        template: 
+          v-slot: tab0
+          div:
+            component:
+              :is: getNodeCompEditorName(node)
+              :node: node
+              :initial: initial
+              :sui: sui
+              @dom-edit: (e) => $emit('dom-edit', e)
+        template: 
+          v-slot: tab1
+          div:
+            studio.doc.node.common.editor:
+              :node: node
+              :initial: initial
+              :sui: sui
 
 props:
   node:
@@ -15,6 +31,9 @@ props:
 data:
   initial:
     node:
+  selected:
+    tab:
+      index: 0
 
 methods:
   getNodeCompEditorName: | #js

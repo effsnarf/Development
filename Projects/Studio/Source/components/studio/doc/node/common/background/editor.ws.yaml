@@ -1,5 +1,6 @@
 dom:
   div:
+    v-if: (node && initial.node)
     .option:
       v-for: bgColor in bgColors
       :class: getOptionClass(bgColor)
@@ -10,6 +11,8 @@ dom:
 
 props:
   node:
+  initial:
+  sui:
 
 data:
   bgColors: ["#ff6644", "#66ff44", "#6644ff"]
@@ -18,16 +21,16 @@ methods:
   onClick: | #js
     function(bgColor) {
       this.node.style.bg.color = bgColor;
-      this.$parent.initial.node.style.bg.color = bgColor;
+      this.initial.node.style.bg.color = bgColor;
     }
   onHover: | #js
     function(bgColor, isHovered) {
-      this.node.style.bg.color = (isHovered ? bgColor : this.$parent.initial.node.style.bg.color);
+      this.node.style.bg.color = (isHovered ? bgColor : this.initial.node.style.bg.color);
     }
   getOptionClass: | #js
     function(bgColor) {
       return {
-        'color-selected': (bgColor == this.$parent.initial.node.style.bg.color)
+        'color-selected': (bgColor == this.initial.node.style.bg.color)
       };
     }
   getOptionStyle: | #js

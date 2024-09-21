@@ -1,5 +1,6 @@
 dom:
   component:
+    v-if: node
     :is: nodeCompName
     :node: node
     :sui: sui

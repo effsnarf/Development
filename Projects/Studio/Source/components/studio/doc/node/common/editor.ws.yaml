@@ -3,12 +3,10 @@ dom:
     v-if: node
     studio.doc.node.common.background.editor:
       :node: node
+      :initial: initial
+      :sui: sui
 
 props:
   node:
-
-computed:
-  initial: | #js
-    function() {
-      return this.$parent.initial;
-    }
+  initial:
+  sui:

@@ -207,7 +207,13 @@ style:
     justify-content: space-between
     margin: 1vw
   .comp-studio-app > .flex1 > *:
-    width: 23%
+    width: 33%
+    overflow: hidden
+    border: 3px solid gray
+  .comp-studio-app > .flex1 > *:nth-child(1):
+    width: 15%
+  .comp-studio-app > .flex1 > *:nth-child(2):
+    width: 15%
   .flex2:
     display: flex
     flex-direction: column
