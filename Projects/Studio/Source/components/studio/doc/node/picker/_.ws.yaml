@@ -12,9 +12,11 @@ dom:
           transition:
             name: slide
             :key: sui.node.active?.id
-            studio.doc.node:
-              :node: sui.node.active
-              :sui: sui
+            div:
+              :style: "{ height: '6em' }"
+              studio.doc.node:
+                :node: sui.node.active
+                :sui: sui
         .flex:
           ui.drawer:
             direction: "horizontal"
