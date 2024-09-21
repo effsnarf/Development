@@ -13,7 +13,7 @@ dom:
             name: slide
             :key: sui.node.active?.id
             div:
-              :style: "{ height: '6em' }"
+              :style: "{ 'max-height': '6em' }"
               studio.doc.node:
                 :node: sui.node.active
                 :sui: sui
@@ -59,8 +59,8 @@ methods:
       await this.refreshParentNodes(newNode);
     }
   onContextPinned: | #js
-    function() {
-      this.sui.node.selected = this.sui.node.hovered;
+    function(isPinned) {
+      this.sui.node.selected = (!isPinned ? false : this.sui.node.hovered);
     }
   refreshNodeTree: | #js
     async function() {
