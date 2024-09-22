@@ -1,18 +1,17 @@
 dom:
   div:
     v-if: visiblePageNode
-    :key: sui.page.selected?.id
-    studio.doc.node:
-      :node: visiblePageNode
-      :sui: sui
+    transition:
+      name: slide
       :key: visiblePageNode.id
+      studio.doc.node:
+        :node: visiblePageNode
+        :sui: sui
+        :key: visiblePageNode.id
 
 props:
   node:
   sui:
-
-data:
-  key1: 1
 
 methods:
 

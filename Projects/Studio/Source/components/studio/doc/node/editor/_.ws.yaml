@@ -6,7 +6,7 @@ dom:
         direction: "horizontal"
         :open: isTabsDrawerOpen
         ui.tabs: 
-          ':options': '[node.type, ''🧱 flex'', ''✨ style'']'
+          ':options': '[node.type, ''🧱 flex'', ''🎨 style'', ''✨ animation'']'
           direction: vertical
           ':can-select-none': 'true'
           v-model: selected.tab.index
