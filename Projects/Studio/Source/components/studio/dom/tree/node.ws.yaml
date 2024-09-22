@@ -28,7 +28,9 @@ methods:
         "comp.inst": "📦",
         image: "🖼️",
         "slot.outlet": "🧩",
-        "slot.content": "🧩🧊"
+        "slot.content": "🧩🧊",
+        vars: "📂🧊",
+        var: "🧊"
       };
       return (icons[node.type] || "❔");
     }

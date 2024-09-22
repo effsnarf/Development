@@ -5,6 +5,7 @@ dom:
       :is: nodeCompName
       :node: node
       :sui: sui
+      :data-item: dataItem
       :content-node: contentNode
       :class: nodeCssClass
       :style: nodeStyle
@@ -14,12 +15,14 @@ dom:
           v-for: childNode in node.children
           :node: childNode
           :sui: sui
+          :data-item: dataItem
           :content-node: contentNode
           :key: childNode.id
 
 props:
   node:
   sui:
+  dataItem:
   contentNode:
 
 methods:
@@ -69,6 +72,17 @@ methods:
     }
 
 computed:
+  nodeVarPath: | #js
+    function() {
+      const node = this.node;
+      const pageName = this.nodePageName;
+      const varPath = `${pageName}.${node.type}.${node.name}`;
+      return varPath;
+    }
+  nodePageName: | #js
+    function() {
+      return this.$root.getNodePageName(this.node);
+    }
   nodeCompName: | #js
     function() {
       return this.getNodeCompName(this.node);

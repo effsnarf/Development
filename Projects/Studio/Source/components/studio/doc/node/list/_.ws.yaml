@@ -1,14 +1,41 @@
 dom:
   div:
     .list-item:
-      v-for: i in 10
+      v-for: item in dataSourceItems
       studio.doc.node:
         :node: node.children[0]
         :sui: sui
+        :data-item: item
+      @mouseenter: () => onHover(item, true)
+      @mouseleave: () => onHover(item, false)
 
 props:
   node:
   sui: sui
+
+methods:
+  onHover: | #js
+    function(item, isHovered) {
+      const newItem = (!isHovered ? null : item);
+      const varPath = `${this.$parent.nodeVarPath}.hovered`;
+      Objects.setProperty(this.rtState, varPath, newItem);
+    }
+
+computed:
+  dataSourceItems: | #js
+    function() {
+      const sourcePath = this.node.data?.source?.name?.path;
+      if (!this.rtState || !sourcePath) return null;
+      return Objects.getProperty(this.rtState, sourcePath)
+    }
+  rtState: | #js
+    function() {
+      return this.studioApp.rtState;
+    }
+  studioApp: | #js
+    function() {
+      return this.$root.getStudioApp(this);
+    }
 
 style:
   .list-item:

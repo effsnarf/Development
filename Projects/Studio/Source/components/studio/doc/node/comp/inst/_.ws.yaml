@@ -2,10 +2,12 @@ dom:
   studio.doc.node:
     :node: compNode.children[0]
     :sui: sui
+    :data-item: dataItem
 
 props:
   node:
   sui:
+  dataItem:
 
 methods:
 

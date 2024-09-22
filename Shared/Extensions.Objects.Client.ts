@@ -230,8 +230,9 @@ class Objects {
     return Objects.clone(subtree);
   }
 
-  static getProperty(obj: any, path: string) {
-    const keys = path.split(".");
+  static getProperty(obj: any, path: string | string[]) {
+    if (typeof path == "string") path = path.split(".");
+    const keys = path as string[];
     let currentObj = obj;
 
     for (const key of keys) {

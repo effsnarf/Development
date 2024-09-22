@@ -1,6 +1,13 @@
 dom:
   div:
     studio.app.logo:
+    div:
+      button:
+        v-text: "'Test'"
+        @click: test
+    studio.doc.node.picker:
+      :user-app: userApp
+      :sui: sui
     .flex1:
       v-if: userApp
       studio.dom.tree:
@@ -21,14 +28,10 @@ dom:
         studio.doc:
           :user-app: userApp
           :sui: sui
-      studio.doc.node.editor:
-        v-if: "false"
-        :node: sui.node.active
-        :sui: sui
-        @dom-edit: onDomEditEvent
-      studio.doc.node.picker:
-        :user-app: userApp
-        :sui: sui
+      div:
+        div:
+          ui.value:
+            :value: rtState
 
 data:
   userApp: null
@@ -44,17 +47,69 @@ data:
       context:
     nodes:
       hovered:
+  rtState: null
 
 mounted: | #js
   function() {
     this.userApp = this.getMockupUserApp();
     // Register global methods
+    this.$root.getUserApp = this.getUserApp.bind(this);
+    this.$root.getStudioApp = this.getStudioApp.bind(this);
     this.$root.getCompNode = this.getCompNode.bind(this);
     this.$root.getPageNodes = this.getPageNodes.bind(this);
     this.$root.getClassNode = this.getClassNode.bind(this);
+    this.$root.getNodePageName = this.getNodePageName.bind(this);
   }
 
 methods:
+  test: | #js
+    function() {
+      this.initRtState();
+    }
+  initRtState: | #js
+    function() {
+      this.compileUserAppRuntime();
+    }
+  compileUserAppRuntime: | #js
+    async function() {
+      const vueCompName = `studio-user-app-runtime`;
+      const vueData = {};
+      const pageName = "home";
+      const pageNode = this.findNodeByPath(["pages", pageName]);
+      vueData[pageName] = {};
+      const pageData = vueData[pageName];
+      const varsNode = this.findNodeByName(pageNode, "vars");
+      const varNodes = varsNode.children;
+      const varNames = varNodes.map(n => n.name);
+
+      pageData.var = {};
+
+      for (const varName of varNames) pageData.var[varName] = null;
+
+      for (const varNode of varNodes) {
+        if (!varNode.on?.init) continue;
+        const initVarFunc = eval(`(${varNode.on.init})`);
+        await initVarFunc.apply(pageData.var);
+      }
+
+      pageData.list = {};
+
+      const listNodes = this.findDescNodes(pageNode, "list");
+      
+      for (const listNode of listNodes) {
+        if (!listNode.name) {
+          alertify.error(`list node in ${pageName} page must have a name.`);
+          continue;
+        }
+        pageData.list[listNode.name] = {
+          hovered: null,
+          selected: null
+        };
+      }
+
+      const rtState = Vue.reactive(vueData);
+      this.rtState = rtState;
+    }
   selectPage: | #js
     function(newPage) {
       this.sui.page.trans.dir = this.getPageTransDir(this.sui.page.selected, newPage);
@@ -156,9 +211,17 @@ methods:
                     children: [
                       {
                         type: "list",
+                        name: "generators",
                         flex: {
                           justify: {
                             content: "center"
+                          }
+                        },
+                        data: {
+                          source: {
+                            name: {
+                              path: ["home", "var", "generators"]
+                            }
                           }
                         },
                         children: [
@@ -169,6 +232,24 @@ methods:
                             }
                           }
                         ]
+                      }
+                    ]
+                  },
+                  {
+                    type: "vars",
+                    children: [
+                      {
+                        type: "var",
+                        name: "generators",
+                        on: {
+                          init: (function() {
+                            this.generators = [
+                              { name: "Socially Awkward Penguin" },
+                              { name: "Foul Bachelor Frog" },
+                              { name: "Insanity Wolf" }
+                            ]
+                          }).toString()
+                        }
                       }
                     ]
                   }
@@ -211,7 +292,7 @@ methods:
                     flex: {
                       dir: "h",
                       justify: {
-                        content: "center"
+                        content: "flex-start"
                       }
                     },
                     children: [
@@ -221,7 +302,9 @@ methods:
                       {
                         type: "title",
                         size: 3,
-                        text: "Courage Wolf"
+                        data: {
+                          field: "name"
+                        }
                       }
                     ]
                   }
@@ -268,6 +351,11 @@ methods:
       }
       return node;
     }
+  getStudioApp: | #js
+    function(vue) {
+      while (vue && (vue != this)) vue = vue.$parent;
+      return vue;
+    }
   getUserApp: | #js
     function(vue) {
       while (vue && !vue.userApp) vue = vue.$parent;
@@ -283,6 +371,30 @@ methods:
         }
         return childNode;
       }
+    }
+  findNodeByPath: | #js
+    function(nodePath) {
+      if (typeof(nodePath) == 'string') nodePath = nodePath.split('.');
+      let node = this.userApp;
+      let part;
+      while (part = nodePath.shift()) {
+        node = this.findNodeByName(node, part);
+      }
+      return node;
+    }
+  findNodeByName: | #js
+    function(parent, name) {
+      return parent.children?.find(c => (name == (c.name || c.type)));
+    }
+  findDescNodes: | #js
+    function(parent, type) {
+      const nodes = [];
+      const search = (node) => {
+        if (nodes.map(n => n.id).includes(node.id)) return;
+        if (type == node.type) nodes.push(node);
+      };
+      Objects.traverse(parent, search);
+      return nodes;
     }
   getNodes: | #js
     function(parentNode, type) {
@@ -314,6 +426,22 @@ methods:
     function(type, inst) {
       const folderNodes = this.getNodesByType(type);
       return folderNodes.find(cls => (cls.name == inst.name));
+    }
+  getNodePageName: | #js
+    function(node) {
+      const ancs = this.getNodeAncestors(node);
+      return ancs.find(n => (n.type == "page"))?.name;
+    }
+  getNodeAncestors: | #js
+    // #TODO Slow
+    function(node, ancs = []) {
+      while (node = this.getNodeParent(node)) ancs.unshift(node);
+      return ancs;
+    }
+  getNodeParent: | #js
+    // #TODO Slow
+    function(node) {
+      return TreeObject.find(this.userApp, (p => (p.children?.map(c => c.id).includes(node.id))));
     }
 watch:
   sui:

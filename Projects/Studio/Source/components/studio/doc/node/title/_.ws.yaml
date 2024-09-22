@@ -1,7 +1,16 @@
 dom:
   div:
     :is: "('h'+node.size)"
-    v-text: node.text
+    v-text: text
 
 props:
   node:
+  dataItem:
+
+computed:
+  text: | #js
+    function() {
+      return this.dataItem?.[this.node.data?.field] ||
+        this.node.text ||
+        '❔';
+    }

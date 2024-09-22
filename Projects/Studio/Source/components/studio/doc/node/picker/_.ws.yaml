@@ -98,7 +98,6 @@ methods:
     }
   getCNodeAncestors: | #js
     async function(cnode) {
-      //if (cnode?.node?.type == "image") debugger;
       if (!cnode?.node || !cnode?.element) return [];
       const cnodes = [];
       cnodes.unshift(cnode);
