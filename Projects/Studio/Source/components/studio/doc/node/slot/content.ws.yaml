@@ -6,9 +6,3 @@ dom:
 props:
   node:
   sui:
-
-methods:
-
-style:
-  .comp-studio-doc-node-layout:
-    width: 100%

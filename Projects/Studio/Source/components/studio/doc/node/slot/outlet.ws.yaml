@@ -1,0 +1,28 @@
+dom:
+  div:
+    .error:
+      v-if: "!slotContentNode"
+      studio.dom.tree.node:
+        :item: node
+        :sui: sui
+    studio.doc.node:
+      v-if: slotContentNode
+      :node: slotContentNode
+      :sui: sui
+
+props:
+  node:
+  sui:
+  contentNode:
+
+methods:
+  getSlotContentNode: | #js
+    function() {
+      return this.contentNode?.children.find(c => (c.slot.name == this.node.name));
+    }
+
+computed:
+  slotContentNode: | #js
+    function() {
+      return this.getSlotContentNode();
+    }

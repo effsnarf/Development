@@ -1,11 +1,8 @@
 dom:
   div:
     :style: nodeStyle
-    studio.doc.node:
-      v-for: childNode in node.children
-      :node: childNode
-      :sui: sui
-      :key: childNode.id
+    slot:
+      name: child-nodes
 
 props:
   node:

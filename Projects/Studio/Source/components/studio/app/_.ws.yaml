@@ -164,12 +164,23 @@ methods:
               {
                 type: "page",
                 name: "generator",
+                layout: {
+                  name: "default"
+                },
                 children: [
                   {
-                    type: "comp.inst",
-                    comp: {
-                      name: "generator"
-                    }
+                    type: "slot.content",
+                    slot: {
+                      name: "header"
+                    },
+                    children: [
+                      {
+                        type: "comp.inst",
+                        comp: {
+                          name: "generator"
+                        }
+                      }
+                    ]
                   }
                 ]
               }

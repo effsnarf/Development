@@ -13,7 +13,7 @@ dom:
             name: slide
             :key: sui.node.active?.id
             div:
-              :style: "{ 'max-height': '6em' }"
+              :style: "{ 'max-height': '6em', overflow: 'hidden' }"
               studio.doc.node:
                 :node: sui.node.active
                 :sui: sui
@@ -32,6 +32,7 @@ dom:
                   v-for: child in hovered.nodes[hovered.nodes.length-1]?.children
                   :item: child
                   :sui: sui
+                  :key: child.id
           div:
             studio.doc.node.editor:
               :node: sui.node.selected

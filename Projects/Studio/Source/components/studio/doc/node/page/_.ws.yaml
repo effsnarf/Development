@@ -6,10 +6,8 @@ dom:
     :content-node: node
   div:
     v-else-if: "!layoutNode"
-    studio.doc.node:
-      v-for: node in node.children
-      :node: node
-      :sui: sui
+    slot:
+      name: child-nodes
 
 props:
   node:

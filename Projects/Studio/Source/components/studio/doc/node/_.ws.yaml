@@ -8,6 +8,14 @@ dom:
       :content-node: contentNode
       :class: nodeCssClass
       :style: nodeStyle
+      template:
+        v-slot: child-nodes
+        studio.doc.node:
+          v-for: childNode in node.children
+          :node: childNode
+          :sui: sui
+          :content-node: contentNode
+          :key: childNode.id
 
 props:
   node:
