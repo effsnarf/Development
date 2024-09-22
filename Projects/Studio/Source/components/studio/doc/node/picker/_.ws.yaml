@@ -13,15 +13,18 @@ dom:
             name: slide
             :key: sui.node.active?.id
             div:
-              :style: "{ 'max-height': '6em', overflow: 'hidden' }"
-              .flex:
-                studio.doc.node:
-                  :node: contextNode
-                  :sui: sui
-                studio.dom.tree.node:
-                  v-if: "false"
-                  :item: contextNode
-                  :sui: sui
+              class: pointer-none dimmed
+              div:
+                :style: "{ 'max-height': '6em', overflow: 'hidden' }"
+                div:
+                  studio.doc.node:
+                    :node: contextNode
+                    :sui: sui
+              div:
+                h2:
+                  studio.dom.tree.node:
+                    :item: contextNode
+                    :sui: sui
         .flex:
           ui.drawer:
             direction: "horizontal"
