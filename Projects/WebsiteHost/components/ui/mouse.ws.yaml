@@ -13,6 +13,7 @@ data:
   posSmoother: null
   smoothPos: null
   moveThrottleRate: 0.01
+  hoverThrottleRate: 0.1
 mounted: | #js
   function() {
     this.isMounted = true;
@@ -65,7 +66,7 @@ methods:
     }
   updateHoveredElement: | #js
     function(pos) {
-      if (!this.__updateHoveredElement) this.__updateHoveredElement = this._updateHoveredElement.throttle(this, 400);
+      if (!this.__updateHoveredElement) this.__updateHoveredElement = this._updateHoveredElement.throttle(this, (this.hoverThrottleRate * 1000));
       this.__updateHoveredElement(pos);
     }
   _updateHoveredElement: | #js

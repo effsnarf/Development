@@ -1,0 +1,40 @@
+dom:
+  div:
+    v-if: (node && initial.node)
+    div:
+      h3:
+        v-text: title
+      div:
+        .clickable:
+          v-for: option in options
+          v-text: option
+          :class: "{ selected: (option == Objects.getProperty(node, propPath)) }"
+          @mouseenter: () => onHover(option, true)
+          @mouseleave: () => onHover(option, false)
+          @click: () => onClick(option)
+
+props:
+  title:
+  node:
+  initial:
+  options:
+  propPath:
+
+methods:
+  onClick: | #js
+    function(option) {
+      Objects.setProperty(this.node, this.propPath, option);
+      Objects.setProperty(this.initial.node, this.propPath, option);
+    }
+  onHover: | #js
+    function(option, isHovered) {
+      const initialValue = Objects.getProperty(this.initial.node, this.propPath);
+      const newValue = (isHovered ? option : initialValue);
+      Objects.setProperty(this.node, this.propPath, newValue);
+    }
+
+computed:
+  Objects: | #js
+    function() {
+      return window.Objects;
+    }

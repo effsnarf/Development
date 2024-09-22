@@ -16,7 +16,8 @@ dom:
         studio.doc.page.selector:
           :user-app: userApp
           :sui: sui
-          v-model: sui.page.selected
+          :value: sui.page.selected
+          @input: selectPage
         studio.doc:
           :user-app: userApp
           :sui: sui
@@ -34,6 +35,8 @@ data:
   sui:
     page:
       selected:
+      trans:
+        dir:
     node:
       hovered:
       selected:
@@ -52,6 +55,17 @@ mounted: | #js
   }
 
 methods:
+  selectPage: | #js
+    function(newPage) {
+      this.sui.page.trans.dir = this.getPageTransDir(this.sui.page.selected, newPage);
+      this.sui.page.selected = newPage;
+    }
+  getPageTransDir: | #js
+    function(fromPage, toPage) {
+      if (!fromPage?.id || !toPage?.id) return null;
+      if (toPage.id > fromPage.id) return "next";
+      if (fromPage.id > toPage.id) return "prev";
+    }
   onSuiEvent: | #js
     function(suiFunc) {
       suiFunc(this.sui);
@@ -59,17 +73,6 @@ methods:
   onDomEditEvent: | #js
     function(editFunc) {
       editFunc();
-    }
-  getMockupNode: | #js
-    function() {
-      const node = {
-        style: {
-          bg: {
-            color: null
-          }
-        }
-      };
-      return node;
     }
   getMockupUserApp: | #js
     function() {
@@ -85,11 +88,19 @@ methods:
                 children: [
                   {
                     type: "panel",
+                    flex: {
+                      dir: "v"
+                    },
                     layout: {
                       position: "fixed",
                       top: 0
                     },
                     children: [
+                      {
+                        type: "title",
+                        text: "MG",
+                        size: 3
+                      },
                       {
                         type: "slot.outlet",
                         name: "header"
@@ -145,6 +156,11 @@ methods:
                     children: [
                       {
                         type: "list",
+                        flex: {
+                          justify: {
+                            content: "center"
+                          }
+                        },
                         children: [
                           {
                             type: "comp.inst",
@@ -192,7 +208,12 @@ methods:
                 children: [
                   {
                     type: "panel",
-                    direction: "horizontal",
+                    flex: {
+                      dir: "h",
+                      justify: {
+                        content: "center"
+                      }
+                    },
                     children: [
                       {
                         type: "image",
@@ -214,13 +235,38 @@ methods:
       let id = 1;
       const initNode = (node) => {
         if (!node.type) return;
+        const mockupNode = this.getMockupNode(node);
+        const nodeProps = Objects.clone(node, { exclude: ["children"] });
+        const merged = Objects.deepMerge(nodeProps, mockupNode);
+        Object.assign(node, merged);
         node.id = id++;
-        Object.assign(node, this.getMockupNode());
       }
 
       Objects.traverse(userApp, initNode);
 
       return userApp;
+    }
+  getMockupNode: | #js
+    function(node) {
+      node = Objects.clone(node, { exclude: ["children"] });
+      node.style = {
+        bg: {
+          color: null
+        }
+      }
+      if (node.type == "panel") {
+        node.props = (node.props || {});
+        const newProps = {
+          dir: "v",
+          justify: {
+            items: "center",
+            content: "center"
+          }
+        };
+        const mergedProps = Objects.deepMerge(newProps, node.props);
+        Object.assign(node.props, mergedProps);
+      }
+      return node;
     }
   getUserApp: | #js
     function(vue) {

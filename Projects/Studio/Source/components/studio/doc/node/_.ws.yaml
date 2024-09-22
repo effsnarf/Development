@@ -32,10 +32,29 @@ methods:
       if (!node) return;
       const s = {};
       s['background-color'] = node.style?.bg?.color;
-      for (let key in s) if (s[key] == null) delete s[key];
+      Object.assign(s, this.getFlexStyle(node));
+      Objects.removeNullValueKeys(s);
       if (!Object.keys(s).length) return null;
       return s;
     }
+  getFlexStyle: | #js
+    function(node) {
+      const s = {};
+      s.display = "flex";
+      s['justify-content'] = (node.flex?.justify?.content || "space-between");
+      s['flex-direction'] = this.toFlexDirection(node);
+      return s;
+    }
+  toFlexDirection: | #js
+    function(node) {
+      switch (node.flex?.dir)
+      {
+        case "h": return "row";
+        case "v": return "column";
+      }
+      return "column";
+    }
+
   areNodesRelated: | #js
     function(node1, node2, tryOpposite = true) {
       if (!node1 || !node2) return false;
@@ -81,6 +100,7 @@ computed:
       if (!this.node) return false;
       return this.areNodesRelated(this.node, this.sui?.node.active);
     }
+
 style:
   .comp-studio-doc-node:
     border: "1px dashed #444"

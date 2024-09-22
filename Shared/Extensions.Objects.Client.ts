@@ -51,6 +51,10 @@ class Objects {
     return [String, Number, Boolean, Date, RegExp].some((t) => t === type);
   }
 
+  static removeNullValueKeys(obj: any) {
+    for (let key in obj) if (obj[key] == null) delete obj[key];
+  }
+
   static getAllKeys(obj: any): string[] {
     let keys: string[] = [];
     let currentObj = obj;
@@ -95,12 +99,15 @@ class Objects {
     }
   }
 
-  static clone(obj: any): any {
+  static clone(obj: any, options?: { exclude?: string[] }): any {
     if (obj == null || obj == undefined || typeof obj != "object") return obj;
     if (obj instanceof Date) return new Date(obj.getTime());
     if (obj instanceof RegExp) return new RegExp(obj.source, obj.flags);
     try {
-      return Objects.json.parse(JSON.stringify(obj));
+      const cloned = Objects.json.parse(JSON.stringify(obj));
+      if (options?.exclude?.length)
+        for (let excludeKey of options.exclude) delete cloned[excludeKey];
+      return cloned;
     } catch (ex) {
       throw ex;
     }
@@ -412,6 +419,10 @@ class Objects {
 
   static deepDiff(obj1: any, obj2: any): any {
     throw new Error(_importMainFileToImplement);
+  }
+
+  static setProperty(obj: any, path: string, value: any): void {
+    return Objects.deepSet(obj, path, value);
   }
 
   static deepSet(obj: any, path: string, value: any): void {

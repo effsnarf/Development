@@ -28,10 +28,11 @@ dom:
             :open: "!$refs.context1?.isPinned"
             .tree-indent:
               div:
-                v-for: (node, i) in hovered.nodes
+                v-for: (cnode, i) in hovered.cnodes
                 studio.dom.tree.node:
-                  :item: node
+                  :item: cnode.node
                   :sui: sui
+                  @click: () => refreshParentNodes(cnode)
               div:
                 studio.dom.tree.node:
                   v-for: child in hovered.nodes[hovered.nodes.length-1]?.children
@@ -54,6 +55,7 @@ data:
     vue:
     node:
     nodes: []
+    cnodes: []
 
 mounted: | #js
   function() {
@@ -63,7 +65,7 @@ mounted: | #js
 methods:
   onSelectedNodeChanged: | #js
     async function(newNode) {
-      await this.refreshParentNodes(newNode);
+      //await this.refreshParentNodes(newNode);
     }
   onContextPinned: | #js
     function(isPinned) {
@@ -74,11 +76,12 @@ methods:
       const vue = this.hovered.vue?.();
       this.hovered.node = this.getDomNodeFromVue(vue);
       this.sui.node.hovered = this.hovered.node;
-      await this.refreshParentNodes(this.hovered.node);
+      await this.refreshParentNodes({ node: this.hovered.node, element: this.hovered.element });
     }
   refreshParentNodes: | #js
-    async function(lastNode) {
-      this.hovered.nodes = await this.getDomNodeAncestors(lastNode);
+    async function(cnode) {
+      this.hovered.cnodes = await this.getCNodeAncestors(cnode);
+      this.hovered.nodes = this.hovered.cnodes.map(cn => cn.node);
       this.sui.nodes.hovered = this.hovered.nodes;
     }
   onHoveredElement: | #js
@@ -89,27 +92,49 @@ methods:
       this.hovered.vue = (!vue ? null : () => vue);
       await this.refreshNodeTree();
     }
-  getDomNodeAncestors: | #js
-    async function(node) {
-      if (!node) return [];
-      const nodes = [];
-      nodes.unshift(node);
-      while (node = await this.getDomNodeParent(node, this.userApp)) nodes.unshift(node);
-      return nodes;
+  getCNodeAncestors: | #js
+    async function(cnode) {
+      //if (cnode?.node?.type == "image") debugger;
+      if (!cnode?.node || !cnode?.element) return [];
+      const cnodes = [];
+      cnodes.unshift(cnode);
+      while ((cnodes.length < 5) && (cnode = await this.getCNodeParent(cnode))) cnodes.unshift(cnode);
+      return cnodes;
     }
-  getDomNodeParent: | #js
-    async function(node, parent) {
-      // #TODO: Slow, scans the whole tree
-      if (!node) return null;
-      if (!parent?.children) return null;
-      if (node == parent) return null;
-      if (["pages", "comps"].includes(node.type)) return null;
-      for (const child of parent.children) {
-        if (child.id == node.id) return parent;
-        const parent2 = await this.getDomNodeParent(node, child);
-        if (parent2) return parent2;
+  getCNodeParent: | #js
+    async function(cnode) {
+      if (!cnode?.node || !cnode?.element) return null;
+      let cparent;
+      let tryAgain = false;
+      let tryCount = 0;
+      let parentVue = this.getVueFromElement(cnode.element)?.$parent;
+      //if (!parentVue) return null;
+      do
+      {
+        cparent = this.getCNodeFromVue(parentVue);
+        tryAgain = false;
+        if (cparent) {
+          if (cparent.node.id == cnode.node.id) {
+            parentVue = parentVue.$parent;
+            tryAgain = true;
+          }
+        }
+        tryCount++;
       }
-      return null;
+      while (tryAgain && (tryCount < 10) && parentVue);
+      return cparent;
+    }
+  getCNodeFromVue: | #js
+    function(vue) {
+      const node = this.getDomNodeFromVue(vue);
+      if (!node) return null;
+      return { node, element: vue.$el };
+    }
+  getCNodeFromElement: | #js
+    function(el) {
+      const vue = this.getVueFromElement(el);
+      const node = this.getDomNodeFromVue(vue);
+      return { node, element: vue.$el };
     }
   getDomNodeFromVue: | #js
     function(vue) {

@@ -1,12 +1,11 @@
 dom:
-  .flex:
+  div:
+    v-if: visiblePageNode
     :key: sui.page.selected?.id
-    v-if: visiblePageNodes?.length
     studio.doc.node:
-      v-for: pageNode in visiblePageNodes
-      :node: pageNode
+      :node: visiblePageNode
       :sui: sui
-      :key: pageNode.id
+      :key: visiblePageNode.id
 
 props:
   node:
@@ -16,21 +15,9 @@ data:
   key1: 1
 
 methods:
-  getVisiblePageNodes: | #js
-    function() {
-      return this.node.children.filter(c => (c.id == this.visiblePageNode?.id));
-    }
-  getVisiblePageNode: | #js
-    function() {
-      return this.node.children.find(c => (c.id == this.sui.page.selected?.id));
-    }
 
 computed:
-  visiblePageNodes: | #js
-    function() {
-      return this.getVisiblePageNodes();
-    }
   visiblePageNode: | #js
     function() {
-      return this.getVisiblePageNode();
+      return this.node.children.find(c => (c.id == this.sui.page.selected?.id));
     }

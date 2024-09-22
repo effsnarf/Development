@@ -4,7 +4,7 @@ dom:
     v-text: nodeText
     @mouseenter: () => onHoverNode(node, true)
     @mouseleave: () => onHoverNode(node, false)
-    @click: () => { if (sui) sui.node.selected = node; }
+    @click: () => { if (sui) sui.node.selected = node; $emit('click'); }
     :class: "{ selected: (node.id == sui?.node.selected?.id) }"
 
 props:

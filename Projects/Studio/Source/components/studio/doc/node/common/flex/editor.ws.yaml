@@ -1,0 +1,28 @@
+dom:
+  div:
+    studio.doc.node.editor.options:
+      title: justify content
+      :node: node
+      :initial: initial
+      :options: options
+      :prop-path: "'flex.justify.content'"
+
+props:
+  node:
+  initial:
+  sui:
+
+data:
+  options:
+    [
+      "flex-start",
+      "flex-end",
+      "center",
+      "space-between",
+      "space-around",
+      "space-evenly",
+      "start",
+      "end",
+      "left",
+      "right",
+    ]

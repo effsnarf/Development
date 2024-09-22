@@ -1,5 +1,5 @@
 dom:
-  div:
+  .flex:
     :style: nodeStyle
     slot:
       name: child-nodes
@@ -12,20 +12,7 @@ methods:
   getNodeStyle: | #js
     function(node) {
       const s = {};
-      if (node.direction) {
-        s.display = "flex";
-        s['flex-direction'] = this.toFlexDirection(node.direction);
-      }
       return s;
-    }
-  toFlexDirection: | #js
-    function(dir) {
-      switch (dir)
-      {
-        case "horizontal": return "row";
-        case "vertical": return "column";
-      }
-      return null;
     }
 
 computed:

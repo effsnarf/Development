@@ -6,7 +6,7 @@ dom:
         direction: "horizontal"
         :open: isTabsDrawerOpen
         ui.tabs: 
-          ':options': '[node.type, ''✨ style'']'
+          ':options': '[node.type, ''🧱 flex'', ''✨ style'']'
           direction: vertical
           ':can-select-none': 'true'
           v-model: selected.tab.index
@@ -21,6 +21,13 @@ dom:
                 @dom-edit: (e) => $emit('dom-edit', e)
           template: 
             v-slot: tab1
+            div:
+              studio.doc.node.common.flex.editor:
+                :node: node
+                :initial: initial
+                :sui: sui
+          template: 
+            v-slot: tab2
             div:
               studio.doc.node.common.editor:
                 :node: node
@@ -43,7 +50,7 @@ methods:
   getNodeCompEditorName: | #js
     function(node) {
       if (!node) return null;
-      return `studio-doc-node-${node.type}-editor`;
+      return `studio-doc-node-${node.type.kebabize()}-editor`;
     }
   getInitialNodeData: | #js
     function(node) {

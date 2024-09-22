@@ -1,2 +1,6 @@
 dom:
   div:
+
+props:
+  node:
+  sui:

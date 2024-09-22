@@ -17,14 +17,11 @@ props:
   sui:
   value:
 
-data:
-  selectedPage:
-
 methods:
   onSelectPage: | #js
-    function(pageNode) {
-      if (pageNode == this.selectedPage) pageNode = null;
-      this.selectedPage = pageNode;
+    function(newPageNode) {
+      if ((newPageNode?.id) && (newPageNode?.id == this.value?.id)) newPageNode = null;
+      this.$emit("input", newPageNode);
     }
 
 computed:
@@ -32,13 +29,6 @@ computed:
     function() {
       return this.$root.getPageNodes();
     }
-
-watch:
-  selectedPage:
-    handler: | #js
-      function(newSelectedPage) {
-        this.$emit("input", newSelectedPage);
-      }
 
 style:
   .page-selector:
