@@ -14,16 +14,21 @@ methods:
   getNodeIcon: | #js
     function(node) {
       const icons = {
-        "user.app": "💻",
-        "pages": "📃",
-        "page": "📄",
-        "title": "🅰️",
-        "list": "🟰",
-        "list.item": "🍃",
-        "comps": "🎁",
-        "comp": "🎁",
-        "comp.inst": "📦",
-        "image": "🖼️"
+        userApp: "💻",
+        layouts: "📄",
+        layout: "📄",
+        pages: "📃",
+        page: "📄",
+        panel: "🗂️",
+        title: "🅰️",
+        list: "🟰",
+        listItem: "🍃",
+        comps: "🎁",
+        comp: "🎁",
+        compInst: "📦",
+        image: "🖼️",
+        "slot.outlet": "🧩",
+        "slot.content": "🧩🧊"
       };
       return (icons[node.type] || "❔");
     }
@@ -38,7 +43,7 @@ computed:
     function() {
       const node = this.node;
       const icon = this.getNodeIcon(node);
-      let text = (node.comp?.name || node.name || node.type);
+      let text = (node.slot?.name || node.comp?.name || node.name || node.type);
       if (text != node.type) text = `[${text}]`;
       return `${icon} ${text}`;
     }

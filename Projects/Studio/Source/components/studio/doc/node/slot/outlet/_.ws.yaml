@@ -1,0 +1,8 @@
+dom:
+  div:
+    v-text: "'slot outlet'"
+
+props:
+  node:
+  sui:
+  contentNode:

@@ -46,6 +46,7 @@ mounted: | #js
     // Register global methods
     this.$root.getCompNode = this.getCompNode.bind(this);
     this.$root.getPageNodes = this.getPageNodes.bind(this);
+    this.$root.getClassNode = this.getClassNode.bind(this);
   }
 
 methods:
@@ -74,28 +75,85 @@ methods:
         type: "user.app",
         children: [
           {
+            type: "layouts",
+            children: [
+              {
+                type: "layout",
+                name: "default",
+                children: [
+                  {
+                    type: "panel",
+                    layout: {
+                      position: "fixed",
+                      top: 0
+                    },
+                    children: [
+                      {
+                        type: "slot.outlet",
+                        name: "header"
+                      }
+                    ]
+                  },
+                  {
+                    type: "panel",
+                    layout: {
+                      position: "fixed",
+                      top: "10vh",
+                      height: "90vh"
+                    },
+                    children: [
+                      {
+                        type: "slot.outlet",
+                        name: "content"
+                      }
+                    ]
+                  },
+                ]
+              }
+            ]
+          },
+          {
             type: "pages",
             children: [
               {
                 type: "page",
                 name: "home",
+                layout: {
+                  name: "default"
+                },
                 children: [
                   {
-                    type: "title",
-                    size: 2,
-                    text: "Home page"
-                  },
-                  {
-                    type: "list",
+                    type: "slot.content",
+                    slot: {
+                      name: "header"
+                    },
                     children: [
                       {
-                        type: "list.item",
+                        type: "title",
+                        size: 2,
+                        text: "Home page"
+                      },
+                    ]
+                  },
+                  {
+                    type: "slot.content",
+                    slot: {
+                      name: "content"
+                    },
+                    children: [
+                      {
+                        type: "list",
                         children: [
                           {
-                            type: "comp.inst",
-                            comp: {
-                              name: "generator"
-                            }
+                            type: "list.item",
+                            children: [
+                              {
+                                type: "comp.inst",
+                                comp: {
+                                  name: "generator"
+                                }
+                              }
+                            ]
                           }
                         ]
                       }
@@ -182,16 +240,26 @@ methods:
     }
   getCompNode: | #js
     function(compInstNode) {
-      const userApp = this.userApp;
-      const compsNode = this.findNode(userApp, "comps");
-      const compNode = this.findNode(compsNode, "comp", compInstNode.comp.name);
-      return compNode;
+      return this.getClassNode("comp", compInstNode.comp);
+    }
+  getNodesByType: | #js
+    function(type) {
+      const folderNode = this.findNode(this.userApp, type.pluralize());
+      const itemNodes = this.getNodes(folderNode, type);
+      return itemNodes;
     }
   getPageNodes: | #js
     function() {
-      const pagesNode = this.findNode(this.userApp, "pages");
-      const pageNodes = this.getNodes(pagesNode, "page");
-      return pageNodes;
+      return this.getNodesByType("page");
+    }
+  getLayoutNodes: | #js
+    function() {
+      return this.getNodesByType("layout");
+    }
+  getClassNode: | #js
+    function(type, inst) {
+      const folderNodes = this.getNodesByType(type);
+      return folderNodes.find(cls => (cls.name == inst.name));
     }
 watch:
   sui:
@@ -211,7 +279,7 @@ style:
     overflow: hidden
     border: 3px solid gray
   .comp-studio-app > .flex1 > *:nth-child(1):
-    width: 15%
+    width: 18%
   .comp-studio-app > .flex1 > *:nth-child(2):
     width: 15%
   .flex2:

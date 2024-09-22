@@ -3,7 +3,7 @@ dom:
     ui.tree:
       ":root": root
       item-type: studio.dom.tree.node
-      :initial-expanded: true
+      :initial-expanded: false
       @node-hover: (node) => $emit('sui', (sui) => sui.node.hovered = node)
       @node-select: (node) => $emit('sui', (sui) => sui.node.selected = node)
     ui.value:

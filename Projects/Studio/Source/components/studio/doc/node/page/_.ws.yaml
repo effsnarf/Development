@@ -1,14 +1,33 @@
 dom:
+  studio.doc.node:
+    v-if: layoutNode
+    :node: layoutNode
+    :sui: sui
+    :content-node: node
   div:
+    v-else-if: "!layoutNode"
     studio.doc.node:
-      v-for: childNode in node.children
-      :node: childNode
+      v-for: node in node.children
+      :node: node
       :sui: sui
-      :key: childNode.id
 
 props:
   node:
   sui:
+
+methods:
+  getLayoutNode: | #js
+    function() {
+      if (!this.node.layout) return null;
+      const layoutNode = this.$root.getClassNode("layout", this.node.layout);
+      return layoutNode;
+    }
+
+computed:
+  layoutNode: | #js
+    function() {
+      return this.getLayoutNode();
+    }
 
 style:
   .comp-studio-doc-node-page:

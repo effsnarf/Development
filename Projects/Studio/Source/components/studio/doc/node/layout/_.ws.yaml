@@ -1,0 +1,18 @@
+dom:
+  div:
+    studio.doc.node:
+      v-for: node in node.children
+      :node: node
+      :sui: sui
+      :content-node: contentNode
+
+props:
+  node:
+  sui:
+  contentNode:
+
+methods:
+
+style:
+  .comp-studio-doc-node-layout:
+    width: 100%

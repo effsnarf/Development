@@ -1,15 +1,18 @@
 dom:
-  component:
-    v-if: node
-    :is: nodeCompName
-    :node: node
-    :sui: sui
-    :class: nodeCssClass
-    :style: nodeStyle
+  div:
+    component:
+      v-if: node
+      :is: nodeCompName
+      :node: node
+      :sui: sui
+      :content-node: contentNode
+      :class: nodeCssClass
+      :style: nodeStyle
 
 props:
   node:
   sui:
+  contentNode:
 
 methods:
   getNodeCompName: | #js
