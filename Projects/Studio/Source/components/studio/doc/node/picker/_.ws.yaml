@@ -11,6 +11,7 @@ dom:
         .flex:
           transition:
             name: slide
+            v-if: sui.node.selected
             :key: sui.node.active?.id
             div:
               class: pointer-none dimmed
