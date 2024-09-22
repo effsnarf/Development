@@ -1,8 +1,0 @@
-dom:
-  studio.doc.node:
-    :node: node.children[0]
-    :sui: sui
-
-props:
-  node:
-  sui:

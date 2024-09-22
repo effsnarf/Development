@@ -11,6 +11,7 @@ dom:
         :root: sui.page.selected
         :sui: sui
         @sui: onSuiEvent
+        :initial-expanded: "true"
       .flex2:
         studio.doc.page.selector:
           :user-app: userApp
@@ -37,6 +38,7 @@ data:
       hovered:
       selected:
       active:
+      context:
     nodes:
       hovered:
 
@@ -145,15 +147,10 @@ methods:
                         type: "list",
                         children: [
                           {
-                            type: "list.item",
-                            children: [
-                              {
-                                type: "comp.inst",
-                                comp: {
-                                  name: "generator"
-                                }
-                              }
-                            ]
+                            type: "comp.inst",
+                            comp: {
+                              name: "generator"
+                            }
                           }
                         ]
                       }

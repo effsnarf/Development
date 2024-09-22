@@ -2,38 +2,42 @@ dom:
   div:
     v-if: node
     div:
-      ui.tabs: 
-        ':options': '[node.type, ''✨ style'']'
-        direction: vertical
-        ':can-select-none': 'true'
-        v-model: selected.tab.index
-        template: 
-          v-slot: tab0
-          div:
-            component:
-              :is: getNodeCompEditorName(node)
-              :node: node
-              :initial: initial
-              :sui: sui
-              @dom-edit: (e) => $emit('dom-edit', e)
-        template: 
-          v-slot: tab1
-          div:
-            studio.doc.node.common.editor:
-              :node: node
-              :initial: initial
-              :sui: sui
+      ui.drawer:
+        direction: "horizontal"
+        :open: isTabsDrawerOpen
+        ui.tabs: 
+          ':options': '[node.type, ''✨ style'']'
+          direction: vertical
+          ':can-select-none': 'true'
+          v-model: selected.tab.index
+          template: 
+            v-slot: tab0
+            div:
+              component:
+                :is: getNodeCompEditorName(node)
+                :node: node
+                :initial: initial
+                :sui: sui
+                @dom-edit: (e) => $emit('dom-edit', e)
+          template: 
+            v-slot: tab1
+            div:
+              studio.doc.node.common.editor:
+                :node: node
+                :initial: initial
+                :sui: sui
 
 props:
   node:
   sui:
+  isTabsDrawerOpen:
 
 data:
   initial:
     node:
   selected:
     tab:
-      index: 0
+      index: null
 
 methods:
   getNodeCompEditorName: | #js

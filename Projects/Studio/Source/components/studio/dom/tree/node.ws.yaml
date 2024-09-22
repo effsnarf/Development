@@ -1,5 +1,6 @@
 dom:
   .clickable:
+    v-if: node
     v-text: nodeText
     @mouseenter: () => onHoverNode(node, true)
     @mouseleave: () => onHoverNode(node, false)
@@ -14,7 +15,7 @@ methods:
   getNodeIcon: | #js
     function(node) {
       const icons = {
-        userApp: "💻",
+        "user.app": "💻",
         layouts: "📄",
         layout: "📄",
         pages: "📃",
@@ -22,10 +23,9 @@ methods:
         panel: "🗂️",
         title: "🅰️",
         list: "🟰",
-        listItem: "🍃",
         comps: "🎁",
         comp: "🎁",
-        compInst: "📦",
+        "comp.inst": "📦",
         image: "🖼️",
         "slot.outlet": "🧩",
         "slot.content": "🧩🧊"

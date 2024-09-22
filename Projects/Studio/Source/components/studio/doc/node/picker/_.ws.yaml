@@ -14,13 +14,18 @@ dom:
             :key: sui.node.active?.id
             div:
               :style: "{ 'max-height': '6em', overflow: 'hidden' }"
-              studio.doc.node:
-                :node: sui.node.active
-                :sui: sui
+              .flex:
+                studio.doc.node:
+                  :node: contextNode
+                  :sui: sui
+                studio.dom.tree.node:
+                  v-if: "false"
+                  :item: contextNode
+                  :sui: sui
         .flex:
           ui.drawer:
             direction: "horizontal"
-            :open: "!sui.node.selected"
+            :open: "!$refs.context1?.isPinned"
             .tree-indent:
               div:
                 v-for: (node, i) in hovered.nodes
@@ -35,8 +40,9 @@ dom:
                   :key: child.id
           div:
             studio.doc.node.editor:
-              :node: sui.node.selected
+              :node: contextNode
               :sui: sui
+              :is-tabs-drawer-open: "$refs.context1?.isPinned"
               @dom-edit: (...args) => $emit('dom-edit', ...args)
 props:
   userApp:
@@ -135,5 +141,11 @@ methods:
       return true;
     }
 
+computed:
+  contextNode: | #js
+    function() {
+      if (this.$refs.context1?.isPinned) return this.sui.node.active;
+      return this.sui.node.hovered;
+    }
 
 style:
