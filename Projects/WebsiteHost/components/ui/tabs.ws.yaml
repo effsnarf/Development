@@ -5,6 +5,9 @@ dom:
     ui.drawer:
       :enabled: "(direction != 'horizontal')"
       :open: "!selectedTabIndex"
+      h2:
+        v-if: title
+        v-text: title
       ui.select:
         ':class': '{ corner: (type==''toggle'') }'
         ':options': (options||[]).map(option => _getOptionHtml(option))
@@ -33,6 +36,7 @@ dom:
             slot: 
               ':name': "'tab' + index"
 props:
+  title:
   options: null
   getOptionText: null
   getOptionHtml: null

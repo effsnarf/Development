@@ -1,9 +1,16 @@
 dom:
   div:
     ui.tabs:
-      ":options": "['🔗🧊 link', '🌀 mock', '🔳 json', '🔗🌐 url']"
+      :title: "'🧊 data'"
+      :options: "['🍃 field', '🔗 link', '🌀 mock', '🔳 json', '🌐 url']"
+      :show-title-in-tab: "true"
       template:
         v-slot: tab0
+        h2:
+          ui.input.text.box:
+            hint: field name
+      template:
+        v-slot: tab1
         div:
           studio.app.runtime.state:
             :user-app: userApp

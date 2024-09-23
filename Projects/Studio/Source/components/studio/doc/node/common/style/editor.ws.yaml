@@ -1,0 +1,14 @@
+dom:
+  div:
+    v-if: (node && initial.node)
+    h2:
+      v-text: "'🎨 style'"
+    studio.doc.node.common.background.editor:
+      :node: node
+      :initial: initial
+      :sui: sui
+
+props:
+  node:
+  initial:
+  sui:
