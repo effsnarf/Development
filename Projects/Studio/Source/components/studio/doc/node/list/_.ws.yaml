@@ -1,40 +1,37 @@
 dom:
   div:
     .list-item:
-      v-for: item in dataSourceItems
+      v-for: item in listItems
       studio.doc.node:
         :node: node.children[0]
         :sui: sui
         :data-item: item
       @mouseenter: () => onHover(item, true)
       @mouseleave: () => onHover(item, false)
-
+      @click: () => onClick(item)
 props:
   node:
   sui: sui
 
 methods:
+  onClick: | #js
+    function(item) {
+      const varPath = `${this.$parent.nodeVarPath}.selected`;
+      this.$root.studio.user.app.state.change(varPath, item);
+    }
   onHover: | #js
     function(item, isHovered) {
-      const newItem = (!isHovered ? null : item);
+      item = (!isHovered ? null : item);
       const varPath = `${this.$parent.nodeVarPath}.hovered`;
-      Objects.setProperty(this.rtState, varPath, newItem);
+      this.$root.studio.user.app.state.change(varPath, item);
     }
 
 computed:
-  dataSourceItems: | #js
+  listItems: | #js
     function() {
-      const sourcePath = this.node.data?.source?.name?.path;
-      if (!this.rtState || !sourcePath) return null;
-      return Objects.getProperty(this.rtState, sourcePath)
-    }
-  rtState: | #js
-    function() {
-      return this.studioApp.rtState;
-    }
-  studioApp: | #js
-    function() {
-      return this.$root.getStudioApp(this);
+      //const varPath = this.node.data?.source?.name?.path;
+      const varPath = `${this.$parent.nodeVarPath}.items`;
+      return Objects.getProperty(this.$root.global.app.state, varPath);
     }
 
 style:

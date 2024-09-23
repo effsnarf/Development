@@ -1,0 +1,99 @@
+dom:
+  div:
+
+props:
+  userApp:
+
+mounted: | #js
+  function() {
+    const methods = this.$options.methods;
+    for (const methodName in methods)
+    {
+      const method = methods[methodName].bind(this);
+      this.$root[methodName] = method;
+    }
+  }
+
+methods:
+  findNode: | #js
+    function(node, type, compName) {
+      for (const childNode of node.children) {
+        if (childNode.type != type) continue;
+        // found the node by type
+        if ((type == "comp") && compName) {
+          if (compName != childNode.name) continue;
+        }
+        return childNode;
+      }
+    }
+  findNodeByPath: | #js
+    function(nodePath) {
+      if (typeof(nodePath) == 'string') nodePath = nodePath.split('.');
+      let node = this.userApp;
+      let part;
+      while (part = nodePath.shift()) {
+        node = this.findNodeByName(node, part);
+      }
+      return node;
+    }
+  findNodeByName: | #js
+    function(parent, name) {
+      return parent.children?.find(c => (name == (c.name || c.type)));
+    }
+  findDescNodes: | #js
+    function(parent, type) {
+      const nodes = [];
+      const search = (node) => {
+        if (nodes.map(n => n.id).includes(node.id)) return;
+        if (type == node.type) nodes.push(node);
+      };
+      Objects.traverse(parent, search);
+      return nodes;
+    }
+  getNodes: | #js
+    function(parentNode, type) {
+      const nodes = [];
+      for (const childNode of parentNode.children) {
+        if (type == childNode.type) nodes.push(childNode);
+      }
+      return nodes;
+    }
+  getCompNode: | #js
+    function(compInstNode) {
+      return this.getClassNode("comp", compInstNode.comp);
+    }
+  getNodesByType: | #js
+    function(type) {
+      const folderNode = this.findNode(this.userApp, type.pluralize());
+      const itemNodes = this.getNodes(folderNode, type);
+      return itemNodes;
+    }
+  getPageNodes: | #js
+    function() {
+      return this.getNodesByType("page");
+    }
+  getLayoutNodes: | #js
+    function() {
+      return this.getNodesByType("layout");
+    }
+  getClassNode: | #js
+    function(type, inst) {
+      const folderNodes = this.getNodesByType(type);
+      return folderNodes.find(cls => (cls.name == inst.name));
+    }
+  getNodePageName: | #js
+    function(node) {
+      const ancs = this.getNodeAncestors(node);
+      return ancs.find(n => (n.type == "page"))?.name;
+    }
+  getNodeAncestors: | #js
+    // #TODO Slow
+    function(node, ancs = []) {
+      while (node = this.getNodeParent(node)) ancs.unshift(node);
+      return ancs;
+    }
+  getNodeParent: | #js
+    // #TODO Slow
+    function(node) {
+      return TreeObject.find(this.userApp, (p => (p.children?.map(c => c.id).includes(node.id))));
+    }

@@ -6,6 +6,55 @@ const _importMainFileToImplement =
 type ObjectNodeFilter = (node: any, key: string, value: any) => boolean;
 
 class Objects {
+  static toTreeObject(
+    obj: any,
+    expandToTree?: (
+      node: any,
+      key: string,
+      value: any,
+      nodePath: string[]
+    ) => boolean,
+    nodePath: string[] = [],
+    keyVarName = "name",
+    valueVarName = "value"
+  ) {
+    const root = {
+      children: [],
+    } as any;
+    let node = root;
+
+    for (const key in obj) {
+      nodePath.push(key);
+      const value = obj[key];
+      const child = {} as any;
+      child[keyVarName] = key;
+
+      node.children.push(child);
+
+      let expand = false;
+
+      if (expandToTree) {
+        expand = expandToTree(obj, key, value, nodePath);
+      } else {
+        expand = !Array.isArray(value) && typeof value == "object";
+      }
+
+      if (expand) {
+        child.children = Objects.toTreeObject(
+          value,
+          expandToTree,
+          nodePath,
+          keyVarName,
+          valueVarName
+        ).children;
+      } else {
+        child[valueVarName] = value;
+      }
+    }
+
+    return root;
+  }
+
   static async wait(milliseconds: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, milliseconds));
   }

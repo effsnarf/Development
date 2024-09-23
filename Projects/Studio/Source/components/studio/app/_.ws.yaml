@@ -1,11 +1,8 @@
 dom:
   div:
     studio.app.logo:
-    div:
-      button:
-        v-text: "'Test'"
-        @click: test
     studio.doc.node.picker:
+      v-if: "false"
       :user-app: userApp
       :sui: sui
     .flex1:
@@ -29,12 +26,16 @@ dom:
           :user-app: userApp
           :sui: sui
       div:
-        div:
-          ui.value:
-            :value: rtState
+        studio.app.runtime.state:
+          ref: vAppState1
+          :user-app: userApp
+          :sui: sui
+    studio.dom.tree.methods:
+      ref: methods1
+      :user-app: userApp
 
 data:
-  userApp: null
+  userApp:
   sui:
     page:
       selected:
@@ -47,69 +48,34 @@ data:
       context:
     nodes:
       hovered:
-  rtState: null
+  appStateChangeKey: 1
 
 mounted: | #js
   function() {
     this.userApp = this.getMockupUserApp();
+    this.$root.global = {
+      app: {
+        state: null
+      }
+    };
     // Register global methods
     this.$root.getUserApp = this.getUserApp.bind(this);
     this.$root.getStudioApp = this.getStudioApp.bind(this);
-    this.$root.getCompNode = this.getCompNode.bind(this);
-    this.$root.getPageNodes = this.getPageNodes.bind(this);
-    this.$root.getClassNode = this.getClassNode.bind(this);
-    this.$root.getNodePageName = this.getNodePageName.bind(this);
+    this.$root.studio = {
+      user: {
+        app: {
+          state: {
+            change: (varPath, value) => {
+              Objects.setProperty(this.$root.global.app.state, varPath, value);
+              this.appStateChangeKey++;
+            }
+          }
+        }
+      }
+    }
   }
 
 methods:
-  test: | #js
-    function() {
-      this.initRtState();
-    }
-  initRtState: | #js
-    function() {
-      this.compileUserAppRuntime();
-    }
-  compileUserAppRuntime: | #js
-    async function() {
-      const vueCompName = `studio-user-app-runtime`;
-      const vueData = {};
-      const pageName = "home";
-      const pageNode = this.findNodeByPath(["pages", pageName]);
-      vueData[pageName] = {};
-      const pageData = vueData[pageName];
-      const varsNode = this.findNodeByName(pageNode, "vars");
-      const varNodes = varsNode.children;
-      const varNames = varNodes.map(n => n.name);
-
-      pageData.var = {};
-
-      for (const varName of varNames) pageData.var[varName] = null;
-
-      for (const varNode of varNodes) {
-        if (!varNode.on?.init) continue;
-        const initVarFunc = eval(`(${varNode.on.init})`);
-        await initVarFunc.apply(pageData.var);
-      }
-
-      pageData.list = {};
-
-      const listNodes = this.findDescNodes(pageNode, "list");
-      
-      for (const listNode of listNodes) {
-        if (!listNode.name) {
-          alertify.error(`list node in ${pageName} page must have a name.`);
-          continue;
-        }
-        pageData.list[listNode.name] = {
-          hovered: null,
-          selected: null
-        };
-      }
-
-      const rtState = Vue.reactive(vueData);
-      this.rtState = rtState;
-    }
   selectPage: | #js
     function(newPage) {
       this.sui.page.trans.dir = this.getPageTransDir(this.sui.page.selected, newPage);
@@ -217,13 +183,13 @@ methods:
                             content: "center"
                           }
                         },
-                        data: {
-                          source: {
-                            name: {
-                              path: ["home", "var", "generators"]
-                            }
-                          }
-                        },
+                        // data: {
+                        //   source: {
+                        //     name: {
+                        //       path: ["home", "var", "generators"]
+                        //     }
+                        //   }
+                        // },
                         children: [
                           {
                             type: "comp.inst",
@@ -235,24 +201,6 @@ methods:
                       }
                     ]
                   },
-                  {
-                    type: "vars",
-                    children: [
-                      {
-                        type: "var",
-                        name: "generators",
-                        on: {
-                          init: (function() {
-                            this.generators = [
-                              { name: "Socially Awkward Penguin" },
-                              { name: "Foul Bachelor Frog" },
-                              { name: "Insanity Wolf" }
-                            ]
-                          }).toString()
-                        }
-                      }
-                    ]
-                  }
                 ]
               },
               {
@@ -361,88 +309,7 @@ methods:
       while (vue && !vue.userApp) vue = vue.$parent;
       return vue.userApp;
     }
-  findNode: | #js
-    function(node, type, compName) {
-      for (const childNode of node.children) {
-        if (childNode.type != type) continue;
-        // found the node by type
-        if ((type == "comp") && compName) {
-          if (compName != childNode.name) continue;
-        }
-        return childNode;
-      }
-    }
-  findNodeByPath: | #js
-    function(nodePath) {
-      if (typeof(nodePath) == 'string') nodePath = nodePath.split('.');
-      let node = this.userApp;
-      let part;
-      while (part = nodePath.shift()) {
-        node = this.findNodeByName(node, part);
-      }
-      return node;
-    }
-  findNodeByName: | #js
-    function(parent, name) {
-      return parent.children?.find(c => (name == (c.name || c.type)));
-    }
-  findDescNodes: | #js
-    function(parent, type) {
-      const nodes = [];
-      const search = (node) => {
-        if (nodes.map(n => n.id).includes(node.id)) return;
-        if (type == node.type) nodes.push(node);
-      };
-      Objects.traverse(parent, search);
-      return nodes;
-    }
-  getNodes: | #js
-    function(parentNode, type) {
-      const nodes = [];
-      for (const childNode of parentNode.children) {
-        if (type == childNode.type) nodes.push(childNode);
-      }
-      return nodes;
-    }
-  getCompNode: | #js
-    function(compInstNode) {
-      return this.getClassNode("comp", compInstNode.comp);
-    }
-  getNodesByType: | #js
-    function(type) {
-      const folderNode = this.findNode(this.userApp, type.pluralize());
-      const itemNodes = this.getNodes(folderNode, type);
-      return itemNodes;
-    }
-  getPageNodes: | #js
-    function() {
-      return this.getNodesByType("page");
-    }
-  getLayoutNodes: | #js
-    function() {
-      return this.getNodesByType("layout");
-    }
-  getClassNode: | #js
-    function(type, inst) {
-      const folderNodes = this.getNodesByType(type);
-      return folderNodes.find(cls => (cls.name == inst.name));
-    }
-  getNodePageName: | #js
-    function(node) {
-      const ancs = this.getNodeAncestors(node);
-      return ancs.find(n => (n.type == "page"))?.name;
-    }
-  getNodeAncestors: | #js
-    // #TODO Slow
-    function(node, ancs = []) {
-      while (node = this.getNodeParent(node)) ancs.unshift(node);
-      return ancs;
-    }
-  getNodeParent: | #js
-    // #TODO Slow
-    function(node) {
-      return TreeObject.find(this.userApp, (p => (p.children?.map(c => c.id).includes(node.id))));
-    }
+
 watch:
   sui:
     deep: true
@@ -450,6 +317,10 @@ watch:
       function(sui) {
         sui.node.active = (sui.node.selected || sui.node.hovered);
       }
+  appStateChangeKey: | #js
+    function() {
+      this.$root.$emit("app-state-changed");
+    }
 
 style:
   .comp-studio-app > .flex1:

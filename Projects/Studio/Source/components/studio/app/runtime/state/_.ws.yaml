@@ -1,0 +1,87 @@
+dom:
+  div:
+    div:
+      button:
+        v-text: "'calc app state'"
+        @click: calcAppState
+    div:
+      ui.tree:
+        :root: appStateTree
+        item-type: studio.app.runtime.state.tree.node
+        :initial-expanded: "true"
+
+props:
+  userApp:
+  sui:
+
+data:
+  appStateTree:
+  key1: 1
+
+mounted: | #js
+  function() {
+    this.$root.$on("app-state-changed", this.refresh.bind(this));
+  }
+
+methods:
+  getAppState: | #js
+    function(userApp) {
+      const root = {};
+      for (const pageNode of this.$root.getPageNodes()) {
+        root[pageNode.name] = this.getPageAppState(pageNode);
+      }
+      return root;
+    }
+  getPageAppState: | #js
+    function(pageNode) {
+      const page = {};
+      
+      page.var = {};
+      for (const varNode of this.$root.findDescNodes(pageNode, "var"))
+      {
+        page.var[varNode.name] = null;
+      }
+
+      page.list = {};
+      for (const listNode of this.$root.findDescNodes(pageNode, "list"))
+      {
+        page.list[listNode.name] = {
+          items: this.getMockupItems(),
+          hovered: null,
+          selected: null
+        };
+      }
+
+      return page;
+    }
+  getMockupItems: | #js
+    function() {
+      return [
+        { name: "Socially Awkward Penguin" },
+        { name: "Foul Bachelor Frog" },
+        { name: "Insanity Wolf" }
+      ];
+    }
+  calcAppState: | #js
+    function() {
+      const appState = this.getAppState(this.userApp);
+      this.$root.global.app.state = appState;
+    }
+  expandNodeToTree: | #js
+    function(node, key, value, nodePath) {
+      // #TODO not accurate
+      if (["items", "hovered", "selected"].includes(nodePath.last())) return false;
+      return true;
+    }
+  refresh: | #js
+    async function() {
+      const pageState = this.$root.global.app.state?.[this.sui?.page?.selected?.name];
+      this.appStateTree = Objects.toTreeObject(pageState, this.expandNodeToTree);
+      this.key1++;
+    }
+
+watch:
+  userApp:
+    immediate: true
+    deep: false
+    handler: this.calcAppState.bind(this)

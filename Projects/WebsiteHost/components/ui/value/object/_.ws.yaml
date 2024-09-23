@@ -33,7 +33,7 @@ methods:
   consoleLog: | #js
     function(value) {
       console.log(value);
-      this.$refs.alert1.show('Object logged to browser console.');
+      //this.$refs.alert1.show('Object logged to browser console.');
     }
 computed:
   type: | #js

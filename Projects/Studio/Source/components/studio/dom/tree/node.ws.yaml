@@ -29,7 +29,7 @@ methods:
         image: "🖼️",
         "slot.outlet": "🧩",
         "slot.content": "🧩🧊",
-        vars: "📂🧊",
+        vars: "📂🍃",
         var: "🧊"
       };
       return (icons[node.type] || "❔");

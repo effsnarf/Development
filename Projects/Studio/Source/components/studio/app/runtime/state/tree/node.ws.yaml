@@ -1,0 +1,23 @@
+dom:
+  div:
+    .flex:
+      div:
+      .flex:
+        span:
+          v-text: "'🧊'"
+        span:
+          v-text: item.name
+      div:
+        class: preview
+        v-if: item.value
+        ui.value:
+          :value: item.value
+
+props:
+  item:
+
+style:
+  .preview:
+    width: 10em
+    height: 3em
+    overflow: hidden

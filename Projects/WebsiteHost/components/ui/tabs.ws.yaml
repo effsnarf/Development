@@ -60,7 +60,7 @@ methods:
         return option;
       }
       let html = getOptionHtml(option);
-      if (['jpg', 'jpeg', 'png'].some(ext => html.endsWith('.' + ext))) {
+      if (['jpg', 'jpeg', 'png'].some(ext => html?.endsWith('.' + ext))) {
         html = `<img src="${html}" />`;
       }
       return html;
