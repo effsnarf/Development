@@ -2,16 +2,19 @@ dom:
   div: 
     ':class': class1
     ':style': style1
-    ui.select:
-      ':class': '{ corner: (type==''toggle'') }'
-      ':options': (options||[]).map(option => _getOptionHtml(option))
-      ':getUrl': getUrl
-      ':direction': direction
-      ':type': type
-      ':show-search': showSearch
-      ':can-select-none': canSelectNone
-      @item-hover: onItemHover
-      v-model: selectedTabIndex
+    ui.drawer:
+      :enabled: "(direction != 'horizontal')"
+      :open: "!selectedTabIndex"
+      ui.select:
+        ':class': '{ corner: (type==''toggle'') }'
+        ':options': (options||[]).map(option => _getOptionHtml(option))
+        ':getUrl': getUrl
+        ':direction': direction
+        ':type': type
+        ':show-search': showSearch
+        ':can-select-none': canSelectNone
+        @item-hover: onItemHover
+        v-model: selectedTabIndex
     div: 
       class: flex-grow-1
       slot: 
@@ -24,6 +27,9 @@ dom:
           .tab:
             v-if: (index == activeIndex)
             ':style': getTabStyle(index)
+            h2:
+              v-if: showTitleInTab
+              v-text: option
             slot: 
               ':name': "'tab' + index"
 props:
@@ -36,6 +42,7 @@ props:
   transitionName: null
   showSearch: null
   canSelectNone: false
+  showTitleInTab: false
 data:
   hoveredTabIndex: null
   selectedTabIndex: 0

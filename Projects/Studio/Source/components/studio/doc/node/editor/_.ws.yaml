@@ -4,11 +4,12 @@ dom:
     div:
       ui.drawer:
         direction: "horizontal"
-        :open: isTabsDrawerOpen
+        :open: "isTabsDrawerOpen"
         ui.tabs: 
-          ':options': '[node.type, ''🧱 flex'', ''🎨 style'', ''✨ animation'']'
+          ':options': '[node.type, ''🧊 data'', ''🧱 flex'', ''🎨 style'', ''✨ animation'']'
           direction: vertical
-          ':can-select-none': 'true'
+          :can-select-none: "true"
+          :show-title-in-tab: "false"
           v-model: selected.tab.index
           template: 
             v-slot: tab0
@@ -22,12 +23,19 @@ dom:
           template: 
             v-slot: tab1
             div:
-              studio.doc.node.common.flex.editor:
+              studio.doc.node.common.data.editor:
                 :node: node
                 :initial: initial
                 :sui: sui
           template: 
             v-slot: tab2
+            div:
+              studio.doc.node.common.flex.editor:
+                :node: node
+                :initial: initial
+                :sui: sui
+          template: 
+            v-slot: tab3
             div:
               studio.doc.node.common.editor:
                 :node: node

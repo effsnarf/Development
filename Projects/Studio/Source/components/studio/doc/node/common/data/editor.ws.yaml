@@ -1,0 +1,23 @@
+dom:
+  div:
+    ui.tabs:
+      ":options": "['🔗🧊 link', '🌀 mock', '🔳 json', '🔗🌐 url']"
+      template:
+        v-slot: tab0
+        div:
+          studio.app.runtime.state:
+            :user-app: userApp
+            :sui: sui
+
+props:
+  node:
+  initial:
+  sui:
+
+data:
+  userApp:
+
+mounted: | #js
+  function() {
+    this.userApp = this.$root.getUserApp(this);
+  }

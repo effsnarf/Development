@@ -2,7 +2,7 @@ dom:
   div:
     studio.app.logo:
     studio.doc.node.picker:
-      v-if: "false"
+      v-if: "true"
       :user-app: userApp
       :sui: sui
     .flex1:
@@ -27,7 +27,6 @@ dom:
           :sui: sui
       div:
         studio.app.runtime.state:
-          ref: vAppState1
           :user-app: userApp
           :sui: sui
     studio.dom.tree.methods:
@@ -183,13 +182,11 @@ methods:
                             content: "center"
                           }
                         },
-                        // data: {
-                        //   source: {
-                        //     name: {
-                        //       path: ["home", "var", "generators"]
-                        //     }
-                        //   }
-                        // },
+                        data: {
+                          source: {
+                            type: "mock"
+                          }
+                        },
                         children: [
                           {
                             type: "comp.inst",
@@ -220,8 +217,8 @@ methods:
                         type: "comp.inst",
                         comp: {
                           name: "generator"
-                        }
-                      }
+                        },
+                      },
                     ]
                   }
                 ]
@@ -332,9 +329,9 @@ style:
     overflow: hidden
     border: 3px solid gray
   .comp-studio-app > .flex1 > *:nth-child(1):
-    width: 18%
-  .comp-studio-app > .flex1 > *:nth-child(2):
     width: 15%
+  .comp-studio-app > .flex1 > *:nth-child(2):
+    width: 18%
   .flex2:
     display: flex
     flex-direction: column

@@ -14,8 +14,9 @@ dom:
             v-if: sui.node.selected
             :key: sui.node.active?.id
             div:
-              class: pointer-none dimmed
+              class: flex
               div:
+                class: pointer-none dimmed
                 :style: "{ 'max-height': '6em', overflow: 'hidden' }"
                 div:
                   studio.doc.node:

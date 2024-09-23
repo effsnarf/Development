@@ -1,39 +1,25 @@
 dom:
   .clickable:
     v-if: node
-    v-text: nodeText
     @mouseenter: () => onHoverNode(node, true)
     @mouseleave: () => onHoverNode(node, false)
     @click: () => { if (sui) sui.node.selected = node; $emit('click'); }
     :class: "{ selected: (node.id == sui?.node.selected?.id) }"
+    div:
+      .flex:
+        div:
+          :title: nodeWarning
+          :class: "{ warn: hasWarning }"
+          v-text: nodeText
+        div:
+          v-if: hasWarning
+          v-text: "'⚠️'"
 
 props:
   item:
   sui:
 
 methods:
-  getNodeIcon: | #js
-    function(node) {
-      const icons = {
-        "user.app": "💻",
-        layouts: "📄",
-        layout: "📄",
-        pages: "📃",
-        page: "📄",
-        panel: "🗂️",
-        title: "🅰️",
-        list: "🟰",
-        comps: "🎁",
-        comp: "🎁",
-        "comp.inst": "📦",
-        image: "🖼️",
-        "slot.outlet": "🧩",
-        "slot.content": "🧩🧊",
-        vars: "📂🍃",
-        var: "🧊"
-      };
-      return (icons[node.type] || "❔");
-    }
   onHoverNode: | #js
     function(node, isHovered) {
       if (!this.sui) return;
@@ -44,12 +30,35 @@ computed:
   nodeText: | #js
     function() {
       const node = this.node;
-      const icon = this.getNodeIcon(node);
+      const icon = this.$root.getNodeIcon(node);
       let text = (node.slot?.name || node.comp?.name || node.name || node.type);
       if (text != node.type) text = `[${text}]`;
       return `${icon} ${text}`;
+    }
+  nodeWarning: | #js
+    function() {
+      const _DATA_SOURCE_MISSING = "Data source missing";
+      if (["list"].contains(this.node.type)) {
+        if (!this.node.data?.source) return _DATA_SOURCE_MISSING;
+      }
+      return null;
+    }
+  hasWarning: | #js
+    function() {
+      return (!!this.nodeWarning);
     }
   node: | #js
     function() {
       return this.item;
     }
+
+style:
+  .comp-studio-dom-tree-node:
+    white-space: nowrap
+    text-shadow: -3px 3px 1px black
+  .warn:
+    background: "repeating-linear-gradient(-45deg, rgba(166, 134, 0, 0.5), rgba(166, 134, 0, 0.5) 12px, rgba(0, 0, 0, 0.5) 10px, rgba(0, 0, 0, 0.5) 20px)"
+  .flex:
+    align-items: center
+
+    

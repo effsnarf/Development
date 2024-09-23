@@ -3,9 +3,11 @@ dom:
     .list-item:
       v-for: item in listItems
       studio.doc.node:
-        :node: node.children[0]
+        v-for: child in node.children
+        :node: child
         :sui: sui
         :data-item: item
+        :key: node.id
       @mouseenter: () => onHover(item, true)
       @mouseleave: () => onHover(item, false)
       @click: () => onClick(item)

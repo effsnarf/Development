@@ -15,6 +15,28 @@ mounted: | #js
   }
 
 methods:
+  getNodeIcon: | #js
+    function(node) {
+      const icons = {
+        "user.app": "💻",
+        layouts: "📄",
+        layout: "📄",
+        pages: "📃",
+        page: "📄",
+        panel: "🗂️",
+        title: "🅰️",
+        list: "🟰",
+        comps: "🎁",
+        comp: "🎁",
+        "comp.inst": "📦",
+        image: "🖼️",
+        "slot.outlet": "🧩",
+        "slot.content": "🧩🧊",
+        vars: "📂🍃",
+        var: "🧊"
+      };
+      return (icons[node.type] || "❔");
+    }
   findNode: | #js
     function(node, type, compName) {
       for (const childNode of node.children) {
@@ -80,6 +102,11 @@ methods:
     function(type, inst) {
       const folderNodes = this.getNodesByType(type);
       return folderNodes.find(cls => (cls.name == inst.name));
+    }
+  getPageNames: | #js
+    function() {
+      const pageNodes = this.getNodesByType("page");
+      return pageNodes.map(p => p.name);
     }
   getNodePageName: | #js
     function(node) {

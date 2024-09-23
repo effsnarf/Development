@@ -6,6 +6,7 @@ dom:
     ':class': cssClass
     slot: null
 props:
+  enabled: true
   open: false
   direction: vertical
 data:
@@ -17,6 +18,7 @@ methods:
       cls[this.direction] = true;
       cls.open = this.open;
       cls.hovered = this.isHovered;
+      if (!this.enabled) cls.open = true;
       return cls;
     }
 computed:

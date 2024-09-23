@@ -5,10 +5,21 @@ dom:
         v-text: "'calc app state'"
         @click: calcAppState
     div:
-      ui.tree:
-        :root: appStateTree
-        item-type: studio.app.runtime.state.tree.node
-        :initial-expanded: "true"
+      v-if: appStateTree
+      ui.tabs:
+        :options: "pageNames.map(p => ('📄 ' + p))"
+        direction: horizontal
+        v-model: selectedPageTabIndex
+      div:
+        v-for: (pageName, i) in pageNames
+        transition:
+          name: slide
+          div:
+            v-if: (i == selectedPageTabIndex)
+            ui.tree:
+              :root: pageStateTrees[pageName]
+              item-type: studio.app.runtime.state.tree.node
+              :initial-expanded: "true"
 
 props:
   userApp:
@@ -16,11 +27,15 @@ props:
 
 data:
   appStateTree:
+  pageStateTrees: "{}"
+  selectedPageTabIndex: null
   key1: 1
 
 mounted: | #js
   function() {
     this.$root.$on("app-state-changed", this.refresh.bind(this));
+    this.$watch("sui.page.selected", this.refresh.bind(this));
+    this.refresh();
   }
 
 methods:
@@ -36,17 +51,17 @@ methods:
     function(pageNode) {
       const page = {};
       
-      page.var = {};
-      for (const varNode of this.$root.findDescNodes(pageNode, "var"))
-      {
-        page.var[varNode.name] = null;
-      }
+      // page.var = {};
+      // for (const varNode of this.$root.findDescNodes(pageNode, "var"))
+      // {
+      //   page.var[varNode.name] = null;
+      // }
 
       page.list = {};
       for (const listNode of this.$root.findDescNodes(pageNode, "list"))
       {
         page.list[listNode.name] = {
-          items: this.getMockupItems(),
+          items: this.getDataFromDataSource(listNode.data.source),
           hovered: null,
           selected: null
         };
@@ -54,18 +69,28 @@ methods:
 
       return page;
     }
-  getMockupItems: | #js
-    function() {
-      return [
-        { name: "Socially Awkward Penguin" },
-        { name: "Foul Bachelor Frog" },
-        { name: "Insanity Wolf" }
-      ];
+  getDataFromDataSource: | #js
+    function(dataSource) {
+      if (dataSource.type == "mock") {
+        const items = Array.from(
+          { length: 10 },
+          (_, i) => ({ name: `item ${i + 1}` })
+        );
+        return items;
+      }
+      throw (`Unknown data source`);
+    }
+  getPageStateTree: | #js
+    function(pageName) {
+      return this.appStateTree
+        ?.children
+        .find(c => (pageName == c.name));
     }
   calcAppState: | #js
     function() {
       const appState = this.getAppState(this.userApp);
       this.$root.global.app.state = appState;
+      this.refresh();
     }
   expandNodeToTree: | #js
     function(node, key, value, nodePath) {
@@ -75,13 +100,17 @@ methods:
     }
   refresh: | #js
     async function() {
-      const pageState = this.$root.global.app.state?.[this.sui?.page?.selected?.name];
-      this.appStateTree = Objects.toTreeObject(pageState, this.expandNodeToTree);
+      const appState = this.$root.global.app.state;
+      const appStateTree = Objects.toTreeObject(appState, this.expandNodeToTree);
+      this.appStateTree = appStateTree;
+      this.pageStateTrees = {};
+      for (const pageName of this.pageNames)
+        this.pageStateTrees[pageName] = this.getPageStateTree(pageName);
       this.key1++;
     }
 
-watch:
-  userApp:
-    immediate: true
-    deep: false
-    handler: this.calcAppState.bind(this)
+computed:
+  pageNames: | #js
+    function() {
+      return this.$root.getPageNames();
+    }
