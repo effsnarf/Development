@@ -1,0 +1,15 @@
+dom:
+  div:
+    v-if: (node && initial.node)
+    ui.input.animation:
+
+props:
+  node:
+  initial:
+  sui:
+
+data:
+
+methods:
+
+style:

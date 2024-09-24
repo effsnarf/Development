@@ -107,12 +107,18 @@ helpers:
   prefixCssSelectors: | #ts
     (context, compName, selectors) => {
       const s = [];
-      const scopeClass = `comp-${compName.replace(/\./g, "-")}`;
+      const scopeClass = (!compName) ? null : `comp-${compName.replace(/\./g, "-")}`;
       const classSelectors = selectors.split(',').map(s => s.trim()).filter(s => s.startsWith("."));
       const otherSelectors = selectors.split(',').map(s => s.trim()).filter(s => !s.startsWith("."));
-      s.push(...classSelectors.map(s => `.${scopeClass}${s}`));
-      s.push(...classSelectors.map(s => `.${scopeClass} ${s}`));
-      s.push(...otherSelectors.map(s => `.${scopeClass} ${s}`));
+      if (compName) {
+        s.push(...classSelectors.map(s => `.${scopeClass}${s}`));
+        s.push(...classSelectors.map(s => `.${scopeClass} ${s}`));
+        s.push(...otherSelectors.map(s => `.${scopeClass} ${s}`));
+      }
+      else {
+        s.push(...classSelectors.map(s => `${s}`));
+        s.push(...otherSelectors.map(s => `${s}`));
+      }
       return s.join(", ");
     }
   unkebabize: | #ts

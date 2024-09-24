@@ -24,6 +24,7 @@ dom:
                     :sui: sui
               div:
                 h2:
+                  class: pointer-none
                   studio.dom.tree.node:
                     :item: contextNode
                     :sui: sui

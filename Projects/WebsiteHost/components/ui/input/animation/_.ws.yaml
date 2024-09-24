@@ -1,0 +1,49 @@
+dom:
+  div:
+    .flex1:
+      ui.input.animation.example:
+        v-for: (anim, i) in anims
+        :anim: anim
+        :key: i
+
+data:
+  anims:
+    - name: fade
+      enter:
+        from:
+          opacity: 0
+      leave:
+        to:
+          opacity: 0
+    - name: slide-x
+      enter:
+        from:
+          transform: translateX(100%)
+          opacity: 0
+      leave:
+        to:
+          transform: translateX(-100%)
+          opacity: 0
+    - name: slide-y
+      enter:
+        from:
+          transform: translateY(100%)
+          opacity: 0
+      leave:
+        to:
+          transform: translateY(-100%)
+          opacity: 0
+    - name: rotate-y
+      active:
+        backface-visibility: hidden
+      enter:
+        from:
+          transform: rotateY(-180deg)
+      leave:
+        to:
+          transform: rotateY(180deg)
+
+style:
+  .flex1:
+    display: flex
+    gap: 1rem

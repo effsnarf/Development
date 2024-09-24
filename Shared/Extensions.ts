@@ -315,6 +315,7 @@ interface Number {
   _getObjectType(obj: any): any;
   _getObjectTypeName(obj: any): string;
   is(type: any): boolean;
+  milliseconds(): number;
   seconds(): number;
   minutes(): number;
   hours(): number;
@@ -594,6 +595,10 @@ if (typeof Number !== "undefined") {
 
   Number.prototype.is = function (type: any): boolean {
     return (0)._is(this, type);
+  };
+
+  Number.prototype.milliseconds = function (): number {
+    return this.valueOf();
   };
 
   Number.prototype.seconds = function (): number {

@@ -1,17 +1,20 @@
 dom:
   div:
-    .list-item:
-      v-for: item in listItems
-      studio.doc.node:
-        v-for: child in node.children
-        :node: child
-        :sui: sui
-        :data-item: item
-        :key: node.id
-      @mouseenter: () => onHover(item, true)
-      @mouseleave: () => onHover(item, false)
-      @click: () => onClick(item)
-      
+    transition.group:
+      name: list
+      .list-item:
+        v-for: item in listItems
+        :key: getListItemKey(item)
+        studio.doc.node:
+          v-for: child in node.children
+          :node: child
+          :sui: sui
+          :data-item: item
+          :key: node.id
+        @mouseenter: () => onHover(item, true)
+        @mouseleave: () => onHover(item, false)
+        @click: () => onClick(item)
+
 props:
   node:
   sui: sui
@@ -27,6 +30,11 @@ methods:
       item = (!isHovered ? null : item);
       const varPath = `${this.$parent.nodeVarPath}.hovered`;
       this.$root.studio.user.app.state.change(varPath, item);
+    }
+  getListItemKey: | #js
+    function(item) {
+      const fields = Object.keys(item);
+      return item[fields[0]];
     }
 
 computed:

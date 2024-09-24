@@ -1,0 +1,128 @@
+dom:
+  div:
+    div:
+      button:
+        v-text: "'click me'"
+        @click: toggleFrame
+      h4:
+        class: text-center dimmed
+        v-text: "'' + anim.name"
+      .list-container:
+        .list:
+          :class: listCls
+          :key: listKey1
+          .list-item:
+            v-for: (listItem, i) in frames
+            v-text: listItem
+            :style: getListItemStyle(i)
+            :key: listItem
+      .frame-container:
+        transition.group:
+          :name: "'anim-' + anim.name"
+          .frame:
+            v-for: (frame, i) in frames
+            v-show: "frameIndex==i"
+            v-text: frame
+            :key: frame
+    pre:
+      v-if: "false"
+      v-text: animCssStyleObj
+    ui.html.style:
+      :component: "{ source: { style: animCssStyleObj } }"
+      
+props:
+  anim:
+
+data:
+  frameIndex: 0
+  frames: ['🍎', '🍌', '🍇', '🍉', '🍊', '🍍', '🍓', '🍑', '🍒', '🍏', '🍋']
+  listCls: {}
+  animationDuration: 1000
+  stagger: 100
+  listKey1: 1
+  
+mounted: | #js
+  function() {
+    //this.toggleFrame({ repeat: false });
+  }
+
+methods:
+  toggleFrame: | #js
+    async function(options) {
+      // single item
+      this.frameIndex = ((this.frameIndex + 1) % this.frames.length);
+      // list
+      const anim = this.anim;
+      Object.keys(this.listCls).forEach(key => delete this.listCls[key]);
+      const enter = `list-anim-${anim.name}-enter`;
+      const leave = `list-anim-${anim.name}-leave-to`;
+      this.listCls[leave] = true;
+      await this.totalAnimDuration.milliseconds().wait();
+      delete this.listCls[leave];
+      this.listCls[enter] = true;
+      this.listKey1++;
+      await (0.1).seconds().wait();
+      delete this.listCls[enter];
+      this.listCls = Objects.clone(this.listCls);
+      // repeat
+      if (options?.repeat) setTimeout((() => this.toggleFrame(options)), this.animationDuration);
+    }
+  getAnimCssStyleObj: | #js
+    function(anim) {
+      const s = {};
+      const active = {
+        transition: `${this.animationDuration}ms`,
+      };
+      Object.assign(active, (anim.active || {}));
+      s[`.anim-${anim.name}-enter-active`] = active;
+      s[`.anim-${anim.name}-leave-active`] = active;
+      s[`.anim-${anim.name}-enter`] = anim.enter.from;
+      s[`.anim-${anim.name}-leave-to`] = anim.leave.to;
+
+      s[`.list-anim-${anim.name}-enter > .list-item`] = anim.enter.from;
+      s[`.list-anim-${anim.name}-leave-to > .list-item`] = anim.leave.to;
+      
+      return s;
+    }
+  getListItemStyle: | #js
+    function(index) {
+      // #TODO heavy
+      return {
+        'transition-delay': `${(index * this.stagger)}ms`
+      };
+    }
+
+computed:
+  animCssStyleObj: | #js
+    function() {
+      return this.getAnimCssStyleObj(this.anim);
+    }
+  totalAnimDuration: | #js
+    function() {
+      return Math.min(this.animationDuration, (this.frames.length * this.stagger));
+    }
+
+style:
+  .list-container:
+    overflow: hidden
+  .list-item:
+    text-align: center
+    transition: 1s
+  .frame-container:
+    overflow: hidden
+    filter: grayscale(1)
+    perspective: 1000px
+  .frame-container:hover:
+    filter: none
+  .frame-container, .frame:
+    width: 6rem
+    aspect-ratio: 1
+  .frame:
+    position: absolute
+    display: flex
+    align-items: center
+    justify-content: center
+    font-size: 3.5rem
+    background: "#80808060"
+    border: 2px solid gray
+    transform-style: preserve-3d
