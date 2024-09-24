@@ -18,6 +18,7 @@ dom:
 props:
   item:
   sui:
+  showName: true
 
 methods:
   onClickNode: | #js
@@ -39,7 +40,7 @@ computed:
     function() {
       const node = this.node;
       const icon = this.$root.getNodeIcon(node);
-      let text = (node.slot?.name || node.comp?.name || node.name || node.type);
+      let text = (!this.showName) ? node.type : (node.slot?.name || node.comp?.name || node.name || node.type);
       if (text != node.type) text = `[${text}]`;
       return `${icon} ${text}`;
     }

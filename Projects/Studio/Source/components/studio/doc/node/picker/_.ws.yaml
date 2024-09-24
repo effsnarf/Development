@@ -10,7 +10,7 @@ dom:
       div:
         .flex:
           transition:
-            name: slide
+            name: slide-hor-ver
             div:
               v-if: sui.node.selected
               :key: sui.node.selected?.id

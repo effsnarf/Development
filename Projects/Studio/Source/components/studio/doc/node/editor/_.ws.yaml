@@ -6,7 +6,7 @@ dom:
         direction: "horizontal"
         :open: "isTabsDrawerOpen"
         ui.tabs: 
-          ':options': '[node.type, ''🧊 data'', ''🧱 flex'', ''🎨 style'', ''✨ animation'']'
+          ':options': '[nodeTypeTabName, ''🧊 data'', ''🧱 flex'', ''🎨 style'', ''✨ animation'']'
           direction: vertical
           :can-select-none: "true"
           :show-title-in-tab: "false"
@@ -68,6 +68,14 @@ methods:
       for (const key in node)
         if (key != "children") newNode[key] = Objects.clone(node[key]);
       return newNode;
+    }
+
+computed:
+  nodeTypeTabName: | #js
+    function() {
+      const icon = this.$root.getNodeIcon(this.node);
+      const type = this.node.type;
+      return `${icon} ${type}`;
     }
 
 watch:
