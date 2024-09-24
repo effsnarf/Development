@@ -176,7 +176,7 @@ methods:
                     children: [
                       {
                         type: "list",
-                        name: "generators",
+                        name: "boards",
                         flex: {
                           justify: {
                             content: "center"
@@ -184,14 +184,21 @@ methods:
                         },
                         data: {
                           source: {
-                            type: "mock"
+                            //type: "mock",
+                            type: "url",
+                            url: "https://a.4cdn.org/boards.json",
+                            linq: [{"type":"select.field","path":["boards"],"_id":1},{"type":"select.fields","fields":["board","title"],"_id":2}]
                           }
                         },
                         children: [
                           {
-                            type: "comp.inst",
-                            comp: {
-                              name: "generator"
+                            type: "title",
+                            size: 2,
+                            data: {
+                              source: {
+                                type: "data.item.field",
+                                field: "title"
+                              }
                             }
                           }
                         ]
@@ -202,7 +209,7 @@ methods:
               },
               {
                 type: "page",
-                name: "generator",
+                name: "board",
                 layout: {
                   name: "default"
                 },
@@ -214,11 +221,61 @@ methods:
                     },
                     children: [
                       {
-                        type: "comp.inst",
-                        comp: {
-                          name: "generator"
+                        type: "title",
+                        size: 2,
+                        data: {
+                          source: {
+                            type: "state.tree.link",
+                            path: ["home", "list", "boards", "selected", "title"]
+                          }
                         },
                       },
+                    ]
+                  },
+                  {
+                    type: "slot.content",
+                    slot: {
+                      name: "content"
+                    },
+                    children: [
+                      {
+                        type: "list",
+                        name: "threads",
+                        data: {
+                          source: {
+                            type: "url",
+                            url: "https://a.4cdn.org/po/catalog.json",
+                            linq: null
+                          }
+                        },
+                        children: [
+                          {
+                            type: "panel",
+                            children: [
+                              {
+                                type: "title",
+                                size: 3,
+                                data: {
+                                  source: {
+                                    type: "data.item.field",
+                                    field: "sub"
+                                  }
+                                }
+                              },
+                              {
+                                type: "title",
+                                size: 5,
+                                data: {
+                                  source: {
+                                    type: "data.item.field",
+                                    field: "com"
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        ]
+                      }
                     ]
                   }
                 ]

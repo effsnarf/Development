@@ -1,6 +1,8 @@
 dom:
   div: 
     .operations.box1:
+      .text-center:
+        v-text: "'🔧 linq'"
       div: 
         div: 
           v-for: (operation, index) in operations
@@ -56,6 +58,13 @@ methods:
       if (!operation._id) operation._id = (this.operations.length + 1);
       this.operations.add(operation);
     }
+    
+computed:
+  output: | #js
+    function() {
+      return this.datas?.[(this.datas?.length || 0) - 1];
+    }
+
 watch:
   input:
     handler: | #js
@@ -64,6 +73,10 @@ watch:
         this.evaluateChain();
       }
     immediate: true
+  output: | #js
+    function(newOutput) {
+      this.$emit("output", newOutput);
+    }
   operations:
     handler: | #js
       async function(operations) {
@@ -77,6 +90,7 @@ watch:
         this.operations = (operations || []);
       }
     immediate: true
+
 style:
   .operations.box1: null
   .operation:

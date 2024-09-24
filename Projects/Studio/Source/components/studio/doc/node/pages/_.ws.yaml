@@ -13,6 +13,10 @@ props:
   node:
   sui:
 
+mounted: | #js
+  function() {
+  }
+
 methods:
 
 computed:

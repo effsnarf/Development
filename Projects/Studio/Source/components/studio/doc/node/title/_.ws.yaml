@@ -1,7 +1,7 @@
 dom:
   div:
-    :is: "('h'+node.size)"
-    v-text: text
+    :is: "('h'+(node.size||4))"
+    v-text: "(text || '❔')"
 
 props:
   node:
@@ -10,7 +10,15 @@ props:
 computed:
   text: | #js
     function() {
-      return this.dataItem?.[this.node.data?.field] ||
-        this.node.text ||
-        '❔';
+      if (!this.node.data?.source) return null;
+      if (this.node.data.source.type == "state.tree.link")
+      {
+        const path = this.node.data.source.path;
+        return Objects.getProperty(this.$root.global.app.state, path);
+      }
+      if (this.node.data.source.type == "data.item.field")
+      {
+        return this.dataItem?.[this.node.data.source.field];
+      }
+      return this.node.text;
     }

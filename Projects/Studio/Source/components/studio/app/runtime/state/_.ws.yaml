@@ -40,15 +40,15 @@ mounted: | #js
 
 methods:
   getAppState: | #js
-    function(userApp) {
+    async function(userApp) {
       const root = {};
       for (const pageNode of this.$root.getPageNodes()) {
-        root[pageNode.name] = this.getPageAppState(pageNode);
+        root[pageNode.name] = (await this.getPageAppState(pageNode));
       }
       return root;
     }
   getPageAppState: | #js
-    function(pageNode) {
+    async function(pageNode) {
       const page = {};
       
       // page.var = {};
@@ -61,7 +61,7 @@ methods:
       for (const listNode of this.$root.findDescNodes(pageNode, "list"))
       {
         page.list[listNode.name] = {
-          items: this.getDataFromDataSource(listNode.data.source),
+          items: (await this.getDataFromDataSource(listNode)),
           hovered: null,
           selected: null
         };
@@ -70,7 +70,9 @@ methods:
       return page;
     }
   getDataFromDataSource: | #js
-    function(dataSource) {
+    async function(node) {
+      if (!node?.data?.source) return;
+      const dataSource = node.data.source;
       if (dataSource.type == "mock") {
         const items = Array.from(
           { length: 10 },
@@ -78,7 +80,27 @@ methods:
         );
         return items;
       }
-      throw (`Unknown data source`);
+      if (dataSource.type == "url") {
+        const url = node.data.source.url;
+        const msg1 = alertify.message(`⏳ fetching ${url}`).delay(0);
+        const data = (await (await fetch(`/fetch?url=${url}`)).json());
+        msg1.dismiss();
+        // #TODO hard coded, replace with linq evaluator for node.data.source.linq
+        if (data.boards) {
+          return data.boards
+            .map(b => ({ board: b.board, title: b.title }))
+            .take(10);
+        }
+        if (data?.[0]?.threads) {
+          return data
+            .flatMap(page => page.threads)
+            .take(10)
+            .map(t => ({ sub: t.sub, com: t.com?.substr(0, 50) }))
+            ;
+        }
+        return data;
+      }
+      throw (`Unknown data source: ${dataSource.type}`);
     }
   getPageStateTree: | #js
     function(pageName) {
@@ -87,8 +109,8 @@ methods:
         .find(c => (pageName == c.name));
     }
   calcAppState: | #js
-    function() {
-      const appState = this.getAppState(this.userApp);
+    async function() {
+      const appState = (await this.getAppState(this.userApp));
       this.$root.global.app.state = appState;
       this.refresh();
     }

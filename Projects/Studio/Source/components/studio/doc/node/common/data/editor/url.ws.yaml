@@ -1,0 +1,54 @@
+dom:
+  div:
+    ui.input.text.box:
+      hint: url
+      multiline: true
+      :value: node.data.source.url
+    button:
+      v-text: "'🌐 get data'"
+      @click: () => getNodeData(true)
+    ui.loading:
+      v-if: isLoading1
+    .flex:
+      ui.linq:
+        v-if: nodeData
+        :input: nodeData
+        v-model: node.data.source.linq
+        @output: (newOutput) => nodeDataOutput = newOutput
+      ui.value:
+        :value: nodeDataOutput
+        :show-visible-fields-filter: "false"
+
+props:
+  node:
+
+data:
+  nodeData: null
+  nodeDataOutput: null
+  isLoading1: 0
+
+methods:
+  getNodeData: | #js
+    async function(assignToDataVar) {
+      this.isLoading1++;
+      try
+      {
+        const url = this.node.data.source.url;
+        const data = (await (await fetch(`/fetch?url=${url}`)).json());
+        if (assignToDataVar) this.nodeData = data;
+        return data;
+      }
+      finally
+      {
+        this.isLoading1--;
+      }
+    }
+
+watch:
+  nodeData:
+    immediate: true
+    deep: false
+    handler: | #js
+      function(newNodeData) {
+        this.nodeDataOutput = newNodeData; 
+      }

@@ -2,7 +2,7 @@ dom:
   div:
     ui.tabs:
       :title: "'🧊 data'"
-      :options: "['🍃 field', '🔗 link', '🌀 mock', '🔳 json', '🌐 url']"
+      :options: "['🍃 field', '🌐 url', '🔗 link', '🌀 mock', '🔳 json']"
       :show-title-in-tab: "true"
       template:
         v-slot: tab0
@@ -11,6 +11,10 @@ dom:
             hint: field name
       template:
         v-slot: tab1
+        studio.doc.node.common.data.editor.url:
+          :node: node
+      template:
+        v-slot: tab2
         div:
           studio.app.runtime.state:
             :user-app: userApp
@@ -28,3 +32,5 @@ mounted: | #js
   function() {
     this.userApp = this.$root.getUserApp(this);
   }
+
+methods:

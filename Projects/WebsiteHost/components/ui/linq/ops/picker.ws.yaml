@@ -39,11 +39,11 @@ data:
       type: flat.map
       default: {}
       if: (obj) => Array.isArray(obj) && (Object.keys(obj[0]).length === 1)
-    - icon: 🔴
-      type: custom.expression
-      default:
-        func: null
-      if: (obj) => true
+    # - icon: 🔴
+    #   type: custom.expression
+    #   default:
+    #     func: null
+    #   if: (obj) => true
 computed:
   eval: | #js
     function() {

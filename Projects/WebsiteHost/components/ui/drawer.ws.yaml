@@ -44,6 +44,7 @@ style:
     opacity: 1
   .drawer.horizontal.open, .drawer.horizontal:hover, .drawer.horizontal.hovered:
     max-height: 20em
+    overflow: auto
     filter: none
     opacity: 1
 example:

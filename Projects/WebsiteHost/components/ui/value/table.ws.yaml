@@ -21,6 +21,7 @@ dom:
             ui.value.any: 
               ':value': row.value
               ':depth': (depth + 1)
+              :show-visible-fields-filter: showVisibleFieldsFilter
           td: 
             v-if: '!isPrimitive(row.value)'
             colspan: 2
@@ -38,6 +39,7 @@ dom:
                 ui.value.any: 
                   ':value': row.value
                   ':depth': (depth + 1)
+                  :show-visible-fields-filter: showVisibleFieldsFilter
       div:
         class: box
         ui.value:
@@ -47,6 +49,7 @@ props:
   title: null
   expandAll: false
   depth: 0
+  showVisibleFieldsFilter: true
 data:
   isExpanded: {}
   rows: null

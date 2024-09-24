@@ -19,5 +19,5 @@ props:
 style:
   .preview:
     width: 10em
-    height: 3em
+    max-height: 6em
     overflow: hidden
