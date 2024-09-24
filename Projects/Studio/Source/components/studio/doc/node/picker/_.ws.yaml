@@ -12,7 +12,7 @@ dom:
           transition:
             name: slide
             v-if: sui.node.selected
-            :key: sui.node.active?.id
+            :key: sui.node.selected?.id
             div:
               class: flex
               div:
@@ -30,7 +30,7 @@ dom:
         .flex:
           ui.drawer:
             direction: "horizontal"
-            :open: "!$refs.context1?.isPinned"
+            :open: "!$refs.context1?.isPinned || !sui.node.selected"
             .tree-indent:
               div:
                 v-for: (cnode, i) in hovered.cnodes
@@ -46,9 +46,10 @@ dom:
                   :key: child.id
           div:
             studio.doc.node.editor:
+              v-if: "$refs.context1?.isPinned && sui.node.selected"
               :node: contextNode
               :sui: sui
-              :is-tabs-drawer-open: "$refs.context1?.isPinned"
+              :is-tabs-drawer-open: "true"
               @dom-edit: (...args) => $emit('dom-edit', ...args)
 props:
   userApp:
@@ -74,7 +75,8 @@ methods:
     }
   onContextPinned: | #js
     function(isPinned) {
-      this.sui.node.selected = (!isPinned ? false : this.sui.node.hovered);
+      if (!isPinned) this.sui.node.selected = null;
+      //this.sui.node.selected = (!isPinned ? false : this.sui.node.hovered);
     }
   refreshNodeTree: | #js
     async function() {

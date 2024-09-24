@@ -11,6 +11,7 @@ dom:
       @mouseenter: () => onHover(item, true)
       @mouseleave: () => onHover(item, false)
       @click: () => onClick(item)
+      
 props:
   node:
   sui: sui
@@ -39,3 +40,6 @@ computed:
 style:
   .list-item:
     border: 2px dashed gray
+    opacity: 0.8
+  .list-item:hover:
+    opacity: 1

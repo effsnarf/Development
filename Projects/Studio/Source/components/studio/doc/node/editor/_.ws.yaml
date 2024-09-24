@@ -25,6 +25,7 @@ dom:
             div:
               studio.doc.node.common.data.editor:
                 :node: node
+                :node-vue: nodeVue
                 :initial: initial
                 :sui: sui
           template: 
@@ -45,6 +46,7 @@ dom:
 props:
   node:
   sui:
+  nodeVue:
   isTabsDrawerOpen:
 
 data:

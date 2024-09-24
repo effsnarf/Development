@@ -3,7 +3,7 @@ dom:
     v-if: node
     @mouseenter: () => onHoverNode(node, true)
     @mouseleave: () => onHoverNode(node, false)
-    @click: () => { if (sui) sui.node.selected = node; $emit('click'); }
+    @click: () => onClickNode(node)
     :class: "{ selected: (node.id == sui?.node.selected?.id) }"
     div:
       .flex:
@@ -20,6 +20,14 @@ props:
   sui:
 
 methods:
+  onClickNode: | #js
+    function(node) {
+      if (this.sui) {
+        if (node?.id == this.sui.node.selected?.id) node = null;
+        this.sui.node.selected = node;
+      }
+      this.$emit('click');
+    }
   onHoverNode: | #js
     function(node, isHovered) {
       if (!this.sui) return;
