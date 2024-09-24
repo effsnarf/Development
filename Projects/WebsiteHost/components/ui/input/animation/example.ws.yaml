@@ -43,7 +43,7 @@ data:
   
 mounted: | #js
   function() {
-    //this.toggleFrame({ repeat: false });
+    this.toggleFrame({ repeat: true });
   }
 
 methods:
@@ -57,13 +57,14 @@ methods:
       const enter = `list-anim-${anim.name}-enter`;
       const leave = `list-anim-${anim.name}-leave-to`;
       this.listCls[leave] = true;
-      await this.totalAnimDuration.milliseconds().wait();
+      await this.totalAnimDuration.wait();
       delete this.listCls[leave];
       this.listCls[enter] = true;
       this.listKey1++;
       await (0.1).seconds().wait();
       delete this.listCls[enter];
       this.listCls = Objects.clone(this.listCls);
+      await this.totalAnimDuration.wait();
       // repeat
       if (options?.repeat) setTimeout((() => this.toggleFrame(options)), this.animationDuration);
     }
