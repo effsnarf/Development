@@ -11,9 +11,9 @@ dom:
         .flex:
           transition:
             name: slide
-            v-if: sui.node.selected
-            :key: sui.node.selected?.id
             div:
+              v-if: sui.node.selected
+              :key: sui.node.selected?.id
               class: flex
               div:
                 class: pointer-none dimmed
