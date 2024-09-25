@@ -1,0 +1,26 @@
+dom:
+  div:
+
+props:
+  interval:
+  count:
+
+data:
+  tickIndex: 0
+
+mounted: | #js
+  function() {
+    this.anotherTick();
+  }
+
+methods:
+  tick: | #js
+    function() {
+      this.$emit("tick", this.tickIndex);
+      if (this.count) this.tickIndex = ((this.tickIndex + 1) % this.count);
+    }
+  anotherTick: | #js
+    function() {
+      this.tick();
+      setTimeout(this.anotherTick.bind(this), this.interval);
+    }

@@ -1,22 +1,24 @@
 dom:
   div:
     div:
-      button:
-        v-text: "'click me'"
-        @click: toggleFrame
-      h4:
-        class: text-center dimmed
-        v-text: "'' + anim.name"
+      ui.ticker:
+        :interval: totalAnimDuration
+        :count: 2
+        @tick: onTick
       .list-container:
         .list:
           :class: listCls
           :key: listKey1
           .list-item:
-            v-for: (listItem, i) in frames
-            v-text: listItem
+            v-for: (listItem, i) in listItems
+            v-text: "listItem + listItem + listItem"
             :style: getListItemStyle(i)
             :key: listItem
+      h4:
+        class: text-center dimmed
+        v-text: "'' + anim.name"
       .frame-container:
+        v-show: "false"
         transition.group:
           :name: "'anim-' + anim.name"
           .frame:
@@ -43,12 +45,16 @@ data:
   
 mounted: | #js
   function() {
-    this.toggleFrame({ repeat: true });
+    this.toggleFrame();
   }
 
 methods:
+  onTick: | #js
+    function(index) {
+      this.toggleFrame(index);
+    }
   toggleFrame: | #js
-    async function(options) {
+    async function(index) {
       // single item
       this.frameIndex = ((this.frameIndex + 1) % this.frames.length);
       // list
@@ -56,17 +62,17 @@ methods:
       Object.keys(this.listCls).forEach(key => delete this.listCls[key]);
       const enter = `list-anim-${anim.name}-enter`;
       const leave = `list-anim-${anim.name}-leave-to`;
-      this.listCls[leave] = true;
-      await this.totalAnimDuration.wait();
-      delete this.listCls[leave];
-      this.listCls[enter] = true;
-      this.listKey1++;
-      await (0.1).seconds().wait();
-      delete this.listCls[enter];
-      this.listCls = Objects.clone(this.listCls);
-      await this.totalAnimDuration.wait();
-      // repeat
-      if (options?.repeat) setTimeout((() => this.toggleFrame(options)), this.animationDuration);
+      if (index == 0) {
+        this.listCls[leave] = true;
+      }
+      if (index == 1) {
+        delete this.listCls[leave];
+        this.listCls[enter] = true;
+        this.listKey1++;
+        await (0.1).seconds().wait();
+        delete this.listCls[enter];
+        this.listCls = Objects.clone(this.listCls);
+      }
     }
   getAnimCssStyleObj: | #js
     function(anim) {
@@ -94,18 +100,28 @@ methods:
     }
 
 computed:
+  listItems: | #js
+    function() {
+      return this.frames.take(6);
+    }
   animCssStyleObj: | #js
     function() {
       return this.getAnimCssStyleObj(this.anim);
     }
   totalAnimDuration: | #js
     function() {
-      return Math.min(this.animationDuration, (this.frames.length * this.stagger));
+      return (this.animationDuration + (this.listItems.length * this.stagger));
     }
 
 style:
   .list-container:
+    border: 2px solid gray
     overflow: hidden
+    opacity: 0.5
+    filter: grayscale(1)
+  .list-container:hover:
+    opacity: 1
+    filter: none
   .list-item:
     text-align: center
     transition: 1s

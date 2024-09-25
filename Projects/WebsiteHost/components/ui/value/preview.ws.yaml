@@ -60,8 +60,8 @@ methods:
       if (typeof value == "boolean") return value ? "✔️" : "✖";
       if (typeof value == "function") return value.toString();
       if (Array.isArray(value)) return `[${value.length}…]`;
-      //if (typeof value == "object") return `{${Object.keys(value).take(5).map(k => `${k}: ${this.valueToString(value[k], depth+1)}`).join(', ')}}`;
-      if (typeof value == "object") return `{${Object.keys(value).take(10).join(', ')}}`;
+      if (typeof value == "object") return `${Object.keys(value).take(5).map(k => `${k}: ${this.valueToString(value[k], depth+1)}`).join('\n ')}`;
+      //if (typeof value == "object") return `{${Object.keys(value).take(10).join(', ')}}`;
       return value.toString();
     }
 computed:
@@ -117,9 +117,7 @@ style:
   .large:
     font-size: 140%
   .value-as-string:
-    white-space: nowrap
-    overflow: hidden
-    text-overflow: ellipsis
+    white-space: pre
   .comp-ui-image:
     width: 5em
   .preview .comp-ui-image:

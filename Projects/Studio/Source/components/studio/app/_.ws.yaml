@@ -190,6 +190,9 @@ methods:
                             linq: [{"type":"select.field","path":["boards"],"_id":1},{"type":"select.fields","fields":["board","title"],"_id":2}]
                           }
                         },
+                        animation: {
+                          
+                        },
                         children: [
                           {
                             type: "title",

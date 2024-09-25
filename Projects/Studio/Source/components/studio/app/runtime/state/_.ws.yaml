@@ -82,9 +82,11 @@ methods:
       }
       if (dataSource.type == "url") {
         const url = node.data.source.url;
-        const msg1 = alertify.message(`⏳ fetching ${url}`).delay(0);
+
+        const ticker = Ticker.alertify((elapsed) => `<h2>⏳ ${elapsed.unitifyTime()}</h2> ${url}`)
         const data = (await (await fetch(`/fetch?url=${url}`)).json());
-        msg1.dismiss();
+        ticker.stop();
+
         // #TODO hard coded, replace with linq evaluator for node.data.source.linq
         if (data.boards) {
           return data.boards

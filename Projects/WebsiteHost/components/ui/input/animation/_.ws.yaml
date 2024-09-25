@@ -1,5 +1,7 @@
 dom:
   div:
+    h2:
+      v-text: "'✨ animation'"
     .flex1:
       ui.input.animation.example:
         v-for: (anim, i) in anims
@@ -38,10 +40,10 @@ data:
         backface-visibility: hidden
       enter:
         from:
-          transform: rotateY(-180deg)
+          transform: rotateY(-90deg)
       leave:
         to:
-          transform: rotateY(180deg)
+          transform: rotateY(90deg)
 
 style:
   .flex1:

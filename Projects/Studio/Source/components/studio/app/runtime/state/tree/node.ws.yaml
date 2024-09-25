@@ -1,23 +1,32 @@
 dom:
   div:
-    .flex:
-      div:
-      .flex:
-        span:
-          v-text: "'🧊'"
-        span:
-          v-text: item.name
-      div:
-        class: preview
-        v-if: item.value
+    .flex1:
+      span:
+        v-text: "'🧊'"
+      span:
+        v-text: item.name
+      .dimmed:
+        v-if: item.value?.length
+        v-text: "'[' + item.value?.length + ']'"
+    div:
+      v-if: item.value
+      .preview:
         ui.value:
           :value: item.value
+          :show-visible-fields-filter: "false"
 
 props:
   item:
 
 style:
+  .flex1:
+    display: flex
+    gap: 0.5em
   .preview:
-    width: 10em
-    max-height: 6em
-    overflow: hidden
+    max-height: 4.5em
+    margin-left: 1em
+    overflow: auto
+    transition: 1s
+  .preview:hover:
+    max-height: 20em
+    
