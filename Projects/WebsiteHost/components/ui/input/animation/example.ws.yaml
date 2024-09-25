@@ -1,18 +1,14 @@
 dom:
   div:
     div:
-      ui.ticker:
-        :interval: totalAnimDuration
-        :count: 2
-        @tick: onTick
       .list-container:
-        .list:
-          :class: listCls
-          :key: listKey1
+        ui.anim:
+          :anim: anim
+          :duration: animationDuration
+          :stagger: stagger
+          :items-count: listItems.length
           .list-item:
             v-for: (listItem, i) in listItems
-            v-text: "listItem + listItem + listItem"
-            :style: getListItemStyle(i)
             :key: listItem
       h4:
         class: text-center dimmed
@@ -26,11 +22,6 @@ dom:
             v-show: "frameIndex==i"
             v-text: frame
             :key: frame
-    pre:
-      v-if: "false"
-      v-text: animCssStyleObj
-    ui.html.style:
-      :component: "{ source: { style: animCssStyleObj } }"
       
 props:
   anim:
@@ -38,79 +29,24 @@ props:
 data:
   frameIndex: 0
   frames: ['🍎', '🍌', '🍇', '🍉', '🍊', '🍍', '🍓', '🍑', '🍒', '🍏', '🍋']
-  listCls: {}
   animationDuration: 1000
   stagger: 100
-  listKey1: 1
   
 mounted: | #js
   function() {
-    this.toggleFrame();
   }
 
 methods:
-  onTick: | #js
-    function(index) {
-      this.toggleFrame(index);
-    }
   toggleFrame: | #js
-    async function(index) {
+    async function() {
       // single item
       this.frameIndex = ((this.frameIndex + 1) % this.frames.length);
-      // list
-      const anim = this.anim;
-      Object.keys(this.listCls).forEach(key => delete this.listCls[key]);
-      const enter = `list-anim-${anim.name}-enter`;
-      const leave = `list-anim-${anim.name}-leave-to`;
-      if (index == 0) {
-        this.listCls[leave] = true;
-      }
-      if (index == 1) {
-        delete this.listCls[leave];
-        this.listCls[enter] = true;
-        this.listKey1++;
-        await (0.1).seconds().wait();
-        delete this.listCls[enter];
-        this.listCls = Objects.clone(this.listCls);
-      }
-    }
-  getAnimCssStyleObj: | #js
-    function(anim) {
-      const s = {};
-      const active = {
-        transition: `${this.animationDuration}ms`,
-      };
-      Object.assign(active, (anim.active || {}));
-      s[`.anim-${anim.name}-enter-active`] = active;
-      s[`.anim-${anim.name}-leave-active`] = active;
-      s[`.anim-${anim.name}-enter`] = anim.enter.from;
-      s[`.anim-${anim.name}-leave-to`] = anim.leave.to;
-
-      s[`.list-anim-${anim.name}-enter > .list-item`] = anim.enter.from;
-      s[`.list-anim-${anim.name}-leave-to > .list-item`] = anim.leave.to;
-      
-      return s;
-    }
-  getListItemStyle: | #js
-    function(index) {
-      // #TODO heavy
-      return {
-        'transition-delay': `${(index * this.stagger)}ms`
-      };
     }
 
 computed:
   listItems: | #js
     function() {
-      return this.frames.take(6);
-    }
-  animCssStyleObj: | #js
-    function() {
-      return this.getAnimCssStyleObj(this.anim);
-    }
-  totalAnimDuration: | #js
-    function() {
-      return (this.animationDuration + (this.listItems.length * this.stagger));
+      return this.frames.take(5);
     }
 
 style:
@@ -122,9 +58,17 @@ style:
   .list-container:hover:
     opacity: 1
     filter: none
+  .list-container > div:
+    padding: 0.5em
+  .list-container > div > div:
+    display: flex
+    flex-direction: column
+    gap: 0.3em
   .list-item:
+    width: 6em
+    height: 1.5em
+    background: "#80808080"
     text-align: center
-    transition: 1s
   .frame-container:
     overflow: hidden
     filter: grayscale(1)

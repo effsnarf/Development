@@ -2,8 +2,9 @@ dom:
   div:
     ui.tabs:
       :title: "'🧊 data'"
-      :options: "['🍃 field', '🌐 url', '🔗 link', '🌀 mock', '🔳 json']"
+      :options: tabOptions
       :show-title-in-tab: "true"
+      :value: initialSelectedTab
       template:
         v-slot: tab0
         h2:
@@ -27,6 +28,7 @@ props:
 
 data:
   userApp:
+  tabOptions: ['🍃 field', '🌐 url', '🔗 link', '🌀 mock', '🔳 json']
 
 mounted: | #js
   function() {
@@ -34,3 +36,11 @@ mounted: | #js
   }
 
 methods:
+
+computed:
+  initialSelectedTab: | #js
+    function() {
+      const type = this.node?.data?.source?.type;
+      if (!type) return null;
+      return this.tabOptions.findIndex(t => (t.endsWith(` ${type}`)));
+    }

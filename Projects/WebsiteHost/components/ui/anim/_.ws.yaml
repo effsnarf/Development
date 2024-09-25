@@ -1,0 +1,73 @@
+dom:
+  div:
+    ui.ticker:
+      :interval: totalAnimDuration
+      :count: 2
+      @tick: nextAnimTick
+    ui.html.style:
+      :component: "{ source: { style: animCssStyleObj } }"
+    div:
+      :class: listCls
+      slot:
+
+props:
+  anim:
+  duration: 1000
+  stagger: 100
+  itemsCount:
+
+data:
+  listCls: []
+
+methods:
+  nextAnimTick: | #js
+    async function(index) {
+      const anim = this.anim;
+      if (!anim) return;
+      const enter = `list-anim-${anim.name}-enter`;
+      const leave = `list-anim-${anim.name}-leave-to`;
+
+      this.listCls.clear();
+      this.listCls.push("list-anim");
+
+      if (index == 0) {
+        this.listCls.push("leaving");
+        this.listCls.push(leave);
+      }
+      if (index == 1) {
+        this.listCls.push("entering");
+        this.listCls.push(enter);
+        await this.$nextTick();
+        await (0.1).seconds().wait();
+        this.listCls.remove("entering");
+        this.listCls.remove(enter);
+      }
+    }
+  getAnimCssStyleObj: | #js
+    function(anim) {
+      if (!anim) return null;
+      const s = {};
+      const active = {
+        transition: `${this.animationDuration}ms`,
+      };
+      Object.assign(active, (anim.active || {}));
+      s[`.anim-${anim.name}-enter-active`] = active;
+      s[`.anim-${anim.name}-leave-active`] = active;
+      s[`.anim-${anim.name}-enter`] = anim.enter.from;
+      s[`.anim-${anim.name}-leave-to`] = anim.leave.to;
+
+      s[`.list-anim-${anim.name}-enter > .list-item`] = anim.enter.from;
+      s[`.list-anim-${anim.name}-leave-to > .list-item`] = anim.leave.to;
+
+      return s;
+    }
+
+computed:
+  animCssStyleObj: | #js
+    function() {
+      return this.getAnimCssStyleObj(this.anim);
+    }
+  totalAnimDuration: | #js
+    function() {
+      return Math.max(this.duration, (this.duration/2 + (this.itemsCount * this.stagger)));
+    }

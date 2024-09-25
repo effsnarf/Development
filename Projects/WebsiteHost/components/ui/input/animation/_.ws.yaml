@@ -3,12 +3,21 @@ dom:
     h2:
       v-text: "'✨ animation'"
     .flex1:
-      ui.input.animation.example:
+      div:
         v-for: (anim, i) in anims
-        :anim: anim
-        :key: i
+        @mouseenter: () => onHover(anim, true)
+        @mouseleave: () => onHover(anim, false)
+        @click: () => onClick(anim)
+        ui.input.animation.example:
+          :anim: anim
+          :key: i
 
 data:
+  lui:
+    hovered:
+      anim:
+    selected:
+      anim:
   anims:
     - name: fade
       enter:
@@ -20,12 +29,12 @@ data:
     - name: slide-x
       enter:
         from:
-          transform: translateX(100%)
-          opacity: 0
+          transform: translateX(50%)
+          opacity: 1
       leave:
         to:
-          transform: translateX(-100%)
-          opacity: 0
+          transform: translateX(-50%)
+          opacity: 1
     - name: slide-y
       enter:
         from:
@@ -44,6 +53,26 @@ data:
       leave:
         to:
           transform: rotateY(90deg)
+
+methods:
+  onHover: | #js
+    function(anim, isHovered) {
+      //anim = (!isHovered ? null : anim);
+      this.lui.hovered.anim = anim;
+      this.$emit("hovered", anim);
+    }
+  onClick: | #js
+    function(anim) {
+      if (anim == this.lui.selected.anim) anim = null;
+      this.lui.selected.anim = anim;
+      this.$emit("selected", anim);
+    }
+
+computed:
+  activeAnim: | #js
+    function() {
+      return (this.lui.hovered.anim || this.lui.selected.anim);
+    }
 
 style:
   .flex1:

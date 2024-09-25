@@ -191,7 +191,7 @@ methods:
                           }
                         },
                         animation: {
-                          
+                          anim: null
                         },
                         children: [
                           {

@@ -496,6 +496,7 @@ interface Array<T> {
   joinColumns(columns: (number | null)[], ellipsis?: boolean): string;
   distinct(project?: ((item: T) => any) | null): T[];
   selectFields(fields: string[]): T[];
+  remove(...items: T[]): void;
   except(...items: T[]): T[];
   exceptBy(items: T[], getItemKey?: (item: T) => any): T[];
   exceptLast(count: number): T[];
@@ -1738,6 +1739,10 @@ if (typeof Array !== "undefined") {
   ) {
     if (appendToEnd && index > this.length) index = this.length;
     this.splice(index, 0, item);
+  };
+
+  Array.prototype.remove = function (...items: any[]) {
+    this.removeBy((item) => items.includes(item));
   };
 
   Array.prototype.removeBy = function (predicate: (item: any) => boolean) {

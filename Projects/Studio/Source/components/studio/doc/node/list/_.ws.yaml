@@ -1,9 +1,13 @@
 dom:
   div:
-    transition.group:
-      name: list
+    v-if: listItems?.length
+    ui.anim:
+      :anim: node.animation.anim
+      :duration: "(node.animation.duration || default1.duration)"
+      :stagger: "(node.animation.stagger || default1.stagger)"
+      :items-count: listItems.length
       .list-item:
-        v-for: item in listItems
+        v-for: (item, i) in listItems
         :key: getListItemKey(item)
         studio.doc.node:
           v-for: child in node.children
@@ -17,7 +21,12 @@ dom:
 
 props:
   node:
-  sui: sui
+  sui:
+
+data:
+  default1:
+    duration: 1000
+    stagger: 100
 
 methods:
   onClick: | #js
