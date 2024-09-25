@@ -4,6 +4,7 @@ dom:
 props:
   interval:
   count:
+  enabled: true
 
 data:
   tickIndex: 0
@@ -16,7 +17,7 @@ mounted: | #js
 methods:
   tick: | #js
     function() {
-      this.$emit("tick", this.tickIndex);
+      if (this.enabled) this.$emit("tick", this.tickIndex);
       if (this.count) this.tickIndex = ((this.tickIndex + 1) % this.count);
     }
   anotherTick: | #js

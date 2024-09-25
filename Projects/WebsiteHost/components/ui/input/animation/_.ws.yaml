@@ -45,8 +45,6 @@ data:
           transform: translateY(-100%)
           opacity: 0
     - name: rotate-y
-      active:
-        backface-visibility: hidden
       enter:
         from:
           transform: rotateY(-90deg)

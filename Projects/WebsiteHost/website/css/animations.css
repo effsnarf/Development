@@ -2,7 +2,7 @@
     transition: 1s;
 }
 
-.list-anim.entering > * {
+.list-anim.anim-entering > * {
     transition: 0s !important;
     transition-delay: 0s !important;
 }
