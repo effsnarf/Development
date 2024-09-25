@@ -69,5 +69,5 @@ computed:
     }
   totalAnimDuration: | #js
     function() {
-      return Math.max(this.duration, (this.duration/2 + (this.itemsCount * this.stagger)));
+      return (this.duration + (this.itemsCount * this.stagger));
     }

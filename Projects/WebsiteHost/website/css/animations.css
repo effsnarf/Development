@@ -2,9 +2,9 @@
     transition: 1s;
 }
 
-.list-anim.entering > .list-item {
-    transition: 0 !important;
-    transition-delay: 0 !important;
+.list-anim.entering > * {
+    transition: 0s !important;
+    transition-delay: 0s !important;
 }
 
 .list-anim > *:nth-child(1) {

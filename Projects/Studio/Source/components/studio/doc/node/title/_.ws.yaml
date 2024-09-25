@@ -10,13 +10,12 @@ props:
 computed:
   text: | #js
     function() {
-      if (!this.node.data?.source) return null;
-      if (this.node.data.source.type == "state.tree.link")
+      if (this.node.data?.source?.type == "state.tree.link")
       {
         const path = this.node.data.source.path;
         return Objects.getProperty(this.$root.global.app.state, path);
       }
-      if (this.node.data.source.type == "data.item.field")
+      if (this.node.data?.source?.type == "data.item.field")
       {
         return this.dataItem?.[this.node.data.source.field];
       }

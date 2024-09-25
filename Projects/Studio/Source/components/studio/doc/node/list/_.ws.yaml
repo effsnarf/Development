@@ -2,9 +2,9 @@ dom:
   div:
     v-if: listItems?.length
     ui.anim:
-      :anim: node.animation.anim
-      :duration: "(node.animation.duration || default1.duration)"
-      :stagger: "(node.animation.stagger || default1.stagger)"
+      :anim: node.animation?.anim
+      :duration: "(node.animation?.duration || default1.duration)"
+      :stagger: "(node.animation?.stagger || default1.stagger)"
       :items-count: listItems.length
       .list-item:
         v-for: (item, i) in listItems
@@ -56,7 +56,7 @@ computed:
 
 style:
   .list-item:
-    border: 2px dashed gray
     opacity: 0.8
   .list-item:hover:
+    background: "#80808030"
     opacity: 1

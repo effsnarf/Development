@@ -67,6 +67,16 @@ mounted: | #js
             change: (varPath, value) => {
               Objects.setProperty(this.$root.global.app.state, varPath, value);
               this.appStateChangeKey++;
+              // check if any node takes their data from this state node
+              // if so, jump to their page
+              // #TODO not very accurate
+              const refingNodes = this.$root.getRefingNodes(varPath);
+              if (refingNodes.length == 1) {
+                const pageNode = this.$root.getContainingPageNode(refingNodes[0]);
+                if (pageNode) {
+                  alertify.message("jump to " + pageNode.name);
+                }
+              }
             }
           }
         }
@@ -163,7 +173,7 @@ methods:
                     children: [
                       {
                         type: "title",
-                        size: 2,
+                        size: 1,
                         text: "Home page"
                       },
                     ]
@@ -225,7 +235,7 @@ methods:
                     children: [
                       {
                         type: "title",
-                        size: 2,
+                        size: 1,
                         data: {
                           source: {
                             type: "state.tree.link",
@@ -250,6 +260,9 @@ methods:
                             url: "https://a.4cdn.org/po/catalog.json",
                             linq: null
                           }
+                        },
+                        animation: {
+                          anim: null
                         },
                         children: [
                           {

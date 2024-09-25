@@ -29,12 +29,12 @@ data:
     - name: slide-x
       enter:
         from:
-          transform: translateX(50%)
-          opacity: 1
+          transform: translateX(100%)
+          opacity: 0
       leave:
         to:
-          transform: translateX(-50%)
-          opacity: 1
+          transform: translateX(-100%)
+          opacity: 0
     - name: slide-y
       enter:
         from:

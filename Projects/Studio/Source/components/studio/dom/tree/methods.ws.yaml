@@ -90,6 +90,12 @@ methods:
       const itemNodes = this.getNodes(folderNode, type);
       return itemNodes;
     }
+  getRefingNodes: | #js
+    function(varPath) {
+      const refs = [];
+      if (!varPath.includes(".selected")) return [];
+      return TreeObject.filter(this.userApp, (n) => (n.data?.source?.path?.join('.').startsWith(varPath)));
+    }
   getPageNodes: | #js
     function() {
       return this.getNodesByType("page");
@@ -112,6 +118,11 @@ methods:
     function(node) {
       const ancs = this.getNodeAncestors(node);
       return ancs.find(n => (n.type == "page"))?.name;
+    }
+  getContainingPageNode: | #js
+    function(node) {
+      const ancs = this.getNodeAncestors(node);
+      return ancs.find(n => (n.type == "page"));
     }
   getNodeAncestors: | #js
     // #TODO Slow

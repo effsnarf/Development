@@ -40,7 +40,7 @@ methods:
 computed:
   initialSelectedTab: | #js
     function() {
-      const type = this.node?.data?.source?.type;
+      const type = this.node?.data?.source?.type?.split('.').last();
       if (!type) return null;
       return this.tabOptions.findIndex(t => (t.endsWith(` ${type}`)));
     }
