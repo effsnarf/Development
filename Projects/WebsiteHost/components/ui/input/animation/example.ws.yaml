@@ -4,7 +4,7 @@ dom:
       .list-container:
         ui.anim:
           :anim: anim
-          :duration: animationDuration
+          :duration: duration
           :items-count: listItems.length
           .list-item:
             v-for: (listItem, i) in listItems
@@ -24,11 +24,11 @@ dom:
       
 props:
   anim:
+  duration:
 
 data:
   frameIndex: 0
   frames: ['🍎', '🍌', '🍇', '🍉', '🍊', '🍍', '🍓', '🍑', '🍒', '🍏', '🍋']
-  animationDuration: 1000
   
 mounted: | #js
   function() {

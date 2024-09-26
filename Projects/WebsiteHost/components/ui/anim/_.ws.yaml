@@ -1,7 +1,7 @@
 dom:
   div:
     ui.ticker:
-      :interval: (duration * 2)
+      :interval: (duration1 * 2)
       :count: 2
       @tick: nextAnimTick
       :enabled: autoPlayLoop
@@ -13,7 +13,7 @@ dom:
 
 props:
   anim:
-  duration: 1000
+  duration:
   itemsCount:
   autoPlayLoop: true
 
@@ -50,13 +50,14 @@ methods:
       if (!anim) return null;
       const s = {};
 
+      s[`.list-anim-${anim.name} > .list-item`] = { transition: `${this.duration1}ms` };
       s[`.page-entering .list-anim-${anim.name} > .list-item`] = anim.enter.from;
       s[`.page-leaving .list-anim-${anim.name} > .list-item`] = anim.leave.to;
       s[`.list-anim-${anim.name}.anim-entering > .list-item`] = anim.enter.from;
       s[`.list-anim-${anim.name}.anim-leaving > .list-item`] = anim.leave.to;
 
       const td = [];
-      const stagger = (this.duration / this.itemsCount);
+      const stagger = (this.duration1 / this.itemsCount);
       // staggers array has [0, stagger, stagger*2, stagger*3, ...]
       const staggers = Array(this.itemsCount).fill(0).map((_, i) => i * stagger).shuffle();
       for (let i = 0; i < this.itemsCount; i++) {
@@ -74,6 +75,10 @@ computed:
   animCssStyleObj: | #js
     function() {
       return this.getAnimCssStyleObj(this.anim);
+    }
+  duration1: | #js
+    function() {
+      return (this.duration || 1000);
     }
 
 watch:

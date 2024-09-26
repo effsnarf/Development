@@ -2,7 +2,10 @@ dom:
   div:
     v-if: (node && initial.node)
     ui.input.animation:
-      @hovered: (anim) => node.animation.anim = anim
+      :anim: node.animation.anim
+      :duration: node.animation.duration
+      @update-anim: (anim) => node.animation.anim = anim
+      @update-duration: (duration) => node.animation.duration = duration
 
 props:
   node:

@@ -1,6 +1,3 @@
-.list-anim > * {
-    transition: 1s;
-}
 
 .list-anim.anim-entering > * {
     transition: 0s !important;

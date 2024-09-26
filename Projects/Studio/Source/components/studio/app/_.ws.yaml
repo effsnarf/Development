@@ -201,7 +201,8 @@ methods:
                           }
                         },
                         animation: {
-                          anim: null
+                          anim: null,
+                          duration: null
                         },
                         children: [
                           {

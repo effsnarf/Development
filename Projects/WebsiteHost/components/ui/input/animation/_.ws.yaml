@@ -2,22 +2,29 @@ dom:
   div:
     h2:
       v-text: "'✨ animation'"
-    .flex1:
+    .flex:
       div:
-        v-for: (anim, i) in anims
-        @mouseenter: () => onHover(anim, true)
-        @mouseleave: () => onHover(anim, false)
-        @click: () => onClick(anim)
-        ui.input.animation.example:
-          :anim: anim
-          :key: i
+        h3:
+          v-text: "'duration'"
+        .clickable:
+          v-for: i in 10
+          v-text: (i * 100)
+          @click: $emit('update-duration', (i * 100))
+      .flex1:
+        div:
+          v-for: (anim1, i) in anims
+          :class: "{ selected: (anim == anim1) }"
+          @click: () => onClick(anim1)
+          ui.input.animation.example:
+            :anim: anim1
+            :duration: duration
+            :key: i
+
+props:
+  anim:
+  duration:
 
 data:
-  lui:
-    hovered:
-      anim:
-    selected:
-      anim:
   anims:
     - name: fade
       enter:
@@ -55,24 +62,17 @@ data:
 methods:
   onHover: | #js
     function(anim, isHovered) {
-      //anim = (!isHovered ? null : anim);
-      this.lui.hovered.anim = anim;
-      this.$emit("hovered", anim);
+      anim = (!isHovered ? null : anim);
     }
   onClick: | #js
     function(anim) {
-      if (anim == this.lui.selected.anim) anim = null;
-      this.lui.selected.anim = anim;
-      this.$emit("selected", anim);
-    }
-
-computed:
-  activeAnim: | #js
-    function() {
-      return (this.lui.hovered.anim || this.lui.selected.anim);
+      if (anim == this.anim) anim = null;
+      this.$emit("update-anim", anim);
     }
 
 style:
   .flex1:
     display: flex
     gap: 1rem
+  .selected:
+    border: 2px solid white
