@@ -5,7 +5,6 @@ dom:
         ui.anim:
           :anim: anim
           :duration: animationDuration
-          :stagger: stagger
           :items-count: listItems.length
           .list-item:
             v-for: (listItem, i) in listItems
@@ -30,7 +29,6 @@ data:
   frameIndex: 0
   frames: ['🍎', '🍌', '🍇', '🍉', '🍊', '🍍', '🍓', '🍑', '🍒', '🍏', '🍋']
   animationDuration: 1000
-  stagger: 100
   
 mounted: | #js
   function() {

@@ -6,34 +6,3 @@
     transition: 0s !important;
     transition-delay: 0s !important;
 }
-
-.list-anim > *:nth-child(1) {
-    transition-delay: 100ms;
-}
-.list-anim > *:nth-child(2) {
-    transition-delay: 200ms;
-}
-.list-anim > *:nth-child(3) {
-    transition-delay: 300ms;
-}
-.list-anim > *:nth-child(4) {
-    transition-delay: 400ms;
-}
-.list-anim > *:nth-child(5) {
-    transition-delay: 500ms;
-}
-.list-anim > *:nth-child(6) {
-    transition-delay: 600ms;
-}
-.list-anim > *:nth-child(7) {
-    transition-delay: 700ms;
-}
-.list-anim > *:nth-child(8) {
-    transition-delay: 800ms;
-}
-.list-anim > *:nth-child(9) {
-    transition-delay: 900ms;
-}
-.list-anim > *:nth-child(10) {
-    transition-delay: 1000ms;
-}

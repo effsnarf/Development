@@ -1,7 +1,7 @@
 dom:
   div:
     ui.ticker:
-      :interval: totalAnimDuration
+      :interval: (duration * 2)
       :count: 2
       @tick: nextAnimTick
       :enabled: autoPlayLoop
@@ -14,7 +14,6 @@ dom:
 props:
   anim:
   duration: 1000
-  stagger: 100
   itemsCount:
   autoPlayLoop: true
 
@@ -34,6 +33,7 @@ methods:
       this.listCls.clear();
       this.listCls.push("list-anim");
       this.listCls.push(`list-anim-${anim.name}`);
+      this.listCls.push(`list-items-${this.itemsCount}`);
 
       if (index == 0) {
         this.listCls.push("anim-leaving");
@@ -55,6 +55,18 @@ methods:
       s[`.list-anim-${anim.name}.anim-entering > .list-item`] = anim.enter.from;
       s[`.list-anim-${anim.name}.anim-leaving > .list-item`] = anim.leave.to;
 
+      const td = [];
+      const stagger = (this.duration / this.itemsCount);
+      // staggers array has [0, stagger, stagger*2, stagger*3, ...]
+      const staggers = Array(this.itemsCount).fill(0).map((_, i) => i * stagger).shuffle();
+      for (let i = 0; i < this.itemsCount; i++) {
+        td.push({
+          sel: `.list-items-${this.itemsCount} > .list-item:nth-child(${i+1})`,
+          val: { 'transition-delay': `${staggers.pop()}ms` }}
+        );
+      }
+      for (const t of td) s[t.sel] = t.val;
+
       return s;
     }
 
@@ -62,10 +74,6 @@ computed:
   animCssStyleObj: | #js
     function() {
       return this.getAnimCssStyleObj(this.anim);
-    }
-  totalAnimDuration: | #js
-    function() {
-      return (this.duration + (this.itemsCount * this.stagger));
     }
 
 watch:

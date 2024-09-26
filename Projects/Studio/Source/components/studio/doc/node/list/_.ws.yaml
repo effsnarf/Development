@@ -4,7 +4,6 @@ dom:
     ui.anim:
       :anim: node.animation?.anim
       :duration: "(node.animation?.duration || default1.duration)"
-      :stagger: "(node.animation?.stagger || default1.stagger)"
       :items-count: listItems.length
       :auto-play-loop: "true"
       .list-item:
@@ -27,7 +26,6 @@ props:
 data:
   default1:
     duration: 1000
-    stagger: 100
 
 methods:
   onClick: | #js
