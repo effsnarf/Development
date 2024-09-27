@@ -15,6 +15,43 @@ mounted: | #js
   }
 
 methods:
+  getBoundData: | #js
+    function(node, dataItem, defaultValue) {
+      const ds = node?.data?.source;
+      if ((!ds) || (!dataItem)) return defaultValue;
+      if (ds?.type == "state.tree.link")
+      {
+        return Objects.getProperty(this.$root.global.app.state, ds.path);
+      }
+      if (ds.type == "data.item")
+      {
+        if (ds.exp in dataItem) return dataItem[ds.exp];
+        const localVars = this.objectsToLocalVars([{obj: this.$root.global.app.state }, { obj: dataItem, keys: ds.exp.getWords() }]);
+        try {
+          const func = eval(`(function() {
+          ${localVars.join('\n')}
+            return ${ds.exp};
+          })`);
+          return func();
+        }
+        catch (ex) {
+          debugger;
+          console.warn(ex);
+          return defaultValue;
+        }
+      }
+      throw `Unknown data source`;
+    }
+  objectsToLocalVars: | #js
+    function(args) {
+      const vars = [];
+      for (const arg of args) {
+        const obj = arg.obj;
+        const keys = (arg.keys || Object.keys(obj));
+        for (const key of keys) if (key in obj) vars.push(`const ${key} = ${JSON.stringify(obj[key])};`);
+      }
+      return vars;
+    }
   getNodeIcon: | #js
     function(node) {
       const icons = {

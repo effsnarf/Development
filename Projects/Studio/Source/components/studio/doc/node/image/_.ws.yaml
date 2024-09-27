@@ -1,9 +1,24 @@
 dom:
   div:
     img:
-      src: https://i.imgur.com/QwWQw2v.jpeg
+      :src: proxiedImageUrl
 
 props:
+  node:
+  dataItem:
+
+data:
+  emptyImageUrl: https://i.imgur.com/QwWQw2v.jpeg
+
+computed:
+  proxiedImageUrl: | #js
+    function() {
+      return `/fetch?url=${this.imageUrl}`;
+    }
+  imageUrl: | #js
+    function() {
+      return this.$root.getBoundData(this.node, this.dataItem, this.emptyImageUrl);
+    }
 
 style:
   img:

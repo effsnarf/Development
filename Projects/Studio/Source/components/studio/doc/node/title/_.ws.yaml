@@ -10,14 +10,5 @@ props:
 computed:
   text: | #js
     function() {
-      if (this.node.data?.source?.type == "state.tree.link")
-      {
-        const path = this.node.data.source.path;
-        return Objects.getProperty(this.$root.global.app.state, path);
-      }
-      if (this.node.data?.source?.type == "data.item.field")
-      {
-        return this.dataItem?.[this.node.data.source.field];
-      }
-      return this.node.text;
+      return this.$root.getBoundData(this.node, this.dataItem, this.node.text);
     }

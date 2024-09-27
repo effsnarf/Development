@@ -210,8 +210,8 @@ methods:
                             size: 2,
                             data: {
                               source: {
-                                type: "data.item.field",
-                                field: "title"
+                                type: "data.item",
+                                exp: "title"
                               }
                             }
                           }
@@ -258,7 +258,7 @@ methods:
                         data: {
                           source: {
                             type: "url",
-                            url: "https://a.4cdn.org/po/catalog.json",
+                            url: "`https://a.4cdn.org/${home.list.boards.selected?.board}/catalog.json`",
                             linq: null
                           }
                         },
@@ -268,28 +268,43 @@ methods:
                         children: [
                           {
                             type: "panel",
+                            direction: "horizontal",
                             children: [
                               {
-                                type: "title",
-                                size: 3,
+                                type: "image",
                                 data: {
                                   source: {
-                                    type: "data.item.field",
-                                    field: "sub"
+                                    type: "data.item",
+                                    exp: "`https://i.4cdn.org/${home.list.boards.selected?.board}/${tim}s${ext}`"
                                   }
                                 }
                               },
                               {
-                                type: "title",
-                                size: 5,
-                                data: {
-                                  source: {
-                                    type: "data.item.field",
-                                    field: "com"
+                                type: "panel",
+                                children: [
+                                  {
+                                    type: "title",
+                                    size: 3,
+                                    data: {
+                                      source: {
+                                        type: "data.item",
+                                        exp: "sub"
+                                      }
+                                    }
+                                  },
+                                  {
+                                    type: "title",
+                                    size: 5,
+                                    data: {
+                                      source: {
+                                        type: "data.item",
+                                        exp: "com"
+                                      }
+                                    }
                                   }
-                                }
+                                ]
                               }
-                            ]
+                            ],
                           }
                         ]
                       }
@@ -322,7 +337,9 @@ methods:
                         type: "title",
                         size: 3,
                         data: {
-                          field: "name"
+                          source: {
+                            exp: "name"
+                          }
                         }
                       }
                     ]

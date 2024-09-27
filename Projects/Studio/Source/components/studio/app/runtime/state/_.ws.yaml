@@ -1,9 +1,12 @@
 dom:
   div:
-    div:
+    .flex:
       button:
         v-text: "'calc app state'"
         @click: calcAppState
+      button:
+        v-text: "'↻'"
+        @click: refreshAppState
     div:
       v-if: appStateTree
       ui.tabs:
@@ -81,7 +84,20 @@ methods:
         return items;
       }
       if (dataSource.type == "url") {
-        const url = node.data.source.url;
+        let url = node.data.source.url;
+
+        // #TODO hack
+        if (url.startsWith("`")) {
+          const appState = this.$root.global.app.state;
+          if (!appState) return;
+          let func = `function() {
+            ${Object.keys(appState).map(k => `const ${k} = this.${k};`).join("\n")}
+            return ${url};
+          }`;
+          func = `(${func})`;
+          func = eval(func);
+          url = await func.apply(this.$root.global.app.state);
+        }
 
         const ticker = Ticker.alertify((elapsed) => `<h2>⏳ ${elapsed.unitifyTime()}</h2> ${url}`)
         const data = (await (await fetch(`/fetch?url=${url}`)).json());
@@ -97,7 +113,6 @@ methods:
           return data
             .flatMap(page => page.threads)
             .take(10)
-            .map(t => ({ sub: t.sub, com: t.com?.substr(0, 50) }))
             ;
         }
         return data;
@@ -115,6 +130,11 @@ methods:
       const appState = (await this.getAppState(this.userApp));
       this.$root.global.app.state = appState;
       this.refresh();
+    }
+  refreshAppState: | #js
+    async function() {
+      const appState = (await this.getAppState(this.userApp));
+      Objects.deepAssign(this.$root.global.app.state, appState);
     }
   expandNodeToTree: | #js
     function(node, key, value, nodePath) {

@@ -1,6 +1,7 @@
 dom:
   div:
     v-if: listItems?.length
+    div:
     ui.anim:
       :anim: node.animation?.anim
       :duration: "(node.animation?.duration || default1.duration)"
@@ -41,6 +42,7 @@ methods:
     }
   getListItemKey: | #js
     function(item) {
+      if (!item) return null;
       const fields = Object.keys(item);
       return item[fields[0]];
     }
@@ -48,9 +50,12 @@ methods:
 computed:
   listItems: | #js
     function() {
-      //const varPath = this.node.data?.source?.name?.path;
       const varPath = `${this.$parent.nodeVarPath}.items`;
-      return Objects.getProperty(this.$root.global.app.state, varPath);
+      let listItems = Objects.getProperty(this.$root.global.app.state, varPath);
+      if (!listItems) {
+        listItems = Array.from({ length: 10 }, (_, i) => null);
+      }
+      return listItems;
     }
 
 style:
