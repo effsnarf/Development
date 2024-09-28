@@ -8,10 +8,12 @@ dom:
     studio.doc.node:
       v-if: slotContentNode
       :node: slotContentNode
+      :user-app-state: userAppState
       :sui: sui
 
 props:
   node:
+  userAppState:
   sui:
   contentNode:
 

@@ -15,8 +15,15 @@ dom:
           direction: horizontal
           template: 
             v-slot: tab0
+            div:
+              ui.input.text.box:
+                type: search
+                icon: 🔎
+                hint: search
+                v-model: stateQuery
             ide.vue.state:
               ':vue': vue
+              :query: stateQuery
           template: 
             v-slot: tab1
             ide.vue.activity:
@@ -24,6 +31,7 @@ dom:
 props:
   vue: null
 data:
+  stateQuery: null
   selectedTabIndex: 0
 methods: null
 watch: null

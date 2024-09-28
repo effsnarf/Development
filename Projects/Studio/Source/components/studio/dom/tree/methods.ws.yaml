@@ -21,12 +21,12 @@ methods:
       if ((!ds) || (!dataItem)) return defaultValue;
       if (ds?.type == "state.tree.link")
       {
-        return Objects.getProperty(this.$root.global.app.state, ds.path);
+        return Objects.getProperty(this.userAppState, ds.path);
       }
       if (ds.type == "data.item")
       {
         if (ds.exp in dataItem) return dataItem[ds.exp];
-        const localVars = this.objectsToLocalVars([{obj: this.$root.global.app.state }, { obj: dataItem, keys: ds.exp.getWords() }]);
+        const localVars = this.objectsToLocalVars([{obj: this.userAppState }, { obj: dataItem, keys: ds.exp.getWords() }]);
         try {
           const func = eval(`(function() {
           ${localVars.join('\n')}
@@ -35,7 +35,6 @@ methods:
           return func();
         }
         catch (ex) {
-          debugger;
           console.warn(ex);
           return defaultValue;
         }
@@ -67,8 +66,8 @@ methods:
         comp: "🎁",
         "comp.inst": "📦",
         image: "🖼️",
-        "slot.outlet": "🧩",
-        "slot.content": "🧩🧊",
+        "slot.outlet": "🔌🧩",
+        "slot.content": "🧩",
         vars: "📂🍃",
         var: "🧊"
       };
@@ -160,6 +159,19 @@ methods:
     function(node) {
       const ancs = this.getNodeAncestors(node);
       return ancs.find(n => (n.type == "page"));
+    }
+  getNodeNamePath: | #js
+    function(node, edge) {
+      const ancs = this.getNodeAncestors(node);
+      let path = ancs
+        .filter(n => n.name)
+        .map(n => n.name);
+      path.push(node.name);
+      if (edge) {
+        if ("list" == node.type) path.push("items");
+      }
+      path = path.filter(p => p);
+      return path;
     }
   getNodeAncestors: | #js
     // #TODO Slow

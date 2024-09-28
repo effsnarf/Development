@@ -1,8 +1,8 @@
 dom:
   div:
     ui.tabs:
-      :title: "'🧊 data'"
       :options: tabOptions
+      direction: vertical
       :show-title-in-tab: "true"
       :value: initialSelectedTab
       template:
@@ -16,10 +16,6 @@ dom:
           :node: node
       template:
         v-slot: tab2
-        div:
-          studio.app.runtime.state:
-            :user-app: userApp
-            :sui: sui
 
 props:
   node:

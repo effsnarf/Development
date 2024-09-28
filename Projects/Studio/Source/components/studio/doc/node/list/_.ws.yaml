@@ -1,7 +1,6 @@
 dom:
   div:
     v-if: listItems?.length
-    div:
     ui.anim:
       :anim: node.animation?.anim
       :duration: "(node.animation?.duration || default1.duration)"
@@ -22,13 +21,25 @@ dom:
 
 props:
   node:
+  userAppState:
   sui:
 
 data:
+  listItems:
   default1:
     duration: 1000
 
+mounted: | #js
+  function() {
+    this.$root.$on("app.state.changed", this.onAppStateChanged.bind(this));
+    this.refresh();
+  }
+
 methods:
+  onAppStateChanged: | #js
+    function(vars) {
+      this.refresh();
+    }
   onClick: | #js
     function(item) {
       const varPath = `${this.$parent.nodeVarPath}.selected`;
@@ -40,22 +51,29 @@ methods:
       const varPath = `${this.$parent.nodeVarPath}.hovered`;
       this.$root.studio.user.app.state.change(varPath, item);
     }
+  getListItems: | #js
+    function() {
+      let listItems = Objects.getProperty(this.userAppState, this.itemsVarPath);
+      if (!listItems) {
+        listItems = Array.from({ length: 5 }, (_, i) => null);
+      }
+      return listItems;
+    }
   getListItemKey: | #js
     function(item) {
       if (!item) return null;
       const fields = Object.keys(item);
       return item[fields[0]];
     }
+  refresh: | #js
+    function() {
+      this.listItems = this.getListItems();
+    }
 
 computed:
-  listItems: | #js
+  itemsVarPath: | #js
     function() {
-      const varPath = `${this.$parent.nodeVarPath}.items`;
-      let listItems = Objects.getProperty(this.$root.global.app.state, varPath);
-      if (!listItems) {
-        listItems = Array.from({ length: 10 }, (_, i) => null);
-      }
-      return listItems;
+      return `${this.$parent.nodeVarPath}.items`.split('.');
     }
 
 style:

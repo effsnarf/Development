@@ -1,0 +1,107 @@
+dom:
+  div:
+    h2:
+      v-text: "'Runtime'"
+    ui.console:
+      ref: console1
+    studio.app.runtime.state:
+      ref: appState1
+      :user-app: userApp
+      :user-app-state: userAppState
+      :sui: sui
+
+props:
+  userApp:
+  userAppState:
+  sui:
+
+mounted: | #js
+  async function() {
+    this.$root.$on("app.state.changed", this.onAppStateChanged.bind(this));
+    await this.$refs.appState1.calcAppState();
+    await this.init();
+  }
+
+methods:
+  init: | #js
+    async function() {
+      this.log("🔴 init app runtime");
+      await TreeObject.traverseAsync(this.userApp, this.initNode);
+    }
+  initNode: | #js
+    async function(node) {
+      if (node.data?.source) {
+        const varPath = this.$root.getNodeNamePath(node, true);
+        const result = await this.getDataFromDataSource(node);
+        if (result) this.$root.studio.user.app.state.change(varPath, result.data, result.info);
+      }
+    }
+  onAppStateChanged: | #js
+    function(vars) {
+      for (const var1 of vars) {
+        if ("hovered" == var1.varPath.last()) continue;
+        this.log(`🧊 ${var1.varPath.join('.')}`, var1.info, var1.value);
+      }
+    }
+  getDataFromDataSource: | #js
+    async function(node) {
+      if (!node?.data?.source) return;
+      const dataSource = node.data.source;
+      if (dataSource.type == "mock") {
+        const items = Array.from(
+          { length: 10 },
+          (_, i) => ({ name: `item ${i + 1}` })
+        );
+        return items;
+      }
+      if (dataSource.type == "url") {
+        let url = node.data.source.url;
+
+        // #TODO hack
+        if (url.startsWith("`")) {
+          const appState = this.userAppState;
+          if (!appState) return;
+          let func = `function() {
+            ${Object.keys(appState).map(k => `const ${k} = this.${k};`).join("\n")}
+            return ${url};
+          }`;
+          func = `(${func})`;
+          func = eval(func);
+          url = await func.apply(this.userAppState);
+        }
+
+        const ticker = Ticker.alertify((elapsed) => `<h2>⏳ ${elapsed.unitifyTime()}</h2> ${url}`)
+        const data = (await (await fetch(`/fetch?url=${url}`)).json());
+        ticker.stop();
+
+        const result = { info: { url, elapsed: ticker.elapsed } };
+
+        // #TODO hard coded, replace with linq evaluator for node.data.source.linq
+        if (data.boards) {
+          return { ...result,
+            data: data.boards
+            .map(b => ({ board: b.board, title: b.title }))
+            .take(10) };
+        }
+        if (data?.[0]?.threads) {
+          return { ...result,
+            data: data
+            .flatMap(page => page.threads)
+            .take(10) };
+        }
+        return { ...result };
+      }
+      if (dataSource.type == "data.item") {
+        return undefined;
+      }
+      if (dataSource.type == "state.tree.link") {
+        console.error("implement state.tree.link");
+        return null;
+      }
+      throw (`Unknown data source: ${dataSource.type}`);
+    }
+
+  log: | #js
+    function(...args) {
+      this.$refs.console1.log(...args);
+    }

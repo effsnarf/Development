@@ -7,8 +7,11 @@ dom:
       ':visible': hoveredItem
       div: 
         v-if: hoveredItem
+        h3:
+          ui.value:
+            :value: hoveredItem.args?.[0]
         ui.value: 
-          v-for: arg in hoveredItem.args
+          v-for: arg in hoveredItem.args.skip(1)
           ':value': arg
     table:
       tr:

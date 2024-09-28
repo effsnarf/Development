@@ -6,6 +6,7 @@ dom:
     ui.context.window:
       ref: context1
       :global: true
+      :visible: enabled
       @pinned: onContextPinned
       div:
         .flex:
@@ -55,6 +56,7 @@ dom:
 props:
   userApp:
   sui:
+  enabled:
 
 data:
   hovered:

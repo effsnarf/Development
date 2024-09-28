@@ -2,53 +2,56 @@ dom:
   div:
     v-if: node
     div:
-      ui.drawer:
-        direction: "horizontal"
-        :open: "isTabsDrawerOpen"
-        ui.tabs: 
-          ':options': '[nodeTypeTabName, ''🧊 data'', ''✨ animation'', ''🧱 flex'', ''🎨 style'']'
-          direction: vertical
-          :can-select-none: "true"
-          :show-title-in-tab: "false"
-          v-model: selected.tab.index
-          template: 
-            v-slot: tab0
-            div:
-              component:
-                :is: getNodeCompEditorName(node)
-                :node: node
-                :initial: initial
-                :sui: sui
-                @dom-edit: (e) => $emit('dom-edit', e)
-          template: 
-            v-slot: tab1
-            div:
-              studio.doc.node.common.data.editor:
-                :node: node
-                :node-vue: nodeVue
-                :initial: initial
-                :sui: sui
-          template: 
-            v-slot: tab2
-            div:
-              studio.doc.node.common.animation.editor:
-                :node: node
-                :initial: initial
-                :sui: sui
-          template: 
-            v-slot: tab3
-            div:
-              studio.doc.node.common.flex.editor:
-                :node: node
-                :initial: initial
-                :sui: sui
-          template: 
-            v-slot: tab4
-            div:
-              studio.doc.node.common.editor:
-                :node: node
-                :initial: initial
-                :sui: sui
+      ui.tabs: 
+        ':options': '[nodeTypeTabName, ''🧊 data'', ''✨ animation'', ''🧱 flex'', ''🎨 style'']'
+        direction: horizontal
+        :can-select-none: "true"
+        :show-title-in-tab: "false"
+        v-model: selected.tab.index
+        template:
+          v-slot: header
+          h2:
+            studio.dom.tree.node:
+              :item: node
+              :sui: sui
+        template: 
+          v-slot: tab0
+          div:
+            component:
+              :is: getNodeCompEditorName(node)
+              :node: node
+              :initial: initial
+              :sui: sui
+              @dom-edit: (e) => $emit('dom-edit', e)
+        template: 
+          v-slot: tab1
+          div:
+            studio.doc.node.common.data.editor:
+              :node: node
+              :node-vue: nodeVue
+              :initial: initial
+              :sui: sui
+        template: 
+          v-slot: tab2
+          div:
+            studio.doc.node.common.animation.editor:
+              :node: node
+              :initial: initial
+              :sui: sui
+        template: 
+          v-slot: tab3
+          div:
+            studio.doc.node.common.flex.editor:
+              :node: node
+              :initial: initial
+              :sui: sui
+        template: 
+          v-slot: tab4
+          div:
+            studio.doc.node.common.editor:
+              :node: node
+              :initial: initial
+              :sui: sui
 
 props:
   node:

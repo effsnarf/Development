@@ -2,6 +2,7 @@ dom:
   studio.doc.node:
     v-if: layoutNode
     :node: layoutNode
+    :user-app-state: userAppState
     :sui: sui
     :content-node: node
   div:
@@ -11,6 +12,7 @@ dom:
 
 props:
   node:
+  userAppState:
   sui:
 
 methods:

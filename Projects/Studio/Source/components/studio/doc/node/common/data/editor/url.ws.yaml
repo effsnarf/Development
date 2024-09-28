@@ -10,11 +10,12 @@ dom:
     ui.loading:
       v-if: isLoading1
     .flex:
-      ui.linq:
-        v-if: nodeData
-        :input: nodeData
-        v-model: node.data.source.linq
-        @output: (newOutput) => nodeDataOutput = newOutput
+      ui.drawer:
+        ui.linq:
+          v-if: nodeData
+          :input: nodeData
+          v-model: node.data.source.linq
+          @output: (newOutput) => nodeDataOutput = newOutput
       ui.value:
         :value: nodeDataOutput
         :show-visible-fields-filter: "false"

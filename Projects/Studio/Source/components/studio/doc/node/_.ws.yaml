@@ -4,6 +4,7 @@ dom:
       v-if: node
       :is: nodeCompName
       :node: node
+      :user-app-state: userAppState
       :sui: sui
       :data-item: dataItem
       :content-node: contentNode
@@ -14,6 +15,7 @@ dom:
         studio.doc.node:
           v-for: childNode in node.children
           :node: childNode
+          :user-app-state: userAppState
           :sui: sui
           :data-item: dataItem
           :content-node: contentNode
@@ -21,11 +23,21 @@ dom:
 
 props:
   node:
+  nodeVarData:
+  userAppState:
   sui:
   dataItem:
   contentNode:
 
+mounted: | #js
+  function() {
+    this.$root.$on("app.state.changed", this.onAppStateChanged.bind(this));
+  }
+
 methods:
+  onAppStateChanged: | #js
+    function(vars) {
+    }
   getNodeCompName: | #js
     function(node) {
       return `studio-doc-node-${node.type.kebabize()}`;
@@ -74,9 +86,10 @@ methods:
 computed:
   nodeVarPath: | #js
     function() {
+      // #TODO might be wrong
       const node = this.node;
       const pageName = this.nodePageName;
-      const varPath = `${pageName}.${node.type}.${node.name}`;
+      const varPath = `${pageName}.${node.name}`;
       return varPath;
     }
   nodePageName: | #js

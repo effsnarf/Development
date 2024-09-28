@@ -476,7 +476,7 @@ class Objects {
   }
 
   static deepSet(obj: any, path: string, value: any): void {
-    const keys = path.split(".");
+    const keys = Array.isArray(path) ? [...path] : path.split(".");
     let current = obj;
 
     for (let i = 0; i < keys.length - 1; i++) {
@@ -621,7 +621,7 @@ class Objects {
 class TreeObject {
   static traverse(root: any, callback: Function, getChildren?: Function) {
     // Traverse a tree structure (children[] on each node)
-    const traverse = (
+    const traverse = async (
       node: any,
       callback: Function,
       getChildren: Function = (node: any) => node.children
@@ -635,6 +635,28 @@ class TreeObject {
       }
     };
     traverse(root, callback, getChildren);
+  }
+
+  static async traverseAsync(
+    root: any,
+    callback: Function,
+    getChildren?: Function
+  ) {
+    // Traverse a tree structure (children[] on each node)
+    const traverse = async (
+      node: any,
+      callback: Function,
+      getChildren: Function = (node: any) => node.children
+    ) => {
+      await callback(node);
+      const children = getChildren(node);
+      if (children) {
+        for (const child of children) {
+          await traverse(child, callback, getChildren);
+        }
+      }
+    };
+    await traverse(root, callback, getChildren);
   }
 
   static filter(root: any, predicate: Function, getChildren?: Function) {

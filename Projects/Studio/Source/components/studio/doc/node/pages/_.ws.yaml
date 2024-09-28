@@ -10,11 +10,13 @@ dom:
           :anim-state: pageStates[pageNode.id]
           studio.doc.node:
             :node: pageNode
+            :user-app-state: userAppState
             :sui: sui
             :key: pageNode.id
 
 props:
   node:
+  userAppState:
   sui:
 
 data:

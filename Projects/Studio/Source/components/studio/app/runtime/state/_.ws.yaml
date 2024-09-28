@@ -1,44 +1,27 @@
 dom:
   div:
-    .flex:
-      button:
-        v-text: "'calc app state'"
-        @click: calcAppState
-      button:
-        v-text: "'↻'"
-        @click: refreshAppState
+    h2:
+      v-text: "'State'"
     div:
-      v-if: appStateTree
-      ui.tabs:
-        :options: "pageNames.map(p => ('📄 ' + p))"
-        direction: horizontal
-        v-model: selectedPageTabIndex
-      div:
-        v-for: (pageName, i) in pageNames
-        transition:
-          name: slide
-          div:
-            v-if: (i == selectedPageTabIndex)
-            ui.tree:
-              :root: pageStateTrees[pageName]
-              item-type: studio.app.runtime.state.tree.node
-              :initial-expanded: "true"
+      :key: key1
+      ui.tree:
+        :root: appStateTree
+        item-type: studio.app.runtime.state.tree.node
+        :initial-expanded: "true"
 
 props:
   userApp:
+  userAppState:
   sui:
 
 data:
   appStateTree:
-  pageStateTrees: "{}"
-  selectedPageTabIndex: null
   key1: 1
 
 mounted: | #js
-  function() {
-    this.$root.$on("app-state-changed", this.refresh.bind(this));
-    this.$watch("sui.page.selected", this.refresh.bind(this));
-    this.refresh();
+  async function() {
+    this.$root.$on("app.state.changed", this.onAppStateChanged.bind(this));
+    //this.$watch("sui.page.selected", this.refresh.bind(this));
   }
 
 methods:
@@ -53,18 +36,11 @@ methods:
   getPageAppState: | #js
     async function(pageNode) {
       const page = {};
-      
-      // page.var = {};
-      // for (const varNode of this.$root.findDescNodes(pageNode, "var"))
-      // {
-      //   page.var[varNode.name] = null;
-      // }
 
-      page.list = {};
       for (const listNode of this.$root.findDescNodes(pageNode, "list"))
       {
-        page.list[listNode.name] = {
-          items: (await this.getDataFromDataSource(listNode)),
+        page[listNode.name] = {
+          items: [],
           hovered: null,
           selected: null
         };
@@ -72,69 +48,21 @@ methods:
 
       return page;
     }
-  getDataFromDataSource: | #js
-    async function(node) {
-      if (!node?.data?.source) return;
-      const dataSource = node.data.source;
-      if (dataSource.type == "mock") {
-        const items = Array.from(
-          { length: 10 },
-          (_, i) => ({ name: `item ${i + 1}` })
-        );
-        return items;
-      }
-      if (dataSource.type == "url") {
-        let url = node.data.source.url;
-
-        // #TODO hack
-        if (url.startsWith("`")) {
-          const appState = this.$root.global.app.state;
-          if (!appState) return;
-          let func = `function() {
-            ${Object.keys(appState).map(k => `const ${k} = this.${k};`).join("\n")}
-            return ${url};
-          }`;
-          func = `(${func})`;
-          func = eval(func);
-          url = await func.apply(this.$root.global.app.state);
-        }
-
-        const ticker = Ticker.alertify((elapsed) => `<h2>⏳ ${elapsed.unitifyTime()}</h2> ${url}`)
-        const data = (await (await fetch(`/fetch?url=${url}`)).json());
-        ticker.stop();
-
-        // #TODO hard coded, replace with linq evaluator for node.data.source.linq
-        if (data.boards) {
-          return data.boards
-            .map(b => ({ board: b.board, title: b.title }))
-            .take(10);
-        }
-        if (data?.[0]?.threads) {
-          return data
-            .flatMap(page => page.threads)
-            .take(10)
-            ;
-        }
-        return data;
-      }
-      throw (`Unknown data source: ${dataSource.type}`);
-    }
-  getPageStateTree: | #js
-    function(pageName) {
-      return this.appStateTree
-        ?.children
-        .find(c => (pageName == c.name));
-    }
   calcAppState: | #js
     async function() {
       const appState = (await this.getAppState(this.userApp));
-      this.$root.global.app.state = appState;
+      for (const key in appState) this.userAppState[key] = appState[key];
       this.refresh();
     }
-  refreshAppState: | #js
+  onAppStateChanged: | #js
+    function(vars) {
+      this.refresh();
+    }
+  refresh: | #js
     async function() {
-      const appState = (await this.getAppState(this.userApp));
-      Objects.deepAssign(this.$root.global.app.state, appState);
+      const appStateTree = Objects.toTreeObject(this.userAppState, this.expandNodeToTree);
+      this.appStateTree = appStateTree;
+      this.key1++;
     }
   expandNodeToTree: | #js
     function(node, key, value, nodePath) {
@@ -142,19 +70,5 @@ methods:
       if (["items", "hovered", "selected"].includes(nodePath.last())) return false;
       return true;
     }
-  refresh: | #js
-    async function() {
-      const appState = this.$root.global.app.state;
-      const appStateTree = Objects.toTreeObject(appState, this.expandNodeToTree);
-      this.appStateTree = appStateTree;
-      this.pageStateTrees = {};
-      for (const pageName of this.pageNames)
-        this.pageStateTrees[pageName] = this.getPageStateTree(pageName);
-      this.key1++;
-    }
 
 computed:
-  pageNames: | #js
-    function() {
-      return this.$root.getPageNames();
-    }

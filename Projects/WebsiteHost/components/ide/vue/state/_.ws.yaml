@@ -7,7 +7,7 @@ dom:
         table:
           class: list1
           ide.vue.state.item:
-            v-for: field in getFields(vue())
+            v-for: field in filterFields(getFields(vue()), query)
             ':class': getCssClass(field)
             @click: toggleWatch(field)
             ':vue': vue
@@ -36,6 +36,7 @@ dom:
               ':preview': 'false'
 props:
   vue: null
+  query:
 data:
   watchedFieldKeys: []
   selectedItem: null
@@ -44,6 +45,12 @@ mounted: | #js
     //this.$root.$on("state-changed", this.onStateChanged.bind(this));
   }
 methods:
+  filterFields: | #js
+    function(fields, query) {
+      if (!query?.length) return fields;
+      query = query.toLowerCase();
+      return fields.filter((f) => f.key.toLowerCase().includes(query));
+    }
   getFields: | #js
     function(vue) {
       if (!vue) return [];
