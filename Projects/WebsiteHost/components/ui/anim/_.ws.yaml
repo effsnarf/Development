@@ -13,36 +13,42 @@ dom:
 
 props:
   anim:
-  duration:
-  itemsCount:
-  autoPlayLoop: true
+  animState: 
+  duration: 1000
+  itemsCount: 1
+  autoPlayLoop: false
 
 data:
-  listCls: []
+  animStateFrame: null
+  autoPlayAnimState: null
 
 methods:
   init: | #js
     function() {
-      this.nextAnimTick(null);
     }
   nextAnimTick: | #js
     async function(index) {
       const anim = this.anim;
       if (!anim) return;
 
-      this.listCls.clear();
-      this.listCls.push("list-anim");
-      this.listCls.push(`list-anim-${anim.name}`);
-      this.listCls.push(`list-items-${this.itemsCount}`);
-
-      if (index == 0) {
-        this.listCls.push("anim-leaving");
+      this.autoPlayAnimState = this.getNextAnimState(this.autoPlayAnimState);
+    }
+  getNextAnimState: | #js
+    function(animState) {
+      switch (animState) {
+        case "entering":
+          return "leaving";
+        case "leaving":
+          return "entering";
+        default:
+          return "entering";
       }
-      if (index == 1) {
-        this.listCls.push("anim-entering");
-        await this.$nextTick();
-        await (0.1).seconds().wait();
-        this.listCls.remove("anim-entering");
+    }
+  setAnimStateFrame: | #js
+    async function(animState) {
+      this.animStateFrame = animState;
+      if (animState == "entering") {
+        requestAnimationFrame(() => { this.animStateFrame = null; });
       }
     }
   getAnimCssStyleObj: | #js
@@ -50,11 +56,16 @@ methods:
       if (!anim) return null;
       const s = {};
 
-      s[`.list-anim-${anim.name} > .list-item`] = { transition: `${this.duration1}ms` };
-      s[`.page-entering .list-anim-${anim.name} > .list-item`] = anim.enter.from;
-      s[`.page-leaving .list-anim-${anim.name} > .list-item`] = anim.leave.to;
-      s[`.list-anim-${anim.name}.anim-entering > .list-item`] = anim.enter.from;
-      s[`.list-anim-${anim.name}.anim-leaving > .list-item`] = anim.leave.to;
+      s[`.list-anim-${anim.name} > *`] = { transition: `${this.duration1}ms` };
+      s[`.page-entering .list-anim-${anim.name} > *`] = anim.enter.from;
+      s[`.page-leaving .list-anim-${anim.name} > *`] = anim.leave.to;
+      const enterSelector = `.list-anim-${anim.name}.anim-entering > *`;
+      const leaveSelector = `.list-anim-${anim.name}.anim-leaving > *`;
+      s[enterSelector] = anim.enter.from;
+      s[leaveSelector] = anim.leave.to;
+      // when a page transitions, internal animations are triggered
+      s[`.page > .comp-ui-anim > .anim-entering ${enterSelector}`] = anim.enter.from;
+      s[`.page > .comp-ui-anim > .anim-leaving ${leaveSelector}`] = anim.leave.to;
 
       const td = [];
       const stagger = (this.duration1 / this.itemsCount);
@@ -62,7 +73,7 @@ methods:
       const staggers = Array(this.itemsCount).fill(0).map((_, i) => i * stagger).shuffle();
       for (let i = 0; i < this.itemsCount; i++) {
         td.push({
-          sel: `.list-items-${this.itemsCount} > .list-item:nth-child(${i+1})`,
+          sel: `.list-items-${this.itemsCount} > *:nth-child(${i+1})`,
           val: { 'transition-delay': `${staggers.pop()}ms` }}
         );
       }
@@ -72,6 +83,19 @@ methods:
     }
 
 computed:
+  listCls: | #js
+    function() {
+      if (!this.anim) return [];
+
+      const listCls = [];
+      listCls.push("list-anim");
+      listCls.push(`list-anim-${this.anim.name}`);
+      listCls.push(`list-items-${this.itemsCount}`);
+
+      if (this.animStateFrame) listCls.push(`anim-${this.animStateFrame}`);
+
+      return listCls;
+    }
   animCssStyleObj: | #js
     function() {
       return this.getAnimCssStyleObj(this.anim);
@@ -89,3 +113,19 @@ watch:
       function(newAnim) {
         this.init();
       }
+  animState:
+    immediate: true
+    handler: | #js
+      function(newAnimState) {
+        this.setAnimStateFrame(newAnimState);
+      }
+  autoPlayAnimState:
+    immediate: true
+    handler: | #js
+      function(newAnimState) {
+        if (this.autoPlayLoop) this.setAnimStateFrame(newAnimState);
+      }
+
+style:
+  .list-anim:
+    overflow: hidden

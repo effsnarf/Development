@@ -6,7 +6,7 @@ dom:
       :anim: node.animation?.anim
       :duration: "(node.animation?.duration || default1.duration)"
       :items-count: listItems.length
-      :auto-play-loop: "true"
+      :auto-play-loop: "false"
       .list-item:
         v-for: (item, i) in listItems
         :key: getListItemKey(item)

@@ -1,4 +1,8 @@
 
+.list-anim > * {
+    transition-timing-function: ease-in-out !important;
+}
+
 .list-anim.anim-entering > * {
     transition: 0s !important;
     transition-delay: 0s !important;

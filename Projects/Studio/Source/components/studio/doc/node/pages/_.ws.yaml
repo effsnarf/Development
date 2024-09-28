@@ -1,26 +1,85 @@
 dom:
   div:
-    v-if: visiblePageNode
-    transition:
-      name: slide
-      :key: visiblePageNode.id
-      studio.doc.node:
-        :node: visiblePageNode
-        :sui: sui
-        :key: visiblePageNode.id
+    .pages:
+      .page:
+        v-for: pageNode in visiblePageNodes
+        :class: pageClasses[pageNode.id]
+        :key: pageNode.id
+        ui.anim:
+          :anim: pageTransAnim
+          :anim-state: pageStates[pageNode.id]
+          studio.doc.node:
+            :node: pageNode
+            :sui: sui
+            :key: pageNode.id
 
 props:
   node:
   sui:
 
+data:
+  pageStates: {}
+  pageClasses: {}
+  visiblePageNodes: []
+  pageTransAnim:
+    name: slide
+    enter:
+      from:
+        transform: translateX(100%)
+    leave:
+      to:
+        transform: translateX(-100%)
+
 mounted: | #js
   function() {
+    this.$watch("sui.page.selected", this.onSelectedPageChanged);
   }
 
 methods:
+  onSelectedPageChanged: | #js
+    function(newPage, oldPage) {
+      this.clearPageStates();
+      if (newPage) this.pageStates[newPage.id] = "entering";
+      if (oldPage) this.pageStates[oldPage.id] = "leaving";
+      this.updatePageClasses();
+      this.refreshVisiblePageNodes();
+    }
+  refreshVisiblePageNodes: | #js
+    function() {
+      this.visiblePageNodes = this.pageNodes.filter(pageNode => (!!this.pageStates[pageNode.id]));
+    }
+  clearPageStates: | #js
+    function() {
+      for (const key in this.pageStates) this.pageStates[key] = null;
+    }
+  updatePageClasses: | #js
+    function() {
+      for (const pageNodeID in this.pageStates) {
+        this.pageClasses[pageNodeID] = this.getPageClass(pageNodeID);
+      }
+    }
+  getPageClass: | #js
+    function(pageNodeID) {
+      const cls = {};
+      cls.active = ("entering" == this.pageStates[pageNodeID]);
+      return cls;
+    }
 
 computed:
-  visiblePageNode: | #js
+  pageNodes: | #js
     function() {
-      return this.node.children.find(c => (c.id == this.sui.page.selected?.id));
+      return [...this.node.children];
     }
+
+watch:
+
+style:
+  .pages:
+    min-height: 100vh
+  .page:
+    position: absolute
+    width: 100%
+    opacity: 0.7
+    pointer-events: none
+  .page.active:
+    pointer-events: auto

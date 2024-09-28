@@ -1,30 +1,30 @@
 dom:
   div:
-    div:
-      .list-container:
-        ui.anim:
-          :anim: anim
-          :duration: duration
-          :items-count: listItems.length
-          .list-item:
-            v-for: (listItem, i) in listItems
-            :key: listItem
-      h4:
-        class: text-center dimmed
-        v-text: "'' + anim.name"
-      .frame-container:
-        v-show: "false"
-        transition.group:
-          :name: "'anim-' + anim.name"
-          .frame:
-            v-for: (frame, i) in frames
-            v-show: "frameIndex==i"
-            v-text: frame
-            :key: frame
+    .list-container:
+      ui.anim:
+        :anim: anim
+        :duration: duration
+        :items-count: listItems.length
+        :auto-play-loop: "true"
+        .list-item:
+          v-for: (listItem, i) in listItems
+          :key: listItem
+    h4:
+      class: text-center dimmed
+      v-text: "'' + anim.name"
+    .frame-container:
+      v-show: "false"
+      transition.group:
+        :name: "'anim-' + anim.name"
+        .frame:
+          v-for: (frame, i) in frames
+          v-show: "frameIndex==i"
+          v-text: frame
+          :key: frame
       
 props:
   anim:
-  duration:
+  duration: 1000
 
 data:
   frameIndex: 0
@@ -48,7 +48,11 @@ computed:
     }
 
 style:
+  .comp-ui-input-animation-example:
+    width: fit-content
+    margin: auto
   .list-container:
+    width: 7em
     border: 2px solid gray
     overflow: hidden
     opacity: 0.5
@@ -63,7 +67,6 @@ style:
     flex-direction: column
     gap: 0.3em
   .list-item:
-    width: 6em
     height: 1.5em
     background: "#80808080"
     text-align: center

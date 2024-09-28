@@ -74,7 +74,8 @@ mounted: | #js
               if (refingNodes.length == 1) {
                 const pageNode = this.$root.getContainingPageNode(refingNodes[0]);
                 if (pageNode) {
-                  alertify.message("jump to " + pageNode.name);
+                  this.sui.page.selected = pageNode;
+                  alertify.message("auto navigate to " + pageNode.name);
                 }
               }
             }
