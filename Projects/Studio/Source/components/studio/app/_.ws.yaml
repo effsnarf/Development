@@ -289,52 +289,10 @@ methods:
                         },
                         children: [
                           {
-                            type: "panel",
-                            flex: {
-                              dir: "h",
-                              justify: {
-                                content: "flex-start"
-                              }
-                            },
-                            children: [
-                              {
-                                type: "image",
-                                layout: {
-                                  width: "20%"
-                                },
-                                data: {
-                                  source: {
-                                    type: "data.item",
-                                    exp: "`https://i.4cdn.org/${this?.home?.boards?.selected?.board}/${tim}s${ext}`"
-                                  }
-                                }
-                              },
-                              {
-                                type: "panel",
-                                children: [
-                                  {
-                                    type: "title",
-                                    size: 3,
-                                    data: {
-                                      source: {
-                                        type: "data.item",
-                                        exp: "sub"
-                                      }
-                                    }
-                                  },
-                                  {
-                                    type: "title",
-                                    size: 5,
-                                    data: {
-                                      source: {
-                                        type: "data.item",
-                                        exp: "com"
-                                      }
-                                    }
-                                  }
-                                ]
-                              }
-                            ],
+                            type: "comp.inst",
+                            comp: {
+                              name: "thread.teaser"
+                            }
                           }
                         ]
                       }
@@ -347,6 +305,60 @@ methods:
           {
             type: "comps",
             children: [
+              {
+                type: "comp",
+                name: "thread.teaser",
+                children: [
+                  {
+                    type: "panel",
+                    flex: {
+                      dir: "h",
+                      justify: {
+                        content: "flex-start"
+                      }
+                    },
+                    children: [
+                      {
+                        type: "image",
+                        layout: {
+                          width: "20%"
+                        },
+                        data: {
+                          source: {
+                            type: "data.item",
+                            exp: "`https://i.4cdn.org/${this?.home?.boards?.selected?.board}/${tim}s${ext}`"
+                          }
+                        }
+                      },
+                      {
+                        type: "panel",
+                        children: [
+                          {
+                            type: "title",
+                            size: 3,
+                            data: {
+                              source: {
+                                type: "data.item",
+                                exp: "sub"
+                              }
+                            }
+                          },
+                          {
+                            type: "title",
+                            size: 5,
+                            data: {
+                              source: {
+                                type: "data.item",
+                                exp: "com"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ],
+                  },
+                ]
+              },
               {
                 type: "comp",
                 name: "generator",

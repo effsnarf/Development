@@ -52,6 +52,9 @@ dom:
               :node: node
               :initial: initial
               :sui: sui
+      div:
+        pre:
+          v-text: node
 
 props:
   node:

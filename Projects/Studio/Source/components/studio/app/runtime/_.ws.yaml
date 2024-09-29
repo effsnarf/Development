@@ -58,13 +58,6 @@ methods:
             selected: null,
           };
 
-          for (const key of Object.keys(pageData[listNode.name])) {
-            watchers[`${listVarPath}.${key}`] = {
-              handler: function(newValue, oldValue) { this.$refs.common1.onAppStateChanged(`${listVarPath}.${key}`.split('.'), newValue, oldValue); },
-              immediate: false
-            };
-          }
-
           if ("url" == ds.type) {
             // [url] variable
             pageData[listNode.name].url = null;
@@ -83,6 +76,13 @@ methods:
                 this.${listVarPath}.items = (await this.fetchFromUrl(newUrl, linq));
               })`),
               immediate: true
+            };
+          }
+
+          for (const key of Object.keys(pageData[listNode.name])) {
+            watchers[`${listVarPath}.${key}`] = {
+              handler: function(newValue, oldValue) { this.$refs.common1.onAppStateChanged(`${listVarPath}.${key}`.split('.'), newValue, oldValue); },
+              immediate: false
             };
           }
         }

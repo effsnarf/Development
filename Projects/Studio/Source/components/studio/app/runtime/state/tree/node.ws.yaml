@@ -5,15 +5,12 @@ dom:
         v-text: "'🧊'"
       span:
         v-text: item.name
-      .dimmed:
-        v-if: item.value?.length
-        v-text: "'[' + item.value?.length + ']'"
-    div:
-      v-if: item.value
-      .preview:
-        ui.value:
-          :value: item.value
-          :show-visible-fields-filter: "false"
+      div:
+        v-if: item.value
+        .preview:
+          ui.value.preview:
+            :value: item.value
+            :show-visible-fields-filter: "false"
 
 props:
   item:
@@ -42,12 +39,15 @@ style:
     display: flex
     gap: 0.5em
   .preview:
-    max-width: 10em
-    max-height: 4.5em
-    margin-left: 1em
-    overflow: auto
+    display: flex
+    align-items: baseline
+    margin: -0.1em
+    max-width: 15em
+    max-height: 3.5em
+    overflow: hidden
     transition: 1s
   .preview:hover:
     max-width: 20em
     max-height: 20em
+    overflow: auto
     
