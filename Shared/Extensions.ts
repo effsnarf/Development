@@ -453,6 +453,7 @@ interface Date {
 interface Array<T> {
   _syncTimeout?: ReturnType<typeof setTimeout>; // Optional property to store the timeout
   all(predicate: (item: T) => boolean): boolean;
+  any(predicate: (item: T) => boolean): boolean;
   keepSyncedWith(
     getSource: () => T[],
     getItemKey: (item: T) => any,
@@ -1610,6 +1611,8 @@ Date.prototype.isToday = function (): boolean {
 
 // #region Array
 if (typeof Array !== "undefined") {
+  Array.prototype.any = Array.prototype.some;
+
   Array.prototype.keepSyncedWith = function <T>(
     this: T[],
     getSource: () => T[],

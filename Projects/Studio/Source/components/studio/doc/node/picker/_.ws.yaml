@@ -10,29 +10,9 @@ dom:
       @pinned: onContextPinned
       div:
         .flex:
-          transition:
-            name: slide-hor-ver
-            div:
-              v-if: sui.node.selected
-              :key: sui.node.selected?.id
-              class: flex
-              div:
-                class: pointer-none dimmed
-                :style: "{ 'max-height': '6em', overflow: 'hidden' }"
-                div:
-                  studio.doc.node:
-                    :node: contextNode
-                    :sui: sui
-              div:
-                h2:
-                  class: pointer-none
-                  studio.dom.tree.node:
-                    :item: contextNode
-                    :sui: sui
-        .flex:
           ui.drawer:
             direction: "horizontal"
-            :open: "!$refs.context1?.isPinned || !sui.node.selected"
+            :open: "(true) || (!$refs.context1?.isPinned || !sui.node.selected)"
             .tree-indent:
               div:
                 v-for: (cnode, i) in hovered.cnodes
@@ -47,6 +27,7 @@ dom:
                   :sui: sui
                   :key: child.id
           div:
+            v-if: "false"
             studio.doc.node.editor:
               v-if: "$refs.context1?.isPinned && sui.node.selected"
               :node: contextNode

@@ -1,0 +1,19 @@
+dom:
+  div:
+    ui.console:
+      ref: console1
+
+props:
+  category:
+
+mounted: | #js
+  function() {
+    this.$root.$on("log", this.onLog.bind(this));
+  }
+
+methods:
+  onLog: | #js
+    function(category, severity, args) {
+      if (category != this.category) return;
+      this.$refs.console1.log(...args);
+    }

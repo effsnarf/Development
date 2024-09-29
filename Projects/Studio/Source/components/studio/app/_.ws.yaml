@@ -8,11 +8,14 @@ dom:
           :root: userApp
           :sui: sui
           @sui: onSuiEvent
-      studio.dom.tree:
-        :root: sui.page.selected
-        :sui: sui
-        @sui: onSuiEvent
-        :initial-expanded: "true"
+      div:
+        studio.dom.tree:
+          :root: sui.page.selected
+          :sui: sui
+          @sui: onSuiEvent
+          :initial-expanded: "true"
+        studio.app.log:
+          category: runtime
       .flex2:
         studio.doc.page.selector:
           :user-app: userApp
@@ -27,6 +30,7 @@ dom:
             :sui: sui
             :enabled: sui.app.hovered
           studio.app.runtime:
+            ref: userAppRuntime1
             :user-app: userApp
             :sui: sui
       div:
@@ -35,13 +39,16 @@ dom:
           :sui: sui
           :is-tabs-drawer-open: "true"
       div:
+        studio.app.runtime.state:
+          :user-app: userApp
+          :user-app-state: userAppState
     studio.dom.tree.methods:
       ref: methods1
       :user-app: userApp
 
 data:
   userApp:
-  userAppState: {}
+  userAppState:
   sui:
     app:
       hovered:
@@ -61,6 +68,10 @@ data:
 
 mounted: | #js
   function() {
+    setTimeout(() => {
+      this.userAppState = this.$refs.userAppRuntime1.$refs.userAppVue1.$data;
+    }, 3000);
+
     this.userApp = this.getMockupUserApp();
     // Register global methods
     this.$root.getUserApp = this.getUserApp.bind(this);
@@ -269,7 +280,7 @@ methods:
                         data: {
                           source: {
                             type: "url",
-                            url: "`https://a.4cdn.org/${this.home?.boards?.selected?.board}/catalog.json`",
+                            url: "`https://a.4cdn.org/${this?.home?.boards?.selected?.board}/catalog.json`",
                             linq: [{"type":"select.fields","fields":["threads"],"_id":1},{"type":"flat.map","path":["threads"],"_id":2}]
                           }
                         },
@@ -288,10 +299,13 @@ methods:
                             children: [
                               {
                                 type: "image",
+                                layout: {
+                                  width: "20%"
+                                },
                                 data: {
                                   source: {
                                     type: "data.item",
-                                    exp: "`https://i.4cdn.org/${this.home?.boards?.selected?.board}/${tim}s${ext}`"
+                                    exp: "`https://i.4cdn.org/${this?.home?.boards?.selected?.board}/${tim}s${ext}`"
                                   }
                                 }
                               },

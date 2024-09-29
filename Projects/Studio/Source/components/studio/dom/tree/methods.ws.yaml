@@ -16,17 +16,20 @@ mounted: | #js
 
 methods:
   getBoundData: | #js
-    function(node, dataItem, defaultValue) {
+    function(userAppState, node, dataItem, defaultValue) {
       const ds = node?.data?.source;
       if ((!ds) || (!dataItem)) return defaultValue;
       if (ds?.type == "state.tree.link")
       {
-        return Objects.getProperty(this.userAppState, ds.path);
+        return Objects.getProperty(userAppState, ds.path);
       }
       if (ds.type == "data.item")
       {
-        if (ds.exp in dataItem) return dataItem[ds.exp];
-        const localVars = this.objectsToLocalVars([{obj: this.userAppState }, { obj: dataItem, keys: ds.exp.getWords() }]);
+        if (ds.exp in dataItem) {
+          return dataItem[ds.exp];
+        }
+
+        const localVars = this.objectsToLocalVars([{obj: userAppState }, { obj: dataItem, keys: ds.exp.getWords() }]);
         try {
           const func = eval(`(function() {
           ${localVars.join('\n')}
@@ -45,6 +48,7 @@ methods:
     function(args) {
       const vars = [];
       for (const arg of args) {
+        if (!arg?.obj) continue;
         const obj = arg.obj;
         const keys = (arg.keys || Object.keys(obj));
         for (const key of keys) if (key in obj) vars.push(`const ${key} = ${JSON.stringify(obj[key])};`);

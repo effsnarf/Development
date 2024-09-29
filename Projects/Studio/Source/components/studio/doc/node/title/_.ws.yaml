@@ -6,9 +6,10 @@ dom:
 props:
   node:
   dataItem:
+  userAppState:
 
 computed:
   text: | #js
     function() {
-      return this.$root.getBoundData(this.node, this.dataItem, this.node.text);
+      return this.$root.getBoundData(this.userAppState, this.node, this.dataItem, this.node.text);
     }

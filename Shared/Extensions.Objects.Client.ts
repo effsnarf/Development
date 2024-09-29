@@ -16,7 +16,8 @@ class Objects {
     ) => boolean,
     nodePath: string[] = [],
     keyVarName = "name",
-    valueVarName = "value"
+    valueVarName = "value",
+    pathVarName = "path"
   ) {
     const root = {
       children: [],
@@ -24,28 +25,33 @@ class Objects {
     let node = root;
 
     for (const key in obj) {
-      nodePath.push(key);
       const value = obj[key];
       const child = {} as any;
       child[keyVarName] = key;
+      child[pathVarName] = [...nodePath, key];
 
       node.children.push(child);
 
       let expand = false;
 
-      if (expandToTree) {
-        expand = expandToTree(obj, key, value, nodePath);
+      if (Objects.isPrimitive(value)) {
+        expand = false;
       } else {
-        expand = !Array.isArray(value) && typeof value == "object";
+        if (expandToTree) {
+          expand = expandToTree(obj, key, value, [...nodePath, key]);
+        } else {
+          expand = Objects.is(value, Object);
+        }
       }
 
       if (expand) {
         child.children = Objects.toTreeObject(
           value,
           expandToTree,
-          nodePath,
+          [...nodePath, key],
           keyVarName,
-          valueVarName
+          valueVarName,
+          pathVarName
         ).children;
       } else {
         child[valueVarName] = value;

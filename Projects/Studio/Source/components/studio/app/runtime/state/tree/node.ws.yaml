@@ -17,16 +17,37 @@ dom:
 
 props:
   item:
+  userAppState:
+
+data:
+  key1:
+
+mounted: | #js
+  function() {
+    this.$root.$on("app.state.changed", this.onAppStateChanged.bind(this));
+  }
+
+methods:
+  refresh: | #js
+    function() {
+    }
+  onAppStateChanged: | #js
+    function(vars) {
+      const var1 = vars.find(v => Objects.areEqual(this.item.path, v.varPath));
+      if (var1) this.item.value = var1.newValue;
+    }
 
 style:
   .flex1:
     display: flex
     gap: 0.5em
   .preview:
+    max-width: 10em
     max-height: 4.5em
     margin-left: 1em
     overflow: auto
     transition: 1s
   .preview:hover:
+    max-width: 20em
     max-height: 20em
     

@@ -10,11 +10,12 @@ dom:
         v-for: (item, i) in listItems
         :key: getListItemKey(item)
         studio.doc.node:
-          v-for: child in node.children
-          :node: child
+          v-for: childNode in node.children
+          :node: childNode
+          :user-app-state: userAppState
           :sui: sui
           :data-item: item
-          :key: node.id
+          :key: childNode.id
         @mouseenter: () => onHover(item, true)
         @mouseleave: () => onHover(item, false)
         @click: () => onClick(item)

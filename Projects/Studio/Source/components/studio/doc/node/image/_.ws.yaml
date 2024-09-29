@@ -6,6 +6,7 @@ dom:
 props:
   node:
   dataItem:
+  userAppState:
 
 data:
   emptyImageUrl: https://i.imgur.com/QwWQw2v.jpeg
@@ -17,7 +18,7 @@ computed:
     }
   imageUrl: | #js
     function() {
-      return this.$root.getBoundData(this.node, this.dataItem, this.emptyImageUrl);
+      return this.$root.getBoundData(this.userAppState, this.node, this.dataItem, this.emptyImageUrl);
     }
 
 style:

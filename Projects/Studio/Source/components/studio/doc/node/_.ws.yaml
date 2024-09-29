@@ -47,6 +47,7 @@ methods:
       if (!node) return;
       const s = {};
       s['background-color'] = node.style?.bg?.color;
+      s['width'] = node.layout?.width;
       Object.assign(s, this.getFlexStyle(node));
       Objects.removeNullValueKeys(s);
       if (!Object.keys(s).length) return null;
@@ -69,7 +70,6 @@ methods:
       }
       return "column";
     }
-
   areNodesRelated: | #js
     function(node1, node2, tryOpposite = true) {
       if (!node1 || !node2) return false;
