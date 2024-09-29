@@ -302,6 +302,65 @@ methods:
                     ]
                   }
                 ]
+              },
+              {
+                type: "page",
+                name: "thread",
+                layout: {
+                  name: "default"
+                },
+                children: [
+                  {
+                    type: "slot.content",
+                    slot: {
+                      name: "header"
+                    },
+                    children: [
+                      {
+                        type: "title",
+                        size: 1,
+                        data: {
+                          source: {
+                            type: "state.tree.link",
+                            path: ["home", "list", "threads", "selected", "sub"]
+                          }
+                        },
+                      },
+                    ]
+                  },
+                  {
+                    type: "slot.content",
+                    slot: {
+                      name: "content"
+                    },
+                    children: [
+                      {
+                        type: "list",
+                        name: "posts",
+                        data: {
+                          source: {
+                            type: "url",
+                            url: "`https://a.4cdn.org/${this?.home?.boards?.selected?.board}/thread/${this.board?.threads?.selected?.no}.json`",
+                            linq: [{"type":"select.fields","fields":["posts"],"_id":1}]
+                          }
+                        },
+                        animation: {
+                          anim: null,
+                          duration: null,
+                          preview: null
+                        },
+                        children: [
+                          {
+                            type: "comp.inst",
+                            comp: {
+                              name: "post"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
               }
             ]
           },
@@ -358,6 +417,45 @@ methods:
                           }
                         ]
                       }
+                    ],
+                  },
+                ]
+              },
+              {
+                type: "comp",
+                name: "post",
+                children: [
+                  {
+                    type: "panel",
+                    flex: {
+                      dir: "h",
+                      justify: {
+                        content: "flex-start"
+                      }
+                    },
+                    children: [
+                      {
+                        type: "image",
+                        layout: {
+                          width: "20%"
+                        },
+                        data: {
+                          source: {
+                            type: "data.item",
+                            exp: "`https://i.4cdn.org/${this?.home?.boards?.selected?.board}/${tim}s${ext}`"
+                          }
+                        }
+                      },
+                      {
+                        type: "title",
+                        size: 3,
+                        data: {
+                          source: {
+                            type: "data.item",
+                            exp: "com"
+                          }
+                        }
+                      },
                     ],
                   },
                 ]

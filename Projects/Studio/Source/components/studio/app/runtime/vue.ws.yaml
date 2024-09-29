@@ -17,13 +17,19 @@ methods:
   fetchFromUrl: | #js
     async function(url, linq) {
       const ticker = Ticker.alertify((elapsed) => `<h2>⏳ ${elapsed.unitifyTime()}</h2> ${url}`)
-      const text = (await (await fetch(`/fetch?url=${url}`)).text());
-      ticker.stop();
-      // #TODO lame
-      try {
-        const obj = JSON.parse(text);
-        const datas = this.$refs.linqEval1.evaluateOps(null, obj, linq);
-        return datas.last();
+      try
+      {
+        const text = (await (await fetch(`/fetch?url=${url}`)).text());
+        // #TODO lame
+        try {
+          const obj = JSON.parse(text);
+          const datas = this.$refs.linqEval1.evaluateOps(null, obj, linq);
+          return datas.last();
+        }
+        catch { return text; }
       }
-      catch { return text; }
+      finally
+      {
+        ticker.stop();
+      }
     }
