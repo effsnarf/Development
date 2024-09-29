@@ -1,11 +1,10 @@
 dom:
   div:
     v-if: listItems?.length
-    ui.anim:
-      :anim: node.animation?.anim
-      :duration: "(node.animation?.duration || default1.duration)"
+    studio.doc.node.anim:
+      :node: node
       :items-count: listItems.length
-      :auto-play-loop: "false"
+      :sui: sui
       .list-item:
         v-for: (item, i) in listItems
         :key: getListItemKey(item)
@@ -27,8 +26,6 @@ props:
 
 data:
   listItems:
-  default1:
-    duration: 1000
 
 mounted: | #js
   function() {

@@ -24,27 +24,28 @@ data:
   pageClasses: {}
   visiblePageNodes: []
   pageTransAnim:
-    name: slide
+    name: fade
     enter:
       from:
-        transform: translateX(100%)
+        opacity: 0
     leave:
       to:
-        transform: translateX(-100%)
+        opacity: 1
 
 mounted: | #js
   function() {
-    this.$watch("sui.page.selected", this.onSelectedPageChanged);
+    this.$watch("sui.page.selected", this.onSelectedPageChanged.bind(this));
   }
 
 methods:
   onSelectedPageChanged: | #js
-    function(newPage, oldPage) {
+    async function(newPage, oldPage) {
       this.clearPageStates();
-      if (newPage) this.pageStates[newPage.id] = "entering";
       if (oldPage) this.pageStates[oldPage.id] = "leaving";
-      this.updatePageClasses();
-      this.refreshVisiblePageNodes();
+      this.refresh();
+      if (oldPage) await (0.5).seconds().wait();
+      this.pageStates[newPage.id] = "entering";
+      this.refresh();
     }
   refreshVisiblePageNodes: | #js
     function() {
@@ -65,6 +66,11 @@ methods:
       const cls = {};
       cls.active = ("entering" == this.pageStates[pageNodeID]);
       return cls;
+    }
+  refresh: | #js
+    function() {
+      this.updatePageClasses();
+      this.refreshVisiblePageNodes();
     }
 
 computed:

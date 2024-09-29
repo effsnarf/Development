@@ -154,6 +154,11 @@ methods:
       const pageNodes = this.getNodesByType("page");
       return pageNodes.map(p => p.name);
     }
+  getNodePage: | #js
+    function(node) {
+      const ancs = this.getNodeAncestors(node);
+      return ancs.find(n => (n.type == "page"));
+    }
   getNodePageName: | #js
     function(node) {
       const ancs = this.getNodeAncestors(node);

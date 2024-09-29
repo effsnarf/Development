@@ -4,16 +4,19 @@ dom:
       v-text: "'✨ animation'"
     .flex:
       div:
+        v-if: "false"
         h3:
           v-text: "'duration'"
         .clickable:
           v-for: i in 10
           v-text: (i * 100)
-          @click: $emit('update-duration', (i * 100))
+          @click: $emit('select-duration', (i * 100))
       .flex1:
-        div:
+        .clickable:
           v-for: (anim1, i) in anims
           :class: "{ selected: (anim == anim1) }"
+          @mouseenter: () => onHover(anim1, true)
+          @mouseleave: () => onHover(anim1, false)
           @click: () => onClick(anim1)
           ui.input.animation.example:
             :anim: anim1
@@ -63,11 +66,12 @@ methods:
   onHover: | #js
     function(anim, isHovered) {
       anim = (!isHovered ? null : anim);
+      this.$emit("hover-anim", anim);
     }
   onClick: | #js
     function(anim) {
       if (anim == this.anim) anim = null;
-      this.$emit("update-anim", anim);
+      this.$emit("select-anim", anim);
     }
 
 style:

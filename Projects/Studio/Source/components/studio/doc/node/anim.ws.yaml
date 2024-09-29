@@ -1,0 +1,31 @@
+dom:
+  ui.anim:
+    :anim: (node.animation.preview || node.animation?.anim)
+    :anim-state: animState
+    :duration: "(node.animation?.duration || default1.duration)"
+    :items-count: itemsCount
+    :auto-play-loop: "(!!node.animation.preview)"
+    slot:
+
+props:
+  node:
+  itemsCount: 1
+  sui:
+
+data:
+  animState:
+  default1:
+    duration: 1000
+
+mounted: | #js
+  function() {
+    this.$watch("sui.page.selected", this.onSelectedPageChanged.bind(this));
+  }
+
+methods:
+  onSelectedPageChanged: | #js
+    function(newPage, oldPage) {
+      const page = this.$root.getNodePage(this.node);
+      this.animState = (page.id == oldPage.id) ? "leaving" :
+        (page.id == newPage.id) ? "entering" : null;
+    }

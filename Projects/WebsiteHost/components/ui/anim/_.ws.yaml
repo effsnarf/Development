@@ -70,7 +70,7 @@ methods:
       const td = [];
       const stagger = (this.duration1 / this.itemsCount);
       // staggers array has [0, stagger, stagger*2, stagger*3, ...]
-      const staggers = Array(this.itemsCount).fill(0).map((_, i) => i * stagger).shuffle();
+      const staggers = Array(this.itemsCount).fill(0).map((_, i) => i * stagger).reverse();
       for (let i = 0; i < this.itemsCount; i++) {
         td.push({
           sel: `.list-items-${this.itemsCount} > *:nth-child(${i+1})`,
@@ -119,6 +119,11 @@ watch:
       function(newAnimState) {
         this.setAnimStateFrame(newAnimState);
       }
+  autoPlayLoop: | #js
+    function(apl) {
+      // when stopping auto-play, we set frame 0
+      if (!apl) this.nextAnimTick(0);
+    }
   autoPlayAnimState:
     immediate: true
     handler: | #js

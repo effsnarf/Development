@@ -4,8 +4,9 @@ dom:
     ui.input.animation:
       :anim: node.animation.anim
       :duration: node.animation.duration
-      @update-anim: (anim) => node.animation.anim = anim
-      @update-duration: (duration) => node.animation.duration = duration
+      @hover-anim: onHover
+      @select-anim: onSelect
+      @select-duration: (duration) => node.animation.duration = duration
 
 props:
   node:
@@ -15,5 +16,13 @@ props:
 data:
 
 methods:
+  onHover: | #js
+    function(anim) {
+      this.node.animation.preview = anim;
+    }
+  onSelect: | #js
+    function(anim) {
+      this.node.animation.anim = anim;
+    }
 
 style:

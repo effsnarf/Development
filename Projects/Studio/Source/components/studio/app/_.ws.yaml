@@ -224,7 +224,8 @@ methods:
                         },
                         animation: {
                           anim: null,
-                          duration: null
+                          duration: null,
+                          preview: null
                         },
                         children: [
                           {
@@ -285,7 +286,9 @@ methods:
                           }
                         },
                         animation: {
-                          anim: null
+                          anim: null,
+                          duration: null,
+                          preview: null
                         },
                         children: [
                           {
