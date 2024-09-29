@@ -1,7 +1,5 @@
 dom:
   div:
-    h2:
-      v-text: "'user app'"
     studio.doc:
       :user-app: userApp
       :user-app-state: $data

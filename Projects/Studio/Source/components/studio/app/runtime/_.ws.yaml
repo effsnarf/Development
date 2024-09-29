@@ -1,13 +1,10 @@
 dom:
   div:
-    h2:
-      v-text: "'Runtime'"
-    div:
-      v-if: showUserAppVue
-      studio.app.runtime.vue:
-        ref: userAppVue1
-        :user-app: userApp
-        :sui: sui
+    v-if: showUserAppVue
+    studio.app.runtime.vue:
+      ref: userAppVue1
+      :user-app: userApp
+      :sui: sui
 
 props:
   userApp:
