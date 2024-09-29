@@ -42,11 +42,21 @@ methods:
         page[listNode.name] = {
           items: [],
           hovered: null,
-          selected: null
+          selected: null,
         };
+        this.addDataSourceState(pageNode, page, listNode);
       }
 
       return page;
+    }
+  addDataSourceState: | #js
+    function(pageNode, page, node) {
+      // #TODO remove
+      const ds = node.data?.source;
+      if (!ds) return;
+      if ("url" == ds.type) {
+        const getUrl = eval(`(function() { return ${ds.url}; })`).bind(this.userAppState);
+      }
     }
   calcAppState: | #js
     async function() {
@@ -60,13 +70,13 @@ methods:
     }
   refresh: | #js
     async function() {
-      const appStateTree = Objects.toTreeObject(this.userAppState, this.expandNodeToTree);
+      const appStateTree = Objects.toTreeObject(this.userAppState, this.expandNodeToTree, [], "name", "value", this.addNodeToTree);
       this.appStateTree = appStateTree;
       this.key1++;
     }
   expandNodeToTree: | #js
     function(node, key, value, nodePath) {
-      // #TODO not accurate
+      // #TODO inaccurate
       if (["items", "hovered", "selected"].includes(nodePath.last())) return false;
       return true;
     }

@@ -1,0 +1,21 @@
+dom:
+  div:
+
+data:
+  appStateChangedVars: []
+  appStateChangeKey: 1
+
+methods:
+  onAppStateChanged: | #js
+    function(varPath, newValue, oldValue) {
+      this.appStateChangedVars.push({ varPath, newValue });
+      this.appStateChangeKey++;
+    }
+
+watch:
+  appStateChangeKey: | #js
+    function() {
+      const vars = [...this.appStateChangedVars];
+      this.appStateChangedVars.clear();
+      this.$root.$emit("app.state.changed", vars);
+    }

@@ -4,37 +4,106 @@ dom:
       v-text: "'Runtime'"
     ui.console:
       ref: console1
-    studio.app.runtime.state:
-      ref: appState1
-      :user-app: userApp
-      :user-app-state: userAppState
-      :sui: sui
+    div:
+      v-if: showUserAppVue
+      studio.app.runtime.state:
+        :user-app: userApp
+        :user-app-state: $refs.userAppVue1?.$data
+      studio.app.runtime.vue:
+        ref: userAppVue1
+        :user-app: userApp
+        :sui: sui
 
 props:
   userApp:
   userAppState:
   sui:
 
+data:
+  showUserAppVue: false
+
 mounted: | #js
   async function() {
     this.$root.$on("app.state.changed", this.onAppStateChanged.bind(this));
-    await this.$refs.appState1.calcAppState();
     await this.init();
   }
 
 methods:
+  initUserAppVue: | #js
+    async function() {
+      this.showUserAppVue = false;
+      await this.$nextTick();
+      const studio_app_runtime_vue = `studio-app-runtime-vue`;
+      const newRuntimeOptions = (await this.getVueOptions(this.userApp));
+      const vueComp = Vue.component(studio_app_runtime_vue);
+      const mergedOptions = Object.assign(vueComp.options, newRuntimeOptions);
+      Vue.component(studio_app_runtime_vue, mergedOptions);
+      this.showUserAppVue = true;
+    }
+  getVueOptions: | #js
+    async function(userApp) {
+      const vueOptions = {};
+      const data = {};
+      const computeds = {};
+      const watchers = {};
+
+      for (const pageNode of this.$root.getPageNodes()) {
+        const pageData = {};
+        // lists
+        for (const listNode of this.$root.findDescNodes(pageNode, "list"))
+        {
+          const ds = listNode.data?.source;
+          const listVarPath = `${pageNode.name}.${listNode.name}`;
+          const listVarName = listVarPath.replaceAll('.', '_');
+
+          // page data
+          pageData[listNode.name] = {
+            items: [],
+            hovered: null,
+            selected: null,
+          };
+
+          for (const key of Object.keys(pageData[listNode.name])) {
+            watchers[`${listVarPath}.${key}`] = {
+              handler: function(newValue, oldValue) { this.$refs.common1.onAppStateChanged(`${listVarPath}.${key}`.split('.'), newValue, oldValue); },
+              immediate: false
+            };
+          }
+
+          if ("url" == ds.type) {
+            // [url] variable
+            pageData[listNode.name].url = null;
+
+            // [url] computed
+            const computedVarName = `${listVarName}_url`;
+            computeds[computedVarName] = {
+              get: eval(`(function() { return ${ds.url} })`)
+            };
+
+            // [url] watchers
+            watchers[computedVarName] = {
+              handler: eval(`(async function(newUrl) {
+                const linq = ${JSON.stringify(ds.linq || null)};
+                this.${listVarPath}.url = newUrl;
+                this.${listVarPath}.items = (await this.fetchFromUrl(newUrl, linq));
+              })`),
+              immediate: true
+            };
+          }
+        }
+        data[pageNode.name] = pageData;
+      }
+
+      vueOptions.data = function() { return data };
+      vueOptions.computed = computeds;
+      vueOptions.watch = watchers;
+
+      return vueOptions;
+    }
   init: | #js
     async function() {
       this.log("🔴 init app runtime");
-      await TreeObject.traverseAsync(this.userApp, this.initNode);
-    }
-  initNode: | #js
-    async function(node) {
-      if (node.data?.source) {
-        const varPath = this.$root.getNodeNamePath(node, true);
-        const result = await this.getDataFromDataSource(node);
-        if (result) this.$root.studio.user.app.state.change(varPath, result.data, result.info);
-      }
+      this.initUserAppVue();
     }
   onAppStateChanged: | #js
     function(vars) {
@@ -42,63 +111,6 @@ methods:
         if ("hovered" == var1.varPath.last()) continue;
         this.log(`🧊 ${var1.varPath.join('.')}`, var1.info, var1.value);
       }
-    }
-  getDataFromDataSource: | #js
-    async function(node) {
-      if (!node?.data?.source) return;
-      const dataSource = node.data.source;
-      if (dataSource.type == "mock") {
-        const items = Array.from(
-          { length: 10 },
-          (_, i) => ({ name: `item ${i + 1}` })
-        );
-        return items;
-      }
-      if (dataSource.type == "url") {
-        let url = node.data.source.url;
-
-        // #TODO hack
-        if (url.startsWith("`")) {
-          const appState = this.userAppState;
-          if (!appState) return;
-          let func = `function() {
-            ${Object.keys(appState).map(k => `const ${k} = this.${k};`).join("\n")}
-            return ${url};
-          }`;
-          func = `(${func})`;
-          func = eval(func);
-          url = await func.apply(this.userAppState);
-        }
-
-        const ticker = Ticker.alertify((elapsed) => `<h2>⏳ ${elapsed.unitifyTime()}</h2> ${url}`)
-        const data = (await (await fetch(`/fetch?url=${url}`)).json());
-        ticker.stop();
-
-        const result = { info: { url, elapsed: ticker.elapsed } };
-
-        // #TODO hard coded, replace with linq evaluator for node.data.source.linq
-        if (data.boards) {
-          return { ...result,
-            data: data.boards
-            .map(b => ({ board: b.board, title: b.title }))
-            .take(10) };
-        }
-        if (data?.[0]?.threads) {
-          return { ...result,
-            data: data
-            .flatMap(page => page.threads)
-            .take(10) };
-        }
-        return { ...result };
-      }
-      if (dataSource.type == "data.item") {
-        return undefined;
-      }
-      if (dataSource.type == "state.tree.link") {
-        console.error("implement state.tree.link");
-        return null;
-      }
-      throw (`Unknown data source: ${dataSource.type}`);
     }
 
   log: | #js

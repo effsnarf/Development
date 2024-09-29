@@ -452,7 +452,7 @@ select, input[type=range]
 }
 .slider-closed:hover, .slider-opened
 {
-  max-width: 20em;
+  max-width: 50em;
   filter: none;
   opacity: 1;
 }

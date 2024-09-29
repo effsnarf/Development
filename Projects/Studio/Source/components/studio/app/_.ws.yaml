@@ -26,9 +26,8 @@ dom:
             :user-app: userApp
             :sui: sui
             :enabled: sui.app.hovered
-          studio.doc:
+          studio.app.runtime:
             :user-app: userApp
-            :user-app-state: userAppState
             :sui: sui
       div:
         studio.doc.node.editor:
@@ -36,10 +35,6 @@ dom:
           :sui: sui
           :is-tabs-drawer-open: "true"
       div:
-        studio.app.runtime:
-          :user-app: userApp
-          :user-app-state: userAppState
-          :sui: sui
     studio.dom.tree.methods:
       ref: methods1
       :user-app: userApp
@@ -212,7 +207,7 @@ methods:
                         data: {
                           source: {
                             type: "url",
-                            url: "https://a.4cdn.org/boards.json",
+                            url: "`https://a.4cdn.org/boards.json`",
                             linq: [{"type":"select.field","path":["boards"],"_id":1},{"type":"select.fields","fields":["board","title"],"_id":2}]
                           }
                         },
@@ -274,8 +269,8 @@ methods:
                         data: {
                           source: {
                             type: "url",
-                            url: "`https://a.4cdn.org/${home.boards.selected?.board}/catalog.json`",
-                            linq: null
+                            url: "`https://a.4cdn.org/${this.home?.boards?.selected?.board}/catalog.json`",
+                            linq: [{"type":"select.fields","fields":["threads"],"_id":1},{"type":"flat.map","path":["threads"],"_id":2}]
                           }
                         },
                         animation: {
@@ -296,7 +291,7 @@ methods:
                                 data: {
                                   source: {
                                     type: "data.item",
-                                    exp: "`https://i.4cdn.org/${home.boards.selected?.board}/${tim}s${ext}`"
+                                    exp: "`https://i.4cdn.org/${this.home?.boards?.selected?.board}/${tim}s${ext}`"
                                   }
                                 }
                               },

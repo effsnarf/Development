@@ -66,6 +66,9 @@ const generalMixin = {
   },
   mounted() {
     const self = this as any;
+    vueApp?.vm.registerVue(this);
+    return;
+
     self.ui.is.mounted = true;
     self.handlers.mouseover = (e: Event) => {
       self.ui.is.hovered = true;
@@ -75,16 +78,15 @@ const generalMixin = {
     };
     self.$el.addEventListener("mouseover", self.handlers.mouseover);
     self.$el.addEventListener("mouseout", self.handlers.mouseout);
-
-    vueApp?.vm.registerVue(this);
   },
   unmounted() {
     const self = this as any;
+    vueApp?.vm.registerVue(this);
+    return;
+    
     self.ui.is.mounted = false;
     self.$el.removeEventListener("mouseover", self.handlers.mouseover);
     self.$el.removeEventListener("mouseout", self.handlers.mouseout);
-
-    vueApp?.vm.registerVue(this);
   },
   computed: {
     $store(): any {

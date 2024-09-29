@@ -43,13 +43,13 @@ methods:
   onClick: | #js
     function(item) {
       const varPath = `${this.$parent.nodeVarPath}.selected`;
-      this.$root.studio.user.app.state.change(varPath, item);
+      Objects.setProperty(this.userAppState, varPath, item);
     }
   onHover: | #js
     function(item, isHovered) {
       item = (!isHovered ? null : item);
       const varPath = `${this.$parent.nodeVarPath}.hovered`;
-      this.$root.studio.user.app.state.change(varPath, item);
+      Objects.setProperty(this.userAppState, varPath, item);
     }
   getListItems: | #js
     function() {
@@ -57,7 +57,7 @@ methods:
       if (!listItems) {
         listItems = Array.from({ length: 5 }, (_, i) => null);
       }
-      return listItems;
+      return listItems.take(6);
     }
   getListItemKey: | #js
     function(item) {
@@ -78,6 +78,8 @@ computed:
 
 style:
   .list-item:
+    max-height: 6em
+    overflow: hidden
     opacity: 0.8
   .list-item:hover:
     background: "#80808030"

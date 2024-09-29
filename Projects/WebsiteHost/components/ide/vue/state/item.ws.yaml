@@ -19,7 +19,7 @@ dom:
     td: 
       class: newValue
       v-if: (valueInGrid && item.newValue)
-      ui.value.preview:
+      ui.value:
         v-if: showValue(item)
         ':value': item.newValue.value
       @mouseenter: onHoverValue
