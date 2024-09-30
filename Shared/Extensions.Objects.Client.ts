@@ -17,8 +17,10 @@ class Objects {
     nodePath: string[] = [],
     keyVarName = "name",
     valueVarName = "value",
-    pathVarName = "path"
+    pathVarName = "path",
+    depth = 0
   ) {
+    if (depth > 100) debugger;
     const root = {
       children: [],
     } as any;
@@ -51,7 +53,8 @@ class Objects {
           [...nodePath, key],
           keyVarName,
           valueVarName,
-          pathVarName
+          pathVarName,
+          depth + 1
         ).children;
       } else {
         child[valueVarName] = value;

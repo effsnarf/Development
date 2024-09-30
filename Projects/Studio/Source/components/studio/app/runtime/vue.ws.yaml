@@ -15,7 +15,7 @@ props:
 
 methods:
   fetchFromUrl: | #js
-    async function(url, linq) {
+    async function(url) {
       const ticker = Ticker.alertify((elapsed) => `<h2>⏳ ${elapsed.unitifyTime()}</h2> ${url}`)
       try
       {
@@ -23,8 +23,7 @@ methods:
         // #TODO lame
         try {
           const obj = JSON.parse(text);
-          const datas = this.$refs.linqEval1.evaluateOps(null, obj, linq);
-          return datas.last();
+          return obj;
         }
         catch { return text; }
       }

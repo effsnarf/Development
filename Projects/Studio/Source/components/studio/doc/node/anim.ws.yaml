@@ -26,6 +26,6 @@ methods:
   onSelectedPageChanged: | #js
     function(newPage, oldPage) {
       const page = this.$root.getNodePage(this.node);
-      this.animState = (page.id == oldPage.id) ? "leaving" :
+      this.animState = (page.id == oldPage?.id) ? "leaving" :
         (page.id == newPage.id) ? "entering" : null;
     }

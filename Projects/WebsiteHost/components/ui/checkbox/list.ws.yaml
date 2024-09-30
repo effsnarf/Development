@@ -1,11 +1,12 @@
 dom:
   div:
     ui.checkbox:
-      v-if: (items?.length > 10)
+      v-if: ((false) && (items?.length > 10))
       icon: ✔️
       text: Show only checked
       v-model: showOnlyChecked
     ui.input.text.box:
+      v-if: showSearchBox
       type: search
       icon: 🔎
       hint: search
@@ -29,6 +30,7 @@ props:
   getItemText: null
   valueArray: null
   sort: true
+  showSearchBox: true
 
 data:
   query: null

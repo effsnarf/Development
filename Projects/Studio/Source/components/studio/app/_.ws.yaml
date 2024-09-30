@@ -36,6 +36,7 @@ dom:
       div:
         studio.doc.node.editor:
           :node: sui.node.selected
+          :user-app-state: userAppState
           :sui: sui
           :is-tabs-drawer-open: "true"
       div:
@@ -85,17 +86,6 @@ mounted: | #js
               Objects.setProperty(this.userAppState, varPath, value);
               this.appStateChangedVars.push({ varPath, value, info });
               this.appStateChangeKey++;
-              // check if any node takes their data from this state node
-              // if so, jump to their page
-              // #TODO not very accurate
-              const refingNodes = this.$root.getRefingNodes(varPath);
-              if (refingNodes.length == 1) {
-                const pageNode = this.$root.getContainingPageNode(refingNodes[0]);
-                if (pageNode) {
-                  this.sui.page.selected = pageNode;
-                  alertify.message("auto navigate to " + pageNode.name);
-                }
-              }
             }
           }
         }
@@ -281,7 +271,7 @@ methods:
                         data: {
                           source: {
                             type: "url",
-                            url: "`https://a.4cdn.org/${this?.home?.boards?.selected?.board}/catalog.json`",
+                            url: "`https://a.4cdn.org/${this.home.boards.selected.board}/catalog.json`",
                             linq: [{"type":"select.fields","fields":["threads"],"_id":1},{"type":"flat.map","path":["threads"],"_id":2}]
                           }
                         },
@@ -340,8 +330,8 @@ methods:
                         data: {
                           source: {
                             type: "url",
-                            url: "`https://a.4cdn.org/${this?.home?.boards?.selected?.board}/thread/${this.board?.threads?.selected?.no}.json`",
-                            linq: [{"type":"select.fields","fields":["posts"],"_id":1}]
+                            url: "`https://a.4cdn.org/${this.home.boards.selected.board}/thread/${this.board.threads.selected.no}.json`",
+                            linq: [ { "type": "select.field", "path": [ "posts" ], "_id": 1 } ]
                           }
                         },
                         animation: {
@@ -381,16 +371,34 @@ methods:
                     },
                     children: [
                       {
-                        type: "image",
+                        type: "panel",
                         layout: {
                           width: "20%"
                         },
-                        data: {
-                          source: {
-                            type: "data.item",
-                            exp: "`https://i.4cdn.org/${this?.home?.boards?.selected?.board}/${tim}s${ext}`"
-                          }
-                        }
+                        children: [
+                          {
+                            type: "title",
+                            size: 2,
+                            data: {
+                              source: {
+                                type: "data.item",
+                                exp: "replies"
+                              }
+                            }
+                          },
+                          {
+                            type: "image",
+                            layout: {
+                              width: "20%"
+                            },
+                            data: {
+                              source: {
+                                type: "data.item",
+                                exp: "`https://i.4cdn.org/${this.home.boards.selected.board}/${tim}s${ext}`"
+                              }
+                            }
+                          },
+                        ]
                       },
                       {
                         type: "panel",
@@ -442,7 +450,7 @@ methods:
                         data: {
                           source: {
                             type: "data.item",
-                            exp: "`https://i.4cdn.org/${this?.home?.boards?.selected?.board}/${tim}s${ext}`"
+                            exp: "`https://i.4cdn.org/${this.home.boards.selected.board}/${tim}s${ext}`"
                           }
                         }
                       },
@@ -564,10 +572,14 @@ style:
     width: 33%
     overflow: hidden
     border: 3px solid gray
+    padding: 1em
+    transition: 0.4s
   .comp-studio-app > .flex1 > *:nth-child(1):
     width: 12%
   .comp-studio-app > .flex1 > *:nth-child(2):
     width: 18%
+  .comp-studio-app > .flex1 > *:nth-child(4):hover:
+    width: 70%
   .flex2:
     display: flex
     flex-direction: column

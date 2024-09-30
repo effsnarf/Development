@@ -9,6 +9,7 @@ dom:
             ui.checkbox.list:
               :items: fields
               :get-item-icon: () => '🧊'
+              :show-search-box: "false"
               :value-array: visibleFields1
       .box1:
         ':class': '{ reversed: reverse }'
@@ -83,7 +84,7 @@ dom:
                 tag: tr
                 name: slide-hor
                 v-for: (item, index) in visibleItems
-                :key: JSON.stringify(item)
+                :key: (index + JSON.stringify(item))
                 ':class': _getItemClass(item, index)
                 @mouseenter: () => onItemHover(item, true)
                 @mouseleave: () => onItemHover(item, false)
@@ -93,6 +94,11 @@ dom:
                   :key: field
                   ui.value.preview: 
                     ':value': item?.[field]
+        ui.pager:
+          :items-count: items?.length
+          :page-size: pageSize
+          :only-arrows: "true"
+          v-model: pageIndex
       .box1:
         v-if: "false"
         ui.value:
@@ -106,6 +112,7 @@ props:
   maxVisibleFields: 1000
   visibleFields: null
   showVisibleFieldsFilter: true
+  pageSize: 10
 data:
   sortByField: null
   sortByFieldDirection: 1
@@ -114,6 +121,7 @@ data:
     item: null
   query: null
   visibleFields1: null
+  pageIndex: 0
 methods:
   onSortByField: | #js
     function(field) {
@@ -176,6 +184,7 @@ computed:
     }
     const query = (this.query || '').toLowerCase();
     if (query) items = items.filter(item => Objects.getValues(item).some(v => (v?.toString().toLowerCase().includes(query))));
+    items = items.skip(this.pageIndex).take(this.pageSize);
     return items;
   shownFields: | #js
     if (this.visibleFields1) return this.visibleFields1;
@@ -223,6 +232,11 @@ watch:
   value:
     handler: | #js
       function(value) {
+        // by default, only show first several fields
+        // for performance reasons
+        if (!this.visibleFields1) {
+          this.visibleFields1 = this.fields.take(3);
+        }
       }
     immediate: true
   query:

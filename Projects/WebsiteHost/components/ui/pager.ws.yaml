@@ -1,14 +1,32 @@
 dom:
-  .pager-buttons:
-    .pager-button:
-      v-for: i in getPageIndexes(pageCount)
-      v-text: (i + 1)
-      :class: "{ selected: (i === value) }"
-      @click: onClickPage(i)
+  div:
+    div:
+      v-if: (onlyArrows)
+      class: pager-buttons
+      div:
+        class: pager-button
+        :class: "{ disabled: (value == 0) }"
+        v-text: "'«'"
+        @click: onClickPage(value - 1)
+      span:
+        v-text: "(value + 1) + ' / ' + pageCount"
+      div:
+        class: pager-button
+        :class: "{ disabled: (value >= (pageCount - 1)) }"
+        v-text: "'»'"
+        @click: onClickPage(value + 1)
+    .pager-buttons:
+      v-if: (!onlyArrows)
+      .pager-button:
+        v-for: i in getPageIndexes(pageCount)
+        v-text: (i + 1)
+        :class: "{ selected: (i === value) }"
+        @click: onClickPage(i)
 
 props:
   itemsCount: null
   pageSize: null
+  onlyArrows: false
   value: null
 
 methods:
@@ -31,12 +49,15 @@ style:
   .pager-buttons:
     display: flex
     justify-content: center
-    gap: 0.5em
+    align-items: center
+    gap: 1em
+    white-space: nowrap
   .pager-button:
     padding: 0.5em 1em
     border-radius: 0.5em
     background: "#80808030"
     cursor: pointer
+    user-select: none
   .pager-button:hover:
     background: "#80808040"
   .pager-button.selected, .pager-button.selected:hover:

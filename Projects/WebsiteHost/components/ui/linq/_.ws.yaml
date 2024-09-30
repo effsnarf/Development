@@ -1,8 +1,6 @@
 dom:
   div: 
     .operations.box1:
-      .text-center:
-        v-text: "'🔧 linq'"
       div: 
         div: 
           v-for: (operation, index) in operations

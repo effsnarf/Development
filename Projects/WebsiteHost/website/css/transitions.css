@@ -19,6 +19,27 @@
 
 
 
+.list-hor-enter-active,
+.list-hor-leave-active,
+.list-hor-move {
+  transition: 1s !important;
+}
+.list-hor-enter-from,
+.list-hor-leave-to {
+  opacity: 0;
+}
+.list-hor-enter-from {
+  transform: translateX(100%);
+}
+.list-hor-leave-to {
+  transform: translateX(-100%);
+}
+.list-hor-leave-active {
+  position: absolute;
+}
+
+
+
 
 .list2-enter-active,
 .list2-leave-active,

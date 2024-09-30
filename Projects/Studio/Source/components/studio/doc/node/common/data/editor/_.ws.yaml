@@ -16,10 +16,15 @@ dom:
           :node: node
       template:
         v-slot: tab2
+    div:
+      studio.doc.node.common.data:
+        :node: node
+        :user-app-state: userAppState
 
 props:
   node:
   initial:
+  userAppState:
   sui:
 
 data:
@@ -40,3 +45,4 @@ computed:
       if (!type) return null;
       return this.tabOptions.findIndex(t => (t.endsWith(` ${type}`)));
     }
+    

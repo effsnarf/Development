@@ -1,25 +1,23 @@
 dom:
-  div:
-    component:
-      v-if: node
-      :is: nodeCompName
-      :node: node
-      :user-app-state: userAppState
-      :sui: sui
-      :data-item: dataItem
-      :content-node: contentNode
-      :class: nodeCssClass
-      :style: nodeStyle
-      template:
-        v-slot: child-nodes
-        studio.doc.node:
-          v-for: childNode in node.children
-          :node: childNode
-          :user-app-state: userAppState
-          :sui: sui
-          :data-item: dataItem
-          :content-node: contentNode
-          :key: childNode.id
+  component:
+    v-if: node
+    ref: comp1
+    :is: nodeCompName
+    :node: node
+    :user-app-state: userAppState
+    :sui: sui
+    :data-item: dataItem
+    :content-node: contentNode
+    template:
+      v-slot: child-nodes
+      studio.doc.node:
+        v-for: childNode in node.children
+        :node: childNode
+        :user-app-state: userAppState
+        :sui: sui
+        :data-item: dataItem
+        :content-node: contentNode
+        :key: childNode.id
 
 props:
   node:
@@ -32,9 +30,33 @@ props:
 mounted: | #js
   function() {
     this.$root.$on("app.state.changed", this.onAppStateChanged.bind(this));
+    this.applyCssClass(this.nodeCssClass);
+    this.applyStyle(this.nodeStyle);
   }
 
 methods:
+  applyCssClass: | #js
+    function(cls) {
+      // Apply CSS classes to this.$el
+      // cls is an object like { cls1: true, cls2: false, ... }
+      if (!this.$el?.classList) return;
+      Object.keys(cls).forEach(key => {
+        if (cls[key]) {
+          this.$el.classList.add(key);
+        } else {
+          this.$el.classList.remove(key);
+        }
+      });
+    }
+  applyStyle: | #js
+    function(s) {
+      // Apply inline styles to this.$el
+      // s is an object like { background: 'red', color: 'blue', ... }
+      if (!this.$el?.style) return;
+      Object.keys(s).forEach(key => {
+        this.$el.style[key] = s[key];
+      });
+    }
   onAppStateChanged: | #js
     function(vars) {
     }
@@ -86,11 +108,7 @@ methods:
 computed:
   nodeVarPath: | #js
     function() {
-      // #TODO might be wrong
-      const node = this.node;
-      const pageName = this.nodePageName;
-      const varPath = `${pageName}.${node.name}`;
-      return varPath;
+      return this.$root.getNodeVarPath(this.node);
     }
   nodePageName: | #js
     function() {
@@ -127,6 +145,20 @@ computed:
       if (!this.node) return false;
       return this.areNodesRelated(this.node, this.sui?.node.active);
     }
+
+watch:
+  nodeCssClass:
+    handler: | #js
+      function(nodeCssClass) {
+        this.applyCssClass(nodeCssClass);
+      }
+    immediate: true
+  nodeStyle:
+    handler: | #js
+      function(nodeStyle) {
+        this.applyStyle(nodeStyle);
+      }
+    immediate: true
 
 style:
   .comp-studio-doc-node:

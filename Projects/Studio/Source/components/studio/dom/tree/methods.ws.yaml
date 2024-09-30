@@ -77,6 +77,13 @@ methods:
       };
       return (icons[node.type] || "❔");
     }
+  getNodeVarPath: | #js
+    function(node) {
+      // #TODO might be wrong
+      const pageName = this.getNodePageName(node);
+      const varPath = `${pageName}.${node.name}`;
+      return varPath;
+    }
   findNode: | #js
     function(node, type, compName) {
       for (const childNode of node.children) {

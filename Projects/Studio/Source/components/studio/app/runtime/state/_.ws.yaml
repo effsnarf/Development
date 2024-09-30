@@ -41,6 +41,7 @@ methods:
       for (const listNode of this.$root.findDescNodes(pageNode, "list"))
       {
         page[listNode.name] = {
+          _items: [],
           items: [],
           hovered: null,
           selected: null,
@@ -78,7 +79,7 @@ methods:
   expandNodeToTree: | #js
     function(node, key, value, nodePath) {
       // #TODO inaccurate
-      if (["items", "hovered", "selected"].includes(nodePath.last())) return false;
+      if (["_items", "items", "hovered", "selected"].includes(nodePath.last())) return false;
       return true;
     }
 

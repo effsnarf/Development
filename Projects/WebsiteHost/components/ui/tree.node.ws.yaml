@@ -23,13 +23,13 @@ dom:
       @dragover: onMouseEnter
       @dragout: onMouseLeave
       slot: null
-    transition:
-      name: slide-fast
+    div:
       ul:
         v-if: isExpanded
         class: ml-3
         li:
           v-for: child in getChildItems(node)
+          :key: child.id
           ui.tree.node:
             ':node': child
             ':depth': (depth + 1)

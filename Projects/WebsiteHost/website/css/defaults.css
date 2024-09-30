@@ -442,6 +442,25 @@ select, input[type=range]
 }
 
 
+.folded
+{
+  overflow: hidden;
+  transition: 1s;
+}
+.folded.em1 { max-height: 1em; }
+.folded.em2 { max-height: 2em; }
+.folded.em3 { max-height: 3em; }
+.folded.em4 { max-height: 4em; }
+.folded.em5 { max-height: 5em; }
+.folded.em6 { max-height: 6em; }
+.folded:hover
+{
+  max-height: 20em;
+  overflow: auto;
+}
+
+
+
 .slider-closed
 {
   max-width: 5em;
@@ -774,6 +793,10 @@ select, input[type=range]
   text-shadow: -3px 3px 1px #000;
   background: #ffa530a0;
   padding: 0.5em;
+}
+.warning::before {
+  content: '⚠️';
+  margin-right: 0.5em;
 }
 .error
 {

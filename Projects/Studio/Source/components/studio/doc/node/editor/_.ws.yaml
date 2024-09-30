@@ -30,6 +30,7 @@ dom:
               :node: node
               :node-vue: nodeVue
               :initial: initial
+              :user-app-state: userAppState
               :sui: sui
         template: 
           v-slot: tab2
@@ -53,11 +54,13 @@ dom:
               :initial: initial
               :sui: sui
       div:
+        v-if: "false"
         pre:
           v-text: node
 
 props:
   node:
+  userAppState:
   sui:
   nodeVue:
   isTabsDrawerOpen:

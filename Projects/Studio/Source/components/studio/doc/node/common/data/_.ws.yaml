@@ -1,0 +1,85 @@
+dom:
+  div:
+    .warning:
+      v-if: (!Array.isArray(nodeDatas?.[1]))
+      v-text: "'Data in a list component must be an array.'"
+    .warning:
+      v-if: (nodeDatas?.[0] && !Array.isArray(nodeDatas?.[1]))
+      v-text: "'Use the 🛠️ linq control to select the array from the data.'"
+    div:
+      v-for: varPath in nodeVarPaths
+      .flex1:
+        h3:
+          v-text: "'🧊 ' + varPath.split('.').last()"
+        .folded.em2:
+          ui.value:
+            :value: Objects.getProperty(userAppState, varPath)
+      div:
+        v-if: "varPath.endsWith('._items')"
+        .flex1:
+          h3:
+            v-text: "'🛠️ linq'"
+          .folded.em2:
+            ui.linq:
+              v-if: (nodeDatas?.[0] && node.data?.source?.linq)
+              :input: nodeDatas[0]
+              v-model: node.data.source.linq
+              @output: onLinqOutput
+
+props:
+  node:
+  userAppState:
+
+data:
+  linqOutputData:
+
+methods:
+  onLinqOutput: | #js
+    function(newValue) {
+      const varPath = (this.nodeVarPaths[1] || this.nodeVarPaths[0]);
+      const oldValue = Objects.getProperty(this.userAppState, varPath);
+      this.$root.studio.user.app.state.change(varPath, newValue);
+    }
+
+computed:
+  nodeDatas: | #js
+    function() {
+      return this.nodeVarPaths.map((p, i) => Objects.getProperty(this.userAppState, this.nodeVarPaths[i]));
+    }
+  nodeVarPaths: | #js
+    function() {
+      const varPaths = [];
+      const varPath = this.$root.getNodeVarPath(this.node);
+      if ("list" == this.node.type) {
+        varPaths.push(`${varPath}._items`);
+        varPaths.push(`${varPath}.items`);
+        varPaths.push(`${varPath}.hovered`);
+        varPaths.push(`${varPath}.selected`);
+      }
+      else {
+        varPaths.push(varPath);
+      }
+      return varPaths;
+    }
+  Objects: | #js
+    function() {
+      return window.Objects;
+    }
+
+style:
+  h3:
+    opacity: 0.7
+  .flex1:
+    display: flex
+  .flex1 > *:hover:
+    background: "#80808040"
+  .flex1 > *:nth-child(1):
+    width: 7em
+  .flex1 > *:nth-child(2):
+    width: calc(100% - 7em)
+    opacity: 0.3
+  .flex1:hover > *:nth-child(2):
+    filter: none
+    opacity: 1
+  .warning:
+    margin: 1em
