@@ -402,7 +402,7 @@ methods:
                     flex: {
                       dir: "h",
                       justify: {
-                        content: "flex-start"
+                        content: "space-between"
                       }
                     },
                     children: [
@@ -421,20 +421,13 @@ methods:
                               }
                             }
                           },
-                          {
-                            type: "title",
-                            size: 4,
-                            data: {
-                              source: {
-                                type: "field",
-                                exp: "replies"
-                              }
-                            }
-                          },
                         ]
                       },
                       {
                         type: "panel",
+                        layout: {
+                          width: "60%"
+                        },
                         children: [
                           {
                             type: "title",
@@ -457,7 +450,17 @@ methods:
                             }
                           }
                         ]
-                      }
+                      },
+                      {
+                        type: "title",
+                        size: 3,
+                        data: {
+                          source: {
+                            type: "field",
+                            exp: "replies"
+                          }
+                        }
+                      },
                     ],
                   },
                 ]
