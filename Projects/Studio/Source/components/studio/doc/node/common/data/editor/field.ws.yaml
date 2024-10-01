@@ -1,0 +1,47 @@
+dom:
+  div:
+    h2:
+      ui.input.text.box:
+        hint: field name or custom expression
+        v-model: node.data.source.exp
+    div:
+      table:
+        tr:
+          v-for: field in dataItemFields
+          :class: "{ clickable: true, selected: (field == initial.node.data.source.exp) }"
+          @mouseenter: () => { node.data.source.exp = field; }
+          @mouseleave: () => { node.data.source.exp = initial.node.data.source.exp; }
+          @click: () => { node.data.source.exp = initial.node.data.source.exp = field; }
+          td:
+            div:
+              v-if: (field == initial.node.data.source.exp)
+              v-text: "'✔️'"
+          td:
+            v-text: "'🧊 ' + field"
+
+props:
+  node:
+  initial:
+  sui:
+
+data:
+
+methods:
+  getDataItemFields: | #js
+    function() {
+      return this.sui.selected.dataItems
+        .take(10)
+        .flatMap(d => Object.keys(d))
+        .distinct()
+        .sortBy(s => s);
+    }
+
+computed:
+  dataItemFields: | #js
+    function() {
+      return this.getDataItemFields();
+    }
+
+style:
+  td:nth-child(1):
+    width: 2em

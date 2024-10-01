@@ -13,7 +13,19 @@ props:
   userApp:
   sui:
 
+mounted: | #js
+  function() {
+    this.$emit("mounted");
+    this.$root.$on("app.state.changed", this.onAppStateChanged.bind(this));
+  }
+
 methods:
+  onAppStateChanged: | #js
+    function(vars) {
+      if (vars.any(v => v.varPath.includes("hovered"))) return;
+      // #TODO lame
+      this.$forceUpdate();
+    }
   fetchFromUrl: | #js
     async function(url) {
       const ticker = Ticker.alertify((elapsed) => `<h2>⏳ ${elapsed.unitifyTime()}</h2> ${url}`)

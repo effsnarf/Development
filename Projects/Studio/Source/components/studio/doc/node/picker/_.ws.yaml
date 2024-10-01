@@ -26,14 +26,6 @@ dom:
                   :item: child
                   :sui: sui
                   :key: child.id
-          div:
-            v-if: "false"
-            studio.doc.node.editor:
-              v-if: "$refs.context1?.isPinned && sui.node.selected"
-              :node: contextNode
-              :sui: sui
-              :is-tabs-drawer-open: "true"
-              @dom-edit: (...args) => $emit('dom-edit', ...args)
 props:
   userApp:
   sui:
@@ -46,6 +38,7 @@ data:
     node:
     nodes: []
     cnodes: []
+  maxDepth: 5
 
 mounted: | #js
   function() {
@@ -55,11 +48,13 @@ mounted: | #js
 methods:
   onSelectedNodeChanged: | #js
     async function(newNode) {
+      // close the context window
+      this.$refs.context1.close();
       //await this.refreshParentNodes(newNode);
     }
   onContextPinned: | #js
     function(isPinned) {
-      if (!isPinned) this.sui.node.selected = null;
+      //if (!isPinned) this.sui.node.selected = null;
       //this.sui.node.selected = (!isPinned ? false : this.sui.node.hovered);
     }
   refreshNodeTree: | #js
@@ -88,7 +83,7 @@ methods:
       if (!cnode?.node || !cnode?.element) return [];
       const cnodes = [];
       cnodes.unshift(cnode);
-      while ((cnodes.length < 5) && (cnode = await this.getCNodeParent(cnode))) cnodes.unshift(cnode);
+      while ((cnodes.length < this.maxDepth) && (cnode = await this.getCNodeParent(cnode))) cnodes.unshift(cnode);
       return cnodes;
     }
   getCNodeParent: | #js

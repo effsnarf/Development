@@ -14,6 +14,9 @@ dom:
         div:
           v-if: hasWarning
           v-text: "'⚠️'"
+        .info:
+          v-if: nodeInfo
+          v-text: nodeInfo
 
 props:
   item:
@@ -34,13 +37,19 @@ methods:
       if (!this.sui) return;
       this.sui.node.hovered = (!isHovered ? null : node);
     }
+  shorten: | #js
+    function(s, len = 10) {
+      if (!s?.length) return null;
+      return (s.length > len ? '…' + s.slice(-len + 1) : s);
+    }
 
 computed:
   nodeText: | #js
     function() {
       const node = this.node;
       const icon = this.$root.getNodeIcon(node);
-      let text = (!this.showName) ? node.type : (node.slot?.name || node.comp?.name || node.name || node.type);
+      let text = (!this.showName) ? node.type :
+        (node.slot?.name || node.comp?.name || node.name || node.type);
       if (text != node.type) text = `[${text}]`;
       return `${icon} ${text}`;
     }
@@ -56,6 +65,15 @@ computed:
     function() {
       return (!!this.nodeWarning);
     }
+  nodeInfo: | #js
+    function() {
+      return null;
+      //
+      const node = this.node;
+      const ds = node.data?.source;
+      if (ds?.exp) return this.shorten(ds?.exp);
+      return null;
+    }
   node: | #js
     function() {
       return this.item;
@@ -65,6 +83,9 @@ style:
   .comp-studio-dom-tree-node:
     white-space: nowrap
     text-shadow: -3px 3px 1px black
+  .info:
+    margin-left: 0.5em
+    opacity: 0.5
   .warn:
     background: "repeating-linear-gradient(-45deg, rgba(166, 134, 0, 0.5), rgba(166, 134, 0, 0.5) 12px, rgba(0, 0, 0, 0.5) 10px, rgba(0, 0, 0, 0.5) 20px)"
   .flex:

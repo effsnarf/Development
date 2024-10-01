@@ -1,10 +1,15 @@
 dom:
-  div:
-    :is: "('h'+(node.size||4))"
-    v-text: "(text || '❔')"
+  studio.doc.node.anim:
+    :node: node
+    :items-count: 1
+    :sui: sui
+    div:
+      :is: "('h'+(node.size||4))"
+      v-text: "(text || '❔')"
 
 props:
   node:
+  sui:
   dataItem:
   userAppState:
 

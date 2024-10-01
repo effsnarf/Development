@@ -6,7 +6,7 @@ dom:
         href: /
         ui.title:
           class: title1
-          text: Studio
+          text: UX Studio
 
 data:
 style:
@@ -15,7 +15,6 @@ style:
     font-family: Audiowide
     color: "#ffffffa0"
     filter: drop-shadow(-1px 1px 1px white)
-    text-shadow: "-6px 6px 6px black"
 
 _:
   examples:

@@ -7,33 +7,40 @@ dom:
       :value: initialSelectedTab
       template:
         v-slot: tab0
-        h2:
-          ui.input.text.box:
-            hint: field name
+        studio.doc.node.common.data.editor.field:
+          :node: node
+          :initial: initial
+          :sui: sui
       template:
         v-slot: tab1
-        studio.doc.node.common.data.editor.url:
-          :node: node
+        h2:
+          ui.input.text.box:
+            hint: expression
+            v-model: node.data.source.exp
       template:
         v-slot: tab2
+        studio.doc.node.common.data.editor.url:
+          :node: node
     div:
       studio.doc.node.common.data:
         :node: node
         :user-app-state: userAppState
+      pre:
+        v-if: "false"
+        v-text: node
 
 props:
   node:
   initial:
+  userApp:
   userAppState:
   sui:
 
 data:
-  userApp:
-  tabOptions: ['🍃 field', '🌐 url', '🔗 link', '🌀 mock', '🔳 json']
+  tabOptions: ['🍃 field', '🟰 exp', '🌐 fetch']
 
 mounted: | #js
   function() {
-    this.userApp = this.$root.getUserApp(this);
   }
 
 methods:
@@ -41,8 +48,8 @@ methods:
 computed:
   initialSelectedTab: | #js
     function() {
-      const type = this.node?.data?.source?.type?.split('.').last();
-      if (!type) return null;
-      return this.tabOptions.findIndex(t => (t.endsWith(` ${type}`)));
+      const types = this.node?.data?.source?.type?.split('.');
+      if (!types?.length) return null;
+      return this.tabOptions.findIndex(t => (types.includes(t.split(' ').last())));
     }
     

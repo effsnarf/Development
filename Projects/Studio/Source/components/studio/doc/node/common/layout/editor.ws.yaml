@@ -1,7 +1,7 @@
 dom:
   div:
     h2:
-      v-text: "'🧱 flex'"
+      v-text: "'🧱 layout'"
     studio.doc.node.editor.options:
       title: justify content
       :node: node

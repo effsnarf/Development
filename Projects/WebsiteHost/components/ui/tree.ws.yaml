@@ -9,7 +9,7 @@ dom:
         ':expandable': initialExpandable
         ':item-type': itemType
         ':get-item': getItem || ((node) => (node?.item || node))
-        ':get-item-key': getItemKey || $root.getKey
+        ':get-item-key': getItemKey1
         ':get-children': getChildren || ((node) => node.children||[])
         ':selected-node': selectedNode
         ':item-props': itemProps
@@ -52,6 +52,10 @@ methods:
       this.$emit('node-hovered', child, isHovered);
     }
 computed:
+  getItemKey1: | #js
+    function() {
+      return (this.getItemKey || this.$root.getKey);
+    }
   initialExpandable: | #js
     function() {
       if (typeof this.initialExpanded == 'boolean') return !this.initialExpanded;

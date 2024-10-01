@@ -7,7 +7,6 @@ dom:
         v-if: showUiExpand
         v-model: isExpanded
       div: 
-        class: w-l2
         v-if: '!showUiExpand'
       component:
         v-if: itemType
@@ -26,10 +25,10 @@ dom:
     div:
       ul:
         v-if: isExpanded
-        class: ml-3
+        class: ml-4
         li:
           v-for: child in getChildItems(node)
-          :key: child.id
+          :key: getItemKey(child)
           ui.tree.node:
             ':node': child
             ':depth': (depth + 1)

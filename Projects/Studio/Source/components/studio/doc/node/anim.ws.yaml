@@ -1,10 +1,10 @@
 dom:
   ui.anim:
-    :anim: (node.animation.preview || node.animation?.anim)
+    :anim: (node.animation?.preview || node.animation?.anim)
     :anim-state: animState
     :duration: "(node.animation?.duration || default1.duration)"
     :items-count: itemsCount
-    :auto-play-loop: "(!!node.animation.preview)"
+    :auto-play-loop: "(!!node.animation?.preview)"
     slot:
 
 props:
@@ -25,7 +25,7 @@ mounted: | #js
 methods:
   onSelectedPageChanged: | #js
     function(newPage, oldPage) {
-      const page = this.$root.getNodePage(this.node);
+      const page = this.$root.getNodePage(this);
       this.animState = (page.id == oldPage?.id) ? "leaving" :
-        (page.id == newPage.id) ? "entering" : null;
+        (page.id == newPage?.id) ? "entering" : null;
     }

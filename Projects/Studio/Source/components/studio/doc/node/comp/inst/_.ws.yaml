@@ -2,9 +2,11 @@ dom:
   studio.doc.node:
     :node: compNode.children[0]
     :sui: sui
+    :user-app-state: userAppState
     :data-item: dataItem
 
 props:
+  userAppState:
   node:
   sui:
   dataItem:

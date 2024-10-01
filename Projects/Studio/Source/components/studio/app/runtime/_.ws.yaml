@@ -5,6 +5,7 @@ dom:
       ref: userAppVue1
       :user-app: userApp
       :sui: sui
+      @mounted: $emit('runtime-vue-inited')
 
 props:
   userApp:
@@ -56,7 +57,7 @@ methods:
             selected: null,
           };
 
-          if ("url" == ds.type) {
+          if ("fetch" == ds.type) {
             // [url] variable
             pageData[listNode.name].url = null;
 
@@ -64,7 +65,8 @@ methods:
             // #TODO show exception to the user
             computeds[`${listVarName}_url`] = {
               get: eval(`(function() {
-                try {
+                try
+                {
                   return ${ds.url};
                 }
                 catch (ex) {

@@ -17,43 +17,36 @@ mounted: | #js
 methods:
   getBoundData: | #js
     function(userAppState, node, dataItem, defaultValue) {
+      if (!userAppState) return null;
       const ds = node?.data?.source;
-      if ((!ds) || (!dataItem)) return defaultValue;
-      if (ds?.type == "state.tree.link")
+      if (!ds) return defaultValue;
+      if (["exp", "field"].includes(ds.type))
       {
-        return Objects.getProperty(userAppState, ds.path);
-      }
-      if (ds.type == "data.item")
-      {
-        if (ds.exp in dataItem) {
+        if ((dataItem) && (ds.exp in dataItem)) {
           return dataItem[ds.exp];
         }
 
-        const localVars = this.objectsToLocalVars([{obj: userAppState }, { obj: dataItem, keys: ds.exp.getWords() }]);
-        try {
-          const func = eval(`(function() {
-          ${localVars.join('\n')}
+        let localVars = [];
+        //for (const key in userAppState) localVars.push({ name: key, value: userAppState[key] });
+        for (const key in dataItem) localVars.push({ name: key, value: dataItem[key] });
+        localVars = localVars.sortBy(v => v.name);
+        const argNames = localVars.map(v => v.name);
+        const argValues = localVars.map(v => v.value);
+
+        try
+        {
+          const func = eval(`(function(${argNames.join(', ')}) {
             return ${ds.exp};
           })`);
-          return func();
+          return func.apply(userAppState, argValues);
         }
         catch (ex) {
+          // #TODO show warning to user
           console.warn(ex);
           return defaultValue;
         }
       }
       throw `Unknown data source`;
-    }
-  objectsToLocalVars: | #js
-    function(args) {
-      const vars = [];
-      for (const arg of args) {
-        if (!arg?.obj) continue;
-        const obj = arg.obj;
-        const keys = (arg.keys || Object.keys(obj));
-        for (const key of keys) if (key in obj) vars.push(`const ${key} = ${JSON.stringify(obj[key])};`);
-      }
-      return vars;
     }
   getNodeIcon: | #js
     function(node) {
@@ -65,7 +58,7 @@ methods:
         page: "📄",
         panel: "🗂️",
         title: "🅰️",
-        list: "🟰",
+        list: "🧮",
         comps: "🎁",
         comp: "🎁",
         "comp.inst": "📦",
@@ -80,6 +73,7 @@ methods:
   getNodeVarPath: | #js
     function(node) {
       // #TODO might be wrong
+      if (!node.name) return null;
       const pageName = this.getNodePageName(node);
       const varPath = `${pageName}.${node.name}`;
       return varPath;
@@ -162,9 +156,9 @@ methods:
       return pageNodes.map(p => p.name);
     }
   getNodePage: | #js
-    function(node) {
-      const ancs = this.getNodeAncestors(node);
-      return ancs.find(n => (n.type == "page"));
+    function(vue) {
+      while ((vue) && (vue.node?.type != "page")) vue = vue.$parent;
+      return vue.node;
     }
   getNodePageName: | #js
     function(node) {

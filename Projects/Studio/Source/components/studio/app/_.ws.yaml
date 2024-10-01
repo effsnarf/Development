@@ -9,11 +9,16 @@ dom:
           :sui: sui
           @sui: onSuiEvent
       div:
-        studio.dom.tree:
-          :root: sui.page.selected
-          :sui: sui
-          @sui: onSuiEvent
-          :initial-expanded: "true"
+        transition.group:
+          name: list2
+          studio.dom.tree:
+            v-for: pageNode in pageNodes
+            :key: pageNode.id
+            v-show: (pageNode.id == sui.page.selected?.id)
+            :root: pageNode
+            :sui: sui
+            @sui: onSuiEvent
+            :initial-expanded: "true"
         studio.app.log:
           category: runtime
       .flex2:
@@ -28,21 +33,26 @@ dom:
           studio.doc.node.picker:
             :user-app: userApp
             :sui: sui
-            :enabled: sui.app.hovered
+            :enabled: sui.app.is.hovered
           studio.app.runtime:
             ref: userAppRuntime1
             :user-app: userApp
             :sui: sui
+            @runtime-vue-inited: onRuntimeVueInited
       div:
         studio.doc.node.editor:
           :node: sui.node.selected
+          :user-app: userApp
           :user-app-state: userAppState
           :sui: sui
           :is-tabs-drawer-open: "true"
       div:
+        h2:
+          v-text: "'App Runtime State'"
         studio.app.runtime.state:
           :user-app: userApp
           :user-app-state: userAppState
+          :sui: sui
     studio.dom.tree.methods:
       ref: methods1
       :user-app: userApp
@@ -52,11 +62,13 @@ data:
   userAppState:
   sui:
     app:
-      hovered:
+      is:
+        hovered:
     page:
       selected:
       trans:
         dir:
+    pages:
     node:
       hovered:
       selected:
@@ -64,16 +76,17 @@ data:
       context:
     nodes:
       hovered:
+    selected:
+      dataItems: []
+  pageNodes:
   appStateChangedVars: []
   appStateChangeKey: 1
 
 mounted: | #js
-  function() {
-    setTimeout(() => {
-      this.userAppState = this.$refs.userAppRuntime1.$refs.userAppVue1.$data;
-    }, 3000);
-
+  async function() {
     this.userApp = this.getMockupUserApp();
+    await this.$nextTick();
+    this.pageNodes = this.$root.getPageNodes();
     // Register global methods
     this.$root.getUserApp = this.getUserApp.bind(this);
     this.$root.getStudioApp = this.getStudioApp.bind(this);
@@ -91,17 +104,55 @@ mounted: | #js
         }
       }
     }
+    this.$watch("sui.page.selected", this.onSelectedPageChanged.bind(this));
+    this.$watch("sui.node.selected", this.onSelectedNodeChanged.bind(this));
+    this.$root.$on("data.item.selected", this.onDataItemSelected.bind(this));
   }
 
 methods:
+  onSelectedPageChanged: | #js
+    function(pageNode) {
+      if (!pageNode) return;
+      this.initPageUiState(pageNode);
+      const sui = this.sui;
+      const page = sui.pages[pageNode.id];
+      // when switching page, set the selected node to the page's selected node
+      sui.node.selected = page.node.selected;
+    }
+  onSelectedNodeChanged: | #js
+    function(node) {
+      this.sui.pages[this.sui.page.selected.id].node.selected = node;
+      this.sui.selected.dataItems.clear();
+    }
+  onDataItemSelected: | #js
+    function(dataItem) {
+      this.sui.selected.dataItems.push(dataItem);
+    }
+  initPageUiState: | #js
+    function(pageNode) {
+      if (!pageNode) return;
+      // init sui.pages[(page-id)] to hold separate ui state for pages
+      const sui = this.sui;
+      sui.pages = (sui.pages || {});
+      sui.pages[pageNode.id] = (this.sui.pages[pageNode.id] || {});
+      const page = sui.pages[pageNode.id];
+      page.node = (page.node || {});
+      page.node.selected = (page.node.selected || null);
+    }
+  onRuntimeVueInited: | #js
+    function() {
+      this.userAppState =  this.$refs.userAppRuntime1.$refs.userAppVue1.$data;
+    }
   onHoverApp: | #js
     function(isHovered) {
-      this.sui.app.hovered = isHovered;
+      this.sui.app.is.hovered = isHovered;
     }
   selectPage: | #js
     function(newPage) {
       this.sui.page.trans.dir = this.getPageTransDir(this.sui.page.selected, newPage);
       this.sui.page.selected = newPage;
+      const node = this.sui.node;
+      node.hovered = node.selected = node.active = node.context = null;
     }
   getPageTransDir: | #js
     function(fromPage, toPage) {
@@ -207,15 +258,10 @@ methods:
                         },
                         data: {
                           source: {
-                            type: "url",
+                            type: "fetch",
                             url: "`https://a.4cdn.org/boards.json`",
                             linq: [{"type":"select.field","path":["boards"],"_id":1},{"type":"select.fields","fields":["board","title"],"_id":2}]
                           }
-                        },
-                        animation: {
-                          anim: null,
-                          duration: null,
-                          preview: null
                         },
                         children: [
                           {
@@ -223,7 +269,7 @@ methods:
                             size: 2,
                             data: {
                               source: {
-                                type: "data.item",
+                                type: "field",
                                 exp: "title"
                               }
                             }
@@ -252,8 +298,8 @@ methods:
                         size: 1,
                         data: {
                           source: {
-                            type: "state.tree.link",
-                            path: ["home", "list", "boards", "selected", "title"]
+                            type: "exp",
+                            exp: "this.home.boards.selected.title",
                           }
                         },
                       },
@@ -270,15 +316,10 @@ methods:
                         name: "threads",
                         data: {
                           source: {
-                            type: "url",
+                            type: "fetch",
                             url: "`https://a.4cdn.org/${this.home.boards.selected.board}/catalog.json`",
                             linq: [{"type":"select.fields","fields":["threads"],"_id":1},{"type":"flat.map","path":["threads"],"_id":2}]
                           }
-                        },
-                        animation: {
-                          anim: null,
-                          duration: null,
-                          preview: null
                         },
                         children: [
                           {
@@ -311,8 +352,8 @@ methods:
                         size: 1,
                         data: {
                           source: {
-                            type: "state.tree.link",
-                            path: ["home", "list", "threads", "selected", "sub"]
+                            type: "exp",
+                            exp: "this.board.threads.selected.sub"
                           }
                         },
                       },
@@ -329,15 +370,10 @@ methods:
                         name: "posts",
                         data: {
                           source: {
-                            type: "url",
+                            type: "fetch",
                             url: "`https://a.4cdn.org/${this.home.boards.selected.board}/thread/${this.board.threads.selected.no}.json`",
                             linq: [ { "type": "select.field", "path": [ "posts" ], "_id": 1 } ]
                           }
-                        },
-                        animation: {
-                          anim: null,
-                          duration: null,
-                          preview: null
                         },
                         children: [
                           {
@@ -377,24 +413,21 @@ methods:
                         },
                         children: [
                           {
-                            type: "title",
-                            size: 2,
+                            type: "image",
                             data: {
                               source: {
-                                type: "data.item",
-                                exp: "replies"
+                                type: "exp",
+                                exp: "`https://i.4cdn.org/${this.home.boards.selected.board}/${tim}${ext}`"
                               }
                             }
                           },
                           {
-                            type: "image",
-                            layout: {
-                              width: "20%"
-                            },
+                            type: "title",
+                            size: 4,
                             data: {
                               source: {
-                                type: "data.item",
-                                exp: "`https://i.4cdn.org/${this.home.boards.selected.board}/${tim}s${ext}`"
+                                type: "field",
+                                exp: "replies"
                               }
                             }
                           },
@@ -408,7 +441,7 @@ methods:
                             size: 3,
                             data: {
                               source: {
-                                type: "data.item",
+                                type: "field",
                                 exp: "sub"
                               }
                             }
@@ -418,7 +451,7 @@ methods:
                             size: 5,
                             data: {
                               source: {
-                                type: "data.item",
+                                type: "field",
                                 exp: "com"
                               }
                             }
@@ -449,8 +482,8 @@ methods:
                         },
                         data: {
                           source: {
-                            type: "data.item",
-                            exp: "`https://i.4cdn.org/${this.home.boards.selected.board}/${tim}s${ext}`"
+                            type: "exp",
+                            exp: "`https://i.4cdn.org/${this.home.boards.selected.board}/${tim}${ext}`"
                           }
                         }
                       },
@@ -459,7 +492,7 @@ methods:
                         size: 3,
                         data: {
                           source: {
-                            type: "data.item",
+                            type: "field",
                             exp: "com"
                           }
                         }
@@ -519,6 +552,11 @@ methods:
   getMockupNode: | #js
     function(node) {
       node = Objects.clone(node, { exclude: ["children"] });
+      node.animation = {
+        anim: null,
+        duration: null,
+        preview: null
+      };
       node.style = {
         bg: {
           color: null
@@ -579,7 +617,7 @@ style:
   .comp-studio-app > .flex1 > *:nth-child(2):
     width: 18%
   .comp-studio-app > .flex1 > *:nth-child(4):hover:
-    width: 70%
+    width: 60%
   .flex2:
     display: flex
     flex-direction: column

@@ -8,6 +8,8 @@ dom:
     :sui: sui
     :data-item: dataItem
     :content-node: contentNode
+    :class: nodeCssClass
+    :style: nodeStyle
     template:
       v-slot: child-nodes
       studio.doc.node:
@@ -30,8 +32,9 @@ props:
 mounted: | #js
   function() {
     this.$root.$on("app.state.changed", this.onAppStateChanged.bind(this));
-    this.applyCssClass(this.nodeCssClass);
-    this.applyStyle(this.nodeStyle);
+    this.$watch("sui.node.selected", this.onSelectedNodeChanged.bind(this));
+    //this.applyCssClass(this.nodeCssClass);
+    //this.applyStyle(this.nodeStyle);
   }
 
 methods:
@@ -60,6 +63,11 @@ methods:
   onAppStateChanged: | #js
     function(vars) {
     }
+  onSelectedNodeChanged: | #js
+    function(node) {
+      if (node?.id != this.node?.id) return;
+      if (this.dataItem) this.$root.$emit("data.item.selected", this.dataItem);
+    }
   getNodeCompName: | #js
     function(node) {
       return `studio-doc-node-${node.type.kebabize()}`;
@@ -70,6 +78,7 @@ methods:
       const s = {};
       s['background-color'] = node.style?.bg?.color;
       s['width'] = node.layout?.width;
+      s['flex'] = 'none';
       Object.assign(s, this.getFlexStyle(node));
       Objects.removeNullValueKeys(s);
       if (!Object.keys(s).length) return null;
@@ -77,10 +86,12 @@ methods:
     }
   getFlexStyle: | #js
     function(node) {
+      if (!node.flex) return {};
       const s = {};
       s.display = "flex";
       s['justify-content'] = (node.flex?.justify?.content || "space-between");
       s['flex-direction'] = this.toFlexDirection(node);
+      Objects.removeNullValueKeys(s);
       return s;
     }
   toFlexDirection: | #js
@@ -90,7 +101,7 @@ methods:
         case "h": return "row";
         case "v": return "column";
       }
-      return "column";
+      return null;
     }
   areNodesRelated: | #js
     function(node1, node2, tryOpposite = true) {
@@ -112,7 +123,7 @@ computed:
     }
   nodePageName: | #js
     function() {
-      return this.$root.getNodePageName(this.node);
+      return this.$root.getNodePageName(this);
     }
   nodeCompName: | #js
     function() {
@@ -150,13 +161,13 @@ watch:
   nodeCssClass:
     handler: | #js
       function(nodeCssClass) {
-        this.applyCssClass(nodeCssClass);
+        //this.applyCssClass(nodeCssClass);
       }
     immediate: true
   nodeStyle:
     handler: | #js
       function(nodeStyle) {
-        this.applyStyle(nodeStyle);
+        //this.applyStyle(nodeStyle);
       }
     immediate: true
 

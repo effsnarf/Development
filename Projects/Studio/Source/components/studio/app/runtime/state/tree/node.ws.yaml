@@ -46,7 +46,7 @@ methods:
       this.isHighlighted = value;
       clearTimeout(this.highlightTimer);
       if (!value) return;
-      //this.highlightTimer = setTimeout(() => { this.flashHighlight(false) }, this.highlightDuration);
+      this.highlightTimer = setTimeout(() => { this.flashHighlight(false) }, this.highlightDuration);
     }
 
 style:

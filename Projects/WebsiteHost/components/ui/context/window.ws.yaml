@@ -104,6 +104,10 @@ unmounted: | #js
     this.unbindFromParent();
   }
 methods:
+  close: | #js
+    function() {
+      this.isPinned = false;
+    }
   bindToParent: | #js
     function() {
       const element = (this.global ? window : this._getContextElement());

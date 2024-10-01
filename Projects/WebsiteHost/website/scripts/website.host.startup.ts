@@ -83,7 +83,7 @@ const generalMixin = {
     const self = this as any;
     vueApp?.vm.registerVue(this);
     return;
-    
+
     self.ui.is.mounted = false;
     self.$el.removeEventListener("mouseover", self.handlers.mouseover);
     self.$el.removeEventListener("mouseout", self.handlers.mouseout);
@@ -1086,6 +1086,7 @@ interface MgParams {
         if (item.id) return item.id;
         if (item._id) return item._id;
         if (item._uid) return item._uid;
+        if (item.path) return (item.path.join?.(`.`) || item.path);
         return item;
       },
       getRandomStanza(poem: any) {

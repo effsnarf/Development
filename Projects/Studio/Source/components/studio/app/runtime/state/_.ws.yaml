@@ -1,11 +1,9 @@
 dom:
   div:
-    h2:
-      v-text: "'State'"
     div:
       :key: key1
       ui.tree:
-        :root: appStateTree
+        :root: root
         :user-app-state: userAppState
         item-type: studio.app.runtime.state.tree.node
         :initial-expanded: "true"
@@ -14,18 +12,25 @@ props:
   userApp:
   userAppState:
   sui:
+  showAllPages: false
 
 data:
   appStateTree:
+  root:
   key1: 1
 
 mounted: | #js
   async function() {
     this.$root.$on("app.state.changed", this.onAppStateChanged.bind(this));
-    //this.$watch("sui.page.selected", this.refresh.bind(this));
+    this.$watch("sui.page.selected", this.onSelectedPageChanged.bind(this));
+    this.refresh();
   }
 
 methods:
+  onSelectedPageChanged: | #js
+    function(pageNode) {
+      this.refresh(pageNode);
+    }
   getAppState: | #js
     async function(userApp) {
       const root = {};
@@ -71,10 +76,13 @@ methods:
       //this.refresh();
     }
   refresh: | #js
-    async function() {
+    async function(pageNode) {
       const appStateTree = Objects.toTreeObject(this.userAppState, this.expandNodeToTree, [], "name", "value");
       this.appStateTree = appStateTree;
+      this.root = this.appStateTree;
+      if (pageNode && !this.showAllPages) this.root = this.appStateTree.children.find(c => (c.name == pageNode.name));
       this.key1++;
+      this.$forceUpdate();
     }
   expandNodeToTree: | #js
     function(node, key, value, nodePath) {

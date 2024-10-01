@@ -79,6 +79,7 @@ style:
     max-height: 6em
     overflow: hidden
     opacity: 0.8
+    cursor: pointer
   .list-item:hover:
     background: "#80808030"
     opacity: 1

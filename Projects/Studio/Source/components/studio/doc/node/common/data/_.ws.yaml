@@ -1,10 +1,10 @@
 dom:
   div:
     .warning:
-      v-if: (!Array.isArray(nodeDatas?.[1]))
+      v-if: (('list' == node.type) && !Array.isArray(nodeDatas?.[2]))
       v-text: "'Data in a list component must be an array.'"
     .warning:
-      v-if: (nodeDatas?.[0] && !Array.isArray(nodeDatas?.[1]))
+      v-if: (nodeDatas?.[1] && !Array.isArray(nodeDatas?.[2]))
       v-text: "'Use the 🛠️ linq control to select the array from the data.'"
     div:
       v-for: varPath in nodeVarPaths
@@ -21,8 +21,8 @@ dom:
             v-text: "'🛠️ linq'"
           .folded.em2:
             ui.linq:
-              v-if: (nodeDatas?.[0] && node.data?.source?.linq)
-              :input: nodeDatas[0]
+              v-if: (nodeDatas?.[1] && node.data?.source?.linq)
+              :input: nodeDatas[1]
               v-model: node.data.source.linq
               @output: onLinqOutput
 
@@ -36,7 +36,7 @@ data:
 methods:
   onLinqOutput: | #js
     function(newValue) {
-      const varPath = (this.nodeVarPaths[1] || this.nodeVarPaths[0]);
+      const varPath = (this.nodeVarPaths[2] || this.nodeVarPaths[1]);
       const oldValue = Objects.getProperty(this.userAppState, varPath);
       this.$root.studio.user.app.state.change(varPath, newValue);
     }
@@ -50,7 +50,10 @@ computed:
     function() {
       const varPaths = [];
       const varPath = this.$root.getNodeVarPath(this.node);
+      if (!varPath) return varPaths;
+
       if ("list" == this.node.type) {
+        varPaths.push(`${varPath}.url`);
         varPaths.push(`${varPath}._items`);
         varPaths.push(`${varPath}.items`);
         varPaths.push(`${varPath}.hovered`);

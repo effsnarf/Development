@@ -3,7 +3,7 @@ dom:
     v-if: node
     div:
       ui.tabs: 
-        ':options': '[nodeTypeTabName, ''🧊 data'', ''✨ animation'', ''🧱 flex'', ''🎨 style'']'
+        ':options': '[nodeTypeTabName, ''🧊 data'', ''✨ animation'', ''🧱 layout'', ''🎨 style'']'
         direction: horizontal
         :can-select-none: "true"
         :show-title-in-tab: "false"
@@ -30,6 +30,7 @@ dom:
               :node: node
               :node-vue: nodeVue
               :initial: initial
+              :user-app: userApp
               :user-app-state: userAppState
               :sui: sui
         template: 
@@ -42,7 +43,7 @@ dom:
         template: 
           v-slot: tab3
           div:
-            studio.doc.node.common.flex.editor:
+            studio.doc.node.common.layout.editor:
               :node: node
               :initial: initial
               :sui: sui
@@ -60,6 +61,7 @@ dom:
 
 props:
   node:
+  userApp:
   userAppState:
   sui:
   nodeVue:
@@ -70,7 +72,12 @@ data:
     node:
   selected:
     tab:
-      index: null
+      index: 1
+  transName: list2
+
+mounted: | #js
+  function() {
+  }
 
 methods:
   getNodeCompEditorName: | #js

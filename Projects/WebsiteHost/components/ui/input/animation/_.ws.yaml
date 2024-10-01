@@ -12,8 +12,9 @@ dom:
           v-text: (i * 100)
           @click: $emit('select-duration', (i * 100))
       .flex1:
-        .clickable:
+        div:
           v-for: (anim1, i) in anims
+        .clickable:
           :class: "{ selected: (anim == anim1) }"
           @mouseenter: () => onHover(anim1, true)
           @mouseleave: () => onHover(anim1, false)
