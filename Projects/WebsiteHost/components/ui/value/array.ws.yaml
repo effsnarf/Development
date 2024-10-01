@@ -249,7 +249,7 @@ watch:
         else
         {
           const oldFields = this.getFields(this.getItems(oldValue));
-          if (Objects.areEqual(oldFields, this.fields)) resetFields = false;
+          resetFields = (!Objects.areEqual(oldFields, this.fields));
         }
         if (resetFields) this.visibleFields1 = this.fields.take(3);
       }
