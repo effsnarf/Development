@@ -55,7 +55,7 @@ methods:
       if (!listItems) {
         listItems = Array.from({ length: 5 }, (_, i) => null);
       }
-      return listItems.take(6);
+      return listItems.take(10);
     }
   getListItemKey: | #js
     function(item) {
