@@ -1,26 +1,18 @@
 dom:
   div:
+    v-if: anim
     .list-container:
       ui.anim:
         :anim: anim
         :duration: duration
-        :items-count: listItems.length
+        :items-count: itemsCount
         :auto-play-loop: "true"
         .list-item:
-          v-for: (listItem, i) in listItems
-          :key: listItem
+          v-for: i in itemsCount
+          :key: i
     h4:
       class: text-center dimmed
-      v-text: "'' + anim.name"
-    .frame-container:
-      v-show: "false"
-      transition.group:
-        :name: "'anim-' + anim.name"
-        .frame:
-          v-for: (frame, i) in frames
-          v-show: "frameIndex==i"
-          v-text: frame
-          :key: frame
+      v-text: "'✨ ' + anim.name"
       
 props:
   anim:
@@ -28,7 +20,7 @@ props:
 
 data:
   frameIndex: 0
-  frames: ['🍎', '🍌', '🍇', '🍉', '🍊', '🍍', '🍓', '🍑', '🍒', '🍏', '🍋']
+  itemsCount: 5
   
 mounted: | #js
   function() {
@@ -39,12 +31,6 @@ methods:
     async function() {
       // single item
       this.frameIndex = ((this.frameIndex + 1) % this.frames.length);
-    }
-
-computed:
-  listItems: | #js
-    function() {
-      return this.frames.take(5);
     }
 
 style:
@@ -70,21 +56,3 @@ style:
     height: 1.5em
     background: "#80808080"
     text-align: center
-  .frame-container:
-    overflow: hidden
-    filter: grayscale(1)
-    perspective: 1000px
-  .frame-container:hover:
-    filter: none
-  .frame-container, .frame:
-    width: 6rem
-    aspect-ratio: 1
-  .frame:
-    position: absolute
-    display: flex
-    align-items: center
-    justify-content: center
-    font-size: 3.5rem
-    background: "#80808060"
-    border: 2px solid gray
-    transform-style: preserve-3d

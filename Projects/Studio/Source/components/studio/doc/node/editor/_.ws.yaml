@@ -72,7 +72,7 @@ data:
     node:
   selected:
     tab:
-      index: 1
+      index: null
   transName: list2
 
 mounted: | #js

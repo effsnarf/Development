@@ -14,15 +14,15 @@ dom:
       .flex1:
         div:
           v-for: (anim1, i) in anims
-        .clickable:
-          :class: "{ selected: (anim == anim1) }"
-          @mouseenter: () => onHover(anim1, true)
-          @mouseleave: () => onHover(anim1, false)
-          @click: () => onClick(anim1)
-          ui.input.animation.example:
-            :anim: anim1
-            :duration: duration
-            :key: i
+          .clickable:
+            :class: "{ selected: (anim == anim1) }"
+            @mouseenter: () => onHover(anim1, true)
+            @mouseleave: () => onHover(anim1, false)
+            @click: () => onClick(anim1)
+            ui.input.animation.example:
+              :anim: anim1
+              :duration: duration
+              :key: i
 
 props:
   anim:
