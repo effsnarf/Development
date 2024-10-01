@@ -120,6 +120,8 @@ style:
     white-space: pre
   .comp-ui-image:
     width: 5em
+  .preview:
+    pointer-events: none
   .preview .comp-ui-image:
     width: 4em
 name: ui-value-preview

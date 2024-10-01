@@ -184,7 +184,7 @@ computed:
     }
     const query = (this.query || '').toLowerCase();
     if (query) items = items.filter(item => Objects.getValues(item).some(v => (v?.toString().toLowerCase().includes(query))));
-    items = items.skip(this.pageIndex).take(this.pageSize);
+    items = items.skip(this.pageIndex * this.pageSize).take(this.pageSize);
     return items;
   shownFields: | #js
     if (this.visibleFields1) return this.visibleFields1;

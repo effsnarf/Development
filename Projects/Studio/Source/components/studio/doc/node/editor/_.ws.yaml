@@ -2,6 +2,10 @@ dom:
   div:
     v-if: node
     div:
+      h2:
+        studio.dom.tree.node:
+          :item: node
+          :sui: sui
       ui.tabs: 
         ':options': '[nodeTypeTabName, ''🧊 data'', ''✨ animation'', ''🧱 layout'', ''🎨 style'']'
         direction: horizontal
@@ -10,10 +14,6 @@ dom:
         v-model: selected.tab.index
         template:
           v-slot: header
-          h2:
-            studio.dom.tree.node:
-              :item: node
-              :sui: sui
         template: 
           v-slot: tab0
           div:

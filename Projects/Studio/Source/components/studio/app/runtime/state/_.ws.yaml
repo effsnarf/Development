@@ -7,6 +7,15 @@ dom:
         :user-app-state: userAppState
         item-type: studio.app.runtime.state.tree.node
         :initial-expanded: "true"
+        @node-select: onNodeSelect
+      div:
+        v-if: selected.node
+        :style: "{ 'margin-top': '2em' }"
+        div:
+          h2:
+            v-text: "'🧊 ' + selected.node.path.join('.')"
+          ui.value:
+            :value: selected.node.value
 
 props:
   userApp:
@@ -17,6 +26,8 @@ props:
 data:
   appStateTree:
   root:
+  selected:
+    node:
   key1: 1
 
 mounted: | #js
@@ -27,6 +38,10 @@ mounted: | #js
   }
 
 methods:
+  onNodeSelect: | #js
+    function(node) {
+      this.selected.node = node;
+    }
   onSelectedPageChanged: | #js
     function(pageNode) {
       this.refresh(pageNode);
@@ -96,3 +111,7 @@ watch:
     function() {
       this.refresh();
     }
+
+style:
+  h2:
+    opacity: 0.5

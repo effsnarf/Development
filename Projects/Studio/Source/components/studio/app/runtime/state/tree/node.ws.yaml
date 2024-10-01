@@ -66,9 +66,4 @@ style:
     max-width: 15em
     max-height: 3.5em
     overflow: hidden
-    transition: 1s
-  .preview:hover:
-    max-width: 20em
-    max-height: 20em
-    overflow: auto
     
