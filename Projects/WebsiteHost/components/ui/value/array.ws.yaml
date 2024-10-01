@@ -9,11 +9,11 @@ dom:
             ui.checkbox.list:
               :items: fields
               :get-item-icon: () => '🧊'
-              :show-search-box: "false"
+              :show-search-box: "true"
               :value-array: visibleFields1
       .box1:
         ':class': '{ reversed: reverse }'
-        .flex.justify-between:
+        div:
           ui.title:
             v-if: "false"
             icon: 🧊
@@ -123,6 +123,31 @@ data:
   visibleFields1: null
   pageIndex: 0
 methods:
+  getItems: | #js
+    function(value) {
+      let items = [...value];
+      if (this.isPrimitive(items[0])) {
+        items = items.map(item => ({ value: item }));
+      }
+      items = items
+        .take(this.maxVisibleItems || 1000)
+        .sortByDirection([this.sortByField], this.sortByFieldDirection);
+      return items;
+    }
+  getFields: | #js
+    function(items) {
+      // Get all the field names from the array of objects
+      if (!items) return [];
+      const objects = items
+        .take(10)
+        .filter(item => !this.isPrimitive(item));
+      const fields = objects.map(o => Object.keys(o||{}))
+        .flatMap(f => f)
+        .distinct()
+        .sortBy(f => f)
+        .take(this.maxVisibleFields || 1000);
+      return fields;
+    }
   onSortByField: | #js
     function(field) {
       if (this.sortByField == field) {
@@ -190,26 +215,9 @@ computed:
     if (this.visibleFields1) return this.visibleFields1;
     return this.fields;
   items: | #js
-    let items = [...this.value];
-    if (this.isPrimitive(items[0])) {
-      items = items.map(item => ({ value: item }));
-    }
-    items = items
-      .take(this.maxVisibleItems || 1000)
-      .sortByDirection([this.sortByField], this.sortByFieldDirection);
-    return items;
+    return this.getItems(this.value);
   fields: | #js
-    // Get all the field names from the array of objects
-    if (!this.items) return [];
-    const objects = this.items
-      .take(10)
-      .filter(item => !this.isPrimitive(item));
-    const fields = objects.map(o => Object.keys(o||{}))
-      .flatMap(f => f)
-      .distinct()
-      .sortBy(f => f)
-      .take(this.maxVisibleFields || 1000);
-    return fields;
+    return this.getFields(this.items);
   view1: | #js
     function() {
       return "table";
@@ -231,12 +239,19 @@ watch:
     immediate: true
   value:
     handler: | #js
-      function(value) {
+      function(newValue, oldValue) {
         // by default, only show first several fields
         // for performance reasons
-        if (!this.visibleFields1) {
-          this.visibleFields1 = this.fields.take(3);
+        let resetFields = false;
+        if (!oldValue) {
+          resetFields = true;
         }
+        else
+        {
+          const oldFields = this.getFields(this.getItems(oldValue));
+          if (Objects.areEqual(oldFields, this.fields)) resetFields = false;
+        }
+        if (resetFields) this.visibleFields1 = this.fields.take(3);
       }
     immediate: true
   query:
@@ -246,12 +261,13 @@ watch:
       }
 style:
   .box1:
+    width: 100%
     border: '1px solid #ffffff80'
     border-radius: 0.5em
     padding: 0.5em
     overflow: hidden
   .search-box:
-    max-height: 0
+    max-height: 2em
     overflow: hidden
     transition: 0.5s
   .box1:hover .search-box:
