@@ -23,7 +23,6 @@ dom:
 
 props:
   node:
-  nodeVarData:
   userAppState:
   sui:
   dataItem:

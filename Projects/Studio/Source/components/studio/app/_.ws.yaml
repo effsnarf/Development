@@ -24,6 +24,7 @@ dom:
       .flex2:
         studio.doc.page.selector:
           :user-app: userApp
+          :user-app-state: userAppState
           :sui: sui
           :value: sui.page.selected
           @input: selectPage
@@ -605,14 +606,19 @@ watch:
     }
 
 style:
+  .comp-studio-app:
+    background: "radial-gradient(circle at center, #2f4e66, #000)"
   .comp-studio-app > .flex1:
     display: flex
     justify-content: space-between
+    gap: 2em
     margin: 1vw
   .comp-studio-app > .flex1 > *:
     width: 33%
     overflow: hidden
+    background: black
     border: 3px solid gray
+    box-shadow: "-0.5em 0.5em 2px #00000080"
     padding: 1em
     transition: 0.4s
   .comp-studio-app > .flex1 > *:nth-child(1):

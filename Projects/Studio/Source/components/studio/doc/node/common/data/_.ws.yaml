@@ -1,30 +1,39 @@
 dom:
   div:
+    v-if: node
     .warning:
-      v-if: (('list' == node.type) && !Array.isArray(nodeDatas?.[2]))
+      v-if: (('list' == node.type) && (nodeDatas?.items) && !Array.isArray(nodeDatas?.items))
       v-text: "'Data in a list component must be an array.'"
     .warning:
-      v-if: (nodeDatas?.[1] && !Array.isArray(nodeDatas?.[2]))
+      v-if: (nodeDatas?._items && !Array.isArray(nodeDatas?.items))
       v-text: "'Use the 🛠️ linq control to select the array from the data.'"
     div:
-      v-for: varPath in nodeVarPaths
+      v-for: varPath in Object.keys(nodeDatas)
       .flex1:
         h3:
           v-text: "'🧊 ' + varPath.split('.').last()"
         .folded.em2:
           ui.value:
-            :value: Objects.getProperty(userAppState, varPath)
+            :value: nodeDatas[varPath]
       div:
         v-if: "varPath.endsWith('._items')"
         .flex1:
           h3:
             v-text: "'🛠️ linq'"
           .folded.em2:
+            pre:
+              v-text: node.data?.source?.linq
             ui.linq:
-              v-if: (nodeDatas?.[1] && node.data?.source?.linq)
-              :input: nodeDatas[1]
+              v-if: (false && nodeDatas?.[varPath] && node.data?.source?.linq)
+              :input: nodeDatas[varPath]
               v-model: node.data.source.linq
               @output: onLinqOutput
+    div:
+      v-if: itemsVarPath
+      h2:
+        v-text: "'🧊 items'"
+      ui.value:
+        :value: Objects.getProperty(userAppState, itemsVarPath)
 
 props:
   node:
@@ -36,7 +45,7 @@ data:
 methods:
   onLinqOutput: | #js
     function(newValue) {
-      const varPath = (this.nodeVarPaths[2] || this.nodeVarPaths[1]);
+      const varPath = this.nodeVarPaths.find(v => (v.endsWith("._items")));
       const oldValue = Objects.getProperty(this.userAppState, varPath);
       this.$root.studio.user.app.state.change(varPath, newValue);
     }
@@ -44,25 +53,35 @@ methods:
 computed:
   nodeDatas: | #js
     function() {
-      return this.nodeVarPaths.map((p, i) => Objects.getProperty(this.userAppState, this.nodeVarPaths[i]));
+      return this.nodeVarPaths.reduce((obj, p, i) => {
+        obj[p] = Objects.getProperty(this.userAppState, p);
+        return obj;
+      }, {});
     }
   nodeVarPaths: | #js
     function() {
       const varPaths = [];
-      const varPath = this.$root.getNodeVarPath(this.node);
+      const varPath = this.varPath;
       if (!varPath) return varPaths;
 
       if ("list" == this.node.type) {
-        varPaths.push(`${varPath}.url`);
         varPaths.push(`${varPath}._items`);
-        varPaths.push(`${varPath}.items`);
-        varPaths.push(`${varPath}.hovered`);
-        varPaths.push(`${varPath}.selected`);
       }
       else {
         varPaths.push(varPath);
       }
       return varPaths;
+    }
+  itemsVarPath: | #js
+    function() {
+      if ("list" == this.node.type) {
+        return `${this.varPath}.items`;
+      }
+      return null;
+    }
+  varPath: | #js
+    function() {
+      return this.$root.getNodeVarPath(this.node);
     }
   Objects: | #js
     function() {

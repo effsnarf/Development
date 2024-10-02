@@ -1,16 +1,16 @@
 dom:
   .flex:
     h2:
-      class: float-left mr-l2
+      class: title1
       a:
         href: /
         ui.title:
-          class: title1
           text: UX Studio
 
 data:
 style:
   .title1:
+    margin: 0 1em
     font-size: 4rem
     font-family: Audiowide
     color: "#ffffffa0"

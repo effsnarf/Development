@@ -1,6 +1,10 @@
 dom:
   .page-selector:
+    button:
+      v-text: "'refresh'"
+      @click: refresh
     .pages:
+      :key: key1
       .clickable:
         v-for: pageNode in pageNodes
         @click: () => onSelectPage(pageNode)
@@ -8,20 +12,29 @@ dom:
         .page-example:
           studio.doc.node:
             :node: pageNode
+            :user-app-state: userAppState
             :sui: sui
         .page-title:
           v-text: pageNode.name
 
 props:
   userApp:
+  userAppState:
   sui:
   value:
+
+data:
+  key1: 1
 
 methods:
   onSelectPage: | #js
     function(newPageNode) {
       if ((newPageNode?.id) && (newPageNode?.id == this.value?.id)) newPageNode = null;
       this.$emit("input", newPageNode);
+    }
+  refresh: | #js
+    function() {
+      this.key1++;
     }
 
 computed:
