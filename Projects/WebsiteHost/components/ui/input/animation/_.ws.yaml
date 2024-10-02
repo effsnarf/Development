@@ -46,6 +46,15 @@ data:
         to:
           transform: translateX(-100%)
           opacity: 0
+    - name: slide-x-reverse
+      enter:
+        from:
+          transform: translateX(-100%)
+          opacity: 0
+      leave:
+        to:
+          transform: translateX(100%)
+          opacity: 0
     - name: slide-y
       enter:
         from:

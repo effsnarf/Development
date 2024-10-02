@@ -54,5 +54,5 @@ style:
     gap: 0.3em
   .list-item:
     height: 1.5em
-    background: "#80808080"
+    background: "#808080a0"
     text-align: center

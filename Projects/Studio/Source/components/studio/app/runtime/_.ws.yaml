@@ -49,64 +49,18 @@ methods:
           const listVarPath = `${pageNode.name}.${listNode.name}`;
           const listVarName = listVarPath.replaceAll('.', '_');
 
-          // page data
-          pageData[listNode.name] = {
-            _items: [],
-            items: [],
-            hovered: null,
-            selected: null,
-          };
+          pageData[listNode.name] = {};
 
-          if ("fetch" == ds.type) {
-            // [url] variable
-            pageData[listNode.name].url = null;
-
-            // [url] computed
-            // #TODO show exception to the user
-            computeds[`${listVarName}_url`] = {
-              get: eval(`(function() {
-                try
-                {
-                  return ${ds.url};
-                }
-                catch (ex) {
-                  console.warn(ex);
-                  return null;
-                }
-              })`)
-            };
-
-            // [url] watchers
-            watchers[`${listVarName}_url`] = {
-              handler: eval(`(async function(newUrl) {
-                this.${listVarPath}.url = newUrl;
-                if (!newUrl) return;
-                const data = (await this.fetchFromUrl(newUrl));
-                this.${listVarPath}._items = data;
-              })`),
-              immediate: true
-            };
-
-            // we can't watch the nested property directly
-            // so we reference the nested by a computed
-            // and watch that
-            computeds[`cw_${listVarName}__items`] = {
-              get: eval(`(function() { return this.${listVarPath}._items; })`)
-            };
-
-            watchers[`cw_${listVarName}__items`] = {
-              handler: eval(`(async function(new_items) {
-                const linq = ${JSON.stringify((ds.linq || null))};
-                const datas = this.$refs.linqEval1.evaluateOps(null, new_items, linq);
-                this.${listVarPath}.items = datas.last();
-              })`),
-            }
+          for (const varName in listNode.vars) {
+            pageData[listNode.name][varName] = null;
           }
 
-          for (const key of Object.keys(pageData[listNode.name])) {
-            watchers[`${listVarPath}.${key}`] = {
-              handler: eval("(function(newValue, oldValue) { this.$refs.common1.onAppStateChanged(`${listVarPath}.${key}`.split('.'), newValue, oldValue); })"),
-              immediate: false
+          // we can't watch the nested properties directly
+          // so we reference the nesteds by a computed
+          // and watch that
+          for (const key in pageData[listNode.name]) {
+            computeds[`cdw_${listVarName}_${key}`] = {
+              get: eval(`(function() { return this.${listVarPath}.${key}; })`)
             };
           }
         }

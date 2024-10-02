@@ -5,6 +5,6 @@ template:
   get: | #ts
     async function(dbp, req) {
       return {
-        title: "UX Studio",
+        title: "🧊 UX Studio",
       }
     }

@@ -95,11 +95,20 @@ mounted: | #js
       user: {
         app: {
           state: {
-            change: (varPath, value, info) => {
+            change: (varPath, newValue, info) => {
               varPath = (varPath.split?.('.') || varPath);
-              Objects.setProperty(this.userAppState, varPath, value);
-              this.appStateChangedVars.push({ varPath, value, info });
+              const oldValue = Objects.getProperty(this.userAppState, varPath);
+              if (newValue == oldValue) return;
+              Objects.setProperty(this.userAppState, varPath, newValue);
+              this.appStateChangedVars.push({ varPath, newValue, info });
               this.appStateChangeKey++;
+            }
+          }
+        },
+        comp: {
+          state: {
+            change: ($root, vue, key, varPath, newValue) => {
+              $root.studio.user.app.state.change(varPath, newValue);
             }
           }
         }
@@ -239,7 +248,12 @@ methods:
                       {
                         type: "title",
                         size: 1,
-                        text: "Home page"
+                        vars: {
+                          text: {
+                            type: "value",
+                            value: "Home page"
+                          }
+                        }
                       },
                     ]
                   },
@@ -257,23 +271,25 @@ methods:
                             content: "center"
                           }
                         },
-                        data: {
-                          source: {
+                        vars: {
+                          items: {
                             type: "fetch",
                             url: "`https://a.4cdn.org/boards.json`",
                             linq: [{"type":"select.field","path":["boards"],"_id":1},{"type":"select.fields","fields":["board","title"],"_id":2}]
-                          }
+                          },
+                          hovered: null,
+                          selected: null
                         },
                         children: [
                           {
                             type: "title",
                             size: 2,
-                            data: {
-                              source: {
+                            vars: {
+                              text: {
                                 type: "field",
                                 exp: "title"
-                              }
-                            }
+                              },
+                            },
                           }
                         ]
                       }
@@ -297,12 +313,12 @@ methods:
                       {
                         type: "title",
                         size: 1,
-                        data: {
-                          source: {
+                        vars: {
+                          text: {
                             type: "exp",
                             exp: "this.home.boards.selected.title",
                           }
-                        },
+                        }
                       },
                     ]
                   },
@@ -315,12 +331,14 @@ methods:
                       {
                         type: "list",
                         name: "threads",
-                        data: {
-                          source: {
+                        vars: {
+                          items: {
                             type: "fetch",
                             url: "`https://a.4cdn.org/${this.home.boards.selected.board}/catalog.json`",
                             linq: [{"type":"select.fields","fields":["threads"],"_id":1},{"type":"flat.map","path":["threads"],"_id":2}]
-                          }
+                          },
+                          hovered: null,
+                          selected: null
                         },
                         children: [
                           {
@@ -351,12 +369,12 @@ methods:
                       {
                         type: "title",
                         size: 1,
-                        data: {
-                          source: {
+                        vars: {
+                          text: {
                             type: "exp",
                             exp: "this.board.threads.selected.sub"
                           }
-                        },
+                        }
                       },
                     ]
                   },
@@ -370,10 +388,12 @@ methods:
                         type: "list",
                         name: "posts",
                         data: {
-                          source: {
-                            type: "fetch",
-                            url: "`https://a.4cdn.org/${this.home.boards.selected.board}/thread/${this.board.threads.selected.no}.json`",
-                            linq: [ { "type": "select.field", "path": [ "posts" ], "_id": 1 } ]
+                          vars: {
+                            items: {
+                              type: "fetch",
+                              url: "`https://a.4cdn.org/${this.home.boards.selected.board}/thread/${this.board.threads.selected.no}.json`",
+                              linq: [ { "type": "select.field", "path": [ "posts" ], "_id": 1 } ]
+                            }
                           }
                         },
                         children: [
@@ -415,8 +435,8 @@ methods:
                         children: [
                           {
                             type: "image",
-                            data: {
-                              source: {
+                            vars: {
+                              imageUrl: {
                                 type: "exp",
                                 exp: "`https://i.4cdn.org/${this.home.boards.selected.board}/${tim}${ext}`"
                               }
@@ -433,8 +453,8 @@ methods:
                           {
                             type: "title",
                             size: 3,
-                            data: {
-                              source: {
+                            vars: {
+                              text: {
                                 type: "field",
                                 exp: "sub"
                               }
@@ -443,8 +463,8 @@ methods:
                           {
                             type: "title",
                             size: 5,
-                            data: {
-                              source: {
+                            vars: {
+                              text: {
                                 type: "field",
                                 exp: "com"
                               }
@@ -455,8 +475,8 @@ methods:
                       {
                         type: "title",
                         size: 3,
-                        data: {
-                          source: {
+                        vars: {
+                          text: {
                             type: "field",
                             exp: "replies"
                           }
@@ -484,8 +504,8 @@ methods:
                         layout: {
                           width: "20%"
                         },
-                        data: {
-                          source: {
+                        vars: {
+                          imageUrl: {
                             type: "exp",
                             exp: "`https://i.4cdn.org/${this.home.boards.selected.board}/${tim}${ext}`"
                           }
@@ -494,8 +514,8 @@ methods:
                       {
                         type: "title",
                         size: 3,
-                        data: {
-                          source: {
+                        vars: {
+                          text: {
                             type: "field",
                             exp: "com"
                           }
@@ -615,6 +635,7 @@ style:
     margin: 1vw
   .comp-studio-app > .flex1 > *:
     width: 33%
+    height: fit-content
     overflow: hidden
     background: black
     border: 3px solid gray

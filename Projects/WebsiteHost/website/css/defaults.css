@@ -197,13 +197,13 @@ li .clickable2:hover
 
 .hoverable
 {
-  transition: 0.2s;
   cursor: pointer;
+  transition: 0s;
 }
 .hoverable:hover
 {
-  background: #ffffff30;
-  transition: 0s;
+  background: linear-gradient(to right, #ffffff20, #ffffff40, #ffffff20);
+  transition: 0.3s;
 }
 
 .highlighted-group > :not(.ide-highlighted)

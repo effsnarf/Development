@@ -34,9 +34,133 @@ mounted: | #js
     this.$watch("sui.node.selected", this.onSelectedNodeChanged.bind(this));
     //this.applyCssClass(this.nodeCssClass);
     //this.applyStyle(this.nodeStyle);
+    this.bindNodeVarsToGlobalAppState();
+    this.initNodeVars();
   }
 
 methods:
+  bindNodeVarsToGlobalAppState: | #js
+    function() {
+      const runtimeVue = this.$root.getUserAppRuntimeVue(this);
+      if (!runtimeVue) return;
+      const comp1 = this.$refs.comp1;
+      if (!this.nodeVarPath) return;
+      const dataKeys = Object.keys(comp1.$data).except("_");
+      if (!dataKeys.length) return;
+      for (const key of dataKeys) {
+        const varPath = `${this.nodeVarPath}.${key}`;
+        comp1._studio_watches = (comp1._studio_watches || {});
+        if (!comp1._studio_watches[key]) {
+          // comp -> global state
+          comp1.$watch(key, (newValue) => { this.$root.studio.user.comp.state.change(this.$root, comp1, key, varPath, newValue); });
+          // global state -> comp
+          runtimeVue.$watch(varPath, (newValue) => { comp1[key] = newValue; }, { immediate: true });
+          comp1._studio_watches[key] = true;
+        }
+      }
+    }
+  initNodeVars: | #js
+    function() {
+      const runtimeVue = this.$root.getUserAppRuntimeVue(this);
+      if (!runtimeVue) return;
+      const comp1 = this.$refs.comp1;
+      const vars = this.node.vars;
+      if (!vars) return;
+      for (const varName in vars)
+      {
+        const varOptions = vars[varName];
+        const nodeVar = this.createNodeVar(comp1, varName, varOptions);
+      }
+    }
+  createNodeVar: | #js
+    function(vComp, varName, varOptions) {
+      if (!varOptions?.type) return;
+      const method = this[`createNodeVar_${varOptions.type}`];
+      if (!method) throw `Unknown node var type ${varOptions.type}`;
+      return method(vComp, varName, varOptions);
+    }
+  createNodeVar_fetch: | #js
+    function(vComp, varName, varOptions) {
+      const $root = this.$root;
+      const runtimeVue = $root.getUserAppRuntimeVue(this);
+      // a fetch var has:
+      // - url (computed, can reference other state nodes)
+      // - _data (holds the downloaded data)
+      // - linq (optional to project the data)
+      // - data (the projected downloaded data)
+      const url = Vue.computed({
+        get: eval(`(function() {
+          return ${varOptions.url};
+        })`).bind(this.userAppState)
+      });
+
+      const _data = Vue.reactive({ value: null });
+
+      const url_watcher = Vue.watch(url,
+        (async function(newUrl) {
+          if (!newUrl) return;
+          _data.value = (await $root.fetchFromUrl(newUrl));
+        }),
+        { immediate: true });
+
+      const _data_watcher = Vue.watch(_data,
+        (async function(newData) {
+          const linq = (varOptions.linq || null);
+          const datas = runtimeVue.$refs.linqEval1.evaluateOps(null, newData.value, linq);
+          const data = datas.last();
+          vComp[varName] = data;
+        })
+      );
+
+      const nodeVar = { url, _data };
+      
+      return nodeVar;
+    }
+  createNodeVar_field: | #js
+    function(vComp, varName, varOptions) {
+      const $root = this.$root;
+      const runtimeVue = $root.getUserAppRuntimeVue(this);
+      // a field node var has:
+      // - value (taken from data-item[field])
+      const field_watcher = Vue.watch(
+        () => this.dataItem?.[varOptions.exp],
+        (function(newValue) {
+          vComp[varName] = newValue;
+        }),
+        { immediate: true });
+
+      return { field_watcher };
+    }
+  createNodeVar_exp: | #js
+    function(vComp, varName, varOptions) {
+      const $root = this.$root;
+      const runtimeVue = $root.getUserAppRuntimeVue(this);
+      // an exp node var has:
+      // - value (evaluated)
+      const exp = Vue.computed({
+        get: eval(`(function() {
+          return ${varOptions.exp};
+        })`).bind(this.userAppState)
+      });
+
+      const exp_watcher = Vue.watch(exp,
+        (function(newValue) {
+          vComp[varName] = newValue;
+        }),
+        { immediate: true });
+
+      return { exp };
+    }
+  createNodeVar_value: | #js
+    function(vComp, varName, varOptions) {
+      const $root = this.$root;
+      const runtimeVue = $root.getUserAppRuntimeVue(this);
+      // a value node var has:
+      // - value (taken from value)
+      vComp[varName] = varOptions.value;
+
+      return { value: varOptions.value };
+    }
   applyCssClass: | #js
     function(cls) {
       // Apply CSS classes to this.$el
@@ -75,7 +199,8 @@ methods:
     function(node) {
       if (!node) return;
       const s = {};
-      s['background-color'] = node.style?.bg?.color;
+      s['background'] = `radial-gradient(circle at center, ${node.style?.bg?.color}, #000)`;
+      //s['background-color'] = node.style?.bg?.color;
       s['width'] = node.layout?.width;
       s['flex'] = 'none';
       Object.assign(s, this.getFlexStyle(node));

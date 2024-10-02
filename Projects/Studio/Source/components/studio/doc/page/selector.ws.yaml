@@ -1,8 +1,5 @@
 dom:
   .page-selector:
-    button:
-      v-text: "'refresh'"
-      @click: refresh
     .pages:
       :key: key1
       .clickable:

@@ -75,7 +75,7 @@ methods:
       // #TODO might be wrong
       if (!node.name) return null;
       const pageName = this.getNodePageName(node);
-      const varPath = `${pageName}.${node.name}`;
+      const varPath = [pageName, node.name].map(s => (s||'')).join('.');
       return varPath;
     }
   findNode: | #js
@@ -193,4 +193,27 @@ methods:
     // #TODO Slow
     function(node) {
       return TreeObject.find(this.userApp, (p => (p.children?.map(c => c.id).includes(node.id))));
+    }
+  fetchFromUrl: | #js
+    async function(url) {
+      const ticker = Ticker.alertify((elapsed) => `<h2>⏳ ${elapsed.unitifyTime()}</h2> ${url}`)
+      try
+      {
+        const text = (await (await fetch(`/fetch?url=${url}`)).text());
+        // #TODO lame
+        try {
+          const obj = JSON.parse(text);
+          return obj;
+        }
+        catch { return text; }
+      }
+      finally
+      {
+        ticker.stop();
+      }
+    }
+  getUserAppRuntimeVue: | #js
+    function(vue) {
+      while ((vue) && (vue.$options._componentTag != "studio-app-runtime-vue")) vue = vue.$parent;
+      return vue;
     }

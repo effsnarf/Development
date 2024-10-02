@@ -1,33 +1,35 @@
 dom:
   div:
-    ui.tabs:
-      :options: tabOptions
-      direction: vertical
-      :show-title-in-tab: "true"
-      :value: initialSelectedTab
-      template:
-        v-slot: tab0
-        studio.doc.node.common.data.editor.field:
-          :node: node
-          :initial: initial
-          :sui: sui
-      template:
-        v-slot: tab1
-        h2:
-          ui.input.text.box:
-            hint: expression
-            v-model: node.data.source.exp
-      template:
-        v-slot: tab2
-        studio.doc.node.common.data.editor.url:
-          :node: node
+    v-if: node?.vars
     div:
-      studio.doc.node.common.data:
-        :node: node
-        :user-app-state: userAppState
-      pre:
-        v-if: "false"
-        v-text: node
+      v-for: varName in Object.keys(node.vars)
+      h2:
+        v-text: "'🧊 ' + varName"
+      ui.tabs:
+        :options: tabOptions
+        direction: vertical
+        :show-title-in-tab: "true"
+        :value: getInitialSelectedTab(varName)
+        template:
+          v-slot: tab0
+          studio.doc.node.common.data.editor.field:
+            :node-var: node.vars[varName]
+            :initial: initial
+            :sui: sui
+        template:
+          v-slot: tab1
+          h2:
+            ui.input.text.box:
+              hint: expression
+              v-model: node.vars[varName].exp
+        template:
+          v-slot: tab2
+          studio.doc.node.common.data.editor.url:
+            :node-var: node.vars[varName]
+      div:
+        pre:
+          v-if: "false"
+          v-text: node
 
 props:
   node:
@@ -44,12 +46,14 @@ mounted: | #js
   }
 
 methods:
-
-computed:
-  initialSelectedTab: | #js
-    function() {
-      const types = this.node?.data?.source?.type?.split('.');
+  getInitialSelectedTab: | #js
+    function(varName) {
+      const nodeVar = this.node.vars[varName];
+      if (!nodeVar) return null;
+      const types = nodeVar.type?.split('.');
       if (!types?.length) return null;
       return this.tabOptions.findIndex(t => (types.includes(t.split(' ').last())));
     }
+
+computed:
     

@@ -13,8 +13,5 @@ props:
   dataItem:
   userAppState:
 
-computed:
-  text: | #js
-    function() {
-      return this.$root.getBoundData(this.userAppState, this.node, this.dataItem, this.node.text);
-    }
+data:
+  text:

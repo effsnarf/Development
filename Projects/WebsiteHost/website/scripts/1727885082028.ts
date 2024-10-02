@@ -52,32 +52,46 @@ const generalMixin = {
   matchComp: (c: Component) => true,
   data() {
     return {
-      // ui: {
-      //   is: {
-      //     hovered: false,
-      //     mounted: false,
-      //   },
-      // },
-      // handlers: {
-      //   mouseover: null as any,
-      //   mouseout: null as any,
-      // },
+      ui: {
+        is: {
+          hovered: false,
+          mounted: false,
+        },
+      },
+      handlers: {
+        mouseover: null as any,
+        mouseout: null as any,
+      },
     };
   },
   mounted() {
     const self = this as any;
     vueApp?.vm.registerVue(this);
     return;
+
+    self.ui.is.mounted = true;
+    self.handlers.mouseover = (e: Event) => {
+      self.ui.is.hovered = true;
+    };
+    self.handlers.mouseout = (e: Event) => {
+      self.ui.is.hovered = false;
+    };
+    self.$el.addEventListener("mouseover", self.handlers.mouseover);
+    self.$el.addEventListener("mouseout", self.handlers.mouseout);
   },
   unmounted() {
     const self = this as any;
     vueApp?.vm.registerVue(this);
     return;
+
+    self.ui.is.mounted = false;
+    self.$el.removeEventListener("mouseover", self.handlers.mouseover);
+    self.$el.removeEventListener("mouseout", self.handlers.mouseout);
   },
   computed: {
-    // $store(): any {
-    //   return (this as any).$root.store;
-    // },
+    $store(): any {
+      return (this as any).$root.store;
+    },
   },
 };
 
@@ -326,9 +340,9 @@ const mgCompMixin = {
   },
 };
 
-const vueAppMixins = [] as any[];
+const vueAppMixins = [gridAppMixin, mgAppMixin];
 
-const webScriptMixins = [generalMixin];
+const webScriptMixins = [generalMixin, gridAppCompMixin, mgCompMixin];
 
 interface MgParams {
   urlName: string;

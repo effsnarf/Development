@@ -1,12 +1,12 @@
 dom:
   div:
-    v-if: listItems?.length
+    v-if: items?.length
     studio.doc.node.anim:
       :node: node
-      :items-count: listItems.length
+      :items-count: visibleItems.length
       :sui: sui
       .list-item:
-        v-for: (item, i) in listItems
+        v-for: (item, i) in visibleItems
         :key: getListItemKey(item)
         studio.doc.node:
           v-for: childNode in node.children
@@ -15,8 +15,8 @@ dom:
           :sui: sui
           :data-item: item
           :key: childNode.id
-        @mouseenter: () => onHover(item, true)
-        @mouseleave: () => onHover(item, false)
+        @mouseenter: () => hovered = item
+        @mouseleave: () => hovered = null
         @click: () => onClick(item)
 
 props:
@@ -25,37 +25,21 @@ props:
   sui:
 
 data:
-  listItems:
+  items:
+  hovered:
+  selected:
 
 mounted: | #js
   function() {
-    this.$root.$on("app.state.changed", this.onAppStateChanged.bind(this));
-    this.refresh();
   }
 
 methods:
-  onAppStateChanged: | #js
-    function(vars) {
-      this.refresh();
-    }
   onClick: | #js
     function(item) {
-      const varPath = `${this.$parent.nodeVarPath}.selected`;
-      Objects.setProperty(this.userAppState, varPath, item);
-    }
-  onHover: | #js
-    function(item, isHovered) {
-      item = (!isHovered ? null : item);
-      const varPath = `${this.$parent.nodeVarPath}.hovered`;
-      Objects.setProperty(this.userAppState, varPath, item);
-    }
-  getListItems: | #js
-    function() {
-      let listItems = Objects.getProperty(this.userAppState, this.itemsVarPath);
-      if (!listItems) {
-        listItems = Array.from({ length: 5 }, (_, i) => null);
-      }
-      return listItems.take(10);
+      this.selected = item;
+      return;
+      if (this.selectedItems.includes(item)) return this.selectedItems.remove(item);
+      this.selectedItems.push(item);
     }
   getListItemKey: | #js
     function(item) {
@@ -63,15 +47,11 @@ methods:
       const fields = Object.keys(item);
       return item[fields[0]];
     }
-  refresh: | #js
-    function() {
-      this.listItems = this.getListItems();
-    }
 
 computed:
-  itemsVarPath: | #js
+  visibleItems: | #js
     function() {
-      return `${this.$parent.nodeVarPath}.items`.split('.');
+      return this.items.take(6);
     }
 
 style:

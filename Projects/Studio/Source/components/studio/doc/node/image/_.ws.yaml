@@ -13,6 +13,7 @@ props:
   userAppState:
 
 data:
+  imageUrl:
   emptyImageUrl: https://i.imgur.com/QwWQw2v.jpeg
   videoExtensions: ["webm", "mp4"]
 
@@ -28,10 +29,6 @@ computed:
   proxiedImageUrl: | #js
     function() {
       return `/fetch?url=${this.imageUrl}`;
-    }
-  imageUrl: | #js
-    function() {
-      return this.$root.getBoundData(this.userAppState, this.node, this.dataItem, this.emptyImageUrl);
     }
   extension: | #js
     function() {

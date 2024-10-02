@@ -3,24 +3,25 @@ dom:
     h2:
       ui.input.text.box:
         hint: field name or custom expression
-        v-model: node.data.source.exp
+        v-model: nodeVar.exp
     div:
       table:
         tr:
           v-for: field in dataItemFields
-          :class: "{ clickable: true, selected: (field == initial.node.data.source.exp) }"
-          @mouseenter: () => { node.data.source.exp = field; }
-          @mouseleave: () => { node.data.source.exp = initial.node.data.source.exp; }
-          @click: () => { node.data.source.exp = initial.node.data.source.exp = field; }
+          :class: "{ clickable: true, selected: false }"
+          @mouseenter: () => { nodeVar.exp = field; }
+          @mouseleave: () => { nodeVar.exp = field; }
+          @click: () => { nodeVar.exp = field; }
           td:
             div:
-              v-if: (field == initial.node.data.source.exp)
+              v-if: (false)
               v-text: "'✔️'"
           td:
             v-text: "'🧊 ' + field"
 
 props:
   node:
+  nodeVar:
   initial:
   sui:
 

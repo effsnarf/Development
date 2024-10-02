@@ -3,10 +3,10 @@ dom:
     ui.input.text.box:
       hint: url
       multiline: true
-      v-model: node.data.source.url
+      v-model: nodeVar.url
 
 props:
-  node:
+  nodeVar:
 
 data:
 

@@ -55,10 +55,6 @@ computed:
     }
   nodeWarning: | #js
     function() {
-      const _DATA_SOURCE_MISSING = "Data source missing";
-      if (["list"].contains(this.node.type)) {
-        if (!this.node.data?.source) return _DATA_SOURCE_MISSING;
-      }
       return null;
     }
   hasWarning: | #js

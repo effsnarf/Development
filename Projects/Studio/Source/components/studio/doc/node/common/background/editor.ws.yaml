@@ -36,7 +36,7 @@ methods:
   getOptionStyle: | #js
     function(bgColor) {
       return {
-        'background-color': bgColor
+        'background': `radial-gradient(circle at center, ${bgColor}, #000)`
       };
     }
 
