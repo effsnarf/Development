@@ -83,6 +83,7 @@ methods:
   getNodeCompEditorName: | #js
     function(node) {
       if (!node) return null;
+      if (node.type.startsWith("ui.")) return `studio-doc-node-vue-comp-editor`;
       return `studio-doc-node-${node.type.kebabize()}-editor`;
     }
   getInitialNodeData: | #js

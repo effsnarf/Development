@@ -264,6 +264,12 @@ methods:
                     },
                     children: [
                       {
+                        type: "ui.input.text.box",
+                        vue: {
+                          props: {}
+                        }
+                      },
+                      {
                         type: "list",
                         name: "boards",
                         flex: {
@@ -292,7 +298,7 @@ methods:
                             },
                           }
                         ]
-                      }
+                      },
                     ]
                   },
                 ]
@@ -627,6 +633,7 @@ watch:
 
 style:
   .comp-studio-app:
+    min-height: 100vh
     background: "radial-gradient(circle at center, #2f4e66, #000)"
   .comp-studio-app > .flex1:
     display: flex

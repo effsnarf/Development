@@ -25,9 +25,9 @@ dom:
     @keydown: onTextAreaKeyDown
 props:
   type: text
-  value: null
-  hint: null
-  icon: null
+  value: ""
+  hint: ""
+  icon: ""
   enabled: true
   multiline: false
   autoResize: false

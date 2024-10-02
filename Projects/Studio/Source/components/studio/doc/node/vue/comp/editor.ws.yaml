@@ -1,0 +1,45 @@
+dom:
+  div:
+    table:
+      tr:
+        v-for: (value, key) in node.vue.props
+        td:
+          v-text: getPropIcon(value)
+        td:
+          v-text: key
+        td:
+          ui.value.editor:
+            v-model: node.vue.props[key]
+
+props:
+  node:
+
+mounted: | #js
+  function() {
+    this.initNodeProps(this.vueProps, this.node);
+    this.$forceUpdate();
+  }
+
+methods:
+  getPropIcon: | #js
+    function(vueProp) {
+      return `🛠️`;
+    }
+  initNodeProps: | #js
+    function(vueProps, node) {
+      for (const key in vueProps)
+      {
+        const vueProp = vueProps[key];
+        if (!(key in node.vue.props)) node.vue.props[key] = vueProp.default;
+      }
+    }
+
+computed:
+  vueProps: | #js
+    function() {
+      return Vue.component(this.vueCompName).options.props;
+    }
+  vueCompName: | #js
+    function() {
+      return this.node.type.replaceAll('.', '-');
+    }

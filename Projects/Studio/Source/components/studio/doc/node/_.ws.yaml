@@ -10,6 +10,7 @@ dom:
     :content-node: contentNode
     :class: nodeCssClass
     :style: nodeStyle
+    v-bind: node.vue?.props
     template:
       v-slot: child-nodes
       studio.doc.node:
@@ -193,6 +194,7 @@ methods:
     }
   getNodeCompName: | #js
     function(node) {
+      if (node.type.startsWith("ui.")) return node.type.kebabize();
       return `studio-doc-node-${node.type.kebabize()}`;
     }
   getNodeStyle: | #js
