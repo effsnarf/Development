@@ -39,8 +39,8 @@ computed:
 watch:
 style:
   .option:
-    padding: 1em 0
-    background: "#ffffff20"
+    padding: 0.5em 0
+    background: "#ffffff30"
     opacity: 0.6
     cursor: pointer
   .option:hover:

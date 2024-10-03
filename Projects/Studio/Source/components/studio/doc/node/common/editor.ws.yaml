@@ -1,7 +1,7 @@
 dom:
   div:
     v-if: node
-    studio.doc.node.common.style.editor:
+    studio.doc.node.common.design.editor:
       :node: node
       :initial: initial
       :sui: sui

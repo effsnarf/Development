@@ -8,7 +8,6 @@ dom:
         studio.dom.tree:
           :root: userApp
           :sui: sui
-          @sui: onSuiEvent
       div:
         transition.group:
           name: list2
@@ -18,7 +17,6 @@ dom:
             v-show: (pageNode.id == sui.page.selected?.id)
             :root: pageNode
             :sui: sui
-            @sui: onSuiEvent
             :initial-expanded: "true"
         studio.app.log:
           category: runtime
@@ -628,7 +626,7 @@ style:
     padding: 1em
     transition: 0.4s
   .comp-studio-app > .flex1 > *:nth-child(1):
-    width: 12%
+    width: 40%
   .comp-studio-app > .flex1 > *:nth-child(2):
     width: 18%
   .comp-studio-app > .flex1 > *:nth-child(4):hover:

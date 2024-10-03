@@ -7,7 +7,7 @@ dom:
           :item: node
           :sui: sui
       ui.tabs: 
-        ':options': '[nodeTypeTabName, ''🧊 data'', ''✨ animation'', ''🧱 layout'', ''🎨 style'']'
+        ':options': '[nodeTypeTabName, ''🧊 data'', ''🧱 layout'', ''🎨 design'', ''✨ animation'']'
         direction: horizontal
         :can-select-none: "true"
         :show-title-in-tab: "false"
@@ -36,21 +36,21 @@ dom:
         template: 
           v-slot: tab2
           div:
-            studio.doc.node.common.animation.editor:
+            studio.doc.node.common.layout.editor:
               :node: node
               :initial: initial
               :sui: sui
         template: 
           v-slot: tab3
           div:
-            studio.doc.node.common.layout.editor:
+            studio.doc.node.common.editor:
               :node: node
               :initial: initial
               :sui: sui
         template: 
           v-slot: tab4
           div:
-            studio.doc.node.common.editor:
+            studio.doc.node.common.animation.editor:
               :node: node
               :initial: initial
               :sui: sui

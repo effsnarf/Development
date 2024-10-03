@@ -1,6 +1,7 @@
 dom:
   .flex:
     :class: cssClass
+    :style: "{ gap: '0.5em' }"
     .item:
       v-for: (i, index) in itemsArray
       div:
@@ -23,7 +24,7 @@ style:
     display: flex
     align-items: center
     justify-content: center
-    width: 5em
-    height: 3em
+    width: 3em
+    height: 2em
     background: "#ffffff40"
     box-shadow: -4px 4px 4px black

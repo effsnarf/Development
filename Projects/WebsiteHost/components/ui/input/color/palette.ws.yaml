@@ -1,0 +1,40 @@
+dom:
+  div:
+    .flex1:
+      .clickable:
+        v-for: palette in palettes
+        :class: "{ selected: isSelected(palette) }"
+        @click: $emit('input', palette)
+        ui.color.palette:
+          :palette: palette
+
+props:
+  value:
+
+data:
+  palettes:
+    - name: red
+      colors: ['#FF0000', '#BF0000', '#800000', '#4D0000', '#000000']
+    - name: green
+      colors: ['#00FF00', '#00BF00', '#008000', '#004D00', '#000000']
+    - name: blue
+      colors: ['#0000FF', '#0000BF', '#000080', '#00004D', '#000000']
+    - name: yellow
+      colors: ['#FFFF00', '#BFBF00', '#808000', '#4D4D00', '#000000']
+    - name: purple
+      colors: ['#800080', '#5B005B', '#3D003D', '#260026', '#000000']
+
+methods:
+  isSelected: | #js
+    function(palette) {
+      return Objects.areEqual(palette, this.value);
+    }
+
+style:
+  .flex1:
+    display: flex
+    flex-direction: row
+    gap: 0
+  .clickable:
+    gap: 0.5em
+    

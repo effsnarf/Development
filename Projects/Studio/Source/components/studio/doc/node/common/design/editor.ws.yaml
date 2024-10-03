@@ -2,7 +2,9 @@ dom:
   div:
     v-if: (node && initial.node)
     h2:
-      v-text: "'🎨 style'"
+      v-text: "'🎨 design'"
+    ui.input.color.palette:
+
     studio.doc.node.common.background.editor:
       :node: node
       :initial: initial

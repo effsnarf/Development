@@ -1,0 +1,25 @@
+dom:
+  .color-items:
+    .color-item:
+      v-for: (color, i) in palette.colors
+      :style: "{ 'background-color': color }"
+    .name:
+      v-text: palette.name
+
+props:
+  palette:
+    name: gray
+    colors: ['#000000', '#4D4D4D', '#999999', '#BFBFBF', '#FFFFFF']
+
+style:
+  .color-items:
+    display: flex
+    flex-direction: column
+    gap: 0.1em
+    width: 6em
+  .color-item:
+    height: 2em
+    border-radius: 0.5em
+    border: 1px solid gray
+  .name:
+    text-align: center

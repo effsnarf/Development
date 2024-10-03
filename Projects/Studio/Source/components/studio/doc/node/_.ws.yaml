@@ -213,8 +213,8 @@ methods:
     function(node) {
       if (!node) return;
       const s = {};
-      s['background'] = `radial-gradient(circle at center, ${node.style?.bg?.color}, #000)`;
-      //s['background-color'] = node.style?.bg?.color;
+      //s['background'] = `radial-gradient(circle at center, ${node.style?.bg?.color}, #000)`;
+      s['background-color'] = node.style?.bg?.color;
       s['width'] = node.layout?.width;
       s['flex'] = 'none';
       Object.assign(s, this.getFlexStyle(node));
@@ -268,6 +268,7 @@ computed:
   nodeCssClass: | #js
     function() {
       return {
+        'studio-doc-node': true,
         'hovered-node': this.isHoveredNode,
         'selected-node': this.isSelectedNode,
         'active-node':  this.isActiveNode
@@ -308,9 +309,10 @@ watch:
     immediate: true
 
 style:
-  .comp-studio-doc-node:
-    border: "1px dashed #444"
+  .studio-doc-node:
+    border: none
   .hovered-node:
     border: 2px dashed yellow
   .selected-node:
-    border: 4px dashed green
+    border: 4px dashed yellow
+    box-shadow: "inset -3px 3px 2px #80808080"

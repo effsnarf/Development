@@ -16,5 +16,5 @@ methods:
   onLog: | #js
     function(category, severity, args) {
       if (category != this.category) return;
-      this.$refs.console1.log(...args);
+      this.$refs.console1?.log(...args);
     }

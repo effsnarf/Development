@@ -1,21 +1,6 @@
 dom:
   div:
-    h2:
-      v-text: "'🧱 layout'"
-    .flex:
-      :style: "{ gap: '4em' }"
-      studio.doc.node.editor.options:
-        title: justify content
-        :node: node
-        :initial: initial
-        :options: options
-        :prop-path: "'flex.justify.content'"
-      studio.doc.node.editor.options:
-        title: direction
-        :node: node
-        :initial: initial
-        :options: "['horizontal', 'vertical']"
-        :prop-path: "'flex.dir'"
+    ui.input.layout:
 
 props:
   node:

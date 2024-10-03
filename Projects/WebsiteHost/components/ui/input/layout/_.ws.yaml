@@ -2,10 +2,10 @@ dom:
   div:
     h2:
       ui.title:
-        icon: 🧩
+        icon: 🧱
         text: layout
     ui.tabs:
-      ':options': '[''🧩 direction'', ''👉 order'', ''🎫 item size'', ''🎫 justify'']'
+      ':options': '[''➡️ direction'', ''👉 order'', ''🎫 item size'', ''🎫 justify'']'
       direction: vertical
       ':can-select-none': 'true'
       template: 

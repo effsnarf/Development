@@ -1,6 +1,6 @@
 dom:
   ui.input.layout.examples:
-    ':style': '{ width: ''25em'' }'
+    ':style': '{ width: ''100%'' }'
     direction: vertical
     ':options': options
     ':value': value

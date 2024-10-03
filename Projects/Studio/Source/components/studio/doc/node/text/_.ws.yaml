@@ -1,7 +1,7 @@
 dom:
   div:
     :is: "('h'+(node.size||4))"
-    v-text: "(text || '[text❔]')"
+    v-text: "(text || node.text || '[text❔]')"
 
 props:
   node:
