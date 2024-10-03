@@ -1,0 +1,17 @@
+dom:
+  component:
+    v-if: node
+    :is: node.type.kebabize()
+    :node: node
+    :user-app-state: userAppState
+    :sui: sui
+    :data-item: dataItem
+    :content-node: contentNode
+    v-bind: node.vue?.props
+
+props:
+  node:
+  userAppState:
+  sui:
+  dataItem:
+  contentNode:

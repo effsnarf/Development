@@ -158,7 +158,7 @@ methods:
   getNodePage: | #js
     function(vue) {
       while ((vue) && (vue.node?.type != "page")) vue = vue.$parent;
-      return vue.node;
+      return vue?.node;
     }
   getNodePageName: | #js
     function(node) {

@@ -9,12 +9,14 @@ dom:
       :component: "{ source: { style: animCssStyleObj } }"
     div:
       :class: listCls
+      :style: styleObj
       slot:
 
 props:
   anim:
   animState: 
   duration: 1000
+  itemIndex: 0
   itemsCount: 1
   autoPlayLoop: false
 
@@ -56,29 +58,35 @@ methods:
       if (!anim) return null;
       const s = {};
 
-      s[`.list-anim-${anim.name} > *`] = { transition: `${this.duration1}ms` };
-      s[`.page-entering .list-anim-${anim.name} > *`] = anim.enter.from;
-      s[`.page-leaving .list-anim-${anim.name} > *`] = anim.leave.to;
-      const enterSelector = `.list-anim-${anim.name}.anim-entering > *`;
-      const leaveSelector = `.list-anim-${anim.name}.anim-leaving > *`;
+      s[`.list-anim-${anim.name}`] = { transition: `${this.duration1}ms` };
+      s[`.page-entering .list-anim-${anim.name}`] = anim.enter.from;
+      s[`.page-leaving .list-anim-${anim.name}`] = anim.leave.to;
+      const enterSelector = `.list-anim-${anim.name}.anim-entering`;
+      const leaveSelector = `.list-anim-${anim.name}.anim-leaving`;
       s[enterSelector] = anim.enter.from;
       s[leaveSelector] = anim.leave.to;
       // when a page transitions, internal animations are triggered
       s[`.page > .comp-ui-anim > .anim-entering ${enterSelector}`] = anim.enter.from;
       s[`.page > .comp-ui-anim > .anim-leaving ${leaveSelector}`] = anim.leave.to;
 
-      const td = [];
-      const stagger = (this.duration1 / this.itemsCount);
-      // staggers array has [0, stagger, stagger*2, stagger*3, ...]
-      const staggers = Array(this.itemsCount).fill(0).map((_, i) => i * stagger).reverse();
-      for (let i = 0; i < this.itemsCount; i++) {
-        td.push({
-          sel: `.list-items-${this.itemsCount} > *:nth-child(${i+1})`,
-          val: { 'transition-delay': `${staggers.pop()}ms` }}
-        );
-      }
-      for (const t of td) s[t.sel] = t.val;
+      // list items transition delay
+      // const td = [];
+      // const staggers = Array(this.itemsCount).fill(0).map((_, i) => i * this.stagger).reverse();
+      // // staggers array has [0, stagger, stagger*2, stagger*3, ...]
+      // for (let i = 0; i < this.itemsCount; i++) {
+      //   td.push({
+      //     sel: `.list-items-${this.itemsCount} > *:nth-child(${i+1})`,
+      //     val: { 'transition-delay': `${staggers.pop()}ms` }}
+      //   );
+      // }
+      // for (const t of td) s[t.sel] = t.val;
 
+      return s;
+    }
+  getStyleObj: | #js
+    function() {
+      const s = {};
+      if (this.itemIndex) s['transition-delay'] = `${this.itemIndex * this.stagger}ms`;
       return s;
     }
 
@@ -90,7 +98,6 @@ computed:
       const listCls = [];
       listCls.push("list-anim");
       listCls.push(`list-anim-${this.anim.name}`);
-      listCls.push(`list-items-${this.itemsCount}`);
 
       if (this.animStateFrame) listCls.push(`anim-${this.animStateFrame}`);
 
@@ -103,6 +110,14 @@ computed:
   duration1: | #js
     function() {
       return (this.duration || 1000);
+    }
+  stagger: | #js
+    function() {
+      return Math.round(this.duration1 / this.itemsCount);
+    }
+  styleObj: | #js
+    function() {
+      return this.getStyleObj();
     }
 
 watch:

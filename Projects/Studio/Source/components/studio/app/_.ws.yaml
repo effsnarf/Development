@@ -266,7 +266,11 @@ methods:
                       {
                         type: "ui.input.text.box",
                         vue: {
-                          props: {}
+                          props: {
+                            type: "search",
+                            hint: "search",
+                            icon: "🔎",
+                          }
                         }
                       },
                       {

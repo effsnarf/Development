@@ -1,32 +1,38 @@
 dom:
-  component:
-    v-if: node
-    ref: comp1
-    :is: nodeCompName
+  studio.doc.node.anim:
     :node: node
-    :user-app-state: userAppState
+    :item-index: itemIndex
+    :items-count: itemsCount
     :sui: sui
-    :data-item: dataItem
-    :content-node: contentNode
-    :class: nodeCssClass
-    :style: nodeStyle
-    v-bind: node.vue?.props
-    template:
-      v-slot: child-nodes
-      studio.doc.node:
-        v-for: childNode in node.children
-        :node: childNode
-        :user-app-state: userAppState
-        :sui: sui
-        :data-item: dataItem
-        :content-node: contentNode
-        :key: childNode.id
+    component:
+      v-if: node
+      ref: comp1
+      :is: nodeCompName
+      :node: node
+      :user-app-state: userAppState
+      :sui: sui
+      :data-item: dataItem
+      :content-node: contentNode
+      :class: nodeCssClass
+      :style: nodeStyle
+      template:
+        v-slot: child-nodes
+        studio.doc.node:
+          v-for: childNode in node.children
+          :node: childNode
+          :user-app-state: userAppState
+          :sui: sui
+          :data-item: dataItem
+          :content-node: contentNode
+          :key: childNode.id
 
 props:
   node:
   userAppState:
   sui:
   dataItem:
+  itemIndex:
+  itemsCount:
   contentNode:
 
 mounted: | #js
@@ -194,7 +200,7 @@ methods:
     }
   getNodeCompName: | #js
     function(node) {
-      if (node.type.startsWith("ui.")) return node.type.kebabize();
+      if (node.type.startsWith("ui.")) return `studio-doc-node-vue-comp`;
       return `studio-doc-node-${node.type.kebabize()}`;
     }
   getNodeStyle: | #js
@@ -227,7 +233,7 @@ methods:
         case "h": return "row";
         case "v": return "column";
       }
-      return null;
+      return "column";
     }
   areNodesRelated: | #js
     function(node1, node2, tryOpposite = true) {

@@ -1,23 +1,21 @@
 dom:
   div:
-    v-if: items?.length
-    studio.doc.node.anim:
-      :node: node
-      :items-count: visibleItems.length
-      :sui: sui
-      .list-item:
-        v-for: (item, i) in visibleItems
-        :key: getListItemKey(item)
-        studio.doc.node:
-          v-for: childNode in node.children
-          :node: childNode
-          :user-app-state: userAppState
-          :sui: sui
-          :data-item: item
-          :key: childNode.id
-        @mouseenter: () => hovered = item
-        @mouseleave: () => hovered = null
-        @click: () => onClick(item)
+    v-if: visibleItems.length
+    .list-item:
+      v-for: (item, i) in visibleItems
+      :key: getListItemKey(item)
+      studio.doc.node:
+        v-for: childNode in node.children
+        :node: childNode
+        :user-app-state: userAppState
+        :sui: sui
+        :data-item: item
+        :item-index: i
+        :items-count: visibleItems.length
+        :key: childNode.id
+      @mouseenter: () => hovered = item
+      @mouseleave: () => hovered = null
+      @click: () => onClick(item)
 
 props:
   node:
@@ -51,7 +49,7 @@ methods:
 computed:
   visibleItems: | #js
     function() {
-      return this.items.take(6);
+      return (this.items?.take(6) || []);
     }
 
 style:
