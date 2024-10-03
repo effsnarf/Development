@@ -3,6 +3,7 @@ dom:
     v-if: root
     li:
       ui.tree.node:
+        ':root': root
         ':node': root
         ':depth': '0'
         ':initial-expanded': initialExpanded

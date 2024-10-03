@@ -1,0 +1,30 @@
+dom:
+  div:
+    ui.dnd.dropzone:
+      @drop-item: onDropItem
+      .trash-can:
+        v-text: "'🗑️'"
+
+props:
+  userApp:
+
+methods:
+  onDropItem: | #js
+    function(dragItem) {
+      switch (dragItem.type) {
+        case "node":
+          const node = dragItem.item;
+          TreeObject.deleteNode(this.userApp, node, { newTree: false });
+          return;
+      }
+      throw `Unknown item type`;
+    }
+
+style:
+  .comp-studio-app-ui-trash-can:
+    position: fixed
+    right: 1em
+    bottom: 1em
+  .trash-can:
+    font-size: 400%
+    filter: drop-shadow(-3px 3px 2px black)

@@ -1,18 +1,30 @@
 dom:
-  div:
-    .flex1:
-      :class: "{ highlighted: isHighlighted }"
-      @mouseenter: () => { isHighlighted = false; }
-      span:
-        v-text: "'🧊'"
-      span:
-        v-text: item.name
-      div:
-        v-if: item.value
+  .state-item:
+    ui.dnd.draggable:
+      :drag-item: "{ type: 'app.state.path', item: item.path }"
+      .flex1:
+        :class: "{ highlighted: isHighlighted }"
+        @mouseenter: () => { isHighlighted = false; }
+        span:
+          v-text: "'🧊'"
+        span:
+          v-text: item.name
         .preview:
           ui.value.preview:
             :value: item.value
-            :show-visible-fields-filter: "false"
+    .value-props:
+      v-if: (Objects.is(item.value, Object))
+      ui.dnd.draggable:
+        v-for: (key, i) in Object.keys(item.value||{})
+        :drag-item: "{ type: 'app.state.path', item: [...item.path, key] }"
+        .flex1:
+          .grayscale:
+            v-text: "'🧊'"
+          span:
+            v-text: key
+          .preview:
+            ui.value.preview:
+              :value: item.value[key]
 
 props:
   item:
@@ -49,7 +61,29 @@ methods:
       this.highlightTimer = setTimeout(() => { this.flashHighlight(false) }, this.highlightDuration);
     }
 
+computed:
+  Objects: | #js
+    function() {
+      return window.Objects;
+    }
+
 style:
+  .value-props, .preview:
+    transition: 2s
+  .value-props:
+    margin-left: 1em
+    max-height: 0em
+    opacity: 0
+  .state-item:hover > * > * > .preview:
+    max-height: 0em
+    overflow: hidden
+    opacity: 0
+  .state-item:hover .value-props:
+    max-height: 20em
+    opacity: 1
+    overflow: auto
+  .value-props >:
+    filter: grayscale
   .highlighted:
     font-size: 110%
     padding: 0 0.5em

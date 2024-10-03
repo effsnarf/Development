@@ -1,6 +1,7 @@
 dom:
   div:
     studio.app.logo:
+    studio.doc.node.toolbar:
     .flex1:
       v-if: userApp
       ui.drawer:
@@ -56,6 +57,8 @@ dom:
           :sui: sui
     studio.dom.tree.methods:
       ref: methods1
+      :user-app: userApp
+    studio.app.ui.trash.can:
       :user-app: userApp
 
 data:
@@ -201,7 +204,7 @@ methods:
                     },
                     children: [
                       {
-                        type: "title",
+                        type: "text",
                         text: "MG",
                         size: 3
                       },
@@ -246,7 +249,7 @@ methods:
                     },
                     children: [
                       {
-                        type: "title",
+                        type: "text",
                         size: 1,
                         vars: {
                           text: {
@@ -292,7 +295,7 @@ methods:
                         },
                         children: [
                           {
-                            type: "title",
+                            type: "text",
                             size: 2,
                             vars: {
                               text: {
@@ -321,7 +324,7 @@ methods:
                     },
                     children: [
                       {
-                        type: "title",
+                        type: "text",
                         size: 1,
                         vars: {
                           text: {
@@ -377,7 +380,7 @@ methods:
                     },
                     children: [
                       {
-                        type: "title",
+                        type: "text",
                         size: 1,
                         vars: {
                           text: {
@@ -461,7 +464,7 @@ methods:
                         },
                         children: [
                           {
-                            type: "title",
+                            type: "text",
                             size: 3,
                             vars: {
                               text: {
@@ -471,7 +474,7 @@ methods:
                             }
                           },
                           {
-                            type: "title",
+                            type: "text",
                             size: 5,
                             vars: {
                               text: {
@@ -483,7 +486,7 @@ methods:
                         ]
                       },
                       {
-                        type: "title",
+                        type: "text",
                         size: 3,
                         vars: {
                           text: {
@@ -522,7 +525,7 @@ methods:
                         }
                       },
                       {
-                        type: "title",
+                        type: "text",
                         size: 3,
                         vars: {
                           text: {
@@ -552,7 +555,7 @@ methods:
                         type: "image",
                       },
                       {
-                        type: "title",
+                        type: "text",
                         size: 3,
                         data: {
                           source: {
@@ -569,46 +572,17 @@ methods:
         ]
       };
 
-      let id = 1;
       const initNode = (node) => {
         if (!node.type) return;
-        const mockupNode = this.getMockupNode(node);
+        const mockupNode = this.$root.initNewNode(userApp, node);
         const nodeProps = Objects.clone(node, { exclude: ["children"] });
         const merged = Objects.deepMerge(nodeProps, mockupNode);
         Object.assign(node, merged);
-        node.id = id++;
       }
 
       Objects.traverse(userApp, initNode);
 
       return userApp;
-    }
-  getMockupNode: | #js
-    function(node) {
-      node = Objects.clone(node, { exclude: ["children"] });
-      node.animation = {
-        anim: null,
-        duration: null,
-        preview: null
-      };
-      node.style = {
-        bg: {
-          color: null
-        }
-      }
-      if (node.type == "panel") {
-        node.flex = (node.flex || {});
-        const newFlex = {
-          dir: "v",
-          justify: {
-            items: "center",
-            content: "center"
-          }
-        };
-        const mergedFlex = Objects.deepMerge(newFlex, node.flex);
-        Object.assign(node.flex, mergedFlex);
-      }
-      return node;
     }
   getStudioApp: | #js
     function(vue) {
@@ -643,7 +617,7 @@ style:
     display: flex
     justify-content: space-between
     gap: 2em
-    margin: 1vw
+    margin: 0 2vw
   .comp-studio-app > .flex1 > *:
     width: 33%
     height: fit-content

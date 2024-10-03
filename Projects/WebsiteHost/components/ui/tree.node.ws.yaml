@@ -11,6 +11,7 @@ dom:
       component:
         v-if: itemType
         ':is': getItemType()
+        ':root': root
         ':item': getItem(node)
         v-bind: itemProps
       @click: onNodeClick
@@ -23,13 +24,16 @@ dom:
       @dragout: onMouseLeave
       slot: null
     div:
-      ul:
+      transition.group:
         v-if: isExpanded
+        tag: ul
+        name: list
         class: ml-4
         li:
           v-for: child in getChildItems(node)
           :key: getItemKey(child)
           ui.tree.node:
+            ':root': root
             ':node': child
             ':depth': (depth + 1)
             ':initial-expanded': initialExpanded
@@ -45,6 +49,7 @@ dom:
             @node-unhover: onChildUnhover
             @node-hovered: onChildHovered
 props:
+  root: null
   node: null
   depth: null
   initialExpanded: false
@@ -143,7 +148,8 @@ watch:
     immediate: true
 style:
   .tree-node:
-    display: flex
+    display: grid
+    grid-template: 1fr / 2em 1fr
     padding-right: 1em
     user-select: none
   .tree.node.expandable:

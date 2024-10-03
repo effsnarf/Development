@@ -12,6 +12,7 @@ mounted: | #js
       const method = methods[methodName].bind(this);
       this.$root[methodName] = method;
     }
+    this.$root._studio_methods_initialized = true;
   }
 
 methods:
@@ -57,7 +58,7 @@ methods:
         pages: "📃",
         page: "📄",
         panel: "🗂️",
-        title: "🅰️",
+        text: "🅰️",
         list: "🧮",
         comps: "🎁",
         comp: "🎁",
@@ -77,6 +78,58 @@ methods:
       const pageName = this.getNodePageName(node);
       const varPath = [pageName, node.name].map(s => (s||'')).join('.');
       return varPath;
+    }
+  initNewNode: | #js
+    function(userApp, node) {
+      const addChildren = (!node.children);
+      node = Objects.clone(node, { exclude: ["children"] });
+      if (addChildren) node.children = [];
+      node.animation = {
+        anim: null,
+        duration: null,
+        preview: null
+      };
+      node.style = {
+        bg: {
+          color: null
+        }
+      }
+      node.flex = (node.flex || {});
+      const newFlex = {
+        dir: "v",
+        justify: {
+          items: "center",
+          content: "center"
+        }
+      };
+      const mergedFlex = Objects.deepMerge(newFlex, node.flex);
+      Object.assign(node.flex, mergedFlex);
+
+      switch (node.type) {
+        case "text":
+          node.text = (node.text || null);
+          node.size = (node.size || null);
+          break;
+      }
+
+      node.id = this.$root.getNewNodeID(userApp);
+      return node;
+    }
+  getNewNodeID: | #js
+    function(userApp) {
+      const newID = ((this.getMaxID(userApp) || 0) + 1);
+      return newID;
+    }
+  getMaxID: | #js
+    function(userApp) {
+      userApp = (userApp || this.userApp);
+      if (!userApp) throw `No user app`;
+      let maxID = -1;
+      TreeObject.traverse(userApp, (node) => {
+        if (node.id > maxID) maxID = node.id;
+      });
+      if (maxID == -1) return null;
+      return maxID;
     }
   findNode: | #js
     function(node, type, compName) {

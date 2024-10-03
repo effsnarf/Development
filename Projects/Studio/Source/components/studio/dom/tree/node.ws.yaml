@@ -5,18 +5,21 @@ dom:
     @mouseleave: () => onHoverNode(node, false)
     @click: () => onClickNode(node)
     :class: "{ selected: (node.id == sui?.node.selected?.id) }"
-    div:
-      .flex:
-        div:
-          :title: nodeWarning
-          :class: "{ warn: hasWarning }"
-          v-text: nodeText
-        div:
-          v-if: hasWarning
-          v-text: "'⚠️'"
-        .info:
-          v-if: nodeInfo
-          v-text: nodeInfo
+    ui.dnd.dropzone:
+      @drop-item: onDropItem
+      ui.dnd.draggable:
+        :drag-item: "{ type: 'node', item: node }"
+        .flex:
+          div:
+            :title: nodeWarning
+            :class: "{ warn: hasWarning }"
+            v-text: nodeText
+          div:
+            v-if: hasWarning
+            v-text: "'⚠️'"
+          .info:
+            v-if: nodeInfo
+            v-text: nodeInfo
 
 props:
   item:
@@ -24,6 +27,25 @@ props:
   showName: true
 
 methods:
+  onDropItem: | #js
+    function(dragItem) {
+      const methodName = `onDropItem_${dragItem.type.replaceAll('.', '_')}`;
+      const method = this[methodName];
+      if (!method) throw `Unknown item type ${dragItem.type}`;
+      method(dragItem.item);
+    }
+  onDropItem_node: | #js
+    function(dropNode) {
+      const userApp = this.$root.getUserApp(this);
+      TreeObject.moveNode(userApp, dropNode, this.node);
+    }
+  onDropItem_new_node: | #js
+    function(newNode) {
+      delete newNode._;
+      newNode = this.$root.initNewNode(null, newNode);
+      this.node.children.insertAt(0, newNode);
+      this.sui.node.selected = newNode;
+    }
   onClickNode: | #js
     function(node) {
       if (this.sui) {

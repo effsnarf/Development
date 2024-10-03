@@ -1,4 +1,6 @@
+import { TypeReferenceNode } from "typescript";
 import "./Extensions";
+import { node } from "webpack";
 
 const _importMainFileToImplement =
   "This is not supported on the client side. Import Extensions.Objects to implement";
@@ -627,6 +629,11 @@ class Objects {
   };
 }
 
+interface TreeNode {
+  id: number;
+  children?: TreeNode[];
+}
+
 class TreeObject {
   static traverse(root: any, callback: Function, getChildren?: Function) {
     // Traverse a tree structure (children[] on each node)
@@ -704,8 +711,45 @@ class TreeObject {
     return Math.max(...values);
   }
 
-  static deleteNode(root: any, isNode: Function) {
-    root = Objects.clone(root);
+  static moveNode(
+    root: TreeNode,
+    node: TreeNode,
+    newParent: TreeNode,
+    newChildIndex?: number
+  ) {
+    // Find the current parent of the node to be moved
+    const currentParent = TreeObject.getParentNode(root, node);
+
+    if (currentParent) {
+      // Remove the node from its current parent's children
+      currentParent.children =
+        currentParent.children?.filter(
+          (child: TreeNode) => child.id !== node.id
+        ) || [];
+    }
+
+    // Add the node to the new parent's children
+    if (!newParent.children) {
+      newParent.children = [];
+    }
+
+    // If newChildIndex is not provided or out of bounds, push to the end
+    if (
+      newChildIndex === undefined ||
+      newChildIndex >= newParent.children.length
+    ) {
+      newParent.children.push(node);
+    } else {
+      newParent.children.insertAt(newChildIndex, node);
+    }
+  }
+
+  static deleteNode(
+    root: TreeNode,
+    isNode: Function,
+    options: { newTree: true }
+  ) {
+    if (options.newTree) root = Objects.clone(root);
     isNode = TreeObject._evalSelector(isNode);
     const parentNode = TreeObject.getParentNode(root, isNode);
     if (!parentNode) return root;
@@ -713,7 +757,7 @@ class TreeObject {
     return root;
   }
 
-  static getParentNode(root: any, isNode: Function): any {
+  static getParentNode(root: TreeNode, isNode: Function | TreeNode): any {
     isNode = TreeObject._evalSelector(isNode);
     let parentNode = null;
     TreeObject.traverse(root, (n: any) => {
@@ -730,6 +774,10 @@ class TreeObject {
     if (typeof func == "string") {
       const key = func;
       return (node: any) => node[key];
+    }
+    if (typeof func == "object") {
+      const id = func.id;
+      return (n: any) => n.id == id;
     }
     return func;
   }

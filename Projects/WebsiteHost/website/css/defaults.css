@@ -144,12 +144,12 @@ li
 }
 .selected
 {
-  background: #ffffff20;
+  background: #ffffff30;
   transition: 0s;
 }
 .selected:hover
 {
-  background: #ffffff30 !important;
+  background: #ffffff40 !important;
 }
 
 .clickable

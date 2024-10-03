@@ -97,7 +97,10 @@ methods:
       // - data (the projected downloaded data)
       const url = Vue.computed({
         get: eval(`(function() {
-          return ${varOptions.url};
+          try {
+            return ${varOptions.url};
+          }
+          catch (ex) {}
         })`).bind(this.userAppState)
       });
 
@@ -146,7 +149,10 @@ methods:
       // - value (evaluated)
       const exp = Vue.computed({
         get: eval(`(function() {
-          return ${varOptions.exp};
+          try {
+            return ${varOptions.exp};
+          }
+          catch (ex) {}
         })`).bind(this.userAppState)
       });
 
@@ -228,11 +234,9 @@ methods:
     }
   toFlexDirection: | #js
     function(node) {
-      switch (node.flex?.dir)
-      {
-        case "h": return "row";
-        case "v": return "column";
-      }
+      const dir = node.flex?.dir;
+      if (dir.startsWith("h")) return "row";
+      if (dir.startsWith("v")) return "column";
       return "column";
     }
   areNodesRelated: | #js

@@ -1,5 +1,6 @@
 dom:
   div:
+    v-show: "false"
     ui.console:
       ref: console1
 

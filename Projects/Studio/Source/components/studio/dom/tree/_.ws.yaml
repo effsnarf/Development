@@ -4,6 +4,7 @@ dom:
       ":root": root
       item-type: studio.dom.tree.node
       :initial-expanded: initialExpanded
+      :item-props: "{ sui }"
       @node-hover: (node) => $emit('sui', (sui) => sui.node.hovered = node)
       @node-select: (node) => $emit('sui', (sui) => sui.node.selected = node)
     ui.value:

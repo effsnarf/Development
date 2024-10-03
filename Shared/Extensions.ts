@@ -469,7 +469,7 @@ interface Array<T> {
   contains(item: T, getItemKey?: (item: T) => any): boolean;
   reversed(): T[];
   removeAt(index: number): void;
-  insertAt(index: number, item: T, appendToEnd: boolean): void;
+  insertAt(index: number, item: T, appendToEnd?: boolean): void;
   removeBy(predicate: (item: T) => boolean): void;
   removeByField(key: string, value: any): void;
   count(predicate: (item: T) => boolean): number;
@@ -1738,7 +1738,7 @@ if (typeof Array !== "undefined") {
   Array.prototype.insertAt = function (
     index: number,
     item: any,
-    appendToEnd: boolean
+    appendToEnd: boolean = true
   ) {
     if (appendToEnd && index > this.length) index = this.length;
     this.splice(index, 0, item);

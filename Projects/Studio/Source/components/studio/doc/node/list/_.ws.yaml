@@ -45,11 +45,15 @@ methods:
       const fields = Object.keys(item);
       return item[fields[0]];
     }
+  getMockArray: | #js
+    function() {
+      return Array.from(Array(6).keys()).map((i) => null);
+    }
 
 computed:
   visibleItems: | #js
     function() {
-      return (this.items?.take(6) || []);
+      return (this.items?.take(6) || this.getMockArray());
     }
 
 style:

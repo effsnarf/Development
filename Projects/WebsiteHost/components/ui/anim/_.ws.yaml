@@ -8,8 +8,8 @@ dom:
     ui.html.style:
       :component: "{ source: { style: animCssStyleObj } }"
     div:
-      :class: listCls
-      :style: styleObj
+      :class: animCls
+      :style: animStyle
       slot:
 
 props:
@@ -58,11 +58,11 @@ methods:
       if (!anim) return null;
       const s = {};
 
-      s[`.list-anim-${anim.name}`] = { transition: `${this.duration1}ms` };
-      s[`.page-entering .list-anim-${anim.name}`] = anim.enter.from;
-      s[`.page-leaving .list-anim-${anim.name}`] = anim.leave.to;
-      const enterSelector = `.list-anim-${anim.name}.anim-entering`;
-      const leaveSelector = `.list-anim-${anim.name}.anim-leaving`;
+      s[`.studio-anim-${anim.name}`] = { transition: `${this.duration1}ms` };
+      s[`.page-entering .studio-anim-${anim.name}`] = anim.enter.from;
+      s[`.page-leaving .studio-anim-${anim.name}`] = anim.leave.to;
+      const enterSelector = `.studio-anim-${anim.name}.anim-entering`;
+      const leaveSelector = `.studio-anim-${anim.name}.anim-leaving`;
       s[enterSelector] = anim.enter.from;
       s[leaveSelector] = anim.leave.to;
       // when a page transitions, internal animations are triggered
@@ -91,13 +91,13 @@ methods:
     }
 
 computed:
-  listCls: | #js
+  animCls: | #js
     function() {
       if (!this.anim) return [];
 
       const listCls = [];
-      listCls.push("list-anim");
-      listCls.push(`list-anim-${this.anim.name}`);
+      listCls.push("studio-anim");
+      listCls.push(`studio-anim-${this.anim.name}`);
 
       if (this.animStateFrame) listCls.push(`anim-${this.animStateFrame}`);
 
@@ -115,7 +115,7 @@ computed:
     function() {
       return Math.round(this.duration1 / this.itemsCount);
     }
-  styleObj: | #js
+  animStyle: | #js
     function() {
       return this.getStyleObj();
     }
@@ -147,5 +147,5 @@ watch:
       }
 
 style:
-  .list-anim:
+  .studio-anim:
     overflow: hidden

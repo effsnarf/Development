@@ -24,13 +24,13 @@ data:
   pageClasses: {}
   visiblePageNodes: []
   pageTransAnim:
-    name: slide-x
+    name: fade
     enter:
       from:
-        transform: translateX(100%)
+        opacity: 1
     leave:
       to:
-        transform: translateX(-100%)
+        opacity: 0
 
 mounted: | #js
   function() {

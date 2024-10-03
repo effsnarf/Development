@@ -1,0 +1,68 @@
+dom:
+  .tools-container:
+    :key: key1
+    .tools:
+      div:
+        v-for: ntt in nodeTypeTools
+        ui.dnd.draggable:
+          :drag-item: "{ type: 'new.node', item: ntt }"
+          .tool:
+            .icon:
+              v-text: ntt._?.icon
+            .title:
+              v-text: ntt.type
+
+data:
+  nodeTypeTools:
+    - type: panel
+    - type: list
+    - type: image
+    - type: text
+  key1: 1
+
+mounted: | #js
+  function() {
+    this.init();
+  }
+
+methods:
+  init: | #js
+    async function() {
+      if (!this.$root._studio_methods_initialized) return setTimeout(this.init.bind(this), 100);
+      for (const ntt of this.nodeTypeTools) {
+        ntt._ = { icon: this.$root.getNodeIcon(ntt) };
+      }
+      this.refresh();
+    }
+  refresh: | #js
+    function() {
+      this.key1++;
+    }
+
+style:
+  .tools-container:
+    overflow: hidden
+  .tools:
+    display: flex
+    justify-content: center
+    gap: 0.1em
+    transform: translateY(60%)
+    filter: blur(2px)
+    opacity: 0.5
+    transition: 1s
+  .tools:hover:
+    transform: translateY(0)
+    filter: blur(0)
+    opacity: 1
+  .tool:
+    padding: 0 1em
+    filter: grayscale(1)
+  .tool:hover:
+    filter: none
+  .title:
+    width: auto
+    padding: 0
+    text-align: center
+    opacity: 0.6
+  .icon:
+    font-size: 200%

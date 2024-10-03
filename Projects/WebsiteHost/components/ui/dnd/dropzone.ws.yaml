@@ -7,7 +7,7 @@ dom:
     @drop: onDrop
     @click: onClick
     slot: null
-props: null
+props:
 data:
   isDraggedOver: false
 methods:
@@ -42,7 +42,7 @@ methods:
   cancelEvent: | #js
     function(e) {
       e.preventDefault();
-      e.stopPropagation();
+      //e.stopPropagation();
     }
 style:
   .drag-over:

@@ -106,6 +106,7 @@ watch:
   node:
     handler: | #js
       function(newNode) {
+        if (!this.selected.tab.index) this.selected.tab.index = 0;
         this.initial.node = this.getInitialNodeData(newNode);
       }
     immediate: true

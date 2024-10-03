@@ -4,7 +4,7 @@ dom:
     div:
       v-for: i in 6
       :is: "('h'+i)"
-      v-text: node.text
+      v-text: "'text size'"
       :class: "{ selected: (i == initial.node.size), hoverable: true }"
       @mouseenter: () => onHover(i, true)
       @mouseleave: () => onHover(i, false)
