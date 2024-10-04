@@ -64,35 +64,37 @@ dom:
             :sui: sui
             :is-tabs-drawer-open: "true"
       div:
-        div:
-          v-if: (sui.tool.category == 'layout')
+        transition:
+          name: slide
           div:
-            studio.app.ui.drawer:
-              :open: "true"
-              .title1:
-                :style: "{ 'margin-top': '1.5rem' }"
-                v-text: "'🧱'"
-            .box1.flex-grow-1:
-              .flex:
-                .title2:
-                  v-text: "'⚙️'"
-                div:
-                  ui.checkbox:
-                    text: layout lines
-                    v-model: sui.grid.lines
-        div:
-          v-if: (sui.tool.category == 'data')
+            v-if: (sui.tool.category == 'layout')
+            div:
+              studio.app.ui.drawer:
+                :open: "true"
+                .title1:
+                  :style: "{ 'margin-top': '1.5rem' }"
+                  v-text: "'🧱'"
+              .box1.flex-grow-1:
+                .flex:
+                  .title2:
+                    v-text: "'⚙️'"
+                  div:
+                    ui.checkbox:
+                      text: layout lines
+                      v-model: sui.grid.lines
           div:
-            studio.app.ui.drawer:
-              :open: "true"
-              .title1:
-                :style: "{ 'margin-top': '1.5rem' }"
-                v-text: "'🧊'"
-            .box1:
-              studio.app.runtime.state:
-                :user-app: userApp
-                :user-app-state: userAppState
-                :sui: sui
+            v-else-if: (sui.tool.category == 'data')
+            div:
+              studio.app.ui.drawer:
+                :open: "true"
+                .title1:
+                  :style: "{ 'margin-top': '1.5rem' }"
+                  v-text: "'🧊'"
+              .box1:
+                studio.app.runtime.state:
+                  :user-app: userApp
+                  :user-app-state: userAppState
+                  :sui: sui
     studio.dom.tree.methods:
       ref: methods1
       :user-app: userApp
@@ -705,7 +707,11 @@ style:
   .comp-studio-app > .flex1 > *:nth-child(1):hover:
     width: 40%
   .comp-studio-app > .flex1 > *:nth-child(2):
-    width: 18%
+    width: 8%
+  .comp-studio-app > .flex1 > *:nth-child(2):hover:
+    width: 20%
+  .comp-studio-app > .flex1 > *:nth-child(3):
+    aspect-ratio: 9 / 16
   .comp-studio-app > .flex1 > *:nth-child(4):hover:
     width: 50%
   .comp-studio-app > .flex1 > *:nth-child(5):
@@ -714,3 +720,5 @@ style:
     display: flex
     flex-direction: column
     gap: 1em
+  .tree-node:
+    grid-template: 1fr / 0em 1fr
