@@ -1,30 +1,35 @@
 dom:
   ui.input.layout.examples:
-    ':style': '{ width: ''100%'' }'
-    direction: vertical
+    :direction: direction
+    :cssClasses: "['justify-between']"
     ':options': options
     ':value': value
     @input: $emit('input', $event)
 props:
+  direction:
   value: null
 data:
   options:
     - cssClass: null
       value: start
     - cssClass: null
-      value: end
-    - cssClass: null
       value: center
     - cssClass: null
-      value: between
+      value: end
     - cssClass: null
-      value: around
+      value: stretch
+    - cssClass: null
+      value: baseline
 mounted: | #js
   function() {
     for (const option of this.options) {
-      option.cssClass = `justify-${option.value}`;
+      option.cssClass = `items-${option.value}`;
     }
   }
+computed:
+style:
+  .option .item:
+    min-width: 33%
 _:
   examples:
     count: 0

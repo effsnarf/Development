@@ -8,9 +8,10 @@ dom:
           ':class': '{ selected: isSelected(option) }'
           @click: onClickOption(option)
           ui.input.layout.example:
+            :direction: direction
             ':css-class': option.cssClass
             :show-number: showNumber
-        h3:
+        div:
           class: opacity-50 text-center
           v-text: (option.text || option.value)
 data:
@@ -19,6 +20,7 @@ props:
   options: null
   value: null
   showNumber: null
+  cssClasses:
 methods:
   onClickOption: | #js
     function(option) {
@@ -33,13 +35,16 @@ methods:
 computed:
   mainFlexClass: | #js
     function() {
-      const direction = (this.direction == "horizontal" ? "row" : "column");
-      return ["flex", direction].join("-");
+      return [...(this.cssClasses||[])];
     }
 watch:
 style:
+  .comp-ui-input-layout-examples:
+    width: 15em
+  .examples:
+    flex-direction: column
   .option:
-    padding: 0.5em 0
+    padding: 0.5em
     background: "#ffffff30"
     opacity: 0.6
     cursor: pointer

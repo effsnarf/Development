@@ -1,0 +1,35 @@
+dom:
+  div:
+    .options:
+      .option:
+        v-for: (option, index) in [...options].reverse()
+        :class: "{ clickable: true, selected: (option == value) }"
+        @mouseenter: $emit('hover', option)
+        @mouseleave: $emit('hover', null)
+        @click: $emit('input', option)
+        .bar:
+          :style: "{ 'width': option+'%' }"
+          v-text: option
+
+props:
+  value:
+  
+data:
+  options: [0, 25, 50, 75, 100]
+
+style:
+  .options:
+    display: flex
+    flex-direction: column
+    gap: 0.1em
+    width: 6em
+  .option, .bar:
+    border-radius: 0.3em
+  .option:
+    height: 1.5em
+    background: "#303030"
+  .option.selected:
+    border: 2px solid gray
+  .bar:
+    height: 100%
+    background: "#505050"

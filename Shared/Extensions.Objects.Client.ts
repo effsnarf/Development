@@ -305,6 +305,21 @@ class Objects {
     return currentObj;
   }
 
+  static pathExists(obj: any, path: string | string[]) {
+    if (typeof path == "string") path = path.split(".");
+    const keys = path as string[];
+    let currentObj = obj;
+  
+    for (const key of keys) {
+      if (currentObj === null || typeof currentObj !== "object" || !(key in currentObj)) {
+        return false;
+      }
+      currentObj = currentObj[key];
+    }
+  
+    return true;
+  }
+
   static withoutFalsyValues(obj: any): any {
     const result: any = {};
     for (const key in obj) {

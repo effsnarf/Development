@@ -4,46 +4,58 @@ dom:
       ui.title:
         icon: 🧱
         text: layout
-    ui.tabs:
-      ':options': '[''➡️ direction'', ''👉 order'', ''🎫 item size'', ''🎫 justify'']'
-      direction: vertical
-      ':can-select-none': 'true'
-      template: 
-        v-slot: tab0
-        ui.input.layout.direction:
-          v-model: direction
-      template: 
-        v-slot: tab1
-        ui.input.layout.order:
-          ':direction': direction
-          v-model: order
-      template: 
-        v-slot: tab2
-        ui.input.layout.item.size:
-          v-model: item.size
-      template: 
-        v-slot: tab3
-        ui.input.layout.justify:
-          v-model: item.justify
+    .flex:
+      ui.tabs:
+        :options: tabOptionNames
+        direction: vertical
+        :can-select-none: "true"
+        :drawer: "false"
+        v-model: selectedTabIndex
+      div:
+        v-for: (tabOption, i) in tabOptions
+        transition:
+          name: slide-hor-ver
+          div:
+            v-if: (selectedTabIndex == i)
+            component:
+              :is: "('ui.input.layout.'+tabOption).replaceAll('.', '-')"
+              :direction: layout.direction
+              :value: getComponentValue(tabOption)
+              @input: (value) => onComponentInput(tabOption, value)
 props:
   value: null
 data:
-  direction: null
-  order: null
-  item:
-    size: null
-    justify: null
+  layout:
+  tabOptions:
+  selectedTabIndex:
+  layoutPropNames: ["direction", "order", "justify.content", "align.items", "size"]
+methods:
+  onComponentInput: | #js
+    function(tabOption, value) {
+      Objects.setProperty(this.layout, tabOption, value);
+    }
+  getComponentValue: | #js
+    function(tabOption) {
+      return Objects.getProperty(this.layout, tabOption);
+    }
+  getTabOptions: | #js
+    function(layout) {
+      const options = [];
+      for (const key of this.layoutPropNames) {
+        if (Objects.pathExists(layout, key)) options.push(key);
+      }
+      return options;
+    }
 computed:
-  layout: | #js
+  tabOptionNames: | #js
     function() {
-      return {
-        direction: this.direction,
-        order: this.order,
-        item: {
-          size: this.itemSize,
-          justify: this.itemJustify,
-        },
-      };
+      return this.tabOptions
+        .map(t => t.replaceAll('.', '-'))
+        .map(t => `🧱 ${t}`);
+    }
+  Objects: | #js
+    function() {
+      return window.Objects;
     }
 watch:
   layout:
@@ -56,9 +68,8 @@ watch:
   value:
     handler: | #js
       function(layout) {
-        this.direction = layout?.direction;
-        this.order = layout?.order;
-        this.item = layout?.item || { size: null, justify: null };
+        this.layout = layout;
+        this.tabOptions = this.getTabOptions(layout);
       }
     immediate: true
     deep: true

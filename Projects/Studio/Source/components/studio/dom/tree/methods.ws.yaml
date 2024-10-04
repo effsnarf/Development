@@ -89,6 +89,24 @@ methods:
         duration: null,
         preview: null
       };
+      const layout = {
+        size: {
+          width: null,
+          height: null
+        }
+      };
+      if (node.type == "list") {
+        layout.direction = null;
+        layout.order = null;
+        layout.justify = {
+          content: null
+        };
+        layout.align = {
+          items: null,
+          content: null
+        };
+      }
+      node.layout = layout;
       node.style = {
         bg: {
           color: null

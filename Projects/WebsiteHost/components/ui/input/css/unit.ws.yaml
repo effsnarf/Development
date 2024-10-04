@@ -1,0 +1,37 @@
+dom:
+  div:
+    .flex:
+      ui.select:
+        :options: unitOptions
+        input-type: value
+        v-model: unit
+      ui.input.percent:
+        v-model: number
+
+props:
+  value:
+
+data:
+  number: null
+  unit: null
+  unitOptions: ["%", "vw", "vh", "em", "rem"]
+
+computed:
+  value1: | #js
+    function() {
+      return `${this.number}${this.unit}`;
+    }
+
+watch:
+  value1: | #js
+    function(newValue1) {
+      this.$emit("input", newValue1);
+    }
+  value: | #js
+    function(value) {
+      // [value] is a css unit value like "100px" or "100%"
+      // we want to extract [number] and [unit] from it
+      this.number = parseFloat(value);
+      this.unit = (value?.replace(this.number, '') || null);
+    }
+

@@ -1,5 +1,6 @@
 dom:
   ui.input.layout.examples:
+    direction: none
     ':options': options
     ':value': value
     @input: $emit('input', $event)
@@ -9,7 +10,7 @@ data:
   options:
     - cssClass: flex-row justify-center
       value: horizontal
-    - cssClass: flex-column justify-center
+    - cssClass: flex-column justify-center items-center
       value: vertical
 _:
   examples:

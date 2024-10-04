@@ -1,7 +1,7 @@
 dom:
   .flex:
-    :class: cssClass
-    :style: "{ gap: '0.5em' }"
+    :class: cssClasses
+    :style: "{ gap: '0', 'min-height': '4em' }"
     .item:
       v-for: (i, index) in itemsArray
       div:
@@ -10,6 +10,7 @@ dom:
 
 props:
   items: 3
+  direction: vertical
   cssClass: null
   showNumber: false
 
@@ -18,13 +19,20 @@ computed:
     function() {
       return Array.from({ length: this.items });
     }
+  cssClasses: | #js
+    function() {
+      const direction = (this.direction == "horizontal") ? "row" :
+        (this.direction == "none") ? null : "column";
+      const flexDirection = `flex-${direction}`;
+      return [flexDirection, ...((this.cssClass||"").split(' '))];
+    }
 
 style:
   .item:
     display: flex
     align-items: center
     justify-content: center
-    width: 3em
-    height: 2em
+    min-width: 3em
+    min-height: 2em
     background: "#ffffff40"
     box-shadow: -4px 4px 4px black

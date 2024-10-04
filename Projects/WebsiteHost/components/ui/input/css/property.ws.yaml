@@ -1,20 +1,22 @@
 dom:
   div:
-    ui.select:
-      :options: cssPropOptions
+    .flex:
+      ui.select:
+        :options: cssPropOptions
+        input-type: value
+        v-model: selectedOption
+      div:
+        v-if: (selectedOption?.endsWith('[unit]'))
+        ui.input.css.unit:
+          :value: value
+          @input: $emit('input', $event)
 
 props:
   cssProperty:
   value: null
 data:
-  number: null
-  unit: null
+  selectedOption:
 methods:
-  getCValue: | #js
-    function(number, unit) {
-      if (number == null) return null;
-      return `${number||""}${unit||""}`;
-    }
 computed:
   cssPropOptions: | #js
     function() {
@@ -25,26 +27,11 @@ computed:
       }
       throw new Error(`Unsupported cssProperty: ${cssProperty}`);
     }
-  cValue: | #js
-    function() {
-      return this.getCValue(this.number, this.unit);
-    }
 watch:
-  cValue:
-    handler: | #js
-      function(cValue) {
-        this.$emit('input', cValue);
-      }
-  value:
-    handler: | #js
-      function(value) {
-        if (value == this.cValue) return;
-        this.number = parseInt(value);
-        this.unit = (value?.replace(this.value1, '') || null);
-        if (parseFloat(this.unit)) this.unit = "%";
-      }
-    immediate: true
-    deep: true
+  selectedOption: | #js
+    function(option) {
+      if (!option.endsWith('[unit]')) this.$emit('input', option.split(' ').last());
+    }
 _:
   examples:
     count: 0

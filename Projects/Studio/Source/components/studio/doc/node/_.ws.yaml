@@ -215,8 +215,9 @@ methods:
       const s = {};
       //s['background'] = `radial-gradient(circle at center, ${node.style?.bg?.color}, #000)`;
       s['background-color'] = node.style?.bg?.color;
-      s['width'] = node.layout?.width;
-      s['flex'] = 'none';
+      s['width'] = node.layout?.size?.width;
+      s['height'] = node.layout?.size?.height;
+      //s['flex'] = 'none';
       Object.assign(s, this.getFlexStyle(node));
       Objects.removeNullValueKeys(s);
       if (!Object.keys(s).length) return null;
@@ -227,17 +228,21 @@ methods:
       if (!node.flex) return {};
       const s = {};
       s.display = "flex";
-      s['justify-content'] = (node.flex?.justify?.content || "space-between");
+      s['justify-content'] = (node.layout?.justify?.content);
+      s['align-content'] = (node.layout?.align?.content);
+      s['align-items'] = (node.layout?.align?.items);
       s['flex-direction'] = this.toFlexDirection(node);
       Objects.removeNullValueKeys(s);
       return s;
     }
   toFlexDirection: | #js
     function(node) {
-      const dir = node.flex?.dir;
+      const defaultValue = "column";
+      const dir = node.layout?.direction;
+      if (!dir) return defaultValue;
       if (dir.startsWith("h")) return "row";
       if (dir.startsWith("v")) return "column";
-      return "column";
+      return defaultValue;
     }
   areNodesRelated: | #js
     function(node1, node2, tryOpposite = true) {
@@ -310,7 +315,7 @@ watch:
 
 style:
   .studio-doc-node:
-    border: none
+    border: 1px dashed gray
   .hovered-node:
     border: 2px dashed yellow
   .selected-node:

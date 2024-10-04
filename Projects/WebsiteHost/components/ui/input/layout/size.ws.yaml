@@ -1,16 +1,20 @@
 dom:
   div: 
     div: 
-      div: 
-        h3: 
-          v-text: '''width'''
-        ui.input.css.value: 
-          v-model: size.width
-      div: 
-        h3: 
-          v-text: '''height'''
-        ui.input.css.value: 
-          v-model: size.height
+      ui.tabs:
+        ':options': '[''➡️ width'', ''⬆️ height'']'
+        direction: horizontal
+        :value: 0
+        template:
+          v-slot: tab0
+          ui.input.css.property:
+            css-property: width 
+            v-model: size.width
+        template:
+          v-slot: tab1
+          ui.input.css.property:
+            css-property: height
+            v-model: size.height
 props:
   value: null
 data:

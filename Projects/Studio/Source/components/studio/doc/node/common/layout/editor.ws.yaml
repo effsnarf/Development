@@ -1,6 +1,7 @@
 dom:
   div:
     ui.input.layout:
+      v-model: node.layout
 
 props:
   node:

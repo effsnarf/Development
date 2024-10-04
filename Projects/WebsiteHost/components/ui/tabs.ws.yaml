@@ -3,7 +3,7 @@ dom:
     ':class': class1
     ':style': style1
     ui.drawer:
-      :enabled: "(direction != 'horizontal')"
+      :enabled: "(drawer && (direction != 'horizontal'))"
       :open: "!selectedTabIndex"
       h2:
         v-if: title
@@ -44,6 +44,7 @@ props:
   direction: vertical
   value: null
   transitionName: null
+  drawer: true
   showSearch: null
   canSelectNone: false
   showTitleInTab: false
@@ -141,7 +142,7 @@ style:
   .menu3.vertical li:
     display: flex
   .menu3.vertical li::after:
-    content: '''❯'''
+    content: ''''''
     opacity: 0.1 !important
     margin-left: 2em
     flex-grow: 1

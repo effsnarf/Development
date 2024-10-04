@@ -194,7 +194,7 @@ methods:
                   {
                     type: "panel",
                     flex: {
-                      dir: "v"
+                      direction: "v"
                     },
                     layout: {
                       position: "fixed",
@@ -217,7 +217,9 @@ methods:
                     layout: {
                       position: "fixed",
                       top: "10vh",
-                      height: "90vh"
+                      size: {
+                        height: "90vh"
+                      }
                     },
                     children: [
                       {
@@ -432,7 +434,7 @@ methods:
                   {
                     type: "panel",
                     flex: {
-                      dir: "h",
+                      direction: "h",
                       justify: {
                         content: "space-between"
                       }
@@ -441,7 +443,9 @@ methods:
                       {
                         type: "panel",
                         layout: {
-                          width: "20%"
+                          size: {
+                            width: "20%"
+                          }
                         },
                         children: [
                           {
@@ -458,7 +462,9 @@ methods:
                       {
                         type: "panel",
                         layout: {
-                          width: "60%"
+                          size: {
+                            width: "60%"
+                          }
                         },
                         children: [
                           {
@@ -504,7 +510,7 @@ methods:
                   {
                     type: "panel",
                     flex: {
-                      dir: "h",
+                      direction: "h",
                       justify: {
                         content: "flex-start"
                       }
@@ -513,7 +519,9 @@ methods:
                       {
                         type: "image",
                         layout: {
-                          width: "20%"
+                          size: {
+                            width: "20%"
+                          }
                         },
                         vars: {
                           imageUrl: {
@@ -543,7 +551,7 @@ methods:
                   {
                     type: "panel",
                     flex: {
-                      dir: "h",
+                      direction: "h",
                       justify: {
                         content: "flex-start"
                       }
