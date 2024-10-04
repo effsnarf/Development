@@ -73,7 +73,9 @@ data:
 
 mounted: | #js
   function() {
-    this.$watch("selected.tab.index", (newIndex) => this.sui.tool.category = this.toolCategoryOptions[newIndex].split(' ').last());
+    this.$watch("selected.tab.index", (newIndex) => {
+      this.sui.tool.category = this.toolCategoryOptions[newIndex]?.split(' ').last()
+  });
   }
 
 methods:
