@@ -1,33 +1,42 @@
 dom:
   div:
     studio.app.logo:
-    studio.doc.node.toolbar:
+    .spacer1:
+      v-text: "''"
     .flex1:
       v-if: userApp
       ui.drawer:
-        studio.dom.tree:
-          :root: userApp
-          :sui: sui
-      div:
-        transition.group:
-          name: list2
+        .box1:
           studio.dom.tree:
-            v-for: pageNode in pageNodes
-            :key: pageNode.id
-            v-show: (pageNode.id == sui.page.selected?.id)
-            :root: pageNode
+            :root: userApp
             :sui: sui
-            :initial-expanded: "true"
+      div:
+        studio.app.ui.drawer:
+          closed-width: 8em
+          studio.doc.node.toolbar:
+        .box1:
+          transition.group:
+            name: list2
+            studio.dom.tree:
+              v-for: pageNode in pageNodes
+              :key: pageNode.id
+              v-show: (pageNode.id == sui.page.selected?.id)
+              :root: pageNode
+              :sui: sui
+              :initial-expanded: "true"
         studio.app.log:
           category: runtime
-      .flex2:
-        studio.doc.page.selector:
-          :user-app: userApp
-          :user-app-state: userAppState
-          :sui: sui
-          :value: sui.page.selected
-          @input: selectPage
-        div:
+      div:
+        studio.app.ui.drawer:
+          closed-width: 8em
+          studio.doc.page.selector:
+            :user-app: userApp
+            :user-app-state: userAppState
+            :sui: sui
+            :value: sui.page.selected
+            @input: selectPage
+        .box1:
+          class: flex-grow-1
           @mouseenter: () => onHoverApp(true)
           @mouseleave: () => onHoverApp(false)
           studio.doc.node.picker:
@@ -40,24 +49,57 @@ dom:
             :sui: sui
             @runtime-vue-inited: onRuntimeVueInited
       div:
-        studio.doc.node.editor:
-          :node: sui.node.selected
-          :user-app: userApp
-          :user-app-state: userAppState
-          :sui: sui
-          :is-tabs-drawer-open: "true"
+        studio.app.ui.drawer:
+          :open: "true"
+          h2:
+            :style: "{ 'margin-top': '1.3em' }"
+            studio.dom.tree.node:
+              :item: sui.node.selected
+              :sui: sui
+        .box1:
+          studio.doc.node.editor:
+            :node: sui.node.selected
+            :user-app: userApp
+            :user-app-state: userAppState
+            :sui: sui
+            :is-tabs-drawer-open: "true"
       div:
-        h2:
-          v-text: "'App Runtime State'"
-        studio.app.runtime.state:
-          :user-app: userApp
-          :user-app-state: userAppState
-          :sui: sui
+        div:
+          v-if: (sui.tool.category == 'layout')
+          div:
+            studio.app.ui.drawer:
+              :open: "true"
+              .title1:
+                :style: "{ 'margin-top': '1.5rem' }"
+                v-text: "'🧱'"
+            .box1.flex-grow-1:
+              .flex:
+                .title2:
+                  v-text: "'⚙️'"
+                div:
+                  ui.checkbox:
+                    text: layout lines
+                    v-model: sui.grid.lines
+        div:
+          v-if: (sui.tool.category == 'data')
+          div:
+            studio.app.ui.drawer:
+              :open: "true"
+              .title1:
+                :style: "{ 'margin-top': '1.5rem' }"
+                v-text: "'🧊'"
+            .box1:
+              studio.app.runtime.state:
+                :user-app: userApp
+                :user-app-state: userAppState
+                :sui: sui
     studio.dom.tree.methods:
       ref: methods1
       :user-app: userApp
     studio.app.ui.trash.can:
       :user-app: userApp
+    ui.css.stylesheet:
+      :rules: userAppStylesheet
 
 data:
   userApp:
@@ -66,6 +108,10 @@ data:
     app:
       is:
         hovered:
+    grid:
+      lines:
+    tool:
+      category:
     page:
       selected:
       trans:
@@ -203,7 +249,7 @@ methods:
                     children: [
                       {
                         type: "text",
-                        text: "MG",
+                        text: "𝓜𝓮𝓶𝓮 𝓖𝓮𝓷𝓮𝓻𝓪𝓽𝓸𝓻",
                         size: 3
                       },
                       {
@@ -615,7 +661,29 @@ watch:
       this.$root.$emit("app.state.changed", vars);
     }
 
+computed:
+  userAppStylesheet: | #js
+    function() {
+      const s = {};
+      if (this.sui.grid.lines) {
+        s['.studio-doc-node'] = {
+          border: '1px dashed gray'
+        };
+      }
+      return s;
+    }
+
 style:
+  .spacer1:
+    height: 4em
+  .title1:
+    font-size: 300%
+  .title2:
+    font-size: 200%
+  .title3:
+    margin-right: 1rem
+    font-size: 140%
+    text-shadow: -3px 3px 2px black
   .comp-studio-app:
     min-height: 100vh
     background: "radial-gradient(circle at center, #2f4e66, #000)"
@@ -625,22 +693,23 @@ style:
     gap: 2em
     margin: 0 2vw
   .comp-studio-app > .flex1 > *:
-    width: 33%
+    width: 25%
+    transition: 0.4s
+  .box1:
     height: fit-content
     overflow: hidden
     background: black
     border: 3px solid gray
     box-shadow: "-0.5em 0.5em 2px #00000080"
     padding: 1em
-    transition: 0.4s
-  .comp-studio-app > .flex1 > *:nth-child(1):
+  .comp-studio-app > .flex1 > *:nth-child(1):hover:
     width: 40%
   .comp-studio-app > .flex1 > *:nth-child(2):
     width: 18%
   .comp-studio-app > .flex1 > *:nth-child(4):hover:
-    width: 60%
+    width: 50%
+  .comp-studio-app > .flex1 > *:nth-child(5):
   .comp-studio-app > .flex1 > *:nth-child(5):hover:
-    width: 60%
   .flex2:
     display: flex
     flex-direction: column

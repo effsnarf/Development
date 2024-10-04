@@ -1,0 +1,50 @@
+dom:
+  .drawer-container:
+    :class: "{ hover: (isOpen) }"
+    @mouseenter: is.hovered = true
+    @mouseleave: is.hovered = false
+    .drawer:
+      :style: drawerStyle
+      slot:
+
+props:
+  closedWidth:
+  open: false
+
+data:
+  is:
+    hovered:
+
+computed:
+  drawerStyle: | #js
+    function() {
+      const s = {};
+      if (!this.isOpen) s['max-width'] = this.closedWidth;
+      else s['max-width'] = '20em';
+      return s;
+    }
+  isOpen: | #js
+    function() {
+      if (this.open) return true;
+      if (this.is.hovered) return true;
+      return false;
+    }
+
+style:
+  .drawer-container:
+    position: absolute
+    left: 50%
+    transform: translateX(-50%)
+    height: 5em
+    margin-top: -5em
+    overflow: hidden
+  .drawer:
+    transform: translateY(3em)
+    filter: blur(2px)
+    opacity: 0.5
+    transition: 1s
+  .drawer-container.hover .drawer:
+    transform: translateY(0)
+    filter: blur(0)
+    opacity: 1
+    z-index: 10

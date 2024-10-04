@@ -28,7 +28,7 @@ data:
   layout:
   tabOptions:
   selectedTabIndex:
-  layoutPropNames: ["direction", "order", "justify.content", "align.items", "size"]
+  layoutPropNames: ["direction", "gap", "order", "justify.content", "align.items", "size"]
 methods:
   onComponentInput: | #js
     function(tabOption, value) {

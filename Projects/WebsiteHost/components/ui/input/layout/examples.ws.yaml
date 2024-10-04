@@ -40,7 +40,7 @@ computed:
 watch:
 style:
   .comp-ui-input-layout-examples:
-    width: 15em
+    width: 12em
   .examples:
     flex-direction: column
   .option:

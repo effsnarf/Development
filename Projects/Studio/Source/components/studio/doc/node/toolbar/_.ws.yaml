@@ -1,16 +1,15 @@
 dom:
-  .tools-container:
+  .tools:
     :key: key1
-    .tools:
-      div:
-        v-for: ntt in nodeTypeTools
-        ui.dnd.draggable:
-          :drag-item: "{ type: 'new.node', item: ntt }"
-          .tool:
-            .icon:
-              v-text: ntt._?.icon
-            .title:
-              v-text: ntt.type
+    div:
+      v-for: ntt in nodeTypeTools
+      ui.dnd.draggable:
+        :drag-item: "{ type: 'new.node', item: ntt }"
+        .tool:
+          .icon:
+            v-text: ntt._?.icon
+          .title:
+            v-text: ntt.type
 
 data:
   nodeTypeTools:
@@ -40,22 +39,13 @@ methods:
     }
 
 style:
-  .tools-container:
-    overflow: hidden
   .tools:
     display: flex
     justify-content: center
     gap: 0.1em
-    transform: translateY(60%)
-    filter: blur(2px)
-    opacity: 0.5
-    transition: 1s
-  .tools:hover:
-    transform: translateY(0)
-    filter: blur(0)
-    opacity: 1
   .tool:
     padding: 0 1em
+    overflow: hidden
     filter: grayscale(1)
   .tool:hover:
     filter: none

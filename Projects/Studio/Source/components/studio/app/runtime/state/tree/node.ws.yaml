@@ -23,6 +23,7 @@ dom:
           span:
             v-text: key
           .preview:
+            v-if: (item.value[key] != undefined)
             ui.value.preview:
               :value: item.value[key]
 

@@ -228,6 +228,7 @@ methods:
       if (!node.flex) return {};
       const s = {};
       s.display = "flex";
+      s['gap'] = node.layout?.gap;
       s['justify-content'] = (node.layout?.justify?.content);
       s['align-content'] = (node.layout?.align?.content);
       s['align-items'] = (node.layout?.align?.items);
@@ -314,8 +315,6 @@ watch:
     immediate: true
 
 style:
-  .studio-doc-node:
-    border: 1px dashed gray
   .hovered-node:
     border: 2px dashed yellow
   .selected-node:

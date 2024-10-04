@@ -5,8 +5,13 @@ dom:
         :options: unitOptions
         input-type: value
         v-model: unit
-      ui.input.percent:
-        v-model: number
+      div:
+        ui.input.text.box:
+          hint: 1
+          :value: number
+          @input: number = $event
+        ui.input.percent:
+          v-model: number
 
 props:
   value:

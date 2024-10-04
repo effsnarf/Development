@@ -1,16 +1,22 @@
 dom:
   div:
     v-if: (node && initial.node)
-    h2:
-      v-text: "'🎨 design'"
-    ui.input.color.palette:
-
-    studio.doc.node.common.background.editor:
-      :node: node
-      :initial: initial
-      :sui: sui
+    ui.tabs:
+      :options: "['🎨 color', '𝔉 𝓕𝓸𝓷𝓽']"
+      direction: horizontal
+      template:
+        v-slot: tab0
+        ui.input.color.palette:
+        studio.doc.node.common.background.editor:
+          :node: node
+          :initial: initial
+          :sui: sui
 
 props:
   node:
   initial:
   sui:
+
+style:
+  .menu3:
+    font-size: 140%

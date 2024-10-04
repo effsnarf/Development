@@ -30,7 +30,7 @@ methods:
   getCssClass: | #js
     function() {
       const dimmed = (this.checkedValue ? "" : "dimmed");
-      return `hoverable ${this.size} ${dimmed}`;
+      return `hoverable items-center ${this.size} ${dimmed}`;
     }
   onClick: | #js
     async function() {

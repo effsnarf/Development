@@ -2,12 +2,8 @@ dom:
   div:
     v-if: node
     div:
-      h2:
-        studio.dom.tree.node:
-          :item: node
-          :sui: sui
       ui.tabs: 
-        ':options': '[nodeTypeTabName, ''🧊 data'', ''🧱 layout'', ''🎨 design'', ''✨ animation'']'
+        :options: toolCategoryOptions
         direction: horizontal
         :can-select-none: "true"
         :show-title-in-tab: "false"
@@ -77,6 +73,7 @@ data:
 
 mounted: | #js
   function() {
+    this.$watch("selected.tab.index", (newIndex) => this.sui.tool.category = this.toolCategoryOptions[newIndex].split(' ').last());
   }
 
 methods:
@@ -95,6 +92,10 @@ methods:
     }
 
 computed:
+  toolCategoryOptions: | #js
+    function() {
+      return [this.nodeTypeTabName, '🧊 data', '🧱 layout', '🎨 design', '✨ animation'];
+    }
   nodeTypeTabName: | #js
     function() {
       const icon = this.$root.getNodeIcon(this.node);

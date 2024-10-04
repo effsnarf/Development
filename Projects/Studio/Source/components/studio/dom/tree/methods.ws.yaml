@@ -95,8 +95,9 @@ methods:
           height: null
         }
       };
-      if (node.type == "list") {
+      if (["panel", "list"].includes(node.type)) {
         layout.direction = null;
+        layout.gap = null;
         layout.order = null;
         layout.justify = {
           content: null

@@ -1,0 +1,8 @@
+dom:
+  div:
+    ui.input.css.unit:
+      :value: value
+      @input: $emit('input', $event)
+
+props:
+  value:
