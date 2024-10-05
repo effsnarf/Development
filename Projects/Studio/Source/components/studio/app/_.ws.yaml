@@ -256,7 +256,7 @@ methods:
                     children: [
                       {
                         type: "text",
-                        text: "𝓜𝓮𝓶𝓮 𝓖𝓮𝓷𝓮𝓻𝓪𝓽𝓸𝓻",
+                        text: "Meme Generator",
                         size: 3
                       },
                       {

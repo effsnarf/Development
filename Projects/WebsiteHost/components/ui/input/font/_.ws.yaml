@@ -2,16 +2,18 @@ dom:
   div:
     div:
       .flex:
-        div:
-          class: large1
-          :class: "{ disabled: (!!query) }"
-          ui.checkbox.list:
-            :items: visibleMoods
-            :get-item-key: (mood) => mood.name
-            :get-item-icon: (mood) => mood.icon
-            :get-item-text: (mood) => mood.name
-            :show-search-box: "false"
-            :value-array: selectedMoods1
+        transition:
+          name: slide-hor
+          div:
+            v-if: (!query)
+            class: large1
+            ui.checkbox.list:
+              :items: visibleMoods
+              :get-item-key: (mood) => mood.name
+              :get-item-icon: (mood) => mood.icon
+              :get-item-text: (mood) => mood.name
+              :show-search-box: "false"
+              :value-array: selectedMoods1
         div:
           .large1:
             ui.input.text.box:
@@ -47,7 +49,7 @@ data:
   exampleText: I'm anaspeptic, phrasmotic, even compunctuous to have caused you such pericombobulation
   query:
   selectedMoods1: []
-  maxVisibleFonts: 200
+  maxVisibleFonts: 100
   moods:
     - icon: 🏢
       name: professional
