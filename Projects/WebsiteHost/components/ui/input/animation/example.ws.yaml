@@ -20,7 +20,7 @@ props:
 
 data:
   frameIndex: 0
-  itemsCount: 5
+  itemsCount: 1
   
 mounted: | #js
   function() {
@@ -41,7 +41,7 @@ style:
     width: 7em
     border: 2px solid gray
     overflow: hidden
-    opacity: 0.5
+    opacity: 0.8
     filter: grayscale(1)
   .list-container:hover:
     opacity: 1
@@ -53,6 +53,6 @@ style:
     flex-direction: column
     gap: 0.3em
   .list-item:
-    height: 1.5em
-    background: "#808080a0"
+    aspect-ratio: 1
+    background: "gray"
     text-align: center

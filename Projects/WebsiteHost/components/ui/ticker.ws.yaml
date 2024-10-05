@@ -21,7 +21,7 @@ methods:
       if (this.count) this.tickIndex = ((this.tickIndex + 1) % this.count);
     }
   anotherTick: | #js
-    function() {
+    async function() {
       this.tick();
-      setTimeout(this.anotherTick.bind(this), this.interval);
+      setTimeout(this.anotherTick.bind(this), (this.interval));
     }

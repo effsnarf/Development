@@ -20,6 +20,7 @@ dom:
           :key: _getItemKey(item)
           :icon: _getItemIcon(item)
           :text: _getItemText(item)
+          :showCheckbox: showCheckbox
           ":value-array": valueArray
           ":value-key": _getItemKey(item)
 
@@ -31,6 +32,7 @@ props:
   valueArray: null
   sort: true
   showSearchBox: true
+  showCheckbox: true
 
 data:
   query: null

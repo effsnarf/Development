@@ -20,17 +20,17 @@ data:
 methods:
   onClick: | #js
     function(bgColor) {
-      this.node.style.bg.color = bgColor;
-      this.initial.node.style.bg.color = bgColor;
+      this.node.design.bg.color = bgColor;
+      this.initial.node.design.bg.color = bgColor;
     }
   onHover: | #js
     function(bgColor, isHovered) {
-      this.node.style.bg.color = (isHovered ? bgColor : this.initial.node.style.bg.color);
+      this.node.design.bg.color = (isHovered ? bgColor : this.initial.node.design.bg.color);
     }
   getOptionClass: | #js
     function(bgColor) {
       return {
-        'color-selected': (bgColor == this.initial.node.style.bg.color)
+        'color-selected': (bgColor == this.initial.node.design.bg.color)
       };
     }
   getOptionStyle: | #js

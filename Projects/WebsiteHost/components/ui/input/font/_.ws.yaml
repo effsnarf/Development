@@ -1,0 +1,1129 @@
+dom:
+  div:
+    div:
+      .flex:
+        div:
+          class: large1
+          :class: "{ disabled: (!!query) }"
+          ui.checkbox.list:
+            :items: visibleMoods
+            :get-item-key: (mood) => mood.name
+            :get-item-icon: (mood) => mood.icon
+            :get-item-text: (mood) => mood.name
+            :show-search-box: "false"
+            :value-array: selectedMoods1
+        div:
+          .large1:
+            ui.input.text.box:
+              icon: 🔎
+              type: search
+              hint: search fonts
+              v-model: query
+          div:
+            v-if: "false"
+            .large-example:
+              :style: "{ 'font-family': value }"
+              v-text: exampleText
+            ui.input.text.box:
+              v-model: exampleText
+          .large1:
+            transition.group:
+              name: list
+              .clickable:
+                v-for: font in visibleFonts
+                :class: "{ selected: ((!!value) && (value == font.family)) }"
+                @mouseenter: $emit('preview', font.family)
+                @mouseleave: $emit('preview', null)
+                @click: $emit('input', font.family)
+                :key: font.family
+                ui.font.example:
+                  :font: font
+
+props:
+  value:
+  selectedMoods: []
+
+data:
+  exampleText: I'm anaspeptic, phrasmotic, even compunctuous to have caused you such pericombobulation
+  query:
+  selectedMoods1: []
+  maxVisibleFonts: 200
+  moods:
+    - icon: 🏢
+      name: professional
+    - icon: 🎉
+      name: playful
+    - icon: ✨
+      name: elegant
+    - icon: 📼
+      name: retro
+    - icon: 💪
+      name: bold/strong
+    - icon: 😊
+      name: friendly
+    - icon: 🎨
+      name: artistic
+    - icon: 🚀
+      name: futuristic
+    - icon: 🌍
+      name: cultural
+    - icon: ⚪
+      name: minimalist
+  fonts:
+    - family: "Poppins"
+      moods: ["professional", "friendly", "minimalist"]
+    - family: "Lato"
+      moods: ["professional", "friendly", "minimalist"]
+    - family: "Material Icons"
+      moods: ["professional", "minimalist"]
+    - family: "Kanit"
+      moods: ["friendly", "playful", "cultural"]
+    - family: "Work Sans"
+      moods: ["professional", "friendly", "minimalist"]
+    - family: "DM Sans"
+      moods: ["professional", "friendly", "minimalist"]
+    - family: "Quicksand"
+      moods: ["playful", "friendly", "artistic"]
+    - family: "Barlow"
+      moods: ["professional", "friendly", "minimalist"]
+    - family: "Inconsolata"
+      moods: ["professional", "bold/strong", "minimalist"]
+    - family: "Material Symbols Outlined"
+      moods: ["professional", "minimalist"]
+    - family: "Titillium Web"
+      moods: ["professional", "friendly", "minimalist"]
+    - family: "Material Icons Outlined"
+      moods: ["professional", "minimalist"]
+    - family: "Karla"
+      moods: ["professional", "friendly", "minimalist"]
+    - family: "Space Grotesk"
+      moods: ["professional", "friendly", "minimalist"]
+    - family: "Bebas Neue"
+      moods: ["bold/strong", "retro"]
+    - family: "Outfit"
+      moods: ["professional", "friendly", "minimalist"]
+    - family: "Josefin Sans"
+      moods: ["elegant", "friendly", "artistic"]
+    - family: "Material Symbols Rounded"
+      moods: ["professional", "minimalist"]
+    - family: "Libre Baskerville"
+      moods: ["elegant", "retro"]
+    - family: "Dancing Script"
+      moods: ["playful", "artistic", "elegant"]
+    - family: "Barlow Condensed"
+      moods: ["professional", "minimalist"]
+    - family: "Cabin"
+      moods: ["professional", "friendly", "minimalist"]
+    - family: "Anton"
+      moods: ["bold/strong", "playful"]
+    - family: "Dosis"
+      moods: ["friendly", "playful", "minimalist"]
+    - family: "Archivo"
+      moods: ["professional", "friendly", "minimalist"]
+    - family: "Figtree"
+      moods: ["friendly", "minimalist"]
+    - family: "Abel"
+      moods: ["bold/strong", "minimalist"]
+    - family: "Oxygen"
+      moods: ["professional", "minimalist"]
+    - family: "Material Icons Round"
+      moods: ["professional", "minimalist"]
+    - family: "Prompt"
+      moods: ["professional", "friendly", "minimalist"]
+    - family: "Public Sans"
+      moods: ["professional", "minimalist"]
+    - family: "Archivo Black"
+      moods: ["bold/strong", "retro"]
+    - family: "Crimson Text"
+      moods: ["elegant", "cultural"]
+    - family: "Red Hat Display"
+      moods: ["playful", "friendly"]
+    - family: "Signika Negative"
+      moods: ["professional", "friendly", "minimalist"]
+    - family: "Lexend"
+      moods: ["professional", "minimalist"]
+    - family: "Material Icons Sharp"
+      moods: ["professional", "minimalist"]
+    - family: "Arvo"
+      moods: ["elegant", "retro"]
+    - family: "Zilla Slab"
+      moods: ["elegant", "retro"]
+    - family: "Chakra Petch"
+      moods: ["friendly", "playful"]
+    - family: "Lilita One"
+      moods: ["playful", "artistic"]
+    - family: "Maven Pro"
+      moods: ["professional", "friendly", "minimalist"]
+    - family: "Asap"
+      moods: ["friendly", "playful"]
+    - family: "Schibsted Grotesk"
+      moods: ["professional", "minimalist"]
+    - family: "Permanent Marker"
+      moods: ["playful", "artistic"]
+    - family: "Sora"
+      moods: ["friendly", "minimalist"]
+    - family: "Slabo 27px"
+      moods: ["bold/strong", "retro"]
+    - family: "Barlow Semi Condensed"
+      moods: ["professional", "minimalist"]
+    - family: "Material Icons Two Tone"
+      moods: ["professional", "minimalist"]
+    - family: "Satisfy"
+      moods: ["elegant", "playful"]
+    - family: "Shadows Into Light"
+      moods: ["playful", "artistic"]
+    - family: "Abril Fatface"
+      moods: ["bold/strong", "artistic"]
+    - family: "Rowdies"
+      moods: ["playful", "friendly"]
+    - family: "DM Serif Display"
+      moods: ["elegant", "artistic"]
+    - family: "Saira Condensed"
+      moods: ["professional", "minimalist"]
+    - family: "Spicy Rice"
+      moods: ["playful", "cultural"]
+    - family: "Questrial"
+      moods: ["professional", "minimalist"]
+    - family: "Indie Flower"
+      moods: ["playful", "artistic"]
+    - family: "Domine"
+      moods: ["elegant", "professional"]
+    - family: "Concert One"
+      moods: ["playful", "friendly"]
+    - family: "Catamaran"
+      moods: ["professional", "friendly", "minimalist"]
+    - family: "Noto Sans Thai"
+      moods: ["cultural", "professional"]
+    - family: "Cinzel"
+      moods: ["elegant", "cultural"]
+    - family: "Signika"
+      moods: ["friendly", "minimalist"]
+    - family: "Urbanist"
+      moods: ["professional", "minimalist"]
+    - family: "Archivo Narrow"
+      moods: ["professional", "minimalist"]
+    - family: "Mate"
+      moods: ["friendly", "playful"]
+    - family: "Oleo Script"
+      moods: ["artistic", "playful"]
+    - family: "Exo"
+      moods: ["futuristic", "bold/strong"]
+    - family: "Sarabun"
+      moods: ["professional", "minimalist"]
+    - family: "Be Vietnam Pro"
+      moods: ["friendly", "playful"]
+    - family: "Acme"
+      moods: ["bold/strong", "playful"]
+    - family: "Bree Serif"
+      moods: ["elegant", "friendly"]
+    - family: "Hind Madurai"
+      moods: ["cultural", "friendly"]
+    - family: "ABeeZee"
+      moods: ["friendly", "playful"]
+    - family: "Orbitron"
+      moods: ["futuristic", "bold/strong"]
+    - family: "Righteous"
+      moods: ["playful", "bold/strong"]
+    - family: "Pirata One"
+      moods: ["bold/strong", "playful"]
+    - family: "Squada One"
+      moods: ["bold/strong", "playful"]
+    - family: "Bowlby One"
+      moods: ["bold/strong", "playful"]
+    - family: "Alfa Slab One"
+      moods: ["bold/strong", "retro"]
+    - family: "Marcellus"
+      moods: ["elegant", "retro"]
+    - family: "Silkscreen"
+      moods: ["playful", "artistic"]
+    - family: "Lexend Deca"
+      moods: ["professional", "minimalist"]
+    - family: "League Spartan"
+      moods: ["bold/strong", "minimalist"]
+    - family: "Antic Slab"
+      moods: ["retro", "professional"]
+    - family: "Chivo"
+      moods: ["professional", "bold/strong"]
+    - family: "Yellowtail"
+      moods: ["playful", "artistic"]
+    - family: "Titan One"
+      moods: ["bold/strong", "playful"]
+    - family: "Bodoni Moda"
+      moods: ["elegant", "artistic"]
+    - family: "Encode Sans"
+      moods: ["professional", "minimalist"]
+    - family: "Patua One"
+      moods: ["playful", "artistic"]
+    - family: "Merienda"
+      moods: ["playful", "friendly"]
+    - family: "Mate SC"
+      moods: ["friendly", "playful"]
+    - family: "Alata"
+      moods: ["professional", "minimalist"]
+    - family: "Courgette"
+      moods: ["artistic", "elegant"]
+    - family: "Asap Condensed"
+      moods: ["professional", "minimalist"]
+    - family: "Rokkitt"
+      moods: ["bold/strong", "retro"]
+    - family: "Cantarell"
+      moods: ["professional", "minimalist"]
+    - family: "Passion One"
+      moods: ["playful", "bold/strong"]
+    - family: "Saira"
+      moods: ["professional", "friendly", "minimalist"]
+    - family: "Paytone One"
+      moods: ["bold/strong", "playful"]
+    - family: "Bungee"
+      moods: ["playful", "friendly"]
+    - family: "Libre Caslon Text"
+      moods: ["elegant", "cultural"]
+    - family: "Lobster Two"
+      moods: ["playful", "artistic"]
+    - family: "Luckiest Guy"
+      moods: ["playful", "bold/strong"]
+    - family: "Noticia Text"
+      moods: ["professional", "friendly", "cultural"]
+    - family: "Crimson Pro"
+      moods: ["elegant", "cultural"]
+    - family: "Bangers"
+      moods: ["playful", "bold/strong"]
+    - family: "Albert Sans"
+      moods: ["professional", "minimalist"]
+    - family: "Space Mono"
+      moods: ["futuristic", "bold/strong"]
+    - family: "Josefin Slab"
+      moods: ["elegant", "artistic"]
+    - family: "Kaushan Script"
+      moods: ["artistic", "playful"]
+    - family: "Creepster"
+      moods: ["playful", "artistic"]
+    - family: "Atkinson Hyperlegible"
+      moods: ["professional", "minimalist"]
+    - family: "Crete Round"
+      moods: ["friendly", "playful"]
+    - family: "DM Serif Text"
+      moods: ["elegant", "cultural"]
+    - family: "Sacramento"
+      moods: ["elegant", "artistic"]
+    - family: "Courier Prime"
+      moods: ["retro", "professional"]
+    - family: "Gloria Hallelujah"
+      moods: ["playful", "friendly"]
+    - family: "Staatliches"
+      moods: ["bold/strong", "minimalist"]
+    - family: "Francois One"
+      moods: ["bold/strong", "friendly"]
+    - family: "Red Hat Text"
+      moods: ["professional", "friendly"]
+    - family: "Encode Sans Condensed"
+      moods: ["professional", "minimalist"]
+    - family: "Quattrocento"
+      moods: ["elegant", "cultural"]
+    - family: "Unna"
+      moods: ["elegant", "cultural"]
+    - family: "Macondo"
+      moods: ["playful", "artistic"]
+    - family: "Sanchez"
+      moods: ["bold/strong", "cultural"]
+    - family: "Neuton"
+      moods: ["professional", "friendly"]
+    - family: "Allura"
+      moods: ["elegant", "artistic"]
+    - family: "Inria Sans"
+      moods: ["professional", "minimalist"]
+    - family: "Sen"
+      moods: ["professional", "friendly"]
+    - family: "Quattrocento Sans"
+      moods: ["professional", "friendly", "minimalist"]
+    - family: "Aleo"
+      moods: ["elegant", "cultural"]
+    - family: "News Cycle"
+      moods: ["professional", "friendly"]
+    - family: "Zeyada"
+      moods: ["playful", "artistic"]
+    - family: "Fugaz One"
+      moods: ["playful", "bold/strong"]
+    - family: "Baskervville"
+      moods: ["elegant", "professional"]
+    - family: "Gilda Display"
+      moods: ["artistic", "playful"]
+    - family: "Pathway Gothic One"
+      moods: ["bold/strong", "minimalist"]
+    - family: "Libre Barcode 39"
+      moods: ["playful", "cultural"]
+    - family: "Sofia"
+      moods: ["friendly", "playful"]
+    - family: "Cookie"
+      moods: ["playful", "friendly"]
+    - family: "Special Elite"
+      moods: ["retro", "playful"]
+    - family: "Architects Daughter"
+      moods: ["playful", "friendly"]
+    - family: "Tangerine"
+      moods: ["elegant", "artistic"]
+    - family: "Patrick Hand"
+      moods: ["playful", "friendly"]
+    - family: "Gruppo"
+      moods: ["bold/strong", "playful"]
+    - family: "Kumbh Sans"
+      moods: ["professional", "friendly", "minimalist"]
+    - family: "Noto Sans Tamil"
+      moods: ["cultural", "professional"]
+    - family: "Gelasio"
+      moods: ["elegant", "cultural"]
+    - family: "Taviraj"
+      moods: ["professional", "friendly"]
+    - family: "Itim"
+      moods: ["friendly", "playful"]
+    - family: "Comic Neue"
+      moods: ["playful", "friendly"]
+    - family: "DM Mono"
+      moods: ["professional", "minimalist"]
+    - family: "Mitr"
+      moods: ["friendly", "playful"]
+    - family: "Fraunces"
+      moods: ["elegant", "professional"]
+    - family: "Mukta Malar"
+      moods: ["professional", "cultural"]
+    - family: "Bai Jamjuree"
+      moods: ["friendly", "playful"]
+    - family: "Saira Semi Condensed"
+      moods: ["professional", "friendly", "minimalist"]
+    - family: "Pridi"
+      moods: ["cultural", "friendly"]
+    - family: "Parisienne"
+      moods: ["elegant", "artistic"]
+    - family: "League Gothic"
+      moods: ["bold/strong", "retro"]
+    - family: "Faustina"
+      moods: ["elegant", "cultural"]
+    - family: "Sriracha"
+      moods: ["playful", "artistic"]
+    - family: "Vidaloka"
+      moods: ["elegant", "cultural"]
+    - family: "Material Symbols Sharp"
+      moods: ["professional", "minimalist"]
+    - family: "Mandali"
+      moods: ["friendly", "cultural"]
+    - family: "Amaranth"
+      moods: ["friendly", "minimalist"]
+    - family: "Alex Brush"
+      moods: ["elegant", "artistic"]
+    - family: "Homemade Apple"
+      moods: ["playful", "artistic"]
+    - family: "Changa One"
+      moods: ["playful", "friendly"]
+    - family: "Epilogue"
+      moods: ["professional", "minimalist"]
+    - family: "Handlee"
+      moods: ["playful", "friendly"]
+    - family: "Ropa Sans"
+      moods: ["professional", "friendly", "minimalist"]
+    - family: "Hammersmith One"
+      moods: ["bold/strong", "playful"]
+    - family: "Bricolage Grotesque"
+      moods: ["playful", "artistic"]
+    - family: "Nerko One"
+      moods: ["playful", "bold/strong"]
+    - family: "Ultra"
+      moods: ["bold/strong", "futuristic"]
+    - family: "Audiowide"
+      moods: ["futuristic", "bold/strong"]
+    - family: "Reenie Beanie"
+      moods: ["playful", "friendly"]
+    - family: "Antonio"
+      moods: ["bold/strong", "professional"]
+    - family: "Sorts Mill Goudy"
+      moods: ["elegant", "retro"]
+    - family: "Abhaya Libre"
+      moods: ["cultural", "professional"]
+    - family: "Krub"
+      moods: ["friendly", "playful"]
+    - family: "Blinker"
+      moods: ["professional", "friendly", "minimalist"]
+    - family: "Volkhov"
+      moods: ["elegant", "professional"]
+    - family: "Allison"
+      moods: ["artistic", "playful"]
+    - family: "Playball"
+      moods: ["playful", "artistic"]
+    - family: "VT323"
+      moods: ["retro", "futuristic"]
+    - family: "Libre Bodoni"
+      moods: ["elegant", "artistic"]
+    - family: "Ramabhadra"
+      moods: ["cultural", "friendly"]
+    - family: "Rammetto One"
+      moods: ["playful", "bold/strong"]
+    - family: "Nothing You Could Do"
+      moods: ["playful", "artistic"]
+    - family: "Mr Dafoe"
+      moods: ["playful", "artistic"]
+    - family: "Monoton"
+      moods: ["playful", "bold/strong"]
+    - family: "Varela"
+      moods: ["friendly", "playful"]
+    - family: "Noto Sans Malayalam"
+      moods: ["cultural", "professional"]
+    - family: "Gudea"
+      moods: ["professional", "friendly", "minimalist"]
+    - family: "Viga"
+      moods: ["professional", "bold/strong"]
+    - family: "Rock Salt"
+      moods: ["playful", "artistic"]
+    - family: "Lusitana"
+      moods: ["elegant", "cultural"]
+    - family: "Carter One"
+      moods: ["bold/strong", "playful"]
+    - family: "Quantico"
+      moods: ["professional", "minimalist"]
+    - family: "Unica One"
+      moods: ["bold/strong", "professional"]
+    - family: "Damion"
+      moods: ["artistic", "playful"]
+    - family: "Monda"
+      moods: ["professional", "friendly"]
+    - family: "Share Tech Mono"
+      moods: ["futuristic", "minimalist"]
+    - family: "Petrona"
+      moods: ["elegant", "cultural"]
+    - family: "Londrina Solid"
+      moods: ["playful", "friendly"]
+    - family: "Cabin Condensed"
+      moods: ["professional", "minimalist"]
+    - family: "Julius Sans One"
+      moods: ["professional", "friendly"]
+    - family: "Pontano Sans"
+      moods: ["professional", "friendly"]
+    - family: "Instrument Sans"
+      moods: ["professional", "minimalist"]
+    - family: "Aclonica"
+      moods: ["playful", "bold/strong"]
+    - family: "Anuphan"
+      moods: ["friendly", "cultural"]
+    - family: "Newsreader"
+      moods: ["professional", "friendly"]
+    - family: "Six Caps"
+      moods: ["bold/strong", "playful"]
+    - family: "Pinyon Script"
+      moods: ["elegant", "artistic"]
+    - family: "Big Shoulders Display"
+      moods: ["bold/strong", "playful"]
+    - family: "Actor"
+      moods: ["professional", "friendly"]
+    - family: "Oxanium"
+      moods: ["bold/strong", "futuristic"]
+    - family: "Niramit"
+      moods: ["professional", "friendly"]
+    - family: "Caveat Brush"
+      moods: ["artistic", "playful"]
+    - family: "Covered By Your Grace"
+      moods: ["elegant", "artistic"]
+    - family: "Economica"
+      moods: ["professional", "minimalist"]
+    - family: "Averia Serif Libre"
+      moods: ["playful", "artistic"]
+    - family: "BenchNine"
+      moods: ["professional", "minimalist"]
+    - family: "Italianno"
+      moods: ["elegant", "artistic"]
+    - family: "Rufina"
+      moods: ["elegant", "cultural"]
+    - family: "Holtwood One SC"
+      moods: ["retro", "elegant"]
+    - family: "Basic"
+      moods: ["minimalist", "professional"]
+    - family: "Hind Guntur"
+      moods: ["friendly", "professional"]
+    - family: "Qwitcher Grypen"
+      moods: ["playful", "artistic"]
+    - family: "Syncopate"
+      moods: ["bold/strong", "playful"]
+    - family: "Adamina"
+      moods: ["elegant", "cultural"]
+    - family: "Grandstander"
+      moods: ["playful", "bold/strong"]
+    - family: "Whisper"
+      moods: ["elegant", "artistic"]
+    - family: "Gochi Hand"
+      moods: ["playful", "friendly"]
+    - family: "Telex"
+      moods: ["professional", "minimalist"]
+    - family: "Darker Grotesque"
+      moods: ["bold/strong", "professional"]
+    - family: "Sansita"
+      moods: ["friendly", "playful"]
+    - family: "Calistoga"
+      moods: ["playful", "bold/strong"]
+    - family: "Arapey"
+      moods: ["elegant", "cultural"]
+    - family: "Cinzel Decorative"
+      moods: ["elegant", "artistic"]
+    - family: "Leckerli One"
+      moods: ["playful", "artistic"]
+    - family: "Charm"
+      moods: ["playful", "friendly"]
+    - family: "Racing Sans One"
+      moods: ["bold/strong", "playful"]
+    - family: "La Belle Aurore"
+      moods: ["elegant", "artistic"]
+    - family: "Days One"
+      moods: ["professional", "minimalist"]
+    - family: "Delius"
+      moods: ["playful", "artistic"]
+    - family: "Georama"
+      moods: ["professional", "minimalist"]
+    - family: "Athiti"
+      moods: ["friendly", "cultural"]
+    - family: "Electrolize"
+      moods: ["futuristic", "minimalist"]
+    - family: "Mrs Saint Delafield"
+      moods: ["elegant", "artistic"]
+    - family: "Belleza"
+      moods: ["elegant", "artistic"]
+    - family: "Judson"
+      moods: ["professional", "elegant"]
+    - family: "Coda"
+      moods: ["bold/strong", "playful"]
+    - family: "Bevan"
+      moods: ["bold/strong", "friendly"]
+    - family: "Cabin Sketch"
+      moods: ["playful", "artistic"]
+    - family: "Berkshire Swash"
+      moods: ["elegant", "artistic"]
+    - family: "Michroma"
+      moods: ["bold/strong", "futuristic"]
+    - family: "Chewy"
+      moods: ["playful", "friendly"]
+    - family: "Corben"
+      moods: ["bold/strong", "playful"]
+    - family: "Yrsa"
+      moods: ["elegant", "artistic"]
+    - family: "Sintony"
+      moods: ["professional", "friendly", "minimalist"]
+    - family: "Kreon"
+      moods: ["professional", "cultural"]
+    - family: "Julee"
+      moods: ["artistic", "playful"]
+    - family: "Kameron"
+      moods: ["bold/strong", "professional"]
+    - family: "Seaweed Script"
+      moods: ["playful", "artistic"]
+    - family: "Lustria"
+      moods: ["elegant", "professional"]
+    - family: "Boogaloo"
+      moods: ["playful", "bold/strong"]
+    - family: "Herr Von Muellerhoff"
+      moods: ["artistic", "elegant"]
+    - family: "Armata"
+      moods: ["professional", "friendly"]
+    - family: "Voltaire"
+      moods: ["bold/strong", "playful"]
+    - family: "Mali"
+      moods: ["friendly", "cultural"]
+    - family: "Marcellus SC"
+      moods: ["elegant", "artistic"]
+    - family: "Gravitas One"
+      moods: ["bold/strong", "professional"]
+    - family: "Gabarito"
+      moods: ["playful", "friendly"]
+    - family: "Fredericka the Great"
+      moods: ["artistic", "playful"]
+    - family: "Saira Extra Condensed"
+      moods: ["professional", "minimalist"]
+    - family: "Graduate"
+      moods: ["playful", "friendly"]
+    - family: "Allerta Stencil"
+      moods: ["bold/strong", "playful"]
+    - family: "Anek Malayalam"
+      moods: ["cultural", "professional"]
+    - family: "Carrois Gothic"
+      moods: ["professional", "minimalist"]
+    - family: "Shadows Into Light Two"
+      moods: ["artistic", "playful"]
+    - family: "Just Another Hand"
+      moods: ["playful", "friendly"]
+    - family: "Cedarville Cursive"
+      moods: ["playful", "artistic"]
+    - family: "Gupter"
+      moods: ["professional", "friendly"]
+    - family: "Antic"
+      moods: ["playful", "artistic"]
+    - family: "BioRhyme"
+      moods: ["friendly", "cultural"]
+    - family: "Nobile"
+      moods: ["professional", "friendly"]
+    - family: "Rancho"
+      moods: ["playful", "artistic"]
+    - family: "Norican"
+      moods: ["playful", "artistic"]
+    - family: "Overlock"
+      moods: ["bold/strong", "futuristic"]
+    - family: "Andada Pro"
+      moods: ["elegant", "cultural"]
+    - family: "Chonburi"
+      moods: ["playful", "friendly"]
+    - family: "Besley"
+      moods: ["professional", "minimalist"]
+    - family: "Cantata One"
+      moods: ["elegant", "cultural"]
+    - family: "Aldrich"
+      moods: ["professional", "bold/strong"]
+    - family: "K2D"
+      moods: ["playful", "artistic"]
+    - family: "Hepta Slab"
+      moods: ["bold/strong", "professional"]
+    - family: "Krona One"
+      moods: ["bold/strong", "futuristic"]
+    - family: "Tomorrow"
+      moods: ["futuristic", "professional"]
+    - family: "Bowlby One SC"
+      moods: ["bold/strong", "playful"]
+    - family: "Candal"
+      moods: ["professional", "minimalist"]
+    - family: "Coming Soon"
+      moods: ["playful", "artistic"]
+    - family: "Pathway Extreme"
+      moods: ["bold/strong", "playful"]
+    - family: "Rye"
+      moods: ["artistic", "friendly"]
+    - family: "Arizonia"
+      moods: ["elegant", "playful"]
+    - family: "Nixie One"
+      moods: ["artistic", "futuristic"]
+    - family: "Averia Libre"
+      moods: ["friendly", "playful"]
+    - family: "Ovo"
+      moods: ["elegant", "artistic"]
+    - family: "Share"
+      moods: ["friendly", "playful"]
+    - family: "Odibee Sans"
+      moods: ["playful", "friendly"]
+    - family: "Livvic"
+      moods: ["professional", "minimalist"]
+    - family: "Italiana"
+      moods: ["elegant", "artistic"]
+    - family: "Cutive Mono"
+      moods: ["professional", "minimalist"]
+    - family: "Annie Use Your Telescope"
+      moods: ["playful", "artistic"]
+    - family: "Ibarra Real Nova"
+      moods: ["elegant", "cultural"]
+    - family: "Fahkwang"
+      moods: ["friendly", "professional"]
+    - family: "Niconne"
+      moods: ["playful", "artistic"]
+    - family: "MuseoModerno"
+      moods: ["professional", "minimalist"]
+    - family: "Trirong"
+      moods: ["professional", "cultural"]
+    - family: "Grand Hotel"
+      moods: ["elegant", "artistic"]
+    - family: "Castoro"
+      moods: ["professional", "friendly"]
+    - family: "Spinnaker"
+      moods: ["playful", "bold/strong"]
+    - family: "Kristi"
+      moods: ["playful", "artistic"]
+    - family: "Padauk"
+      moods: ["friendly", "professional"]
+    - family: "Stardos Stencil"
+      moods: ["bold/strong", "playful"]
+    - family: "Knewave"
+      moods: ["playful", "artistic"]
+    - family: "Allerta"
+      moods: ["professional", "friendly"]
+    - family: "Limelight"
+      moods: ["playful", "bold/strong"]
+    - family: "Bungee Shade"
+      moods: ["playful", "artistic"]
+    - family: "Poetsen One"
+      moods: ["professional", "friendly"]
+    - family: "Contrail One"
+      moods: ["friendly", "playful"]
+    - family: "Ms Madi"
+      moods: ["playful", "artistic"]
+    - family: "Proza Libre"
+      moods: ["professional", "friendly"]
+    - family: "Yesteryear"
+      moods: ["elegant", "artistic"]
+    - family: "Montserrat Subrayada"
+      moods: ["bold/strong", "professional"]
+    - family: "Metrophobic"
+      moods: ["minimalist", "futuristic"]
+    - family: "Wallpoet"
+      moods: ["artistic", "playful"]
+    - family: "Manjari"
+      moods: ["friendly", "cultural"]
+    - family: "Sigmar One"
+      moods: ["bold/strong", "playful"]
+    - family: "Arbutus Slab"
+      moods: ["professional", "cultural"]
+    - family: "UnifrakturMaguntia"
+      moods: ["artistic", "cultural"]
+    - family: "Petit Formal Script"
+      moods: ["elegant", "artistic"]
+    - family: "Enriqueta"
+      moods: ["professional", "friendly"]
+    - family: "Dawning of a New Day"
+      moods: ["artistic", "playful"]
+    - family: "Fresca"
+      moods: ["playful", "friendly"]
+    - family: "Average Sans"
+      moods: ["professional", "minimalist"]
+    - family: "Encode Sans Semi Condensed"
+      moods: ["professional", "minimalist"]
+    - family: "Trocchi"
+      moods: ["artistic", "playful"]
+    - family: "Oooh Baby"
+      moods: ["playful", "artistic"]
+    - family: "Rambla"
+      moods: ["friendly", "professional"]
+    - family: "Maitree"
+      moods: ["friendly", "cultural"]
+    - family: "Cormorant Upright"
+      moods: ["elegant", "artistic"]
+    - family: "Waiting for the Sunrise"
+      moods: ["artistic", "playful"]
+    - family: "Encode Sans Expanded"
+      moods: ["professional", "minimalist"]
+    - family: "Azeret Mono"
+      moods: ["minimalist", "professional"]
+    - family: "Short Stack"
+      moods: ["playful", "artistic"]
+    - family: "B612"
+      moods: ["professional", "minimalist"]
+    - family: "Rosario"
+      moods: ["friendly", "professional"]
+    - family: "Schoolbell"
+      moods: ["playful", "artistic"]
+    - family: "Irish Grover"
+      moods: ["playful", "artistic"]
+    - family: "Big Shoulders Text"
+      moods: ["bold/strong", "friendly"]
+    - family: "Lemon"
+      moods: ["playful", "artistic"]
+    - family: "Bungee Inline"
+      moods: ["playful", "bold/strong"]
+    - family: "McLaren"
+      moods: ["futuristic", "professional"]
+    - family: "Oxygen Mono"
+      moods: ["professional", "minimalist"]
+    - family: "Bentham"
+      moods: ["professional", "friendly"]
+    - family: "Skranji"
+      moods: ["playful", "artistic"]
+    - family: "IM Fell English"
+      moods: ["elegant", "cultural"]
+    - family: "Major Mono Display"
+      moods: ["artistic", "minimalist"]
+    - family: "Love Ya Like A Sister"
+      moods: ["playful", "artistic"]
+    - family: "Fanwood Text"
+      moods: ["elegant", "cultural"]
+    - family: "Jockey One"
+      moods: ["playful", "artistic"]
+    - family: "Calligraffitti"
+      moods: ["artistic", "playful"]
+    - family: "Bubblegum Sans"
+      moods: ["playful", "friendly"]
+    - family: "Caladea"
+      moods: ["professional", "friendly"]
+    - family: "Noto Sans Telugu"
+      moods: ["cultural", "professional"]
+    - family: "Rochester"
+      moods: ["elegant", "artistic"]
+    - family: "Radley"
+      moods: ["friendly", "artistic"]
+    - family: "Goudy Bookletter 1911"
+      moods: ["elegant", "cultural"]
+    - family: "Monsieur La Doulaise"
+      moods: ["elegant", "artistic"]
+    - family: "Spline Sans"
+      moods: ["professional", "minimalist"]
+    - family: "B612 Mono"
+      moods: ["professional", "minimalist"]
+    - family: "Lexend Exa"
+      moods: ["professional", "friendly"]
+    - family: "Grenze Gotisch"
+      moods: ["artistic", "cultural"]
+    - family: "Antic Didone"
+      moods: ["elegant", "artistic"]
+    - family: "Coustard"
+      moods: ["professional", "bold/strong"]
+    - family: "Quintessential"
+      moods: ["elegant", "artistic"]
+    - family: "Gurajada"
+      moods: ["cultural", "friendly"]
+    - family: "Sniglet"
+      moods: ["playful", "friendly"]
+    - family: "Inria Serif"
+      moods: ["elegant", "professional"]
+    - family: "Magra"
+      moods: ["friendly", "professional"]
+    - family: "Rethink Sans"
+      moods: ["minimalist", "professional"]
+    - family: "Glory"
+      moods: ["artistic", "playful"]
+    - family: "Style Script"
+      moods: ["elegant", "artistic"]
+    - family: "Tenali Ramakrishna"
+      moods: ["cultural", "friendly"]
+    - family: "Fjord One"
+      moods: ["professional", "minimalist"]
+    - family: "Lexend Zetta"
+      moods: ["friendly", "professional"]
+    - family: "Average"
+      moods: ["playful", "artistic"]
+    - family: "Mallanna"
+      moods: ["cultural", "artistic"]
+    - family: "Copse"
+      moods: ["friendly", "professional"]
+    - family: "Qwigley"
+      moods: ["artistic", "playful"]
+    - family: "Libre Barcode 39 Text"
+      moods: ["playful", "artistic"]
+    - family: "Chelsea Market"
+      moods: ["playful", "artistic"]
+    - family: "Alike"
+      moods: ["friendly", "playful"]
+    - family: "Geo"
+      moods: ["minimalist", "professional"]
+    - family: "Familjen Grotesk"
+      moods: ["professional", "friendly"]
+    - family: "Over the Rainbow"
+      moods: ["playful", "artistic"]
+    - family: "Fauna One"
+      moods: ["friendly", "professional"]
+    - family: "Noto Sans Sinhala"
+      moods: ["cultural", "professional"]
+    - family: "IM Fell English SC"
+      moods: ["elegant", "cultural"]
+    - family: "Aboreto"
+      moods: ["artistic", "friendly"]
+    - family: "KoHo"
+      moods: ["playful", "artistic"]
+    - family: "IM Fell DW Pica"
+      moods: ["elegant", "cultural"]
+    - family: "Meddon"
+      moods: ["professional", "friendly"]
+    - family: "Molengo"
+      moods: ["friendly", "playful"]
+    - family: "Turret Road"
+      moods: ["artistic", "playful"]
+    - family: "Poller One"
+      moods: ["playful", "artistic"]
+    - family: "Brawler"
+      moods: ["bold/strong", "playful"]
+    - family: "Baloo Thambi 2"
+      moods: ["playful", "friendly"]
+    - family: "Pompiere"
+      moods: ["artistic", "cultural"]
+    - family: "Thasadith"
+      moods: ["playful", "friendly"]
+    - family: "Marvel"
+      moods: ["bold/strong", "playful"]
+    - family: "Megrim"
+      moods: ["playful", "artistic"]
+    - family: "Poly"
+      moods: ["professional", "minimalist"]
+    - family: "Baloo Chettan 2"
+      moods: ["playful", "friendly"]
+    - family: "Buenard"
+      moods: ["elegant", "professional"]
+    - family: "Mr De Haviland"
+      moods: ["artistic", "friendly"]
+    - family: "Young Serif"
+      moods: ["elegant", "professional"]
+    - family: "Saira Stencil One"
+      moods: ["bold/strong", "playful"]
+    - family: "Capriola"
+      moods: ["friendly", "artistic"]
+    - family: "Gluten"
+      moods: ["friendly", "playful"]
+    - family: "Noto Sans Meetei Mayek"
+      moods: ["cultural", "professional"]
+    - family: "Ephesis"
+      moods: ["elegant", "artistic"]
+    - family: "Fondamento"
+      moods: ["elegant", "artistic"]
+    - family: "Euphoria Script"
+      moods: ["artistic", "playful"]
+    - family: "Sedgwick Ave"
+      moods: ["playful", "friendly"]
+    - family: "Mouse Memoirs"
+      moods: ["playful", "artistic"]
+    - family: "Imbue"
+      moods: ["artistic", "friendly"]
+    - family: "Della Respira"
+      moods: ["elegant", "artistic"]
+    - family: "Protest Strike"
+      moods: ["bold/strong", "playful"]
+    - family: "Cutive"
+      moods: ["professional", "minimalist"]
+    - family: "Mountains of Christmas"
+      moods: ["playful", "artistic"]
+    - family: "Loved by the King"
+      moods: ["artistic", "elegant"]
+    - family: "Expletus Sans"
+      moods: ["professional", "minimalist"]
+    - family: "Asul"
+      moods: ["professional", "friendly"]
+    - family: "Suranna"
+      moods: ["friendly", "artistic"]
+    - family: "Quando"
+      moods: ["artistic", "friendly"]
+    - family: "Caprasimo"
+      moods: ["artistic", "playful"]
+    - family: "Encode Sans Semi Expanded"
+      moods: ["professional", "minimalist"]
+    - family: "Gantari"
+      moods: ["friendly", "playful"]
+    - family: "Nova Square"
+      moods: ["professional", "minimalist"]
+    - family: "Notable"
+      moods: ["professional", "minimalist"]
+    - family: "Inder"
+      moods: ["friendly", "playful"]
+    - family: "Cambo"
+      moods: ["artistic", "friendly"]
+    - family: "Aladin"
+      moods: ["artistic", "playful"]
+    - family: "Noto Sans NKo Unjoined"
+      moods: ["cultural", "professional"]
+    - family: "Sansita Swashed"
+      moods: ["playful", "artistic"]
+    - family: "Lekton"
+      moods: ["professional", "minimalist"]
+    - family: "Vibur"
+      moods: ["artistic", "friendly"]
+    - family: "Supermercado One"
+      moods: ["playful", "artistic"]
+    - family: "Federo"
+      moods: ["professional", "friendly"]
+    - family: "Kodchasan"
+      moods: ["playful", "artistic"]
+    - family: "Farro"
+      moods: ["professional", "friendly"]
+    - family: "NTR"
+      moods: ["playful", "artistic"]
+    - family: "Allan"
+      moods: ["friendly", "artistic"]
+    - family: "Anek Latin"
+      moods: ["cultural", "professional"]
+    - family: "Aguafina Script"
+      moods: ["elegant", "artistic"]
+    - family: "Hurricane"
+      moods: ["bold/strong", "playful"]
+    - family: "Shojumaru"
+      moods: ["artistic", "playful"]
+    - family: "Noto Serif Malayalam"
+      moods: ["cultural", "professional"]
+    - family: "REM"
+      moods: ["playful", "artistic"]
+    - family: "Libre Barcode 39 Extended Text"
+      moods: ["playful", "artistic"]
+    - family: "Libre Barcode 128"
+      moods: ["playful", "artistic"]
+    - family: "Noto Sans Symbols"
+      moods: ["playful", "artistic"]
+    - family: "Libre Caslon Display"
+      moods: ["elegant", "professional"]
+    - family: "Solway"
+      moods: ["professional", "friendly"]
+    - family: "Sue Ellen Francisco"
+      moods: ["playful", "artistic"]
+    - family: "Almendra"
+      moods: ["elegant", "artistic"]
+    - family: "Amethysta"
+      moods: ["elegant", "artistic"]
+    - family: "Croissant One"
+      moods: ["elegant", "artistic"]
+    - family: "Coiny"
+      moods: ["playful", "artistic"]
+    - family: "Oregano"
+      moods: ["friendly", "artistic"]
+    - family: "Give You Glory"
+      moods: ["artistic", "playful"]
+    - family: "Montaga"
+      moods: ["professional", "friendly"]
+    - family: "Elsie"
+      moods: ["elegant", "artistic"]
+    - family: "Happy Monkey"
+      moods: ["playful", "artistic"]
+    - family: "Metamorphous"
+      moods: ["playful", "artistic"]
+    - family: "Walter Turncoat"
+      moods: ["playful", "artistic"]
+    - family: "Vina Sans"
+      moods: ["professional", "minimalist"]
+    - family: "Oleo Script Swash Caps"
+      moods: ["elegant", "artistic"]
+    - family: "Reddit Mono"
+      moods: ["professional", "minimalist"]
+    - family: "Tienne"
+      moods: ["friendly", "playful"]
+    - family: "Esteban"
+      moods: ["friendly", "artistic"]
+    - family: "Imprima"
+      moods: ["professional", "friendly"]
+    - family: "League Script"
+      moods: ["elegant", "artistic"]
+
+computed:
+  visibleMoods: | #js
+    function() {
+      if (!this.visibleFonts?.length) return this.moods;
+      const visibleFontsMoods = this.visibleFonts
+        .flatMap(font => font.moods)
+        .distinct();
+      const moods = this.moods
+        .filter(mood => visibleFontsMoods.includes(mood.name));
+      return moods;
+    }
+  visibleFonts: | #js
+    function() {
+      const moods = [...this.selectedMoods1];
+      let fonts = this.fonts
+        .filter(font => (!font.family.toLowerCase().includes(' icons')))
+        .filter(font => (!font.family.toLowerCase().includes(' symbols')));
+
+      if (this.query) {
+        const query = this.query.toLowerCase();
+        fonts = fonts.filter(font => font.family.toLowerCase().includes(query));
+      }
+      else if (moods)
+      {
+        fonts = fonts.filter(font => moods.every(mood => font.moods.includes(mood)));
+      }
+      fonts = fonts.take(this.maxVisibleFonts);
+      return fonts;
+    }
+
+watch:
+  selectedMoods:
+    immediate: true
+    handler: | #js
+      function(newSelectedMoods) {
+        if (!newSelectedMoods) return;
+        this.selectedMoods1 = newSelectedMoods;
+      }
+  selectedMoods1:
+    deep: true
+    handler: | #js
+      function(newSelectedMoods) {
+        this.$emit("selected-moods", newSelectedMoods);
+      }
+style:
+  .large1:
+    font-size: 1.4rem
+  .large-example:
+    height: 4rem
+    overflow: hidden
+    font-size: 2rem
+    line-height: 1em
+    border-radius: 0
+  .comp-ui-font-example div:
+    line-height: 1em
+    overflow: hidden

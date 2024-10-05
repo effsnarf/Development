@@ -39,7 +39,7 @@ dom:
         template: 
           v-slot: tab3
           div:
-            studio.doc.node.common.editor:
+            studio.doc.node.common.design.editor:
               :node: node
               :initial: initial
               :sui: sui

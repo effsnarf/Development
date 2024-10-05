@@ -1,7 +1,7 @@
 dom:
   div:
     ui.ticker:
-      :interval: (duration1 * 2)
+      :interval: duration1
       :count: 2
       @tick: nextAnimTick
       :enabled: autoPlayLoop

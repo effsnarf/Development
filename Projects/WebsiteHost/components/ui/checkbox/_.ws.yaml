@@ -4,9 +4,13 @@ dom:
     @mouseenter: $emit('mouseenter')
     @mouseleave: $emit('mouseleave')
     @click: onClick
-    input:
-      type: checkbox
-      ':checked': checkedValue
+    div:
+      .checkbox-icon:
+        v-text: "(checkedValue ? '✔️' : '')"
+      input:
+        v-if: "false"
+        type: checkbox
+        ':checked': checkedValue
     span: 
       class: clickable
       .icon:
@@ -21,6 +25,7 @@ props:
   valueArray: null
   valueArrayExclude: false
   valueKey: null
+  showCheckbox: true
   icon: null
   text: null
   size: large
@@ -29,7 +34,8 @@ data:
 methods:
   getCssClass: | #js
     function() {
-      const dimmed = (this.checkedValue ? "" : "dimmed");
+      //const dimmed = (this.checkedValue ? "" : "dimmed");
+      const dimmed = "";
       return `hoverable items-center ${this.size} ${dimmed}`;
     }
   onClick: | #js
@@ -39,6 +45,7 @@ methods:
     }
   onInput: | #js
     async function(value) {
+      debugger;
       if (this.valueArray && this.valueKey) {
         this.toggleArrayValue(this.valueArray, this.valueKey);
         await this.$nextTick();
@@ -101,6 +108,8 @@ example1:
       ui.checkbox:
         text: Check me
 style:
+  .checkbox-icon:
+    width: 1.5em
   .icon:
     display: inline-block
     margin-right: 0.3rem

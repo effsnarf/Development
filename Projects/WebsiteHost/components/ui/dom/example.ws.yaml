@@ -15,7 +15,8 @@ props:
 style:
   .example-layout:
     display: flex
-
+    justify-content: center
   .box:
     background: gray
+    box-shadow: -4px 4px 4px black
     width: 3rem

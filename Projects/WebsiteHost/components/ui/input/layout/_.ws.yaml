@@ -42,10 +42,11 @@ methods:
   onComponentInput: | #js
     function(tabOption, value) {
       Objects.setProperty(this.layout, tabOption, value);
+      Objects.setProperty(this.initial.layout, tabOption, value);
     }
   getComponentValue: | #js
     function(tabOption) {
-      return Objects.getProperty(this.layout, tabOption);
+      return Objects.getProperty(this.initial.layout, tabOption);
     }
   getTabOptions: | #js
     function(layout) {
@@ -77,7 +78,7 @@ watch:
   value:
     handler: | #js
       function(layout) {
-        if (!this.initial.layout) this.initial.layout = layout;
+        if (!this.initial.layout) this.initial.layout = Objects.clone(layout);
         this.layout = layout;
         this.tabOptions = this.getTabOptions(layout);
       }

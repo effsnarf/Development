@@ -217,6 +217,8 @@ methods:
       s['background-color'] = node.style?.bg?.color;
       s['width'] = node.layout?.size?.width;
       s['height'] = node.layout?.size?.height;
+      s['font-family'] = node.design?.font?.family;
+      s['line-height'] = node.design?.line?.height;
       //s['flex'] = 'none';
       Object.assign(s, this.getFlexStyle(node));
       Objects.removeNullValueKeys(s);

@@ -108,7 +108,13 @@ methods:
         };
       }
       node.layout = layout;
-      node.style = {
+      node.design = {
+        font: {
+          family: null,
+          line: {
+            height: null
+          }
+        },
         bg: {
           color: null
         }

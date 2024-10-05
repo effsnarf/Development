@@ -64,6 +64,7 @@ dom:
             :sui: sui
             :is-tabs-drawer-open: "true"
       div:
+        v-if: (['layout', 'data'].includes(sui.tool.category))
         transition:
           name: slide
           div:
@@ -114,6 +115,10 @@ data:
       lines:
     tool:
       category:
+    design:
+      selected:
+        tab: 
+        moods:
     page:
       selected:
       trans:
@@ -713,7 +718,7 @@ style:
   .comp-studio-app > .flex1 > *:nth-child(3):
     aspect-ratio: 9 / 16
   .comp-studio-app > .flex1 > *:nth-child(4):hover:
-    width: 50%
+    width: 70%
   .comp-studio-app > .flex1 > *:nth-child(5):
   .comp-studio-app > .flex1 > *:nth-child(5):hover:
   .flex2:

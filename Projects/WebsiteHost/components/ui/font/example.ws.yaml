@@ -1,0 +1,23 @@
+dom:
+  div:
+    .flex1:
+      .dimmed:
+        v-text: "'𝔉'"
+      div:
+        :style: "{ 'font-family': font.family }"
+        v-text: (text || font.family)
+    component:
+      is: link
+      rel: stylesheet
+      :href: "('https://fonts.googleapis.com/css?family=' + font.family)"
+
+props:
+  font:
+  text: 
+
+style:
+  div:
+    border-radius: 0
+  .flex1:
+    display: flex
+    gap: 0.5em

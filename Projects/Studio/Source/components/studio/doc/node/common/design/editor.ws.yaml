@@ -4,6 +4,7 @@ dom:
     ui.tabs:
       :options: "['🎨 color', '𝔉 𝓕𝓸𝓷𝓽']"
       direction: horizontal
+      v-model: sui.design.selected.tab
       template:
         v-slot: tab0
         ui.input.color.palette:
@@ -11,6 +12,14 @@ dom:
           :node: node
           :initial: initial
           :sui: sui
+      template:
+        v-slot: tab1
+        ui.input.font:
+          :selected-moods: sui.design.selected.moods
+          :value: node.design.font.family
+          @selected-moods: (sm) => sui.design.selected.moods = sm
+          @preview: (fontFamily) => { node.design.font.family = (fontFamily || initial.node.design.font.family); }
+          @input: (fontFamily) => { initial.node.design.font.family = node.design.font.family = fontFamily; }
 
 props:
   node:
