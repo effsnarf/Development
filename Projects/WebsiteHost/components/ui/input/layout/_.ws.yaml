@@ -21,6 +21,7 @@ dom:
               :is: "('ui.input.layout.'+tabOption).replaceAll('.', '-')"
               :direction: layout.direction
               :value: getComponentValue(tabOption)
+              @preview: (value) => onComponentPreview(tabOption, value)
               @input: (value) => onComponentInput(tabOption, value)
 props:
   value: null
@@ -29,7 +30,15 @@ data:
   tabOptions:
   selectedTabIndex:
   layoutPropNames: ["direction", "gap", "order", "justify.content", "align.items", "size"]
+  initial:
+    layout:
 methods:
+  onComponentPreview: | #js
+    function(tabOption, value) {
+      if (value) return Objects.setProperty(this.layout, tabOption, value);
+      const initialValue = Objects.getProperty(this.initial.layout, tabOption);
+      Objects.setProperty(this.layout, tabOption, initialValue);
+    }
   onComponentInput: | #js
     function(tabOption, value) {
       Objects.setProperty(this.layout, tabOption, value);
@@ -68,6 +77,7 @@ watch:
   value:
     handler: | #js
       function(layout) {
+        if (!this.initial.layout) this.initial.layout = layout;
         this.layout = layout;
         this.tabOptions = this.getTabOptions(layout);
       }
