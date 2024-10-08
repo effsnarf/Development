@@ -8,6 +8,7 @@ import {
   TreeObject,
 } from "../../../../Shared/Extensions.Objects.Client";
 import { Reflection } from "../../../../Shared/Reflection";
+import { Color } from "../../../../Shared/Color";
 import { Diff } from "../../../../Shared/Diff";
 import { TaskQueue } from "../../../../Shared/TaskQueue";
 import { Actionable } from "../../../../Shared/Actionable";
@@ -36,6 +37,7 @@ window1.Mixins = Mixins;
 window1.Objects = Objects;
 window1.TreeObject = TreeObject;
 window1.Reflection = Reflection;
+window1.Color = Color;
 window1.Diff = Diff;
 window1.TaskQueue = TaskQueue;
 window1.Data = Data;

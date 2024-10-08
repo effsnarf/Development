@@ -20,4 +20,4 @@ style:
     border-radius: 0
   .flex1:
     display: flex
-    gap: 0.5em
+    gap: 0.5em !important

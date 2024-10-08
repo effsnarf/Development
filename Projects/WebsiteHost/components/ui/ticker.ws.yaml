@@ -3,25 +3,29 @@ dom:
 
 props:
   interval:
+  delay:
   count:
   enabled: true
 
 data:
+  started:
   tickIndex: 0
 
 mounted: | #js
   function() {
-    this.anotherTick();
+    const now = new Date();
+    if (!this.started) this.started = Date.now();
+    setTimeout(this.anotherTick.bind(this), (this.delay ?? 0));
   }
 
 methods:
   tick: | #js
     function() {
       if (this.enabled) this.$emit("tick", this.tickIndex);
-      if (this.count) this.tickIndex = ((this.tickIndex + 1) % this.count);
+      if (this.count) this.tickIndex = (this.tickIndex + 1) % this.count;
     }
   anotherTick: | #js
     async function() {
       this.tick();
-      setTimeout(this.anotherTick.bind(this), (this.interval));
+      setTimeout(this.anotherTick.bind(this), this.interval);
     }

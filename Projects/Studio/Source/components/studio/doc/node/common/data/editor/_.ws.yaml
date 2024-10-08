@@ -2,18 +2,18 @@ dom:
   div:
     v-if: node?.vars
     div:
-      v-for: varName in Object.keys(node.vars)
+      v-for: var1 in node.vars
       h2:
-        v-text: "'🧊 ' + varName"
+        v-text: "'🧊 ' + var1.name"
       ui.tabs:
         :options: tabOptions
         direction: vertical
         :show-title-in-tab: "true"
-        :value: getInitialSelectedTab(varName)
+        :value: getInitialSelectedTab(var1)
         template:
           v-slot: tab0
           studio.doc.node.common.data.editor.field:
-            :node-var: node.vars[varName]
+            :node-var: var1
             :initial: initial
             :sui: sui
         template:
@@ -21,11 +21,11 @@ dom:
           h2:
             ui.input.text.box:
               hint: expression
-              v-model: node.vars[varName].exp
+              v-model: var1.exp
         template:
           v-slot: tab2
           studio.doc.node.common.data.editor.url:
-            :node-var: node.vars[varName]
+            :node-var: var1
       div:
         pre:
           v-if: "false"
@@ -47,10 +47,9 @@ mounted: | #js
 
 methods:
   getInitialSelectedTab: | #js
-    function(varName) {
-      const nodeVar = this.node.vars[varName];
-      if (!nodeVar) return null;
-      const types = nodeVar.type?.split('.');
+    function(var1) {
+      if (!var1) return null;
+      const types = var1.type?.split('.');
       if (!types?.length) return null;
       return this.tabOptions.findIndex(t => (types.includes(t.split(' ').last())));
     }

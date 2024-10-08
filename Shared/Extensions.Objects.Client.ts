@@ -309,14 +309,18 @@ class Objects {
     if (typeof path == "string") path = path.split(".");
     const keys = path as string[];
     let currentObj = obj;
-  
+
     for (const key of keys) {
-      if (currentObj === null || typeof currentObj !== "object" || !(key in currentObj)) {
+      if (
+        currentObj === null ||
+        typeof currentObj !== "object" ||
+        !(key in currentObj)
+      ) {
         return false;
       }
       currentObj = currentObj[key];
     }
-  
+
     return true;
   }
 
@@ -761,24 +765,38 @@ class TreeObject {
 
   static deleteNode(
     root: TreeNode,
-    isNode: Function,
+    isNode: ((item: TreeNode) => boolean) | TreeNode,
     options: { newTree: true }
   ) {
     if (options.newTree) root = Objects.clone(root);
     isNode = TreeObject._evalSelector(isNode);
     const parentNode = TreeObject.getParentNode(root, isNode);
     if (!parentNode) return root;
-    parentNode.children.removeBy(isNode);
+    parentNode.children?.removeBy(isNode);
     return root;
   }
 
-  static getParentNode(root: TreeNode, isNode: Function | TreeNode): any {
+  static getParentNode(
+    root: TreeNode,
+    isNode: Function | TreeNode
+  ): TreeNode | null {
     isNode = TreeObject._evalSelector(isNode);
     let parentNode = null;
     TreeObject.traverse(root, (n: any) => {
       if (n.children && n.children.find(isNode)) parentNode = n;
     });
     return parentNode;
+  }
+
+  static getNodeDepth(root: TreeNode, node: TreeNode): number {
+    let depth = 0;
+    let parent = TreeObject.getParentNode(root, node);
+    while (parent) {
+      depth++;
+      node = parent;
+      parent = TreeObject.getParentNode(root, node);
+    }
+    return depth;
   }
 
   static _evalSelector(func: any) {

@@ -1,0 +1,59 @@
+dom:
+  div:
+    .options:
+      .option:
+        v-for: (color, i) in colors
+        :class: getOptionClass(color, i)
+        :style: getOptionStyle(color)
+        @mouseenter: onPreview(color, i)
+        @mouseleave: onPreview(null, null)
+        @click: onClick(color, i)
+
+props:
+  colors:
+  value:
+  valueIndex:
+
+methods:
+  onClick: | #js
+    function(color, index) {
+      if ((color == this.value) || (index == this.valueIndex)) {
+        color = null;
+        index = null;
+      }
+      this.$emit('input', color, index);
+    }
+  onPreview: | #js
+    function(color, index) {
+      this.$emit('preview', color, index);
+    }
+  getOptionClass: | #js
+    function(color, index) {
+      return {
+        selected: (index == this.valueIndex) || (color == this.value)
+      };
+    }
+  getOptionStyle: | #js
+    function(color) {
+      return {
+        'background': `${color}`
+      };
+    }
+
+style:
+  .options:
+    display: flex
+    justify-content: center
+    gap: 0.5em
+  .option:
+    width: 5em
+    aspect-ratio: 1
+    opacity: 0.8
+    box-shadow: inset -2px 2px 4px black
+    border: 2px solid gray
+    cursor: pointer
+  .option.selected:
+    box-shadow: 2px -2px 4px black
+  .option:hover:
+    opacity: 1
+

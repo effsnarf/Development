@@ -1,0 +1,37 @@
+dom:
+  div:
+    .box2:
+      h2:
+        v-text: "'✨ Page Transition'"
+      ui.input.animation:
+        :anim: userApp.global.page.anim
+        @hover-anim: onHoverPageAnim
+        @select-anim: onSelectPageAnim
+
+props:
+  userApp:
+  userAppState:
+  sui:
+
+data:
+  initial:
+    global:
+      page:
+        anim:
+
+mounted: | #js
+  function() {
+    this.initial.global.page.anim = this.userApp.global.page.anim;
+  }
+
+methods:
+  onHoverPageAnim: | #js
+    function(anim) {
+      this.sui.page.trans.preview = (anim ? true : false);
+      //this.userApp.global.page.anim = (anim ?? this.initial.global.page.anim);
+    }
+  onSelectPageAnim: | #js
+    function(anim) {
+      this.initial.global.page.anim = anim;
+      this.userApp.global.page.anim = anim;
+    }

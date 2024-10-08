@@ -22,7 +22,7 @@ props:
   tree: false
   showIdeComponents: false
 data:
-  maxVisibleVues: 20
+  maxVisibleVues: 100
 methods:
   showVueComponent: | #js
     function(vue) {

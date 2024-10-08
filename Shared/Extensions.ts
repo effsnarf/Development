@@ -465,12 +465,13 @@ interface Array<T> {
   ): Promise<TResult[]>;
   toMap(getKey: (item: T, index: number) => any): object;
   toMapValue(getValue: (item: T, index: number) => any): object;
+  getIndex(predicate: (item: T) => boolean | T): number;
   findIndexFromEnd(predicate: (item: T) => boolean): number;
   contains(item: T, getItemKey?: (item: T) => any): boolean;
   reversed(): T[];
   removeAt(index: number): void;
   insertAt(index: number, item: T, appendToEnd?: boolean): void;
-  removeBy(predicate: (item: T) => boolean): void;
+  removeBy(predicate: ((item: T) => boolean) | T): void;
   removeByField(key: string, value: any): void;
   count(predicate: (item: T) => boolean): number;
   clear(stagger?: number): void;
@@ -1693,6 +1694,13 @@ if (typeof Array !== "undefined") {
     return map;
   };
 
+  Array.prototype.getIndex = function <T>(predicate: (item: T) => boolean | T) {
+    for (let i = 0; i < this.length; i++) {
+      if (predicate(this[i])) return i;
+    }
+    return -1;
+  };
+
   Array.prototype.findIndexFromEnd = function (
     predicate: (item: any) => boolean
   ) {
@@ -1745,16 +1753,16 @@ if (typeof Array !== "undefined") {
   };
 
   Array.prototype.remove = function (...items: any[]) {
-    this.removeBy((item) => items.includes(item));
+    this.removeBy((item: any) => items.includes(item));
   };
 
-  Array.prototype.removeBy = function (predicate: (item: any) => boolean) {
+  Array.prototype.removeBy = function <T>(predicate: (item: T) => boolean | T) {
     const index = this.findIndex(predicate);
     if (index != -1) this.removeAt(index);
   };
 
   Array.prototype.removeByField = function (key: string, value: any) {
-    this.removeBy((item) => item[key] == value);
+    this.removeBy((item: any) => item[key] == value);
   };
 
   Array.prototype.count = function (predicate: (item: any) => boolean) {

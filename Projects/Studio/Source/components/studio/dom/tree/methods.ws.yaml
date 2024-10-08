@@ -90,6 +90,8 @@ methods:
         preview: null
       };
       const layout = {
+        type: null,
+        grid: null,
         size: {
           width: null,
           height: null
@@ -116,7 +118,12 @@ methods:
           }
         },
         bg: {
-          color: null
+          color: {
+            palette: {
+              index: null
+            },
+          },
+          gradient: null
         }
       }
       node.flex = (node.flex || {});
@@ -137,7 +144,7 @@ methods:
           break;
       }
 
-      node.id = this.$root.getNewNodeID(userApp);
+      node.depth = TreeObject.getNodeDepth(userApp, node);
       return node;
     }
   getNewNodeID: | #js
@@ -147,7 +154,7 @@ methods:
     }
   getMaxID: | #js
     function(userApp) {
-      userApp = (userApp || this.userApp);
+      userApp = (userApp ?? this.userApp);
       if (!userApp) throw `No user app`;
       let maxID = -1;
       TreeObject.traverse(userApp, (node) => {

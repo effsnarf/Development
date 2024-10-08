@@ -1,9 +1,16 @@
 dom:
   div:
-    h2:
-      ui.title:
-        icon: 🧱
-        text: layout
+    .flex:
+      h2:
+        ui.title:
+          icon: 🧱
+          text: layout
+      h2:
+        ui.tabs:
+          :options: layoutTypes
+          direction: horizontal
+          :can-select-none: "false"
+          v-model: layoutTypeIndex
     .flex:
       ui.tabs:
         :options: tabOptionNames
@@ -19,6 +26,7 @@ dom:
             v-if: (selectedTabIndex == i)
             component:
               :is: "('ui.input.layout.'+tabOption).replaceAll('.', '-')"
+              :layout-type: layout.type
               :direction: layout.direction
               :value: getComponentValue(tabOption)
               @preview: (value) => onComponentPreview(tabOption, value)
@@ -28,8 +36,10 @@ props:
 data:
   layout:
   tabOptions:
-  selectedTabIndex:
-  layoutPropNames: ["direction", "gap", "order", "justify.content", "align.items", "size"]
+  selectedTabIndex: 0
+  layoutPropNames: ["grid", "direction", "gap", "order", "justify.content", "align.items", "size"]
+  layoutTypes: ["list-y", "list-x", "grid.uniform", "grid.mosaic"]
+  layoutTypeIndex: null
   initial:
     layout:
 methods:
@@ -68,6 +78,10 @@ computed:
       return window.Objects;
     }
 watch:
+  layoutTypeIndex: | #js
+    function(newIndex) {
+      this.layout.type = this.layoutTypes[newIndex];
+    }
   layout:
     handler: | #js
       function(layout) {

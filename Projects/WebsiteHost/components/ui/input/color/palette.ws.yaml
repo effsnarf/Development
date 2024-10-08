@@ -1,28 +1,247 @@
 dom:
   div:
-    .flex1:
-      .clickable:
-        v-for: palette in palettes
-        :class: "{ selected: isSelected(palette) }"
-        @click: $emit('input', palette)
-        ui.color.palette:
-          :palette: palette
+    .flex:
+      ui.select:
+        :options: categories
+        :get-item-icon: (item) => item.icon
+        :get-item-text: (item) => item.name
+        input-type: value
+        v-model: selected.category
+      transition:
+        name: slide-hor
+        .flex1:
+          v-if: selected.category
+          :key: selected.category.name
+          h2:
+            v-text: "selected.category.icon + ' ' + selected.category.name"
+          div:
+            v-text: selected.category.desc
+          .dimmed:
+            v-text: selected.category.use
+          .flex.flex-wrap.justify-center:
+            .clickable:
+              v-for: palette in selected.category?.palettes
+              :class: "{ selected: isSelected(palette) }"
+              @mouseenter: $emit('preview', Objects.clone(palette))
+              @mouseleave: $emit('preview', null)
+              @click: $emit('input', Objects.clone(palette))
+              ui.color.palette:
+                :palette: palette
 
 props:
   value:
 
 data:
-  palettes:
-    - name: red
-      colors: ['#FF0000', '#BF0000', '#800000', '#4D0000', '#000000']
-    - name: green
-      colors: ['#00FF00', '#00BF00', '#008000', '#004D00', '#000000']
-    - name: blue
-      colors: ['#0000FF', '#0000BF', '#000080', '#00004D', '#000000']
-    - name: yellow
-      colors: ['#FFFF00', '#BFBF00', '#808000', '#4D4D00', '#000000']
-    - name: purple
-      colors: ['#800080', '#5B005B', '#3D003D', '#260026', '#000000']
+  categories:
+    - icon: "✨"
+      name: "Modern & Minimal"
+      desc: "Clean, simple, and elegant palettes for a sleek, modern look."
+      use: "Corporate websites, portfolios, tech startups."
+      palettes:
+        - name: "Corporate Takeover"
+          colors: ['#2C3E50', '#ECF0F1', '#95A5A6', '#34495E', '#BDC3C7']
+        - name: "Sleek Slate"
+          colors: ['#333333', '#4D4D4D', '#E5E5E5', '#F2F2F2', '#666666']
+        - name: "Ivory Tower"
+          colors: ['#F9F9F9', '#EDEDED', '#D9D9D9', '#CCCCCC', '#8A8A8A']
+        - name: "Glass & Steel"
+          colors: ['#5D6D7E', '#ABB2B9', '#E5E8E8', '#2C3E50', '#D5DBDB']
+        - name: "Minimalist Zen"
+          colors: ['#FFFFFF', '#F5F5F5', '#9E9E9E', '#757575', '#BDBDBD']
+        - name: "Soft Shadows"
+          colors: ['#FAFAFA', '#EEEEEE', '#9E9E9E', '#616161', '#424242']
+        - name: "Clean Cut"
+          colors: ['#ECECEC', '#BFBFBF', '#8C8C8C', '#595959', '#404040']
+        - name: "Urban Sophistication"
+          colors: ['#2D2D2D', '#575757', '#9D9D9D', '#C8C8C8', '#F1F1F1']
+        - name: "Sterling White"
+          colors: ['#F8F9FA', '#E9ECEF', '#DEE2E6', '#ADB5BD', '#6C757D']
+    - icon: "🔥"
+      name: "Bold & Vibrant"
+      desc: "Eye-catching, energetic colors for high-impact designs."
+      use: "Entertainment, fashion, creative industries."
+      palettes:
+        - name: "Electric Pop"
+          colors: ['#FF5252', '#FF4081', '#FFEA00', '#00E5FF', '#7C4DFF']
+        - name: "Citrus Burst"
+          colors: ['#FF9800', '#FFC107', '#FFEB3B', '#FF5722', '#00BCD4']
+        - name: "Tropical Heat"
+          colors: ['#FF6F61', '#F39C12', '#16A085', '#2980B9', '#8E44AD']
+        - name: "Techno Vibe"
+          colors: ['#00E676', '#1DE9B6', '#FF4081', '#651FFF', '#18FFFF']
+        - name: "Neon Dreams"
+          colors: ['#F50057', '#3D5AFE', '#00E5FF', '#76FF03', '#FFFF00']
+        - name: "Pop Art"
+          colors: ['#FF5722', '#E91E63', '#00BCD4', '#FFC107', '#9C27B0']
+        - name: "Carnival"
+          colors: ['#FF1744', '#FF9100', '#FDD835', '#00E676', '#651FFF']
+        - name: "High Contrast"
+          colors: ['#F44336', '#FFC107', '#4CAF50', '#2196F3', '#673AB7']
+        - name: "Fluorescent Burst"
+          colors: ['#00E676', '#FFEB3B', '#FF4081', '#7C4DFF', '#00B0FF']
+    - icon: "🍧"
+      name: "Soft & Pastel"
+      desc: "Gentle, soothing colors for a calm and approachable design."
+      use: "Wellness, lifestyle, beauty products."
+      palettes:
+        - name: "Cotton Candy"
+          colors: ['#FFB3BA', '#FFDFBA', '#FFFFBA', '#BAFFC9', '#BAE1FF']
+        - name: "Pastel Sky"
+          colors: ['#AEC6CF', '#FFB347', '#FDFD96', '#FF6961', '#B39EB5']
+        - name: "Blush Tones"
+          colors: ['#FADADD', '#FFC3A0', '#FFDAC1', '#B5EAD7', '#E2F0CB']
+        - name: "Spring Meadow"
+          colors: ['#F1E6E1', '#F8E5C8', '#C8E6C9', '#FFCCBC', '#E1BEE7']
+        - name: "Lilac Haze"
+          colors: ['#D6BEEB', '#E6E6FA', '#C1C1D7', '#F8D1CF', '#B4E0F7']
+        - name: "Peach Sorbet"
+          colors: ['#FFD1DC', '#FFE4E1', '#FFCCCB', '#FAD4C0', '#FFEFD5']
+        - name: "Sunset Pastels"
+          colors: ['#FFCCBC', '#FFE082', '#FFEB99', '#B3E5FC', '#D1C4E9']
+        - name: "Mint Cream"
+          colors: ['#E0F7FA', '#F1F8E9', '#FFEBEE', '#FFF3E0', '#E8EAF6']
+        - name: "Baby Blue"
+          colors: ['#A7C7E7', '#CCE2FF', '#D3F8E2', '#FFE5E2', '#F5E8C7']
+    - icon: "🌑"
+      name: "Dark & Moody"
+      desc: "Deep, dramatic palettes with high contrast and mystery."
+      use: "Photography, fashion, tech, luxury brands."
+      palettes:
+        - name: "Noir"
+          colors: ['#121212', '#282828', '#383838', '#484848', '#F5F5F5']
+        - name: "Midnight Blue"
+          colors: ['#001F3F', '#011627', '#011F4B', '#03396C', '#A7BBC7']
+        - name: "Mystic Forest"
+          colors: ['#1B2631', '#1C2833', '#212F3D', '#1F618D', '#85C1E9']
+        - name: "Crimson Night"
+          colors: ['#B03A2E', '#641E16', '#2C3E50', '#7B241C', '#E74C3C']
+        - name: "Shadow Realm"
+          colors: ['#2C2C2C', '#444444', '#666666', '#999999', '#FFFFFF']
+        - name: "Deep Waters"
+          colors: ['#0D3B66', '#112D4E', '#1B3A4B', '#206A5D', '#D9BF77']
+        - name: "Velvet Sky"
+          colors: ['#2C3A47', '#1E272E', '#485460', '#778CA3', '#D1CCC0']
+        - name: "Stormy Nights"
+          colors: ['#1A1A1D', '#4E4E50', '#6F2232', '#950740', '#C3073F']
+        - name: "Twilight Glow"
+          colors: ['#1B1464', '#6F1E51', '#833471', '#F79F1F', '#EE5A24']
+    - icon: "🌿"
+      name: "Earthy & Natural"
+      desc: "Organic, grounded colors inspired by nature and sustainability."
+      use: "Eco-friendly, outdoors, wellness, food industries."
+      palettes:
+        - name: "Forest Walk"
+          colors: ['#4CAF50', '#8BC34A', '#CDDC39', '#795548', '#607D8B']
+        - name: "Sage & Sand"
+          colors: ['#A5A58D', '#B7B78A', '#C7C7A6', '#F2E8CF', '#606C38']
+        - name: "Woodland Retreat"
+          colors: ['#3E2723', '#5D4037', '#8D6E63', '#D7CCC8', '#4E342E']
+        - name: "Desert Bloom"
+          colors: ['#F4A261', '#2A9D8F', '#264653', '#E9C46A', '#F4F1DE']
+        - name: "Mountain Air"
+          colors: ['#98C1D9', '#EE6C4D', '#293241', '#3D5A80', '#E0FBFC']
+        - name: "Earth & Clay"
+          colors: ['#6D4C41', '#D7CCC8', '#A1887F', '#8D6E63', '#795548']
+        - name: "Ocean Breeze"
+          colors: ['#1976D2', '#64B5F6', '#81C784', '#4CAF50', '#E0F2F1']
+        - name: "Herb Garden"
+          colors: ['#3B5323', '#8A9A5B', '#A5C689', '#CDD7B6', '#F4F2E9']
+        - name: "Terra Cotta"
+          colors: ['#E27D60', '#F8B195', '#C06C84', '#355C7D', '#87AFC7']
+    - icon: "📼"
+      name: "Retro & Vintage"
+      desc: "Nostalgic and timeless palettes with a vintage flair."
+      use: "Coffee shops, vintage clothing, retro designs."
+      palettes:
+        - name: "Retro Diner"
+          colors: ['#FF6F61', '#6B5B95', '#88B04B', '#F7CAC9', '#92A8D1']
+        - name: "Summer of '69"
+          colors: ['#FF5733', '#C70039', '#900C3F', '#581845', '#FFC300']
+        - name: "Disco Fever"
+          colors: ['#D7263D', '#3F88C5', '#F49D37', '#140F2D', '#8C2155']
+        - name: "Polaroid Memories"
+          colors: ['#F4A261', '#E76F51', '#264653', '#2A9D8F', '#E9C46A']
+        - name: "Vintage Vinyl"
+          colors: ['#264653', '#2A9D8F', '#E9C46A', '#F4A261', '#E76F51']
+        - name: "Golden Age"
+          colors: ['#B68D40', '#C8B370', '#EED6C4', '#84714F', '#8E6A53']
+        - name: "Old School Cool"
+          colors: ['#6B4226', '#D8C3A5', '#EAE7DC', '#E85A4F', '#8E8D8A']
+        - name: "Groovy Vibes"
+          colors: ['#FF9800', '#F44336', '#2196F3', '#8BC34A', '#FFC107']
+        - name: "Rust & Leather"
+          colors: ['#B87333', '#8B4513', '#A0522D', '#D2691E', '#FFE4C4']
+    - icon: "🎨"
+      name: "Playful & Fun"
+      desc: "Bright and joyful colors that create a lively, playful atmosphere."
+      use: "Kids' brands, games, entertainment."
+      palettes:
+        - name: "Rainbow Party"
+          colors: ['#FF1744', '#F50057', '#D500F9', '#651FFF', '#2979FF']
+        - name: "Candy Land"
+          colors: ['#F06292', '#BA68C8', '#64B5F6', '#4DB6AC', '#FFD54F']
+        - name: "Confetti"
+          colors: ['#FFEB3B', '#FF9800', '#F44336', '#4CAF50', '#03A9F4']
+        - name: "Balloon Fiesta"
+          colors: ['#FF5722', '#FFC107', '#FFEB3B', '#8BC34A', '#03A9F4']
+        - name: "Festival Fun"
+          colors: ['#FF4081', '#E040FB', '#7C4DFF', '#536DFE', '#448AFF']
+        - name: "Popsicle"
+          colors: ['#FFCDD2', '#F8BBD0', '#E1BEE7', '#D1C4E9', '#C5CAE9']
+        - name: "Circus Parade"
+          colors: ['#F44336', '#FFEB3B', '#4CAF50', '#2196F3', '#9C27B0']
+        - name: "Bubblegum Pop"
+          colors: ['#F48FB1', '#FF4081', '#C2185B', '#E91E63', '#AD1457']
+        - name: "Splash Zone"
+          colors: ['#64B5F6', '#42A5F5', '#2196F3', '#1E88E5', '#1976D2']
+    - icon: "⚖️"
+      name: "Neutral & Balanced"
+      desc: "Subtle, balanced colors that work well across various designs."
+      use: "Corporate, professional, balanced aesthetics."
+      palettes:
+        - name: "Greyscale Elegance"
+          colors: ['#F0F0F0', '#D9D9D9', '#BFBFBF', '#808080', '#404040']
+        - name: "Balanced Stone"
+          colors: ['#B0BEC5', '#78909C', '#546E7A', '#37474F', '#263238']
+        - name: "Neutral Harmony"
+          colors: ['#ECEFF1', '#CFD8DC', '#B0BEC5', '#90A4AE', '#78909C']
+        - name: "Soft Sands"
+          colors: ['#FFF9E6', '#FFF3E0', '#FFE0B2', '#FFCC80', '#FFB74D']
+        - name: "Coastal Calm"
+          colors: ['#E0F7FA', '#B2EBF2', '#80DEEA', '#4DD0E1', '#26C6DA']
+        - name: "Balanced Beige"
+          colors: ['#F5F5F5', '#E0E0E0', '#BDBDBD', '#757575', '#424242']
+        - name: "Soft Grayscale"
+          colors: ['#FAFAFA', '#F5F5F5', '#EEEEEE', '#E0E0E0', '#BDBDBD']
+        - name: "Warm Neutrals"
+          colors: ['#F5F5DC', '#E0E0D1', '#B3B3A4', '#999999', '#666666']
+        - name: "Muted Blues"
+          colors: ['#ECEFF1', '#CFD8DC', '#B0BEC5', '#90A4AE', '#78909C']
+    - icon: "🚀"
+      name: "Futuristic & Tech"
+      desc: "Sleek, high-tech palettes with neon accents and metallic tones."
+      use: "Tech products, gaming, innovation."
+      palettes:
+        - name: "Neon Circuit"
+          colors: ['#00FF00', '#00FFFF', '#FF00FF', '#FFFF00', '#FF0000']
+        - name: "Digital Horizon"
+          colors: ['#0D7377', '#14FFEC', '#323232', '#212121', '#FFC857']
+        - name: "Metallic Blue"
+          colors: ['#1F618D', '#2E86C1', '#3498DB', '#5DADE2', '#AED6F1']
+        - name: "Quantum Leap"
+          colors: ['#0A2463', '#3E92CC', '#D8315B', '#F39237', '#2E294E']
+        - name: "Neon Future"
+          colors: ['#FF1744', '#D500F9', '#00E676', '#2979FF', '#F9A825']
+        - name: "Cyber Glow"
+          colors: ['#7FFF00', '#00FFFF', '#FF00FF', '#FFFF00', '#FF4500']
+        - name: "Steel Grid"
+          colors: ['#273746', '#1C2833', '#34495E', '#5D6D7E', '#AAB7B8']
+        - name: "Virtual World"
+          colors: ['#F39C12', '#D35400', '#8E44AD', '#2980B9', '#27AE60']
+        - name: "Robo Neon"
+          colors: ['#0FF1CE', '#F000FF', '#FF1493', '#FFD700', '#1E90FF']
+  selected:
+    category:
 
 methods:
   isSelected: | #js
@@ -30,11 +249,17 @@ methods:
       return Objects.areEqual(palette, this.value);
     }
 
+computed:
+  Objects: | #js
+    function() {
+      return window.Objects;
+    }
+
 style:
   .flex1:
     display: flex
-    flex-direction: row
-    gap: 0
+    flex-direction: column
+    gap: 1em
   .clickable:
     gap: 0.5em
     

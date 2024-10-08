@@ -3,18 +3,22 @@ dom:
     studio.app.logo:
     .spacer1:
       v-text: "''"
-    .flex1:
+    .main-boxes:
       v-if: userApp
-      ui.drawer:
-        .box1:
-          studio.dom.tree:
-            :root: userApp
-            :sui: sui
-      div:
+      :class: "{ ['box-hovered-' + sui.main.box.hovered]: true }"
+      .main-box.a:
+        ui.drawer:
+          .box2:
+            studio.dom.tree:
+              :root: userApp
+              :sui: sui
+        @mouseenter: sui.main.box.hovered = 0
+        @mouseleave: sui.main.box.hovered = null
+      .main-box.b:
         studio.app.ui.drawer:
           closed-width: 8em
           studio.doc.node.toolbar:
-        .box1:
+        .box2:
           transition.group:
             name: list2
             studio.dom.tree:
@@ -26,7 +30,9 @@ dom:
               :initial-expanded: "true"
         studio.app.log:
           category: runtime
-      div:
+        @mouseenter: sui.main.box.hovered = 1
+        @mouseleave: sui.main.box.hovered = null
+      .main-box.c:
         studio.app.ui.drawer:
           closed-width: 8em
           studio.doc.page.selector:
@@ -35,8 +41,9 @@ dom:
             :sui: sui
             :value: sui.page.selected
             @input: selectPage
-        .box1:
+        .box2:
           class: flex-grow-1
+          :class: "{ 'user-app-tilted': sui.app.is.tilted }"
           @mouseenter: () => onHoverApp(true)
           @mouseleave: () => onHoverApp(false)
           studio.doc.node.picker:
@@ -48,7 +55,9 @@ dom:
             :user-app: userApp
             :sui: sui
             @runtime-vue-inited: onRuntimeVueInited
-      div:
+        @mouseenter: sui.main.box.hovered = 2
+        @mouseleave: sui.main.box.hovered = null
+      .main-box.d:
         studio.app.ui.drawer:
           :open: "true"
           h2:
@@ -56,46 +65,22 @@ dom:
             studio.dom.tree.node:
               :item: sui.node.selected
               :sui: sui
-        .box1:
+        .box2:
           studio.doc.node.editor:
             :node: sui.node.selected
             :user-app: userApp
             :user-app-state: userAppState
             :sui: sui
             :is-tabs-drawer-open: "true"
-      div:
-        v-if: (['layout', 'data'].includes(sui.tool.category))
-        transition:
-          name: slide
-          div:
-            v-if: (sui.tool.category == 'layout')
-            div:
-              studio.app.ui.drawer:
-                :open: "true"
-                .title1:
-                  :style: "{ 'margin-top': '1.5rem' }"
-                  v-text: "'🧱'"
-              .box1.flex-grow-1:
-                .flex:
-                  .title2:
-                    v-text: "'⚙️'"
-                  div:
-                    ui.checkbox:
-                      text: layout lines
-                      v-model: sui.grid.lines
-          div:
-            v-else-if: (sui.tool.category == 'data')
-            div:
-              studio.app.ui.drawer:
-                :open: "true"
-                .title1:
-                  :style: "{ 'margin-top': '1.5rem' }"
-                  v-text: "'🧊'"
-              .box1:
-                studio.app.runtime.state:
-                  :user-app: userApp
-                  :user-app-state: userAppState
-                  :sui: sui
+        @mouseenter: sui.main.box.hovered = 3
+        @mouseleave: sui.main.box.hovered = null
+      .main-box.e:
+        studio.app.global.settings:
+          :user-app: userApp
+          :user-app-state: userAppState
+          :sui: sui
+        @mouseenter: sui.main.box.hovered = 4
+        @mouseleave: sui.main.box.hovered = null
     studio.dom.tree.methods:
       ref: methods1
       :user-app: userApp
@@ -111,10 +96,16 @@ data:
     app:
       is:
         hovered:
+        tilted:
     grid:
       lines:
     tool:
       category:
+      grid:
+        lines: false
+    main:
+      box:
+        hovered: null
     design:
       selected:
         tab: 
@@ -123,16 +114,21 @@ data:
       selected:
       trans:
         dir:
+        preview: false
     pages:
     node:
       hovered:
       selected:
       active:
       context:
+      tree:
+        is:
+          hovered:
     nodes:
       hovered:
     selected:
       dataItems: []
+    debug: true
   pageNodes:
   appStateChangedVars: []
   appStateChangeKey: 1
@@ -236,6 +232,28 @@ methods:
     function() {
       const userApp = {
         type: "user.app",
+        global: {
+          design: {
+            palette: null
+          },
+          page: {
+            anim: {
+              "name": "slide-x",
+              "enter": {
+                "from": {
+                  "transform": "translateX(100%)",
+                  "opacity": 0
+                }
+              },
+              "leave": {
+                "to": {
+                  "transform": "translateX(-100%)",
+                  "opacity": 0
+                }
+              }
+            }
+          }
+        },
         children: [
           {
             type: "layouts",
@@ -304,12 +322,13 @@ methods:
                       {
                         type: "text",
                         size: 1,
-                        vars: {
-                          text: {
+                        vars: [
+                          {
+                            name: "text",
                             type: "value",
                             value: "Home page"
                           }
-                        }
+                        ]
                       },
                     ]
                   },
@@ -337,25 +356,33 @@ methods:
                             content: "center"
                           }
                         },
-                        vars: {
-                          items: {
+                        vars: [
+                          {
+                            name: "items",
                             type: "fetch",
                             url: "`https://a.4cdn.org/boards.json`",
                             linq: [{"type":"select.field","path":["boards"],"_id":1},{"type":"select.fields","fields":["board","title"],"_id":2}]
                           },
-                          hovered: null,
-                          selected: null
-                        },
+                          {
+                            name: "hovered",
+                            type: "value",
+                          },
+                          {
+                            name: "selected",
+                            type: "value",
+                          }
+                        ],
                         children: [
                           {
                             type: "text",
                             size: 2,
-                            vars: {
-                              text: {
+                            vars: [
+                              {
+                                name: "text",
                                 type: "field",
                                 exp: "title"
-                              },
-                            },
+                              }
+                            ]
                           }
                         ]
                       },
@@ -379,12 +406,13 @@ methods:
                       {
                         type: "text",
                         size: 1,
-                        vars: {
-                          text: {
+                        vars: [
+                          {
+                            name: "text",
                             type: "exp",
                             exp: "this.home.boards.selected.title",
                           }
-                        }
+                        ]
                       },
                     ]
                   },
@@ -397,15 +425,22 @@ methods:
                       {
                         type: "list",
                         name: "threads",
-                        vars: {
-                          items: {
+                        vars: [
+                          {
+                            name: "items",
                             type: "fetch",
                             url: "`https://a.4cdn.org/${this.home.boards.selected.board}/catalog.json`",
                             linq: [{"type":"select.fields","fields":["threads"],"_id":1},{"type":"flat.map","path":["threads"],"_id":2}]
                           },
-                          hovered: null,
-                          selected: null
-                        },
+                          {
+                            name: "hovered",
+                            type: "value",
+                          },
+                          {
+                            name: "selected",
+                            type: "value",
+                          }
+                        ],
                         children: [
                           {
                             type: "comp.inst",
@@ -435,12 +470,13 @@ methods:
                       {
                         type: "text",
                         size: 1,
-                        vars: {
-                          text: {
+                        vars: [
+                          {
+                            name: "text",
                             type: "exp",
                             exp: "this.board.threads.selected.sub"
                           }
-                        }
+                        ]
                       },
                     ]
                   },
@@ -454,13 +490,14 @@ methods:
                         type: "list",
                         name: "posts",
                         data: {
-                          vars: {
-                            items: {
+                          vars: [
+                            {
+                              name: "items",
                               type: "fetch",
                               url: "`https://a.4cdn.org/${this.home.boards.selected.board}/thread/${this.board.threads.selected.no}.json`",
                               linq: [ { "type": "select.field", "path": [ "posts" ], "_id": 1 } ]
                             }
-                          }
+                          ],
                         },
                         children: [
                           {
@@ -503,12 +540,13 @@ methods:
                         children: [
                           {
                             type: "image",
-                            vars: {
-                              imageUrl: {
+                            vars: [
+                              {
+                                name: "imageUrl",
                                 type: "exp",
                                 exp: "`https://i.4cdn.org/${this.home.boards.selected.board}/${tim}${ext}`"
                               }
-                            }
+                            ]
                           },
                         ]
                       },
@@ -523,34 +561,37 @@ methods:
                           {
                             type: "text",
                             size: 3,
-                            vars: {
-                              text: {
+                            vars: [
+                              {
+                                name: "text",
                                 type: "field",
                                 exp: "sub"
                               }
-                            }
+                            ]
                           },
                           {
                             type: "text",
                             size: 5,
-                            vars: {
-                              text: {
+                            vars: [
+                              {
+                                name: "text",
                                 type: "field",
                                 exp: "com"
                               }
-                            }
+                            ]
                           }
                         ]
                       },
                       {
                         type: "text",
                         size: 3,
-                        vars: {
-                          text: {
+                        vars: [
+                          {
+                            name: "text",
                             type: "field",
                             exp: "replies"
                           }
-                        }
+                        ]
                       },
                     ],
                   },
@@ -576,22 +617,24 @@ methods:
                             width: "20%"
                           }
                         },
-                        vars: {
-                          imageUrl: {
+                        vars: [
+                          {
+                            name: "imageUrl",
                             type: "exp",
                             exp: "`https://i.4cdn.org/${this.home.boards.selected.board}/${tim}${ext}`"
                           }
-                        }
+                        ]
                       },
                       {
                         type: "text",
                         size: 3,
-                        vars: {
-                          text: {
+                        vars: [
+                          {
+                            name: "text",
                             type: "field",
                             exp: "com"
                           }
-                        }
+                        ]
                       },
                     ],
                   },
@@ -633,13 +676,14 @@ methods:
 
       const initNode = (node) => {
         if (!node.type) return;
+        node.id = this.$root.getNewNodeID(userApp);
         const mockupNode = this.$root.initNewNode(userApp, node);
         const nodeProps = Objects.clone(node, { exclude: ["children"] });
         const merged = Objects.deepMerge(nodeProps, mockupNode);
         Object.assign(node, merged);
       }
 
-      Objects.traverse(userApp, initNode);
+      TreeObject.traverse(userApp, initNode);
 
       return userApp;
     }
@@ -667,13 +711,23 @@ watch:
       this.appStateChangedVars.clear();
       this.$root.$emit("app.state.changed", vars);
     }
+  isUserAppTilted: | #js
+    function(newValue) {
+      this.sui.app.is.tilted = newValue;
+      this.sui.tool.grid.lines = newValue;
+    }
 
 computed:
+  isUserAppTilted: | #js
+    function() {
+      return (this.sui.main.box.hovered == 1);
+    }
   userAppStylesheet: | #js
     function() {
       const s = {};
-      if (this.sui.grid.lines) {
-        s['.studio-doc-node'] = {
+      if (this.sui.tool.grid.lines) {
+        const pageName = this.sui.page.selected?.name;
+        s[`.studio-doc-node[data-sui-page=${pageName}]`] = {
           border: '1px dashed gray'
         };
       }
@@ -694,33 +748,45 @@ style:
   .comp-studio-app:
     min-height: 100vh
     background: "radial-gradient(circle at center, #2f4e66, #000)"
-  .comp-studio-app > .flex1:
+  .main-boxes:
     display: flex
     justify-content: space-between
     gap: 2em
     margin: 0 2vw
-  .comp-studio-app > .flex1 > *:
+  .main-box:
     width: 25%
     transition: 0.4s
-  .box1:
-    height: fit-content
+    perspective: 60vw
+  .main-box .box2:
     overflow: hidden
+  .user-app-container:
+    overflow: hidden
+  .main-boxes > *:nth-child(3) .box2:
+    transform: rotateY(0deg)
+    transform-style: preserve-3d
+    transition: 0.6s
+  .main-boxes > *:nth-child(3) .box2.user-app-tilted:
+    transform: rotateY(10deg)
+  .user-app-tilted .studio-doc-node .list-item:
+    opacity: 1
+  .box2 *:
+    transform-style: preserve-3d
+  .box2:
+    height: fit-content
     background: black
     border: 3px solid gray
     box-shadow: "-0.5em 0.5em 2px #00000080"
     padding: 1em
-  .comp-studio-app > .flex1 > *:nth-child(1):hover:
-    width: 40%
-  .comp-studio-app > .flex1 > *:nth-child(2):
-    width: 8%
-  .comp-studio-app > .flex1 > *:nth-child(2):hover:
-    width: 20%
-  .comp-studio-app > .flex1 > *:nth-child(3):
-    aspect-ratio: 9 / 16
-  .comp-studio-app > .flex1 > *:nth-child(4):hover:
-    width: 70%
-  .comp-studio-app > .flex1 > *:nth-child(5):
-  .comp-studio-app > .flex1 > *:nth-child(5):hover:
+  .main-box.a:
+    width: 10%
+  .main-boxes.box-hovered-3 .main-box.d:
+    width: 46%
+  .main-boxes.box-hovered-3 .main-box.e:
+    width: 4%
+  .main-boxes.box-hovered-4 .main-box.d:
+    width: 4%
+  .main-boxes.box-hovered-4 .main-box.e:
+    width: 46%
   .flex2:
     display: flex
     flex-direction: column

@@ -45,7 +45,6 @@ methods:
     }
   onInput: | #js
     async function(value) {
-      debugger;
       if (this.valueArray && this.valueKey) {
         this.toggleArrayValue(this.valueArray, this.valueKey);
         await this.$nextTick();

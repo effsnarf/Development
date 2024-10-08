@@ -1,0 +1,17 @@
+dom:
+  div:
+    studio.app.ui.drawer:
+      :open: "true"
+      .title1:
+        :style: "{ 'margin-top': '1.5rem' }"
+        v-text: "'🧊'"
+    .box2:
+      studio.app.runtime.state:
+        :user-app: userApp
+        :user-app-state: userAppState
+        :sui: sui
+
+props:
+  userApp:
+  userAppState:
+  sui:

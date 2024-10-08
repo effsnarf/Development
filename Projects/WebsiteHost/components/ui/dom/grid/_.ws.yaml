@@ -1,0 +1,74 @@
+dom:
+  div:
+    ui.html.style:
+      :css-style-obj: gridCssStyleObj
+    div:
+      :class: "'grid-' + gridID"
+      .box:
+        v-if: showExample
+        v-for: (area, index) in getGridBoxes(grid)
+        :key: "'box-' + index"
+        :data-area: "{ area }"
+      slot:
+
+props:
+  grid:
+  showExample: false
+
+methods:
+  getGridBoxes: | #js
+    function(grid) {
+      if (!grid) return null;
+      const { areas } = grid.template;
+      const namedAreas = grid.template.named?.areas;
+      if (namedAreas) return namedAreas?.flat();
+      if (grid.example?.boxes) return Array.from({ length: (grid.example.boxes ?? 1) })
+        .map((b, i) => `box-${i}`);
+      return [];
+    }
+
+computed:
+  gridCssStyleObj: | #js
+    function() {
+      if (!this.grid) return null;
+      const s = {};
+      const { columns, rows, areas } = this.grid.template;
+      const namedAreas = this.grid.template.named?.areas;
+
+      s[`.grid-${this.gridID}`] = {
+        'display': 'grid',
+        'gap': '0.2em',
+        'aspect-ratio': (this.grid.example?.aspect?.ratio ?? 1),
+        'grid-template-columns': columns,
+        'grid-template-rows': rows,
+        'grid-template-areas': namedAreas?.map(row => `"${row.join('" "')}"`).join(' '),
+      };
+
+      if (areas) {
+        for (let i = 0; i < areas.length; i++) {
+          const area = areas[i];
+          s[`.grid-${this.gridID} > :nth-child(${(i + 1)})`] = {
+            'grid-area': area.join(' / ')
+          };
+        }
+      }
+
+      return s;
+    }
+  gridID: | #js
+    function() {
+      return this._uid;
+    }
+
+style:
+  .grid:
+    display: grid
+    gap: 0.5em
+  .box:
+    display: flex
+    justify-content: center
+    align-items: center
+    min-width: 1em
+    min-height: 1em
+    background: gray
+    border-radius: 0.2em

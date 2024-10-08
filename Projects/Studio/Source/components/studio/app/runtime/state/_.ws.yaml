@@ -43,47 +43,7 @@ methods:
       this.selected.node = node;
     }
   onSelectedPageChanged: | #js
-    function(pageNode) {
-      this.refresh(pageNode);
-    }
-  getAppState: | #js
-    async function(userApp) {
-      const root = {};
-      for (const pageNode of this.$root.getPageNodes()) {
-        root[pageNode.name] = (await this.getPageAppState(pageNode));
-      }
-      return root;
-    }
-  getPageAppState: | #js
-    async function(pageNode) {
-      const page = {};
-
-      for (const listNode of this.$root.findDescNodes(pageNode, "list"))
-      {
-        page[listNode.name] = {
-          _items: [],
-          items: [],
-          hovered: null,
-          selected: null,
-        };
-        this.addDataSourceState(pageNode, page, listNode);
-      }
-
-      return page;
-    }
-  addDataSourceState: | #js
-    function(pageNode, page, node) {
-      // #TODO remove
-      const ds = node.data?.source;
-      if (!ds) return;
-      if ("url" == ds.type) {
-        const getUrl = eval(`(function() { return ${ds.url}; })`).bind(this.userAppState);
-      }
-    }
-  calcAppState: | #js
-    async function() {
-      const appState = (await this.getAppState(this.userApp));
-      for (const key in appState) this.userAppState[key] = appState[key];
+    function() {
       this.refresh();
     }
   onAppStateChanged: | #js
@@ -91,18 +51,18 @@ methods:
       //this.refresh();
     }
   refresh: | #js
-    async function(pageNode) {
+    async function() {
       const appStateTree = Objects.toTreeObject(this.userAppState, this.expandNodeToTree, [], "name", "value");
       this.appStateTree = appStateTree;
       this.root = this.appStateTree;
-      if (pageNode && !this.showAllPages) this.root = this.appStateTree.children.find(c => (c.name == pageNode.name));
+      if (this.sui.page.selected && !this.showAllPages) this.root = this.appStateTree.children.find(c => (c.name == this.sui.page.selected.name));
       this.key1++;
       this.$forceUpdate();
     }
   expandNodeToTree: | #js
     function(node, key, value, nodePath) {
       // #TODO inaccurate
-      if (["_items", "items", "hovered", "selected"].includes(nodePath.last())) return false;
+      if (["dataUrl", "_items", "items", "hovered", "selected"].includes(nodePath.last())) return false;
       return true;
     }
 

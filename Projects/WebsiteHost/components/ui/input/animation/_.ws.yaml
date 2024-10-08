@@ -71,6 +71,42 @@ data:
       leave:
         to:
           transform: rotateY(90deg)
+    - name: zoom-in
+      enter:
+        from:
+          transform: scale(0.5)
+          opacity: 0
+      leave:
+        to:
+          transform: scale(0.5)
+          opacity: 0
+    - name: zoom-out
+      enter:
+        from:
+          transform: scale(1.5)
+          opacity: 0
+      leave:
+        to:
+          transform: scale(1.5)
+          opacity: 0
+    - name: flip-x
+      enter:
+        from:
+          transform: rotateX(90deg)
+          opacity: 0
+      leave:
+        to:
+          transform: rotateX(-90deg)
+          opacity: 0
+    - name: flip-y
+      enter:
+        from:
+          transform: rotateY(90deg)
+          opacity: 0
+      leave:
+        to:
+          transform: rotateY(-90deg)
+          opacity: 0
 
 methods:
   onHover: | #js
@@ -87,6 +123,8 @@ methods:
 style:
   .flex1:
     display: flex
-    gap: 1rem
+    flex-wrap: wrap
+    justify-content: center
+    gap: 0rem
   .selected:
     border: 2px solid white

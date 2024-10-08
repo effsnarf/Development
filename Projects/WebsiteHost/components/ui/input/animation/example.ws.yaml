@@ -54,5 +54,5 @@ style:
     gap: 0.3em
   .list-item:
     aspect-ratio: 1
-    background: "gray"
+    background: "linear-gradient(45deg, #80808040, #808080f0)"
     text-align: center

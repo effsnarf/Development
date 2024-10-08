@@ -9,25 +9,32 @@ dom:
       ref: comp1
       :is: nodeCompName
       :node: node
+      :user-app: userApp
       :user-app-state: userAppState
       :sui: sui
       :data-item: dataItem
       :content-node: contentNode
       :class: nodeCssClass
       :style: nodeStyle
+      :data-sui-page: nodePageName
       template:
         v-slot: child-nodes
-        studio.doc.node:
-          v-for: childNode in node.children
-          :node: childNode
-          :user-app-state: userAppState
-          :sui: sui
-          :data-item: dataItem
-          :content-node: contentNode
-          :key: childNode.id
+        ui.dom.grid:
+          :grid: node.layout.grid
+          :show-example: (!node.children?.length)
+          studio.doc.node:
+            v-for: childNode in node.children
+            :node: childNode
+            :user-app: userApp
+            :user-app-state: userAppState
+            :sui: sui
+            :data-item: dataItem
+            :content-node: contentNode
+            :key: childNode.id
 
 props:
   node:
+  userApp:
   userAppState:
   sui:
   dataItem:
@@ -39,8 +46,6 @@ mounted: | #js
   function() {
     this.$root.$on("app.state.changed", this.onAppStateChanged.bind(this));
     this.$watch("sui.node.selected", this.onSelectedNodeChanged.bind(this));
-    //this.applyCssClass(this.nodeCssClass);
-    //this.applyStyle(this.nodeStyle);
     this.bindNodeVarsToGlobalAppState();
     this.initNodeVars();
   }
@@ -73,23 +78,24 @@ methods:
       const comp1 = this.$refs.comp1;
       const vars = this.node.vars;
       if (!vars) return;
-      for (const varName in vars)
+      for (const var1 of vars)
       {
-        const varOptions = vars[varName];
-        const nodeVar = this.createNodeVar(comp1, varName, varOptions);
+        const nodeVar = this.createNodeVar(comp1, var1);
       }
     }
   createNodeVar: | #js
-    function(vComp, varName, varOptions) {
-      if (!varOptions?.type) return;
-      const method = this[`createNodeVar_${varOptions.type}`];
-      if (!method) throw `Unknown node var type ${varOptions.type}`;
-      return method(vComp, varName, varOptions);
+    function(vComp, var1) {
+      if (!var1?.type) return;
+      const method = this[`createNodeVar_${var1.type}`];
+      if (!method) throw `Unknown node var type ${var1.type}`;
+      return method(vComp, var1);
     }
   createNodeVar_fetch: | #js
-    function(vComp, varName, varOptions) {
+    function(vComp, var1) {
       const $root = this.$root;
       const runtimeVue = $root.getUserAppRuntimeVue(this);
+      const pageNode = this.$root.getNodePage(this);
+      const sui = this.sui;
       // a fetch var has:
       // - url (computed, can reference other state nodes)
       // - _data (holds the downloaded data)
@@ -98,7 +104,7 @@ methods:
       const url = Vue.computed({
         get: eval(`(function() {
           try {
-            return ${varOptions.url};
+            return ${var1.url};
           }
           catch (ex) {}
         })`).bind(this.userAppState)
@@ -109,16 +115,20 @@ methods:
       const url_watcher = Vue.watch(url,
         (async function(newUrl) {
           if (!newUrl) return;
+          vComp[`${var1.name}Url`] = newUrl;
           _data.value = (await $root.fetchFromUrl(newUrl));
+          // #TODO not accurate
+          // switch to the page this list is in
+          if (pageNode) sui.page.selected = pageNode;
         }),
         { immediate: true });
 
       const _data_watcher = Vue.watch(_data,
         (async function(newData) {
-          const linq = (varOptions.linq || null);
+          const linq = (var1.linq || null);
           const datas = runtimeVue.$refs.linqEval1.evaluateOps(null, newData.value, linq);
           const data = datas.last();
-          vComp[varName] = data;
+          vComp[var1.name] = data;
         })
       );
 
@@ -127,22 +137,22 @@ methods:
       return nodeVar;
     }
   createNodeVar_field: | #js
-    function(vComp, varName, varOptions) {
+    function(vComp, var1) {
       const $root = this.$root;
       const runtimeVue = $root.getUserAppRuntimeVue(this);
       // a field node var has:
       // - value (taken from data-item[field])
       const field_watcher = Vue.watch(
-        () => this.dataItem?.[varOptions.exp],
+        () => this.dataItem?.[var1.exp],
         (function(newValue) {
-          vComp[varName] = newValue;
+          vComp[var1.name] = newValue;
         }),
         { immediate: true });
 
       return { field_watcher };
     }
   createNodeVar_exp: | #js
-    function(vComp, varName, varOptions) {
+    function(vComp, var1) {
       const $root = this.$root;
       const runtimeVue = $root.getUserAppRuntimeVue(this);
       // an exp node var has:
@@ -150,7 +160,7 @@ methods:
       const exp = Vue.computed({
         get: eval(`(function() {
           try {
-            return ${varOptions.exp};
+            return ${var1.exp};
           }
           catch (ex) {}
         })`).bind(this.userAppState)
@@ -158,43 +168,21 @@ methods:
 
       const exp_watcher = Vue.watch(exp,
         (function(newValue) {
-          vComp[varName] = newValue;
+          vComp[var1.name] = newValue;
         }),
         { immediate: true });
 
       return { exp };
     }
   createNodeVar_value: | #js
-    function(vComp, varName, varOptions) {
+    function(vComp, var1) {
       const $root = this.$root;
       const runtimeVue = $root.getUserAppRuntimeVue(this);
       // a value node var has:
       // - value (taken from value)
-      vComp[varName] = varOptions.value;
+      vComp[var1.name] = var1.value;
 
-      return { value: varOptions.value };
-    }
-  applyCssClass: | #js
-    function(cls) {
-      // Apply CSS classes to this.$el
-      // cls is an object like { cls1: true, cls2: false, ... }
-      if (!this.$el?.classList) return;
-      Object.keys(cls).forEach(key => {
-        if (cls[key]) {
-          this.$el.classList.add(key);
-        } else {
-          this.$el.classList.remove(key);
-        }
-      });
-    }
-  applyStyle: | #js
-    function(s) {
-      // Apply inline styles to this.$el
-      // s is an object like { background: 'red', color: 'blue', ... }
-      if (!this.$el?.style) return;
-      Object.keys(s).forEach(key => {
-        this.$el.style[key] = s[key];
-      });
+      return { value: var1.value };
     }
   onAppStateChanged: | #js
     function(vars) {
@@ -213,17 +201,64 @@ methods:
     function(node) {
       if (!node) return;
       const s = {};
-      //s['background'] = `radial-gradient(circle at center, ${node.style?.bg?.color}, #000)`;
-      s['background-color'] = node.style?.bg?.color;
+      const userApp = this.$root.getUserApp?.(this);
+      const bgColor = this.toStyleColor(userApp, node.design?.bg.color);
+      s['background'] = this.toBackground(node.design?.bg);
+      // set text color to contrast the background
+      if (bgColor) {
+        const textColor = Color.fromHexColor(bgColor).toContrastingTextColor();
+        s['color'] = textColor.asHexColor();
+        if (textColor.brightness > 0.5) {
+          s['text-shadow'] = `-2px 2px 1px black`;
+        }
+        else {
+          s['text-shadow'] = 'none';
+        }
+      }
       s['width'] = node.layout?.size?.width;
       s['height'] = node.layout?.size?.height;
       s['font-family'] = node.design?.font?.family;
       s['line-height'] = node.design?.line?.height;
+
+      if (this.sui.node.hovered?.id == node.id) {
+        s['border'] = `4px dashed #ffff00 !important`;
+      }
+      if (!this.sui.app.is.tilted) {
+        if (this.sui.node.selected?.id == node.id) {
+          s['border'] = `4px dashed #ffff00 !important`;
+        }
+        if (this.sui.node.active?.id == node.id) {
+          s['box-shadow'] = `-2px 2px 2px black !important`;
+        }
+      }
+      if (this.sui.tool.grid.lines) {
+        s['transform'] = `translateZ(${(node.depth * 0.2)}em)`;
+      }
       //s['flex'] = 'none';
       Object.assign(s, this.getFlexStyle(node));
       Objects.removeNullValueKeys(s);
       if (!Object.keys(s).length) return null;
       return s;
+    }
+  toBackground: | #js
+    function(bg) {
+      const userApp = this.$root.getUserApp?.(this);
+      if (!userApp || !bg) return null;
+      const color = this.toStyleColor(userApp, bg.color);
+      if (!bg.gradient) return color;
+      let gradient = (bg.gradient||"");
+      const color1 = `${color}`;
+      const color2 = `${color}40`;
+      gradient = gradient
+        .replaceAll("{color1}", color1)
+        .replaceAll("{color2}", color2)
+      return gradient;
+    }
+  toStyleColor: | #js
+    function(userApp, color) {
+      if (color.palette?.index != null) return userApp.global.design.palette.colors[color.palette.index];
+      if (color.value) return color.value;
+      return null;
     }
   getFlexStyle: | #js
     function(node) {
@@ -267,7 +302,7 @@ computed:
     }
   nodePageName: | #js
     function() {
-      return this.$root.getNodePageName(this);
+      return this.$root.getNodePageName(this.node);
     }
   nodeCompName: | #js
     function() {
@@ -306,19 +341,18 @@ watch:
   nodeCssClass:
     handler: | #js
       function(nodeCssClass) {
-        //this.applyCssClass(nodeCssClass);
       }
-    immediate: true
   nodeStyle:
     handler: | #js
       function(nodeStyle) {
-        //this.applyStyle(nodeStyle);
       }
-    immediate: true
 
 style:
+  .studio-doc-node:
+    transition: all 0.6s, color 0.2s, border 0s
   .hovered-node:
-    border: 2px dashed yellow
+    border: "2px dashed #FFFF0080 !important"
   .selected-node:
-    border: 4px dashed yellow
+    border: "2px dashed #FFFF00 !important"
+  .hovered-node, .selected-node:
     box-shadow: "inset -3px 3px 2px #80808080"

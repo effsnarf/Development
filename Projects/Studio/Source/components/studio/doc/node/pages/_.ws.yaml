@@ -1,21 +1,23 @@
 dom:
-  div:
-    .pages:
-      .page:
-        v-for: pageNode in visiblePageNodes
-        :class: pageClasses[pageNode.id]
-        :key: pageNode.id
-        ui.anim:
-          :anim: pageTransAnim
-          :anim-state: pageStates[pageNode.id]
-          studio.doc.node:
-            :node: pageNode
-            :user-app-state: userAppState
-            :sui: sui
-            :key: pageNode.id
+  .pages:
+    .page:
+      v-for: (pageNode, i) in visiblePageNodes
+      :class: pageClasses[pageNode.id]
+      :key: pageNode.id
+      ui.anim:
+        :anim: userApp.global.page.anim
+        :anim-state: pageStates[pageNode.id]
+        :auto-play-loop: (sui.page.trans.preview && (pageStates[pageNode.id] == 'entering'))
+        :debug: sui.debug
+        studio.doc.node:
+          :node: pageNode
+          :user-app-state: userAppState
+          :sui: sui
+          :key: pageNode.id
 
 props:
   node:
+  userApp:
   userAppState:
   sui:
 
@@ -23,14 +25,6 @@ data:
   pageStates: {}
   pageClasses: {}
   visiblePageNodes: []
-  pageTransAnim:
-    name: fade
-    enter:
-      from:
-        opacity: 1
-    leave:
-      to:
-        opacity: 0
 
 mounted: | #js
   function() {
@@ -40,21 +34,23 @@ mounted: | #js
 methods:
   onSelectedPageChanged: | #js
     async function(newPage, oldPage) {
-      //await (0.5).seconds().wait();
-      this.clearPageStates();
+      // wait for page elements to animate before transitioning page
+      //await (1).seconds().wait();
+
       if (oldPage) this.pageStates[oldPage.id] = "leaving";
       this.refresh();
-      //if (oldPage) await (0.5).seconds().wait();
+
+      // finish leaving page transition and only then
+      // start entering page transition
+      //if (oldPage) await (1).seconds().wait();
+
       this.pageStates[newPage.id] = "entering";
       this.refresh();
     }
   refreshVisiblePageNodes: | #js
-    function() {
-      this.visiblePageNodes = this.pageNodes.filter(pageNode => (!!this.pageStates[pageNode.id]));
-    }
-  clearPageStates: | #js
-    function() {
-      for (const key in this.pageStates) this.pageStates[key] = null;
+    async function() {
+      this.visiblePageNodes = [...this.pageNodes];
+      //this.visiblePageNodes = this.pageNodes.filter(pageNode => (!!this.pageStates[pageNode.id]));
     }
   updatePageClasses: | #js
     function() {
@@ -65,6 +61,7 @@ methods:
   getPageClass: | #js
     function(pageNodeID) {
       const cls = {};
+      cls[this.pageStates[pageNodeID]] = true;
       cls.active = ("entering" == this.pageStates[pageNodeID]);
       return cls;
     }
@@ -88,6 +85,9 @@ style:
   .page:
     position: absolute
     width: 100%
+    opacity: 0
     pointer-events: none
+  .page.active, .page.entering, .page.leaving:
+    opacity: 1
   .page.active:
     pointer-events: auto

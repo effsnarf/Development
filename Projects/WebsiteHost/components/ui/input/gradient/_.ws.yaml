@@ -1,0 +1,117 @@
+dom:
+  div:
+    .categories:
+      .category:
+        v-for: (category, i) in categories
+        :class: getCategoryClass(category, i)
+        .options:
+          .option:
+            v-for: (option, i) in category.options
+            :class: getOptionClass(option.gradient, i)
+            :style: getOptionStyle(option.gradient)
+            @mouseenter: $emit('preview', option.gradient, i)
+            @mouseleave: $emit('preview', null, null)
+            @click: onClick(option.gradient, i)
+
+props:
+  value:
+
+data:
+  categories:
+    - name: linear
+      options:
+      - name: bottom
+        gradient: linear-gradient(to top, {color1}, {color2})
+      - name: left
+        gradient: linear-gradient(to right, {color1}, {color2})
+      - name: top
+        gradient: linear-gradient(to bottom, {color1}, {color2})
+      - name: right
+        gradient: linear-gradient(to left, {color1}, {color2})
+    - name: radial (corner)
+      options:
+      - name: bottom left
+        gradient: radial-gradient(circle at bottom left, {color1}, {color2})
+      - name: top left
+        gradient: radial-gradient(circle at top left, {color1}, {color2})
+      - name: top right
+        gradient: radial-gradient(circle at top right, {color1}, {color2})
+      - name: bottom right
+        gradient: radial-gradient(circle at bottom right, {color1}, {color2})
+    - name: radial (edge)
+      options:
+        - name: center bottom
+          gradient: radial-gradient(circle at center bottom, {color1}, {color2})
+        - name: center left
+          gradient: radial-gradient(circle at center left, {color1}, {color2})
+        - name: center top
+          gradient: radial-gradient(circle at center top, {color1}, {color2})
+        - name: center right
+          gradient: radial-gradient(circle at center right, {color1}, {color2})
+    - name: radial (center)
+      options:
+      - name: center
+        gradient: radial-gradient(circle at center, {color1}, {color2})
+
+methods:
+  onClick: | #js
+    function(gradient, index) {
+      if (gradient == this.value) gradient = null;
+      this.$emit('input', gradient, index);
+    }
+  getCategoryClass: | #js
+    function(category, index) {
+      return {
+        'category-selected': this.categoryContainsGradient(category, this.value)
+      };
+    }
+  getOptionClass: | #js
+    function(gradient, index) {
+      return {
+        selected: (index == this.valueIndex) || (gradient == this.value)
+      };
+    }
+  getOptionStyle: | #js
+    function(gradient) {
+      const color1 = "#808080d0";
+      const color2 = "#80808020";
+      gradient = gradient
+        .replace("{color1}", color1)
+        .replace("{color2}", color2);
+      return {
+        'background': gradient
+      };
+    }
+  categoryContainsGradient: | #js
+    function(category, gradient) {
+      return category.options.some(option => option.gradient == gradient);
+    }
+    
+style:
+  .categories:
+    display: flex
+    flex-direction: row
+    justify-content: center
+  .category-selected:
+    border: 4px solid gray
+  .options:
+    max-height: 5em
+    overflow: hidden
+    display: flex
+    flex-direction: column
+    transition: 1s
+  .options:hover:
+    max-height: 30em
+  .option:
+    width: 5em
+    aspect-ratio: 1
+    opacity: 0.8
+    box-shadow: inset -2px 2px 4px black
+    border: 2px solid gray
+    cursor: pointer
+  .option.selected:
+    box-shadow: 2px -2px 4px black
+  .option:hover:
+    opacity: 1
+  .selected:
+    border: 2px solid white !important

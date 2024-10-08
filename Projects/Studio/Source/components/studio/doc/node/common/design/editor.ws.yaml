@@ -7,8 +7,8 @@ dom:
       v-model: sui.design.selected.tab
       template:
         v-slot: tab0
-        ui.input.color.palette:
-        studio.doc.node.common.background.editor:
+        studio.doc.node.common.design.color.editor:
+          :user-app: userApp
           :node: node
           :initial: initial
           :sui: sui
@@ -22,6 +22,7 @@ dom:
           @input: (fontFamily) => { initial.node.design.font.family = node.design.font.family = fontFamily; }
 
 props:
+  userApp:
   node:
   initial:
   sui:

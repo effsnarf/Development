@@ -82,8 +82,7 @@ body
   display: grid;
 }
 
-body, h1, h2, h3, h4, h5, h6,
-button
+body
 {
   color: white;
   text-shadow: -3px 3px 2px #000000a0;
@@ -144,14 +143,10 @@ li
 }
 .selected
 {
-  border: 2px solid white;
-  box-shadow: inset -2px 2px 4px black;
+  border: 2px solid white !important;
+  box-shadow: inset -4px 4px 4px black !important;
   background: #ffffff30;
-  transition: 0s;
-}
-.selected:hover
-{
-  background: #ffffff40 !important;
+  transition: border 0s, box-shadow 0s, background 0s;
 }
 
 .clickable

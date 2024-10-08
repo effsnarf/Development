@@ -1,0 +1,45 @@
+dom:
+  .example-layout:
+    :style: listStyle
+    .box:
+      v-for: i in boxes
+      :style: boxStyle
+
+props:
+  boxes: 3
+  boxAspect: 1
+  boxWidth: null
+  gridTemplate: null
+  gap: 0.1rem
+
+computed:
+  listStyle: | #js
+    function() {
+      const s = {};
+      if (this.gridTemplate)  {
+        s.display = "grid";
+        s.gridTemplate = this.gridTemplate;
+      }
+      s.gap = this.gap;
+      return s;
+    }
+  boxStyle: | #js
+    function() {
+      const s = {};
+      if (this.boxWidth) {
+        s.width = this.boxWidth;
+        if (this.boxWidth == "1rem") s['border-radius'] = '0.1rem';
+      }
+      s['aspect-ratio'] = this.boxAspect;
+      return s;
+    }
+
+style:
+  .example-layout:
+    display: flex
+    justify-content: center
+  .box:
+    padding: 0.5em
+    border: "1px solid black !important"
+    background: gray
+    width: 3rem

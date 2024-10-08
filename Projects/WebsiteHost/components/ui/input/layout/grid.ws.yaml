@@ -1,0 +1,17 @@
+dom:
+  div:
+    h2:
+      v-text: layoutType
+    div:
+      v-if: (layoutType == 'grid.mosaic')
+      div:
+        ui.input.grid:
+          :value: value
+          @preview: (value) => $emit('preview', value)
+          @input: (value) => $emit('input', value)
+
+
+props:
+  layoutType:
+  value:
+

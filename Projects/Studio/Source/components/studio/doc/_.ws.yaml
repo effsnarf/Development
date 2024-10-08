@@ -1,6 +1,7 @@
 dom:
   studio.doc.node:
     :node: userApp
+    :user-app: userApp
     :user-app-state: userAppState
     :sui: sui
     :class: docCssClass

@@ -1,39 +1,68 @@
 dom:
-  .gap-options:
-    .gap-option:
-      v-for: gap in gaps
-      :class: "{ selected: (gap == value) }"
-      @mouseenter: () => $emit('preview', gap)
-      @mouseleave: () => $emit('preview', null)
-      @click: () => $emit('input', gap)
-      ui.dom.example:
-        :boxes: "2"
-        box-aspect: "2 / 1"
-        :gap: gap
+  div:
+    .flex-x:
+      .flex-y:
+        v-for: x in [0, 1, 2, 3, 4]
+        .gap-option:
+          v-for: y in [0, 1, 2, 3, 4]
+          :class: "{ selected: (value == getGapValue(x, y)) }"
+          @mouseenter: onPreview(getGapValue(x, y))
+          @mouseleave: onPreview(null)
+          @click: onSelect(getGapValue(x, y))
+          ui.dom.example:
+            :boxes: "4"
+            :box-aspect: "1"
+            :box-width: "'1rem'"
+            :grid-template: "'1fr 1fr / 1fr 1fr'"
+            :gap: "getGapValue(x, y)"
+          .dimmed.text-center:
+            v-text: "parseFloat(getGapValue(x, y))"
 
 props:
   value:
 
-computed:
-  gaps: | #js
-    function() {
-      const gaps = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1];
-      return gaps.map(g => `${g}rem`);
+data:
+  clearPreviewTimeout:
+
+methods:
+  onPreview: | #js
+    function(gap) {
+      clearTimeout(this.clearPreviewTimeout);
+      if (gap) return this.$emit("preview", gap);
+      this.clearPreviewTimeout = setTimeout(() => this.$emit("preview", null), 400);
+    }
+  onSelect: | #js
+    function(gap) {
+      clearTimeout(this.clearPreviewTimeout);
+      this.$emit("input", gap);
+    }
+  getGapValue: | #js
+    function(x, y) {
+      return ((x*3+y)/10)+'rem';
     }
 
 style:
-  .gap-options:
+  .flex-x, .flex-y:
     display: flex
+    gap: 1em
+  .flex-x:
+    flex-direction: row
+    align-items: baseline
+  .flex-y:
     flex-direction: column
-    align-items: center
-    padding: 0.5em
-    background: "#80808040"
+    justify-content: space-around
+  .gap-option:not(:nth-child(1)):
+    display: none
+    opacity: 0.5
+  .flex-y:hover .gap-option:not(:nth-child(1)):
+    display: block
   .gap-option:
-    width: 100%
-    padding: 0.2em
+    border: 1px solid gray
+    padding: 0.5em
     opacity: 0.8
     cursor: pointer
     transition: opacity 0
   .gap-option:hover:
+    background: "#80808040"
     opacity: 1
     transition: opacity 0.3

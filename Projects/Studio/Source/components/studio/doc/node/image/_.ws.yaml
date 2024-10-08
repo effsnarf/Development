@@ -28,7 +28,7 @@ computed:
     }
   proxiedImageUrl: | #js
     function() {
-      return `/fetch?url=${this.imageUrl}`;
+      return `/fetch?url=${(this.imageUrl ?? this.emptyImageUrl)}`;
     }
   extension: | #js
     function() {

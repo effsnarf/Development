@@ -88,7 +88,7 @@ style:
   .highlighted:
     font-size: 110%
     padding: 0 0.5em
-    border: 2px dashed yellow !important
+    border: 1px dashed yellow !important
     background: "#22448880"
   .flex1:
     display: flex

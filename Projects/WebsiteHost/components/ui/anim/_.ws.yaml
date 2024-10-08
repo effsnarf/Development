@@ -2,9 +2,10 @@ dom:
   div:
     ui.ticker:
       :interval: duration1
+      :delay: itemIndexStagger
       :count: 2
-      @tick: nextAnimTick
       :enabled: autoPlayLoop
+      @tick: nextAutoPlayTick
     ui.html.style:
       :component: "{ source: { style: animCssStyleObj } }"
     div:
@@ -14,25 +15,29 @@ dom:
 
 props:
   anim:
-  animState: 
-  duration: 1000
+  animState:
+  duration:
   itemIndex: 0
   itemsCount: 1
   autoPlayLoop: false
+  debug:
 
 data:
   animStateFrame: null
   autoPlayAnimState: null
+  default:
+    duration: 1000
+  transition:
+    disabled: false
 
 methods:
   init: | #js
     function() {
     }
-  nextAnimTick: | #js
+  nextAutoPlayTick: | #js
     async function(index) {
       const anim = this.anim;
       if (!anim) return;
-
       this.autoPlayAnimState = this.getNextAnimState(this.autoPlayAnimState);
     }
   getNextAnimState: | #js
@@ -49,8 +54,17 @@ methods:
   setAnimStateFrame: | #js
     async function(animState) {
       this.animStateFrame = animState;
+      // when switching to [entering],
+      // we want to set transition time to 0 for a moment
+      // to jump immediately to the entering position
+      // when we remove [entering]
+      // the animation starts smoothly to the default position
       if (animState == "entering") {
-        requestAnimationFrame(() => { this.animStateFrame = null; });
+        this.transition.disabled = true;
+        requestAnimationFrame(() => {
+          this.transition.disabled = false;
+          this.animStateFrame = null;
+        });
       }
     }
   getAnimCssStyleObj: | #js
@@ -59,34 +73,19 @@ methods:
       const s = {};
 
       s[`.studio-anim-${anim.name}`] = { transition: `${this.duration1}ms` };
-      s[`.page-entering .studio-anim-${anim.name}`] = anim.enter.from;
-      s[`.page-leaving .studio-anim-${anim.name}`] = anim.leave.to;
       const enterSelector = `.studio-anim-${anim.name}.anim-entering`;
       const leaveSelector = `.studio-anim-${anim.name}.anim-leaving`;
       s[enterSelector] = anim.enter.from;
       s[leaveSelector] = anim.leave.to;
-      // when a page transitions, internal animations are triggered
-      s[`.page > .comp-ui-anim > .anim-entering ${enterSelector}`] = anim.enter.from;
-      s[`.page > .comp-ui-anim > .anim-leaving ${leaveSelector}`] = anim.leave.to;
-
-      // list items transition delay
-      // const td = [];
-      // const staggers = Array(this.itemsCount).fill(0).map((_, i) => i * this.stagger).reverse();
-      // // staggers array has [0, stagger, stagger*2, stagger*3, ...]
-      // for (let i = 0; i < this.itemsCount; i++) {
-      //   td.push({
-      //     sel: `.list-items-${this.itemsCount} > *:nth-child(${i+1})`,
-      //     val: { 'transition-delay': `${staggers.pop()}ms` }}
-      //   );
-      // }
-      // for (const t of td) s[t.sel] = t.val;
 
       return s;
     }
   getStyleObj: | #js
     function() {
       const s = {};
-      if (this.itemIndex) s['transition-delay'] = `${this.itemIndex * this.stagger}ms`;
+      if (this.transition.disabled) {
+        s['transition'] = '0s';
+      }
       return s;
     }
 
@@ -109,11 +108,15 @@ computed:
     }
   duration1: | #js
     function() {
-      return (this.duration || 1000);
+      return (this.duration || this.default.duration);
     }
   stagger: | #js
     function() {
       return Math.round(this.duration1 / this.itemsCount);
+    }
+  itemIndexStagger: | #js
+    function() {
+      return ((this.itemIndex ?? 0) * this.stagger);
     }
   animStyle: | #js
     function() {
@@ -134,11 +137,15 @@ watch:
       function(newAnimState) {
         this.setAnimStateFrame(newAnimState);
       }
-  autoPlayLoop: | #js
-    function(apl) {
-      // when stopping auto-play, we set frame 0
-      if (!apl) this.nextAnimTick(0);
-    }
+  autoPlayLoop:
+    immediate: true
+    handler: | #js
+      function(apl) {
+        // when starting auto-play, we start from entering
+        if (apl) this.autoPlayAnimState = "entering";
+        // when stopping auto-play, we set frame 0
+        if (!apl) setTimeout(() => this.nextAutoPlayTick(0), (this.duration1 + 100));
+      }
   autoPlayAnimState:
     immediate: true
     handler: | #js
@@ -147,5 +154,3 @@ watch:
       }
 
 style:
-  .studio-anim:
-    overflow: hidden

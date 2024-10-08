@@ -1,11 +1,13 @@
 dom:
   studio.doc.node:
     :node: pagesNode
+    :user-app: userApp
     :user-app-state: userAppState
     :sui: sui
 
 props:
   node:
+  userApp:
   userAppState:
   sui:
 

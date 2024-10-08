@@ -1,6 +1,6 @@
 dom:
-  .flex:
-    div:
+  .flex.justify-between:
+    .flex-grow-1:
       input:
         type: range
         ':value': tempValue
@@ -28,7 +28,7 @@ methods:
     }
   onValueChange: | #js
     async function(e) {
-      const value = (e.target.value == null) ? null : parseInt(e.target.value);
+      const value = (e.target.value == null) ? null : parseFloat(e.target.value);
       this.tempValue = value;
       if (!this.__onValueChange) this.__onValueChange = this._onValueChange.debounce(100);
       this.__onValueChange(value);

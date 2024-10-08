@@ -1,10 +1,11 @@
 dom:
   style:
     v-if: '!documentHead'
-    ':class': component.name
     v-html: css
 props:
   component: null
+  className: null
+  cssStyleObj: null
   documentHead: false
 data:
   css: null
@@ -22,8 +23,14 @@ mounted: | #js
   }
 methods:
   getCss: | #js
-    function(component) {
-      if (!component?.source?.style) return null;
+    function() {
+      const clsName = (this.className ?? this.component?.name);
+      const style = (this.cssStyleObj ?? this.component?.source?.style);
+      if (!style) return null;
+      const component = {
+        name: clsName,
+        source: { style }
+      };
       const template = this.$root.templates.style;
       let css = Handlebars.compile(template)(component);
       css = this.htmlDecode(css);
@@ -38,9 +45,20 @@ watch:
   component:
     handler: | #js
       function(component) {
-        this.css = this.getCss(component);
+        this.css = this.getCss();
       }
     immediate: true
+  className:
+    handler: | #js
+      function(className) {
+        this.css = this.getCss();
+      }
+    immediate: true
+  cssStyleObj:
+    handler: | #js
+      function(cssStyleObj) {
+        this.css = this.getCss();
+      }
 name: ui-html-style
 _:
   examples:

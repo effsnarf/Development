@@ -1,12 +1,11 @@
 dom:
   div:
     div:
-      .flex:
+      .flex1:
         transition:
           name: slide-hor
           div:
             v-if: (!query)
-            class: large1
             ui.checkbox.list:
               :items: visibleMoods
               :get-item-key: (mood) => mood.name
@@ -1117,7 +1116,11 @@ watch:
       function(newSelectedMoods) {
         this.$emit("selected-moods", newSelectedMoods);
       }
+
 style:
+  .flex1:
+    display: flex
+    gap: 3em
   .large1:
     font-size: 1.4rem
   .large-example:

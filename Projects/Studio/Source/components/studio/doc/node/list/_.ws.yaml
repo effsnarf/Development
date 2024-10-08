@@ -53,14 +53,11 @@ methods:
 computed:
   visibleItems: | #js
     function() {
-      return (this.items?.take(6) || this.getMockArray());
+      return (this.items?.take(6) ?? this.getMockArray());
     }
 
 style:
   .list-item:
-    max-height: 6em
-    overflow: hidden
-    opacity: 0.8
     cursor: pointer
   .list-item:hover:
     background: "#80808030"

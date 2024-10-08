@@ -1,0 +1,54 @@
+dom:
+  div:
+    v-if: (node && initial.node && palette)
+    .flex1:
+      ui.input.color.picker:
+        :colors: palette.colors
+        :value-index: initial.node.design.bg.color.palette.index
+        @preview: onPreviewColor
+        @input: onSelectColor
+      ui.input.gradient:
+        :value: initial.node.design.bg.gradient
+        @preview: onPreviewGradient
+        @input: onSelectGradient
+
+props:
+  userApp:
+  node:
+  initial:
+  sui:
+
+data:
+
+methods:
+  onSelectGradient: | #js
+    function(gradient, index) {
+      this.node.design.bg.gradient = gradient;
+      this.initial.node.design.bg.gradient = gradient;
+    }
+  onPreviewGradient: | #js
+    function(gradient, index) {
+      this.node.design.bg.gradient = (gradient ?? this.initial.node.design.bg.gradient);
+    }
+  onSelectColor: | #js
+    function(color, index) {
+      this.node.design.bg.color.palette.index = index;
+      this.initial.node.design.bg.color.palette.index = index;
+    }
+  onPreviewColor: | #js
+    function(color, index) {
+      debugger;
+      this.node.design.bg.color.palette.index = (index ?? this.initial.node.design.bg.color.palette.index);
+    }
+
+computed:
+  palette: | #js
+    function() {
+      return this.userApp.global.design.palette;
+    }
+
+style:
+  .flex1:
+    display: flex
+    flex-direction: column
+    gap: 3em

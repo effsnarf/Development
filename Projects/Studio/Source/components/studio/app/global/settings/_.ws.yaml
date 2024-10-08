@@ -1,0 +1,17 @@
+dom:
+  div:
+    transition:
+      name: slide
+      component:
+        :is: "'studio-app-global-settings-' + sui.tool.category"
+        :user-app: userApp
+        :user-app-state: userAppState
+        :sui: sui
+        :key: sui.tool.category
+
+props:
+  userApp:
+  userAppState:
+  sui:
+
+data:

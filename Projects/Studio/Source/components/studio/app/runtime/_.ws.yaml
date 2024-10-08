@@ -51,8 +51,10 @@ methods:
 
           pageData[listNode.name] = {};
 
-          for (const varName in listNode.vars) {
-            pageData[listNode.name][varName] = null;
+          if (listNode.vars) {
+            for (const var1 of listNode.vars) {
+              pageData[listNode.name][var1.name] = null;
+            }
           }
 
           // we can't watch the nested properties directly
@@ -90,3 +92,7 @@ methods:
     function(...args) {
       this.$root.$emit('log', 'runtime', null, args);
     }
+
+style:
+  .comp-studio-app-runtime:
+  .comp-studio-app-runtime-vue:
