@@ -16,13 +16,15 @@ data:
     - cssClass: null
       value: center
     - cssClass: null
-      value: between
+      value: space-between
     - cssClass: null
-      value: around
+      value: space-around
+    - cssClass: null
+      value: space-evenly
 mounted: | #js
   function() {
     for (const option of this.options) {
-      option.cssClass = `justify-${option.value}`;
+      option.cssClass = `justify-${option.value.split('-').last()}`;
     }
   }
 _:

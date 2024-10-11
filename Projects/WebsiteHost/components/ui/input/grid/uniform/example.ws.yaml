@@ -1,0 +1,16 @@
+dom:
+  div:
+    ui.dom.grid:
+      :grid: grid
+      :show-example: "true"
+      :show-grid-name: "true"
+
+data:
+  grid:
+    name: grid
+    template:
+      columns: "repeat(3, 1fr)"
+    example:
+      boxes: 12
+      aspect:
+        ratio: 3 / 4

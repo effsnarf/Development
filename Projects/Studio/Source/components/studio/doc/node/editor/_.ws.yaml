@@ -10,6 +10,10 @@ dom:
         v-model: selected.tab.index
         template:
           v-slot: header
+        template:
+          v-slot: footer
+          pre:
+            v-text: node[sui.tool.category]
         template: 
           v-slot: tab0
           div:

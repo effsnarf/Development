@@ -1,0 +1,17 @@
+dom:
+  div:
+    ui.dom.grid:
+      :grid: grid
+      :show-example: "true"
+      :show-grid-name: "true"
+
+data:
+  grid:
+    name: mosaic
+    template:
+      columns: "1fr"
+      rows: "30% 70%"
+      named:
+        areas:
+          - ["header"]
+          - ["content"]

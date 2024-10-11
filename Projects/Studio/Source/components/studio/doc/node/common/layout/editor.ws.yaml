@@ -1,7 +1,10 @@
 dom:
   div:
     ui.input.layout:
-      v-model: node.layout
+      :layout-types: layoutTypes
+      :value: node.layout
+      @preview: onPreview
+      @input: onInput
 
 props:
   node:
@@ -9,16 +12,25 @@ props:
   sui:
 
 data:
-  options:
-    [
-      "flex-start",
-      "flex-end",
-      "center",
-      "space-between",
-      "space-around",
-      "space-evenly",
-      "start",
-      "end",
-      "left",
-      "right",
-    ]
+
+methods:
+  onPreview: | #js
+    function(layout) {
+      this.node.layout = layout;
+      this.$root.$emit("app.node.changed", this.node);
+    }
+  onInput: | #js
+    function(layout) {
+      this.initial.node.layout = this.node.layout = layout;
+      this.$root.$emit("app.node.changed", this.node);
+    }
+
+computed:
+  layoutTypes: | #js
+    function() {
+      switch (this.node.type) {
+        case "panel": return null;
+        case "list": return ["grid.y", "grid.x", "grid.uniform"];
+      }
+      throw `Not implemented`;
+    }

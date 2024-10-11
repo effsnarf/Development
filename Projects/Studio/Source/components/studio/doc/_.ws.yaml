@@ -24,3 +24,5 @@ computed:
     }
 
 style:
+  .selected-node .comp-studio-doc-node:
+    border: 1px dashed gray

@@ -1,0 +1,129 @@
+dom:
+  div:
+    v-if: layout
+    ui.html.style:
+      :css-style-obj: gridCssStyleObj
+    div:
+      v-if: (!showExample)
+      :class: "'grid-' + gridID"
+      slot:
+    div:
+      v-else-if: (showExample)
+      .grid-name:
+        v-if: showGridName
+        v-text: layout.grid?.name
+      div:
+        div:
+          class: grid-opacity-overlay
+        div:
+          :class: "'grid-' + gridID"
+          .box:
+            v-for: (box, index) in getGridBoxes(layout)
+            :class: box.class
+            :data-area: "box.area"
+            :key: "'box-' + index"
+
+props:
+  layout:
+  showExample: false
+  showGridName: true
+
+data:
+
+methods:
+  getGridBoxes: | #js
+    function(layout) {
+      if (!layout) return null;
+      if (["grid.x", "grid.y"].includes(layout.type)) return this.getBoxes(6);
+      const grid = layout.grid;
+      if (!grid) return null;
+      const { areas } = grid.template;
+      const namedAreas = grid.template.named?.areas;
+      if (namedAreas) return namedAreas?.flat();
+      if (grid.example?.boxes) return this.getBoxes(grid.example?.boxes);
+      return [];
+    }
+  getBoxes: | #js
+    function(count) {
+      count = (count ?? 1);
+      return Array.from({ length: count }).map((b, i) => ({ area: `box-${i}` }));
+    }
+
+computed:
+  gridCssStyleObj: | #js
+    function() {
+      if (!this.layout) return null;
+      const layout = this.layout;
+      const s = {};
+      const { columns, rows, areas } = (layout.grid?.template ?? {});
+      const namedAreas = layout.grid?.template?.named?.areas;
+      const exampleGap = "0.2em";
+      const isReversed = ((layout.order == "reversed") ? "-reverse" : "");
+      const gridSelector = `.grid-${this.gridID}`;
+      if (!layout.type) return s;
+
+      if (["grid.x", "grid.y"].includes(layout.type)) {
+        s[gridSelector] = {
+          'display': 'flex',
+          'gap': (layout.gap ?? exampleGap),
+          'flex-direction': (layout.type === "grid.x") ? `row${isReversed}` : `column${isReversed}`,
+          'justify-content': (layout.justify?.content ?? "space-between"),
+        };
+        s[`${gridSelector} > *`] = {
+          'flex-grow': 1
+        };
+      }
+      if (["grid.uniform", "grid.mosaic"].includes(layout.type)) {
+        s[gridSelector] = {
+          'display': 'grid',
+          'gap': (layout.gap ?? exampleGap),
+          'aspect-ratio': ((!this.showExample) ? null : layout.grid?.example?.aspect?.ratio),
+          'grid-template-columns': columns,
+          'grid-template-rows': rows,
+          'grid-template-areas': namedAreas?.map(row => `"${row.join('" "')}"`).join(' '),
+        };
+      }
+
+      if (areas) {
+        for (let i = 0; i < areas.length; i++) {
+          const area = areas[i];
+          s[`${gridSelector}} > :nth-child(${(i + 1)})`] = {
+            'grid-area': area.join(' / ')
+          };
+        }
+      }
+
+      Objects.removeNullValueKeys(s[gridSelector]);
+      return s;
+    }
+  gridID: | #js
+    function() {
+      return this._uid;
+    }
+
+style:
+  .grid:
+    display: grid
+    gap: 0.5em
+  .grid-name:
+    opacity: 0.5
+    text-align: center
+  .grid-opacity-overlay:
+    position: absolute
+    bottom: 0
+    left: 0
+    width: 100%
+    height: 100%
+    border-radius: 0
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 100%)
+    z-index: 10
+    pointer-events: none
+  .box:
+    display: flex
+    justify-content: center
+    align-items: center
+    min-width: 1em
+    min-height: 2em
+    background: gray
+    border-radius: 0.2em
+    

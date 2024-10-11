@@ -1,6 +1,5 @@
 dom:
-  .flex:
-    :style: nodeStyle
+  div:
     slot:
       name: child-nodes
 
@@ -9,14 +8,5 @@ props:
   sui:
 
 methods:
-  getNodeStyle: | #js
-    function(node) {
-      const s = {};
-      return s;
-    }
 
 computed:
-  nodeStyle: | #js
-    function() {
-      return this.getNodeStyle(this.node);
-    }

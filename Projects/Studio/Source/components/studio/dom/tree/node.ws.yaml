@@ -41,9 +41,10 @@ methods:
     }
   onDropItem_new_node: | #js
     function(newNode) {
+      const userApp = this.$root.getUserApp(this);
       delete newNode._;
-      newNode = this.$root.initNewNode(null, newNode);
-      this.node.children.insertAt(0, newNode);
+      newNode = this.$root.initNewNode(userApp, newNode,
+        { childOf: { parent: this.node, insertAt: 0 } });
       this.sui.node.selected = newNode;
     }
   onClickNode: | #js

@@ -35,6 +35,8 @@ dom:
               v-text: option
             slot: 
               ':name': "'tab' + index"
+      slot: 
+        name: footer
 props:
   title:
   options: null

@@ -80,9 +80,13 @@ methods:
       return varPath;
     }
   initNewNode: | #js
-    function(userApp, node) {
+    function(userApp, node, options) {
       const addChildren = (!node.children);
       node = Objects.clone(node, { exclude: ["children"] });
+      if (!("id" in node)) node.id = this.$root.getNewNodeID(userApp);
+      if (options?.childOf) {
+        options.childOf.parent.children.insertAt((options.childOf.insertAt ?? 0), node);
+      }
       if (addChildren) node.children = [];
       node.animation = {
         anim: null,

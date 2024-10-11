@@ -1,0 +1,35 @@
+dom:
+  ui.input.grid:
+    :grids: grids
+    :show-grid-name: "true"
+    :show-opacity-overlay: "true"
+    :value: value
+    @preview: (...args) => $emit('preview', ...args)
+    @input: (...args) => $emit('input', ...args)
+
+props:
+  value:
+  
+data:
+  grids:
+    - name: 2 x …
+      template:
+        columns: "repeat(2, 1fr)"
+      example:
+        boxes: 6
+        aspect:
+          ratio: 2 / 3
+    - name: 3 x …
+      template:
+        columns: "repeat(3, 1fr)"
+      example:
+        boxes: 12
+        aspect:
+          ratio: 3 / 4
+    - name: 4 x …
+      template:
+        columns: "repeat(4, 1fr)"
+      example:
+        boxes: 16
+        aspect:
+          ratio: 4 / 4

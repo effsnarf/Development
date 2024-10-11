@@ -44,7 +44,7 @@ methods:
       // start entering page transition
       //if (oldPage) await (1).seconds().wait();
 
-      this.pageStates[newPage.id] = "entering";
+      if (newPage) this.pageStates[newPage.id] = "entering";
       this.refresh();
     }
   refreshVisiblePageNodes: | #js

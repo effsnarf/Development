@@ -8,6 +8,8 @@ class ClientDatabase {
   //   Cache: ["key", "value"],
   // };
   private constructor(dbName: string, collections: any) {
+    if (!Dexie) return;
+    
     this.db = new Dexie(dbName);
 
     this.db

@@ -26,21 +26,3 @@ methods:
       // #TODO lame
       this.$forceUpdate();
     }
-  fetchFromUrl: | #js
-    async function(url) {
-      const ticker = Ticker.alertify((elapsed) => `<h2>⏳ ${elapsed.unitifyTime()}</h2> ${url}`)
-      try
-      {
-        const text = (await (await fetch(`/fetch?url=${url}`)).text());
-        // #TODO lame
-        try {
-          const obj = JSON.parse(text);
-          return obj;
-        }
-        catch { return text; }
-      }
-      finally
-      {
-        ticker.stop();
-      }
-    }

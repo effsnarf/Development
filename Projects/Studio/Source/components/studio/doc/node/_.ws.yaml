@@ -1,5 +1,6 @@
 dom:
   studio.doc.node.anim:
+    :key: key1
     :node: node
     :item-index: itemIndex
     :items-count: itemsCount
@@ -19,9 +20,10 @@ dom:
       :data-sui-page: nodePageName
       template:
         v-slot: child-nodes
-        ui.dom.grid:
-          :grid: node.layout.grid
+        ui.dom.layout:
+          :layout: node.layout
           :show-example: (!node.children?.length)
+          :show-grid-name: "false"
           studio.doc.node:
             v-for: childNode in node.children
             :node: childNode
@@ -42,9 +44,13 @@ props:
   itemsCount:
   contentNode:
 
+data:
+  key1: 1
+
 mounted: | #js
   function() {
     this.$root.$on("app.state.changed", this.onAppStateChanged.bind(this));
+    this.$root.$on("app.node.changed", this.onAppNodeChanged.bind(this));
     this.$watch("sui.node.selected", this.onSelectedNodeChanged.bind(this));
     this.bindNodeVarsToGlobalAppState();
     this.initNodeVars();
@@ -187,6 +193,11 @@ methods:
   onAppStateChanged: | #js
     function(vars) {
     }
+  onAppNodeChanged: | #js
+    function(node) {
+      if (node?.id != this.node?.id) return;
+      this.refresh();
+    }
   onSelectedNodeChanged: | #js
     function(node) {
       if (node?.id != this.node?.id) return;
@@ -234,8 +245,6 @@ methods:
       if (this.sui.tool.grid.lines) {
         s['transform'] = `translateZ(${(node.depth * 0.2)}em)`;
       }
-      //s['flex'] = 'none';
-      Object.assign(s, this.getFlexStyle(node));
       Objects.removeNullValueKeys(s);
       if (!Object.keys(s).length) return null;
       return s;
@@ -256,31 +265,10 @@ methods:
     }
   toStyleColor: | #js
     function(userApp, color) {
+      if (!color) return null;
       if (color.palette?.index != null) return userApp.global.design.palette.colors[color.palette.index];
       if (color.value) return color.value;
       return null;
-    }
-  getFlexStyle: | #js
-    function(node) {
-      if (!node.flex) return {};
-      const s = {};
-      s.display = "flex";
-      s['gap'] = node.layout?.gap;
-      s['justify-content'] = (node.layout?.justify?.content);
-      s['align-content'] = (node.layout?.align?.content);
-      s['align-items'] = (node.layout?.align?.items);
-      s['flex-direction'] = this.toFlexDirection(node);
-      Objects.removeNullValueKeys(s);
-      return s;
-    }
-  toFlexDirection: | #js
-    function(node) {
-      const defaultValue = "column";
-      const dir = node.layout?.direction;
-      if (!dir) return defaultValue;
-      if (dir.startsWith("h")) return "row";
-      if (dir.startsWith("v")) return "column";
-      return defaultValue;
     }
   areNodesRelated: | #js
     function(node1, node2, tryOpposite = true) {
@@ -293,6 +281,10 @@ methods:
       }
       if (tryOpposite) return this.areNodesRelated(node2, node1, false);
       return false;
+    }
+  refresh: | #js
+    function() {
+      this.key1++;
     }
 
 computed:

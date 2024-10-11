@@ -112,6 +112,7 @@ class Objects {
   }
 
   static removeNullValueKeys(obj: any) {
+    if (!obj) return;
     for (let key in obj) if (obj[key] == null) delete obj[key];
   }
 

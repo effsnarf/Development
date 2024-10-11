@@ -264,9 +264,6 @@ methods:
                 children: [
                   {
                     type: "panel",
-                    flex: {
-                      direction: "v"
-                    },
                     layout: {
                       position: "fixed",
                       top: 0
@@ -339,23 +336,35 @@ methods:
                     },
                     children: [
                       {
-                        type: "ui.input.text.box",
-                        vue: {
-                          props: {
-                            type: "search",
-                            hint: "search",
-                            icon: "🔎",
-                          }
-                        }
+                        type: "panel",
+                        layout: {
+                          type: "grid.x"
+                        },
+                        children: [
+                          {
+                            type: "ui.input.text.box",
+                            vue: {
+                              props: {
+                                type: "search",
+                                hint: "search",
+                                icon: "🔎",
+                              }
+                            }
+                          },
+                          {
+                            type: "ui.button",
+                            vue: {
+                              props: {
+                                icon: "👆",
+                                text: "click me",
+                              }
+                            }
+                          },
+                        ]
                       },
                       {
                         type: "list",
                         name: "boards",
-                        flex: {
-                          justify: {
-                            content: "center"
-                          }
-                        },
                         vars: [
                           {
                             name: "items",
@@ -410,7 +419,7 @@ methods:
                           {
                             name: "text",
                             type: "exp",
-                            exp: "this.home.boards.selected.title",
+                            exp: "this.home.boards.selected?.title",
                           }
                         ]
                       },
@@ -429,7 +438,7 @@ methods:
                           {
                             name: "items",
                             type: "fetch",
-                            url: "`https://a.4cdn.org/${this.home.boards.selected.board}/catalog.json`",
+                            url: "((!this.home.boards.selected) ? null : `https://a.4cdn.org/${this.home.boards.selected.board}/catalog.json`)",
                             linq: [{"type":"select.fields","fields":["threads"],"_id":1},{"type":"flat.map","path":["threads"],"_id":2}]
                           },
                           {
@@ -474,7 +483,7 @@ methods:
                           {
                             name: "text",
                             type: "exp",
-                            exp: "this.board.threads.selected.sub"
+                            exp: "this.board.threads.selected?.sub"
                           }
                         ]
                       },
@@ -494,7 +503,7 @@ methods:
                             {
                               name: "items",
                               type: "fetch",
-                              url: "`https://a.4cdn.org/${this.home.boards.selected.board}/thread/${this.board.threads.selected.no}.json`",
+                              url: "`https://a.4cdn.org/${this.home.boards.selected?.board}/thread/${this.board.threads.selected?.no}.json`",
                               linq: [ { "type": "select.field", "path": [ "posts" ], "_id": 1 } ]
                             }
                           ],
@@ -523,12 +532,6 @@ methods:
                 children: [
                   {
                     type: "panel",
-                    flex: {
-                      direction: "h",
-                      justify: {
-                        content: "space-between"
-                      }
-                    },
                     children: [
                       {
                         type: "panel",
@@ -544,7 +547,7 @@ methods:
                               {
                                 name: "imageUrl",
                                 type: "exp",
-                                exp: "`https://i.4cdn.org/${this.home.boards.selected.board}/${tim}${ext}`"
+                                exp: "((!this.home.boards.selected) ? null : `https://i.4cdn.org/${this.home.boards.selected.board}/${tim}${ext}`)"
                               }
                             ]
                           },
@@ -603,12 +606,6 @@ methods:
                 children: [
                   {
                     type: "panel",
-                    flex: {
-                      direction: "h",
-                      justify: {
-                        content: "flex-start"
-                      }
-                    },
                     children: [
                       {
                         type: "image",
@@ -621,7 +618,7 @@ methods:
                           {
                             name: "imageUrl",
                             type: "exp",
-                            exp: "`https://i.4cdn.org/${this.home.boards.selected.board}/${tim}${ext}`"
+                            exp: "((!this.home.boards.selected) ? null : `https://i.4cdn.org/${this.home.boards.selected?.board}/${tim}${ext}`)"
                           }
                         ]
                       },
@@ -646,12 +643,6 @@ methods:
                 children: [
                   {
                     type: "panel",
-                    flex: {
-                      direction: "h",
-                      justify: {
-                        content: "flex-start"
-                      }
-                    },
                     children: [
                       {
                         type: "image",
@@ -676,7 +667,6 @@ methods:
 
       const initNode = (node) => {
         if (!node.type) return;
-        node.id = this.$root.getNewNodeID(userApp);
         const mockupNode = this.$root.initNewNode(userApp, node);
         const nodeProps = Objects.clone(node, { exclude: ["children"] });
         const merged = Objects.deepMerge(nodeProps, mockupNode);

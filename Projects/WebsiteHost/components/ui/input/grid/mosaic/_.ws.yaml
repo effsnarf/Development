@@ -1,0 +1,50 @@
+dom:
+  ui.input.grid:
+    :grids: grids
+    :show-grid-name: "false"
+    :show-opacity-overlay: "false"
+    :value: value
+    @preview: (...args) => $emit('preview', ...args)
+    @input: (...args) => $emit('input', ...args)
+
+props:
+  value:
+  
+data:
+  grids:
+    - name: header, content
+      template:
+        columns: "1fr"
+        rows: "30% 70%"
+        named:
+          areas:
+            - ["header"]
+            - ["content"]
+    - name: column, content
+      template:
+        columns: "1fr 3fr"
+        rows: "1fr"
+        named:
+          areas:
+            - ["column", "content"]
+    - name: header, content, footer
+      template:
+        columns: "1fr"
+        rows: "20% 1fr 20%"
+        named:
+          areas:
+            - ["header"]
+            - ["content"]
+            - ["footer"]
+    - name: left box, wide rectangles
+      template:
+        columns: "2fr 3fr"
+        rows: "1fr 1fr"
+        areas:
+          - [1, 1, 3, 2]
+          - [1, 2, 2, 3]
+          - [2, 2, 3, 3]
+      example:
+        boxes: 3
+        aspect:
+          ratio: 3 / 1

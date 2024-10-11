@@ -37,7 +37,6 @@ methods:
     }
   onPreviewColor: | #js
     function(color, index) {
-      debugger;
       this.node.design.bg.color.palette.index = (index ?? this.initial.node.design.bg.color.palette.index);
     }
 

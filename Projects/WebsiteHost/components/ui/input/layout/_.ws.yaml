@@ -1,13 +1,18 @@
 dom:
   div:
-    .flex:
+    .layout-type-options:
+      div:
+        v-for: layoutType in shownLayoutTypes
+        :class: "{ selected: (layoutType == initial.layout?.type) }"
+        @mouseenter: previewLayoutType(layoutType)
+        @mouseleave: previewLayoutType(null)
+        @click: selectLayoutType(layoutType)
+        component:
+          :is: "('ui.input.' + layoutType + '.example').kebabize()"
       h2:
-        ui.title:
-          icon: 🧱
-          text: layout
-      h2:
+        v-if: "false"
         ui.tabs:
-          :options: layoutTypes
+          :options: shownLayoutTypes
           direction: horizontal
           :can-select-none: "false"
           v-model: layoutTypeIndex
@@ -18,41 +23,55 @@ dom:
         :can-select-none: "true"
         :drawer: "false"
         v-model: selectedTabIndex
-      div:
-        v-for: (tabOption, i) in tabOptions
-        transition:
+      .flex-grow-1:
+        transition.group:
           name: slide-hor-ver
+          v-for: (tabOption, i) in tabOptions
           div:
-            v-if: (selectedTabIndex == i)
+            v-if: (i == selectedTabIndex)
+            :key: tabOption
             component:
               :is: "('ui.input.layout.'+tabOption).replaceAll('.', '-')"
-              :layout-type: layout.type
+              :layout-type: layout?.type
               :direction: layout.direction
               :value: getComponentValue(tabOption)
               @preview: (value) => onComponentPreview(tabOption, value)
               @input: (value) => onComponentInput(tabOption, value)
 props:
   value: null
+  layoutTypes: null
 data:
   layout:
   tabOptions:
   selectedTabIndex: 0
-  layoutPropNames: ["grid", "direction", "gap", "order", "justify.content", "align.items", "size"]
-  layoutTypes: ["list-y", "list-x", "grid.uniform", "grid.mosaic"]
+  layoutPropNames: ["grid", "gap", "order", "justify.content", "align.items", "size"]
+  allLayoutTypes: ["grid.y", "grid.x", "grid.uniform", "grid.mosaic"]
   layoutTypeIndex: null
   initial:
     layout:
 methods:
+  previewLayoutType: | #js
+    function(layoutType) {
+      this.onComponentPreview("type", layoutType);
+    }
+  selectLayoutType: | #js
+    function(layoutType) {
+      this.onComponentInput("type", layoutType);
+    }
   onComponentPreview: | #js
     function(tabOption, value) {
       if (value) return Objects.setProperty(this.layout, tabOption, value);
       const initialValue = Objects.getProperty(this.initial.layout, tabOption);
       Objects.setProperty(this.layout, tabOption, initialValue);
+      this.$emit("preview", this.layout);
     }
   onComponentInput: | #js
     function(tabOption, value) {
+      if (!this.layout) return;
       Objects.setProperty(this.layout, tabOption, value);
       Objects.setProperty(this.initial.layout, tabOption, value);
+      this.$emit("preview", this.layout);
+      this.$emit("input", this.layout);
     }
   getComponentValue: | #js
     function(tabOption) {
@@ -67,6 +86,14 @@ methods:
       return options;
     }
 computed:
+  shownLayoutTypes: | #js
+    function() {
+      return (this.layoutTypes ?? this.allLayoutTypes);
+    }
+  layoutTypeName: | #js
+    function() {
+      return this.shownLayoutTypes[this.layoutTypeIndex];
+    }
   tabOptionNames: | #js
     function() {
       return this.tabOptions
@@ -78,10 +105,21 @@ computed:
       return window.Objects;
     }
 watch:
-  layoutTypeIndex: | #js
-    function(newIndex) {
-      this.layout.type = this.layoutTypes[newIndex];
-    }
+  layoutTypes:
+    immediate: true
+    handler: | #js
+      async function(newLayoutTypes) {
+        this.layoutTypeIndex = null;
+        if (this.shownLayoutTypes.length == 1) {
+          this.layoutTypeIndex = 0;
+        }
+      }
+  layoutTypeIndex:
+    immediate: true
+    handler: | #js
+      function(newIndex) {
+        this.onComponentInput("type", this.allLayoutTypes[newIndex]);
+      }
   layout:
     handler: | #js
       function(layout) {
@@ -98,6 +136,15 @@ watch:
       }
     immediate: true
     deep: true
+style:
+  .layout-type-options:
+    display: flex
+  .layout-type-options > *:
+    flex: 1
+    padding: 0.5em
+    cursor: pointer
+  .layout-type-options > *:hover:
+    background: "#ffffff40"
 _:
   examples:
     count: 0
