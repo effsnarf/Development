@@ -1,6 +1,5 @@
 dom:
   studio.doc.node.anim:
-    :key: key1
     :node: node
     :item-index: itemIndex
     :items-count: itemsCount
@@ -24,6 +23,7 @@ dom:
           :layout: node.layout
           :show-example: (!node.children?.length)
           :show-grid-name: "false"
+          :key: key1
           studio.doc.node:
             v-for: childNode in node.children
             :node: childNode

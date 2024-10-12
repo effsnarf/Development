@@ -17,7 +17,7 @@ dom:
           class: grid-opacity-overlay
         div:
           :class: "'grid-' + gridID"
-          .box:
+          .box.ui-dom-trans-item:
             v-for: (box, index) in getGridBoxes(layout)
             :class: box.class
             :data-area: "box.area"

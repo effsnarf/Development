@@ -209,8 +209,8 @@ const vueIdeCompMixin = {
       },
       async reloadComponentsFromServer() {
         await client.reloadComponentsFromServer();
-        await this.init();
-        await this.refreshComponents();
+        //await this.init();
+        //await this.refreshComponents();
       },
       async refreshComponents() {
         const self = this as any;

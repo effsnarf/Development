@@ -55,7 +55,7 @@ methods:
   reloadComponentsFromServer: | #js
     async function() {
       await this.$root.reloadComponentsFromServer();
-      vueApp?.refreshComponents();
+      //vueApp?.refreshComponents();
     }
   setupCheatCodeListener: | #js
     function(triggerCode, action) {

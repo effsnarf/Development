@@ -10,6 +10,7 @@ import {
 import { Reflection } from "../../../../Shared/Reflection";
 import { Color } from "../../../../Shared/Color";
 import { Diff } from "../../../../Shared/Diff";
+import { Dom } from "../../../../Shared/Dom";
 import { TaskQueue } from "../../../../Shared/TaskQueue";
 import { Actionable } from "../../../../Shared/Actionable";
 import { AnalyticsTracker } from "../../Classes/AnalyticsTracker";
@@ -39,6 +40,7 @@ window1.TreeObject = TreeObject;
 window1.Reflection = Reflection;
 window1.Color = Color;
 window1.Diff = Diff;
+window1.Dom = Dom;
 window1.TaskQueue = TaskQueue;
 window1.Data = Data;
 window1.Timer = Timer;
@@ -1276,10 +1278,10 @@ interface MgParams {
         const rect = el.getBoundingClientRect();
         const scrollLeft = document.documentElement.scrollLeft;
         const scrollTop = document.documentElement.scrollTop;
-        const top = rect.top + scrollTop;
-        const left = rect.left + scrollLeft;
-        const width = rect.width;
-        const height = rect.height;
+        const top = Math.round(rect.top + scrollTop);
+        const left = Math.round(rect.left + scrollLeft);
+        const width = Math.round(rect.width);
+        const height = Math.round(rect.height);
         return { top, left, width, height };
       },
     },

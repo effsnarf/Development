@@ -26,6 +26,7 @@
   },
   created: {{{addCode created ""}}},
   mounted: {{{addCode mounted ""}}},
+  beforeUnmount: {{{addCode beforeUnmount ""}}},
   unmounted: {{{addCode unmounted ""}}},
   methods: {
     {{#each methods}}
@@ -37,6 +38,9 @@
     {{#if get}}
     {{@key}}: {
       get: {{{addCode get ""}}},
+      {{#if set}}
+      set: {{{addCode set "" @key ""}}},
+      {{/if}}
     },
     {{else}}
     {{@key}}: {{{addCode this "" @key ""}}},

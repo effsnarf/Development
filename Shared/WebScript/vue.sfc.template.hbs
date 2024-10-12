@@ -40,6 +40,9 @@ export default {
   {{#if mounted}}
   mounted: {{{addCode mounted ""}}},
   {{/if}}
+  {{#if beforeUnmount}}
+  beforeUnmount: {{{addCode beforeUnmount ""}}},
+  {{/if}}
   {{#if unmounted}}
   unmounted: {{{addCode unmounted ""}}},
   {{/if}}
@@ -65,6 +68,9 @@ export default {
     },
     {{else}}
     {{@key}}: {{{addCode this "" @key ""}}},
+    {{/if}}
+    {{#if set}}
+    {{@key}}: {{{addCode set "" @key ""}}},
     {{/if}}
     {{/each}}
   },
