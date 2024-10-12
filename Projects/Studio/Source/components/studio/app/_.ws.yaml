@@ -343,6 +343,7 @@ methods:
                         children: [
                           {
                             type: "ui.input.text.box",
+                            name: "query",
                             vue: {
                               props: {
                                 type: "search",
@@ -353,18 +354,42 @@ methods:
                             vars: [
                               {
                                 name: "text",
-                                type: "v-model",
+                                type: "node.prop",
+                                value: "hello",
+                                vModel: true
                               }
                             ]
                           },
                           {
                             type: "ui.button",
+                            name: "button1",
+                            events: [
+                              {
+                                name: "click",
+                                handler: {
+                                  args: [],
+                                  code: `$node.clickCount = ($node.clickCount??0) + 1; \n alertify.message(\`clicked (\${$node.clickCount})\`);`,
+                                },
+                              }
+                            ],
                             vue: {
                               props: {
                                 icon: "👆",
-                                text: "click me",
+                                //text: "click me",
                               }
-                            }
+                            },
+                            vars: [
+                              {
+                                name: "text",
+                                type: "exp",
+                                exp: "`click me (${$node.clickCount})`",
+                              },
+                              {
+                                name: "clickCount",
+                                type: "value",
+                                value: 0
+                              }
+                            ]
                           },
                         ]
                       },
@@ -380,11 +405,13 @@ methods:
                           },
                           {
                             name: "hovered",
-                            type: "node.prop"
+                            type: "node.prop",
+                            editable: false
                           },
                           {
                             name: "selected",
                             type: "node.prop",
+                            editable: false
                           }
                         ],
                         children: [
@@ -425,7 +452,7 @@ methods:
                           {
                             name: "text",
                             type: "exp",
-                            exp: "this.home.boards.selected?.title",
+                            exp: "$app.home.boards.selected?.title",
                           }
                         ]
                       },
@@ -444,16 +471,18 @@ methods:
                           {
                             name: "items",
                             type: "fetch",
-                            url: "((!this.home.boards.selected) ? null : `https://a.4cdn.org/${this.home.boards.selected.board}/catalog.json`)",
+                            url: "((!$app.home.boards.selected) ? null : `https://a.4cdn.org/${$app.home.boards.selected.board}/catalog.json`)",
                             linq: [{"type":"select.fields","fields":["threads"],"_id":1},{"type":"flat.map","path":["threads"],"_id":2}]
                           },
                           {
                             name: "hovered",
-                            type: "value",
+                            type: "node.prop",
+                            editable: false
                           },
                           {
                             name: "selected",
-                            type: "value",
+                            type: "node.prop",
+                            editable: false
                           }
                         ],
                         children: [
@@ -489,7 +518,7 @@ methods:
                           {
                             name: "text",
                             type: "exp",
-                            exp: "this.board.threads.selected?.sub"
+                            exp: "$app.board.threads.selected?.sub"
                           }
                         ]
                       },
@@ -509,7 +538,7 @@ methods:
                             {
                               name: "items",
                               type: "fetch",
-                              url: "`https://a.4cdn.org/${this.home.boards.selected?.board}/thread/${this.board.threads.selected?.no}.json`",
+                              url: "`https://a.4cdn.org/${$app.home.boards.selected?.board}/thread/${$page.threads.selected?.no}.json`",
                               linq: [ { "type": "select.field", "path": [ "posts" ], "_id": 1 } ]
                             }
                           ],
@@ -538,14 +567,18 @@ methods:
                 children: [
                   {
                     type: "panel",
+                    layout: {
+                      type: "grid.uniform",
+                      grid: {
+                        name: "3 x …",
+                        template: {
+                          columns: "repeat(3, 1fr)"
+                        },
+                      },
+                    },
                     children: [
                       {
                         type: "panel",
-                        layout: {
-                          size: {
-                            width: "20%"
-                          }
-                        },
                         children: [
                           {
                             type: "image",
@@ -553,7 +586,7 @@ methods:
                               {
                                 name: "imageUrl",
                                 type: "exp",
-                                exp: "((!this.home.boards.selected) ? null : `https://i.4cdn.org/${this.home.boards.selected.board}/${tim}${ext}`)"
+                                exp: "((!$app.home.boards.selected) ? null : `https://i.4cdn.org/${$app.home.boards.selected.board}/${tim}${ext}`)"
                               }
                             ]
                           },
@@ -624,7 +657,7 @@ methods:
                           {
                             name: "imageUrl",
                             type: "exp",
-                            exp: "((!this.home.boards.selected) ? null : `https://i.4cdn.org/${this.home.boards.selected?.board}/${tim}${ext}`)"
+                            exp: "((!$app.home.boards.selected) ? null : `https://i.4cdn.org/${$app.home.boards.selected?.board}/${tim}${ext}`)"
                           }
                         ]
                       },
@@ -774,6 +807,8 @@ style:
     box-shadow: "-0.5em 0.5em 2px #00000080"
     padding: 1em
   .main-box.a:
+    width: 2%
+  .main-box.b:
     width: 10%
   .main-boxes.box-hovered-3 .main-box.d:
     width: 46%

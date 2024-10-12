@@ -1,0 +1,15 @@
+dom:
+  div:
+    ui.checkbox:
+      icon: "🔗"
+      text: "v-model"
+      v-model: nodeVar.vModel
+
+props:
+  nodeVar:
+
+data:
+
+methods:
+
+watch:

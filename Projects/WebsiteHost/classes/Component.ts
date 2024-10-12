@@ -1,9 +1,17 @@
 import { ClientContext } from "./ClientContext";
 
 (String.prototype as any).kebabize = function () {
+  return this.ize('-');
+};
+
+(String.prototype as any).underscorize = function () {
+  return this.ize('_');
+};
+
+(String.prototype as any).ize = function (c: string) {
   let s = this.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
-  s = s.replace(/[^a-z0-9-]/g, "-");
-  s = s.replace(/--+/g, "-");
+  s = s.replace(/[^a-z0-9-]/g, c);
+  s = s.replace(/--+/g, c);
   return s;
 };
 

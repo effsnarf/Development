@@ -1,5 +1,6 @@
 dom:
   .state-item:
+    :key: key1
     ui.dnd.draggable:
       :drag-item: "{ type: 'app.state.path', item: item.path }"
       .flex1:
@@ -11,6 +12,7 @@ dom:
           v-text: item.name
         .preview:
           ui.value.preview:
+            v-if: (item.value != undefined)
             :value: item.value
     .value-props:
       v-if: (Objects.is(item.value, Object))
@@ -35,7 +37,7 @@ data:
   isHighlighted: 0
   highlightDuration: 3000
   highlightTimer: null
-  key1:
+  key1: 1
 
 mounted: | #js
   function() {
@@ -43,16 +45,13 @@ mounted: | #js
   }
 
 methods:
-  refresh: | #js
-    function() {
-    }
   onAppStateChanged: | #js
     function(vars) {
       const var1 = vars.find(v => Objects.areEqual(this.item.path, v.varPath));
-      if (var1) {
-        this.item.value = var1.newValue;
-        this.flashHighlight();
-      }
+      if (!var1) return;
+      this.item.value = var1.newValue;
+      this.refresh();
+      this.flashHighlight();
     }
   flashHighlight: | #js
     function(value = true) {
@@ -60,6 +59,10 @@ methods:
       clearTimeout(this.highlightTimer);
       if (!value) return;
       this.highlightTimer = setTimeout(() => { this.flashHighlight(false) }, this.highlightDuration);
+    }
+  refresh: | #js
+    function() {
+      this.key1++;
     }
 
 computed:

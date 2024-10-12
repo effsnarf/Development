@@ -1,5 +1,6 @@
 dom:
   component:
+    ref: comp1
     v-if: node
     :is: node.type.kebabize()
     :node: node
@@ -15,3 +16,23 @@ props:
   sui:
   dataItem:
   contentNode:
+
+mounted: | #js
+  function() {
+    const self = this;
+    const comp1 = this.$refs.comp1;
+    const comp1_emit = comp1.$emit.bind(comp1);
+    comp1.$emit = (function(...args) {
+      comp1_emit(...args);
+      self.onCompEvent(...args);
+    }).bind(comp1);
+  }
+
+methods:
+  onCompEvent: | #js
+    async function(eventName, ...args) {
+      const nodeEvent = this.node.events?.find(e => e.name == eventName);
+      if (!nodeEvent) return;
+      const func = this.$root.toContextFunc(this, nodeEvent.handler);
+      await func(...args);
+    }

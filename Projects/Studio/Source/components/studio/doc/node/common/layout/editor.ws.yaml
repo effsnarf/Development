@@ -32,5 +32,5 @@ computed:
         case "panel": return null;
         case "list": return ["grid.y", "grid.x", "grid.uniform"];
       }
-      throw `Not implemented`;
+      throw `${this.node.type} layout types not implemented`;
     }

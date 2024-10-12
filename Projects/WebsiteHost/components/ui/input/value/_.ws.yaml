@@ -1,0 +1,56 @@
+dom:
+  div:
+    ui.input.text.box:
+      :hint: "'JSON or YAML or simple values (string, number, etc)'"
+      :multiline: "true"
+      v-model: valueStr
+    ui.value:
+      :value: valueObj
+
+props:
+  value:
+
+data:
+  valueStr: null
+  valueObj: null
+
+methods:
+  strToObj: | #js
+    function(str) {
+      if (!str) return null;
+      // try JSON.parse, jsyaml.load, and return value if failed
+      try {
+        return JSON.parse(str);
+      } catch (e) {
+        try {
+          return jsyaml.load(str);
+        } catch (e) {
+          return str;
+        }
+      }
+    }
+  objToStr: | #js
+    function(obj) {
+      if (!obj) return obj;
+      return jsyaml.dump(obj);
+    }
+
+watch:
+  value:
+    immediate: true
+    handler: | #js
+      function(value) {
+        if (this.valueObj) return;
+        this.valueObj = value;
+        this.valueStr = this.objToStr(value);
+      }
+  valueStr:
+    handler: | #js
+      function(valueStr) {
+        this.valueObj = this.strToObj(valueStr);
+      }
+  valueObj:
+    handler: | #js
+      function(valueObj) {
+        this.$emit('input', valueObj);
+      }

@@ -16,39 +16,6 @@ mounted: | #js
   }
 
 methods:
-  getBoundData: | #js
-    function(userAppState, node, dataItem, defaultValue) {
-      if (!userAppState) return null;
-      const ds = node?.data?.source;
-      if (!ds) return defaultValue;
-      if (["exp", "field"].includes(ds.type))
-      {
-        if ((dataItem) && (ds.exp in dataItem)) {
-          return dataItem[ds.exp];
-        }
-
-        let localVars = [];
-        //for (const key in userAppState) localVars.push({ name: key, value: userAppState[key] });
-        for (const key in dataItem) localVars.push({ name: key, value: dataItem[key] });
-        localVars = localVars.sortBy(v => v.name);
-        const argNames = localVars.map(v => v.name);
-        const argValues = localVars.map(v => v.value);
-
-        try
-        {
-          const func = eval(`(function(${argNames.join(', ')}) {
-            return ${ds.exp};
-          })`);
-          return func.apply(userAppState, argValues);
-        }
-        catch (ex) {
-          // #TODO show warning to user
-          console.warn(ex);
-          return defaultValue;
-        }
-      }
-      throw `Unknown data source`;
-    }
   getNodeIcon: | #js
     function(node) {
       const icons = {
@@ -113,7 +80,11 @@ methods:
           content: null
         };
       }
-      node.layout = layout;
+      
+      node.layout = (node.layout ?? {});
+      const mergedLayout = Objects.deepMerge(layout, node.layout);
+      Object.assign(node.layout, mergedLayout);
+
       node.design = {
         font: {
           family: null,
@@ -243,6 +214,11 @@ methods:
       const folderNodes = this.getNodesByType(type);
       return folderNodes.find(cls => (cls.name == inst.name));
     }
+  getPageName: | #js
+    function(vue) {
+      while ((vue) && (vue.node?.type != "page")) vue = vue.$parent;
+      return vue?.node?.name;
+    }
   getPageNames: | #js
     function() {
       const pageNodes = this.getNodesByType("page");
@@ -309,4 +285,32 @@ methods:
     function(vue) {
       while ((vue) && (vue.$options._componentTag != "studio-app-runtime-vue")) vue = vue.$parent;
       return vue;
+    }
+  toContextFunc: | #js
+    function(vue, funcDef, options) {
+      const isAsync = (options?.async ?? true);
+      // accepts:
+      // { args: ['a', 'b'], code: 'return a + b' }
+      // returns a function
+      // defaults to async function
+      if (!funcDef) return null;
+      const argNames = [...(funcDef.args || []), '$app', '$page', '$node'];
+      const code = funcDef.code || '';
+      const funcStr = `${(isAsync ? "async" : "")} function(${argNames.join(', ')}) { ${code} }`;
+      const func = eval(`(${funcStr})`);
+      // this.$node.clickCount
+      // this.$page.button1, this.$page.boards, etc (data from this page)
+      // this.$app.home, this.$app.boards, etc (access other pages)
+      const pageName = this.$root.getPageName(vue);
+      const nodeVarPath = (vue.nodeVarPath ?? this.$root.getNodeVarPath(vue.node));
+      const userAppState = vue.userAppState;
+      const nodeData = (!nodeVarPath) ? null : Objects.getProperty(userAppState, nodeVarPath);
+      const $app = userAppState;
+      const $page = userAppState[pageName];
+      const $node = nodeData;
+      const context = { $app, $page, $node };
+      return function(...args) {
+        args.push(...Object.values(context));
+        return func.apply(vue, args);
+      }
     }

@@ -55,6 +55,11 @@ dom:
               :node: node
               :initial: initial
               :sui: sui
+        template:
+          v-slot: tab5
+          div:
+            studio.doc.node.common.events.editor:
+              :node: node
       div:
         v-if: "false"
         pre:
@@ -101,7 +106,7 @@ methods:
 computed:
   toolCategoryOptions: | #js
     function() {
-      return [this.nodeTypeTabName, '🧊 data', '🧱 layout', '🎨 design', '✨ animation'];
+      return [this.nodeTypeTabName, '🧊 data', '🧱 layout', '🎨 design', '✨ animation', '⚡ events'];
     }
   nodeTypeTabName: | #js
     function() {

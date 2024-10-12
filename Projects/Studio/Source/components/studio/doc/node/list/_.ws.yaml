@@ -1,6 +1,8 @@
 dom:
-  div:
-    v-if: visibleItems.length
+  ui.dom.layout:
+    :layout: node.layout
+    :show-example: (!node.children?.length)
+    :show-grid-name: "false"
     .list-item:
       v-for: (item, i) in visibleItems
       :key: getListItemKey(item)

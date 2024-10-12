@@ -1,35 +1,63 @@
 dom:
   div:
-    v-if: node?.vars
     div:
-      v-for: var1 in editableNodeVars
       h2:
-        v-text: "'🧊 ' + var1.name"
-      ui.tabs:
-        :options: tabOptions
-        direction: vertical
-        :show-title-in-tab: "true"
-        :value: getInitialSelectedTab(var1)
-        template:
-          v-slot: tab0
-          studio.doc.node.common.data.editor.field:
-            :node-var: var1
-            :initial: initial
-            :sui: sui
-        template:
-          v-slot: tab1
-          h2:
-            ui.input.text.box:
-              hint: expression
-              v-model: var1.exp
-        template:
-          v-slot: tab2
-          studio.doc.node.common.data.editor.url:
-            :node-var: var1
-      div:
-        pre:
-          v-if: "false"
-          v-text: node
+        ui.input.text.box:
+          icon: 📦🧊
+          camouflage: true
+          v-model: node.name
+    div:
+      v-if: node?.vars
+      .flex:
+        ui.select:
+          :options: visibleNodeVars
+          :get-item-icon: (v) => '🧊'
+          :get-item-text: (v) => v.name
+          v-model: selectedNodeVarIndex
+        .flex-grow-1:
+          div:
+            v-for: (var1, i) in visibleNodeVars
+            transition:
+              name: slide-hor
+              div:
+                v-if: (i == selectedNodeVarIndex)
+                h3:
+                  ui.input.text.box:
+                    icon: 🧊
+                    camouflage: true
+                    v-model: var1.name
+                ui.tabs:
+                  :options: tabOptions
+                  direction: vertical
+                  :drawer: "true"
+                  :show-title-in-tab: "true"
+                  :value: getInitialSelectedTab(var1)
+                  @input: (newTab) => onTabChange(var1, newTab)
+                  template:
+                    v-slot: tab0
+                    studio.doc.node.common.data.editor.field:
+                      :node-var: var1
+                      :initial: initial
+                      :sui: sui
+                  template:
+                    v-slot: tab1
+                    ui.input.text.box:
+                      hint: expression
+                      :multiline: "true"
+                      :auto-resize: "true"
+                      v-model: var1.exp
+                  template:
+                    v-slot: tab2
+                    studio.doc.node.common.data.editor.url:
+                      :node-var: var1
+                  template:
+                    v-slot: tab3
+                    studio.doc.node.common.data.editor.node.prop:
+                      :node-var: var1
+                  template:
+                    v-slot: tab4
+                    studio.doc.node.common.data.editor.value:
+                      :node-var: var1
 
 props:
   node:
@@ -39,7 +67,8 @@ props:
   sui:
 
 data:
-  tabOptions: ['🍃 field', '🟰 exp', '🌐 fetch']
+  tabOptions: ['🍃 field', '🟰 exp', '🌐 fetch', '🔗 node.prop', '🧊 value']
+  selectedNodeVarIndex: 0
 
 mounted: | #js
   function() {
@@ -49,13 +78,17 @@ methods:
   getInitialSelectedTab: | #js
     function(var1) {
       if (!var1) return null;
-      const types = var1.type?.split('.');
-      if (!types?.length) return null;
-      return this.tabOptions.findIndex(t => (types.includes(t.split(' ').last())));
+      return this.tabOptions.findIndex(t => (var1.type == (t.split(' ').last())));
+    }
+  onTabChange: | #js
+    function(var1, newTab) {
+      if (!var1) return;
+      var1.type = this.tabOptions[newTab].split(' ').last();
     }
 
 computed:
-  editableNodeVars: | #js
+  visibleNodeVars: | #js
     function() {
-      return this.node?.vars?.filter(v => (v.type != "node.prop"));
+      return (this.node?.vars ?? [])
+        .filter(v => (v.editable ?? true));
     }

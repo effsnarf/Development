@@ -52,36 +52,16 @@ mounted: | #js
     this.$root.$on("app.state.changed", this.onAppStateChanged.bind(this));
     this.$root.$on("app.node.changed", this.onAppNodeChanged.bind(this));
     this.$watch("sui.node.selected", this.onSelectedNodeChanged.bind(this));
-    this.bindNodeVarsToGlobalAppState();
     this.initNodeVars();
   }
 
 methods:
-  bindNodeVarsToGlobalAppState: | #js
-    function() {
-      const runtimeVue = this.$root.getUserAppRuntimeVue(this);
-      if (!runtimeVue) return;
-      const comp1 = this.$refs.comp1;
-      if (!this.nodeVarPath) return;
-      const dataKeys = Object.keys(comp1.$data).except("_");
-      if (!dataKeys.length) return;
-      for (const key of dataKeys) {
-        const varPath = `${this.nodeVarPath}.${key}`;
-        comp1._studio_watches = (comp1._studio_watches || {});
-        if (!comp1._studio_watches[key]) {
-          // comp -> global state
-          comp1.$watch(key, (newValue) => { this.$root.studio.user.comp.state.change(this.$root, comp1, key, varPath, newValue); });
-          // global state -> comp
-          runtimeVue.$watch(varPath, (newValue) => { comp1[key] = newValue; }, { immediate: true });
-          comp1._studio_watches[key] = true;
-        }
-      }
-    }
   initNodeVars: | #js
     function() {
       const runtimeVue = this.$root.getUserAppRuntimeVue(this);
       if (!runtimeVue) return;
-      const comp1 = this.$refs.comp1;
+      let comp1 = this.$refs.comp1;
+      if (comp1.$options._componentTag == "studio-doc-node-vue-comp") comp1 = comp1.$children[0];
       const vars = this.node.vars;
       if (!vars) return;
       for (const var1 of vars)
@@ -92,7 +72,7 @@ methods:
   createNodeVar: | #js
     function(vComp, var1) {
       if (!var1?.type) return;
-      const method = this[`createNodeVar_${var1.type}`];
+      const method = this[`createNodeVar.${var1.type}`.replaceAll('.', '_')];
       if (!method) throw `Unknown node var type ${var1.type}`;
       return method(vComp, var1);
     }
@@ -102,18 +82,15 @@ methods:
       const runtimeVue = $root.getUserAppRuntimeVue(this);
       const pageNode = this.$root.getNodePage(this);
       const sui = this.sui;
+      this.bindNodeVarToGlobalAppState(vComp, var1);
+
       // a fetch var has:
       // - url (computed, can reference other state nodes)
       // - _data (holds the downloaded data)
       // - linq (optional to project the data)
       // - data (the projected downloaded data)
       const url = Vue.computed({
-        get: eval(`(function() {
-          try {
-            return ${var1.url};
-          }
-          catch (ex) {}
-        })`).bind(this.userAppState)
+        get: this.$root.toContextFunc(this, { args: ["vue"], code: `try { return ${var1.url}; } catch (ex) {}` }, { async: false })
       });
 
       const _data = Vue.reactive({ value: null });
@@ -161,15 +138,11 @@ methods:
     function(vComp, var1) {
       const $root = this.$root;
       const runtimeVue = $root.getUserAppRuntimeVue(this);
+      this.bindNodeVarToGlobalAppState(vComp, var1);
       // an exp node var has:
       // - value (evaluated)
       const exp = Vue.computed({
-        get: eval(`(function() {
-          try {
-            return ${var1.exp};
-          }
-          catch (ex) {}
-        })`).bind(this.userAppState)
+        get: this.$root.toContextFunc(this, { args: ["vue"], code: `try { return ${var1.exp}; } catch (ex) {}` }, { async: false })
       });
 
       const exp_watcher = Vue.watch(exp,
@@ -180,15 +153,63 @@ methods:
 
       return { exp };
     }
+  createNodeVar_node_prop: | #js
+    function(vComp, var1) {
+      const $root = this.$root;
+      const runtimeVue = $root.getUserAppRuntimeVue(this);
+      this.bindNodeVarToGlobalAppState(vComp, var1);
+      // a node prop node var is used to connect to custom vue components
+      // it cannot be configued by the user like a [fetch] or [field] var
+      // it is used to pass data from the node to the vue component and vice versa
+      // example: [selected], [hovered]
+
+      // may be initialized from the node
+      vComp[var1.name] = var1.value;
+
+      return { value: var1.value };
+    }
   createNodeVar_value: | #js
     function(vComp, var1) {
       const $root = this.$root;
       const runtimeVue = $root.getUserAppRuntimeVue(this);
-      // a value node var has:
-      // - value (taken from value)
+      this.bindNodeVarToGlobalAppState(vComp, var1);
+
+      // simple value node var
+      // for example to set a color or a text
       vComp[var1.name] = var1.value;
 
       return { value: var1.value };
+    }
+  bindNodeVarToGlobalAppState: | #js
+    function(vComp, var1) {
+      // we make sure that changes in the vue component's data property
+      // are reflected in the node var app state and vice versa
+      const runtimeVue = this.$root.getUserAppRuntimeVue(this);
+      if (!runtimeVue) return;
+      const varPath = `${this.nodeVarPath}.${var1.name}`;
+      // a special case is [v-model] which binds to :value and @input
+      if (var1.vModel) {
+        vComp.$on("input", (function(newValue) {
+          // comp -> global state
+          this.$root.studio.user.comp.state.change(this.$root, vComp, var1.name, varPath, newValue);
+        }));
+        // global state -> comp
+        runtimeVue.$watch(varPath, (newValue) => {
+          this.node.vue.props[var1.name] = var1.value;
+        }, { immediate: true });
+      }
+      else {
+        // comp -> global state
+        //if (var1.name == "clickCount") debugger;
+        vComp.$watch(var1.name, (newValue) => {
+          this.$root.studio.user.comp.state.change(this.$root, vComp, var1.name, varPath, newValue);
+        });
+        // global state -> comp
+        runtimeVue.$watch(varPath, (newValue) => {
+          vComp[var1.name] = newValue;
+          },
+          { immediate: true });
+      }
     }
   onAppStateChanged: | #js
     function(vars) {
@@ -232,11 +253,11 @@ methods:
       s['line-height'] = node.design?.line?.height;
 
       if (this.sui.node.hovered?.id == node.id) {
-        s['border'] = `4px dashed #ffff00 !important`;
+        s['border'] = `2px dashed #ffff00 !important`;
       }
       if (!this.sui.app.is.tilted) {
         if (this.sui.node.selected?.id == node.id) {
-          s['border'] = `4px dashed #ffff00 !important`;
+          s['border'] = `2px dashed #ffff00 !important`;
         }
         if (this.sui.node.active?.id == node.id) {
           s['box-shadow'] = `-2px 2px 2px black !important`;

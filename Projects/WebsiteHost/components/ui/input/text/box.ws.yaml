@@ -8,7 +8,7 @@ dom:
     input:
       ref: input1
       ':class': '{ hasIcon: icon }'
-      ':style': textBoxStyle
+      ':style': textBoxStyle1
       ':type': type
       ':placeholder': hint
       ':value': value
@@ -83,6 +83,15 @@ methods:
       }
       return false;
     }
+computed:
+  textBoxStyle1: | #js
+    function() {
+      const style = Objects.clone(this.textBoxStyle ?? {});
+      if (this.icon) {
+        style.paddingLeft = `${(1 + (this.icon.length / 2))}em !important`;
+      }
+      return style;
+    }
 watch:
   value:
     handler: | #js
@@ -101,12 +110,11 @@ style:
     background: no-repeat
     box-shadow: none
     opacity: 0.5
-  input.hasIcon:
-    padding-left: 2em !important
   .icon:
     position: absolute
     margin: 0.25em
     width: fit-content
+    z-index: 10
 _:
   examples:
     count: 0

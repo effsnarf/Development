@@ -43,27 +43,18 @@ methods:
       for (const pageNode of this.$root.getPageNodes()) {
         const pageData = {};
         // lists
-        for (const listNode of this.$root.findDescNodes(pageNode, ((n) => n.vars?.length)))
+        for (const node of this.$root.findDescNodes(pageNode, ((n) => n.vars?.length)))
         {
-          const ds = listNode.data?.source;
-          const listVarPath = `${pageNode.name}.${listNode.name}`;
+          const ds = node.data?.source;
+          const listVarPath = `${pageNode.name}.${node.name}`;
           const listVarName = listVarPath.replaceAll('.', '_');
 
-          pageData[listNode.name] = {};
+          pageData[node.name] = {};
 
-          if (listNode.vars) {
-            for (const var1 of listNode.vars) {
-              pageData[listNode.name][var1.name] = null;
+          if (node.vars) {
+            for (const var1 of node.vars) {
+              pageData[node.name][var1.name] = null;
             }
-          }
-
-          // we can't watch the nested properties directly
-          // so we reference the nesteds by a computed
-          // and watch that
-          for (const key in pageData[listNode.name]) {
-            computeds[`cdw_${listVarName}_${key}`] = {
-              get: eval(`(function() { return this.${listVarPath}.${key}; })`)
-            };
           }
         }
         data[pageNode.name] = pageData;

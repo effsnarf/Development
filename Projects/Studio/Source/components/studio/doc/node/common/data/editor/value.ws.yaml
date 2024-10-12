@@ -1,0 +1,32 @@
+dom:
+  div:
+    ui.input.value:
+      v-model: nodeVar.value
+
+props:
+  node:
+  nodeVar:
+  initial:
+  sui:
+
+data:
+
+methods:
+  getDataItemFields: | #js
+    function() {
+      return this.sui.selected.dataItems
+        .take(10)
+        .flatMap(d => Object.keys(d))
+        .distinct()
+        .sortBy(s => s);
+    }
+
+computed:
+  dataItemFields: | #js
+    function() {
+      return this.getDataItemFields();
+    }
+
+style:
+  td:nth-child(1):
+    width: 2em

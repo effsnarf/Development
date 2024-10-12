@@ -1,0 +1,22 @@
+dom:
+  div:
+    div:
+      div:
+        v-for: event in node.events
+        h2:
+          ui.input.text.box:
+            v-if: "false"
+            icon: "⚡"
+            camouflage: true
+            v-model: event.name
+          .flex:
+            div:
+              v-text: "'⚡'"
+            div:
+              v-text: event.name
+        ui.func.editor:
+          :func: event.handler
+          :args-editable: "false"
+
+props:
+  node:

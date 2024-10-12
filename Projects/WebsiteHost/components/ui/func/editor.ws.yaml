@@ -1,0 +1,23 @@
+dom:
+  div:
+    .flex:
+      h2:
+        v-text: "'🔴'"
+      .flex-grow-1:
+        h2:
+          ui.input.text.box:
+            v-if: ('name' in func)
+            hint: name
+        h3:
+          v-if: argsEditable
+          ui.input.text.box:
+            hint: arg1, arg2…
+        ui.input.text.box:
+          hint: const result = await fetch('…
+          multiline: true
+          :auto-resize: "true"
+          v-model: func.code
+
+props:
+  func:
+  argsEditable: true
