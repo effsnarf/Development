@@ -18,7 +18,7 @@ dom:
           div:
             v-for: (var1, i) in visibleNodeVars
             transition:
-              name: slide-hor
+              name: slide-ver
               div:
                 v-if: (i == selectedNodeVarIndex)
                 h3:

@@ -157,6 +157,27 @@
 
 
 
+.slide-ver-enter-active,
+.slide-ver-leave-active,
+.slide-ver-move {
+  transition: 1s;
+}
+.slide-ver-enter,
+.slide-ver-leave-to {
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+}
+.slide-ver-enter-to,
+.slide-ver-leave {
+  opacity: 1;
+  max-height: 40rem;
+  overflow: hidden;
+}
+
+
+
+
 
 
 .slide-hor-ver-enter-active,

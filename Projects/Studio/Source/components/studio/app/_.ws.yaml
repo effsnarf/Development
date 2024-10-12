@@ -338,7 +338,7 @@ methods:
                       {
                         type: "panel",
                         layout: {
-                          type: "grid.x"
+                          type: "grid.y"
                         },
                         children: [
                           {
