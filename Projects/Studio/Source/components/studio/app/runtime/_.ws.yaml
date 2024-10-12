@@ -43,7 +43,7 @@ methods:
       for (const pageNode of this.$root.getPageNodes()) {
         const pageData = {};
         // lists
-        for (const listNode of this.$root.findDescNodes(pageNode, "list"))
+        for (const listNode of this.$root.findDescNodes(pageNode, ((n) => n.vars?.length)))
         {
           const ds = listNode.data?.source;
           const listVarPath = `${pageNode.name}.${listNode.name}`;

@@ -193,11 +193,15 @@ methods:
       return parent.children?.find(c => (name == (c.name || c.type)));
     }
   findDescNodes: | #js
-    function(parent, type) {
+    function(parent, filter) {
+      if ((typeof filter) == "string") {
+        const type = filter;
+        filter = (node) => (node.type == type);
+      }
       const nodes = [];
       const search = (node) => {
         if (nodes.map(n => n.id).includes(node.id)) return;
-        if (type == node.type) nodes.push(node);
+        if (filter(node)) nodes.push(node);
       };
       Objects.traverse(parent, search);
       return nodes;

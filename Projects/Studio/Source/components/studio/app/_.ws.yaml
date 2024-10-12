@@ -349,7 +349,13 @@ methods:
                                 hint: "search",
                                 icon: "🔎",
                               }
-                            }
+                            },
+                            vars: [
+                              {
+                                name: "text",
+                                type: "v-model",
+                              }
+                            ]
                           },
                           {
                             type: "ui.button",
@@ -374,11 +380,11 @@ methods:
                           },
                           {
                             name: "hovered",
-                            type: "value",
+                            type: "node.prop"
                           },
                           {
                             name: "selected",
-                            type: "value",
+                            type: "node.prop",
                           }
                         ],
                         children: [

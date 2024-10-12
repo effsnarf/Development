@@ -2,7 +2,7 @@ dom:
   div:
     v-if: node?.vars
     div:
-      v-for: var1 in node.vars
+      v-for: var1 in editableNodeVars
       h2:
         v-text: "'🧊 ' + var1.name"
       ui.tabs:
@@ -55,4 +55,7 @@ methods:
     }
 
 computed:
-    
+  editableNodeVars: | #js
+    function() {
+      return this.node?.vars?.filter(v => (v.type != "node.prop"));
+    }
