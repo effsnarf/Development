@@ -308,7 +308,8 @@ methods:
       const $app = userAppState;
       const $page = userAppState[pageName];
       const $node = nodeData;
-      const context = { $app, $page, $node };
+      const $item = vue.dataItem;
+      const context = { $app, $page, $node, $item };
       return function(...args) {
         args.push(...Object.values(context));
         return func.apply(vue, args);

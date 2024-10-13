@@ -12,7 +12,7 @@ data:
   dragStart: null
   posSmoother: null
   smoothPos: null
-  moveThrottleRate: 0.1
+  moveThrottleRate: 0.01
   hoverThrottleRate: 0.1
 mounted: | #js
   function() {

@@ -28,6 +28,7 @@ data:
   items:
   hovered:
   selected:
+  maxVisibleItems: 6
 
 mounted: | #js
   function() {
@@ -49,17 +50,19 @@ methods:
     }
   getMockArray: | #js
     function() {
-      return Array.from(Array(6).keys()).map((i) => null);
+      return Array.from(Array(this.maxVisibleItems).keys()).map((i) => null);
     }
 
 computed:
   visibleItems: | #js
     function() {
-      return (this.items?.take(6) ?? this.getMockArray());
+      return (this.items?.take(this.maxVisibleItems) ?? this.getMockArray());
     }
 
 style:
   .list-item:
+    max-height: 5em
+    overflow: hidden
     cursor: pointer
   .list-item:hover:
     background: "#80808030"

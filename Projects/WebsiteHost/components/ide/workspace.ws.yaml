@@ -80,6 +80,10 @@ methods:
     }
   refresh: | #js
     async function() {
+      this.appVuesCount = vueApp.vm.vuesCount;
+      setTimeout(this.refresh.bind(this), 1000);
+      return;
+
       if (true)
       {
         var allVues = vueApp.vm.getDescendants(vueApp);

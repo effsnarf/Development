@@ -49,7 +49,8 @@ function wrapFunction(
       result = fn.apply(this, args);
     } catch (err) {
       const end = performance.now();
-      callbackQueue.enqueue({ ...compEvent, elapsed: end - start });
+      const elapsed = Math.round(end - start);
+      callbackQueue.enqueue({ ...compEvent, elapsed });
       throw err; // Synchronous error
     }
 
@@ -57,12 +58,15 @@ function wrapFunction(
     if (result instanceof Promise) {
       return result.finally(() => {
         const end = performance.now();
-        callbackQueue.enqueue({ ...compEvent, elapsed: end - start });
+        callbackQueue.enqueue({
+          ...compEvent,
+          elapsed: Math.round(end - start),
+        });
       });
     } else {
       // Handle synchronous functions
       const end = performance.now();
-      callbackQueue.enqueue({ ...compEvent, elapsed: end - start });
+      callbackQueue.enqueue({ ...compEvent, elapsed: Math.round(end - start) });
       return result;
     }
   };
@@ -78,6 +82,8 @@ const Mixins = {
     const callbackQueue = new CallbackQueue(afterCompEvent);
 
     const mixin = {
+      matchComp: (c: any) => ["ide.", "ui."].none((s) => c.name.startsWith(s)),
+
       created(this: any) {
         const vue = this;
 
@@ -119,11 +125,13 @@ const Mixins = {
                 const compName = this.$options._componentTag;
                 // Watching a class instance
                 // Need to think about this
-                (window as any).alertify
-                  .warning(
-                    `<h2>⚠️ 📦 ${compName} 🧊 ${dataKey}</h2><p>Activity tracking is disabled for 📦 ${compName} 🧊 ${dataKey}.</p><p>Use plain objects or primitives for data, not class instances.</p>`
-                  )
-                  .delay(0);
+                if (false) {
+                  (window as any).alertify
+                    .warning(
+                      `<h2>⚠️ 📦 ${compName} 🧊 ${dataKey}</h2><p>Activity tracking is disabled for 📦 ${compName} 🧊 ${dataKey}.</p><p>Use plain objects or primitives for data, not class instances.</p>`
+                    )
+                    .delay(0);
+                }
                 return null;
               }
           }
@@ -270,4 +278,4 @@ const Mixins = {
   },
 };
 
-export { Mixins };
+export { Mixins, CompEvent };

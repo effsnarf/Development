@@ -23,7 +23,7 @@ import { VueManager } from "../../Classes/VueManager";
 import { Data } from "../../../../Shared/Data";
 import { Graph } from "../../../../Shared/Database/Graph";
 import { StateTracker, StateValue } from "../../Classes/StateTracker";
-import { Mixins } from "../../../../Shared/Mvc/Vue/Mixins";
+import { CompEvent, Mixins } from "../../../../Shared/Mvc/Vue/Mixins";
 import { MovingPositionSmoother } from "../../../../Shared/MovingPositionSmoother";
 
 const window1 = window as any;
@@ -75,7 +75,7 @@ const generalMixin = {
   },
   unmounted() {
     const self = this as any;
-    vueApp?.vm.registerVue(this);
+    vueApp?.vm.unregisterVue(this);
     return;
   },
   computed: {
@@ -330,9 +330,16 @@ const mgCompMixin = {
   },
 };
 
+const afterCompEvent = (e: CompEvent) => {
+  (window as any).vueIdeApp?.perfInspector?.().afterCompEvent(e);
+  //console.log(`⚡`, e.elapsed, e.name);
+}
+
+const compEventTracker = Mixins.CompEventTracker(afterCompEvent);
+
 const vueAppMixins = [] as any[];
 
-const webScriptMixins = [generalMixin];
+const webScriptMixins = [generalMixin, compEventTracker];
 
 interface MgParams {
   urlName: string;

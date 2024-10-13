@@ -454,6 +454,7 @@ interface Array<T> {
   _syncTimeout?: ReturnType<typeof setTimeout>; // Optional property to store the timeout
   all(predicate: (item: T) => boolean): boolean;
   any(predicate: (item: T) => boolean): boolean;
+  none(predicate: (item: T) => boolean): boolean;
   keepSyncedWith(
     getSource: () => T[],
     getItemKey: (item: T) => any,
@@ -1722,6 +1723,10 @@ if (typeof Array !== "undefined") {
 
   Array.prototype.all = function (predicate: (item: any) => boolean) {
     return this.findIndex((item) => !predicate(item)) == -1;
+  };
+
+  Array.prototype.none = function (predicate: (item: any) => boolean) {
+    return this.findIndex(predicate) == -1;
   };
 
   Array.prototype.contains = function (

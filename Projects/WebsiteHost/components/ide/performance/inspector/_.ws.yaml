@@ -1,14 +1,20 @@
 dom:
   .inspector:
-    v-if: 'false'
+    v-if: 'true'
     h2:
-      v-text: "'⌚ Performance'"
+      ui.checkbox:
+        v-model: isEnabled
+        :text: "'⚙️ Performance Inspector'"
+    div:
+      button:
+        v-text: "'❌ clear'"
+        @click: clear
     @mouseenter: isHovered = true
     @mouseleave: isHovered = false
     transition:
       name: slide
       .warning:
-        v-if: isHovered
+        v-if: "!isEnabled"
         v-text: "'Refresh is paused'"
     div:
       v-text: "'Frequent operations are throttled for performance sake.'"
@@ -19,10 +25,12 @@ dom:
 data:
   logs: {}
   logItems: []
+  isEnabled: true
   isHovered: false
 
 mounted: | #js
   function() {
+    this.$root.perfInspector = (() => this);
     this.refresh();
   }
 
@@ -50,16 +58,18 @@ methods:
     }
   getOperationName: | #js
     function(logItem) {
+      const { compEvent } = logItem;
       const icon = ({
         "event": "⚡",
         "computed": "💡",
         "watcher": "👁️",
         "method": "🔴",
-      })[logItem.type] || "❔";
-      return `${icon} ${logItem.name}`;
+      })[compEvent.type] || "❔";
+      return `${icon} ${compEvent.name}`;
     }
   afterCompEvent: | #js
     function(compEvent) {
+      if (!this.isEnabled) return;
       const log = this.getCompEventLog(compEvent);
       log.invokes++;
       log.elapsed.min = Math.min(log.elapsed.min, compEvent.elapsed);
@@ -97,12 +107,16 @@ methods:
       }));
       return log;
     }
+  clear: | #js
+    function() {
+      this.logs = {};
+    }
 
 style:
   .inspector:
     position: fixed
-    left: 0
-    bottom: 0
+    right: 1em
+    bottom: 1em
     opacity: 0.5
     max-width: 10em
     max-height: 10em

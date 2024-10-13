@@ -46,10 +46,10 @@ props:
 
 data:
   key1: 1
+  nodeStyle: null
 
 mounted: | #js
   function() {
-    this.$root.$on("app.state.changed", this.onAppStateChanged.bind(this));
     this.$root.$on("app.node.changed", this.onAppNodeChanged.bind(this));
     this.$watch("sui.node.selected", this.onSelectedNodeChanged.bind(this));
     this.initNodeVars();
@@ -211,9 +211,6 @@ methods:
           { immediate: true });
       }
     }
-  onAppStateChanged: | #js
-    function(vars) {
-    }
   onAppNodeChanged: | #js
     function(node) {
       if (node?.id != this.node?.id) return;
@@ -305,7 +302,8 @@ methods:
     }
   refresh: | #js
     function() {
-      this.key1++;
+      //this.nodeStyle = this.getNodeStyle(this.node);
+      //this.key1++;
     }
 
 computed:
@@ -330,27 +328,32 @@ computed:
         'active-node':  this.isActiveNode
       };
     }
-  nodeStyle: | #js
-    function() {
-      return this.getNodeStyle(this.node);
-    }
   isHoveredNode: | #js
     function() {
       if (!this.node) return false;
-      return this.areNodesRelated(this.node, this.sui?.node.hovered);
+      return false;
+      //return this.areNodesRelated(this.node, this.sui?.node.hovered);
     }
   isSelectedNode: | #js
     function() {
       if (!this.node) return false;
-      return this.areNodesRelated(this.node, this.sui?.node.selected);
+      return false;
+      //return this.areNodesRelated(this.node, this.sui?.node.selected);
     }
   isActiveNode: | #js
     function() {
       if (!this.node) return false;
-      return this.areNodesRelated(this.node, this.sui?.node.active);
+      return false;
+      //return this.areNodesRelated(this.node, this.sui?.node.active);
     }
 
 watch:
+  node:
+    immediate: true
+    handler: | #js
+      function(node) {
+        this.nodeStyle = this.getNodeStyle(node);
+      }
   nodeCssClass:
     handler: | #js
       function(nodeCssClass) {

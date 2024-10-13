@@ -16,6 +16,7 @@ props:
 
 data:
   animState:
+  nodePage: null
 
 mounted: | #js
   function() {
@@ -25,7 +26,7 @@ mounted: | #js
 methods:
   onSelectedPageChanged: | #js
     function(newPage, oldPage) {
-      const page = this.$root.getNodePage(this);
+      const page = (this.nodePage ?? (this.nodePage = this.$root.getNodePage(this)));
       this.animState = (!page) ? null :
         (page.id == oldPage?.id) ? "leaving" :
         (page.id == newPage?.id) ? "entering" : null;

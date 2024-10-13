@@ -271,7 +271,7 @@ methods:
                     children: [
                       {
                         type: "text",
-                        text: "Meme Generator",
+                        text: "4chan viewer",
                         size: 3
                       },
                       {
@@ -586,7 +586,7 @@ methods:
                               {
                                 name: "imageUrl",
                                 type: "exp",
-                                exp: "((!$app.home.boards.selected) ? null : `https://i.4cdn.org/${$app.home.boards.selected.board}/${tim}${ext}`)"
+                                exp: "((!$app.home.boards.selected) ? null : `https://i.4cdn.org/${$app.home.boards.selected.board}/${$item?.tim}${$item?.ext}`)"
                               }
                             ]
                           },
@@ -657,7 +657,7 @@ methods:
                           {
                             name: "imageUrl",
                             type: "exp",
-                            exp: "((!$app.home.boards.selected) ? null : `https://i.4cdn.org/${$app.home.boards.selected?.board}/${tim}${ext}`)"
+                            exp: "((!$app.home.boards.selected) ? null : `https://i.4cdn.org/${$app.home.boards.selected?.board}/${$item?.tim}${$item?.ext}`)"
                           }
                         ]
                       },
@@ -795,7 +795,7 @@ style:
     transform-style: preserve-3d
     transition: 0.6s
   .main-boxes > *:nth-child(3) .box2.user-app-tilted:
-    transform: rotateY(10deg)
+    # transform: rotateY(10deg)
   .user-app-tilted .studio-doc-node .list-item:
     opacity: 1
   .box2 *:
@@ -807,9 +807,9 @@ style:
     box-shadow: "-0.5em 0.5em 2px #00000080"
     padding: 1em
   .main-box.a:
-    width: 2%
+    width: 0%
   .main-box.b:
-    width: 10%
+    width: 15%
   .main-boxes.box-hovered-3 .main-box.d:
     width: 46%
   .main-boxes.box-hovered-3 .main-box.e:
