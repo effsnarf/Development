@@ -1,8 +1,8 @@
 dom:
   .clickable:
     v-if: node
-    @mouseenter: () => onHoverNode(node, true)
-    @mouseleave: () => onHoverNode(node, false)
+    @mouseenter: () => onHoverNode(node)
+    @mouseleave: () => onHoverNode(null)
     @click: () => onClickNode(node)
     :class: "{ selected: (node.id == sui?.node.selected?.id) }"
     ui.dnd.dropzone:
@@ -56,10 +56,9 @@ methods:
       this.$emit('click');
     }
   onHoverNode: | #js
-    function(node, isHovered) {
-      return;
+    function(node) {
       if (!this.sui) return;
-      this.sui.node.hovered = (!isHovered ? null : node);
+      this.sui.node.hovered = node;
     }
   shorten: | #js
     function(s, len = 10) {

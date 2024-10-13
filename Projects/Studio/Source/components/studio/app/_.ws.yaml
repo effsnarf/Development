@@ -55,6 +55,8 @@ dom:
             :user-app: userApp
             :sui: sui
             @runtime-vue-inited: onRuntimeVueInited
+          div:
+            v-text: sui.node.hovered?.id
         @mouseenter: sui.main.box.hovered = 2
         @mouseleave: sui.main.box.hovered = null
       .main-box.d:
@@ -165,6 +167,7 @@ mounted: | #js
       }
     }
     this.$watch("sui.page.selected", this.onSelectedPageChanged.bind(this));
+    this.$watch("sui.node.hovered", this.onHoveredNodeChanged.bind(this));
     this.$watch("sui.node.selected", this.onSelectedNodeChanged.bind(this));
     this.$root.$on("data.item.selected", this.onDataItemSelected.bind(this));
   }
@@ -178,6 +181,15 @@ methods:
       const page = sui.pages[pageNode.id];
       // when switching page, set the selected node to the page's selected node
       sui.node.selected = page.node.selected;
+    }
+  onHoveredNodeChanged: | #js
+    function(node) {
+      if (!node) {
+        document.querySelectorAll(".hovered-node").forEach(n => n.classList.remove("hovered-node"));
+        return;
+      }
+      const els = document.querySelectorAll(`[data-node-id="${node.id}"]`);
+      els.forEach(n => n.classList.add("hovered-node"));
     }
   onSelectedNodeChanged: | #js
     function(node) {
@@ -756,9 +768,9 @@ computed:
       const s = {};
       if (this.sui.tool.grid.lines) {
         const pageName = this.sui.page.selected?.name;
-        s[`.studio-doc-node[data-sui-page=${pageName}]`] = {
-          border: '1px dashed gray'
-        };
+        //s[`.studio-doc-node[data-sui-page=${pageName}]`] = {
+        //  border: '1px dashed gray'
+        //};
       }
       return s;
     }

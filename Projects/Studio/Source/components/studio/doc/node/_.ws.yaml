@@ -17,6 +17,7 @@ dom:
       :class: nodeCssClass
       :style: nodeStyle
       :data-sui-page: nodePageName
+      :data-node-id: node.id
       template:
         v-slot: child-nodes
         ui.dom.layout:
@@ -47,12 +48,14 @@ props:
 data:
   key1: 1
   nodeStyle: null
+  nodeCssClass: null
 
 mounted: | #js
   function() {
     this.$root.$on("app.node.changed", this.onAppNodeChanged.bind(this));
-    this.$watch("sui.node.selected", this.onSelectedNodeChanged.bind(this));
+    this.$watch("sui.node.selected", this.onSuiNodeChanged.bind(this, "selected"));
     this.initNodeVars();
+    this.refresh1();
   }
 
 methods:
@@ -216,10 +219,12 @@ methods:
       if (node?.id != this.node?.id) return;
       this.refresh();
     }
-  onSelectedNodeChanged: | #js
-    function(node) {
+  onSuiNodeChanged: | #js
+    function(type, node) {
       if (node?.id != this.node?.id) return;
-      if (this.dataItem) this.$root.$emit("data.item.selected", this.dataItem);
+      if (type == "selected") {
+        if (this.dataItem) this.$root.$emit("data.item.selected", this.dataItem);
+      }
     }
   getNodeCompName: | #js
     function(node) {
@@ -249,23 +254,22 @@ methods:
       s['font-family'] = node.design?.font?.family;
       s['line-height'] = node.design?.line?.height;
 
-      if (this.sui.node.hovered?.id == node.id) {
-        s['border'] = `2px dashed #ffff00 !important`;
-      }
-      if (!this.sui.app.is.tilted) {
-        if (this.sui.node.selected?.id == node.id) {
-          s['border'] = `2px dashed #ffff00 !important`;
-        }
-        if (this.sui.node.active?.id == node.id) {
-          s['box-shadow'] = `-2px 2px 2px black !important`;
-        }
-      }
       if (this.sui.tool.grid.lines) {
         s['transform'] = `translateZ(${(node.depth * 0.2)}em)`;
       }
       Objects.removeNullValueKeys(s);
       if (!Object.keys(s).length) return null;
       return s;
+    }
+  getNodeCssClass: | #js
+    function(node) {
+      const cls = {
+        'studio-doc-node': true,
+        'hovered-node': this.isHoveredNode,
+        'selected-node': this.isSelectedNode,
+        'active-node':  this.isActiveNode,
+      };
+      return cls;
     }
   toBackground: | #js
     function(bg) {
@@ -300,6 +304,10 @@ methods:
       if (tryOpposite) return this.areNodesRelated(node2, node1, false);
       return false;
     }
+  refresh1: | #js
+    function() {
+      this.nodeCssClass = this.getNodeCssClass(this.node);
+    }
   refresh: | #js
     function() {
       //this.nodeStyle = this.getNodeStyle(this.node);
@@ -319,30 +327,24 @@ computed:
     function() {
       return this.getNodeCompName(this.node);
     }
-  nodeCssClass: | #js
-    function() {
-      return {
-        'studio-doc-node': true,
-        'hovered-node': this.isHoveredNode,
-        'selected-node': this.isSelectedNode,
-        'active-node':  this.isActiveNode
-      };
-    }
   isHoveredNode: | #js
     function() {
       if (!this.node) return false;
+      if (this.node == this.sui?.node.hovered) return true;
       return false;
       //return this.areNodesRelated(this.node, this.sui?.node.hovered);
     }
   isSelectedNode: | #js
     function() {
       if (!this.node) return false;
+      if (this.node == this.sui?.node.selected) return true;
       return false;
       //return this.areNodesRelated(this.node, this.sui?.node.selected);
     }
   isActiveNode: | #js
     function() {
       if (!this.node) return false;
+      if (this.node == this.sui?.node.active) return true;
       return false;
       //return this.areNodesRelated(this.node, this.sui?.node.active);
     }
@@ -353,10 +355,6 @@ watch:
     handler: | #js
       function(node) {
         this.nodeStyle = this.getNodeStyle(node);
-      }
-  nodeCssClass:
-    handler: | #js
-      function(nodeCssClass) {
       }
   nodeStyle:
     handler: | #js
@@ -371,4 +369,4 @@ style:
   .selected-node:
     border: "2px dashed #FFFF00 !important"
   .hovered-node, .selected-node:
-    box-shadow: "inset -3px 3px 2px #80808080"
+    box-shadow: "inset -3px 3px 2px black !important"

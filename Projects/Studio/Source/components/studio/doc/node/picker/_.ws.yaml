@@ -59,6 +59,10 @@ methods:
     }
   refreshNodeTree: | #js
     async function() {
+      if (this.sui.node.hovered) {
+        this.sui.node.hovered = null;
+        await this.$nextTick();
+      }
       const vue = this.hovered.vue?.();
       this.hovered.node = this.getDomNodeFromVue(vue);
       this.sui.node.hovered = this.hovered.node;

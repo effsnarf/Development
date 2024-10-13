@@ -237,9 +237,9 @@ class VueManager {
       this.vueRefsToUIDs.set(refKey, vue.$refs[refKey]._uid);
     }
 
-    console.log(
-      `➕📦`, `(${this.vuesCounts[vueCompName].toLocaleString()})`, `${vue.$options._componentTag}`
-    );
+    // console.log(
+    //   `➕📦`, `(${this.vuesCounts[vueCompName].toLocaleString()})`, `${vue.$options._componentTag}`
+    // );
   }
 
   unregisterVue(vue: any) {
@@ -255,9 +255,9 @@ class VueManager {
       this.vueRefsToUIDs.delete(refKey);
     }
 
-    console.log(
-      `➖📦`, `${vue.$options._componentTag}`
-    );
+    // console.log(
+    //   `➖📦`, `${vue.$options._componentTag}`
+    // );
   }
 }
 
