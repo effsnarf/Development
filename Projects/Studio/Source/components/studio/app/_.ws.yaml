@@ -21,16 +21,9 @@ dom:
         studio.app.ui.drawer:
           closed-width: 8em
           studio.doc.node.toolbar:
-        .box2:
-          transition.group:
-            name: list2
-            studio.dom.tree:
-              v-for: pageNode in pageNodes
-              :key: pageNode.id
-              v-show: (pageNode.id == sui.page.selected?.id)
-              :root: pageNode
-              :sui: sui
-              :initial-expanded: "true"
+        studio.dom.node.browser:
+          :user-app: userApp
+          :sui: sui
         studio.app.log:
           category: runtime
         @mouseenter: sui.main.box.hovered = 1
@@ -90,7 +83,7 @@ dom:
     studio.app.ui.trash.can:
       :user-app: userApp
     ui.css.stylesheet:
-      :rules: userAppStylesheet
+      :rules: appStylesheet
 
 data:
   userApp:
@@ -126,6 +119,7 @@ data:
     node:
       hovered:
       selected:
+      selecteds: []
       active:
       context:
       tree:
@@ -766,9 +760,15 @@ computed:
     function() {
       return (this.sui.main.box.hovered == 1);
     }
-  userAppStylesheet: | #js
+  appStylesheet: | #js
     function() {
       const s = {};
+      s[`[data-node-id="${this.sui.node.hovered?.id}"]`] = {
+        border: '2px dashed #ffff0080'
+      };
+      s[`[data-node-id="${this.sui.node.selected?.id}"]`] = {
+        border: '2px dashed green'
+      };
       if (this.sui.tool.grid.lines) {
         const pageName = this.sui.page.selected?.name;
         //s[`.studio-doc-node[data-sui-page=${pageName}]`] = {

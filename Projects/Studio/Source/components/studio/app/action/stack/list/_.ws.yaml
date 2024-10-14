@@ -4,7 +4,7 @@ dom:
       tbody:
         tr:
           v-for: action in [...actions].reverse()
-          :class: "{ done: (action.i <= pointer) }"
+          :class: getActionClass(action)
           td:
             class: dimmed
             v-text: action.id
@@ -13,7 +13,6 @@ dom:
           td:
             v-text: action.do.icon
           td:
-            :class: "{ dimmed: (!action.do.text) }"
             v-text: (action.do.text ?? action.do.type)
 
 props:
@@ -26,13 +25,28 @@ methods:
       type = type.split('.').first();
       return {
         "select": "👆",
-        "create": "🌱",
+        "create": "➕",
         "edit": "✏️",
-        "delete": "🔥",
+        "delete": "❌",
       }[type] || "❔";
+    }
+  getActionClass: | #js
+    function(action) {
+      const cls = {};
+      const type = this.getActionType(action);
+      cls.done = (action.i <= this.pointer);
+      cls[`type-${type}`] = true;
+      return cls;
+    }
+  getActionType: | #js
+    function(action) {
+      const type = action.do.type.split('.').first();
+      return type;
     }
 
 style:
+  .type-select:
+    color: "#ffffff80"
   tr:not(.done):
     opacity: 0.5
   .done:

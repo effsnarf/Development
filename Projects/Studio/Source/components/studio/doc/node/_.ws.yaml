@@ -332,21 +332,21 @@ computed:
   isHoveredNode: | #js
     function() {
       if (!this.node) return false;
-      if (this.node == this.sui?.node.hovered) return true;
+      if (this.node?.id == this.sui?.node.hovered?.id) return true;
       return false;
       //return this.areNodesRelated(this.node, this.sui?.node.hovered);
     }
   isSelectedNode: | #js
     function() {
       if (!this.node) return false;
-      if (this.node == this.sui?.node.selected) return true;
+      if (this.node?.id == this.sui?.node.selected?.id) return true;
       return false;
       //return this.areNodesRelated(this.node, this.sui?.node.selected);
     }
   isActiveNode: | #js
     function() {
       if (!this.node) return false;
-      if (this.node == this.sui?.node.active) return true;
+      if (this.node?.id == this.sui?.node.active?.id) return true;
       return false;
       //return this.areNodesRelated(this.node, this.sui?.node.active);
     }

@@ -4,7 +4,6 @@ dom:
     @mouseenter: () => onHoverNode(node)
     @mouseleave: () => onHoverNode(null)
     @click: () => onClickNode(node)
-    :class: "{ selected: (node.id == sui?.node.selected?.id) }"
     ui.dnd.dropzone:
       @drop-item: onDropItem
       ui.dnd.draggable:
@@ -46,8 +45,8 @@ methods:
   onClickNode: | #js
     function(node) {
       if (this.sui) {
-        if (node?.id == this.sui.node.selected?.id) node = null;
-        this.$root.do("select.node", { node });
+        //if (node?.id == this.sui.node.selected?.id) node = null;
+        //this.$root.do("select.node", { node });
       }
       this.$emit('click');
     }

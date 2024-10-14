@@ -5,6 +5,8 @@ dom:
       item-type: studio.dom.tree.node
       :initial-expanded: initialExpanded
       :item-props: "{ sui }"
+      @node-hover: (...args) => $emit('node-hover', ...args)
+      @node-click: (...args) => $emit('node-click', ...args)
     ui.value:
       v-if: "false"
       :value: selectedNodeData

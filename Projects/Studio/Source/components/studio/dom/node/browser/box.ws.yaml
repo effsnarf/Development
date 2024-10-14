@@ -1,0 +1,82 @@
+dom:
+  div:
+    transition:
+      name: slide
+      .box2:
+        :key: rootNode?.id
+        :class: "{ folded2: (!isLastBox) }"
+        studio.dom.tree:
+          :root: rootNode
+          :sui: sui
+          :initial-expanded: "true"
+          @node-click: onNodeClick
+    transition:
+      name: slide
+      div:
+        v-if: selected.node
+        :key: selected.node?.id
+        studio.dom.node.browser.box:
+          :user-app: userApp
+          :sui: sui
+          :context-node: selected.node
+          :box-index: (boxIndex + 1)
+
+props:
+  userApp:
+  sui:
+  contextNode:
+  boxIndex:
+
+data:
+  selected:
+    node:
+  rootNode:
+
+methods:
+  getRootNode: | #js
+    function(contextNode) {
+      // in case of [comp.inst] nodes, we want to show the template node
+      if (!contextNode) return null;
+      if (contextNode.type == "comp.inst") return this.$root.getCompNode(contextNode);
+      return contextNode;
+    }
+  onNodeClick: | #js
+    function(node) {
+      this.selected.node = node;
+      this.$root.do("select.node", { node });
+    }
+
+watch:
+  contextNode:
+    immediate: true
+    handler: | #js
+      function(contextNode) {
+        this.selected.node = null;
+        this.rootNode = this.getRootNode(contextNode);
+      }
+    
+computed:
+  showBox: | #js
+    function() {
+      if (!this.contextNode) return false;
+      if (this.contextNode.id != this.rootNode.id) return true;
+      if (this.isFirstBox) return true;
+      return false;
+    }
+  isLastBox: | #js
+    function() {
+      if (!this.selected.node) return true;
+      return false;
+    }
+
+style:
+  .box2:
+    margin-bottom: 1em
+  .box2.folded:
+    max-height: 3.5em
+    overflow: hidden
+    transition: max-height 2s
+  .box2.folded:hover:
+    max-height: 100vh
+    overflow: auto
+
