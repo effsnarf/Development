@@ -14,7 +14,7 @@ methods:
       switch (dragItem.type) {
         case "node":
           const node = dragItem.item;
-          TreeObject.deleteNode(this.userApp, node, { newTree: false });
+          this.$root.do("delete.node", { node });
           return;
       }
       throw `Unknown item type`;

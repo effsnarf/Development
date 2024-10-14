@@ -3,11 +3,11 @@ dom:
     transition:
       name: slide
       component:
-        :is: "'studio-app-global-settings-' + (sui.tool.category??'data')"
+        :is: "'studio-app-global-settings-' + (sui.tool.category.name??'data')"
         :user-app: userApp
         :user-app-state: userAppState
         :sui: sui
-        :key: sui.tool.category
+        :key: sui.tool.category.index
 
 props:
   userApp:

@@ -69,8 +69,8 @@ methods:
     function(tabOption, value) {
       if (!this.layout) return;
       Objects.setProperty(this.layout, tabOption, value);
-      Objects.setProperty(this.initial.layout, tabOption, value);
-      this.$emit("preview", this.layout);
+      //Objects.setProperty(this.initial.layout, tabOption, value);
+      //this.$emit("preview", this.layout);
       this.$emit("input", this.layout);
     }
   getComponentValue: | #js

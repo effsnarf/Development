@@ -41,17 +41,13 @@ methods:
     }
   onDropItem_new_node: | #js
     function(newNode) {
-      const userApp = this.$root.getUserApp(this);
-      delete newNode._;
-      newNode = this.$root.initNewNode(userApp, newNode,
-        { childOf: { parent: this.node, insertAt: 0 } });
-      this.sui.node.selected = newNode;
+      this.$root.do("create.node", { parent: { node: { id: this.node.id } }, newNode });
     }
   onClickNode: | #js
     function(node) {
       if (this.sui) {
         if (node?.id == this.sui.node.selected?.id) node = null;
-        this.sui.node.selected = node;
+        this.$root.do("select.node", { node });
       }
       this.$emit('click');
     }
@@ -71,10 +67,8 @@ computed:
     function() {
       const node = this.node;
       const icon = this.$root.getNodeIcon(node);
-      let text = (!this.showName) ? node.type :
-        (node.slot?.name || node.comp?.name || node.name || node.type);
-      if (text != node.type) text = `[${text}]`;
-      return `${icon} ${text}`;
+      let text = (!this.showName) ? node.type : this.$root.getNodeText(node);
+      return `${icon} ${(text??'')}`;
     }
   nodeWarning: | #js
     function() {

@@ -7,6 +7,9 @@ dom:
       v-if: userApp
       :class: "{ ['box-hovered-' + sui.main.box.hovered]: true }"
       .main-box.a:
+        studio.app.action.stack:
+          :user-app: userApp
+          :sui: sui
         ui.drawer:
           .box2:
             studio.dom.tree:
@@ -60,13 +63,11 @@ dom:
         @mouseenter: sui.main.box.hovered = 2
         @mouseleave: sui.main.box.hovered = null
       .main-box.d:
-        studio.app.ui.drawer:
-          :open: "true"
-          h2:
-            :style: "{ 'margin-top': '1.3em' }"
-            studio.dom.tree.node:
-              :item: sui.node.selected
-              :sui: sui
+        h2:
+          :style: "{ 'margin-top': '-2em', height: '2em' }"
+          studio.dom.tree.node:
+            :item: sui.node.selected
+            :sui: sui
         .box2:
           studio.doc.node.editor:
             :node: sui.node.selected
@@ -103,6 +104,10 @@ data:
       lines:
     tool:
       category:
+        index:
+        name:
+        options: ['🍃 node', '🧊 data', '🧱 layout', '🎨 design', '✨ animation', '⚡ events']
+        icons: ['🍃', '🧊', '🧱', '🎨', '✨', '⚡']
       grid:
         lines: false
     main:
@@ -819,7 +824,7 @@ style:
     box-shadow: "-0.5em 0.5em 2px #00000080"
     padding: 1em
   .main-box.a:
-    width: 0%
+    width: 10%
   .main-box.b:
     width: 15%
   .main-boxes.box-hovered-3 .main-box.d:

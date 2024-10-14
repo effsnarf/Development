@@ -1,0 +1,143 @@
+dom:
+  div:
+    .flex.justify-center:
+      button:
+        v-text: "'⤺'"
+        @click: undo
+      button:
+        v-text: "'⤻'"
+        @click: redo
+    studio.app.action.stack.list:
+      :actions: actions
+      :pointer: pointer
+
+props:
+  userApp:
+  sui:
+
+data:
+  actions: []
+  pointer: -1
+
+mounted: | #js
+  function() {
+    this.$root.do = this._do.bind(this);
+  }
+
+methods:
+  do_select_tool_category: | #js
+    function(_do, index) {
+      const oldIndex = this.sui.tool.category.index;
+      if (((!oldIndex) && (!index)) || (oldIndex == index)) return;
+      const oldIcon = this.sui.tool.category.icons[oldIndex];
+      const newIcon = this.sui.tool.category.icons[index];
+      const name = this.sui.tool.category.options[index]?.split(' ').last();
+      this.sui.tool.category.index = index;
+      this.sui.tool.category.name = name;
+      _do.icon = newIcon;
+      _do.text = name;
+      const undo = { type: "select.tool.category", args: { index: oldIndex } };
+      return { _do, undo };
+    }
+  do_select_node: | #js
+    function(_do, node) {
+      let oldNode = this.sui.node.selected;
+      if (oldNode) oldNode = { id: oldNode.id };
+      node = this.$root.getNode(node);
+      this.sui.node.selected = node;
+      _do.icon = this.$root.getNodeIcon(node);
+      _do.text = this.$root.getNodeText(node);
+      const undo = { type: "select.node", args: { node: oldNode } };
+      return { _do, undo };
+    }
+  do_create_node: | #js
+    function(_do, parent, newNode) {
+      delete newNode._;
+      parent = this.$root.getNode(parent);
+      newNode = this.$root.initNewNode(this.userApp, newNode, { childOf: { parent, insertAt: 0 } });
+      this.sui.node.selected = newNode;
+      const undo = { type: "delete.node", args: { node: { id: newNode.id } } };
+      return { _do, undo };
+    }
+  do_delete_node: | #js
+    function(_do, node) {
+      node = this.$root.getNode(node);
+      let parent = this.$root.getNodeParent(node);
+      const index = parent.children.findIndex(n => (n.id == node.id));
+      parent = { node: { id: parent.id } };
+      TreeObject.deleteNode(this.userApp, node, { newTree: false });
+      const undo = { type: "undelete.node", args: { parent, node, index } };
+      return { _do, undo };
+    }
+  do_edit_node: | #js
+    function(_do, oldNode, newNode, changes) {
+      let undoChanges = [];
+      if (oldNode && newNode) {
+        delete oldNode.children;
+        delete newNode.children;
+        changes = DeepDiff.diff(oldNode, newNode);
+        undoChanges = DeepDiff.diff(newNode, oldNode);
+        if (!changes) debugger;
+      }
+      let node = this.$root.getNode(oldNode);
+      const prevNode = Objects.clone(node, { exclude: ["children"] });
+      for (const change of changes) DeepDiff.applyChange(node, change);
+      if (!undoChanges.length) {
+        const node2 = Objects.clone(node, { exclude: ["children"] });
+        undoChanges = DeepDiff.diff(node2, prevNode);
+      }
+      node = { id: node.id };
+      _do = { type: "edit.node", args: { node, newNode: null, changes } };
+      const undo = { type: "edit.node", args: { node, newNode: null, changes: undoChanges } };
+      this.$root.appNodeEdited(node);
+      return { _do, undo };
+    }
+  do_undelete_node: | #js
+    function(_do, parent, node, index) {
+      parent = this.$root.getNode(parent);
+      TreeObject.addNode(parent, node, index);
+      const undo = { type: "delete.node", args: { node: { id: node.id } } };
+      return { _do, undo };
+    }
+  undo: | #js
+    function() {
+      if (this.pointer < 0) return alertify.error("Nothing to undo");
+      const action = this.actions[this.pointer];
+      this.do(action.undo, false);
+      this.pointer--;
+    }
+  redo: | #js
+    function() {
+      if (this.pointer >= (this.actions.length - 1)) return alertify.error("Nothing to redo");
+      this.pointer++;
+      const action = this.actions[this.pointer];
+      this.do(action.do, false);
+    }
+  do: | #js
+    function(_do, addToStack = true) {
+      const doMethod = this[`do_${_do.type.replace(/\./g, "_")}`];
+      if (!doMethod) return alertify.error(`Action type not implemented: ${doAction.type}`);
+      const action = doMethod(_do, ...Object.values(_do.args));
+      if (!addToStack || !action) return;
+      this.addAction(action);
+    }
+  _do: | #js
+    function(type, args) {
+      this.do({ type, args });
+    }
+  addAction: | #js
+    function(action) {
+      if (this.pointer < (this.actions.length - 1)) {
+        this.actions = this.actions.slice(0, this.pointer + 1);
+      }
+      const actionIndex = this.actions.length;
+      const actionID = ((this.actions.last()?.id ?? 0) + 1);
+      action.i = actionIndex;
+      action.id = actionID;
+      if (action._do) {
+        action.do = action._do;
+        delete action._do;
+      }
+      this.actions.add(action);
+      this.pointer = (this.actions.length - 1);
+    }

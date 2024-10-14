@@ -2,18 +2,16 @@ dom:
   div:
     v-if: node
     div:
+      :key: node.id
       ui.tabs: 
-        :options: toolCategoryOptions
+        :options: sui.tool.category.options
         direction: horizontal
         :can-select-none: "true"
         :show-title-in-tab: "false"
-        v-model: selected.tab.index
+        :value: sui.tool.category.index
+        @input: selectToolCategory
         template:
           v-slot: header
-        template:
-          v-slot: footer
-          pre:
-            v-text: node[sui.tool.category]
         template: 
           v-slot: tab0
           div:
@@ -75,7 +73,7 @@ props:
 
 data:
   initial:
-    node:
+    node: null
   selected:
     tab:
       index: null
@@ -83,12 +81,19 @@ data:
 
 mounted: | #js
   function() {
-    this.$watch("selected.tab.index", (newIndex) => {
-      this.sui.tool.category = this.toolCategoryOptions[newIndex]?.split(' ').last()
-  });
+    this.$root.$on("app.node.edited", this.onAppNodeEdited.bind(this));
   }
 
 methods:
+  selectToolCategory: | #js
+    function(index) {
+      this.$root.do("select.tool.category", { index });
+    }
+  onAppNodeEdited: | #js
+    function(node) {
+      if (node.id != this.node.id) return;
+      this.initial.node = this.getInitialNodeData(node);
+    }
   getNodeCompEditorName: | #js
     function(node) {
       if (!node) return null;
@@ -101,18 +106,6 @@ methods:
       for (const key in node)
         if (key != "children") newNode[key] = Objects.clone(node[key]);
       return newNode;
-    }
-
-computed:
-  toolCategoryOptions: | #js
-    function() {
-      return [this.nodeTypeTabName, '🧊 data', '🧱 layout', '🎨 design', '✨ animation', '⚡ events'];
-    }
-  nodeTypeTabName: | #js
-    function() {
-      const icon = this.$root.getNodeIcon(this.node);
-      const type = this.node.type;
-      return `${icon} ${type}`;
     }
 
 watch:

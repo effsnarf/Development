@@ -36,7 +36,14 @@ methods:
         vars: "📂🍃",
         var: "🧊"
       };
-      return (icons[node.type] || "❔");
+      return (icons[node?.type] || "❔");
+    }
+  getNodeText: | #js
+    function(node) {
+      if (!node) return null;
+      let text = (node.slot?.name || node.comp?.name || node.name || node.type);
+      if (text != node.type) text = `[${text}]`;
+      return text;
     }
   getNodeVarPath: | #js
     function(node) {
@@ -45,6 +52,13 @@ methods:
       const pageName = this.getNodePageName(node);
       const varPath = [pageName, node.name].map(s => (s||'')).join('.');
       return varPath;
+    }
+  getNode: | #js
+    function(nodeID) {
+      if (!nodeID) return null;
+      if (nodeID.id) nodeID = nodeID.id;
+      if (nodeID.node?.id) nodeID = nodeID.node.id;
+      return TreeObject.find(this.userApp, (n) => (n.id == nodeID));
     }
   initNewNode: | #js
     function(userApp, node, options) {
@@ -262,6 +276,17 @@ methods:
     // #TODO Slow
     function(node) {
       return TreeObject.find(this.userApp, (p => (p.children?.map(c => c.id).includes(node.id))));
+    }
+  appNodeChanged: | #js
+    function(node) {
+      node = this.$root.getNode(node);
+      this.$root.$emit("app.node.changed", node);
+    }
+  appNodeEdited: | #js
+    function(node) {
+      node = this.$root.getNode(node);
+      this.$root.appNodeChanged(node);
+      this.$root.$emit("app.node.edited", node);
     }
   fetchFromUrl: | #js
     async function(url) {

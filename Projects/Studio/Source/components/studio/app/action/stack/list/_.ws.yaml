@@ -1,0 +1,46 @@
+dom:
+  div:
+    table:
+      tbody:
+        tr:
+          v-for: action in [...actions].reverse()
+          :class: "{ done: (action.i <= pointer) }"
+          td:
+            class: dimmed
+            v-text: action.id
+          td:
+            v-text: getActionIcon(action.do.type)
+          td:
+            v-text: action.do.icon
+          td:
+            :class: "{ dimmed: (!action.do.text) }"
+            v-text: (action.do.text ?? action.do.type)
+
+props:
+  actions:
+  pointer:
+
+methods:
+  getActionIcon: | #js
+    function(type) {
+      type = type.split('.').first();
+      return {
+        "select": "👆",
+        "create": "🌱",
+        "edit": "✏️",
+        "delete": "🔥",
+      }[type] || "❔";
+    }
+
+style:
+  tr:not(.done):
+    opacity: 0.5
+  .done:
+    background-color: "#80808080"
+    border-radius: 0
+  .done td:
+    padding: 0.2em 0.3em
+  .done td:first-child:
+    border-radius: 0.5em 0 0 0.5em
+  .done td:last-child:
+    border-radius: 0 0.5em 0.5em 0

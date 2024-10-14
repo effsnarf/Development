@@ -1,5 +1,6 @@
 dom:
   div:
+    :key: key1
     ui.input.layout:
       :layout-types: layoutTypes
       :value: node.layout
@@ -12,8 +13,19 @@ props:
   sui:
 
 data:
+  key1: 1
+
+mounted: | #js
+  function() {
+    this.$root.$on("app.node.changed", this.onAppNodeChanged.bind(this));
+  }
 
 methods:
+  onAppNodeChanged: | #js
+    function(node) {
+      if (node.id != this.node.id) return;
+      this.refresh();
+    }
   onPreview: | #js
     function(layout) {
       this.node.layout = layout;
@@ -21,8 +33,16 @@ methods:
     }
   onInput: | #js
     function(layout) {
-      this.initial.node.layout = this.node.layout = layout;
-      this.$root.$emit("app.node.changed", this.node);
+      // because of preview, [node] already has the new layout
+      const oldNode = Objects.clone(this.initial.node);
+      const newNode = Objects.clone(this.node);
+      this.$root.do("edit.node", { oldNode, newNode });
+      this.initial.node.layout = Objects.clone(layout);
+      this.refresh();
+    }
+  refresh: | #js
+    function() {
+      this.key1++;
     }
 
 computed:

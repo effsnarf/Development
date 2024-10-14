@@ -165,9 +165,14 @@ class Objects {
     if (obj instanceof Date) return new Date(obj.getTime());
     if (obj instanceof RegExp) return new RegExp(obj.source, obj.flags);
     try {
-      const cloned = Objects.json.parse(JSON.stringify(obj));
-      if (options?.exclude?.length)
-        for (let excludeKey of options.exclude) delete cloned[excludeKey];
+      let cloned = null;
+      if (options?.exclude?.length) {
+        const keys = Object.keys(obj).except(...options.exclude);
+        cloned = {} as any;
+        for (const key of keys) cloned[key] = Objects.clone(obj[key]);
+      } else {
+        cloned = Objects.json.parse(JSON.stringify(obj));
+      }
       return cloned;
     } catch (ex) {
       throw ex;
@@ -729,6 +734,16 @@ class TreeObject {
   static max(root: any, selector: Function) {
     const values = TreeObject.map(root, selector);
     return Math.max(...values);
+  }
+
+  static getChildIndex(parent: TreeNode, child: TreeNode) {
+    const index = parent.children?.findIndex((c) => c.id == child.id);
+    return index === -1 ? null : index;
+  }
+
+  static addNode(parent: TreeNode, node: TreeNode, index: number) {
+    if (!parent.children) parent.children = [];
+    parent.children.insertAt(index, node);
   }
 
   static moveNode(
