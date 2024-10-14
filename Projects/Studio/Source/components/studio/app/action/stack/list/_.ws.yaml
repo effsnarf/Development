@@ -40,7 +40,12 @@ style:
     border-radius: 0
   .done td:
     padding: 0.2em 0.3em
-  .done td:first-child:
-    border-radius: 0.5em 0 0 0.5em
-  .done td:last-child:
-    border-radius: 0 0.5em 0.5em 0
+  .done:first-child td:first-child:
+    border-radius: 0.5em 0 0 0
+  .done:first-child td:last-child:
+    border-radius: 0 0.5em 0 0
+  .done:last-child td:first-child:
+    border-radius: 0 0 0 0.5em
+  .done:last-child td:last-child:
+    border-radius: 0 0 0.5em 0
+

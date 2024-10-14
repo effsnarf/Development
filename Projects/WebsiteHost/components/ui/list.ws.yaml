@@ -65,6 +65,7 @@ methods:
       if ((newIndex == null) && !this.canSelectNone) return;
       this.mySelectedIndex = newIndex;
       const value = (this.valueType == 'index') ? newIndex : this.items[newIndex];
+      this.$emit('item-click', e);
       this.$emit('input', value);
     }
   getCssClass: | #js

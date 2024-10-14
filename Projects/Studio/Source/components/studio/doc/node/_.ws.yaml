@@ -53,6 +53,7 @@ data:
 mounted: | #js
   function() {
     this.$root.$on("app.node.changed", this.onAppNodeChanged.bind(this));
+    //this.$watch("sui.node.hovered", this.onSuiNodeChanged.bind(this, "hovered"));
     this.$watch("sui.node.selected", this.onSuiNodeChanged.bind(this, "selected"));
     this.initNodeVars();
     this.refresh1();
@@ -221,6 +222,7 @@ methods:
     }
   onSuiNodeChanged: | #js
     function(type, node) {
+      this.refresh1();
       if (node?.id != this.node?.id) return;
       if (type == "selected") {
         if (this.dataItem) this.$root.$emit("data.item.selected", this.dataItem);

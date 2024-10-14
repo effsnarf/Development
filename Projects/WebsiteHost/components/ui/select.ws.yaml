@@ -44,6 +44,7 @@ dom:
               ':html': __getItemText(slotProps.item)
               :number: _getItemNumber(slotProps.item)
           @item-hover: onItemHover($event)
+          @item-click: onItemClick($event)
           @input: onInput($event)
 props:
   options: null
@@ -89,6 +90,10 @@ methods:
   onItemHover: | #js
     function(e) {
       this.$emit("item-hover", e);
+    }
+  onItemClick: | #js
+    function(e) {
+      this.$emit("item-click", e);
     }
   onInput: | #js
     function(index) {

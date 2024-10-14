@@ -17,6 +17,7 @@ dom:
         ':show-search': showSearch
         ':can-select-none': canSelectNone
         @item-hover: onItemHover
+        @item-click: onItemClick
         v-model: selectedTabIndex
     div: 
       class: flex-grow-1
@@ -65,6 +66,10 @@ methods:
   onItemHover: | #js
     function(e) {
       this.hoveredTabIndex = e.index;
+    }
+  onItemClick: | #js
+    function(e) {
+      this.$emit('tab-click', e);
     }
   _getOptionHtml: | #js
     function(option) {

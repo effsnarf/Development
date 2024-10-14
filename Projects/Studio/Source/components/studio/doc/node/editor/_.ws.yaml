@@ -9,7 +9,7 @@ dom:
         :can-select-none: "true"
         :show-title-in-tab: "false"
         :value: sui.tool.category.index
-        @input: selectToolCategory
+        @tab-click: onToolTabClick
         template:
           v-slot: header
         template: 
@@ -85,6 +85,10 @@ mounted: | #js
   }
 
 methods:
+  onToolTabClick: | #js
+    function(e) {
+      this.selectToolCategory(e?.index);
+    }
   selectToolCategory: | #js
     function(index) {
       this.$root.do("select.tool.category", { index });

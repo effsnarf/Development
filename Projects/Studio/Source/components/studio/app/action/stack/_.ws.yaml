@@ -22,9 +22,29 @@ data:
 mounted: | #js
   function() {
     this.$root.do = this._do.bind(this);
+    // ctrl + z, ctrl + y
+    window.addEventListener("keydown", (e) => {
+      if (e.ctrlKey && e.key == "z") this.undo();
+      if (e.ctrlKey && e.key == "y") this.redo();
+    });
   }
 
 methods:
+  do_select_page: | #js
+    function(_do, pageNode) {
+      let oldPageNode = this.sui.page.selected;
+      if ((!oldPageNode && !pageNode) || (oldPageNode?.id == pageNode?.id)) return;
+      pageNode = this.$root.getNode(pageNode);
+      this.sui.page.selected = pageNode;
+      _do.icon = this.$root.getNodeIcon(pageNode);
+      _do.text = this.$root.getNodeText(pageNode);
+      _do.pageNode = (!pageNode) ? null : { id: pageNode.id };
+      const node = this.sui.node;
+      node.hovered = node.selected = node.active = node.context = null;
+      oldPageNode = (!oldPageNode) ? null : { id: oldPageNode.id };
+      const undo = { type: "select.page", args: { pageNode: oldPageNode } };
+      return { _do, undo };
+    }
   do_select_tool_category: | #js
     function(_do, index) {
       const oldIndex = this.sui.tool.category.index;
@@ -47,6 +67,7 @@ methods:
       this.sui.node.selected = node;
       _do.icon = this.$root.getNodeIcon(node);
       _do.text = this.$root.getNodeText(node);
+      _do.node = (!node) ? null : { id: node.id };
       const undo = { type: "select.node", args: { node: oldNode } };
       return { _do, undo };
     }
@@ -56,6 +77,9 @@ methods:
       parent = this.$root.getNode(parent);
       newNode = this.$root.initNewNode(this.userApp, newNode, { childOf: { parent, insertAt: 0 } });
       this.sui.node.selected = newNode;
+      _do.icon = this.$root.getNodeIcon(newNode);
+      _do.text = this.$root.getNodeText(newNode);
+      _do.parent = { id: parent.id };
       const undo = { type: "delete.node", args: { node: { id: newNode.id } } };
       return { _do, undo };
     }
@@ -66,6 +90,9 @@ methods:
       const index = parent.children.findIndex(n => (n.id == node.id));
       parent = { node: { id: parent.id } };
       TreeObject.deleteNode(this.userApp, node, { newTree: false });
+      _do.icon = this.$root.getNodeIcon(node);
+      _do.text = this.$root.getNodeText(node);
+      _do.node = (!node) ? null : { id: node.id };
       const undo = { type: "undelete.node", args: { parent, node, index } };
       return { _do, undo };
     }
@@ -86,6 +113,8 @@ methods:
         const node2 = Objects.clone(node, { exclude: ["children"] });
         undoChanges = DeepDiff.diff(node2, prevNode);
       }
+      _do.icon = this.$root.getNodeIcon(node);
+      _do.text = this.$root.getNodeText(node);
       node = { id: node.id };
       _do = { type: "edit.node", args: { node, newNode: null, changes } };
       const undo = { type: "edit.node", args: { node, newNode: null, changes: undoChanges } };
