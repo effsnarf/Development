@@ -25,6 +25,10 @@ props:
   sui:
   showName: true
 
+mounted: | #js
+  function() {
+  }
+
 methods:
   onDropItem: | #js
     function(dragItem) {

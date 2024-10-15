@@ -4,36 +4,44 @@ dom:
     :item-index: itemIndex
     :items-count: itemsCount
     :sui: sui
-    component:
-      v-if: node
-      ref: comp1
-      :is: nodeCompName
-      :node: node
-      :user-app: userApp
-      :user-app-state: userAppState
-      :sui: sui
-      :data-item: dataItem
-      :content-node: contentNode
-      :class: nodeCssClass
-      :style: nodeStyle
-      :data-sui-page: nodePageName
-      :data-node-id: node.id
-      template:
-        v-slot: child-nodes
-        ui.dom.layout:
-          :layout: node.layout
-          :show-example: (!node.children?.length)
-          :show-grid-name: "false"
-          :key: key1
-          studio.doc.node:
-            v-for: childNode in node.children
-            :node: childNode
-            :user-app: userApp
-            :user-app-state: userAppState
-            :sui: sui
-            :data-item: dataItem
-            :content-node: contentNode
-            :key: childNode.id
+    div:
+      v-if: "(node.type == 'list')"
+      button:
+        @click: initNodeVars
+        v-text: "'♻️'"
+    transition:
+      name: slide
+      component:
+        v-if: node
+        :key: node.id
+        ref: comp1
+        :is: nodeCompName
+        :node: node
+        :user-app: userApp
+        :user-app-state: userAppState
+        :sui: sui
+        :data-item: dataItem
+        :content-node: contentNode
+        :class: nodeCssClass
+        :style: nodeStyle
+        :data-sui-page: nodePageName
+        :data-node-id: node.id
+        template:
+          v-slot: child-nodes
+          ui.dom.layout:
+            :layout: node.layout
+            :show-example: showLayoutExample
+            :show-grid-name: "false"
+            :key: key1
+            studio.doc.node:
+              v-for: childNode in node.children
+              :node: childNode
+              :user-app: userApp
+              :user-app-state: userAppState
+              :sui: sui
+              :data-item: dataItem
+              :content-node: contentNode
+              :key: childNode.id
 
 props:
   node:
@@ -106,7 +114,7 @@ methods:
           _data.value = (await $root.fetchFromUrl(newUrl));
           // #TODO not accurate
           // switch to the page this list is in
-          if (pageNode) sui.page.selected = pageNode;
+          if (pageNode) $root.do("select.page", { pageNode });
         }),
         { immediate: true });
 
@@ -313,10 +321,18 @@ methods:
   refresh: | #js
     function() {
       //this.nodeStyle = this.getNodeStyle(this.node);
-      //this.key1++;
+      this.key1++;
     }
 
 computed:
+  showLayoutExample: | #js
+    function() {
+      const node = this.node;
+      if (["list"].includes(node.type)) {
+        if (!this.node.children?.length) return true;
+      }
+      return false;
+    }
   nodeVarPath: | #js
     function() {
       return this.$root.getNodeVarPath(this.node);
@@ -366,6 +382,12 @@ watch:
 style:
   .studio-doc-node:
     transition: all 0.6s, color 0.2s, border 0s
+  .node-warning:
+    font-size: 120%
+    text-align: center
+    padding: 1em
+    opacity: 0.8
+    background: "repeating-linear-gradient(-45deg, #3b3b3b, #3b3b3b 20px, #1f1f1f 20px, #1f1f1f 40px)"
   .hovered-node:
     border: "2px dashed #FFFF0080 !important"
   .selected-node:

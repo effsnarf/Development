@@ -1,12 +1,12 @@
 dom:
   studio.doc.node:
-    v-if: layoutNode
-    :node: layoutNode
+    v-if: pageTemplateNode
+    :node: pageTemplateNode
     :user-app-state: userAppState
     :sui: sui
     :content-node: node
   div:
-    v-else-if: "!layoutNode"
+    v-else-if: "!pageTemplateNode"
     slot:
       name: child-nodes
 
@@ -16,17 +16,17 @@ props:
   sui:
 
 methods:
-  getLayoutNode: | #js
+  getPageTemplateNode: | #js
     function() {
-      if (!this.node.layout) return null;
-      const layoutNode = this.$root.getClassNode("layout", this.node.layout);
-      return layoutNode;
+      if (!this.node.page.template) return null;
+      const pageTemplateNode = this.$root.getClassNode("page.template", this.node.page.template);
+      return pageTemplateNode;
     }
 
 computed:
-  layoutNode: | #js
+  pageTemplateNode: | #js
     function() {
-      return this.getLayoutNode();
+      return this.getPageTemplateNode();
     }
 
 style:

@@ -36,12 +36,10 @@ methods:
       if ((!oldPageNode && !pageNode) || (oldPageNode?.id == pageNode?.id)) return;
       pageNode = this.$root.getNode(pageNode);
       this.sui.page.selected = pageNode;
-      _do.icon = this.$root.getNodeIcon(pageNode);
-      _do.text = this.$root.getNodeText(pageNode);
-      _do.pageNode = (!pageNode) ? null : { id: pageNode.id };
+      this.setIconText(_do, pageNode);
       const node = this.sui.node;
       node.hovered = node.selected = node.active = node.context = null;
-      oldPageNode = (!oldPageNode) ? null : { id: oldPageNode.id };
+      oldPageNode = this.onlyNodeID(oldPageNode);
       const undo = { type: "select.page", args: { pageNode: oldPageNode } };
       return { _do, undo };
     }
@@ -60,15 +58,35 @@ methods:
       return { _do, undo };
     }
   do_select_node: | #js
-    function(_do, node) {
-      let oldNode = this.sui.node.selected;
-      if (oldNode) oldNode = { id: oldNode.id };
+    function(_do, selectIndex, node) {
+      if (!node) return;
+      const selecteds = this.sui.node.selecteds;
+      const oldSelectedNodes = selecteds.map(n => ({ id: n.id }));
+      const oldSelectedPage = this.onlyNodeID(this.sui.page.selected);
+      // clear anything above selectIndex
+      selecteds.splice(selectIndex);
       node = this.$root.getNode(node);
-      this.sui.node.selected = node;
-      _do.icon = this.$root.getNodeIcon(node);
-      _do.text = this.$root.getNodeText(node);
-      _do.node = (!node) ? null : { id: node.id };
-      const undo = { type: "select.node", args: { node: oldNode } };
+      selecteds.push(node);
+      // if this is a page node, set sui.page.selected
+      if (node?.type == "page") this.do_select_page(_do, node);
+      this.setIconText(_do, node);
+      const undo = { type: "select.nodes", args: { page: oldSelectedPage, nodes: oldSelectedNodes } };
+      return { _do, undo };
+    }
+  do_select_nodes: | #js
+    function(_do, page, nodes) {
+      const selecteds = this.sui.node.selecteds;
+      const oldSelectedNodes = selecteds.map(n => ({ id: n.id }));
+      selecteds.splice(0);
+      for (let node of nodes) {
+        node = this.$root.getNode(node);
+        selecteds.push(node);
+      }
+      const lastNode = selecteds.pop();
+      this.do_select_node(_do, selecteds.length, lastNode);
+      this.do_select_page(_do, page);
+      this.setIconText(_do, selecteds.last());
+      const undo = { type: "select.nodes", args: { nodes: oldSelectedNodes } };
       return { _do, undo };
     }
   do_create_node: | #js
@@ -77,10 +95,9 @@ methods:
       parent = this.$root.getNode(parent);
       newNode = this.$root.initNewNode(this.userApp, newNode, { childOf: { parent, insertAt: 0 } });
       this.sui.node.selected = newNode;
-      _do.icon = this.$root.getNodeIcon(newNode);
-      _do.text = this.$root.getNodeText(newNode);
-      _do.parent = { id: parent.id };
+      this.setIconText(_do, newNode);
       const undo = { type: "delete.node", args: { node: { id: newNode.id } } };
+      this.$root.$emit("app.node.changed", parent);
       return { _do, undo };
     }
   do_delete_node: | #js
@@ -90,10 +107,9 @@ methods:
       const index = parent.children.findIndex(n => (n.id == node.id));
       parent = { node: { id: parent.id } };
       TreeObject.deleteNode(this.userApp, node, { newTree: false });
-      _do.icon = this.$root.getNodeIcon(node);
-      _do.text = this.$root.getNodeText(node);
-      _do.node = (!node) ? null : { id: node.id };
+      this.setIconText(_do, parent);
       const undo = { type: "undelete.node", args: { parent, node, index } };
+      this.$root.$emit("app.node.changed", parent.node);
       return { _do, undo };
     }
   do_edit_node: | #js
@@ -113,10 +129,8 @@ methods:
         const node2 = Objects.clone(node, { exclude: ["children"] });
         undoChanges = DeepDiff.diff(node2, prevNode);
       }
-      _do.icon = this.$root.getNodeIcon(node);
-      _do.text = this.$root.getNodeText(node);
-      node = { id: node.id };
       _do = { type: "edit.node", args: { node, newNode: null, changes } };
+      this.setIconText(_do, node);
       const undo = { type: "edit.node", args: { node, newNode: null, changes: undoChanges } };
       this.$root.appNodeEdited(node);
       return { _do, undo };
@@ -126,6 +140,7 @@ methods:
       parent = this.$root.getNode(parent);
       TreeObject.addNode(parent, node, index);
       const undo = { type: "delete.node", args: { node: { id: node.id } } };
+      this.$root.$emit("app.node.changed", parent);
       return { _do, undo };
     }
   undo: | #js
@@ -169,4 +184,18 @@ methods:
       }
       this.actions.add(action);
       this.pointer = (this.actions.length - 1);
+    }
+  setIconText: | #js
+    function(_do, node) {
+      _do.icon = this.$root.getNodeIcon(node);
+      _do.text = this.$root.getNodeText(node);
+      // find any node props in _do.args (has [id] and [type]) and keep only their { id: [id] }
+      for (const key in _do.args) {
+        const value = _do.args[key];
+        if (value?.id && value?.type) _do.args[key] = { id: value.id };
+      }
+    }
+  onlyNodeID: | #js
+    function(node) {
+      return (!node) ? null : { id: node.id };
     }

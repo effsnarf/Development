@@ -3,8 +3,11 @@ dom:
     ui.tree:
       ":root": root
       item-type: studio.dom.tree.node
+      :custom-node-select: true
+      :selected-node-id: selectedNodeId
       :initial-expanded: initialExpanded
       :item-props: "{ sui }"
+      :max-depth: maxDepth
       @node-hover: (...args) => $emit('node-hover', ...args)
       @node-click: (...args) => $emit('node-click', ...args)
     ui.value:
@@ -14,10 +17,27 @@ dom:
 props:
   root:
   sui:
+  selectedNodeId:
   initialExpanded: false
+  maxDepth: 100
 
 data:
 
+mounted: | #js
+  function() {
+    this.$root.$on("app.node.changed", this.onAppNodeChanged.bind(this));
+  }
+
+methods:
+  onAppNodeChanged: | #js
+    function() {
+      this.refresh();
+    }
+  refresh: | #js
+    function() {
+      this.$forceUpdate();
+    }
+    
 computed:
   selectedNodeData: | #js
     function() {

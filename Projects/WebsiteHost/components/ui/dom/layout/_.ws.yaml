@@ -22,6 +22,8 @@ dom:
             :class: box.class
             :data-area: "box.area"
             :key: "'box-' + index"
+            slot:
+              name: example-box
 
 props:
   layout:

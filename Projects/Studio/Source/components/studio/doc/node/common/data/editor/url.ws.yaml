@@ -3,13 +3,28 @@ dom:
     ui.input.text.box:
       hint: url
       multiline: true
-      v-model: nodeVar.url
+      @input: is.dirty = true
+      v-model: url
+    div:
+      v-if: is.dirty
+      ui.button:
+        icon: ✔️
+        text: save
 
 props:
   nodeVar:
 
 data:
+  url:
+  is:
+    dirty: false
 
 methods:
 
 watch:
+  nodeVar:
+    immediate: true
+    handler: | #js
+      function() {
+        this.url = this.nodeVar?.url;
+      }

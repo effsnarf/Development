@@ -1,5 +1,8 @@
 dom:
   div:
+    .node-warning:
+      v-if: "!node.children?.length"
+      v-text: "'⚠️ empty panel'"
     slot:
       name: child-nodes
 
@@ -10,3 +13,5 @@ props:
 methods:
 
 computed:
+
+style:

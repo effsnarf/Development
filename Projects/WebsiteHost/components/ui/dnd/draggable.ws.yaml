@@ -27,6 +27,8 @@ methods:
     function(e) {
       this.isDragging = true;
 
+      e.stopPropagation();
+
       this.dragElementPos = { x: e.clientX, y: e.clientY };
 
       if (!this.showDragGhost)

@@ -42,7 +42,10 @@ style:
   .tools:
     display: flex
     justify-content: center
-    gap: 0.1em
+    gap: 1em
+    opacity: 0.4
+  .tools:hover:
+    opacity: 1
   .tool:
     padding: 0 1em
     overflow: hidden
@@ -51,6 +54,7 @@ style:
     filter: none
   .title:
     width: auto
+    margin-top: -0.5em
     padding: 0
     text-align: center
     opacity: 0.6

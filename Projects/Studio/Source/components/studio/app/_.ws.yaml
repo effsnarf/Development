@@ -1,29 +1,30 @@
 dom:
   div:
     studio.app.logo:
+    div:
+      studio.doc.node.toolbar:
     .spacer1:
       v-text: "''"
     .main-boxes:
       v-if: userApp
       :class: "{ ['box-hovered-' + sui.main.box.hovered]: true }"
       .main-box.a:
-        studio.app.action.stack:
+        studio.doc.page.selector:
           :user-app: userApp
+          :user-app-state: userAppState
           :sui: sui
-        ui.drawer:
-          .box2:
-            studio.dom.tree:
-              :root: userApp
-              :sui: sui
+          :value: sui.page.selected
+          @input: selectPage
         @mouseenter: sui.main.box.hovered = 0
         @mouseleave: sui.main.box.hovered = null
       .main-box.b:
         studio.app.ui.drawer:
           closed-width: 8em
-          studio.doc.node.toolbar:
-        studio.dom.node.browser:
-          :user-app: userApp
-          :sui: sui
+        div:
+          :style: "{ 'margin-top': 'calc(-2.9em + 1px)' }"
+          studio.dom.node.browser:
+            :user-app: userApp
+            :sui: sui
         studio.app.log:
           category: runtime
         @mouseenter: sui.main.box.hovered = 1
@@ -31,12 +32,6 @@ dom:
       .main-box.c:
         studio.app.ui.drawer:
           closed-width: 8em
-          studio.doc.page.selector:
-            :user-app: userApp
-            :user-app-state: userAppState
-            :sui: sui
-            :value: sui.page.selected
-            @input: selectPage
         .box2:
           class: flex-grow-1
           :class: "{ 'user-app-tilted': sui.app.is.tilted }"
@@ -63,7 +58,7 @@ dom:
             :sui: sui
         .box2:
           studio.doc.node.editor:
-            :node: sui.node.selected
+            :node: sui.node.selecteds[sui.node.selecteds.length-1]
             :user-app: userApp
             :user-app-state: userAppState
             :sui: sui
@@ -74,6 +69,9 @@ dom:
         studio.app.global.settings:
           :user-app: userApp
           :user-app-state: userAppState
+          :sui: sui
+        studio.app.action.stack:
+          :user-app: userApp
           :sui: sui
         @mouseenter: sui.main.box.hovered = 4
         @mouseleave: sui.main.box.hovered = null
@@ -192,7 +190,7 @@ methods:
     }
   onSelectedNodeChanged: | #js
     function(node) {
-      this.sui.pages[this.sui.page.selected.id].node.selected = node;
+      if (this.sui.page.selected) this.sui.pages[this.sui.page.selected.id].node.selected = node;
       this.sui.selected.dataItems.clear();
     }
   onDataItemSelected: | #js
@@ -212,7 +210,9 @@ methods:
     }
   onRuntimeVueInited: | #js
     function() {
-      this.userAppState =  this.$refs.userAppRuntime1.$refs.userAppVue1.$data;
+      if (this.$refs.userAppRuntime1.$refs.userAppVue1) {
+        this.userAppState =  this.$refs.userAppRuntime1.$refs.userAppVue1.$data;
+      }
     }
   onHoverApp: | #js
     function(isHovered) {
@@ -239,7 +239,7 @@ methods:
     }
   getMockupUserApp: | #js
     function() {
-      const userApp = {
+      const mgUserApp = {
         type: "user.app",
         global: {
           design: {
@@ -265,10 +265,10 @@ methods:
         },
         children: [
           {
-            type: "layouts",
+            type: "page.templates",
             children: [
               {
-                type: "layout",
+                type: "page.template",
                 name: "default",
                 children: [
                   {
@@ -315,8 +315,10 @@ methods:
               {
                 type: "page",
                 name: "home",
-                layout: {
-                  name: "default"
+                page: {
+                  template: {
+                    name: "default"
+                  }
                 },
                 children: [
                   {
@@ -444,8 +446,10 @@ methods:
               {
                 type: "page",
                 name: "board",
-                layout: {
-                  name: "default"
+                page: {
+                  template: {
+                    name: "default"
+                  }
                 },
                 children: [
                   {
@@ -510,8 +514,10 @@ methods:
               {
                 type: "page",
                 name: "thread",
-                layout: {
-                  name: "default"
+                page: {
+                  template: {
+                    name: "default"
+                  }
                 },
                 children: [
                   {
@@ -713,7 +719,122 @@ methods:
         ]
       };
 
-      const initNode = (node) => {
+      const emptyUserApp = {
+        type: "user.app",
+        global: {
+          design: {
+            palette: null
+          },
+          page: {
+            anim: {
+              "name": "slide-x",
+              "enter": {
+                "from": {
+                  "transform": "translateX(100%)",
+                  "opacity": 0
+                }
+              },
+              "leave": {
+                "to": {
+                  "transform": "translateX(-100%)",
+                  "opacity": 0
+                }
+              }
+            }
+          }
+        },
+        children: [
+          {
+            type: "page.templates",
+            children: [
+              {
+                type: "page.template",
+                name: "default",
+                children: [
+                  {
+                    type: "panel",
+                    layout: {},
+                    children: [
+                      {
+                        type: "text",
+                        text: "[app title]",
+                        size: 3
+                      },
+                      {
+                        type: "slot.outlet",
+                        name: "header"
+                      }
+                    ]
+                  },
+                  {
+                    type: "panel",
+                    layout: {
+                    },
+                    children: [
+                      {
+                        type: "slot.outlet",
+                        name: "content"
+                      }
+                    ]
+                  },
+                ]
+              }
+            ]
+          },
+          {
+            type: "pages",
+            children: [
+              {
+                type: "page",
+                name: "home",
+                page: {
+                  template: {
+                    name: "default"
+                  },
+                },
+                children: [
+                  {
+                    type: "slot.content",
+                    slot: {
+                      name: "header"
+                    },
+                    children: [
+                      {
+                        type: "text",
+                        size: 1,
+                        vars: [
+                          {
+                            name: "text",
+                            type: "value",
+                            value: "Home page"
+                          }
+                        ]
+                      },
+                    ]
+                  },
+                  {
+                    type: "slot.content",
+                    slot: {
+                      name: "content"
+                    },
+                    children: [
+                    ]
+                  },
+                ]
+              },
+            ]
+          },
+          {
+            type: "comps",
+            children: [
+            ]
+          }
+        ]
+      };
+
+      const userApp = Objects.clone(emptyUserApp);
+
+      const initNode = (node, depth) => {
         if (!node.type) return;
         const mockupNode = this.$root.initNewNode(userApp, node);
         const nodeProps = Objects.clone(node, { exclude: ["children"] });
@@ -780,9 +901,9 @@ computed:
 
 style:
   .spacer1:
-    height: 4em
+    height: 3em
   .title1:
-    font-size: 300%
+    font-size: 200%
   .title2:
     font-size: 200%
   .title3:
@@ -822,7 +943,7 @@ style:
     box-shadow: "-0.5em 0.5em 2px #00000080"
     padding: 1em
   .main-box.a:
-    width: 10%
+    width: 8%
   .main-box.b:
     width: 15%
   .main-boxes.box-hovered-3 .main-box.d:

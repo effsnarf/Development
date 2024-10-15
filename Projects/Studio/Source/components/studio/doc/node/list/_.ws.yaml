@@ -3,6 +3,11 @@ dom:
     :layout: node.layout
     :show-example: (!node.children?.length)
     :show-grid-name: "false"
+    template:
+      v-slot: example-box
+      .node-warning:
+        v-if: "!node.children?.length"
+        v-text: "'⚠️ list template'"
     .list-item:
       v-for: (item, i) in visibleItems
       :key: getListItemKey(item)
@@ -28,6 +33,7 @@ data:
   items:
   hovered:
   selected:
+  exampleItems: 9
   maxVisibleItems: 3
 
 mounted: | #js
@@ -50,7 +56,7 @@ methods:
     }
   getMockArray: | #js
     function() {
-      return Array.from(Array(this.maxVisibleItems).keys()).map((i) => null);
+      return Array.from(Array(this.exampleItems).keys()).map((i) => null);
     }
 
 computed:

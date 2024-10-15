@@ -660,22 +660,27 @@ interface TreeNode {
 }
 
 class TreeObject {
-  static traverse(root: any, callback: Function, getChildren?: Function) {
-    // Traverse a tree structure (children[] on each node)
-    const traverse = async (
+  static traverse(
+    root: any,
+    callback: (node: any, depth: number) => void,
+    getChildren: (node: any) => any[] = (node) => node.children || []
+  ) {
+    const traverse = (
       node: any,
-      callback: Function,
-      getChildren: Function = (node: any) => node.children
+      depth: number,
+      callback: (node: any, depth: number) => void,
+      getChildren: (node: any) => any[]
     ) => {
-      callback(node);
+      callback(node, depth);
       const children = getChildren(node);
       if (children) {
         for (const child of children) {
-          traverse(child, callback, getChildren);
+          traverse(child, depth + 1, callback, getChildren);
         }
       }
     };
-    traverse(root, callback, getChildren);
+
+    traverse(root, 0, callback, getChildren);
   }
 
   static async traverseAsync(

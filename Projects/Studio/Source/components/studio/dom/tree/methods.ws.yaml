@@ -20,10 +20,10 @@ methods:
     function(node) {
       const icons = {
         "user.app": "💻",
-        layouts: "📄",
-        layout: "📄",
-        pages: "📃",
-        page: "📄",
+        "page.templates": "📚",
+        "page.template": "📚",
+        pages: "📜",
+        page: "📜",
         panel: "🗂️",
         text: "🅰️",
         list: "🧮",
@@ -64,7 +64,9 @@ methods:
     function(userApp, node, options) {
       const addChildren = (!node.children);
       node = Objects.clone(node, { exclude: ["children"] });
-      if (!("id" in node)) node.id = this.$root.getNewNodeID(userApp);
+      if (!("id" in node)) {
+        node.id = this.$root.getNewNodeID(userApp);
+      }
       if (options?.childOf) {
         options.childOf.parent.children.insertAt((options.childOf.insertAt ?? 0), node);
       }
@@ -83,6 +85,7 @@ methods:
         }
       };
       if (["panel", "list"].includes(node.type)) {
+        layout.type = "grid.y";
         layout.direction = null;
         layout.gap = null;
         layout.order = null;
@@ -93,6 +96,35 @@ methods:
           items: null,
           content: null
         };
+      }
+
+      node.vars = (node.vars || []);
+
+      if (node.type == "list") {
+        node.vars.push({
+          name: "items",
+          type: "fetch",
+          url: null,
+          linq: []
+        });
+        node.vars.push({
+          name: "hovered",
+          type: "node.prop",
+          editable: false
+        });
+        node.vars.push({
+          name: "selected",
+          type: "node.prop",
+          editable: false
+        });
+      }
+
+      const namedNodeTypes = ["list"];
+
+      if (namedNodeTypes.includes(node.type)) {
+        const nodesOfThisType = TreeObject.filter(userApp, (n) => (n.type == node.type));
+        const count = nodesOfThisType.length;
+        node.name = `${node.type}${(count)}`;
       }
       
       node.layout = (node.layout ?? {});
@@ -138,7 +170,8 @@ methods:
     }
   getNewNodeID: | #js
     function(userApp) {
-      const newID = ((this.getMaxID(userApp) || 0) + 1);
+      const maxID = this.getMaxID(userApp);
+      const newID = ((maxID || 0) + 1);
       return newID;
     }
   getMaxID: | #js
@@ -219,9 +252,9 @@ methods:
     function() {
       return this.getNodesByType("page");
     }
-  getLayoutNodes: | #js
+  getPageTemplateNodes: | #js
     function() {
-      return this.getNodesByType("layout");
+      return this.getNodesByType("page.template");
     }
   getClassNode: | #js
     function(type, inst) {

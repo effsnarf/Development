@@ -4,7 +4,7 @@ dom:
       :user-app: userApp
       :sui: sui
       :box-index: 0
-      :context-node: sui.page.selected
+      :window-node: sui.page.selected
 
 props:
   userApp:

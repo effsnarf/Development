@@ -1,6 +1,10 @@
 dom:
   div:
     v-if: showUserAppVue
+    div:
+      ui.button:
+        text: "♻️"
+        @click: initUserAppVue
     studio.app.runtime.vue:
       ref: userAppVue1
       :user-app: userApp
@@ -32,6 +36,7 @@ methods:
       const mergedOptions = Object.assign(vueComp.options, newRuntimeOptions);
       Vue.component(studio_app_runtime_vue, mergedOptions);
       this.showUserAppVue = true;
+      this.$emit("runtime-vue-inited");
     }
   getVueOptions: | #js
     async function(userApp) {

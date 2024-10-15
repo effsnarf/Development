@@ -115,11 +115,11 @@ methods:
 style:
   .inspector:
     position: fixed
-    left: 1em
+    right: 8em
     bottom: 1em
     opacity: 0.5
     max-width: 10em
-    max-height: 10em
+    max-height: 5em
     overflow: hidden
     padding: 1em
     border: "1px solid #ccc"

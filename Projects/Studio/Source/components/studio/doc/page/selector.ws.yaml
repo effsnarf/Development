@@ -46,6 +46,7 @@ style:
     overflow: hidden
   .pages:
     display: flex
+    flex-direction: column
     gap: 0
     justify-content: center
   .pages > *:

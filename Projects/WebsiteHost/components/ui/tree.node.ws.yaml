@@ -24,8 +24,9 @@ dom:
       @dragout: onMouseLeave
       slot: null
     div:
+      v-if: ((!maxDepth) || (depth < maxDepth))
       transition.group:
-        v-if: isExpanded
+        v-if: (isExpanded)
         tag: ul
         name: list
         class: ml-4
@@ -44,6 +45,7 @@ dom:
             ':get-children': getChildren
             ':selected-node': selectedNode
             ':item-props': itemProps
+            ':max-depth': maxDepth
             @node-click: onChildClick
             @node-hover: onChildHover
             @node-unhover: onChildUnhover
@@ -60,6 +62,7 @@ props:
   getChildren: null
   selectedNode: null
   itemProps: null
+  maxDepth: null
 data:
   isInited: false
   isExpanded: null
@@ -82,7 +85,7 @@ methods:
       {
         this.children = this.getChildren(this.node);
       }
-      const node = Objects.areEqual(this.node, this.selectedNode) ? null : this.node;
+      const node = this.areNodesEqual(this.node, this.selectedNode) ? null : this.node;
       this.$emit('node-click', node);
     }
   onNodeDoubleClick: | #js
@@ -126,10 +129,15 @@ methods:
       if (!this.isExpanded) return [];
       return this.getChildren(node);
     }
+  areNodesEqual: | #js
+    function(node1, node2) {
+      if (!node1 || !node2) return false;
+      return this.getItemKey(node1) == this.getItemKey(node2);
+    }
 computed:
   isSelected: | #js
     function() {
-      return Objects.areEqual(this.node, this.selectedNode);
+      return this.areNodesEqual(this.node, this.selectedNode);
     }
   showUiExpand: | #js
     function() {

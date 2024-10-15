@@ -12,14 +12,17 @@ dom:
         ':get-item': getItem || ((node) => (node?.item || node))
         ':get-item-key': getItemKey1
         ':get-children': getChildren || ((node) => node.children||[])
-        ':selected-node': selectedNode
+        ':selected-node': selectedNode1
         ':item-props': itemProps
+        ':max-depth': maxDepth
         @node-click: onChildClick
         @node-hover: onChildHover
         @node-unhover: onChildUnhover
         @node-hovered: onChildHovered
 props:
   root: null
+  customNodeSelect: null
+  selectedNodeId: null
   initialExpanded: false
   expandable: true
   itemType: null
@@ -27,17 +30,18 @@ props:
   getItemKey: null
   getChildren: null
   itemProps: null
+  maxDepth: null
 data:
-  selectedNode: null
+  mySelectedNode: null
 methods:
   selectNode: | #js
     function(node) {
-      this.selectedNode = node;
+      this.mySelectedNode = node;
     }
   onChildClick: | #js
     function(child) {
       this.$emit('node-click', child);
-      this.selectedNode = (child == this.selectedNode) ? null : child;
+      this.mySelectedNode = (child == this.mySelectedNode) ? null : child;
     }
   onChildHover: | #js
     function (child) {
@@ -53,6 +57,11 @@ methods:
       this.$emit('node-hovered', child, isHovered);
     }
 computed:
+  selectedNode1: | #js
+    function() {
+      if (this.customNodeSelect) return { id: this.selectedNodeId };
+      return this.mySelectedNode;
+    }
   getItemKey1: | #js
     function() {
       return (this.getItemKey || this.$root.getKey);
@@ -67,7 +76,7 @@ computed:
       return 0;
     }
 watch:
-  selectedNode: | #js
+  mySelectedNode: | #js
     function(newVal, oldVal) {
       this.$emit('node-select', newVal);
     }
