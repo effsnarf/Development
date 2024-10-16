@@ -77,6 +77,8 @@ dom:
           :sui: sui
         @mouseenter: sui.main.box.hovered = 4
         @mouseleave: sui.main.box.hovered = null
+    .logo:
+      v-text: "''"
     studio.dom.tree.methods:
       ref: methods1
       :user-app: userApp
@@ -902,10 +904,19 @@ computed:
     }
 
 style:
+  .logo:
+    position: fixed
+    top: 1em
+    right: 1em
+    background: url(https://i.imgur.com/FJgDKYo.png)
+    width: 10vw
+    aspect-ratio: 1
+    background-position: center
+    background-size: cover
   .spacer1:
     height: 3em
   .title1:
-    font-size: 200%
+    font-size: 300%
   .title2:
     font-size: 200%
   .title3:
