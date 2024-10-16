@@ -32,10 +32,12 @@ class Component {
   async compile(mixins: any[] = []) {
     if (this.isCompiled) return;
 
+    
     const logGroup = true;
-
+    
     await ClientContext.waitUntilLoaded();
     const client = ClientContext.context!;
+    const globalVue = this.getGlobalVue();
 
     if (logGroup) {
       console.groupCollapsed(`📦`, this.name);
@@ -45,12 +47,12 @@ class Component {
     }
 
     try {
-      const vueOptions = await this.getVueOptions();
+      const vueName = Component.toVueName(this.name);
+      const vueOptions = await this.getVueOptions(vueName);
       const compMixins = mixins.filter((m: any) => m.matchComp(this));
       vueOptions.mixins = [...(vueOptions.mixins || []), ...compMixins];
 
       if (logGroup) console.log(vueOptions);
-      const vueName = Component.toVueName(this.name);
       if (this.source) {
         const pug = vueOptions.template;
         let html = (await client.pugToHtml(pug)) || "";
@@ -58,7 +60,7 @@ class Component {
         vueOptions.template = html;
         this.source.template = html;
       }
-      client.Vue.component(vueName, vueOptions);
+      globalVue.component(vueName, vueOptions);
       this.isCompiled = true;
     } catch (ex) {
       throw ex;
@@ -67,17 +69,26 @@ class Component {
     }
   }
 
-  async getVueOptions() {
+  async getVueOptions(name: string) {
     await ClientContext.waitUntilLoaded();
     const client = ClientContext.context!;
     let json = client.Handlebars.compile(client.templates.vue)(this.source);
     try {
       const vueOptions = eval(`(${json})`);
+      vueOptions.name = name;
       return vueOptions;
     } catch (ex) {
       debugger;
       throw ex;
     }
+  }
+
+  getGlobalVue() {
+    const w = (window as any);
+    if (!w.globalVue) {
+      w.globalVue = w.Vue.createApp({});
+    }
+    return w.globalVue;
   }
 
   private static toVueName(name: string) {

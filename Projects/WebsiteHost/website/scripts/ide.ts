@@ -191,13 +191,15 @@ const vueIdeCompMixin = {
 
   const performanceTracker = Performance.Tracker.new();
 
-  vueIdeApp = new client.Vue({
-    data: {
-      vm: vueManager,
-      html: new HtmlHelper(),
-      comps: client.Vue.ref(client.comps),
-      templates: client.templates,
-      perf: performanceTracker,
+  vueIdeApp = client.Vue.createApp({
+    data: function() {
+      return {
+        vm: vueManager,
+        html: new HtmlHelper(),
+        comps: client.Vue.ref(client.comps),
+        templates: client.templates,
+        perf: performanceTracker,
+      };
     },
     async mounted() {
       await this.init();
@@ -352,13 +354,13 @@ const vueIdeCompMixin = {
 
   vueIdeApp.state = state;
 
-  await vueIdeApp.wait(4000);
+  await (4).seconds().wait();
 
   // Create an element to host the Vue IDE app
   const el = document.createElement("div");
   el.id = `vue-ide-app-${Date.now()}`;
   document.body.appendChild(el);
-  vueIdeApp.$mount(`#${el.id}`);
+  vueIdeApp.mount(`#${el.id}`);
 
   (window as any).vueIdeApp = vueIdeApp;
 })();

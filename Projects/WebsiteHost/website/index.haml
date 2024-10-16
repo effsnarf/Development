@@ -29,7 +29,8 @@
     %script{src: "https://cdnjs.cloudflare.com/ajax/libs/dexie/3.2.3/dexie.js"}
     %script{src: "https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.js"}
     %script{src: "https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.7/handlebars.js"}
-    %script{src: "https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.js"}
+    / %script{src: "https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.js"}
+    %script{src: "https://unpkg.com/vue@3/dist/vue.global.js"}
     %script{src: "https://unpkg.com/vue-async-computed"}
     %script{src: "/js/lib/leader-line/leader-line.min.js"}
     %script{src: "/js/tooltip.js"}
@@ -47,5 +48,6 @@
     %script{src: "/scripts/ide.js?_uid=(((scriptUrlCacheInvalidator)))", defer: "true"}
     %script{src: "/scripts/website.host.startup.js?_uid=(((scriptUrlCacheInvalidator)))", defer: "true"}
   %body
-    %div{id: "app"}
-      %app{ref: "app", ":key": "key1"}
+    %div{id: "globalVueDiv"}
+      %app
+
