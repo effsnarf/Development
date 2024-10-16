@@ -48,8 +48,10 @@ dom:
                       v-model: var1.exp
                   template:
                     v-slot: tab2
-                    studio.doc.node.common.data.editor.url:
+                    studio.doc.node.common.data.editor.fetch:
+                      :node: node
                       :node-var: var1
+                      :node-var-path: getNodeVarPath(var1)
                   template:
                     v-slot: tab3
                     studio.doc.node.common.data.editor.node.prop:
@@ -80,10 +82,15 @@ methods:
       if (!var1) return null;
       return this.tabOptions.findIndex(t => (var1.type == (t.split(' ').last())));
     }
+  getNodeVarPath: | #js
+    function(var1) {
+      const nvp = this.$root.getNodeVarPath(this.node);
+      return `${nvp}.${var1.name}`;
+    }
   onTabChange: | #js
     function(var1, newTab) {
       if (!var1) return;
-      var1.type = this.tabOptions[newTab].split(' ').last();
+      var1.type = (newTab < 0) ? null : this.tabOptions[newTab].split(' ').last();
     }
 
 computed:

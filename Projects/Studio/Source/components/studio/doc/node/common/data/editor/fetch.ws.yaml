@@ -1,0 +1,55 @@
+dom:
+  div:
+    ui.input.text.box:
+      hint: url
+      multiline: true
+      v-model: url
+    div:
+      v-if: (url != nodeVar.url)
+      ui.button:
+        icon: ✔️
+        text: save
+        @click: onSaveUrl
+    div:
+      studio.app.runtime.state.data:
+        :node-var-path: nodeVarPath
+        v-model: nodeVarData
+      ui.value.preview:
+        :value: nodeVarData
+      ui.linq:
+        v-if: (nodeVarData && nodeVar.linq)
+        :input: nodeVarData
+        :value: nodeVar.linq
+        @input: setLinq
+        @output: (value) => nodeVarLinqedData = value
+      ui.value:
+        :value: nodeVarLinqedData
+
+props:
+  node:
+  nodeVar:
+  nodeVarPath:
+
+data:
+  url:
+  nodeVarData:
+  nodeVarLinqedData:
+
+methods:
+  setLinq: | #js
+    function(linq) {
+      if (Objects.areEqual(linq, this.nodeVar.linq)) return;
+      //this.$root.do("edit.node.var", { node: this.node, varName: this.nodeVar.name, key: "linq", value: linq });
+    }
+  onSaveUrl: | #js
+    function() {
+      this.$root.do("edit.node.var", { node: this.node, varName: this.nodeVar.name, key: "url", value: this.url });
+    }
+
+watch:
+  nodeVar:
+    immediate: true
+    handler: | #js
+      function() {
+        this.url = this.nodeVar?.url;
+      }

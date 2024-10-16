@@ -1,0 +1,44 @@
+dom:
+  div:
+    h3:
+      v-text: var1.name
+    h2:
+      v-text: url
+    h3:
+      v-text: nodeVarPath
+    ui.value:
+      :value: items
+
+props:
+  var1:
+  nodeVarPath:
+
+data:
+  url:
+  items: []
+
+methods:
+  init: | #js
+    function(var1) {
+      //const cUrl = this.$root.computedNodeVar(this, "url", var1.url);
+      // [local].items -> [userAppState].items and vice versa
+      //this.$root.bindToUserAppState(this, this.nodeVarPath, "items");
+    }
+
+watch:
+  url:
+    immediate: true
+    handler: | #js
+      async function(newUrl, oldUrl) {
+        if (newUrl == oldUrl) return;
+        //this.items = (await this.$root.fetchFromUrl(newUrl));
+        // #TODO not accurate
+        // switch to the page this list is in
+        //if (pageNode) $root.do("select.page", { pageNode });
+      }
+  var1:
+    immediate: true
+    handler: | #js
+      function(var1) {
+        this.init(var1);
+      }

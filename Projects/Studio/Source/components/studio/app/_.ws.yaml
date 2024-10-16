@@ -38,6 +38,7 @@ dom:
           @mouseenter: () => onHoverApp(true)
           @mouseleave: () => onHoverApp(false)
           studio.doc.node.picker:
+            v-if: "false"
             :user-app: userApp
             :sui: sui
             :enabled: sui.app.is.hovered
@@ -45,7 +46,7 @@ dom:
             ref: userAppRuntime1
             :user-app: userApp
             :sui: sui
-            @runtime-vue-inited: onRuntimeVueInited
+            @user-app-state: (uas) => userAppState = uas
           div:
             v-text: sui.node.hovered?.id
         @mouseenter: sui.main.box.hovered = 2
@@ -66,12 +67,13 @@ dom:
         @mouseenter: sui.main.box.hovered = 3
         @mouseleave: sui.main.box.hovered = null
       .main-box.e:
+        div:
+          studio.app.action.stack:
+            :user-app: userApp
+            :sui: sui
         studio.app.global.settings:
           :user-app: userApp
           :user-app-state: userAppState
-          :sui: sui
-        studio.app.action.stack:
-          :user-app: userApp
           :sui: sui
         @mouseenter: sui.main.box.hovered = 4
         @mouseleave: sui.main.box.hovered = null
@@ -144,6 +146,9 @@ mounted: | #js
       user: {
         app: {
           state: {
+            set: (varPath, varName, value) => {
+              this.$root.studio.user.app.state.change(`${varPath}.${varName}`, value);
+            },
             change: (varPath, newValue, info) => {
               varPath = (varPath.split?.('.') || varPath);
               const oldValue = Objects.getProperty(this.userAppState, varPath);
@@ -207,12 +212,6 @@ methods:
       const page = sui.pages[pageNode.id];
       page.node = (page.node || {});
       page.node.selected = (page.node.selected || null);
-    }
-  onRuntimeVueInited: | #js
-    function() {
-      if (this.$refs.userAppRuntime1.$refs.userAppVue1) {
-        this.userAppState =  this.$refs.userAppRuntime1.$refs.userAppVue1.$data;
-      }
     }
   onHoverApp: | #js
     function(isHovered) {
@@ -947,13 +946,13 @@ style:
   .main-box.b:
     width: 15%
   .main-boxes.box-hovered-3 .main-box.d:
-    width: 46%
+    width: 35%
   .main-boxes.box-hovered-3 .main-box.e:
-    width: 4%
+    width: 15%
   .main-boxes.box-hovered-4 .main-box.d:
-    width: 4%
+    width: 15%
   .main-boxes.box-hovered-4 .main-box.e:
-    width: 46%
+    width: 35%
   .flex2:
     display: flex
     flex-direction: column

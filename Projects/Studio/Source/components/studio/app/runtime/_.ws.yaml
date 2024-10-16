@@ -1,50 +1,44 @@
 dom:
   div:
-    v-if: showUserAppVue
-    div:
-      ui.button:
-        text: "♻️"
-        @click: initUserAppVue
-    studio.app.runtime.vue:
-      ref: userAppVue1
+    studio.doc.node.user.app:
       :user-app: userApp
+      :user-app-state: userAppState
       :sui: sui
-      @mounted: $emit('runtime-vue-inited')
+    studio.app.runtime.common:
+      ref: common1
+    ui.linq.evaluator:
+      ref: linqEval1
 
 props:
   userApp:
-  userAppState:
   sui:
 
 data:
-  showUserAppVue: false
+  userAppState:
 
 mounted: | #js
-  async function() {
+  function() {
+    this.initAppState();
+    this.$root.$on("app.node.changed", this.onAppNodeChanged.bind(this));
     this.$root.$on("app.state.changed", this.onAppStateChanged.bind(this));
-    await this.init();
   }
 
 methods:
-  initUserAppVue: | #js
-    async function() {
-      this.showUserAppVue = false;
-      await this.$nextTick();
-      const studio_app_runtime_vue = `studio-app-runtime-vue`;
-      const newRuntimeOptions = (await this.getVueOptions(this.userApp));
-      const vueComp = Vue.component(studio_app_runtime_vue);
-      const mergedOptions = Object.assign(vueComp.options, newRuntimeOptions);
-      Vue.component(studio_app_runtime_vue, mergedOptions);
-      this.showUserAppVue = true;
-      this.$emit("runtime-vue-inited");
+  initAppState: | #js
+    function() {
+      this.userAppState = this.getNewAppState(this.userApp);
+      this.$emit("user-app-state", this.userAppState);
     }
-  getVueOptions: | #js
-    async function(userApp) {
-      const vueOptions = {};
+  updateAppState: | #js
+    function() {
+      const oldAppState = this.userAppState;
+      const newAppState = this.getNewAppState(this.userApp);
+      this.userAppState = newAppState;
+      this.$emit("user-app-state", this.userAppState);
+    }
+  getNewAppState: | #js
+    function(userApp) {
       const data = {};
-      const computeds = {};
-      const watchers = {};
-
       for (const pageNode of this.$root.getPageNodes()) {
         const pageData = {};
         // lists
@@ -64,31 +58,15 @@ methods:
         }
         data[pageNode.name] = pageData;
       }
-
-      vueOptions.data = function() { return data };
-      vueOptions.computed = computeds;
-      vueOptions.watch = watchers;
-
-      return vueOptions;
+      return data;
     }
-  init: | #js
-    async function() {
-      this.log("🔴 init app runtime");
-      this.initUserAppVue();
+  onAppNodeChanged: | #js
+    function() {
+      this.updateAppState();
     }
   onAppStateChanged: | #js
     function(vars) {
-      for (const var1 of vars) {
-        if ("hovered" == var1.varPath.last()) continue;
-        this.log(`🧊 ${var1.varPath.join('.')}`, var1.info, var1.value);
-      }
+      if (vars.any(v => v.varPath.includes("hovered"))) return;
+      // #TODO lame
+      this.$forceUpdate();
     }
-
-  log: | #js
-    function(...args) {
-      this.$root.$emit('log', 'runtime', null, args);
-    }
-
-style:
-  .comp-studio-app-runtime:
-  .comp-studio-app-runtime-vue:

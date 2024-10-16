@@ -25,6 +25,12 @@ props:
   sui:
   showName: true
 
+data:
+  node:
+  nodeText:
+  nodeWarning:
+  nodeInfo:
+
 mounted: | #js
   function() {
   }
@@ -56,8 +62,27 @@ methods:
     }
   onHoverNode: | #js
     function(node) {
+      return;
       if (!this.sui) return;
       this.sui.node.hovered = node;
+    }
+  getNodeText: | #js
+    function(node) {
+      const icon = this.$root.getNodeIcon(node);
+      const text = (!this.showName) ? node.type : this.$root.getNodeText(node);
+      return `${icon} ${(text??'')}`;
+    }
+  getNodeWarning: | #js
+    function(node) {
+      return null;
+    }
+  getNodeInfo: | #js
+    function(node) {
+      return null;
+      //
+      const ds = node.data?.source;
+      if (ds?.exp) return this.shorten(ds?.exp);
+      return null;
     }
   shorten: | #js
     function(s, len = 10) {
@@ -66,34 +91,21 @@ methods:
     }
 
 computed:
-  nodeText: | #js
-    function() {
-      const node = this.node;
-      const icon = this.$root.getNodeIcon(node);
-      let text = (!this.showName) ? node.type : this.$root.getNodeText(node);
-      return `${icon} ${(text??'')}`;
-    }
-  nodeWarning: | #js
-    function() {
-      return null;
-    }
   hasWarning: | #js
     function() {
       return (!!this.nodeWarning);
     }
-  nodeInfo: | #js
-    function() {
-      return null;
-      //
-      const node = this.node;
-      const ds = node.data?.source;
-      if (ds?.exp) return this.shorten(ds?.exp);
-      return null;
-    }
-  node: | #js
-    function() {
-      return this.item;
-    }
+
+watch:
+  item:
+    immediate: true
+    handler: | #js
+      function(item) {
+        const node = this.node = item;
+        this.nodeText = this.getNodeText(node);
+        this.nodeWarning = this.getNodeWarning(node);
+        this.nodeInfo = this.getNodeInfo(node);
+      }
 
 style:
   .comp-studio-dom-tree-node:
@@ -106,5 +118,3 @@ style:
     background: "repeating-linear-gradient(-45deg, rgba(166, 134, 0, 0.5), rgba(166, 134, 0, 0.5) 12px, rgba(0, 0, 0, 0.5) 10px, rgba(0, 0, 0, 0.5) 20px)"
   .flex:
     align-items: center
-
-    

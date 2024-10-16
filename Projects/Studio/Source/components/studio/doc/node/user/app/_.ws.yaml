@@ -6,7 +6,6 @@ dom:
     :sui: sui
 
 props:
-  node:
   userApp:
   userAppState:
   sui:
@@ -14,8 +13,8 @@ props:
 methods:
   getPagesNode: | #js
     function() {
-      if (!this.node) return null;
-      return this.node.children.find(c => (c.type == "pages"));  
+      if (!this.userApp) return null;
+      return this.userApp.children.find(c => (c.type == "pages"));  
     }
 
 computed:

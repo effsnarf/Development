@@ -5,6 +5,9 @@ dom:
         tr:
           v-for: action in [...actions].reverse()
           :class: getActionClass(action)
+          @mouseenter: () => hovered.action = action
+          @mouseleave: () => hovered.action = null
+          @click: selectAction(action)
           td:
             class: dimmed
             v-text: action.id
@@ -14,12 +17,31 @@ dom:
             v-text: action.do.icon
           td:
             v-text: (action.do.text ?? action.do.type)
+    transition:
+      name: slide
+      .box2:
+        v-if: selected.action
+        pre:
+          v-text: selected.action.do
+        pre:
+          v-text: selected.action.undo
 
 props:
   actions:
   pointer:
 
+data:
+  hovered:
+    action: null
+  selected:
+    action: null
+
 methods:
+  selectAction: | #js
+    function(action) {
+      if (action == this.selected.action) action = null;
+      this.selected.action = action;
+    }
   getActionIcon: | #js
     function(type) {
       type = type.split('.').first();
@@ -34,8 +56,9 @@ methods:
     function(action) {
       const cls = {};
       const type = this.getActionType(action);
-      cls.done = (action.i <= this.pointer);
+      cls.done = (action._i <= this.pointer);
       cls[`type-${type}`] = true;
+      cls.selected = (action == this.selected.action);
       return cls;
     }
   getActionType: | #js
@@ -47,6 +70,10 @@ methods:
 style:
   .type-select:
     color: "#ffffff80"
+  tr:hover:
+    background-color: "#80808040"
+  tr.done:hover:
+    background-color: "#808080a0"
   tr:not(.done):
     opacity: 0.5
   .done:

@@ -705,7 +705,11 @@ class TreeObject {
     await traverse(root, callback, getChildren);
   }
 
-  static filter(root: any, predicate: Function, getChildren?: Function) {
+  static filter(
+    root: any,
+    predicate: Function,
+    getChildren?: (node: any) => any[]
+  ) {
     predicate = TreeObject._evalSelector(predicate);
     const items = [] as any[];
     TreeObject.traverse(
@@ -718,12 +722,20 @@ class TreeObject {
     return items;
   }
 
-  static find(root: any, predicate: Function, getChildren?: Function) {
+  static find(
+    root: any,
+    predicate: Function,
+    getChildren?: (node: any) => any[]
+  ) {
     const items = TreeObject.filter(root, predicate, getChildren);
     return items.length ? items[0] : null;
   }
 
-  static map(root: any, selector: Function, getChildren?: Function) {
+  static map(
+    root: any,
+    selector: Function,
+    getChildren?: (node: any) => any[]
+  ) {
     selector = TreeObject._evalSelector(selector);
     const items = [] as any[];
     TreeObject.traverse(

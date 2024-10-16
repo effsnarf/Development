@@ -109,13 +109,11 @@ methods:
         });
         node.vars.push({
           name: "hovered",
-          type: "node.prop",
-          editable: false
+          type: "var",
         });
         node.vars.push({
           name: "selected",
-          type: "node.prop",
-          editable: false
+          type: "var",
         });
       }
 
@@ -323,6 +321,7 @@ methods:
     }
   fetchFromUrl: | #js
     async function(url) {
+      debugger;
       const ticker = Ticker.alertify((elapsed) => `<h2>⏳ ${elapsed.unitifyTime()}</h2> ${url}`)
       try
       {
@@ -339,14 +338,46 @@ methods:
         ticker.stop();
       }
     }
+  bindToUserAppState: | #js
+    function(vue, nodeVarPath, varName) {
+      // local -> userAppState
+      vue.$watch(varName, (newValue) => {
+        console.log(`🧊 setting ${nodeVarPath}.${varName} to ${newValue}`);
+        this.$root.studio.user.app.state.set(nodeVarPath, varName, newValue);
+      });
+      // userAppState -> local
+      this.$root.watchUserAppState(vue, nodeVarPath, varName, (newValue) => {
+        console.log(`🧊 setting local ${varName} to ${newValue}`);
+        vue[varName] = newValue;
+      });
+    }
+  watchUserAppState: | #js
+    function(vue, nodeVarPath, varName, handler) {
+      const userAppState = this.$root.getUserAppState(vue);
+      const nodeVarData = Objects.getProperty(userAppState, nodeVarPath);
+      vue.$watch(() => nodeVarData[varName], { handler, immediate: true });
+    }
   getUserAppRuntimeVue: | #js
     function(vue) {
       while ((vue) && (vue.$options._componentTag != "studio-app-runtime-vue")) vue = vue.$parent;
       return vue;
     }
+  getUserAppState: | #js
+    function(vue) {
+      while (!vue.userAppState) vue = vue.$parent;
+      return vue.userAppState;
+    }
+  computedNodeVar: | #js
+    function(vue, varName, exp) {
+      const computed = Vue.computed({
+        get: this.$root.toContextFunc(vue, { args: ["vue"], code: `try { return ${exp}; } catch (ex) {}` }, { async: false })
+      });
+      const watcher = Vue.watch(computed, (newValue) => { vue[varName] = newValue; }, { immediate: true });
+    }
   toContextFunc: | #js
     function(vue, funcDef, options) {
       const isAsync = (options?.async ?? true);
+      while (!vue.node) vue = vue.$parent;
       // accepts:
       // { args: ['a', 'b'], code: 'return a + b' }
       // returns a function
@@ -361,7 +392,7 @@ methods:
       // this.$app.home, this.$app.boards, etc (access other pages)
       const pageName = this.$root.getPageName(vue);
       const nodeVarPath = (vue.nodeVarPath ?? this.$root.getNodeVarPath(vue.node));
-      const userAppState = vue.userAppState;
+      const userAppState = this.$root.getUserAppState(vue);
       const nodeData = (!nodeVarPath) ? null : Objects.getProperty(userAppState, nodeVarPath);
       const $app = userAppState;
       const $page = userAppState[pageName];

@@ -37,6 +37,7 @@ dom:
         ide.element.picker:
           v-if: (selectedEditor == 'html dom')
         ide.performance.inspector:
+          v-if: false
 props: null
 data:
   showWorkspace: true

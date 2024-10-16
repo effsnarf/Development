@@ -1,5 +1,6 @@
 dom:
   div:
+    v-if: false
     .flex.justify-center:
       button:
         v-text: "'⤺'"
@@ -18,6 +19,9 @@ props:
 data:
   actions: []
   pointer: -1
+  remote:
+    actions:
+    pointer:
 
 mounted: | #js
   function() {
@@ -27,6 +31,10 @@ mounted: | #js
       if (e.ctrlKey && e.key == "z") this.undo();
       if (e.ctrlKey && e.key == "y") this.redo();
     });
+
+    const remoteStore = (new Data2.Browser.LocalStorage());
+    this.remote.actions = remoteStore.array("actions", this.actions);
+    this.remote.pointer = remoteStore.vue.reactive(this, "pointer", -1);
   }
 
 methods:
@@ -120,7 +128,7 @@ methods:
         delete newNode.children;
         changes = DeepDiff.diff(oldNode, newNode);
         undoChanges = DeepDiff.diff(newNode, oldNode);
-        if (!changes) debugger;
+        if (!changes) throw "No changes detected";
       }
       let node = this.$root.getNode(oldNode);
       const prevNode = Objects.clone(node, { exclude: ["children"] });
@@ -131,8 +139,21 @@ methods:
       }
       _do = { type: "edit.node", args: { node, newNode: null, changes } };
       this.setIconText(_do, node);
-      const undo = { type: "edit.node", args: { node, newNode: null, changes: undoChanges } };
+      const undo = { type: "edit.node", args: { node: { id: node.id }, newNode: null, changes: undoChanges } };
       this.$root.appNodeEdited(node);
+      return { _do, undo };
+    }
+  do_edit_node_var: | #js
+    function(_do, node, varName, key, value) {
+      node = this.$root.getNode(node);
+      const oldNode = Objects.clone(node, { exclude: ["children"] });
+      const nodeVar = node.vars.find(v => (v.name == varName));
+      const oldValue = Objects.clone(nodeVar[key]);
+      nodeVar[key] = value;
+      const newNode = Objects.clone(node);
+      this.$root.do("edit.node", { oldNode, newNode })
+      this.setIconText(_do, node);
+      const undo = { type: "edit.node.var", args: { node: { id: node.id }, varName, key, value: oldValue } };
       return { _do, undo };
     }
   do_undelete_node: | #js
@@ -172,11 +193,11 @@ methods:
   addAction: | #js
     function(action) {
       if (this.pointer < (this.actions.length - 1)) {
-        this.actions = this.actions.slice(0, this.pointer + 1);
+        this.actions.splice(this.pointer + 1);
       }
       const actionIndex = this.actions.length;
       const actionID = ((this.actions.last()?.id ?? 0) + 1);
-      action.i = actionIndex;
+      action._i = actionIndex;
       action.id = actionID;
       if (action._do) {
         action.do = action._do;

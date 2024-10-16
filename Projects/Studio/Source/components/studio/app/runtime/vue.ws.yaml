@@ -2,7 +2,7 @@ dom:
   div:
     studio.doc:
       :user-app: userApp
-      :user-app-state: $data
+      :user-app-state: userAppState
       :sui: sui
     studio.app.runtime.common:
       ref: common1
@@ -13,13 +13,40 @@ props:
   userApp:
   sui:
 
+data:
+  userAppState:
+
 mounted: | #js
   function() {
-    this.$emit("mounted");
+    this.userAppState = this.initAppState(this.userApp);
     this.$root.$on("app.state.changed", this.onAppStateChanged.bind(this));
   }
 
 methods:
+  initAppState: | #js
+    function(userApp) {
+      const data = {};
+      for (const pageNode of this.$root.getPageNodes()) {
+        const pageData = {};
+        // lists
+        for (const node of this.$root.findDescNodes(pageNode, ((n) => n.vars?.length)))
+        {
+          const ds = node.data?.source;
+          const listVarPath = `${pageNode.name}.${node.name}`;
+          const listVarName = listVarPath.replaceAll('.', '_');
+
+          pageData[node.name] = {};
+
+          if (node.vars) {
+            for (const var1 of node.vars) {
+              pageData[node.name][var1.name] = null;
+            }
+          }
+        }
+        data[pageNode.name] = pageData;
+      }
+      return data;
+    }
   onAppStateChanged: | #js
     function(vars) {
       if (vars.any(v => v.varPath.includes("hovered"))) return;

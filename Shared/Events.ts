@@ -31,4 +31,11 @@ class Events {
   }
 }
 
-export { Events };
+class Channel {
+  constructor(
+    public out: Events,
+    public inc: Events
+  ) {}
+}
+
+export { Events, Channel };

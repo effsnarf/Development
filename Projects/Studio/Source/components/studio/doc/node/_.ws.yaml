@@ -4,11 +4,6 @@ dom:
     :item-index: itemIndex
     :items-count: itemsCount
     :sui: sui
-    div:
-      v-if: "(node.type == 'list')"
-      button:
-        @click: initNodeVars
-        v-text: "'♻️'"
     transition:
       name: slide
       component:
@@ -57,13 +52,16 @@ data:
   key1: 1
   nodeStyle: null
   nodeCssClass: null
+  nodeCompName: null
+  nodePageName: null
+  nodeVarPath: null
+  showLayoutExample: null
 
 mounted: | #js
   function() {
     this.$root.$on("app.node.changed", this.onAppNodeChanged.bind(this));
     //this.$watch("sui.node.hovered", this.onSuiNodeChanged.bind(this, "hovered"));
     this.$watch("sui.node.selected", this.onSuiNodeChanged.bind(this, "selected"));
-    this.initNodeVars();
     this.refresh1();
   }
 
@@ -281,6 +279,13 @@ methods:
       };
       return cls;
     }
+  getShowLayoutExample: | #js
+    function(node) {
+      if (["list"].includes(node.type)) {
+        if (!this.node.children?.length) return true;
+      }
+      return false;
+    }
   toBackground: | #js
     function(bg) {
       const userApp = this.$root.getUserApp?.(this);
@@ -320,31 +325,11 @@ methods:
     }
   refresh: | #js
     function() {
-      //this.nodeStyle = this.getNodeStyle(this.node);
+      this.nodeStyle = this.getNodeStyle(this.node);
       this.key1++;
     }
 
 computed:
-  showLayoutExample: | #js
-    function() {
-      const node = this.node;
-      if (["list"].includes(node.type)) {
-        if (!this.node.children?.length) return true;
-      }
-      return false;
-    }
-  nodeVarPath: | #js
-    function() {
-      return this.$root.getNodeVarPath(this.node);
-    }
-  nodePageName: | #js
-    function() {
-      return this.$root.getNodePageName(this.node);
-    }
-  nodeCompName: | #js
-    function() {
-      return this.getNodeCompName(this.node);
-    }
   isHoveredNode: | #js
     function() {
       if (!this.node) return false;
@@ -372,7 +357,11 @@ watch:
     immediate: true
     handler: | #js
       function(node) {
+        this.nodePageName = this.$root.getNodePageName(this.node);
+        this.nodeCompName = this.getNodeCompName(this.node);
+        this.nodeVarPath = this.$root.getNodeVarPath(node);
         this.nodeStyle = this.getNodeStyle(node);
+        this.showLayoutExample = this.getShowLayoutExample(node);
       }
   nodeStyle:
     handler: | #js

@@ -1,0 +1,26 @@
+dom:
+  div:
+
+props:
+  nodeVarPath:
+  value:
+
+mounted: | #js
+  function() {
+    this.init();
+    this.$root.$on("app.state.changed", this.onAppStateChanged.bind(this));
+  }
+
+methods:
+  onAppStateChanged: | #js
+    function(vars) {
+      const var1 = vars.find(v => (v.varPath.join('.') == this.nodeVarPath));
+      if (!var1) return;
+      this.$emit("input", var1.newValue);
+    }
+  init: | #js
+    function() {
+      const userAppState = this.$root.getUserAppState(this);
+      const value = Objects.getProperty(userAppState, this.nodeVarPath);
+      this.$emit("input", value);
+    }

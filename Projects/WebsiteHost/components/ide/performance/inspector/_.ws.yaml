@@ -18,15 +18,39 @@ dom:
         v-text: "'Refresh is paused'"
     div:
       v-text: "'Frequent operations are throttled for performance sake.'"
-    ui.value:
-      :value: logItems
-      @input:query: refresh2
+    ui.tabs:
+      :options: "['📜 aggragate', '⚡ realtime']"
+      direction: horizontal
+      :value: 0
+      template:
+        v-slot: tab0
+        ui.value:
+          :value: logItems
+          @input:query: refresh2
+      template:
+        v-slot: tab1
+        ui.value.array:
+          :value: rtItems2
 
 data:
   logs: {}
   logItems: []
+  rtItems: []
+  rtItems2: []
+  maxRtItems: 100
+  rtItemID: 1
   isEnabled: true
   isHovered: false
+  exclude:
+    component:
+      - studio-app
+      - studio-doc-node-picker
+      - studio-dom-tree-methods
+      - studio-dom-tree-node
+    name:
+      - getNodeIcon
+      - getNodeText
+      - getNodeCompName
 
 mounted: | #js
   function() {
@@ -38,6 +62,7 @@ methods:
   refresh: | #js
     function(force) {
       if (force || (!this.isHovered)) this.refresh2();
+      this.rtItems2 = [...this.rtItems];
       setTimeout(this.refresh.bind(this), 1000);
     }
   refresh2: | #js
@@ -79,6 +104,25 @@ methods:
       log.last.measurements.push(compEvent.elapsed);
       if (log.last.measurements.length > 100) {
         log.last.measurements.shift();
+      }
+      this.rtAfterCompEvent(compEvent);
+    }
+  rtAfterCompEvent: | #js
+    function(ce) {
+      const comp = ce.context.$options.name;
+      const rtItem = {
+        id: (this.rtItemID++),
+        component: comp,
+        type: ce.type,
+        name: ce.name,
+      };
+      for (const key in rtItem) {
+        const exc = this.exclude?.[key];
+        if (exc?.includes(rtItem[key])) return;
+      }
+      this.rtItems.unshift(rtItem);
+      if (this.rtItems.length > this.maxRtItems) {
+        this.rtItems.pop();
       }
     }
   getCompEventLog: | #js
