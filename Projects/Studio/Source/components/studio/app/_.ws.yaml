@@ -3,6 +3,7 @@ dom:
     studio.app.logo:
     div:
       studio.doc.node.toolbar:
+        :user-app: userApp
     .spacer1:
       v-text: "''"
     .main-boxes:

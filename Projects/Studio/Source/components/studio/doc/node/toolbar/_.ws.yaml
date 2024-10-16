@@ -1,8 +1,45 @@
 dom:
   .tools:
     :key: key1
+    ui.context.window:
+      :visible: "['page', 'panel', 'list'].includes(hovered.ntt?.type)"
+      .box2:
+        video:
+          v-if: "false"
+          :style: "{ width: '20em' }"
+          ref: video1
+          source:
+            src: "https://i.imgur.com/y55qHHt.mp4"
+            type: "video/mp4"
+        div:
+          .flex:
+            v-if: ('page' == hovered.ntt?.type)
+            h2:
+              v-text: "'📜'"
+            div:
+              div:
+                v-text: "'👆 Click to edit settings for all pages.'"
+              div:
+                v-text: "'🖐️ Drag to create a new page.'"
+          .flex:
+            v-if: ('panel' == hovered.ntt?.type)
+            h2:
+              v-text: "'📁'"
+            div:
+              div:
+                v-text: "'A panel is a general container for other elements, in a grid or flex layout.'"
+          .flex:
+            v-if: ('list' == hovered.ntt?.type)
+            h2:
+              v-text: "'🧮'"
+            div:
+              div:
+                v-text: "'A list binds array data to other elements (like a for loop), in a grid or flex layout.'"
     div:
       v-for: ntt in nodeTypeTools
+      :key: ntt.type
+      @mouseenter: hovered.ntt = ntt
+      @mouseleave: hovered.ntt = null
       ui.dnd.draggable:
         :drag-item: "{ type: 'new.node', item: ntt }"
         .tool:
@@ -10,13 +47,42 @@ dom:
             v-text: ntt._?.icon
           .title:
             v-text: ntt.type
+    div:
+      v-for: compNode in compNodes
+      :key: compNode.id
+      ui.dnd.draggable:
+        .tool:
+          .icon:
+            v-text: "'📦'"
+          .title:
+            v-text: compNode.name
+    div:
+      ui.context.window:
+        .box2:
+          .flex:
+            h2:
+              v-text: "'➕📦'"
+            div:
+              div:
+                v-text: "'Drop a 📁 panel node from the app tree here to create a new reusable component.'"
+      ui.dnd.dropzone:
+        .tool.new-comp:
+          .icon:
+            v-text: "'➕'"
+          .title:
+            v-text: "'[new component]'"
 
 data:
   nodeTypeTools:
+    - type: page
     - type: panel
     - type: list
     - type: image
     - type: text
+    - type: button
+  compNodes: []
+  hovered:
+    ntt: null
   key1: 1
 
 mounted: | #js
@@ -29,16 +95,29 @@ methods:
     async function() {
       if (!this.$root._studio_methods_initialized) return setTimeout(this.init.bind(this), 100);
       for (const ntt of this.nodeTypeTools) {
-        ntt._ = { icon: this.$root.getNodeIcon(ntt) };
+        ntt._ = { icon: (this.$root.getNodeIcon(ntt, "comp.inst")) };
       }
       this.refresh();
     }
   refresh: | #js
     function() {
+      //this.compNodes = this.$root.getNodesByType("comp");
       this.key1++;
     }
 
+watch:
+  userApp:
+    immediate: true
+    deep: false
+    handler: | #js
+      function() {
+        this.refresh();
+      }
+
 style:
+  .context-menu h2:
+    white-space: nowrap
+    margin-right: 0.5em
   .tools:
     display: flex
     justify-content: center
@@ -47,11 +126,19 @@ style:
   .tools:hover:
     opacity: 1
   .tool:
+    display: flex
+    flex-direction: column
+    align-items: center
+    max-width: 4em
     padding: 0 1em
     overflow: hidden
     filter: grayscale(1)
+    transition: all 0s, max-width 0.6s
   .tool:hover:
-    filter: none
+    max-width: 8em
+    filter: "drop-shadow(-6px 6px 2px #00000080)"
+  .new-comp:
+    border: 4px dashed gray
   .title:
     width: auto
     margin-top: -0.5em

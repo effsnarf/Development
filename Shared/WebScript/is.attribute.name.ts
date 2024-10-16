@@ -64,6 +64,7 @@ export default (componentNames: string[], name: string) => {
       "p",
       "img",
       "video",
+      "source",
       "table",
       "thead",
       "tbody",

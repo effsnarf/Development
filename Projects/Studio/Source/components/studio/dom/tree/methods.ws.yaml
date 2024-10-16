@@ -17,7 +17,7 @@ mounted: | #js
 
 methods:
   getNodeIcon: | #js
-    function(node) {
+    function(node, altType) {
       const icons = {
         "user.app": "💻",
         "page.templates": "📚",
@@ -25,8 +25,9 @@ methods:
         pages: "📜",
         page: "📜",
         panel: "🗂️",
-        text: "🅰️",
         list: "🧮",
+        text: "🅰️",
+        button: "✔️",
         comps: "🎁",
         comp: "🎁",
         "comp.inst": "📦",
@@ -36,7 +37,7 @@ methods:
         vars: "📂🍃",
         var: "🧊"
       };
-      return (icons[node?.type] || "❔");
+      return ((icons[node?.type] ?? ((!altType) ? "❔" : this.getNodeIcon({ type: altType }))) ?? "❔");
     }
   getNodeText: | #js
     function(node) {
