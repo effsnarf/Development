@@ -71,6 +71,7 @@ props:
 data:
   tabOptions: ['🍃 field', '🟰 exp', '🌐 fetch', '🔗 node.prop', '🧊 value']
   selectedNodeVarIndex: 0
+  visibleNodeVars:
 
 mounted: | #js
   function() {
@@ -92,10 +93,17 @@ methods:
       if (!var1) return;
       var1.type = (newTab < 0) ? null : this.tabOptions[newTab].split(' ').last();
     }
-
-computed:
-  visibleNodeVars: | #js
-    function() {
-      return (this.node?.vars ?? [])
+  getVisibleNodeVars: | #js
+    function(node) {
+      return (node?.vars ?? [])
         .filter(v => (v.editable ?? true));
     }
+
+watch:
+  node:
+    immediate: true
+    deep: false
+    handler: | #js
+      function(node) {
+        this.visibleNodeVars = this.getVisibleNodeVars(node);
+      }

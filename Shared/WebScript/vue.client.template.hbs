@@ -1,64 +1,54 @@
-{
-  mixins: [],
-  props: {
-    {{#each props}}
-    {{@key}}: {
-      default: {{{or this null}}}
-      },
-    {{/each}}
+{ mixins: [], props: {
+{{#each props}}
+  {{@key}}: { default:
+  {{{or this null}}}
   },
-  data: function () {
-    return {
-        {{#each data}}
-        {{@key}}: {{{or this null}}},
-        {{/each}}
-        _: {
-          comp: {
-            name: `{{unkebabize name}}`,
-          },
-          log: {
-            elapsed: {
-              minimum: 1000,
-            }
-          }
-        }
-    }
-  },
-  created: {{{addCode created ""}}},
-  mounted: {{{addCode mounted ""}}},
-  beforeUnmount: {{{addCode beforeUnmount ""}}},
-  unmounted: {{{addCode unmounted ""}}},
-  methods: {
-    {{#each methods}}
-    {{@key}}: {{{addCode this "if (window.vueIdeApp?.isPauseOnMethod(this.$options._componentTag, '{{method}}')) debugger;" @key ""}}},
-    {{/each}}
-  },
-  computed: {
-    {{#each computed}}
-    {{#if get}}
-    {{@key}}: {
-      get: {{{addCode get ""}}},
-      {{#if set}}
-      set: {{{addCode set "" @key ""}}},
-      {{/if}}
-    },
-    {{else}}
-    {{@key}}: {{{addCode this "" @key ""}}},
+{{/each}}
+}, data: function () { return {
+{{#each data}}
+  {{@key}}:
+  {{{or this null}}},
+{{/each}}
+_: { comp: { name: `{{unkebabize name}}`, }, log: { elapsed: { minimum: 1000, }
+} } } }, created:
+{{{addCode created ""}}}, mounted:
+{{{addCode mounted ""}}}, beforeUnmount:
+{{{addCode beforeUnmount ""}}}, unmounted:
+{{{addCode unmounted ""}}}, methods: {
+{{#each methods}}
+  {{@key}}:
+  {{{addCode
+    this
+    "if (window.vueIdeApp?.isPauseOnMethod?.(this.$options.name, '{{method}}')) debugger;"
+    @key
+    ""
+  }}},
+{{/each}}
+}, computed: {
+{{#each computed}}
+  {{#if get}}
+    {{@key}}: { get:
+    {{{addCode get ""}}},
+    {{#if set}}
+      set:
+      {{{addCode set "" @key ""}}},
     {{/if}}
-    {{/each}}
-  },
-  watch: {    
-    {{#each watch}}
-    {{#if handler}}
-    {{@key}}: {
-      handler: {{{addCode handler "" @key ""}}},
-      immediate: {{{or immediate false}}},
-      deep: {{{or deep false}}},
     },
-    {{else}}
-    {{@key}}: {{{this}}},
-    {{/if}}
-    {{/each}}
-  },
-  template: `{{{dom dom name}}}`
-}
+  {{else}}
+    {{@key}}:
+    {{{addCode this "" @key ""}}},
+  {{/if}}
+{{/each}}
+}, watch: {
+{{#each watch}}
+  {{#if handler}}
+    {{@key}}: { handler:
+    {{{addCode handler "" @key ""}}}, immediate:
+    {{{or immediate false}}}, deep:
+    {{{or deep false}}}, },
+  {{else}}
+    {{@key}}:
+    {{{this}}},
+  {{/if}}
+{{/each}}
+}, template: `{{{dom dom name}}}` }

@@ -8,7 +8,7 @@ props:
 mounted: | #js
   function() {
     this.init();
-    this.$root.$on("app.state.changed", this.onAppStateChanged.bind(this));
+    this.$root.e.on("app.state.changed", this.onAppStateChanged.bind(this));
   }
 
 methods:

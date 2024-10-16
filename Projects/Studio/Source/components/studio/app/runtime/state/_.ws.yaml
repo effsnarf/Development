@@ -32,7 +32,7 @@ data:
 
 mounted: | #js
   async function() {
-    this.$root.$on("app.state.changed", this.onAppStateChanged.bind(this));
+    this.$root.e.on("app.state.changed", this.onAppStateChanged.bind(this));
     this.$watch("sui.page.selected", this.onSelectedPageChanged.bind(this));
     this.refresh();
   }

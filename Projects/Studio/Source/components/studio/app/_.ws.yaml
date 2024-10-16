@@ -6,7 +6,7 @@ dom:
     .spacer1:
       v-text: "''"
     .main-boxes:
-      v-if: userApp
+      v-if: (userApp && is.inited)
       :class: "{ ['box-hovered-' + sui.main.box.hovered]: true }"
       .main-box.a:
         studio.doc.page.selector:
@@ -130,6 +130,8 @@ data:
     selected:
       dataItems: []
     debug: true
+  is:
+    inited: false
   pageNodes:
   appStateChangedVars: []
   appStateChangeKey: 1
@@ -171,7 +173,8 @@ mounted: | #js
     this.$watch("sui.page.selected", this.onSelectedPageChanged.bind(this));
     this.$watch("sui.node.hovered", this.onHoveredNodeChanged.bind(this));
     this.$watch("sui.node.selected", this.onSelectedNodeChanged.bind(this));
-    this.$root.$on("data.item.selected", this.onDataItemSelected.bind(this));
+    this.$root.e.on("data.item.selected", this.onDataItemSelected.bind(this));
+    this.is.inited = true;
   }
 
 methods:
@@ -867,7 +870,7 @@ watch:
     function() {
       const vars = [...this.appStateChangedVars];
       this.appStateChangedVars.clear();
-      this.$root.$emit("app.state.changed", vars);
+      this.$root.e.emit("app.state.changed", vars);
     }
   isUserAppTilted: | #js
     function(newValue) {

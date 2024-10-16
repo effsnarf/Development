@@ -2945,7 +2945,7 @@ class StateTracker {
                 id: StateTracker._nextID++,
                 dt: Date.now(),
                 uid: vue._uid,
-                vueCompName: vue.$options._componentTag,
+                vueCompName: vue.$options.name,
                 type,
                 key,
                 args,
@@ -3113,10 +3113,10 @@ class VueHelper {
             return null;
         if (!comp)
             return null;
-        const compName = vue.$options._componentTag;
+        const compName = vue.$options.name;
         if (!compName)
             return null;
-        const vueComp = Vue.component(vue.$options._componentTag);
+        const vueComp = Vue.component(vue.$options.name);
         const ideComp = {};
         ideComp.uid = vue._uid;
         ideComp.name = compName;
@@ -3410,7 +3410,7 @@ class VueManager {
         return this.getVueFromVnode(vnode.$parent);
     }
     vNodeIsVue(vnode) {
-        if ([`transition`, `transition-group`, `keep-alive`].includes(vnode.$options._componentTag))
+        if ([`transition`, `transition-group`, `keep-alive`].includes(vnode.$options.name))
             return false;
         return true;
     }
@@ -3420,11 +3420,11 @@ class VueManager {
         if (this.vues[vue._uid])
             return;
         // console.log(
-        //   `Registering vue ${vue._uid} (${vue.$options._componentTag})) (total: ${this.vuesCount})`,
+        //   `Registering vue ${vue._uid} (${vue.$options.name})) (total: ${this.vuesCount})`,
         //   vue
         // );
         this.vues[vue._uid] = () => vue;
-        const vueCompName = vue.$options._componentTag;
+        const vueCompName = vue.$options.name;
         this.vuesCounts[vueCompName] = (this.vuesCounts[vueCompName] || 0) + 1;
         this.vuesCount++;
         //const compName = vue.$data._.comp.name;
@@ -3440,7 +3440,7 @@ class VueManager {
             return;
         // console.log(`Unregistering vue ${vue._uid}`);
         delete this.vues[vue._uid];
-        const vueCompName = vue.$options._componentTag;
+        const vueCompName = vue.$options.name;
         //this.vuesCounts[vueCompName]--;
         this.vuesCount--;
         for (const refKey of Object.keys(vue.$refs)) {

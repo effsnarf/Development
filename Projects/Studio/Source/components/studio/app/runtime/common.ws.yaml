@@ -17,5 +17,5 @@ watch:
     function() {
       const vars = [...this.appStateChangedVars];
       this.appStateChangedVars.clear();
-      this.$root.$emit("app.state.changed", vars);
+      this.$root.e.emit("app.state.changed", vars);
     }

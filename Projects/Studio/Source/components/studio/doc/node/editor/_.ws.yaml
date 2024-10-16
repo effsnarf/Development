@@ -81,7 +81,7 @@ data:
 
 mounted: | #js
   function() {
-    this.$root.$on("app.node.edited", this.onAppNodeEdited.bind(this));
+    this.$root.e.on("app.node.edited", this.onAppNodeEdited.bind(this));
   }
 
 methods:

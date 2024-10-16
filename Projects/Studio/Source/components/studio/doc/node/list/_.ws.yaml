@@ -33,6 +33,7 @@ data:
   items:
   hovered:
   selected:
+  visibleItems:
   exampleItems: 9
   maxVisibleItems: 3
 
@@ -41,6 +42,10 @@ mounted: | #js
   }
 
 methods:
+  getVisibleItems: | #js
+    function(items) {
+      return (items?.take(this.maxVisibleItems) ?? this.getMockArray());
+    }
   onClick: | #js
     function(item) {
       this.selected = item;
@@ -59,12 +64,15 @@ methods:
       return Array.from(Array(this.exampleItems).keys()).map((i) => null);
     }
 
-computed:
-  visibleItems: | #js
-    function() {
-      return (this.items?.take(this.maxVisibleItems) ?? this.getMockArray());
-    }
-
+watch:
+  items:
+    immediate: true
+    deep: false
+    handler: | #js
+      function(items) {
+        this.visibleItems = this.getVisibleItems(items);
+      }
+      
 style:
   .list-item:
     max-height: 5em

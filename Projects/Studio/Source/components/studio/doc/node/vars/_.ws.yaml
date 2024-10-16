@@ -2,16 +2,11 @@ dom:
   div:
     component:
       v-for: var1 in node.vars
-      :is: getNodeVarCompName(var1)
+      :is: "('studio.doc.node.vars.' + var1.type).kebabize()"
       :var1: var1
       :node-var-path: nodeVarPath
+      @update: (key, value) => $emit('update', key, value)
 
 props:
   node:
   nodeVarPath:
-
-methods:
-  getNodeVarCompName: | #js
-    function(var1) {
-      return `studio.doc.node.vars.${var1.type}`.kebabize();
-    }

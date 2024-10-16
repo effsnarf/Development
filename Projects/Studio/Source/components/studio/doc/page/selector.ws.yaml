@@ -1,5 +1,6 @@
 dom:
   .page-selector:
+    v-if: is.inited
     .pages:
       :key: key1
       .clickable:
@@ -21,7 +22,16 @@ props:
   value:
 
 data:
+  is:
+    inited: false
   key1: 1
+
+mounted: | #js
+  function() {
+    setTimeout(() => {
+      this.is.inited = true;
+    }, 1000);
+  }
 
 methods:
   onSelectPage: | #js

@@ -19,7 +19,7 @@ data:
 mounted: | #js
   function() {
     this.userAppState = this.initAppState(this.userApp);
-    this.$root.$on("app.state.changed", this.onAppStateChanged.bind(this));
+    this.$root.e.on("app.state.changed", this.onAppStateChanged.bind(this));
   }
 
 methods:

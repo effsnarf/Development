@@ -17,7 +17,7 @@ data:
 
 mounted: | #js
   function() {
-    this.$root.$on("app.node.changed", this.onAppNodeChanged.bind(this));
+    this.$root.e.on("app.node.changed", this.onAppNodeChanged.bind(this));
   }
 
 methods:
@@ -29,7 +29,7 @@ methods:
   onPreview: | #js
     function(layout) {
       this.node.layout = layout;
-      this.$root.$emit("app.node.changed", this.node);
+      this.$root.e.emit("app.node.changed", this.node);
     }
   onInput: | #js
     function(layout) {

@@ -105,7 +105,7 @@ methods:
       this.sui.node.selected = newNode;
       this.setIconText(_do, newNode);
       const undo = { type: "delete.node", args: { node: { id: newNode.id } } };
-      this.$root.$emit("app.node.changed", parent);
+      this.$root.e.emit("app.node.changed", parent);
       return { _do, undo };
     }
   do_delete_node: | #js
@@ -117,7 +117,7 @@ methods:
       TreeObject.deleteNode(this.userApp, node, { newTree: false });
       this.setIconText(_do, parent);
       const undo = { type: "undelete.node", args: { parent, node, index } };
-      this.$root.$emit("app.node.changed", parent.node);
+      this.$root.e.emit("app.node.changed", parent.node);
       return { _do, undo };
     }
   do_edit_node: | #js
@@ -161,7 +161,7 @@ methods:
       parent = this.$root.getNode(parent);
       TreeObject.addNode(parent, node, index);
       const undo = { type: "delete.node", args: { node: { id: node.id } } };
-      this.$root.$emit("app.node.changed", parent);
+      this.$root.e.emit("app.node.changed", parent);
       return { _do, undo };
     }
   undo: | #js

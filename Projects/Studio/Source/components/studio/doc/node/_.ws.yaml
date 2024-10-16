@@ -4,6 +4,10 @@ dom:
     :item-index: itemIndex
     :items-count: itemsCount
     :sui: sui
+    studio.doc.node.vars:
+      :node: node
+      :node-var-path: nodeVarPath
+      @update: onNodeVarValueUpdate
     transition:
       name: slide
       component:
@@ -21,6 +25,7 @@ dom:
         :style: nodeStyle
         :data-sui-page: nodePageName
         :data-node-id: node.id
+        v-bind: nodeVarData
         template:
           v-slot: child-nodes
           ui.dom.layout:
@@ -55,23 +60,29 @@ data:
   nodeCompName: null
   nodePageName: null
   nodeVarPath: null
+  nodeVarData: {}
   showLayoutExample: null
 
 mounted: | #js
   function() {
-    this.$root.$on("app.node.changed", this.onAppNodeChanged.bind(this));
+    this.$root.e.on("app.node.changed", this.onAppNodeChanged.bind(this));
     //this.$watch("sui.node.hovered", this.onSuiNodeChanged.bind(this, "hovered"));
     this.$watch("sui.node.selected", this.onSuiNodeChanged.bind(this, "selected"));
     this.refresh1();
   }
 
 methods:
+  onNodeVarValueUpdate: | #js
+    function(key, value) {
+      if (!value) return;
+      this.nodeVarData[key] = value;
+    }
   initNodeVars: | #js
     function() {
       const runtimeVue = this.$root.getUserAppRuntimeVue(this);
       if (!runtimeVue) return;
       let comp1 = this.$refs.comp1;
-      if (comp1.$options._componentTag == "studio-doc-node-vue-comp") comp1 = comp1.$children[0];
+      if (comp1.$options.name == "studio-doc-node-vue-comp") comp1 = comp1.$children[0];
       const vars = this.node.vars;
       if (!vars) return;
       for (const var1 of vars)
@@ -231,7 +242,7 @@ methods:
       this.refresh1();
       if (node?.id != this.node?.id) return;
       if (type == "selected") {
-        if (this.dataItem) this.$root.$emit("data.item.selected", this.dataItem);
+        if (this.dataItem) this.$root.e.emit("data.item.selected", this.dataItem);
       }
     }
   getNodeCompName: | #js

@@ -94,7 +94,7 @@ methods:
       const addChildren = (vue) => {
         if (!vue) return;
         for (const child of vue.$children) {
-          if (["transition", "transition-group"].includes(child.$options._componentTag)) {
+          if (["transition", "transition-group"].includes(child.$options.name)) {
             addChildren(child);
             continue;
           }
@@ -129,7 +129,7 @@ methods:
     }
   vNodeIsVue: | #js
     function(vnode) {
-      if ([`transition`, `transition-group`, `keep-alive`].includes(vnode.$options._componentTag)) return false;
+      if ([`transition`, `transition-group`, `keep-alive`].includes(vnode.$options.name)) return false;
       return true;
     }
   updateChains: | #js

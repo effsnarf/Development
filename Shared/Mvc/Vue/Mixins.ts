@@ -18,7 +18,7 @@ class CallbackQueue {
     this.callback(compEvent);
     return;
     //if (elapsed < 10) return;
-    const contextName = compEvent.context.$options._componentTag;
+    const contextName = compEvent.context.$options.name;
     const key = `${contextName}.${compEvent.type}.${compEvent.name}`;
     const tcb = (this.tcbs[key] = this.tcbs[key] || this.createTcb());
     tcb(compEvent);
@@ -122,7 +122,7 @@ const Mixins = {
               if (value.constructor.name == "Object") {
                 return Object.assign({}, value);
               } else {
-                const compName = this.$options._componentTag;
+                const compName = this.$options.name;
                 // Watching a class instance
                 // Need to think about this
                 if (false) {

@@ -100,6 +100,14 @@ methods:
 
       node.vars = (node.vars || []);
 
+      if (node.type == "text") {
+        node.vars.push({
+          name: "text",
+          type: "value",
+          value: null
+        });
+      }
+
       if (node.type == "list") {
         node.vars.push({
           name: "items",
@@ -311,13 +319,13 @@ methods:
   appNodeChanged: | #js
     function(node) {
       node = this.$root.getNode(node);
-      this.$root.$emit("app.node.changed", node);
+      this.$root.e.emit("app.node.changed", node);
     }
   appNodeEdited: | #js
     function(node) {
       node = this.$root.getNode(node);
       this.$root.appNodeChanged(node);
-      this.$root.$emit("app.node.edited", node);
+      this.$root.e.emit("app.node.edited", node);
     }
   fetchFromUrl: | #js
     async function(url) {
@@ -359,20 +367,23 @@ methods:
     }
   getUserAppRuntimeVue: | #js
     function(vue) {
-      while ((vue) && (vue.$options._componentTag != "studio-app-runtime-vue")) vue = vue.$parent;
+      while ((vue) && (vue.$options.name != "studio-app-runtime-vue")) vue = vue.$parent;
       return vue;
     }
   getUserAppState: | #js
     function(vue) {
-      while (!vue.userAppState) vue = vue.$parent;
-      return vue.userAppState;
+      while (vue && !vue.userAppState) vue = vue.$parent;
+      return vue?.userAppState;
     }
   computedNodeVar: | #js
     function(vue, varName, exp) {
       const computed = Vue.computed({
         get: this.$root.toContextFunc(vue, { args: ["vue"], code: `try { return ${exp}; } catch (ex) {}` }, { async: false })
       });
-      const watcher = Vue.watch(computed, (newValue) => { vue[varName] = newValue; }, { immediate: true });
+      const watcher = Vue.watch(computed, (newValue) => {
+        vue[varName] = newValue;
+        vue.$emit("update", varName, newValue);
+      }, { immediate: true });
     }
   toContextFunc: | #js
     function(vue, funcDef, options) {
@@ -392,8 +403,8 @@ methods:
       // this.$app.home, this.$app.boards, etc (access other pages)
       const pageName = this.$root.getPageName(vue);
       const nodeVarPath = (vue.nodeVarPath ?? this.$root.getNodeVarPath(vue.node));
-      const userAppState = this.$root.getUserAppState(vue);
       const nodeData = (!nodeVarPath) ? null : Objects.getProperty(userAppState, nodeVarPath);
+      const userAppState = this.$root.getUserAppState(vue);
       const $app = userAppState;
       const $page = userAppState[pageName];
       const $node = nodeData;

@@ -116,7 +116,7 @@ class StateTracker {
         id: StateTracker._nextID++,
         dt: Date.now(),
         uid: vue._uid,
-        vueCompName: vue.$options._componentTag,
+        vueCompName: vue.$options.name,
         type,
         key,
         args,

@@ -17,14 +17,20 @@ props:
   sui:
   contentNode:
 
+data:
+  slotContentNode: null
+
 methods:
   getSlotContentNode: | #js
-    function() {
-      return this.contentNode?.children.find(c => (c.slot.name == this.node.name));
+    function(contentNode) {
+      return contentNode?.children.find(c => (c.slot.name == this.node.name));
     }
 
-computed:
-  slotContentNode: | #js
-    function() {
-      return this.getSlotContentNode();
-    }
+watch:
+  contentNode:
+    immediate: true
+    deep: false
+    handler: | #js
+      function(contentNode) {
+        this.slotContentNode = this.getSlotContentNode(contentNode);
+      }

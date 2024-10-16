@@ -212,7 +212,7 @@ class VueManager {
   vNodeIsVue(vnode: any) {
     if (
       [`transition`, `transition-group`, `keep-alive`].includes(
-        vnode.$options._componentTag
+        vnode.$options.name
       )
     )
       return false;
@@ -225,11 +225,11 @@ class VueManager {
     if (this.vues[vue._uid]) return;
 
     this.vues[vue._uid] = () => vue;
-    const vueCompName = vue.$options._componentTag;
+    const vueCompName = vue.$options.name;
     this.vuesCounts[vueCompName] = (this.vuesCounts[vueCompName] || 0) + 1;
     this.vuesCount++;
 
-    const compName = vue.$options._componentTag;
+    const compName = vue.$options.name;
     if (["e-", "ui-"].some((prefix) => compName.startsWith(prefix))) return;
 
     for (const refKey of Object.keys(vue.$refs)) {
@@ -238,7 +238,7 @@ class VueManager {
     }
 
     // console.log(
-    //   `➕📦`, `(${this.vuesCounts[vueCompName].toLocaleString()})`, `${vue.$options._componentTag}`
+    //   `➕📦`, `(${this.vuesCounts[vueCompName].toLocaleString()})`, `${vue.$options.name}`
     // );
   }
 
@@ -246,7 +246,7 @@ class VueManager {
     if (!vue) return;
 
     delete this.vues[vue._uid];
-    const vueCompName = vue.$options._componentTag;
+    const vueCompName = vue.$options.name;
     this.vuesCounts[vueCompName]--;
     this.vuesCount--;
 
@@ -256,7 +256,7 @@ class VueManager {
     }
 
     // console.log(
-    //   `➖📦`, `${vue.$options._componentTag}`
+    //   `➖📦`, `${vue.$options.name}`
     // );
   }
 }

@@ -1,5 +1,6 @@
 dom:
   div:
+    v-if: false
     h3:
       v-text: var1.name
     h2:

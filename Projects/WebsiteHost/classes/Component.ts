@@ -1,5 +1,7 @@
 import { ClientContext } from "./ClientContext";
 
+const w = (window as any);
+
 (String.prototype as any).kebabize = function () {
   return this.ize('-');
 };
@@ -37,7 +39,6 @@ class Component {
     
     await ClientContext.waitUntilLoaded();
     const client = ClientContext.context!;
-    const globalVue = this.getGlobalVue();
 
     if (logGroup) {
       console.groupCollapsed(`📦`, this.name);
@@ -60,7 +61,7 @@ class Component {
         vueOptions.template = html;
         this.source.template = html;
       }
-      globalVue.component(vueName, vueOptions);
+      w.Vue.component(vueName, vueOptions);
       this.isCompiled = true;
     } catch (ex) {
       throw ex;
@@ -81,14 +82,6 @@ class Component {
       debugger;
       throw ex;
     }
-  }
-
-  getGlobalVue() {
-    const w = (window as any);
-    if (!w.globalVue) {
-      w.globalVue = w.Vue.createApp({});
-    }
-    return w.globalVue;
   }
 
   private static toVueName(name: string) {

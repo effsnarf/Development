@@ -57,6 +57,30 @@ window1.MovingPositionSmoother = MovingPositionSmoother;
 
 const w = (window as any);
 
+const getGlobalVue = () => {
+  const w = (window as any);
+  if (!w.globalVue) w.globalVue = new w.Vue({
+    data() {
+      return {
+        e: new Events()
+      }
+    },
+    methods: {
+      getKey(item: any) {
+        if (!item) return null;
+        if (item.id) return item.id;
+        if (item._id) return item._id;
+        if (item._uid) return item._uid;
+        if (item.path) return (item.path.join?.(`.`) || item.path);
+        return item;
+      },
+    }
+  });
+  return w.globalVue;
+}
+
+w.globalVue = getGlobalVue();
+
 const generalMixin = {
   matchComp: (c: Component) => true,
   data() {
@@ -657,7 +681,7 @@ interface MgParams {
 
   const params = await getNewParams();
 
-  vueApp = client.Vue.createApp({
+  vueApp = new client.Vue({
     mixins: vueAppMixins,
     data: function() {
       return {
@@ -667,7 +691,7 @@ interface MgParams {
           all: {} as any,
         },
         //
-        events: new Events(),
+        e: new Events(),
         vm: null as unknown as VueManager,
         client,
         analytics: null,//await AnalyticsTracker.new(),
@@ -692,16 +716,11 @@ interface MgParams {
     },
     async mounted() {
       await this.init();
-      this.events.on("*", this.onAppEvent.bind(this));
       window.addEventListener("resize", () => {
         this.isDevToolsOpen = window.outerWidth - window.innerWidth > 100;
       });
     },
     methods: {
-      async onAppEvent(name: string, ...args: any[]) {
-        const self = this as any;
-        self.$emit(name, ...args);
-      },
       async init() {
         const self = this as any;
         self.newCssRules = await (await fetch(`/css-tool`)).json();
@@ -1088,14 +1107,6 @@ interface MgParams {
       setDocumentTitle(title: string) {
         document.title = [title, "Meme Generator"].filter((a) => a).join(" - ");
       },
-      getKey(item: any) {
-        if (!item) return null;
-        if (item.id) return item.id;
-        if (item._id) return item._id;
-        if (item._uid) return item._uid;
-        if (item.path) return (item.path.join?.(`.`) || item.path);
-        return item;
-      },
       getRandomStanza(poem: any) {
         if (!poem?.length) return null;
         const count = poem.length;
@@ -1301,6 +1312,14 @@ interface MgParams {
         const height = Math.round(rect.height);
         return { top, left, width, height };
       },
+      getKey(item: any) {
+        if (!item) return null;
+        if (item.id) return item.id;
+        if (item._id) return item._id;
+        if (item._uid) return item._uid;
+        if (item.path) return (item.path.join?.(`.`) || item.path);
+        return item;
+      },
     },
     computed: {
       console: () => console,
@@ -1327,9 +1346,8 @@ interface MgParams {
     //await vueApp.wait(() => vueApp.dbp);
   }
 
-  debugger;
-  w.globalVue.mount("#globalVueDiv");
-  //vueApp.mount("#app");
+  //w.globalVue.$mount("#globalVueDiv");
+  vueApp.$mount("#app");
 
   window.addEventListener("popstate", async function (event) {
     await vueApp.refresh();

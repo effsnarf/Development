@@ -19,7 +19,7 @@ data:
 methods:
   getTitle: | #js
     function(vue) {
-      return vue.$options._componentTag;
+      return vue.$options.name;
     }
   onClick: | #js
     function() {
@@ -41,5 +41,5 @@ template: >-
   @mouseleave="$emit('mouseleave')" @click="$emit('click')" v-if="vue"
   path="259955427."><ui-highlighter :get-elements="() =&gt; vue.$el"
   path="259955427.0"><div @click="onClick" path="259955427.0.0"><ui-title
-  icon="📦" :value="vue.$options._componentTag"
+  icon="📦" :value="vue.$options.name"
   path="259955427.0.0.0"></ui-title></div></ui-highlighter></div>

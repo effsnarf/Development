@@ -62,7 +62,6 @@ methods:
     }
   onHoverNode: | #js
     function(node) {
-      return;
       if (!this.sui) return;
       this.sui.node.hovered = node;
     }

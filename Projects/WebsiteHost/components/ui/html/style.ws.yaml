@@ -31,7 +31,7 @@ methods:
         name: clsName,
         source: { style }
       };
-      const template = this.$root.templates.style;
+      const template = window.templates.style;
       let css = Handlebars.compile(template)(component);
       css = this.htmlDecode(css);
       return css;

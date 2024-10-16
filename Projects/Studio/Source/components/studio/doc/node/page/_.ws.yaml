@@ -15,6 +15,9 @@ props:
   userAppState:
   sui:
 
+data:
+  pageTemplateNode:
+
 methods:
   getPageTemplateNode: | #js
     function() {
@@ -23,11 +26,13 @@ methods:
       return pageTemplateNode;
     }
 
-computed:
-  pageTemplateNode: | #js
-    function() {
-      return this.getPageTemplateNode();
-    }
+watch:
+  node:
+    immediate: true
+    handler: | #js
+      function() {
+        this.pageTemplateNode = this.getPageTemplateNode();
+      }
 
 style:
   .comp-studio-doc-node-page:

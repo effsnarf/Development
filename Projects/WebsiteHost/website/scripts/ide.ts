@@ -191,7 +191,7 @@ const vueIdeCompMixin = {
 
   const performanceTracker = Performance.Tracker.new();
 
-  vueIdeApp = client.Vue.createApp({
+  vueIdeApp = new client.Vue({
     data: function() {
       return {
         vm: vueManager,
@@ -360,7 +360,7 @@ const vueIdeCompMixin = {
   const el = document.createElement("div");
   el.id = `vue-ide-app-${Date.now()}`;
   document.body.appendChild(el);
-  vueIdeApp.mount(`#${el.id}`);
+  vueIdeApp.$mount(`#${el.id}`);
 
   (window as any).vueIdeApp = vueIdeApp;
 })();

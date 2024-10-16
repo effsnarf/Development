@@ -9,7 +9,7 @@ props:
 
 mounted: | #js
   function() {
-    this.$root.$on("log", this.onLog.bind(this));
+    this.$root.e.on("log", this.onLog.bind(this));
   }
 
 methods:

@@ -16,9 +16,9 @@ class VueHelper {
   static toIdeComponent(vue: any, comp: any) {
     if (!vue) return null;
     if (!comp) return null;
-    const compName = vue.$options._componentTag;
+    const compName = vue.$options.name;
     if (!compName) return null;
-    const vueComp = Vue.component(vue.$options._componentTag);
+    const vueComp = Vue.component(vue.$options.name);
 
     const ideComp = {} as any;
 

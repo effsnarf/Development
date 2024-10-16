@@ -48,7 +48,7 @@ methods:
             type: "vue",
             name: {
               icon: "📦",
-              text: childVue.$options._componentTag
+              text: childVue.$options.name
             },
           },
           children: this.getDfProps(childVue, depth + 1)
