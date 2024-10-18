@@ -82,7 +82,8 @@ const Mixins = {
     const callbackQueue = new CallbackQueue(afterCompEvent);
 
     const mixin = {
-      matchComp: (c: any) => ["ide.", "ui."].none((s) => c.name.startsWith(s)),
+      matchComp: (c: any) =>
+        ["ide.", "ui.mouse"].none((s) => c.name.startsWith(s)),
 
       created(this: any) {
         const vue = this;

@@ -34,11 +34,11 @@ data:
         fields: []
       if: | #js
         (obj) => ((typeof obj === 'object') && (Object.keys(obj).length > 1)) ||
-        (Array.isArray(obj) && (Object.keys(obj[0]).length > 1))
+        (Array.isArray(obj) && (Object.keys(obj[0]??{}).length > 1))
     - icon: ➖
       type: flat.map
       default: {}
-      if: (obj) => Array.isArray(obj) && (Object.keys(obj[0]).length === 1)
+      if: (obj) => Array.isArray(obj) && (Object.keys(obj[0]??{}).length === 1)
     # - icon: 🔴
     #   type: custom.expression
     #   default:

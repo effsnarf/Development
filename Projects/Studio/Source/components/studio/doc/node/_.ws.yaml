@@ -33,17 +33,15 @@ dom:
             :show-example: showLayoutExample
             :show-grid-name: "false"
             :key: key1
-            transition.group:
-              name: slide
-              studio.doc.node:
-                v-for: childNode in node.children
-                :node: childNode
-                :user-app: userApp
-                :user-app-state: userAppState
-                :sui: sui
-                :data-item: dataItem
-                :content-node: contentNode
-                :key: childNode.id
+            studio.doc.node:
+              v-for: childNode in node.children
+              :node: childNode
+              :user-app: userApp
+              :user-app-state: userAppState
+              :sui: sui
+              :data-item: dataItem
+              :content-node: contentNode
+              :key: childNode.id
 
 props:
   node:

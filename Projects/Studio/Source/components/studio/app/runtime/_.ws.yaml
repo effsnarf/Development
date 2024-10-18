@@ -26,17 +26,17 @@ mounted: | #js
 methods:
   initAppState: | #js
     function() {
-      this.userAppState = this.getNewAppState(this.userApp);
+      this.userAppState = this.getNewUserAppState(this.userApp);
       this.$emit("user-app-state", this.userAppState);
     }
-  updateAppState: | #js
+  updateUserAppState: | #js
     function() {
-      const oldAppState = this.userAppState;
-      const newAppState = this.getNewAppState(this.userApp);
+      const oldAppState = Objects.clone(this.userAppState);
+      const newAppState = this.getNewUserAppState(this.userApp);
       this.userAppState = newAppState;
       this.$emit("user-app-state", this.userAppState);
     }
-  getNewAppState: | #js
+  getNewUserAppState: | #js
     function(userApp) {
       const data = {};
       for (const pageNode of this.$root.getPageNodes()) {
@@ -44,15 +44,13 @@ methods:
         // lists
         for (const node of this.$root.findDescNodes(pageNode, ((n) => n.vars?.length)))
         {
-          const ds = node.data?.source;
-          const listVarPath = `${pageNode.name}.${node.name}`;
-          const listVarName = listVarPath.replaceAll('.', '_');
-
-          pageData[node.name] = {};
-
-          if (node.vars) {
-            for (const var1 of node.vars) {
-              pageData[node.name][var1.name] = null;
+          if (!node.name) continue;
+          for (const var1 of node.vars) {
+            pageData[node.name] = pageData[node.name] || {};
+            const varData = pageData[node.name][var1.name] = { value: null };
+            if (var1.type == "fetch") {
+              varData._url = var1.url;
+              varData._value = [];
             }
           }
         }
@@ -62,7 +60,7 @@ methods:
     }
   onAppNodeChanged: | #js
     function() {
-      this.updateAppState();
+      this.updateUserAppState();
     }
   onAppStateChanged: | #js
     function(vars) {

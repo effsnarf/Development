@@ -65,13 +65,13 @@ methods:
     function(userApp, node, options) {
       const addChildren = (!node.children);
       node = Objects.clone(node, { exclude: ["children"] });
+      if (addChildren) node.children = [];
       if (!("id" in node)) {
         node.id = this.$root.getNewNodeID(userApp);
       }
       if (options?.childOf) {
         options.childOf.parent.children.insertAt((options.childOf.insertAt ?? 0), node);
       }
-      if (addChildren) node.children = [];
       node.animation = {
         anim: null,
         duration: null,
@@ -330,7 +330,6 @@ methods:
     }
   fetchFromUrl: | #js
     async function(url) {
-      debugger;
       const ticker = Ticker.alertify((elapsed) => `<h2>⏳ ${elapsed.unitifyTime()}</h2> ${url}`)
       try
       {
@@ -348,23 +347,27 @@ methods:
       }
     }
   bindToUserAppState: | #js
-    function(vue, nodeVarPath, varName) {
+    function(vue, nodeVarPath, var1, propName) {
       // local -> userAppState
-      vue.$watch(varName, (newValue) => {
-        console.log(`🧊 setting ${nodeVarPath}.${varName} to ${newValue}`);
-        this.$root.studio.user.app.state.set(nodeVarPath, varName, newValue);
+      vue.$watch(propName, (newValue) => {
+        //if (propName == "_value") debugger;
+        //alertify.message(`🧊 setting ${nodeVarPath}.${var1.name}.${propName} to ${newValue}`);
+        this.$root.studio.user.app.state.set(`${nodeVarPath}.${var1.name}`, propName, newValue);
       });
       // userAppState -> local
-      this.$root.watchUserAppState(vue, nodeVarPath, varName, (newValue) => {
-        console.log(`🧊 setting local ${varName} to ${newValue}`);
-        vue[varName] = newValue;
+      this.$root.watchUserAppState(vue, `${nodeVarPath}.${var1.name}`, propName, (newValue) => {
+        vue.$data[propName] = newValue;
       });
     }
   watchUserAppState: | #js
     function(vue, nodeVarPath, varName, handler) {
-      const userAppState = this.$root.getUserAppState(vue);
-      const nodeVarData = Objects.getProperty(userAppState, nodeVarPath);
-      vue.$watch(() => nodeVarData[varName], { handler, immediate: true });
+      this.$root.e.on("app.state.changed", (vars) => {
+        for (const var1 of vars) {
+          if (var1.varPath.join('.') == `${nodeVarPath}.${varName}`) {
+            handler(var1.newValue);
+          }
+        }
+      });
     }
   getUserAppRuntimeVue: | #js
     function(vue) {
@@ -376,15 +379,19 @@ methods:
       while (vue && !vue.userAppState) vue = vue.$parent;
       return vue?.userAppState;
     }
-  computedNodeVar: | #js
-    function(vue, varName, exp) {
+  liveNodeVar: | #js
+    function(vue, var1, propName, exp, onChange) {
       const computed = Vue.computed({
         get: this.$root.toContextFunc(vue, { args: ["vue"], code: `try { return ${exp}; } catch (ex) {}` }, { async: false })
       });
       const watcher = Vue.watch(computed, (newValue) => {
-        vue[varName] = newValue;
-        vue.$emit("update", varName, newValue);
+        this.$root.studio.user.app.state.set(`${vue.nodeVarPath}.${var1.name}`, propName, newValue);
+        onChange?.(newValue);
       }, { immediate: true });
+      const destroy = () => {
+        watcher();
+      };
+      return { destroy, computed, watcher };
     }
   toContextFunc: | #js
     function(vue, funcDef, options) {
@@ -402,10 +409,10 @@ methods:
       // this.$node.clickCount
       // this.$page.button1, this.$page.boards, etc (data from this page)
       // this.$app.home, this.$app.boards, etc (access other pages)
+      const userAppState = this.$root.getUserAppState(vue);
       const pageName = this.$root.getPageName(vue);
       const nodeVarPath = (vue.nodeVarPath ?? this.$root.getNodeVarPath(vue.node));
       const nodeData = (!nodeVarPath) ? null : Objects.getProperty(userAppState, nodeVarPath);
-      const userAppState = this.$root.getUserAppState(vue);
       const $app = userAppState;
       const $page = userAppState[pageName];
       const $node = nodeData;

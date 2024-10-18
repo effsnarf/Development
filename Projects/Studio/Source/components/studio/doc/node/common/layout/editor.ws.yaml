@@ -36,7 +36,7 @@ methods:
       // because of preview, [node] already has the new layout
       const oldNode = Objects.clone(this.initial.node);
       const newNode = Objects.clone(this.node);
-      this.$root.do("edit.node", { oldNode, newNode });
+      this.$root.do("edit.node", { oldNode, newNode, changes: null });
       this.initial.node.layout = Objects.clone(layout);
       this.refresh();
     }

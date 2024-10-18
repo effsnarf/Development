@@ -97,8 +97,48 @@ methods:
       const undo = { type: "select.nodes", args: { nodes: oldSelectedNodes } };
       return { _do, undo };
     }
+  do_create_comp: | #js
+    function(_do, contentNode) {
+      _do.args.contentNode = Objects.clone(contentNode);
+      const parent = this.$root.getNodeParent(contentNode);
+      const contentNodeIndex = parent.children.findIndex(n => (n.id == contentNode.id));
+      const compsNode = this.userApp.children.find(n => (n.type == "comps"));
+      let newCompNode = {
+        type: "comp",
+        name: null,
+      };
+      newCompNode = this.$root.initNewNode(this.userApp, newCompNode);
+      compsNode.children.push(newCompNode);
+      TreeObject.moveNode(this.userApp, contentNode, newCompNode, { newTree: false });
+      // insert a comp inst node instead of the content node
+      const compInstNode = {
+        id: this.$root.getNewNodeID(this.userApp),
+        type: "comp.inst",
+        comp: { id: newCompNode.id, name: newCompNode.name },
+      };
+      TreeObject.addNode(parent, compInstNode, contentNodeIndex);
+      this.setIconText(_do, newCompNode, false);
+      const undo = { type: "uncreate.comp", args: { parent: { node: { id: parent.id } }, comp: { node: { id: newCompNode.id } }, index: contentNodeIndex } };
+      this.$root.e.emit("new.comp.created", newCompNode);
+      return { _do, undo };
+    }
+  do_uncreate_comp: | #js
+    function(_do, parent, comp, index) {
+      parent = this.$root.getNode(parent);
+      comp = this.$root.getNode(comp);
+      const compInst = parent.children[index];
+      // delete the component instance node
+      TreeObject.deleteNode(parent, compInst, { newTree: false });
+      // remove the comp node from comps
+      TreeObject.deleteNode(this.userApp, comp, { newTree: false });
+      // unpack the comp back to [parent]
+      const contentNode = Objects.clone(comp.children[0]);
+      TreeObject.addNode(parent, contentNode, index);
+      this.$root.e.emit("app.node.changed", parent);
+    }
   do_create_node: | #js
     function(_do, parent, newNode) {
+      newNode = Objects.clone(newNode);
       delete newNode._;
       parent = this.$root.getNode(parent);
       newNode = this.$root.initNewNode(this.userApp, newNode, { childOf: { parent, insertAt: 0 } });
@@ -121,7 +161,7 @@ methods:
       return { _do, undo };
     }
   do_edit_node: | #js
-    function(_do, oldNode, newNode, changes) {
+    function(_do, oldNode, newNode, changes, isFirstTime) {
       let undoChanges = [];
       if (oldNode && newNode) {
         delete oldNode.children;
@@ -130,7 +170,30 @@ methods:
         undoChanges = DeepDiff.diff(newNode, oldNode);
         if (!changes) throw "No changes detected";
       }
+
+      if (isFirstTime) {
+        // group with previous edit, if any
+        const prevAction = this.actions.last();
+        if (prevAction?.do.type == "edit.node") {
+          if (prevAction.do.args.node.id == oldNode.id) {
+            undoChanges = prevAction.undo.args.changes;
+            this.actions.pop();
+          }
+        }
+      }
+
       let node = this.$root.getNode(oldNode);
+
+      if ((node.type == "comp") && (changes.length == 1) && (Objects.areEqual(changes[0].path, ["name"]))) {
+        // if comp name changed, update comp inst names
+        const compInsts = TreeObject.filter(this.userApp, (n) => (n.type == "comp.inst" && n.comp.id == oldNode.id));
+        const newName = changes[0].rhs;
+        for (const compInst of compInsts) {
+          compInst.comp.name = newName;
+          this.$root.appNodeChanged(compInst);
+        }
+      }
+
       const prevNode = Objects.clone(node, { exclude: ["children"] });
       for (const change of changes) DeepDiff.applyChange(node, change);
       if (!undoChanges.length) {
@@ -151,9 +214,10 @@ methods:
       const oldValue = Objects.clone(nodeVar[key]);
       nodeVar[key] = value;
       const newNode = Objects.clone(node);
-      this.$root.do("edit.node", { oldNode, newNode })
+      this.$root.do("edit.node", { oldNode, newNode, changes: null })
       this.setIconText(_do, node);
       const undo = { type: "edit.node.var", args: { node: { id: node.id }, varName, key, value: oldValue } };
+      this.$root.appNodeChanged(node);
       return { _do, undo };
     }
   do_undelete_node: | #js
@@ -180,9 +244,10 @@ methods:
     }
   do: | #js
     function(_do, addToStack = true) {
+      const isFirstTime = (addToStack);
       const doMethod = this[`do_${_do.type.replace(/\./g, "_")}`];
       if (!doMethod) return alertify.error(`Action type not implemented: ${doAction.type}`);
-      const action = doMethod(_do, ...Object.values(_do.args));
+      const action = doMethod(_do, ...Object.values(_do.args), isFirstTime);
       if (!addToStack || !action) return;
       this.addAction(action);
     }
@@ -207,13 +272,15 @@ methods:
       this.pointer = (this.actions.length - 1);
     }
   setIconText: | #js
-    function(_do, node) {
+    function(_do, node, shortenNodeRefs = true) {
       _do.icon = this.$root.getNodeIcon(node);
       _do.text = this.$root.getNodeText(node);
       // find any node props in _do.args (has [id] and [type]) and keep only their { id: [id] }
-      for (const key in _do.args) {
-        const value = _do.args[key];
-        if (value?.id && value?.type) _do.args[key] = { id: value.id };
+      if (shortenNodeRefs) {
+        for (const key in _do.args) {
+          const value = _do.args[key];
+          if (value?.id && value?.type) _do.args[key] = { id: value.id };
+        }
       }
     }
   onlyNodeID: | #js

@@ -359,10 +359,10 @@ const mgCompMixin = {
   },
 };
 
-const afterCompEvent = (e: CompEvent) => {
+const afterCompEvent = ((e: CompEvent) => {
   (window as any).vueIdeApp?.perfInspector?.().afterCompEvent(e);
   //console.log(`⚡`, e.elapsed, e.name);
-}
+}).throttle(100);
 
 const compEventTracker = Mixins.CompEventTracker(afterCompEvent);
 

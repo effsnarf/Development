@@ -11,7 +11,7 @@ data:
 methods:
   init: | #js
     function(var1) {
-      const computed = this.$root.computedNodeVar(this, var1.name, JSON.stringify(var1.value));
+      const computed = this.$root.liveNodeVar(this, var1.name, JSON.stringify(var1.value));
       // [local].items -> [userAppState].items and vice versa
       //this.$root.bindToUserAppState(this, this.nodeVarPath, "items");
     }

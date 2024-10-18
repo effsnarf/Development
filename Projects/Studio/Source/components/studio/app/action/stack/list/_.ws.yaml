@@ -76,6 +76,8 @@ style:
     background-color: "#808080a0"
   tr:not(.done):
     opacity: 0.5
+  td:nth-child(1), td:nth-child(2), td:nth-child(3):
+    width: 1.5em
   .done:
     background-color: "#80808080"
     border-radius: 0

@@ -1,0 +1,52 @@
+dom:
+  div:
+    ui.dnd.draggable:
+      .tool:
+        :class: "{ 'tool-dimmed': !is.editing }"
+        .icon:
+          v-text: "'📦'"
+        .title:
+          v-if: "!is.editing"
+          v-text: "'📦 ' + compNode.name"
+        .flex:
+          ui.input.text.box:
+            v-if: is.editing
+            hint: comp name
+            :auto-focus: "true"
+            :text-box-style: "{ width: '8em', 'text-align': 'center' }"
+            v-model: editedName
+            @enter: setCompName
+          button:
+            v-if: is.editing
+            v-text: "'✔️'"
+            @click: setCompName
+
+props:
+  compNode:
+
+data:
+  is:
+    editing: false
+  editedName:
+
+methods:
+  setCompName: | #js
+    function() {
+      const newName = this.editedName;
+      const compNode = this.compNode;
+      const node = { id: compNode.id, name: compNode.name };
+      const oldNode = Objects.clone(node);
+      const newNode = Objects.clone(node);
+      newNode.name = newName;
+      this.$root.do("edit.node", { oldNode, newNode, changes: null });
+    }
+
+watch:
+  compNode:
+    immediate: true
+    deep: false
+    handler: | #js
+      function(newCompNode, oldCompNode) {
+        this.editedName = newCompNode.name;
+        this.is.editing = (!newCompNode.name);
+      }

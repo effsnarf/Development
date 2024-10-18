@@ -517,7 +517,7 @@ interface Function {
   getArgumentNames(): string[];
   postpone(delay: number): (...args: any[]) => (...args: any[]) => any;
   debounce(delay: number): (...args: any[]) => any;
-  throttle(delay: number, context: any): (...args: any[]) => any;
+  throttle(delay: number, context?: any): (...args: any[]) => any;
 }
 // #endregion
 

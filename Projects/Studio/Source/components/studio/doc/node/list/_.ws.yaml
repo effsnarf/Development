@@ -10,7 +10,7 @@ dom:
         v-text: "'⚠️ list template'"
     .list-item:
       v-for: (item, i) in visibleItems
-      :key: getListItemKey(item)
+      :key: visibleItemKeys[i]
       studio.doc.node:
         v-for: childNode in node.children
         :node: childNode
@@ -34,6 +34,7 @@ data:
   hovered:
   selected:
   visibleItems:
+  visibleItemKeys: []
   exampleItems: 9
   maxVisibleItems: 3
 
@@ -71,6 +72,7 @@ watch:
     handler: | #js
       function(items) {
         this.visibleItems = this.getVisibleItems(items);
+        this.visibleItemKeys = this.visibleItems.map((item) => this.getListItemKey(item));
       }
       
 style:

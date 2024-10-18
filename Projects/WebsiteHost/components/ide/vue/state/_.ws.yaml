@@ -64,7 +64,7 @@ methods:
       fields.push(...this.getComputedKeys(vue).map((k) => {
           return { type: "c", key: k, newValue: StateValue.from(vue[k]) };
       }));
-      fields = fields.filter((f) => !f.key.startsWith("_"));
+      //fields = fields.filter((f) => !f.key.startsWith("_"));
       fields = fields.sortBy((f) => f.type, (f) => f.key);
       return fields;
     }

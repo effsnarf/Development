@@ -1,6 +1,6 @@
 dom:
   .flex:
-    ':class': getCssClass()
+    ':class': cssClass
     @mouseenter: $emit('mouseenter')
     @mouseleave: $emit('mouseleave')
     @click: onClick
@@ -71,6 +71,10 @@ watch:
       }
     immediate: true
 computed:
+  cssClass: | #js
+    function() {
+      return this.getCssClass();
+    }
   checkedValue: | #js
     function() {
       if (this.valueArray && this.valueKey)

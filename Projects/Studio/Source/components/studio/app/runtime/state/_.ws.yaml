@@ -4,7 +4,6 @@ dom:
       :key: key1
       ui.tree:
         :root: root
-        :user-app-state: userAppState
         item-type: studio.app.runtime.state.tree.node
         :initial-expanded: "true"
         @node-select: onNodeSelect
@@ -33,6 +32,7 @@ data:
 mounted: | #js
   async function() {
     this.$root.e.on("app.state.changed", this.onAppStateChanged.bind(this));
+    this.$root.e.on("app.node.changed", this.onAppNodeChanged.bind(this));
     this.$watch("sui.page.selected", this.onSelectedPageChanged.bind(this));
     this.refresh();
   }
@@ -50,6 +50,10 @@ methods:
     function(vars) {
       //this.refresh();
     }
+  onAppNodeChanged: | #js
+    function(node) {
+      this.refresh();
+    }
   refresh: | #js
     async function() {
       const appStateTree = Objects.toTreeObject(this.userAppState, this.expandNodeToTree, [], "name", "value");
@@ -57,7 +61,6 @@ methods:
       this.root = this.appStateTree;
       if (this.sui.page.selected && !this.showAllPages) this.root = this.appStateTree.children.find(c => (c.name == this.sui.page.selected.name));
       this.key1++;
-      this.$forceUpdate();
     }
   expandNodeToTree: | #js
     function(node, key, value, nodePath) {

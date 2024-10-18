@@ -1,7 +1,43 @@
 dom:
-  .tools:
+  div:
     :key: key1
-    ui.context.window:
+    .tools:
+      div:
+        v-for: ntt in nodeTypeTools
+        :key: ntt.type
+        @mouseenter: hovered.ntt = ntt
+        @mouseleave: hovered.ntt = null
+        ui.dnd.draggable:
+          :drag-item: "{ type: 'new.node', item: ntt }"
+          .tool.tool-dimmed:
+            .icon:
+              v-text: ntt._?.icon
+            .title:
+              v-text: ntt.type
+      transition.group:
+        name: slide-hor
+        studio.doc.node.toolbar.comp:
+          v-for: compNode in compNodes
+          :comp-node: compNode
+          :key: compNode.id
+      div:
+        ui.context.window:
+          .box2:
+            .flex:
+              h2:
+                v-text: "'➕📦'"
+              div:
+                div:
+                  v-text: "'Drop a 📁 panel branch from the app tree here to create a new reusable component.'"
+        ui.dnd.dropzone:
+          @drop-item: onDropItem_new_comp
+          .tool.tool-dimmed.new-comp:
+            .icon:
+              v-text: "'➕📦'"
+            .title:
+              v-text: "'[new comp]'"
+    div:
+      v-if: "false"
       :visible: "['page', 'panel', 'list'].includes(hovered.ntt?.type)"
       .box2:
         video:
@@ -35,42 +71,6 @@ dom:
             div:
               div:
                 v-text: "'A list binds array data to other elements (like a for loop), in a grid or flex layout.'"
-    div:
-      v-for: ntt in nodeTypeTools
-      :key: ntt.type
-      @mouseenter: hovered.ntt = ntt
-      @mouseleave: hovered.ntt = null
-      ui.dnd.draggable:
-        :drag-item: "{ type: 'new.node', item: ntt }"
-        .tool:
-          .icon:
-            v-text: ntt._?.icon
-          .title:
-            v-text: ntt.type
-    div:
-      v-for: compNode in compNodes
-      :key: compNode.id
-      ui.dnd.draggable:
-        .tool:
-          .icon:
-            v-text: "'📦'"
-          .title:
-            v-text: compNode.name
-    div:
-      ui.context.window:
-        .box2:
-          .flex:
-            h2:
-              v-text: "'➕📦'"
-            div:
-              div:
-                v-text: "'Drop a 📁 panel node from the app tree here to create a new reusable component.'"
-      ui.dnd.dropzone:
-        .tool.new-comp:
-          .icon:
-            v-text: "'➕'"
-          .title:
-            v-text: "'[new component]'"
 
 data:
   nodeTypeTools:
@@ -94,14 +94,21 @@ methods:
   init: | #js
     async function() {
       if (!this.$root._studio_methods_initialized) return setTimeout(this.init.bind(this), 100);
+      this.$root.e.on("app.node.changed", this.refresh.bind(this));
+      this.$root.e.on("new.comp.created", this.refresh.bind(this));
       for (const ntt of this.nodeTypeTools) {
         ntt._ = { icon: (this.$root.getNodeIcon(ntt, "comp.inst")) };
       }
       this.refresh();
     }
+  onDropItem_new_comp: | #js
+    function(item) {
+      const node = item.item;
+      this.$root.do("create.comp", { contentNode: node });
+    }
   refresh: | #js
     function() {
-      //this.compNodes = this.$root.getNodesByType("comp");
+      this.compNodes = this.$root.getNodesByType?.("comp");
       this.key1++;
     }
 
@@ -122,20 +129,17 @@ style:
     display: flex
     justify-content: center
     gap: 1em
-    opacity: 0.4
-  .tools:hover:
-    opacity: 1
   .tool:
     display: flex
     flex-direction: column
     align-items: center
-    max-width: 4em
     padding: 0 1em
     overflow: hidden
+  .tool-dimmed:
+    opacity: 0.4
     filter: grayscale(1)
-    transition: all 0s, max-width 0.6s
-  .tool:hover:
-    max-width: 8em
+  .tool-dimmed:hover:
+    opacity: 1
     filter: "drop-shadow(-6px 6px 2px #00000080)"
   .new-comp:
     border: 4px dashed gray

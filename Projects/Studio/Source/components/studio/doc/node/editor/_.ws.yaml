@@ -95,7 +95,7 @@ methods:
     }
   onAppNodeEdited: | #js
     function(node) {
-      if (node.id != this.node.id) return;
+      if (node.id != this.node?.id) return;
       this.initial.node = this.getInitialNodeData(node);
     }
   getNodeCompEditorName: | #js

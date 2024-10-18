@@ -1,7 +1,7 @@
 dom:
   div:
     component:
-      ":is": getComponentType(value)
+      ":is": compType
       ":value": visibleValue
       ":title": title
       ":preview": "false"
@@ -38,6 +38,10 @@ methods:
       return `ui.value.${getType(value)}`.replace(/\./g, "-");
     }
 computed:
+  compType: | #js
+    function() {
+      return this.getComponentType(this.value);
+    }
   visibleValue: | #js
     function() {
       if (this.value === null) return null;

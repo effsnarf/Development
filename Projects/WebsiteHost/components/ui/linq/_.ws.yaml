@@ -85,7 +85,7 @@ watch:
   value:
     handler: | #js
       function(operations) {
-        this.operations = (operations || []);
+        this.operations = Objects.clone(operations || []);
       }
     immediate: true
 

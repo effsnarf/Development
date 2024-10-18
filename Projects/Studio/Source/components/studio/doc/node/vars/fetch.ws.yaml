@@ -1,42 +1,90 @@
 dom:
   div:
     v-if: "true"
+    h2:
+      v-text: _uid
     h3:
       v-text: var1.name
     h2:
-      v-text: url
+      v-text: $data._url
     h3:
       v-text: nodeVarPath
     ui.value:
-      :value: items
+      :value: value
+    ui.linq.evaluator:
+      ref: linqEval1
 
 props:
+  node:
   var1:
   nodeVarPath:
 
 data:
-  url:
-  items: []
+  _url:
+  _value: []
+  value: []
+  inited:
+    url:
+    linq:
+  live:
+    url: null
+
+mounted: | #js
+  function() {
+    this.init();
+    this.$root.e.on("app.node.changed", this.onAppNodeChanged.bind(this));
+  }
 
 methods:
+  onAppNodeChanged: | #js
+    function(node) {
+      debugger;
+      if (node.id != this.node.id) return;
+      const var1 = this.var1;
+      // if the url has changed
+      if (var1.url != this.inited.url) {
+        // stop the previous watcher
+        this.live.url?.destroy();
+        this.live.url = this.$root.liveNodeVar(this, var1, "_url", var1.url, async (newUrl) => {
+          this._value = (await this.$root.fetchFromUrl(newUrl));
+          this.value = this.linqEval(this._value);
+          // #TODO not accurate
+          // switch to the page this list is in
+          //if (pageNode) $root.do("select.page", { pageNode });
+        });
+        this.inited.url = var1.url;
+      }
+      // if the linq has changed
+      if (var1.linq != this.inited.linq) {
+        this.value = this.linqEval(this._value)
+        this.inited.linq = var1.linq;
+      }
+    }
   init: | #js
-    function(var1) {
-      //const cUrl = this.$root.computedNodeVar(this, "url", var1.url);
-      // [local].items -> [userAppState].items and vice versa
-      //this.$root.bindToUserAppState(this, this.nodeVarPath, "items");
+    function() {
+      this.$root.bindToUserAppState(this, this.nodeVarPath, this.var1, "_url");
+      this.$root.bindToUserAppState(this, this.nodeVarPath, this.var1, "value");
+      this.onAppNodeChanged(this.node);
+    }
+  linqEval: | #js
+    function(inputData) {
+      if (!this.$refs.linqEval1) return null;
+      const linq = (this.var1.linq ?? []);
+      const datas = this.$refs.linqEval1.evaluateOps(null, inputData, linq);
+      const outputData = datas.last();
+      return outputData;
     }
 
 watch:
-  url:
-    immediate: true
-    handler: | #js
-      async function(newUrl, oldUrl) {
-        if (newUrl == oldUrl) return;
-        //this.items = (await this.$root.fetchFromUrl(newUrl));
-        // #TODO not accurate
-        // switch to the page this list is in
-        //if (pageNode) $root.do("select.page", { pageNode });
-      }
+  _value: | #js
+    function() {
+      this.$root.studio.user.app.state.set(`${this.nodeVarPath}.${this.var1.name}`, "_value", this._value);
+    }
+  value: | #js
+    function(newValue) {
+      this.$root.studio.user.app.state.set(`${this.nodeVarPath}.${this.var1.name}`, "value", this.value);
+      this.$emit("update", newValue);
+    }
   var1:
     immediate: true
     handler: | #js

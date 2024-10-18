@@ -11,10 +11,20 @@ props:
   sui:
   dataItem:
 
-methods:
+data:
+  compNode:
 
-computed:
-  compNode: | #js
-    function() {
-      return this.$root.getCompNode(this.node);
+methods:
+  getCompNode: | #js
+    function(node) {
+      return this.$root.getCompNode(node);
     }
+
+watch:
+  node:
+    immediate: true
+    deep: false
+    handler: | #js
+      function(node) {
+        this.compNode = this.getCompNode(node);
+      }

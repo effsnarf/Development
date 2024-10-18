@@ -98,7 +98,7 @@ namespace Data2 {
       args: any[],
       returnValue: any
     ) => {
-      if (["add", "splice"].includes(methodName)) {
+      if (["add", "splice", "pop"].includes(methodName)) {
         this.events.emit(methodName, ...args);
       }
     };

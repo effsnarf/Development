@@ -33,6 +33,7 @@ data:
 
 mounted: | #js
   function() {
+    this.$root.e.on("app.node.changed", this.onAppNodeChanged.bind(this));
   }
 
 methods:
@@ -83,6 +84,18 @@ methods:
       if (ds?.exp) return this.shorten(ds?.exp);
       return null;
     }
+  onAppNodeChanged: | #js
+    function(node) {
+      if (node.id != this.node?.id) return;
+      this.refresh();
+    }
+  refresh: | #js
+    function(node) {
+      if (!node) node = this.node;
+      this.nodeText = this.getNodeText(node);
+      this.nodeWarning = this.getNodeWarning(node);
+      this.nodeInfo = this.getNodeInfo(node);
+    }
   shorten: | #js
     function(s, len = 10) {
       if (!s?.length) return null;
@@ -101,9 +114,7 @@ watch:
     handler: | #js
       function(item) {
         const node = this.node = item;
-        this.nodeText = this.getNodeText(node);
-        this.nodeWarning = this.getNodeWarning(node);
-        this.nodeInfo = this.getNodeInfo(node);
+        this.refresh(node);
       }
 
 style:

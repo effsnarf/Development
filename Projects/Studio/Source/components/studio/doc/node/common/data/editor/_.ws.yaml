@@ -9,11 +9,12 @@ dom:
     div:
       v-if: node?.vars
       .flex:
-        ui.select:
-          :options: visibleNodeVars
-          :get-item-icon: (v) => '🧊'
-          :get-item-text: (v) => v.name
-          v-model: selectedNodeVarIndex
+        ui.drawer:
+          ui.select:
+            :options: visibleNodeVars
+            :get-item-icon: (v) => '🧊'
+            :get-item-text: (v) => v.name
+            v-model: selectedNodeVarIndex
         .flex-grow-1:
           div:
             v-for: (var1, i) in visibleNodeVars
@@ -31,7 +32,7 @@ dom:
                   direction: vertical
                   :drawer: "true"
                   :show-title-in-tab: "true"
-                  :value: getInitialSelectedTab(var1)
+                  :value: null
                   @input: (newTab) => onTabChange(var1, newTab)
                   template:
                     v-slot: tab0
@@ -71,7 +72,7 @@ props:
 data:
   tabOptions: ['🍃 field', '🟰 exp', '🌐 fetch', '🔗 node.prop', '🧊 value']
   selectedNodeVarIndex: 0
-  visibleNodeVars:
+  visibleNodeVars: []
 
 mounted: | #js
   function() {
@@ -91,7 +92,7 @@ methods:
   onTabChange: | #js
     function(var1, newTab) {
       if (!var1) return;
-      var1.type = (newTab < 0) ? null : this.tabOptions[newTab].split(' ').last();
+      var1.type = (newTab < 0) ? null : this.tabOptions[newTab]?.split(' ').last();
     }
   getVisibleNodeVars: | #js
     function(node) {
@@ -104,6 +105,5 @@ watch:
     immediate: true
     deep: false
     handler: | #js
-      function(node) {
-        this.visibleNodeVars = this.getVisibleNodeVars(node);
-      }
+      this.visibleNodeVars = this.getVisibleNodeVars(this.node);
+

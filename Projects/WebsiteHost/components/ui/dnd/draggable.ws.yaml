@@ -6,11 +6,11 @@ dom:
     draggable: true
     @dragstart: onDragStart
     @dragend: onDragEnd
-    @mousemove: onDrag
+    # @mousemove: onDrag
     @drag: onDrag
     ui.mouse:
       ':global': true
-      @move: onDrag
+      # @move: onDrag
     slot: null
 props:
   dragItem: null

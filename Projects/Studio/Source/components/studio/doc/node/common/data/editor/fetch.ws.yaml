@@ -5,7 +5,7 @@ dom:
       multiline: true
       v-model: url
     div:
-      v-if: (url != nodeVar.url)
+      v-if: (true) || (url != initial.url)
       ui.button:
         icon: ✔️
         text: save
@@ -17,9 +17,9 @@ dom:
       ui.value.preview:
         :value: nodeVarData
       ui.linq:
-        v-if: (nodeVarData && nodeVar.linq)
-        :input: nodeVarData
-        :value: nodeVar.linq
+        v-if: (nodeVarData)
+        :input: nodeVarData._value
+        :value: initial.linq
         @input: setLinq
         @output: (value) => nodeVarLinqedData = value
       ui.value:
@@ -32,14 +32,18 @@ props:
 
 data:
   url:
+  initial:
+    url:
+    linq:
   nodeVarData:
   nodeVarLinqedData:
 
 methods:
   setLinq: | #js
     function(linq) {
-      if (Objects.areEqual(linq, this.nodeVar.linq)) return;
-      //this.$root.do("edit.node.var", { node: this.node, varName: this.nodeVar.name, key: "linq", value: linq });
+      if (Objects.areEqual(linq, this.initial.linq)) return;
+      this.initial.linq = Objects.clone(linq);
+      this.$root.do("edit.node.var", { node: this.node, varName: this.nodeVar.name, key: "linq", value: linq });
     }
   onSaveUrl: | #js
     function() {
@@ -50,6 +54,7 @@ watch:
   nodeVar:
     immediate: true
     handler: | #js
-      function() {
-        this.url = this.nodeVar?.url;
+      function(nodeVar) {
+        this.initial.linq = Objects.clone(nodeVar.linq);
+        this.initial.url = this.url = this.nodeVar?.url;
       }

@@ -7,7 +7,7 @@ dom:
         :user-app: userApp
         :user-app-state: userAppState
         :sui: sui
-        :key: sui.tool.category.index
+        :key: (sui.tool.category.name??'data')
 
 props:
   userApp:

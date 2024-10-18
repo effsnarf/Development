@@ -21,7 +21,7 @@ dom:
     ui.tabs:
       :options: "['📜 aggragate', '⚡ realtime']"
       direction: horizontal
-      :value: 0
+      :value: "0"
       template:
         v-slot: tab0
         ui.value:
@@ -42,15 +42,8 @@ data:
   isEnabled: true
   isHovered: false
   exclude:
-    component:
-      - studio-app
-      - studio-doc-node-picker
-      - studio-dom-tree-methods
-      - studio-dom-tree-node
-    name:
-      - getNodeIcon
-      - getNodeText
-      - getNodeCompName
+    component: []
+    name: []
 
 mounted: | #js
   function() {
@@ -159,7 +152,7 @@ methods:
 style:
   .inspector:
     position: fixed
-    right: 8em
+    left: 8em
     bottom: 1em
     opacity: 0.5
     max-width: 10em

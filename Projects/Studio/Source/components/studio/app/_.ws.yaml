@@ -68,14 +68,14 @@ dom:
         @mouseenter: sui.main.box.hovered = 3
         @mouseleave: sui.main.box.hovered = null
       .main-box.e:
-        div:
-          studio.app.action.stack:
-            :user-app: userApp
-            :sui: sui
         studio.app.global.settings:
           :user-app: userApp
           :user-app-state: userAppState
           :sui: sui
+        div:
+          studio.app.action.stack:
+            :user-app: userApp
+            :sui: sui
         @mouseenter: sui.main.box.hovered = 4
         @mouseleave: sui.main.box.hovered = null
     .logo:
