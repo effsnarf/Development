@@ -154,17 +154,29 @@ mounted: | #js
       user: {
         app: {
           state: {
-            set: (varPath, varName, value) => {
-              this.$root.studio.user.app.state.change(`${varPath}.${varName}`, value);
+            get: (varPath) => {
+              return Objects.getProperty(this.userAppState, varPath);
             },
-            change: (varPath, newValue, info) => {
+            set: (vue, ...args) => {
+              // it's either (varPath, newValue) or (varPath, varName, newValue)
+              let varPath, varName, newValue;
+              if (args.length == 2) {
+                [varPath, newValue] = args;
+                // extract varName from varPath
+                varName = varPath.split('.').last();
+                // remove varName from varPath
+                varPath = varPath.split('.').slice(0, -1).join('.');
+              } else {
+                [varPath, varName, newValue] = args;
+              }
               varPath = (varPath.split?.('.') || varPath);
               const oldValue = Objects.getProperty(this.userAppState, varPath);
               if (newValue == oldValue) return;
               Objects.setProperty(this.userAppState, varPath, newValue);
-              this.appStateChangedVars.push({ varPath, newValue, info });
+              this.appStateChangedVars.push({ varPath, newValue });
               this.appStateChangeKey++;
-            }
+              this.$root.e.emit("app.log", vue, "🧊", "app.state.set", { varPath, varName, newValue });
+            },
           },
           log: (vue, icon, method, data) => {
             this.$root.e.emit("app.log", vue, icon, method, data);
@@ -173,7 +185,7 @@ mounted: | #js
         comp: {
           state: {
             change: ($root, vue, key, varPath, newValue) => {
-              $root.studio.user.app.state.change(varPath, newValue);
+              $root.studio.user.app.state.set(this, varPath, newValue);
             }
           }
         }
@@ -879,7 +891,7 @@ watch:
     function() {
       const vars = [...this.appStateChangedVars];
       this.appStateChangedVars.clear();
-      this.$root.e.emit("app.state.changed", vars);
+      this.$root.appStateChanged(this, "🔑", "appStateChangeKey", vars);
     }
   isUserAppTilted: | #js
     function(newValue) {

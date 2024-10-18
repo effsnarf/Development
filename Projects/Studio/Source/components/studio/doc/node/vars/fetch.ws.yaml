@@ -79,11 +79,11 @@ methods:
 watch:
   _value: | #js
     function() {
-      this.$root.studio.user.app.state.set(`${this.nodeVarPath}.${this.var1.name}`, "_value", this._value);
+      this.$root.studio.user.app.state.set(this, `${this.nodeVarPath}.${this.var1.name}`, "_value", this._value);
     }
   value: | #js
     function(newValue) {
-      this.$root.studio.user.app.state.set(`${this.nodeVarPath}.${this.var1.name}`, "value", this.value);
+      this.$root.studio.user.app.state.set(this, `${this.nodeVarPath}.${this.var1.name}`, "value", this.value);
       this.$emit("update", newValue);
     }
   var1:

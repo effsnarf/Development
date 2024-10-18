@@ -317,6 +317,11 @@ methods:
     function(node) {
       return TreeObject.find(this.userApp, (p => (p.children?.map(c => c.id).includes(node.id))));
     }
+  appStateChanged: | #js
+    function(vue, icon, method, vars) {
+      this.$root.e.emit("app.state.changed", vars);
+      this.$root.studio.user.app.log(vue, icon, method, `🧊`, "app.state.changed", vars);
+    }
   appNodeChanged: | #js
     function(node) {
       node = this.$root.getNode(node);
@@ -350,13 +355,16 @@ methods:
     function(vue, nodeVarPath, var1, propName) {
       // local -> userAppState
       vue.$watch(propName, (newValue) => {
-        this.$root.studio.user.app.log(this, `🧊`, "$watcher", { dir: "local -> app.state", path: `${nodeVarPath}.${var1.name}.${propName}`, newValue });
-        this.$root.studio.user.app.state.set(`${nodeVarPath}.${var1.name}`, propName, newValue);
+        const oldValue = this.$root.studio.user.app.state.get(`${nodeVarPath}.${var1.name}.${propName}`);
+        if (oldValue == newValue) return;
+        this.$root.studio.user.app.state.set(this, `${nodeVarPath}.${var1.name}`, propName, newValue);
+        this.$root.studio.user.app.log(this, `🧊`, "$watcher", { dir: "local -> app.state", path: `🧊 ${nodeVarPath}.${var1.name}.${propName}`, newValue });
       });
       // userAppState -> local
       this.$root.watchUserAppState(vue, `${nodeVarPath}.${var1.name}`, propName, (newValue) => {
-        this.$root.studio.user.app.log(this, `🧊`, "$watcher", { dir: "app.state -> local", path: `${nodeVarPath}.${var1.name}.${propName}`, newValue });
+        if (vue.$data[propName] == newValue) return;
         vue.$data[propName] = newValue;
+        this.$root.studio.user.app.log(this, `🧊`, "$watcher", { dir: "app.state -> local", path: `🧊 ${nodeVarPath}.${var1.name}.${propName}`, newValue });
       });
     }
   watchUserAppState: | #js
@@ -385,7 +393,7 @@ methods:
         get: this.$root.toContextFunc(vue, { args: ["vue"], code: `try { return ${exp}; } catch (ex) {}` }, { async: false })
       });
       const watcher = Vue.watch(computed, (newValue) => {
-        this.$root.studio.user.app.state.set(`${vue.nodeVarPath}.${var1.name}`, propName, newValue);
+        this.$root.studio.user.app.state.set(this, `${vue.nodeVarPath}.${var1.name}`, propName, newValue);
         onChange?.(newValue);
       }, { immediate: true });
       const destroy = () => {

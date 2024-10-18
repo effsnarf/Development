@@ -32,6 +32,7 @@ methods:
       const dataFields = Objects.mapKeys(data, (k, i) => String.fromCharCode(97 + i));
       return {
         id: ((this.logItems.last()?.id || 0) + 1),
+        icon,
         vue: `[𝐕] ${vue.$options.name}`,
         method: `🔴 ${method}`,
         ...dataFields,
