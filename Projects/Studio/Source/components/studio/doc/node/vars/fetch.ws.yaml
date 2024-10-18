@@ -38,7 +38,6 @@ mounted: | #js
 methods:
   onAppNodeChanged: | #js
     function(node) {
-      debugger;
       if (node.id != this.node.id) return;
       const var1 = this.var1;
       // if the url has changed
@@ -46,6 +45,7 @@ methods:
         // stop the previous watcher
         this.live.url?.destroy();
         this.live.url = this.$root.liveNodeVar(this, var1, "_url", var1.url, async (newUrl) => {
+          debugger;
           this._value = (await this.$root.fetchFromUrl(newUrl));
           this.value = this.linqEval(this._value);
           // #TODO not accurate
@@ -63,6 +63,7 @@ methods:
   init: | #js
     function() {
       this.$root.bindToUserAppState(this, this.nodeVarPath, this.var1, "_url");
+      this.$root.bindToUserAppState(this, this.nodeVarPath, this.var1, "_value");
       this.$root.bindToUserAppState(this, this.nodeVarPath, this.var1, "value");
       this.onAppNodeChanged(this.node);
     }

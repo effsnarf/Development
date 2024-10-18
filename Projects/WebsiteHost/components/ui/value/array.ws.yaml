@@ -111,6 +111,7 @@ props:
   maxVisibleItems: 500
   maxVisibleFields: 1000
   visibleFields: null
+  initialVisibleFieldsCount: 5
   showVisibleFieldsFilter: true
   pageSize: 10
 data:
@@ -144,7 +145,7 @@ methods:
       const fields = objects.map(o => Object.keys(o||{}))
         .flatMap(f => f)
         .distinct()
-        .sortBy(f => f)
+        //.sortBy(f => f)
         .take(this.maxVisibleFields || 1000);
       return fields;
     }
@@ -251,7 +252,7 @@ watch:
           const oldFields = this.getFields(this.getItems(oldValue));
           resetFields = (!Objects.areEqual(oldFields, this.fields));
         }
-        if (resetFields) this.visibleFields1 = this.fields.take(3);
+        if (resetFields) this.visibleFields1 = this.fields.take(this.initialVisibleFieldsCount);
       }
     immediate: true
   query:
@@ -280,7 +281,7 @@ style:
     line-height: 1.1em
     overflow: hidden
   tr .value-as-string:
-    max-width: 12em
+    # max-width: 12em
   img:
     width: 5em
   tr:

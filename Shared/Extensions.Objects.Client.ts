@@ -589,13 +589,22 @@ class Objects {
     return result;
   }
 
-  static map(obj: any, func: (key: string, value: any) => [string, any]): any {
+  static map(
+    obj: any,
+    func: (key: string, value: any, index: number) => [string, any]
+  ): any {
     const result = {} as any;
+    let index = 0;
     for (const key of Object.keys(obj)) {
-      const [newKey, newValue] = func(key, obj[key]);
+      const [newKey, newValue] = func(key, obj[key], index++);
       result[newKey] = newValue;
     }
     return result;
+  }
+
+  static mapKeys(obj: any, func: (key: string, index: number) => string): any {
+    // replace all the keys of an object, keeping the same values
+    return Objects.map(obj, (key, value, index) => [func(key, index), value]);
   }
 
   static mapValues(obj: any, func: (value: any) => any) {

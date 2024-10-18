@@ -2,6 +2,9 @@ dom:
   div:
     studio.app.logo:
     div:
+      :style: "{ width: 'fit-content', 'max-height': '15em', overflow: 'auto', margin: 'auto' }"
+      studio.app.runtime.log:
+    div:
       studio.doc.node.toolbar:
         :user-app: userApp
     .spacer1:
@@ -162,6 +165,9 @@ mounted: | #js
               this.appStateChangedVars.push({ varPath, newValue, info });
               this.appStateChangeKey++;
             }
+          },
+          log: (vue, icon, method, data) => {
+            this.$root.e.emit("app.log", vue, icon, method, data);
           }
         },
         comp: {

@@ -1,0 +1,43 @@
+dom:
+  div:
+    :key: "key1"
+    ui.value.array:
+      :value: "[...logItems].reverse()"
+      :initial-visible-fields-count: 10
+
+data:
+  logItems: []
+  maxLogItems: 100
+  key1: 1
+
+mounted: | #js
+  function() {
+    this.refresh = this._refresh.throttle(1000);
+    this.$root.e.on("app.log", this.log.bind(this));
+  }
+
+methods:
+  log: | #js
+    function(vue, icon, method, data) {
+      this.logItems.push(this.getNewLogItem(vue, icon, method, data));
+      if (this.logItems.length > this.maxLogItems) this.logItems.shift();
+      this.refresh();
+    }
+  getNewLogItem: | #js
+    function(vue, icon, method, data) {
+      // map all the object keys so that instead of:
+      // { name: "[name]", address: "[address]", phone: "[phone]" }
+      // we get:
+      // { a: "[name]", b: "[address]", c: "[phone]" }
+      const dataFields = Objects.mapKeys(data, (k, i) => String.fromCharCode(97 + i));
+      return {
+        id: ((this.logItems.last()?.id || 0) + 1),
+        vue: `[𝐕] ${vue.$options.name}`,
+        method: `🔴 ${method}`,
+        ...dataFields,
+      };
+    }
+  _refresh: | #js
+    function() {
+      this.key1++;
+    }

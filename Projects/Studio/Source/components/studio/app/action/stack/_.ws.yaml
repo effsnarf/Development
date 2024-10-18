@@ -250,6 +250,7 @@ methods:
       const action = doMethod(_do, ...Object.values(_do.args), isFirstTime);
       if (!addToStack || !action) return;
       this.addAction(action);
+      //this.$root.studio.user.app.log(this, `🖱️`, "do", { action });
     }
   _do: | #js
     function(type, args) {

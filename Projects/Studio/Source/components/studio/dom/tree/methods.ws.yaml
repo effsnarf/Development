@@ -350,12 +350,12 @@ methods:
     function(vue, nodeVarPath, var1, propName) {
       // local -> userAppState
       vue.$watch(propName, (newValue) => {
-        //if (propName == "_value") debugger;
-        //alertify.message(`🧊 setting ${nodeVarPath}.${var1.name}.${propName} to ${newValue}`);
+        this.$root.studio.user.app.log(this, `🧊`, "$watcher", { dir: "local -> app.state", path: `${nodeVarPath}.${var1.name}.${propName}`, newValue });
         this.$root.studio.user.app.state.set(`${nodeVarPath}.${var1.name}`, propName, newValue);
       });
       // userAppState -> local
       this.$root.watchUserAppState(vue, `${nodeVarPath}.${var1.name}`, propName, (newValue) => {
+        this.$root.studio.user.app.log(this, `🧊`, "$watcher", { dir: "app.state -> local", path: `${nodeVarPath}.${var1.name}.${propName}`, newValue });
         vue.$data[propName] = newValue;
       });
     }
