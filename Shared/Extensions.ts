@@ -579,6 +579,11 @@ if (typeof Number !== "undefined") {
         return compare(json1, json2);
       }
 
+      // if booleans
+      if (typeof obj1 === "boolean" || typeof obj2 === "boolean") {
+        return Number(obj2) - Number(obj1);
+      }
+
       throw new Error(
         `Cannot compare ${obj1} (${typeof obj1}) with ${obj2} (${typeof obj2})`
       );

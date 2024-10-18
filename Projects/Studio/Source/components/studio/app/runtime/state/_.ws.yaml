@@ -1,6 +1,9 @@
 dom:
   div:
     div:
+      button:
+        v-text: "'refresh'"
+        @click: refresh
       :key: key1
       ui.tree:
         :root: root
@@ -48,11 +51,11 @@ methods:
     }
   onAppStateChanged: | #js
     function(vars) {
-      //this.refresh();
+      this.refresh();
     }
   onAppNodeChanged: | #js
     function(node) {
-      this.refresh();
+      //this.refresh();
     }
   refresh: | #js
     async function() {

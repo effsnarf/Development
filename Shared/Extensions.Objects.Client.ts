@@ -508,6 +508,7 @@ class Objects {
   }
 
   static setProperty(obj: any, path: string, value: any): void {
+    console.log("setProperty", path);
     return Objects.deepSet(obj, path, value);
   }
 

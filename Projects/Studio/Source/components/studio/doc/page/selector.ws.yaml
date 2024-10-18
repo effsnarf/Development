@@ -7,11 +7,6 @@ dom:
         v-for: pageNode in pageNodes
         @click: () => onSelectPage(pageNode)
         :class: "{ selected: (value?.id == pageNode.id) }"
-        .page-example:
-          studio.doc.node:
-            :node: pageNode
-            :user-app-state: userAppState
-            :sui: sui
         .page-title:
           v-text: pageNode.name
 

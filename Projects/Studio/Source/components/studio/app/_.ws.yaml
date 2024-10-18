@@ -162,17 +162,20 @@ mounted: | #js
               let varPath, varName, newValue;
               if (args.length == 2) {
                 [varPath, newValue] = args;
+              } else {
+                [varPath, varName, newValue] = args;
+              }
+              if (Array.isArray(varPath)) varPath = varPath.join('.');
+              if (!varName) {
                 // extract varName from varPath
                 varName = varPath.split('.').last();
                 // remove varName from varPath
                 varPath = varPath.split('.').slice(0, -1).join('.');
-              } else {
-                [varPath, varName, newValue] = args;
               }
               varPath = (varPath.split?.('.') || varPath);
               const oldValue = Objects.getProperty(this.userAppState, varPath);
               if (newValue == oldValue) return;
-              Objects.setProperty(this.userAppState, varPath, newValue);
+              Objects.setProperty(this.userAppState, `${varPath.join('.')}.${varName}`, newValue);
               this.appStateChangedVars.push({ varPath, newValue });
               this.appStateChangeKey++;
               this.$root.e.emit("app.log", vue, "🧊", "app.state.set", { varPath, varName, newValue });
@@ -891,7 +894,7 @@ watch:
     function() {
       const vars = [...this.appStateChangedVars];
       this.appStateChangedVars.clear();
-      this.$root.appStateChanged(this, "🔑", "appStateChangeKey", vars);
+      this.$root.e.emit("app.state.changed", vars);
     }
   isUserAppTilted: | #js
     function(newValue) {

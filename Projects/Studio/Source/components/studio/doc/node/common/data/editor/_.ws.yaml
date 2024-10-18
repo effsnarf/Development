@@ -53,6 +53,14 @@ dom:
                       :node: node
                       :node-var: var1
                       :node-var-path: getNodeVarPath(var1)
+                      :user-app-state: userAppState
+                    div:
+                      studio.app.runtime.state.branch:
+                        :node: node
+                        :node-var: var1
+                        :node-var-path: getNodeVarPath(var1)
+                        :user-app-state: userAppState
+                        :field-names: "{ _url: 'url', _value: 'fetched data', value: 'linqd data' }"
                   template:
                     v-slot: tab3
                     studio.doc.node.common.data.editor.node.prop:
@@ -61,7 +69,6 @@ dom:
                     v-slot: tab4
                     studio.doc.node.common.data.editor.value:
                       :node-var: var1
-
 props:
   node:
   initial:

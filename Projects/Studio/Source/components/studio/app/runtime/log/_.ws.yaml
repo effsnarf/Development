@@ -25,6 +25,12 @@ methods:
     }
   getNewLogItem: | #js
     function(vue, icon, method, data) {
+      // convert any [varPath] named fields from string[] to `🧊 a.b.c`
+      for (const k in data) {
+        if ((k == "varPath") && (Objects.is(data[k], Array))) {
+          data[k] = `🧊 ${data[k].join('.')}`;
+        }
+      }
       // map all the object keys so that instead of:
       // { name: "[name]", address: "[address]", phone: "[phone]" }
       // we get:
@@ -33,6 +39,7 @@ methods:
       return {
         id: ((this.logItems.last()?.id || 0) + 1),
         icon,
+        _uid: vue._uid,
         vue: `[𝐕] ${vue.$options.name}`,
         method: `🔴 ${method}`,
         ...dataFields,

@@ -1,0 +1,58 @@
+dom:
+  div:
+    :key: key1
+    div:
+      v-for: key in this.sortFields(Object.keys(nodeVarBranch))
+      h3:
+        v-text: (fieldNames?.[key] ?? key)
+      .folded1:
+        ui.value:
+          :value: nodeVarBranch[key]
+
+props:
+  node:
+  nodeVar:
+  nodeVarPath:
+  userAppState:
+  fieldNames:
+
+data:
+  nodeVarBranch:
+  key1: 1
+
+mounted: | #js
+  function() {
+    this.$root.e.on("app.state.changed", this.onAppStateChanged.bind(this));
+    this.refresh();
+  }
+
+methods:
+  onAppStateChanged: | #js
+    function(vars) {
+      const var1 = vars.find(v => (this.nodeVarPath == v.varPath.join(".")));
+      if (!var1) return;
+      this.refresh();
+    }
+  refresh: | #js
+    function() {
+      this.nodeVarBranch = Objects.getProperty(this.userAppState, this.nodeVarPath);
+      this.key1++;
+    }
+  sortFields: | #js
+    function(fields) {
+      return fields.sortBy(s => s.startsWith("_"));
+    }
+
+watch:
+  nodeVarPath:
+    immediate: true
+    handler: this.refresh();
+
+style:
+  .folded1:
+    max-height: 5em
+    overflow: hidden
+    transition: 3s
+  .folded1:hover:
+    max-height: 100vh
+    overflow: auto

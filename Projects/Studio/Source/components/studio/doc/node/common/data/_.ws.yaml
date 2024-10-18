@@ -47,7 +47,7 @@ methods:
     function(newValue) {
       const varPath = this.nodeVarPaths.find(v => (v.endsWith("._items")));
       const oldValue = Objects.getProperty(this.userAppState, varPath);
-      this.$root.studio.user.app.state.set(varPath, newValue);
+      this.$root.studio.user.app.state.set(this, varPath, newValue);
     }
 
 computed:

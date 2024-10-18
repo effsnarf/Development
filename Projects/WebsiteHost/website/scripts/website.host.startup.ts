@@ -1354,4 +1354,6 @@ interface MgParams {
   });
 
   (window as any).vueApp = vueApp;
+
+  (window as any).findVue = (p: (vue: any) => boolean) => TreeObject.find(vueApp, p, v => v.$children)
 })();

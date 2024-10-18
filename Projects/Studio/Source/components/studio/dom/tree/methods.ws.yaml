@@ -354,7 +354,7 @@ methods:
   bindToUserAppState: | #js
     function(vue, nodeVarPath, var1, propName) {
       // local -> userAppState
-      vue.$watch(propName, (newValue) => {
+      Vue.watch(() => vue.$data[propName], (newValue) => {
         const oldValue = this.$root.studio.user.app.state.get(`${nodeVarPath}.${var1.name}.${propName}`);
         if (oldValue == newValue) return;
         this.$root.studio.user.app.state.set(this, `${nodeVarPath}.${var1.name}`, propName, newValue);
@@ -389,10 +389,14 @@ methods:
     }
   liveNodeVar: | #js
     function(vue, var1, propName, exp, onChange) {
+      this.$root.studio.user.app.log(vue, `🧊`, "liveNodeVar.init", { var1, propName, exp });
       const computed = Vue.computed({
         get: this.$root.toContextFunc(vue, { args: ["vue"], code: `try { return ${exp}; } catch (ex) {}` }, { async: false })
       });
       const watcher = Vue.watch(computed, (newValue) => {
+        if (!vue.nodeVarPath) return;
+        vue.$data[propName] = newValue;
+        this.$root.studio.user.app.log(vue, `🧊`, "liveNodeVar.$watcher", { propName, newValue });
         this.$root.studio.user.app.state.set(this, `${vue.nodeVarPath}.${var1.name}`, propName, newValue);
         onChange?.(newValue);
       }, { immediate: true });
