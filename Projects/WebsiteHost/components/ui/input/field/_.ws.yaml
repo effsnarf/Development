@@ -14,7 +14,7 @@ dom:
         v-if: active
         div:
           v-for: item in [...dataItems].take(10)
-          ui.value:
+          ui.value.preview:
             ':value': item[active]
 
 props:

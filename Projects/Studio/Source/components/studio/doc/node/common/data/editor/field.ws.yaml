@@ -1,9 +1,7 @@
 dom:
   div:
     h2:
-      ui.input.text.box:
-        hint: field name or custom expression
-        v-model: nodeVar.exp
+      v-text: "'🧊🍃 ' + (nodeVar.exp ?? '')"
     div:
       ui.input.field:
         :data-items: sui.selected.dataItems
@@ -49,5 +47,8 @@ watch:
       }
 
 style:
+  h2:
+    min-height: 1.2em
+    overflow: hidden
   td:nth-child(1):
     width: 2em
