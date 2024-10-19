@@ -4,12 +4,11 @@ dom:
       table:
         tr:
           v-for: field in fields
-          :class: "{ clickable: true, selected: false }"
+          :class: "{ clickable: true, selected: (field == value) }"
           @mouseenter: hovered = field
           @mouseleave: hovered = null
           @click: $emit('input', field)
           td:
-            :class: "{ selected: (value == field) }"
             v-text: "'🧊 ' + field"
       div:
         v-if: active
@@ -25,6 +24,8 @@ props:
 data:
   fields:
   hovered:
+  initial:
+    value:
 
 methods:
   getFields: | #js

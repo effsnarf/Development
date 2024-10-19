@@ -1,17 +1,39 @@
 dom:
   div:
+    :key: key1
     div:
       v-for: nodeVar in node.vars
+      h3:
+        v-if: "false"
+        v-text: "(_uid + '_' + node.id + '_' + nodeVar.type + '_' + nodeVar.name)"
       component:
-        :is: "('studio.doc.node.vars.' + nodeVar.type).kebabize()"
+        :is: "(!nodeVar.type) ? null : ('studio.doc.node.vars.' + nodeVar.type).kebabize()"
         :node: node
         :node-var: nodeVar
         :node-var-path: nodeVarPath
         :data-item: dataItem
-        @update: (value) => $emit('update', nodeVar.name, value)
+        @update: (value) => onUpdateNodeVarValue(nodeVar, value)
         :key: "(_uid + '_' + node.id + '_' + nodeVar.name)"
 
 props:
   node:
   nodeVarPath:
   dataItem:
+
+data:
+  key1: 1
+
+mounted: | #js
+  function() {
+    this.$root.e.on("app.node.changed", this.refresh.bind(this));
+  }
+
+methods:
+  onUpdateNodeVarValue: | #js
+    function(nodeVar, value) {
+      this.$emit('update', nodeVar.name, value);
+    }
+  refresh: | #js
+    function() {
+      this.key1++;
+    }

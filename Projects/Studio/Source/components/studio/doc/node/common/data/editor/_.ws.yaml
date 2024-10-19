@@ -29,11 +29,13 @@ dom:
                     v-model: var1.name
                 ui.tabs:
                   :options: tabOptions
+                  :icons: tabIcons
                   direction: vertical
                   :drawer: "true"
                   :show-title-in-tab: "true"
-                  :value: null
-                  @input: (newTab) => onTabChange(var1, newTab)
+                  value-type: option
+                  :value: var1.type
+                  @tab-click: (newTabIndex) => onTabChange(var1, newTabIndex)
                   template:
                     v-slot: tab0
                     studio.doc.node.common.data.editor.field:
@@ -71,15 +73,28 @@ props:
   sui:
 
 data:
-  tabOptions: ['🍃 field', '🟰 exp', '🌐 fetch', '🔗 node.prop', '🧊 value']
+  tabOptions: ['field', 'exp', 'fetch', 'node.prop', 'value']
+  tabIcons: ['🍃', '🟰', '🌐', '🔗', '🧊']
   selectedNodeVarIndex: 0
   visibleNodeVars: []
+  nodeVarTypeIndex: 0
+  key1: 1
 
 mounted: | #js
   function() {
+    //this.$root.e.on("app.node.changed", this.onAppNodeChanged.bind(this));
   }
 
 methods:
+  onAppNodeChanged: | #js
+    function(node) {
+      if (node.id != this.node.id) return;
+      this.refresh();
+    }
+  getTabOption: | #js
+    function(type) {
+      return this.tabOptions.findIndex(t => (t.includes(type)));
+    }
   getInitialSelectedTab: | #js
     function(var1) {
       if (!var1) return null;
@@ -93,12 +108,17 @@ methods:
   onTabChange: | #js
     function(var1, newTab) {
       if (!var1) return;
-      var1.type = (newTab < 0) ? null : this.tabOptions[newTab]?.split(' ').last();
+      const type = newTab.item;
+      this.$root.do("edit.node.var", { node: this.node, varName: var1.name, key: "type", value: type });
     }
   getVisibleNodeVars: | #js
     function(node) {
       return (node?.vars ?? [])
         .filter(v => (v.editable ?? true));
+    }
+  refresh: | #js
+    function() {
+      this.key1++;
     }
 
 watch:

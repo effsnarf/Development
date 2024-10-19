@@ -7,14 +7,13 @@ dom:
     div:
       ui.input.field:
         :data-items: sui.selected.dataItems
-        :value: nodeVar.exp
+        :value: initial.exp
         @preview: previewField
         @input: selectField
 
 props:
   node:
   nodeVar:
-  initial:
   sui:
 
 data:

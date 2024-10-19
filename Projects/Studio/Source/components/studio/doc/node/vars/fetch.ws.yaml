@@ -66,8 +66,8 @@ watch:
     immediate: true
     deep: false
     handler: | #js
-      function(value) {
-        this.$emit("update", value);
+      function(items) {
+        this.$emit("update", items);
       }
   nodeVar:
     immediate: true

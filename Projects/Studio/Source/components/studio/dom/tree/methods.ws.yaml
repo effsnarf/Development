@@ -104,8 +104,9 @@ methods:
       if (node.type == "text") {
         node.vars.push({
           name: "text",
-          type: "value",
-          value: null
+          type: null,
+          value: null,
+          exp: null
         });
       }
 

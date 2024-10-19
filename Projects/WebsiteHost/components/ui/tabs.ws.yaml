@@ -10,7 +10,7 @@ dom:
         v-text: title
       ui.select:
         ':class': '{ corner: (type==''toggle'') }'
-        ':options': (options||[]).map(option => _getOptionHtml(option))
+        ':options': (options||[]).map((option, index) => _getOptionHtml(index))
         ':getUrl': getUrl
         ':direction': direction
         ':type': type
@@ -33,7 +33,7 @@ dom:
             ':style': getTabStyle(index)
             h2:
               v-if: showTitleInTab
-              v-text: option
+              v-text: getTabTitle(index)
             slot: 
               ':name': "'tab' + index"
       slot: 
@@ -41,11 +41,13 @@ dom:
 props:
   title:
   options: null
+  icons: null
   getOptionText: null
   getOptionHtml: null
   getUrl: null
   direction: vertical
   value: null
+  valueType: index
   transitionName: null
   drawer: true
   showSearch: null
@@ -55,6 +57,12 @@ data:
   hoveredTabIndex: null
   selectedTabIndex: 0
 methods:
+  getTabTitle: | #js
+    function(index) {
+      return [this.icons[index], this.options[index]]
+        .filter(s => s)
+        .join(' ');
+    }
   getTabStyle: | #js
     function(index) {
       const style = {};
@@ -69,10 +77,15 @@ methods:
     }
   onItemClick: | #js
     function(e) {
+      e = {
+        index: e.index,
+        item: this.options[e.index],
+      }
       this.$emit('tab-click', e);
     }
   _getOptionHtml: | #js
-    function(option) {
+    function(index) {
+      const option = this.options[index];
       const getOptionHtml = (option) => {
         if (this.getOptionHtml) return this.getOptionHtml(option);
         if (this.getOptionText) return this.getOptionText(option)?.textToHtml();
@@ -82,6 +95,7 @@ methods:
       if (['jpg', 'jpeg', 'png'].some(ext => html?.endsWith('.' + ext))) {
         html = `<img src="${html}" />`;
       }
+      if (this.icons?.[index]) html = `${this.icons[index]} ${html}`;
       return html;
     }
 computed:
@@ -124,7 +138,8 @@ watch:
   selectedTabIndex:
     handler: | #js
       function(newIndex) {
-        this.$emit('input', newIndex);
+        const value = (this.valueType == 'index') ? newIndex : this.options[newIndex];
+        this.$emit('input', value);
       }
     immediate: true
   hoveredTabIndex:
@@ -138,7 +153,7 @@ watch:
     handler: | #js
       function(value) {
         if (!this.options) return;
-        const newIndex = value;
+        const newIndex = (this.valueType == 'index') ? value : this.options.indexOf(value);
         if (newIndex == this.selectedTabIndex) return;
         this.selectedTabIndex = newIndex;
       }
