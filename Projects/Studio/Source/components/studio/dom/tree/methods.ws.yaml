@@ -420,7 +420,7 @@ methods:
       const $page = userAppState[pageName];
       const $node = nodeData;
       const $item = (dataItem ?? vue.dataItem);
-      const context = { $app, $page, $node, $item };
+      const context = { $item, $node, $page, $app };
       return context;
     }
   toContextFunc: | #js
@@ -432,7 +432,7 @@ methods:
       // returns a function
       // defaults to async function
       if (!funcDef) return null;
-      const argNames = [...(funcDef.args || []), '$app', '$page', '$node', '$item'];
+      const argNames = [...(funcDef.args || []), '$item', '$node', '$page', '$app'];
       const code = funcDef.code || '';
       const funcStr = `${(isAsync ? "async" : "")} function(${argNames.join(', ')}) { ${code} }`;
       const func = eval(`(${funcStr})`);
