@@ -144,9 +144,9 @@ watch:
       function(value) {
         this.rows = this.getRows();
         // Expand the first row
-        if (this.rows.length && !this.isExpanded[this.rows[0].key]) {
-          this.toggleExpanded(this.rows[0].key);
-        }
+        //if (this.rows.length && !this.isExpanded[this.rows[0].key]) {
+        //  this.toggleExpanded(this.rows[0].key);
+        //}
       }
     immediate: true
 style:

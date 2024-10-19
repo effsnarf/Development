@@ -1,0 +1,61 @@
+dom:
+  div:
+    .error:
+      v-if: error
+      v-text: error
+    ui.value:
+      :value: value
+
+props:
+  node:
+  nodeVar:
+  nodeVarPath:
+  dataItem:
+
+data:
+  error:
+  value:
+
+mounted: | #js
+  function() {
+    this.init();
+    this.$root.e.on(["app.node.changed", "app.node.preview"], this.onAppNodeChanged.bind(this));
+    this.$root.e.on("app.state.changed", this.onAppStateChanged.bind(this));
+  }
+
+methods:
+  init: | #js
+    function() {
+      this.refresh();
+    }
+  refresh: | #js
+    function() {
+      try {
+        this.error = null;
+        const func = this.$root.toContextFunc(this, { args: [], code: `return ${this.nodeVar.exp};` }, { async: false });
+        this.value = func();
+        this.$emit("update", this.value);
+      }
+      catch (ex) {
+        this.error = ex.message;
+      }
+    }
+  onAppStateChanged: | #js
+    function(vars) {
+      const var1 = vars.find(v => (this.nodeVarPath == v.varPath.join(".")));
+      if (!var1) return;
+      this.refresh();
+    }
+  onAppNodeChanged: | #js
+    function(node) {
+      if (node.id != this.node.id) return;
+      this.refresh();
+    }
+
+watch:
+  nodeVar:
+    immediate: true
+    handler: | #js
+      function(nodeVar) {
+        this.init();
+      }

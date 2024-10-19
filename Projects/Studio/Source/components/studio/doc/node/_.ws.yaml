@@ -5,6 +5,7 @@ dom:
     :items-count: itemsCount
     :sui: sui
     studio.doc.node.vars:
+      :style: "{ display: 'none' }"
       :node: node
       :node-var-path: nodeVarPath
       :data-item: dataItem

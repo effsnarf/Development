@@ -1,0 +1,51 @@
+dom:
+  div:
+    ui.input.text.box:
+      hint: expression
+      :multiline: "true"
+      :auto-resize: "true"
+      v-model: tempValue
+    .flex.justify-center:
+      ui.button:
+        text: ✔️
+    div:
+      v-if: "false"
+      div:
+        v-for: item in [...dataItems].take(10)
+        ui.value.preview:
+          ':value': item
+
+props:
+  dataItems:
+  value:
+
+data:
+  fields:
+  tempValue:
+
+methods:
+  getFields: | #js
+    function(dataItems) {
+      return dataItems
+        .take(10)
+        .flatMap(d => Object.keys(d))
+        .distinct();
+    }
+
+watch:
+  value:
+    handler: | #js
+      function(value) {
+        this.tempValue = value;
+      }
+  tempValue:
+    handler: | #js
+      function(value) {
+        this.$emit('preview', value);
+      }
+
+style:
+  .flex > *:
+    width: 50%
+    overflow: hidden
+    white-space: nowrap

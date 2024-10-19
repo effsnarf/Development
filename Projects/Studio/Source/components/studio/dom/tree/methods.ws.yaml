@@ -47,10 +47,10 @@ methods:
       return text;
     }
   getNodeVarPath: | #js
-    function(node) {
+    function(node, pageName) {
       // #TODO might be wrong
       if (!node.name) return null;
-      const pageName = this.getNodePageName(node);
+      if (!pageName) pageName = this.getNodePageName(node);
       const varPath = [pageName, node.name].map(s => (s||'')).join('.');
       return varPath;
     }
@@ -407,6 +407,22 @@ methods:
       };
       return { destroy, computed, watcher };
     }
+  getNodeContext: | #js
+    function(vue, pageName, dataItem) {
+      // this.$node.clickCount
+      // this.$page.button1, this.$page.boards, etc (data from this page)
+      // this.$app.home, this.$app.boards, etc (access other pages)
+      const userAppState = this.$root.getUserAppState(vue);
+      if (!pageName) pageName = this.$root.getPageName(vue);
+      const nodeVarPath = (vue.nodeVarPath ?? this.$root.getNodeVarPath(vue.node, pageName));
+      const nodeData = (!nodeVarPath) ? null : Objects.getProperty(userAppState, nodeVarPath);
+      const $app = userAppState;
+      const $page = userAppState[pageName];
+      const $node = nodeData;
+      const $item = (dataItem ?? vue.dataItem);
+      const context = { $app, $page, $node, $item };
+      return context;
+    }
   toContextFunc: | #js
     function(vue, funcDef, options) {
       const isAsync = (options?.async ?? true);
@@ -416,22 +432,11 @@ methods:
       // returns a function
       // defaults to async function
       if (!funcDef) return null;
-      const argNames = [...(funcDef.args || []), '$app', '$page', '$node'];
+      const argNames = [...(funcDef.args || []), '$app', '$page', '$node', '$item'];
       const code = funcDef.code || '';
       const funcStr = `${(isAsync ? "async" : "")} function(${argNames.join(', ')}) { ${code} }`;
       const func = eval(`(${funcStr})`);
-      // this.$node.clickCount
-      // this.$page.button1, this.$page.boards, etc (data from this page)
-      // this.$app.home, this.$app.boards, etc (access other pages)
-      const userAppState = this.$root.getUserAppState(vue);
-      const pageName = this.$root.getPageName(vue);
-      const nodeVarPath = (vue.nodeVarPath ?? this.$root.getNodeVarPath(vue.node));
-      const nodeData = (!nodeVarPath) ? null : Objects.getProperty(userAppState, nodeVarPath);
-      const $app = userAppState;
-      const $page = userAppState[pageName];
-      const $node = nodeData;
-      const $item = vue.dataItem;
-      const context = { $app, $page, $node, $item };
+      const context = this.$root.getNodeContext(vue);
       return function(...args) {
         args.push(...Object.values(context));
         return func.apply(vue, args);

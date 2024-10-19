@@ -22,8 +22,8 @@ methods:
     }
   refresh: | #js
     function() {
-      this.value = this.dataItem?.[this.nodeVar.exp];
-      this.$emit("update", this.value);
+      const value = this.dataItem?.[this.nodeVar.exp];
+      this.$emit("update", value);
     }
   onAppNodeChanged: | #js
     function(node) {

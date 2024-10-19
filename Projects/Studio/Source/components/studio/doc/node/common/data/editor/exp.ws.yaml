@@ -1,0 +1,71 @@
+dom:
+  div:
+    ui.input.exp:
+      :data-items: sui.selected.dataItems
+      :value: initial.exp
+      @preview: previewField
+      @input: selectField
+    div:
+      h2:
+        v-text: "'🧊 context'"
+      table:
+        tr:
+          v-for: (v, key) in nodeContext
+          th:
+            v-text: "'🧊 ' + key"
+          td:
+            .folded:
+              ui.value:
+                :value: nodeContext[key]
+
+props:
+  node:
+  nodeVar:
+  sui:
+
+data:
+  initial:
+  nodeContext:
+
+mounted: | #js
+  function() {
+    this.$root.e.on("app.node.changed", this.init.bind(this));
+  }
+
+methods:
+  init: | #js
+    function() {
+      this.initial = Objects.clone(this.nodeVar);
+      this.nodeContext = this.$root.getNodeContext(this, this.sui.page.selected?.name, this.sui.selected.dataItems?.first());
+    }
+  previewField: | #js
+    function(value) {
+      this.nodeVar.exp = (value || this.initial.exp);
+      this.$root.e.emit("app.node.preview", this.node);
+    }
+  selectField: | #js
+    function(value) {
+      this.nodeVar.exp = this.initial.exp;
+      this.$root.do("edit.node.var", { node: this.node, varName: this.nodeVar.name, key: "exp", value });
+    }
+
+watch:
+  nodeVar:
+    immediate: true
+    handler: | #js
+      function(nodeVar) {
+        this.init();
+      }
+
+style:
+  .folded:
+    max-width: 20em
+    max-height: 3em
+    overflow: hidden
+    transition: 2s
+  .folded:hover:
+    max-height: 100vh
+    overflow: auto
+  th:
+    padding: 0.5em 1em 0 0
+    vertical-align: top

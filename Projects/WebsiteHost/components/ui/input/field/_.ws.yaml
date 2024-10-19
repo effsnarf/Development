@@ -24,8 +24,6 @@ props:
 data:
   fields:
   hovered:
-  initial:
-    value:
 
 methods:
   getFields: | #js
@@ -59,5 +57,5 @@ computed:
 style:
   .flex > *:
     width: 50%
-    overflow: hiddene
+    overflow: hidden
     white-space: nowrap

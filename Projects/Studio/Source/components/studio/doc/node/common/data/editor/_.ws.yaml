@@ -17,7 +17,7 @@ dom:
             v-model: selectedNodeVarIndex
         .flex-grow-1:
           div:
-            v-for: (var1, i) in visibleNodeVars
+            v-for: (nodeVar, i) in visibleNodeVars
             transition:
               name: slide-ver
               div:
@@ -26,7 +26,7 @@ dom:
                   ui.input.text.box:
                     icon: 🧊
                     camouflage: true
-                    v-model: var1.name
+                    v-model: nodeVar.name
                 ui.tabs:
                   :options: tabOptions
                   :icons: tabIcons
@@ -34,37 +34,41 @@ dom:
                   :drawer: "true"
                   :show-title-in-tab: "true"
                   value-type: option
-                  :value: var1.type
-                  @tab-click: (newTabIndex) => onTabChange(var1, newTabIndex)
+                  :value: nodeVar.type
+                  @tab-click: (newTabIndex) => onTabChange(nodeVar, newTabIndex)
                   template:
                     v-slot: tab0
                     studio.doc.node.common.data.editor.field:
                       :node: node
-                      :node-var: var1
+                      :node-var: nodeVar
                       :initial: initial
                       :sui: sui
                   template:
                     v-slot: tab1
-                    ui.input.text.box:
-                      hint: expression
-                      :multiline: "true"
-                      :auto-resize: "true"
-                      v-model: var1.exp
+                    studio.doc.node.common.data.editor.exp:
+                      :node: node
+                      :node-var: nodeVar
+                      :initial: initial
+                      :sui: sui
+                    component:
+                      :is: "(!nodeVar.type) ? null : ('studio.doc.node.vars.' + nodeVar.type).kebabize()"
+                      :node: node
+                      :node-var: nodeVar
                   template:
                     v-slot: tab2
                     studio.doc.node.common.data.editor.fetch:
                       :node: node
-                      :node-var: var1
-                      :node-var-path: getNodeVarPath(var1)
+                      :node-var: nodeVar
+                      :node-var-path: getNodeVarPath(nodeVar)
                       :user-app-state: userAppState
                   template:
                     v-slot: tab3
                     studio.doc.node.common.data.editor.node.prop:
-                      :node-var: var1
+                      :node-var: nodeVar
                   template:
                     v-slot: tab4
                     studio.doc.node.common.data.editor.value:
-                      :node-var: var1
+                      :node-var: nodeVar
 props:
   node:
   initial:
@@ -96,20 +100,20 @@ methods:
       return this.tabOptions.findIndex(t => (t.includes(type)));
     }
   getInitialSelectedTab: | #js
-    function(var1) {
-      if (!var1) return null;
-      return this.tabOptions.findIndex(t => (var1.type == (t.split(' ').last())));
+    function(nodeVar) {
+      if (!nodeVar) return null;
+      return this.tabOptions.findIndex(t => (nodeVar.type == (t.split(' ').last())));
     }
   getNodeVarPath: | #js
-    function(var1) {
+    function(nodeVar) {
       const nvp = this.$root.getNodeVarPath(this.node);
-      return `${nvp}.${var1.name}`;
+      return `${nvp}.${nodeVar.name}`;
     }
   onTabChange: | #js
-    function(var1, newTab) {
-      if (!var1) return;
+    function(nodeVar, newTab) {
+      if (!nodeVar) return;
       const type = newTab.item;
-      this.$root.do("edit.node.var", { node: this.node, varName: var1.name, key: "type", value: type });
+      this.$root.do("edit.node.var", { node: this.node, varName: nodeVar.name, key: "type", value: type });
     }
   getVisibleNodeVars: | #js
     function(node) {
@@ -127,4 +131,3 @@ watch:
     deep: false
     handler: | #js
       this.visibleNodeVars = this.getVisibleNodeVars(this.node);
-
