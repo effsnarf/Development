@@ -1,8 +1,18 @@
 dom:
   ui.dom.layout:
     :layout: node.layout
-    :show-example: (!node.children?.length)
+    :show-example: (!visibleItems)
     :show-grid-name: "false"
+    template:
+      v-slot: header
+      .node-warning:
+        v-if: "itemsIsNotArray"
+        div:
+          v-text: "'⚠️ array expected'"
+        div:
+          v-text: "'(not ' + (typeof items) + ')'"
+        ui.value.preview:
+          :value: items
     template:
       v-slot: example-box
       .node-warning:
@@ -10,8 +20,16 @@ dom:
         v-text: "'⚠️ list template'"
     .list-item:
       v-for: (item, i) in visibleItems
+      :class: "{ empty: (!node.children?.length) }"
       :key: visibleItemKeys[i]
+      div:
+        v-if: "!node.children?.length"
+        .node-warning.small:
+          v-text: "'⚠️ list template'"
+        ui.value.preview:
+          :value: item
       studio.doc.node:
+        v-else:
         v-for: childNode in node.children
         :node: childNode
         :user-app-state: userAppState
@@ -20,12 +38,13 @@ dom:
         :item-index: i
         :items-count: visibleItems.length
         :key: childNode.id
-      @mouseenter: () => hovered = item
-      @mouseleave: () => hovered = null
+      @mouseenter: () => onHover(item)
+      @mouseleave: () => onHover(null)
       @click: () => onClick(item)
 
 props:
   node:
+  nodeVarPath:
   userAppState:
   sui:
 
@@ -40,15 +59,23 @@ data:
 
 mounted: | #js
   function() {
+    this.$root.bindToUserAppState(this, "hovered", `${this.nodeVarPath}.hovered.value`);
+    this.$root.bindToUserAppState(this, "selected", `${this.nodeVarPath}.selected.value`);
   }
 
 methods:
   getVisibleItems: | #js
     function(items) {
-      return (items?.take(this.maxVisibleItems) ?? this.getMockArray());
+      if (!Array.isArray(items)) return null;
+      return (items?.take(this.maxVisibleItems) ?? null);
+    }
+  onHover: | #js
+    function(item) {
+      this.hovered = item;
     }
   onClick: | #js
     function(item) {
+      if (item == this.selected) item = null;
       this.selected = item;
       return;
       if (this.selectedItems.includes(item)) return this.selectedItems.remove(item);
@@ -57,12 +84,20 @@ methods:
   getListItemKey: | #js
     function(item) {
       if (!item) return null;
+      if (item._id) return item._id;
+      if (item.id) return item.id;
       const fields = Object.keys(item);
       return item[fields[0]];
     }
   getMockArray: | #js
     function() {
       return Array.from(Array(this.exampleItems).keys()).map((i) => null);
+    }
+
+computed:
+  itemsIsNotArray: | #js
+    function() {
+      return (!!this.items) && (!Array.isArray(this.items));
     }
 
 watch:
@@ -72,12 +107,12 @@ watch:
     handler: | #js
       function(items) {
         this.visibleItems = this.getVisibleItems(items);
-        this.visibleItemKeys = this.visibleItems.map((item) => this.getListItemKey(item));
+        this.visibleItemKeys = this.visibleItems?.map((item) => this.getListItemKey(item));
       }
       
 style:
-  .list-item:
-    max-height: 5em
+  .list-item.empty:
+    max-height: 7em
     overflow: hidden
     cursor: pointer
   .list-item:hover:

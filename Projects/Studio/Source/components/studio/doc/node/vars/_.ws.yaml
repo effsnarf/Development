@@ -1,18 +1,17 @@
 dom:
   div:
     div:
-      v-for: var1 in node.vars
-      h3:
-        v-if: "false"
-        v-text: "(_uid + '_' + node.id + '_' + var1.name)"
+      v-for: nodeVar in node.vars
       component:
-        :is: "('studio.doc.node.vars.' + var1.type).kebabize()"
+        :is: "('studio.doc.node.vars.' + nodeVar.type).kebabize()"
         :node: node
-        :var1: var1
+        :node-var: nodeVar
         :node-var-path: nodeVarPath
-        @update: (value) => $emit('update', var1.name, value)
-        :key: "(_uid + '_' + node.id + '_' + var1.name)"
+        :data-item: dataItem
+        @update: (value) => $emit('update', nodeVar.name, value)
+        :key: "(_uid + '_' + node.id + '_' + nodeVar.name)"
 
 props:
   node:
   nodeVarPath:
+  dataItem:

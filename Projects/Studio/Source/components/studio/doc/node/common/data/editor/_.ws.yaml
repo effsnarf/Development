@@ -37,6 +37,7 @@ dom:
                   template:
                     v-slot: tab0
                     studio.doc.node.common.data.editor.field:
+                      :node: node
                       :node-var: var1
                       :initial: initial
                       :sui: sui
@@ -54,13 +55,6 @@ dom:
                       :node-var: var1
                       :node-var-path: getNodeVarPath(var1)
                       :user-app-state: userAppState
-                    div:
-                      studio.app.runtime.state.branch:
-                        :node: node
-                        :node-var: var1
-                        :node-var-path: getNodeVarPath(var1)
-                        :user-app-state: userAppState
-                        :field-names: "{ _url: 'url', _value: 'fetched data', value: 'linqd data' }"
                   template:
                     v-slot: tab3
                     studio.doc.node.common.data.editor.node.prop:

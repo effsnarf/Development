@@ -1,2 +1,40 @@
 dom:
   div:
+
+props:
+  node:
+  nodeVarPath:
+  nodeVar:
+  dataItem:
+
+data:
+
+mounted: | #js
+  function() {
+    this.init();
+    this.$root.e.on(["app.node.changed", "app.node.preview"], this.onAppNodeChanged.bind(this));
+  }
+
+methods:
+  init: | #js
+    function() {
+      this.refresh();
+    }
+  refresh: | #js
+    function() {
+      this.value = this.dataItem?.[this.nodeVar.exp];
+      this.$emit("update", this.value);
+    }
+  onAppNodeChanged: | #js
+    function(node) {
+      if (node.id != this.node.id) return;
+      this.refresh();
+    }
+
+watch:
+  nodeVar:
+    immediate: true
+    handler: | #js
+      function(nodeVar) {
+        this.init();
+      }

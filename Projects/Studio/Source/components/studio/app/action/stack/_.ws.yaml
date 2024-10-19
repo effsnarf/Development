@@ -79,6 +79,7 @@ methods:
       if (node?.type == "page") this.do_select_page(_do, node);
       this.setIconText(_do, node);
       const undo = { type: "select.nodes", args: { page: oldSelectedPage, nodes: oldSelectedNodes } };
+      this.$root.e.emit("sui.node.selecteds", selecteds);
       return { _do, undo };
     }
   do_select_nodes: | #js
@@ -168,7 +169,7 @@ methods:
         delete newNode.children;
         changes = DeepDiff.diff(oldNode, newNode);
         undoChanges = DeepDiff.diff(newNode, oldNode);
-        if (!changes) throw "No changes detected";
+        if (!changes) return alertify.error("No changes detected");
       }
 
       if (isFirstTime) {
@@ -214,7 +215,8 @@ methods:
       const oldValue = Objects.clone(nodeVar[key]);
       nodeVar[key] = value;
       const newNode = Objects.clone(node);
-      this.$root.do("edit.node", { oldNode, newNode, changes: null })
+      this.do_edit_node(_do, oldNode, newNode, null);
+      this.$root.do("edit.node", { oldNode, newNode, changes: null }, false)
       this.setIconText(_do, node);
       const undo = { type: "edit.node.var", args: { node: { id: node.id }, varName, key, value: oldValue } };
       this.$root.appNodeChanged(node);
@@ -253,8 +255,8 @@ methods:
       //this.$root.studio.user.app.log(this, `🖱️`, "do", { action });
     }
   _do: | #js
-    function(type, args) {
-      this.do({ type, args });
+    function(type, args, addToStack = true) {
+      this.do({ type, args }, addToStack);
     }
   addAction: | #js
     function(action) {

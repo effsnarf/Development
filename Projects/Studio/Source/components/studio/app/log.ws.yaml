@@ -7,13 +7,29 @@ dom:
 props:
   category:
 
+data:
+  logQueueItems: []
+  timeout: null
+
 mounted: | #js
   function() {
-    this.$root.e.on("log", this.onLog.bind(this));
+    this.$root.e.on("log", (...args) => {
+      this.logQueueItems.push(args);
+      clearTimeout(this.timeout);
+      this.timeout = setTimeout(() => this._logQueue(), 2000);
+      this.logQueue();
+    });
   }
 
 methods:
-  onLog: | #js
+  logQueue: | #js
+    function() {
+      while (this.logQueueItems.length) {
+        const args = this.logQueueItems.shift();
+        this._onLog(...args);
+      }
+    }
+  _onLog: | #js
     function(category, severity, args) {
       if (category != this.category) return;
       this.$refs.console1?.log(...args);

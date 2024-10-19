@@ -33,6 +33,7 @@ methods:
     function() {
       const oldAppState = Objects.clone(this.userAppState);
       const newAppState = this.getNewUserAppState(this.userApp);
+      Objects.deepAssignLeafs(newAppState, oldAppState);
       this.userAppState = newAppState;
       this.$emit("user-app-state", this.userAppState);
     }
@@ -47,16 +48,24 @@ methods:
           if (!node.name) continue;
           for (const var1 of node.vars) {
             pageData[node.name] = pageData[node.name] || {};
-            const varData = pageData[node.name][var1.name] = { value: null };
-            if (var1.type == "fetch") {
-              varData._url = var1.url;
-              varData._value = [];
-            }
+            const varData = this.getNewVarData(var1);
+            pageData[node.name][var1.name] = varData;
           }
         }
         data[pageNode.name] = pageData;
       }
       return data;
+    }
+  getNewVarData: | #js
+    function(var1) {
+      const d = {
+        value: null
+      };
+      if (var1.type == "fetch") {
+        d._url = null;
+        d._value = null;
+      }
+      return d;
     }
   onAppNodeChanged: | #js
     function() {

@@ -1,108 +1,115 @@
 dom:
   div:
-    .flex.gap-1:
-      div:
-        v-if: "(showVisibleFieldsFilter)"
-        ui.drawer:
-          v-if: "(fields.length > 1)"
-          .box1:
-            ui.checkbox.list:
-              :items: fields
-              :get-item-icon: () => '🧊'
-              :show-search-box: "true"
-              :value-array: visibleFields1
-      .box1:
-        ':class': '{ reversed: reverse }'
+    div:
+      v-if: (!items?.length)
+      ui.title:
+        text: "[0]"
+    div:
+      v-else:
+      .flex.gap-1:
         div:
-          ui.title:
-            v-if: "false"
-            icon: 🧊
-            text: Array
-            ':number': value?.length
-          ui.input.text.box:
-            class: search-box
-            type: search
-            icon: 🔎
-            hint: search
-            camouflage: true
-            v-model: query
-        ui.select:
-          v-if: 'false'
-          ':options': '[''table'', ''short-list'', ''expanded-list'']'
-          input-type: value
-          type: toggle
-          v-model: view1
-        ui.context.window:
-          v-if: 'false'
-          ref: hoveredItemContext1
-          ':visible': hoveredItem
-          ui.value: 
-            ':value': hoveredItem
-        transition: 
-          name: slide
-          table: 
-            v-if: (view1.includes('list'))
-            tbody: 
-              tr: 
-                v-for: (item, index) in visibleItems
-                td: 
-                  class: opacity-50
-                  v-text: index
-                td: 
-                  ui.value.preview: 
-                    v-if: (view1 == 'short-list')
-                    ':value': item
-                  ui.value.any:
-                    v-else-if: (view1 == 'expanded-list')
-                    ':value': item
-                  ui.value: 
-                    v-else: null
-                    ':value': item
-        transition: 
-          name: slide
-          table: 
-            v-if: (view1 == 'table')
-            thead:
-              transition.group:
-                tag: tr
-                name: slide-hor
-                th:
-                  v-for: field in shownFields
-                  :key: field
-                  div:
-                    .flex.clickable:
-                      ':class': '{ selected: (sortByField == field) }'
-                      @click: onSortByField(field)
-                      div:
-                        v-text: field
-                      div:
-                        v-if: (sortByField == field)
+          v-if: "(showVisibleFieldsFilter)"
+          ui.drawer:
+            v-if: "(fields.length > 1)"
+            .box1:
+              ui.checkbox.list:
+                :items: fields
+                :get-item-icon: () => '🧊'
+                :show-search-box: "true"
+                :value-array: visibleFields1
+        .box1:
+          ':class': '{ reversed: reverse }'
+          div:
+            ui.title:
+              v-if: "false"
+              icon: 🧊
+              text: Array
+              ':number': value?.length
+            ui.input.text.box:
+              v-if: (items?.length > 10)
+              class: search-box
+              type: search
+              icon: 🔎
+              hint: search
+              camouflage: true
+              v-model: query
+          ui.select:
+            v-if: 'false'
+            ':options': '[''table'', ''short-list'', ''expanded-list'']'
+            input-type: value
+            type: toggle
+            v-model: view1
+          ui.context.window:
+            v-if: 'false'
+            ref: hoveredItemContext1
+            ':visible': hoveredItem
+            ui.value: 
+              ':value': hoveredItem
+          transition: 
+            name: slide
+            table: 
+              v-if: (view1.includes('list'))
+              tbody: 
+                tr: 
+                  v-for: (item, index) in visibleItems
+                  td: 
+                    class: opacity-50
+                    v-text: index
+                  td: 
+                    ui.value.preview: 
+                      v-if: (view1 == 'short-list')
+                      ':value': item
+                    ui.value.any:
+                      v-else-if: (view1 == 'expanded-list')
+                      ':value': item
+                    ui.value: 
+                      v-else: null
+                      ':value': item
+          transition: 
+            name: slide
+            table: 
+              v-if: (view1 == 'table')
+              thead:
+                transition.group:
+                  tag: tr
+                  name: slide-hor
+                  th:
+                    v-for: field in shownFields
+                    :key: field
+                    div:
+                      .flex.clickable:
+                        ':class': '{ selected: (sortByField == field) }'
+                        @click: onSortByField(field)
                         div:
-                          v-text: "(sortByFieldDirection == 1) ? '▲' : '▼'"
-            tbody:
-              transition.group:
-                tag: tr
-                name: slide-hor
-                v-for: (item, index) in visibleItems
-                :key: (index + JSON.stringify(item))
-                ':class': _getItemClass(item, index)
-                @mouseenter: () => onItemHover(item, true)
-                @mouseleave: () => onItemHover(item, false)
-                @click: () => onItemClick(item, index)
-                td: 
-                  v-for: field in shownFields
-                  :key: field
-                  ui.value.preview: 
-                    ':value': item?.[field]
-        ui.pager:
-          :items-count: items?.length
-          :page-size: pageSize
-          :only-arrows: "true"
-          v-model: pageIndex
-      .box1:
-        v-if: "false"
-        ui.value:
-          ':value': selected.item
+                          v-text: field
+                        div:
+                          v-if: (sortByField == field)
+                          div:
+                            v-text: "(sortByFieldDirection == 1) ? '▲' : '▼'"
+              tbody:
+                transition.group:
+                  tag: tr
+                  name: slide-hor
+                  v-for: (item, index) in visibleItems
+                  :key: (index + JSON.stringify(item))
+                  ':class': _getItemClass(item, index)
+                  @mouseenter: () => onItemHover(item, true)
+                  @mouseleave: () => onItemHover(item, false)
+                  @click: () => onItemClick(item, index)
+                  td: 
+                    v-for: field in shownFields
+                    :key: field
+                    ui.value.preview: 
+                      ':value': item?.[field]
+          ui.pager:
+            :items-count: items?.length
+            :page-size: pageSize
+            :only-arrows: "true"
+            v-model: pageIndex
+        .box1:
+          v-if: "false"
+          ui.value:
+            ':value': selected.item
 props:
   value: null
   reverse: false

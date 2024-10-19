@@ -1,5 +1,6 @@
 dom:
   div:
+    v-if: (pageCount > 1)
     div:
       v-if: (onlyArrows)
       class: pager-buttons

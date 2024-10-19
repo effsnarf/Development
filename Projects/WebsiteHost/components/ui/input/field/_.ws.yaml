@@ -1,0 +1,62 @@
+dom:
+  div:
+    .flex:
+      table:
+        tr:
+          v-for: field in fields
+          :class: "{ clickable: true, selected: false }"
+          @mouseenter: hovered = field
+          @mouseleave: hovered = null
+          @click: $emit('input', field)
+          td:
+            :class: "{ selected: (value == field) }"
+            v-text: "'🧊 ' + field"
+      div:
+        v-if: active
+        div:
+          v-for: item in [...dataItems].take(10)
+          ui.value:
+            ':value': item[active]
+
+props:
+  dataItems:
+  value:
+
+data:
+  fields:
+  hovered:
+
+methods:
+  getFields: | #js
+    function(dataItems) {
+      return dataItems
+        .take(10)
+        .flatMap(d => Object.keys(d))
+        .distinct();
+    }
+
+watch:
+  hovered:
+    handler: | #js
+      function(hovered) {
+        this.$emit('preview', hovered);
+      }
+  dataItems:
+    immediate: true
+    deep: false
+    handler: | #js
+      function(dataItems) {
+        this.fields = this.getFields(dataItems);
+      }
+
+computed:
+  active: | #js
+    function() {
+      return (this.hovered || this.value);
+    }
+
+style:
+  .flex > *:
+    width: 50%
+    overflow: hiddene
+    white-space: nowrap

@@ -124,7 +124,6 @@ data:
     pages:
     node:
       hovered:
-      selected:
       selecteds: []
       active:
       context:
@@ -173,12 +172,15 @@ mounted: | #js
                 varPath = varPath.split('.').slice(0, -1).join('.');
               }
               varPath = (varPath.split?.('.') || varPath);
-              const oldValue = Objects.getProperty(this.userAppState, varPath);
+              if (varPath.join(".") == "home.list1") debugger;
+              const fullVarPath = varPath.concat([varName]).join('.');
+              const oldValue = Objects.getProperty(this.userAppState, fullVarPath);
               if (newValue == oldValue) return;
-              Objects.setProperty(this.userAppState, `${varPath.join('.')}.${varName}`, newValue);
+              Objects.setProperty(this.userAppState, fullVarPath, newValue);
               this.appStateChangedVars.push({ varPath, newValue });
               this.appStateChangeKey++;
-              this.$root.e.emit("app.log", vue, "🧊", "app.state.set", { varPath, varName, newValue });
+              //console.log("🧊", fullVarPath, newValue);
+              //this.$root.e.emit("app.log", vue, "🧊", "app.state.set", { varPath, varName, newValue });
             },
           },
           log: (vue, icon, method, data) => {
@@ -196,8 +198,7 @@ mounted: | #js
     }
     this.$watch("sui.page.selected", this.onSelectedPageChanged.bind(this));
     this.$watch("sui.node.hovered", this.onHoveredNodeChanged.bind(this));
-    this.$watch("sui.node.selected", this.onSelectedNodeChanged.bind(this));
-    this.$root.e.on("data.item.selected", this.onDataItemSelected.bind(this));
+    this.$root.e.on("sui.node.selecteds", this.onSuiNodeSelecteds.bind(this));
     this.is.inited = true;
   }
 
@@ -220,14 +221,11 @@ methods:
       //const els = document.querySelectorAll(`[data-node-id="${node.id}"]`);
       //els.forEach(n => n.classList.add("hovered-node"));
     }
-  onSelectedNodeChanged: | #js
-    function(node) {
+  onSuiNodeSelecteds: | #js
+    function(selecteds) {
+      const node = selecteds.last();
       if (this.sui.page.selected) this.sui.pages[this.sui.page.selected.id].node.selected = node;
       this.sui.selected.dataItems.clear();
-    }
-  onDataItemSelected: | #js
-    function(dataItem) {
-      this.sui.selected.dataItems.push(dataItem);
     }
   initPageUiState: | #js
     function(pageNode) {
@@ -891,9 +889,10 @@ watch:
         sui.node.active = (sui.node.selected || sui.node.hovered);
       }
   appStateChangeKey: | #js
-    function() {
+    async function() {
       const vars = [...this.appStateChangedVars];
       this.appStateChangedVars.clear();
+      await this.$nextTick();
       this.$root.e.emit("app.state.changed", vars);
     }
   isUserAppTilted: | #js

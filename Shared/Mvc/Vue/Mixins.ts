@@ -83,7 +83,7 @@ const Mixins = {
 
     const mixin = {
       matchComp: (c: any) =>
-        ["ide.", "ui.mouse"].none((s) => c.name.startsWith(s)),
+        ["ide.", "ui.mouse", "ui.value"].none((s) => c.name.startsWith(s)),
 
       created(this: any) {
         const vue = this;

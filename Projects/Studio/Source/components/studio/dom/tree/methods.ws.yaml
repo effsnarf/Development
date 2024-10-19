@@ -335,6 +335,7 @@ methods:
     }
   fetchFromUrl: | #js
     async function(url) {
+      if (!url) return null;
       const ticker = Ticker.alertify((elapsed) => `<h2>⏳ ${elapsed.unitifyTime()}</h2> ${url}`)
       try
       {
@@ -352,26 +353,26 @@ methods:
       }
     }
   bindToUserAppState: | #js
-    function(vue, nodeVarPath, var1, propName) {
+    function(vue, vueDataKey, nodeVarPath) {
       // local -> userAppState
-      Vue.watch(() => vue.$data[propName], (newValue) => {
-        const oldValue = this.$root.studio.user.app.state.get(`${nodeVarPath}.${var1.name}.${propName}`);
+      Vue.watch(() => vue.$data[vueDataKey], (newValue) => {
+        const oldValue = this.$root.studio.user.app.state.get(nodeVarPath);
         if (oldValue == newValue) return;
-        this.$root.studio.user.app.state.set(this, `${nodeVarPath}.${var1.name}`, propName, newValue);
-        this.$root.studio.user.app.log(this, `🧊`, "$watcher", { dir: "local -> app.state", path: `🧊 ${nodeVarPath}.${var1.name}.${propName}`, newValue });
+        this.$root.studio.user.app.state.set(this, nodeVarPath, newValue);
+        //this.$root.studio.user.app.log(this, `🧊`, "$watcher", { dir: "local -> app.state", path: `🧊 ${nodeVarPath}.${var1.name}.${propName}`, newValue });
       });
       // userAppState -> local
-      this.$root.watchUserAppState(vue, `${nodeVarPath}.${var1.name}`, propName, (newValue) => {
-        if (vue.$data[propName] == newValue) return;
-        vue.$data[propName] = newValue;
-        this.$root.studio.user.app.log(this, `🧊`, "$watcher", { dir: "app.state -> local", path: `🧊 ${nodeVarPath}.${var1.name}.${propName}`, newValue });
+      this.$root.watchUserAppState(vue, nodeVarPath, (newValue) => {
+        if (vue.$data[vueDataKey] == newValue) return;
+        vue.$data[vueDataKey] = newValue;
+        //this.$root.studio.user.app.log(this, `🧊`, "$watcher", { dir: "app.state -> local", path: `🧊 ${nodeVarPath}.${var1.name}.${propName}`, newValue });
       });
     }
   watchUserAppState: | #js
-    function(vue, nodeVarPath, varName, handler) {
+    function(vue, nodeVarPath, handler) {
       this.$root.e.on("app.state.changed", (vars) => {
         for (const var1 of vars) {
-          if (var1.varPath.join('.') == `${nodeVarPath}.${varName}`) {
+          if (var1.varPath.join('.') == nodeVarPath) {
             handler(var1.newValue);
           }
         }

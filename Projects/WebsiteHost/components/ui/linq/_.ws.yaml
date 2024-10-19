@@ -1,5 +1,6 @@
 dom:
   div: 
+    :style: "{ width: 'fit-content' }"
     .operations.box1:
       div: 
         div: 
@@ -27,7 +28,9 @@ dom:
               v-text: '''➕'''
           .show-on-hover:
             ui.linq.ops.picker:
+              ref: opsPicker1
               ':input': datas?.last()
+              @update:ops-visible-options: opsVisibleOptions = $event
               @select: addOperation
       ui.linq.evaluator:
         ref: evaluator1
@@ -39,6 +42,7 @@ data:
   operations: []
   datas: []
   isConfirmed: {}
+  opsVisibleOptions: []
 mounted: ''
 methods:
   onClickDelete: | #js

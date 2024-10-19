@@ -9,7 +9,16 @@ class Events {
     });
   }
 
-  on(name: string, callback: Function) {
+  on(names: string | string[], callback: Function) {
+    if (typeof names === "string") {
+      names = [names];
+    }
+    for (const name of names) {
+      this.addListener(name, callback);
+    }
+  }
+
+  private addListener(name: string, callback: Function) {
     if (!this.listeners[name]) {
       this.listeners[name] = [];
     }

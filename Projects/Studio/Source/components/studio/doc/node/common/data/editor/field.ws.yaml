@@ -5,19 +5,11 @@ dom:
         hint: field name or custom expression
         v-model: nodeVar.exp
     div:
-      table:
-        tr:
-          v-for: field in dataItemFields
-          :class: "{ clickable: true, selected: false }"
-          @mouseenter: () => { nodeVar.exp = field; }
-          @mouseleave: () => { nodeVar.exp = field; }
-          @click: () => { nodeVar.exp = field; }
-          td:
-            div:
-              v-if: (false)
-              v-text: "'✔️'"
-          td:
-            v-text: "'🧊 ' + field"
+      ui.input.field:
+        :data-items: sui.selected.dataItems
+        :value: nodeVar.exp
+        @preview: previewField
+        @input: selectField
 
 props:
   node:
@@ -26,22 +18,36 @@ props:
   sui:
 
 data:
+  initial:
+
+mounted: | #js
+  function() {
+    this.$root.e.on("app.node.changed", this.init.bind(this));
+  }
 
 methods:
-  getDataItemFields: | #js
+  init: | #js
     function() {
-      return this.sui.selected.dataItems
-        .take(10)
-        .flatMap(d => Object.keys(d))
-        .distinct()
-        .sortBy(s => s);
+      this.initial = Objects.clone(this.nodeVar);
+    }
+  previewField: | #js
+    function(value) {
+      this.nodeVar.exp = (value || this.initial.exp);
+      this.$root.e.emit("app.node.preview", this.node);
+    }
+  selectField: | #js
+    function(value) {
+      this.nodeVar.exp = this.initial.exp;
+      this.$root.do("edit.node.var", { node: this.node, varName: this.nodeVar.name, key: "exp", value });
     }
 
-computed:
-  dataItemFields: | #js
-    function() {
-      return this.getDataItemFields();
-    }
+watch:
+  nodeVar:
+    immediate: true
+    handler: | #js
+      function(nodeVar) {
+        this.init();
+      }
 
 style:
   td:nth-child(1):

@@ -296,7 +296,7 @@ class Objects {
     return Objects.clone(subtree);
   }
 
-  static getProperty(obj: any, path: string | string[]) {
+  static getProperty(obj: any, path: string | (string | number)[]) {
     if (typeof path == "string") path = path.split(".");
     const keys = path as string[];
     let currentObj = obj;
@@ -388,7 +388,13 @@ class Objects {
 
   static traverse(
     obj: any,
-    onValue: (node: any, key: string, value: any, path: number[]) => void,
+    onValue: (
+      node: any,
+      key: string,
+      value: any,
+      path: number[],
+      keyPath: (string | number)[]
+    ) => void,
     include?: ObjectNodeFilter
   ): void {
     const traverse = function (
@@ -396,11 +402,12 @@ class Objects {
       key: string,
       value: any,
       path: number[],
+      keyPath: (string | number)[],
       include?: ObjectNodeFilter
     ) {
       if (!include) include = () => true;
 
-      onValue(node, key, value, path);
+      onValue(node, key, value, path, keyPath);
 
       if (value && (Array.isArray(value) || typeof value === "object")) {
         if (Array.isArray(value)) {
@@ -409,7 +416,14 @@ class Objects {
           let pfi = 0;
           for (let i = 0; i < value.length; i++) {
             if (!include(node, i.toString(), value[i])) continue;
-            traverse(value, i.toString(), value[i], [...path, pfi], include);
+            traverse(
+              value,
+              i.toString(),
+              value[i],
+              [...path, pfi],
+              [...keyPath, pfi],
+              include
+            );
             pfi++;
           }
         } else {
@@ -418,13 +432,20 @@ class Objects {
           for (let j = 0; j < keys.length; j++) {
             const k = keys[j];
             if (!include(node, k, value[k])) continue;
-            traverse(value, k, value[k], [...path, pfj], include);
+            traverse(
+              value,
+              k,
+              value[k],
+              [...path, pfj],
+              [...keyPath, k],
+              include
+            );
             pfj++;
           }
         }
       }
     };
-    traverse(obj, "", obj, [], include);
+    traverse(obj, "", obj, [], [], include);
   }
 
   static traverseMap(obj: any) {
@@ -507,13 +528,20 @@ class Objects {
     throw new Error(_importMainFileToImplement);
   }
 
-  static setProperty(obj: any, path: string, value: any): void {
-    console.log("setProperty", path);
-    return Objects.deepSet(obj, path, value);
+  static setProperty(
+    obj: any,
+    keyPath: string | (string | number)[],
+    value: any
+  ): void {
+    return Objects.deepSet(obj, keyPath, value);
   }
 
-  static deepSet(obj: any, path: string, value: any): void {
-    const keys = Array.isArray(path) ? [...path] : path.split(".");
+  static deepSet(
+    obj: any,
+    keyPath: string | (string | number)[],
+    value: any
+  ): void {
+    const keys = Array.isArray(keyPath) ? [...keyPath] : keyPath.split(".");
     let current = obj;
 
     for (let i = 0; i < keys.length - 1; i++) {
@@ -588,6 +616,30 @@ class Objects {
       result = deepAssign(result, object);
     }
     return result;
+  }
+
+  static deepAssignLeafs(target: any, source: any) {
+    const keyPaths = Objects.getLeafKeyPaths(target);
+    for (const keyPath of keyPaths) {
+      const value = Objects.getProperty(source, keyPath);
+      Objects.setProperty(target, keyPath, value);
+    }
+  }
+
+  static getLeafKeyPaths(obj: any): (string | number)[][] {
+    const keyPaths = Objects.getAllKeyPaths(obj);
+    return keyPaths.filter((keyPath) => {
+      const value = Objects.getProperty(obj, keyPath);
+      return value == null || Objects.isPrimitive(value);
+    });
+  }
+
+  static getAllKeyPaths(obj: any): (string | number)[][] {
+    const keyPaths = [] as (string | number)[][];
+    Objects.traverse(obj, (node, key, value, path, keyPath) => {
+      keyPaths.push(keyPath);
+    });
+    return keyPaths;
   }
 
   static map(

@@ -37,6 +37,7 @@ mounted: | #js
     this.$root.e.on("app.state.changed", this.onAppStateChanged.bind(this));
     this.$root.e.on("app.node.changed", this.onAppNodeChanged.bind(this));
     this.$watch("sui.page.selected", this.onSelectedPageChanged.bind(this));
+    this.refresh = this._refresh.bind(this).throttle(400);
     this.refresh();
   }
 
@@ -58,6 +59,10 @@ methods:
       //this.refresh();
     }
   refresh: | #js
+    function() {
+      // replaced with throttled version in mounted
+    }
+  _refresh: | #js
     async function() {
       const appStateTree = Objects.toTreeObject(this.userAppState, this.expandNodeToTree, [], "name", "value");
       this.appStateTree = appStateTree;

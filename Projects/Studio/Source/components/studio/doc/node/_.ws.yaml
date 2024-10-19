@@ -7,6 +7,7 @@ dom:
     studio.doc.node.vars:
       :node: node
       :node-var-path: nodeVarPath
+      :data-item: dataItem
       @update: onNodeVarValueUpdate
     transition:
       name: slide
@@ -16,6 +17,7 @@ dom:
         ref: comp1
         :is: nodeCompName
         :node: node
+        :node-var-path: nodeVarPath
         :user-app: userApp
         :user-app-state: userAppState
         :sui: sui
@@ -25,7 +27,6 @@ dom:
         :style: nodeStyle
         :data-sui-page: nodePageName
         :data-node-id: node.id
-        v-bind: nodeVarData
         template:
           v-slot: child-nodes
           ui.dom.layout:
@@ -67,15 +68,16 @@ mounted: | #js
   function() {
     this.$root.e.on("app.node.changed", this.onAppNodeChanged.bind(this));
     //this.$watch("sui.node.hovered", this.onSuiNodeChanged.bind(this, "hovered"));
-    this.$watch("sui.node.selected", this.onSuiNodeChanged.bind(this, "selected"));
+    this.$root.e.on("sui.node.selecteds", this.onSuiNodeSelecteds.bind(this));
     this.refresh1();
   }
 
 methods:
   onNodeVarValueUpdate: | #js
     function(key, value) {
-      if (!value) return;
       this.nodeVarData[key] = value;
+      const comp1 = this.$refs.comp1;
+      if (comp1 && (key in comp1.$data)) comp1.$data[key] = value;
     }
   initNodeVars: | #js
     function() {
@@ -237,13 +239,12 @@ methods:
       if (node?.id != this.node?.id) return;
       this.refresh();
     }
-  onSuiNodeChanged: | #js
-    function(type, node) {
-      this.refresh1();
+  onSuiNodeSelecteds: | #js
+    function(selecteds) {
+      const node = selecteds.last();
       if (node?.id != this.node?.id) return;
-      if (type == "selected") {
-        if (this.dataItem) this.$root.e.emit("data.item.selected", this.dataItem);
-      }
+      this.refresh1();
+      if (this.dataItem) this.sui.selected.dataItems.push(this.dataItem);
     }
   getNodeCompName: | #js
     function(node) {
@@ -388,6 +389,8 @@ style:
     padding: 1em
     opacity: 0.8
     background: "repeating-linear-gradient(-45deg, #3b3b3b, #3b3b3b 20px, #1f1f1f 20px, #1f1f1f 40px)"
+  .node-warning.small:
+    padding: 0.2em
   .hovered-node:
     border: "2px dashed #FFFF0080 !important"
   .selected-node:

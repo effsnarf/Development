@@ -1,17 +1,18 @@
 dom:
-  div:
+  .flex1:
     :key: key1
     div:
-      v-for: key in this.sortFields(Object.keys(nodeVarBranch))
+      v-for: key in this.sortFields(Object.keys(nodeVarBranch??{}))
       h3:
         v-text: (fieldNames?.[key] ?? key)
       .folded1:
         ui.value:
           :value: nodeVarBranch[key]
+      slot:
+        :name: "'after_' + key"
 
 props:
   node:
-  nodeVar:
   nodeVarPath:
   userAppState:
   fieldNames:
@@ -49,7 +50,12 @@ watch:
     handler: this.refresh();
 
 style:
+  .flex1:
+    display: flex
+    flex-direction: column
+    gap: 1em
   .folded1:
+    max-width: 25em
     max-height: 5em
     overflow: hidden
     transition: 3s

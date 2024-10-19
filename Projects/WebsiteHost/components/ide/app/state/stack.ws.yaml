@@ -1,0 +1,104 @@
+dom:
+  .box:
+    .flex.justify-center:
+      ui.button:
+        icon: 💾
+        text: save
+        :click: saveAppState
+    .clickable:
+      v-for: (appState, index) in appStates
+      .flex:
+        div:
+          v-text: appState.desc
+          @click: restoreAppState(appState)
+          ':key': appState.dt
+        .clickable:
+          v-text: "'❌'"
+          :click: () => appStates.splice(index, 1)
+
+data:
+  appStates: []
+
+methods:
+  saveAppState: | #js
+    function() {
+      const appState = this.getAppState();
+      this.appStates.add(appState);
+    }
+  restoreAppState: | #js
+    function(appState) {
+      this.setAppState(appState);
+    }
+  getAppState: | #js
+    function() {
+      const globalObjectMap = new WeakMap();  // Track seen objects globally
+
+      function cloneWithGlobalReferences(obj) {
+        if (obj === null || typeof obj !== 'object') return obj;
+        if (globalObjectMap.has(obj)) return globalObjectMap.get(obj);  // Use stored reference
+        // skip HTML elements
+        if (obj instanceof HTMLElement) return null;
+        // skip (() => vue) items (variables that save vue instance by a function)
+        if (typeof obj === 'function' && obj() instanceof Vue) return null;
+
+        const copy = Array.isArray(obj) ? [] : {};
+        globalObjectMap.set(obj, copy);  // Store this object in the map
+
+        for (const key in obj) {
+          copy[key] = cloneWithGlobalReferences(obj[key]);  // Recursively clone properties
+        }
+        return copy;
+      }
+
+      const vues = {};
+      TreeObject.traverse(
+        vueApp, 
+        (v) => {
+          if (v == vueApp) return;
+          vues[v._uid] = {
+            data: cloneWithGlobalReferences(v.$data),
+          };
+        },
+        v => v.$children
+      );
+
+      const vuesCount = Object.keys(vues).length;
+
+      return {
+        vues,
+        dt: Date.now(),
+        vuesCount,
+        desc: `${new Date().toLocaleTimeString()} - ${vuesCount} vues`,
+      };
+    }
+  setAppState: | #js
+    function(appState) {
+      if (!appState) return;
+
+      const globalObjectMap = new WeakMap();  // Track objects during restoration
+
+      function restoreWithGlobalReferences(obj) {
+        if (obj === null || typeof obj !== 'object') return obj;
+        if (globalObjectMap.has(obj)) return globalObjectMap.get(obj);
+
+        const copy = Array.isArray(obj) ? [] : {};
+        globalObjectMap.set(obj, copy);  // Store reference to avoid duplication
+
+        for (const key in obj) {
+          copy[key] = restoreWithGlobalReferences(obj[key]);  // Recursively restore
+        }
+        return copy;
+      }
+
+      TreeObject.traverse(vueApp, (v) => {
+        const state = appState.vues[v._uid];
+        if (!state) return;
+        Object.assign(v.$data, restoreWithGlobalReferences(state.data));
+      }, v => v.$children);
+    }
+
+.style:
+  .box:
+    padding: 1em
+    border: 1px solid gray
+    background: black

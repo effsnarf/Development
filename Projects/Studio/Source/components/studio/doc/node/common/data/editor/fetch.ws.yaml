@@ -4,7 +4,8 @@ dom:
     ui.input.text.box:
       hint: url
       multiline: true
-      v-model: url
+      :value: initial.url
+      @input: (value) => url = value
     div:
       v-if: (true) || (url != initial.url)
       ui.button:
@@ -12,15 +13,25 @@ dom:
         text: save
         @click: onSaveUrl
     div:
-      ui.value.preview:
-        :value: nodeVarData
-      div:
-        ui.linq:
-          v-if: (nodeVarData)
-          :input: nodeVarData._value
-          :value: initial.linq
-          @input: setLinq
-          @output: (value) => nodeVarLinqedData = value
+      studio.app.runtime.state.branch:
+        :node: node
+        :node-var-path: nodeVarPath
+        :user-app-state: userAppState
+        :field-names: "{ _url: '🌐 url', _value: '🌐🧊 fetched data', value: '🔎🧊 linqd data' }"
+        template:
+          v-slot: after__url
+          div:
+            v-if: (nodeVarData?._value)
+            h3:
+              v-text: "'🧊🔎 linq'"
+            .info1:
+              v-text: "'The fetched data can be transformed using a LINQ expression.'"
+            ui.linq:
+              :style: "{ margin: 'auto' }"
+              :input: nodeVarData._value
+              :value: initial.linq
+              @input: setLinq
+              @output: (value) => nodeVarLinqedData = value
 
 props:
   node:
@@ -39,11 +50,17 @@ data:
 
 mounted: | #js
   function() {
+    this.$root.e.on("app.node.changed", this.onAppNodeChanged.bind(this));
     this.$root.e.on("app.state.changed", this.onAppStateChanged.bind(this));
     this.refresh();
   }
 
 methods:
+  onAppNodeChanged: | #js
+    function(node) {
+      if (node.id != this.node.id) return;
+      this.refresh();
+    }
   onAppStateChanged: | #js
     function(vars) {
       const var1 = vars.find(v => (this.nodeVarPath == v.varPath.join(".")));
@@ -61,7 +78,10 @@ methods:
       this.$root.do("edit.node.var", { node: this.node, varName: this.nodeVar.name, key: "url", value: this.url });
     }
   refresh: | #js
-    function() {
+    function(nodeVar) {
+      if (!nodeVar) nodeVar = this.nodeVar;
+      this.initial.linq = Objects.clone(nodeVar.linq);
+      this.initial.url = this.url = this.nodeVar?.url;
       this.nodeVarData = Objects.getProperty(this.userAppState, this.nodeVarPath);
       this.key1++;
     }
@@ -71,7 +91,5 @@ watch:
     immediate: true
     handler: | #js
       function(nodeVar) {
-        this.initial.linq = Objects.clone(nodeVar.linq);
-        this.initial.url = this.url = this.nodeVar?.url;
-        this.refresh();
+        this.refresh(nodeVar);
       }

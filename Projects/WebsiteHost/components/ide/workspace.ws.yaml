@@ -10,6 +10,7 @@ dom:
           ui.title: 
             icon: 🎄
             ':value': appVuesCount?.toLocaleString()
+          ide.app.state.stack:
           div: 
             ui.button:
               icon: ♻

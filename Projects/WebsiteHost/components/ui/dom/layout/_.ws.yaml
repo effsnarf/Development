@@ -3,12 +3,13 @@ dom:
     v-if: layout
     ui.html.style:
       :css-style-obj: gridCssStyleObj
+    slot:
+      name: header
     div:
-      v-if: (!showExample)
       :class: "'grid-' + gridID"
       slot:
     div:
-      v-else-if: (showExample)
+      v-if: (showExample)
       .grid-name:
         v-if: showGridName
         v-text: layout.grid?.name
@@ -18,7 +19,7 @@ dom:
         div:
           :class: "'grid-' + gridID"
           .box.ui-dom-trans-item:
-            v-for: (box, index) in getGridBoxes(layout)
+            v-for: (box, index) in (getGridBoxes(layout))
             :class: box.class
             :data-area: "box.area"
             :key: "'box-' + index"
@@ -48,7 +49,9 @@ methods:
   getBoxes: | #js
     function(count) {
       count = (count ?? 1);
-      return Array.from({ length: count }).map((b, i) => ({ area: `box-${i}` }));
+      return Array.from({ length: count }).map((b, i) => ({
+        area: `box-${i}`,
+      }));
     }
 
 computed:
