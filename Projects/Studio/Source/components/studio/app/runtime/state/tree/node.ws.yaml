@@ -41,7 +41,6 @@ data:
 
 mounted: | #js
   function() {
-    this.$root.e.on("app.state.changed", this.onAppStateChanged.bind(this));
   }
 
 methods:

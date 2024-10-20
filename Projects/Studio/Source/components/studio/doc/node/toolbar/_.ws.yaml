@@ -28,7 +28,7 @@ dom:
                 v-text: "'➕📦'"
               div:
                 div:
-                  v-text: "'Drop a 📁 panel branch from the app tree here to create a new reusable component.'"
+                  v-text: "'Drop a 📂 panel branch from the app tree here to create a new reusable component.'"
         ui.dnd.dropzone:
           @drop-item: onDropItem_new_comp
           .tool.tool-dimmed.new-comp:
@@ -60,7 +60,7 @@ dom:
           .flex:
             v-if: ('panel' == hovered.ntt?.type)
             h2:
-              v-text: "'📁'"
+              v-text: "'📂'"
             div:
               div:
                 v-text: "'A panel is a general container for other elements, in a grid or flex layout.'"

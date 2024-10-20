@@ -32,7 +32,7 @@ class Tooltip {
         this.updatePosition(x, y);
     }
 
-    show(text, x, y, delay = 400) {
+    show(text, x, y, delay = 200) {
         if (this.fadeInTimeout) clearTimeout(this.fadeInTimeout);
         this.setText(text, x, y);
         this.fadeInTimeout = setTimeout(() => {
@@ -83,7 +83,7 @@ class TooltipManager {
 
     attachGlobalMouseMoveListener() {
         document.addEventListener('mousemove', e => {
-            this.tooltip.updatePosition(e.pageX + 10, e.pageY + 10); // Offset to avoid cursor overlap
+            this.tooltip.updatePosition(e.clientX + 10, e.clientY + 10); // Offset to avoid cursor overlap
         });
     }
 }

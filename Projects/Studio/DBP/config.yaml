@@ -1,0 +1,24 @@
+title: Studio.DBP
+server:
+  host: localhost
+  port: 4041
+  cors: [localhost:5051]
+database:
+  connectionString: mongodb://localhost:27017
+  query:
+    max:
+      docs: 50
+log:
+  debug:
+    enabled: false
+    path: (env) => env.getLogPath(env.config.title, "debug")
+  errors:
+severity:
+  time: [50, 500, "<"]
+requests:
+  severity:
+    time: [100, 500, "<"]
+dbs:
+  IdeStudio:
+    users:
+      enabled: true

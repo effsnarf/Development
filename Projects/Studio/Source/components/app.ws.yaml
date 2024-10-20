@@ -1,12 +1,13 @@
 dom:
   div:
-    studio.app: null
+    studio.app:
     div:
       ui.html.style:
         v-for: comp in $root.comps
         ":key": comp.name
         ":component": comp
         ":document-head": "true"
+
 mounted: | #js
   function() {
   }

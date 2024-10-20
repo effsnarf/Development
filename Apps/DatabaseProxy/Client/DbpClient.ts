@@ -530,4 +530,4 @@ class DatabaseProxy {
   }
 }
 
-export { DatabaseProxy };
+export { DatabaseProxy, EntityMethods };

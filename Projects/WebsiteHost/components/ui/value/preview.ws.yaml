@@ -13,10 +13,19 @@ dom:
     div: 
       v-else-if: 'true'
       ':class': cssClass
-      div: 
-        ':class': '{ clickable: true, ''value-as-string'': true }'
-        v-text: valueAsString
-        @click: (e) => onClickValue(e, valueAsString)
+      .flex:
+        ':class': '{ ''value-as-string'': true }'
+        div: 
+          :class: "{ clickable: true }"
+          v-text: valueAsString
+          @click: (e) => onClickValue(e, valueAsString)
+        a:
+          v-if: valueIsUrl
+          class: clickable dimmed
+          target: _blank
+          ':href': valueAsString
+          title: open in new tab
+          v-text: "'🌐📤'"
       transition:
         name: slide
         ui.value.any:
@@ -68,6 +77,11 @@ methods:
       //if (typeof value == "object") return `{${Object.keys(value).take(10).join(', ')}}`;
       return value.toString();
     }
+  isUrl: | #js
+    function(value) {
+      if (typeof value != "string") return false;
+      return value.startsWith("http");
+    }
 computed:
   cssClass: | #js
     function() {
@@ -86,6 +100,10 @@ computed:
         "object": "cyan",
         "array": "white"
       }[this.type]) || null;
+    }
+  valueIsUrl: | #js
+    function() {
+      return this.isUrl(this.value);
     }
   valueAsString: | #js
     function() {

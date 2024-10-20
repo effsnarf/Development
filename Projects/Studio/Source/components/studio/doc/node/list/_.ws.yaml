@@ -1,14 +1,19 @@
 dom:
   ui.dom.layout:
     :layout: node.layout
-    :show-example: (!visibleItems)
+    :show-example: (false)
     :show-grid-name: "false"
     template:
       v-slot: header
-      .node-warning:
+      div:
+        class: node-warning
+        v-if: "isMockArray"
+        v-text: "'⚠️🧊 data missing'"
+      div:
+        class: node-warning
         v-if: "itemsIsNotArray"
         div:
-          v-text: "'⚠️ array expected'"
+          v-text: "'⚠️🧊 array expected'"
         div:
           v-text: "'(not ' + (typeof items) + ')'"
         ui.value.preview:
@@ -17,19 +22,20 @@ dom:
       v-slot: example-box
       .node-warning:
         v-if: "!node.children?.length"
-        v-text: "'⚠️ list template'"
+        v-text: "'⚠️📂 template missing'"
     .list-item:
       v-for: (item, i) in visibleItems
       :class: "{ empty: (!node.children?.length) }"
       :key: visibleItemKeys[i]
       div:
         v-if: "!node.children?.length"
-        .node-warning.small:
-          v-text: "'⚠️ list template'"
+        .node-warning:
+          v-text: "'⚠️📂 template missing'"
         ui.value.preview:
+          v-if: "!isMockArray"
           :value: item
       studio.doc.node:
-        v-else:
+        v-if: "node.children?.length"
         v-for: childNode in node.children
         :node: childNode
         :user-app-state: userAppState
@@ -54,20 +60,31 @@ data:
   selected:
   visibleItems:
   visibleItemKeys: []
+  isMockArray: false
   exampleItems: 9
-  maxVisibleItems: 3
+  maxVisibleItems: 12
 
 mounted: | #js
   function() {
+    this.$root.e.on("app.node.changed", this.onAppNodeChanged.bind(this));
     this.$root.bindToUserAppState(this, "hovered", `${this.nodeVarPath}.hovered.value`);
     this.$root.bindToUserAppState(this, "selected", `${this.nodeVarPath}.selected.value`);
   }
 
 methods:
+  onAppNodeChanged: | #js
+    function(node) {
+      if (node.id != this.node.id) return;
+      this.refresh();
+    }
   getVisibleItems: | #js
     function(items) {
-      if (!Array.isArray(items)) return null;
-      return (items?.take(this.maxVisibleItems) ?? null);
+      this.isMockArray = false;
+      if (!items || !Array.isArray(items)) {
+        this.isMockArray = true;
+        return this.getMockArray();
+      }
+      return items.take(this.maxVisibleItems);
     }
   onHover: | #js
     function(item) {
@@ -93,6 +110,11 @@ methods:
     function() {
       return Array.from(Array(this.exampleItems).keys()).map((i) => null);
     }
+  refresh: | #js
+    function() {
+      this.visibleItems = this.getVisibleItems(this.items);
+      this.visibleItemKeys = this.visibleItems?.map((item) => this.getListItemKey(item));
+    }
 
 computed:
   itemsIsNotArray: | #js
@@ -106,8 +128,7 @@ watch:
     deep: false
     handler: | #js
       function(items) {
-        this.visibleItems = this.getVisibleItems(items);
-        this.visibleItemKeys = this.visibleItems?.map((item) => this.getListItemKey(item));
+        this.refresh();
       }
       
 style:

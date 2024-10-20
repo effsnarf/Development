@@ -26,9 +26,9 @@ class CallbackQueue {
 
   // Some operations are called very frequently, so we throttle them
   private createTcb() {
-    return ((compEvent: CompEvent) => {
+    return (compEvent: CompEvent) => {
       this.callback(compEvent);
-    }).throttle(10, this);
+    };
   }
 }
 
@@ -83,7 +83,7 @@ const Mixins = {
 
     const mixin = {
       matchComp: (c: any) =>
-        ["ide.", "ui.mouse", "ui.value"].none((s) => c.name.startsWith(s)),
+        ["ide.", "ui.value", "ui.mouse"].none((s) => c.name.startsWith(s)),
 
       created(this: any) {
         const vue = this;
@@ -138,35 +138,35 @@ const Mixins = {
           }
         };
 
-        // Wrap data properties
-        const data = this._data || {};
-        Object.keys(data)
-          .except(...exceptKeys)
-          .forEach((dataKey) => {
-            const originalData = data[dataKey];
-            // Create a watcher for each data property
-            this.$watch(
-              function () {
-                return getWatchableData(dataKey);
-              },
-              (newValue: any, oldValue: any) => {
-                const compEvent = {
-                  context: vue,
-                  type: "data",
-                  name: dataKey,
-                  oldValue,
-                  newValue,
-                  elapsed: 0,
-                };
-                callbackQueue.enqueue(compEvent);
-              },
-              {
-                deep: true,
-              }
-            );
-          });
-
-        return;
+        if (false) {
+          // Wrap data properties
+          const data = this._data || {};
+          Object.keys(data)
+            .except(...exceptKeys)
+            .forEach((dataKey) => {
+              const originalData = data[dataKey];
+              // Create a watcher for each data property
+              this.$watch(
+                function () {
+                  return getWatchableData(dataKey);
+                },
+                (newValue: any, oldValue: any) => {
+                  const compEvent = {
+                    context: vue,
+                    type: "data",
+                    name: dataKey,
+                    oldValue,
+                    newValue,
+                    elapsed: 0,
+                  };
+                  callbackQueue.enqueue(compEvent);
+                },
+                {
+                  deep: true,
+                }
+              );
+            });
+        }
 
         // Wrap computed properties
         const computed = this._computedWatchers || {};
@@ -175,24 +175,19 @@ const Mixins = {
           .filter((cn) => !cn.startsWith("_"))
           .filter((cn) => !cn.startsWith("$"))
           .forEach((computedName) => {
-            if (computedName == "cItems") {
-              this.$watch("cItems", {
-                handler: (newValue: any, oldValue: any) => {
-                  (window as any).alertify.message(
-                    `cItems changed \n from ${JSON.stringify(
-                      oldValue
-                    )} \n to ${JSON.stringify(newValue)})}`
-                  );
-                },
-              });
-            }
-            return;
             const originalComputed = computed[computedName];
             const getter = originalComputed.getter;
             const setter = originalComputed.setter;
 
             computed[computedName].getter = wrapFunction(
               getter,
+              callbackQueue,
+              vue,
+              "computed",
+              computedName
+            );
+            computed[computedName].setter = wrapFunction(
+              setter,
               callbackQueue,
               vue,
               "computed",

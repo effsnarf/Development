@@ -66,6 +66,17 @@ class Objects {
     return root;
   }
 
+  // { user: 1, a: 2 } to ['user', '1', 'a', '2']
+  static flatten(obj: any) {
+    const arr = [] as string[];
+    Objects.traverse(obj, (node, key, value, path) => {
+      if (!key.length) return;
+      arr.push(key);
+      arr.push(value);
+    });
+    return arr;
+  }
+
   static async wait(milliseconds: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, milliseconds));
   }
@@ -82,6 +93,13 @@ class Objects {
 
   static is(obj: any, type: any): boolean {
     return (0)._is(obj, type);
+  }
+
+  // returns true for numbers and for strings that can be converted to numbers
+  static isNumbery(obj: any): boolean {
+    if (typeof obj === "number") return true;
+    if (typeof obj === "string") return !isNaN(parseFloat(obj));
+    return false;
   }
 
   static isPrimitive(obj: any): boolean {

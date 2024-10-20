@@ -19,6 +19,7 @@ mounted: | #js
 methods:
   start: | #js
     function() {
+      return;
       const now = new Date();
       if (!this.started) this.started = Date.now();
       setTimeout(this.anotherTick.bind(this), (this.delay ?? 0));

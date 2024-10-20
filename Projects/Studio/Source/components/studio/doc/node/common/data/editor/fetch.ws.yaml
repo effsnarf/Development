@@ -2,7 +2,7 @@ dom:
   div:
     :key: key1
     ui.input.text.box:
-      hint: url
+      hint: "https://a.4cdn.org/boards.json"
       multiline: true
       :value: initial.url
       @input: (value) => url = value
@@ -23,9 +23,8 @@ dom:
           div:
             v-if: (nodeVarData?._value)
             h3:
+              title: The fetched data can be transformed using a LINQ expression.
               v-text: "'🧊🔎 linq'"
-            .info1:
-              v-text: "'The fetched data can be transformed using a LINQ expression.'"
             ui.linq:
               :style: "{ margin: 'auto' }"
               :input: nodeVarData._value

@@ -24,7 +24,7 @@ methods:
         "page.template": "📚",
         pages: "📜",
         page: "📜",
-        panel: "🗂️",
+        panel: "📂",
         list: "🧮",
         text: "🅰️",
         button: "✔️",

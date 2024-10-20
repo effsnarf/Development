@@ -26,6 +26,7 @@ import { Graph } from "../../../../Shared/Database/Graph";
 import { StateTracker, StateValue } from "../../Classes/StateTracker";
 import { CompEvent, Mixins } from "../../../../Shared/Mvc/Vue/Mixins";
 import { MovingPositionSmoother } from "../../../../Shared/MovingPositionSmoother";
+import { before } from "node:test";
 
 const window1 = window as any;
 
@@ -98,14 +99,13 @@ const generalMixin = {
     };
   },
   mounted() {
-    const self = this as any;
-    vueApp?.vm.registerVue(this);
-    return;
+    //console.log(`🔝 mounted`);
+  },
+  beforeUnmount() {
+    console.log(`👇 beforeUnmount`);
   },
   unmounted() {
-    const self = this as any;
-    vueApp?.vm.unregisterVue(this);
-    return;
+    console.log(`🔻 unmounted`);
   },
   computed: {
     // $store(): any {
@@ -359,10 +359,19 @@ const mgCompMixin = {
   },
 };
 
+const calls = {} as any;
+window1.calls = calls;
+window1.getSortedCalls = () => {
+  return Object.entries(calls).sort((a: any, b: any) => b[1] - a[1]);
+}
+
 const afterCompEvent = ((e: CompEvent) => {
   (window as any).vueIdeApp?.perfInspector?.().afterCompEvent(e);
-  //console.log(`⚡`, e.elapsed, e.name);
-}).throttle(100);
+  const compName = e.context.$options._componentTag;
+  const key = `${compName}.${e.type}.${e.name}`;
+  calls[key] = (calls[key] || 0) + 1;
+  //console.log(`⚡ ${comp} ${e.type} ${e.name}`);
+});
 
 const compEventTracker = Mixins.CompEventTracker(afterCompEvent);
 

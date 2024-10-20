@@ -67,7 +67,7 @@ data:
 
 mounted: | #js
   function() {
-    this.$root.e.on("app.node.changed", this.onAppNodeChanged.bind(this));
+    this.$root.e.on("app.node.changed", this.onAppNodeChanged.bind(this).throttle(100));
     //this.$watch("sui.node.hovered", this.onSuiNodeChanged.bind(this, "hovered"));
     this.$root.e.on("sui.node.selecteds", this.onSuiNodeSelecteds.bind(this));
     this.refresh1();
@@ -79,130 +79,6 @@ methods:
       this.nodeVarData[key] = value;
       const comp1 = this.$refs.comp1;
       if (comp1 && (key in comp1.$data)) comp1.$data[key] = value;
-    }
-  initNodeVars: | #js
-    function() {
-      const runtimeVue = this.$root.getUserAppRuntimeVue(this);
-      if (!runtimeVue) return;
-      let comp1 = this.$refs.comp1;
-      if (comp1.$options.name == "studio-doc-node-vue-comp") comp1 = comp1.$children[0];
-      const vars = this.node.vars;
-      if (!vars) return;
-      for (const var1 of vars)
-      {
-        const nodeVar = this.createNodeVar(comp1, var1);
-      }
-    }
-  createNodeVar: | #js
-    function(vComp, var1) {
-      if (!var1?.type) return;
-      const method = this[`createNodeVar.${var1.type}`.replaceAll('.', '_')];
-      if (!method) throw `Unknown node var type ${var1.type}`;
-      return method(vComp, var1);
-    }
-  createNodeVar_fetch: | #js
-    function(vComp, var1) {
-      const $root = this.$root;
-      const runtimeVue = $root.getUserAppRuntimeVue(this);
-      const pageNode = this.$root.getNodePage(this);
-      const sui = this.sui;
-      this.bindNodeVarToGlobalAppState(vComp, var1);
-
-      // a fetch var has:
-      // - url (computed, can reference other state nodes)
-      // - _data (holds the downloaded data)
-      // - linq (optional to project the data)
-      // - data (the projected downloaded data)
-      const url = Vue.computed({
-        get: this.$root.toContextFunc(this, { args: ["vue"], code: `try { return ${var1.url}; } catch (ex) {}` }, { async: false })
-      });
-
-      const _data = Vue.reactive({ value: null });
-
-      const url_watcher = Vue.watch(url,
-        (async function(newUrl) {
-          if (!newUrl) return;
-          vComp[`${var1.name}Url`] = newUrl;
-          _data.value = (await $root.fetchFromUrl(newUrl));
-          // #TODO not accurate
-          // switch to the page this list is in
-          if (pageNode) $root.do("select.page", { pageNode });
-        }),
-        { immediate: true });
-
-      const _data_watcher = Vue.watch(_data,
-        (async function(newData) {
-          const linq = (var1.linq || null);
-          const datas = runtimeVue.$refs.linqEval1.evaluateOps(null, newData.value, linq);
-          const data = datas.last();
-          vComp[var1.name] = data;
-        })
-      );
-
-      const nodeVar = { url, _data };
-      
-      return nodeVar;
-    }
-  createNodeVar_field: | #js
-    function(vComp, var1) {
-      const $root = this.$root;
-      const runtimeVue = $root.getUserAppRuntimeVue(this);
-      // a field node var has:
-      // - value (taken from data-item[field])
-      const field_watcher = Vue.watch(
-        () => this.dataItem?.[var1.exp],
-        (function(newValue) {
-          vComp[var1.name] = newValue;
-        }),
-        { immediate: true });
-
-      return { field_watcher };
-    }
-  createNodeVar_exp: | #js
-    function(vComp, var1) {
-      const $root = this.$root;
-      const runtimeVue = $root.getUserAppRuntimeVue(this);
-      this.bindNodeVarToGlobalAppState(vComp, var1);
-      // an exp node var has:
-      // - value (evaluated)
-      const exp = Vue.computed({
-        get: this.$root.toContextFunc(this, { args: ["vue"], code: `try { return ${var1.exp}; } catch (ex) {}` }, { async: false })
-      });
-
-      const exp_watcher = Vue.watch(exp,
-        (function(newValue) {
-          vComp[var1.name] = newValue;
-        }),
-        { immediate: true });
-
-      return { exp };
-    }
-  createNodeVar_node_prop: | #js
-    function(vComp, var1) {
-      const $root = this.$root;
-      const runtimeVue = $root.getUserAppRuntimeVue(this);
-      this.bindNodeVarToGlobalAppState(vComp, var1);
-      // a node prop node var is used to connect to custom vue components
-      // it cannot be configued by the user like a [fetch] or [field] var
-      // it is used to pass data from the node to the vue component and vice versa
-      // example: [selected], [hovered]
-
-      // may be initialized from the node
-      vComp[var1.name] = var1.value;
-
-      return { value: var1.value };
-    }
-  createNodeVar_value: | #js
-    function(vComp, var1) {
-      const $root = this.$root;
-      const runtimeVue = $root.getUserAppRuntimeVue(this);
-      this.bindNodeVarToGlobalAppState(vComp, var1);
-
-      // simple value node var
-      // for example to set a color or a text
-      vComp[var1.name] = var1.value;
-
-      return { value: var1.value };
     }
   bindNodeVarToGlobalAppState: | #js
     function(vComp, var1) {

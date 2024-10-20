@@ -18,11 +18,29 @@ class Events {
     }
   }
 
+  off(names: string | string[], callback: Function) {
+    if (typeof names === "string") {
+      names = [names];
+    }
+    for (const name of names) {
+      this.removeListener(name, callback);
+    }
+  }
+
   private addListener(name: string, callback: Function) {
     if (!this.listeners[name]) {
       this.listeners[name] = [];
     }
     this.listeners[name].push(callback);
+  }
+
+  private removeListener(name: string, callback: Function) {
+    if (!this.listeners[name]) {
+      return;
+    }
+    this.listeners[name] = this.listeners[name].filter(
+      (listener) => listener !== callback
+    );
   }
 
   emit(name: string, ...args: any[]) {

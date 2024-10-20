@@ -8,20 +8,24 @@ props:
   cssStyleObj: null
   documentHead: false
 data:
-  css: null
+  css:
 mounted: | #js
   function() {
-    if (this.documentHead) {
-      const css = this.getCss(this.component);
-      if (!css?.length) return;
-      const style = document.createElement("style");
-      style.type = "text/css";
-      style.classList.add(this.component.name);
-      style.innerHTML = css;
-      document.head.appendChild(style);
-    }
+    this.init();
   }
 methods:
+  init: | #js
+    function() {
+      this.css = this.getCss(this.component);
+      if (this.documentHead) {
+        if (!this.css?.length) return;
+        const style = document.createElement("style");
+        style.type = "text/css";
+        style.classList.add(this.component.name);
+        style.innerHTML = this.css;
+        document.head.appendChild(style);
+      }
+    }
   getCss: | #js
     function() {
       const clsName = (this.className ?? this.component?.name);
@@ -41,24 +45,6 @@ methods:
       var doc = new DOMParser().parseFromString(input, "text/html");
       return doc.documentElement.textContent;
     }
-watch:
-  component:
-    handler: | #js
-      function(component) {
-        this.css = this.getCss();
-      }
-    immediate: true
-  className:
-    handler: | #js
-      function(className) {
-        this.css = this.getCss();
-      }
-    immediate: true
-  cssStyleObj:
-    handler: | #js
-      function(cssStyleObj) {
-        this.css = this.getCss();
-      }
 name: ui-html-style
 _:
   examples:

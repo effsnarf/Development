@@ -2,7 +2,6 @@
 import "colors";
 import path from "path";
 import fs from "fs";
-import util, { debuglog } from "util";
 import axios from "axios";
 import express from "express";
 const bodyParser = require("body-parser");
@@ -32,7 +31,6 @@ import { MongoDatabase } from "@shared/Database/MongoDatabase";
 import { Analytics, Intervals, Interval, ItemType } from "@shared/Analytics";
 import { debug } from "console";
 import { DatabaseProxy } from "../Client/DbpClient";
-import { Shakespearizer } from "../../../Projects/Shakespearizer/Shakespearizer";
 import { ChatOpenAI, Roles } from "../../../Apis/OpenAI/classes/ChatOpenAI";
 import { Model, OpenAI } from "../../../Apis/OpenAI/classes/OpenAI";
 // #endregion
@@ -231,7 +229,7 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
     _dbs: new Map<string, MongoDatabase>(),
     get: async (dbName: string) => {
       if (!dbs._analytics) {
-        if (config.analytics.database) {
+        if (config.analytics?.database) {
           dbs._analytics = await Analytics.new(config.analytics);
         }
       }
@@ -247,7 +245,11 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
           db,
           () => Timer.start(),
           (timer, className, methodName, args) => {
-            if (timer.elapsed < config.analytics.min.elapsed) return;
+            if (
+              !config.analytics?.min.elapsed ||
+              timer.elapsed < config.analytics?.min.elapsed
+            )
+              return;
             // Remove the $ from $match, $sort, etc, because it can't be stored in MongoDB
             args = args.map((arg) =>
               Objects.json.parse(
@@ -401,8 +403,9 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
               ? await Http.getPostDataFromStream(req)
               : null;
           const user = await User.get(req, res, data);
+          debugLogger.log();
           debugLogger.log(req.method, req.url, data);
-          await handler(req, res, user, data);
+          const result = await handler(req, res, user, data);
           itemsLog.log(
             req.method,
             res.statusCode.severifyByHttpStatus(),
@@ -853,6 +856,9 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
 
         const items = await db?.aggregate(req.params.entity, pipeline);
 
+        debugLogger.log(pipeline);
+        debugLogger.log(items);
+
         return res.end(JSON.stringify(items));
       })
     );
@@ -863,7 +869,9 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
       processRequest(async (req: any, res: any, user: User, postData: any) => {
         const db = await dbs.get(req.params.database);
         const entity = req.params.entity;
-        const _id = parseInt(req.query._id);
+        const _id = Objects.isNumbery(req.query._id)
+          ? parseInt(req.query._id)
+          : req.query._id;
         const doc = postData;
         if (!doc._id) doc._id = _id;
         const result = await db?.upsert(entity, doc, false, true);

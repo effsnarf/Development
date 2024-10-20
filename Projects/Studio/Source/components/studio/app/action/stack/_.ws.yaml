@@ -24,17 +24,19 @@ data:
     pointer:
 
 mounted: | #js
-  function() {
+  async function() {
     this.$root.do = this._do.bind(this);
     // ctrl + z, ctrl + y
     window.addEventListener("keydown", (e) => {
+      // ignore events from [input] and [textarea]
+      if ([ "input", "textarea" ].includes(e.target.tagName.toLowerCase())) return;
       if (e.ctrlKey && e.key == "z") this.undo();
       if (e.ctrlKey && e.key == "y") this.redo();
     });
 
-    const remoteStore = (new Data2.Browser.LocalStorage());
-    this.remote.actions = remoteStore.array("actions", this.actions);
-    this.remote.pointer = remoteStore.vue.reactive(this, "pointer", -1);
+    this.remote.actions = await this.$root.data.array("Actions", this.actions);
+    this.remote.pointer = await this.$root.data.vue.reactive("Pointers", this, "pointer", -1);
+    this.pointer = -1;
   }
 
 methods:
@@ -229,6 +231,13 @@ methods:
       const undo = { type: "delete.node", args: { node: { id: node.id } } };
       this.$root.e.emit("app.node.changed", parent);
       return { _do, undo };
+    }
+  replay: | #js
+    function(from, to) {
+      for (let i = from; i <= to; i++) {
+        const action = this.actions[i];
+        this.do(action.do, false);
+      }
     }
   undo: | #js
     function() {
