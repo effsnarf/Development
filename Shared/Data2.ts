@@ -26,63 +26,24 @@ namespace Data2 {
     rhs: any;
   }
 
-  export class Obj<T> {
-    public events = new Events();
-
-    constructor(private _value: T) {}
-
-    static from = {
-      vue: {
-        reactive: (vue: any, key: string) => {
-          return new VueObj(vue, key);
-        },
-      },
-      array: (array: any[]) => {
-        return new Data2.Array(array);
-      },
-    };
-
-    get value() {
-      return this._value;
-    }
-
-    set value(value: any) {
-      this._value = value;
-    }
-  }
-
   export class VueObj {
-    private _obj: Obj<any>;
-
-    get events() {
-      return this._obj.events;
-    }
-
-    get value() {
-      return this._obj.value;
-    }
-
-    set value(value: any) {
-      this._vue[this._key] = value;
-      this._obj.value = value;
-    }
+    events = new Events({ sync: true });
 
     constructor(
       private _vue: any,
-      private _key: string
+      private _key: string,
+      initialValue: any
     ) {
-      const obj = (this._obj = new Obj(Objects.clone(this._vue[_key])));
-      this._vue.$watch(
+      let oldValue = Objects.clone(initialValue);
+      _vue.$data[_key] = initialValue;
+      _vue.$watch(
         _key,
         (newValue: any) => {
-          const oldValue = Objects.clone(obj.value);
-          this.value = newValue;
           // #TODO slow
           const changes = deepDiff.diff(oldValue, newValue);
           if (!changes) return;
-          for (const change of changes) {
-            obj.events.emit("change", newValue, change);
-          }
+          oldValue = Objects.clone(newValue);
+          this.events.emit("modified", newValue, changes);
         },
         { deep: true }
       );
@@ -91,22 +52,19 @@ namespace Data2 {
 
   // emits changes on every array operation
   export class Array {
-    public events = new Events();
+    public events = new Events({ sync: true });
 
-    constructor(private _array: any[]) {
+    constructor(
+      private _array: any[],
+      initialValues: any[]
+    ) {
+      _array.clear();
+      _array.push(...initialValues);
       Reflection.bindClassMethods(
         _array,
         this.beforeMethod.bind(this),
-        this.afterMethod
+        this.afterMethod.bind(this)
       );
-    }
-
-    clear() {
-      this._array.clear();
-    }
-
-    push(...items: any[]) {
-      this._array.push(...items);
     }
 
     private beforeMethod = (
@@ -122,7 +80,7 @@ namespace Data2 {
       args: any[],
       returnValue: any
     ) => {
-      if (["add", "splice", "pop"].includes(methodName)) {
+      if (["clear", "push", "splice", "pop"].includes(methodName)) {
         this.events.emit(methodName, ...args);
       }
     };
@@ -150,13 +108,16 @@ namespace Data2 {
         key: string,
         defaultValue: any
       ): Promise<VueObj> => {
-        const vueObj = new VueObj(vue, key);
         // load the value from storage
-        vueObj.value = (await this.getFromStore(key, defaultValue)).value;
+        const storedValue = (await this.getFromStore(key, defaultValue)).value;
+        const vueObj = new VueObj(vue, key, storedValue);
         // hook into the vue events to save to storage
-        vueObj.events.on("change", (newValue: any, change: Data2.Change) => {
-          this.setToStore(key, newValue, change);
-        });
+        vueObj.events.on(
+          "modified",
+          async (newValue: any, changes: Data2.Change[]) => {
+            await this.setToStore(key, newValue, changes);
+          }
+        );
         // emit loaded event
         this._events.emit("loaded", key, vueObj);
         return vueObj;
@@ -164,17 +125,15 @@ namespace Data2 {
     };
 
     async array(key: string, array: any[]): Promise<Data2.Array> {
-      const arrayObj = new Data2.Array(array);
       // load the array from storage
       const storedArray = (await this.getFromStore(key, [])).value;
-      arrayObj.clear();
-      arrayObj.push(...storedArray);
+      const arrayObj = new Data2.Array(array, storedArray);
       // hook into the array events to save to storage
-      arrayObj.events.on("*", (method: string, ...args: any[]) => {
-        this.executeOnStoreObject(key, method, args);
+      arrayObj.events.on("*", async (method: string, ...args: any[]) => {
+        await this.executeOnStoreObject(key, method, args);
       });
       // emit loaded event
-      this._events.emit("loaded", key, array);
+      this._events.emit("loaded", key, storedArray);
       return arrayObj;
     }
 
@@ -183,7 +142,7 @@ namespace Data2 {
     abstract setToStore(
       key: string,
       value: any,
-      change: Data2.Change | null
+      changes: Data2.Change[] | null
     ): Promise<void>;
 
     abstract executeOnStoreObject(
@@ -206,7 +165,7 @@ namespace Data2 {
       return { key, value };
     }
 
-    async setToStore(key: string, value: any, change: Data2.Change | null) {
+    async setToStore(key: string, value: any, changes: Data2.Change[] | null) {
       localStorage.setItem(key, JSON.stringify(value));
     }
 
@@ -248,7 +207,7 @@ namespace Data2 {
       return { key, value: item.value };
     }
 
-    async setToStore(key: string, value: any, change: Data2.Change | null) {
+    async setToStore(key: string, value: any, changes: Data2.Change[] | null) {
       await this._items.update(this.fullID(key), { value });
     }
 

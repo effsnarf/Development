@@ -17,6 +17,10 @@ dom:
             v-text: action.do.icon
           td:
             v-text: (action.do.text ?? action.do.type)
+          td:
+            ui.value:
+              v-if: action.do.info
+              :value: action.do.info
     transition:
       name: slide
       .box2:
@@ -70,6 +74,7 @@ methods:
 style:
   .type-select:
     color: "#ffffff80"
+    filter: grayscale(1)
   tr:hover:
     background-color: "#80808040"
   tr.done:hover:

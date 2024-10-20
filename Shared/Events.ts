@@ -1,7 +1,17 @@
 // Passing events between components
 
+interface EventsOptions {
+  sync?: boolean;
+}
+
 class Events {
-  private listeners: { [key: string]: Function[] } = {};
+  private _listeners: { [key: string]: Function[] } = {};
+
+  private _callbackQueue = [] as Function[];
+
+  constructor(private _options: EventsOptions = {}) {
+    if (this._options.sync) this._processCallbackQueue();
+  }
 
   forward(events: Events, prefix: string) {
     events.on("*", (name: string, ...args: any[]) => {
@@ -28,33 +38,47 @@ class Events {
   }
 
   private addListener(name: string, callback: Function) {
-    if (!this.listeners[name]) {
-      this.listeners[name] = [];
+    if (!this._listeners[name]) {
+      this._listeners[name] = [];
     }
-    this.listeners[name].push(callback);
+    this._listeners[name].push(callback);
   }
 
   private removeListener(name: string, callback: Function) {
-    if (!this.listeners[name]) {
+    if (!this._listeners[name]) {
       return;
     }
-    this.listeners[name] = this.listeners[name].filter(
+    this._listeners[name] = this._listeners[name].filter(
       (listener) => listener !== callback
     );
   }
 
-  emit(name: string, ...args: any[]) {
-    if (this.listeners["*"]) {
-      this.listeners["*"].forEach((callback) => {
-        callback(name, ...args);
-      });
+  async emit(name: string, ...args: any[]) {
+    if (this._listeners["*"]) {
+      for (const callback of this._listeners["*"]) {
+        this._call(callback, name, ...args);
+      }
     }
 
-    if (this.listeners[name]) {
-      this.listeners[name].forEach((callback) => {
-        callback(...args);
-      });
+    if (this._listeners[name]) {
+      for (const callback of this._listeners[name]) {
+        this._call(callback, ...args);
+      }
     }
+  }
+
+  private _call(callback: Function, ...args: any[]) {
+    if (this._options.sync) {
+      this._callbackQueue.push(async () => await callback(...args));
+    } else {
+      setTimeout(async () => await callback(...args), 0);
+    }
+  }
+
+  private async _processCallbackQueue() {
+    const callback = this._callbackQueue.shift();
+    await callback?.();
+    setTimeout(() => this._processCallbackQueue(), !callback ? 100 : 0);
   }
 }
 

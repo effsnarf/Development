@@ -204,6 +204,12 @@ methods:
         return childNode;
       }
     }
+  findNodeByID: | #js
+    function(node, id) {
+      if (!id) return null;
+      if (id.id) id = id.id;
+      return TreeObject.find(node, (n) => (n.id == id));
+    }
   findNodeByPath: | #js
     function(nodePath) {
       if (typeof(nodePath) == 'string') nodePath = nodePath.split('.');

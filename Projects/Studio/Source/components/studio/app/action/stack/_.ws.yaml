@@ -36,15 +36,29 @@ mounted: | #js
 
     this.remote.actions = await this.$root.data.array("Actions", this.actions);
     this.remote.pointer = await this.$root.data.vue.reactive("Pointers", this, "pointer", -1);
-    this.pointer = -1;
+    this.updateSuiFromUserApp();
   }
 
 methods:
+  updateSuiFromUserApp: | #js
+    function() {
+      // page
+      this.sui.page.selected = this.$root.findNodeByID(this.userApp, this.userApp.ui.selected.page);
+      // nodes
+      this.sui.node.selecteds = this.userApp.ui.selected.nodes.map(n => this.$root.findNodeByID(this.userApp, n));
+      // tool category
+      this.sui.tool.category.index = this.userApp.ui.selected.tool.category.index;
+      this.sui.tool.category.name = this.sui.tool.category.options[this.sui.tool.category.index]?.split(' ').last();
+    }
   do_select_page: | #js
     function(_do, pageNode) {
       let oldPageNode = this.sui.page.selected;
-      if ((!oldPageNode && !pageNode) || (oldPageNode?.id == pageNode?.id)) return;
+      if ((!oldPageNode && !pageNode) || (oldPageNode?.id == pageNode?.id)) {
+        this.userApp.ui.selected.page = null;
+        return;
+      }
       pageNode = this.$root.getNode(pageNode);
+      this.userApp.ui.selected.page = (!pageNode ? null : { id: pageNode.id });
       this.sui.page.selected = pageNode;
       this.setIconText(_do, pageNode);
       const node = this.sui.node;
@@ -62,6 +76,7 @@ methods:
       const name = this.sui.tool.category.options[index]?.split(' ').last();
       this.sui.tool.category.index = index;
       this.sui.tool.category.name = name;
+      this.userApp.ui.selected.tool.category.index = index;
       _do.icon = newIcon;
       _do.text = name;
       const undo = { type: "select.tool.category", args: { index: oldIndex } };
@@ -77,6 +92,7 @@ methods:
       selecteds.splice(selectIndex);
       node = this.$root.getNode(node);
       selecteds.push(node);
+      this.userApp.ui.selected.nodes = selecteds.map(n => ({ id: n.id }));
       // if this is a page node, set sui.page.selected
       if (node?.type == "page") this.do_select_page(_do, node);
       this.setIconText(_do, node);
@@ -187,8 +203,8 @@ methods:
 
       let node = this.$root.getNode(oldNode);
 
+      // if comp name changed, update comp inst names
       if ((node.type == "comp") && (changes.length == 1) && (Objects.areEqual(changes[0].path, ["name"]))) {
-        // if comp name changed, update comp inst names
         const compInsts = TreeObject.filter(this.userApp, (n) => (n.type == "comp.inst" && n.comp.id == oldNode.id));
         const newName = changes[0].rhs;
         for (const compInst of compInsts) {
@@ -204,10 +220,16 @@ methods:
         undoChanges = DeepDiff.diff(node2, prevNode);
       }
       _do = { type: "edit.node", args: { node, newNode: null, changes } };
-      this.setIconText(_do, node);
+      this.setIconText(_do, node, true, this.getActionInfo(changes));
       const undo = { type: "edit.node", args: { node: { id: node.id }, newNode: null, changes: undoChanges } };
       this.$root.appNodeEdited(node);
       return { _do, undo };
+    }
+  getActionInfo: | #js
+    function(changes) {
+      let info = (changes[0].item?.rhs?.type ?? changes[0].item?.rhs ?? changes[0].rhs);
+      if ((typeof info == "object")) info = null;
+      return info;
     }
   do_edit_node_var: | #js
     function(_do, node, varName, key, value) {
@@ -217,9 +239,8 @@ methods:
       const oldValue = Objects.clone(nodeVar[key]);
       nodeVar[key] = value;
       const newNode = Objects.clone(node);
-      this.do_edit_node(_do, oldNode, newNode, null);
-      this.$root.do("edit.node", { oldNode, newNode, changes: null }, false)
-      this.setIconText(_do, node);
+      const editNodeAction = this.do_edit_node(_do, oldNode, newNode, null);
+      this.setIconText(_do, node, true, editNodeAction._do.info);
       const undo = { type: "edit.node.var", args: { node: { id: node.id }, varName, key, value: oldValue } };
       this.$root.appNodeChanged(node);
       return { _do, undo };
@@ -232,11 +253,14 @@ methods:
       this.$root.e.emit("app.node.changed", parent);
       return { _do, undo };
     }
-  replay: | #js
-    function(from, to) {
-      for (let i = from; i <= to; i++) {
-        const action = this.actions[i];
-        this.do(action.do, false);
+  doUntil: | #js
+    function(target) {
+      if (target == this.pointer) return;
+      if (this.pointer > target) {
+        while (this.pointer > target) this.undo();
+      }
+      else {
+        while (this.pointer < target) this.redo();
       }
     }
   undo: | #js
@@ -284,7 +308,7 @@ methods:
       this.pointer = (this.actions.length - 1);
     }
   setIconText: | #js
-    function(_do, node, shortenNodeRefs = true) {
+    function(_do, node, shortenNodeRefs = true, info = null) {
       _do.icon = this.$root.getNodeIcon(node);
       _do.text = this.$root.getNodeText(node);
       // find any node props in _do.args (has [id] and [type]) and keep only their { id: [id] }
@@ -294,6 +318,7 @@ methods:
           if (value?.id && value?.type) _do.args[key] = { id: value.id };
         }
       }
+      if (info) _do.info = info;
     }
   onlyNodeID: | #js
     function(node) {
