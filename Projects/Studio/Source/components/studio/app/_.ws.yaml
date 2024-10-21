@@ -151,14 +151,14 @@ mounted: | #js
       _dbp,
       _storage: (entities) => (new Data2.DatabaseProxyStorage(_dbp, entities.capitalize(), { userID: 1 })),
       vue: {
-        reactive: async (entities, vue, key, defaultValue) => (await this.$root.data._storage(entities).vue.reactive(vue, key, defaultValue)),
+        reactive: async (entities, vue, key, defaultValue, options) => (await this.$root.data._storage(entities).vue.reactive(vue, key, defaultValue, options)),
       },
-      array: async (entities, array) => (await this.$root.data._storage(entities).array(entities, array)),
+      array: async (entities, array) => (await this.$root.data._storage(entities).array(entities, array, 5)),
     };
 
     const mockUserApp = this.getMockupUserApp();
     this.userApp = mockUserApp;
-    this.remote.userApp = (await this.$root.data.vue.reactive("UserApps", this, "userApp", mockUserApp));
+    this.remote.userApp = (await this.$root.data.vue.reactive("UserApps", this, "userApp", mockUserApp, { allowNull: false }));
 
     await this.$nextTick();
     this.pageNodes = this.$root.getPageNodes();

@@ -7,11 +7,9 @@ interface EventsOptions {
 class Events {
   private _listeners: { [key: string]: Function[] } = {};
 
-  private _callbackQueue = [] as Function[];
+  private promiseQueue: any[] = [];
 
-  constructor(private _options: EventsOptions = {}) {
-    if (this._options.sync) this._processCallbackQueue();
-  }
+  constructor(private _options: EventsOptions = {}) {}
 
   forward(events: Events, prefix: string) {
     events.on("*", (name: string, ...args: any[]) => {
@@ -56,29 +54,25 @@ class Events {
   async emit(name: string, ...args: any[]) {
     if (this._listeners["*"]) {
       for (const callback of this._listeners["*"]) {
-        this._call(callback, name, ...args);
+        await this._call(callback, name, ...args);
       }
     }
 
     if (this._listeners[name]) {
       for (const callback of this._listeners[name]) {
-        this._call(callback, ...args);
+        await this._call(callback, ...args);
       }
     }
   }
 
-  private _call(callback: Function, ...args: any[]) {
+  private async _call(callback: Function, ...args: any[]) {
     if (this._options.sync) {
-      this._callbackQueue.push(async () => await callback(...args));
+      const executingPromise = this.promiseQueue.pop();
+      if (executingPromise) await executingPromise;
+      this.promiseQueue.push(callback(...args));
     } else {
       setTimeout(async () => await callback(...args), 0);
     }
-  }
-
-  private async _processCallbackQueue() {
-    const callback = this._callbackQueue.shift();
-    await callback?.();
-    setTimeout(() => this._processCallbackQueue(), !callback ? 100 : 0);
   }
 }
 

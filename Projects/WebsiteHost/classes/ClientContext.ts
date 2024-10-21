@@ -1,6 +1,7 @@
 import { Lock } from "../../../Shared/Lock";
 import toTemplate from "../../../Shared/WebScript/to.template";
 import isAttributeName from "../../../Shared/WebScript/is.attribute.name";
+import { Ticker } from "../../../Shared/Ticker";
 import { Component } from "./Component";
 import { ComponentManager } from "./ComponentManager";
 import { ClientDatabase } from "./ClientDatabase";
@@ -166,29 +167,58 @@ class ClientContext {
     await fetch(url, { method: "post", body: JSON.stringify(comp) });
   }
 
+  private static async fetchAgain(args: any[], attempt = 10, msg?: any): Promise<any> {
+    const delay = 1000;
+    const url = args[0];
+    try
+    {
+      const result = await ClientContext.__fetch(...args);
+      return result;
+    }
+    catch (ex: any)
+    {
+      if (attempt <= 0) {
+        ClientContext.alertify.error(`<h3>Error fetching</h3><div>${url}</div>`).delay(0);
+        throw ex;
+      }
+      let err = ex.message;
+      if (err == "signal is aborted without reason") err = `Request timed out`;
+      const msg = ClientContext.alertify.warning(`<h3>⏳ Retrying</h3><p>${err}</p><p>${url}</p>`);
+      await (delay).wait();
+      return await ClientContext.fetchAgain(args, attempt - 1, msg);
+    }
+    finally
+    {
+      msg?.dismiss();
+    }
+  }
+
   private static async fetch(...args: any[]): Promise<any> {
+    return await ClientContext.fetchAgain(args);
+  }
+
+  private static async __fetch(...args: any[]) {
+    const msg = Ticker.alertify((elapsed) => `<div>🌐 <span>${elapsed.unitifyTime()}</span> <span class="dimmed">${args[0]}</span></div>`) as any;
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000);
     try {
       args = [...args];
       if (args.length < 2) args.push({});
+      args[1].signal = controller.signal;
       if (!args[1]?.credentials) args[1].credentials = "include";
       const result = await ClientContext._fetch(...args);
       if (result.status < 500) return result;
       const text = await result.text();
       throw new Error(text);
     } catch (ex: any) {
-      const url = args[0];
-      console.error(`Error fetching ${url}`);
-      console.error(ex);
       if (ex.message.includes("You are not authorized")) {
         ClientContext.alertify.error(`<h3>${ex.message}</h3>`);
         return;
       }
-
       throw ex;
-      // Try again
-      // Wait a bit
-      //await new Promise((resolve) => setTimeout(resolve, 1000));
-      //return await ClientContext.fetch(...args);
+    }
+    finally {
+      msg?.dismiss();
     }
   }
 

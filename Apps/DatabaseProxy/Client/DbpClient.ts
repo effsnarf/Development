@@ -245,11 +245,7 @@ class DatabaseProxy {
       return user;
     },
     token: async (type: string) => {
-      return JSON.parse(
-        await (
-          await this.fetchAsJson(`${this.urlBase}/get/token?type=${type}`)
-        ).text()
-      );
+      return await this.fetchAsJson(`${this.urlBase}/get/token?type=${type}`);
     },
     new: {
       id: async () => {

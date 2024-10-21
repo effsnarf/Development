@@ -1,10 +1,13 @@
 class Ticker {
   static alertify(getMessage: (elapsed: number) => string) {
     const alertify = (window as any).alertify;
-    const msg1 = alertify?.message(getMessage(0)).delay(0);
+    let msg1 = null as any;
     const ticker = Ticker.new(
       200,
       (elapsed) => {
+        if (elapsed < 1000) return;
+        if (!ticker.isRunning) return;
+        msg1 = msg1 ?? alertify?.message(getMessage(0)).delay(0);
         const message = getMessage(elapsed);
         if (!msg1) console.log(message);
         msg1?.setContent(message);
@@ -31,7 +34,8 @@ class Ticker {
   private constructor(
     public interval: number,
     private onTick: (elapsed: number) => void,
-    private onStop?: Function
+    private onStop?: Function,
+    private alertMsg?: any
   ) {
     this.started = Date.now();
     this.anotherTick();
@@ -44,7 +48,12 @@ class Ticker {
 
   stop() {
     this.isRunning = false;
+    this.alertMsg?.dismiss();
     this.onStop?.();
+  }
+
+  dismiss() {
+    this.stop();
   }
 
   dispose() {

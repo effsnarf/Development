@@ -62,7 +62,7 @@ data:
   visibleItemKeys: []
   isMockArray: false
   exampleItems: 9
-  maxVisibleItems: 12
+  maxVisibleItems: 3
 
 mounted: | #js
   function() {

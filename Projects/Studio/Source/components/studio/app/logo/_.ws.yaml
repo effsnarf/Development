@@ -1,11 +1,13 @@
 dom:
-  .flex:
+  div:
     h2:
       class: title1
       a:
         href: /
         ui.title:
           text: 🧊 Interface Studio
+    .tagline:
+      v-text: "'🥋 Karate chop her grill bits'"
 
 data:
 style:

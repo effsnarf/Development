@@ -624,6 +624,15 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
       })
     );
 
+    httpServer.get("/:database/get/token", async (req: any, res: any) => {
+      const type = req.query.type;
+      const data =
+        req.method.toLowerCase() == "post"
+          ? await Http.getPostDataFromStream(req)
+          : null;
+      return res.end(JSON.stringify({ type }));
+    });
+
     // For /[database]/get/new/id, return a new unique ID
     httpServer.get("/:database/get/new/id", async (req: any, res: any) => {
       // Response type
@@ -844,15 +853,24 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
         res.setHeader("Content-Type", "application/json");
 
         const db = await dbs.get(req.params.database);
+
         const getArg = (name: string) => {
           if (req.query[name]) return Objects.json.parse(req.query[name]);
           return null;
         };
 
+        const sort = getArg("sort");
+        const fields = getArg("fields");
+        let limit = getArg("limit");
+        if (limit) limit = Math.min(limit, config.database.query.max.docs);
+
         const pipeline = [
           { $match: getArg("find") },
-          { $limit: config.database.query.max.docs },
-        ];
+          { $sort: sort },
+          { $limit: limit ?? config.database.query.max.docs },
+        ] as any[];
+
+        if (fields) pipeline.push({ $project: fields });
 
         const items = await db?.aggregate(req.params.entity, pipeline);
 
@@ -860,6 +878,37 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
         debugLogger.log(items);
 
         return res.end(JSON.stringify(items));
+      })
+    );
+
+    // [database]/[entity]/count?find={...}
+    httpServer.get(
+      "/:database/:entity/count",
+      processRequest(async (req: any, res: any) => {
+        const db = await dbs.get(req.params.database);
+
+        const getArg = (name: string) => {
+          if (req.query[name]) return Objects.json.parse(req.query[name]);
+          return null;
+        };
+
+        const find = getArg("find") ?? {};
+
+        const count = await db?.count(req.params.entity, find);
+
+        return res.end(JSON.stringify(count));
+      })
+    );
+
+    // [database]/[entity]/create?tokenID=...
+    httpServer.post(
+      "/:database/:entity/create",
+      processRequest(async (req: any, res: any, user: User, postData: any) => {
+        const db = await dbs.get(req.params.database);
+        const entity = req.params.entity;
+        const doc = postData;
+        const result = await db?.upsert(entity, doc, true);
+        return res.end(JSON.stringify(result));
       })
     );
 
@@ -879,6 +928,20 @@ const loadApiMethods = async (db: MongoDatabase, config: any) => {
       })
     );
     // #endregion
+
+    // [database]/[entity]/delete
+    httpServer.get(
+      "/:database/:entity/delete",
+      processRequest(async (req: any, res: any, user: User) => {
+        const db = await dbs.get(req.params.database);
+        const entity = req.params.entity;
+        const _id = Objects.isNumbery(req.query._id)
+          ? parseInt(req.query._id)
+          : req.query._id;
+        const result = await db?.delete(entity, { _id });
+        return res.end(JSON.stringify(result));
+      })
+    );
   };
   // #endregion
 
