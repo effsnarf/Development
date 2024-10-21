@@ -8,64 +8,6 @@ const _importMainFileToImplement =
 type ObjectNodeFilter = (node: any, key: string, value: any) => boolean;
 
 class Objects {
-  static toTreeObject(
-    obj: any,
-    expandToTree?: (
-      node: any,
-      key: string,
-      value: any,
-      nodePath: string[]
-    ) => boolean,
-    nodePath: string[] = [],
-    keyVarName = "name",
-    valueVarName = "value",
-    pathVarName = "path",
-    depth = 0
-  ) {
-    if (depth > 100) debugger;
-    const root = {
-      children: [],
-    } as any;
-    let node = root;
-
-    for (const key in obj) {
-      const value = obj[key];
-      const child = {} as any;
-      child[keyVarName] = key;
-      child[pathVarName] = [...nodePath, key];
-
-      node.children.push(child);
-
-      let expand = false;
-
-      if (Objects.isPrimitive(value)) {
-        expand = false;
-      } else {
-        if (expandToTree) {
-          expand = expandToTree(obj, key, value, [...nodePath, key]);
-        } else {
-          expand = Objects.is(value, Object);
-        }
-      }
-
-      if (expand) {
-        child.children = Objects.toTreeObject(
-          value,
-          expandToTree,
-          [...nodePath, key],
-          keyVarName,
-          valueVarName,
-          pathVarName,
-          depth + 1
-        ).children;
-      } else {
-        child[valueVarName] = value;
-      }
-    }
-
-    return root;
-  }
-
   // { user: 1, a: 2 } to ['user', '1', 'a', '2']
   static flatten(obj: any) {
     const arr = [] as string[];
@@ -742,6 +684,83 @@ interface TreeNode {
 }
 
 class TreeObject {
+  static fromObject(
+    obj: any,
+    expandToTree?: (
+      node: any,
+      key: string,
+      value: any,
+      nodePath: string[]
+    ) => boolean,
+    nodePath: string[] = [],
+    keyVarName = "name",
+    valueVarName = "value",
+    pathVarName = "path",
+    depth = 0,
+    onNode?: (
+      objNode: any,
+      treeNode: any,
+      key: string,
+      value: any,
+      nodePath: string[]
+    ) => void
+  ) {
+    if (depth > 100) debugger;
+    const root = {
+      children: [],
+    } as any;
+    let node = root;
+
+    for (const key in obj) {
+      const value = obj[key];
+      const child = {} as any;
+      child[keyVarName] = key;
+      child[pathVarName] = [...nodePath, key];
+      onNode?.(obj, child, key, value, [...nodePath, key]);
+
+      node.children.push(child);
+
+      let expand = false;
+
+      if (Objects.isPrimitive(value)) {
+        expand = false;
+      } else {
+        if (expandToTree) {
+          expand = expandToTree(obj, key, value, [...nodePath, key]);
+        } else {
+          expand = Objects.is(value, Object);
+        }
+      }
+
+      if (expand) {
+        child.children = TreeObject.fromObject(
+          value,
+          expandToTree,
+          [...nodePath, key],
+          keyVarName,
+          valueVarName,
+          pathVarName,
+          depth + 1,
+          onNode
+        ).children;
+      } else {
+        child[valueVarName] = value;
+      }
+    }
+
+    return root;
+  }
+
+  static getByPath(root: any, path: string[] | number[]) {
+    let node = root;
+    for (const part of path) {
+      node = node.children.find(
+        (c: any) => c.name == part || c.id == part || c.type == part
+      );
+    }
+    return node;
+  }
+
   static traverse(
     root: any,
     callback: (node: any, depth: number) => void,

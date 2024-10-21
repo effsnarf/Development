@@ -23,8 +23,6 @@ dom:
           title: "clear all"
           v-text: "'❌'"
           @click: clearAll
-    pre:
-      v-text: userApp.ui.selected.nodes
     studio.app.action.stack.list:
       :actions: actions
       :pointer: pointer

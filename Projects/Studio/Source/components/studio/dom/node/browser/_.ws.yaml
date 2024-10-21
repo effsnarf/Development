@@ -1,12 +1,16 @@
 dom:
   div:
-    v-if: sui.node.selecteds[0]
+    studio.doc.page.selector:
+      :user-app: userApp
+      :user-app-state: userAppState
+      :sui: sui
     studio.dom.node.browser.box:
-      :user-app: sui.node.selecteds[0]
+      :user-app: userApp
       :sui: sui
       :box-index: 0
-      :window-node: sui.page.selected
+      :window-node: sui.node.selecteds?.[0]
 
 props:
   userApp:
+  userAppState:
   sui:

@@ -130,7 +130,7 @@ style:
   .tools:
     display: flex
     justify-content: center
-    gap: 1em
+    gap: 0.1em
   .tool:
     display: flex
     flex-direction: column

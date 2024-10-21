@@ -40,7 +40,8 @@ methods:
     }
   getNewUserAppState: | #js
     function(userApp) {
-      return this.getContainerData(userApp);
+      const pagesNode = TreeObject.getByPath(userApp, ["pages"]);
+      return this.getContainerData(pagesNode);
     }
   getContainerData: | #js
     function(container) {

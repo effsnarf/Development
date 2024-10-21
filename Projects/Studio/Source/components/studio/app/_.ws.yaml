@@ -1,11 +1,15 @@
 dom:
   div:
-    studio.app.logo:
+    .absolute:
+      studio.app.logo:
+    .spacer0:
+      v-text: "''"
     div:
       :style: "{ width: 'fit-content', 'max-height': '15em', overflow: 'auto', margin: 'auto' }"
       studio.app.runtime.log:
         v-if: "false"
     div:
+      :style: "{ 'margin-bottom': '2em' }"
       studio.doc.node.toolbar:
         :user-app: userApp
     .spacer1:
@@ -14,19 +18,16 @@ dom:
       v-if: (userApp && is.inited)
       :class: "{ ['box-hovered-' + sui.main.box.hovered]: true }"
       .main-box.a:
-        studio.doc.page.selector:
-          :user-app: userApp
-          :user-app-state: userAppState
-          :sui: sui
         @mouseenter: sui.main.box.hovered = 0
         @mouseleave: sui.main.box.hovered = null
       .main-box.b:
         studio.app.ui.drawer:
           closed-width: 8em
         div:
-          :style: "{ 'margin-top': 'calc(-2.9em + 1px)' }"
+          :style: "{ 'margin-top': 'calc(-2.2em)' }"
           studio.dom.node.browser:
             :user-app: userApp
+            :user-app-state: userAppState
             :sui: sui
         studio.app.log:
           category: runtime
@@ -56,9 +57,9 @@ dom:
         @mouseleave: sui.main.box.hovered = null
       .main-box.d:
         h2:
-          :style: "{ 'margin-top': '-2em', height: '2em' }"
+          :style: "{ 'margin-top': '-2em', height: '2em', 'pointer-events': 'none' }"
           studio.dom.tree.node:
-            :item: sui.node.selected
+            :item: sui.node.selecteds?.[sui.node.selecteds?.length-1]
             :sui: sui
         .box2:
           studio.doc.node.editor:
@@ -955,6 +956,8 @@ style:
     aspect-ratio: 1
     background-position: center
     background-size: cover
+  .spacer0:
+    height: 2em
   .spacer1:
     height: 3em
   .spacer2:
@@ -1003,7 +1006,7 @@ style:
     box-shadow: "-0.5em 0.5em 2px #00000080"
     padding: 1em
   .main-box.a:
-    width: 8%
+    width: 0%
   .main-box.b:
     width: 15%
   .main-boxes.box-hovered-3 .main-box.d:

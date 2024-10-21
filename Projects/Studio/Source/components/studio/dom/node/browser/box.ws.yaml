@@ -3,6 +3,7 @@ dom:
     div:
       v-if: (boxIndex)
       h2:
+        v-if: (boxIndex > 1)
         :style: "{ 'pointer-events': 'none' }"
         studio.dom.tree.node:
           :item: windowNode

@@ -9,6 +9,9 @@ dom:
         span:
           v-text: "'🧊'"
         span:
+          v-if: (item.icon)
+          v-text: item.icon
+        span:
           v-text: item.name
         .preview:
           ui.value.preview:

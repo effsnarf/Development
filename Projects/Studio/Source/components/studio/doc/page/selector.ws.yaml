@@ -47,8 +47,6 @@ computed:
 
 style:
   .page-selector:
-    height: 6em
-    overflow: hidden
   .pages:
     display: flex
     flex-direction: column

@@ -75,7 +75,8 @@ methods:
   _refresh: | #js
     async function() {
       //alertify.message("🌲refreshing app state tree");
-      const appStateTree = Objects.toTreeObject(this.userAppState, this.expandNodeToTree, [], "name", "value");
+      const onNode = (objNode, treeNode, key, value, path) => { treeNode.icon = this.$root.getNodeIcon(this.$root.getContainerNodeByPath(path), null, null); }
+      const appStateTree = TreeObject.fromObject(this.userAppState, this.expandNodeToTree, [], "name", "value", "path", 0, onNode);
       this.appStateTree = appStateTree;
       this.root = this.appStateTree;
       if (this.sui.page.selected && !this.showAllPages) this.root = this.appStateTree.children.find(c => (c.name == this.sui.page.selected.name));

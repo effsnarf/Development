@@ -17,7 +17,7 @@ mounted: | #js
 
 methods:
   getNodeIcon: | #js
-    function(node, altType) {
+    function(node, altType, altIcon) {
       const icons = {
         "user.app": "💻",
         "page.templates": "📚",
@@ -37,7 +37,10 @@ methods:
         vars: "📂🍃",
         var: "🧊"
       };
-      return ((icons[node?.type] ?? ((!altType) ? "❔" : this.getNodeIcon({ type: altType }))) ?? "❔");
+      if (icons[node?.type]) return icons[node?.type];
+      if (altType) return this.getNodeIcon({ type: altType }, null, altIcon);
+      if (altIcon !== undefined) return altIcon;
+      return "❔";
     }
   getNodeText: | #js
     function(node) {
@@ -235,6 +238,17 @@ methods:
         filter = (node) => (node.type == type);
       }
       return TreeObject.filter(parent, filter);
+    }
+  getContainerNodeByPath: | #js
+    function(path) {
+      if (typeof(path) == 'string') path = path.split('.');
+      let node = this.userApp;
+      let part;
+      while (part = path.shift()) {
+        const scopeNodes = this.getScopeContainerNodes(node);
+        node = scopeNodes.find(n => (n.id == part) || (n.name == part));
+      }
+      return node;
     }
   getScopeContainerNodes: | #js
     function(parent) {
