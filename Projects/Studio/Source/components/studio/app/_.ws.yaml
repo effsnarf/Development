@@ -18,8 +18,6 @@ dom:
           :user-app: userApp
           :user-app-state: userAppState
           :sui: sui
-          :value: sui.page.selected
-          @input: selectPage
         @mouseenter: sui.main.box.hovered = 0
         @mouseleave: sui.main.box.hovered = null
       .main-box.b:
@@ -258,11 +256,6 @@ methods:
   onHoverApp: | #js
     function(isHovered) {
       this.sui.app.is.hovered = isHovered;
-    }
-  selectPage: | #js
-    function(newPage) {
-      //this.sui.page.trans.dir = this.getPageTransDir(this.sui.page.selected, newPage);
-      this.$root.do("select.page", { pageNode: newPage });
     }
   getPageTransDir: | #js
     function(fromPage, toPage) {

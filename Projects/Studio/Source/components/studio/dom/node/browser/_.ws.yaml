@@ -1,7 +1,8 @@
 dom:
   div:
+    v-if: sui.node.selecteds[0]
     studio.dom.node.browser.box:
-      :user-app: userApp
+      :user-app: sui.node.selecteds[0]
       :sui: sui
       :box-index: 0
       :window-node: sui.page.selected

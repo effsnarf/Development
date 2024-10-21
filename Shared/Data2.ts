@@ -302,15 +302,8 @@ namespace Data2 {
 
     async addArrayItems(key: string, items: any[]): Promise<void> {
       const arrayID = this.fullID(key);
-      const lastItem = await this._items.listOne({ arrayID }, { _i: -1 });
-      let _i = (!lastItem ? -1 : lastItem._i) + 1;
-      let id = (!lastItem ? 0 : lastItem.item.id) + 1;
       for (const item of items) {
-        item._i = _i;
-        item.id = id;
-        await this._items.create({ arrayID, _i, item });
-        _i++;
-        id++;
+        await this._items.create({ arrayID, _i: item._i, item });
       }
     }
 

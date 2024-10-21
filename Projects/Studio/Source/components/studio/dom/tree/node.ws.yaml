@@ -59,7 +59,6 @@ methods:
         //if (node?.id == this.sui.node.selected?.id) node = null;
         //this.$root.do("select.node", { node });
       }
-      this.$emit('click');
     }
   onHoverNode: | #js
     function(node) {

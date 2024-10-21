@@ -23,6 +23,8 @@ dom:
           title: "clear all"
           v-text: "'❌'"
           @click: clearAll
+    pre:
+      v-text: userApp.ui.selected.nodes
     studio.app.action.stack.list:
       :actions: actions
       :pointer: pointer
@@ -123,22 +125,19 @@ methods:
       // if this is a page node, set sui.page.selected
       if (node?.type == "page") this.do_select_page(_do, node);
       this.setIconText(_do, node);
-      const undo = { type: "select.nodes", args: { page: oldSelectedPage, nodes: oldSelectedNodes } };
+      const undo = { type: "select.nodes", args: { nodes: oldSelectedNodes } };
       this.$root.e.emit("sui.node.selecteds", selecteds);
       return { _do, undo };
     }
   do_select_nodes: | #js
-    function(_do, page, nodes) {
+    function(_do, nodes) {
       const selecteds = this.sui.node.selecteds;
       const oldSelectedNodes = selecteds.map(n => ({ id: n.id }));
       selecteds.splice(0);
-      for (let node of nodes) {
-        node = this.$root.getNode(node);
-        selecteds.push(node);
+      for (let i = 0; i < nodes.length; i++) {
+        this.do_select_node(_do, i, nodes[i]);
       }
-      const lastNode = selecteds.pop();
-      this.do_select_node(_do, selecteds.length, lastNode);
-      this.do_select_page(_do, page);
+      this.userApp.ui.selected.nodes = selecteds.map(n => ({ id: n.id }));
       this.setIconText(_do, selecteds.last());
       const undo = { type: "select.nodes", args: { nodes: oldSelectedNodes } };
       return { _do, undo };
@@ -315,7 +314,10 @@ methods:
   addAction: | #js
     function(action) {
       const localPointer = this.pointerToLocalIndex(this.pointer);
-      const lastDoneAction = this.actions[localPointer];
+      const lastAction = this.actions.last();
+      const lastDoneAction = this.actions[this.pointer];
+      action._i = (lastDoneAction?._i ?? -1) + 1;
+      action.id = (lastAction?.id ?? 0) + 1;
       if (this.pointer < this.actions.last()?._i) {
         this.actions.splice(localPointer + 1);
       }

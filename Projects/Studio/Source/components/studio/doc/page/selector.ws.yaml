@@ -6,7 +6,7 @@ dom:
       .clickable:
         v-for: pageNode in pageNodes
         @click: () => onSelectPage(pageNode)
-        :class: "{ selected: (value?.id == pageNode.id) }"
+        :class: "{ selected: (sui.node.selecteds[0]?.id == pageNode.id) }"
         .page-title:
           v-text: "'📜 ' + pageNode.name"
 
@@ -14,7 +14,6 @@ props:
   userApp:
   userAppState:
   sui:
-  value:
 
 data:
   is:
@@ -31,8 +30,9 @@ mounted: | #js
 methods:
   onSelectPage: | #js
     function(newPageNode) {
-      if ((newPageNode?.id) && (newPageNode?.id == this.value?.id)) newPageNode = null;
-      this.$emit("input", newPageNode);
+      if ((newPageNode?.id) && (newPageNode?.id == this.sui.node.selecteds[0]?.id)) newPageNode = null;
+      //this.sui.page.trans.dir = this.getPageTransDir(this.sui.page.selected, newPage);
+      this.$root.do("select.node", { selectIndex: 0, node: newPageNode });
     }
   refresh: | #js
     function() {

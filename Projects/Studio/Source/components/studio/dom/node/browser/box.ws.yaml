@@ -1,21 +1,23 @@
 dom:
   div:
-    h2:
-      :style: "{ 'pointer-events': 'none' }"
-      studio.dom.tree.node:
-        :item: windowNode
-    transition:
-      name: slide
-      .box2:
-        :key: rootNode?.id
-        :class: "{ folded: (!!selectedNode && showNextBox) }"
-        studio.dom.tree:
-          :root: rootNode
-          :sui: sui
-          :selected-node-id: selectedNode?.id
-          :initial-expanded: "true"
-          :max-depth: maxDepth
-          @node-click: onNodeClick
+    div:
+      v-if: (boxIndex)
+      h2:
+        :style: "{ 'pointer-events': 'none' }"
+        studio.dom.tree.node:
+          :item: windowNode
+      transition:
+        name: slide
+        .box2:
+          :key: rootNode?.id
+          :class: "{ folded: (!!selectedNode && showNextBox) }"
+          studio.dom.tree:
+            :root: rootNode
+            :sui: sui
+            :selected-node-id: selectedNode?.id
+            :initial-expanded: "true"
+            :max-depth: maxDepth
+            @node-click: onNodeClick
     transition:
       name: slide
       div:
@@ -46,6 +48,7 @@ methods:
     }
   onNodeClick: | #js
     function(node) {
+      if (node?.type == "page") return;
       this.$root.do("select.node", { selectIndex: this.boxIndex, node });
     }
 
