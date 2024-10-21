@@ -1,24 +1,28 @@
 dom:
   div:
-    h3:
-      .flex.gap-1:
-        div:
-          v-text: "'👆 actions'"
-        .dimmed:
-          v-text: actions.totalCount
-        .dimmed:
-          v-text: pointer
-    div:
-      button:
-        v-text: "'❌ clear all'"
-        @click: clearAll
-    .flex.justify-center:
-      button:
-        v-text: "'⤺'"
-        @click: undo
-      button:
-        v-text: "'⤻'"
-        @click: redo
+    .flex.justify-between.items-center:
+      h3:
+        .flex.gap-05:
+          div:
+            v-text: "'🖱️👆 actions'"
+          .dimmed:
+            v-text: "'(' + actions.totalCount + ')'"
+          div:
+            v-text: pointer
+      .flex.justify-center:
+        button:
+          title: "undo (ctrl + z)"
+          v-text: "'⤺'"
+          @click: undo
+        button:
+          title: "redo (ctrl + y)"
+          v-text: "'⤻'"
+          @click: redo
+      div:
+        button:
+          title: "clear all"
+          v-text: "'❌'"
+          @click: clearAll
     studio.app.action.stack.list:
       :actions: actions
       :pointer: pointer
@@ -140,27 +144,30 @@ methods:
       return { _do, undo };
     }
   do_create_comp: | #js
-    function(_do, contentNode) {
+    function(_do, contentNode, compName) {
       _do.args.contentNode = Objects.clone(contentNode);
       const parent = this.$root.getNodeParent(contentNode);
       const contentNodeIndex = parent.children.findIndex(n => (n.id == contentNode.id));
       const compsNode = this.userApp.children.find(n => (n.type == "comps"));
       let newCompNode = {
         type: "comp",
-        name: null,
+        name: compName,
       };
       newCompNode = this.$root.initNewNode(this.userApp, newCompNode);
       compsNode.children.push(newCompNode);
       TreeObject.moveNode(this.userApp, contentNode, newCompNode, { newTree: false });
       // insert a comp inst node instead of the content node
+      const compInstName = this.$root.getNewNodeName(newCompNode.name);
       const compInstNode = {
         id: this.$root.getNewNodeID(this.userApp),
         type: "comp.inst",
         comp: { id: newCompNode.id, name: newCompNode.name },
+        name: compInstName,
       };
       TreeObject.addNode(parent, compInstNode, contentNodeIndex);
-      this.setIconText(_do, newCompNode, false);
+      this.setIconText(_do, newCompNode, false, `📦 ${compInstName}`);
       const undo = { type: "uncreate.comp", args: { parent: { node: { id: parent.id } }, comp: { node: { id: newCompNode.id } }, index: contentNodeIndex } };
+      this.$root.e.emit("app.node.changed", parent);
       this.$root.e.emit("new.comp.created", newCompNode);
       return { _do, undo };
     }
@@ -263,6 +270,7 @@ methods:
       nodeVar[key] = value;
       const newNode = Objects.clone(node);
       const editNodeAction = this.do_edit_node(_do, oldNode, newNode, null);
+      if (!editNodeAction._do) return;
       this.setIconText(_do, node, true, editNodeAction._do.info);
       const undo = { type: "edit.node.var", args: { node: { id: node.id }, varName, key, value: oldValue } };
       this.$root.appNodeChanged(node);
@@ -306,17 +314,17 @@ methods:
     }
   addAction: | #js
     function(action) {
-      action.id = (this.actions.last()?.id ?? 0) + 1;
+      const localPointer = this.pointerToLocalIndex(this.pointer);
+      const lastDoneAction = this.actions[localPointer];
       if (this.pointer < this.actions.last()?._i) {
-        this.actions.splice(this.pointerToLocalIndex(this.pointer) + 1);
+        this.actions.splice(localPointer + 1);
       }
       if (action._do) {
         action.do = action._do;
         delete action._do;
       }
-      action._i = (this.actions.last()?._i ?? -1) + 1;
       this.actions.add(action);
-      this.pointer = action._i;
+      this.pointer++;
       this.refresh();
     }
   setIconText: | #js
@@ -354,3 +362,7 @@ watch:
     function(newPointer) {
       this.refresh();
     }
+
+style:
+  h3:
+    white-space: nowrap

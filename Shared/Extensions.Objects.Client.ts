@@ -189,7 +189,9 @@ class Objects {
         cloned = {} as any;
         for (const key of keys) cloned[key] = Objects.clone(obj[key]);
       } else {
-        cloned = Objects.json.parse(JSON.stringify(obj));
+        const replacer = (key: string, value: any) =>
+          value === undefined ? null : value;
+        cloned = Objects.json.parse(JSON.stringify(obj, replacer));
       }
       return cloned;
     } catch (ex) {

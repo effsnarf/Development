@@ -28,7 +28,7 @@ dom:
                 v-text: "'➕📦'"
               div:
                 div:
-                  v-text: "'Drop a 📂 panel branch from the app tree here to create a new reusable component.'"
+                  v-text: "'Drop a branch from the app tree here to create a new reusable component.'"
         ui.dnd.dropzone:
           @drop-item: onDropItem_new_comp
           .tool.tool-dimmed.new-comp:
@@ -104,7 +104,9 @@ methods:
   onDropItem_new_comp: | #js
     function(item) {
       const node = item.item;
-      this.$root.do("create.comp", { contentNode: node });
+      alertify.prompt('🎁 Component name', null, (e, compName) => {
+        this.$root.do("create.comp", { contentNode: node, compName });
+      });
     }
   refresh: | #js
     function() {

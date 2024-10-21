@@ -15,6 +15,7 @@ class Tooltip {
         el.style.boxShadow = "-12px 12px 5px #00000080";
         el.style.opacity = 0;
         el.style.pointerEvents = "none";
+        el.style.transform = "translate(-50%, calc(-100% - 2em))";
         el.style.transition = "opacity 0.3s";
         el.style.zIndex = 10000;
         this.tooltipEl = el;

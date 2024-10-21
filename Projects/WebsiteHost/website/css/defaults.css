@@ -839,6 +839,10 @@ progress
   flex-direction: column;
 }
 
+.gap-05
+{
+  gap: 0.5em;
+}
 .gap-1
 {
   gap: 1em;
@@ -1029,6 +1033,35 @@ img[src=""]
   right: 400px;
 }
 
+.ajs-dialog
+{
+  margin: 10% auto;
+  padding: 0.5em !important;
+  background: linear-gradient(142deg, rgba(79, 79, 79, 1) 0%, rgb(40 40 40) 66%) !important;
+  box-shadow: -1em 1em 1em black;
+}
+.ajs-dialog .ajs-commands,
+.ajs-dialog .ajs-reset
+{
+  display: none;
+}
+
+.ajs-header, .ajs-footer
+{
+  background: none !important;
+}
+
+.ajs-dialog .ajs-content p
+{
+  margin: 0 0 1em;
+}
+
+.ajs-dialog .ajs-footer
+{
+  margin: -1em 0;
+  padding: 1em;
+}
+
 .ajs-message
 {
   background: linear-gradient(142deg, rgba(79, 79, 79, 1) 0%, rgb(40 40 40) 66%);
@@ -1089,11 +1122,6 @@ img[src=""]
 .ajs-dialog .ajs-header
 {
   display: none;
-}
-
-.ajs-dialog, .ajs-header, .ajs-footer
-{
-  background: #606060 !important;
 }
 
 .ajs-content

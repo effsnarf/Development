@@ -21,6 +21,7 @@ mounted: | #js
     this.initAppState();
     this.$root.e.on("app.node.changed", this.onAppNodeChanged.bind(this));
     this.$root.e.on("app.state.changed", this.onAppStateChanged.bind(this));
+    this.$root.e.on("rebuild.app.state", this.initAppState.bind(this));
   }
 
 methods:
@@ -39,20 +40,24 @@ methods:
     }
   getNewUserAppState: | #js
     function(userApp) {
+      return this.getContainerData(userApp);
+    }
+  getContainerData: | #js
+    function(container) {
       const data = {};
-      for (const pageNode of this.$root.getPageNodes()) {
-        const pageData = {};
-        // lists
-        for (const node of this.$root.findDescNodes(pageNode, ((n) => n.vars?.length)))
-        {
-          if (!node.name) continue;
-          for (const var1 of node.vars) {
-            pageData[node.name] = pageData[node.name] || {};
-            const varData = this.getNewVarData(var1);
-            pageData[node.name][var1.name] = varData;
-          }
-        }
-        data[pageNode.name] = pageData;
+      const varsData = this.getNewVarsData(container);
+      Object.assign(data, varsData);
+      const scopeChildren = this.$root.getScopeContainerNodes(container);
+      for (const child of scopeChildren) {
+        data[child.name] = this.getContainerData(child);
+      }
+      return data;
+    }
+  getNewVarsData: | #js
+    function(container) {
+      const data = {};
+      for (const var1 of (container.vars??[])) {
+        data[var1.name] = this.getNewVarData(var1);
       }
       return data;
     }

@@ -4,7 +4,7 @@ dom:
       .tool:
         :class: "{ 'tool-dimmed': !is.editing }"
         .icon:
-          v-text: "'📦'"
+          v-text: "'🎁'"
         .title:
           v-if: "!is.editing"
           v-text: "'📦 ' + compNode.name"

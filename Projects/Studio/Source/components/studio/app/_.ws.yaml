@@ -77,6 +77,8 @@ dom:
           :user-app-state: userAppState
           :sui: sui
         div:
+          .spacer2:
+            v-text: "''"
           studio.app.action.stack:
             :user-app: userApp
             :sui: sui
@@ -153,7 +155,7 @@ mounted: | #js
       vue: {
         reactive: async (entities, vue, key, defaultValue, options) => (await this.$root.data._storage(entities).vue.reactive(vue, key, defaultValue, options)),
       },
-      array: async (entities, array) => (await this.$root.data._storage(entities).array(entities, array, 5)),
+      array: async (entities, array) => (await this.$root.data._storage(entities).array(entities, array, 20)),
     };
 
     const mockUserApp = this.getMockupUserApp();
@@ -962,6 +964,8 @@ style:
     background-size: cover
   .spacer1:
     height: 3em
+  .spacer2:
+    height: 1em
   .title1:
     font-size: 300%
   .title2:

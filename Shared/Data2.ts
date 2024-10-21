@@ -15,9 +15,9 @@ namespace Data2 {
 
   export interface StoredValue {
     key: string;
-    value: any;
-    items: any[];
-    totalCount: number;
+    value?: any;
+    items?: any[];
+    totalCount?: number;
   }
 
   export interface DeepDiffInterface {
@@ -213,7 +213,7 @@ namespace Data2 {
         default:
           throw new Error(`Method ${method} not implemented`);
       }
-      arrayObj.events.emit("after.array.op", key, method, args);
+      //arrayObj.events.emit("after.array.op", key, method, args);
     }
 
     abstract getArrayItems(key: string, maxItems: number): Promise<StoredValue>;

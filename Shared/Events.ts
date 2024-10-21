@@ -52,6 +52,7 @@ class Events {
   }
 
   async emit(name: string, ...args: any[]) {
+    console.log(`⚡ ${name}`, args);
     if (this._listeners["*"]) {
       for (const callback of this._listeners["*"]) {
         await this._call(callback, name, ...args);

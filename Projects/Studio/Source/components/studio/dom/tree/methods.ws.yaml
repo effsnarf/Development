@@ -42,7 +42,7 @@ methods:
   getNodeText: | #js
     function(node) {
       if (!node) return null;
-      let text = (node.slot?.name || node.comp?.name || node.name || node.type);
+      let text = (node.slot?.name || node.name || node.comp?.name || node.type);
       if (text != node.type) text = `[${text}]`;
       return text;
     }
@@ -224,19 +224,33 @@ methods:
     function(parent, name) {
       return parent.children?.find(c => (name == (c.name || c.type)));
     }
+  findNodeByName2: | #js
+    function(parent, name) {
+      return TreeObject.find(parent, (n) => (name == n.name));
+    }
   findDescNodes: | #js
     function(parent, filter) {
       if ((typeof filter) == "string") {
         const type = filter;
         filter = (node) => (node.type == type);
       }
-      const nodes = [];
-      const search = (node) => {
-        if (nodes.map(n => n.id).includes(node.id)) return;
-        if (filter(node)) nodes.push(node);
-      };
-      Objects.traverse(parent, search);
-      return nodes;
+      return TreeObject.filter(parent, filter);
+    }
+  getScopeContainerNodes: | #js
+    function(parent) {
+      if (parent.type == "comp.inst") {
+        const compNode = this.getCompNode(parent);
+        parent = compNode;
+      }
+      // get all descendant data container nodes not their children
+      return TreeObject.filter(parent, (n => this.isContainerNode(parent, n)), (n => (this.isContainerNode(parent, n) ? [] : n.children)));
+    }
+  isContainerNode: | #js
+    function(parent, node) {
+      if (node == parent) return false;
+      if (["page.template", "slot.outlet"].includes(node.type)) return false;
+      if (node.name) return true;
+      return false;
     }
   getNodes: | #js
     function(parentNode, type) {
@@ -395,6 +409,12 @@ methods:
       while (vue && !vue.userAppState) vue = vue.$parent;
       return vue?.userAppState;
     }
+  getNewNodeName: | #js
+    function(name) {
+      let index = 1;
+      while (this.findNodeByName2(this.userApp, `${name}${index}`)) index++;
+      return `${name}${index}`;
+    }
   liveNodeVar: | #js
     function(vue, var1, propName, exp, onChange) {
       this.$root.studio.user.app.log(vue, `🧊`, "liveNodeVar.init", { var1, propName, exp });
@@ -448,3 +468,10 @@ methods:
         return func.apply(vue, args);
       }
     }
+  confirm: | #js
+    function(message) {
+      return new Promise((resolve) => {
+          const confirmed = window.confirm(message);
+          resolve(confirmed);
+        });
+      }

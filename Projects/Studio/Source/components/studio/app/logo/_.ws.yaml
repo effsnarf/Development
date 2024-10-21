@@ -1,18 +1,25 @@
 dom:
   div:
-    h2:
-      class: title1
-      a:
-        href: /
-        ui.title:
-          text: 🧊 Interface Studio
-    .tagline:
-      v-text: "'🥋 Karate chop her grill bits'"
+    .flex:
+      div:
+        h2:
+          class: title1
+          v-text: "'🧊'"
+      div:
+        h2:
+          class: title1
+          v-text: "'Interface Studio'"
+        .tagline:
+          v-text: "'Karate chop her grill bits'"
 
 data:
 style:
+  .tagline:
+    font-family: Audiowide
+    opacity: 0.4
+    margin-left: 0.5rem
   .title1:
-    margin: 0 1em
+    margin: 0 0.5rem
     font-size: 4rem
     font-family: Audiowide
     color: "#ffffffa0"
