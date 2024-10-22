@@ -19,6 +19,7 @@ dom:
             :initial-expanded: "true"
             :max-depth: maxDepth
             @node-click: onNodeClick
+            @create-node: onCreateNode
     transition:
       name: slide
       div:
@@ -40,6 +41,10 @@ data:
   rootNode:
 
 methods:
+  onCreateNode: | #js
+    function(parentNode, newNode) {
+      this.$root.do("create.node", { selectIndex: this.boxIndex, parent: { node: { id: parentNode.id } }, newNode });
+    }
   getRootNode: | #js
     function(windowNode) {
       // in case of [comp.inst] nodes, we want to show the template node

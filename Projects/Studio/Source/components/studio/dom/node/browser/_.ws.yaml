@@ -1,10 +1,12 @@
 dom:
   ui.dnd.dropzone:
     :accepts: "['new.page']"
+    :content-ghost: "false"
+    @drop-item: onDropItem
     template:
       v-slot: tooltip
       div:
-        v-text: "'create a new page'"
+        v-text: "'➕ new 📜 page'"
     studio.doc.page.selector:
       :user-app: userApp
       :user-app-state: userAppState
@@ -19,3 +21,19 @@ props:
   userApp:
   userAppState:
   sui:
+
+methods:
+  onDropItem: | #js
+    function(dragItem) {
+      const methodName = `onDropItem_${dragItem.type.replaceAll('.', '_')}`;
+      const method = this[methodName];
+      if (!method) throw `Unknown item type ${dragItem.type}`;
+      method(dragItem.item);
+    }
+  onDropItem_new_page: | #js
+    function() {
+      alertify.prompt('➕📜 Page name', null, (e, pageName) => {
+        if (!pageName?.length) return alertify.error("Page name is required.");
+        this.$root.do("create.page", { pageName });
+      });
+    }

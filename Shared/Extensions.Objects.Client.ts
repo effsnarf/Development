@@ -937,6 +937,7 @@ class TreeObject {
     let depth = 0;
     let parent = TreeObject.getParentNode(root, node);
     while (parent) {
+      if (depth > 100) throw new Error("Tree too deep");
       depth++;
       node = parent;
       parent = TreeObject.getParentNode(root, node);

@@ -95,7 +95,7 @@ namespace Data2 {
       args: any[]
     ) => {
       if (!this._isSyncing) return;
-      if (!["push", "splice"].includes(methodName)) return;
+      if (!["push", "pop", "splice"].includes(methodName)) return;
       this.events.emit(methodName, ...args);
     };
 
@@ -163,7 +163,7 @@ namespace Data2 {
       arrayObj.events.on("*", async (method: string, ...args: any[]) => {
         if (["after.array.op"].includes(method)) return;
         await this._arrayOperation(arrayObj, key, method, args);
-        await this.updateViewItems(arrayObj, key, viewItemsCount);
+        //await this.updateViewItems(arrayObj, key, viewItemsCount);
       });
       // emit loaded event
       this._events.emit("loaded", key, appArray);
@@ -178,8 +178,8 @@ namespace Data2 {
       maxItems: number
     ) {
       const viewItems = await this.getArrayItems(key, maxItems);
-      arrayObj.totalCount = viewItems.totalCount;
-      arrayObj.setItems(viewItems.items);
+      arrayObj.totalCount = viewItems.totalCount ?? 0;
+      arrayObj.setItems(viewItems.items ?? []);
     }
 
     abstract existsInStore(key: string): Promise<boolean>;
@@ -204,6 +204,9 @@ namespace Data2 {
         case "push":
           await this.addArrayItems(key, args);
           break;
+        case "pop":
+          await this.popArrayItem(key);
+          break;
         case "splice":
           const items = arrayObj.getItems();
           if (!items?.length) return;
@@ -218,6 +221,7 @@ namespace Data2 {
 
     abstract getArrayItems(key: string, maxItems: number): Promise<StoredValue>;
     abstract addArrayItems(key: string, items: any[]): Promise<void>;
+    abstract popArrayItem(key: string): Promise<void>;
     abstract spliceArrayItems(
       key: string,
       index: number,
@@ -247,6 +251,10 @@ namespace Data2 {
     }
 
     async addArrayItems(key: string, items: any[]): Promise<void> {
+      throw new Error("Method not implemented.");
+    }
+
+    async popArrayItem(key: string): Promise<void> {
       throw new Error("Method not implemented.");
     }
 
@@ -305,6 +313,12 @@ namespace Data2 {
       for (const item of items) {
         await this._items.create({ arrayID, _i: item._i, item });
       }
+    }
+
+    async popArrayItem(key: string): Promise<void> {
+      const arrayID = this.fullID(key);
+      const lastItem = await this._items.listOne({ arrayID }, { _i: -1 });
+      await this._items.delete(lastItem._id);
     }
 
     async spliceArrayItems(

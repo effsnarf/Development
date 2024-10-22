@@ -5,7 +5,8 @@ dom:
       h3:
         ui.checkbox:
           text: "🪲🚧 Debugger"
-          v-model: vd.is.enabled
+          :value: vd?.is.enabled
+          @input: (v) =>  vd.is.enabled = v
     .box2.folded:
       .flex:
         h3:

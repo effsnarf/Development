@@ -12,12 +12,20 @@ data:
 methods:
   init: | #js
     function(nodeVar) {
-      this.live = this.$root.liveNodeVar(this, nodeVar, "value", JSON.stringify(nodeVar.value));
-      // [local].items -> [userAppState].items and vice versa
-      //this.$root.bindToUserAppState(this, this.nodeVarPath, "items");
+      //alertify.message(`🧊 init ${nodeVar.name}`);
+      this.live = this.$root.liveNodeVar(this, nodeVar, "value", JSON.stringify(nodeVar.value), (newValue) => {
+        this.value = newValue;
+      });
     }
 
 watch:
+  value:
+    immediate: true
+    deep: false
+    handler: | #js
+      function(value) {
+        this.$emit("update", value);
+      }
   nodeVar:
     immediate: true
     handler: | #js

@@ -25,7 +25,7 @@ data:
 
 mounted: | #js
   function() {
-    //this.$root.e.on("app.node.changed", this.refresh.bind(this));
+    this.$root.e.on("app.node.changed", this.refresh.bind(this));
   }
 
 methods:
@@ -33,7 +33,7 @@ methods:
     function(nodeVar, value) {
       this.$emit('update', nodeVar.name, value);
     }
-  _refresh: | #js
+  refresh: | #js
     function() {
       this.key1++;
     }

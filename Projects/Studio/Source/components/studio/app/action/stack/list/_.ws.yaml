@@ -31,7 +31,8 @@ dom:
         pre:
           v-text: selected.action.do
         pre:
-          v-text: selected.action.undo
+          v-for: undo in selected.action.undos
+          v-text: undo
 
 props:
   actions:

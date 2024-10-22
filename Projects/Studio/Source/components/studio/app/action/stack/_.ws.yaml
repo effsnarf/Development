@@ -46,8 +46,14 @@ mounted: | #js
     window.addEventListener("keydown", (e) => {
       // ignore events from [input] and [textarea]
       if ([ "input", "textarea" ].includes(e.target.tagName.toLowerCase())) return;
-      if (e.ctrlKey && e.key == "z") this.undo();
-      if (e.ctrlKey && e.key == "y") this.redo();
+      if (e.ctrlKey) {
+        const op = (e.key == "z") ? "undo" : (e.key == "y") ? "redo" : null;
+        if (op) {
+          e.preventDefault();
+          e.stopPropagation();
+          this[op]();
+        }
+      }
     });
 
     this.remote.actions = await this.$root.data.array("Actions", this.actions);
@@ -140,6 +146,18 @@ methods:
       const undo = { type: "select.nodes", args: { nodes: oldSelectedNodes } };
       return { _do, undo };
     }
+  do_create_page: | #js
+    function(_do, pageName) {
+      const pageTemplatesNode = this.userApp.children.find(n => (n.type == "page.templates"));
+      const pageTemplate = pageTemplatesNode.children.find(n => (n.name == "default"));
+      const newPageNode = this.$root.createNewPageNode(this.userApp, pageName, "default");
+      const action2 = this.do_select_node(_do, 0, newPageNode);
+      this.setIconText(_do, newPageNode);
+      const undo = { type: "delete.node", args: { node: { id: newPageNode.id } } };
+      const undos = [undo, action2.undo];
+      this.$root.e.emit("app.node.changed", this.userApp);
+      return { _do, undos };
+    }
   do_create_comp: | #js
     function(_do, contentNode, compName) {
       _do.args.contentNode = Objects.clone(contentNode);
@@ -183,16 +201,17 @@ methods:
       this.$root.e.emit("app.node.changed", parent);
     }
   do_create_node: | #js
-    function(_do, parent, newNode) {
+    function(_do, selectIndex, parent, newNode) {
       newNode = Objects.clone(newNode);
       delete newNode._;
       parent = this.$root.getNode(parent);
       newNode = this.$root.initNewNode(this.userApp, newNode, { childOf: { parent, insertAt: 0 } });
-      this.sui.node.selected = newNode;
+      const action2 = this.do_select_node(_do, selectIndex, newNode);
       this.setIconText(_do, newNode);
       const undo = { type: "delete.node", args: { node: { id: newNode.id } } };
+      const undos = [undo, action2.undo];
       this.$root.e.emit("app.node.changed", parent);
-      return { _do, undo };
+      return { _do, undos };
     }
   do_delete_node: | #js
     function(_do, node) {
@@ -207,7 +226,7 @@ methods:
       return { _do, undo };
     }
   do_edit_node: | #js
-    function(_do, oldNode, newNode, changes, isFirstTime) {
+    function(_do, oldNode, newNode, changes) {
       let undoChanges = [];
       if (oldNode && newNode) {
         delete oldNode.children;
@@ -215,17 +234,6 @@ methods:
         changes = DeepDiff.diff(oldNode, newNode);
         undoChanges = DeepDiff.diff(newNode, oldNode);
         if (!changes) return alertify.error("No changes detected");
-      }
-
-      if (isFirstTime) {
-        // group with previous edit, if any
-        const prevAction = this.actions.last();
-        if (prevAction?.do.type == "edit.node") {
-          if (prevAction.do.args.node.id == oldNode.id) {
-            undoChanges = prevAction.undo.args.changes;
-            this.actions.pop();
-          }
-        }
       }
 
       let node = this.$root.getNode(oldNode);
@@ -283,10 +291,15 @@ methods:
     }
   undo: | #js
     function() {
-      if (this.pointerToLocalIndex(this.pointer) < 0) return alertify.error("Nothing to undo");
+      debugger;
+      if (this.pointerToLocalIndex(this.pointer) < 0) {
+        return alertify.error("Nothing to undo");
+      }
       const action = this.getAction(this.pointer);
-      this.do(action.undo, false);
+      if (action.undo) this.do(action.undo, false);
+      if (action.undos) for (const undo of action.undos) this.do(undo, false);
       this.pointer--;
+      this.$root.e.emit("action.undo", action);
     }
   redo: | #js
     function() {
@@ -294,14 +307,19 @@ methods:
       this.pointer++;
       const action = this.getAction(this.pointer);
       this.do(action.do, false);
+      this.$root.e.emit("action.redo", action);
     }
   do: | #js
     function(_do, addToStack = true) {
-      const isFirstTime = (addToStack);
       const doMethod = this[`do_${_do.type.replace(/\./g, "_")}`];
       if (!doMethod) return alertify.error(`Action type not implemented: ${doAction.type}`);
-      const action = doMethod(_do, ...Object.values(_do.args), isFirstTime);
+
+      const action = doMethod(_do, ...Object.values(_do.args));
       if (!addToStack || !action) return;
+      action.undos = (action.undos ?? []);
+      if (action.undo) action.undos.unshift(action.undo);
+      delete action.undo;
+
       this.addAction(action);
       //this.$root.studio.user.app.log(this, `🖱️`, "do", { action });
     }
@@ -309,13 +327,32 @@ methods:
     function(type, args, addToStack = true) {
       this.do({ type, args }, addToStack);
     }
+  getLastGroupableAction: | #js
+    function(action) {
+      const prev = this.actions.last();
+      if (!prev) return null;
+      if (action.do.type != prev.do.type) return null;
+      const type = prev.undos[0].type;
+      const prevArgs = prev.undos[0].args;
+      const args = action.do.args;
+      if (type == "edit.node") {
+        if (prevArgs.node.id == args.node.id) return prev;
+      }
+      if (type == "edit.node.var") {
+        if (prevArgs.node.id == args.node.id) {
+          if (prevArgs.varName == args.varName) {
+            if ((typeof prevArgs.value) == "string") {
+              return prev;
+            }
+          }
+        }
+      }
+      return null;
+    }
   addAction: | #js
     function(action) {
       const localPointer = this.pointerToLocalIndex(this.pointer);
-      const lastAction = this.actions.last();
-      const lastDoneAction = this.actions[this.pointer];
-      action._i = (lastDoneAction?._i ?? -1) + 1;
-      action.id = (lastAction?.id ?? 0) + 1;
+      action.id = (this.actions.last()?.id ?? 0) + 1;
       if (this.pointer < this.actions.last()?._i) {
         this.actions.splice(localPointer + 1);
       }
@@ -323,6 +360,16 @@ methods:
         action.do = action._do;
         delete action._do;
       }
+      // group with previous edit, if any
+      // by deleting the previous edit action and merging its changes
+      const prevAction = this.getLastGroupableAction(action);
+      if (prevAction) {
+        action.undos.shift();
+        action.undos.unshift(prevAction.undos.first());
+        this.actions.pop();
+        this.pointer--;
+      }
+      action._i = (this.actions.last()?._i ?? -1) + 1;
       this.actions.add(action);
       this.pointer++;
       this.refresh();

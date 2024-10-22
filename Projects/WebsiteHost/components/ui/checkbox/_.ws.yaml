@@ -12,7 +12,6 @@ dom:
         type: checkbox
         ':checked': checkedValue
     span: 
-      class: clickable
       .icon:
         v-if: icon
         v-text: icon
@@ -36,7 +35,7 @@ methods:
     function() {
       //const dimmed = (this.checkedValue ? "" : "dimmed");
       const dimmed = "";
-      return `hoverable items-center ${this.size} ${dimmed}`;
+      return `clickable items-center ${this.size} ${dimmed}`;
     }
   onClick: | #js
     async function() {
@@ -114,9 +113,12 @@ style:
   .checkbox-icon:
     aspect-ratio: 1
     width: 1.5em
+    margin-right: 0.3em
     border: "1px solid #808080c0"
-  .checkbox-icon:hover:
-    background: "#80808060"
+    transition: box-shadow 0.3s
+  .flex:hover .checkbox-icon:
+    background: "#00000040"
+    box-shadow: inset -4px 4px 2px black
   .icon:
     display: inline-block
     margin-right: 0.3rem

@@ -805,8 +805,14 @@ methods:
                     children: [
                       {
                         type: "text",
-                        text: "[app title]",
-                        size: 3
+                        size: 3,
+                        vars: [
+                          {
+                            name: "text",
+                            type: "value",
+                            value: "[🍏 clever app]"
+                          }
+                        ]
                       },
                       {
                         type: "slot.outlet",

@@ -15,6 +15,7 @@ dom:
         ':selected-node': selectedNode1
         ':item-props': itemProps
         ':max-depth': maxDepth
+        @node-event: (...args) => $emit('node-event', ...args)
         @node-click: onChildClick
         @node-hover: onChildHover
         @node-unhover: onChildUnhover

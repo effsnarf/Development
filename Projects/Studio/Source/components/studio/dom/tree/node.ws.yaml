@@ -16,6 +16,8 @@ dom:
       ui.dnd.draggable:
         :drag-item: "{ type: 'node', item: node }"
         .flex:
+          .dimmed:
+            v-text: node.id
           div:
             :title: nodeWarning
             :class: "{ warn: hasWarning }"
@@ -51,7 +53,8 @@ methods:
     function(dragItem) {
       this.dragItem = dragItem;
       const name = dragItem.item.type.replaceAll('.', ' ');
-      this.tooltipText = (dragItem.type == "node") ? "🫳 move" : "➕ create";
+      const icon = this.$root.getNodeIcon({ type: name });
+      this.tooltipText = (dragItem.type == "node") ? "🫳 move" : `➕ new ${icon} ${name}`;
     }
   onDropItem: | #js
     function(dragItem) {
@@ -67,7 +70,7 @@ methods:
     }
   onDropItem_new_node: | #js
     function(newNode) {
-      this.$root.do("create.node", { parent: { node: { id: this.node.id } }, newNode });
+      this.$emit("node-event", "create-node", this.node, newNode);
     }
   onClickNode: | #js
     function(node) {

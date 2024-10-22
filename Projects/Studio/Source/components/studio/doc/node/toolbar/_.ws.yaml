@@ -110,7 +110,8 @@ methods:
   onDropItem_new_comp: | #js
     function(item) {
       const node = item.item;
-      alertify.prompt('🎁 Component name', null, (e, compName) => {
+      alertify.prompt('➕🎁 Component name', null, (e, compName) => {
+        if (!compName?.length) return alertify.error("Component name is required.");
         this.$root.do("create.comp", { contentNode: node, compName });
       });
     }

@@ -66,51 +66,79 @@ methods:
     }
   initNewNode: | #js
     function(userApp, node, options) {
-      const addChildren = (!node.children);
-      node = Objects.clone(node, { exclude: ["children"] });
-      if (addChildren) node.children = [];
-      if (!("id" in node)) {
-        node.id = this.$root.getNewNodeID(userApp);
+      if (options?.includeChildren) {
+        node = Objects.clone(node);
       }
-      if (options?.childOf) {
+      else {
+        const addChildren = (!node.children);
+        node = Objects.clone(node, { exclude: ["children"] });
+        if (addChildren) node.children = [];
+      }
+
+      options = (options ?? {});
+
+      if (node.type == "page") {
+        if (options.insert?.page) {
+          const pagesNode = userApp.children.find(n => (n.type == "pages"));
+          if (!pagesNode) throw `No pages node`;
+          options.childOf = {
+            parent: pagesNode,
+            insertAt: (pagesNode.children.length)
+          }
+        }
+      }
+
+      if (options.childOf) {
         options.childOf.parent.children.insertAt((options.childOf.insertAt ?? 0), node);
       }
+
+      if ((node.type == "page") && (options.insert?.page)) {
+        const slotOutlets = this.getSlotOutlets(userApp, node);
+        node.children = (node.children ?? []);
+        node.children.push(...slotOutlets.map(s => this.getNewSlotContent(userApp, s)));
+      }
+
+      if (!(options && (options.new?.id == false))) this.ensureNodeIDs(userApp, node);
+
       node.animation = {
         anim: null,
         duration: null,
         preview: null
       };
+
       const layout = {
-        type: null,
+        type: "grid.y",
         grid: null,
+        direction: null,
+        gap: null,
+        order: null,
+        justify: {
+          content: null
+        },
+        align: {
+          items: null,
+          content: null
+        },
         size: {
           width: null,
           height: null
         }
       };
-      if (["panel", "list"].includes(node.type)) {
-        layout.type = "grid.y";
-        layout.direction = null;
-        layout.gap = null;
-        layout.order = null;
-        layout.justify = {
-          content: null
-        };
-        layout.align = {
-          items: null,
-          content: null
-        };
-      }
+      node.layout = (node.layout ?? {});
+      const mergedLayout = Objects.deepMerge(layout, node.layout);
+      Object.assign(node.layout, mergedLayout);
 
       node.vars = (node.vars || []);
 
       if (node.type == "text") {
-        node.vars.push({
-          name: "text",
-          type: null,
-          value: null,
-          exp: null
-        });
+        if (!node.vars.find(v => (v.name == "text"))) {
+          node.vars.push({
+            name: "text",
+            type: "value",
+            value: `Text ${node.id}`,
+            exp: null
+          });
+        }
       }
 
       if (node.type == "list") {
@@ -138,10 +166,6 @@ methods:
         node.name = `${node.type}${(count)}`;
       }
       
-      node.layout = (node.layout ?? {});
-      const mergedLayout = Objects.deepMerge(layout, node.layout);
-      Object.assign(node.layout, mergedLayout);
-
       node.design = {
         font: {
           family: null,
@@ -158,26 +182,66 @@ methods:
           gradient: null
         }
       }
-      node.flex = (node.flex || {});
-      const newFlex = {
-        dir: "v",
-        justify: {
-          items: "center",
-          content: "center"
-        }
-      };
-      const mergedFlex = Objects.deepMerge(newFlex, node.flex);
-      Object.assign(node.flex, mergedFlex);
 
       switch (node.type) {
         case "text":
-          node.text = (node.text || null);
-          node.size = (node.size || null);
+          node.size = (node.size || 2);
           break;
       }
 
       node.depth = TreeObject.getNodeDepth(userApp, node);
       return node;
+    }
+  createNewPageNode: | #js
+    function(userApp, pageName, pageTemplateName) {
+      const pagesNode = this.userApp.children.find(n => (n.type == "pages"));
+      let page = {
+        id: this.$root.getNewNodeID(userApp),
+        type: "page",
+        name: pageName,
+        page: {
+          template: {
+            name: pageTemplateName,
+          }
+        },
+        children: []
+      };
+      page = this.$root.initNewNode(userApp, page, { insert: { page: true } });
+      return page;
+    }
+  getSlotOutlets: | #js
+    function(userApp, templateNode) {
+      if (templateNode.type == "page") templateNode = this.getPageTemplateNode(userApp, templateNode);
+      const slotOutlets = [];
+      TreeObject.traverse(templateNode, (node) => {
+        if (node.type == "slot.outlet") slotOutlets.push(node);
+      });
+      return slotOutlets;
+    }
+  getPageTemplateNode: | #js
+    function(userApp, pageNode) {
+      return TreeObject.find(userApp, (n) => (n.type == "page.template") && (n.name == pageNode.page.template.name));
+    }
+  getNewSlotContent: | #js
+    function(userApp, slotOutlet) {
+      let node = {
+        type: "slot.content",
+        slot: {
+          name: slotOutlet.name
+        },
+        children: []
+      };
+      node = this.$root.initNewNode(userApp, node, { new: { id: false }, includeChildren: true });
+      return node;
+    }
+  ensureNodeIDs: | #js
+    function(userApp, node) {
+      if (!("id" in node)) {
+        node.id = this.$root.getNewNodeID(userApp);
+      }
+      for (const childNode of (node.children??[])) {
+        this.ensureNodeIDs(userApp, childNode);
+      }
     }
   getNewNodeID: | #js
     function(userApp) {
@@ -436,10 +500,9 @@ methods:
         get: this.$root.toContextFunc(vue, { args: ["vue"], code: `try { return ${exp}; } catch (ex) {}` }, { async: false })
       });
       const watcher = Vue.watch(computed, (newValue) => {
-        if (!vue.nodeVarPath) return;
         vue.$data[propName] = newValue;
         this.$root.studio.user.app.log(vue, `🧊`, "liveNodeVar.$watcher", { propName, newValue });
-        this.$root.studio.user.app.state.set(this, `${vue.nodeVarPath}.${var1.name}`, propName, newValue);
+        if (vue.nodeVarPath) this.$root.studio.user.app.state.set(this, `${vue.nodeVarPath}.${var1.name}`, propName, newValue);
         onChange?.(newValue);
       }, { immediate: true });
       const destroy = () => {

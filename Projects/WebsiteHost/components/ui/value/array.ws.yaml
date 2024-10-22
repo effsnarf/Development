@@ -293,7 +293,8 @@ style:
     width: 5em
   tr:
     cursor: pointer
-    transition: 0s
+  tr td:
+    transition: 0.3s
   tr:hover td:
     background-color: '#ffffff20'
     transition: 0s

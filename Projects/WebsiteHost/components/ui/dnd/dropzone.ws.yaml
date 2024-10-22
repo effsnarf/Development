@@ -16,6 +16,7 @@ dom:
 props:
   enabled: true
   accepts:
+  contentGhost: true
   tooltip: true
 data:
   isDraggedOver: false
@@ -34,10 +35,12 @@ methods:
       this.ghost.dropzone = document.createElement('div');
       this.ghost.dropzone.classList.add('ghost-dropzone');
       // copy $el content into an inner div
-      const inner = document.createElement('div');
-      inner.innerHTML = this.$el?.innerHTML;
-      inner.style.pointerEvents = 'none';
-      this.ghost.dropzone.appendChild(inner);
+      if (this.contentGhost) {
+        const inner = document.createElement('div');
+        inner.innerHTML = this.$el?.innerHTML;
+        inner.style.pointerEvents = 'none';
+        this.ghost.dropzone.appendChild(inner);
+      }
       // position the ghost exactly where this $el is
       const rect = this.$root.getAbsoluteRect(this.$el);
       this.ghost.dropzone.style.position = 'fixed';
@@ -72,8 +75,9 @@ methods:
     }
   setTooltipPosition: | #js
     function(e) {
-      const rect = this.$root.getAbsoluteRect(this.$el);
       const t = this.ghost.tooltip;
+      if (!t) return;
+      const rect = this.$root.getAbsoluteRect(this.$el);
       t.style.position = 'fixed';
       t.style.top = e.clientY + 0 + 'px';
       t.style.left = e.clientX + 50 + 'px';
@@ -97,8 +101,8 @@ methods:
       if (!this.accepts?.includes(this.$root.dragItem?.type)) return;
       this.cancelEvent(e);
       this.isDraggedOver = true;
-      this.ghost.dropzone.classList.add('drag-over');
-      if (this.tooltip) this.ghost.tooltip.classList.add('visible');
+      this.ghost.dropzone?.classList.add('drag-over');
+      if (this.tooltip) this.ghost.tooltip?.classList.add('visible');
       this.setTooltipPosition(e);
     }
   onDragEnter: | #js
@@ -113,8 +117,8 @@ methods:
       if (!this.enabled) return;
       this.cancelEvent(e);
       this.isDraggedOver = false;
-      this.ghost.tooltip.classList.remove('visible');
-      this.ghost.dropzone.classList.remove('drag-over');
+      this.ghost.tooltip?.classList.remove('visible');
+      this.ghost.dropzone?.classList.remove('drag-over');
     }
   onDrop: | #js
     function(e) {

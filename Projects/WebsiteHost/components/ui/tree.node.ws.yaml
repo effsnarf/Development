@@ -14,6 +14,7 @@ dom:
         ':root': root
         ':item': getItem(node)
         v-bind: itemProps
+        @node-event: (...args) => $emit('node-event', ...args)
       @click: onNodeClick
       @dblclick: onNodeDoubleClick
       @mouseenter: onMouseEnter
@@ -46,6 +47,7 @@ dom:
             ':selected-node': selectedNode
             ':item-props': itemProps
             ':max-depth': maxDepth
+            @node-event: (...args) => $emit('node-event', ...args)
             @node-click: onChildClick
             @node-hover: onChildHover
             @node-unhover: onChildUnhover

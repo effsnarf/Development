@@ -8,8 +8,10 @@ dom:
       :initial-expanded: initialExpanded
       :item-props: "{ sui }"
       :max-depth: maxDepth
+      @node-event: (name, ...args) => $emit(name, ...args)
       @node-hover: (...args) => $emit('node-hover', ...args)
       @node-click: (...args) => $emit('node-click', ...args)
+      @create-node: (...args) => $emit('create-node', ...args)
     ui.value:
       v-if: "false"
       :value: selectedNodeData

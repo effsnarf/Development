@@ -1,31 +1,35 @@
 dom:
   div:
+    :key: key1
     ui.input.value:
-      v-model: nodeVar.value
+      :value: nodeVar?.value
+      @input: onInput
 
 props:
   node:
   nodeVar:
-  initial:
   sui:
 
 data:
+  value:
+  key1: 1
+
+mounted: | #js
+  function() {
+    this.$root.e.on(["action.undo", "action.redo"], this.refresh.bind(this));
+  }
 
 methods:
-  getDataItemFields: | #js
+  onInput: | #js
+    function(value) {
+      this.$root.do("edit.node.var", { node: this.node, varName: this.nodeVar.name, key: "value", value });
+    }
+  refresh: | #js
     function() {
-      return this.sui.selected.dataItems
-        .take(10)
-        .flatMap(d => Object.keys(d))
-        .distinct()
-        .sortBy(s => s);
+      this.key1++;
     }
 
 computed:
-  dataItemFields: | #js
-    function() {
-      return this.getDataItemFields();
-    }
 
 style:
   td:nth-child(1):

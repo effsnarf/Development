@@ -263,7 +263,7 @@ style:
   .node-warning:
     font-size: 120%
     text-align: center
-    padding: 1em
+    padding: 0.5em
     opacity: 0.8
     background: "repeating-linear-gradient(-45deg, #3b3b3b, #3b3b3b 20px, #1f1f1f 20px, #1f1f1f 40px)"
   .node-warning.small:
