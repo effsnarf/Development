@@ -35,7 +35,7 @@ dom:
           template:
             v-slot: tooltip
             div:
-              v-text: "'➕📦 create a new component'"
+              v-text: "'➕ create a 📦 new component'"
           .tool.tool-dimmed.new-comp:
             .icon:
               v-text: "'➕📦'"
