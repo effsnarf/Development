@@ -1,5 +1,10 @@
 dom:
-  div:
+  ui.dnd.dropzone:
+    :accepts: "['new.page']"
+    template:
+      v-slot: tooltip
+      div:
+        v-text: "'create a new page'"
     studio.doc.page.selector:
       :user-app: userApp
       :user-app-state: userAppState

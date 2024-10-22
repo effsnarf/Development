@@ -5,7 +5,7 @@ dom:
       v-if: showWorkspace
       class: workspace
       div:
-        v-if: "true"
+        v-if: "false"
         h3:
           ui.title: 
             icon: 🎄

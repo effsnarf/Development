@@ -1,11 +1,17 @@
 dom:
-  .clickable:
+  div:
     v-if: node
     @mouseenter: () => onHoverNode(node)
     @mouseleave: () => onHoverNode(null)
     @click: () => onClickNode(node)
     ui.dnd.dropzone:
+      :accepts: "['node', 'new.node']"
+      @drag-enter: onDragEnter
       @drop-item: onDropItem
+      template:
+        v-slot: tooltip
+        div:
+          v-text: tooltipText
       ui.dnd.draggable:
         :drag-item: "{ type: 'node', item: node }"
         .flex:
@@ -30,6 +36,8 @@ data:
   nodeText:
   nodeWarning:
   nodeInfo:
+  dragItem: null
+  tooltipText: null
 
 mounted: | #js
   function() {
@@ -37,6 +45,12 @@ mounted: | #js
   }
 
 methods:
+  onDragEnter: | #js
+    function(dragItem) {
+      this.dragItem = dragItem;
+      const name = dragItem.item.type.replaceAll('.', ' ');
+      this.tooltipText = (dragItem.type == "node") ? "🫳 move" : "➕ create";
+    }
   onDropItem: | #js
     function(dragItem) {
       const methodName = `onDropItem_${dragItem.type.replaceAll('.', '_')}`;
@@ -117,6 +131,8 @@ watch:
       }
 
 style:
+  .comp-ui-dnd-draggable:
+    padding: 0.2em 0.2em
   .comp-studio-dom-tree-node:
     white-space: nowrap
     text-shadow: -3px 3px 1px black

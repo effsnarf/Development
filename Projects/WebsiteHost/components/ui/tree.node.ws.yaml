@@ -66,6 +66,7 @@ props:
 data:
   isInited: false
   isExpanded: null
+  maxChildren: 10
 methods:
   getCssClass: | #js
     function() {
@@ -127,7 +128,7 @@ methods:
   getChildItems: | #js
     function(node) {
       if (!this.isExpanded) return [];
-      return this.getChildren(node);
+      return this.getChildren(node).take(this.maxChildren);
     }
   areNodesEqual: | #js
     function(node1, node2) {

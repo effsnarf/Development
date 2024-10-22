@@ -1,0 +1,17 @@
+dom:
+  div:
+    .flex:
+      div:
+        v-if: item.ex
+        v-text: "'❌'"
+      div:
+        v-text: item.name
+      .dimmed:
+        v-text: item.children?.length
+
+props:
+  item:
+
+style:
+  .flex:
+    gap: 0.5em

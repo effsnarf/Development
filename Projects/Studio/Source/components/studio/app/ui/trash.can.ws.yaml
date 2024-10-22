@@ -1,7 +1,12 @@
 dom:
   div:
     ui.dnd.dropzone:
+      :accepts: "['node']"
       @drop-item: onDropItem
+      template:
+        v-slot: tooltip
+        div:
+          v-text: "'🗑️ delete'"
       .trash-can:
         v-text: "'🗑️'"
 

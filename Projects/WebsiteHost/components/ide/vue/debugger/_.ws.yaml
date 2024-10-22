@@ -1,0 +1,47 @@
+dom:
+  div:
+    :key: key1
+    .flex:
+      h3:
+        ui.checkbox:
+          text: "🪲🚧 Debugger"
+          v-model: vd.is.enabled
+    .box2.folded:
+      .flex:
+        h3:
+          v-text: "'📊 invokes'"
+      ui.value:
+        :value: invokes
+
+data:
+  vd:
+  invokes: []
+  key1: 1
+
+mounted: | #js
+  function() {
+    this.vd = window.vueDebugger;
+    this.refresh();
+  }
+
+methods:
+  refresh: | #js
+    function() {
+      this.invokes = this.vd.invokes.getSortedItems();
+      this.key1++;
+      setTimeout(this.refresh.bind(this), 5000);
+    }
+
+computed:
+  console: | #js
+    function() {
+      return window.console;
+    }
+    
+style:
+  .folded:
+    max-height: 2em
+    overflow: hidden
+    transition: 2s
+  .folded:hover:
+    max-height: 50vh

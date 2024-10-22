@@ -24,7 +24,8 @@ import { Data } from "../../../../Shared/Data";
 import { Data2 } from "../../../../Shared/Data2";
 import { Graph } from "../../../../Shared/Database/Graph";
 import { StateTracker, StateValue } from "../../Classes/StateTracker";
-import { CompEvent, Mixins } from "../../../../Shared/Mvc/Vue/Mixins";
+import { Mixins } from "../../../../Shared/Mvc/Vue/Mixins";
+import { VueDebugger } from "../../../../Shared/Mvc/Vue/VueDebugger";
 import { MovingPositionSmoother } from "../../../../Shared/MovingPositionSmoother";
 import { before } from "node:test";
 
@@ -365,19 +366,12 @@ window1.getSortedCalls = () => {
   return Object.entries(calls).sort((a: any, b: any) => b[1] - a[1]);
 }
 
-const afterCompEvent = ((e: CompEvent) => {
-  (window as any).vueIdeApp?.perfInspector?.().afterCompEvent(e);
-  const compName = e.context.$options._componentTag;
-  const key = `${compName}.${e.type}.${e.name}`;
-  calls[key] = (calls[key] || 0) + 1;
-  //console.log(`⚡ ${comp} ${e.type} ${e.name}`);
-});
-
-const compEventTracker = Mixins.CompEventTracker(afterCompEvent);
+const vueDebugger = new VueDebugger();
+window1.vueDebugger = vueDebugger;
 
 const vueAppMixins = [] as any[];
 
-const webScriptMixins = [generalMixin, compEventTracker];
+const webScriptMixins = [vueDebugger.mixin];
 
 interface MgParams {
   urlName: string;

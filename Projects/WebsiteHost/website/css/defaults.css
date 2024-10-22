@@ -1002,6 +1002,55 @@ img[src=""]
 }
 
 
+.full-screen-dark-overlay
+{
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s;
+  z-index: 100;
+}
+
+.full-screen-dark-overlay.visible
+{
+  opacity: 0.6;
+}
+
+
+.ghost-dropzone {
+  border: 1px dashed yellow;
+}
+
+.ghost-dropzone.drag-over {
+  background: rgb(255, 255, 0, 0.4);
+  box-shadow: inset -4px 4px 2px black;
+}
+
+.ghost-dropzone.drag-over > *
+{
+  transform: scale(1.1);
+}
+
+.ghost-tooltip {
+  border: 2px solid gray;
+  background: black;
+  padding: 1em;
+  background: rgb(25, 25, 0);
+  box-shadow: -6px 6px 6px #000000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s;
+}
+
+.ghost-tooltip.visible {
+  opacity: 1;
+}
+
 
 [tooltip]:hover::before {
   content: attr(tooltip);

@@ -18,6 +18,7 @@ dom:
       v-if: (userApp && is.inited)
       :class: "{ ['box-hovered-' + sui.main.box.hovered]: true }"
       .main-box.a:
+        ide.vue.debugger:
         @mouseenter: sui.main.box.hovered = 0
         @mouseleave: sui.main.box.hovered = null
       .main-box.b:
@@ -952,6 +953,7 @@ style:
     top: 1em
     right: 1em
     background: url(https://i.imgur.com/FJgDKYo.png)
+    background-repeat: no-repeat
     width: 10vw
     aspect-ratio: 1
     background-position: center
@@ -1006,9 +1008,15 @@ style:
     box-shadow: "-0.5em 0.5em 2px #00000080"
     padding: 1em
   .main-box.a:
-    width: 0%
+    width: 10%
   .main-box.b:
     width: 15%
+  .main-boxes.box-hovered-0 .main-box.a:
+    width: 35%
+  .main-boxes.box-hovered-0 .main-box.d:
+    width: 10%
+  .main-boxes.box-hovered-0 .main-box.e:
+    width: 10%
   .main-boxes.box-hovered-3 .main-box.d:
     width: 35%
   .main-boxes.box-hovered-3 .main-box.e:

@@ -112,7 +112,11 @@ example1:
         text: Check me
 style:
   .checkbox-icon:
+    aspect-ratio: 1
     width: 1.5em
+    border: "1px solid #808080c0"
+  .checkbox-icon:hover:
+    background: "#80808060"
   .icon:
     display: inline-block
     margin-right: 0.3rem

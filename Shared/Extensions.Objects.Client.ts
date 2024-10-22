@@ -124,12 +124,14 @@ class Objects {
     if (obj == null || obj == undefined || typeof obj != "object") return obj;
     if (obj instanceof Date) return new Date(obj.getTime());
     if (obj instanceof RegExp) return new RegExp(obj.source, obj.flags);
+    if (Array.isArray(obj)) return obj.map((o) => Objects.clone(o, options));
+    if (obj._isVue) return Objects.cloneVue(obj);
     try {
       let cloned = null;
       if (options?.exclude?.length) {
         const keys = Object.keys(obj).except(...options.exclude);
         cloned = {} as any;
-        for (const key of keys) cloned[key] = Objects.clone(obj[key]);
+        for (const key of keys) cloned[key] = Objects.clone(obj[key], options);
       } else {
         const replacer = (key: string, value: any) =>
           value === undefined ? null : value;
@@ -139,6 +141,15 @@ class Objects {
     } catch (ex) {
       throw ex;
     }
+  }
+
+  private static cloneVue(vue: any): any {
+    const c = {} as any;
+    c._uid = vue._uid;
+    c.$options = Objects.clone({
+      _componentTag: vue.$options._componentTag,
+    });
+    return c;
   }
 
   // JSDoc documentation

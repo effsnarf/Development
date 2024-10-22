@@ -1,144 +1,149 @@
 import { Objects } from "../../Extensions.Objects.Client";
+import { Timer } from "../../Timer";
 
-interface CompEvent {
-  context: any;
+type BeforeCompEvent = {
+  vue: any;
+  comp: string;
   type: string;
   name: string;
+  args?: any[];
+};
+
+type AfterCompEvent = BeforeCompEvent & {
+  ex?: any;
+  result?: any;
   elapsed: number;
-}
+};
 
-type AfterCompEventCallback = (compEvent: CompEvent) => void;
-
-class CallbackQueue {
-  private tcbs = {} as { [key: string]: Function };
-
-  constructor(private callback: AfterCompEventCallback) {}
-
-  enqueue(compEvent: CompEvent) {
-    this.callback(compEvent);
-    return;
-    //if (elapsed < 10) return;
-    const contextName = compEvent.context.$options.name;
-    const key = `${contextName}.${compEvent.type}.${compEvent.name}`;
-    const tcb = (this.tcbs[key] = this.tcbs[key] || this.createTcb());
-    tcb(compEvent);
-  }
-
-  // Some operations are called very frequently, so we throttle them
-  private createTcb() {
-    return (compEvent: CompEvent) => {
-      this.callback(compEvent);
-    };
-  }
-}
+type BeforeCompEventCallback = (e: BeforeCompEvent) => void;
+type AfterCompEventCallback = (e: AfterCompEvent) => void;
 
 function wrapFunction(
   fn: Function,
-  callbackQueue: CallbackQueue,
-  context: any,
+  before: BeforeCompEventCallback,
+  after: AfterCompEventCallback,
+  vue: any,
   type: string,
-  name: string
+  name: string | Function
 ) {
   return function (this: any, ...args: any[]) {
-    const start = performance.now();
     let result: any;
 
-    const compEvent = { context: this, type, name };
+    if (typeof name == "function") name = name(args) as string;
 
+    const compEvent = { vue, comp: vue.$options._componentTag, type, name };
+
+    before(compEvent);
+
+    const timer = Timer.start();
     try {
-      result = fn.apply(this, args);
-    } catch (err) {
-      const end = performance.now();
-      const elapsed = Math.round(end - start);
-      callbackQueue.enqueue({ ...compEvent, elapsed });
-      throw err; // Synchronous error
-    }
-
-    // If the function returns a promise, handle it asynchronously
-    if (result instanceof Promise) {
-      return result.finally(() => {
-        const end = performance.now();
-        callbackQueue.enqueue({
-          ...compEvent,
-          elapsed: Math.round(end - start),
-        });
-      });
-    } else {
-      // Handle synchronous functions
-      const end = performance.now();
-      callbackQueue.enqueue({ ...compEvent, elapsed: Math.round(end - start) });
-      return result;
+      result = fn.apply(vue, args);
+      // if the function returns a promise
+      if (result instanceof Promise) {
+        return result
+          .then((r) => {
+            const elapsed = timer.elapsed ?? 0;
+            after({ ...compEvent, result: r, elapsed });
+            return r;
+          })
+          .catch((ex) => {});
+      } else {
+        // sync function
+        const elapsed = timer.elapsed ?? 0;
+        after({ ...compEvent, result, elapsed });
+        return result;
+      }
+    } catch (ex: any) {
+      const elapsed = timer.elapsed ?? 0;
+      const ex2 = !ex ? null : { message: ex.message, stack: ex.stack };
+      after({ ...compEvent, ex: ex2, result, elapsed });
+      throw ex;
     }
   };
 }
 
 const Mixins = {
-  CompEventTracker(afterCompEvent: AfterCompEventCallback): any {
-    const origAfterCompEvent = afterCompEvent;
-    afterCompEvent = (compEvent: CompEvent) => {
-      origAfterCompEvent(compEvent);
-    };
-
-    const callbackQueue = new CallbackQueue(afterCompEvent);
-
+  CompEventTracker(
+    before: BeforeCompEventCallback,
+    after: AfterCompEventCallback
+  ): any {
     const mixin = {
       matchComp: (c: any) =>
-        ["ide.", "ui.value", "ui.mouse"].none((s) => c.name.startsWith(s)),
+        [
+          "ide.",
+          "ui.html.style",
+          "ui.context.window",
+          "ui.ticker",
+          "ui.value",
+          "ui.mouse",
+        ].none((s) => c.name.startsWith(s)),
 
       created(this: any) {
         const vue = this;
 
+        // Wrap $emit
+        vue.$emit = wrapFunction(
+          vue.$emit,
+          before,
+          after,
+          vue,
+          "🚀",
+          (args: any[]) => args[0]
+        );
+
         // Wrap methods
-        const methods = this.$options.methods || {};
+        const methods = vue.$options.methods || {};
         Object.keys(methods).forEach((methodName) => {
-          const originalMethod = methods[methodName] as Function;
-          methods[methodName] = wrapFunction(
-            originalMethod,
-            callbackQueue,
+          if (methodName == "getItemKey") debugger;
+          const method = methods[methodName] as Function;
+          vue[methodName] = wrapFunction(
+            method,
+            before,
+            after,
             vue,
-            "method",
+            "🔴",
             methodName
           );
         });
 
         const exceptKeys = ["_asyncComputed", "_ide_activity", "_meow"];
 
-        // When modifying arrays, vue will not detect the old value correctly
-        // This solves the issue
-        const getWatchableData = (dataKey: string) => {
-          const value = this[dataKey];
-          switch (Objects.getTypeName(value)) {
-            case "string":
-            case "number":
-            case "boolean":
-            case "date":
-            case "regexp":
-            case "function":
-            case "null":
-            case "undefined":
-              return value;
-            case "array":
-              return [...(value as any[])];
-            case "object":
-              if (value.constructor.name == "Object") {
-                return Object.assign({}, value);
-              } else {
-                const compName = this.$options.name;
-                // Watching a class instance
-                // Need to think about this
-                if (false) {
-                  (window as any).alertify
-                    .warning(
-                      `<h2>⚠️ 📦 ${compName} 🧊 ${dataKey}</h2><p>Activity tracking is disabled for 📦 ${compName} 🧊 ${dataKey}.</p><p>Use plain objects or primitives for data, not class instances.</p>`
-                    )
-                    .delay(0);
-                }
-                return null;
-              }
-          }
-        };
-
         if (false) {
+          // When modifying arrays, vue will not detect the old value correctly
+          // This solves the issue
+          const getWatchableData = (dataKey: string) => {
+            const value = vue[dataKey];
+            switch (Objects.getTypeName(value)) {
+              case "string":
+              case "number":
+              case "boolean":
+              case "date":
+              case "regexp":
+              case "function":
+              case "null":
+              case "undefined":
+                return value;
+              case "array":
+                return [...(value as any[])];
+              case "object":
+                if (value.constructor.name == "Object") {
+                  return Object.assign({}, value);
+                } else {
+                  const compName = vue.$options.name;
+                  // Watching a class instance
+                  // Need to think about this
+                  if (false) {
+                    (window as any).alertify
+                      .warning(
+                        `<h2>⚠️ 📦 ${compName} 🧊 ${dataKey}</h2><p>Activity tracking is disabled for 📦 ${compName} 🧊 ${dataKey}.</p><p>Use plain objects or primitives for data, not class instances.</p>`
+                      )
+                      .delay(0);
+                  }
+                  return null;
+                }
+            }
+          };
+
           // Wrap data properties
           const data = this._data || {};
           Object.keys(data)
@@ -152,14 +157,13 @@ const Mixins = {
                 },
                 (newValue: any, oldValue: any) => {
                   const compEvent = {
-                    context: vue,
+                    vue: vue,
                     type: "data",
                     name: dataKey,
                     oldValue,
                     newValue,
                     elapsed: 0,
                   };
-                  callbackQueue.enqueue(compEvent);
                 },
                 {
                   deep: true,
@@ -168,103 +172,78 @@ const Mixins = {
             });
         }
 
-        // Wrap computed properties
-        const computed = this._computedWatchers || {};
-        Object.keys(computed)
-          .except(...exceptKeys)
-          .filter((cn) => !cn.startsWith("_"))
-          .filter((cn) => !cn.startsWith("$"))
-          .forEach((computedName) => {
-            const originalComputed = computed[computedName];
-            const getter = originalComputed.getter;
-            const setter = originalComputed.setter;
+        if (false) {
+          // Wrap computed properties
+          const computed = vue._computedWatchers || {};
+          Object.keys(computed)
+            .except(...exceptKeys)
+            .filter((cn) => !cn.startsWith("_"))
+            .filter((cn) => !cn.startsWith("$"))
+            .forEach((computedName) => {
+              const originalComputed = computed[computedName];
+              const getter = originalComputed.getter;
+              const setter = originalComputed.setter;
 
-            computed[computedName].getter = wrapFunction(
-              getter,
-              callbackQueue,
-              vue,
-              "computed",
-              computedName
-            );
-            computed[computedName].setter = wrapFunction(
-              setter,
-              callbackQueue,
-              vue,
-              "computed",
-              computedName
-            );
-          });
+              computed[computedName].getter = wrapFunction(
+                getter,
+                before,
+                after,
+                vue,
+                "💡",
+                computedName
+              );
+              computed[computedName].setter = wrapFunction(
+                setter,
+                before,
+                after,
+                vue,
+                "💡",
+                computedName
+              );
+            });
 
-        return;
-
-        // Wrap watchers
-        const watchers = this.$options.watch || {};
-        Object.keys(watchers).forEach((watchKey) => {
-          const originalWatcher = watchers[watchKey] as any;
-          const handler = originalWatcher.handler || originalWatcher;
-          const immediate = originalWatcher.immediate;
-          const deep = originalWatcher.deep;
-          const newHandler = wrapFunction(
-            originalWatcher.handler,
-            callbackQueue,
-            vue,
-            "watcher",
-            watchKey
-          );
-          this.$watch(watchKey, newHandler, {
-            immediate,
-            deep,
-          });
-          return;
-          if (typeof originalWatcher === "function") {
-            watchers[watchKey] = wrapFunction(
-              originalWatcher,
-              callbackQueue,
-              this,
-              "watcher",
-              watchKey
-            );
-          } else if (
-            originalWatcher &&
-            typeof originalWatcher.handler === "function"
-          ) {
-            const handler = originalWatcher.handler;
-            originalWatcher.handler = wrapFunction(
+          // Wrap watchers
+          const watchers = vue.$options.watch || {};
+          Object.keys(watchers).forEach((watchKey) => {
+            const originalWatcher = watchers[watchKey] as any;
+            const handler = originalWatcher.handler || originalWatcher;
+            const immediate = originalWatcher.immediate;
+            const deep = originalWatcher.deep;
+            const newHandler = wrapFunction(
               handler,
-              callbackQueue,
-              this,
-              "watcher",
+              before,
+              after,
+              vue,
+              "👁️",
               watchKey
             );
-          }
-        });
+            vue.$watch(watchKey, newHandler, {
+              immediate,
+              deep,
+            });
+          });
+        }
       },
-      beforeUpdate(this: any) {
-        this._updateStart = performance.now();
-      },
-      updated(this: any) {
-        return;
-        const end = performance.now();
-        afterCompEvent({
-          context: this,
-          type: "update",
-          name: "update",
-          elapsed: end - this._updateStart,
-        });
-      },
+      updated(this: any) {},
       mounted(this: any) {
-        afterCompEvent({
-          context: this,
-          type: "mount",
+        return;
+        after({
+          vue: this,
+          comp: this.$options._componentTag,
+          type: "♻️",
           name: "mount",
+          result: null,
           elapsed: 0,
         });
       },
       unmounted(this: any) {
-        afterCompEvent({
-          context: this,
-          type: "unmount",
+        return;
+        after({
+          vue: this,
+          comp: this.$options._componentTag,
+          type: "♻️",
           name: "unmount",
+          result: null,
           elapsed: 0,
         });
       },
@@ -274,4 +253,4 @@ const Mixins = {
   },
 };
 
-export { Mixins, CompEvent };
+export { Mixins, BeforeCompEvent, AfterCompEvent };

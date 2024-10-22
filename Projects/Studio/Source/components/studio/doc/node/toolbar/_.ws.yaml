@@ -8,7 +8,7 @@ dom:
         @mouseenter: hovered.ntt = ntt
         @mouseleave: hovered.ntt = null
         ui.dnd.draggable:
-          :drag-item: "{ type: 'new.node', item: ntt }"
+          :drag-item: "{ type: (ntt.dragType??'new.node'), item: ntt }"
           .tool.tool-dimmed:
             .icon:
               v-text: ntt._?.icon
@@ -30,7 +30,12 @@ dom:
                 div:
                   v-text: "'Drop a branch from the app tree here to create a new reusable component.'"
         ui.dnd.dropzone:
+          :accepts: "['node']"
           @drop-item: onDropItem_new_comp
+          template:
+            v-slot: tooltip
+            div:
+              v-text: "'➕📦 create a new component'"
           .tool.tool-dimmed.new-comp:
             .icon:
               v-text: "'➕📦'"
@@ -75,6 +80,7 @@ dom:
 data:
   nodeTypeTools:
     - type: page
+      dragType: new.page
     - type: panel
     - type: list
     - type: image

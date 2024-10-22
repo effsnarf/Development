@@ -22,9 +22,24 @@ data:
   lastPos:
     x: null
     'y': null
+  darkOverlay: null
 methods:
+  showDarkOverlay: | #js
+    function() {
+      if (this.darkOverlay) return;
+      this.darkOverlay = document.createElement('div');
+      this.darkOverlay.classList.add('full-screen-dark-overlay');
+      document.body.appendChild(this.darkOverlay);
+      this.darkOverlay.classList.add('visible');
+    }
+  hideDarkOverlay: | #js
+    function() {
+      if (!this.darkOverlay) return;
+      this.darkOverlay.remove();
+      this.darkOverlay = null;
+    }
   onDragStart: | #js
-    function(e) {
+    async function(e) {
       this.isDragging = true;
 
       e.stopPropagation();
@@ -40,13 +55,22 @@ methods:
 
       this.$root.dragItem = this.dragItem;
       this.$emit('drag-start', this.dragItem);
+
+      await this.$nextTick();
+      await (0.2).seconds().wait();
+      this.showDarkOverlay();
+      this.$root.e.emit("drag.start", e, this.dragItem);
     }
   onDragEnd: | #js
     async function(e) {
       this.isDragging = false;
-      await this.$nextTick();
       this.$emit('drag-end', this.dragItem);
       this.$root.dragItem = null;
+      this.hideDarkOverlay();
+
+      await this.$nextTick();
+      await (0.2).seconds().wait();
+      this.$root.e.emit("drag.end", e, this.dragItem);
     }
   onDrag: | #js
     function(e) {
