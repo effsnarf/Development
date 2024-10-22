@@ -959,7 +959,7 @@ style:
     background-position: center
     background-size: cover
   .spacer0:
-    height: 2em
+    height: 3em
   .spacer1:
     height: 3em
   .spacer2:
