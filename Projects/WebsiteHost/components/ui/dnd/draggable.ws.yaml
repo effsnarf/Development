@@ -25,16 +25,19 @@ data:
   darkOverlay: null
 methods:
   showDarkOverlay: | #js
-    function() {
+    async function() {
       if (this.darkOverlay) return;
       this.darkOverlay = document.createElement('div');
       this.darkOverlay.classList.add('full-screen-dark-overlay');
       document.body.appendChild(this.darkOverlay);
+      await (0.2).seconds().wait();
       this.darkOverlay.classList.add('visible');
     }
   hideDarkOverlay: | #js
-    function() {
+    async function() {
       if (!this.darkOverlay) return;
+      this.darkOverlay.classList.remove('visible');
+      await (1).seconds().wait();
       this.darkOverlay.remove();
       this.darkOverlay = null;
     }

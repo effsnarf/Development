@@ -62,6 +62,7 @@ dom:
           studio.dom.tree.node:
             :item: sui.node.selecteds?.[sui.node.selecteds?.length-1]
             :sui: sui
+            :dropzone: "false"
         .box2:
           studio.doc.node.editor:
             :node: sui.node.selecteds[sui.node.selecteds.length-1]

@@ -91,7 +91,7 @@ style:
     background-color: "#80808080"
     border-radius: 0
   .done td:
-    padding: 0.2em 0.3em
+    padding: 0em 0.3em
   .done:first-child td:first-child:
     border-radius: 0.5em 0 0 0
   .done:first-child td:last-child:

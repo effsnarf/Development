@@ -5,6 +5,7 @@ dom:
     @mouseleave: () => onHoverNode(null)
     @click: () => onClickNode(node)
     ui.dnd.dropzone:
+      :enabled: dropzone
       :accepts: "['node', 'new.node']"
       @drag-enter: onDragEnter
       @drop-item: onDropItem
@@ -30,6 +31,7 @@ props:
   item:
   sui:
   showName: true
+  dropzone: true
 
 data:
   node:
