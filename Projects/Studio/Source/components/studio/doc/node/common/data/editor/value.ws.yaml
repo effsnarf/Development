@@ -2,7 +2,7 @@ dom:
   div:
     :key: key1
     ui.input.value:
-      :value: nodeVar?.value
+      :value: initial.value
       @input: onInput
 
 props:
@@ -11,7 +11,7 @@ props:
   sui:
 
 data:
-  value:
+  initial:
   key1: 1
 
 mounted: | #js
@@ -22,14 +22,31 @@ mounted: | #js
 methods:
   onInput: | #js
     function(value) {
+      if (!this.__onInput) this.__onInput = this._onInput.bind(this).throttle(400);
+      this.__onInput(value);
+    }
+  _onInput: | #js
+    function(value) {
       this.$root.do("edit.node.var", { node: this.node, varName: this.nodeVar.name, key: "value", value });
     }
   refresh: | #js
     function() {
       this.key1++;
     }
+  init: | #js
+    function() {
+      this.initial = Objects.clone(this.nodeVar);
+    }
 
 computed:
+
+watch:
+  nodeVar:
+    immediate: true
+    handler: | #js
+      function(nodeVar) {
+        this.init();
+      }
 
 style:
   td:nth-child(1):

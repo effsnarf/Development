@@ -371,7 +371,7 @@ window1.vueDebugger = vueDebugger;
 
 const vueAppMixins = [] as any[];
 
-const webScriptMixins = [] as any[]; //[vueDebugger.mixin];
+const webScriptMixins = [vueDebugger.mixin];
 
 interface MgParams {
   urlName: string;

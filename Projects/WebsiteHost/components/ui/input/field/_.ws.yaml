@@ -30,7 +30,7 @@ methods:
     function(dataItems) {
       return dataItems
         .take(10)
-        .flatMap(d => Object.keys(d))
+        .flatMap(d => Object.keys(d??{}))
         .distinct();
     }
 

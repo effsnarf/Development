@@ -117,14 +117,14 @@ methods:
     }
   do_select_node: | #js
     function(_do, selectIndex, node) {
-      if (!node) return;
       const selecteds = this.sui.node.selecteds;
       const oldSelectedNodes = selecteds.map(n => ({ id: n.id }));
       const oldSelectedPage = this.onlyNodeID(this.sui.page.selected);
+      if (selectIndex == null) selectIndex = (selecteds.length - 1);
       // clear anything above selectIndex
       selecteds.splice(selectIndex);
       node = this.$root.getNode(node);
-      selecteds.push(node);
+      if (node) selecteds.push(node);
       this.userApp.ui.selected.nodes = selecteds.map(n => ({ id: n.id }));
       // if this is a page node, set sui.page.selected
       if (node?.type == "page") this.do_select_page(_do, node);
@@ -291,7 +291,6 @@ methods:
     }
   undo: | #js
     function() {
-      debugger;
       if (this.pointerToLocalIndex(this.pointer) < 0) {
         return alertify.error("Nothing to undo");
       }
@@ -341,7 +340,7 @@ methods:
       if (type == "edit.node.var") {
         if (prevArgs.node.id == args.node.id) {
           if (prevArgs.varName == args.varName) {
-            if ((typeof prevArgs.value) == "string") {
+            if ([(typeof prevArgs.value), (typeof args.value)].includes("string")) {
               return prev;
             }
           }

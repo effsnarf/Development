@@ -44,33 +44,28 @@ methods:
       return this.getContainerData(pagesNode);
     }
   getContainerData: | #js
-    function(container) {
+    function(container, path = []) {
       const data = {};
-      const varsData = this.getNewVarsData(container);
+      const varsData = this.getNewVarsData(container, path);
       Object.assign(data, varsData);
       const scopeChildren = this.$root.getScopeContainerNodes(container);
       for (const child of scopeChildren) {
-        data[child.name] = this.getContainerData(child);
+        data[child.name] = this.getContainerData(child, [...path, child.name]);
       }
       return data;
     }
   getNewVarsData: | #js
-    function(container) {
+    function(container, path = []) {
       const data = {};
       for (const var1 of (container.vars??[])) {
         data[var1.name] = this.getNewVarData(var1);
+        var1.path = [...path, var1.name];
       }
       return data;
     }
   getNewVarData: | #js
     function(var1) {
-      const d = {
-        value: null
-      };
-      if (var1.type == "fetch") {
-        d._url = null;
-        d._value = null;
-      }
+      const d = {};
       return d;
     }
   onAppNodeChanged: | #js

@@ -19,6 +19,7 @@ dom:
                 studio.dom.tree.node:
                   :item: cnode.node
                   :sui: sui
+                  @node-click: onNodeClick
                   @click: () => refreshParentNodes(cnode)
               div:
                 studio.dom.tree.node:
@@ -26,6 +27,7 @@ dom:
                   :item: child
                   :sui: sui
                   :key: child.id
+                  @node-click: onNodeClick
 props:
   userApp:
   sui:
@@ -46,6 +48,11 @@ mounted: | #js
   }
 
 methods:
+  onNodeClick: | #js
+    function(node) {
+      this.$refs.context1.close();
+      this.$root.do("select.node", { selectIndex: null, node });
+    }
   onSelectedNodeChanged: | #js
     async function(newNode) {
       // close the context window
@@ -72,7 +79,7 @@ methods:
     async function(cnode) {
       this.hovered.cnodes = await this.getCNodeAncestors(cnode);
       this.hovered.nodes = this.hovered.cnodes.map(cn => cn.node);
-      this.sui.nodes.hovered = this.hovered.nodes;
+      this.sui.node.hovereds = this.hovered.nodes;
     }
   onHoveredElement: | #js
     async function(el) {

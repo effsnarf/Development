@@ -1,0 +1,14 @@
+dom:
+  div:
+    div:
+      v-for: var1 in node.vars
+      h2:
+        v-text: "'🧊 ' + var1.name"
+      .flex:
+        div:
+          v-text: var1.type
+        div:
+          v-text: (var1.url ?? var1.field ?? var1.exp ?? var1.value)
+
+props:
+  node:

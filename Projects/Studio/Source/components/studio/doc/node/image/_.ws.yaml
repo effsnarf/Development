@@ -17,6 +17,11 @@ data:
   emptyImageUrl: https://i.imgur.com/QwWQw2v.jpeg
   videoExtensions: ["webm", "mp4"]
 
+mounted: | #js
+  function() {
+    this.imageUrl = this.$parent.$parent.$parent.nodeVarData.imageUrl;
+  }
+
 computed:
   isImage: | #js
     function() {

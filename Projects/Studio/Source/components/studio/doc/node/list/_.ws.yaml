@@ -62,11 +62,12 @@ data:
   visibleItemKeys: []
   isMockArray: false
   exampleItems: 9
-  maxVisibleItems: 9
+  maxVisibleItems: 20
 
 mounted: | #js
   function() {
     this.$root.e.on("app.node.changed", this.onAppNodeChanged.bind(this));
+    this.$root.bindToUserAppState(this, "items", `${this.nodeVarPath}.items.items`, this.refresh.bind(this));
     this.$root.bindToUserAppState(this, "hovered", `${this.nodeVarPath}.hovered.value`);
     this.$root.bindToUserAppState(this, "selected", `${this.nodeVarPath}.selected.value`);
   }
@@ -88,6 +89,7 @@ methods:
     }
   onHover: | #js
     function(item) {
+      return;
       this.hovered = item;
     }
   onClick: | #js

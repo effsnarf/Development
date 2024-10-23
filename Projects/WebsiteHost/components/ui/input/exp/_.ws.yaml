@@ -4,48 +4,125 @@ dom:
       hint: expression
       :multiline: "true"
       :auto-resize: "true"
-      v-model: tempValue
-    .flex.justify-center:
-      ui.button:
-        text: ✔️
+      @input: onInput
+      v-model: tempExp
+    .error:
+      v-if: error
+      v-text: error
     div:
-      v-if: "false"
+      h3:
+        v-text: "'🧊 context'"
       div:
-        v-for: item in [...dataItems].take(10)
-        ui.value.preview:
-          ':value': item
+        .flex:
+          ui.title:
+            v-for: field in contextFields
+            icon: 🧊
+            :text: field
+        .flex.flex-wrap:
+          ui.title:
+            v-for: field in dataItemFields
+            icon: 🧊
+            :text: field
+    .flex:
+      v-if: dataItems?.length
+      :key: key1
+      :style: "{ 'max-width': '40em' }"
+      div:
+        ui.value:
+          :value: "sampleDataItems"
+      div:
+        ui.value:
+          :value: "expDataItems"
 
 props:
   dataItems:
+  dataItemContextKey: "$item"
+  context:
+  evalExpItem:
+  error:
   value:
 
 data:
+  contextFields:
+  dataItemFields:
+  expFields:
   fields:
-  tempValue:
+  tempExp:
+  sampleDataItems:
+  expDataItems:
+  is:
+    inited: false
+  key1: 1
 
+mounted: | #js
+  function() {
+  }
 methods:
-  getFields: | #js
+  getContextFields: | #js
+    function() {
+      return Object.keys(this.context);
+    }
+  getExpFields: | #js
+    function(item) {
+      const contextFields = Object.keys(this.context);
+      const itemFields = this.getDataItemFields([item]).except(contextFields);
+      const fields = [...contextFields, ...itemFields];
+      return fields;
+    }
+  getDataItemFields: | #js
     function(dataItems) {
       return dataItems
         .take(10)
-        .flatMap(d => Object.keys(d))
-        .distinct();
+        .flatMap(d => Object.keys(d??{}))
+        .distinct()
+        .sortBy(f => f);
+    }
+  onInput: | #js
+    function(value) {
+      if (!this.__onInput) this.__onInput = this._onInput.bind(this).throttle(400);
+      this.__onInput(value);
+    }
+  _onInput: | #js
+    function(value) {
+      this.expDataItems = this.sampleDataItems.map((dataItem) => this.evalExpItem(this.tempExp, dataItem));
+      this.$emit('input', value);
+    }
+  refresh: | #js
+    function() {
+      this.key1++;
     }
 
 watch:
+  context:
+    immediate: true
+    handler: | #js
+      function(context) {
+        this.contextFields = this.getContextFields(context);
+      }
   value:
     handler: | #js
       function(value) {
-        this.tempValue = value;
+        if (this.is.inited) return;
+        this.is.inited = true;
+        this.tempExp = value;
       }
-  tempValue:
+    immediate: true
+  dataItems:
     handler: | #js
-      function(value) {
-        this.$emit('preview', value);
+      function(dataItems) {
+        this.dataItemFields = this.getDataItemFields(dataItems);
+        this.expFields = this.getExpFields(dataItems?.[0]);
+        this.sampleDataItems = [...dataItems].take(10);
+        this.expDataItems = this.sampleDataItems.map(this.evalExpItem.bind(this, this.tempExp));
+        this.refresh();
       }
+    immediate: true
+    deep: false
+
+computed:
 
 style:
-  .flex > *:
+  .comp-ui-input-exp > .flex > *:
     width: 50%
     overflow: hidden
     white-space: nowrap

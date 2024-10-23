@@ -1,22 +1,12 @@
 dom:
   div:
     ui.input.exp:
+      :context: nodeContext
       :data-items: sui.selected.dataItems
+      :eval-exp-item: evalExpItem.bind(this)
       :value: initial.exp
-      @preview: previewField
-      @input: selectField
-    div:
-      h2:
-        v-text: "'🧊 context'"
-      table:
-        tr:
-          v-for: (v, key) in nodeContext
-          th:
-            v-text: "'🧊 ' + key"
-          td:
-            .folded:
-              ui.value:
-                :value: nodeContext[key]
+      :error: error
+      @input: onInput
 
 props:
   node:
@@ -26,6 +16,7 @@ props:
 data:
   initial:
   nodeContext:
+  error:
 
 mounted: | #js
   function() {
@@ -33,20 +24,28 @@ mounted: | #js
   }
 
 methods:
+  evalExpItem: | #js
+    function(exp, dataItem) {
+      try {
+        this.error = null;
+        const func = this.$root.toContextFunc(this, dataItem, { args: [], code: `return ${exp};` }, { async: false });
+        const value = func();
+        return value;
+      }
+      catch (ex) {
+        if (ex.message.includes("Object")) debugger;
+        this.error = ex.message;
+      }
+    }
+  onInput: | #js
+    function(value) {
+      this.initial.exp = value;
+      this.$root.do("edit.node.var", { node: this.node, varName: this.nodeVar.name, key: "exp", value });
+    }
   init: | #js
     function() {
       this.initial = Objects.clone(this.nodeVar);
-      this.nodeContext = this.$root.getNodeContext(this, this.sui.page.selected?.name, this.sui.selected.dataItems?.first());
-    }
-  previewField: | #js
-    function(value) {
-      this.nodeVar.exp = (value || this.initial.exp);
-      this.$root.e.emit("app.node.preview", this.node);
-    }
-  selectField: | #js
-    function(value) {
-      this.nodeVar.exp = this.initial.exp;
-      this.$root.do("edit.node.var", { node: this.node, varName: this.nodeVar.name, key: "exp", value });
+      this.nodeContext = this.$root.getNodeContext(this, this.sui.page.selected?.name);
     }
 
 watch:

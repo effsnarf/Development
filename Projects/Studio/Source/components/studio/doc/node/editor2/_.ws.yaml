@@ -1,0 +1,11 @@
+dom:
+  div:
+    h2:
+      studio.dom.tree.node:
+        :item: node
+        :dropzone: "false"
+    studio.doc.node.editor2.vars:
+      :node: node
+
+props:
+  node:

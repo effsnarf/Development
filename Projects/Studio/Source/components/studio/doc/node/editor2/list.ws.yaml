@@ -1,0 +1,8 @@
+dom:
+  div:
+    studio.doc.node.editor2:
+      v-for: node in [...nodes].reverse()
+      :node: node
+
+props:
+  nodes:

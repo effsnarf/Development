@@ -152,7 +152,7 @@ methods:
       const fields = objects.map(o => Object.keys(o||{}))
         .flatMap(f => f)
         .distinct()
-        //.sortBy(f => f)
+        .sortBy(f => f)
         .take(this.maxVisibleFields || 1000);
       return fields;
     }

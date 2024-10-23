@@ -19,6 +19,7 @@ dom:
       :class: "{ ['box-hovered-' + sui.main.box.hovered]: true }"
       .main-box.a:
         ide.vue.debugger:
+          v-if: "false"
         @mouseenter: sui.main.box.hovered = 0
         @mouseleave: sui.main.box.hovered = null
       .main-box.b:
@@ -43,7 +44,6 @@ dom:
           @mouseenter: () => onHoverApp(true)
           @mouseleave: () => onHoverApp(false)
           studio.doc.node.picker:
-            v-if: "false"
             :user-app: userApp
             :sui: sui
             :enabled: sui.app.is.hovered
@@ -134,14 +134,13 @@ data:
     pages:
     node:
       hovered:
+      hovereds: []
       selecteds: []
       active:
       context:
       tree:
         is:
           hovered:
-    nodes:
-      hovered:
     selected:
       dataItems: []
     debug: true
@@ -179,7 +178,7 @@ mounted: | #js
             get: (varPath) => {
               return Objects.getProperty(this.userAppState, varPath);
             },
-            set: (vue, ...args) => {
+            set: (...args) => {
               // it's either (varPath, newValue) or (varPath, varName, newValue)
               let varPath, varName, newValue;
               if (args.length == 2) {
@@ -196,11 +195,11 @@ mounted: | #js
               }
               varPath = (varPath.split?.('.') || varPath);
               if (varPath.join(".") == "home.list1") debugger;
-              const fullVarPath = varPath.concat([varName]).join('.');
+              const fullVarPath = varPath.concat([varName]);
               const oldValue = Objects.getProperty(this.userAppState, fullVarPath);
               if (newValue == oldValue) return;
               Objects.setProperty(this.userAppState, fullVarPath, newValue);
-              this.appStateChangedVars.push({ varPath, newValue });
+              this.appStateChangedVars.push({ varPath: fullVarPath, newValue });
               this.appStateChangeKey++;
               //console.log("🧊", fullVarPath, newValue);
               //this.$root.e.emit("app.log", vue, "🧊", "app.state.set", { varPath, varName, newValue });
@@ -213,7 +212,7 @@ mounted: | #js
         comp: {
           state: {
             change: ($root, vue, key, varPath, newValue) => {
-              $root.studio.user.app.state.set(this, varPath, newValue);
+              $root.studio.user.app.state.set(varPath, newValue);
             }
           }
         }
@@ -1019,23 +1018,31 @@ style:
     box-shadow: "-0.5em 0.5em 2px #00000080"
     padding: 1em
   .main-box.a:
-    width: 10%
+    width: 0%
   .main-box.b:
     width: 15%
+
   .main-boxes.box-hovered-0 .main-box.a:
     width: 35%
   .main-boxes.box-hovered-0 .main-box.d:
     width: 10%
   .main-boxes.box-hovered-0 .main-box.e:
     width: 10%
-  .main-boxes.box-hovered-3 .main-box.d:
-    width: 35%
-  .main-boxes.box-hovered-3 .main-box.e:
+
+  .main-boxes.box-hovered-3 .main-box.b:
+    width: 10%
+  .main-boxes.box-hovered-3 .main-box.c:
     width: 15%
+  .main-boxes.box-hovered-3 .main-box.d:
+    width: 50%
+  .main-boxes.box-hovered-3 .main-box.e:
+    width: 10%
+
   .main-boxes.box-hovered-4 .main-box.d:
     width: 15%
   .main-boxes.box-hovered-4 .main-box.e:
     width: 35%
+
   .flex2:
     display: flex
     flex-direction: column

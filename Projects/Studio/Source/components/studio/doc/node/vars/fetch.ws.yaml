@@ -10,52 +10,79 @@ props:
   nodeVarPath:
 
 data:
-  _url:
-  _items: []
-  items: []
   inited:
-    url:
     linq:
   live:
     url: null
+  error:
 
 mounted: | #js
   function() {
     this.init();
     this.$root.e.on("app.node.changed", this.onAppNodeChanged.bind(this));
+    this.$root.e.on("app.state.changed", this.onAppStateChanged.bind(this));
   }
 
 methods:
-  onAppNodeChanged: | #js
-    function(node) {
-      if (node.id != this.node.id) return;
-      const nodeVar = this.nodeVar;
-      // if the url has changed
-      if (nodeVar.url != this.inited.url) {
-        // stop the previous watcher
-        this.live.url?.destroy();
-        this.live.url = this.$root.liveNodeVar(this, nodeVar, "_url", nodeVar.url, async (newUrl) => {
-          this.$data._items = (await this.$root.fetchFromUrl(newUrl));
-          this.items = this.linqEval(this.$data._items);
-        });
-        this.inited.url = nodeVar.url;
+  refresh: | #js
+    async function() {
+      try {
+        this.error = null;
+        const varPath = this.nodeVar.path.join('.');
+        const getNewUrl = this.$root.toContextFunc(this, null, { args: [], code: `return ${this.nodeVar.url};` }, { async: false });
+        const oldUrl = this.$root.studio.user.app.state.get(`${varPath}._url`);
+        const newUrl = getNewUrl();
+        const oldLinq = this.$root.studio.user.app.state.get(`${varPath}._linq`);
+        const newLinq = this.nodeVar.linq;
+        let _items = [];
+        let items = [];
+        let linqItems = false;
+        // if the url has changed
+        if (newUrl != oldUrl) {
+          this.$root.studio.user.app.state.set(`${varPath}._url`, newUrl);
+          _items = (await this.$root.fetchFromUrl(newUrl));
+          this.$root.studio.user.app.state.set(`${varPath}._items`, _items);
+          linqItems = true;
+        }
+        else
+        {
+          _items = this.$root.studio.user.app.state.get(`${varPath}._items`);
+        }
+        // if the linq has changed
+        if (!Objects.areEqual(newLinq, oldLinq)) {
+          this.$root.studio.user.app.state.set(`${varPath}._linq`, newLinq);
+          linqItems = true;
+        }
+        if (linqItems) {
+          items = this.linqEval(_items, newLinq);
+          this.$root.studio.user.app.state.set(`${varPath}.items`, items);
+        }
+        items = this.$root.studio.user.app.state.get(`${varPath}.items`);
+        this.$emit("update", items);
       }
-      // if the linq has changed
-      if (nodeVar.linq != this.inited.linq) {
-        this.items = this.linqEval(this.$data._items)
-        this.inited.linq = nodeVar.linq;
+      catch (ex) {
+        this.$root.e.emit("user.app.error", this, ex.message);
       }
     }
   init: | #js
     function() {
-      this.$root.bindToUserAppState(this, "_items", `${this.nodeVarPath}.${this.nodeVar.name}._value`);
-      this.$root.bindToUserAppState(this, "items", `${this.nodeVarPath}.${this.nodeVar.name}.value`);
-      this.onAppNodeChanged(this.node);
+      this.refresh();
+    }
+  onAppStateChanged: | #js
+    function(vars) {
+      const var1 = vars.find(v => (this.nodeVarPath == v.varPath.join(".")));
+      if (!var1) return;
+      this.refresh();
+    }
+  onAppNodeChanged: | #js
+    function(node) {
+      if (node.id != this.node.id) return;
+      this.refresh();
     }
   linqEval: | #js
-    function(inputData) {
+    function(inputData, linq) {
       if (!this.$refs.linqEval1) return null;
-      const linq = (this.nodeVar.linq ?? []);
+      linq = (linq ?? []);
       const datas = this.$refs.linqEval1.evaluateOps(null, inputData, linq);
       const outputData = datas.last();
       return outputData;

@@ -1,6 +1,7 @@
 dom:
   div:
-    :is: "('h'+(node.size||4))"
+    # :is: "('h'+(node.size||4))"
+    :is: "'h3'"
     div:
       v-text: "(text || node.text || '[text❔]')"
 
@@ -12,3 +13,8 @@ props:
 
 data:
   text:
+
+mounted: | #js
+  function() {
+    this.text = this.$parent.$parent.$parent.nodeVarData.text;
+  }

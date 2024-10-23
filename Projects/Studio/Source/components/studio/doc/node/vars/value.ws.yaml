@@ -2,33 +2,51 @@ dom:
   div:
 
 props:
+  node:
   nodeVar:
   nodeVarPath:
 
 data:
-  value:
-  live:
+
+mounted: | #js
+  function() {
+    this.init();
+    this.$root.e.on("app.node.changed", this.onAppNodeChanged.bind(this));
+    this.$root.e.on("app.state.changed", this.onAppStateChanged.bind(this));
+  }
 
 methods:
   init: | #js
-    function(nodeVar) {
-      //alertify.message(`🧊 init ${nodeVar.name}`);
-      this.live = this.$root.liveNodeVar(this, nodeVar, "value", JSON.stringify(nodeVar.value), (newValue) => {
-        this.value = newValue;
-      });
+    function() {
+      this.refresh();
+    }
+  refresh: | #js
+    function() {
+      try {
+        this.error = null;
+        const value = Objects.clone(this.nodeVar.value);
+        this.$emit("update", value);
+      }
+      catch (ex) {
+        this.error = ex.message;
+      }
+    }
+  onAppStateChanged: | #js
+    function(vars) {
+      const var1 = vars.find(v => (this.nodeVarPath == v.varPath.join(".")));
+      if (!var1) return;
+      this.refresh();
+    }
+  onAppNodeChanged: | #js
+    function(node) {
+      if (node.id != this.node.id) return;
+      this.refresh();
     }
 
 watch:
-  value:
-    immediate: true
-    deep: false
-    handler: | #js
-      function(value) {
-        this.$emit("update", value);
-      }
   nodeVar:
     immediate: true
     handler: | #js
       function(nodeVar) {
-        this.init(nodeVar);
+        this.init();
       }

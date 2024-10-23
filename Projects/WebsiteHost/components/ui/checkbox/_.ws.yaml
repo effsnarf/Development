@@ -11,7 +11,7 @@ dom:
         v-if: "false"
         type: checkbox
         ':checked': checkedValue
-    span: 
+    div: 
       .icon:
         v-if: icon
         v-text: icon

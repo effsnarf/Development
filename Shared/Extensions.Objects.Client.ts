@@ -599,12 +599,36 @@ class Objects {
     }
   }
 
-  static getLeafKeyPaths(obj: any): (string | number)[][] {
-    const keyPaths = Objects.getAllKeyPaths(obj);
-    return keyPaths.filter((keyPath) => {
-      const value = Objects.getProperty(obj, keyPath);
-      return value == null || Objects.isPrimitive(value);
-    });
+  static getLeafKeyPaths(
+    obj: any,
+    prefix: (string | number)[] = []
+  ): (string | number)[][] {
+    const paths: (string | number)[][] = [];
+
+    for (const key in obj) {
+      const newPrefix = [...prefix, key];
+
+      const value = obj[key];
+      if (
+        value !== null &&
+        typeof value === "object" &&
+        !Array.isArray(value)
+      ) {
+        const subPaths = this.getLeafKeyPaths(value, newPrefix);
+
+        // If the object is empty, treat it as a leaf.
+        if (subPaths.length === 0) {
+          paths.push(newPrefix);
+        } else {
+          paths.push(...subPaths);
+        }
+      } else {
+        // If the value is null or a primitive, it's a leaf node.
+        paths.push(newPrefix);
+      }
+    }
+
+    return paths;
   }
 
   static getAllKeyPaths(obj: any): (string | number)[][] {

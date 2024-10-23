@@ -33,6 +33,6 @@ methods:
     async function(eventName, ...args) {
       const nodeEvent = this.node.events?.find(e => e.name == eventName);
       if (!nodeEvent) return;
-      const func = this.$root.toContextFunc(this, nodeEvent.handler);
+      const func = this.$root.toContextFunc(this, null, nodeEvent.handler);
       await func(...args);
     }

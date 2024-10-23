@@ -35,7 +35,7 @@ class Component {
     if (this.isCompiled) return;
 
     
-    const logGroup = true;
+    const logGroup = false;
     
     await ClientContext.waitUntilLoaded();
     const client = ClientContext.context!;
@@ -44,7 +44,7 @@ class Component {
       console.groupCollapsed(`📦`, this.name);
       console.log(this);
     } else {
-      console.log(`📦`, this.name);
+      //console.log(`📦`, this.name);
     }
 
     try {

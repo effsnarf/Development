@@ -32,8 +32,11 @@ methods:
     function() {
       try {
         this.error = null;
-        const func = this.$root.toContextFunc(this, { args: [], code: `return ${this.nodeVar.exp};` }, { async: false });
-        this.value = func();
+        const func = this.$root.toContextFunc(this, null, { args: [], code: `return ${this.nodeVar.exp};` }, { async: false });
+        const oldValue = this.value;
+        const newValue = func();
+        if (newValue == oldValue) return;
+        this.value = newValue;
         this.$emit("update", this.value);
       }
       catch (ex) {
@@ -42,8 +45,6 @@ methods:
     }
   onAppStateChanged: | #js
     function(vars) {
-      const var1 = vars.find(v => (this.nodeVarPath == v.varPath.join(".")));
-      if (!var1) return;
       this.refresh();
     }
   onAppNodeChanged: | #js

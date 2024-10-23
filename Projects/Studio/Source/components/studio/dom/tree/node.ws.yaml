@@ -74,10 +74,7 @@ methods:
     }
   onClickNode: | #js
     function(node) {
-      if (this.sui) {
-        //if (node?.id == this.sui.node.selected?.id) node = null;
-        //this.$root.do("select.node", { node });
-      }
+      this.$emit("node-click", node);
     }
   onHoverNode: | #js
     function(node) {

@@ -141,6 +141,17 @@ methods:
         }
       }
 
+      if (node.type == "image") {
+        if (!node.vars.find(v => (v.name == "url"))) {
+          node.vars.push({
+            name: "imageUrl",
+            type: "exp",
+            value: null,
+            exp: null
+          });
+        }
+      }
+
       if (node.type == "list") {
         node.vars.push({
           name: "items",
@@ -306,6 +317,7 @@ methods:
   getContainerNodeByPath: | #js
     function(path) {
       if (typeof(path) == 'string') path = path.split('.');
+      if (!path.length) return null;
       let node = this.userApp;
       let part;
       while (part = path.shift()) {
@@ -316,6 +328,7 @@ methods:
     }
   getScopeContainerNodes: | #js
     function(parent) {
+      if (!parent) return [];
       if (parent.type == "comp.inst") {
         const compNode = this.getCompNode(parent);
         parent = compNode;
@@ -435,6 +448,7 @@ methods:
   fetchFromUrl: | #js
     async function(url) {
       if (!url) return null;
+      console.log(`🌐 ${url}`);
       const ticker = Ticker.alertify((elapsed) => `<h2>⏳ ${elapsed.unitifyTime()}</h2> ${url}`)
       try
       {
@@ -452,18 +466,19 @@ methods:
       }
     }
   bindToUserAppState: | #js
-    function(vue, vueDataKey, nodeVarPath) {
+    function(vue, vueDataKey, nodeVarPath, onVarValueChanged) {
       // local -> userAppState
       Vue.watch(() => vue.$data[vueDataKey], (newValue) => {
         const oldValue = this.$root.studio.user.app.state.get(nodeVarPath);
         if (oldValue == newValue) return;
-        this.$root.studio.user.app.state.set(this, nodeVarPath, newValue);
+        this.$root.studio.user.app.state.set(nodeVarPath, newValue);
         //this.$root.studio.user.app.log(this, `🧊`, "$watcher", { dir: "local -> app.state", path: `🧊 ${nodeVarPath}.${var1.name}.${propName}`, newValue });
       });
       // userAppState -> local
       this.$root.watchUserAppState(vue, nodeVarPath, (newValue) => {
         if (vue.$data[vueDataKey] == newValue) return;
         vue.$data[vueDataKey] = newValue;
+        onVarValueChanged?.();
         //this.$root.studio.user.app.log(this, `🧊`, "$watcher", { dir: "app.state -> local", path: `🧊 ${nodeVarPath}.${var1.name}.${propName}`, newValue });
       });
     }
@@ -497,12 +512,14 @@ methods:
     function(vue, var1, propName, exp, onChange) {
       this.$root.studio.user.app.log(vue, `🧊`, "liveNodeVar.init", { var1, propName, exp });
       const computed = Vue.computed({
-        get: this.$root.toContextFunc(vue, { args: ["vue"], code: `try { return ${exp}; } catch (ex) {}` }, { async: false })
+        get: this.$root.toContextFunc(vue, null, { args: ["vue"], code: `try { return ${exp}; } catch (ex) {}` }, { async: false })
       });
       const watcher = Vue.watch(computed, (newValue) => {
+        const oldValue = this.$root.studio.user.app.state.get(`${vue.nodeVarPath}.${var1.name}.${propName}`);
+        if (oldValue == newValue) return;
         vue.$data[propName] = newValue;
-        this.$root.studio.user.app.log(vue, `🧊`, "liveNodeVar.$watcher", { propName, newValue });
-        if (vue.nodeVarPath) this.$root.studio.user.app.state.set(this, `${vue.nodeVarPath}.${var1.name}`, propName, newValue);
+        //this.$root.studio.user.app.log(vue, `🧊`, "liveNodeVar.$watcher", { propName, newValue });
+        this.$root.studio.user.app.state.set(`${vue.nodeVarPath}.${var1.name}`, propName, newValue);
         onChange?.(newValue);
       }, { immediate: true });
       const destroy = () => {
@@ -524,10 +541,11 @@ methods:
       const $node = nodeData;
       const $item = (dataItem ?? vue.dataItem);
       const context = { $item, $node, $page, $app };
+      if ($item) for (const key in $item) context[key] = $item[key];
       return context;
     }
   toContextFunc: | #js
-    function(vue, funcDef, options) {
+    function(vue, dataItem, funcDef, options) {
       const isAsync = (options?.async ?? true);
       while (!vue.node) vue = vue.$parent;
       // accepts:
@@ -535,11 +553,11 @@ methods:
       // returns a function
       // defaults to async function
       if (!funcDef) return null;
-      const argNames = [...(funcDef.args || []), '$item', '$node', '$page', '$app'];
+      const context = this.$root.getNodeContext(vue, null, dataItem);
+      const argNames = [...(funcDef.args || []), ...Object.keys(context)];
       const code = funcDef.code || '';
       const funcStr = `${(isAsync ? "async" : "")} function(${argNames.join(', ')}) { ${code} }`;
       const func = eval(`(${funcStr})`);
-      const context = this.$root.getNodeContext(vue);
       return function(...args) {
         args.push(...Object.values(context));
         return func.apply(vue, args);
