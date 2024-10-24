@@ -137,6 +137,9 @@ computed:
       return true;
     }
 style:
+  .comp-ui-image img:
+    height: 1em
+    object-fit: cover
   .large:
     font-size: 140%
   .value-as-string:

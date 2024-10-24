@@ -5,19 +5,19 @@ dom:
     :show-grid-name: "false"
     template:
       v-slot: header
-      div:
-        class: node-warning
-        v-if: "(isMockArray) && (!itemsIsNotArray)"
-        v-text: "'⚠️🧊 data missing'"
-      div:
-        class: node-warning
-        v-if: "itemsIsNotArray"
+      .error.clickable:
+        @click: "$root.do('navigate', { node, nodeVar, toolCategoryIndex: 1 })"
         div:
-          v-text: "'⚠️🧊 array expected'"
+          v-if: "(isMockArray) && (!itemsIsNotArray)"
+          v-text: "'🧊 data missing'"
         div:
-          v-text: "'(not ' + (typeof items) + ')'"
-        ui.value.preview:
-          :value: items
+          v-if: "itemsIsNotArray"
+          div:
+            v-text: "'🧊 array expected'"
+          div:
+            v-text: "'(not ' + (typeof items) + ')'"
+          ui.value:
+            :value: items
     template:
       v-slot: example-box
       .node-warning:
@@ -29,11 +29,12 @@ dom:
       :key: visibleItemKeys[i]
       div:
         v-if: "!node.children?.length"
-        .node-warning:
-          v-text: "'⚠️📂 template missing'"
-        ui.value.preview:
-          v-if: "!isMockArray"
-          :value: item
+        .folded1:
+          .node-warning:
+            v-text: "'⚠️📂 template missing'"
+          ui.value:
+            v-if: "!isMockArray"
+            :value: item
       studio.doc.node:
         v-if: "node.children?.length"
         v-for: childNode in node.children
@@ -134,10 +135,14 @@ watch:
       }
       
 style:
-  .list-item.empty:
+  .folded1:
     max-height: 7em
     overflow: hidden
-    cursor: pointer
+    transition: 0.6s
+  .folded1:hover:
+    max-height: 12em
+    overflow: hidden
+  .list-item:
+    opacity: 0.8
   .list-item:hover:
-    background: "#80808030"
     opacity: 1

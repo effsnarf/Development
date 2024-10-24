@@ -17,15 +17,20 @@ dom:
       @blur: is.focused = false
       @input: onInput
       @keydown: onTextBoxKeyDown
-  textarea:
-    ref: textarea1
+  div:
     v-else-if: multiline
-    ':value': value
-    ':placeholder': hint
-    @focus: $emit('focus')
-    @blur: $emit('blur')
-    @input: onTextAreaInput
-    @keydown: onTextAreaKeyDown
+    textarea:
+      ref: textarea1
+      ':value': value
+      ':placeholder': hint
+      @focus: $emit('focus')
+      @blur: $emit('blur')
+      @input: onTextAreaInput
+      @keydown: onTextAreaKeyDown
+    pre:
+      v-if: "false"
+      code:
+        v-text: value
 props:
   type: text
   value: ""
@@ -73,6 +78,7 @@ methods:
       const textarea = e.target;
       this.$emit('input', textarea.value);
       this.resizeTextArea(textarea);
+      Prism.highlightAll();
     }
   resizeInput: | #js
     function(input) {

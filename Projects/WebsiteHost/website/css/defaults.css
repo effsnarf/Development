@@ -166,7 +166,6 @@ li
 }
 .clickable:hover
 {
-  background: #80808040 !important;
   opacity: 1;
   transition: 0s;
 }
@@ -797,7 +796,7 @@ select, input[type=range]
 {
   text-align: left;
   text-shadow: -3px 3px 1px #000;
-  background: #b03030;
+  background:  linear-gradient(140deg, #ba2525, #3e0000);
   padding: 0.5em;
   font-weight: normal;
 }
