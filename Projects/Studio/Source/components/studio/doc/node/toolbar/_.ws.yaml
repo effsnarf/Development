@@ -85,6 +85,7 @@ data:
     - type: list
     - type: image
     - type: text
+    - type: textbox
     - type: button
   compNodes: []
   hovered:

@@ -1,17 +1,12 @@
 dom:
   div:
-    :key: key1
-    ui.input.text.box:
-      hint: "https://a.4cdn.org/boards.json"
-      multiline: true
+    ui.input.exp:
+      :context: nodeContext
+      :data-items: sui?.selected.dataItems
+      :eval-exp-item: evalExpItem.bind(this)
       :value: initial.url
-      @input: (value) => url = value
-    div:
-      v-if: (true) || (url != initial.url)
-      ui.button:
-        icon: ✔️
-        text: save
-        @click: onSaveUrl
+      :error: error
+      @input: onInput
     div:
       studio.app.runtime.state.branch:
         :node: node
@@ -37,6 +32,7 @@ props:
   nodeVar:
   nodeVarPath:
   userAppState:
+  sui:
 
 data:
   url:
@@ -45,16 +41,39 @@ data:
     linq:
   nodeVarData:
   nodeVarLinqedData:
-  key1: 1
+  error:
 
 mounted: | #js
   function() {
+    this.$root.e.on("app.node.changed", this.init.bind(this));
     this.$root.e.on("app.node.changed", this.onAppNodeChanged.bind(this));
     this.$root.e.on("app.state.changed", this.onAppStateChanged.bind(this));
     this.refresh();
   }
 
 methods:
+  init: | #js
+    function() {
+      this.initial = Objects.clone(this.nodeVar);
+      this.nodeContext = this.$root.getNodeContext(this, this.sui?.page.selected?.name);
+    }
+  evalExpItem: | #js
+    function(url, dataItem) {
+      try {
+        this.error = null;
+        const func = this.$root.toContextFunc(this, dataItem, { args: [], code: `return ${url};` }, { async: false });
+        const value = func();
+        return value;
+      }
+      catch (ex) {
+        this.error = ex.message;
+      }
+    }
+  onInput: | #js
+    function(value) {
+      this.initial.url = value;
+      this.$root.do("edit.node.var", { node: this.node, varName: this.nodeVar.name, key: "url", value });
+    }
   onAppNodeChanged: | #js
     function(node) {
       if (node.id != this.node.id) return;
@@ -82,7 +101,6 @@ methods:
       this.initial.linq = Objects.clone(nodeVar.linq);
       this.initial.url = this.url = this.nodeVar?.url;
       this.nodeVarData = Objects.getProperty(this.userAppState, this.nodeVarPath);
-      this.key1++;
     }
 
 watch:
@@ -90,5 +108,6 @@ watch:
     immediate: true
     handler: | #js
       function(nodeVar) {
+        this.init();
         this.refresh(nodeVar);
       }

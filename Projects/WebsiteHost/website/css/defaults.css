@@ -166,6 +166,7 @@ li
 }
 .clickable:hover
 {
+  background: #80808040 !important;
   opacity: 1;
   transition: 0s;
 }

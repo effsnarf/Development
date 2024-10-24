@@ -4,6 +4,7 @@ dom:
     ui.image:
       v-if: isImageUrl
       ':url': value
+      :square: 'true'
     ui.value.preview.function:
       v-else-if: isFunction
       ':value': value

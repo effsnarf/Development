@@ -9,10 +9,12 @@ dom:
           @mouseleave: hovered = null
           @click: $emit('input', field)
           td:
-            v-text: "'🧊 ' + field"
+            v-text: "'🧊'"
+          td:
+            v-text: "field"
       div:
         v-if: active
-        div:
+        .value:
           v-for: item in [...dataItems].take(10)
           ui.value.preview:
             ':value': item[active]
@@ -28,6 +30,7 @@ data:
 methods:
   getFields: | #js
     function(dataItems) {
+      if (!dataItems) return [];
       return dataItems
         .take(10)
         .flatMap(d => Object.keys(d??{}))
@@ -55,7 +58,12 @@ computed:
     }
 
 style:
+  .flex:
+    max-width: 30em
   .flex > *:
     width: 50%
     overflow: hidden
     white-space: nowrap
+  .flex tr, .value:
+    height: 2em
+    overflow: hidden

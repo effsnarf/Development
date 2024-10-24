@@ -27,6 +27,7 @@ methods:
         panel: "📂",
         list: "🧮",
         text: "🅰️",
+        textbox: "⌨️",
         button: "✔️",
         comps: "🎁",
         comp: "🎁",
@@ -76,6 +77,8 @@ methods:
       }
 
       options = (options ?? {});
+
+      if (!node.name) node.name = this.getNewNodeName(userApp, node.type);
 
       if (node.type == "page") {
         if (options.insert?.page) {
@@ -142,6 +145,15 @@ methods:
             textVar.type = "field";
           }
           node.vars.push(textVar);
+        }
+      }
+
+      if (node.type == "textbox") {
+        if (!node.vars.find(v => (v.name == "text"))) {
+          node.vars.push({
+            name: "text",
+            type: "var",
+          });
         }
       }
 
@@ -507,9 +519,9 @@ methods:
       return vue?.userAppState;
     }
   getNewNodeName: | #js
-    function(name) {
+    function(userApp, name) {
       let index = 1;
-      while (this.findNodeByName2(this.userApp, `${name}${index}`)) index++;
+      while (this.findNodeByName2(userApp, `${name}${index}`)) index++;
       return `${name}${index}`;
     }
   liveNodeVar: | #js

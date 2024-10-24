@@ -1,22 +1,14 @@
 dom:
   div:
-    .error.clickable:
-      v-if: error
-      @click: "$root.do('navigate', { node, nodeVar, toolCategoryIndex: 1 })"
-      ui.title:
-        icon: "🧊"
-        :text: nodeVar.name
-      div:
-        v-text: error
 
 props:
   node:
   nodeVar:
   nodeVarPath:
+  nodeContext:
   dataItem:
 
 data:
-  error:
   value:
 
 mounted: | #js
@@ -34,7 +26,7 @@ methods:
   refresh: | #js
     function() {
       try {
-        this.error = null;
+        this.$emit("error", null);
         const func = this.$root.toContextFunc(this, null, { args: [], code: `return ${this.nodeVar.exp};` }, { async: false });
         const oldValue = this.value;
         const newValue = func();
@@ -43,7 +35,7 @@ methods:
         this.$emit("update", this.value);
       }
       catch (ex) {
-        this.error = ex.message;
+        this.$emit("error", ex.message);
       }
     }
   onAppStateChanged: | #js

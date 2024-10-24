@@ -5,7 +5,9 @@ dom:
         ui.input.text.box:
           :icon: "(nodeIcon + '🧊')"
           camouflage: true
-          v-model: node.name
+          :hint: "(node.type + ' name')"
+          :value: node.name
+          @input: "(value) => $root.do('edit.node', { oldNode: node, newNode: { name: value } })"
     div:
       v-if: node?.vars
       .flex:

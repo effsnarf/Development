@@ -274,6 +274,11 @@ methods:
     function(_do, oldNode, newNode, changes) {
       let undoChanges = [];
       if (oldNode && newNode) {
+        if (!newNode.id) {
+          const newNode2 = Objects.clone(newNode);
+          newNode = Objects.clone(oldNode, { exclude: ["children"] });
+          Objects.deepAssign(newNode, newNode2);
+        }
         delete oldNode.children;
         delete newNode.children;
         changes = DeepDiff.diff(oldNode, newNode);

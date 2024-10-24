@@ -1,0 +1,34 @@
+dom:
+  div:
+    ui.input.text.box:
+      :value: text
+      @input: onInput
+
+props:
+  node:
+  nodeVarPath:
+  nodeVarData:
+  sui:
+  dataItem:
+  userAppState:
+
+data:
+  text:
+
+mounted: | #js
+  function() {
+    this.text = this.nodeVarData.text;
+  }
+
+methods:
+  onInput: | #js
+    function(text) {
+      if (!this.__onInput) this.__onInput = this._onInput.bind(this).throttle(400);
+      this.__onInput(text);
+    }
+  _onInput: | #js
+    function(text) {
+      this.text = text;
+      this.$root.studio.user.app.state.set(`${this.nodeVarPath}.text`, text);
+    }
+

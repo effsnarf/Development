@@ -18,6 +18,7 @@ dom:
         :is: nodeCompName
         :node: node
         :node-var-path: nodeVarPath
+        :node-var-data: nodeVarData
         :user-app: userApp
         :user-app-state: userAppState
         :sui: sui

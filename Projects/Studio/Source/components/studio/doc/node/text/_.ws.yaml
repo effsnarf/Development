@@ -7,6 +7,7 @@ dom:
 
 props:
   node:
+  nodeVarData:
   sui:
   dataItem:
   userAppState:
@@ -16,5 +17,5 @@ data:
 
 mounted: | #js
   function() {
-    this.text = this.$parent.$parent.$parent.nodeVarData.text;
+    this.text = this.nodeVarData.text;
   }

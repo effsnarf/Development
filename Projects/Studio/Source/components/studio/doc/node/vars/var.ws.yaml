@@ -2,21 +2,7 @@ dom:
   div:
 
 props:
-  var1:
+  node:
+  nodeVar:
   nodeVarPath:
-
-data:
-  value:
-
-methods:
-  init: | #js
-    function(var1) {
-    }
-
-watch:
-  var1:
-    immediate: true
-    handler: | #js
-      function(var1) {
-        this.init(var1);
-      }
+  dataItem:

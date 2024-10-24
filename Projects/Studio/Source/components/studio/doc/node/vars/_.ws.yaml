@@ -1,38 +1,27 @@
 dom:
   div:
-    :key: key1
     div:
       v-for: nodeVar in node.vars
       h3:
         v-if: "false"
         v-text: "(_uid + '_' + node.id + '_' + nodeVar.type + '_' + nodeVar.name)"
-      component:
-        :is: "(!nodeVar.type) ? null : ('studio.doc.node.vars.' + nodeVar.type).kebabize()"
+      studio.doc.node.vars.var.item:
         :node: node
         :node-var: nodeVar
         :data-item: dataItem
-        @update: (value) => onUpdateNodeVarValue(nodeVar, value)
+        @update: (value) => $emit('update', nodeVar.name, value)
         :key: "(_uid + '_' + node.id + '_' + nodeVar.name)"
 
 props:
   node:
+  nodeVar:
   dataItem:
   userAppState:
 
 data:
-  key1: 1
 
 mounted: | #js
   function() {
-    this.$root.e.on("app.node.changed", this.refresh.bind(this));
   }
 
 methods:
-  onUpdateNodeVarValue: | #js
-    function(nodeVar, value) {
-      this.$emit('update', nodeVar.name, value);
-    }
-  refresh: | #js
-    function() {
-      this.key1++;
-    }
