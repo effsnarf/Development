@@ -58,7 +58,7 @@ methods:
       this.nodeContext = this.$root.getNodeContext(this, this.sui?.page.selected?.name);
     }
   evalExpItem: | #js
-    function(url, dataItem) {
+    function(url, dataItem, options) {
       try {
         this.error = null;
         const func = this.$root.toContextFunc(this, dataItem, { args: [], code: `return ${url};` }, { async: false });
@@ -66,6 +66,7 @@ methods:
         return value;
       }
       catch (ex) {
+        if (options?.ignore?.errors) return null;
         this.error = ex.message;
       }
     }

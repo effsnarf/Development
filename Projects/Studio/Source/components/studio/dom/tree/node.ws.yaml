@@ -28,6 +28,7 @@ dom:
           v-if: "!editable"
           :style: "{ 'pointer-events': (editable ? 'none' : 'auto') }"
           .dimmed:
+            v-if: "false"
             v-text: node.id
           div:
             :title: nodeWarning

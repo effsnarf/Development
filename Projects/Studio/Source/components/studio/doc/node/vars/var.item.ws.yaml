@@ -3,9 +3,14 @@ dom:
     .error.clickable:
       v-if: error
       @click: "$root.do('navigate', { node, nodeVar, toolCategoryIndex: 1 })"
-      ui.title:
-        icon: "🧊"
-        :text: nodeVar.name
+      .flex.justify-between.items-center:
+        h3:
+          studio.dom.tree.node:
+            :item: node
+            :dropzone: "false"
+        ui.title:
+          icon: "🧊"
+          :text: nodeVar.name
       div:
         v-text: error
     component:

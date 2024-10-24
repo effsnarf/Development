@@ -6,7 +6,12 @@ dom:
     template:
       v-slot: header
       .error.clickable:
+        v-if: "(isMockArray) || (!node.children?.length)"
         @click: "$root.do('navigate', { node, nodeVar, toolCategoryIndex: 1 })"
+        h3:
+          studio.dom.tree.node:
+            :item: node
+            :dropzone: "false"
         div:
           v-if: "(isMockArray) && (!itemsIsNotArray)"
           v-text: "'🧊 data missing'"
@@ -18,11 +23,11 @@ dom:
             v-text: "'(not ' + (typeof items) + ')'"
           ui.value:
             :value: items
+        div:
+          v-if: "!node.children?.length"
+          v-text: "'📂 template missing'"
     template:
       v-slot: example-box
-      .node-warning:
-        v-if: "!node.children?.length"
-        v-text: "'⚠️📂 template missing'"
     .list-item:
       v-for: (item, i) in visibleItems
       :class: "{ empty: (!node.children?.length) }"
@@ -30,8 +35,6 @@ dom:
       div:
         v-if: "!node.children?.length"
         .folded1:
-          .node-warning:
-            v-text: "'⚠️📂 template missing'"
           ui.value:
             v-if: "!isMockArray"
             :value: item

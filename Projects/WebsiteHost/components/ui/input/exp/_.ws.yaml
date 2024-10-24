@@ -1,11 +1,5 @@
 dom:
   div:
-    ui.input.text.box:
-      hint: expression
-      :multiline: "true"
-      :auto-resize: "true"
-      @input: onInput
-      v-model: tempExp
     .error:
       v-if: error
       v-text: error
@@ -18,8 +12,23 @@ dom:
             v-for: field in contextFields
             icon: 🧊
             :text: field
+    ui.input.text.box:
+      hint: expression
+      :multiline: "true"
+      :auto-resize: "true"
+      @input: onInput
+      @hovered-identifier-path: onHoveredIdentifierPath
+      v-model: tempExp
+    div:
+      pre:
+        v-if: hovered.identifier.path
+        v-text: "'🧊 ' + hovered.identifier.path"
+      div:
+        v-if: hovered.identifier.value
         ui.value:
-          :value: dataItems?.[0]
+          :value: hovered.identifier.value
+    ui.value:
+      :value: dataItems?.[0]
     div:
       v-if: dataItems?.length
       :key: key1
@@ -48,6 +57,10 @@ data:
   sampleDataItems:
   expDataItems:
   sampleDataItemsSize: 3
+  hovered:
+    identifier:
+      path:
+      value:
   is:
     inited: false
   key1: 1
@@ -56,6 +69,17 @@ mounted: | #js
   function() {
   }
 methods:
+  onHoveredIdentifierPath: | #js
+    function(path) {
+      this.hovered.identifier.path = path;
+      this.hovered.identifier.value = null;
+      if (!path) return;
+      try
+      {
+        this.hovered.identifier.value = this.evalExpItem(path, this.dataItems?.[0], { ignore: { errors: true }});
+      }
+      catch (ex) {}
+    }
   getContextFields: | #js
     function() {
       return Object.keys(this.context);

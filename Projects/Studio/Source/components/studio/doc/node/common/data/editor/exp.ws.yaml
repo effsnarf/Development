@@ -25,7 +25,7 @@ mounted: | #js
 
 methods:
   evalExpItem: | #js
-    function(exp, dataItem) {
+    function(exp, dataItem, options) {
       try {
         this.error = null;
         const func = this.$root.toContextFunc(this, dataItem, { args: [], code: `return ${exp};` }, { async: false });
@@ -33,7 +33,7 @@ methods:
         return value;
       }
       catch (ex) {
-        if (ex.message.includes("Object")) debugger;
+        if (options?.ignore?.errors) return null;
         this.error = ex.message;
       }
     }

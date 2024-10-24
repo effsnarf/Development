@@ -40,10 +40,6 @@ dom:
                   ':value': row.value
                   ':depth': (depth + 1)
                   :show-visible-fields-filter: showVisibleFieldsFilter
-      div:
-        class: box
-        ui.value:
-          :value: selected.item
 props:
   value: null
   title: null
