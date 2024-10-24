@@ -355,7 +355,7 @@ methods:
   isContainerNode: | #js
     function(parent, node) {
       if (node == parent) return false;
-      if (["page.template", "slot.outlet"].includes(node.type)) return false;
+      if (["page.template", "slot.content", "slot.outlet"].includes(node.type)) return false;
       if (node.name) return true;
       return false;
     }

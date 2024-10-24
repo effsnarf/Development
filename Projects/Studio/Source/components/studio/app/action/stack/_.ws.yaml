@@ -204,7 +204,7 @@ methods:
       compsNode.children.push(newCompNode);
       TreeObject.moveNode(this.userApp, contentNode, newCompNode, { newTree: false });
       // insert a comp inst node instead of the content node
-      const compInstName = this.$root.getNewNodeName(newCompNode.name);
+      const compInstName = this.$root.getNewNodeName(this.userApp, newCompNode.name);
       const compInstNode = {
         id: this.$root.getNewNodeID(this.userApp),
         type: "comp.inst",
