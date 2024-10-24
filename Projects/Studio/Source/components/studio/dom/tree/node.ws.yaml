@@ -15,7 +15,18 @@ dom:
           v-text: tooltipText
       ui.dnd.draggable:
         :drag-item: "{ type: 'node', item: node }"
+        div:
+          v-if: editable
+          ui.input.text.box:
+            :icon: $root.getNodeIcon(node)
+            camouflage: true
+            :hint: "(node.type + ' name')"
+            :debounce: 400
+            :value: node.name
+            @input: onNameChange
         .flex:
+          v-if: "!editable"
+          :style: "{ 'pointer-events': (editable ? 'none' : 'auto') }"
           .dimmed:
             v-text: node.id
           div:
@@ -33,6 +44,7 @@ props:
   item:
   sui:
   showName: true
+  editable: false
   dropzone: true
 
 data:
@@ -49,6 +61,10 @@ mounted: | #js
   }
 
 methods:
+  onNameChange: | #js
+    function(newName) {
+      this.$root.do('edit.node', { oldNode: this.node, newNode: { name: newName } });
+    }
   onDragEnter: | #js
     function(dragItem) {
       this.dragItem = dragItem;

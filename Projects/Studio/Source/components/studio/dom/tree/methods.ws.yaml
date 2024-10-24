@@ -370,7 +370,6 @@ methods:
   getContainerNodeByPath: | #js
     function(path) {
       if (typeof(path) == 'string') path = path.split('.');
-      console.log(path.join('.'));
       if (!path.length) return null;
       let node = this.userApp;
       let part;
@@ -378,7 +377,6 @@ methods:
         const scopeNodes = this.getScopeContainerNodes(node);
         node = scopeNodes.find(n => (n.id == part) || (n.name == part));
       }
-      console.log(node);
       return node;
     }
   getScopeContainerNodes: | #js

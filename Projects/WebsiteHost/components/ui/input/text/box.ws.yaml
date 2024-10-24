@@ -1,7 +1,7 @@
 dom:
   div:
     v-if: '!multiline'
-    ':class': '{ disabled: !enabled, camouflage }'
+    ':class': '{ disabled: !enabled, camouflage: (is.focused ? false : camouflage) }'
     .icon:
       v-if: icon
       v-text: icon
@@ -13,6 +13,8 @@ dom:
       ':placeholder': hint
       ':value': value
       ':disabled': '!enabled'
+      @focus: is.focused = true
+      @blur: is.focused = false
       @input: onInput
       @keydown: onTextBoxKeyDown
   textarea:
@@ -37,6 +39,8 @@ props:
   textBoxStyle: null
   debounce: 0
 data:
+  is:
+    focused: false
   _onInput: null
 mounted: | #js
   function() {

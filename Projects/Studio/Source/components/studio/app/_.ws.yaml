@@ -58,7 +58,7 @@ dom:
         @mouseleave: sui.main.box.hovered = null
       .main-box.d:
         div:
-          :style: "{ 'margin-top': '-2em', height: '2em', 'pointer-events': 'none' }"
+          :style: "{ 'margin-top': '-3.5em', height: '3.5em' }"
           transition:
             name: slide
             h2:
@@ -66,6 +66,7 @@ dom:
               studio.dom.tree.node:
                 :item: sui.node.selecteds?.[sui.node.selecteds?.length-1]
                 :sui: sui
+                :editable: "true"
                 :dropzone: "false"
         .box2:
           studio.doc.node.editor:

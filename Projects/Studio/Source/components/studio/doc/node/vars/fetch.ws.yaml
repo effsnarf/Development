@@ -37,6 +37,7 @@ methods:
         const oldLinq = this.$root.studio.user.app.state.get(`${varPath}._linq`);
         const newLinq = this.nodeVar.linq;
         let linqItems = false;
+
         // if the url has changed
         if (newUrl != oldUrl) {
           this.$root.studio.user.app.state.set(`${varPath}._url`, newUrl);
