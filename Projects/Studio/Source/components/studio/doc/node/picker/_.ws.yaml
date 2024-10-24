@@ -9,7 +9,7 @@ dom:
       :visible: enabled
       @pinned: onContextPinned
       div:
-        .flex:
+        .flex.gap-1:
           ui.drawer:
             direction: "horizontal"
             :open: "(true) || (!$refs.context1?.isPinned || !sui.node.selected)"

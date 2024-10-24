@@ -1,10 +1,13 @@
 dom:
   div:
-    .error:
+    .error.clickable:
       v-if: error
-      v-text: error
-    ui.value:
-      :value: value
+      @click: "$root.do('navigate', { node, nodeVar, toolCategoryIndex: 1 })"
+      ui.title:
+        icon: "🧊"
+        :text: nodeVar.name
+      div:
+        v-text: error
 
 props:
   node:

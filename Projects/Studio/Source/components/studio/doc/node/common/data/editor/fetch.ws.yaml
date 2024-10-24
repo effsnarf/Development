@@ -17,17 +17,17 @@ dom:
         :node: node
         :node-var-path: nodeVarPath
         :user-app-state: userAppState
-        :field-names: "{ _url: '🌐 url', _value: '🌐🧊 fetched data', value: '🔎🧊 linqd data' }"
+        :field-names: "{ _url: '🌐 url', _items: '🌐🧊 fetched data', items: '🔎🧊 linqd data' }"
         template:
           v-slot: after__url
           div:
-            v-if: (nodeVarData?._value)
+            v-if: (nodeVarData?._items)
             h3:
               title: The fetched data can be transformed using a LINQ expression.
               v-text: "'🧊🔎 linq'"
             ui.linq:
               :style: "{ margin: 'auto' }"
-              :input: nodeVarData._value
+              :input: nodeVarData._items
               :value: initial.linq
               @input: setLinq
               @output: (value) => nodeVarLinqedData = value

@@ -3,7 +3,7 @@ dom:
     :key: key1
     ui.input.layout:
       :layout-types: layoutTypes
-      :value: node.layout
+      :value: initial.node.layout
       @preview: onPreview
       @input: onInput
 

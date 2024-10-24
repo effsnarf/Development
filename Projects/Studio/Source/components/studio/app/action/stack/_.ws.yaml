@@ -60,6 +60,7 @@ mounted: | #js
     this.remote.pointer = await this.$root.data.vue.reactive("Pointers", this, "pointer", -1);
     //this.remote.actions.events.on("after.array.op", this.refresh.bind(this));
     this.updateSuiFromUserApp();
+    this.$root.e.emit("app.loaded");
   }
 
 methods:
@@ -72,16 +73,47 @@ methods:
       this.actions.splice(0);
       this.pointer = -1;
       vue.userApp = (vue.getMockupUserApp());
+      this.$root.e.emit("rebuild.app.state");
     }
   updateSuiFromUserApp: | #js
     function() {
-      // page
-      this.sui.page.selected = this.$root.findNodeByID(this.userApp, this.userApp.ui.selected.page);
       // nodes
+      if (!this.userApp.ui.selected.nodes?.length) {
+        this.userApp.ui.selected.nodes.push({ id: this.getPageNodes(this.userApp)[0].id });
+      }
       this.sui.node.selecteds = this.userApp.ui.selected.nodes.map(n => this.$root.findNodeByID(this.userApp, n));
+      // page
+      if (!this.userApp.ui.selected.page?.id) {
+        const selectedPage = this.getSelectedPage(this.userApp);
+        this.userApp.ui.selected.page = { id: selectedPage?.id };
+      }
+      this.sui.page.selected = this.$root.findNodeByID(this.userApp, this.userApp.ui.selected.page);
       // tool category
       this.sui.tool.category.index = this.userApp.ui.selected.tool.category.index;
       this.sui.tool.category.name = this.sui.tool.category.options[this.sui.tool.category.index]?.split(' ').last();
+    }
+  getPageNodes: | #js
+    function() {
+      return this.userApp.children.find(n => (n.type == "pages")).children;
+    }
+  getSelectedPage: | #js
+    function(userApp) {
+      const selectedNodes = userApp.ui.selected.nodes.map(this.$root.getNode);
+      let selectedPage = selectedNodes.find(n => (n.type == "page"));
+      if (!selectedPage) {
+        const pages = userApp.children.find(n => (n.type == "pages"));
+        selectedPage = pages.children[0];
+      }
+      return selectedPage;
+    }
+  do_navigate: | #js
+    function(_do, node, nodeVar, toolCategoryIndex) {
+      const actions = [];
+      if (node) actions.push(this.do_select_node(_do, null, node));
+      if (toolCategoryIndex) actions.push(this.do_select_tool_category(_do, toolCategoryIndex));
+      const undos = actions.map(a => a.undo);
+      this.setIconText(_do, node);
+      return { _do, undos };
     }
   do_select_page: | #js
     function(_do, pageNode) {
@@ -100,6 +132,24 @@ methods:
       const undo = { type: "select.page", args: { pageNode: oldPageNode } };
       return { _do, undo };
     }
+  do_select_node: | #js
+    function(_do, selectIndex, node) {
+      const selecteds = this.getSuiSelectedNodes();
+      const oldSelectedNodes = selecteds.map(n => ({ id: n.id }));
+      const oldSelectedPage = this.onlyNodeID(this.sui.page.selected);
+      if (selectIndex == null) selectIndex = (selecteds.length);
+      // clear anything above selectIndex
+      selecteds.splice(selectIndex);
+      node = this.$root.getNode(node);
+      if (node) selecteds.push(node);
+      this.userApp.ui.selected.nodes = selecteds.map(n => ({ id: n.id }));
+      // if this is a page node, set sui.page.selected
+      if (node?.type == "page") this.do_select_page(_do, node);
+      this.setIconText(_do, node);
+      const undo = { type: "select.nodes", args: { nodes: oldSelectedNodes } };
+      this.$root.e.emit("sui.node.selecteds", selecteds);
+      return { _do, undo };
+    }
   do_select_tool_category: | #js
     function(_do, index) {
       const oldIndex = this.sui.tool.category.index;
@@ -115,27 +165,9 @@ methods:
       const undo = { type: "select.tool.category", args: { index: oldIndex } };
       return { _do, undo };
     }
-  do_select_node: | #js
-    function(_do, selectIndex, node) {
-      const selecteds = this.sui.node.selecteds;
-      const oldSelectedNodes = selecteds.map(n => ({ id: n.id }));
-      const oldSelectedPage = this.onlyNodeID(this.sui.page.selected);
-      if (selectIndex == null) selectIndex = (selecteds.length - 1);
-      // clear anything above selectIndex
-      selecteds.splice(selectIndex);
-      node = this.$root.getNode(node);
-      if (node) selecteds.push(node);
-      this.userApp.ui.selected.nodes = selecteds.map(n => ({ id: n.id }));
-      // if this is a page node, set sui.page.selected
-      if (node?.type == "page") this.do_select_page(_do, node);
-      this.setIconText(_do, node);
-      const undo = { type: "select.nodes", args: { nodes: oldSelectedNodes } };
-      this.$root.e.emit("sui.node.selecteds", selecteds);
-      return { _do, undo };
-    }
   do_select_nodes: | #js
     function(_do, nodes) {
-      const selecteds = this.sui.node.selecteds;
+      const selecteds = this.getSuiSelectedNodes();
       const oldSelectedNodes = selecteds.map(n => ({ id: n.id }));
       selecteds.splice(0);
       for (let i = 0; i < nodes.length; i++) {
@@ -389,6 +421,11 @@ methods:
   getAction: | #js
     function(index) {
       return this.actions.find(a => (a._i == index));
+    }
+  getSuiSelectedNodes: | #js
+    function() {
+      this.sui.node.selecteds = this.sui.node.selecteds.filter(n => n);
+      return this.sui.node.selecteds;
     }
   pointerToLocalIndex: | #js
     function(pointer) {

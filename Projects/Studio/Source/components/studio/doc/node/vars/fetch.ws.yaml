@@ -1,6 +1,5 @@
 dom:
   div:
-    v-if: "true"
     ui.linq.evaluator:
       ref: linqEval1
 
@@ -10,6 +9,8 @@ props:
   nodeVarPath:
 
 data:
+  _items:
+  items:
   inited:
     linq:
   live:
@@ -34,19 +35,17 @@ methods:
         const newUrl = getNewUrl();
         const oldLinq = this.$root.studio.user.app.state.get(`${varPath}._linq`);
         const newLinq = this.nodeVar.linq;
-        let _items = [];
-        let items = [];
         let linqItems = false;
         // if the url has changed
         if (newUrl != oldUrl) {
           this.$root.studio.user.app.state.set(`${varPath}._url`, newUrl);
-          _items = (await this.$root.fetchFromUrl(newUrl));
-          this.$root.studio.user.app.state.set(`${varPath}._items`, _items);
+          this._items = (await this.$root.fetchFromUrl(newUrl));
+          this.$root.studio.user.app.state.set(`${varPath}._items`, this._items);
           linqItems = true;
         }
         else
         {
-          _items = this.$root.studio.user.app.state.get(`${varPath}._items`);
+          this._items = this.$root.studio.user.app.state.get(`${varPath}._items`);
         }
         // if the linq has changed
         if (!Objects.areEqual(newLinq, oldLinq)) {
@@ -54,11 +53,11 @@ methods:
           linqItems = true;
         }
         if (linqItems) {
-          items = this.linqEval(_items, newLinq);
-          this.$root.studio.user.app.state.set(`${varPath}.items`, items);
+          this.items = await this.linqEval(this._items, newLinq);
+          this.$root.studio.user.app.state.set(`${varPath}.items`, this.items);
         }
-        items = this.$root.studio.user.app.state.get(`${varPath}.items`);
-        this.$emit("update", items);
+        this.items = this.$root.studio.user.app.state.get(`${varPath}.items`);
+        this.$emit("update", this.items);
       }
       catch (ex) {
         this.$root.e.emit("user.app.error", this, ex.message);
@@ -80,12 +79,27 @@ methods:
       this.refresh();
     }
   linqEval: | #js
-    function(inputData, linq) {
-      if (!this.$refs.linqEval1) return null;
+    async function(inputData, linq, attempt = 0) {
+      const linqEval1 = this.getLinqEvaluator();
+      if (!linqEval1) {
+        if (attempt > 20) {
+          alertify.error("Linq evaluator not found.");
+          return;
+        }
+        await this.$nextTick();
+        await (0.1).seconds().wait();
+        return await this.linqEval(inputData, linq, (attempt + 1));
+      }
+      this.ticker1?.stop();
+      this.ticker1 = null;
       linq = (linq ?? []);
-      const datas = this.$refs.linqEval1.evaluateOps(null, inputData, linq);
+      const datas = linqEval1.evaluateOps(null, inputData, linq);
       const outputData = datas.last();
       return outputData;
+    }
+  getLinqEvaluator: | #js
+    function() {
+      return this.$children.find(c => c.$options.name == "ui-linq-evaluator");
     }
 
 watch:

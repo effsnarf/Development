@@ -3,7 +3,7 @@ dom:
     div:
       h2:
         ui.input.text.box:
-          icon: 📦🧊
+          :icon: "(nodeIcon + '🧊')"
           camouflage: true
           v-model: node.name
     div:
@@ -24,7 +24,7 @@ dom:
                 v-if: (i == selectedNodeVarIndex)
                 h3:
                   ui.input.text.box:
-                    icon: 🧊
+                    :icon: "(nodeIcon + '🧊')"
                     camouflage: true
                     v-model: nodeVar.name
                 ui.tabs:
@@ -83,6 +83,7 @@ data:
   selectedNodeVarIndex: 0
   visibleNodeVars: []
   nodeVarTypeIndex: 0
+  nodeIcon:
   key1: 1
 
 mounted: | #js
@@ -131,4 +132,5 @@ watch:
     immediate: true
     deep: false
     handler: | #js
+      this.nodeIcon = this.$root.getNodeIcon(this.node);
       this.visibleNodeVars = this.getVisibleNodeVars(this.node);

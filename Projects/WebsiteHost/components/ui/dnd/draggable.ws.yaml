@@ -23,6 +23,10 @@ data:
     x: null
     'y': null
   darkOverlay: null
+mounted: | #js
+  function() {
+    this.$root.e.on("drag.drop", this.onDrop.bind(this));
+  }
 methods:
   showDarkOverlay: | #js
     async function() {
@@ -38,7 +42,7 @@ methods:
       if (!this.darkOverlay) return;
       this.darkOverlay.classList.remove('visible');
       await (1).seconds().wait();
-      this.darkOverlay.remove();
+      this.darkOverlay?.remove();
       this.darkOverlay = null;
     }
   onDragStart: | #js
@@ -74,6 +78,10 @@ methods:
       await this.$nextTick();
       await (0.2).seconds().wait();
       this.$root.e.emit("drag.end", e, this.dragItem);
+    }
+  onDrop: | #js
+    function(e) {
+      this.hideDarkOverlay();
     }
   onDrag: | #js
     function(e) {

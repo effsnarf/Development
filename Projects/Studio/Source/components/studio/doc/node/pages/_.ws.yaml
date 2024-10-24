@@ -1,5 +1,6 @@
 dom:
   .pages:
+    :key: key1
     .page:
       v-for: (pageNode, i) in visiblePageNodes
       :class: pageClasses[pageNode.id]
@@ -25,10 +26,12 @@ data:
   pageStates: {}
   pageClasses: {}
   visiblePageNodes: []
+  key1: 1
 
 mounted: | #js
   function() {
     this.$watch("sui.page.selected", this.onSelectedPageChanged.bind(this));
+    this.$root.e.on("app.loaded", this.refresh.bind(this));
   }
 
 methods:

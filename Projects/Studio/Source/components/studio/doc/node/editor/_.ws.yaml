@@ -106,10 +106,7 @@ methods:
     }
   getInitialNodeData: | #js
     function(node) {
-      const newNode = {};
-      for (const key in node)
-        if (key != "children") newNode[key] = Objects.clone(node[key]);
-      return newNode;
+      return Objects.clone(node, { exclude: ["children"] });
     }
 
 watch:
@@ -117,7 +114,7 @@ watch:
     handler: | #js
       function(newNode) {
         if (!this.selected.tab.index) this.selected.tab.index = 0;
-        this.initial.node = this.getInitialNodeData(newNode);
+        if (!this.initial.node) this.initial.node = this.getInitialNodeData(newNode);
       }
     immediate: true
     

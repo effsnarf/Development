@@ -7,7 +7,7 @@ dom:
       v-slot: header
       div:
         class: node-warning
-        v-if: "isMockArray"
+        v-if: "(isMockArray) && (!itemsIsNotArray)"
         v-text: "'⚠️🧊 data missing'"
       div:
         class: node-warning

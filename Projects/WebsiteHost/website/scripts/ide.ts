@@ -7,6 +7,7 @@ import { VueHelper } from "../../Classes/VueHelper";
 import { VueManager } from "../../Classes/VueManager";
 import { Component } from "../../Classes/Component";
 import { Performance } from "@shared/Performance";
+import { Events } from "@shared/Events";
 
 (window as any).Component = Component;
 
@@ -194,6 +195,7 @@ const vueIdeCompMixin = {
   vueIdeApp = new client.Vue({
     data: function() {
       return {
+        e: new Events(),
         vm: vueManager,
         html: new HtmlHelper(),
         comps: client.Vue.ref(client.comps),

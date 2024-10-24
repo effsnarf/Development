@@ -23,7 +23,7 @@ dom:
             v-for: field in dataItemFields
             icon: 🧊
             :text: field
-    .flex:
+    div:
       v-if: dataItems?.length
       :key: key1
       :style: "{ 'max-width': '40em' }"
@@ -50,6 +50,7 @@ data:
   tempExp:
   sampleDataItems:
   expDataItems:
+  sampleDataItemsSize: 3
   is:
     inited: false
   key1: 1
@@ -112,7 +113,7 @@ watch:
       function(dataItems) {
         this.dataItemFields = this.getDataItemFields(dataItems);
         this.expFields = this.getExpFields(dataItems?.[0]);
-        this.sampleDataItems = [...dataItems].take(10);
+        this.sampleDataItems = [...dataItems].take(this.sampleDataItemsSize);
         this.expDataItems = this.sampleDataItems.map(this.evalExpItem.bind(this, this.tempExp));
         this.refresh();
       }

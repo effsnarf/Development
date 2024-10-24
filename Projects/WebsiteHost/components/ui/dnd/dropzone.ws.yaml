@@ -27,6 +27,7 @@ mounted: | #js
   function() {
     this.$root.e.on("drag.start", this.onDragStart.bind(this));
     this.$root.e.on("drag.end", this.onDragEnd.bind(this));
+    this.$root.e.on("drag.drop", this.onSomeoneDrop.bind(this));
   }
 methods:
   createGhost: | #js
@@ -43,7 +44,7 @@ methods:
       }
       // position the ghost exactly where this $el is
       const rect = this.$root.getAbsoluteRect(this.$el);
-      this.ghost.dropzone.style.position = 'fixed';
+      this.ghost.dropzone.style.position = 'absolute';
       this.ghost.dropzone.style.top = rect.top + 'px';
       this.ghost.dropzone.style.left = rect.left + 'px';
       this.ghost.dropzone.style.width = rect.width + 'px';
@@ -120,6 +121,11 @@ methods:
       this.ghost.tooltip?.classList.remove('visible');
       this.ghost.dropzone?.classList.remove('drag-over');
     }
+  onSomeoneDrop: | #js
+    function(e, dragItem) {
+      if (!this.enabled) return;
+      this.removeGhost();
+    }
   onDrop: | #js
     function(e) {
       if (!this.enabled) return;
@@ -129,6 +135,7 @@ methods:
       this.$root.dragItem = null;
       this.$emit('drag-over', false);
       this.$emit('drop-item', dragItem);
+      this.$root.e.emit("drag.drop", e, dragItem);
     }
   onClick: | #js
     function(e) {

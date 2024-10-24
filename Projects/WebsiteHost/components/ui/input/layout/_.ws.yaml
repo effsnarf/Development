@@ -75,6 +75,7 @@ methods:
     }
   getComponentValue: | #js
     function(tabOption) {
+      if (!tabOption) return null;
       return Objects.getProperty(this.initial.layout, tabOption);
     }
   getTabOptions: | #js
@@ -118,20 +119,13 @@ watch:
     immediate: true
     handler: | #js
       function(newIndex) {
-        this.onComponentInput("type", this.allLayoutTypes[newIndex]);
+        //this.onComponentInput("type", this.allLayoutTypes[newIndex]);
       }
-  layout:
-    handler: | #js
-      function(layout) {
-        if (Objects.areEqual(layout, this.value)) return;
-        this.$emit('input', layout);
-      }
-    deep: true
   value:
     handler: | #js
       function(layout) {
         if (!this.initial.layout) this.initial.layout = Objects.clone(layout);
-        this.layout = layout;
+        this.layout = Objects.clone(layout);
         this.tabOptions = this.getTabOptions(layout);
       }
     immediate: true

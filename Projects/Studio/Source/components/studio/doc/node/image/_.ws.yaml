@@ -1,11 +1,16 @@
 dom:
   div:
+    v-if: imageUrl
     img:
       v-if: isImage
       :src: proxiedImageUrl
     video:
       v-if: isVideo
       :src: proxiedImageUrl
+  div:
+    v-else-if: "!imageUrl"
+    .image-placeholder:
+      v-text: "'🖼️'"
 
 props:
   node:

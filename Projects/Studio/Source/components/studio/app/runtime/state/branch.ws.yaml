@@ -30,7 +30,7 @@ mounted: | #js
 methods:
   onAppStateChanged: | #js
     function(vars) {
-      const var1 = vars.find(v => (this.nodeVarPath == v.varPath.join(".")));
+      const var1 = vars.find(v => (v.varPath.join(".").startsWith(this.nodeVarPath)));
       if (!var1) return;
       this.refresh();
     }
@@ -55,7 +55,7 @@ style:
     flex-direction: column
     gap: 1em
   .folded1:
-    max-width: 25em
+    max-width: 30em
     max-height: 5em
     overflow: hidden
     transition: 3s

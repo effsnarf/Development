@@ -38,6 +38,14 @@ a:not([href])
   cursor: default;
 }
 
+.image-placeholder
+{
+  font-size: 300%;
+  border: 1px dashed gray;
+  border-radius: 0.5rem;
+  width: fit-content;
+}
+
 .focused
 {
   box-shadow: 0 0 0 max(100vh, 100vw) rgba(0, 0, 0, 0.9);
@@ -158,7 +166,6 @@ li
 }
 .clickable:hover
 {
-  background: #ffffff20;
   opacity: 1;
   transition: 0s;
 }
@@ -777,13 +784,17 @@ select, input[type=range]
   background: #ffa530a0;
   padding: 0.5em;
 }
-.warning::before {
+
+.warning::before, .error::before {
   content: '⚠️';
+  float: left;
+  font-size: 150%;
   margin-right: 0.5em;
 }
+
 .error
 {
-  text-align: center;
+  text-align: left;
   text-shadow: -3px 3px 1px #000;
   background: #b03030;
   padding: 0.5em;

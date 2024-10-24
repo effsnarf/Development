@@ -132,12 +132,16 @@ methods:
 
       if (node.type == "text") {
         if (!node.vars.find(v => (v.name == "text"))) {
-          node.vars.push({
+          const textVar = {
             name: "text",
             type: "value",
             value: `Text ${node.id}`,
             exp: null
-          });
+          };
+          if (options.childOf.parent.type == "list") {
+            textVar.type = "field";
+          }
+          node.vars.push(textVar);
         }
       }
 

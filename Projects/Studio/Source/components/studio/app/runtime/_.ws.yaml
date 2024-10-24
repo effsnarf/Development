@@ -32,6 +32,7 @@ methods:
     }
   updateUserAppState: | #js
     function() {
+      //alertify.message("Updating app state");
       const oldAppState = Objects.clone(this.userAppState);
       const newAppState = this.getNewUserAppState(this.userApp);
       Objects.deepAssignLeafs(newAppState, oldAppState);

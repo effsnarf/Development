@@ -2,7 +2,7 @@ dom:
   .flex1:
     .option.clickable:
       v-for: grid in grids
-      :class: "{ selected: (grid == value) }"
+      :class: "{ selected: (Objects.areEqual(grid, value)) }"
       @mouseenter: onPreview(grid)
       @mouseleave: onPreview(null)
       @click: onSelect(grid)
@@ -28,6 +28,12 @@ methods:
   onSelect: | #js
     function(grid) {
       this.$emit("input", grid);
+    }
+
+computed:
+  Objects: | #js
+    function() {
+      return window.Objects;
     }
 
 style:
