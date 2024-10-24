@@ -4,7 +4,7 @@ dom:
       table:
         tr:
           v-for: field in fields
-          :class: "{ clickable: true, selected: (field == value) }"
+          :class: "{ hoverable: true, selected: (field == value) }"
           @mouseenter: hovered = field
           @mouseleave: hovered = null
           @click: $emit('input', field)
@@ -65,5 +65,5 @@ style:
     overflow: hidden
     white-space: nowrap
   .flex tr, .value:
-    height: 2em
+    height: 1.5em
     overflow: hidden

@@ -18,11 +18,12 @@ dom:
         div:
           v-if: "itemsIsNotArray"
           div:
-            v-text: "'🧊 array expected'"
-          div:
-            v-text: "'(not ' + (typeof items) + ')'"
+            v-text: "'🧊 array expected (not ' + (typeof items) + ')'"
           ui.value:
             :value: items
+          ui.linq:
+            :style: "{ margin: 'auto' }"
+            :input: items
         div:
           v-if: "!node.children?.length"
           v-text: "'📂 template missing'"
