@@ -20,6 +20,7 @@ dom:
             :max-depth: maxDepth
             @node-click: onNodeClick
             @create-node: onCreateNode
+            @move-node: onMoveNode
     transition:
       name: slide
       div:
@@ -44,6 +45,10 @@ methods:
   onCreateNode: | #js
     function(parentNode, newNode) {
       this.$root.do("create.node", { selectIndex: this.boxIndex, parent: { node: { id: parentNode.id } }, newNode });
+    }
+  onMoveNode: | #js
+    function(parentNode, node) {
+      this.$root.do("move.node", { node, parent: { node: { id: parentNode.id } } });
     }
   getRootNode: | #js
     function(windowNode) {

@@ -245,6 +245,19 @@ methods:
       this.$root.e.emit("app.node.changed", parent);
       return { _do, undos };
     }
+  do_move_node: | #js
+    function(_do, node, parent, newIndex) {
+      parent = this.$root.getNode(parent);
+      node = this.$root.getNode(node);
+      const oldParent = this.$root.getNodeParent(node);
+      const oldIndex = oldParent.children.findIndex(n => (n.id == node.id));
+      if (newIndex == null) newIndex = parent.children.length;
+      TreeObject.moveNode(this.userApp, node, parent, newIndex);
+      this.setIconText(_do, parent, true, node);
+      const undo = { type: "move.node", args: { node: { id: node.id }, parent: { id: oldParent.id }, newIndex: oldIndex } };
+      this.$root.e.emit("app.node.changed", parent);
+      return { _do, undo };
+    }
   do_delete_node: | #js
     function(_do, node) {
       node = this.$root.getNode(node);
@@ -416,7 +429,15 @@ methods:
           if (value?.id && value?.type) _do.args[key] = { id: value.id };
         }
       }
-      if (info) _do.info = info;
+      if (info) {
+        if (info.id) {
+          const node2 = info;
+          _do.info = `${this.$root.getNodeIcon(node2)} ${this.$root.getNodeText(node2)}`;
+        }
+        else {
+          _do.info = info;
+        }
+      }
     }
   getAction: | #js
     function(index) {

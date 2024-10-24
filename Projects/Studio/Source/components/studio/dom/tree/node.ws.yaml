@@ -65,8 +65,7 @@ methods:
     }
   onDropItem_node: | #js
     function(dropNode) {
-      const userApp = this.$root.getUserApp(this);
-      TreeObject.moveNode(userApp, dropNode, this.node);
+      this.$emit("node-event", "move-node", this.node, dropNode);
     }
   onDropItem_new_node: | #js
     function(newNode) {
