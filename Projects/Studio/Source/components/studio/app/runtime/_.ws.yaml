@@ -27,47 +27,17 @@ mounted: | #js
 methods:
   initAppState: | #js
     function() {
-      this.userAppState = this.getNewUserAppState(this.userApp);
+      this.userAppState = this.$root.getNewUserAppState(this.userApp);
       this.$emit("user-app-state", this.userAppState);
     }
   updateUserAppState: | #js
     function() {
       //alertify.message("Updating app state");
       const oldAppState = Objects.clone(this.userAppState);
-      const newAppState = this.getNewUserAppState(this.userApp);
+      const newAppState = this.$root.getNewUserAppState(this.userApp);
       Objects.deepAssignLeafs(newAppState, oldAppState);
       this.userAppState = newAppState;
       this.$emit("user-app-state", this.userAppState);
-    }
-  getNewUserAppState: | #js
-    function(userApp) {
-      const pagesNode = TreeObject.getByPath(userApp, ["pages"]);
-      return this.getContainerData(pagesNode);
-    }
-  getContainerData: | #js
-    function(container, path = []) {
-      const data = {};
-      const varsData = this.getNewVarsData(container, path);
-      Object.assign(data, varsData);
-      const scopeChildren = this.$root.getScopeContainerNodes(container);
-      for (const child of scopeChildren) {
-        data[child.name] = this.getContainerData(child, [...path, child.name]);
-      }
-      return data;
-    }
-  getNewVarsData: | #js
-    function(container, path = []) {
-      const data = {};
-      for (const var1 of (container.vars??[])) {
-        data[var1.name] = this.getNewVarData(var1);
-        var1.path = [...path, var1.name];
-      }
-      return data;
-    }
-  getNewVarData: | #js
-    function(var1) {
-      const d = {};
-      return d;
     }
   onAppNodeChanged: | #js
     function() {

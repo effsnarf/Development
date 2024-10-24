@@ -65,6 +65,38 @@ methods:
       if (nodeID.node?.id) nodeID = nodeID.node.id;
       return TreeObject.find(this.userApp, (n) => (n.id == nodeID));
     }
+  # user app state
+  getNewUserAppState: | #js
+    function(userApp) {
+      const pagesNode = TreeObject.getByPath(userApp, ["pages"]);
+      return this.getContainerData(pagesNode);
+    }
+  getContainerData: | #js
+    function(container, path = []) {
+      const data = {};
+      const varsData = this.getNewVarsData(container, path);
+      Object.assign(data, varsData);
+      const scopeChildren = this.$root.getScopeContainerNodes(container);
+      for (const child of scopeChildren) {
+        data[child.name] = this.getContainerData(child, [...path, child.name]);
+      }
+      return data;
+    }
+  getNewVarsData: | #js
+    function(container, path = []) {
+      const data = {};
+      for (const var1 of (container.vars??[])) {
+        data[var1.name] = this.getNewVarData(var1);
+        var1.path = [...path, var1.name];
+      }
+      return data;
+    }
+  getNewVarData: | #js
+    function(var1) {
+      const d = {};
+      return d;
+    }
+  # ################
   initNewNode: | #js
     function(userApp, node, options) {
       if (options?.includeChildren) {
@@ -77,8 +109,6 @@ methods:
       }
 
       options = (options ?? {});
-
-      if (!node.name) node.name = this.getNewNodeName(userApp, node.type);
 
       if (node.type == "page") {
         if (options.insert?.page) {
@@ -185,12 +215,10 @@ methods:
         });
       }
 
-      const namedNodeTypes = ["list"];
+      const namedNodeTypes = ["list", "textbox"];
 
       if (namedNodeTypes.includes(node.type)) {
-        const nodesOfThisType = TreeObject.filter(userApp, (n) => (n.type == node.type));
-        const count = nodesOfThisType.length;
-        node.name = `${node.type}${(count)}`;
+        node.name = this.getNewNodeName(userApp, node.type);
       }
       
       node.design = {
@@ -216,7 +244,16 @@ methods:
           break;
       }
 
+      // #TODO Slow
+      // if we just added this node to the user app
+      // we need to set its node var paths
+      // which is done when we build a new user app state tree
+      if (options.childOf) {
+        this.getNewUserAppState(userApp);
+      }
+
       node.depth = TreeObject.getNodeDepth(userApp, node);
+
       return node;
     }
   createNewPageNode: | #js
@@ -333,6 +370,7 @@ methods:
   getContainerNodeByPath: | #js
     function(path) {
       if (typeof(path) == 'string') path = path.split('.');
+      console.log(path.join('.'));
       if (!path.length) return null;
       let node = this.userApp;
       let part;
@@ -340,6 +378,7 @@ methods:
         const scopeNodes = this.getScopeContainerNodes(node);
         node = scopeNodes.find(n => (n.id == part) || (n.name == part));
       }
+      console.log(node);
       return node;
     }
   getScopeContainerNodes: | #js

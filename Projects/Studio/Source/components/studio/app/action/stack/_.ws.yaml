@@ -272,6 +272,8 @@ methods:
     }
   do_edit_node: | #js
     function(_do, oldNode, newNode, changes) {
+      oldNode = Objects.clone(oldNode, { exclude: ["children"] });
+      newNode = Objects.clone(newNode, { exclude: ["children"] });
       let undoChanges = [];
       if (oldNode && newNode) {
         if (!newNode.id) {
