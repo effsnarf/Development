@@ -1,6 +1,7 @@
 dom:
   div:
     ui.dnd.draggable:
+      :drag-item: "{ type: 'comp', item: compNode }"
       .tool:
         :class: "{ 'tool-dimmed': !is.editing }"
         .icon:

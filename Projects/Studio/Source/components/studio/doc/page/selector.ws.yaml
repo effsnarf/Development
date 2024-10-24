@@ -3,7 +3,7 @@ dom:
     v-if: is.inited
     .pages:
       :key: key1
-      .clickable:
+      .clickable.hoverable:
         v-for: pageNode in pageNodes
         @click: () => onSelectPage(pageNode)
         :class: "{ selected: (sui.node.selecteds[0]?.id == pageNode.id) }"

@@ -1,7 +1,7 @@
 dom:
   div:
     ui.dnd.dropzone:
-      :accepts: "['node']"
+      :accepts: "['node', 'comp']"
       @drop-item: onDropItem
       template:
         v-slot: tooltip
@@ -20,6 +20,10 @@ methods:
         case "node":
           const node = dragItem.item;
           this.$root.do("delete.node", { node });
+          return;
+        case "comp":
+          const comp = dragItem.item;
+          this.$root.do("delete.comp", { node: comp });
           return;
       }
       throw `Unknown item type`;
